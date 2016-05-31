@@ -1,0 +1,70 @@
+From 0a83e7fdf5840554f0bb514d1b394c7126c3b941 Mon Sep 17 00:00:00 2001
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Tue, 11 Nov 2014 09:17:00 +0100
+Subject: [PATCH 35/44] break kconfig dependency loop
+
+After adding virtio-gpu I get this funky kconfig dependency loop.
+
+scripts/kconfig/conf --oldconfig Kconfig
+drivers/video/fbdev/Kconfig:5:error: recursive dependency detected!
+drivers/video/fbdev/Kconfig:5:  symbol FB is selected by DRM_KMS_FB_HELPER
+drivers/gpu/drm/Kconfig:34:     symbol DRM_KMS_FB_HELPER is selected by DRM_VIRTIO_GPU
+drivers/gpu/drm/virtio/Kconfig:1:       symbol DRM_VIRTIO_GPU depends on VIRTIO
+drivers/virtio/Kconfig:1:       symbol VIRTIO is selected by REMOTEPROC
+drivers/remoteproc/Kconfig:4:   symbol REMOTEPROC is selected by OMAP_REMOTEPROC
+drivers/remoteproc/Kconfig:12:  symbol OMAP_REMOTEPROC depends on OMAP_IOMMU
+drivers/iommu/Kconfig:141:      symbol OMAP_IOMMU is selected by VIDEO_OMAP3
+drivers/media/platform/Kconfig:96:      symbol VIDEO_OMAP3 depends on VIDEO_V4L2
+drivers/media/v4l2-core/Kconfig:6:      symbol VIDEO_V4L2 depends on I2C
+drivers/i2c/Kconfig:7:  symbol I2C is selected by FB_DDC
+drivers/video/fbdev/Kconfig:59: symbol FB_DDC is selected by FB_CYBER2000_DDC
+drivers/video/fbdev/Kconfig:374:        symbol FB_CYBER2000_DDC depends on FB_CYBER2000
+drivers/video/fbdev/Kconfig:362:        symbol FB_CYBER2000 depends on FB
+
+Making VIDEO_OMAP3 depend on OMAP_IOMMU instead of selecting it breaks the
+loop, which looks like the best way to handle it to me.  Updated OMAP_IOMMU
+help text accordingly.
+
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Acked-by: Mauro Carvalho Chehab <mchehab@osg.samsung.com>
+Git-commit: 06b718c01208d8f5fff9216c95d5b20984804df7
+Git-repo: git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git
+CRs-Fixed: 1015337
+Change-Id: If40fbb2b28512923229f7a679a11257173bf8e16
+Signed-off-by: Jin Li <jinl@codeaurora.org>
+---
+ drivers/iommu/Kconfig          | 3 +++
+ drivers/media/platform/Kconfig | 2 +-
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/iommu/Kconfig b/drivers/iommu/Kconfig
+index 3977473..221931c 100644
+--- a/drivers/iommu/Kconfig
++++ b/drivers/iommu/Kconfig
+@@ -294,6 +294,9 @@ config OMAP_IOMMU
+ 	bool "OMAP IOMMU Support"
+ 	depends on ARCH_OMAP2PLUS
+ 	select IOMMU_API
++	---help---
++	  The OMAP3 media platform drivers depend on iommu support,
++	  if you need them say Y here.
+ 
+ config OMAP_IOMMU_DEBUG
+        tristate "Export OMAP IOMMU internals in DebugFS"
+diff --git a/drivers/media/platform/Kconfig b/drivers/media/platform/Kconfig
+index 22cf27a..409bd30 100644
+--- a/drivers/media/platform/Kconfig
++++ b/drivers/media/platform/Kconfig
+@@ -95,8 +95,8 @@ config VIDEO_OMAP3
+ 	tristate "OMAP 3 Camera support"
+ 	depends on VIDEO_V4L2 && I2C && VIDEO_V4L2_SUBDEV_API && ARCH_OMAP3
+ 	depends on HAS_DMA
++	depends on OMAP_IOMMU
+ 	select ARM_DMA_USE_IOMMU
+-	select OMAP_IOMMU
+ 	select VIDEOBUF2_DMA_CONTIG
+ 	---help---
+ 	  Driver for an OMAP 3 camera controller.
+-- 
+2.8.2
+

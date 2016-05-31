@@ -1,0 +1,104 @@
+From 4defe750bb385681a1b1019bf855f4a19c0c7139 Mon Sep 17 00:00:00 2001
+From: Stephane Viau <sviau@codeaurora.org>
+Date: Wed, 15 Jul 2015 09:28:13 -0400
+Subject: [PATCH 24/44] drm/msm/hdmi: Add basic HDMI support for msm8996
+
+The HDMI controller is new in MDP5 v1.7. As of now, this change
+doesn't reflect the novelty and only adds the basics so the probe
+gets triggered.
+
+Change-Id: I27a8b6ada81c5ba4707cc083846af9fe351896a3
+Signed-off-by: Stephane Viau <sviau@codeaurora.org>
+---
+ Documentation/devicetree/bindings/drm/msm/hdmi.txt |  3 +++
+ drivers/gpu/drm/msm/hdmi/hdmi.c                    | 19 ++++++++++++++++---
+ 2 files changed, 19 insertions(+), 3 deletions(-)
+
+diff --git a/Documentation/devicetree/bindings/drm/msm/hdmi.txt b/Documentation/devicetree/bindings/drm/msm/hdmi.txt
+index e926239..379ee2e 100644
+--- a/Documentation/devicetree/bindings/drm/msm/hdmi.txt
++++ b/Documentation/devicetree/bindings/drm/msm/hdmi.txt
+@@ -2,6 +2,7 @@ Qualcomm adreno/snapdragon hdmi output
+ 
+ Required properties:
+ - compatible: one of the following
++   * "qcom,hdmi-tx-8996"
+    * "qcom,hdmi-tx-8994"
+    * "qcom,hdmi-tx-8084"
+    * "qcom,hdmi-tx-8974"
+@@ -21,6 +22,7 @@ Required properties:
+ Optional properties:
+ - qcom,hdmi-tx-mux-en-gpio: hdmi mux enable pin
+ - qcom,hdmi-tx-mux-sel-gpio: hdmi mux select pin
++- power-domains: reference to the power domain(s), if available.
+ - pinctrl-names: the pin control state names; should contain "default"
+ - pinctrl-0: the default pinctrl state (active)
+ - pinctrl-1: the "sleep" pinctrl state
+@@ -35,6 +37,7 @@ Example:
+ 		reg-names = "core_physical";
+ 		reg = <0x04a00000 0x1000>;
+ 		interrupts = <GIC_SPI 79 0>;
++		power-domains = <&mmcc MDSS_GDSC>;
+ 		clock-names =
+ 		    "core_clk",
+ 		    "master_iface_clk",
+diff --git a/drivers/gpu/drm/msm/hdmi/hdmi.c b/drivers/gpu/drm/msm/hdmi/hdmi.c
+index 101b324..53a2228 100644
+--- a/drivers/gpu/drm/msm/hdmi/hdmi.c
++++ b/drivers/gpu/drm/msm/hdmi/hdmi.c
+@@ -328,6 +328,9 @@ fail:
+ 	.item ## _names = item ##_names_ ## entry, \
+ 	.item ## _cnt   = ARRAY_SIZE(item ## _names_ ## entry)
+ 
++static const char *pwr_reg_names_none[] = {};
++static const char *hpd_reg_names_none[] = {};
++
+ static struct hdmi_platform_config hdmi_tx_8660_config = {
+ 		.phy_init = hdmi_phy_8x60_init,
+ };
+@@ -367,18 +370,26 @@ static struct hdmi_platform_config hdmi_tx_8084_config = {
+ 		.hpd_freq      = hpd_clk_freq_8x74,
+ };
+ 
+-static const char *hpd_reg_names_8x94[] = {};
+-
+ static struct hdmi_platform_config hdmi_tx_8994_config = {
+ 		.phy_init = NULL, /* nothing to do for this HDMI PHY 20nm */
+ 		HDMI_CFG(pwr_reg, 8x74),
+-		HDMI_CFG(hpd_reg, 8x94),
++		HDMI_CFG(hpd_reg, none),
++		HDMI_CFG(pwr_clk, 8x74),
++		HDMI_CFG(hpd_clk, 8x74),
++		.hpd_freq      = hpd_clk_freq_8x74,
++};
++
++static struct hdmi_platform_config hdmi_tx_8996_config = {
++		.phy_init = NULL,
++		HDMI_CFG(pwr_reg, none),
++		HDMI_CFG(hpd_reg, none),
+ 		HDMI_CFG(pwr_clk, 8x74),
+ 		HDMI_CFG(hpd_clk, 8x74),
+ 		.hpd_freq      = hpd_clk_freq_8x74,
+ };
+ 
+ static const struct of_device_id dt_match[] = {
++	{ .compatible = "qcom,hdmi-tx-8996", .data = &hdmi_tx_8996_config },
+ 	{ .compatible = "qcom,hdmi-tx-8994", .data = &hdmi_tx_8994_config },
+ 	{ .compatible = "qcom,hdmi-tx-8084", .data = &hdmi_tx_8084_config },
+ 	{ .compatible = "qcom,hdmi-tx-8974", .data = &hdmi_tx_8974_config },
+@@ -529,10 +540,12 @@ static struct platform_driver hdmi_driver = {
+ 
+ void __init hdmi_register(void)
+ {
++	DBG("");
+ 	platform_driver_register(&hdmi_driver);
+ }
+ 
+ void __exit hdmi_unregister(void)
+ {
++	DBG("");
+ 	platform_driver_unregister(&hdmi_driver);
+ }
+-- 
+2.8.2
+

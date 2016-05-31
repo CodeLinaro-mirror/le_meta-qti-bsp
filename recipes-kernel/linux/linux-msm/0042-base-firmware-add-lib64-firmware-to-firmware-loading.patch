@@ -1,0 +1,32 @@
+From 8ddb214347d8d923c51a6eb3cda96d7b0a41dcf9 Mon Sep 17 00:00:00 2001
+From: Jin Li <jinl@codeaurora.org>
+Date: Wed, 22 Jun 2016 15:54:48 -0400
+Subject: [PATCH 42/44] base: firmware: add /lib64/firmware to firmware loading
+ path
+
+Adding /lib64/firmware to the driver for loading firmware from
+the target.
+
+Change-Id: I6c016e08aa442feec0013b2c399c8448f9220909
+Signed-off-by: Jin Li <jinl@codeaurora.org>
+---
+ drivers/base/firmware_class.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/base/firmware_class.c b/drivers/base/firmware_class.c
+index 83d4c1d..b02ed81 100644
+--- a/drivers/base/firmware_class.c
++++ b/drivers/base/firmware_class.c
+@@ -302,7 +302,8 @@ static const char * const fw_path[] = {
+ 	"/lib/firmware/updates/" UTS_RELEASE,
+ 	"/lib/firmware/updates",
+ 	"/lib/firmware/" UTS_RELEASE,
+-	"/lib/firmware"
++	"/lib/firmware",
++	"/lib64/firmware"
+ };
+ 
+ /*
+-- 
+2.8.2
+

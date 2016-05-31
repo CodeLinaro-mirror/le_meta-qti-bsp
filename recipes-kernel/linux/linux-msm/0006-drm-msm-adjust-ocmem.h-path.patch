@@ -1,0 +1,30 @@
+From eb5bca579201a0ce4529faef69d0c175d597c701 Mon Sep 17 00:00:00 2001
+From: Stephane Viau <sviau@codeaurora.org>
+Date: Mon, 19 Jan 2015 10:49:22 -0500
+Subject: [PATCH 06/44] drm/msm: adjust ocmem.h path
+
+The path for ocmem.h is different in msm-3.18 kernel tree than 4.4.
+Change to correct path.
+
+Change-Id: Ic1779b6b8e4faf64a135e0cdfa8f5ea85ce29239
+Signed-off-by: Stephane Viau <sviau@codeaurora.org>
+---
+ drivers/gpu/drm/msm/adreno/a3xx_gpu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/gpu/drm/msm/adreno/a3xx_gpu.c b/drivers/gpu/drm/msm/adreno/a3xx_gpu.c
+index fd266ed..57d4a7f 100644
+--- a/drivers/gpu/drm/msm/adreno/a3xx_gpu.c
++++ b/drivers/gpu/drm/msm/adreno/a3xx_gpu.c
+@@ -18,7 +18,7 @@
+  */
+ 
+ #ifdef CONFIG_MSM_OCMEM
+-#  include <mach/ocmem.h>
++#  include <soc/qcom/ocmem.h>
+ #endif
+ 
+ #include "a3xx_gpu.h"
+-- 
+2.8.2
+

@@ -1,0 +1,47 @@
+From 9dd46e949287f4af03bd0c52f9ce4ebb119ddb6c Mon Sep 17 00:00:00 2001
+From: Stephane Viau <sviau@codeaurora.org>
+Date: Tue, 7 Jul 2015 15:18:02 -0400
+Subject: [PATCH 13/44] drm: Fix compilation in msm-3.18 kernel
+
+The OF APIs in msm-3.18 kernel is different than msm-4.4 kernel.
+Revert the change for for_each_endpoint_of_node API calls in drm driver.
+
+Change-Id: I0e3f29dfa9ce7e8826107f05528929934f001359
+Signed-off-by: Jin Li <jinl@codeaurora.org>
+---
+ drivers/gpu/drm/drm_of.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/gpu/drm/drm_of.c b/drivers/gpu/drm/drm_of.c
+index be38840..3333466 100644
+--- a/drivers/gpu/drm/drm_of.c
++++ b/drivers/gpu/drm/drm_of.c
+@@ -43,10 +43,14 @@ static uint32_t drm_crtc_port_mask(struct drm_device *dev,
+ uint32_t drm_of_find_possible_crtcs(struct drm_device *dev,
+ 				    struct device_node *port)
+ {
+-	struct device_node *remote_port, *ep;
++	struct device_node *remote_port, *ep = NULL;
+ 	uint32_t possible_crtcs = 0;
+ 
+-	for_each_endpoint_of_node(port, ep) {
++	do {
++		ep = of_graph_get_next_endpoint(port, ep);
++		if (!ep)
++			break;
++
+ 		remote_port = of_graph_get_remote_port(ep);
+ 		if (!remote_port) {
+ 			of_node_put(ep);
+@@ -56,7 +60,7 @@ uint32_t drm_of_find_possible_crtcs(struct drm_device *dev,
+ 		possible_crtcs |= drm_crtc_port_mask(dev, remote_port);
+ 
+ 		of_node_put(remote_port);
+-	}
++	} while (1);
+ 
+ 	return possible_crtcs;
+ }
+-- 
+2.8.2
+

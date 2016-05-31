@@ -1,0 +1,80 @@
+From b1a979705b314ba336975160011f2e74ac7b1a89 Mon Sep 17 00:00:00 2001
+From: Hai Li <hali@codeaurora.org>
+Date: Thu, 12 Mar 2015 18:45:29 -0400
+Subject: [PATCH 09/44] drm/msm: Enable clocks wherever accessing register
+
+We don't support PM functions for now, so clocks need to be enabled
+when register is accessed.
+
+Change-Id: Ia7be42a2f040fa8e6f8e0a9781c0770d33e6a240
+Signed-off-by: Hai Li <hali@codeaurora.org>
+---
+ drivers/gpu/drm/msm/mdp/mdp5/mdp5_crtc.c | 4 ++++
+ drivers/gpu/drm/msm/mdp/mdp5/mdp5_irq.c  | 2 ++
+ drivers/gpu/drm/msm/mdp/mdp5/mdp5_kms.c  | 2 ++
+ 3 files changed, 8 insertions(+)
+
+diff --git a/drivers/gpu/drm/msm/mdp/mdp5/mdp5_crtc.c b/drivers/gpu/drm/msm/mdp/mdp5/mdp5_crtc.c
+index 8f7da14..798e5c2 100644
+--- a/drivers/gpu/drm/msm/mdp/mdp5/mdp5_crtc.c
++++ b/drivers/gpu/drm/msm/mdp/mdp5/mdp5_crtc.c
+@@ -527,6 +527,7 @@ static int mdp5_crtc_cursor_set(struct drm_crtc *crtc,
+ 	if (!handle) {
+ 		DBG("Cursor off");
+ 		cursor_enable = false;
++		mdp5_enable(mdp5_kms);
+ 		goto set_cursor;
+ 	}
+ 
+@@ -542,6 +543,7 @@ static int mdp5_crtc_cursor_set(struct drm_crtc *crtc,
+ 	drm_fb_get_bpp_depth(DRM_FORMAT_ARGB8888, &depth, &bpp);
+ 	stride = width * (bpp >> 3);
+ 
++	mdp5_enable(mdp5_kms);
+ 	spin_lock_irqsave(&mdp5_crtc->cursor.lock, flags);
+ 	old_bo = mdp5_crtc->cursor.scanout_bo;
+ 
+@@ -584,6 +586,8 @@ end:
+ 		/* enable vblank to complete cursor work: */
+ 		request_pending(crtc, PENDING_CURSOR);
+ 	}
++	mdp5_disable(mdp5_kms);
++
+ 	return ret;
+ }
+ 
+diff --git a/drivers/gpu/drm/msm/mdp/mdp5/mdp5_irq.c b/drivers/gpu/drm/msm/mdp/mdp5/mdp5_irq.c
+index 2a578f2..1ad9b1e 100644
+--- a/drivers/gpu/drm/msm/mdp/mdp5/mdp5_irq.c
++++ b/drivers/gpu/drm/msm/mdp/mdp5/mdp5_irq.c
+@@ -52,7 +52,9 @@ int mdp5_irq_postinstall(struct msm_kms *kms)
+ 			MDP5_IRQ_INTF2_UNDER_RUN |
+ 			MDP5_IRQ_INTF3_UNDER_RUN;
+ 
++	mdp5_enable(mdp5_kms);
+ 	mdp_irq_register(mdp_kms, error_handler);
++	mdp5_disable(mdp5_kms);
+ 
+ 	return 0;
+ }
+diff --git a/drivers/gpu/drm/msm/mdp/mdp5/mdp5_kms.c b/drivers/gpu/drm/msm/mdp/mdp5/mdp5_kms.c
+index 047cb04..bbab6e6 100644
+--- a/drivers/gpu/drm/msm/mdp/mdp5/mdp5_kms.c
++++ b/drivers/gpu/drm/msm/mdp/mdp5/mdp5_kms.c
+@@ -57,11 +57,13 @@ static int mdp5_hw_init(struct msm_kms *kms)
+ 	 * care.
+ 	 */
+ 
++	mdp5_enable(mdp5_kms);
+ 	spin_lock_irqsave(&mdp5_kms->resource_lock, flags);
+ 	mdp5_write(mdp5_kms, REG_MDP5_MDP_DISP_INTF_SEL(0), 0);
+ 	spin_unlock_irqrestore(&mdp5_kms->resource_lock, flags);
+ 
+ 	mdp5_ctlm_hw_reset(mdp5_kms->ctlm);
++	mdp5_disable(mdp5_kms);
+ 
+ 	pm_runtime_put_sync(dev->dev);
+ 
+-- 
+2.8.2
+

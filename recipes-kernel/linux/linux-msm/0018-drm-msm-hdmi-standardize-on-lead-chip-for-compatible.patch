@@ -1,0 +1,30 @@
+From 07a602b60a0a34d65ab4d6f2265972594c29f9fa Mon Sep 17 00:00:00 2001
+From: Stephane Viau <sviau@codeaurora.org>
+Date: Fri, 31 Jul 2015 16:25:18 -0400
+Subject: [PATCH 18/44] drm/msm/hdmi: standardize on lead chip for compatible
+ names
+
+Use 8084 as compatible name but no 8094 to match the DTS changes.
+
+Change-Id: Ide9a5860ea2e845abec890c144a15cd63caacda8
+Signed-off-by: Stephane Viau <sviau@codeaurora.org>
+---
+ Documentation/devicetree/bindings/drm/msm/hdmi.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Documentation/devicetree/bindings/drm/msm/hdmi.txt b/Documentation/devicetree/bindings/drm/msm/hdmi.txt
+index bdf8c55..e926239 100644
+--- a/Documentation/devicetree/bindings/drm/msm/hdmi.txt
++++ b/Documentation/devicetree/bindings/drm/msm/hdmi.txt
+@@ -3,7 +3,7 @@ Qualcomm adreno/snapdragon hdmi output
+ Required properties:
+ - compatible: one of the following
+    * "qcom,hdmi-tx-8994"
+-   * "qcom,hdmi-tx-8984"
++   * "qcom,hdmi-tx-8084"
+    * "qcom,hdmi-tx-8974"
+    * "qcom,hdmi-tx-8660"
+    * "qcom,hdmi-tx-8960"
+-- 
+2.8.2
+

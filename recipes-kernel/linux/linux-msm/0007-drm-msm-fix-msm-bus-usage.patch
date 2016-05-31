@@ -1,0 +1,32 @@
+From a07729fd75513f9c40acb9c5e451b50c58ceca49 Mon Sep 17 00:00:00 2001
+From: Stephane Viau <sviau@codeaurora.org>
+Date: Tue, 29 Jul 2014 13:27:53 -0400
+Subject: [PATCH 07/44] drm/msm: fix msm-bus usage
+
+msm_bus is renamed into msm-bus. This change reflects this new
+name and adds msm-bus inclusion in mach-msm's board.h file.
+
+Change-Id: Id0e0fc6651b0eb399af6e80a51816f8934de8bb4
+Signed-off-by: Stephane Viau <sviau@codeaurora.org>
+---
+ drivers/gpu/drm/msm/mdp/mdp5/mdp5_encoder.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/gpu/drm/msm/mdp/mdp5/mdp5_encoder.c b/drivers/gpu/drm/msm/mdp/mdp5/mdp5_encoder.c
+index c9e32b0..a7fd9fe 100644
+--- a/drivers/gpu/drm/msm/mdp/mdp5/mdp5_encoder.c
++++ b/drivers/gpu/drm/msm/mdp/mdp5/mdp5_encoder.c
+@@ -40,8 +40,8 @@ static struct mdp5_kms *get_kms(struct drm_encoder *encoder)
+ 
+ #ifdef DOWNSTREAM_CONFIG_MSM_BUS_SCALING
+ #include <mach/board.h>
+-#include <mach/msm_bus.h>
+-#include <mach/msm_bus_board.h>
++#include <linux/msm-bus.h>
++#include <linux/msm-bus-board.h>
+ #define MDP_BUS_VECTOR_ENTRY(ab_val, ib_val)		\
+ 	{						\
+ 		.src = MSM_BUS_MASTER_MDP_PORT0,	\
+-- 
+2.8.2
+

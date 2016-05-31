@@ -1,0 +1,47 @@
+From 0ec34215451b6f778fbee326ccb55de2aa42b751 Mon Sep 17 00:00:00 2001
+From: Jin Li <jinl@codeaurora.org>
+Date: Tue, 25 Aug 2015 11:42:43 -0700
+Subject: [PATCH 34/44] drm/msm: add msm_iounmap to unmap io region
+
+Add a helper for unmapping IO region from virtual memory.
+
+Change-Id: Ie8193612790dfedfa3317fa36023edb05092da0f
+Signed-off-by: Jin Li <jinl@codeaurora.org>
+---
+ drivers/gpu/drm/msm/msm_drv.c | 7 +++++++
+ drivers/gpu/drm/msm/msm_drv.h | 1 +
+ 2 files changed, 8 insertions(+)
+
+diff --git a/drivers/gpu/drm/msm/msm_drv.c b/drivers/gpu/drm/msm/msm_drv.c
+index 4df58b4..19ace91 100644
+--- a/drivers/gpu/drm/msm/msm_drv.c
++++ b/drivers/gpu/drm/msm/msm_drv.c
+@@ -101,6 +101,13 @@ void __iomem *msm_ioremap(struct platform_device *pdev, const char *name,
+ 	return ptr;
+ }
+ 
++void msm_iounmap(struct platform_device *pdev, void __iomem *addr)
++{
++	devm_iounmap(&pdev->dev, addr);
++	if (reglog)
++		pr_debug("IOUNMAP:region %p\n", addr);
++}
++
+ void msm_writel(u32 data, void __iomem *addr)
+ {
+ 	if (reglog)
+diff --git a/drivers/gpu/drm/msm/msm_drv.h b/drivers/gpu/drm/msm/msm_drv.h
+index 838c788..9ebd6f5 100644
+--- a/drivers/gpu/drm/msm/msm_drv.h
++++ b/drivers/gpu/drm/msm/msm_drv.h
+@@ -301,6 +301,7 @@ static inline void msm_rd_dump_submit(struct msm_gem_submit *submit) {}
+ 
+ void __iomem *msm_ioremap(struct platform_device *pdev, const char *name,
+ 		const char *dbgname);
++void msm_iounmap(struct platform_device *pdev, void __iomem *addr);
+ void msm_writel(u32 data, void __iomem *addr);
+ u32 msm_readl(const void __iomem *addr);
+ 
+-- 
+2.8.2
+

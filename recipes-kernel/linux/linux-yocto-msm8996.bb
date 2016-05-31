@@ -39,8 +39,7 @@ KBUILD_DEFCONFIG = "msm-auto_defconfig"
 
 SRC_URI += " \
     file://msm.cfg \
-    file://weston_colorforamt.patch"
- 
+"
 
 LINUX_VERSION ?= "3.18"
 LINUX_VERSION_EXTENSION ?= "8996"

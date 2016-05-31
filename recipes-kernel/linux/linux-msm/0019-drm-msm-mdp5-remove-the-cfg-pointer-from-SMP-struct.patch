@@ -1,0 +1,72 @@
+From 23407d492eaa76be7cf251b64cebe188fc3dea96 Mon Sep 17 00:00:00 2001
+From: Stephane Viau <sviau@codeaurora.org>
+Date: Thu, 9 Jul 2015 16:19:10 -0400
+Subject: [PATCH 19/44] drm/msm/mdp5: remove the cfg pointer from SMP struct
+
+We want to make sure we control all the information being passed
+down to SMP block. Having access to the cfg pointer here may create
+bad things in the future.
+
+Change-Id: I82d99d7c7f1c9244fbf43676d4a220827f6fbe96
+Signed-off-by: Stephane Viau <sviau@codeaurora.org>
+---
+ drivers/gpu/drm/msm/mdp/mdp5/mdp5_cfg.h | 2 +-
+ drivers/gpu/drm/msm/mdp/mdp5/mdp5_smp.c | 8 ++++----
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/gpu/drm/msm/mdp/mdp5/mdp5_cfg.h b/drivers/gpu/drm/msm/mdp/mdp5/mdp5_cfg.h
+index efb918d..a6facaf 100644
+--- a/drivers/gpu/drm/msm/mdp/mdp5/mdp5_cfg.h
++++ b/drivers/gpu/drm/msm/mdp/mdp5/mdp5_cfg.h
+@@ -61,7 +61,7 @@ struct mdp5_smp_block {
+ 	int mmb_size;			/* MMB: size in bytes */
+ 	uint32_t clients[MAX_CLIENTS];	/* SMP port allocation /pipe */
+ 	mdp5_smp_state_t reserved_state;/* SMP MMBs statically allocated */
+-	int reserved[MAX_CLIENTS];	/* # of MMBs allocated per client */
++	uint8_t reserved[MAX_CLIENTS];	/* # of MMBs allocated per client */
+ };
+ 
+ #define MDP5_INTF_NUM_MAX	5
+diff --git a/drivers/gpu/drm/msm/mdp/mdp5/mdp5_smp.c b/drivers/gpu/drm/msm/mdp/mdp5/mdp5_smp.c
+index 563cca9..6f425c2 100644
+--- a/drivers/gpu/drm/msm/mdp/mdp5/mdp5_smp.c
++++ b/drivers/gpu/drm/msm/mdp/mdp5/mdp5_smp.c
+@@ -90,7 +90,7 @@
+ struct mdp5_smp {
+ 	struct drm_device *dev;
+ 
+-	const struct mdp5_smp_block *cfg;
++	uint8_t reserved[MAX_CLIENTS]; /* fixed MMBs allocation per client */
+ 
+ 	int blk_cnt;
+ 	int blk_size;
+@@ -141,10 +141,10 @@ static int smp_request_block(struct mdp5_smp *smp,
+ 	struct mdp5_kms *mdp5_kms = get_kms(smp);
+ 	struct mdp5_client_smp_state *ps = &smp->client_state[cid];
+ 	int i, ret, avail, cur_nblks, cnt = smp->blk_cnt;
+-	int reserved;
++	uint8_t reserved;
+ 	unsigned long flags;
+ 
+-	reserved = smp->cfg->reserved[cid];
++	reserved = smp->reserved[cid];
+ 
+ 	spin_lock_irqsave(&smp->state_lock, flags);
+ 
+@@ -405,12 +405,12 @@ struct mdp5_smp *mdp5_smp_init(struct drm_device *dev, const struct mdp5_smp_blo
+ 	}
+ 
+ 	smp->dev = dev;
+-	smp->cfg = cfg;
+ 	smp->blk_cnt = cfg->mmb_count;
+ 	smp->blk_size = cfg->mmb_size;
+ 
+ 	/* statically tied MMBs cannot be re-allocated: */
+ 	bitmap_copy(smp->state, cfg->reserved_state, smp->blk_cnt);
++	memcpy(smp->reserved, cfg->reserved, sizeof(smp->reserved));
+ 	spin_lock_init(&smp->state_lock);
+ 
+ 	return smp;
+-- 
+2.8.2
+

@@ -1,0 +1,277 @@
+From fc53090a821d74ec6ff0e18d09d732052bc88539 Mon Sep 17 00:00:00 2001
+From: Jin Li <jinl@codeaurora.org>
+Date: Fri, 20 May 2016 09:42:59 -0400
+Subject: [PATCH 37/44] drm: kms: change interrupt handling
+
+Add irq register into functions to be passed by caller.
+
+Change-Id: I5c18cae8bd8e7fdc5f9c05d5e5e4154b1b0fc6c0
+Signed-off-by: Jin Li <jinl@codeaurora.org>
+---
+ drivers/gpu/drm/msm/mdp/mdp5/mdp5_crtc.c    | 13 +++++++---
+ drivers/gpu/drm/msm/mdp/mdp5/mdp5_encoder.c |  2 +-
+ drivers/gpu/drm/msm/mdp/mdp5/mdp5_irq.c     |  7 +++---
+ drivers/gpu/drm/msm/mdp/mdp5/mdp5_kms.h     |  3 ++-
+ drivers/gpu/drm/msm/mdp/mdp_kms.c           | 38 ++++++++++++++++++++++-------
+ drivers/gpu/drm/msm/mdp/mdp_kms.h           | 16 +++++++++---
+ 6 files changed, 57 insertions(+), 22 deletions(-)
+
+diff --git a/drivers/gpu/drm/msm/mdp/mdp5/mdp5_crtc.c b/drivers/gpu/drm/msm/mdp/mdp5/mdp5_crtc.c
+index 798e5c2..cc5c278 100644
+--- a/drivers/gpu/drm/msm/mdp/mdp5/mdp5_crtc.c
++++ b/drivers/gpu/drm/msm/mdp/mdp5/mdp5_crtc.c
+@@ -645,9 +645,11 @@ static const struct drm_crtc_helper_funcs mdp5_crtc_helper_funcs = {
+ 	.atomic_flush = mdp5_crtc_atomic_flush,
+ };
+ 
+-static void mdp5_crtc_vblank_irq(struct mdp_irq *irq, uint32_t irqstatus)
++static void mdp5_crtc_vblank_irq(struct mdp_irq *irq, uint32_t irqreg,
++		uint32_t irqstatus)
+ {
+-	struct mdp5_crtc *mdp5_crtc = container_of(irq, struct mdp5_crtc, vblank);
++	struct mdp5_crtc *mdp5_crtc = container_of(irq, struct mdp5_crtc,
++							vblank);
+ 	struct drm_crtc *crtc = &mdp5_crtc->base;
+ 	struct msm_drm_private *priv = crtc->dev->dev_private;
+ 	unsigned pending;
+@@ -664,14 +666,16 @@ static void mdp5_crtc_vblank_irq(struct mdp_irq *irq, uint32_t irqstatus)
+ 		drm_flip_work_commit(&mdp5_crtc->unref_cursor_work, priv->wq);
+ }
+ 
+-static void mdp5_crtc_err_irq(struct mdp_irq *irq, uint32_t irqstatus)
++static void mdp5_crtc_err_irq(struct mdp_irq *irq, uint32_t irqreg,
++				uint32_t irqstatus)
+ {
+ 	struct mdp5_crtc *mdp5_crtc = container_of(irq, struct mdp5_crtc, err);
+ 
+ 	DBG("%s: error: %08x", mdp5_crtc->name, irqstatus);
+ }
+ 
+-static void mdp5_crtc_pp_done_irq(struct mdp_irq *irq, uint32_t irqstatus)
++static void mdp5_crtc_pp_done_irq(struct mdp_irq *irq, uint32_t irqreg,
++		uint32_t irqstatus)
+ {
+ 	struct mdp5_crtc *mdp5_crtc = container_of(irq, struct mdp5_crtc,
+ 								pp_done);
+@@ -739,6 +743,7 @@ void mdp5_crtc_set_pipeline(struct drm_crtc *crtc,
+ 	/* now that we know what irq's we want: */
+ 	mdp5_crtc->err.irqmask = intf2err(intf->num);
+ 	mdp5_crtc->vblank.irqmask = intf2vblank(lm, intf);
++	mdp5_crtc->vblank.irqreg = REG_MDP5_MDP_INTR_STATUS(0);
+ 
+ 	if ((intf->type == INTF_DSI) &&
+ 		(intf->mode == MDP5_INTF_DSI_MODE_COMMAND)) {
+diff --git a/drivers/gpu/drm/msm/mdp/mdp5/mdp5_encoder.c b/drivers/gpu/drm/msm/mdp/mdp5/mdp5_encoder.c
+index cca935f..2ae2268 100644
+--- a/drivers/gpu/drm/msm/mdp/mdp5/mdp5_encoder.c
++++ b/drivers/gpu/drm/msm/mdp/mdp5/mdp5_encoder.c
+@@ -255,7 +255,7 @@ static void mdp5_encoder_disable(struct drm_encoder *encoder)
+ 	 * the settings changes for the new modeset (like new
+ 	 * scanout buffer) don't latch properly..
+ 	 */
+-	mdp_irq_wait(&mdp5_kms->base, intf2vblank(lm, intf));
++	mdp_irq_wait(&mdp5_kms->base, intf2vblank(lm, intf), 0);
+ 
+ 	bs_set(mdp5_encoder, 0);
+ 
+diff --git a/drivers/gpu/drm/msm/mdp/mdp5/mdp5_irq.c b/drivers/gpu/drm/msm/mdp/mdp5/mdp5_irq.c
+index 1ad9b1e..ca248af 100644
+--- a/drivers/gpu/drm/msm/mdp/mdp5/mdp5_irq.c
++++ b/drivers/gpu/drm/msm/mdp/mdp5/mdp5_irq.c
+@@ -21,12 +21,13 @@
+ #include "msm_drv.h"
+ #include "mdp5_kms.h"
+ 
+-void mdp5_set_irqmask(struct mdp_kms *mdp_kms, uint32_t irqmask)
++void mdp5_set_irqmask(struct mdp_kms *mdp_kms, uint32_t reg, uint32_t irqmask)
+ {
+ 	mdp5_write(to_mdp5_kms(mdp_kms), REG_MDP5_MDP_INTR_EN(0), irqmask);
+ }
+ 
+-static void mdp5_irq_error_handler(struct mdp_irq *irq, uint32_t irqstatus)
++static void mdp5_irq_error_handler(struct mdp_irq *irq, uint32_t irqreg,
++		uint32_t irqstatus)
+ {
+ 	DRM_ERROR("errors: %08x\n", irqstatus);
+ }
+@@ -80,7 +81,7 @@ static void mdp5_irq_mdp(struct mdp_kms *mdp_kms)
+ 
+ 	VERB("status=%08x", status);
+ 
+-	mdp_dispatch_irqs(mdp_kms, status);
++	mdp_dispatch_irqs(mdp_kms, REG_MDP5_MDP_INTR_STATUS(0), status);
+ 
+ 	for (id = 0; id < priv->num_crtcs; id++)
+ 		if (status & mdp5_crtc_vblank(priv->crtcs[id]))
+diff --git a/drivers/gpu/drm/msm/mdp/mdp5/mdp5_kms.h b/drivers/gpu/drm/msm/mdp/mdp5/mdp5_kms.h
+index 24aebb6..924d7b2 100644
+--- a/drivers/gpu/drm/msm/mdp/mdp5/mdp5_kms.h
++++ b/drivers/gpu/drm/msm/mdp/mdp5/mdp5_kms.h
+@@ -192,7 +192,8 @@ static inline uint32_t lm2ppdone(int lm)
+ int mdp5_disable(struct mdp5_kms *mdp5_kms);
+ int mdp5_enable(struct mdp5_kms *mdp5_kms);
+ 
+-void mdp5_set_irqmask(struct mdp_kms *mdp_kms, uint32_t irqmask);
++void mdp5_set_irqmask(struct mdp_kms *mdp_kms, uint32_t irqreg,
++		uint32_t irqmask);
+ void mdp5_irq_preinstall(struct msm_kms *kms);
+ int mdp5_irq_postinstall(struct msm_kms *kms);
+ void mdp5_irq_uninstall(struct msm_kms *kms);
+diff --git a/drivers/gpu/drm/msm/mdp/mdp_kms.c b/drivers/gpu/drm/msm/mdp/mdp_kms.c
+index 1988c24..04889d7 100644
+--- a/drivers/gpu/drm/msm/mdp/mdp_kms.c
++++ b/drivers/gpu/drm/msm/mdp/mdp_kms.c
+@@ -33,13 +33,19 @@ static void update_irq(struct mdp_kms *mdp_kms)
+ {
+ 	struct mdp_irq *irq;
+ 	uint32_t irqmask = mdp_kms->vblank_mask;
++	uint32_t irqreg = 0;
+ 
+ 	assert_spin_locked(&list_lock);
+ 
+-	list_for_each_entry(irq, &mdp_kms->irq_list, node)
++	/*
++	 * TODO: This needs fixing for different IRQ registers
++	 */
++	list_for_each_entry(irq, &mdp_kms->irq_list, node) {
++		irqreg = irq->irqreg;
+ 		irqmask |= irq->irqmask;
++	}
+ 
+-	mdp_kms->funcs->set_irqmask(mdp_kms, irqmask);
++	mdp_kms->funcs->set_irqmask(mdp_kms, irqreg, irqmask);
+ }
+ 
+ /* if an mdp_irq's irqmask has changed, such as when mdp5 crtc<->encoder
+@@ -53,7 +59,10 @@ void mdp_irq_update(struct mdp_kms *mdp_kms)
+ 	spin_unlock_irqrestore(&list_lock, flags);
+ }
+ 
+-void mdp_dispatch_irqs(struct mdp_kms *mdp_kms, uint32_t status)
++/**
++ * Dispatch IRQs for the specified irq register and the bit mask (in status)
++ */
++void mdp_dispatch_irqs(struct mdp_kms *mdp_kms, uint32_t reg, uint32_t status)
+ {
+ 	struct mdp_irq *handler, *n;
+ 	unsigned long flags;
+@@ -61,16 +70,15 @@ void mdp_dispatch_irqs(struct mdp_kms *mdp_kms, uint32_t status)
+ 	spin_lock_irqsave(&list_lock, flags);
+ 	mdp_kms->in_irq = true;
+ 	list_for_each_entry_safe(handler, n, &mdp_kms->irq_list, node) {
+-		if (handler->irqmask & status) {
++		if ((reg == handler->irqreg) && (handler->irqmask & status)) {
+ 			spin_unlock_irqrestore(&list_lock, flags);
+-			handler->irq(handler, handler->irqmask & status);
++			handler->irq(handler, reg, handler->irqmask & status);
+ 			spin_lock_irqsave(&list_lock, flags);
+ 		}
+ 	}
+ 	mdp_kms->in_irq = false;
+ 	update_irq(mdp_kms);
+ 	spin_unlock_irqrestore(&list_lock, flags);
+-
+ }
+ 
+ void mdp_update_vblank_mask(struct mdp_kms *mdp_kms, uint32_t mask, bool enable)
+@@ -86,7 +94,7 @@ void mdp_update_vblank_mask(struct mdp_kms *mdp_kms, uint32_t mask, bool enable)
+ 	spin_unlock_irqrestore(&list_lock, flags);
+ }
+ 
+-static void wait_irq(struct mdp_irq *irq, uint32_t irqstatus)
++static void wait_irq(struct mdp_irq *irq, uint32_t irqreg, uint32_t irqstatus)
+ {
+ 	struct mdp_irq_wait *wait =
+ 			container_of(irq, struct mdp_irq_wait, irq);
+@@ -94,19 +102,30 @@ static void wait_irq(struct mdp_irq *irq, uint32_t irqstatus)
+ 	wake_up_all(&wait_event);
+ }
+ 
+-void mdp_irq_wait(struct mdp_kms *mdp_kms, uint32_t irqmask)
++int mdp_irq_wait(struct mdp_kms *mdp_kms, uint32_t irqmask, uint32_t irqreg)
+ {
+ 	struct mdp_irq_wait wait = {
+ 		.irq = {
+ 			.irq = wait_irq,
+ 			.irqmask = irqmask,
++			.irqreg = irqreg
+ 		},
+ 		.count = 1,
+ 	};
++	int rc = 0;
++
+ 	mdp_irq_register(mdp_kms, &wait.irq);
+-	wait_event_timeout(wait_event, (wait.count <= 0),
++	/*
++	 * Returns 0 if never happened and timed out
++	 * 1 if eval to true but timed out
++	 * >1 if eval to true before timeout
++	 */
++	rc = wait_event_timeout(wait_event, (wait.count <= 0),
+ 			msecs_to_jiffies(100));
+ 	mdp_irq_unregister(mdp_kms, &wait.irq);
++
++	/* Return whether or not it timed out */
++	return (rc <= 1);
+ }
+ 
+ void mdp_irq_register(struct mdp_kms *mdp_kms, struct mdp_irq *irq)
+@@ -116,6 +135,7 @@ void mdp_irq_register(struct mdp_kms *mdp_kms, struct mdp_irq *irq)
+ 
+ 	spin_lock_irqsave(&list_lock, flags);
+ 
++	DBG("registering for mask %d", irq->irqmask);
+ 	if (!irq->registered) {
+ 		irq->registered = true;
+ 		list_add(&irq->node, &mdp_kms->irq_list);
+diff --git a/drivers/gpu/drm/msm/mdp/mdp_kms.h b/drivers/gpu/drm/msm/mdp/mdp_kms.h
+index 1963f0e..0acf2a8 100644
+--- a/drivers/gpu/drm/msm/mdp/mdp_kms.h
++++ b/drivers/gpu/drm/msm/mdp/mdp_kms.h
+@@ -1,4 +1,5 @@
+ /*
++ * Copyright (c) 2016 The Linux Foundation. All rights reserved.
+  * Copyright (C) 2013 Red Hat
+  * Author: Rob Clark <robdclark@gmail.com>
+  *
+@@ -30,7 +31,8 @@ struct mdp_kms;
+ 
+ struct mdp_kms_funcs {
+ 	struct msm_kms_funcs base;
+-	void (*set_irqmask)(struct mdp_kms *mdp_kms, uint32_t irqmask);
++	void (*set_irqmask)(struct mdp_kms *mdp_kms, uint32_t reg,
++				uint32_t irqmask);
+ };
+ 
+ struct mdp_kms {
+@@ -65,18 +67,24 @@ static inline void mdp_kms_init(struct mdp_kms *mdp_kms,
+  */
+ struct mdp_irq {
+ 	struct list_head node;
++	uint32_t irqreg;
+ 	uint32_t irqmask;
+ 	bool registered;
+-	void (*irq)(struct mdp_irq *irq, uint32_t irqstatus);
++	void (*irq)(struct mdp_irq *irq, uint32_t irqreg, uint32_t irqstatus);
+ };
+ 
+-void mdp_dispatch_irqs(struct mdp_kms *mdp_kms, uint32_t status);
++void mdp_dispatch_irqs(struct mdp_kms *mdp_kms, uint32_t reg, uint32_t status);
+ void mdp_update_vblank_mask(struct mdp_kms *mdp_kms, uint32_t mask, bool enable);
+-void mdp_irq_wait(struct mdp_kms *mdp_kms, uint32_t irqmask);
++int mdp_irq_wait(struct mdp_kms *mdp_kms, uint32_t irqmask, uint32_t irqreg);
+ void mdp_irq_register(struct mdp_kms *mdp_kms, struct mdp_irq *irq);
+ void mdp_irq_unregister(struct mdp_kms *mdp_kms, struct mdp_irq *irq);
+ void mdp_irq_update(struct mdp_kms *mdp_kms);
+ 
++static inline bool mdp_irq_is_registered(struct mdp_irq *irq)
++{
++	return irq != NULL && irq->registered;
++}
++
+ /*
+  * pixel format helpers:
+  */
+-- 
+2.8.2
+

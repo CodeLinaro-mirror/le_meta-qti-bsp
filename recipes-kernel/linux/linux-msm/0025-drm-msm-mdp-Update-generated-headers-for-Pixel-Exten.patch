@@ -1,0 +1,132 @@
+From 162154ba87790be39fdc8b730b8976213369f72f Mon Sep 17 00:00:00 2001
+From: Stephane Viau <sviau@codeaurora.org>
+Date: Fri, 31 Jul 2015 17:29:39 -0400
+Subject: [PATCH 25/44] drm/msm/mdp: Update generated headers for Pixel
+ Extension
+
+Update generate headers by Envytools for Pixel Extension registers.
+
+Change-Id: I8a26a9093eea970c167d02ef71585b564633f209
+Signed-off-by: Stephane Viau <sviau@codeaurora.org>
+---
+ drivers/gpu/drm/msm/mdp/mdp5/mdp5.xml.h  | 78 ++++++++++++++++++++++++++++++++
+ drivers/gpu/drm/msm/mdp/mdp_common.xml.h |  7 +++
+ 2 files changed, 85 insertions(+)
+
+diff --git a/drivers/gpu/drm/msm/mdp/mdp5/mdp5.xml.h b/drivers/gpu/drm/msm/mdp/mdp5/mdp5.xml.h
+index 6972e18..aeca4f2 100644
+--- a/drivers/gpu/drm/msm/mdp/mdp5/mdp5.xml.h
++++ b/drivers/gpu/drm/msm/mdp/mdp5/mdp5.xml.h
+@@ -895,6 +895,7 @@ static inline uint32_t MDP5_PIPE_SRC_OP_MODE_BWC(enum mdp5_pipe_bwc val)
+ #define MDP5_PIPE_SRC_OP_MODE_IGC_ROM_1				0x00040000
+ #define MDP5_PIPE_SRC_OP_MODE_DEINTERLACE			0x00400000
+ #define MDP5_PIPE_SRC_OP_MODE_DEINTERLACE_ODD			0x00800000
++#define MDP5_PIPE_SRC_OP_MODE_SW_PIX_EXT_OVERRIDE		0x80000000
+ 
+ static inline uint32_t REG_MDP5_PIPE_SRC_CONSTANT_COLOR(enum mdp5_pipe i0) { return 0x0000003c + __offset_PIPE(i0); }
+ 
+@@ -932,6 +933,83 @@ static inline uint32_t MDP5_PIPE_DECIMATION_HORZ(uint32_t val)
+ 	return ((val) << MDP5_PIPE_DECIMATION_HORZ__SHIFT) & MDP5_PIPE_DECIMATION_HORZ__MASK;
+ }
+ 
++static inline uint32_t __offset_SW_PIX_EXT(enum mdp_component_type idx)
++{
++	switch (idx) {
++		case COMP_0: return 0x00000100;
++		case COMP_1_2: return 0x00000110;
++		case COMP_3: return 0x00000120;
++		default: return INVALID_IDX(idx);
++	}
++}
++static inline uint32_t REG_MDP5_PIPE_SW_PIX_EXT(enum mdp5_pipe i0, enum mdp_component_type i1) { return 0x00000000 + __offset_PIPE(i0) + __offset_SW_PIX_EXT(i1); }
++
++static inline uint32_t REG_MDP5_PIPE_SW_PIX_EXT_LR(enum mdp5_pipe i0, enum mdp_component_type i1) { return 0x00000000 + __offset_PIPE(i0) + __offset_SW_PIX_EXT(i1); }
++#define MDP5_PIPE_SW_PIX_EXT_LR_LEFT_RPT__MASK			0x000000ff
++#define MDP5_PIPE_SW_PIX_EXT_LR_LEFT_RPT__SHIFT			0
++static inline uint32_t MDP5_PIPE_SW_PIX_EXT_LR_LEFT_RPT(uint32_t val)
++{
++	return ((val) << MDP5_PIPE_SW_PIX_EXT_LR_LEFT_RPT__SHIFT) & MDP5_PIPE_SW_PIX_EXT_LR_LEFT_RPT__MASK;
++}
++#define MDP5_PIPE_SW_PIX_EXT_LR_LEFT_OVF__MASK			0x0000ff00
++#define MDP5_PIPE_SW_PIX_EXT_LR_LEFT_OVF__SHIFT			8
++static inline uint32_t MDP5_PIPE_SW_PIX_EXT_LR_LEFT_OVF(int32_t val)
++{
++	return ((val) << MDP5_PIPE_SW_PIX_EXT_LR_LEFT_OVF__SHIFT) & MDP5_PIPE_SW_PIX_EXT_LR_LEFT_OVF__MASK;
++}
++#define MDP5_PIPE_SW_PIX_EXT_LR_RIGHT_RPT__MASK			0x00ff0000
++#define MDP5_PIPE_SW_PIX_EXT_LR_RIGHT_RPT__SHIFT		16
++static inline uint32_t MDP5_PIPE_SW_PIX_EXT_LR_RIGHT_RPT(uint32_t val)
++{
++	return ((val) << MDP5_PIPE_SW_PIX_EXT_LR_RIGHT_RPT__SHIFT) & MDP5_PIPE_SW_PIX_EXT_LR_RIGHT_RPT__MASK;
++}
++#define MDP5_PIPE_SW_PIX_EXT_LR_RIGHT_OVF__MASK			0xff000000
++#define MDP5_PIPE_SW_PIX_EXT_LR_RIGHT_OVF__SHIFT		24
++static inline uint32_t MDP5_PIPE_SW_PIX_EXT_LR_RIGHT_OVF(int32_t val)
++{
++	return ((val) << MDP5_PIPE_SW_PIX_EXT_LR_RIGHT_OVF__SHIFT) & MDP5_PIPE_SW_PIX_EXT_LR_RIGHT_OVF__MASK;
++}
++
++static inline uint32_t REG_MDP5_PIPE_SW_PIX_EXT_TB(enum mdp5_pipe i0, enum mdp_component_type i1) { return 0x00000004 + __offset_PIPE(i0) + __offset_SW_PIX_EXT(i1); }
++#define MDP5_PIPE_SW_PIX_EXT_TB_TOP_RPT__MASK			0x000000ff
++#define MDP5_PIPE_SW_PIX_EXT_TB_TOP_RPT__SHIFT			0
++static inline uint32_t MDP5_PIPE_SW_PIX_EXT_TB_TOP_RPT(uint32_t val)
++{
++	return ((val) << MDP5_PIPE_SW_PIX_EXT_TB_TOP_RPT__SHIFT) & MDP5_PIPE_SW_PIX_EXT_TB_TOP_RPT__MASK;
++}
++#define MDP5_PIPE_SW_PIX_EXT_TB_TOP_OVF__MASK			0x0000ff00
++#define MDP5_PIPE_SW_PIX_EXT_TB_TOP_OVF__SHIFT			8
++static inline uint32_t MDP5_PIPE_SW_PIX_EXT_TB_TOP_OVF(int32_t val)
++{
++	return ((val) << MDP5_PIPE_SW_PIX_EXT_TB_TOP_OVF__SHIFT) & MDP5_PIPE_SW_PIX_EXT_TB_TOP_OVF__MASK;
++}
++#define MDP5_PIPE_SW_PIX_EXT_TB_BOTTOM_RPT__MASK		0x00ff0000
++#define MDP5_PIPE_SW_PIX_EXT_TB_BOTTOM_RPT__SHIFT		16
++static inline uint32_t MDP5_PIPE_SW_PIX_EXT_TB_BOTTOM_RPT(uint32_t val)
++{
++	return ((val) << MDP5_PIPE_SW_PIX_EXT_TB_BOTTOM_RPT__SHIFT) & MDP5_PIPE_SW_PIX_EXT_TB_BOTTOM_RPT__MASK;
++}
++#define MDP5_PIPE_SW_PIX_EXT_TB_BOTTOM_OVF__MASK		0xff000000
++#define MDP5_PIPE_SW_PIX_EXT_TB_BOTTOM_OVF__SHIFT		24
++static inline uint32_t MDP5_PIPE_SW_PIX_EXT_TB_BOTTOM_OVF(int32_t val)
++{
++	return ((val) << MDP5_PIPE_SW_PIX_EXT_TB_BOTTOM_OVF__SHIFT) & MDP5_PIPE_SW_PIX_EXT_TB_BOTTOM_OVF__MASK;
++}
++
++static inline uint32_t REG_MDP5_PIPE_SW_PIX_EXT_REQ_PIXELS(enum mdp5_pipe i0, enum mdp_component_type i1) { return 0x00000008 + __offset_PIPE(i0) + __offset_SW_PIX_EXT(i1); }
++#define MDP5_PIPE_SW_PIX_EXT_REQ_PIXELS_LEFT_RIGHT__MASK	0x0000ffff
++#define MDP5_PIPE_SW_PIX_EXT_REQ_PIXELS_LEFT_RIGHT__SHIFT	0
++static inline uint32_t MDP5_PIPE_SW_PIX_EXT_REQ_PIXELS_LEFT_RIGHT(uint32_t val)
++{
++	return ((val) << MDP5_PIPE_SW_PIX_EXT_REQ_PIXELS_LEFT_RIGHT__SHIFT) & MDP5_PIPE_SW_PIX_EXT_REQ_PIXELS_LEFT_RIGHT__MASK;
++}
++#define MDP5_PIPE_SW_PIX_EXT_REQ_PIXELS_TOP_BOTTOM__MASK	0xffff0000
++#define MDP5_PIPE_SW_PIX_EXT_REQ_PIXELS_TOP_BOTTOM__SHIFT	16
++static inline uint32_t MDP5_PIPE_SW_PIX_EXT_REQ_PIXELS_TOP_BOTTOM(uint32_t val)
++{
++	return ((val) << MDP5_PIPE_SW_PIX_EXT_REQ_PIXELS_TOP_BOTTOM__SHIFT) & MDP5_PIPE_SW_PIX_EXT_REQ_PIXELS_TOP_BOTTOM__MASK;
++}
++
+ static inline uint32_t REG_MDP5_PIPE_SCALE_CONFIG(enum mdp5_pipe i0) { return 0x00000204 + __offset_PIPE(i0); }
+ #define MDP5_PIPE_SCALE_CONFIG_SCALEX_EN			0x00000001
+ #define MDP5_PIPE_SCALE_CONFIG_SCALEY_EN			0x00000002
+diff --git a/drivers/gpu/drm/msm/mdp/mdp_common.xml.h b/drivers/gpu/drm/msm/mdp/mdp_common.xml.h
+index 214e2c7..c360d7e 100644
+--- a/drivers/gpu/drm/msm/mdp/mdp_common.xml.h
++++ b/drivers/gpu/drm/msm/mdp/mdp_common.xml.h
+@@ -78,6 +78,13 @@ enum mdp_alpha_type {
+ 	BG_PIXEL = 3,
+ };
+ 
++enum mdp_component_type {
++	COMP_0 = 0,
++	COMP_1_2 = 1,
++	COMP_3 = 2,
++	COMP_MAX = 3,
++};
++
+ enum mdp_bpc {
+ 	BPC1 = 0,
+ 	BPC5 = 1,
+-- 
+2.8.2
+

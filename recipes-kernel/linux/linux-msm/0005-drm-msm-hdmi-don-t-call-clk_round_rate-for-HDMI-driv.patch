@@ -1,0 +1,35 @@
+From aabf18629117ca35991f2e232f1bd284934b0671 Mon Sep 17 00:00:00 2001
+From: Rob Clark <robdclark@gmail.com>
+Date: Tue, 4 Nov 2014 12:33:20 -0500
+Subject: [PATCH 05/44] drm/msm/hdmi: don't call clk_round_rate for HDMI driver
+
+DRM/KMS driver is not using Common Clock Framework on msm-3.18 kernel
+yet. Don't call clk_round_rate in HDMI driver.
+
+Change-Id: Ia3046b871a53a2e3bd2a928cc06c9c5aa608b8cc
+Signed-off-by: Jin Li <jinl@codeaurora.org>
+---
+ drivers/gpu/drm/msm/hdmi/hdmi_connector.c | 7 -------
+ 1 file changed, 7 deletions(-)
+
+diff --git a/drivers/gpu/drm/msm/hdmi/hdmi_connector.c b/drivers/gpu/drm/msm/hdmi/hdmi_connector.c
+index a3b05ae..88c727c 100644
+--- a/drivers/gpu/drm/msm/hdmi/hdmi_connector.c
++++ b/drivers/gpu/drm/msm/hdmi/hdmi_connector.c
+@@ -435,13 +435,6 @@ static int hdmi_connector_mode_valid(struct drm_connector *connector,
+ 	actual = kms->funcs->round_pixclk(kms,
+ 			requested, hdmi_connector->hdmi->encoder);
+ 
+-	/* for mdp5/apq8074, we manage our own pixel clk (as opposed to
+-	 * mdp4/dtv stuff where pixel clk is assigned to mdp/encoder
+-	 * instead):
+-	 */
+-	if (config->pwr_clk_cnt > 0)
+-		actual = clk_round_rate(hdmi->pwr_clks[0], actual);
+-
+ 	DBG("requested=%ld, actual=%ld", requested, actual);
+ 
+ 	if (actual != requested)
+-- 
+2.8.2
+

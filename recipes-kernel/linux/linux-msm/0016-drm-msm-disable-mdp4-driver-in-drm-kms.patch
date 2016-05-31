@@ -1,0 +1,146 @@
+From c88fdf531ef71acda9e10b1be7ef7a89822da333 Mon Sep 17 00:00:00 2001
+From: Stephane Viau <sviau@codeaurora.org>
+Date: Wed, 29 Apr 2015 14:57:31 -0400
+Subject: [PATCH 16/44] drm/msm: disable mdp4 driver in drm kms
+
+mdp4 drm driver is for old MDP revision. It is not required for newer
+version of chipsets. Disable this driver because it is using older
+smmu/bus APIs which are not supported now.
+
+Change-Id: Ic25e77112a378b96295d78f1bd9d8f48a07be32d
+Signed-off-by: Stephane Viau <sviau@codeaurora.org>
+---
+ drivers/gpu/drm/msm/Kconfig                     | 10 ++++++++++
+ drivers/gpu/drm/msm/Makefile                    | 16 +++++++++-------
+ drivers/gpu/drm/msm/mdp/mdp5/mdp5_cmd_encoder.c |  1 -
+ drivers/gpu/drm/msm/mdp/mdp5/mdp5_encoder.c     |  1 -
+ drivers/gpu/drm/msm/msm_drv.h                   |  2 +-
+ drivers/gpu/drm/msm/msm_gpu.c                   |  2 +-
+ drivers/gpu/drm/msm/msm_kms.h                   |  5 +++++
+ 7 files changed, 26 insertions(+), 11 deletions(-)
+
+diff --git a/drivers/gpu/drm/msm/Kconfig b/drivers/gpu/drm/msm/Kconfig
+index bf4d2db..462f818 100644
+--- a/drivers/gpu/drm/msm/Kconfig
++++ b/drivers/gpu/drm/msm/Kconfig
+@@ -13,6 +13,16 @@ config DRM_MSM
+ 	help
+ 	  DRM/KMS driver for MSM/snapdragon.
+ 
++config DRM_MSM_MDP4
++	tristate "MSM MDP4 DRM driver"
++	depends on DRM_MSM
++	default n
++	help
++	  DRM/KMS driver for MSM/snapdragon MDP revision 4. Choose this
++	  option if you want to support older MDP version. Please be
++	  aware of that this driver may not be fully functional in
++	  new kernel version.
++
+ config DRM_MSM_FBDEV
+ 	bool "Enable legacy fbdev support for MSM modesetting driver"
+ 	depends on DRM_MSM
+diff --git a/drivers/gpu/drm/msm/Makefile b/drivers/gpu/drm/msm/Makefile
+index 5f3bd50..0c592cf 100644
+--- a/drivers/gpu/drm/msm/Makefile
++++ b/drivers/gpu/drm/msm/Makefile
+@@ -19,13 +19,6 @@ msm-y := \
+ 	edp/edp_phy.o \
+ 	mdp/mdp_format.o \
+ 	mdp/mdp_kms.o \
+-	mdp/mdp4/mdp4_crtc.o \
+-	mdp/mdp4/mdp4_dtv_encoder.o \
+-	mdp/mdp4/mdp4_lcdc_encoder.o \
+-	mdp/mdp4/mdp4_lvds_connector.o \
+-	mdp/mdp4/mdp4_irq.o \
+-	mdp/mdp4/mdp4_kms.o \
+-	mdp/mdp4/mdp4_plane.o \
+ 	mdp/mdp5/mdp5_cfg.o \
+ 	mdp/mdp5/mdp5_ctl.o \
+ 	mdp/mdp5/mdp5_crtc.o \
+@@ -54,6 +47,15 @@ msm-y += adreno/adreno_device.o \
+ 	adreno/a4xx_gpu.o
+ endif
+ 
++msm-$(CONFIG_DRM_MSM_MDP4) += \
++	mdp/mdp4/mdp4_crtc.o \
++	mdp/mdp4/mdp4_dtv_encoder.o \
++	mdp/mdp4/mdp4_lcdc_encoder.o \
++	mdp/mdp4/mdp4_lvds_connector.o \
++	mdp/mdp4/mdp4_irq.o \
++	mdp/mdp4/mdp4_kms.o \
++	mdp/mdp4/mdp4_plane.o
++
+ msm-$(CONFIG_DRM_MSM_FBDEV) += msm_fbdev.o
+ msm-$(CONFIG_COMMON_CLK) += mdp/mdp4/mdp4_lvds_pll.o
+ 
+diff --git a/drivers/gpu/drm/msm/mdp/mdp5/mdp5_cmd_encoder.c b/drivers/gpu/drm/msm/mdp/mdp5/mdp5_cmd_encoder.c
+index bfbfb64..9b983f7 100644
+--- a/drivers/gpu/drm/msm/mdp/mdp5/mdp5_cmd_encoder.c
++++ b/drivers/gpu/drm/msm/mdp/mdp5/mdp5_cmd_encoder.c
+@@ -33,7 +33,6 @@ static struct mdp5_kms *get_kms(struct drm_encoder *encoder)
+ }
+ 
+ #ifdef CONFIG_MSM_BUS_SCALING
+-#include <mach/board.h>
+ #include <linux/msm-bus.h>
+ #include <linux/msm-bus-board.h>
+ #define MDP_BUS_VECTOR_ENTRY(ab_val, ib_val)		\
+diff --git a/drivers/gpu/drm/msm/mdp/mdp5/mdp5_encoder.c b/drivers/gpu/drm/msm/mdp/mdp5/mdp5_encoder.c
+index 44b2041..cca935f 100644
+--- a/drivers/gpu/drm/msm/mdp/mdp5/mdp5_encoder.c
++++ b/drivers/gpu/drm/msm/mdp/mdp5/mdp5_encoder.c
+@@ -39,7 +39,6 @@ static struct mdp5_kms *get_kms(struct drm_encoder *encoder)
+ }
+ 
+ #ifdef CONFIG_MSM_BUS_SCALING
+-#include <mach/board.h>
+ #include <linux/msm-bus.h>
+ #include <linux/msm-bus-board.h>
+ #define MDP_BUS_VECTOR_ENTRY(ab_val, ib_val)		\
+diff --git a/drivers/gpu/drm/msm/msm_drv.h b/drivers/gpu/drm/msm/msm_drv.h
+index 3be7a56..838c788 100644
+--- a/drivers/gpu/drm/msm/msm_drv.h
++++ b/drivers/gpu/drm/msm/msm_drv.h
+@@ -34,7 +34,7 @@
+ #include <asm/sizes.h>
+ 
+ #ifndef CONFIG_OF
+-#include <mach/board.h>
++#include <linux/msm-bus.h>
+ #include <mach/socinfo.h>
+ #include <mach/iommu_domains.h>
+ #endif
+diff --git a/drivers/gpu/drm/msm/msm_gpu.c b/drivers/gpu/drm/msm/msm_gpu.c
+index 05e318d..5d31b5a 100644
+--- a/drivers/gpu/drm/msm/msm_gpu.c
++++ b/drivers/gpu/drm/msm/msm_gpu.c
+@@ -25,7 +25,7 @@
+  */
+ 
+ #ifdef CONFIG_MSM_BUS_SCALING
+-#include <mach/board.h>
++#include <linux/msm-bus.h>
+ static void bs_init(struct msm_gpu *gpu)
+ {
+ 	if (gpu->bus_scale_table) {
+diff --git a/drivers/gpu/drm/msm/msm_kms.h b/drivers/gpu/drm/msm/msm_kms.h
+index 9bcabaa..d05243d 100644
+--- a/drivers/gpu/drm/msm/msm_kms.h
++++ b/drivers/gpu/drm/msm/msm_kms.h
+@@ -74,7 +74,12 @@ static inline void msm_kms_init(struct msm_kms *kms,
+ 	kms->funcs = funcs;
+ }
+ 
++#ifdef CONFIG_DRM_MSM_MDP4
+ struct msm_kms *mdp4_kms_init(struct drm_device *dev);
++#else
++static inline
++struct msm_kms *mdp4_kms_init(struct drm_device *dev) { return NULL; };
++#endif
+ struct msm_kms *mdp5_kms_init(struct drm_device *dev);
+ 
+ #endif /* __MSM_KMS_H__ */
+-- 
+2.8.2
+
