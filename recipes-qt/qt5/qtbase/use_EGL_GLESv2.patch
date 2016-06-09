@@ -1,0 +1,17 @@
+diff --git a/mkspecs/linux-oe-g++/qmake.conf b/mkspecs/linux-oe-g++/qmake.conf
+index ca26b10..ea442f0 100644
+--- a/mkspecs/linux-oe-g++/qmake.conf
++++ b/mkspecs/linux-oe-g++/qmake.conf
+@@ -37,4 +37,12 @@ QMAKE_LINK_C_SHLIB = $(OE_QMAKE_LINK)
+ # for the SDK
+ isEmpty(QMAKE_QT_CONFIG):QMAKE_QT_CONFIG = $(OE_QMAKE_QT_CONFIG)
+ 
++QMAKE_LIBS_EGL         += -lEGL -ldl -lglib-2.0 -lpthread
++QMAKE_LIBS_OPENGL_ES2  += -lGLESv2 -lgsl -lEGL -ldl -lglib-2.0 -lpthread
++
++QMAKE_CFLAGS                += -DLINUX=1 -DWL_EGL_PLATFORM
++QMAKE_CXXFLAGS              += -DLINUX=1 -DWL_EGL_PLATFORM
++
++QT_QPA_DEFAULT_PLATFORM = wayland
++
+ load(qt_config)
