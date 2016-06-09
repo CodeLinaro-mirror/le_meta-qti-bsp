@@ -5,7 +5,6 @@ require recipes-platform/images/agl-demo-platform.bb
 
 #add packages on top of AGL master
 IMAGE_INSTALL_append = " \
-    mesa-megadriver \
     weston \
     weston-examples \
     qtbase-examples \
