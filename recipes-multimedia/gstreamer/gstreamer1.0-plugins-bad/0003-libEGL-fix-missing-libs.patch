@@ -1,0 +1,52 @@
+From 30b24dc29ee75eeb4e3990a9a184fd7b9b07db32 Mon Sep 17 00:00:00 2001
+From: Alison Chaiken <alison_chaiken@mentor.com>
+Date: Thu, 16 Jul 2015 18:03:41 +0200
+Subject: [PATCH 03/26] libEGL fix missing libs
+
+---
+ configure.ac | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 807cac8..cf1719a 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -678,7 +678,7 @@ case $host in
+       AG_GST_CHECK_LIBHEADER(GLES2, GLESv2, glTexImage2D,, GLES2/gl2.h)
+     fi
+     if test "x$NEED_EGL" != "xno"; then
+-      AG_GST_CHECK_LIBHEADER(EGL, EGL, eglGetError,, EGL/egl.h)
++      AG_GST_CHECK_LIBHEADER(EGL, EGL, eglGetError, -ldl -lglib-2.0 -lpthread, EGL/egl.h)
+     fi
+ 
+     old_LIBS=$LIBS
+@@ -722,7 +722,7 @@ case $host in
+             LIBS="$LIBS -lGLESv2"
+             AC_CHECK_LIB([EGL], [eglGetProcAddress],
+               [
+-                LIBS="$LIBS -lEGL"
++                LIBS="$LIBS -lEGL -ldl -lglib-2.0 -lpthread"
+                 AC_CHECK_HEADER([EGL/egl.h],
+                   [
+                     AC_CHECK_LIB([GLESv2], [glEnable],
+@@ -900,7 +900,7 @@ case $host in
+     dnl EGL
+     if test "x$HAVE_EGL" = "xyes"; then
+       if test "x$NEED_EGL" != "xno"; then
+-        GL_LIBS="$GL_LIBS -lEGL"
++        GL_LIBS="$GL_LIBS -lEGL -ldl -lglib-2.0 -lpthread"
+         USE_EGL=yes
+       fi
+     fi
+@@ -979,7 +979,7 @@ case $host in
+     else
+       if test "x$NEED_EGL" != "xno"; then
+         if test "x$HAVE_WINDOW_WAYLAND" = "xyes" -o "x$HAVE_WINDOW_X11" = "xyes" -o "x$HAVE_WINDOW_DISPMANX" = "xyes"; then
+-          GL_LIBS="$GL_LIBS -lEGL $EGL_LIBS"
++          GL_LIBS="$GL_LIBS -lEGL -ldl -lglib-2.0 -lpthread $EGL_LIBS"
+           GL_CFLAGS="$GL_CFLAGS $EGL_CFLAGS"
+           USE_EGL=yes
+         fi
+-- 
+1.9.1
+
