@@ -62,6 +62,14 @@ SRC_URI += " \
 	file://0009-drm-msm-add-hang-dump-function.patch \
 	file://0010-drm-msm-add-interface-to-query-gpu-address.patch \
 	file://0011-drm-msm-Fix-issue-iommu-unmap-failed.patch \
+	file://0100-ARM-dts-support-drm-render-in-mojave-dragonboard.patch \
+	file://0101-drm-adreno-Move-letency-api-out-of-global-file.patch \
+	file://0102-drm-adreno-Support-processor-commands-of-A5.patch \
+	file://0103-drm-adreno-Support-resource-parsing-for-Adreno5.patch \
+	file://0104-drm-adreno-Fix-submit-crashing-issue.patch \
+	file://0105-drm-adreno-Enable-Adreno-5.patch \
+	file://0106-drm-adreno-Fix-issue-of-zero-addrass-writing.patch \
+	file://0107-drm-adreno-Fix-issue-of-wait-too-long.patch \
 "
 
 SRC_URI[0001.md5sum] = "7fdc9ffea731349324901598d8e34b48"

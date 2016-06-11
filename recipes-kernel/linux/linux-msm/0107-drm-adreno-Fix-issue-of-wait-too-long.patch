@@ -1,0 +1,102 @@
+From 8263e4aed0a8e3a13b0b1fd632199dbf0b82ceba Mon Sep 17 00:00:00 2001
+From: Kasin Li <donglil@codeaurora.org>
+Date: Thu, 23 Jun 2016 20:26:50 +0800
+Subject: [PATCH 107/107] drm:adreno: Fix issue of wait too long
+
+The system update complete fence so slowly without interrupt. So we
+enable FLUSH_TS interrupt and make fence updated in its irq.
+
+Change-Id: Ided74b09be909c9c9074fb053744b3bd2421d022
+Signed-off-by: Kasin Li <donglil@codeaurora.org>
+---
+ drivers/gpu/drm/msm/adreno/a5xx_gpu.c   | 10 +++++++++-
+ drivers/gpu/drm/msm/adreno/adreno_gpu.c | 11 ++---------
+ 2 files changed, 11 insertions(+), 10 deletions(-)
+
+diff --git a/drivers/gpu/drm/msm/adreno/a5xx_gpu.c b/drivers/gpu/drm/msm/adreno/a5xx_gpu.c
+index 7bd601a..a7443d6 100644
+--- a/drivers/gpu/drm/msm/adreno/a5xx_gpu.c
++++ b/drivers/gpu/drm/msm/adreno/a5xx_gpu.c
+@@ -1015,12 +1015,17 @@ static int a5xx_idle(struct msm_gpu *gpu)
+ 	bool timeout = true;
+ 	unsigned long __t = jiffies + ADRENO_IDLE_TIMEOUT;
+ 	unsigned int rptr, wptr;
++	unsigned int status;
+ 
+ 	/* wait for ringbuffer to drain: */
+ 	do {
+ 		rptr = gpu_read(gpu, A5XX_CP_RB_RPTR);
+ 		wptr = gpu_read(gpu, A5XX_CP_RB_WPTR);
+-		if (rptr == wptr) {
++		if (rptr != wptr)
++			continue;
++
++		status = gpu_read(gpu, A5XX_RBBM_STATUS);
++		if ((status & 0xfffffffe) == 0) {
+ 			timeout = false;
+ 			break;
+ 		}
+@@ -1030,6 +1035,7 @@ static int a5xx_idle(struct msm_gpu *gpu)
+ 		DRM_ERROR("%s: timeout waiting to drain ringbuffer!\n",
+ 				gpu->name);
+ 		DRM_ERROR("RPTR:%x WPTR:%x\n", rptr, wptr);
++		DRM_ERROR("Status:%x\n", (status & 0xfffffffe));
+ 		return -1;
+ 	}
+ 	return 0;
+@@ -1087,6 +1093,8 @@ static void a5xx_err_checker(struct msm_gpu *gpu, unsigned int bit)
+ 	case A5XX_INT_GPMU_VOLTAGE_DROOP:
+ 		DRM_ERROR("GPMU: Voltage droop\n");
+ 		break;
++	case A5XX_INT_CP_CACHE_FLUSH_TS:
++		break;
+ 	default:
+ 		DRM_ERROR("Unknown interrupt %d\n", bit);
+ 	}
+diff --git a/drivers/gpu/drm/msm/adreno/adreno_gpu.c b/drivers/gpu/drm/msm/adreno/adreno_gpu.c
+index 5d63a0a..241e64d 100644
+--- a/drivers/gpu/drm/msm/adreno/adreno_gpu.c
++++ b/drivers/gpu/drm/msm/adreno/adreno_gpu.c
+@@ -68,7 +68,7 @@ int adreno_hw_init(struct msm_gpu *gpu)
+ 	/* Setup REG_CP_RB_CNTL: */
+ 	adreno_gpu_write(adreno_gpu, REG_ADRENO_CP_RB_CNTL,
+ 			/* size is log2(quad-words): */
+-			AXXX_CP_RB_CNTL_BUFSZ(ilog2(gpu->rb->size / 8))|
++			AXXX_CP_RB_CNTL_BUFSZ(ilog2(gpu->rb->size / 8)) |
+ 			(1 << 27));
+ 
+ 	/* Setup ringbuffer address: */
+@@ -142,9 +142,8 @@ int adreno_submit(struct msm_gpu *gpu, struct msm_gem_submit *submit,
+ 	}
+ 
+ 	OUT_PKT7(ring, CP_WAIT_FOR_IDLE, 0);
+-
+ 	OUT_PKT7(ring, CP_EVENT_WRITE, 4);
+-	OUT_RING(ring, CACHE_FLUSH_TS);
++	OUT_RING(ring, CACHE_FLUSH_TS | (1 << 31));
+ 	OUT_RING(ring, lower_32_bits(rbmemptr(adreno_gpu, fence)));
+ 	OUT_RING(ring, upper_32_bits(rbmemptr(adreno_gpu, fence)));
+ 	OUT_RING(ring, submit->fence);
+@@ -190,10 +189,6 @@ void adreno_show(struct msm_gpu *gpu, struct seq_file *m)
+ 
+ 	seq_printf(m, "fence:    %d/%d\n", adreno_gpu->memptrs->fence,
+ 			gpu->submitted_fence);
+-	seq_printf(m, "rptr:     %d\n", adreno_gpu->memptrs->rptr);
+-	seq_printf(m, "wptr:     %d\n", adreno_gpu->memptrs->wptr);
+-	seq_printf(m, "rb wptr:  %d\n", get_wptr(gpu->rb));
+-
+ 	gpu->funcs->pm_resume(gpu);
+ 
+ 	/* dump these out in a form that can be parsed by demsm: */
+@@ -231,8 +226,6 @@ void adreno_dump_info(struct msm_gpu *gpu)
+ 
+ 	pr_info("fence:    %d/%d\n", adreno_gpu->memptrs->fence,
+ 			gpu->submitted_fence);
+-	pr_info("rptr:     %d\n", adreno_gpu->memptrs->rptr);
+-	pr_info("wptr:     %d\n", adreno_gpu->memptrs->wptr);
+ 	pr_info("rb wptr:  %d\n", get_wptr(gpu->rb));
+ 
+ 	for (i = 0; i < 8; i++) {
+-- 
+2.8.2
+
