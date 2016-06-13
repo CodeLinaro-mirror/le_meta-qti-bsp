@@ -51,6 +51,17 @@ SRC_URI += " \
 	file://0042-base-firmware-add-lib64-firmware-to-firmware-loading.patch \
 	file://0043-gpu-drm-add-cursor-support-for-mdss-1.7.patch \
 	file://0044-ARM-dtsi-disable-ispif-module-for-8996-board.patch \
+	file://0001-drm-Make-msm_drm.h-uapi-header-safe-for-C.patch \
+	file://0002-drm-Make-drm.h-uapi-header-safe-for-C.patch \
+	file://0003-drm-Make-uapi-headers-C89-pendantic-compliant.patch \
+	file://0004-drm-msm-add-gpu-domain-in-smmu.patch \
+	file://0005-drm-msm-move-GEM-back-buffer-from-SHMEM-to-DMA.patch \
+	file://0006-drm-msm-fix-kernel-hang-issue-when-free-gem-obj.patch \
+	file://0007-drm-msm-add-iommu-fault-handler-function.patch \
+	file://0008-drm-msm-add-mechanism-to-check-status-per-draw.patch \
+	file://0009-drm-msm-add-hang-dump-function.patch \
+	file://0010-drm-msm-add-interface-to-query-gpu-address.patch \
+	file://0011-drm-msm-Fix-issue-iommu-unmap-failed.patch \
 "
 
 SRC_URI[0001.md5sum] = "7fdc9ffea731349324901598d8e34b48"

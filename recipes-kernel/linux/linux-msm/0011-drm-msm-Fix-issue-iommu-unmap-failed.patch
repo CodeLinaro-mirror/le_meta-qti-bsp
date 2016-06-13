@@ -1,0 +1,167 @@
+From 0fae7b3d52f13220d838122bb90cf56705d2e8da Mon Sep 17 00:00:00 2001
+From: Yajun Li <yajunl@codeaurora.org>
+Date: Thu, 23 Jun 2016 17:35:51 +0800
+Subject: [PATCH 11/11] drm:msm Fix issue# iommu unmap failed
+
+Change-Id: Ibc836bb3d1fefb76e722df0de27a636696fb282c
+Signed-off-by: Yajun Li <yajunl@codeaurora.org>
+---
+ drivers/gpu/drm/msm/msm_gem.c | 49 ++++++++++++++++++++++++-------------------
+ drivers/gpu/drm/msm/msm_gem.h |  3 +--
+ 2 files changed, 29 insertions(+), 23 deletions(-)
+
+diff --git a/drivers/gpu/drm/msm/msm_gem.c b/drivers/gpu/drm/msm/msm_gem.c
+index 3fc14e5..2d018ce8 100644
+--- a/drivers/gpu/drm/msm/msm_gem.c
++++ b/drivers/gpu/drm/msm/msm_gem.c
+@@ -183,12 +183,6 @@ static struct page **get_pages(struct drm_gem_object *obj)
+ 			return p;
+ 		}
+ 
+-		msm_obj->sgt = drm_prime_pages_to_sg(p, npages);
+-		if (IS_ERR(msm_obj->sgt)) {
+-			dev_err(dev->dev, "failed to allocate sgt\n");
+-			return ERR_CAST(msm_obj->sgt);
+-		}
+-
+ 		msm_obj->pages = p;
+ 	}
+ 
+@@ -198,10 +192,16 @@ static struct page **get_pages(struct drm_gem_object *obj)
+ static void put_pages(struct drm_gem_object *obj)
+ {
+ 	struct msm_gem_object *msm_obj = to_msm_bo(obj);
++	int id;
+ 
+ 	if (msm_obj->pages) {
+-		sg_free_table(msm_obj->sgt);
+-		kfree(msm_obj->sgt);
++		for (id = 0; id < ARRAY_SIZE(msm_obj->domain); id++) {
++			if (msm_obj->domain[id].sgt) {
++				sg_free_table(msm_obj->domain[id].sgt);
++				kfree(msm_obj->domain[id].sgt);
++				msm_obj->domain[id].sgt = NULL;
++			}
++		}
+ 
+ 		if (use_pages(obj))
+ 			msm_drm_free_buf(obj);
+@@ -369,11 +369,20 @@ int msm_gem_get_iova_locked(struct drm_gem_object *obj, int id,
+ 
+ 	if (!msm_obj->domain[id].iova) {
+ 		struct msm_drm_private *priv = obj->dev->dev_private;
++		int npages = obj->size >> PAGE_SHIFT;
+ 		struct page **pages = get_pages(obj);
+ 
+ 		if (IS_ERR(pages))
+ 			return PTR_ERR(pages);
+ 
++		if (!msm_obj->domain[id].sgt) {
++			msm_obj->domain[id].sgt = drm_prime_pages_to_sg(pages, npages);
++			if (IS_ERR(msm_obj->domain[id].sgt)) {
++				dev_err(obj->dev, "failed to allocate sgt\n");
++				return ERR_CAST(msm_obj->domain[id].sgt);
++			}
++		}
++
+ 		if (iommu_present(&platform_bus_type)) {
+ 			struct msm_mmu *mmu = priv->mmus[id];
+ 
+@@ -381,7 +390,7 @@ int msm_gem_get_iova_locked(struct drm_gem_object *obj, int id,
+ 				return -EINVAL;
+ 
+ 			if (obj->import_attach && mmu->funcs->map_dma_buf) {
+-				ret = mmu->funcs->map_dma_buf(mmu, msm_obj->sgt,
++				ret = mmu->funcs->map_dma_buf(mmu, msm_obj->domain[id].sgt,
+ 						obj->import_attach->dmabuf,
+ 						DMA_BIDIRECTIONAL);
+ 				if (ret) {
+@@ -389,12 +398,12 @@ int msm_gem_get_iova_locked(struct drm_gem_object *obj, int id,
+ 					return ret;
+ 				}
+ 				msm_obj->domain[id].iova =
+-					sg_dma_address(msm_obj->sgt->sgl);
++					sg_dma_address(msm_obj->domain[id].sgt->sgl);
+ 			} else if (!use_pages(obj)) {
+ 				/* use vram */
+ 				dma_addr_t pa = physaddr(obj);
+ 
+-				ret = mmu->funcs->map(mmu, pa, msm_obj->sgt,
++				ret = mmu->funcs->map(mmu, pa, msm_obj->domain[id].sgt,
+ 						obj->size,
+ 						IOMMU_READ | IOMMU_NOEXEC);
+ 				if (ret) {
+@@ -405,10 +414,10 @@ int msm_gem_get_iova_locked(struct drm_gem_object *obj, int id,
+ 				msm_obj->domain[id].iova = pa;
+ 			} else {
+ 				if (msm_obj->flags & (MSM_BO_WC|MSM_BO_UNCACHED))
+-					dma_map_sg(mmu->dev, msm_obj->sgt->sgl,
+-							msm_obj->sgt->nents, DMA_BIDIRECTIONAL);
++					dma_map_sg(mmu->dev, msm_obj->domain[id].sgt->sgl,
++							msm_obj->domain[id].sgt->nents, DMA_BIDIRECTIONAL);
+ 				msm_obj->domain[id].iova =
+-					sg_dma_address(msm_obj->sgt->sgl);
++					sg_dma_address(msm_obj->domain[id].sgt->sgl);
+ 			}
+ 			dev_dbg(mmu->dev, "iova=0x%lx\n", msm_obj->domain[id].iova);
+ 		} else {
+@@ -653,17 +662,18 @@ void msm_gem_free_object(struct drm_gem_object *obj)
+ 		struct msm_mmu *mmu = priv->mmus[id];
+ 		if (mmu && msm_obj->domain[id].iova) {
+ 			if (obj->import_attach && mmu->funcs->unmap_dma_buf) {
+-				mmu->funcs->unmap_dma_buf(mmu, msm_obj->sgt,
++				mmu->funcs->unmap_dma_buf(mmu, msm_obj->domain[id].sgt,
+ 						obj->import_attach->dmabuf,
+ 						DMA_BIDIRECTIONAL);
++				drm_prime_gem_destroy(obj, msm_obj->domain[id].sgt);
+ 			} else if (!use_pages(obj)) {
+ 				uint32_t offset = msm_obj->domain[id].iova;
+ 
+-				mmu->funcs->unmap(mmu, offset, msm_obj->sgt,
++				mmu->funcs->unmap(mmu, offset, msm_obj->domain[id].sgt,
+ 					obj->size);
+ 			} else {
+-				dma_unmap_sg(mmu->dev, msm_obj->sgt->sgl,
+-					msm_obj->sgt->nents, DMA_BIDIRECTIONAL);
++				dma_unmap_sg(mmu->dev, msm_obj->domain[id].sgt->sgl,
++					msm_obj->domain[id].sgt->nents, DMA_BIDIRECTIONAL);
+ 			}
+ 			msm_obj->domain[id].iova = 0;
+ 		}
+@@ -680,8 +690,6 @@ void msm_gem_free_object(struct drm_gem_object *obj)
+ 			drm_free_large(msm_obj->pages);
+ 			msm_obj->pages = NULL;
+ 		}
+-
+-		drm_prime_gem_destroy(obj, msm_obj->sgt);
+ 	} else {
+ 		if (msm_obj->vaddr)
+ 			vunmap(msm_obj->vaddr);
+@@ -845,7 +853,6 @@ struct drm_gem_object *msm_gem_import(struct drm_device *dev,
+ 	npages = size / PAGE_SIZE;
+ 
+ 	msm_obj = to_msm_bo(obj);
+-	msm_obj->sgt = sgt;
+ 	msm_obj->pages = drm_malloc_ab(npages, sizeof(struct page *));
+ 	if (!msm_obj->pages) {
+ 		ret = -ENOMEM;
+diff --git a/drivers/gpu/drm/msm/msm_gem.h b/drivers/gpu/drm/msm/msm_gem.h
+index 4dab85f..e2bbb88 100644
+--- a/drivers/gpu/drm/msm/msm_gem.h
++++ b/drivers/gpu/drm/msm/msm_gem.h
+@@ -54,11 +54,10 @@ struct msm_gem_object {
+ 	struct list_head submit_entry;
+ 
+ 	struct page **pages;
+-	struct sg_table *sgt;
+ 	void *vaddr;
+ 
+ 	struct {
+-		// XXX
++		struct sg_table *sgt;
+ 		dma_addr_t iova;
+ 	} domain[NUM_DOMAINS];
+ 
+-- 
+2.8.2
+

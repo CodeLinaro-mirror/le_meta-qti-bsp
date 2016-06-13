@@ -1,0 +1,125 @@
+From dbd48087c7d83a749b226d1b5e2dc7b98631b7ba Mon Sep 17 00:00:00 2001
+From: Yajun Li <yajunl@codeaurora.org>
+Date: Sat, 11 Jun 2016 04:35:42 +0800
+Subject: [PATCH 10/11] drm:msm add interface to query gpu address
+
+adreno does gpu address patch in user mode, but
+info.offset is only used by mmap, which is not
+iommu va, so add function query the iova of GPU domain
+
+Change-Id: I088123889e398b38a4334d8fd3e346f593c41978
+Signed-off-by: Yajun Li <yajunl@codeaurora.org>
+---
+ drivers/gpu/drm/msm/msm_drv.c  |  3 +++
+ drivers/gpu/drm/msm/msm_drv.h  |  2 ++
+ drivers/gpu/drm/msm/msm_gem.c  | 20 ++++++++++++++++++++
+ drivers/gpu/drm/msm/msm_mmu.h  |  1 +
+ drivers/gpu/drm/msm/msm_smmu.c |  1 +
+ include/uapi/drm/msm_drm.h     |  2 ++
+ 6 files changed, 29 insertions(+)
+
+diff --git a/drivers/gpu/drm/msm/msm_drv.c b/drivers/gpu/drm/msm/msm_drv.c
+index 21aca33..ba44fd2 100644
+--- a/drivers/gpu/drm/msm/msm_drv.c
++++ b/drivers/gpu/drm/msm/msm_drv.c
+@@ -18,6 +18,7 @@
+ #include "msm_drv.h"
+ #include "msm_gpu.h"
+ #include "msm_kms.h"
++#include "msm_mmu.h"
+ 
+ static void msm_fb_output_poll_changed(struct drm_device *dev)
+ {
+@@ -938,6 +939,8 @@ static int msm_ioctl_gem_info(struct drm_device *dev, void *data,
+ 		return -ENOENT;
+ 
+ 	args->offset = msm_gem_mmap_offset(obj);
++	if (args->pipe == MSM_PIPE_3D0)
++		msm_gem_get_iova_in_domain(obj, MSM_SMMU_DOMAIN_GPU, &args->iova);
+ 
+ 	drm_gem_object_unreference_unlocked(obj);
+ 
+diff --git a/drivers/gpu/drm/msm/msm_drv.h b/drivers/gpu/drm/msm/msm_drv.h
+index 69be2a0..ec2fd43 100644
+--- a/drivers/gpu/drm/msm/msm_drv.h
++++ b/drivers/gpu/drm/msm/msm_drv.h
+@@ -201,6 +201,8 @@ uint64_t msm_gem_mmap_offset(struct drm_gem_object *obj);
+ int msm_gem_get_iova_locked(struct drm_gem_object *obj, int id,
+ 		uint32_t *iova);
+ int msm_gem_get_iova(struct drm_gem_object *obj, int id, uint32_t *iova);
++int msm_gem_get_iova_in_domain(struct drm_gem_object *obj, 
++		int domian, uint32_t *iova);
+ uint32_t msm_gem_iova(struct drm_gem_object *obj, int id);
+ struct page **msm_gem_get_pages(struct drm_gem_object *obj);
+ void msm_gem_put_pages(struct drm_gem_object *obj);
+diff --git a/drivers/gpu/drm/msm/msm_gem.c b/drivers/gpu/drm/msm/msm_gem.c
+index 2bc2767..3fc14e5 100644
+--- a/drivers/gpu/drm/msm/msm_gem.c
++++ b/drivers/gpu/drm/msm/msm_gem.c
+@@ -443,6 +443,26 @@ int msm_gem_get_iova(struct drm_gem_object *obj, int id, uint32_t *iova)
+ 	return ret;
+ }
+ 
++int msm_gem_get_iova_in_domain(struct drm_gem_object *obj, int domian, uint32_t *iova)
++{
++	struct msm_drm_private *priv = obj->dev->dev_private;
++	struct msm_gem_object *msm_obj = to_msm_bo(obj);
++	int id;
++	int ret = -1;
++
++	mutex_lock(&obj->dev->struct_mutex);
++	for (id = 0; id < ARRAY_SIZE(msm_obj->domain); id++) {
++		struct msm_mmu *mmu = priv->mmus[id];
++
++		if (mmu->domain == domian) {
++			ret = msm_gem_get_iova_locked(obj, id, iova);
++			break;
++		}
++	}
++	mutex_unlock(&obj->dev->struct_mutex);
++	return ret;
++}
++
+ /* get iova without taking a reference, used in places where you have
+  * already done a 'msm_gem_get_iova()'.
+  */
+diff --git a/drivers/gpu/drm/msm/msm_mmu.h b/drivers/gpu/drm/msm/msm_mmu.h
+index 5a2d13c..3a4fc77 100644
+--- a/drivers/gpu/drm/msm/msm_mmu.h
++++ b/drivers/gpu/drm/msm/msm_mmu.h
+@@ -50,6 +50,7 @@ struct msm_mmu_funcs {
+ struct msm_mmu {
+ 	const struct msm_mmu_funcs *funcs;
+ 	struct device *dev;
++	enum msm_mmu_domain_type domain;
+ };
+ 
+ static inline void msm_mmu_init(struct msm_mmu *mmu, struct device *dev,
+diff --git a/drivers/gpu/drm/msm/msm_smmu.c b/drivers/gpu/drm/msm/msm_smmu.c
+index 9976554..5b85f56 100644
+--- a/drivers/gpu/drm/msm/msm_smmu.c
++++ b/drivers/gpu/drm/msm/msm_smmu.c
+@@ -321,6 +321,7 @@ struct msm_mmu *msm_smmu_new(struct device *dev,
+ 
+ 	smmu->client_dev = client_dev;
+ 	msm_mmu_init(&smmu->base, dev, &funcs);
++	smmu->base.domain = domain;
+ 
+ 	client = msm_smmu_to_client(smmu);
+ 	iommu_set_fault_handler(client->mmu_mapping->domain, msm_smmu_fault_handler, dev);
+diff --git a/include/uapi/drm/msm_drm.h b/include/uapi/drm/msm_drm.h
+index d350ba5..0b1863c 100644
+--- a/include/uapi/drm/msm_drm.h
++++ b/include/uapi/drm/msm_drm.h
+@@ -87,6 +87,8 @@ struct drm_msm_gem_new {
+ 
+ struct drm_msm_gem_info {
+ 	__u32 handle;         /* in */
++	__u32 pipe;
++	__u32 iova;
+ 	__u32 pad;
+ 	__u64 offset;         /* out, offset to pass to mmap() */
+ };
+-- 
+2.8.2
+

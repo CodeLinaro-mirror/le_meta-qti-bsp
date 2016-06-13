@@ -1,0 +1,44 @@
+From cb3964cbef39824df1ec9e02e776093ba84e28dc Mon Sep 17 00:00:00 2001
+From: Yajun Li <yajunl@codeaurora.org>
+Date: Thu, 9 Jun 2016 06:45:45 +0800
+Subject: [PATCH 06/11] drm:msm fix kernel hang issue when free gem obj
+
+Change-Id: Ic2fd85023641099119a4390323cf015d0b77a7d0
+Signed-off-by: Yajun Li <yajunl@codeaurora.org>
+---
+ drivers/gpu/drm/msm/msm_gem.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/gpu/drm/msm/msm_gem.c b/drivers/gpu/drm/msm/msm_gem.c
+index fc12cf8..2bc2767 100644
+--- a/drivers/gpu/drm/msm/msm_gem.c
++++ b/drivers/gpu/drm/msm/msm_gem.c
+@@ -645,6 +645,7 @@ void msm_gem_free_object(struct drm_gem_object *obj)
+ 				dma_unmap_sg(mmu->dev, msm_obj->sgt->sgl,
+ 					msm_obj->sgt->nents, DMA_BIDIRECTIONAL);
+ 			}
++			msm_obj->domain[id].iova = 0;
+ 		}
+ 	}
+ 
+@@ -655,12 +656,15 @@ void msm_gem_free_object(struct drm_gem_object *obj)
+ 		/* Don't drop the pages for imported dmabuf, as they are not
+ 		 * ours, just free the array we allocated:
+ 		 */
+-		if (msm_obj->pages)
++		if (msm_obj->pages) {
+ 			drm_free_large(msm_obj->pages);
++			msm_obj->pages = NULL;
++		}
+ 
+ 		drm_prime_gem_destroy(obj, msm_obj->sgt);
+ 	} else {
+-		vunmap(msm_obj->vaddr);
++		if (msm_obj->vaddr)
++			vunmap(msm_obj->vaddr);
+ 		put_pages(obj);
+ 	}
+ 
+-- 
+2.8.2
+

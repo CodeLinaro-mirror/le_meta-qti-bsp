@@ -1,0 +1,54 @@
+From 3d200c94b75cf65185c467d84718553a875811fc Mon Sep 17 00:00:00 2001
+From: Yajun Li <yajunl@codeaurora.org>
+Date: Sat, 11 Jun 2016 03:55:02 +0800
+Subject: [PATCH 04/11] drm:msm add gpu domain in smmu
+
+Change-Id: Ief223a8a5f41dbc952f2a5f8c347f013a8513666
+Signed-off-by: Yajun Li <yajunl@codeaurora.org>
+---
+ drivers/gpu/drm/msm/msm_mmu.h  |  1 +
+ drivers/gpu/drm/msm/msm_smmu.c | 12 +++++++++++-
+ 2 files changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/gpu/drm/msm/msm_mmu.h b/drivers/gpu/drm/msm/msm_mmu.h
+index 6d2f562..5a2d13c 100644
+--- a/drivers/gpu/drm/msm/msm_mmu.h
++++ b/drivers/gpu/drm/msm/msm_mmu.h
+@@ -25,6 +25,7 @@ struct msm_gpu;
+ 
+ enum msm_mmu_domain_type {
+ 	MSM_SMMU_DOMAIN_UNSECURE,
++	MSM_SMMU_DOMAIN_GPU,
+ 	MSM_SMMU_DOMAIN_MAX,
+ };
+ 
+diff --git a/drivers/gpu/drm/msm/msm_smmu.c b/drivers/gpu/drm/msm/msm_smmu.c
+index c073032..3202c5e 100644
+--- a/drivers/gpu/drm/msm/msm_smmu.c
++++ b/drivers/gpu/drm/msm/msm_smmu.c
+@@ -221,11 +221,21 @@ static struct msm_smmu_domain msm_smmu_domains[MSM_SMMU_DOMAIN_MAX] = {
+ 		.va_start = SZ_1M,
+ 		.va_size = SZ_2G,
+ 	},
++	[MSM_SMMU_DOMAIN_GPU] = {
++		.label = "gpu",
++		.va_start = SZ_16M,
++		.va_size = 0xFFFFFFFF - SZ_16M,
++	},
+ };
+ 
+ static const struct of_device_id msm_smmu_dt_match[] = {
+ 	{ .compatible = "qcom,smmu_mdp_unsec",
+-		.data = &msm_smmu_domains[MSM_SMMU_DOMAIN_UNSECURE] },
++	  .data = &msm_smmu_domains[MSM_SMMU_DOMAIN_UNSECURE] 
++	},
++	{
++	  .compatible = "qcom,kgsl-smmu-v2",
++	  .data = &msm_smmu_domains[MSM_SMMU_DOMAIN_GPU]
++	},
+ 	/* TODO: implement other domains */
+ 	{}
+ };
+-- 
+2.8.2
+

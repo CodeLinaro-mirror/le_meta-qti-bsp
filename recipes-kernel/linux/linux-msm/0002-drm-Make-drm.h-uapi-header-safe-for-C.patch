@@ -1,0 +1,42 @@
+From bd11d3ff261efc0da23133e250be93f8b539dba7 Mon Sep 17 00:00:00 2001
+From: Daniel Vetter <daniel.vetter@ffwll.ch>
+Date: Wed, 30 Mar 2016 17:12:33 +0200
+Subject: [PATCH 02/11] drm: Make drm.h uapi header safe for C++
+
+virtual is a protected keyword in C++ and can't be used at all. Ugh.
+
+This aligns the kernel versions of the drm headers with the ones in
+libdrm.
+
+v2: Also annote with __user, as request by Emil&Ilia.
+
+Change-Id: I7e03ac0b39d6266ff865c00feb97bec6bc5d753b
+Cc: Ilia Mirkin <imirkin@alum.mit.edu>
+Cc: Emil Velikov <emil.l.velikov@gmail.com>
+Reviewed-by: Emil Velikov <emil.l.velikov@gmail.com>
+Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
+Link: http://patchwork.freedesktop.org/patch/msgid/1459350753-18320-1-git-send-email-daniel.vetter@ffwll.ch
+Signed-off-by: Yajun Li <yajunl@codeaurora.org>
+---
+ include/uapi/drm/drm.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/include/uapi/drm/drm.h b/include/uapi/drm/drm.h
+index 3801584..68927d7 100644
+--- a/include/uapi/drm/drm.h
++++ b/include/uapi/drm/drm.h
+@@ -372,7 +372,11 @@ struct drm_buf_pub {
+  */
+ struct drm_buf_map {
+ 	int count;		/**< Length of the buffer list */
++#ifdef __cplusplus
++	void __user *virt;
++#else
+ 	void __user *virtual;		/**< Mmap'd area in user-virtual */
++#endif
+ 	struct drm_buf_pub __user *list;	/**< Buffer information */
+ };
+ 
+-- 
+2.8.2
+

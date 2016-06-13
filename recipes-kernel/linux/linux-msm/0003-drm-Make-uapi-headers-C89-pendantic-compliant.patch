@@ -1,0 +1,59 @@
+From 4da5a9a1f6f6534c909af7af7c089ac4ad09e47d Mon Sep 17 00:00:00 2001
+From: Daniel Vetter <daniel.vetter@ffwll.ch>
+Date: Wed, 30 Mar 2016 16:42:23 +0200
+Subject: [PATCH 03/11] drm: Make uapi headers C89 pendantic compliant
+
+This ports the below libdrm commit to the kernel
+
+commit 0f4452bb51306024fbf4cbf77d8baab20cefba67
+Author: Daniel Kurtz <djkurtz@chromium.org>
+Date:   Mon Aug 26 23:39:16 2013 +0800
+
+    libdrm: Make some drm headers compatible with gcc -std=c89 -pedantic
+
+    The following minor changes were needed to these headers:
+     * Convert // comments to /* */
+     * No , after final member of enum
+
+    With these changes, these header files can be included by a program that
+    is built with gcc options:
+      -std=c89 -Werror -pedantic
+
+    Signed-off-by: Daniel Kurtz <djkurtz@chromium.org>
+    Signed-off-by: Eric Anholt <eric@anholt.net>
+    Reviewed-by: Eric Anholt <eric@anholt.net>
+
+Change-Id: I0d9554353b81061dc0024cb57af0aab5e54c53a3
+Reviewed-by: Emil Velikov <emil.l.velikov@gmail.com>
+Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
+Link: http://patchwork.freedesktop.org/patch/msgid/1459348943-12803-2-git-send-email-daniel.vetter@ffwll.ch
+Signed-off-by: Yajun Li <yajunl@codeaurora.org>
+---
+ include/uapi/drm/drm.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/include/uapi/drm/drm.h b/include/uapi/drm/drm.h
+index 68927d7..c0e4d0d 100644
+--- a/include/uapi/drm/drm.h
++++ b/include/uapi/drm/drm.h
+@@ -180,7 +180,7 @@ enum drm_map_type {
+ 	_DRM_SHM = 2,		  /**< shared, cached */
+ 	_DRM_AGP = 3,		  /**< AGP/GART */
+ 	_DRM_SCATTER_GATHER = 4,  /**< Scatter/gather memory for PCI DMA */
+-	_DRM_CONSISTENT = 5,	  /**< Consistent memory for PCI DMA */
++	_DRM_CONSISTENT = 5	  /**< Consistent memory for PCI DMA */
+ };
+ 
+ /**
+@@ -434,7 +434,7 @@ struct drm_draw {
+  * DRM_IOCTL_UPDATE_DRAW ioctl argument type.
+  */
+ typedef enum {
+-	DRM_DRAWABLE_CLIPRECTS,
++	DRM_DRAWABLE_CLIPRECTS
+ } drm_drawable_info_type_t;
+ 
+ struct drm_update_draw {
+-- 
+2.8.2
+
