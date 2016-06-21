@@ -29,16 +29,11 @@
 
 inherit kernel
 require recipes-kernel/linux/linux-yocto.inc
+require recipes-kernel/linux/linux-msm.inc
 
-DESCRIPTION = "Linux kernel"
-SECTION     = "kernel"
-LICENSE     = "GPLv2"
-LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 
 DEPENDS += "mkbootimg-native"
 
-FILESEXTRAPATHS_prepend := "${WORKSPACE}/:"
-SRC_URI   =  "file://kernel"
 
 KBUILD_DEFCONFIG = "msm-auto_defconfig"
 
@@ -50,10 +45,8 @@ SRC_URI += " \
 LINUX_VERSION ?= "3.18"
 LINUX_VERSION_EXTENSION ?= "8996"
 
-S =  "${WORKDIR}/kernel"
-
 PV = "${LINUX_VERSION}"
-PR = "r1"
+PR = "r2"
 
 KCONFIG_MODE="--alldefconfig"
 
