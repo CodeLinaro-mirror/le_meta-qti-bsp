@@ -1,0 +1,79 @@
+From 79b42a5624056b2b1e6c6639166ce750c5dc1935 Mon Sep 17 00:00:00 2001
+From: Alison Chaiken <alison_chaiken@mentor.com>
+Date: Wed, 29 Jul 2015 11:22:32 -0700
+Subject: [PATCH 13/26] gstionbuf_meta: add pointer to GstOMXBuffer to metadata
+
+---
+ gst-libs/gst/ionbuf/gstionbuf_meta.c | 10 ++++++----
+ gst-libs/gst/ionbuf/gstionbuf_meta.h |  5 ++++-
+ 2 files changed, 10 insertions(+), 5 deletions(-)
+
+diff --git a/gst-libs/gst/ionbuf/gstionbuf_meta.c b/gst-libs/gst/ionbuf/gstionbuf_meta.c
+index 6043feb..030cdac 100644
+--- a/gst-libs/gst/ionbuf/gstionbuf_meta.c
++++ b/gst-libs/gst/ionbuf/gstionbuf_meta.c
+@@ -20,6 +20,7 @@ ionBufFd_meta_init (GstMeta * meta, gpointer params, GstBuffer * buffer)
+   newmeta->fd = 0;              /* dangerous: stdin */
+   newmeta->offset = 0;
+   newmeta->size = 0;
++  newmeta->ionbufp = 0;
+ 
+   return TRUE;
+ }
+@@ -36,7 +37,7 @@ ionBufFd_meta_transform (GstBuffer * transbuf, GstMeta * meta,
+ {
+   GstIonBufFdMeta *newmeta = (GstIonBufFdMeta *) meta;
+   gst_buffer_add_ionBufFd_meta (transbuf, newmeta->fd, newmeta->offset,
+-      newmeta->size);
++				newmeta->size, newmeta->ionbufp);
+   return TRUE;
+ }
+ 
+@@ -57,7 +58,7 @@ gst_ionBufFd_meta_get_info (void)
+ 
+ GstIonBufFdMeta *
+ gst_buffer_add_ionBufFd_meta (GstBuffer * buffer, unsigned int fd,
+-    unsigned int offset, unsigned int size)
++			      unsigned int offset, unsigned int size, gpointer ionbufp)
+ {
+   GstIonBufFdMeta *meta;
+   g_return_val_if_fail (GST_IS_BUFFER (buffer), NULL);
+@@ -68,9 +69,10 @@ gst_buffer_add_ionBufFd_meta (GstBuffer * buffer, unsigned int fd,
+   meta->fd = fd;
+   meta->offset = offset;
+   meta->size = size;
++  meta->ionbufp = ionbufp;
+ 
+-  g_print ("Adding ionBufFd metadata fd %u, offset %u, size %u\n", fd, offset,
+-      size);
++  g_print ("Adding ionBufFd metadata fd %u, offset %u, size %u, ionbufp %p\n", fd, offset,
++	   size, ionbufp);
+ 
+   return meta;
+ }
+diff --git a/gst-libs/gst/ionbuf/gstionbuf_meta.h b/gst-libs/gst/ionbuf/gstionbuf_meta.h
+index 37ffba2..07bfb25 100644
+--- a/gst-libs/gst/ionbuf/gstionbuf_meta.h
++++ b/gst-libs/gst/ionbuf/gstionbuf_meta.h
+@@ -17,6 +17,9 @@ struct _GstIonBufFdMeta {
+   unsigned int offset;
+   /** Size of ion buffer */
+   unsigned int size;
++  /** pointer to GstOMXBuffer associated with the offset, needed by
++      gst_omx_port_release_buffer() **/
++  gpointer ionbufp;
+ };
+ 
+ typedef struct _GstIonBufFdMeta GstIonBufFdMeta;
+@@ -30,7 +33,7 @@ const GstMetaInfo * gst_ionBufFd_meta_get_info (void);
+ #define ION_BUF_FD_META_INFO (gst_ionBufFd_meta_get_info ())
+ 
+ GstIonBufFdMeta * gst_buffer_add_ionBufFd_meta (GstBuffer * buffer,
+-					     unsigned int fd, unsigned int offset, unsigned int size);
++						unsigned int fd, unsigned int offset, unsigned int size, gpointer ionbufp);
+ 
+ G_END_DECLS
+ 
+-- 
+1.9.1
+

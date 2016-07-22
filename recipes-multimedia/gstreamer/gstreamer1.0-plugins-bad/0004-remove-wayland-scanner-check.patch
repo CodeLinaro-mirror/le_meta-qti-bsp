@@ -1,0 +1,25 @@
+From a2431bfb2d05165c5d1ef4e37874352337863be6 Mon Sep 17 00:00:00 2001
+From: Alison Chaiken <alison_chaiken@mentor.com>
+Date: Thu, 16 Jul 2015 18:04:02 +0200
+Subject: [PATCH 04/26] remove wayland scanner check
+
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index cf1719a..187dc3b 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1960,7 +1960,7 @@ AG_GST_CHECK_FEATURE(DIRECTFB, [directfb], dfbvideosink , [
+ dnl **** Wayland ****
+ translit(dnm, m, l) AM_CONDITIONAL(USE_WAYLAND, true)
+ AG_GST_CHECK_FEATURE(WAYLAND, [wayland sink], wayland , [
+-  PKG_CHECK_MODULES(WAYLAND, wayland-client >= 1.4.0 wayland-scanner, [
++  PKG_CHECK_MODULES(WAYLAND, wayland-client >= 1.4.0, [
+     HAVE_WAYLAND="yes" ], [ HAVE_WAYLAND="no"
+   ])
+ ])
+-- 
+1.9.1
+

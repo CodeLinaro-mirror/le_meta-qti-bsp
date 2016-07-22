@@ -1,0 +1,28 @@
+From a4b98e4dadc194a780ff57ded36dbe130d074dc6 Mon Sep 17 00:00:00 2001
+From: Alison Chaiken <alison_chaiken@mentor.com>
+Date: Sat, 8 Aug 2015 16:20:31 -0700
+Subject: [PATCH 22/26] gstwaylandsink: note buffer dropping by waylandsink
+
+---
+ ext/wayland/gstwaylandsink.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/ext/wayland/gstwaylandsink.c b/ext/wayland/gstwaylandsink.c
+index 0768d92..6174ade 100644
+--- a/ext/wayland/gstwaylandsink.c
++++ b/ext/wayland/gstwaylandsink.c
+@@ -984,8 +984,10 @@ gst_wayland_sink_render (GstBaseSink * bsink, GstBuffer * buffer)
+   }
+ 
+   /* drop buffers until we get a frame callback */
+-  if (g_atomic_int_get (&sink->redraw_pending) == TRUE)
++  if (g_atomic_int_get (&sink->redraw_pending) == TRUE) {
++    GST_DEBUG_OBJECT(sink, "Dropping buffer %p while waiting on frame callback", buffer);
+     goto done;
++  }
+ 
+   if (G_UNLIKELY (sink->video_info_changed)) {
+     gst_wl_window_set_video_info (sink->window, &sink->video_info);
+-- 
+1.9.1
+

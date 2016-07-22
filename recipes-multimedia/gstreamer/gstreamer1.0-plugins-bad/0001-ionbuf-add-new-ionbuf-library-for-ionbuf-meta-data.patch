@@ -1,0 +1,339 @@
+From 1c4bb206923abaed70e04e2231a462f5541d7fd5 Mon Sep 17 00:00:00 2001
+From: Mathias Fiedler <mathias_fiedler@mentor.com>
+Date: Fri, 24 Jul 2015 15:59:11 +0200
+Subject: [PATCH] ionbuf: add new ionbuf library for ionbuf meta data
+
+Change-Id: I8ff2e4b112415c29b3cc56c3c2b4fefba43cfb79
+Signed-off-by: Bharathraj Nagaraju <snbraj@codeaurora.org>
+---
+ configure.ac                         |   2 +
+ ext/wayland/Makefile.am              |   1 +
+ gst-libs/gst/Makefile.am             |   2 +-
+ gst-libs/gst/ionbuf/Makefile.am      |  40 +++++++++++++
+ gst-libs/gst/ionbuf/gstionbuf_meta.c | 106 +++++++++++++++++++++++++++++++++++
+ gst-libs/gst/ionbuf/gstionbuf_meta.h |  67 ++++++++++++++++++++++
+ pkgconfig/Makefile.am                |   2 +
+ pkgconfig/gstreamer-ionbuf.pc.in     |  12 ++++
+ 8 files changed, 231 insertions(+), 1 deletion(-)
+ create mode 100644 gst-libs/gst/ionbuf/Makefile.am
+ create mode 100644 gst-libs/gst/ionbuf/gstionbuf_meta.c
+ create mode 100644 gst-libs/gst/ionbuf/gstionbuf_meta.h
+ create mode 100644 pkgconfig/gstreamer-ionbuf.pc.in
+
+diff --git a/configure.ac b/configure.ac
+index ef826d7..6e6e4e8 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -3214,6 +3214,7 @@ gst-libs/gst/uridownloader/Makefile
+ gst-libs/gst/wayland/Makefile
+ gst-libs/gst/base/Makefile
+ gst-libs/gst/video/Makefile
++gst-libs/gst/ionbuf/Makefile
+ sys/Makefile
+ sys/dshowdecwrapper/Makefile
+ sys/acmenc/Makefile
+@@ -3348,6 +3349,7 @@ pkgconfig/gstreamer-insertbin.pc
+ pkgconfig/gstreamer-insertbin-uninstalled.pc
+ pkgconfig/gstreamer-gl.pc
+ pkgconfig/gstreamer-gl-uninstalled.pc
++pkgconfig/gstreamer-ionbuf.pc
+ pkgconfig/gstreamer-mpegts.pc
+ pkgconfig/gstreamer-mpegts-uninstalled.pc
+ pkgconfig/gstreamer-wayland.pc
+diff --git a/ext/wayland/Makefile.am b/ext/wayland/Makefile.am
+index 58c1e99..b14400d 100644
+--- a/ext/wayland/Makefile.am
++++ b/ext/wayland/Makefile.am
+@@ -14,6 +14,7 @@ libgstwaylandsink_la_LIBADD = \
+ 	$(GST_PLUGINS_BASE_LIBS) \
+ 	-lgstvideo-$(GST_API_VERSION) \
+ 	$(WAYLAND_LIBS) \
++	$(top_builddir)/gst-libs/gst/ionbuf/libgstionbuf-$(GST_API_VERSION).la \
+ 	$(top_builddir)/gst-libs/gst/wayland/libgstwayland-$(GST_API_VERSION).la
+ libgstwaylandsink_la_LDFLAGS = $(GST_PLUGIN_LDFLAGS)
+ libgstwaylandsink_la_LIBTOOLFLAGS = $(GST_PLUGIN_LIBTOOLFLAGS)
+diff --git a/gst-libs/gst/Makefile.am b/gst-libs/gst/Makefile.am
+index b3f23f4..efbfb17 100644
+--- a/gst-libs/gst/Makefile.am
++++ b/gst-libs/gst/Makefile.am
+@@ -11,7 +11,7 @@ WAYLAND_DIR=wayland
+ endif
+ 
+ SUBDIRS = interfaces basecamerabinsrc codecparsers \
+-	 insertbin uridownloader mpegts base video $(GL_DIR) $(WAYLAND_DIR)
++	 insertbin uridownloader mpegts base video ionbuf $(GL_DIR) $(WAYLAND_DIR)
+ 
+ noinst_HEADERS = gst-i18n-plugin.h gettext.h glib-compat-private.h
+ DIST_SUBDIRS = interfaces gl basecamerabinsrc codecparsers \
+diff --git a/gst-libs/gst/ionbuf/Makefile.am b/gst-libs/gst/ionbuf/Makefile.am
+new file mode 100644
+index 0000000..f8ece5b
+--- /dev/null
++++ b/gst-libs/gst/ionbuf/Makefile.am
+@@ -0,0 +1,40 @@
++lib_LTLIBRARIES = libgstionbuf-@GST_API_VERSION@.la
++
++libgstionbuf_@GST_API_VERSION@_la_SOURCES = \
++	gstionbuf_meta.c
++
++libgstionbuf_@GST_API_VERSION@includedir = \
++	$(includedir)/gstreamer-@GST_API_VERSION@/gst/ionbuf
++
++libgstionbuf_@GST_API_VERSION@include_HEADERS = \
++	gstionbuf_meta.h
++
++libgstionbuf_@GST_API_VERSION@_la_CFLAGS = \
++	$(GST_PLUGINS_BAD_CFLAGS) \
++	-DGST_USE_UNSTABLE_API \
++	$(GST_CFLAGS)
++
++libgstionbuf_@GST_API_VERSION@_la_LIBADD = \
++	$(GST_BASE_LIBS) \
++	$(GST_LIBS)
++
++libgstionbuf_@GST_API_VERSION@_la_LDFLAGS = \
++	$(GST_LIB_LDFLAGS) \
++	$(GST_ALL_LDFLAGS) \
++	$(GST_LT_LDFLAGS)
++
++Android.mk:  $(BUILT_SOURCES) Makefile.am
++	androgenizer -:PROJECT libgstionbuf -:STATIC libgstionbuf-@GST_API_VERSION@ \
++	 -:TAGS eng debug \
++         -:REL_TOP $(top_srcdir) -:ABS_TOP $(abs_top_srcdir) \
++	 -:SOURCES $(libgstionbuf_@GST_API_VERSION@_la_SOURCES) \
++         $(built_sources) \
++	 -:CFLAGS $(DEFS) $(libgstionbuf_@GST_API_VERSION@_la_CFLAGS) \
++	 -:LDFLAGS $(libgstionbuf_@GST_API_VERSION@_la_LDFLAGS) \
++	           $(libgstionbuf@GST_API_VERSION@_la_LIBADD) \
++	           -ldl \
++	 -:HEADER_TARGET gstreamer-@GST_API_VERSION@/gst/uridownloader \
++	 -:HEADERS $(libgstionbufinclude_HEADERS) \
++         $(built_headers) \
++	 -:PASSTHROUGH LOCAL_ARM_MODE:=arm \
++	> $@
+diff --git a/gst-libs/gst/ionbuf/gstionbuf_meta.c b/gst-libs/gst/ionbuf/gstionbuf_meta.c
+new file mode 100644
+index 0000000..c1d0ce9
+--- /dev/null
++++ b/gst-libs/gst/ionbuf/gstionbuf_meta.c
+@@ -0,0 +1,106 @@
++/*
++ * Copyright (c) 2016, The Linux Foundation. All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions are
++ * met:
++ *     * Redistributions of source code must retain the above copyright
++ *       notice, this list of conditions and the following disclaimer.
++ *     * Redistributions in binary form must reproduce the above
++ *       copyright notice, this list of conditions and the following
++ *       disclaimer in the documentation and/or other materials provided
++ *       with the distribution.
++ *     * Neither the name of The Linux Foundation nor the names of its
++ *       contributors may be used to endorse or promote products derived
++ *       from this software without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
++ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
++ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT
++ * ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
++ * BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
++ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
++ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
++ * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
++ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
++ * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
++ * (IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ *
++ */
++
++#include "gstionbuf_meta.h"
++
++GType
++ionBufFd_meta_api_get_type (void)
++{
++  static volatile GType type;
++  static const gchar *tags[] = { NULL };
++  if (g_once_init_enter (&type)) {
++    GType _type = gst_meta_api_type_register ("ION_BUF_FD_META_API", tags);
++    g_once_init_leave (&type, _type);
++  }
++  return type;
++}
++
++/* initialize HEAD of list of GstMeta items */
++static gboolean
++ionBufFd_meta_init (GstMeta * meta, gpointer params, GstBuffer * buffer)
++{
++  GstIonBufFdMeta *newmeta = (GstIonBufFdMeta *) meta;
++  newmeta->fd = 0;              /* dangerous: stdin */
++  newmeta->offset = 0;
++  newmeta->size = 0;
++
++  return TRUE;
++}
++
++static void
++ionBufFd_meta_free (GstMeta * meta, GstBuffer * buffer)
++{
++  return;
++}
++
++static gboolean
++ionBufFd_meta_transform (GstBuffer * transbuf, GstMeta * meta,
++    GstBuffer * buffer, GQuark type, gpointer data)
++{
++  GstIonBufFdMeta *newmeta = (GstIonBufFdMeta *) meta;
++  gst_buffer_add_ionBufFd_meta (transbuf, newmeta->fd, newmeta->offset,
++      newmeta->size);
++  return TRUE;
++}
++
++const GstMetaInfo *
++ionBufFd_meta_get_info (void)
++{
++  static const GstMetaInfo *meta_info = NULL;
++
++  if (g_once_init_enter (&meta_info)) {
++    const GstMetaInfo *mi =
++        gst_meta_register (ION_BUF_FD_META_API_TYPE, "ionBufFdMeta",
++        sizeof (GstIonBufFdMeta), ionBufFd_meta_init, ionBufFd_meta_free,
++        ionBufFd_meta_transform);
++    g_once_init_leave (&meta_info, mi);
++  }
++  return meta_info;
++}
++
++GstIonBufFdMeta *
++gst_buffer_add_ionBufFd_meta (GstBuffer * buffer, unsigned int fd,
++    unsigned int offset, unsigned int size)
++{
++  GstIonBufFdMeta *meta;
++  g_return_val_if_fail (GST_IS_BUFFER (buffer), NULL);
++
++  meta =
++      (GstIonBufFdMeta *) gst_buffer_add_meta (buffer, ION_BUF_FD_META_INFO,
++      NULL);
++  meta->fd = fd;
++  meta->offset = offset;
++  meta->size = size;
++
++  g_print ("Adding ionBufFd metadata fd %u, offset %u, size %u\n", fd, offset,
++      size);
++
++  return meta;
++}
+diff --git a/gst-libs/gst/ionbuf/gstionbuf_meta.h b/gst-libs/gst/ionbuf/gstionbuf_meta.h
+new file mode 100644
+index 0000000..9dae232
+--- /dev/null
++++ b/gst-libs/gst/ionbuf/gstionbuf_meta.h
+@@ -0,0 +1,67 @@
++/*
++ * Copyright (c) 2016, The Linux Foundation. All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions are
++ * met:
++ *     * Redistributions of source code must retain the above copyright
++ *       notice, this list of conditions and the following disclaimer.
++ *     * Redistributions in binary form must reproduce the above
++ *       copyright notice, this list of conditions and the following
++ *       disclaimer in the documentation and/or other materials provided
++ *       with the distribution.
++ *     * Neither the name of The Linux Foundation nor the names of its
++ *       contributors may be used to endorse or promote products derived
++ *       from this software without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
++ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
++ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT
++ * ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
++ * BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
++ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
++ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
++ * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
++ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
++ * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
++ * (IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ *
++ */
++
++#ifndef __GSTIONBUF_META_H__
++#define __GSTIONBUF_META_H__
++
++#include <gst/gst.h>
++#include <gst/video/gstvideometa.h>
++
++G_BEGIN_DECLS
++
++#define GST_CAPS_FEATURE_MEMORY_VENUS_IMAGE "memory:Venus"
++
++struct _GstIonBufFdMeta {
++  GstMeta meta;
++
++  /** ion buffer file descriptor */
++  unsigned int fd;
++  /** Offset from ion buffer base address */
++  unsigned int offset;
++  /** Size of ion buffer */
++  unsigned int size;
++};
++
++typedef struct _GstIonBufFdMeta GstIonBufFdMeta;
++
++GType ionBufFd_meta_api_get_type (void);
++const GstMetaInfo * ionBufFd_meta_get_info (void);
++
++#define ION_BUF_FD_META_API_TYPE (ionBufFd_meta_api_get_type())
++#define gst_buffer_get_ionfd_meta(b)		\
++  ((GstIonBufFdMeta*)gst_buffer_get_meta((b),ION_BUF_FD_META_API_TYPE))
++#define ION_BUF_FD_META_INFO (ionBufFd_meta_get_info ())
++
++GstIonBufFdMeta * gst_buffer_add_ionBufFd_meta (GstBuffer * buffer,
++					     unsigned int fd, unsigned int offset, unsigned int size);
++
++G_END_DECLS
++
++#endif /* __GSTIONBUF_META_H__ */
+diff --git a/pkgconfig/Makefile.am b/pkgconfig/Makefile.am
+index 3e53a6e..8cdcc5b 100644
+--- a/pkgconfig/Makefile.am
++++ b/pkgconfig/Makefile.am
+@@ -4,6 +4,7 @@ pcverfiles =  \
+ 	gstreamer-plugins-bad-@GST_API_VERSION@.pc \
+ 	gstreamer-codecparsers-@GST_API_VERSION@.pc \
+ 	gstreamer-insertbin-@GST_API_VERSION@.pc \
++	gstreamer-ionbuf-@GST_API_VERSION@.pc
+ 	gstreamer-mpegts-@GST_API_VERSION@.pc
+ 
+ pcverfiles_uninstalled = \
+@@ -38,6 +39,7 @@ pcinfiles = \
+            gstreamer-codecparsers.pc.in gstreamer-codecparsers-uninstalled.pc.in \
+            gstreamer-gl.pc.in gstreamer-gl-uninstalled.pc.in \
+            gstreamer-insertbin.pc.in gstreamer-insertbin-uninstalled.pc.in \
++           gstreamer-ionbuf.pc.in \
+            gstreamer-mpegts.pc.in gstreamer-mpegts-uninstalled.pc.in
+ 
+ DISTCLEANFILES = $(pcinfiles:.in=)
+diff --git a/pkgconfig/gstreamer-ionbuf.pc.in b/pkgconfig/gstreamer-ionbuf.pc.in
+new file mode 100644
+index 0000000..abeb8b3
+--- /dev/null
++++ b/pkgconfig/gstreamer-ionbuf.pc.in
+@@ -0,0 +1,12 @@
++prefix=@prefix@
++exec_prefix=@exec_prefix@
++libdir=@libdir@
++includedir=@includedir@/gstreamer-@GST_API_VERSION@
++
++Name: GStreamer IonBuf
++Description: GStreamer ionbuf support
++Requires: gstreamer-@GST_API_VERSION@ gstreamer-video-@GST_API_VERSION@
++Version: @VERSION@
++Libs: -L${libdir} -lgstionbuf-@GST_API_VERSION@
++Cflags: -I${includedir}
++
+-- 
+2.9.0.137.gcf4c2cf
+

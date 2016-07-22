@@ -1,0 +1,66 @@
+From 91893114f774ecadb746040cb3bf75247829165c Mon Sep 17 00:00:00 2001
+From: Alison Chaiken <alison_chaiken@mentor.com>
+Date: Wed, 5 Aug 2015 15:07:43 -0700
+Subject: [PATCH 14/23] gstomx: fixup comp->lock handling
+
+Signed-off-by: Alison Chaiken <alison_chaiken@mentor.com>
+---
+ omx/gstomx.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/omx/gstomx.c b/omx/gstomx.c
+index 0ab7ad7..b048de4 100644
+--- a/omx/gstomx.c
++++ b/omx/gstomx.c
+@@ -607,11 +607,12 @@ gboolean omx_port_out_buf_release_event(GstPad * pad,  GstObject * self, GstEven
+       break;
+     }
+     if (gst_structure_has_name(s, "IonBufRelease")) {
++
+       ionbufval = gst_structure_get_value(s, "ion_buf_pointer");
+       if (!(G_IS_VALUE (ionbufval)))
+ 	{
+ 	  GST_ERROR("No GValue in event structure passed by waylandsink.");
+-	  return FALSE;
++	  ret = FALSE;
+ 	}
+       ionbufp = (GstOMXBuffer *) g_value_get_pointer(ionbufval);
+ 
+@@ -650,17 +651,26 @@ gboolean omx_port_out_buf_release_event(GstPad * pad,  GstObject * self, GstEven
+ 
+       ionbufp->used = TRUE;
+       g_print("omx_port_out_buf_release_event: calling OMX_FillThisBuffer with GstOMXBuffer * %p and OMX_BUFFERHEADERTYPE %p\n", ionbufp, ionbufp->omx_buf);
++
++      /* NOTE: Uses comp->lock and comp->messages_lock in imitation of gst_omx_port_release_buffer */
++      g_mutex_lock (&comp->lock);
+       err = OMX_FillThisBuffer (comp->handle, ionbufp->omx_buf);
++      gst_omx_component_handle_messages (comp);
++      g_mutex_unlock (&comp->lock);
++
+       g_print("Recycled output buffer %p to %s port %u: %s \n", ionbufp->omx_buf,  comp->name, outport->index, gst_omx_error_to_string (err));
++      ret = (err == OMX_ErrorNone);
+       break;
+     }
+     GST_DEBUG_OBJECT(self, "CUSTOM_UPSTREAM event has name %s.", gst_structure_get_name((GstStructure *) s));
+     gst_event_unref(event);
+     break;
+   default:
++    /* is putting this inside comp->lock dangerous? */
+     ret = gst_pad_event_default (pad,  self, event);
+     break;
+   }
++
+   return ret;
+ }
+ 
+@@ -1524,6 +1534,7 @@ gst_omx_port_release_buffer (GstOMXPort * port, GstOMXBuffer * buf)
+     g_print("Waiting for wayland: buf %p, buf->omx_buf %p, buf->omx_buf->pBuffer %p, nAllocLen %u, nFilledLen %u, nOffset %u",
+ 		     buf, buf->omx_buf, buf->omx_buf->pBuffer, (unsigned) buf->omx_buf->nAllocLen, (unsigned) buf->omx_buf->nFilledLen,
+ 		     (unsigned) buf->omx_buf->nOffset);
++  goto done;
+ #else
+   buf->used = TRUE;
+ 
+-- 
+1.9.1
+

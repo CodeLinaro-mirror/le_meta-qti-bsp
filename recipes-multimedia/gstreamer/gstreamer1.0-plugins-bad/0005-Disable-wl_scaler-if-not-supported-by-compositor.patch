@@ -1,0 +1,83 @@
+From f04f366ddb4971bcd045ad47a5000372b0b99925 Mon Sep 17 00:00:00 2001
+From: Guenther Huber <guenther_huber@mentor.com>
+Date: Fri, 8 May 2015 15:35:52 +0200
+Subject: [PATCH 05/26] Disable wl_scaler if not supported by compositor
+
+---
+ ext/wayland/wldisplay.c |  1 -
+ ext/wayland/wlwindow.c  | 29 +++++++++++++++++++++--------
+ 2 files changed, 21 insertions(+), 9 deletions(-)
+
+diff --git a/ext/wayland/wldisplay.c b/ext/wayland/wldisplay.c
+index 46efab9..2c082cb 100644
+--- a/ext/wayland/wldisplay.c
++++ b/ext/wayland/wldisplay.c
+@@ -251,7 +251,6 @@ gst_wl_display_new_existing (struct wl_display * display,
+   VERIFY_INTERFACE_EXISTS (subcompositor, "wl_subcompositor");
+   VERIFY_INTERFACE_EXISTS (shell, "wl_shell");
+   VERIFY_INTERFACE_EXISTS (shm, "wl_shm");
+-  VERIFY_INTERFACE_EXISTS (scaler, "wl_scaler");
+ 
+ #undef VERIFY_INTERFACE_EXISTS
+ 
+diff --git a/ext/wayland/wlwindow.c b/ext/wayland/wlwindow.c
+index ea6c681..f827501 100644
+--- a/ext/wayland/wlwindow.c
++++ b/ext/wayland/wlwindow.c
+@@ -82,7 +82,9 @@ gst_wl_window_finalize (GObject * gobject)
+     wl_subsurface_destroy (self->subsurface);
+   }
+ 
+-  wl_viewport_destroy (self->viewport);
++  if (self->viewport) {
++    wl_viewport_destroy (self->viewport);
++  }
+   wl_surface_destroy (self->surface);
+ 
+   g_clear_object (&self->display);
+@@ -105,7 +107,11 @@ gst_wl_window_new_internal (GstWlDisplay * display, struct wl_surface *surface)
+   /* make sure the surface runs on our local queue */
+   wl_proxy_set_queue ((struct wl_proxy *) surface, display->queue);
+ 
+-  window->viewport = wl_scaler_get_viewport (display->scaler, window->surface);
++  if (display->scaler) {
++    window->viewport = wl_scaler_get_viewport (display->scaler, window->surface);
++  } else {
++    window->viewport = NULL;
++  }
+ 
+   /* do not accept input */
+   region = wl_compositor_create_region (display->compositor);
+@@ -197,16 +203,23 @@ gst_wl_window_resize_internal (GstWlWindow * window, gboolean commit)
+   if (window->subsurface)
+     wl_subsurface_set_position (window->subsurface,
+         window->render_rectangle.x + res.x, window->render_rectangle.y + res.y);
+-  wl_viewport_set_destination (window->viewport, res.w, res.h);
++
++  if (window->viewport) {
++    wl_viewport_set_destination (window->viewport, res.w, res.h);
++
++    /* this is saved for use in wl_surface_damage */
++    window->surface_width = res.w;
++    window->surface_height = res.h;
++  } else {
++    /* this is saved for use in wl_surface_damage */
++    window->surface_width = window->video_width;
++    window->surface_height = window->video_height;
++  }
+ 
+   if (commit) {
+-    wl_surface_damage (window->surface, 0, 0, res.w, res.h);
++    wl_surface_damage (window->surface, 0, 0, window->surface_width, window->surface_height);
+     wl_surface_commit (window->surface);
+   }
+-
+-  /* this is saved for use in wl_surface_damage */
+-  window->surface_width = res.w;
+-  window->surface_height = res.h;
+ }
+ 
+ void
+-- 
+1.9.1
+

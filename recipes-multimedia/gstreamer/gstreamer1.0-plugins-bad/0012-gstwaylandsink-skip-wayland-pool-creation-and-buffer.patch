@@ -1,0 +1,48 @@
+From 5106f0801521a6115ae4a6a35bc3d2904a917548 Mon Sep 17 00:00:00 2001
+From: Mathias Fiedler <mathias_fiedler@mentor.com>
+Date: Wed, 29 Jul 2015 00:49:12 +0200
+Subject: [PATCH 12/26] gstwaylandsink: skip wayland pool creation and buffer
+ allocation
+
+(cherry picked from commit 4b699cd1b36bb4543fe43543a43f32a71cea48b2)
+---
+ ext/wayland/gstwaylandsink.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/ext/wayland/gstwaylandsink.c b/ext/wayland/gstwaylandsink.c
+index a709041..3708bb6 100644
+--- a/ext/wayland/gstwaylandsink.c
++++ b/ext/wayland/gstwaylandsink.c
+@@ -553,6 +553,9 @@ gst_wayland_sink_set_caps (GstBaseSink * bsink, GstCaps * caps)
+   if (i >= formats->len)
+     goto unsupported_format;
+ 
++  // HACK: skip pool creation
++  return TRUE;
++
+   /* create a new pool for the new configuration */
+   newpool = gst_wayland_buffer_pool_new (sink->display);
+   if (!newpool)
+@@ -610,6 +613,9 @@ gst_wayland_sink_propose_allocation (GstBaseSink * bsink, GstQuery * query)
+ 
+   gst_query_parse_allocation (query, &caps, &need_pool);
+ 
++  /* HACK: create no pool */
++  need_pool = FALSE;
++
+   if (caps == NULL)
+     goto no_caps;
+ 
+@@ -784,6 +790,9 @@ gst_wayland_sink_render (GstBaseSink * bsink, GstBuffer * buffer)
+ 	ret = GST_FLOW_ERROR;
+ 	goto done;
+   }
++
++  goto done;
++
+ #endif
+ 
+   meta = gst_buffer_get_wl_meta (buffer);
+-- 
+1.9.1
+

@@ -1,0 +1,51 @@
+From 87fb091b46573eed01a53afa1cafe40a9f450d7c Mon Sep 17 00:00:00 2001
+From: Alison Chaiken <alison_chaiken@mentor.com>
+Date: Fri, 31 Jul 2015 23:07:25 -0700
+Subject: [PATCH 11/23] Restore limited caps negotiation.
+
+---
+ omx/gstomx.c         | 1 +
+ omx/gstomxvideodec.c | 6 +++---
+ 2 files changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/omx/gstomx.c b/omx/gstomx.c
+index a5c5acb..5dced58 100644
+--- a/omx/gstomx.c
++++ b/omx/gstomx.c
+@@ -2712,6 +2712,7 @@ plugin_init (GstPlugin * plugin)
+   static const gchar *env_config_name[] = { "GST_OMX_CONFIG_DIR", NULL };
+ 
+   GST_DEBUG_CATEGORY_INIT (gstomx_debug, "omx", 0, "gst-omx");
++#define DEBUG_INIT \
+   GST_DEBUG_CATEGORY_INIT (gst_omx_video_debug_category, "omxvideo", 0,
+       "gst-omx-video");
+ 
+diff --git a/omx/gstomxvideodec.c b/omx/gstomxvideodec.c
+index b7d75d7..73a7821 100644
+--- a/omx/gstomxvideodec.c
++++ b/omx/gstomxvideodec.c
+@@ -1920,7 +1920,8 @@ gst_omx_video_dec_negotiate (GstOMXVideoDec * self)
+ 	   (unsigned int) param.nIndex, (unsigned int) param.nPortIndex, param.eCompressionFormat, decode_color(param.eColorFormat), (unsigned int) param.xFramerate );
+   }
+ 
+-  gst_caps_unref (intersection);
++  if (intersection)
++    gst_caps_unref (intersection);
+   return (err == OMX_ErrorNone);
+ }
+ 
+@@ -2130,10 +2131,9 @@ gst_omx_video_dec_set_format (GstVideoDecoder * decoder,
+       Wayland buffer-release synchronization.
+     */
+   gst_pad_set_event_function (srcpad,  (GstPadEventFunction) GST_DEBUG_FUNCPTR (omx_port_out_buf_release_event));
+-#else
++#endif
+     if (!gst_omx_video_dec_negotiate (self))
+       GST_LOG_OBJECT (self, "Negotiation failed, will get output format later");
+-#endif
+ 
+     if (!(klass->cdata.hacks & GST_OMX_HACK_NO_DISABLE_OUTPORT)) {
+       /* Disable output port */
+-- 
+1.9.1
+

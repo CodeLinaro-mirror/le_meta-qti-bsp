@@ -1,0 +1,46 @@
+From 28eaddba20ac07b37512db95709629b02053a9fd Mon Sep 17 00:00:00 2001
+From: Alison Chaiken <alison_chaiken@mentor.com>
+Date: Mon, 20 Jul 2015 11:08:49 -0700
+Subject: [PATCH 03/23] gstomxvideodec: look up ionBufInfo in fill_buffer
+
+---
+ omx/gstomxvideodec.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/omx/gstomxvideodec.c b/omx/gstomxvideodec.c
+index 4675ea1..e3ce488 100644
+--- a/omx/gstomxvideodec.c
++++ b/omx/gstomxvideodec.c
+@@ -428,6 +428,10 @@ gst_omx_video_dec_fill_buffer (GstOMXVideoDec * self,
+   gboolean ret = FALSE;
+   GstVideoFrame frame;
+ 
++#if (defined (USE_OMX_TARGET_VENUS))
++  GstOmxPlatformPrivateInfo *ionBufInfo = NULL;
++#endif
++
+   if (vinfo->width != port_def->format.video.nFrameWidth ||
+       vinfo->height != port_def->format.video.nFrameHeight) {
+     GST_ERROR_OBJECT (self, "Resolution do not match: port=%ux%u vinfo=%dx%d",
+@@ -437,6 +441,18 @@ gst_omx_video_dec_fill_buffer (GstOMXVideoDec * self,
+     goto done;
+   }
+ 
++#if (defined (USE_OMX_TARGET_VENUS))
++  ionBufInfo = (GstOmxPlatformPrivateInfo *)((GstOmxPlatformPrivateList *)inbuf->omx_buf->pPlatformPrivate)->entryList->entry;
++
++  if (!ionBufInfo) {
++    GST_ERROR_OBJECT (self, "Read of ionBufInfo from port buffer failed.");
++    ret = FALSE;
++    goto done;
++  }
++
++  GST_DEBUG_OBJECT (self, "Found ionBufInfo in gst_omx_video_dec_fill_buffer(): size %u, offset %u and fd %u\n", ionBufInfo->ion_buf_size, ionBufInfo->ion_buf_offset, ionBufInfo->ion_buf_fd);
++#endif
++
+   /* Same strides and everything */
+   if (gst_buffer_get_size (outbuf) == inbuf->omx_buf->nFilledLen) {
+     GstMapInfo map = GST_MAP_INFO_INIT;
+-- 
+1.9.1
+

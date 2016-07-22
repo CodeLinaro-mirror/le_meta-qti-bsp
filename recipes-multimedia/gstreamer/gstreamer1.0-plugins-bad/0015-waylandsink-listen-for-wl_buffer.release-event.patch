@@ -1,0 +1,74 @@
+From 4ca60fbbf29012ddfa1a4c6621bc531e86d1d044 Mon Sep 17 00:00:00 2001
+From: Mathias Fiedler <mathias_fiedler@mentor.com>
+Date: Thu, 30 Jul 2015 00:15:17 +0200
+Subject: [PATCH 15/26] waylandsink: listen for wl_buffer.release event
+
+---
+ ext/wayland/gstwaylandsink.c | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
+
+diff --git a/ext/wayland/gstwaylandsink.c b/ext/wayland/gstwaylandsink.c
+index a9ada79..f14200d 100644
+--- a/ext/wayland/gstwaylandsink.c
++++ b/ext/wayland/gstwaylandsink.c
+@@ -74,6 +74,7 @@ GST_DEBUG_CATEGORY (gstwayland_debug);
+ #include <EGL/eglext.h>
+ #include <drm/drm_fourcc.h>
+ 
++
+ static GstIonBufFdMeta  *gst_wayland_sink_read_ionBufFd (GstWaylandSink *sink, GstBuffer * buf) {
+ 
+   GstIonBufFdMeta *meta = gst_buffer_get_ionfd_meta(buf);
+@@ -778,6 +779,23 @@ render_last_buffer (GstWaylandSink * sink)
+   wl_display_flush (sink->display->display);
+ }
+ 
++struct wlbuffer_info
++{
++  GstWaylandSink *sink;
++  gpointer *msg_data;
++};
++
++static void
++buffer_release (void *data, struct wl_buffer *wlbuf)
++{
++  // struct wlbuffer_info *bufinfo = data;
++  g_print("TODO: release buffer %p\n", wlbuf);
++}
++
++static const struct wl_buffer_listener buffer_listener = {
++  buffer_release
++};
++
+ static struct wl_buffer*
+ gst_wayland_sink_create_wl_buffer(GstWaylandSink *sink, GstIonBufFdMeta *ionBufFdMeta)
+ {
+@@ -813,6 +831,16 @@ gst_wayland_sink_create_wl_buffer(GstWaylandSink *sink, GstIonBufFdMeta *ionBufF
+   wlbuf = sink->eglCreateWaylandBufferFromImage(sink->egldpy, eglimg);
+   if (! wlbuf) {
+     GST_WARNING_OBJECT(sink, "failed to create a wl_buffer from EGLImage %p", eglimg);
++  } else {
++    struct wlbuffer_info *bufinfo = g_malloc(sizeof *bufinfo);
++
++    bufinfo->sink = sink;
++    g_print("TODO: store msg_data for releasing %p\n", wlbuf);
++    bufinfo->msg_data = (gpointer)ionBufFdMeta;
++
++    /* use default queue for this wl_buffer */
++    wl_proxy_set_queue((struct wl_proxy*)wlbuf, sink->display->queue);
++    wl_buffer_add_listener (wlbuf, &buffer_listener, bufinfo);
+   }
+ 
+   sink->eglDestroyImage(sink->egldpy, eglimg);
+@@ -824,6 +852,8 @@ static void
+ destroy_wl_buffer(gpointer data)
+ {
+   struct wl_buffer *wlbuf = (struct wl_buffer *)data;
++  struct wlbuffer_info *bufinfo = wl_buffer_get_user_data(wlbuf);
++  g_free(bufinfo);
+   wl_buffer_destroy(wlbuf);
+ }
+ 
+-- 
+1.9.1
+

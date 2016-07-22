@@ -1,0 +1,68 @@
+From 869b63a3c5dd358d49dc380c5752e26d72a74a04 Mon Sep 17 00:00:00 2001
+From: Alison Chaiken <alison_chaiken@mentor.com>
+Date: Mon, 27 Jul 2015 16:46:31 -0700
+Subject: [PATCH 08/26] gstwaylandsink: read ionBufFd metadata
+
+Amended to remove gstomx_meta.h and add gstionbuf_meta.h reference.
+---
+ ext/wayland/gstwaylandsink.c | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
+
+diff --git a/ext/wayland/gstwaylandsink.c b/ext/wayland/gstwaylandsink.c
+index 5866051..d4f7606 100644
+--- a/ext/wayland/gstwaylandsink.c
++++ b/ext/wayland/gstwaylandsink.c
+@@ -67,6 +67,23 @@ GST_DEBUG_CATEGORY (gstwayland_debug);
+ 
+ #define USE_OMX_TARGET_VENUS
+ 
++#if defined(USE_OMX_TARGET_VENUS)
++#include <gst/ionbuf/gstionbuf_meta.h>
++
++static GstIonBufFdMeta  *gst_wayland_sink_read_ionBufFd (GstWaylandSink *sink, GstBuffer * buf) {
++
++  GstIonBufFdMeta *meta = gst_buffer_get_ionfd_meta(buf);
++  if (!meta) {
++    GST_ERROR_OBJECT(sink, "Unable to read ionBufFd from buffer %p.", buf);
++    return NULL;
++  }
++
++  GST_DEBUG_OBJECT (sink, "Read ionBufFd metadata fd %u, offset %u, size %u\n", meta->fd, meta->offset, meta->size);
++
++  return meta;
++}
++#endif
++
+ static GstStaticPadTemplate sink_template = GST_STATIC_PAD_TEMPLATE ("sink",
+     GST_PAD_SINK,
+     GST_PAD_ALWAYS,
+@@ -716,6 +733,10 @@ gst_wayland_sink_render (GstBaseSink * bsink, GstBuffer * buffer)
+   GstWlMeta *meta;
+   GstFlowReturn ret = GST_FLOW_OK;
+ 
++#if defined(USE_OMX_TARGET_VENUS)
++  GstIonBufFdMeta *ionBufFdMeta;
++#endif
++
+   g_mutex_lock (&sink->render_lock);
+ 
+   GST_LOG_OBJECT (sink, "render buffer %p", buffer);
+@@ -756,6 +777,15 @@ gst_wayland_sink_render (GstBaseSink * bsink, GstBuffer * buffer)
+           sink->window->surface_height == 0))
+     goto no_window_size;
+ 
++#if defined(USE_OMX_TARGET_VENUS)
++  ionBufFdMeta = gst_wayland_sink_read_ionBufFd(sink, buffer);
++  if (!ionBufFdMeta) {
++        GST_ERROR_OBJECT(sink, "Unable to read ionBufFd from buffer %p.", buffer);
++	ret = GST_FLOW_ERROR;
++	goto done;
++  }
++#endif
++
+   meta = gst_buffer_get_wl_meta (buffer);
+ 
+   if (meta && meta->pool->display == sink->display) {
+-- 
+1.9.1
+

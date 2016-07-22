@@ -1,0 +1,65 @@
+From 0ac01ebb24c4ba8457ed6aab21c3a4e9d9b7a16a Mon Sep 17 00:00:00 2001
+From: Alison Chaiken <alison_chaiken@mentor.com>
+Date: Sat, 8 Aug 2015 23:26:25 -0700
+Subject: [PATCH 19/23] Change g_print to GST_DEBUG
+
+---
+ omx/gstomx.c         | 9 ++++-----
+ omx/gstomxvideodec.c | 2 +-
+ 2 files changed, 5 insertions(+), 6 deletions(-)
+
+diff --git a/omx/gstomx.c b/omx/gstomx.c
+index f022e73..40ab160 100644
+--- a/omx/gstomx.c
++++ b/omx/gstomx.c
+@@ -618,7 +618,7 @@ gboolean omx_port_out_buf_release_event(GstPad * pad,  GstObject * self, GstEven
+       ionbufp = (GstOMXBuffer *) g_value_get_pointer(ionbufval);
+ 
+       outport = ((GstOMXVideoDec *) self)->dec_out_port;
+-      g_print("Processing GST_EVENT_CUSTOM_UPSTREAM with ionbufp %p and outport %p.\n", ionbufp, outport);
++      GST_DEBUG_OBJECT(self, "Processing GST_EVENT_CUSTOM_UPSTREAM with ionbufp %p and outport %p.", ionbufp, outport);
+       if (!ionbufp) {
+ 	GST_ERROR_OBJECT(self, "No readable GstIonBufMeta data.");
+ 	break;
+@@ -672,14 +672,13 @@ gboolean omx_port_out_buf_release_event(GstPad * pad,  GstObject * self, GstEven
+       ionbufp->omx_buf->nOffset = 0;
+       ionbufp->omx_buf->nFilledLen = 0;
+ 
+-      g_print("omx_port_out_buf_release_event: calling OMX_FillThisBuffer with GstOMXBuffer * %p and OMX_BUFFERHEADERTYPE %p\n", ionbufp, ionbufp->omx_buf);
+-
++      GST_DEBUG_OBJECT(self, "omx_port_out_buf_release_event: calling OMX_FillThisBuffer with GstOMXBuffer * %p and OMX_BUFFERHEADERTYPE %p", ionbufp, ionbufp->omx_buf);
+ 
+       err = OMX_FillThisBuffer (comp->handle, ionbufp->omx_buf);
+       gst_omx_component_handle_messages (comp);
+       g_mutex_unlock (&comp->lock);
+ 
+-      g_print("Recycled output buffer %p to %s port %u: error %s \n", ionbufp->omx_buf,  comp->name, outport->index, gst_omx_error_to_string (err));
++      GST_DEBUG_OBJECT(self, "Recycled output buffer %p to %s port %u: error %s", ionbufp->omx_buf,  comp->name, outport->index, gst_omx_error_to_string (err));
+       ret = (err == OMX_ErrorNone);
+       break;
+     }
+@@ -1550,7 +1549,7 @@ gst_omx_port_release_buffer (GstOMXPort * port, GstOMXBuffer * buf)
+   /* for Venus output buffer, wait for gstwaylandsink pad event to reuse buffer */
+ #if defined (USE_OMX_TARGET_VENUS)
+   if (port->port_def.eDir == OMX_DirOutput)
+-    g_print("Waiting for wayland: buf %p, buf->omx_buf %p, buf->omx_buf->pBuffer %p, nAllocLen %u, nFilledLen %u, nOffset %u",
++    GST_DEBUG_OBJECT(self,"Pushing to wayland: buf %p, buf->omx_buf %p, buf->omx_buf->pBuffer %p, nAllocLen %u, nFilledLen %u, nOffset %u",
+ 		     buf, buf->omx_buf, buf->omx_buf->pBuffer, (unsigned) buf->omx_buf->nAllocLen, (unsigned) buf->omx_buf->nFilledLen,
+ 		     (unsigned) buf->omx_buf->nOffset);
+   goto done;
+diff --git a/omx/gstomxvideodec.c b/omx/gstomxvideodec.c
+index b1fac6a..71a87dc 100644
+--- a/omx/gstomxvideodec.c
++++ b/omx/gstomxvideodec.c
+@@ -467,7 +467,7 @@ gst_omx_video_dec_fill_buffer (GstOMXVideoDec * self,
+     goto done;
+   }
+ 
+-  g_print ("Found ionBufInfo in gst_omx_video_dec_fill_buffer(): size %u, offset %u and fd %u\n", ionBufInfo->ion_buf_size, ionBufInfo->ion_buf_offset, ionBufInfo->ion_buf_fd);
++  GST_DEBUG_OBJECT(self, "Found ionBufInfo in gst_omx_video_dec_fill_buffer(): size %u, offset %u and fd %u", ionBufInfo->ion_buf_size, ionBufInfo->ion_buf_offset, ionBufInfo->ion_buf_fd);
+ 
+   meta = gst_buffer_add_ionBufFd_meta(outbuf, ionBufInfo->ion_buf_fd, ionBufInfo->ion_buf_offset, ionBufInfo->ion_buf_size, inbuf);
+ 
+-- 
+1.9.1
+

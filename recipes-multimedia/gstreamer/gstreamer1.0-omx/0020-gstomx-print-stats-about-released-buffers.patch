@@ -1,0 +1,124 @@
+From 993e375df4decdf539791fb2699827209e6159a9 Mon Sep 17 00:00:00 2001
+From: Alison Chaiken <alison_chaiken@mentor.com>
+Date: Sun, 9 Aug 2015 14:18:38 -0700
+Subject: [PATCH 20/23] gstomx: print stats about released buffers
+
+---
+ omx/gstomx.c         | 37 ++++++++++++++++++++++++++++++++++++-
+ omx/gstomx.h         |  2 ++
+ omx/gstomxvideodec.c | 11 -----------
+ 3 files changed, 38 insertions(+), 12 deletions(-)
+
+diff --git a/omx/gstomx.c b/omx/gstomx.c
+index 40ab160..bcaad98 100644
+--- a/omx/gstomx.c
++++ b/omx/gstomx.c
+@@ -60,6 +60,32 @@ GST_DEBUG_CATEGORY (gstomx_debug);
+ G_LOCK_DEFINE_STATIC (core_handles);
+ static GHashTable *core_handles;
+ 
++const  char * flagstrings[] = { "END-OF-STREAM", "START-TIME", "DECODE-ONLY", "DATA-CORRUPT", "END-OF-FRAME", "SYNC-FRAME", "EXTRA-DATA", "CODECCONFIG" };
++
++const int decoder_flags[] = { OMX_BUFFERFLAG_EOS,  OMX_BUFFERFLAG_STARTTIME,  OMX_BUFFERFLAG_DECODEONLY,  OMX_BUFFERFLAG_DATACORRUPT,  OMX_BUFFERFLAG_ENDOFFRAME,  OMX_BUFFERFLAG_SYNCFRAME,  OMX_BUFFERFLAG_EXTRADATA,  OMX_BUFFERFLAG_CODECCONFIG };
++
++void decode_buffer_flags(unsigned bflags, char *flagstring) {
++  int i, j = 0x1;
++  int max = (sizeof(decoder_flags)/(sizeof(int)));
++
++  strcpy(flagstring, "");
++
++  if (bflags > 0XFF) {
++    strcpy(flagstring, "*Malformed buffer flags*");
++    return;
++  }
++
++  for (i=0; i<max; i++) {
++    if (bflags & j) {
++      if (strcmp(flagstring, ""))
++	strcat(flagstring, "\t");
++      strcat(flagstring, flagstrings[i]);
++    }
++    j <<= 1;
++  }
++  return;
++}
++
+ GstOMXCore *
+ gst_omx_core_acquire (const gchar * filename)
+ {
+@@ -1503,12 +1529,21 @@ gst_omx_port_release_buffer (GstOMXPort * port, GstOMXBuffer * buf)
+ {
+   GstOMXComponent *comp;
+   OMX_ERRORTYPE err = OMX_ErrorNone;
++  char *buff_flagstring;
++  unsigned ion_buf_offset = 999999999;
+ 
+   g_return_val_if_fail (port != NULL, OMX_ErrorUndefined);
+   g_return_val_if_fail (!port->tunneled, GST_OMX_ACQUIRE_BUFFER_ERROR);
+   g_return_val_if_fail (buf != NULL, OMX_ErrorUndefined);
+   g_return_val_if_fail (buf->port == port, OMX_ErrorUndefined);
+ 
++  buff_flagstring = (char *) g_malloc(sizeof(flagstrings) + 1);
++  decode_buffer_flags(buf->omx_buf->nFlags, buff_flagstring);
++  if ((GstOmxPlatformPrivateInfo *)((GstOmxPlatformPrivateList *)buf->omx_buf->pPlatformPrivate))
++    ion_buf_offset =  ((GstOmxPlatformPrivateInfo *)((GstOmxPlatformPrivateList *)buf->omx_buf->pPlatformPrivate)->entryList->entry)->ion_buf_offset;
++  GST_DEBUG("gst_omx_port_release_buffer: offset %u, nFilledLen %u, nFlags %s", ion_buf_offset, (unsigned) buf->omx_buf->nFilledLen, buff_flagstring);
++  g_free(buff_flagstring);
++
+   comp = port->comp;
+ 
+   g_mutex_lock (&comp->lock);
+@@ -1549,7 +1584,7 @@ gst_omx_port_release_buffer (GstOMXPort * port, GstOMXBuffer * buf)
+   /* for Venus output buffer, wait for gstwaylandsink pad event to reuse buffer */
+ #if defined (USE_OMX_TARGET_VENUS)
+   if (port->port_def.eDir == OMX_DirOutput)
+-    GST_DEBUG_OBJECT(self,"Pushing to wayland: buf %p, buf->omx_buf %p, buf->omx_buf->pBuffer %p, nAllocLen %u, nFilledLen %u, nOffset %u",
++    GST_DEBUG_OBJECT(comp->parent,"Pushing to wayland: buf %p, buf->omx_buf %p, buf->omx_buf->pBuffer %p, nAllocLen %u, nFilledLen %u, nOffset %u",
+ 		     buf, buf->omx_buf, buf->omx_buf->pBuffer, (unsigned) buf->omx_buf->nAllocLen, (unsigned) buf->omx_buf->nFilledLen,
+ 		     (unsigned) buf->omx_buf->nOffset);
+   goto done;
+diff --git a/omx/gstomx.h b/omx/gstomx.h
+index 9ad8e2f..f13b696 100644
+--- a/omx/gstomx.h
++++ b/omx/gstomx.h
+@@ -350,6 +350,8 @@ gboolean          gst_omx_port_is_enabled (GstOMXPort * port);
+ 
+ void              gst_omx_set_default_role (GstOMXClassData *class_data, const gchar *default_role);
+ 
++void decode_buffer_flags(unsigned bufflags, char* buf_flag_string);
++
+ /* refered by plugin_init */
+ GST_DEBUG_CATEGORY_EXTERN (gst_omx_video_debug_category);
+ 
+diff --git a/omx/gstomxvideodec.c b/omx/gstomxvideodec.c
+index 71a87dc..dc5187a 100644
+--- a/omx/gstomxvideodec.c
++++ b/omx/gstomxvideodec.c
+@@ -89,13 +89,6 @@ static OMX_ERRORTYPE gst_omx_video_dec_allocate_output_buffers (GstOMXVideoDec *
+ static OMX_ERRORTYPE gst_omx_video_dec_deallocate_output_buffers (GstOMXVideoDec
+     * self);
+ 
+-/*#if defined (USE_OMX_TARGET_VENUS)
+-static gboolean ionBufFd_meta_init (GstMeta * meta, gpointer params, GstBuffer * buffer);
+-static gboolean ionBufFd_meta_transform (GstBuffer * transbuf, GstMeta * meta,
+-			      GstBuffer * buffer, GQuark type, gpointer data);
+-static void ionBufFd_meta_free (GstMeta * meta, GstBuffer * buffer);
+-#endif*/
+-
+ enum
+ {
+   PROP_0
+@@ -1242,10 +1235,6 @@ gst_omx_video_dec_clean_older_frames (GstOMXVideoDec * self,
+             "discarding ghost frame %p (#%d) PTS:%" GST_TIME_FORMAT " DTS:%"
+             GST_TIME_FORMAT, tmp, tmp->system_frame_number,
+             GST_TIME_ARGS (tmp->pts), GST_TIME_ARGS (tmp->dts));
+-        GST_DEBUG_OBJECT (self,
+-			  "discarding ghost frame buf %p omx_buf %p: %p (#%d) PTS:%" GST_TIME_FORMAT " DTS:%",
+-			  buf, buf->omx_buf, GST_TIME_FORMAT, tmp, tmp->system_frame_number,
+-			GST_TIME_ARGS (tmp->pts), GST_TIME_ARGS (tmp->dts));
+       } else {
+         gst_video_codec_frame_unref (tmp);
+       }
+-- 
+1.9.1
+

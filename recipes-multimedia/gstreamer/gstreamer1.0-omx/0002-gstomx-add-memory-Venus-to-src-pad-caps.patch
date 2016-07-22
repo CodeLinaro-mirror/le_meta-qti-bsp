@@ -1,0 +1,47 @@
+From d26ca03f9d1afeeb7741987dfa8c01606d339ea0 Mon Sep 17 00:00:00 2001
+From: Alison Chaiken <alison_chaiken@mentor.com>
+Date: Mon, 13 Jul 2015 10:29:58 +0200
+Subject: [PATCH 02/23] gstomx: add 'memory:Venus' to src-pad caps
+
+glimagesink doesn't accept YUV-formatted GstEGLImages, but only RGBA.
+The function createEGLImage() outputs Khronos-compliant memory objects,
+but not gstreamer-compliant GstEGLImage objects.   GstEGLImage objects
+are created by GstEGLImageAllocator and appear incompatible with dmabuf
+mechanism as implemented upstream.
+---
+ omx/gstomx_meta.h    | 3 +++
+ omx/gstomxvideodec.c | 4 ++++
+ 2 files changed, 7 insertions(+)
+
+diff --git a/omx/gstomx_meta.h b/omx/gstomx_meta.h
+index 0cad622..0e90cb1 100644
+--- a/omx/gstomx_meta.h
++++ b/omx/gstomx_meta.h
+@@ -3,6 +3,9 @@
+ 
+ G_BEGIN_DECLS
+ 
++#define GST_CAPS_FEATURE_MEMORY_VENUS_IMAGE "memory:Venus"
++
++
+ const char *decode_color(OMX_COLOR_FORMATTYPE colorcode);
+ 
+ typedef struct GstOmxPlatformPrivateInfo {
+diff --git a/omx/gstomxvideodec.c b/omx/gstomxvideodec.c
+index 22581c7..4675ea1 100644
+--- a/omx/gstomxvideodec.c
++++ b/omx/gstomxvideodec.c
+@@ -134,6 +134,10 @@ gst_omx_video_dec_class_init (GstOMXVideoDecClass * klass)
+       GST_VIDEO_CAPS_MAKE_WITH_FEATURES (GST_CAPS_FEATURE_MEMORY_EGL_IMAGE,
+       "RGBA") "; "
+ #endif
++#if defined (USE_OMX_TARGET_VENUS) && defined (HAVE_GST_GL)
++       GST_VIDEO_CAPS_MAKE_WITH_FEATURES (GST_CAPS_FEATURE_MEMORY_VENUS_IMAGE,
++       "NV12") "; "
++#endif
+       "video/x-raw, "
+       "width = " GST_VIDEO_SIZE_RANGE ", "
+       "height = " GST_VIDEO_SIZE_RANGE ", " "framerate = " GST_VIDEO_FPS_RANGE;
+-- 
+1.9.1
+

@@ -1,0 +1,25 @@
+From 57644e7733a83e25336aab05edf3ffd7868782f4 Mon Sep 17 00:00:00 2001
+From: Alison Chaiken <alison_chaiken@mentor.com>
+Date: Wed, 29 Jul 2015 11:22:32 -0700
+Subject: [PATCH 19/26] gstionbuf_meta: add pointer to GstOMXBuffer to metadata
+
+---
+ ext/wayland/gstwaylandsink.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ext/wayland/gstwaylandsink.c b/ext/wayland/gstwaylandsink.c
+index b58227d..b015361 100644
+--- a/ext/wayland/gstwaylandsink.c
++++ b/ext/wayland/gstwaylandsink.c
+@@ -83,7 +83,7 @@ static GstIonBufFdMeta  *gst_wayland_sink_read_ionBufFd (GstWaylandSink *sink, G
+     return NULL;
+   }
+ 
+-  GST_DEBUG_OBJECT (sink, "Read ionBufFd metadata fd %u, offset %u, size %u\n", meta->fd, meta->offset, meta->size);
++  GST_DEBUG_OBJECT (sink, "Read ionBufFd metadata fd %u, offset %u, size %u, GstOMXBuffer %p\n", meta->fd, meta->offset, meta->size, meta->ionbufp);
+ 
+   return meta;
+ }
+-- 
+1.9.1
+

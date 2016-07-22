@@ -1,0 +1,82 @@
+From 1b9dc0d26112fa2c3a2c6ace7c2b50e853f26684 Mon Sep 17 00:00:00 2001
+From: Mathias Fiedler <mathias_fiedler@mentor.com>
+Date: Thu, 30 Jul 2015 00:16:09 +0200
+Subject: [PATCH 16/26] waylandsink: cleanup formatting and error messages
+
+---
+ ext/wayland/gstwaylandsink.c | 35 +++++++++++++++++++----------------
+ 1 file changed, 19 insertions(+), 16 deletions(-)
+
+diff --git a/ext/wayland/gstwaylandsink.c b/ext/wayland/gstwaylandsink.c
+index f14200d..9a9faa9 100644
+--- a/ext/wayland/gstwaylandsink.c
++++ b/ext/wayland/gstwaylandsink.c
+@@ -100,7 +100,7 @@ static GstStaticPadTemplate sink_template = GST_STATIC_PAD_TEMPLATE ("sink",
+     GST_STATIC_CAPS (GST_VIDEO_CAPS_MAKE
+         ("{ BGRx, BGRA, RGBx, xBGR, xRGB, RGBA, ABGR, ARGB, RGB, BGR, "
+             "RGB16, BGR16, YUY2, YVYU, UYVY, AYUV, NV12, NV21, NV16, "
+-	 "YUV9, YVU9, Y41B, I420, YV12, Y42B, v308 }") "; "
++            "YUV9, YVU9, Y41B, I420, YV12, Y42B, v308 }"))
+ #endif
+     );
+ 
+@@ -299,23 +299,26 @@ gst_wayland_sink_setup_egl (GstWaylandSink * sink)
+     egldpy = eglGetDisplay(sink->display->display);
+     if (! eglInitialize(egldpy, &major, &minor)) {
+       sink->egldpy = EGL_NO_DISPLAY;
+-      g_print("failed to setup EGLDisplay\n");
++      GST_ERROR_OBJECT(sink, "Failed to initialise EGLDisplay");
+       return;
+     }
+ 
+     sink->egldpy = egldpy;
+-    g_print("setup EGL %d.%d\n", major, minor);
+ 
+-    sink->eglCreateImage = (PFNEGLCREATEIMAGEKHRPROC)eglGetProcAddress("eglCreateImageKHR");
+-    sink->eglDestroyImage = (PFNEGLDESTROYIMAGEKHRPROC)eglGetProcAddress("eglDestroyImageKHR");
+-    sink->eglCreateWaylandBufferFromImage = (PFNEGLCREATEWAYLANDBUFFERFROMIMAGEWL)eglGetProcAddress("eglCreateWaylandBufferFromImageWL");
++    sink->eglCreateImage =
++      (PFNEGLCREATEIMAGEKHRPROC)eglGetProcAddress("eglCreateImageKHR");
++    sink->eglDestroyImage =
++      (PFNEGLDESTROYIMAGEKHRPROC)eglGetProcAddress("eglDestroyImageKHR");
++    sink->eglCreateWaylandBufferFromImage = 
++      (PFNEGLCREATEWAYLANDBUFFERFROMIMAGEWL)
++        eglGetProcAddress("eglCreateWaylandBufferFromImageWL");
+ 
+     if (sink->eglCreateImage == NULL || sink->eglDestroyImage == NULL) {
+-      g_print("failed to get EGL_KHR_image_base\n");
++      GST_ERROR_OBJECT(sink, "Failed to get EGL_KHR_image_base");
+     }
+ 
+     if (sink->eglCreateWaylandBufferFromImage == NULL) {
+-      g_print("failed to get EGL_WL_create_wayland_buffer_from_image\n");
++      GST_ERROR_OBJECT(sink,"Failed to get EGL_WL_create_wayland_buffer_from_image");
+     }
+   }
+ }
+@@ -813,14 +816,14 @@ gst_wayland_sink_create_wl_buffer(GstWaylandSink *sink, GstIonBufFdMeta *ionBufF
+     EGL_NONE};
+   int w = sink->window->surface_width;
+   int h = sink->window->surface_height;
+-    attribs[1] = w;
+-    attribs[3] = h;
+-    attribs[5] = ionBufFdMeta->size;
+-    // attribs[5] = (1920 * 1080 * 1.5) + 27136;
+-    attribs[9] = ionBufFdMeta->fd;
+-    attribs[11] = ionBufFdMeta->offset;
+-    attribs[13] = ionBufFdMeta->fd;
+-    attribs[15] = ionBufFdMeta->offset + ((w + 31) & ~31) * ((h + 31) & ~31);
++
++  attribs[1] = w;
++  attribs[3] = h;
++  attribs[5] = ionBufFdMeta->size;
++  attribs[9] = ionBufFdMeta->fd;
++  attribs[11] = ionBufFdMeta->offset;
++  attribs[13] = ionBufFdMeta->fd;
++  attribs[15] = ionBufFdMeta->offset + ((w + 31) & ~31) * ((h + 31) & ~31);
+ 
+   eglimg = sink->eglCreateImage(sink->egldpy, EGL_NO_CONTEXT, EGL_LINUX_DMA_BUF_EXT, NULL, attribs);
+   if (eglimg == EGL_NO_IMAGE_KHR) {
+-- 
+1.9.1
+

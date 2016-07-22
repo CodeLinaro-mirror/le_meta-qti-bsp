@@ -1,0 +1,109 @@
+From f635907b8d2ecefc0906126b8151dc6efbb1b5e6 Mon Sep 17 00:00:00 2001
+From: Bharathraj Nagaraju <snbraj@codeaurora.org>
+Date: Fri, 15 Jul 2016 01:56:52 +0530
+Subject: [PATCH] Updated to correct type of IonBuffFd and alignment
+ requirement for uv plane offset
+
+Change-Id: Ia4573075fabf8d6164328de9b936e62a5623bd68
+Signed-off-by: Bharathraj Nagaraju <snbraj@codeaurora.org>
+---
+ ext/wayland/gstwaylandsink.c         | 13 +++++++------
+ gst-libs/gst/ionbuf/gstionbuf_meta.c |  9 +++++++--
+ gst-libs/gst/ionbuf/gstionbuf_meta.h | 11 ++++++++---
+ 3 files changed, 22 insertions(+), 11 deletions(-)
+
+diff --git a/ext/wayland/gstwaylandsink.c b/ext/wayland/gstwaylandsink.c
+index 54af136..ced28f8 100644
+--- a/ext/wayland/gstwaylandsink.c
++++ b/ext/wayland/gstwaylandsink.c
+@@ -85,7 +85,7 @@ static GstIonBufFdMeta  *gst_wayland_sink_read_ionBufFd (GstWaylandSink *sink, G
+     return NULL;
+   }
+ 
+-  GST_DEBUG_OBJECT(sink, "Read ionBufFd metadata fd %u, offset %u, size %u, (GstOMXBuffer *) %p", meta->fd, meta->offset, meta->size, meta->ionbufp);
++  GST_DEBUG_OBJECT(sink, "Read ionBufFd metadata fd %d, offset %u, size %u, (GstOMXBuffer *) %p", meta->fd, meta->offset, meta->size, meta->ionbufp);
+ 
+   return meta;
+ }
+@@ -879,13 +879,14 @@ gst_wayland_sink_create_wl_buffer(GstWaylandSink *sink, GstIonBufFdMeta *ionBufF
+   int w = sink->window->surface_width;
+   int h = sink->window->surface_height;
+ 
+-  attribs[1] = w;
+-  attribs[3] = h;
+-  attribs[5] = ionBufFdMeta->size;
+-  attribs[9] = ionBufFdMeta->fd;
++  attribs[1]  = w;
++  attribs[3]  = h;
++  attribs[5]  = ionBufFdMeta->size;
++  attribs[9]  = ionBufFdMeta->fd;
+   attribs[11] = ionBufFdMeta->offset;
+   attribs[13] = ionBufFdMeta->fd;
+-  attribs[15] = ionBufFdMeta->offset + ((w + 31) & ~31) * ((h + 31) & ~31);
++  /* MSM8996: Updated the offset with correct width allignment */
++  attribs[15] = ionBufFdMeta->offset + ((w + 127) & ~127) * ((h + 31) & ~31);
+ 
+   eglimg = sink->eglCreateImage(sink->egldpy, EGL_NO_CONTEXT, EGL_LINUX_DMA_BUF_EXT, NULL, attribs);
+   if (eglimg == EGL_NO_IMAGE_KHR) {
+diff --git a/gst-libs/gst/ionbuf/gstionbuf_meta.c b/gst-libs/gst/ionbuf/gstionbuf_meta.c
+index e4c2a0e..2b24d18 100644
+--- a/gst-libs/gst/ionbuf/gstionbuf_meta.c
++++ b/gst-libs/gst/ionbuf/gstionbuf_meta.c
+@@ -56,8 +56,13 @@ gst_ionBufFd_meta_get_info (void)
+   return meta_info;
+ }
+ 
++/******************************************************************************
++ * gst_buffer_add_ionBufFd_meta:
++ * Updating the MSM8996 IONBuferFd "fd" type to "int" as per the changes made
++ * in the msm-omx video decoder.
++ ******************************************************************************/
+ GstIonBufFdMeta *
+-gst_buffer_add_ionBufFd_meta (GstBuffer * buffer, unsigned int fd,
++gst_buffer_add_ionBufFd_meta (GstBuffer * buffer, int fd,
+ 			      unsigned int offset, unsigned int size, gpointer ionbufp)
+ {
+   GstIonBufFdMeta *meta;
+@@ -76,7 +81,7 @@ gst_buffer_add_ionBufFd_meta (GstBuffer * buffer, unsigned int fd,
+      decoder's port object. */
+   meta->ionbufp = ionbufp;
+ 
+-  GST_DEBUG("Adding ionBufFd metadata fd %u, offset %u, size %u, ionbufp %p", fd, offset,
++  GST_DEBUG("Adding ionBufFd metadata fd %d, offset %u, size %u, ionbufp %p", fd, offset,
+ 	   size, ionbufp);
+ 
+   return meta;
+diff --git a/gst-libs/gst/ionbuf/gstionbuf_meta.h b/gst-libs/gst/ionbuf/gstionbuf_meta.h
+index b6b8e42..7994500 100644
+--- a/gst-libs/gst/ionbuf/gstionbuf_meta.h
++++ b/gst-libs/gst/ionbuf/gstionbuf_meta.h
+@@ -8,9 +8,11 @@ G_BEGIN_DECLS
+ 
+ struct _GstIonBufFdMeta {
+   GstMeta meta;
+-
+   /** ion buffer file descriptor */
+-  unsigned int fd;
++  /**MSM 8996: Update type of "fd" to correct "signed int" type to support the
++   * new updates at msm-omx decoder.
++  */
++  int fd;
+   /** Offset from ion buffer base address */
+   unsigned int offset;
+   /** Size of ion buffer */
+@@ -30,8 +32,11 @@ const GstMetaInfo * gst_ionBufFd_meta_get_info (void);
+   ((GstIonBufFdMeta*)gst_buffer_get_meta((b),ION_BUF_FD_META_API_TYPE))
+ #define ION_BUF_FD_META_INFO (gst_ionBufFd_meta_get_info ())
+ 
++/**MSM 8996: Update type of "fd" to correct "signed int" type to support the
++  * new updates at msm-omx decoder.
++*/
+ GstIonBufFdMeta * gst_buffer_add_ionBufFd_meta (GstBuffer * buffer,
+-						unsigned int fd, unsigned int offset, unsigned int size, gpointer ionbufp);
++						int fd, unsigned int offset, unsigned int size, gpointer ionbufp);
+ 
+ G_END_DECLS
+ 
+-- 
+2.9.0.137.gcf4c2cf
+

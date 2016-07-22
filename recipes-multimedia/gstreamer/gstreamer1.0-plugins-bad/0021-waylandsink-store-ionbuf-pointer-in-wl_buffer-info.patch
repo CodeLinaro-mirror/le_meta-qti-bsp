@@ -1,0 +1,44 @@
+From 8535545bcf2c2779257bf894036d1e16b137cb83 Mon Sep 17 00:00:00 2001
+From: Mathias Fiedler <mathias_fiedler@mentor.com>
+Date: Fri, 7 Aug 2015 11:46:12 +0200
+Subject: [PATCH 21/26] waylandsink: store ionbuf pointer in wl_buffer info
+
+The ionbuf meta data seems to get overwritten at some point.
+---
+ ext/wayland/gstwaylandsink.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
+
+diff --git a/ext/wayland/gstwaylandsink.c b/ext/wayland/gstwaylandsink.c
+index 3b94502..0768d92 100644
+--- a/ext/wayland/gstwaylandsink.c
++++ b/ext/wayland/gstwaylandsink.c
+@@ -830,15 +830,12 @@ wl_omx_buffer_release (void *data, struct wl_buffer *wlbuf)
+   GstPad *sinkpad = GST_BASE_SINK_PAD(bufinfo->sink);
+   GstStructure * event_struct = gst_structure_new_empty("IonBufRelease");
+   gboolean pushed;
+-  unsigned bufsize = (unsigned) ((GstIonBufFdMeta  *) (bufinfo->msg_data))->size;
+-  unsigned buffd = (unsigned) ((GstIonBufFdMeta  *) (bufinfo->msg_data))->fd;
+-  unsigned bufoffset = (unsigned) ((GstIonBufFdMeta  *) (bufinfo->msg_data))->offset;
+ 
+   GValue bufval = { 0, };
+   g_value_init(&bufval, G_TYPE_POINTER);
+-  g_value_set_pointer(&bufval, (gpointer) ((GstIonBufFdMeta *)bufinfo->msg_data)->ionbufp);
++  g_value_set_pointer(&bufval, bufinfo->msg_data);
+ 
+-  g_print("waylandsink: releasing GstOMXBuffer * %p, msg_data size %u, fd %u, offset %u.\n", (gpointer) g_value_get_pointer(&bufval),  bufsize, buffd, bufoffset);
++  g_print("waylandsink: releasing GstOMXBuffer * %p, wlbuf %u.\n", (gpointer) g_value_get_pointer(&bufval), wl_proxy_get_id((struct wl_proxy *)wlbuf));
+ 
+   gst_structure_set_value(event_struct, "ion_buf_pointer", (const GValue *) &bufval);
+   /*  gst_structure_set (event_struct,
+@@ -907,7 +904,7 @@ gst_wayland_sink_create_wl_buffer(GstWaylandSink *sink, GstIonBufFdMeta *ionBufF
+ 
+     bufinfo->sink = sink;
+     g_print("waylandsink: storing msg_data for releasing wayland buffer %p that holds GstOMXBuf %p\n", wlbuf, ionBufFdMeta->ionbufp);
+-    bufinfo->msg_data = (gpointer)ionBufFdMeta;
++    bufinfo->msg_data = (gpointer)ionBufFdMeta->ionbufp;
+ 
+     /* use default queue for this wl_buffer */
+     wl_proxy_set_queue((struct wl_proxy*)wlbuf, sink->display->queue);
+-- 
+1.9.1
+

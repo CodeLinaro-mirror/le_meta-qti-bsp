@@ -1,0 +1,262 @@
+From 09ff8739c2275899b3e844446485e845e519c056 Mon Sep 17 00:00:00 2001
+From: Mathias Fiedler <mathias_fiedler@mentor.com>
+Date: Wed, 29 Jul 2015 03:28:39 +0200
+Subject: [PATCH 14/26] waylandsink: post wl_buffer created from ionbuf
+
+For each (fd, offset) tuple a new wl_buffer is created and stored in
+hashtable for reuse.
+---
+ ext/wayland/Makefile.am      |   6 +-
+ ext/wayland/gstwaylandsink.c | 143 +++++++++++++++++++++++++++++++++++++++++++
+ ext/wayland/gstwaylandsink.h |  12 ++++
+ 3 files changed, 159 insertions(+), 2 deletions(-)
+
+diff --git a/ext/wayland/Makefile.am b/ext/wayland/Makefile.am
+index b14400d..542bc43 100644
+--- a/ext/wayland/Makefile.am
++++ b/ext/wayland/Makefile.am
+@@ -9,11 +9,13 @@ libgstwaylandsink_la_SOURCES =  \
+ 	scaler-protocol.c
+ 
+ libgstwaylandsink_la_CFLAGS = $(GST_CFLAGS) $(GST_PLUGINS_BASE_CFLAGS) \
+-                               $(WAYLAND_CFLAGS) $(GST_PLUGINS_BAD_CFLAGS)
++                               $(WAYLAND_EGL_CFLAGS) \
++                               $(GST_PLUGINS_BAD_CFLAGS)
+ libgstwaylandsink_la_LIBADD = \
+ 	$(GST_PLUGINS_BASE_LIBS) \
+ 	-lgstvideo-$(GST_API_VERSION) \
+-	$(WAYLAND_LIBS) \
++	-lEGL \
++	$(WAYLAND_EGL_LIBS) \
+ 	$(top_builddir)/gst-libs/gst/ionbuf/libgstionbuf-$(GST_API_VERSION).la \
+ 	$(top_builddir)/gst-libs/gst/wayland/libgstwayland-$(GST_API_VERSION).la
+ libgstwaylandsink_la_LDFLAGS = $(GST_PLUGIN_LDFLAGS)
+diff --git a/ext/wayland/gstwaylandsink.c b/ext/wayland/gstwaylandsink.c
+index 3708bb6..a9ada79 100644
+--- a/ext/wayland/gstwaylandsink.c
++++ b/ext/wayland/gstwaylandsink.c
+@@ -70,6 +70,10 @@ GST_DEBUG_CATEGORY (gstwayland_debug);
+ #if defined(USE_OMX_TARGET_VENUS)
+ #include <gst/ionbuf/gstionbuf_meta.h>
+ 
++#include <EGL/egl.h>
++#include <EGL/eglext.h>
++#include <drm/drm_fourcc.h>
++
+ static GstIonBufFdMeta  *gst_wayland_sink_read_ionBufFd (GstWaylandSink *sink, GstBuffer * buf) {
+ 
+   GstIonBufFdMeta *meta = gst_buffer_get_ionfd_meta(buf);
+@@ -236,6 +240,13 @@ gst_wayland_sink_finalize (GObject * object)
+ 
+   if (sink->last_buffer)
+     gst_buffer_unref (sink->last_buffer);
++
++  if (sink->buffer_table)
++    g_hash_table_destroy(sink->buffer_table);
++
++  if (sink->egldpy)
++    eglTerminate(sink->egldpy);
++
+   if (sink->display) {
+     /* see comment about this call in gst_wayland_sink_change_state() */
+     if (sink->pool) {
+@@ -277,6 +288,37 @@ gst_wayland_sink_set_display_from_context (GstWaylandSink * sink,
+   }
+ }
+ 
++static void
++gst_wayland_sink_setup_egl (GstWaylandSink * sink)
++{
++  if (sink->display) {
++    EGLDisplay egldpy;
++    int major = 0, minor = 0;
++    /* Setup EGL */
++    egldpy = eglGetDisplay(sink->display->display);
++    if (! eglInitialize(egldpy, &major, &minor)) {
++      sink->egldpy = EGL_NO_DISPLAY;
++      g_print("failed to setup EGLDisplay\n");
++      return;
++    }
++
++    sink->egldpy = egldpy;
++    g_print("setup EGL %d.%d\n", major, minor);
++
++    sink->eglCreateImage = (PFNEGLCREATEIMAGEKHRPROC)eglGetProcAddress("eglCreateImageKHR");
++    sink->eglDestroyImage = (PFNEGLDESTROYIMAGEKHRPROC)eglGetProcAddress("eglDestroyImageKHR");
++    sink->eglCreateWaylandBufferFromImage = (PFNEGLCREATEWAYLANDBUFFERFROMIMAGEWL)eglGetProcAddress("eglCreateWaylandBufferFromImageWL");
++
++    if (sink->eglCreateImage == NULL || sink->eglDestroyImage == NULL) {
++      g_print("failed to get EGL_KHR_image_base\n");
++    }
++
++    if (sink->eglCreateWaylandBufferFromImage == NULL) {
++      g_print("failed to get EGL_WL_create_wayland_buffer_from_image\n");
++    }
++  }
++}
++
+ static gboolean
+ gst_wayland_sink_find_display (GstWaylandSink * sink)
+ {
+@@ -329,6 +371,8 @@ gst_wayland_sink_find_display (GstWaylandSink * sink)
+         }
+       }
+     }
++
++    gst_wayland_sink_setup_egl(sink);
+   }
+ 
+   g_mutex_unlock (&sink->display_lock);
+@@ -401,6 +445,9 @@ gst_wayland_sink_change_state (GstElement * element, GstStateChange transition)
+           gst_wayland_compositor_release_all_buffers (GST_WAYLAND_BUFFER_POOL
+               (sink->pool));
+         }
++
++        g_hash_table_remove_all(sink->buffer_table);
++
+         g_clear_object (&sink->display);
+         g_clear_object (&sink->pool);
+       }
+@@ -731,6 +778,79 @@ render_last_buffer (GstWaylandSink * sink)
+   wl_display_flush (sink->display->display);
+ }
+ 
++static struct wl_buffer*
++gst_wayland_sink_create_wl_buffer(GstWaylandSink *sink, GstIonBufFdMeta *ionBufFdMeta)
++{
++  EGLImageKHR eglimg;
++  struct wl_buffer *wlbuf;
++  EGLint attribs[] = {
++    EGL_WIDTH, 0,
++    EGL_HEIGHT, 0,
++    EGL_BUFFER_SIZE, 0,
++    EGL_LINUX_DRM_FOURCC_EXT, DRM_FORMAT_NV12,
++    EGL_DMA_BUF_PLANE0_FD_EXT, 0,
++    EGL_DMA_BUF_PLANE0_OFFSET_EXT, 0,
++    EGL_DMA_BUF_PLANE1_FD_EXT, 0,
++    EGL_DMA_BUF_PLANE1_OFFSET_EXT, 0,
++    EGL_NONE};
++  int w = sink->window->surface_width;
++  int h = sink->window->surface_height;
++    attribs[1] = w;
++    attribs[3] = h;
++    attribs[5] = ionBufFdMeta->size;
++    // attribs[5] = (1920 * 1080 * 1.5) + 27136;
++    attribs[9] = ionBufFdMeta->fd;
++    attribs[11] = ionBufFdMeta->offset;
++    attribs[13] = ionBufFdMeta->fd;
++    attribs[15] = ionBufFdMeta->offset + ((w + 31) & ~31) * ((h + 31) & ~31);
++
++  eglimg = sink->eglCreateImage(sink->egldpy, EGL_NO_CONTEXT, EGL_LINUX_DMA_BUF_EXT, NULL, attribs);
++  if (eglimg == EGL_NO_IMAGE_KHR) {
++    GST_WARNING_OBJECT(sink, "failed to create EGLImage");
++    return NULL;
++  }
++
++  wlbuf = sink->eglCreateWaylandBufferFromImage(sink->egldpy, eglimg);
++  if (! wlbuf) {
++    GST_WARNING_OBJECT(sink, "failed to create a wl_buffer from EGLImage %p", eglimg);
++  }
++
++  sink->eglDestroyImage(sink->egldpy, eglimg);
++
++  return wlbuf;
++}
++
++static void
++destroy_wl_buffer(gpointer data)
++{
++  struct wl_buffer *wlbuf = (struct wl_buffer *)data;
++  wl_buffer_destroy(wlbuf);
++}
++
++static struct wl_buffer*
++gst_wayland_sink_get_wl_buffer(GstWaylandSink *sink, GstIonBufFdMeta *ionBufFdMeta)
++{
++  struct wl_buffer *wlbuf;
++  gint64 key;
++  if (G_UNLIKELY (!sink->buffer_table)) {
++    sink->buffer_table = g_hash_table_new_full (g_int64_hash, g_int64_equal, g_free, destroy_wl_buffer);
++  }
++  /* put fd and offset into a int64 key*/
++  key = ((gint64)(ionBufFdMeta->fd & 0xFFFFFFFF) << 32) | (ionBufFdMeta->offset & 0xFFFFFFFF);
++
++  wlbuf = (struct wl_buffer*) g_hash_table_lookup(sink->buffer_table, &key);
++  if (! wlbuf) {
++    /* create a new wl_buffer */
++    gint64 *bufkey = g_malloc(sizeof(*bufkey));
++    *bufkey = key;
++    wlbuf = gst_wayland_sink_create_wl_buffer(sink, ionBufFdMeta);
++    if (wlbuf)
++      g_hash_table_insert(sink->buffer_table, bufkey, wlbuf);
++  }
++
++  return wlbuf;
++}
++
+ static GstFlowReturn
+ gst_wayland_sink_render (GstBaseSink * bsink, GstBuffer * buffer)
+ {
+@@ -791,6 +911,29 @@ gst_wayland_sink_render (GstBaseSink * bsink, GstBuffer * buffer)
+ 	goto done;
+   }
+ 
++  {
++    struct wl_surface *surface;
++    struct wl_buffer *wlbuf;
++    struct wl_callback *callback;
++    wlbuf = gst_wayland_sink_get_wl_buffer(sink, ionBufFdMeta);
++
++    if (!wlbuf) {
++      goto no_buffer;
++    }
++
++    surface = gst_wl_window_get_wl_surface (sink->window);
++
++    g_atomic_int_set (&sink->redraw_pending, TRUE);
++    callback = wl_surface_frame (surface);
++    wl_callback_add_listener (callback, &frame_callback_listener, sink);
++
++    wl_surface_attach (surface, wlbuf, 0, 0);
++    wl_surface_damage (surface, 0, 0, sink->window->surface_width, sink->window->surface_height);
++
++    wl_surface_commit (surface);
++    wl_display_flush (sink->display->display);
++  }
++
+   goto done;
+ 
+ #endif
+diff --git a/ext/wayland/gstwaylandsink.h b/ext/wayland/gstwaylandsink.h
+index afbed40..c2f91ee 100644
+--- a/ext/wayland/gstwaylandsink.h
++++ b/ext/wayland/gstwaylandsink.h
+@@ -26,6 +26,9 @@
+ #include <gst/video/video.h>
+ 
+ #include <wayland-client.h>
++#include <wayland-egl.h>
++#include <EGL/egl.h>
++#include <EGL/eglext.h>
+ 
+ #include "wldisplay.h"
+ #include "wlwindow.h"
+@@ -57,6 +60,15 @@ struct _GstWaylandSink
+   GstWlWindow *window;
+   GstBufferPool *pool;
+ 
++  /* EGL */
++  EGLDisplay egldpy;
++  PFNEGLCREATEIMAGEKHRPROC eglCreateImage;
++  PFNEGLDESTROYIMAGEKHRPROC eglDestroyImage;
++  PFNEGLCREATEWAYLANDBUFFERFROMIMAGEWL eglCreateWaylandBufferFromImage;
++
++  /* Map from ion_buf to wl_buffer */
++  GHashTable *buffer_table;
++
+   gboolean video_info_changed;
+   GstVideoInfo video_info;
+ 
+-- 
+1.9.1
+

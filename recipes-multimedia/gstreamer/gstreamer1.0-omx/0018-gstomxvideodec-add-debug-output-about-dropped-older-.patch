@@ -1,0 +1,28 @@
+From b83e711d9cefd3d6396754db4557b18e6ab5b545 Mon Sep 17 00:00:00 2001
+From: Alison Chaiken <alison_chaiken@mentor.com>
+Date: Sat, 8 Aug 2015 14:20:41 -0700
+Subject: [PATCH 18/23] gstomxvideodec: add debug output about dropped older
+ frames
+
+---
+ omx/gstomxvideodec.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/omx/gstomxvideodec.c b/omx/gstomxvideodec.c
+index 08e9925..b1fac6a 100644
+--- a/omx/gstomxvideodec.c
++++ b/omx/gstomxvideodec.c
+@@ -1242,6 +1242,10 @@ gst_omx_video_dec_clean_older_frames (GstOMXVideoDec * self,
+             "discarding ghost frame %p (#%d) PTS:%" GST_TIME_FORMAT " DTS:%"
+             GST_TIME_FORMAT, tmp, tmp->system_frame_number,
+             GST_TIME_ARGS (tmp->pts), GST_TIME_ARGS (tmp->dts));
++        GST_DEBUG_OBJECT (self,
++			  "discarding ghost frame buf %p omx_buf %p: %p (#%d) PTS:%" GST_TIME_FORMAT " DTS:%",
++			  buf, buf->omx_buf, GST_TIME_FORMAT, tmp, tmp->system_frame_number,
++			GST_TIME_ARGS (tmp->pts), GST_TIME_ARGS (tmp->dts));
+       } else {
+         gst_video_codec_frame_unref (tmp);
+       }
+-- 
+1.9.1
+

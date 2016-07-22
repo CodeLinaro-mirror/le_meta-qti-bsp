@@ -1,0 +1,26 @@
+From 73b5c43d445180695b2080c82c766389a846647b Mon Sep 17 00:00:00 2001
+From: Mathias Fiedler <mathias_fiedler@mentor.com>
+Date: Thu, 6 Aug 2015 14:34:02 +0200
+Subject: [PATCH 15/23] gstomxvideodec: initialize intersection caps
+
+Prevents potential crash at trying to unref uninitialized object.
+---
+ omx/gstomxvideodec.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/omx/gstomxvideodec.c b/omx/gstomxvideodec.c
+index 9dbe733..a5c3cc6 100644
+--- a/omx/gstomxvideodec.c
++++ b/omx/gstomxvideodec.c
+@@ -1825,7 +1825,7 @@ gst_omx_video_dec_negotiate (GstOMXVideoDec * self)
+   OMX_ERRORTYPE err;
+   GstCaps *comp_supported_caps;
+   GList *negotiation_map = NULL, *l;
+-  GstCaps *templ_caps, *intersection;
++  GstCaps *templ_caps, *intersection = NULL;
+   GstVideoFormat format;
+   GstStructure *s;
+   const gchar *format_str;
+-- 
+1.9.1
+
