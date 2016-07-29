@@ -1,0 +1,13 @@
+diff --git a/drivers/video/msm/mdss/mdss_fb.c b/drivers/video/msm/mdss/mdss_fb.c
+index f3db4f6..443c1f1 100644
+--- a/drivers/video/msm/mdss/mdss_fb.c
++++ b/drivers/video/msm/mdss/mdss_fb.c
+@@ -1089,7 +1089,7 @@ static int mdss_fb_probe(struct platform_device *pdev)
+ 	mfd->bl_scale = 1024;
+ 	mfd->bl_min_lvl = 30;
+ 	mfd->ad_bl_level = 0;
+-	mfd->fb_imgType = MDP_RGBA_8888;
++	mfd->fb_imgType = MDP_RGB_888;
+ 	mfd->calib_mode_bl = 0;
+ 
+ 	mfd->pdev = pdev;
