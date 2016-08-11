@@ -1,4 +1,4 @@
-inherit autotools
+inherit autotools update-rc.d
 
 DESCRIPTION = "Installing audio init script"
 LICENSE = "BSD"
@@ -18,6 +18,8 @@ S = "${WORKDIR}"
 S_msm8974 = "${WORKDIR}/${BASEMACHINE}"
 S_msm8610 = "${WORKDIR}/${BASEMACHINE}"
 
+INITSCRIPT_NAME_msm8996 = "init_qcom_audio"
+INITSCRIPT_PARAMS_msm8996 = "start 99 2 3 4 5 . stop 1 0 1 6 ."
 INITSCRIPT_NAME_msm8974 = "init_qcom_audio"
 INITSCRIPT_PARAMS_msm8974 = "start 99 2 3 4 5 . stop 1 0 1 6 ."
 INITSCRIPT_NAME_msm8610 = "init_qcom_audio"
