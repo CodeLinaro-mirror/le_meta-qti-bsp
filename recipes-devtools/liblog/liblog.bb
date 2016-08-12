@@ -20,7 +20,7 @@ do_install_append() {
    install -m 0644 -D ../50-log.rules ${D}${sysconfdir}/udev/rules.d/50-log.rules
 }
 
-FILES_${PN}-dbg    = "${libdir}/.debug/liblog.* ${bindir}/.debug/logcat"
-FILES_${PN}        = "${libdir}/pkgconfig/* ${libdir}/liblog.so.* ${sysconfdir}/udev/rules.d/50-log.rules"
-FILES_${PN}-dev    = "${libdir}/liblog.so ${libdir}/liblog.la ${includedir}/log ${includedir}/android"
-FILES_${PN}-static = "${libdir}/liblog.a"
+FILES_${PN}-dbg    += "${libdir}/.debug/liblog.* ${bindir}/.debug/logcat"
+FILES_${PN}        += "${libdir}/pkgconfig/* ${libdir}/liblog.so.* ${sysconfdir}/udev/rules.d/50-log.rules"
+FILES_${PN}-dev    += "${libdir}/liblog.so ${libdir}/liblog.la ${includedir}/log ${includedir}/android"
+FILES_${PN}-static += "${libdir}/liblog.a"

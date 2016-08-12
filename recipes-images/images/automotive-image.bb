@@ -11,14 +11,14 @@ IMAGE_INSTALL_append = " \
     qtbase-examples \
     qtwebkit \
     qtwebkit-examples-examples \
-    \
     qtmultimedia \
     qtmultimedia-plugins \
     qtmultimedia-qmlplugins \
     lmbench \
-"
-
-IMAGE_INSTALL += " \
+    libcutils \
+    liblog \
+    system-core-adbd \
+    system-core-usb \
     packagegroup-multimedia \
     lib32-lk \
     lib32-gensecimage \

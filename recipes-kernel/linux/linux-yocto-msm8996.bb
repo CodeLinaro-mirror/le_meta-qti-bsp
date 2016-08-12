@@ -57,6 +57,10 @@ PR = "r1"
 
 KCONFIG_MODE="--alldefconfig"
 
+do_install_append() {
+	oe_runmake headers_install INSTALL_HDR_PATH=${STAGING_KERNEL_BUILDDIR}/usr ARCH=$ARCH
+}
+
 do_deploy_append() {
    rm -f  "${DEPLOYDIR}/boot.img" "{DEPLOYDIR}/initrd"
    touch "${DEPLOYDIR}/initrd"
