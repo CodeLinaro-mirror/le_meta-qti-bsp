@@ -24,8 +24,6 @@ IMAGE_INSTALL += " \
     lib32-gensecimage \
     cdcdriver-noship \
     audio-nxp-auto-noship \
-    cdcdriver \
-    audio-nxp-auto \
     init-audio \
 "
 
