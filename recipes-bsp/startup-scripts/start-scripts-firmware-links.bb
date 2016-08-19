@@ -15,7 +15,7 @@ PR = "r5"
 inherit update-rc.d
 
 INITSCRIPT_NAME   = "firmware-links.sh"
-INITSCRIPT_PARAMS = "start 37 S ."
+INITSCRIPT_PARAMS = "start 37 2 3 4 5 ."
 
 do_install() {
     install -m 0755 ${WORKDIR}/${BASEMACHINE}/firmware-links.sh -D ${D}${sysconfdir}/init.d/firmware-links.sh

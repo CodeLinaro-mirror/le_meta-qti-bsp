@@ -15,7 +15,7 @@ PR = "r4"
 inherit update-rc.d
 
 INITSCRIPT_NAME = "find_partitions.sh"
-INITSCRIPT_PARAMS = "start 36 S ."
+INITSCRIPT_PARAMS = "start 36 2 3 4 5 ."
 
 do_install() {
     install -m 0755 ${WORKDIR}/${BASEMACHINE}/find_partitions.sh -D ${D}${sysconfdir}/init.d/find_partitions.sh
