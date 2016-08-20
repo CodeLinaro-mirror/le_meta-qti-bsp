@@ -25,8 +25,6 @@ IMAGE_INSTALL_append = " \
     cdcdriver-noship \
     audio-nxp-auto-noship \
     init-audio \
-    start-scripts-firmware-links \
-    start-scripts-find-partitions \
 "
 
 IMAGE_ROOTFS_SIZE = "1048576"
