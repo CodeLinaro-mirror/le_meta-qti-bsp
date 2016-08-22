@@ -12,6 +12,7 @@ SRC_URI += " \
    file://0003-mm-video-v4l2-vdec-strip-dependence-on-android.patch \
    file://0004-mm-video-v4l2-vdec-add-makefile-and-vdec-test-progra.patch \
    file://0001-mm-core-Update-pmem-file-descriptor-type-to-integer.patch \
+   file://0001-mm-video-v4l2-vdec-Disable-split-mode-on-Automotive.patch \
 "
 
 SRCREV = "c8933f995d8679ce21af1821ef3982672362d8ea"

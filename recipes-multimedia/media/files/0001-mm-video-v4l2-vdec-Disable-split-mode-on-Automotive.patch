@@ -1,0 +1,37 @@
+From 26ac8b2bb71c861bb3db93cc327b761ff6e4e7f9 Mon Sep 17 00:00:00 2001
+From: Shiju Mathew <shijum@codeaurora.org>
+Date: Thu, 4 Aug 2016 15:21:06 -0400
+Subject: [PATCH 1/1] mm-video-v4l2: vdec: Disable split mode on Automotive
+
+Temporarily disable split mode on Automotive since this is causing
+issues with 4k playback.
+
+Change-Id: Ib2609d46c08605bf03c6114c31d0e8ad95968c4e
+---
+ mm-video-v4l2/vidc/vdec/src/omx_vdec_v4l2.cpp | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/mm-video-v4l2/vidc/vdec/src/omx_vdec_v4l2.cpp b/mm-video-v4l2/vidc/vdec/src/omx_vdec_v4l2.cpp
+index ce36ef6..384a186 100644
+--- a/mm-video-v4l2/vidc/vdec/src/omx_vdec_v4l2.cpp
++++ b/mm-video-v4l2/vidc/vdec/src/omx_vdec_v4l2.cpp
+@@ -967,12 +967,14 @@ OMX_ERRORTYPE omx_vdec::decide_dpb_buffer_mode()
+     OMX_ERRORTYPE eRet = OMX_ErrorNone;
+ 
+     bool cpu_access = capture_capability != V4L2_PIX_FMT_NV12_UBWC;
++    bool is_res_above_1080p = false;
+ 
+-    bool is_res_above_1080p = (drv_ctx.video_resolution.frame_width > 1920 &&
++#ifdef _ANDROID_
++    is_res_above_1080p = (drv_ctx.video_resolution.frame_width > 1920 &&
+             drv_ctx.video_resolution.frame_height > 1088) ||
+             (drv_ctx.video_resolution.frame_height > 1088 &&
+              drv_ctx.video_resolution.frame_width > 1920);
+-
++#endif
+     if (cpu_access) {
+         if (dpb_bit_depth == MSM_VIDC_BIT_DEPTH_8) {
+             if (m_force_compressed_for_dpb || is_res_above_1080p) {
+-- 
+1.9.1
+
