@@ -1,0 +1,29 @@
+From eb1991e97539d0ae165b9cef1dd774be8f8168e4 Mon Sep 17 00:00:00 2001
+From: Shiju Mathew <shijum@codeaurora.org>
+Date: Thu, 21 Jul 2016 14:47:18 -0400
+Subject: [PATCH] mm-core: Update pmem file descriptor type to integer
+
+Update pmem fd type to int to avoid type casts in multimedia
+frameworks.
+
+Change-Id: I868f8052f6b5f388972e4d80fef823a349912e21
+---
+ mm-core/inc/OMX_QCOMExtns.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/mm-core/inc/OMX_QCOMExtns.h b/mm-core/inc/OMX_QCOMExtns.h
+index 16bfd36..5b900f4 100644
+--- a/mm-core/inc/OMX_QCOMExtns.h
++++ b/mm-core/inc/OMX_QCOMExtns.h
+@@ -218,7 +218,7 @@ struct OMX_QCOM_PLATFORMPRIVATE_EXTN
+ typedef struct OMX_QCOM_PLATFORM_PRIVATE_PMEM_INFO
+ {
+     /** pmem file descriptor */
+-    unsigned long pmem_fd;
++    OMX_S32 pmem_fd;
+     /** Offset from pmem device base address */
+     OMX_U32 offset;
+     OMX_U32 size;
+-- 
+1.9.1
+
