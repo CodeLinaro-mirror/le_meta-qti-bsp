@@ -1,7 +1,6 @@
 
 [core]
 shell=desktop-shell.so
-backend=fbdev-backend.so
 
 [shell]
 locking=true

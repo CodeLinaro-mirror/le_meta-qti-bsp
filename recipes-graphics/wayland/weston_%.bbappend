@@ -1,6 +1,7 @@
 FILESEXTRAPATHS_append := ":${THISDIR}/${PN}"
 
 SRC_URI_append = "\
+    file://weston.service_qc \
     file://weston.ini_qc \
     file://0001-outpub_fbdev-follow-the-work-flow-of-MSM8996.patch \
     file://0001-configure-don-t-control-egl-version.patch \
@@ -16,5 +17,10 @@ PACKAGECONFIG[kms] = "--enable-drm-compositor,--disable-drm-compositor,drm udev 
 PACKAGECONFIG[wayland] = "--enable-wayland-compositor,--disable-wayland-compositor,libgbm"
 
 do_install_append() {
+    # Install systemd unit files
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
+        install -m 644 -p -D ${WORKDIR}/weston.service_qc ${D}${systemd_system_unitdir}/weston.service
+    fi
+
     install -m 0644 ${WORKDIR}/weston.ini_qc ${D}${WESTON_INI_CONFIG}/weston.ini
 }
