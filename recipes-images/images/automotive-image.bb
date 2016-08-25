@@ -27,6 +27,7 @@ IMAGE_INSTALL_append = " \
     init-audio \
     start-scripts-firmware-links \
     start-scripts-find-partitions \
+    neutrino-eth \
 "
 
 IMAGE_ROOTFS_SIZE = "1048576"
