@@ -27,6 +27,7 @@ IMAGE_INSTALL_append = " \
     start-scripts-firmware-links \
     start-scripts-find-partitions \
     neutrino-eth \
+    neutrino-flash \
 "
 
 IMAGE_ROOTFS_SIZE = "1048576"
