@@ -24,6 +24,7 @@ IMAGE_INSTALL_append = " \
     cdcdriver-noship \
     audio-nxp-auto-noship \
     init-audio \
+    alsaucm-conf \
     start-scripts-firmware-links \
     start-scripts-find-partitions \
     neutrino-eth \
