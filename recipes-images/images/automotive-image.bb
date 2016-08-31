@@ -30,6 +30,8 @@ IMAGE_INSTALL_append = " \
     neutrino-eth \
     neutrino-flash \
     neutrino-firmware \
+    iperf \
+    ethtool \
 "
 
 IMAGE_ROOTFS_SIZE = "1048576"
