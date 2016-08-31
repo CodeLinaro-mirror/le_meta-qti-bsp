@@ -20,13 +20,13 @@ INHIBIT_PACKAGE_STRIP = "1"
 inherit module
 
 do_compile_append () {
-    KMOD_SIG_ALL=`cat ${TMPDIR}/work/msm8996-poky-linux/linux-yocto-msm8996/3.18-r1/linux-msm8996-standard-build/.config | grep CONFIG_MODULE_SIG_ALL | cut -d'=' -f2`
-    KMOD_SIG_HASH=`cat ${TMPDIR}/work/msm8996-poky-linux/linux-yocto-msm8996/3.18-r1/linux-msm8996-standard-build/.config | grep CONFIG_MODULE_SIG_HASH | cut -d'=' -f2 | sed 's/\"//g'`
+    KMOD_SIG_ALL=`cat ${TMPDIR}/work/msm8996-poky-linux/linux-yocto-msm8996/3.18-r2/linux-msm8996-standard-build/.config | grep CONFIG_MODULE_SIG_ALL | cut -d'=' -f2`
+    KMOD_SIG_HASH=`cat ${TMPDIR}/work/msm8996-poky-linux/linux-yocto-msm8996/3.18-r2/linux-msm8996-standard-build/.config | grep CONFIG_MODULE_SIG_HASH | cut -d'=' -f2 | sed 's/\"//g'`
     if [ "$KMOD_SIG_ALL" = "y" ] && [ -n "$KMOD_SIG_HASH" ]; then
-        MODSECKEY=${TMPDIR}/work/msm8996-poky-linux/linux-yocto-msm8996/3.18-r1/linux-msm8996-standard-build/signing_key.priv
-        MODPUBKEY=${TMPDIR}/work/msm8996-poky-linux/linux-yocto-msm8996/3.18-r1/linux-msm8996-standard-build/signing_key.x509
+        MODSECKEY=${TMPDIR}/work/msm8996-poky-linux/linux-yocto-msm8996/3.18-r2/linux-msm8996-standard-build/signing_key.priv
+        MODPUBKEY=${TMPDIR}/work/msm8996-poky-linux/linux-yocto-msm8996/3.18-r2/linux-msm8996-standard-build/signing_key.x509
         cp ${S}/DWC_ETH_QOS.ko ${S}/DWC_ETH_QOS.ko.unsigned
-        perl ${TMPDIR}/work/msm8996-poky-linux/linux-yocto-msm8996/3.18-r1/kernel/scripts/sign-file $KMOD_SIG_HASH $MODSECKEY $MODPUBKEY ${S}/DWC_ETH_QOS.ko
+        perl ${TMPDIR}/work/msm8996-poky-linux/linux-yocto-msm8996/3.18-r2/kernel/scripts/sign-file $KMOD_SIG_HASH $MODSECKEY $MODPUBKEY ${S}/DWC_ETH_QOS.ko
     fi;
 }
 
