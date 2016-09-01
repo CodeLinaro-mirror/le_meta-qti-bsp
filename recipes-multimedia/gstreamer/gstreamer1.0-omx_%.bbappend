@@ -32,6 +32,7 @@ SRC_URI_append += " \
    file://0022-hack-wait-30ms-before-reusing-unreleased-buffers.patch \
    file://0023-free-wl_omx_buffer_release-event-in-omx-handler.patch \
    file://0001-msm-omx-interface-and-ionbuff-updates-added-with-wor.patch \
+   file://0001-Disable-the-HACK-for-reuse-of-unreleased-buffer.patch \
 "
 
 do_configure_prepend() {
