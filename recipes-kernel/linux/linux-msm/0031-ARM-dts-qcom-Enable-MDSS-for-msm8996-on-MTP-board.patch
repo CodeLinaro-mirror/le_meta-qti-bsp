@@ -1,4 +1,4 @@
-From 268289a8e8858214fcdda5ef3806fcfd98ddc02d Mon Sep 17 00:00:00 2001
+From 7046e39f201d1e36b8777ee49d126fd3236f1c46 Mon Sep 17 00:00:00 2001
 From: Stephane Viau <sviau@codeaurora.org>
 Date: Tue, 7 Jul 2015 16:42:07 -0400
 Subject: [PATCH 31/44] ARM: dts: qcom: Enable MDSS for msm8996 on MTP board
@@ -12,8 +12,8 @@ Signed-off-by: Stephane Viau <sviau@codeaurora.org>
  arch/arm/boot/dts/qcom/msm8996-dtp.dtsi |  2 +
  arch/arm/boot/dts/qcom/msm8996-mtp.dtsi |  6 ++-
  arch/arm/boot/dts/qcom/msm8996-v2.dtsi  |  4 ++
- arch/arm/boot/dts/qcom/msm8996.dtsi     | 87 ++++++++++++++++++++++++++++++++-
- 4 files changed, 97 insertions(+), 2 deletions(-)
+ arch/arm/boot/dts/qcom/msm8996.dtsi     | 91 ++++++++++++++++++++++++++++++++-
+ 4 files changed, 101 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm/boot/dts/qcom/msm8996-dtp.dtsi b/arch/arm/boot/dts/qcom/msm8996-dtp.dtsi
 index 19d0527..1740922 100644
@@ -32,7 +32,7 @@ index 19d0527..1740922 100644
  &mdss_hdmi_tx {
  	status = "disabled";
 diff --git a/arch/arm/boot/dts/qcom/msm8996-mtp.dtsi b/arch/arm/boot/dts/qcom/msm8996-mtp.dtsi
-index dfd4162..ecb6a8c 100644
+index cdcc871..263071b 100644
 --- a/arch/arm/boot/dts/qcom/msm8996-mtp.dtsi
 +++ b/arch/arm/boot/dts/qcom/msm8996-mtp.dtsi
 @@ -338,7 +338,11 @@
@@ -64,7 +64,7 @@ index ea73899..621501c 100644
  	gdsc-venus-supply = <&gdsc_venus>;
  	qcom,core-supply-entries {
 diff --git a/arch/arm/boot/dts/qcom/msm8996.dtsi b/arch/arm/boot/dts/qcom/msm8996.dtsi
-index e119637..8e31cc9 100644
+index b505f81..3ee7ace 100644
 --- a/arch/arm/boot/dts/qcom/msm8996.dtsi
 +++ b/arch/arm/boot/dts/qcom/msm8996.dtsi
 @@ -219,7 +219,6 @@
@@ -75,7 +75,7 @@ index e119637..8e31cc9 100644
  #include "msm8996-mdss-pll.dtsi"
  #include "msm8996-smp2p.dtsi"
  #include "msm8996-ipcrouter.dtsi"
-@@ -3756,6 +3755,92 @@
+@@ -3759,6 +3758,96 @@
  		clock-names = "gpu_clk";
  		clocks = <&clock_gpu clk_gpu_gx_gfx3d_clk>;
  	};
@@ -125,6 +125,10 @@ index e119637..8e31cc9 100644
 +
 +	mdss_hdmi_tx: qcom,hdmi_tx@0 {
 +		// XXX Unused by KMS driver
++	};
++
++	mdss_rotator: qcom,mdss_rotator {
++		// TODO
 +	};
 +
 +	mdss_hdmi: qcom,hdmi_tx@9a0000 {
