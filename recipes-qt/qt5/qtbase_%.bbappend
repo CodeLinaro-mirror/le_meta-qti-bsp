@@ -1,4 +1,4 @@
-PACKAGECONFIG += "examples"
+PACKAGECONFIG += "sql-sqlite examples"
 
 FILESEXTRAPATHS_append := ":${THISDIR}/${PN}"
 
