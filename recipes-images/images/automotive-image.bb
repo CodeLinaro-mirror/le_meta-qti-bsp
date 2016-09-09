@@ -48,6 +48,15 @@ IMAGE_INSTALL += "common"
 IMAGE_INSTALL += "tftp-server"
 
 
+#wifi
+IMAGE_INSTALL_append = " \
+    qcacld \
+    wpa-supplicant \
+    hostapd \
+    iw \
+    wireless-tools \
+"
+
 IMAGE_ROOTFS_SIZE = "1048576"
 
 IMAGE_ROOTFS_EXTRA_SPACE_append = "${@bb.utils.contains("DISTRO_FEATURES", "systemd", " + 4096", "" ,d)}"
