@@ -13,6 +13,9 @@ SRC_URI += " \
    file://0004-mm-video-v4l2-vdec-add-makefile-and-vdec-test-progra.patch \
    file://0001-mm-core-Update-pmem-file-descriptor-type-to-integer.patch \
    file://0001-mm-video-v4l2-vdec-Disable-split-mode-on-Automotive.patch \
+   file://0005-mm-video-v4l2-vdec-de-couple-c2d-output-buf-reqs-fro.patch \
+   file://0006-mm-video-v4l2-vidc-Restore-pixel-format-on-capture-p.patch \
+   file://0007-mm-video-v4l2-vidc-vdec-Fix-multistream-issues.patch \
 "
 
 SRCREV = "c8933f995d8679ce21af1821ef3982672362d8ea"
