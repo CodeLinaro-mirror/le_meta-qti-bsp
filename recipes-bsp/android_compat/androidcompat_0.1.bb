@@ -21,4 +21,4 @@ PACKAGES = "${PN} andorid_compat"
 
 EXTRA_OECONF = " --with-core-includes=${WORKSPACE}/system/core/include --with-glib"
 CFLAGS += "-I${STAGING_INCDIR}/cutils"
-LDFLAGS += "-lcutils"
+LDFLAGS_prepend = " -lcutils "
