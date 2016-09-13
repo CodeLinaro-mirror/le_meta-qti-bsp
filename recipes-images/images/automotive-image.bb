@@ -25,6 +25,8 @@ IMAGE_INSTALL_append = " \
     audio-nxp-auto-noship \
     init-audio \
     alsaucm-conf \
+    audcal \
+    acdbloader \
     start-scripts-firmware-links \
     start-scripts-find-partitions \
     neutrino-eth \
