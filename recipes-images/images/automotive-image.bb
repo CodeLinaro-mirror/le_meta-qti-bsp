@@ -32,6 +32,13 @@ IMAGE_INSTALL_append = " \
     neutrino-firmware \
     iperf \
     ethtool \
+    lib32-androidcompat \
+    lib32-cameradbg \
+    lib32-mm-camerasdk \
+    lib32-mm-camera-lib \
+    lib32-mm-camera-core \
+    lib32-mm-3a-core \
+    lib32-mm-camera \
 "
 
 IMAGE_ROOTFS_SIZE = "1048576"
