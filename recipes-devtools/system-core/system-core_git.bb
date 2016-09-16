@@ -22,6 +22,11 @@ CPPFLAGS += "-I${STAGING_INCDIR}/libselinux"
 CPPFLAGS += "-I${STAGING_INCDIR}/libunwind"
 
 
+CFLAGS_append_pn-lib32-system-core = " -Dstrlcpy=g_strlcpy "
+CFLAGS_append_pn-lib32-system-core = " -Dstrlcat=g_strlcat "
+LDFLAGS_append_pn-lib32-liblog = " -lglib-2.0 -shared "
+
+
 COMPOSITION         = "9025"
 COMPOSITION_apq8009 = "9091"
 COMPOSITION_apq8053 = "901D"
