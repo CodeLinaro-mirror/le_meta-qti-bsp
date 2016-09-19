@@ -1,0 +1,57 @@
+From 00345b813e69fbead750d972da41eb9fbb151d80 Mon Sep 17 00:00:00 2001
+From: Bharathraj Nagaraju <c_bnagra@quicinc.com>
+Date: Thu, 1 Sep 2016 10:55:53 -0700
+Subject: [PATCH] Disable the HACK for reuse of unreleased buffer.
+
+with software audio decoder, since decode processing
+takes time, the reuse of unreleased buffers didn't
+result in repeat rendering of video decoded buffer.
+
+However the re-use poses issues with hardware acceleration
+hence disabling the hack
+
+Change-Id: I0f87173c21213eb7fc0565d4b88964ee2410532d
+Signed-off-by: Bharathraj Nagaraju <snbraj@codeaurora.org>
+---
+ omx/gstomx.c | 25 +------------------------
+ 1 file changed, 1 insertion(+), 24 deletions(-)
+
+diff --git a/omx/gstomx.c b/omx/gstomx.c
+index d7b63b8..ed00ee9 100644
+--- a/omx/gstomx.c
++++ b/omx/gstomx.c
+@@ -1515,30 +1515,7 @@ retry:
+     GST_DEBUG_OBJECT (comp->parent, "Queue of %s port %u is empty",
+         comp->name, port->index);
+ 
+-    /* HACK: */
+-    if (! gst_omx_component_wait_message (comp, GST_MSECOND * 30))
+-    {
+-      while ((_buf = g_queue_pop_head (&port->pushed_buffers)) != NULL) {
+-        _buf->used = TRUE;
+-
+-        /* Reset all flags, some implementations don't
+-         * reset them themselves and the flags are not
+-         * valid anymore after the buffer was consumed
+-         */
+-        _buf->omx_buf->nFlags = 0;
+-
+-        /* Reset offset and filled length */
+-        _buf->omx_buf->nOffset = 0;
+-        _buf->omx_buf->nFilledLen = 0;
+-
+-        GST_ERROR_OBJECT(comp->parent, "reusing unreleased GstOMXBuffer %p ", _buf);
+-
+-        OMX_FillThisBuffer (comp->handle, _buf->omx_buf);
+-      }
+-
+-      _buf = NULL;
+-    }
+-
++    gst_omx_component_wait_message (comp, GST_CLOCK_TIME_NONE);
+     gst_omx_component_handle_messages (comp);
+ 
+     /* And now check everything again and maybe get a buffer */
+-- 
+2.9.0.137.gcf4c2cf
+
