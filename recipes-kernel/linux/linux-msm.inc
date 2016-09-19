@@ -50,7 +50,6 @@ SRC_URI += " \
 	file://0041-defconfig-enable-drm-kms-driver.patch \
 	file://0042-base-firmware-add-lib64-firmware-to-firmware-loading.patch \
 	file://0043-gpu-drm-add-cursor-support-for-mdss-1.7.patch \
-	file://0044-ARM-dtsi-disable-ispif-module-for-8996-board.patch \
 	file://0001-drm-Make-msm_drm.h-uapi-header-safe-for-C.patch \
 	file://0002-drm-Make-drm.h-uapi-header-safe-for-C.patch \
 	file://0003-drm-Make-uapi-headers-C89-pendantic-compliant.patch \
