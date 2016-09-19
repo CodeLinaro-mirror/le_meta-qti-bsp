@@ -1,0 +1,134 @@
+From 95313ec60cf8db981af9f7c8b97e4bb447c985a5 Mon Sep 17 00:00:00 2001
+From: Jie Zhou <zhojie@codeaurora.org>
+Date: Mon, 19 Sep 2016 11:05:14 +0800
+Subject: [PATCH 1/4] mm video v4l2 venc add makefile
+
+Change-Id: Id184362cfb2a94ca1b60296d50ccfc2f0e3212f8
+Signed-off-by: Jie Zhou <zhojie@codeaurora.org>
+---
+ configure.ac                        |  3 +-
+ mm-video-v4l2/vidc/Makefile.am      |  3 +-
+ mm-video-v4l2/vidc/venc/Makefile.am | 85 +++++++++++++++++++++++++++++++++++++
+ 3 files changed, 88 insertions(+), 3 deletions(-)
+ mode change 100755 => 100644 mm-video-v4l2/vidc/Makefile.am
+ create mode 100644 mm-video-v4l2/vidc/venc/Makefile.am
+
+diff --git a/configure.ac b/configure.ac
+index a9875cc..4f03a85 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -69,6 +69,7 @@ AC_CONFIG_FILES([     \
+ 	mm-core/Makefile \
+ 	mm-video-v4l2/Makefile \
+ 	mm-video-v4l2/vidc/Makefile \
+-	mm-video-v4l2/vidc/vdec/Makefile
++	mm-video-v4l2/vidc/vdec/Makefile \
++	mm-video-v4l2/vidc/venc/Makefile
+ 	])
+ AC_OUTPUT
+diff --git a/mm-video-v4l2/vidc/Makefile.am b/mm-video-v4l2/vidc/Makefile.am
+old mode 100755
+new mode 100644
+index 338c2df..a0a1f3d
+--- a/mm-video-v4l2/vidc/Makefile.am
++++ b/mm-video-v4l2/vidc/Makefile.am
+@@ -2,5 +2,4 @@
+ #
+ ACLOCAL_AMFLAGS = -I m4
+ 
+-SUBDIRS = vdec
+-#SUBDIRS = vdec venc
++SUBDIRS = vdec venc
+diff --git a/mm-video-v4l2/vidc/venc/Makefile.am b/mm-video-v4l2/vidc/venc/Makefile.am
+new file mode 100644
+index 0000000..f2ce02f
+--- /dev/null
++++ b/mm-video-v4l2/vidc/venc/Makefile.am
+@@ -0,0 +1,85 @@
++AM_CFLAGS = -Wall
++AM_CFLAGS += -Wundef
++AM_CFLAGS += -Wstrict-prototypes
++AM_CFLAGS += -Wno-trigraphs
++AM_CFLAGS += -g -O3
++
++AM_CPPFLAGS = -D__alignx\(x\)=__attribute__\(\(__aligned__\(x\)\)\)
++AM_CPPFLAGS += -D__align=__alignx
++AM_CPPFLAGS += -Dinline=__inline
++AM_CPPFLAGS += -DIMAGE_APPS_PROC
++AM_CPPFLAGS += -DCDECL
++AM_CPPFLAGS += -DT_ARM
++AM_CPPFLAGS += -DNO_ARM_CLZ
++AM_CPPFLAGS += -UENABLE_DEBUG_LOW
++AM_CPPFLAGS += -DENABLE_DEBUG_HIGH
++AM_CPPFLAGS += -DENABLE_DEBUG_ERROR
++AM_CPPFLAGS += -UINPUT_BUFFER_LOG
++AM_CPPFLAGS += -UOUTPUT_BUFFER_LOG
++AM_CPPFLAGS += -Wno-parentheses
++if TARGET_MSM8960
++AM_CPPFLAGS += -DMAX_RES_1080P
++AM_CPPFLAGS += -DMAX_RES_1080P_EBI
++AM_CPPFLAGS += -UENABLE_GET_SYNTAX_HDR
++AM_CPPFLAGS += -DUSE_ION
++endif
++if TARGET_MSM8974
++AM_CPPFLAGS += -DMAX_RES_1080P
++AM_CPPFLAGS += -DMAX_RES_1080P_EBI
++AM_CPPFLAGS += -DPROCESS_EXTRADATA_IN_OUTPUT_PORT
++AM_CPPFLAGS += -DUSE_ION
++AM_CPPFLAGS += -D_MSM8974_
++AM_CPPFLAGS += -D_METAMODE_
++AM_CPPFLAGS += -D_OPAQUE_
++endif
++
++AM_CPPFLAGS += -I$(top_srcdir)/mm-video-v4l2/vidc/venc/inc
++AM_CPPFLAGS += -I$(top_srcdir)/mm-video-v4l2/vidc/common/inc
++#AM_CPPFLAGS += -I$(top_srcdir)/libc2dcolorconvert
++AM_CPPFLAGS += -I$(top_srcdir)/mm-core/inc
++AM_CPPFLAGS += -I$(top_srcdir)/mm-core/src/common
++#AM_CPPFLAGS += -I../libc2dcolorconvert
++sources = src/omx_video_base.cpp
++sources += src/omx_video_encoder.cpp
++
++if TARGET_MSM8960
++sources += src/video_encoder_device.cpp
++endif
++
++if TARGET_MSM8974
++sources += src/video_encoder_device_v4l2.cpp
++endif
++sources += ../common/src/extra_data_handler.cpp
++#sources += ../common/src/vidc_color_converter.cpp
++
++lib_LTLIBRARIES = libOmxVenc.la
++libOmxVenc_la_SOURCES = $(sources)
++libOmxVenc_la_CFLAGS = $(AM_CFLAGS) $(AM_CPPFLAGS) -fPIC
++libOmxVenc_la_CXXFLAGS = $(AM_CFLAGS) $(AM_CPPFLAGS) -fPIC
++#libOmxVenc_la_LDLIBS = -lOmxCore -lstdc++ -lpthread -lc2d2
++#libOmxVenc_la_LDLIBS += ../libc2d2colorconvert/libc2dcolorconvert.la
++libOmxVenc_la_LDFLAGS = -shared -version-info $(OMXVIDEO_LIBRARY_VERSION)
++
++
++bin_PROGRAMS = mm-venc-omx-test
++
++mm_venc_omx_test_CPPFLAGS = -I$(top_srcdir)/mm-video-v4l2/vidc/venc/inc
++mm_venc_omx_test_CPPFLAGS += -I$(top_srcdir)/mm-core/inc
++mm_venc_omx_test_CPPFLAGS += -I$(top_srcdir)/mm-video-v4l2/vidc/common/inc
++
++if TARGET_MSM8974
++mm_venc_omx_test_CPPFLAGS += -DMAX_RES_1080P
++mm_venc_omx_test_CPPFLAGS += -DMAX_RES_1080P_EBI
++mm_venc_omx_test_CPPFLAGS += -DPROCESS_EXTRADATA_IN_OUTPUT_PORT
++mm_venc_omx_test_CPPFLAGS += -D_MSM8974_
++mm_venc_omx_test_CPPFLAGS += -DUSE_ION
++mm_venc_omx_test_CPPFLAGS += -D_METAMODE_
++endif
++
++mm_venc_omx_test_SOURCES = test/venc_test.cpp
++mm_venc_omx_test_SOURCES += test/camera_test.cpp
++mm_venc_omx_test_SOURCES += test/venc_util.c
++mm_venc_omx_test_SOURCES += test/fb_test.c
++mm_venc_omx_test_LDADD = -ldl -lpthread
++mm_venc_omx_test_LDADD += ../../../mm-core/libOmxCore.la
++mm_venc_omx_test_LDADD += ./libOmxVenc.la
+-- 
+1.9.1

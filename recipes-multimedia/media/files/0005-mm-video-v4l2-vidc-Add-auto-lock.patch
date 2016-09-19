@@ -1,0 +1,46 @@
+From 521bed83f79b88efcc1238ce313c6ff9e331f197 Mon Sep 17 00:00:00 2001
+From: Shiju Mathew <shijum@codeaurora.org>
+Date: Tue, 20 Sep 2016 12:10:05 -0400
+Subject: [PATCH 1/2] mm-video-v4l2: vidc: Add auto lock
+
+Add helper function for locking.
+
+Change-Id: I166010a59d9eb8556cadcd9de9ea52209f9a7da5
+---
+ mm-video-v4l2/vidc/common/inc/vidc_debug.h | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/mm-video-v4l2/vidc/common/inc/vidc_debug.h b/mm-video-v4l2/vidc/common/inc/vidc_debug.h
+index ec8f390..a2b3696 100644
+--- a/mm-video-v4l2/vidc/common/inc/vidc_debug.h
++++ b/mm-video-v4l2/vidc/common/inc/vidc_debug.h
+@@ -29,6 +29,8 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ #ifndef __VIDC_DEBUG_H__
+ #define __VIDC_DEBUG_H__
+ 
++#include <pthread.h>
++
+ enum {
+    PRIO_ERROR=0x1,
+    PRIO_INFO=0x1,
+@@ -83,4 +85,17 @@ extern int debug_level;
+ #define DEBUG_PRINT_HIGH(fmt, args...) DEBUG_PRINT_CTL(PRIO_HIGH, fmt, ##args)
+ #endif
+ 
++class auto_lock {
++    public:
++        auto_lock(pthread_mutex_t &lock)
++            : mLock(lock) {
++                pthread_mutex_lock(&mLock);
++            }
++        ~auto_lock() {
++            pthread_mutex_unlock(&mLock);
++        }
++    private:
++        pthread_mutex_t &mLock;
++};
++
+ #endif
+-- 
+1.9.1
+
