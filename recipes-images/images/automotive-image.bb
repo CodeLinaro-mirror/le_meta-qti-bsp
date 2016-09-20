@@ -39,6 +39,10 @@ IMAGE_INSTALL_append = " \
     lib32-mm-camera-core \
     lib32-mm-3a-core \
     lib32-mm-camera \
+    diag \
+    qmi \
+    qmi-framework \
+    common \
 "
 
 IMAGE_ROOTFS_SIZE = "1048576"
