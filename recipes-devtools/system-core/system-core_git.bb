@@ -12,13 +12,15 @@ SRC_URI   = "file://system/core/"
 S = "${WORKDIR}/system/core"
 PR = "r17"
 
-DEPENDS = "virtual/kernel openssl glib-2.0 libselinux safe-iop ext4-utils"
+DEPENDS = "virtual/kernel openssl glib-2.0 libselinux safe-iop ext4-utils libunwind libcutils"
 
 EXTRA_OECONF = " --with-host-os=${HOST_OS} --with-glib"
 EXTRA_OECONF_append = " --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
 
 CPPFLAGS += "-I${STAGING_INCDIR}/ext4_utils"
 CPPFLAGS += "-I${STAGING_INCDIR}/libselinux"
+CPPFLAGS += "-I${STAGING_INCDIR}/libunwind"
+
 
 COMPOSITION         = "9025"
 COMPOSITION_apq8009 = "9091"
@@ -39,6 +41,26 @@ do_install_append() {
    install -m 0755 ${S}/usb/debuger/usb_debug -D ${D}${base_sbindir}/
    ln -s  /sbin/usb/compositions/${COMPOSITION} ${D}${base_sbindir}/usb/boot_hsusb_composition
    ln -s  /sbin/usb/compositions/empty ${D}${base_sbindir}/usb/boot_hsic_composition
+}
+
+do_install_append_apq8009() {
+   install -m 0755 ${S}/debuggerd/start_debuggerd -D ${D}${sysconfdir}/init.d/init_debuggerd
+}
+do_install_append_apq8053(){
+   install -m 0755 ${S}/debuggerd/start_debuggerd64 -D ${D}${sysconfdir}/init.d/init_debuggerd
+}
+do_install_append_apq8096() {
+   install -m 0755 ${S}/debuggerd/start_debuggerd64 -D ${D}${sysconfdir}/init.d/init_debuggerd
+}
+do_install_append_apq8017(){
+   install -m 0755 ${S}/debuggerd/start_debuggerd64 -D ${D}${sysconfdir}/init.d/init_debuggerd
+}
+pkg_postinst_${PN} () {
+        [ -n "$D" ] && OPT="-r $D" || OPT="-s"
+        # remove all rc.d-links potentially created from alternatives
+        update-rc.d $OPT -f init_debuggerd remove
+        update-rc.d $OPT init_debuggerd start 31 S .
+
 }
 
 INITSCRIPT_PACKAGES =+ "${PN}-usb"
