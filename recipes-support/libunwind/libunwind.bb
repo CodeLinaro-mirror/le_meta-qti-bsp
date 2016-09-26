@@ -10,4 +10,5 @@ FILESPATH =+ "${WORKSPACE}:"
 SRC_URI = "file://external/libunwind/"
 S = "${WORKDIR}/external/libunwind"
 
-
+PACKAGECONFIG ??= ""
+PACKAGECONFIG[lzma] = "--enable-minidebuginfo,--disable-minidebuginfo,xz"
