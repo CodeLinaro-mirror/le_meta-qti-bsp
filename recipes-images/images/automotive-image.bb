@@ -46,6 +46,7 @@ IMAGE_INSTALL += "qmi"
 IMAGE_INSTALL += "qmi-framework"
 IMAGE_INSTALL += "common"
 IMAGE_INSTALL += "tftp-server"
+IMAGE_INSTALL += "qmi-client-helper"
 
 
 #wifi
