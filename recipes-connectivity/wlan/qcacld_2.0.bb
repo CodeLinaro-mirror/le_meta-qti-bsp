@@ -41,7 +41,7 @@ do_install () {
     install -D -m 0644 ${S}/firmware_bin/WCNSS_qcom_cfg.ini ${D}/lib/firmware/wlan/qca_cld/
     install -D -m 0644 ${S}/firmware_bin/WCNSS_qcom_cfg.ini ${D}/lib/firmware/wlan/qcom_cfg.ini
     install -D -m 0644 ${S}/firmware_bin/WCNSS_cfg.dat ${D}/lib/firmware/wlan/qca_cld/
-    install -D -m 0644 ${S}/firmware_bin/WCNSS_cfg.dat ${D}/lib/firmware/wlan/qca_cld/cfg.dat
+    install -D -m 0644 ${S}/firmware_bin/WCNSS_cfg.dat ${D}/lib/firmware/wlan/cfg.dat
 
     install -d ${D}/usr/sbin
     install -D -m 0544 ${WORKDIR}/wifi_on.sh ${D}/usr/sbin/
