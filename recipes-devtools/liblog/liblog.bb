@@ -16,10 +16,10 @@ SRC_URI  += "file://50-log.rules"
 
 S = "${WORKDIR}/liblog"
 
-CFLAGS_append_pn-lib32-liblog = " -Dstrlcpy=g_strlcpy "
-CFLAGS_append_pn-lib32-liblog = " -Dstrlcat=g_strlcat "
+CFLAGS_append_pn-liblog = " -Dstrlcpy=g_strlcpy "
+CFLAGS_append_pn-liblog = " -Dstrlcat=g_strlcat "
 
-LDFLAGS_append_pn-lib32-liblog = " -lglib-2.0 -shared "
+LDFLAGS_append_pn-liblog = " -lglib-2.0 -shared "
 
 EXTRA_OECONF = " --with-core-includes=${WORKSPACE}/system/core/include"
 
