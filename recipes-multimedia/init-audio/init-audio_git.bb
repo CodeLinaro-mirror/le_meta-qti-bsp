@@ -20,6 +20,8 @@ S_msm8610 = "${WORKDIR}/${BASEMACHINE}"
 
 INITSCRIPT_NAME_msm8996 = "init_qcom_audio"
 INITSCRIPT_PARAMS_msm8996 = "start 99 2 3 4 5 . stop 1 0 1 6 ."
+INITSCRIPT_NAME_8x96mctm = "init_qcom_audio"
+INITSCRIPT_PARAMS_8x96mctm = "start 99 2 3 4 5 . stop 1 0 1 6 ."
 INITSCRIPT_NAME_msm8974 = "init_qcom_audio"
 INITSCRIPT_PARAMS_msm8974 = "start 99 2 3 4 5 . stop 1 0 1 6 ."
 INITSCRIPT_NAME_msm8610 = "init_qcom_audio"
