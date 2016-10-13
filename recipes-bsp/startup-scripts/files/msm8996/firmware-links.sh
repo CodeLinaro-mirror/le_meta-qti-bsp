@@ -81,4 +81,8 @@ case $linksNeeded in
 esac
 
 cd /
+
+#Autoprobe Wlan module here after firmware link is ready
+modprobe wlan
+
 exit 0
