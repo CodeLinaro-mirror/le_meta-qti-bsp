@@ -24,5 +24,6 @@ do_configure_prepend () {
     sed -i -e 's/^#CONFIG_P2P=y/CONFIG_P2P=y/g' ${WORKDIR}/defconfig
     sed -i -e 's/^#CONFIG_TDLS=y/CONFIG_TDLS=y/g' ${WORKDIR}/defconfig
     sed -i -e 's/^#CONFIG_WIFI_DISPLAY=y/CONFIG_WIFI_DISPLAY=y/g' ${WORKDIR}/defconfig
+    sed -i -e 's/^#CONFIG_READLINE=y/CONFIG_READLINE=y/g' ${WORKDIR}/defconfig
 }
 
