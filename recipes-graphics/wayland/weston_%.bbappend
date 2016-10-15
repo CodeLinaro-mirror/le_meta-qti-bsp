@@ -16,6 +16,8 @@ SRC_URI_append = "\
     file://weston-1.9-atomic-patches/0009-compositor-drm-Atomic-modesetting-support.patch \
     file://weston-1.9-atomic-patches/0010-compositor-drm-Track-currently-active-view-for-plane.patch \
     file://weston-1.9-atomic-patches/0011-wip-scanout-plane.patch \
+    file://weston-1.9-atomic-patches/0020-Enable-sprite-plane.patch \
+    file://weston-1.9-atomic-patches/0021-compositor-drm-add-proper-stride-handle-for-NV12-UV-.patch \
     "
 CFLAGS += "-idirafter ${STAGING_KERNEL_DIR}/include/"
 
