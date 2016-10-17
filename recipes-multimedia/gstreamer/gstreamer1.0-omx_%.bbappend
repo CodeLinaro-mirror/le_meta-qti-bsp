@@ -35,6 +35,7 @@ SRC_URI_append += " \
    file://0001-Disable-the-HACK-for-reuse-of-unreleased-buffer.patch \
    file://0026-gstomx-support-videoencoder.patch \
    file://0027-gstomx-increase-one-buffer-for-weston-atomic-modeset.patch \
+   file://0028-gst-omx-Fix-video-hang-issue.patch \
 "
 
 do_configure_prepend() {

@@ -1,0 +1,60 @@
+From a4caa0576b49ec609355046fae4f05eb9e9b6212 Mon Sep 17 00:00:00 2001
+From: Shiju Mathew <shijum@codeaurora.org>
+Date: Mon, 17 Oct 2016 13:07:24 -0400
+Subject: [PATCH 1/1] gst-omx: Fix video hang issue
+
+Change-Id: I642e223b6adc3c12072975fb2aed5c3105d274ca
+---
+ omx/gstomx.c         |  9 +--------
+ omx/gstomxvideodec.c | 14 ++++++++++++++
+ 2 files changed, 15 insertions(+), 8 deletions(-)
+
+diff --git a/omx/gstomx.c b/omx/gstomx.c
+index d568135..fe06cb3 100644
+--- a/omx/gstomx.c
++++ b/omx/gstomx.c
+@@ -1623,14 +1623,7 @@ gst_omx_port_release_buffer (GstOMXPort * port, GstOMXBuffer * buf)
+               OMX_IndexParamVideoPortFormat,
+               &param);
+ 
+-    if ( param.eCompressionFormat == OMX_VIDEO_CodingUnused ) {
+-      GST_DEBUG_OBJECT(comp->parent,"Pushing to wayland: buf %p, buf->omx_buf %p, buf->omx_buf->pBuffer %p, nAllocLen %u, nFilledLen %u, nOffset %u",
+-        buf, buf->omx_buf, buf->omx_buf->pBuffer, (unsigned) buf->omx_buf->nAllocLen, (unsigned) buf->omx_buf->nFilledLen,
+-       (unsigned) buf->omx_buf->nOffset);
+-
+-      g_queue_push_tail (&port->pushed_buffers, buf);
+-    }
+-    else {
++    if ( param.eCompressionFormat != OMX_VIDEO_CodingUnused ) {
+         buf->used = TRUE;
+         if (port->port_def.eDir == OMX_DirOutput) {
+            /* Reset all flags, some implementations don't
+diff --git a/omx/gstomxvideodec.c b/omx/gstomxvideodec.c
+index d33cddb..e4b07d9 100644
+--- a/omx/gstomxvideodec.c
++++ b/omx/gstomxvideodec.c
+@@ -1548,7 +1548,21 @@ gst_omx_video_dec_loop (GstOMXVideoDec * self)
+           frame = NULL;
+           gst_omx_port_release_buffer (port, buf);
+           goto invalid_buffer;
++         }
++
++        if (buf)
++        {
++          if (port->port_def.eDir == OMX_DirOutput)
++          {
++
++            GST_DEBUG_OBJECT(self,"Pushing to wayland: buf %p, buf->omx_buf %p, buf->omx_buf->pBuffer %p, nAllocLen %u, nFilledLen %u, nOffset %u",
++                 buf, buf->omx_buf, buf->omx_buf->pBuffer, (unsigned) buf->omx_buf->nAllocLen, (unsigned) buf->omx_buf->nFilledLen,
++                 (unsigned) buf->omx_buf->nOffset);
++
++            g_queue_push_tail (&port->pushed_buffers, buf);
++          }
+         }
++
+         flow_ret =
+             gst_video_decoder_finish_frame (GST_VIDEO_DECODER (self), frame);
+         frame = NULL;
+-- 
+1.9.1
+
