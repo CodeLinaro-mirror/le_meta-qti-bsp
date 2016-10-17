@@ -1,9 +1,7 @@
-DESCRIPTION = "AGL Demo Platform image currently contains a simple HMI and \
-demos."
+# List of FOSS packages installed onto the root file system as specified by the user.
 
-require recipes-platform/images/agl-demo-platform.bb
-
-#add packages on top of AGL root file system
+# Base image
+require recipes-ivi/images/agl-image-ivi.inc
 
 IMAGE_INSTALL += "weston"
 IMAGE_INSTALL += "weston-examples"
@@ -48,15 +46,14 @@ IMAGE_INSTALL += "common"
 IMAGE_INSTALL += "tftp-server"
 IMAGE_INSTALL += "qmi-client-helper"
 IMAGE_INSTALL += "diag-reboot-app"
+IMAGE_INSTALL += "thermal-engine"
 
 #wifi
-IMAGE_INSTALL_append = " \
-    qcacld \
-    wpa-supplicant \
-    hostapd \
-    iw \
-    wireless-tools \
-"
+IMAGE_INSTALL += "qcacld"
+IMAGE_INSTALL += "wpa-supplicant"
+IMAGE_INSTALL += "hostapd"
+IMAGE_INSTALL += "iw"
+IMAGE_INSTALL += "wireless-tools"
 
 IMAGE_ROOTFS_SIZE = "1048576"
 
