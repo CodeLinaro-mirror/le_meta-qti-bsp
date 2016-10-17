@@ -51,6 +51,7 @@ SRC_URI_append += " \
    file://0001-Updated-to-correct-type-of-IonBuffFd-and-alignment-r.patch \
    file://0001-Egldisplay-should-get-destroyed-before-clearing-the-.patch \
    file://0001-Increase-the-rank-of-gstwaylandsink.patch \
+   file://0027-gstreamer-plugins-bad-Fix-video-playback-issue-due-t.patch \
 "
 
 
