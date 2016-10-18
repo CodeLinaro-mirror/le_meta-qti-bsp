@@ -55,6 +55,11 @@ IMAGE_INSTALL += "hostapd"
 IMAGE_INSTALL += "iw"
 IMAGE_INSTALL += "wireless-tools"
 
+IMAGE_INSTALL += "packagegroup-agl-core"
+IMAGE_INSTALL += "packagegroup-agl-ivi"
+IMAGE_INSTALL += "packagegroup-ivi-common-core"
+IMAGE_INSTALL += "packagegroup-agl-demo-platform"
+
 IMAGE_ROOTFS_SIZE = "1048576"
 
 IMAGE_ROOTFS_EXTRA_SPACE_append = "${@bb.utils.contains("DISTRO_FEATURES", "systemd", " + 4096", "" ,d)}"
