@@ -74,4 +74,13 @@ IMAGE_INSTALL += "synergy-opensource"
 
 IMAGE_ROOTFS_SIZE = "2097152"
 
+# Add Persistence Storage related components
+IMAGE_INSTALL += "dlt-daemon"
+IMAGE_INSTALL += "persistence-common-object"
+IMAGE_INSTALL += "persistence-client-library"
+IMAGE_INSTALL += "persistence-administrator"
+IMAGE_INSTALL += "node-state-manager"
+IMAGE_INSTALL += "node-health-monitor"
+IMAGE_INSTALL += "node-startup-controller"
+
 IMAGE_ROOTFS_EXTRA_SPACE_append = "${@bb.utils.contains("DISTRO_FEATURES", "systemd", " + 4096", "" ,d)}"
