@@ -35,6 +35,7 @@ IMAGE_INSTALL += "start-scripts-find-partitions"
 IMAGE_INSTALL += "neutrino-eth"
 IMAGE_INSTALL += "neutrino-flash"
 IMAGE_INSTALL += "neutrino-firmware"
+IMAGE_INSTALL += "open-avb"
 IMAGE_INSTALL += "iperf"
 IMAGE_INSTALL += "ethtool"
 #camera related
