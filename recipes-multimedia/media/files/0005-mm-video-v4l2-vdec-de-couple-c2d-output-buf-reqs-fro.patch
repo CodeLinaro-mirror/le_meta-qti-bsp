@@ -1,7 +1,7 @@
-From bda292f9c2a266923c7a33ed5a10aba687c043e8 Mon Sep 17 00:00:00 2001
+From b8874051ff0f9a5375ff739f6f0ea2771ed2753f Mon Sep 17 00:00:00 2001
 From: Praveen Chavan <pchavan@codeaurora.org>
 Date: Tue, 21 Jun 2016 18:59:40 -0700
-Subject: [PATCH 1/3] mm-video-v4l2: vdec: de-couple c2d output-buf reqs from
+Subject: [PATCH 1/1] mm-video-v4l2: vdec: de-couple c2d output-buf reqs from
  venus
 
 When C2D is enabled (for on-the-fly-color-conversion), output
@@ -20,8 +20,8 @@ sizes reflect the actual allocation sizes.
 Change-Id: If64165f19c7210121a205375c0e460cb873a9d92
 ---
  mm-video-v4l2/vidc/vdec/inc/omx_vdec.h        |  3 +
- mm-video-v4l2/vidc/vdec/src/omx_vdec_v4l2.cpp | 97 ++++++++++++++++++++++++---
- 2 files changed, 89 insertions(+), 11 deletions(-)
+ mm-video-v4l2/vidc/vdec/src/omx_vdec_v4l2.cpp | 93 +++++++++++++++++++++++----
+ 2 files changed, 83 insertions(+), 13 deletions(-)
 
 diff --git a/mm-video-v4l2/vidc/vdec/inc/omx_vdec.h b/mm-video-v4l2/vidc/vdec/inc/omx_vdec.h
 index cb580b6..8730b89 100644
@@ -45,19 +45,19 @@ index cb580b6..8730b89 100644
                  OMX_QCOM_PLATFORM_PRIVATE_ENTRY     m_platform_entry_client[MAX_COUNT];
                  OMX_QCOM_PLATFORM_PRIVATE_PMEM_INFO m_pmem_info_client[MAX_COUNT];
 diff --git a/mm-video-v4l2/vidc/vdec/src/omx_vdec_v4l2.cpp b/mm-video-v4l2/vidc/vdec/src/omx_vdec_v4l2.cpp
-index 243907a..c56f097 100644
+index 4b8f52a..62daeae 100644
 --- a/mm-video-v4l2/vidc/vdec/src/omx_vdec_v4l2.cpp
 +++ b/mm-video-v4l2/vidc/vdec/src/omx_vdec_v4l2.cpp
-@@ -3825,6 +3825,19 @@ OMX_ERRORTYPE  omx_vdec::set_parameter(OMX_IN OMX_HANDLETYPE     hComp,
-                                   #else
-                                      if (!port_format_changed) {
-                                   #endif
-+                                       // Buffer count can change only when port is disabled
-+                                       if (!release_output_done()) {
-+                                           DEBUG_PRINT_ERROR("Cannot change o/p buffer count since all buffers are not freed yet !");
-+                                           eRet = OMX_ErrorInvalidState;
-+                                           break;
-+                                       }
+@@ -3832,12 +3832,17 @@ OMX_ERRORTYPE  omx_vdec::set_parameter(OMX_IN OMX_HANDLETYPE     hComp,
+                                        if (m_out_mem_ptr &&
+                                                 (portDefn->nBufferCountActual != drv_ctx.op_buf.actualcount ||
+                                                 portDefn->nBufferSize != drv_ctx.op_buf.buffer_size)) {
+-
+                                            DEBUG_PRINT_ERROR("Cannot change o/p buffer count since all buffers are not freed yet !");
+                                            eRet = OMX_ErrorInvalidState;
+                                            break;
+                                        }
+-
 +                                  #ifdef _COLOR_CONVERTION_
 +                                       // route updating of buffer requirements via c2d proxy.
 +                                       // Based on whether c2d is enabled, requirements will be handed
@@ -68,7 +68,7 @@ index 243907a..c56f097 100644
                                         if ( portDefn->nBufferCountActual >= drv_ctx.op_buf.mincount &&
                                                 portDefn->nBufferSize >=  drv_ctx.op_buf.buffer_size ) {
                                             drv_ctx.op_buf.actualcount = portDefn->nBufferCountActual;
-@@ -3833,11 +3846,13 @@ OMX_ERRORTYPE  omx_vdec::set_parameter(OMX_IN OMX_HANDLETYPE     hComp,
+@@ -3846,11 +3851,13 @@ OMX_ERRORTYPE  omx_vdec::set_parameter(OMX_IN OMX_HANDLETYPE     hComp,
                                             drv_ctx.extradata_info.size = drv_ctx.extradata_info.count *
                                                 drv_ctx.extradata_info.buffer_size;
                                             eRet = set_buffer_req(&drv_ctx.op_buf);
@@ -85,7 +85,7 @@ index 243907a..c56f097 100644
                                                     (unsigned int)portDefn->nBufferCountActual, (unsigned int)portDefn->nBufferSize);
                                             eRet = OMX_ErrorBadParameter;
                                         }
-@@ -10895,6 +10910,8 @@ omx_vdec::allocate_color_convert_buf::allocate_color_convert_buf()
+@@ -10902,6 +10909,8 @@ omx_vdec::allocate_color_convert_buf::allocate_color_convert_buf()
      init_members();
      ColorFormat = OMX_COLOR_FormatMax;
      dest_format = YCbCr420P;
@@ -94,7 +94,7 @@ index 243907a..c56f097 100644
  }
  
  void omx_vdec::allocate_color_convert_buf::set_vdec_client(void *client)
-@@ -10907,6 +10924,7 @@ void omx_vdec::allocate_color_convert_buf::init_members()
+@@ -10914,6 +10923,7 @@ void omx_vdec::allocate_color_convert_buf::init_members()
      allocated_count = 0;
      buffer_size_req = 0;
      buffer_alignment_req = 0;
@@ -102,7 +102,7 @@ index 243907a..c56f097 100644
      memset(m_platform_list_client,0,sizeof(m_platform_list_client));
      memset(m_platform_entry_client,0,sizeof(m_platform_entry_client));
      memset(m_pmem_info_client,0,sizeof(m_pmem_info_client));
-@@ -10937,6 +10955,20 @@ bool omx_vdec::allocate_color_convert_buf::update_buffer_req()
+@@ -10944,6 +10954,20 @@ bool omx_vdec::allocate_color_convert_buf::update_buffer_req()
          return status;
      }
      pthread_mutex_lock(&omx->c_lock);
@@ -123,7 +123,7 @@ index 243907a..c56f097 100644
      if (omx->drv_ctx.output_format != VDEC_YUV_FORMAT_NV12 &&
              ColorFormat != OMX_COLOR_FormatYUV420Planar) {
          DEBUG_PRINT_ERROR("update_buffer_req: Unsupported color conversion");
-@@ -10962,12 +10994,12 @@ bool omx_vdec::allocate_color_convert_buf::update_buffer_req()
+@@ -10969,12 +10993,12 @@ bool omx_vdec::allocate_color_convert_buf::update_buffer_req()
              status = false;
              c2d.close();
              buffer_size_req = 0;
@@ -140,7 +140,7 @@ index 243907a..c56f097 100644
          }
      }
  fail_update_buf_req:
-@@ -11118,14 +11150,57 @@ OMX_BUFFERHEADERTYPE* omx_vdec::allocate_color_convert_buf::get_il_buf_hdr()
+@@ -11125,14 +11149,57 @@ OMX_BUFFERHEADERTYPE* omx_vdec::allocate_color_convert_buf::get_il_buf_hdr()
              goto fail_get_buffer_size;
          }
      }
