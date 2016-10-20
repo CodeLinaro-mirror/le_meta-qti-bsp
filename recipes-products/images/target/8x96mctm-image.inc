@@ -35,6 +35,8 @@ IMAGE_INSTALL += "neutrino-flash"
 IMAGE_INSTALL += "neutrino-firmware"
 IMAGE_INSTALL += "iperf"
 IMAGE_INSTALL += "ethtool"
+IMAGE_INSTALL += "pciutils"
+IMAGE_INSTALL += "i2c-tools"
 #camera related
 IMAGE_INSTALL += "lib32-androidcompat"
 IMAGE_INSTALL += "lib32-cameradbg"
