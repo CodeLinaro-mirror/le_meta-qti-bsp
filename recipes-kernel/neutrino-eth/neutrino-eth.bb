@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/GPL-2.0;md5=80
 DEPENDS = "virtual/kernel"
 
 FILESEXTRAPATHS_prepend := "${WORKSPACE}/:"
-SRC_URI = "file://vnw/ethernet"
+SRC_URI = "file://vehiclenetwork/ethernet"
 
 PR = "r0"
 PV = "0.1"

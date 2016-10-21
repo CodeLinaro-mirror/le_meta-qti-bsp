@@ -38,6 +38,7 @@ IMAGE_INSTALL += "neutrino-firmware"
 IMAGE_INSTALL += "open-avb"
 IMAGE_INSTALL += "iperf"
 IMAGE_INSTALL += "ethtool"
+IMAGE_INSTALL += "rh850-firmware"
 #camera related
 IMAGE_INSTALL += "lib32-androidcompat"
 IMAGE_INSTALL += "lib32-cameradbg"

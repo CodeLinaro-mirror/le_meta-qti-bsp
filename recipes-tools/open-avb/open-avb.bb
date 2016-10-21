@@ -5,7 +5,7 @@ LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/BSD;md5=3775480a712fc46a69647678acb234cb"
 
 FILESEXTRAPATHS_prepend := "${WORKSPACE}/:"
-SRC_URI = "file://vnw/Open-AVB"
+SRC_URI = "file://vehiclenetwork/Open-AVB"
 
 PR = "r0"
 PV = "0.1"
