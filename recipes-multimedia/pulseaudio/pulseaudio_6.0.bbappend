@@ -13,3 +13,8 @@ SRC_URI += " \
              file://0004-udev-Add-rules-for-QTI-MSM8996.patch \
              file://0005-default.pa-Disable-module-suspend-on-idle.patch \
            "
+
+RDEPENDS_pulseaudio-server += "\
+         ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', '\
+                 pulseaudio-module-systemd-login\
+         ', '', d)}"
