@@ -1,0 +1,53 @@
+From be70651f113f80daaaa40a141006592057672db2 Mon Sep 17 00:00:00 2001
+From: Yannick Gicquel <yannick.gicquel@iot.bzh>
+Date: Wed, 28 Sep 2016 10:10:35 +0200
+Subject: [PATCH 2/5] config: fixup type for demo effect
+
+this is hardcoded for now, and automatically applied for phone routing group.
+
+Signed-off-by: Yannick Gicquel <yannick.gicquel@iot.bzh>
+---
+ config.c           | 4 ++--
+ pulseaudio-agl.cfg | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/config.c b/config.c
+index ee13ce6..c317e6f 100644
+--- a/config.c
++++ b/config.c
+@@ -121,8 +121,8 @@ bool agl_config_dofile (struct userdata *u, const char *path)
+ 		 effect_fct = json_object_get_string (json_object_object_get (elt, "effect_fct"));
+ 		agl_router_create_rtgroup (u, pa_streq(type, "OUTPUT") ? agl_output : agl_input,
+ 					      name, card,
+-					      pa_streq(type, "phone") ? agl_router_phone_accept : NULL,
+-					      pa_streq(type, "phone") ? agl_router_phone_effect : NULL);
++					      pa_streq(name, "phone") ? agl_router_phone_accept : NULL,
++					      pa_streq(name, "phone") ? agl_router_phone_effect : NULL);
+ 	}
+ 
+ 	 /* [classmap] section */
+diff --git a/pulseaudio-agl.cfg b/pulseaudio-agl.cfg
+index 3d0a837..3a5cf24 100644
+--- a/pulseaudio-agl.cfg
++++ b/pulseaudio-agl.cfg
+@@ -3,7 +3,7 @@
+ "zones": ["driver", "passenger1", "passenger2", "passenger3", "passenger4" ],
+ 
+ "rtgroups": [
+- {"name":"Phone",
++ {"name":"phone",
+   "type":"INPUT",
+   "card":"PhoneCard",
+   "accept_fct":"phone",
+@@ -15,7 +15,7 @@
+ ],
+ 
+ "classmap": [
+- {"class":    "agl_phone", "zone":0, "type":"INPUT", "rtgroup":"Phone"},
++ {"class":    "agl_phone", "zone":0, "type":"INPUT", "rtgroup":"phone"},
+  {"class":   "agl_player", "zone":0, "type":"INPUT", "rtgroup":"default"},
+  {"class":    "agl_radio", "zone":0, "type":"INPUT", "rtgroup":"default"},
+  {"class":"agl_navigator", "zone":0, "type":"INPUT", "rtgroup":"default"},
+-- 
+1.9.1
+
