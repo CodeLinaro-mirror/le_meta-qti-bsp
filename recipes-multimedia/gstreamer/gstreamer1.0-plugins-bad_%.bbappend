@@ -18,6 +18,7 @@ EXTRA_OECONF += " \
     --disable-resindvd \
     --disable-voaacenc \
     --disable-voamrwbenc \
+    --disable-yadif \
     ${GSTREAMER_1_0_ORC} \
     "
 
