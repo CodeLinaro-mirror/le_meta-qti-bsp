@@ -39,6 +39,7 @@ IMAGE_INSTALL += "open-avb"
 IMAGE_INSTALL += "iperf"
 IMAGE_INSTALL += "ethtool"
 IMAGE_INSTALL += "rh850-firmware"
+IMAGE_INSTALL += "adreno200"
 #camera related
 IMAGE_INSTALL += "lib32-androidcompat"
 IMAGE_INSTALL += "lib32-cameradbg"
@@ -71,6 +72,6 @@ IMAGE_INSTALL += "synergy"
 IMAGE_INSTALL += "synergy-bt-app"
 
 
-IMAGE_ROOTFS_SIZE = "1048576"
+IMAGE_ROOTFS_SIZE = "2097152"
 
 IMAGE_ROOTFS_EXTRA_SPACE_append = "${@bb.utils.contains("DISTRO_FEATURES", "systemd", " + 4096", "" ,d)}"
