@@ -69,6 +69,7 @@ SRC_URI += " \
 	file://0105-drm-adreno-Enable-Adreno-5.patch \
 	file://0106-drm-adreno-Fix-issue-of-zero-addrass-writing.patch \
 	file://0107-drm-adreno-Fix-issue-of-wait-too-long.patch \
+	file://0001-drm-msm-add-modifier-support-in-kms-driver.patch \
 "
 
 SRC_URI[0001.md5sum] = "7fdc9ffea731349324901598d8e34b48"
