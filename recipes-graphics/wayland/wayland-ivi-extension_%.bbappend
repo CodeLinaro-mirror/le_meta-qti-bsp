@@ -1,6 +1,6 @@
 #package libs from correct libdir after adding mulitilib support.
 
-SRC_URI = "git://git.projects.genivi.org/${PN}.git;protocol=https \
+SRC_URI = "git://git.projects.genivi.org/${PN}.git;protocol=http \
           "
 
 do_install_append() {
