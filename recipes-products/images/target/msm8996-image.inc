@@ -66,6 +66,11 @@ IMAGE_INSTALL += "wireless-tools"
 IMAGE_INSTALL += "ath6kl-utils"
 IMAGE_INSTALL += "ftm"
 
+#bt
+IMAGE_INSTALL += "synergy"
+IMAGE_INSTALL += "synergy-bt-app"
+
+
 IMAGE_ROOTFS_SIZE = "1048576"
 
 IMAGE_ROOTFS_EXTRA_SPACE_append = "${@bb.utils.contains("DISTRO_FEATURES", "systemd", " + 4096", "" ,d)}"
