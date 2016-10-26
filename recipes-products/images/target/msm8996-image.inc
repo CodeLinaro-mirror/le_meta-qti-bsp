@@ -70,7 +70,7 @@ IMAGE_INSTALL += "ftm"
 #bt
 IMAGE_INSTALL += "synergy"
 IMAGE_INSTALL += "synergy-bt-app"
-
+IMAGE_INSTALL += "synergy-opensource"
 
 IMAGE_ROOTFS_SIZE = "2097152"
 
