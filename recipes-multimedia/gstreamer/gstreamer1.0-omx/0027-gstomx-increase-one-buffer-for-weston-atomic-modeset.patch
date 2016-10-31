@@ -1,0 +1,59 @@
+From b1ccee209c929212b13cfefd9046433b44f1bacd Mon Sep 17 00:00:00 2001
+From: Jin Li <jinl@codeaurora.org>
+Date: Tue, 25 Oct 2016 18:29:48 -0400
+Subject: [PATCH] gstomx: increase one buffer for weston atomic modeset feature
+
+With Weston atomic modeset feature enabled, video content could
+directly go to display video layer without GL composition. But
+since display HW always holds one buffer, the first buffer from
+decoder will be released until VSYNC happens after second buffer,
+and it won't be released back to client until third buffer being
+committed to Weston. So, decoder needs one extra buffer in this
+scenario.
+
+Signed-off-by: Jin Li <jinl@codeaurora.org>
+---
+ omx/gstomxvideodec.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/omx/gstomxvideodec.c b/omx/gstomxvideodec.c
+index d33cddb..b37cb87 100644
+--- a/omx/gstomxvideodec.c
++++ b/omx/gstomxvideodec.c
+@@ -288,7 +288,7 @@ gst_omx_video_dec_shutdown (GstOMXVideoDec * self)
+     }
+   }
+ 
+-  /* Otherwise we didn't use EGL and just fall back to 
++  /* Otherwise we didn't use EGL and just fall back to
+    * shutting down the decoder */
+ #endif
+ 
+@@ -629,6 +629,15 @@ gst_omx_video_dec_allocate_output_buffers (GstOMXVideoDec * self)
+       goto done;
+     }
+ 
++    /* With atomic modeset enabled in Weston, we need minimum 3 buffers
++     * in order to swap them on video layer, because display HW is releasing
++     * the first buffer only when Vsync happens after second buffer, and
++     * first buffer won't release back to client until third buffer being
++     * committed to Westion.
++     * Long term, we need to consider use fence for sychronization.
++     */
++    port->port_def.nBufferCountMin += 1;
++
+     /* Need at least 2 buffers for anything meaningful */
+     min = MAX (MAX (min, port->port_def.nBufferCountMin), 4);
+     if (max == 0) {
+@@ -1847,7 +1856,7 @@ gst_omx_video_dec_negotiate (GstOMXVideoDec * self)
+   param.eCompressionFormat = OMX_VIDEO_CodingUnused;
+   param.xFramerate = 25;
+   /* MSM8996: Index for required MSM color format */
+-  param.nIndex = 1; 
++  param.nIndex = 1;
+ #else
+   intersection =
+       gst_pad_peer_query_caps (GST_VIDEO_DECODER_SRC_PAD (self), templ_caps);
+-- 
+2.10.1
+
