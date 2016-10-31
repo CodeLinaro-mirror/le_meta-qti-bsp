@@ -33,10 +33,13 @@ IMAGE_INSTALL += "start-scripts-find-partitions"
 IMAGE_INSTALL += "neutrino-eth"
 IMAGE_INSTALL += "neutrino-flash"
 IMAGE_INSTALL += "neutrino-firmware"
+IMAGE_INSTALL += "open-avb"
 IMAGE_INSTALL += "iperf"
 IMAGE_INSTALL += "ethtool"
 IMAGE_INSTALL += "pciutils"
 IMAGE_INSTALL += "i2c-tools"
+IMAGE_INSTALL += "rh850-firmware"
+
 #camera related
 IMAGE_INSTALL += "lib32-androidcompat"
 IMAGE_INSTALL += "lib32-cameradbg"
@@ -61,12 +64,26 @@ IMAGE_INSTALL += "wpa-supplicant"
 IMAGE_INSTALL += "hostapd"
 IMAGE_INSTALL += "iw"
 IMAGE_INSTALL += "wireless-tools"
-
+#IMAGE_INSTALL += "ath6kl-utils"
+#IMAGE_INSTALL += "ftm"
 IMAGE_INSTALL += "packagegroup-agl-core"
+#bt
+IMAGE_INSTALL += "synergy"
+IMAGE_INSTALL += "synergy-bt-app"
+IMAGE_INSTALL += "synergy-opensource"
+
 IMAGE_INSTALL += "packagegroup-agl-ivi"
 IMAGE_INSTALL += "packagegroup-ivi-common-core"
 IMAGE_INSTALL += "packagegroup-agl-demo-platform"
 
-IMAGE_ROOTFS_SIZE = "1048576"
+IMAGE_ROOTFS_SIZE = "2097152"
 
+# Add Persistence Storage related components
+IMAGE_INSTALL += "dlt-daemon"
+IMAGE_INSTALL += "persistence-common-object"
+IMAGE_INSTALL += "persistence-client-library"
+IMAGE_INSTALL += "persistence-administrator"
+IMAGE_INSTALL += "node-state-manager"
+IMAGE_INSTALL += "node-health-monitor"
+IMAGE_INSTALL += "node-startup-controller"
 IMAGE_ROOTFS_EXTRA_SPACE_append = "${@bb.utils.contains("DISTRO_FEATURES", "systemd", " + 4096", "" ,d)}"
