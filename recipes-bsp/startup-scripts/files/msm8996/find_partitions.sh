@@ -33,10 +33,12 @@ mkdir -p /dsp
 mkdir -p /data
 mkdir -p /persist
 mkdir -p /firmware
+mkdir -p /bluetooth
 
 mount /dsp
 mount /data
 mount /persist
 mount /firmware
+mount /bluetooth
 
 exit 0
