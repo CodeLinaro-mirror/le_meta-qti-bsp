@@ -1,0 +1,679 @@
+From 5eb790427bd95ff43a4c14019f5298bb28cf9753 Mon Sep 17 00:00:00 2001
+From: Jie Zhou <zhojie@codeaurora.org>
+Date: Mon, 19 Sep 2016 13:17:20 +0800
+Subject: [PATCH 1/1] mm video v4l2 venc strip dependence on android and
+ disable color conversion
+
+Change-Id: I250b1401b629498f7998d69dac5d7df8deeba1ae
+Signed-off-by: Jie Zhou <zhojie@codeaurora.org>
+---
+ mm-video-v4l2/vidc/venc/Makefile.am                |  1 +
+ mm-video-v4l2/vidc/venc/inc/omx_video_base.h       | 12 ++++--
+ .../vidc/venc/inc/video_encoder_device_v4l2.h      |  2 +
+ mm-video-v4l2/vidc/venc/src/omx_swvenc_mpeg4.cpp   | 13 +++++-
+ mm-video-v4l2/vidc/venc/src/omx_video_base.cpp     | 47 +++++++++++++++++++++-
+ mm-video-v4l2/vidc/venc/src/omx_video_encoder.cpp  |  9 +++++
+ .../vidc/venc/src/video_encoder_device.cpp         |  8 ++--
+ .../vidc/venc/src/video_encoder_device_v4l2.cpp    | 34 +++++++++++++++-
+ 8 files changed, 114 insertions(+), 12 deletions(-)
+
+diff --git a/mm-video-v4l2/vidc/venc/Makefile.am b/mm-video-v4l2/vidc/venc/Makefile.am
+index f2ce02f..a5d0abd 100644
+--- a/mm-video-v4l2/vidc/venc/Makefile.am
++++ b/mm-video-v4l2/vidc/venc/Makefile.am
+@@ -11,6 +11,7 @@ AM_CPPFLAGS += -DIMAGE_APPS_PROC
+ AM_CPPFLAGS += -DCDECL
+ AM_CPPFLAGS += -DT_ARM
+ AM_CPPFLAGS += -DNO_ARM_CLZ
++AM_CPPFLAGS += -D_AGL_LINUX_
+ AM_CPPFLAGS += -UENABLE_DEBUG_LOW
+ AM_CPPFLAGS += -DENABLE_DEBUG_HIGH
+ AM_CPPFLAGS += -DENABLE_DEBUG_ERROR
+diff --git a/mm-video-v4l2/vidc/venc/inc/omx_video_base.h b/mm-video-v4l2/vidc/venc/inc/omx_video_base.h
+index 3918708..ac2cc98 100644
+--- a/mm-video-v4l2/vidc/venc/inc/omx_video_base.h
++++ b/mm-video-v4l2/vidc/venc/inc/omx_video_base.h
+@@ -47,6 +47,7 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ #include <stdio.h>
+ #include <sys/mman.h>
+ #ifdef _ANDROID_
++#include <media/hardware/HardwareAPI.h>
+ #include <binder/MemoryHeapBase.h>
+ #ifdef _ANDROID_ICS_
+ #include "QComOMXMetadata.h"
+@@ -55,7 +56,6 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ #include <pthread.h>
+ #include <semaphore.h>
+ #include <linux/msm_vidc_enc.h>
+-#include <media/hardware/HardwareAPI.h>
+ #include "OMX_Core.h"
+ #include "OMX_QCOMExtns.h"
+ #include "OMX_Skype_VideoExtensions.h"
+@@ -66,7 +66,9 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ #include "extra_data_handler.h"
+ #include <linux/videodev2.h>
+ #include <dlfcn.h>
++#ifdef _COLOR_CONVERSION_
+ #include "C2DColorConverter.h"
++#endif
+ #include "vidc_debug.h"
+ 
+ #ifdef _ANDROID_
+@@ -154,10 +156,10 @@ enum omx_venc_extradata_types {
+ class omx_video: public qc_omx_component
+ {
+     protected:
+-#ifdef _ANDROID_ICS_
+         bool meta_mode_enable;
+-        bool c2d_opened;
++#ifdef _ANDROID_
+         encoder_media_buffer_type meta_buffers[MAX_NUM_INPUT_BUFFERS];
++#endif
+         OMX_BUFFERHEADERTYPE *opaque_buffer_hdr[MAX_NUM_INPUT_BUFFERS];
+         bool get_syntaxhdr_enable;
+         OMX_BUFFERHEADERTYPE  *psource_frame;
+@@ -167,6 +169,8 @@ class omx_video: public qc_omx_component
+         //intermediate conversion buffer queued to encoder in case of invalid EOS input
+         OMX_BUFFERHEADERTYPE  *mEmptyEosBuffer;
+ 
++#ifdef _COLOR_CONVERSION_
++        bool c2d_opened;
+         class omx_c2d_conv
+         {
+             public:
+@@ -633,7 +637,9 @@ class omx_video: public qc_omx_component
+         OMX_SKYPE_VIDEO_PARAM_DRIVERVER m_sDriverVer;
+         OMX_SKYPE_VIDEO_CONFIG_QP m_sConfigQP;
+         QOMX_EXTNINDEX_VIDEO_VENC_SAR m_sSar;
++#ifdef _ANDROID_
+         PrependSPSPPSToIDRFramesParams m_sPrependSPSPPS;
++#endif
+         struct timestamp_info {
+             OMX_U64 m_TimeStamp;
+             bool is_buffer_pending;
+diff --git a/mm-video-v4l2/vidc/venc/inc/video_encoder_device_v4l2.h b/mm-video-v4l2/vidc/venc/inc/video_encoder_device_v4l2.h
+index 73059e5..a74102a 100644
+--- a/mm-video-v4l2/vidc/venc/inc/video_encoder_device_v4l2.h
++++ b/mm-video-v4l2/vidc/venc/inc/video_encoder_device_v4l2.h
+@@ -558,11 +558,13 @@ class venc_dev
+             // utility methods to parse entities in batch
+             // payload format for batch of 3
+             //| fd0 | fd1 | fd2 | off0 | off1 | off2 | len0 | len1 | len2 | csc0 | csc1 | csc2 | dTS0 | dTS1 | dTS2|
++#ifdef _ANDROID_
+             static inline int getFdAt(native_handle_t *, int index);
+             static inline int getOffsetAt(native_handle_t *, int index);
+             static inline int getSizeAt(native_handle_t *, int index);
+             static inline int getColorFormatAt(native_handle_t *, int index);
+             static inline int getTimeStampAt(native_handle_t *, int index);
++#endif
+         };
+         BatchInfo mBatchInfo;
+ };
+diff --git a/mm-video-v4l2/vidc/venc/src/omx_swvenc_mpeg4.cpp b/mm-video-v4l2/vidc/venc/src/omx_swvenc_mpeg4.cpp
+index 48c1d01..7dafef4 100644
+--- a/mm-video-v4l2/vidc/venc/src/omx_swvenc_mpeg4.cpp
++++ b/mm-video-v4l2/vidc/venc/src/omx_swvenc_mpeg4.cpp
+@@ -63,6 +63,7 @@ omx_venc::omx_venc()
+ {
+     ENTER_FUNC();
+ 
++#ifdef _ANDROID_
+     char property_value[PROPERTY_VALUE_MAX] = {0};
+ 
+     memset(&m_debug,0,sizeof(m_debug));
+@@ -86,11 +87,11 @@ omx_venc::omx_venc()
+     {
+        strlcpy(m_debug.log_loc, property_value, PROPERTY_VALUE_MAX);
+     }
+-
++    memset(meta_buffers,0,sizeof(meta_buffers));
++#endif
+     memset(meta_buffer_hdr,0,sizeof(meta_buffer_hdr));
+     meta_mode_enable = false;
+     memset(meta_buffer_hdr,0,sizeof(meta_buffer_hdr));
+-    memset(meta_buffers,0,sizeof(meta_buffers));
+     memset(opaque_buffer_hdr,0,sizeof(opaque_buffer_hdr));
+     mUseProxyColorFormat = false;
+     get_syntaxhdr_enable = false;
+@@ -1781,6 +1782,7 @@ bool omx_venc::dev_empty_buf
+     (void)pmem_data_buf;
+     (void)index;
+ 
++#ifdef _ANDROID_
+     if (meta_mode_enable)
+     {
+        encoder_media_buffer_type *meta_buf = NULL;
+@@ -1808,6 +1810,13 @@ bool omx_venc::dev_empty_buf
+        ipbuffer.size = bufhdr->nAllocLen;
+        ipbuffer.filled_length = bufhdr->nFilledLen;
+     }
++#else
++    ipbuffer.p_buffer = bufhdr->pBuffer;
++    ipbuffer.size = bufhdr->nAllocLen;
++    ipbuffer.filled_length = bufhdr->nFilledLen;
++#endif
++
++
+     ipbuffer.flags = 0;
+     if (bufhdr->nFlags & OMX_BUFFERFLAG_EOS)
+     {
+diff --git a/mm-video-v4l2/vidc/venc/src/omx_video_base.cpp b/mm-video-v4l2/vidc/venc/src/omx_video_base.cpp
+index ed5881c..aba0b28 100644
+--- a/mm-video-v4l2/vidc/venc/src/omx_video_base.cpp
++++ b/mm-video-v4l2/vidc/venc/src/omx_video_base.cpp
+@@ -53,6 +53,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ #endif
+ #ifndef _ANDROID_
+ #include <glib.h>
++#include <sys/ioctl.h>
+ #define strlcpy g_strlcpy
+ #endif
+ #define H264_SUPPORTED_WIDTH (480)
+@@ -264,11 +265,13 @@ VideoHeap::VideoHeap(int fd, size_t size, void* base)
+    None.
+    ========================================================================== */
+ omx_video::omx_video():
++#ifdef _ANDROID_
+     c2d_opened(false),
+     psource_frame(NULL),
+     pdest_frame(NULL),
+     secure_session(false),
+     mEmptyEosBuffer(NULL),
++#endif
+     m_pipe_in(-1),
+     m_pipe_out(-1),
+     m_pInput_pmem(NULL),
+@@ -2027,10 +2030,12 @@ OMX_ERRORTYPE  omx_video::get_parameter(OMX_IN OMX_HANDLETYPE     hComp,
+             }
+         case OMX_QcomIndexParamSequenceHeaderWithIDR:
+             {
++#ifdef _ANDROID_
+                 PrependSPSPPSToIDRFramesParams * pParam =
+                     reinterpret_cast<PrependSPSPPSToIDRFramesParams *>(paramData);
+                 DEBUG_PRINT_LOW("get_parameter: OMX_QcomIndexParamSequenceHeaderWithIDR");
+                 memcpy(pParam, &m_sPrependSPSPPS, sizeof(m_sPrependSPSPPS));
++#endif
+                 break;
+             }
+         case OMX_QcomIndexParamVencAspectRatio:
+@@ -2896,13 +2901,16 @@ OMX_ERRORTYPE omx_video::free_output_buffer(OMX_BUFFERHEADERTYPE *bufferHdr)
+             if(!secure_session) {
+                 munmap (m_pOutput_pmem[index].buffer,
+                         m_pOutput_pmem[index].size);
+-            } else {
++            }
++#ifdef _ANDROID_
++            else {
+                 char *data = (char*) m_pOutput_pmem[index].buffer;
+                 native_handle_t *handle = NULL;
+                 memcpy(&handle, data + sizeof(OMX_U32), sizeof(native_handle_t*));
+                 native_handle_delete(handle);
+                 free(m_pOutput_pmem[index].buffer);
+             }
++#endif
+             close (m_pOutput_pmem[index].fd);
+ #ifdef USE_ION
+             free_ion_memory(&m_pOutput_ion[index]);
+@@ -3109,7 +3117,9 @@ OMX_ERRORTYPE  omx_video::allocate_input_buffer(
+ #endif
+                 return OMX_ErrorInsufficientResources;
+             }
+-        } else {
++        }
++#ifdef _ANDROID_
++        else {
+             //This should only be used for passing reference to source type and
+             //secure handle fd struct native_handle_t*
+             m_pInput_pmem[i].buffer = malloc(sizeof(OMX_U32) + sizeof(native_handle_t*));
+@@ -3119,6 +3129,7 @@ OMX_ERRORTYPE  omx_video::allocate_input_buffer(
+             }
+             (*bufferHdr)->nAllocLen = sizeof(OMX_U32) + sizeof(native_handle_t*);
+         }
++#endif
+ 
+         (*bufferHdr)->pBuffer           = (OMX_U8 *)m_pInput_pmem[i].buffer;
+         DEBUG_PRINT_LOW("Virtual address in allocate buffer is %p", m_pInput_pmem[i].buffer);
+@@ -3284,6 +3295,7 @@ OMX_ERRORTYPE  omx_video::allocate_output_buffer(
+                     return OMX_ErrorInsufficientResources;
+                 }
+             }
++#ifdef _ANDROID_
+             else {
+                 //This should only be used for passing reference to source type and
+                 //secure handle fd struct native_handle_t*
+@@ -3300,6 +3312,7 @@ OMX_ERRORTYPE  omx_video::allocate_output_buffer(
+                 memcpy(data, &type, sizeof(OMX_U32));
+                 memcpy(data + sizeof(OMX_U32), &handle, sizeof(native_handle_t*));
+             }
++#endif
+ 
+             *bufferHdr = (m_out_mem_ptr + i );
+             (*bufferHdr)->pBuffer = (OMX_U8 *)m_pOutput_pmem[i].buffer;
+@@ -3646,7 +3659,9 @@ OMX_ERRORTYPE  omx_video::empty_this_buffer_proxy(OMX_IN OMX_HANDLETYPE  hComp,
+     int push_cnt = 0;
+     unsigned nBufIndex = 0;
+     OMX_ERRORTYPE ret = OMX_ErrorNone;
++#ifdef _ANDROID_
+     encoder_media_buffer_type *media_buffer = NULL;
++#endif
+ 
+ #ifdef _MSM8974_
+     int fd = 0;
+@@ -3657,6 +3672,7 @@ OMX_ERRORTYPE  omx_video::empty_this_buffer_proxy(OMX_IN OMX_HANDLETYPE  hComp,
+         return OMX_ErrorBadParameter;
+     }
+ 
++#ifdef _ANDROID_
+     // Buffer sanity checks
+     if (meta_mode_enable && !mUsesColorConversion) {
+         //For color-conversion case, we have an internal buffer and not a meta buffer
+@@ -3701,6 +3717,13 @@ OMX_ERRORTYPE  omx_video::empty_this_buffer_proxy(OMX_IN OMX_HANDLETYPE  hComp,
+             return OMX_ErrorBadParameter;
+         }
+     }
++#else
++    nBufIndex = buffer - ((OMX_BUFFERHEADERTYPE *)m_inp_mem_ptr);
++    if (nBufIndex >= m_sInPortDef.nBufferCountActual) {
++        DEBUG_PRINT_ERROR("ERROR: ETBProxy: Invalid bufIndex = %u", nBufIndex);
++        return OMX_ErrorBadParameter;
++    }
++#endif
+ 
+     pending_input_buffers++;
+     if (input_flush_progress == true) {
+@@ -4332,6 +4355,7 @@ OMX_ERRORTYPE omx_video::empty_buffer_done(OMX_HANDLETYPE         hComp,
+ 
+     pending_input_buffers--;
+ 
++#ifdef _COLOR_CONVERSION_
+     if (mUseProxyColorFormat &&
+         (buffer_index >= 0 && (buffer_index < (int)m_sInPortDef.nBufferCountActual))) {
+         if (!pdest_frame  && !input_flush_progress && mUsesColorConversion) {
+@@ -4363,6 +4387,10 @@ OMX_ERRORTYPE omx_video::empty_buffer_done(OMX_HANDLETYPE         hComp,
+     } else if (m_pCallbacks.EmptyBufferDone) {
+         m_pCallbacks.EmptyBufferDone(hComp ,m_app_data, buffer);
+     }
++#else
++    m_pCallbacks.EmptyBufferDone(hComp ,m_app_data, buffer);
++#endif
++
+     return OMX_ErrorNone;
+ }
+ 
+@@ -4719,6 +4747,7 @@ void omx_video::omx_release_meta_buffer(OMX_BUFFERHEADERTYPE *buffer)
+     }
+ }
+ #endif
++#ifdef _COLOR_CONVERSION_
+ omx_video::omx_c2d_conv::omx_c2d_conv()
+ {
+     c2dcc = NULL;
+@@ -4857,14 +4886,17 @@ bool omx_video::is_conv_needed(int hal_fmt, int hal_flags)
+     DEBUG_PRINT_LOW("RGBA conversion %s", bRet ? "Needed":"Not-Needed");
+     return bRet;
+ }
++#endif
+ 
+ OMX_ERRORTYPE  omx_video::empty_this_buffer_opaque(OMX_IN OMX_HANDLETYPE hComp,
+         OMX_IN OMX_BUFFERHEADERTYPE* buffer)
+ {
+     unsigned nBufIndex = 0;
+     OMX_ERRORTYPE ret = OMX_ErrorNone;
++#ifdef _ANDROID_
+     encoder_media_buffer_type *media_buffer;
+     private_handle_t *handle = NULL;
++#endif
+     DEBUG_PRINT_LOW("ETBProxyOpaque: buffer[%p]", buffer);
+ 
+     if (buffer == NULL) {
+@@ -4883,6 +4915,7 @@ OMX_ERRORTYPE  omx_video::empty_this_buffer_opaque(OMX_IN OMX_HANDLETYPE hComp,
+                 nBufIndex);
+         return OMX_ErrorBadParameter;
+     }
++#ifdef _ANDROID_
+     media_buffer = (encoder_media_buffer_type *)buffer->pBuffer;
+     if ((!media_buffer || !media_buffer->meta_handle) &&
+             !(buffer->nFlags & OMX_BUFFERFLAG_EOS)) {
+@@ -4898,10 +4931,12 @@ OMX_ERRORTYPE  omx_video::empty_this_buffer_opaque(OMX_IN OMX_HANDLETYPE hComp,
+          kMetadataBufferTypeCameraSource) {
+         return empty_this_buffer_proxy(hComp, buffer);
+     }
++#endif
+ 
+     /*Enable following code once private handle color format is
+       updated correctly*/
+ 
++#ifdef _COLOR_CONVERSION_
+     if (buffer->nFilledLen > 0 && handle) {
+         if (c2d_opened && handle->format != c2d_conv.get_src_format()) {
+             c2d_conv.close();
+@@ -4929,6 +4964,7 @@ OMX_ERRORTYPE  omx_video::empty_this_buffer_opaque(OMX_IN OMX_HANDLETYPE hComp,
+             }
+         }
+     }
++#endif
+     if (input_flush_progress == true) {
+         m_pCallbacks.EmptyBufferDone(hComp,m_app_data,buffer);
+         DEBUG_PRINT_ERROR("ERROR: ETBProxyA: Input flush in progress");
+@@ -4948,6 +4984,7 @@ OMX_ERRORTYPE  omx_video::empty_this_buffer_opaque(OMX_IN OMX_HANDLETYPE hComp,
+     return ret;
+ }
+ 
++#ifdef _ANDROID_
+ OMX_ERRORTYPE omx_video::queue_meta_buffer(OMX_HANDLETYPE hComp,
+         struct pmem &Input_pmem_info)
+ {
+@@ -5071,6 +5108,7 @@ OMX_ERRORTYPE omx_video::convert_queue_buffer(OMX_HANDLETYPE hComp,
+     }
+     return ret;
+ }
++#endif
+ 
+ OMX_ERRORTYPE omx_video::push_input_buffer(OMX_HANDLETYPE hComp)
+ {
+@@ -5089,7 +5127,9 @@ OMX_ERRORTYPE omx_video::push_input_buffer(OMX_HANDLETYPE hComp)
+     while (psource_frame != NULL && pdest_frame != NULL &&
+             ret == OMX_ErrorNone) {
+         struct pmem Input_pmem_info;
++#ifdef _ANDROID_
+         encoder_media_buffer_type *media_buffer;
++#endif
+         index = pdest_frame - m_inp_mem_ptr;
+         if (index >= m_sInPortDef.nBufferCountActual) {
+             DEBUG_PRINT_ERROR("Output buffer index is wrong %u act count %u",
+@@ -5104,6 +5144,7 @@ OMX_ERRORTYPE omx_video::push_input_buffer(OMX_HANDLETYPE hComp)
+         if (psource_frame->nFilledLen == 0 && (psource_frame->nFlags & OMX_BUFFERFLAG_EOS)) {
+             return push_empty_eos_buffer(hComp, psource_frame);
+         }
++#ifdef _ANDROID_
+         media_buffer = (encoder_media_buffer_type *)psource_frame->pBuffer;
+         /*Will enable to verify camcorder in current TIPS can be removed*/
+         if (media_buffer->buffer_type == kMetadataBufferTypeCameraSource) {
+@@ -5133,6 +5174,8 @@ OMX_ERRORTYPE omx_video::push_input_buffer(OMX_HANDLETYPE hComp)
+             else
+                 ret = OMX_ErrorBadParameter;
+         }
++#endif
++
+     }
+     return ret;
+ }
+diff --git a/mm-video-v4l2/vidc/venc/src/omx_video_encoder.cpp b/mm-video-v4l2/vidc/venc/src/omx_video_encoder.cpp
+index f463d36..f1fe044 100644
+--- a/mm-video-v4l2/vidc/venc/src/omx_video_encoder.cpp
++++ b/mm-video-v4l2/vidc/venc/src/omx_video_encoder.cpp
+@@ -105,10 +105,12 @@ bool omx_venc::perf_control::load_lib()
+     if (m_perf_lib)
+         return true;
+ 
++#ifdef _ANDROID_
+     if ((property_get("ro.vendor.extension_library", perf_lib_path, NULL) <= 0)) {
+         DEBUG_PRINT_ERROR("vendor library not set in ro.vendor.extension_library");
+         goto handle_err;
+     }
++#endif
+     if ((m_perf_lib = dlopen(perf_lib_path, RTLD_NOW)) == NULL) {
+         DEBUG_PRINT_ERROR("Failed to open %s : %s",perf_lib_path, dlerror());
+         goto handle_err;
+@@ -145,6 +147,7 @@ omx_venc::omx_venc()
+     mUseProxyColorFormat = false;
+     get_syntaxhdr_enable = false;
+ #endif
++#ifdef _ANDROID_
+     bframes = entropy = 0;
+     char property_value[PROPERTY_VALUE_MAX] = {0};
+     property_get("vidc.debug.level", property_value, "1");
+@@ -159,6 +162,10 @@ omx_venc::omx_venc()
+     property_get("vidc.debug.perf.mode", property_value, "0");
+     perfmode = atoi(property_value);
+     property_value[0] = '\0';
++#else
++    char *env_ptr = getenv("OMX_DEBUG_LEVEL");
++    debug_level = env_ptr ? atoi(env_ptr) : 0;
++#endif
+     handle = NULL;
+     m_perf_control.send_hint_to_mpctl(true);
+ }
+@@ -1432,6 +1439,7 @@ OMX_ERRORTYPE  omx_venc::set_parameter(OMX_IN OMX_HANDLETYPE     hComp,
+             }
+         case OMX_QcomIndexParamSequenceHeaderWithIDR:
+             {
++#ifdef _ANDROID_
+                 if(!handle->venc_set_param(paramData,
+                             (OMX_INDEXTYPE)OMX_QcomIndexParamSequenceHeaderWithIDR)) {
+                     DEBUG_PRINT_ERROR("%s: %s",
+@@ -1440,6 +1448,7 @@ OMX_ERRORTYPE  omx_venc::set_parameter(OMX_IN OMX_HANDLETYPE     hComp,
+                     return OMX_ErrorUnsupportedSetting;
+                 }
+                 memcpy((void *) &m_sPrependSPSPPS, &paramData, sizeof(m_sPrependSPSPPS));
++#endif
+                 break;
+             }
+         case OMX_QcomIndexParamH264AUDelimiter:
+diff --git a/mm-video-v4l2/vidc/venc/src/video_encoder_device.cpp b/mm-video-v4l2/vidc/venc/src/video_encoder_device.cpp
+index 855c79f..1c03036 100644
+--- a/mm-video-v4l2/vidc/venc/src/video_encoder_device.cpp
++++ b/mm-video-v4l2/vidc/venc/src/video_encoder_device.cpp
+@@ -25,10 +25,11 @@ WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ --------------------------------------------------------------------------*/
+-#include<string.h>
++#include <string.h>
+ #include <sys/ioctl.h>
+ #include <sys/prctl.h>
+-#include<unistd.h>
++#include <unistd.h>
++#include <errno.h>
+ #include <fcntl.h>
+ #include "video_encoder_device.h"
+ #include "omx_video_encoder.h"
+@@ -142,6 +143,7 @@ venc_dev::venc_dev(class omx_venc *venc_class)
+     pthread_cond_init (&loaded_start_stop_cond, NULL);
+     memset(&m_debug,0,sizeof(m_debug));
+ 
++#ifdef _ANDROID_
+     char property_value[PROPERTY_VALUE_MAX] = {0};
+     property_value[0] = '\0';
+     property_get("vidc.enc.log.in", property_value, "0");
+@@ -152,7 +154,7 @@ venc_dev::venc_dev(class omx_venc *venc_class)
+     m_debug.out_buffer_log = atoi(property_value);
+     snprintf(m_debug.log_loc, PROPERTY_VAL_MAX,
+              "%s", BUFFER_LOG_LOC);
+-
++#endif
+     DEBUG_PRINT_LOW("venc_dev constructor");
+ }
+ 
+diff --git a/mm-video-v4l2/vidc/venc/src/video_encoder_device_v4l2.cpp b/mm-video-v4l2/vidc/venc/src/video_encoder_device_v4l2.cpp
+index 70e2e34..a8ab0b0 100644
+--- a/mm-video-v4l2/vidc/venc/src/video_encoder_device_v4l2.cpp
++++ b/mm-video-v4l2/vidc/venc/src/video_encoder_device_v4l2.cpp
+@@ -31,6 +31,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ #include <sys/prctl.h>
+ #include <sys/eventfd.h>
+ #include <unistd.h>
++#include <errno.h>
+ #include <fcntl.h>
+ #include "video_encoder_device_v4l2.h"
+ #include "omx_video_encoder.h"
+@@ -39,12 +40,11 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ #include <linux/msm_ion.h>
+ #endif
+ #include <media/msm_media_info.h>
+-#include <cutils/properties.h>
+-#include <media/hardware/HardwareAPI.h>
+ 
+ #ifdef _ANDROID_
+ #include <media/hardware/HardwareAPI.h>
+ #include <gralloc_priv.h>
++#include <cutils/properties.h>
+ #endif
+ 
+ #define ALIGN(x, to_align) ((((unsigned long) x) + (to_align - 1)) & ~(to_align - 1))
+@@ -268,6 +268,7 @@ venc_dev::venc_dev(class omx_venc *venc_class):mInputExtradata(venc_class), mOut
+     operating_rate = 0;
+     low_latency_mode = OMX_FALSE;
+ 
++#ifdef _ANDROID_
+     char property_value[PROPERTY_VALUE_MAX] = {0};
+     property_get("vidc.enc.log.in", property_value, "0");
+     m_debug.in_buffer_log = atoi(property_value);
+@@ -280,7 +281,9 @@ venc_dev::venc_dev(class omx_venc *venc_class):mInputExtradata(venc_class), mOut
+ 
+     property_get("vidc.enc.log.roiqp", property_value, "0");
+     m_debug.roiqp_log = atoi(property_value);
++#endif
+ #ifdef _UBWC_
++#ifdef _ANDROID_
+     property_get("debug.gralloc.gfx_ubwc_disable", property_value, "0");
+     if(!(strncmp(property_value, "1", PROPERTY_VALUE_MAX)) ||
+         !(strncmp(property_value, "true", PROPERTY_VALUE_MAX))) {
+@@ -288,6 +291,7 @@ venc_dev::venc_dev(class omx_venc *venc_class):mInputExtradata(venc_class), mOut
+     } else {
+         is_gralloc_source_ubwc = 1;
+     }
++#endif
+ #else
+     is_gralloc_source_ubwc = 0;
+ #endif
+@@ -1046,9 +1050,11 @@ bool venc_dev::venc_open(OMX_U32 codec)
+     FILE *soc_file = NULL;
+     char buffer[10];
+ 
++#ifdef _ANDROID_
+     property_get("ro.board.platform", platform_name, "0");
+     property_get("vidc.enc.narrow.searchrange", property_value, "0");
+     enable_mv_narrow_searchrange = atoi(property_value);
++#endif
+ 
+     if (!strncmp(platform_name, "msm8610", 7)) {
+         device_name = (OMX_STRING)"/dev/video/q6_enc";
+@@ -1265,6 +1271,7 @@ bool venc_dev::venc_open(OMX_U32 codec)
+             DEBUG_PRINT_ERROR("Failed to set V4L2_CID_MPEG_VIDC_VIDEO_NUM_P_FRAME\n");
+     }
+ 
++#ifdef _ANDROID_
+     property_get("vidc.debug.turbo", property_value, "0");
+     if (atoi(property_value)) {
+         DEBUG_PRINT_HIGH("Turbo mode debug property enabled");
+@@ -1274,6 +1281,7 @@ bool venc_dev::venc_open(OMX_U32 codec)
+             DEBUG_PRINT_ERROR("Failed to set turbo mode");
+         }
+     }
++#endif
+     return true;
+ }
+ 
+@@ -2033,6 +2041,7 @@ bool venc_dev::venc_set_param(void *paramData, OMX_INDEXTYPE index)
+                 extradata = true;
+                 break;
+             }
++#ifdef _ANDROID_
+         case OMX_QcomIndexParamSequenceHeaderWithIDR:
+             {
+                 PrependSPSPPSToIDRFramesParams * pParam =
+@@ -2046,6 +2055,7 @@ bool venc_dev::venc_set_param(void *paramData, OMX_INDEXTYPE index)
+ 
+                 break;
+             }
++#endif
+         case OMX_QcomIndexParamH264AUDelimiter:
+             {
+                 OMX_QCOM_VIDEO_CONFIG_H264_AUD * pParam =
+@@ -2654,6 +2664,7 @@ unsigned venc_dev::venc_set_message_thread_id(pthread_t tid)
+     return 0;
+ }
+ 
++#ifdef _ANDROID_
+ void venc_dev::venc_set_vqzip_defaults()
+ {
+     struct v4l2_control control;
+@@ -2679,6 +2690,7 @@ void venc_dev::venc_set_vqzip_defaults()
+         DEBUG_PRINT_ERROR("Failed to set B frame period for VQZIP");
+ 
+ }
++#endif
+ 
+ 
+ unsigned venc_dev::venc_start(void)
+@@ -2701,8 +2713,10 @@ unsigned venc_dev::venc_start(void)
+                 __func__, codec_profile.profile, profile_level.level);
+     }
+ 
++#ifdef _ANDROID_
+     if (vqzip_sei_info.enabled)
+         venc_set_vqzip_defaults();
++#endif
+ 
+     venc_config_print();
+ 
+@@ -3089,7 +3103,9 @@ bool venc_dev::venc_empty_buf(void *buffer, void *pmem_data_buf, unsigned index,
+     struct v4l2_plane plane[VIDEO_MAX_PLANES];
+     int rc = 0, extra_idx;
+     struct OMX_BUFFERHEADERTYPE *bufhdr;
++#ifdef _ANDROID_
+     encoder_media_buffer_type * meta_buf = NULL;
++#endif
+     temp_buffer = (struct pmem *)buffer;
+ 
+     memset (&buf, 0, sizeof(buf));
+@@ -3122,6 +3138,7 @@ bool venc_dev::venc_empty_buf(void *buffer, void *pmem_data_buf, unsigned index,
+         // surface encode (RBG)  1            GrallocSource  1              bufhdr (color-converted)
+         // CPU (Eg: MediaCodec)  0            --             0              bufhdr
+         // ---------------------------------------------------------------------------------------
++#ifdef _ANDROID_
+         if (metadatamode) {
+             plane[0].m.userptr = (unsigned long)bufhdr->pBuffer;
+             meta_buf = (encoder_media_buffer_type *)bufhdr->pBuffer;
+@@ -3252,6 +3269,15 @@ bool venc_dev::venc_empty_buf(void *buffer, void *pmem_data_buf, unsigned index,
+             DEBUG_PRINT_LOW("venc_empty_buf: non-camera buf: fd = %d filled %d of %d",
+                     fd, plane[0].bytesused, plane[0].length);
+         }
++#else
++        plane[0].m.userptr = (unsigned long) bufhdr->pBuffer;
++        plane[0].data_offset = bufhdr->nOffset;
++        plane[0].length = bufhdr->nAllocLen;
++        plane[0].bytesused = bufhdr->nFilledLen;
++        DEBUG_PRINT_LOW("venc_empty_buf: non-camera buf: fd = %d filled %d of %d",
++                fd, plane[0].bytesused, plane[0].length);
++#endif
++
+     }
+ 
+     extra_idx = EXTRADATA_IDX(num_input_planes);
+@@ -3324,6 +3350,7 @@ bool venc_dev::venc_empty_buf(void *buffer, void *pmem_data_buf, unsigned index,
+     return true;
+ }
+ 
++#ifdef _ANDROID_
+ bool venc_dev::venc_empty_batch(OMX_BUFFERHEADERTYPE *bufhdr, unsigned index)
+ {
+     struct v4l2_buffer buf;
+@@ -3444,6 +3471,7 @@ bool venc_dev::venc_empty_batch(OMX_BUFFERHEADERTYPE *bufhdr, unsigned index)
+ 
+     return status;
+ }
++#endif
+ 
+ bool venc_dev::venc_fill_buf(void *buffer, void *pmem_data_buf,unsigned index,unsigned fd)
+ {
+@@ -6430,6 +6458,7 @@ bool venc_dev::BatchInfo::isPending(int bufferId) {
+     return existsId < kMaxBufs;
+ }
+ 
++#ifdef _ANDROID_
+ int venc_dev::BatchInfo::getFdAt(native_handle_t *hnd, int index) {
+     int fd = hnd && index < hnd->numFds ? hnd->data[index] : -1;
+     return fd;
+@@ -6457,6 +6486,7 @@ int venc_dev::BatchInfo::getTimeStampAt(native_handle_t *hnd, int index) {
+             hnd->data[4*hnd->numFds + index] : -1;
+     return size;
+ }
++#endif
+ 
+ venc_dev::venc_dev_vqzip::venc_dev_vqzip()
+ {
+-- 
+1.9.1
+

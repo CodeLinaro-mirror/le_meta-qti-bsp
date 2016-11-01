@@ -16,17 +16,22 @@ SRC_URI += " \
    file://0005-mm-video-v4l2-vdec-de-couple-c2d-output-buf-reqs-fro.patch \
    file://0006-mm-video-v4l2-vidc-Restore-pixel-format-on-capture-p.patch \
    file://0007-mm-video-v4l2-vidc-vdec-Fix-multistream-issues.patch \
+   file://0001-mm-video-v4l2-venc-add-makefile.patch \
+   file://0002-mm-video-v4l2-venc-strip-dependence-on-android-and-d.patch \
+   file://0003-mm-video-v4l2-venc-disable-vqzip-related-functions.patch \
+   file://0004-mm-video-v4l2-venc-add-encoder-test-tool.patch \
+   file://0005-mm-video-v4l2-vidc-Add-auto-lock.patch \
+   file://0006-Migrate-c2d-color-convert-libraries-and-support-c2d-.patch \
 "
-
-SRCREV = "c8933f995d8679ce21af1821ef3982672362d8ea"
-S      = "${WORKDIR}/hardware/qcom/media"
+S = "${WORKDIR}/hardware/qcom/media"
 
 PR = "r1"
 
 DEPENDS = "virtual/kernel"
 DEPENDS += "glib-2.0"
 DEPENDS += "virtual/libc"
-#DEPENDS += "adreno200"
+DEPENDS += "libcutils liblog liblog-native system-core"
+#DEPENDS += "adreno"
 #RDEPENDS_{PN} = "mm-video-prop"
 #INSANE_SKIP = 1
 
@@ -53,6 +58,7 @@ CPPFLAGS += "-I${STAGING_INCDIR} \
              -I${STAGING_LIBDIR}/glib-2.0/include \
              -I${STAGING_INCDIR}/c++ \
              -I${STAGING_INCDIR}/c++/${TARGET_SYS}"
+CPPFLAGS += "-include stdint.h"
 
 LDFLAGS += "-lglib-2.0"
 
