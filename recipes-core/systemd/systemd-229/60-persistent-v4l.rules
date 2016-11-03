@@ -1,0 +1,24 @@
+#Purpose: overriding original rule is to prevent udev to calling v4l_id for the video device.
+#         v4l_id will open/ioctl(VIDIOC_QUERYCAP)/close video.
+#Reason:  1. open video operation will enable the interrupt of the ispif and may
+#         cuase a stable issue. 
+#         2. mm-qcarcamera-daemon will be blocked about 6 seconds
+#         after it probes a video device, because udev has called ioctl(VIDIOC_QUERYCAP,...).
+
+ACTION=="remove", GOTO="persistent_v4l_end"
+SUBSYSTEM!="video4linux", GOTO="persistent_v4l_end"
+ENV{MAJOR}=="", GOTO="persistent_v4l_end"
+
+
+SUBSYSTEMS=="usb", IMPORT{builtin}="usb_id"
+KERNEL=="video*", ENV{ID_SERIAL}=="?*", SYMLINK+="v4l/by-id/$env{ID_BUS}-$env{ID_SERIAL}-video-index$attr{index}"
+
+# check for valid "index" number
+TEST!="index", GOTO="persistent_v4l_end"
+ATTR{index}!="?*", GOTO="persistent_v4l_end"
+
+IMPORT{builtin}="path_id"
+ENV{ID_PATH}=="?*", KERNEL=="video*|vbi*", SYMLINK+="v4l/by-path/$env{ID_PATH}-video-index$attr{index}"
+ENV{ID_PATH}=="?*", KERNEL=="audio*", SYMLINK+="v4l/by-path/$env{ID_PATH}-audio-index$attr{index}"
+
+LABEL="persistent_v4l_end"
