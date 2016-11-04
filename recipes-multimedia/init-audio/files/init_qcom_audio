@@ -32,12 +32,16 @@
 set -e
 
 export KERNEL=`uname -r`
+AUDIO_PROC=/proc/asound/apq8096adpagave/
 
 case "$1" in
 start)
     echo -n "Starting init_qcom_audio: "
     echo 0 > /sys/module/subsystem_restart/parameters/enable_debug
     echo 1 > /sys/kernel/boot_adsp/boot 
+    while [ ! -d "$AUDIO_PROC" ]; do
+        sleep 1
+    done
     echo "done"
     ;;
   stop)
