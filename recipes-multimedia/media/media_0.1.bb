@@ -6,23 +6,6 @@ ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI = "file://hardware/qcom/media/"
-SRC_URI += " \
-   file://0001-mm-core-migration-for-agl.patch \
-   file://0002-mm-video-v4l2-disable-color-convertion.patch \
-   file://0003-mm-video-v4l2-vdec-strip-dependence-on-android.patch \
-   file://0004-mm-video-v4l2-vdec-add-makefile-and-vdec-test-progra.patch \
-   file://0001-mm-core-Update-pmem-file-descriptor-type-to-integer.patch \
-   file://0001-mm-video-v4l2-vdec-Disable-split-mode-on-Automotive.patch \
-   file://0005-mm-video-v4l2-vdec-de-couple-c2d-output-buf-reqs-fro.patch \
-   file://0006-mm-video-v4l2-vidc-Restore-pixel-format-on-capture-p.patch \
-   file://0007-mm-video-v4l2-vidc-vdec-Fix-multistream-issues.patch \
-   file://0001-mm-video-v4l2-venc-add-makefile.patch \
-   file://0002-mm-video-v4l2-venc-strip-dependence-on-android-and-d.patch \
-   file://0003-mm-video-v4l2-venc-disable-vqzip-related-functions.patch \
-   file://0004-mm-video-v4l2-venc-add-encoder-test-tool.patch \
-   file://0005-mm-video-v4l2-vidc-Add-auto-lock.patch \
-   file://0006-Migrate-c2d-color-convert-libraries-and-support-c2d-.patch \
-"
 S = "${WORKDIR}/hardware/qcom/media"
 
 PR = "r1"
