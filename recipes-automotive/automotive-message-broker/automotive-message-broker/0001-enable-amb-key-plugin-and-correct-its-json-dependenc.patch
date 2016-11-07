@@ -1,0 +1,53 @@
+From f3892f4e7eae5ed1c1b051c38a45c88d03a9f28c Mon Sep 17 00:00:00 2001
+From: Jiang Xincong <xincongj@codeaurora.org>
+Date: Wed, 9 Nov 2016 15:24:13 +0800
+Subject: [PATCH 1/5] enable amb key plugin and correct its json dependency
+
+enable cangenplugin which is a source plugin receiving can frame from
+can drivers
+
+besides the cmakefile in cangenplugin is still no correct
+
+Signed-off-by: Jiang Xincong <xincongj@codeaurora.org>
+---
+ CMakeLists.txt | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 3814c37..9ff6d36 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -28,8 +28,8 @@ set (INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/include")
+ set (DOC_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/doc/packages/${PROJECT_NAME}/${PROJECT_SERIES}")
+ set (PLUGIN_SEGMENT_INSTALL_PATH "/etc/ambd/plugins.d")
+ 
+-option(qtmainloop "Use QCoreApplication mainloop " OFF)
+-option(websocket_plugin "websocket source and sink plugins" OFF)
++option(qtmainloop "Use QCoreApplication mainloop " ON)
++option(websocket_plugin "websocket source and sink plugins" ON)
+ option(obd2_plugin "OBD-II plugin" OFF)
+ option(database_plugin "Database plugins" OFF)
+ option(qt_bindings "AMB Qt DBus bindings" OFF)
+@@ -42,7 +42,7 @@ option(chrony_plugin "chrony plugin" OFF)
+ option(openxc_plugin "OpenXC plugin" OFF)
+ option(bluetooth_plugin "bluetooth plugin" OFF)
+ option(cansim_plugin "Can simulator plugin" OFF)
+-option(cangen_plugin "Can generator plugin" OFF)
++option(cangen_plugin "Can generator plugin" ON)
+ option(enable_icecc "Enable icecc checking, for distributed compilation" ON)
+ option(enable_docs "enable Doxygen doc generation" OFF)
+ option(usebluez5 "use bluez 5 API" OFF)
+@@ -73,8 +73,8 @@ pkg_check_modules(glib REQUIRED glib-2.0 gobject-2.0)
+ 
+ add_definitions(-DDBusServiceName="org.automotive.message.broker")
+ 
+-set(include_dirs ${libtool_INCLUDE_DIR} ${glib_INCLUDE_DIRS} ${gio_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${json_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/lib)
+-set(link_libraries -lamb ${glib_LIBRARIES} ${json_LIBRARIES} -L${CMAKE_CURRENT_BINARY_DIR}/lib)
++set(include_dirs ${libtool_INCLUDE_DIR} ${glib_INCLUDE_DIRS} ${gio_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${json-c_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/lib)
++set(link_libraries -lamb ${glib_LIBRARIES} ${json-c_LIBRARIES} -L${CMAKE_CURRENT_BINARY_DIR}/lib)
+ 
+ if(usebluez5)
+ 	add_definitions(-DUSE_BLUEZ5)
+-- 
+1.9.1
+

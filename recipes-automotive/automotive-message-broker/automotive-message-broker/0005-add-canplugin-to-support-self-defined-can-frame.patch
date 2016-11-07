@@ -1,0 +1,1082 @@
+From 4471d11392de36ad8aa8c0a4bafc6e259b78ed5c Mon Sep 17 00:00:00 2001
+From: Jiang Xincong <xincongj@codeaurora.org>
+Date: Wed, 9 Nov 2016 17:24:47 +0800
+Subject: [PATCH] add canplugin to support self-defined can frame.
+
+canplugin funtionality
+1. receiving can frame from can drivers, converting them to property
+   message and transmit to sink
+2. getting property message from sink, converting them to can frame and
+   transmit to can driver
+
+canplugin supported frame_type&property_type
+1. support only MODE 2 in RH850 currently, which is a specific frame
+   mode only used for AMB.
+2. support only CES2016 demo needed properties.
+
+TODO
+1. support all properties
+2. finish zone type converting function: "pzone2fzone"&"fzone2pzone"
+3. receiving&sending part have no error handling mechanism, need to
+   complete
+4. more log need to be added
+5. ADDPROPERTY should be automatically inserted
+
+Signed-off-by: Jiang Xincong <xincongj@codeaurora.org>
+---
+ CMakeLists.txt                   |   3 +-
+ lib/vehicleproperty.cpp          |  38 +++++++
+ lib/vehicleproperty.h            |  37 +++++-
+ plugins/CMakeLists.txt           |   1 +
+ plugins/canplugin/CMakeLists.txt |  19 ++++
+ plugins/canplugin/canframe.cpp   | 195 +++++++++++++++++++++++++++++++
+ plugins/canplugin/canframe.h     | 213 ++++++++++++++++++++++++++++++++++
+ plugins/canplugin/canmatrix.h    |  61 ++++++++++
+ plugins/canplugin/canplugin.cpp  | 240 +++++++++++++++++++++++++++++++++++++++
+ plugins/canplugin/canplugin.h    |  59 ++++++++++
+ plugins/dbus/CMakeLists.txt      |   2 +-
+ plugins/dbus/aglprop.h           |  63 ++++++++++
+ 12 files changed, 928 insertions(+), 3 deletions(-)
+ create mode 100644 plugins/canplugin/CMakeLists.txt
+ create mode 100644 plugins/canplugin/canframe.cpp
+ create mode 100644 plugins/canplugin/canframe.h
+ create mode 100644 plugins/canplugin/canmatrix.h
+ create mode 100644 plugins/canplugin/canplugin.cpp
+ create mode 100644 plugins/canplugin/canplugin.h
+ create mode 100644 plugins/dbus/aglprop.h
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 9ff6d36..ff2e201 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -42,7 +42,8 @@ option(chrony_plugin "chrony plugin" OFF)
+ option(openxc_plugin "OpenXC plugin" OFF)
+ option(bluetooth_plugin "bluetooth plugin" OFF)
+ option(cansim_plugin "Can simulator plugin" OFF)
+-option(cangen_plugin "Can generator plugin" ON)
++option(cangen_plugin "Can generator plugin" OFF)
++option(can_plugin "Can plugin" ON)
+ option(enable_icecc "Enable icecc checking, for distributed compilation" ON)
+ option(enable_docs "enable Doxygen doc generation" OFF)
+ option(usebluez5 "use bluez 5 API" OFF)
+diff --git a/lib/vehicleproperty.cpp b/lib/vehicleproperty.cpp
+index c4a25a1..910dc47 100644
+--- a/lib/vehicleproperty.cpp
++++ b/lib/vehicleproperty.cpp
+@@ -300,6 +300,25 @@ const VehicleProperty::Property VehicleProperty::AtmosphericPressure = "Atmosphe
+ const VehicleProperty::Property VehicleProperty::LaneDepartureStatus = "LaneDepartureStatus";
+ const VehicleProperty::Property VehicleProperty::AlarmStatus = "AlarmStatus";
+ 
++// agl demo need supported properties
++const VehicleProperty::Property VehicleProperty::FuelLevelX = "FuelLevelX";
++const VehicleProperty::Property VehicleProperty::ExteriorTemperatureX = "ExteriorTemperatureX";
++const VehicleProperty::Property VehicleProperty::InteriorTemperatureX = "InteriorTemperatureX";
++const VehicleProperty::Property VehicleProperty::VehicleSpeedX = "VehicleSpeedX";
++const VehicleProperty::Property VehicleProperty::OdometerX = "TirePressureX";
++const VehicleProperty::Property VehicleProperty::TirePressureX = "TirePressureX";
++const VehicleProperty::Property VehicleProperty::TireTemperatureX = "TireTemperatureX";
++const VehicleProperty::Property VehicleProperty::WheelBrakeX = "WheelBrakeX";
++const VehicleProperty::Property VehicleProperty::DoorStatusX = "DoorStatusX";
++const VehicleProperty::Property VehicleProperty::SeatBeltStatusX = "SeatBeltStatusX";
++const VehicleProperty::Property VehicleProperty::LightHazardX = "LightHazardX";
++const VehicleProperty::Property VehicleProperty::FanAC = "FanAC";
++const VehicleProperty::Property VehicleProperty::FanAuto = "FanAuto";
++const VehicleProperty::Property VehicleProperty::FanRecirc = "FanRecirc";
++const VehicleProperty::Property VehicleProperty::FanDown = "FanDown";
++const VehicleProperty::Property VehicleProperty::FanRight = "FanRight";
++const VehicleProperty::Property VehicleProperty::FanUp = "FanUp";
++
+ PropertyList VehicleProperty::mCapabilities;
+ PropertyList VehicleProperty::mCustomProperties;
+ 
+@@ -514,6 +533,25 @@ VehicleProperty::VehicleProperty()
+ 	REGISTERPROPERTY(AtmosphericPressure, 0);
+ 	REGISTERPROPERTY(LaneDepartureStatus, "");
+ 	REGISTERPROPERTY(AlarmStatus, "");
++
++        //agl demo supported properties
++	REGISTERPROPERTY(FuelLevelX, 0);
++	REGISTERPROPERTY(ExteriorTemperatureX, 0);
++	REGISTERPROPERTY(InteriorTemperatureX, 0);
++	REGISTERPROPERTY(VehicleSpeedX, 0);
++	REGISTERPROPERTY(OdometerX, 0);
++	REGISTERPROPERTY(TirePressureX, 0);
++	REGISTERPROPERTY(TireTemperatureX, 0);
++	REGISTERPROPERTY(WheelBrakeX, false);
++	REGISTERPROPERTY(DoorStatusX, false);
++	REGISTERPROPERTY(SeatBeltStatusX, false);
++	REGISTERPROPERTY(LightHazardX, false);
++	REGISTERPROPERTY(FanAC, false);
++	REGISTERPROPERTY(FanAuto, false);
++	REGISTERPROPERTY(FanRecirc, false);
++	REGISTERPROPERTY(FanDown, false);
++	REGISTERPROPERTY(FanRight, false);
++	REGISTERPROPERTY(FanUp, false);
+ }
+ 
+ void VehicleProperty::factory()
+diff --git a/lib/vehicleproperty.h b/lib/vehicleproperty.h
+index f627992..26895df 100644
+--- a/lib/vehicleproperty.h
++++ b/lib/vehicleproperty.h
+@@ -1127,7 +1127,42 @@ public:
+ 	 */
+ 	static bool registerProperty(Property name, PropertyTypeFactoryCallback factory);
+ 
+-
++        // agl demo supported properties
++	static const Property FuelLevelX;
++	PROPERTYTYPE(FuelLevelX, FuelLevelXType, BasicPropertyType<double>, double)
++	static const Property ExteriorTemperatureX;
++	PROPERTYTYPE(ExteriorTemperatureX, ExteriorTemperatureXType, BasicPropertyType<double>, double)
++	static const Property InteriorTemperatureX;
++	PROPERTYTYPE(InteriorTemperatureX, InteriorTemperatureXType, BasicPropertyType<double>, double)
++	static const Property VehicleSpeedX;
++	PROPERTYTYPE(VehicleSpeedX, VehicleSpeedXType, BasicPropertyType<double>, double)
++	static const Property OdometerX;
++	PROPERTYTYPE(OdometerX, OdometerXType, BasicPropertyType<double>, double)
++	static const Property TirePressureX;
++	PROPERTYTYPE(TirePressureX, TirePressureXType, BasicPropertyType<double>, double)
++	static const Property TireTemperatureX;
++	PROPERTYTYPE(TireTemperatureX, TireTemperatureXType, BasicPropertyType<double>, double)
++	static const Property WheelBrakeX;
++	PROPERTYTYPE(WheelBrakeX, WheelBrakeXType, BasicPropertyType<double>, double)
++	static const Property DoorStatusX;
++	PROPERTYTYPE(DoorStatusX, DoorStatusXType, BasicPropertyType<bool>, bool)
++	static const Property SeatBeltStatusX;
++	PROPERTYTYPE(SeatBeltStatusX, SeatBeltStatusXType, BasicPropertyType<bool>, bool)
++	static const Property LightHazardX;
++	PROPERTYTYPE(LightHazardX, LightHazardXType, BasicPropertyType<bool>, bool)
++
++	static const Property FanAC;
++	PROPERTYTYPE(FanAC, FanACType, BasicPropertyType<bool>, bool)
++	static const Property FanAuto;
++	PROPERTYTYPE(FanAuto, FanAutoType, BasicPropertyType<bool>, bool)
++	static const Property FanRecirc;
++	PROPERTYTYPE(FanRecirc, FanRecircType, BasicPropertyType<bool>, bool)
++	static const Property FanDown;
++	PROPERTYTYPE(FanDown, FanDownType, BasicPropertyType<bool>, bool)
++	static const Property FanRight;
++	PROPERTYTYPE(FanRight, FanRightType, BasicPropertyType<bool>, bool)
++	static const Property FanUp;
++	PROPERTYTYPE(FanUp, FanUpType, BasicPropertyType<bool>, bool)
+ 
+ private:
+ 
+diff --git a/plugins/CMakeLists.txt b/plugins/CMakeLists.txt
+index 6b119c8..0732dd7 100644
+--- a/plugins/CMakeLists.txt
++++ b/plugins/CMakeLists.txt
+@@ -51,3 +51,4 @@ add_subdirectory(bluetooth)
+ add_subdirectory(cansimplugin)
+ add_subdirectory(cangenplugin)
+ add_subdirectory(chrony)
++add_subdirectory(canplugin)
+diff --git a/plugins/canplugin/CMakeLists.txt b/plugins/canplugin/CMakeLists.txt
+new file mode 100644
+index 0000000..7544f98
+--- /dev/null
++++ b/plugins/canplugin/CMakeLists.txt
+@@ -0,0 +1,19 @@
++if(can_plugin)
++############################################################################################################################################
++
++pkg_check_modules(json REQUIRED json-c)
++
++include_directories(${CMAKE_SOURCE_DIR}/lib ${include_dirs} ${gio_INCLUDE_DIRS} ${gio-unix_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/plugins/common ${Boost_INCLUDE_DIRS} ${json-c_INCLUDE_DIRS})
++
++set(canplugin_headers canplugin.h canframe.h canmatrix.h)
++set(canplugin_sources canplugin.cpp canframe.cpp)
++
++add_library(canplugin MODULE ${canplugin_sources} ${canplugin_headers})
++set_target_properties(canplugin PROPERTIES PREFIX "")
++target_link_libraries(canplugin amb amb-plugins-common -L${CMAKE_CURRENT_BINARY_DIR}/plugins/common ${link_libraries} ${websockets_LIBRARIES} -lrt ${json-c_LIBRARIES})
++
++install(TARGETS canplugin LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH})
++
++############################################################################################################################################
++
++endif(can_plugin)
+diff --git a/plugins/canplugin/canframe.cpp b/plugins/canplugin/canframe.cpp
+new file mode 100644
+index 0000000..edadcdb
+--- /dev/null
++++ b/plugins/canplugin/canframe.cpp
+@@ -0,0 +1,195 @@
++/*
++Copyright (c) 2016, The Linux Foundation. All rights reserved.
++
++Redistribution and use in source and binary forms, with or without
++modification, are permitted provided that the following conditions are
++met:
++    * Redistributions of source code must retain the above copyright
++      notice, this list of conditions and the following disclaimer.
++    * Redistributions in binary form must reproduce the above
++      copyright notice, this list of conditions and the following
++      disclaimer in the documentation and/or other materials provided
++      with the distribution.
++    * Neither the name of The Linux Foundation nor the names of its
++      contributors may be used to endorse or promote products derived
++      from this software without specific prior written permission.
++
++THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
++WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
++MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT
++ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
++BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
++CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
++SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
++BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
++WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
++OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
++IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++*/
++
++#include "canframe.h"
++
++/* socketcan definition */
++int sockcan_fd = 0;
++sockaddr_can g_addr;
++
++/* helper functions*/
++void printFrameData(can_ts_rw_property& f)
++{
++        switch (f.val_type) {
++                case 0x100:
++                        printf("%x", f.bval); break;
++                case 0x200:
++                        printf("%x", f.val); break;
++                case 0x400:
++                        printf("%f", f.f_value); break;
++                case 0x203:
++                        printf("%x %x %x %x", f.val_arr[0], f.val_arr[1], f.val_arr[2],
++                                        f.val_arr[3]); break;
++                case 0x403:
++                        printf("%f %f %f %f", f.float_arr[0], f.float_arr[1], f.float_arr[2],
++                                        f.float_arr[3]); break;
++                default:
++                        printf("not recongized!"); break;
++        }
++
++        printf("\n");
++        return;
++}
++
++int findInterface(char * pname, int sock)
++{
++        struct ifreq ifr;
++        ifr.ifr_ifindex = 0;
++        strncpy(ifr.ifr_name, pname, sizeof(ifr.ifr_name));
++        ioctl(sock, SIOCGIFINDEX, &ifr);
++        return ifr.ifr_ifindex;
++}
++
++int canframe_init(int mode)
++{
++        //use can0 as interface in this test
++        sockcan_fd = socket(PF_CAN, SOCK_RAW, CAN_RAW);
++        int sysifNo = findInterface("can0", sockcan_fd);
++        if (sysifNo < 0) {
++            DebugOut(DebugOut::Warning)<<"sysifNo is "<<sysifNo<<endl;
++            return -1;
++        }
++        DebugOut(DebugOut::Warning)<<"sysifNo is "<<sysifNo<<endl;
++        g_addr.can_family = AF_CAN;
++        g_addr.can_ifindex = sysifNo;
++
++        bind(sockcan_fd, (struct sockaddr *)&g_addr, sizeof(g_addr));
++
++        const int timestampOn = 1;
++        int rc = setsockopt(sockcan_fd, SOL_SOCKET, SO_TIMESTAMP, &timestampOn, sizeof(timestampOn));
++        if (rc != 0) {
++	    DebugOut(DebugOut::Warning)<<"createRaw setsockopt returned "<<rc<<" "<<strerror(errno)<<endl;
++            return -1;
++        }
++        // tell the RAW layer to alloc can fd
++        const int canfd = 1;
++        rc = setsockopt(sockcan_fd, SOL_CAN_RAW, CAN_RAW_FD_FRAMES, &canfd, sizeof(canfd));
++        if (rc != 0) {
++	    DebugOut(DebugOut::Warning)<<"createRaw setsockopt returned "<<rc<<" "<<strerror(errno)<<endl;
++            return -1;
++        }
++
++        struct ifreq ifr;
++        strcpy(ifr.ifr_name, "can0");
++        ifr.ifr_data = (char*)&mode; //mode = DRIVER_MODE_AMB
++        rc = ioctl(sockcan_fd, SIOCDEVPRIVATE + 0/*=IOCTL_RELEASE_CAN_BUFFER*/, &ifr);
++        if (rc != 0) {
++	    DebugOut(DebugOut::Warning)<<"releaseCanBuffer ioctl returned "<<rc<<" "<<strerror(errno)<<endl;
++            return -1;
++        }
++
++        return 0;
++}
++
++int canframe_send(can_ts_rw_property* f)
++{
++        int len = sendto(sockcan_fd, f, sizeof(can_ts_rw_property),
++                        0, (struct sockaddr*)&g_addr, sizeof(g_addr));
++        if (len < 0) {
++	    DebugOut(DebugOut::Warning)<<"transmit frame: "<<len<<strerror(errno)<<endl;
++        }
++
++        return len;
++}
++
++int canframe_recv(can_ts_rw_property* f)
++{
++        struct sockaddr_can addr;
++        socklen_t addrl = sizeof(addr);
++        int len = recvfrom(sockcan_fd, f, sizeof(can_ts_rw_property),
++                            0, (struct sockaddr*)&addr, &addrl);
++        if (len < 0) {
++	    DebugOut(DebugOut::Warning)<<"receiving frame: "<<len<<strerror(errno)<<endl;
++        } else {
++	    DebugOut(DebugOut::Warning)<<"receiving frame success: "<<len<<endl;
++            printf("%x, %lx, %x, %x, %d, ", f->id, f->ts, f->zone, f->val_type, f->data_len);
++            printFrameData(*f);
++        }
++
++        return len;
++}
++
++// can_id to index of caninfo
++// 0x73000000 -> 0
++// 0x73000100 -> K_COUNT_00 + 0
++// 0x73000200 -> K_COUNT_00 + K_COUNT_10 + 0
++int id2idx(int id)
++{
++        if(id & 0x73000000 != 0x73000000)
++                return -1;
++
++        if(id & 0x8CFFF000 > 0)
++                return -1;
++
++        return ((id & 0x100)?K_COUNT_00:0) +
++                ((id & 0x200)?(K_COUNT_10+K_COUNT_00):0) +
++                (id & 0xFF);
++}
++
++// transfer property zone to frame zone or
++// frame zone to property zone
++//
++// property zone definition:
++//
++//enum {
++//        None = 0,
++//        Front = 1,
++//        Middle = 1 << 1,
++//        Right = 1 << 2,
++//        Left = 1 << 3,
++//        Rear = 1 << 4,
++//        Center = 1 << 5,
++//        LeftSide = 1 << 6,
++//        RightSide = 1 << 7,
++//        FrontSide = 1 << 8,
++//        BackSide = 1 << 9
++//};
++int pzone2fzone(int zone, int type)
++{
++        if (type == NONE) {
++        } else if (type == ZONE) {
++        } else if (type == SEAT) {
++        } else if (type == DOOR) {
++        } else if (type == WINDOW) {
++        } else {
++            return -1;
++        }
++}
++
++int fzone2pzone(int zone, int type)
++{
++        if (type == NONE) {
++        } else if (type == ZONE) {
++        } else if (type == SEAT) {
++        } else if (type == DOOR) {
++        } else if (type == WINDOW) {
++        } else {
++            return -1;
++        }
++}
+diff --git a/plugins/canplugin/canframe.h b/plugins/canplugin/canframe.h
+new file mode 100644
+index 0000000..b6ce804
+--- /dev/null
++++ b/plugins/canplugin/canframe.h
+@@ -0,0 +1,213 @@
++/*
++Copyright (c) 2016, The Linux Foundation. All rights reserved.
++
++Redistribution and use in source and binary forms, with or without
++modification, are permitted provided that the following conditions are
++met:
++    * Redistributions of source code must retain the above copyright
++      notice, this list of conditions and the following disclaimer.
++    * Redistributions in binary form must reproduce the above
++      copyright notice, this list of conditions and the following
++      disclaimer in the documentation and/or other materials provided
++      with the distribution.
++    * Neither the name of The Linux Foundation nor the names of its
++      contributors may be used to endorse or promote products derived
++      from this software without specific prior written permission.
++
++THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
++WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
++MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT
++ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
++BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
++CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
++SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
++BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
++WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
++OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
++IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++*/
++
++#ifndef _CANFRAME_H_
++#define _CANFRAME_H_
++
++#include <net/if.h>
++#include <linux/can.h>
++#include <linux/can/raw.h>
++#include <sys/ioctl.h>
++#include <unistd.h>
++#include <sys/socket.h>
++#include <sys/types.h>
++#include <string.h>
++
++#include <ambplugin.h>
++
++#define PROP_RX         0
++#define PROP_TX_BI      1
++#define PROP_TX_VT      2
++
++#define NONE            0
++#define ZONE            1
++#define SEAT            2
++#define DOOR            3
++#define WINDOW          4
++
++#include "canmatrix.h"
++
++enum vehicle_value_type {
++        VALUE_BOOL                      = 0x100,
++        VALUE_BOOL_ARR2                = 0x101,
++        VALUE_BOOL_ARR3                = 0x102,
++        VALUE_BOOL_ARR4                = 0x103,
++        VALUE_INT32                     = 0x200,
++        VALUE_INT32_ARR2                = 0x201,
++        VALUE_INT32_ARR3                = 0x202,
++        VALUE_INT32_ARR4                = 0x203,
++        VALUE_INT64                     = 0x300,
++        VALUE_INT64_ARR2                = 0x301,
++        VALUE_INT64_ARR3                = 0x302,
++        VALUE_INT64_ARR4                = 0x303,
++        VALUE_FLOAT                     = 0x400,
++        VALUE_FLOAT_ARR2                = 0x401,
++        VALUE_FLOAT_ARR3                = 0x402,
++        VALUE_FLOAT_ARR4                = 0x403,
++        VALUE_BYTES                     = 0x500,
++        VALUE_BYTES_ARR2                = 0x501,
++        VALUE_BYTES_ARR4                = 0x502,
++        VALUE_BYTES_ARR8                = 0x503,
++        VALUE_BYTES_ARR16               = 0x504,
++        VALUE_BYTES_ARR32               = 0x505
++};
++
++enum zone {
++        FRONT_LEFT                      = 0x00000001,
++        FRONT_RIGHT                     = 0x00000002,
++        REAR_LEFT                       = 0x00000004,
++        REAR_RIGHT                      = 0x00000008,
++        ROW_1_LEFT                      = 0x00000010,
++        ROW_1_CENTER                    = 0x00000020,
++        ROW_1_RIGHT                     = 0x00000040,
++        ROW_1_ALL                       = 0x00000080,
++        ROW_2_LEFT                      = 0x00000100,
++        ROW_2_CENTER                    = 0x00000200,
++        ROW_2_RIGHT                     = 0x00000400,
++        ROW_2_ALL                       = 0x00000800,
++        ROW_3_LEFT                      = 0x00001000,
++        ROW_3_CENTER                    = 0x00002000,
++        ROW_3_RIGHT                     = 0x00004000,
++        ROW_3_ALL                       = 0x00008000,
++        ROW_4_LEFT                      = 0x00010000,
++        ROW_4_CENTER                    = 0x00020000,
++        ROW_4_RIGHT                     = 0x00040000,
++        ROW_4_ALL                       = 0x00080000,
++        ALL                             = 0x80000000
++};
++
++enum seat {
++        SEAT_DRIVER_LHD                 = 0x0001,
++        SEAT_DRIVER_RHD                 = 0x0002,
++        SEAT_ROW_1_PASSENGER_LEFT       = 0x0010,
++        SEAT_ROW_1_PASSENGER_CENTER     = 0x0020,
++        SEAT_ROW_1_PASSENGER_RIGHT      = 0x0040,
++        SEAT_ROW_2_PASSENGER_LEFT       = 0x0100,
++        SEAT_ROW_2_PASSENGER_CENTER     = 0x0200,
++        SEAT_ROW_2_PASSENGER_RIGHT      = 0x0400,
++        SEAT_ROW_3_PASSENGER_LEFT       = 0x1000,
++        SEAT_ROW_3_PASSENGER_CENTER     = 0x2000,
++        SEAT_ROW_3_PASSENGER_RIGHT      = 0x4000
++};
++
++enum door {
++        DOOR_ROW_1_LEFT                 = 0x00000001,
++        DOOR_ROW_1_RIGHT                = 0x00000004,
++        DOOR_ROW_2_LEFT                 = 0x00000010,
++        DOOR_ROW_2_RIGHT                = 0x00000040,
++        DOOR_ROW_3_LEFT                 = 0x00000100,
++        DOOR_ROW_3_RIGHT                = 0x00000400,
++        DOOR_HOOD                       = 0x10000000,
++        DOOR_REAR                       = 0x20000000,
++};
++
++enum window {
++        WINDOW_FRONT_WINDSHIELD         = 0x0001,
++        WINDOW_REAR_WINDSHIELD          = 0x0002,
++        WINDOW_ROOF_TOP                 = 0x0004,
++        WINDOW_ROW_1_LEFT               = 0x0010,
++        WINDOW_ROW_1_RIGHT              = 0x0020,
++        WINDOW_ROW_2_LEFT               = 0x0100,
++        WINDOW_ROW_2_RIGHT              = 0x0200,
++        WINDOW_ROW_3_LEFT               = 0x1000,
++        WINDOW_ROW_3_RIGHT              = 0x2000,
++};
++
++#define K_HELPER(prop, id, reg, vt, vl, tt, pc) \
++        {#prop, id, reg, vt, vl, tt, new pc(0)},
++struct {
++        const char* property;
++        int32_t can_id;
++        int32_t region_t;
++        int32_t value_t;
++        int32_t value_l;
++        int32_t trans_t;
++        AbstractPropertyType* v;
++} caninfo[K_PROP_COUNT] = {
++        #include "canmatrix.h"
++        {"property_unknown", 0, 0, 0, 0, 0, NULL}
++};
++
++struct _can_ts_rw_property
++{
++        int32_t prop;
++        uint64_t ts;
++        union {
++                int32_t zone;
++                int32_t seat;
++                int32_t window;
++                int32_t door;
++        };
++        int32_t val_type;
++        uint32_t data_len;
++        uint8_t data[];
++};
++
++struct vehicle_property {
++        int32_t padding;
++        uint8_t len;
++        uint8_t r1;
++        uint8_t r2;
++        uint8_t r3;
++        int32_t id;
++        uint64_t ts;
++        int32_t zone;
++        int32_t val_type;
++        uint32_t data_len;
++        union {
++                uint8_t bval;
++                int val;
++                int val_arr[4];
++                float f_value;
++                float float_arr[4];
++                uint8_t str[36];
++        };
++        uint32_t padding2;
++} __attribute__((packed, aligned(4)));
++
++typedef struct vehicle_property can_ts_rw_property __attribute__((packed, aligned(4)));
++
++
++int findInterface(char * pname, int sock);
++
++void printFrameData(can_ts_rw_property& f);
++
++int canframe_init(int mode);
++
++int canframe_send(can_ts_rw_property* f);
++
++int canframe_recv(can_ts_rw_property* f);
++
++int id2idx(int id);
++
++int fzone2pzone(int zone, int region_type);
++
++int pzone2fzone(int zone, int region_type);
++
++#endif
+diff --git a/plugins/canplugin/canmatrix.h b/plugins/canplugin/canmatrix.h
+new file mode 100644
+index 0000000..4e67c23
+--- /dev/null
++++ b/plugins/canplugin/canmatrix.h
+@@ -0,0 +1,61 @@
++/*
++Copyright (c) 2016, The Linux Foundation. All rights reserved.
++
++Redistribution and use in source and binary forms, with or without
++modification, are permitted provided that the following conditions are
++met:
++    * Redistributions of source code must retain the above copyright
++      notice, this list of conditions and the following disclaimer.
++    * Redistributions in binary form must reproduce the above
++      copyright notice, this list of conditions and the following
++      disclaimer in the documentation and/or other materials provided
++      with the distribution.
++    * Neither the name of The Linux Foundation nor the names of its
++      contributors may be used to endorse or promote products derived
++      from this software without specific prior written permission.
++
++THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
++WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
++MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT
++ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
++BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
++CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
++SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
++BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
++WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
++OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
++IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++*/
++
++#ifndef K_HELPER
++#define K_HELPER(prop, id, reg, vt, vl, tt, pc) K_##prop,
++#define K_ENUM_COUNTER
++enum {
++        K_UNKNOWN,
++#endif
++        K_HELPER(FuelLevelX,            0x73000000, NONE, VALUE_FLOAT, 4,   PROP_RX,        VehicleProperty::FuelLevelXType)
++        K_HELPER(ExteriorTemperatureX,  0x73000001, NONE, VALUE_FLOAT, 4,   PROP_RX,        VehicleProperty::ExteriorTemperatureXType)
++        K_HELPER(InteriorTemperatureX,  0x73000002, NONE, VALUE_FLOAT, 4,   PROP_RX,        VehicleProperty::InteriorTemperatureXType)
++        K_HELPER(VehicleSpeedX,         0x73000003, NONE, VALUE_FLOAT, 4,   PROP_RX,        VehicleProperty::VehicleSpeedXType)
++        K_HELPER(OdometerX,             0x73000004, NONE, VALUE_FLOAT, 4,   PROP_RX,        VehicleProperty::OdometerXType)
++        K_HELPER(TirePressureX,         0x73000005, ZONE, VALUE_FLOAT, 4,   PROP_RX,        VehicleProperty::TirePressureXType)
++        K_HELPER(TireTemperatureX,      0x73000006, ZONE, VALUE_FLOAT, 4,   PROP_RX,        VehicleProperty::TireTemperatureXType)
++        K_HELPER(WheelBrakeX,           0x73000007, ZONE, VALUE_BOOL,  1,   PROP_RX,        VehicleProperty::WheelBrakeXType)
++        K_HELPER(DoorStatusX,           0x73000008, DOOR, VALUE_BOOL,  1,   PROP_RX,        VehicleProperty::DoorStatusXType)
++        K_HELPER(SeatBeltStatusX,       0x73000009, SEAT, VALUE_BOOL,  1,   PROP_RX,        VehicleProperty::SeatBeltStatusXType)
++        K_HELPER(LightHazardX,          0x73000100, NONE, VALUE_BOOL,  1,   PROP_TX_BI,     VehicleProperty::LightHazardXType)
++        K_HELPER(FanAC,                 0x73000101, NONE, VALUE_BOOL,  1,   PROP_TX_BI,     VehicleProperty::FanACType)
++        K_HELPER(FanAuto,               0x73000102, NONE, VALUE_BOOL,  1,   PROP_TX_BI,     VehicleProperty::FanAutoType)
++        K_HELPER(FanRecirc,             0x73000103, NONE, VALUE_BOOL,  1,   PROP_TX_BI,     VehicleProperty::FanRecircType)
++        K_HELPER(FanDown,               0x73000104, NONE, VALUE_BOOL,  1,   PROP_TX_BI,     VehicleProperty::FanDownType)
++        K_HELPER(FanRight,              0x73000105, NONE, VALUE_BOOL,  1,   PROP_TX_BI,     VehicleProperty::FanRightType)
++        K_HELPER(FanUp,                 0x73000106, NONE, VALUE_BOOL,  1,   PROP_TX_BI,     VehicleProperty::FanUpType)
++#ifdef K_ENUM_COUNTER
++        K_PROP_COUNT,
++};
++
++#define K_COUNT_00 10
++#define K_COUNT_10 11
++#undef K_ENUM_COUNTER
++#undef K_HELPER
++#endif
+diff --git a/plugins/canplugin/canplugin.cpp b/plugins/canplugin/canplugin.cpp
+new file mode 100644
+index 0000000..3f0e94d
+--- /dev/null
++++ b/plugins/canplugin/canplugin.cpp
+@@ -0,0 +1,240 @@
++/*
++Copyright (c) 2016, The Linux Foundation. All rights reserved.
++
++Redistribution and use in source and binary forms, with or without
++modification, are permitted provided that the following conditions are
++met:
++    * Redistributions of source code must retain the above copyright
++      notice, this list of conditions and the following disclaimer.
++    * Redistributions in binary form must reproduce the above
++      copyright notice, this list of conditions and the following
++      disclaimer in the documentation and/or other materials provided
++      with the distribution.
++    * Neither the name of The Linux Foundation nor the names of its
++      contributors may be used to endorse or promote products derived
++      from this software without specific prior written permission.
++
++THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
++WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
++MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT
++ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
++BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
++CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
++SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
++BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
++WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
++OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
++IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++*/
++
++#include <boost/assert.hpp>
++#include <glib.h>
++#include <deque>
++
++#include <vehicleproperty.h>
++#include <listplusplus.h>
++
++#include <logger.h>
++#include <ambplugin.h>
++#include <canbusimpl.h>
++
++#include "canplugin.h"
++
++/* headers for thread operation */
++#include "thread.h"
++
++/* headers for socket operation */
++#include "canframe.h"
++
++int mode = 2;
++
++
++/* thread class*/
++class CANDataGen : public CUtil::Thread
++{
++public:
++    CANDataGen(AbstractRoutingEngine* input);
++    virtual bool start();
++
++    virtual void stop();
++
++    AbstractRoutingEngine* re;
++
++private:
++    virtual void run();
++
++private:
++};
++
++CANDataGen *gen = NULL;
++
++CANDataGen::CANDataGen(AbstractRoutingEngine* input)
++{
++    re = input;
++}
++
++bool CANDataGen::start()
++{
++    bool res = CUtil::Thread::start();
++    return res;
++}
++
++void CANDataGen::stop()
++{
++    CUtil::Thread::stop();
++    return;
++}
++
++void CANDataGen::run()
++{
++    while(isRunnable()) {
++            /*mode 2*/
++            can_ts_rw_property f;
++            canframe_recv(&f);
++
++            int idx;
++            if((idx = id2idx(f.id)) == -1) {
++                DebugOut(DebugOut::Warning)<<"receiving wrong id: "<<f.id<<endl;
++                continue;
++            }
++
++            //DebugOut(DebugOut::Warning)<<"receive value is "<<f.f_value<<endl;
++
++            AbstractPropertyType* value = caninfo[idx].v;
++            if (value == NULL) {
++                DebugOut(DebugOut::Warning)<<"VALUE IS NULL"<<endl;
++                continue;
++            }
++
++            if (f.val_type == VALUE_BOOL) {
++                ((BasicPropertyType<bool>*)value)->setValue((bool)f.bval);
++                DebugOut(DebugOut::Warning)<<"receive bool is "<<f.bval<<endl;
++            } else if (f.val_type == VALUE_FLOAT) {
++                ((BasicPropertyType<double>*)value)->setValue((double)((float)f.f_value));
++                DebugOut(DebugOut::Warning)<<"receive float is "<<f.f_value<<endl;
++            } else {
++	        DebugOut(DebugOut::Warning)<<"no matching value type"<<endl;
++                continue;
++            }
++            value->priority = AbstractPropertyType::Instant;
++            value->zone = fzone2pzone(f.zone, caninfo[idx].region_t);
++
++
++            //if (!re) {
++            //    DebugOut(DebugOut::Warning)<<"re is null!"<<endl;
++            //    return;
++            //}
++            //DebugOut(DebugOut::Warning)<<"enter updateproperty!"<<endl;
++            re->updateProperty(value, "becbbef9-6cc8-4b9e-8cd7-2fbe37b9b52a");
++    }
++}
++//----------------------------------------------------------------------------
++// CANPlugin
++//----------------------------------------------------------------------------
++
++// library exported function for plugin loader
++extern "C" void create(AbstractRoutingEngine* routingengine, std::map<std::string, std::string> config)
++{
++
++	AmbPlugin<CANPlugin> * plugin = new AmbPlugin<CANPlugin>(routingengine, config);
++	plugin->init();
++}
++
++//----------------------------------------------------------------------------
++// CANPlugin
++//----------------------------------------------------------------------------
++
++#define ADDPROPERTY(property, default_value, zone_value) \
++			addPropertySupport(zone_value, [](){ \
++				return new property ## Type(default_value); \
++			})
++
++CANPlugin::CANPlugin(AbstractRoutingEngine* re, const map<string, string>& config, AbstractSource& parent) :
++	AmbPluginImpl(re, config, parent)
++{
++	addPropertySupport(
++		Zone::None,
++		[](){
++			StringPropertyType *s = new StringPropertyType("MappingTable", "");
++			s->zone = Zone::None;
++			return s;
++		}
++	);
++
++	ADDPROPERTY(VehicleProperty::FuelLevelX, 0, Zone::None);
++	ADDPROPERTY(VehicleProperty::ExteriorTemperatureX, 0, Zone::None);
++	ADDPROPERTY(VehicleProperty::InteriorTemperatureX, 0, Zone::None);
++	ADDPROPERTY(VehicleProperty::VehicleSpeedX, 0, Zone::None);
++	ADDPROPERTY(VehicleProperty::OdometerX, 0, Zone::None);
++	ADDPROPERTY(VehicleProperty::TirePressureX, 0, Zone::None);
++	ADDPROPERTY(VehicleProperty::TireTemperatureX, 0, Zone::None);
++	ADDPROPERTY(VehicleProperty::WheelBrakeX, false, Zone::None);
++	ADDPROPERTY(VehicleProperty::DoorStatusX, false, Zone::None);
++	ADDPROPERTY(VehicleProperty::SeatBeltStatusX, false, Zone::None);
++	ADDPROPERTY(VehicleProperty::LightHazardX, false, Zone::None);
++	ADDPROPERTY(VehicleProperty::FanAC, false, Zone::None);
++	ADDPROPERTY(VehicleProperty::FanAuto, false, Zone::None);
++	ADDPROPERTY(VehicleProperty::FanRecirc, false, Zone::None);
++	ADDPROPERTY(VehicleProperty::FanRight, false, Zone::None);
++	ADDPROPERTY(VehicleProperty::FanDown, false, Zone::None);
++	ADDPROPERTY(VehicleProperty::FanUp, false, Zone::None);
++
++        if (canframe_init(mode) != 0)
++            return;
++
++        CANDataGen *gen = new CANDataGen(routingEngine);
++        gen->start();
++}
++
++CANPlugin::~CANPlugin()
++{
++}
++
++void CANPlugin::init()
++{
++}
++
++void CANPlugin::propertyChanged(AbstractPropertyType* value)
++{
++	if(!value)
++		return;
++}
++
++AsyncPropertyReply *CANPlugin::setProperty(const AsyncSetPropertyRequest &request)
++{
++        /*mode 2*/
++        int i = 0;
++        can_ts_rw_property* f = (can_ts_rw_property*)malloc(sizeof(can_ts_rw_property));
++        memset(f, 0, sizeof(can_ts_rw_property));
++
++        //TODO: hash search of right caninfo
++        for (i = 0; i < K_PROP_COUNT; i++) {
++                if (strncmp(request.value->name.c_str(), caninfo[i].property,
++                                        request.value->name.length()) == 0) {
++	            DebugOut(DebugOut::Warning)<<"caninfo index is "<<i<<endl;
++                    break;
++                }
++        }
++        if (i == K_PROP_COUNT)
++                return AmbPluginImpl::setProperty(request);
++
++        f->len = 60;
++        f->id = caninfo[i].can_id;
++        f->ts = 0;
++        f->zone = pzone2fzone(request.value->zone, caninfo[i].region_t);
++        f->val_type = caninfo[i].value_t;
++        f->data_len = caninfo[i].value_l;
++        if (caninfo[i].value_t == VALUE_BOOL) {
++            f->bval = (bool)((BasicPropertyType<bool>*)request.value)->basicValue();
++        } else if (caninfo[i].value_t == VALUE_INT32) {
++            f->val = (int32_t)((BasicPropertyType<int32_t>*)request.value)->basicValue();
++        } else {
++	    DebugOut(DebugOut::Warning)<<"no matching value type"<<endl;
++	    return AmbPluginImpl::setProperty(request);
++        }
++
++	DebugOut(DebugOut::Warning)<<"transmit framelen is "<<sizeof(can_ts_rw_property)<<endl;
++        canframe_send(f);
++
++	return AmbPluginImpl::setProperty(request);
++}
+diff --git a/plugins/canplugin/canplugin.h b/plugins/canplugin/canplugin.h
+new file mode 100644
+index 0000000..b8f8fc9
+--- /dev/null
++++ b/plugins/canplugin/canplugin.h
+@@ -0,0 +1,59 @@
++/*
++Copyright (c) 2016, The Linux Foundation. All rights reserved.
++
++Redistribution and use in source and binary forms, with or without
++modification, are permitted provided that the following conditions are
++met:
++    * Redistributions of source code must retain the above copyright
++      notice, this list of conditions and the following disclaimer.
++    * Redistributions in binary form must reproduce the above
++      copyright notice, this list of conditions and the following
++      disclaimer in the documentation and/or other materials provided
++      with the distribution.
++    * Neither the name of The Linux Foundation nor the names of its
++      contributors may be used to endorse or promote products derived
++      from this software without specific prior written permission.
++
++THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
++WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
++MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT
++ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
++BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
++CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
++SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
++BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
++WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
++OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
++IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++*/
++
++#ifndef _CAnconPLUGINIMPL_H_
++#define _CANPLUGINIMPL_H_
++
++#include <map>
++#include <memory>
++#include <tgmath.h>
++#include <json-c/json.h>
++
++#include <ambpluginimpl.h>
++
++static const char* CANSimPluginUUID = "3f43e231-11ec-4782-9b5a-3dbcc5221eeb";
++
++class CANPlugin: public AmbPluginImpl {
++
++public:
++
++	CANPlugin(AbstractRoutingEngine* re, const std::map<std::string, std::string>& config, AbstractSource &parent);
++	virtual ~CANPlugin();
++
++public:
++
++	const std::string uuid() const { return "becbbef9-6cc8-4b9e-8cd7-2fbe37b9b52a"; }
++
++	void propertyChanged(AbstractPropertyType* value);
++
++	AsyncPropertyReply* setProperty(const AsyncSetPropertyRequest &request);
++
++	virtual void init();
++};
++#endif // _CANPLUGINIMPL_H_
+diff --git a/plugins/dbus/CMakeLists.txt b/plugins/dbus/CMakeLists.txt
+index e3cd247..5298821 100644
+--- a/plugins/dbus/CMakeLists.txt
++++ b/plugins/dbus/CMakeLists.txt
+@@ -4,7 +4,7 @@ include_directories(${CMAKE_SOURCE_DIR}/lib ${include_dirs} ${CMAKE_SOURCE_DIR}/
+ pkg_check_modules(gio REQUIRED gio-2.0)
+ 
+ set(dbussinkplugin_headers automotivemanager.h dbusinterfacemanager.h runningstatus.h
+-	custompropertyinterface.h uncategorizedproperty.h environmentproperties.h vehicleinfo.h maintenance.h parking.h fakeidlheader.h drivingsafety.h personalization.h)
++	custompropertyinterface.h uncategorizedproperty.h environmentproperties.h vehicleinfo.h maintenance.h parking.h fakeidlheader.h drivingsafety.h personalization.h aglprop.h)
+ set(dbussinkplugin_sources automotivemanager.cpp dbusinterfacemanager.cpp runningstatus.cpp
+ 	custompropertyinterface.cpp uncategorizedproperty.cpp environmentproperties.cpp vehicleinfo.cpp maintenance.cpp parking.cpp drivingsafety.cpp personalization.cpp)
+ 
+diff --git a/plugins/dbus/aglprop.h b/plugins/dbus/aglprop.h
+new file mode 100644
+index 0000000..f96f416
+--- /dev/null
++++ b/plugins/dbus/aglprop.h
+@@ -0,0 +1,63 @@
++/*
++Copyright (c) 2016, The Linux Foundation. All rights reserved.
++
++Redistribution and use in source and binary forms, with or without
++modification, are permitted provided that the following conditions are
++met:
++    * Redistributions of source code must retain the above copyright
++      notice, this list of conditions and the following disclaimer.
++    * Redistributions in binary form must reproduce the above
++      copyright notice, this list of conditions and the following
++      disclaimer in the documentation and/or other materials provided
++      with the distribution.
++    * Neither the name of The Linux Foundation nor the names of its
++      contributors may be used to endorse or promote products derived
++      from this software without specific prior written permission.
++
++THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
++WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
++MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT
++ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
++BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
++CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
++SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
++BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
++WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
++OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
++IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++*/
++
++#ifndef _AGLPROP_H_
++#define _AGLPROP_H_
++
++
++#include "dbusplugin.h"
++#include "abstractdbusinterface.h"
++#include "abstractroutingengine.h"
++
++class AglDemoProperty: public DBusSink
++{
++public:
++	AglDemoProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
++		:DBusSink("AglDemo", re, connection, map<string, string>())
++	{
++		wantPropertyVariant(VehicleProperty::FuelLevelX, "FuelLevelX", VariantType::Read);
++		wantPropertyVariant(VehicleProperty::ExteriorTemperatureX, "ExteriorTemperatureX", VariantType::Read);
++		wantPropertyVariant(VehicleProperty::InteriorTemperatureX, "InteriorTemperatureX", VariantType::Read);
++		wantPropertyVariant(VehicleProperty::VehicleSpeedX, "VehicleSpeedX", VariantType::Read);
++		wantPropertyVariant(VehicleProperty::OdometerX, "OdometerX", VariantType::Read);
++		wantPropertyVariant(VehicleProperty::TirePressureX, "TirePressureX", VariantType::Read);
++		wantPropertyVariant(VehicleProperty::TireTemperatureX, "TireTemperatureX", VariantType::Read);
++		wantPropertyVariant(VehicleProperty::WheelBrakeX, "WheelBrakeX", VariantType::Read);
++		wantPropertyVariant(VehicleProperty::DoorStatusX, "DoorStatusX", VariantType::Read);
++		wantPropertyVariant(VehicleProperty::SeatBeltStatusX, "SeatBeltStatusX", VariantType::Read);
++		wantPropertyVariant(VehicleProperty::LightHazardX, "LightHazardX", VariantType::Read);
++		wantPropertyVariant(VehicleProperty::FanAC, "FanAC", VariantType::Write);
++		wantPropertyVariant(VehicleProperty::FanRecirc, "FanRecirc", VariantType::Write);
++		wantPropertyVariant(VehicleProperty::FanAuto, "FanAuto", VariantType::Write);
++		wantPropertyVariant(VehicleProperty::FanRight, "FanRight", VariantType::Write);
++		wantPropertyVariant(VehicleProperty::FanUp, "FanUp", VariantType::Write);
++		wantPropertyVariant(VehicleProperty::FanDown, "FanDown", VariantType::Write);
++	}
++};
++#endif
+-- 
+1.9.1
+
