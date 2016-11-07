@@ -1,0 +1,29 @@
+From 7c0ed874afe9ef30677a8a49360e2f98f416be07 Mon Sep 17 00:00:00 2001
+From: Hugh Guan <hhguan@codeaurora.org>
+Date: Wed, 26 Oct 2016 17:04:07 +0800
+Subject: [PATCH 5/5] default.pa: Disable module-suspend-on-idle
+
+Tempo fix for snd_pcm_hw_params failed when alsa-source resuming
+due to UCM enable sequence delayed.
+
+Signed-off-by: Hugh Guan <hhguan@codeaurora.org>
+---
+ src/daemon/default.pa.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/daemon/default.pa.in b/src/daemon/default.pa.in
+index 383e603..889cd01 100755
+--- a/src/daemon/default.pa.in
++++ b/src/daemon/default.pa.in
+@@ -158,7 +158,7 @@ load-module module-always-sink
+ load-module module-intended-roles
+ 
+ ### Automatically suspend sinks/sources that become idle for too long
+-load-module module-suspend-on-idle
++#load-module module-suspend-on-idle
+ 
+ ### If autoexit on idle is enabled we want to make sure we only quit
+ ### when no local session needs us anymore.
+-- 
+1.9.1
+

@@ -1,0 +1,31 @@
+From 28a05c66d6cf00b6e943c6109a10f55530270454 Mon Sep 17 00:00:00 2001
+From: Hugh Guan <hhguan@codeaurora.org>
+Date: Thu, 20 Oct 2016 18:19:21 +0800
+Subject: [PATCH 4/5] udev: Add rules for QTI MSM8996
+
+For audio policy manager extension by agl-audio-plugin on QTI target,
+enable PULSE_IGNORE for skipping ALSA devices auto enumeration by udev
+module.
+
+Signed-off-by: Hugh Guan <hhguan@codeaurora.org>
+---
+ src/modules/alsa/mixer/profile-sets/90-pulseaudio.rules | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/modules/alsa/mixer/profile-sets/90-pulseaudio.rules b/src/modules/alsa/mixer/profile-sets/90-pulseaudio.rules
+index eeb6ac4..c86c47f 100644
+--- a/src/modules/alsa/mixer/profile-sets/90-pulseaudio.rules
++++ b/src/modules/alsa/mixer/profile-sets/90-pulseaudio.rules
+@@ -22,6 +22,9 @@ SUBSYSTEMS=="usb", GOTO="pulseaudio_check_usb"
+ 
+ SUBSYSTEMS=="platform", DRIVERS=="thinkpad_acpi", ENV{PULSE_IGNORE}="1"
+ 
++# QTI MSM8996
++ATTRS{id}=="apq8096adpagave", ENV{PULSE_IGNORE}="1"
++
+ # Force enable speaker and internal mic for some laptops
+ # This should only be necessary for kernels 3.3, 3.4 and 3.5 (as they are lacking the phantom jack kctls).
+ # Acer AOA150
+-- 
+1.9.1
+
