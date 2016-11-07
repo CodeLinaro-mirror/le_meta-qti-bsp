@@ -11,7 +11,7 @@ PR = "r0"
 PV = "0.1"
 
 #DEPENDS += "alsa-lib alsa-intf libpcap pciutils cmake-native"
-DEPENDS += "alsa-lib libpcap pciutils cmake-native glib-2.0"
+DEPENDS += "alsa-lib libpcap pciutils cmake-native glib-2.0 gstreamer1.0"
 
 S = "${WORKDIR}/Open-AVB"
 
@@ -23,6 +23,8 @@ do_compile_prepend() {
 do_compile() {
 	export AVB_FEATURE_NEUTRINO=1
 	export AVB_FEATURE_INTF_ALSA2=0
+	export AVB_FEATURE_GSTREAMER=1
+	export GSTREAMER_1_0=1
 	mkdir -p ${S}/daemons/maap/build
 	oe_runmake daemons_all
 	make avtp_pipeline
