@@ -67,6 +67,7 @@ IMAGE_INSTALL += "iw"
 IMAGE_INSTALL += "wireless-tools"
 IMAGE_INSTALL += "ath6kl-utils"
 IMAGE_INSTALL += "ftm"
+IMAGE_INSTALL += "sigma-dut"
 
 #BT
 IMAGE_INSTALL += "synergy"
