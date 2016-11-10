@@ -1,0 +1,155 @@
+From 84da1955309269f328a6c89b88680e387764881d Mon Sep 17 00:00:00 2001
+From: Cong Tang <congt@codeaurora.org>
+Date: Thu, 10 Nov 2016 17:12:37 +0800
+Subject: [PATCH] support adjust hfp volume
+
+---
+ snd_card_utils.c | 104 +++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ snd_card_utils.h |   2 +-
+ 2 files changed, 102 insertions(+), 4 deletions(-)
+
+diff --git a/snd_card_utils.c b/snd_card_utils.c
+index 84f681c..315dfdc 100644
+--- a/snd_card_utils.c
++++ b/snd_card_utils.c
+@@ -54,7 +54,7 @@ static agl_audio_usecasemap_node *usecasemap_list_head = NULL;
+ static agl_snd_card_utils_hooks pa_hooks;
+ static char current_use_case_verb[128] = SND_USE_CASE_VERB_INACTIVE;
+ static bool current_use_case_verb_active = false;
+-
++static char hfp_volume_ctl_name[] = "PRI AUXPCM LOOPBACK Volume";
+ 
+ /*************************************************************************/
+ /*                  STATIC FUNCTION DECLARATIONS                         */
+@@ -460,6 +460,102 @@ source_output_unlink_end:
+ 	return PA_HOOK_OK;
+ }
+ 
++static void agl_snd_card_utils_mixer_set_volume(int volume, const char *ctl_name)
++{
++	int err,index=0;
++	char card[100];
++	static snd_ctl_t *handle = NULL;
++	snd_ctl_elem_id_t *id;
++	snd_ctl_elem_value_t *control;
++
++	snd_ctl_elem_id_alloca(&id);
++	snd_ctl_elem_value_alloca(&control);
++
++	index = -1;
++	if (snd_card_next(&index) < 0 || index < 0) {
++		pa_log_error("no soundcards found...");
++		goto exit;
++	}
++	sprintf(card, "hw:%d", index);
++
++	if ((err = snd_ctl_open(&handle, card, 0)) < 0) {
++		pa_log_error("Control %s open error: %s", card, snd_strerror(err));
++		goto exit;
++	}
++
++	snd_ctl_elem_id_set_interface(id, SND_CTL_ELEM_IFACE_MIXER);
++	snd_ctl_elem_id_set_name(id, ctl_name);
++
++	snd_ctl_elem_value_set_id(control, id);
++	if ((err = snd_ctl_elem_read(handle, control)) < 0) {
++		pa_log_error("Cannot read the given element from control");
++		goto exit;
++	}
++
++	snd_ctl_elem_value_set_integer(control, 0, volume);
++	if ((err = snd_ctl_elem_write(handle, control)) < 0) {
++		pa_log_error("Cannot write the given element from control");
++		goto exit;
++	}
++
++exit:
++	if (handle)
++		snd_ctl_close(handle);
++}
++
++
++static pa_hook_result_t agl_snd_card_utils_sink_input_mute_changed_cb(void *hook_data,
++                                  void *call_data,
++                                  void *slot_data)
++{
++	return PA_HOOK_OK;
++}
++
++
++static pa_hook_result_t agl_snd_card_utils_sink_input_volume_changed_cb(void *hook_data,
++                                  void *call_data,
++                                  void *slot_data)
++{
++	pa_sink_input *sinp = (pa_sink_input *)call_data;
++	struct userdata *u = (struct userdata *)slot_data;
++	const char *role;
++	char *ucm_verb;
++	int32_t err, ret = 0;
++	float value;
++	int vol;
++
++	role = pa_proplist_gets (sinp->proplist, PA_PROP_MEDIA_ROLE);
++	if (role == NULL)
++		goto sink_input_volume_end;
++
++	err = agl_snd_utils_find_ucm_verb(role, &ucm_verb);
++	if (err < 0)
++	{
++		pa_log_info("Invalid media role.");
++		goto sink_input_volume_end;
++	}
++
++	if (!strncmp(ucm_verb, SND_USE_CASE_VERB_INACTIVE, strlen(SND_USE_CASE_VERB_INACTIVE)))
++		goto sink_input_volume_end;
++
++	if ((!strcmp(ucm_verb, "Hfp_wb")) || (!(strcmp(ucm_verb, "Hfp")))) {
++		value = (float)sinp->volume.values[0];
++		if (value < 0.0) {
++			pa_log_info("%s: (%f) Under 0.0, assuming 0.0\n", __func__, value);
++			value = 0.0;
++		} else {
++			value = ((value > 15.000000) ? 1.0 : (value / 15));
++			pa_log_info("%s: Volume brought with in range (%f)\n", __func__, value);
++		}
++		vol = lrint((value * 0x2000) + 0.5);
++
++		agl_snd_card_utils_mixer_set_volume(vol, hfp_volume_ctl_name);
++	} else
++		goto sink_input_volume_end;
++
++sink_input_volume_end:
++	return PA_HOOK_OK;
++}
+ 
+ 
+ 
+@@ -488,8 +584,10 @@ int agl_snd_card_utils_init (struct userdata *u)
+ 		                                PA_HOOK_EARLY, agl_snd_card_utils_source_output_fixate_cb, u);
+ 	pa_hooks.source_output_unlink = pa_hook_connect (hooks + PA_CORE_HOOK_SOURCE_OUTPUT_UNLINK,
+ 		                                (PA_HOOK_LATE + 1), agl_snd_card_utils_source_output_unlink_cb, u);
+-
+-
++	pa_hooks.sink_input_volume_changed = pa_hook_connect (hooks + PA_CORE_HOOK_SINK_INPUT_VOLUME_CHANGED,
++		                                (PA_HOOK_LATE + 1),agl_snd_card_utils_sink_input_volume_changed_cb, u);
++	pa_hooks.sink_input_mute_changed = pa_hook_connect (hooks + PA_CORE_HOOK_SINK_INPUT_MUTE_CHANGED,
++		                                (PA_HOOK_LATE + 1), agl_snd_card_utils_sink_input_mute_changed_cb, u);
+ 
+ 	/* Try and find the proper sound card.  Retry five times before failing */
+ 	retry_cnt = 0;
+diff --git a/snd_card_utils.h b/snd_card_utils.h
+index 82fb67e..a89eab5 100644
+--- a/snd_card_utils.h
++++ b/snd_card_utils.h
+@@ -76,7 +76,7 @@ typedef struct {
+ 	pa_hook_slot    *source_output_fixate;
+ 	pa_hook_slot    *source_output_unlink;
+ 	pa_hook_slot    *sink_input_volume_changed;
+-	pa_hook_slot    *sink_input_mute;
++	pa_hook_slot    *sink_input_mute_changed;
+ } agl_snd_card_utils_hooks;
+ 
+ int agl_snd_card_utils_init (struct userdata *u);
+-- 
+1.9.1
+
