@@ -5,6 +5,8 @@ PR = "r0"
 
 DEPENDS = "glib-2.0 pulseaudio audio-hal-plugin-noship"
 
+PACKAGE_ARCH = "${MACHINE_ARCH}"
+
 SRC_DIR = "${WORKSPACE}/audio/mm-audio-opensource/pulseaudio-module-codec-control/"
 S = "${WORKDIR}/audio/mm-audio-opensource/pulseaudio-module-codec-control/"
 

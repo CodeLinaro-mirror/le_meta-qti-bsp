@@ -1,3 +1,5 @@
+PACKAGE_ARCH = "${MACHINE_ARCH}"
+
 FILESEXTRAPATHS_prepend := "${THISDIR}/pulseaudio:"
 
 PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'zeroconf', 'avahi', '', d)} \

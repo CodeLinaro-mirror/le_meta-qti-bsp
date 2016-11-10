@@ -15,7 +15,7 @@ DEPENDS += "alsa-lib libpcap pciutils cmake-native glib-2.0"
 
 S = "${WORKDIR}/Open-AVB"
 
-
+PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 do_compile_prepend() {
 }

@@ -1,3 +1,5 @@
+PACKAGE_ARCH = "${MACHINE_ARCH}"
+
 do_install () {
         mkdir -p ${D}${libdir}/qt5/qml/Automotive/ClimateControl/
         cp libClimateControl.so ${D}${libdir}/qt5/qml/Automotive/ClimateControl/

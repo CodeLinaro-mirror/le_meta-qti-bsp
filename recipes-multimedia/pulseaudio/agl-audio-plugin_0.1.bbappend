@@ -1,3 +1,5 @@
+PACKAGE_ARCH = "${MACHINE_ARCH}"
+
 FILESEXTRAPATHS_prepend := "${THISDIR}/agl-audio-plugin:"
 
 SRC_URI += " \

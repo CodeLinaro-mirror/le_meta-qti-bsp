@@ -4,6 +4,8 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}-${PV}:"
 BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
 
 SRC_URI += "file://fstab"
+SRC_URI_append_8x96auto += "file://${BASEMACHINE}/fstab"
+SRC_URI_append_8x96autofusion += "file://${BASEMACHINE}/fstab"
 SRC_URI_append_msm8996 += "file://${BASEMACHINE}/fstab"
 SRC_URI_append_8x96mctm += "file://${BASEMACHINE}/fstab"
 

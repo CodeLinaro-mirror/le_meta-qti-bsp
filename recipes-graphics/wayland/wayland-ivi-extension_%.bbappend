@@ -3,6 +3,8 @@
 SRC_URI = "git://git.projects.genivi.org/${PN}.git;protocol=http \
           "
 
+PACKAGE_ARCH = "${MACHINE_ARCH}"
+
 do_install_append() {
 install -d ${D}${libdir}/
 cp -r  ${D}/usr/lib/* ${D}${libdir}
