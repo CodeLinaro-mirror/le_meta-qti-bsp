@@ -1,0 +1,9 @@
+[Unit]
+Description=Init can
+
+[Service]
+Type=simple
+ExecStart=/bin/sh /usr/bin/init.qti.can.sh
+
+[Install]
+WantedBy=multi-user.target

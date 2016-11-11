@@ -57,6 +57,7 @@ IMAGE_INSTALL += "tftp-server"
 IMAGE_INSTALL += "qmi-client-helper"
 IMAGE_INSTALL += "diag-reboot-app"
 IMAGE_INSTALL += "thermal-engine"
+IMAGE_INSTALL += "init-can"
 
 #WiFi
 IMAGE_INSTALL += "qcacld"
