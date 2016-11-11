@@ -1,0 +1,78 @@
+From 35d6dd33f49f1ebdf12bbf9da18833c1577c4ae8 Mon Sep 17 00:00:00 2001
+From: Jiang Xincong <xincongj@codeaurora.org>
+Date: Wed, 9 Nov 2016 15:41:21 +0800
+Subject: [PATCH 3/5] modify header file to support current json header name
+
+avoid header file error when compiling
+
+Signed-off-by: Jiang Xincong <xincongj@codeaurora.org>
+---
+ plugins/cangenplugin/cangenplugin.h        | 2 +-
+ plugins/cangenplugin/websockets.cpp        | 6 +++---
+ plugins/cansimplugin/cansimplugin.cpp      | 2 +-
+ plugins/websocket/websocketsinkmanager.cpp | 6 +++---
+ 4 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/plugins/cangenplugin/cangenplugin.h b/plugins/cangenplugin/cangenplugin.h
+index 163cde0..3d7d81b 100644
+--- a/plugins/cangenplugin/cangenplugin.h
++++ b/plugins/cangenplugin/cangenplugin.h
+@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ #include <memory>
+ #include <tgmath.h>
+ #include <libwebsockets.h>
+-#include <json.h>
++#include <json-c/json.h>
+ 
+ #include <canbus.h>
+ #include <canobserver.h>
+diff --git a/plugins/cangenplugin/websockets.cpp b/plugins/cangenplugin/websockets.cpp
+index bafbe16..560282a 100644
+--- a/plugins/cangenplugin/websockets.cpp
++++ b/plugins/cangenplugin/websockets.cpp
+@@ -17,9 +17,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+ 
+ #include "websockets.h"
+-#include <json/json.h>
+-#include <json/json_object.h>
+-#include <json/json_tokener.h>
++#include <json-c/json.h>
++#include <json-c/json_object.h>
++#include <json-c/json_tokener.h>
+ #include <vehicleproperty.h>
+ #include <listplusplus.h>
+ 
+diff --git a/plugins/cansimplugin/cansimplugin.cpp b/plugins/cansimplugin/cansimplugin.cpp
+index c8b9921..f03493e 100644
+--- a/plugins/cansimplugin/cansimplugin.cpp
++++ b/plugins/cansimplugin/cansimplugin.cpp
+@@ -19,7 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ #include <boost/assert.hpp>
+ #include <glib.h>
+ #include <deque>
+-#include <json.h>
++#include <json-c/json.h>
+ 
+ #include <vehicleproperty.h>
+ #include <listplusplus.h>
+diff --git a/plugins/websocket/websocketsinkmanager.cpp b/plugins/websocket/websocketsinkmanager.cpp
+index 6003af9..2fc6f91 100644
+--- a/plugins/websocket/websocketsinkmanager.cpp
++++ b/plugins/websocket/websocketsinkmanager.cpp
+@@ -21,9 +21,9 @@
+ #include "common.h"
+ 
+ #include <sstream>
+-#include <json/json.h>
+-#include <json/json_object.h>
+-#include <json/json_tokener.h>
++#include <json-c/json.h>
++#include <json-c/json_object.h>
++#include <json-c/json_tokener.h>
+ #include <listplusplus.h>
+ #include <memory>
+ 
+-- 
+1.9.1
+

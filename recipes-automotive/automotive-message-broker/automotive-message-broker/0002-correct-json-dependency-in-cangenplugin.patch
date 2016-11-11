@@ -1,0 +1,99 @@
+From 0c34ad881da5ee02df8adbfe09293b38e19a88be Mon Sep 17 00:00:00 2001
+From: Jiang Xincong <xincongj@codeaurora.org>
+Date: Wed, 9 Nov 2016 15:37:11 +0800
+Subject: [PATCH 2/5] correct json dependency in cangenplugin
+
+correct this dependency to build cangenplugin
+
+Signed-off-by: Jiang Xincong <xincongj@codeaurora.org>
+---
+ lib/CMakeLists.txt                       | 2 +-
+ plugins/cangenplugin/CMakeLists.txt      | 6 +++---
+ plugins/cangenplugin/test/CMakeLists.txt | 4 ++--
+ plugins/cansimplugin/CMakeLists.txt      | 6 +++---
+ 4 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/lib/CMakeLists.txt b/lib/CMakeLists.txt
+index f5f62a1..a06a4fd 100644
+--- a/lib/CMakeLists.txt
++++ b/lib/CMakeLists.txt
+@@ -16,7 +16,7 @@ endif(uuid_LIBRARY)
+ 
+ include_directories( ${include_dirs} ${uuid_INCLUDE_DIR})
+ 
+-target_link_libraries(amb ${libtool_LIBRARY} ${glib_LIBRARIES} ${gio_LIBRARIES} ${uuid_LIBRARY} ${json_LIBRARIES})
++target_link_libraries(amb ${libtool_LIBRARY} ${glib_LIBRARIES} ${gio_LIBRARIES} ${uuid_LIBRARY} ${json-c_LIBRARIES})
+ set_target_properties(amb PROPERTIES SOVERSION ${PROJECT_VERSION})
+ 
+ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/automotive-message-broker.pc.in ${CMAKE_CURRENT_BINARY_DIR}/automotive-message-broker.pc @ONLY)
+diff --git a/plugins/cangenplugin/CMakeLists.txt b/plugins/cangenplugin/CMakeLists.txt
+index a954a00..f1dc428 100644
+--- a/plugins/cangenplugin/CMakeLists.txt
++++ b/plugins/cangenplugin/CMakeLists.txt
+@@ -2,16 +2,16 @@ if(cangen_plugin)
+ ############################################################################################################################################
+ 
+ pkg_check_modules(websockets REQUIRED libwebsockets)
+-pkg_check_modules(json REQUIRED json)
++pkg_check_modules(json REQUIRED json-c)
+ 
+-include_directories(${CMAKE_SOURCE_DIR}/lib ${include_dirs} ${gio_INCLUDE_DIRS} ${gio-unix_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/plugins/common ${Boost_INCLUDE_DIRS} ${json_INCLUDE_DIRS})
++include_directories(${CMAKE_SOURCE_DIR}/lib ${include_dirs} ${gio_INCLUDE_DIRS} ${gio-unix_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/plugins/common ${Boost_INCLUDE_DIRS} ${json-c_INCLUDE_DIRS})
+ 
+ set(cangenplugin_headers cangenplugin.h websockets.h)
+ set(cangenplugin_sources cangenplugin.cpp websockets.cpp)
+ 
+ add_library(cangenplugin MODULE ${cangenplugin_sources} ${cangenplugin_headers})
+ set_target_properties(cangenplugin PROPERTIES PREFIX "")
+-target_link_libraries(cangenplugin amb amb-plugins-common -L${CMAKE_CURRENT_BINARY_DIR}/plugins/common ${link_libraries} ${websockets_LIBRARIES} -lrt ${json_LIBRARIES})
++target_link_libraries(cangenplugin amb amb-plugins-common -L${CMAKE_CURRENT_BINARY_DIR}/plugins/common ${link_libraries} ${websockets_LIBRARIES} -lrt ${json-c_LIBRARIES})
+ 
+ install(TARGETS cangenplugin LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH})
+ 
+diff --git a/plugins/cangenplugin/test/CMakeLists.txt b/plugins/cangenplugin/test/CMakeLists.txt
+index 76348e7..d93c54a 100644
+--- a/plugins/cangenplugin/test/CMakeLists.txt
++++ b/plugins/cangenplugin/test/CMakeLists.txt
+@@ -5,7 +5,7 @@ find_library(libtool_LIBRARY ltdl DOC "Libtool libraries")
+ find_path(libtool_INCLUDE_DIR ltdl.h DOC "Libtool headers")
+ 
+ pkg_check_modules(glib REQUIRED glib-2.0)
+-pkg_check_modules(json REQUIRED json)
++pkg_check_modules(json REQUIRED json-c)
+ pkg_check_modules(websockets REQUIRED libwebsockets)
+ 
+ #find libcanbus.a library:
+@@ -44,5 +44,5 @@ add_definitions(-fPIC -g)
+ add_executable(ut_cangenplugin ${ut_cangenplugin_sources})
+ 
+ include_directories(${include_dirs} ../ivipocbase ${libtool_INCLUDE_DIR} ${canbus_INCLUDE_DIR} ${glib_INCLUDE_DIRS} ${gio_INCLUDE_DIRS})
+-target_link_libraries(ut_cangenplugin ${link_libraries} ivipocbase -L${CMAKE_CURRENT_BINARY_DIR}/../../../ivipocbase/build ${libtool_LIBRARY} ${glib_LIBRARIES} ${json_LIBRARIES} amb ${websockets_LIBRARIES} ${canbus_LIBRARY} ${ivipoc-common_LIBRARY} -lgobject-2.0 -lpthread)
++target_link_libraries(ut_cangenplugin ${link_libraries} ivipocbase -L${CMAKE_CURRENT_BINARY_DIR}/../../../ivipocbase/build ${libtool_LIBRARY} ${glib_LIBRARIES} ${json-c_LIBRARIES} amb ${websockets_LIBRARIES} ${canbus_LIBRARY} ${ivipoc-common_LIBRARY} -lgobject-2.0 -lpthread)
+ 
+diff --git a/plugins/cansimplugin/CMakeLists.txt b/plugins/cansimplugin/CMakeLists.txt
+index e29c0de..4b554cb 100644
+--- a/plugins/cansimplugin/CMakeLists.txt
++++ b/plugins/cansimplugin/CMakeLists.txt
+@@ -1,16 +1,16 @@
+ if(cansim_plugin)
+ ############################################################################################################################################
+ 
+-pkg_check_modules(json REQUIRED json)
++pkg_check_modules(json REQUIRED json-c)
+ 
+-include_directories(${CMAKE_SOURCE_DIR}/lib ${include_dirs} ${gio_INCLUDE_DIRS} ${gio-unix_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/plugins/common ${Boost_INCLUDE_DIRS} ${json_INCLUDE_DIRS})
++include_directories(${CMAKE_SOURCE_DIR}/lib ${include_dirs} ${gio_INCLUDE_DIRS} ${gio-unix_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/plugins/common ${Boost_INCLUDE_DIRS} ${json-c_INCLUDE_DIRS})
+ 
+ set(cansimplugin_headers cansimplugin.h)
+ set(cansimplugin_sources cansimplugin.cpp)
+ 
+ add_library(cansimplugin MODULE ${cansimplugin_sources} ${cansimplugin_headers})
+ set_target_properties(cansimplugin PROPERTIES PREFIX "")
+-target_link_libraries(cansimplugin amb amb-plugins-common -L${CMAKE_CURRENT_BINARY_DIR}/plugins/common ${link_libraries} -lrt ${json_LIBRARIES})
++target_link_libraries(cansimplugin amb amb-plugins-common -L${CMAKE_CURRENT_BINARY_DIR}/plugins/common ${link_libraries} -lrt ${json-c_LIBRARIES})
+ 
+ install(TARGETS cansimplugin LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH})
+ 
+-- 
+1.9.1
+
