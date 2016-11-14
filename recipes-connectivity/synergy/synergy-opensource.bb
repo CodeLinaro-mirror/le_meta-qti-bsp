@@ -33,18 +33,10 @@ fi
 # Install synergy-opensource
 do_install_opensource () {
     install -d ${D}${bindir}
-    install -d ${D}/lib/systemd
-    install -d ${D}/lib/systemd/system
-    install -d ${D}/lib/systemd/system/multi-user.target.wants
-
-# Install synergy-bt-service.target to start synergy related service
-if [ -f "${B}/synergy-opensource/platform/msm/prebuilt/synergy-bt-service.target" ]; then
-    install ${B}/synergy-opensource/platform/msm/prebuilt/synergy-bt-service.target ${D}/lib/systemd/system/multi-user.target.wants/
-fi
 
 # [TODO] Install bt_audio_service which can support HF and A2DP audio. Currently, HF audio is verified through "bt_hf_audio.sh".
-if [ -f "${B}/synergy-opensource/platform/msm/app/bt_audio_service/bt_audio_service" ]; then
-    install ${B}/synergy-opensource/platform/msm/app/bt_audio_service/bt_audio_service ${D}${bindir}
+if [ -f "${B}/synergy-opensource/platform/msm/bt_audio_service/bt_audio_service" ]; then
+    install ${B}/synergy-opensource/platform/msm/bt_audio_service/bt_audio_service ${D}${bindir}
 fi
 }
 
@@ -61,5 +53,4 @@ do_install () {
 }
 
 FILES_${PN} += "usr/bin \
-                lib/systemd/system/* \
                 etc/dbus-1/system.d/"
