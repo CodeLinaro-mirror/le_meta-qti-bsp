@@ -9,4 +9,6 @@ SRC_URI += " \
              file://0002-agl-audio-plugin-Duck-behavior-support-on-audio-poli.patch \
              file://0003-agl-audio-plugin-UCM-support-on-audio-policy-manager.patch \
              file://0004-support-hfp-usecase.patch \
+            file://0006-support-adjust-hfp-volume.patch \
+            file://0007-enable-nullsource-for-capture.patch \
 "

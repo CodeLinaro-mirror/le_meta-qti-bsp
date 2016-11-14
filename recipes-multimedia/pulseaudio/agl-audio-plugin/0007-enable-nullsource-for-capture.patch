@@ -1,0 +1,327 @@
+From e30453c29bd6ec0605f9a37dd78935ed2d86628b Mon Sep 17 00:00:00 2001
+From: Cong Tang <congt@codeaurora.org>
+Date: Mon, 14 Nov 2016 14:49:55 +0800
+Subject: [PATCH] enable nullsource for capture
+
+---
+ discover.c       | 22 +++++++++++++++++-----
+ node.c           | 37 +++++++++++++++++++++++++++----------
+ node.h           |  2 +-
+ snd_card_utils.c | 22 ++++++++++++----------
+ snd_card_utils.h |  4 ++--
+ switch.c         |  3 ++-
+ tracker.c        |  6 ++++++
+ utils.c          | 15 +++++++++++++++
+ utils.h          |  1 +
+ 9 files changed, 83 insertions(+), 29 deletions(-)
+
+diff --git a/discover.c b/discover.c
+index 55bac3a..283fa44 100644
+--- a/discover.c
++++ b/discover.c
+@@ -593,7 +593,6 @@ bool agl_discover_preroute_sink_input(struct userdata *u, pa_sink_input_new_data
+ 	node = agl_node_get_from_data (u, agl_input, data);
+ 
+ 	if (!node) {
+-		pa_log_debug ("congt create new node");
+ 		 /* create node */
+ 		node = agl_node_create (u, NULL);
+ 		node->direction = agl_input;
+@@ -750,7 +749,7 @@ void agl_discover_add_sink_input (struct userdata *u, pa_sink_input *sinp)
+ 		return;
+ 
+ 	 /* is there an existing matching node ? */
+-	node = agl_node_get_from_client (u, sinp->client);
++	node = agl_node_get_from_client (u, sinp->client,sinp, agl_input);
+ 	if (!node) return;
+ 
+ 	 /* start routing */
+@@ -776,7 +775,7 @@ void agl_discover_remove_sink_input (struct userdata *u, pa_sink_input *sinp)
+ 		return;
+ 
+ 	 /* is there an existing matching node ? */
+-	node = agl_node_get_from_client (u, sinp->client);
++	node = agl_node_get_from_client (u, sinp->client, sinp, agl_input);
+ 	if (!node) return;
+ 
+ 	 /* stop routing */
+@@ -825,6 +824,19 @@ bool agl_discover_preroute_source_output(struct userdata *u, pa_source_output_ne
+ 		 /* add to global nodeset */
+ 		pa_idxset_put (nodeset->nodes, node, &node->index);
+ 	}
++	if (!node->nullsource)
++		node->nullsource = agl_utils_create_null_source (u, u->nsnam);
++	if (!node->nullsource)
++		return false;
++
++	 /* redirect source output to NULL source */
++	source = agl_utils_get_source (u, node->nullsource);
++	//sink_input pointer to null sink
++	if (pa_source_output_new_data_set_source (data, source, false))
++		pa_log_debug ("set source %u for new source-output", source->index);
++	else
++		pa_log ("can't set source %u for new source-output", source->index);
++
+ 	return true;
+ }
+ 
+@@ -841,7 +853,7 @@ void agl_discover_add_source_output (struct userdata *u, pa_source_output *soup)
+         return;
+ 
+ 	 /* is there an existing matching node ? */
+-	node = agl_node_get_from_client (u, soup->client);
++	node = agl_node_get_from_client (u, soup->client, soup,agl_output);
+ 	if (!node) return;
+ 
+ 	node->paidx   = soup->index;
+@@ -866,7 +878,7 @@ void agl_discover_remove_source_output (struct userdata *u, pa_source_output *so
+ 		return;
+ 
+ 	 /* is there an existing matching node ? */
+-	node = agl_node_get_from_client (u, soup->client);
++	node = agl_node_get_from_client (u, soup->client,soup, agl_output);
+ 	if (!node) return;
+ 
+ 	 /* stop routing */
+diff --git a/node.c b/node.c
+index 32e5309..6908660 100644
+--- a/node.c
++++ b/node.c
+@@ -21,6 +21,7 @@
+  */
+ #include "node.h"
+ #include "router.h"
++#include "classify.h"
+ 
+ #include <pulsecore/idxset.h>
+ #include <pulsecore/core-util.h>
+@@ -203,10 +204,10 @@ const char *agl_node_type_str (agl_node_type type)
+ 		case agl_alert:             return "Alert";
+ 		case agl_event:             return "Event";
+ 		case agl_system:            return "System";
+-		case agl_hfp_wb_downlink:		return "Hfp_wb_downlink";
+-		case agl_hfp_wb_uplink:		return "Hfp_wb_uplink";
+-		case agl_hfp_downlink:		return "Hfp_downlink";
+-		case agl_hfp_uplink:		return "Hfp_uplink";
++		case agl_hfp_wb_downlink:		return "HfpDownlink";
++		case agl_hfp_wb_uplink:		return "HfpUplink";
++		case agl_hfp_downlink:		return "HfpDownlink";
++		case agl_hfp_uplink:		return "HfpUplink";
+ 		default:                    return "default";
+ 	}
+ }
+@@ -239,7 +240,9 @@ agl_node *agl_node_get_from_data (struct userdata *u, agl_direction type, void *
+ 	if (type == agl_input) {
+ 		sinp_data = (pa_sink_input_new_data *) data;
+ 		PA_IDXSET_FOREACH(node, nodeset->nodes, index) {
+-			if (node->client == sinp_data->client)
++			if ((node->client == sinp_data->client)
++				&&((node->type) ==  agl_classify_guess_stream_node_type (u, sinp_data->proplist))
++				&& (node->direction == type))
+ 				return node;
+ 		}
+ 	/* output (= source_output) TODO */
+@@ -249,21 +252,35 @@ agl_node *agl_node_get_from_data (struct userdata *u, agl_direction type, void *
+ 	return NULL;
+ }
+ 
+-agl_node *agl_node_get_from_client (struct userdata *u, pa_client *client)
++agl_node *agl_node_get_from_client (struct userdata *u, pa_client *client, void *data,agl_direction type)
+ {
+ 	agl_nodeset *nodeset;
+ 	agl_node *node;
+ 	uint32_t index;
++	pa_sink_input *sinp_data;
++	pa_source_output *sout_data;
+ 
+ 	pa_assert (u);
+ 	pa_assert (client);
+ 	pa_assert (nodeset = u->nodeset);
+ 
+-	PA_IDXSET_FOREACH(node, nodeset->nodes, index) {
+-		if (node->client == client)
+-			return node;
++	if (type == agl_input) {
++		sinp_data = (pa_sink_input *) data;
++		PA_IDXSET_FOREACH(node, nodeset->nodes, index) {
++			if ((node->client == client)
++				&& ((node->type) == agl_classify_guess_stream_node_type (u, sinp_data->proplist))
++				&& (node->direction == type))
++				return node;
++		}
++	} else {
++		sout_data = (pa_source_output *) data;
++		PA_IDXSET_FOREACH(node, nodeset->nodes, index) {
++			if ((node->client == client)
++				&& ((node->type) == agl_classify_guess_stream_node_type (u, sout_data->proplist))
++				&& (node->direction == type))
++				return node;
++		}
+ 	}
+-
+ 	return NULL;
+ }
+ 
+diff --git a/node.h b/node.h
+index 3cee5c1..5c1eac5 100644
+--- a/node.h
++++ b/node.h
+@@ -111,7 +111,7 @@ const char *agl_node_type_str (agl_node_type);
+ const char *agl_node_direction_str (agl_direction);
+ 
+ agl_node *agl_node_get_from_data (struct userdata *, agl_direction, void *);
+-agl_node *agl_node_get_from_client (struct userdata *, pa_client *);
++agl_node *agl_node_get_from_client (struct userdata *, pa_client *, void *data,agl_direction type);
+ 
+ bool agl_node_has_highest_priority (struct userdata *, agl_node *);
+ 
+diff --git a/snd_card_utils.c b/snd_card_utils.c
+index 315dfdc..fb5ad8b 100644
+--- a/snd_card_utils.c
++++ b/snd_card_utils.c
+@@ -115,7 +115,7 @@ static int agl_snd_utils_find_ucm_verb (const char *role, char **ret_ucm_verb)
+ 	return err;
+ }
+ 
+-static pa_hook_result_t agl_snd_card_utils_sink_input_fixate_cb (void *hook_data,
++static pa_hook_result_t agl_snd_card_utils_sink_input_put_cb (void *hook_data,
+                                   void *call_data,
+                                   void *slot_data)
+ {
+@@ -123,8 +123,8 @@ static pa_hook_result_t agl_snd_card_utils_sink_input_fixate_cb (void *hook_data
+ 	const char *role;
+ 	int err = 0;
+ 
+-	pa_log_info("Callback received for sink_input_fixate");
+-	pa_sink_input_new_data *data = (pa_sink_input_new_data *)call_data;
++	pa_log_info("Callback received for sink_input_put");
++	pa_sink_input *data = (pa_sink_input *)call_data;
+ 	struct userdata *u = (struct userdata *)slot_data;
+ 
+ 	/* Using media role property to find UCM verb in usecasemap list */
+@@ -286,7 +286,7 @@ sink_input_unlink_end:
+ 	return PA_HOOK_OK;
+ }
+ 
+-static pa_hook_result_t agl_snd_card_utils_source_output_fixate_cb (void *hook_data,
++static pa_hook_result_t agl_snd_card_utils_source_output_put_cb (void *hook_data,
+                                   void *call_data,
+                                   void *slot_data)
+ {
+@@ -294,8 +294,8 @@ static pa_hook_result_t agl_snd_card_utils_source_output_fixate_cb (void *hook_d
+ 	const char *role;
+ 	int err = 0;
+ 
+-	pa_log_info("Callback received for source_output_fixate");
+-	pa_source_output_new_data *data = (pa_source_output_new_data *)call_data;
++	pa_log_info("Callback received for source_output_put");
++	pa_source_output *data = (pa_source_output *)call_data;
+ 	struct userdata *u = (struct userdata *)slot_data;
+ 
+ 	/* Using media role property to find UCM verb in usecasemap list */
+@@ -576,12 +576,14 @@ int agl_snd_card_utils_init (struct userdata *u)
+ 	pa_assert (u);
+ 	pa_assert_se (hooks = u->core->hooks);
+ 
+-	pa_hooks.sink_input_fixate = pa_hook_connect (hooks + PA_CORE_HOOK_SINK_INPUT_FIXATE,
+-		                             PA_HOOK_EARLY, agl_snd_card_utils_sink_input_fixate_cb, u);
++	/*sink_input_put priority = PA_HOOK_EARLY + 1, later than module-acdb PA_HOOK_EARLY
++	to ensure acdb paramter effective*/
++	pa_hooks.sink_input_put = pa_hook_connect (hooks + PA_CORE_HOOK_SINK_INPUT_PUT,
++		                             (PA_HOOK_EARLY + 1), agl_snd_card_utils_sink_input_put_cb, u);
+ 	pa_hooks.sink_input_unlink = pa_hook_connect (hooks + PA_CORE_HOOK_SINK_INPUT_UNLINK,
+ 		                             (PA_HOOK_LATE + 1), agl_snd_card_utils_sink_input_unlink_cb, u);
+-	pa_hooks.source_output_fixate = pa_hook_connect (hooks + PA_CORE_HOOK_SOURCE_OUTPUT_FIXATE,
+-		                                PA_HOOK_EARLY, agl_snd_card_utils_source_output_fixate_cb, u);
++	pa_hooks.source_output_put = pa_hook_connect (hooks + PA_CORE_HOOK_SOURCE_OUTPUT_PUT,
++		                               ( PA_HOOK_EARLY + 1), agl_snd_card_utils_source_output_put_cb, u);
+ 	pa_hooks.source_output_unlink = pa_hook_connect (hooks + PA_CORE_HOOK_SOURCE_OUTPUT_UNLINK,
+ 		                                (PA_HOOK_LATE + 1), agl_snd_card_utils_source_output_unlink_cb, u);
+ 	pa_hooks.sink_input_volume_changed = pa_hook_connect (hooks + PA_CORE_HOOK_SINK_INPUT_VOLUME_CHANGED,
+diff --git a/snd_card_utils.h b/snd_card_utils.h
+index a89eab5..cd7b08c 100644
+--- a/snd_card_utils.h
++++ b/snd_card_utils.h
+@@ -71,9 +71,9 @@ typedef struct {
+ } agl_audio_source_prop_node;
+ 
+ typedef struct {
+-	pa_hook_slot    *sink_input_fixate;
++	pa_hook_slot    *sink_input_put;
+ 	pa_hook_slot    *sink_input_unlink;
+-	pa_hook_slot    *source_output_fixate;
++	pa_hook_slot    *source_output_put;
+ 	pa_hook_slot    *source_output_unlink;
+ 	pa_hook_slot    *sink_input_volume_changed;
+ 	pa_hook_slot    *sink_input_mute_changed;
+diff --git a/switch.c b/switch.c
+index 065e386..cfa63e9 100644
+--- a/switch.c
++++ b/switch.c
+@@ -206,7 +206,8 @@ bool agl_switch_teardown_link (struct userdata *u, agl_node *from, agl_node *to)
+ 
+ 	/* "TO" IS DEFINED */
+ 	if (to) {
+-
++		if (to->nullsource)
++			agl_utils_destroy_null_source(u, to->nullsource);
+ 	}
+ 	/* ONLY "FROM" IS DEFINED */
+ 	else {
+diff --git a/tracker.c b/tracker.c
+index 4614d85..d01bebc 100644
+--- a/tracker.c
++++ b/tracker.c
+@@ -387,5 +387,11 @@ static pa_hook_result_t source_output_unlink (void *hook_data,
+                                               void *call_data,
+                                               void *slot_data)
+ {
++	/* called by each client when stopping sound */
++	pa_source_output *soup = (pa_source_output *)call_data;
++	struct userdata *u = (struct userdata *)slot_data;
++
++	agl_discover_remove_source_output (u, soup);
++
+ 	return PA_HOOK_OK;
+ }
+diff --git a/utils.c b/utils.c
+index 63ab521..76f3066 100644
+--- a/utils.c
++++ b/utils.c
+@@ -103,6 +103,21 @@ pa_source *agl_utils_get_source (struct userdata *u, struct agl_null_source *ns)
+ 	return pa_idxset_get_by_index (core->sources, ns->source_index);
+ }
+ 
++void agl_utils_destroy_null_source (struct userdata *u, agl_null_source*ns)
++{
++	pa_core      *core;
++	pa_module    *module;
++
++	if (u && (core = u->core)) {
++		if ((module = pa_idxset_get_by_index (core->modules, ns->module_index))){
++			pa_log_info ("unloading null source '%s'", ns->name);
++			pa_module_unload (core, module, false);
++		}
++
++		pa_xfree (ns->name);
++		pa_xfree (ns);
++	}
++}
+ 
+ agl_null_sink *agl_utils_create_null_sink (struct userdata *u, const char *name)
+ {
+diff --git a/utils.h b/utils.h
+index a2f44ee..18e5e8e 100644
+--- a/utils.h
++++ b/utils.h
+@@ -34,6 +34,7 @@ void agl_utils_destroy_null_sink (struct userdata *, struct agl_null_sink *);
+ pa_sink *agl_utils_get_null_sink (struct userdata *, struct agl_null_sink *);
+ 
+ struct agl_null_source *agl_utils_create_null_source (struct userdata *, const char *);
++void agl_utils_destroy_null_source (struct userdata *u, agl_null_source*ns);
+ pa_source *agl_utils_get_source (struct userdata *u, struct agl_null_source *ns);
+ 
+ pa_source *agl_utils_get_null_source (struct userdata *u, struct agl_null_sink *ns);
+-- 
+1.9.1
+
