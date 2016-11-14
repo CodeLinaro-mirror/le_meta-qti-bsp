@@ -1,7 +1,9 @@
-From 4471d11392de36ad8aa8c0a4bafc6e259b78ed5c Mon Sep 17 00:00:00 2001
+From 19ae15ebfe7deafdaa4f6bac968692e1ca761291 Mon Sep 17 00:00:00 2001
 From: Jiang Xincong <xincongj@codeaurora.org>
 Date: Wed, 9 Nov 2016 17:24:47 +0800
 Subject: [PATCH] add canplugin to support self-defined can frame.
+
+disable cangenplugin at the same time
 
 canplugin funtionality
 1. receiving can frame from can drivers, converting them to property
@@ -24,7 +26,7 @@ TODO
 
 Signed-off-by: Jiang Xincong <xincongj@codeaurora.org>
 ---
- CMakeLists.txt                   |   3 +-
+ CMakeLists.txt                   |   5 +-
  lib/vehicleproperty.cpp          |  38 +++++++
  lib/vehicleproperty.h            |  37 +++++-
  plugins/CMakeLists.txt           |   1 +
@@ -36,7 +38,7 @@ Signed-off-by: Jiang Xincong <xincongj@codeaurora.org>
  plugins/canplugin/canplugin.h    |  59 ++++++++++
  plugins/dbus/CMakeLists.txt      |   2 +-
  plugins/dbus/aglprop.h           |  63 ++++++++++
- 12 files changed, 928 insertions(+), 3 deletions(-)
+ 12 files changed, 929 insertions(+), 4 deletions(-)
  create mode 100644 plugins/canplugin/CMakeLists.txt
  create mode 100644 plugins/canplugin/canframe.cpp
  create mode 100644 plugins/canplugin/canframe.h
@@ -46,9 +48,18 @@ Signed-off-by: Jiang Xincong <xincongj@codeaurora.org>
  create mode 100644 plugins/dbus/aglprop.h
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 9ff6d36..ff2e201 100644
+index 9ff6d36..18282ac 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
+@@ -29,7 +29,7 @@ set (DOC_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/doc/packages/${PROJECT_NAME}
+ set (PLUGIN_SEGMENT_INSTALL_PATH "/etc/ambd/plugins.d")
+ 
+ option(qtmainloop "Use QCoreApplication mainloop " ON)
+-option(websocket_plugin "websocket source and sink plugins" ON)
++option(websocket_plugin "websocket source and sink plugins" OFF)
+ option(obd2_plugin "OBD-II plugin" OFF)
+ option(database_plugin "Database plugins" OFF)
+ option(qt_bindings "AMB Qt DBus bindings" OFF)
 @@ -42,7 +42,8 @@ option(chrony_plugin "chrony plugin" OFF)
  option(openxc_plugin "OpenXC plugin" OFF)
  option(bluetooth_plugin "bluetooth plugin" OFF)
