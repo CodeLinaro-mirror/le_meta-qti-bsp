@@ -20,3 +20,5 @@ RDEPENDS_pulseaudio-server += "\
          ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', '\
                  pulseaudio-module-systemd-login\
          ', '', d)}"
+
+RDEPENDS_pulseaudio-server += "pulseaudio-module-null-source"
