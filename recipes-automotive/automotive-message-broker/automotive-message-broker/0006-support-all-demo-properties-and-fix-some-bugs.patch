@@ -1,0 +1,719 @@
+From aa83bff1a2222435c1131bbdf687dd9f42970779 Mon Sep 17 00:00:00 2001
+From: Jiang Xincong <xincongj@codeaurora.org>
+Date: Thu, 17 Nov 2016 17:16:12 +0800
+Subject: [PATCH] support all demo properties and fix some bugs
+
+This is a totally workable version of AMB which support all demo
+properties. These properties are available in canmatrix.h and customer
+can define their own property in the same way.
+
+Other functions in this commit:
+1.fzone2pzone and pzone2fzone is done, so zone-property works
+2.log info is enriched
+3.ADDPROPERTY is dynamically loaded, so canplugin can make all changes
+  with modifying canmatrix.h only.
+
+Bug fix in this commit:
+1.correct amb-set tool
+2.correct the value type of some property
+3.correct zone value pass
+
+Signed-off-by: Jiang Xincong <xincongj@codeaurora.org>
+---
+ lib/vehicleproperty.cpp               |  14 ++-
+ lib/vehicleproperty.h                 |  18 +++-
+ plugins/canplugin/canframe.cpp        | 109 +++++++++++++++++------
+ plugins/canplugin/canframe.h          |  37 ++++++--
+ plugins/canplugin/canmatrix.h         |  53 +++++++----
+ plugins/canplugin/canplugin.cpp       | 160 +++++++++++++++++++---------------
+ plugins/canplugin/canplugin.h         |   2 +-
+ plugins/dbus/CMakeLists.txt           |   1 +
+ plugins/dbus/aglprop.h                |   8 +-
+ plugins/dbus/dbusinterfacemanager.cpp |   2 +
+ tests/amb-set.py                      |   8 +-
+ 11 files changed, 280 insertions(+), 132 deletions(-)
+
+diff --git a/lib/vehicleproperty.cpp b/lib/vehicleproperty.cpp
+index 910dc47..c0300c2 100644
+--- a/lib/vehicleproperty.cpp
++++ b/lib/vehicleproperty.cpp
+@@ -305,7 +305,7 @@ const VehicleProperty::Property VehicleProperty::FuelLevelX = "FuelLevelX";
+ const VehicleProperty::Property VehicleProperty::ExteriorTemperatureX = "ExteriorTemperatureX";
+ const VehicleProperty::Property VehicleProperty::InteriorTemperatureX = "InteriorTemperatureX";
+ const VehicleProperty::Property VehicleProperty::VehicleSpeedX = "VehicleSpeedX";
+-const VehicleProperty::Property VehicleProperty::OdometerX = "TirePressureX";
++const VehicleProperty::Property VehicleProperty::OdometerX = "OdometerX";
+ const VehicleProperty::Property VehicleProperty::TirePressureX = "TirePressureX";
+ const VehicleProperty::Property VehicleProperty::TireTemperatureX = "TireTemperatureX";
+ const VehicleProperty::Property VehicleProperty::WheelBrakeX = "WheelBrakeX";
+@@ -318,6 +318,12 @@ const VehicleProperty::Property VehicleProperty::FanRecirc = "FanRecirc";
+ const VehicleProperty::Property VehicleProperty::FanDown = "FanDown";
+ const VehicleProperty::Property VehicleProperty::FanRight = "FanRight";
+ const VehicleProperty::Property VehicleProperty::FanUp = "FanUp";
++const VehicleProperty::Property VehicleProperty::DefrostMax = "DefrostMax";
++const VehicleProperty::Property VehicleProperty::DefrostRear = "DefrostRear";
++const VehicleProperty::Property VehicleProperty::DefrostFront = "DefrostFront";
++const VehicleProperty::Property VehicleProperty::SeatHeat = "SeatHeat";
++const VehicleProperty::Property VehicleProperty::TemperatureControl = "TemperatureControl";
++const VehicleProperty::Property VehicleProperty::FanSpeedX = "FanSpeedX";
+ 
+ PropertyList VehicleProperty::mCapabilities;
+ PropertyList VehicleProperty::mCustomProperties;
+@@ -552,6 +558,12 @@ VehicleProperty::VehicleProperty()
+ 	REGISTERPROPERTY(FanDown, false);
+ 	REGISTERPROPERTY(FanRight, false);
+ 	REGISTERPROPERTY(FanUp, false);
++	REGISTERPROPERTY(DefrostMax, false);
++	REGISTERPROPERTY(DefrostRear, false);
++	REGISTERPROPERTY(DefrostFront, false);
++	REGISTERPROPERTY(SeatHeat, false);
++	REGISTERPROPERTY(TemperatureControl, 0);
++	REGISTERPROPERTY(FanSpeedX, 0);
+ }
+ 
+ void VehicleProperty::factory()
+diff --git a/lib/vehicleproperty.h b/lib/vehicleproperty.h
+index 26895df..7f32ff6 100644
+--- a/lib/vehicleproperty.h
++++ b/lib/vehicleproperty.h
+@@ -1143,14 +1143,14 @@ public:
+ 	static const Property TireTemperatureX;
+ 	PROPERTYTYPE(TireTemperatureX, TireTemperatureXType, BasicPropertyType<double>, double)
+ 	static const Property WheelBrakeX;
+-	PROPERTYTYPE(WheelBrakeX, WheelBrakeXType, BasicPropertyType<double>, double)
++	PROPERTYTYPE(WheelBrakeX, WheelBrakeXType, BasicPropertyType<bool>, bool)
+ 	static const Property DoorStatusX;
+ 	PROPERTYTYPE(DoorStatusX, DoorStatusXType, BasicPropertyType<bool>, bool)
+ 	static const Property SeatBeltStatusX;
+ 	PROPERTYTYPE(SeatBeltStatusX, SeatBeltStatusXType, BasicPropertyType<bool>, bool)
++
+ 	static const Property LightHazardX;
+ 	PROPERTYTYPE(LightHazardX, LightHazardXType, BasicPropertyType<bool>, bool)
+-
+ 	static const Property FanAC;
+ 	PROPERTYTYPE(FanAC, FanACType, BasicPropertyType<bool>, bool)
+ 	static const Property FanAuto;
+@@ -1163,7 +1163,19 @@ public:
+ 	PROPERTYTYPE(FanRight, FanRightType, BasicPropertyType<bool>, bool)
+ 	static const Property FanUp;
+ 	PROPERTYTYPE(FanUp, FanUpType, BasicPropertyType<bool>, bool)
+-
++	static const Property DefrostMax;
++	PROPERTYTYPE(DefrostMax, DefrostMaxType, BasicPropertyType<bool>, bool)
++	static const Property DefrostFront;
++	PROPERTYTYPE(DefrostFront, DefrostFrontType, BasicPropertyType<bool>, bool)
++	static const Property DefrostRear;
++	PROPERTYTYPE(DefrostRear, DefrostRearType, BasicPropertyType<bool>, bool)
++	static const Property SeatHeat;
++	PROPERTYTYPE(SeatHeat, SeatHeatType, BasicPropertyType<bool>, bool)
++
++	static const Property TemperatureControl;
++	PROPERTYTYPE(TemperatureControl, TemperatureControlType, BasicPropertyType<int32_t>, int32_t)
++	static const Property FanSpeedX;
++	PROPERTYTYPE(FanSpeedX, FanSpeedXType, BasicPropertyType<int32_t>, int32_t)
+ private:
+ 
+ 	VehicleProperty();
+diff --git a/plugins/canplugin/canframe.cpp b/plugins/canplugin/canframe.cpp
+index edadcdb..b4b80fb 100644
+--- a/plugins/canplugin/canframe.cpp
++++ b/plugins/canplugin/canframe.cpp
+@@ -36,21 +36,24 @@ sockaddr_can g_addr;
+ /* helper functions*/
+ void printFrameData(can_ts_rw_property& f)
+ {
++        printf("id: %x, ts: %lx, zone: %x, val_t: %x, dl: %d, val: ",
++                        f.id, f.ts, f.zone, f.val_type, f.data_len);
++
+         switch (f.val_type) {
+-                case 0x100:
++                case VALUE_BOOL:
+                         printf("%x", f.bval); break;
+-                case 0x200:
++                case VALUE_INT32:
+                         printf("%x", f.val); break;
+-                case 0x400:
++                case VALUE_FLOAT:
+                         printf("%f", f.f_value); break;
+-                case 0x203:
++                case VALUE_INT32_ARR4:
+                         printf("%x %x %x %x", f.val_arr[0], f.val_arr[1], f.val_arr[2],
+                                         f.val_arr[3]); break;
+-                case 0x403:
++                case VALUE_FLOAT_ARR4:
+                         printf("%f %f %f %f", f.float_arr[0], f.float_arr[1], f.float_arr[2],
+                                         f.float_arr[3]); break;
+                 default:
+-                        printf("not recongized!"); break;
++                        printf("frame value not recongized!"); break;
+         }
+ 
+         printf("\n");
+@@ -128,7 +131,6 @@ int canframe_recv(can_ts_rw_property* f)
+ 	    DebugOut(DebugOut::Warning)<<"receiving frame: "<<len<<strerror(errno)<<endl;
+         } else {
+ 	    DebugOut(DebugOut::Warning)<<"receiving frame success: "<<len<<endl;
+-            printf("%x, %lx, %x, %x, %d, ", f->id, f->ts, f->zone, f->val_type, f->data_len);
+             printFrameData(*f);
+         }
+ 
+@@ -141,11 +143,15 @@ int canframe_recv(can_ts_rw_property* f)
+ // 0x73000200 -> K_COUNT_00 + K_COUNT_10 + 0
+ int id2idx(int id)
+ {
+-        if(id & 0x73000000 != 0x73000000)
+-                return -1;
++        if((id & 0x73000000) != 0x73000000) {
++	    DebugOut(DebugOut::Warning)<<"id2idx error &0x73000000"<<endl;
++            return -1;
++        }
+ 
+-        if(id & 0x8CFFF000 > 0)
+-                return -1;
++        if((id & 0x8CFFF000) > 0) {
++	    DebugOut(DebugOut::Warning)<<"id2idx error &0x8CFFF000"<<endl;
++            return -1;
++        }
+ 
+         return ((id & 0x100)?K_COUNT_00:0) +
+                 ((id & 0x200)?(K_COUNT_10+K_COUNT_00):0) +
+@@ -157,39 +163,90 @@ int id2idx(int id)
+ //
+ // property zone definition:
+ //
+-//enum {
+-//        None = 0,
+-//        Front = 1,
+-//        Middle = 1 << 1,
+-//        Right = 1 << 2,
+-//        Left = 1 << 3,
+-//        Rear = 1 << 4,
+-//        Center = 1 << 5,
+-//        LeftSide = 1 << 6,
+-//        RightSide = 1 << 7,
+-//        FrontSide = 1 << 8,
+-//        BackSide = 1 << 9
+-//};
++// Zone::Type FrontRight;
++// Zone::Type FrontLeft;
++// Zone::Type MiddleRight;
++// Zone::Type MiddleLeft;
++// Zone::Type RearRight;
++// Zone::Type RearLeft;
+ int pzone2fzone(int zone, int type)
+ {
+         if (type == NONE) {
++            return ZONE_VAL_NONE;
+         } else if (type == ZONE) {
++            if (zone == Zone::FrontLeft) return FRONT_LEFT;
++            else if (zone == Zone::FrontRight) return FRONT_RIGHT;
++            else if (zone == Zone::MiddleLeft) return ROW_1_LEFT;
++            else if (zone == Zone::MiddleRight) return ROW_1_RIGHT;
++            else if (zone == Zone::RearLeft) return REAR_LEFT;
++            else if (zone == Zone::RearRight) return REAR_RIGHT;
++            else return ZONE_N_SUP;
+         } else if (type == SEAT) {
++            if (zone == Zone::FrontLeft) return SEAT_DRIVER_LHD;
++            else if (zone == Zone::FrontRight) return SEAT_DRIVER_RHD;
++            else if (zone == Zone::MiddleLeft) return SEAT_ROW_1_PASSENGER_LEFT;
++            else if (zone == Zone::MiddleRight) return SEAT_ROW_1_PASSENGER_RIGHT;
++            else if (zone == Zone::RearLeft) return SEAT_ROW_2_PASSENGER_LEFT;
++            else if (zone == Zone::RearRight) return SEAT_ROW_2_PASSENGER_RIGHT;
++            else return ZONE_N_SUP;
+         } else if (type == DOOR) {
++            if (zone == Zone::FrontLeft) return DOOR_ROW_1_LEFT;
++            else if (zone == Zone::FrontRight) return DOOR_ROW_1_RIGHT;
++            else if (zone == Zone::MiddleLeft) return DOOR_ROW_2_LEFT;
++            else if (zone == Zone::MiddleRight) return DOOR_ROW_2_RIGHT;
++            else if (zone == Zone::RearLeft) return DOOR_ROW_3_LEFT;
++            else if (zone == Zone::RearRight) return DOOR_ROW_3_RIGHT;
++            else return ZONE_N_SUP;
+         } else if (type == WINDOW) {
++            if (zone == Zone::FrontLeft) return WINDOW_ROW_1_LEFT;
++            else if (zone == Zone::FrontRight) return WINDOW_ROW_1_RIGHT;
++            else if (zone == Zone::MiddleLeft) return WINDOW_ROW_2_LEFT;
++            else if (zone == Zone::MiddleRight) return WINDOW_ROW_2_RIGHT;
++            else if (zone == Zone::RearLeft) return WINDOW_ROW_3_LEFT;
++            else if (zone == Zone::RearRight) return WINDOW_ROW_3_RIGHT;
++            else return ZONE_N_SUP;
+         } else {
+-            return -1;
++            return ZONE_N_SUP;
+         }
+ }
+ 
+ int fzone2pzone(int zone, int type)
+ {
+         if (type == NONE) {
++            return Zone::None;
+         } else if (type == ZONE) {
++            if (zone == FRONT_LEFT) return Zone::FrontLeft;
++            else if (zone == FRONT_RIGHT) return Zone::FrontRight;
++            else if (zone == ROW_1_LEFT) return Zone::MiddleLeft;
++            else if (zone == ROW_1_RIGHT) return Zone::MiddleRight;
++            else if (zone == REAR_LEFT) return Zone::RearLeft;
++            else if (zone == REAR_RIGHT) return  Zone::RearRight;
++            else return ZONE_N_SUP;
+         } else if (type == SEAT) {
++            if (zone == SEAT_DRIVER_LHD) return Zone::FrontLeft;
++            else if (zone == SEAT_DRIVER_RHD) return Zone::FrontRight;
++            else if (zone == SEAT_ROW_1_PASSENGER_LEFT) return Zone::MiddleLeft;
++            else if (zone == SEAT_ROW_1_PASSENGER_RIGHT) return Zone::MiddleRight;
++            else if (zone == SEAT_ROW_2_PASSENGER_LEFT) return Zone::RearLeft;
++            else if (zone == SEAT_ROW_2_PASSENGER_RIGHT) return  Zone::RearRight;
++            else return ZONE_N_SUP;
+         } else if (type == DOOR) {
++            if (zone == DOOR_ROW_1_LEFT) return Zone::FrontLeft;
++            else if (zone == DOOR_ROW_1_RIGHT) return Zone::FrontRight;
++            else if (zone == DOOR_ROW_2_LEFT) return Zone::MiddleLeft;
++            else if (zone == DOOR_ROW_2_RIGHT) return Zone::MiddleRight;
++            else if (zone == DOOR_ROW_3_LEFT) return Zone::RearLeft;
++            else if (zone == DOOR_ROW_3_RIGHT) return  Zone::RearRight;
++            else return ZONE_N_SUP;
+         } else if (type == WINDOW) {
++            if (zone == WINDOW_ROW_1_LEFT) return Zone::FrontLeft;
++            else if (zone == WINDOW_ROW_1_RIGHT) return Zone::FrontRight;
++            else if (zone == WINDOW_ROW_2_LEFT) return Zone::MiddleLeft;
++            else if (zone == WINDOW_ROW_2_RIGHT) return Zone::MiddleRight;
++            else if (zone == WINDOW_ROW_3_LEFT) return Zone::RearLeft;
++            else if (zone == WINDOW_ROW_3_RIGHT) return  Zone::RearRight;
++            else return ZONE_N_SUP;
+         } else {
+-            return -1;
++            return ZONE_N_SUP;
+         }
+ }
+diff --git a/plugins/canplugin/canframe.h b/plugins/canplugin/canframe.h
+index b6ce804..638439d 100644
+--- a/plugins/canplugin/canframe.h
++++ b/plugins/canplugin/canframe.h
+@@ -41,23 +41,44 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ 
+ #include <ambplugin.h>
+ 
+-#define PROP_RX         0
+-#define PROP_TX_BI      1
+-#define PROP_TX_VT      2
+-
++/* helper macro 
++ * the main purpose is make canmatrix content 
++ * likes simple and easy to understand
++ * */
++// zone type macro used for canmatrix
+ #define NONE            0
+ #define ZONE            1
+ #define SEAT            2
+ #define DOOR            3
+ #define WINDOW          4
+ 
++// transmit property
++#define PROP_RX         0
++#define PROP_TX_BI      1
++#define PROP_TX_VT      2
++
++// zone region macro used for canmatrix
++// which is one to one mapping to Zone::Type
++#define R_NN              0x00
++#define R_FL              0x01
++#define R_FR              0x02
++#define R_ML              0x04
++#define R_MR              0x08
++#define R_RL              0x10
++#define R_RR              0x20
++#define R_COM             (R_FL|R_FR|R_RL|R_RR)
++#define R_ALL             (R_FL|R_FR|R_ML|R_MR|R_RL|R_RR)
++
+ #include "canmatrix.h"
+ 
++#define ZONE_VAL_NONE 0
++#define ZONE_N_SUP -1
++
+ enum vehicle_value_type {
+         VALUE_BOOL                      = 0x100,
+-        VALUE_BOOL_ARR2                = 0x101,
+-        VALUE_BOOL_ARR3                = 0x102,
+-        VALUE_BOOL_ARR4                = 0x103,
++        VALUE_BOOL_ARR2                 = 0x101,
++        VALUE_BOOL_ARR3                 = 0x102,
++        VALUE_BOOL_ARR4                 = 0x103,
+         VALUE_INT32                     = 0x200,
+         VALUE_INT32_ARR2                = 0x201,
+         VALUE_INT32_ARR3                = 0x202,
+@@ -139,7 +160,7 @@ enum window {
+         WINDOW_ROW_3_RIGHT              = 0x2000,
+ };
+ 
+-#define K_HELPER(prop, id, reg, vt, vl, tt, pc) \
++#define K_HELPER(prop, id, reg, sr, vt, vl, tt, dv, pc) \
+         {#prop, id, reg, vt, vl, tt, new pc(0)},
+ struct {
+         const char* property;
+diff --git a/plugins/canplugin/canmatrix.h b/plugins/canplugin/canmatrix.h
+index 4e67c23..3432fe0 100644
+--- a/plugins/canplugin/canmatrix.h
++++ b/plugins/canplugin/canmatrix.h
+@@ -28,33 +28,50 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+ 
+ #ifndef K_HELPER
+-#define K_HELPER(prop, id, reg, vt, vl, tt, pc) K_##prop,
++// prop <-> property name, string
++// id   <-> can id, uint
++// reg  <-> region type, uint
++// sr   <-> supported region, uint (NN/FL/FR/ML/MR/RL/RR/COM/ALL)
++// vt   <-> value type, uint
++// vl   <-> value length, uint, float-4 bool-1
++// tt   <-> transmit type, uint
++// dv   <-> default value, any 0/0.0/false/...
++// pc   <-> property class, extended from BasicPropertyType<>
++#define K_HELPER(prop, id, reg, sr, vt, vl, tt, dv, pc) K_##prop,
+ #define K_ENUM_COUNTER
+ enum {
+         K_UNKNOWN,
+ #endif
+-        K_HELPER(FuelLevelX,            0x73000000, NONE, VALUE_FLOAT, 4,   PROP_RX,        VehicleProperty::FuelLevelXType)
+-        K_HELPER(ExteriorTemperatureX,  0x73000001, NONE, VALUE_FLOAT, 4,   PROP_RX,        VehicleProperty::ExteriorTemperatureXType)
+-        K_HELPER(InteriorTemperatureX,  0x73000002, NONE, VALUE_FLOAT, 4,   PROP_RX,        VehicleProperty::InteriorTemperatureXType)
+-        K_HELPER(VehicleSpeedX,         0x73000003, NONE, VALUE_FLOAT, 4,   PROP_RX,        VehicleProperty::VehicleSpeedXType)
+-        K_HELPER(OdometerX,             0x73000004, NONE, VALUE_FLOAT, 4,   PROP_RX,        VehicleProperty::OdometerXType)
+-        K_HELPER(TirePressureX,         0x73000005, ZONE, VALUE_FLOAT, 4,   PROP_RX,        VehicleProperty::TirePressureXType)
+-        K_HELPER(TireTemperatureX,      0x73000006, ZONE, VALUE_FLOAT, 4,   PROP_RX,        VehicleProperty::TireTemperatureXType)
+-        K_HELPER(WheelBrakeX,           0x73000007, ZONE, VALUE_BOOL,  1,   PROP_RX,        VehicleProperty::WheelBrakeXType)
+-        K_HELPER(DoorStatusX,           0x73000008, DOOR, VALUE_BOOL,  1,   PROP_RX,        VehicleProperty::DoorStatusXType)
+-        K_HELPER(SeatBeltStatusX,       0x73000009, SEAT, VALUE_BOOL,  1,   PROP_RX,        VehicleProperty::SeatBeltStatusXType)
+-        K_HELPER(LightHazardX,          0x73000100, NONE, VALUE_BOOL,  1,   PROP_TX_BI,     VehicleProperty::LightHazardXType)
+-        K_HELPER(FanAC,                 0x73000101, NONE, VALUE_BOOL,  1,   PROP_TX_BI,     VehicleProperty::FanACType)
+-        K_HELPER(FanAuto,               0x73000102, NONE, VALUE_BOOL,  1,   PROP_TX_BI,     VehicleProperty::FanAutoType)
+-        K_HELPER(FanRecirc,             0x73000103, NONE, VALUE_BOOL,  1,   PROP_TX_BI,     VehicleProperty::FanRecircType)
+-        K_HELPER(FanDown,               0x73000104, NONE, VALUE_BOOL,  1,   PROP_TX_BI,     VehicleProperty::FanDownType)
+-        K_HELPER(FanRight,              0x73000105, NONE, VALUE_BOOL,  1,   PROP_TX_BI,     VehicleProperty::FanRightType)
+-        K_HELPER(FanUp,                 0x73000106, NONE, VALUE_BOOL,  1,   PROP_TX_BI,     VehicleProperty::FanUpType)
++        K_HELPER(FuelLevelX,            0x73000000, NONE, R_NN,  VALUE_FLOAT, 4,   PROP_RX,     0,      VehicleProperty::FuelLevelXType)
++        K_HELPER(ExteriorTemperatureX,  0x73000001, NONE, R_NN,  VALUE_FLOAT, 4,   PROP_RX,     0,      VehicleProperty::ExteriorTemperatureXType)
++        K_HELPER(InteriorTemperatureX,  0x73000002, NONE, R_NN,  VALUE_FLOAT, 4,   PROP_RX,     0,      VehicleProperty::InteriorTemperatureXType)
++        K_HELPER(VehicleSpeedX,         0x73000003, NONE, R_NN,  VALUE_FLOAT, 4,   PROP_RX,     0,      VehicleProperty::VehicleSpeedXType)
++        K_HELPER(OdometerX,             0x73000004, NONE, R_NN,  VALUE_FLOAT, 4,   PROP_RX,     0,      VehicleProperty::OdometerXType)
++        K_HELPER(TirePressureX,         0x73000005, ZONE, R_COM, VALUE_FLOAT, 4,   PROP_RX,     0,      VehicleProperty::TirePressureXType)
++        K_HELPER(TireTemperatureX,      0x73000006, ZONE, R_COM, VALUE_FLOAT, 4,   PROP_RX,     0,      VehicleProperty::TireTemperatureXType)
++        K_HELPER(WheelBrakeX,           0x73000007, ZONE, R_COM, VALUE_BOOL,  1,   PROP_RX,     false,  VehicleProperty::WheelBrakeXType)
++        K_HELPER(DoorStatusX,           0x73000008, DOOR, R_ALL, VALUE_BOOL,  1,   PROP_RX,     false,  VehicleProperty::DoorStatusXType)
++        K_HELPER(SeatBeltStatusX,       0x73000009, SEAT, R_ALL, VALUE_BOOL,  1,   PROP_RX,     false,  VehicleProperty::SeatBeltStatusXType)
++        K_HELPER(LightHazardX,          0x73000100, NONE, R_NN,  VALUE_BOOL,  1,   PROP_TX_BI,  false,  VehicleProperty::LightHazardXType)
++        K_HELPER(FanAC,                 0x73000101, NONE, R_NN,  VALUE_BOOL,  1,   PROP_TX_BI,  false,  VehicleProperty::FanACType)
++        K_HELPER(FanAuto,               0x73000102, NONE, R_NN,  VALUE_BOOL,  1,   PROP_TX_BI,  false,  VehicleProperty::FanAutoType)
++        K_HELPER(FanRecirc,             0x73000103, NONE, R_NN,  VALUE_BOOL,  1,   PROP_TX_BI,  false,  VehicleProperty::FanRecircType)
++        K_HELPER(FanDown,               0x73000104, NONE, R_NN,  VALUE_BOOL,  1,   PROP_TX_BI,  false,  VehicleProperty::FanDownType)
++        K_HELPER(FanRight,              0x73000105, NONE, R_NN,  VALUE_BOOL,  1,   PROP_TX_BI,  false,  VehicleProperty::FanRightType)
++        K_HELPER(FanUp,                 0x73000106, NONE, R_NN,  VALUE_BOOL,  1,   PROP_TX_BI,  false,  VehicleProperty::FanUpType)
++        K_HELPER(DefrostMax,            0x73000107, NONE, R_NN,  VALUE_BOOL,  1,   PROP_TX_BI,  false,  VehicleProperty::DefrostMaxType)
++        K_HELPER(DefrostRear,           0x73000108, NONE, R_NN,  VALUE_BOOL,  1,   PROP_TX_BI,  false,  VehicleProperty::DefrostRearType)
++        K_HELPER(DefrostFront,          0x73000109, NONE, R_NN,  VALUE_BOOL,  1,   PROP_TX_BI,  false,  VehicleProperty::DefrostFrontType)
++        K_HELPER(SeatHeat,              0x7300010A, SEAT, R_ALL, VALUE_BOOL,  1,   PROP_TX_BI,  false,  VehicleProperty::SeatHeatType)
++        K_HELPER(TemperatureControl,    0x73000200, ZONE, R_COM, VALUE_INT32, 4,   PROP_TX_VT,  0,      VehicleProperty::TemperatureControlType)
++        K_HELPER(FanSpeedX,             0x73000201, NONE, R_NN,  VALUE_INT32, 4,   PROP_TX_VT,  0,      VehicleProperty::FanSpeedXType)
+ #ifdef K_ENUM_COUNTER
+         K_PROP_COUNT,
+ };
+ 
++// the number begins with 0x73000000
+ #define K_COUNT_00 10
++// the number begins with 0x73000100
+ #define K_COUNT_10 11
+ #undef K_ENUM_COUNTER
+ #undef K_HELPER
+diff --git a/plugins/canplugin/canplugin.cpp b/plugins/canplugin/canplugin.cpp
+index 3f0e94d..8a86480 100644
+--- a/plugins/canplugin/canplugin.cpp
++++ b/plugins/canplugin/canplugin.cpp
+@@ -88,44 +88,48 @@ void CANDataGen::stop()
+ void CANDataGen::run()
+ {
+     while(isRunnable()) {
+-            /*mode 2*/
+-            can_ts_rw_property f;
+-            canframe_recv(&f);
+-
+-            int idx;
+-            if((idx = id2idx(f.id)) == -1) {
+-                DebugOut(DebugOut::Warning)<<"receiving wrong id: "<<f.id<<endl;
+-                continue;
+-            }
++        /*mode 2*/
++        can_ts_rw_property f;
++        canframe_recv(&f);
+ 
+-            //DebugOut(DebugOut::Warning)<<"receive value is "<<f.f_value<<endl;
++        int idx;
++        if((idx = id2idx(f.id)) == -1) {
++            DebugOut(DebugOut::Warning)<<"receiving wrong id: "<<f.id<<endl;
++            continue;
++        }
+ 
+-            AbstractPropertyType* value = caninfo[idx].v;
+-            if (value == NULL) {
+-                DebugOut(DebugOut::Warning)<<"VALUE IS NULL"<<endl;
+-                continue;
+-            }
++        AbstractPropertyType* value = caninfo[idx].v;
++        if (value == NULL) {
++            DebugOut(DebugOut::Warning)<<"VALUE IS NULL"<<endl;
++            continue;
++        }
+ 
+-            if (f.val_type == VALUE_BOOL) {
+-                ((BasicPropertyType<bool>*)value)->setValue((bool)f.bval);
+-                DebugOut(DebugOut::Warning)<<"receive bool is "<<f.bval<<endl;
+-            } else if (f.val_type == VALUE_FLOAT) {
+-                ((BasicPropertyType<double>*)value)->setValue((double)((float)f.f_value));
+-                DebugOut(DebugOut::Warning)<<"receive float is "<<f.f_value<<endl;
+-            } else {
+-	        DebugOut(DebugOut::Warning)<<"no matching value type"<<endl;
+-                continue;
+-            }
+-            value->priority = AbstractPropertyType::Instant;
+-            value->zone = fzone2pzone(f.zone, caninfo[idx].region_t);
++        //TODO: supporting all value type
++        if (f.val_type == VALUE_BOOL) {
++            ((BasicPropertyType<bool>*)value)->setValue((bool)f.bval);
++            DebugOut(DebugOut::Warning)<<"receive bool is "<<f.bval<<endl;
++        } else if (f.val_type == VALUE_FLOAT) {
++            ((BasicPropertyType<double>*)value)->setValue((double)((float)f.f_value));
++            DebugOut(DebugOut::Warning)<<"receive float is "<<f.f_value<<endl;
++        } else {
++	    DebugOut(DebugOut::Warning)<<"no matching value type"<<endl;
++            continue;
++        }
++
++        if ((value->zone = fzone2pzone(f.zone, caninfo[idx].region_t)) == ZONE_N_SUP) {
++	    DebugOut(DebugOut::Warning)<<"don't support zone value: "<<f.zone<<endl;
++            continue;
++        }
++	DebugOut(DebugOut::Warning)<<"zone value: "<<value->zone<<endl;
++        value->priority = AbstractPropertyType::Instant;
+ 
+ 
+-            //if (!re) {
+-            //    DebugOut(DebugOut::Warning)<<"re is null!"<<endl;
+-            //    return;
+-            //}
+-            //DebugOut(DebugOut::Warning)<<"enter updateproperty!"<<endl;
+-            re->updateProperty(value, "becbbef9-6cc8-4b9e-8cd7-2fbe37b9b52a");
++        //if (!re) {
++        //    DebugOut(DebugOut::Warning)<<"re is null!"<<endl;
++        //    return;
++        //}
++        //DebugOut(DebugOut::Warning)<<"enter updateproperty!"<<endl;
++        re->updateProperty(value, "becbbef9-6cc8-4b9e-8cd7-2fbe37b9b52a");
+     }
+ }
+ //----------------------------------------------------------------------------
+@@ -152,32 +156,35 @@ extern "C" void create(AbstractRoutingEngine* routingengine, std::map<std::strin
+ CANPlugin::CANPlugin(AbstractRoutingEngine* re, const map<string, string>& config, AbstractSource& parent) :
+ 	AmbPluginImpl(re, config, parent)
+ {
+-	addPropertySupport(
+-		Zone::None,
+-		[](){
+-			StringPropertyType *s = new StringPropertyType("MappingTable", "");
+-			s->zone = Zone::None;
+-			return s;
+-		}
+-	);
+-
+-	ADDPROPERTY(VehicleProperty::FuelLevelX, 0, Zone::None);
+-	ADDPROPERTY(VehicleProperty::ExteriorTemperatureX, 0, Zone::None);
+-	ADDPROPERTY(VehicleProperty::InteriorTemperatureX, 0, Zone::None);
+-	ADDPROPERTY(VehicleProperty::VehicleSpeedX, 0, Zone::None);
+-	ADDPROPERTY(VehicleProperty::OdometerX, 0, Zone::None);
+-	ADDPROPERTY(VehicleProperty::TirePressureX, 0, Zone::None);
+-	ADDPROPERTY(VehicleProperty::TireTemperatureX, 0, Zone::None);
+-	ADDPROPERTY(VehicleProperty::WheelBrakeX, false, Zone::None);
+-	ADDPROPERTY(VehicleProperty::DoorStatusX, false, Zone::None);
+-	ADDPROPERTY(VehicleProperty::SeatBeltStatusX, false, Zone::None);
+-	ADDPROPERTY(VehicleProperty::LightHazardX, false, Zone::None);
+-	ADDPROPERTY(VehicleProperty::FanAC, false, Zone::None);
+-	ADDPROPERTY(VehicleProperty::FanAuto, false, Zone::None);
+-	ADDPROPERTY(VehicleProperty::FanRecirc, false, Zone::None);
+-	ADDPROPERTY(VehicleProperty::FanRight, false, Zone::None);
+-	ADDPROPERTY(VehicleProperty::FanDown, false, Zone::None);
+-	ADDPROPERTY(VehicleProperty::FanUp, false, Zone::None);
++
++#ifdef K_HELPER
++#undef K_HELPER
++#endif
++
++#define K_HELPER(prop, id, reg, sr, vt, vl, tt, dv, pc) \
++        if (sr == R_NN) {\
++            ADDPROPERTY(VehicleProperty:: prop, dv, Zone::None); \
++        } else if (sr == R_COM) { \
++            ADDPROPERTY(VehicleProperty:: prop, dv, Zone::FrontLeft); \
++            ADDPROPERTY(VehicleProperty:: prop, dv, Zone::FrontRight); \
++            ADDPROPERTY(VehicleProperty:: prop, dv, Zone::RearLeft); \
++            ADDPROPERTY(VehicleProperty:: prop, dv, Zone::RearRight); \
++        } else if (sr == R_ALL) { \
++            ADDPROPERTY(VehicleProperty:: prop, dv, Zone::FrontLeft); \
++            ADDPROPERTY(VehicleProperty:: prop, dv, Zone::FrontRight); \
++            ADDPROPERTY(VehicleProperty:: prop, dv, Zone::RearLeft); \
++            ADDPROPERTY(VehicleProperty:: prop, dv, Zone::RearRight); \
++            ADDPROPERTY(VehicleProperty:: prop, dv, Zone::MiddleLeft); \
++            ADDPROPERTY(VehicleProperty:: prop, dv, Zone::MiddleRight); \
++        } else { \
++            if ((sr & R_FL) > 0) ADDPROPERTY(VehicleProperty:: prop, dv, Zone::FrontLeft); \
++            if ((sr & R_FR) > 0) ADDPROPERTY(VehicleProperty:: prop, dv, Zone::FrontRight); \
++            if ((sr & R_ML) > 0) ADDPROPERTY(VehicleProperty:: prop, dv, Zone::MiddleLeft); \
++            if ((sr & R_MR) > 0) ADDPROPERTY(VehicleProperty:: prop, dv, Zone::MiddleRight); \
++            if ((sr & R_RL) > 0) ADDPROPERTY(VehicleProperty:: prop, dv, Zone::RearLeft); \
++            if ((sr & R_RR) > 0) ADDPROPERTY(VehicleProperty:: prop, dv, Zone::RearRight); \
++        }
++#include "canmatrix.h"
+ 
+         if (canframe_init(mode) != 0)
+             return;
+@@ -208,32 +215,41 @@ AsyncPropertyReply *CANPlugin::setProperty(const AsyncSetPropertyRequest &reques
+         memset(f, 0, sizeof(can_ts_rw_property));
+ 
+         //TODO: hash search of right caninfo
++        // find the right index in caninfo for the property in request
+         for (i = 0; i < K_PROP_COUNT; i++) {
+-                if (strncmp(request.value->name.c_str(), caninfo[i].property,
+-                                        request.value->name.length()) == 0) {
+-	            DebugOut(DebugOut::Warning)<<"caninfo index is "<<i<<endl;
+-                    break;
+-                }
++            if (strncmp(request.value->name.c_str(), caninfo[i].property,
++                                    request.value->name.length()) == 0) {
++	        DebugOut(DebugOut::Warning)<<"caninfo index is "<<i<<endl;
++                break;
++            }
+         }
+         if (i == K_PROP_COUNT)
+-                return AmbPluginImpl::setProperty(request);
++            return AmbPluginImpl::setProperty(request);
+ 
+-        f->len = 60;
+-        f->id = caninfo[i].can_id;
+-        f->ts = 0;
+-        f->zone = pzone2fzone(request.value->zone, caninfo[i].region_t);
+-        f->val_type = caninfo[i].value_t;
+-        f->data_len = caninfo[i].value_l;
++        if ((f->zone = pzone2fzone(request.zoneFilter, caninfo[i].region_t)) == ZONE_N_SUP) {
++	    DebugOut(DebugOut::Warning)<<"don't support zone value: "<<request.zoneFilter<<endl;
++            return AmbPluginImpl::setProperty(request);
++        }
++
++        //TODO: supporting all value type
+         if (caninfo[i].value_t == VALUE_BOOL) {
+             f->bval = (bool)((BasicPropertyType<bool>*)request.value)->basicValue();
+         } else if (caninfo[i].value_t == VALUE_INT32) {
+             f->val = (int32_t)((BasicPropertyType<int32_t>*)request.value)->basicValue();
+         } else {
+-	    DebugOut(DebugOut::Warning)<<"no matching value type"<<endl;
++	    DebugOut(DebugOut::Warning)<<"no matching value type: "<<caninfo[i].value_t<<endl;
+ 	    return AmbPluginImpl::setProperty(request);
+         }
+ 
++        f->len = 60;
++        f->id = caninfo[i].can_id;
++        f->ts = 0;
++        f->val_type = caninfo[i].value_t;
++        f->data_len = caninfo[i].value_l;
++
+ 	DebugOut(DebugOut::Warning)<<"transmit framelen is "<<sizeof(can_ts_rw_property)<<endl;
++        printFrameData(*f);
++
+         canframe_send(f);
+ 
+ 	return AmbPluginImpl::setProperty(request);
+diff --git a/plugins/canplugin/canplugin.h b/plugins/canplugin/canplugin.h
+index b8f8fc9..aac655e 100644
+--- a/plugins/canplugin/canplugin.h
++++ b/plugins/canplugin/canplugin.h
+@@ -27,7 +27,7 @@ OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+ 
+-#ifndef _CAnconPLUGINIMPL_H_
++#ifndef _CANPLUGINIMPL_H_
+ #define _CANPLUGINIMPL_H_
+ 
+ #include <map>
+diff --git a/plugins/dbus/CMakeLists.txt b/plugins/dbus/CMakeLists.txt
+index 5298821..06e4331 100644
+--- a/plugins/dbus/CMakeLists.txt
++++ b/plugins/dbus/CMakeLists.txt
+@@ -24,6 +24,7 @@ set(dbus_mapping_headers ${dbus_mapping_headers} ${CMAKE_CURRENT_SOURCE_DIR}/mai
+ set(dbus_mapping_headers ${dbus_mapping_headers} ${CMAKE_CURRENT_SOURCE_DIR}/parking.h CACHE INTERNAL "dbus mapping headers")
+ set(dbus_mapping_headers ${dbus_mapping_headers} ${CMAKE_CURRENT_SOURCE_DIR}/drivingsafety.h CACHE INTERNAL "dbus mapping headers")
+ set(dbus_mapping_headers ${dbus_mapping_headers} ${CMAKE_CURRENT_SOURCE_DIR}/personalization.h CACHE INTERNAL "dbus mapping headers")
++set(dbus_mapping_headers ${dbus_mapping_headers} ${CMAKE_CURRENT_SOURCE_DIR}/aglprop.h CACHE INTERNAL "dbus mapping headers")
+ 
+ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/README ${CMAKE_CURRENT_BINARY_DIR}/dbus.README.md @ONLY)
+ install (FILES ${CMAKE_CURRENT_BINARY_DIR}/dbus.README.md DESTINATION ${DOC_INSTALL_DIR}/plugins)
+diff --git a/plugins/dbus/aglprop.h b/plugins/dbus/aglprop.h
+index f96f416..f58b838 100644
+--- a/plugins/dbus/aglprop.h
++++ b/plugins/dbus/aglprop.h
+@@ -51,13 +51,19 @@ public:
+ 		wantPropertyVariant(VehicleProperty::WheelBrakeX, "WheelBrakeX", VariantType::Read);
+ 		wantPropertyVariant(VehicleProperty::DoorStatusX, "DoorStatusX", VariantType::Read);
+ 		wantPropertyVariant(VehicleProperty::SeatBeltStatusX, "SeatBeltStatusX", VariantType::Read);
+-		wantPropertyVariant(VehicleProperty::LightHazardX, "LightHazardX", VariantType::Read);
++		wantPropertyVariant(VehicleProperty::LightHazardX, "LightHazardX", VariantType::Write);
+ 		wantPropertyVariant(VehicleProperty::FanAC, "FanAC", VariantType::Write);
+ 		wantPropertyVariant(VehicleProperty::FanRecirc, "FanRecirc", VariantType::Write);
+ 		wantPropertyVariant(VehicleProperty::FanAuto, "FanAuto", VariantType::Write);
+ 		wantPropertyVariant(VehicleProperty::FanRight, "FanRight", VariantType::Write);
+ 		wantPropertyVariant(VehicleProperty::FanUp, "FanUp", VariantType::Write);
+ 		wantPropertyVariant(VehicleProperty::FanDown, "FanDown", VariantType::Write);
++		wantPropertyVariant(VehicleProperty::DefrostMax, "DefrostMax", VariantType::Write);
++		wantPropertyVariant(VehicleProperty::DefrostRear, "DefrostRear", VariantType::Write);
++		wantPropertyVariant(VehicleProperty::DefrostFront, "DefrostFront", VariantType::Write);
++		wantPropertyVariant(VehicleProperty::SeatHeat, "SeatHeat", VariantType::Write);
++		wantPropertyVariant(VehicleProperty::TemperatureControl, "TemperatureControl", VariantType::Write);
++		wantPropertyVariant(VehicleProperty::FanSpeedX, "FanSpeedX", VariantType::Write);
+ 	}
+ };
+ #endif
+diff --git a/plugins/dbus/dbusinterfacemanager.cpp b/plugins/dbus/dbusinterfacemanager.cpp
+index b556fd1..b7b184e 100644
+--- a/plugins/dbus/dbusinterfacemanager.cpp
++++ b/plugins/dbus/dbusinterfacemanager.cpp
+@@ -39,6 +39,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ #include "parking.h"
+ #include "drivingsafety.h"
+ #include "personalization.h"
++#include "aglprop.h"
+ 
+ extern "C" void create(AbstractRoutingEngine* routingengine, map<string, string> config)
+ {
+@@ -200,6 +201,7 @@ void DBusInterfaceManager::registerTypes()
+ 	exporter->exportProperty<AtmosphericPressure>(re);
+ 	exporter->exportProperty<LaneDepartureStatus>(re);
+ 	exporter->exportProperty<AlarmStatus>(re);
++	exporter->exportProperty<AglDemoProperty>(re);
+ 
+ 	PropertyList list = VehicleProperty::customProperties();
+ 	PropertyList implemented = AbstractDBusInterface::implementedProperties();
+diff --git a/tests/amb-set.py b/tests/amb-set.py
+index bbdbc48..5d6d9f9 100755
+--- a/tests/amb-set.py
++++ b/tests/amb-set.py
+@@ -30,9 +30,13 @@ elif valueType == "integer":
+ elif valueType == "string":
+ 	realValue = value
+ elif valueType == "double":
+-	realValue = double(value)
+-elif valueType == "UInt16":
++	realValue = dbus.Double(value)
++elif valueType == "uint16":
+ 	realValue = dbus.UInt16(value)
++elif valueType == "uint32":
++	realValue = dbus.UInt32(value)
++elif valueType == "int32":
++	realValue = dbus.Int32(value)
+ else:
+ 	raise Exception("Unknown type: " + valueType)
+ 
+-- 
+1.9.1
+
