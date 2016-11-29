@@ -32,6 +32,7 @@ IMAGE_INSTALL += "tcpdump"
 IMAGE_INSTALL += "ebtables"
 IMAGE_INSTALL += "vlan"
 IMAGE_INSTALL += "bridge-utils"
+IMAGE_INSTALL += "wqy-microhei"
 
 #Firmware-links
 IMAGE_INSTALL += "firmware-links"
