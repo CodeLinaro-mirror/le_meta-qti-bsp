@@ -3,6 +3,7 @@ FILESEXTRAPATHS_append := ":${THISDIR}/${PN}"
 S = "${WORKDIR}/gst-omx-${PV}"
 
 RDEPENDS_${PN} = "media"
+DEPENDS += "media"
 GSTREAMER_1_0_OMX_TARGET ?= "generic"
 GSTREAMER_1_0_OMX_CORE_NAME = "${libdir}/libOmxCore.so"
 
@@ -36,6 +37,7 @@ SRC_URI_append += " \
    file://0026-gstomx-support-videoencoder.patch \
    file://0027-gstomx-increase-one-buffer-for-weston-atomic-modeset.patch \
    file://0028-gst-omx-Fix-video-hang-issue.patch \
+   file://0029-Enable-feature-SPS-PPS-generation-with-IDR-frames.patch \
 "
 
 do_configure_prepend() {
