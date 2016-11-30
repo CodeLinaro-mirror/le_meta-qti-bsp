@@ -57,3 +57,5 @@ IMAGE_INSTALL += "node-state-manager"
 IMAGE_INSTALL += "node-health-monitor"
 IMAGE_INSTALL += "node-startup-controller"
 
+IMAGE_INSTALL += "usbutils"
+IMAGE_INSTALL += "sysstat"
