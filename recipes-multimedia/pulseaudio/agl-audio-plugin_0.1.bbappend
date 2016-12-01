@@ -11,4 +11,5 @@ SRC_URI += " \
              file://0004-support-hfp-usecase.patch \
             file://0006-support-adjust-hfp-volume.patch \
             file://0007-enable-nullsource-for-capture.patch \
+            file://0009-support-SDARS-tuner-on-local-AMP-use-case.patch \
 "

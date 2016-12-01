@@ -1,0 +1,136 @@
+From 17ee030d6ceb49d721e410e63fa2eda16058b718 Mon Sep 17 00:00:00 2001
+From: Honghao Liu <honghaol@codeaurora.org>
+Date: Thu, 1 Dec 2016 11:59:07 -0500
+Subject: [PATCH] support SDARS tuner on local AMP use case
+
+Add support for routing SDARS tuner playback on local amplifier
+use case to proper sink/source devices.
+---
+ classify.c         |  2 ++
+ node.c             |  3 +++
+ pulseaudio-agl.cfg | 25 ++++++++++++++++++++-----
+ userdata.h         |  1 +
+ 4 files changed, 26 insertions(+), 5 deletions(-)
+
+diff --git a/classify.c b/classify.c
+index c26a17b..1d67e57 100644
+--- a/classify.c
++++ b/classify.c
+@@ -73,6 +73,8 @@ agl_node_type agl_classify_guess_stream_node_type (struct userdata *u,  pa_propl
+ 		type = agl_hfp_downlink;
+ 	else if (pa_streq (role, "hfp_uplink"))
+ 		type = agl_hfp_uplink;
++	else if (pa_streq (role, "sdars_tuner_local_amp"))
++		type = agl_sdars_tuner_local_amp;
+ 	else
+ 		type = agl_player;
+ 
+diff --git a/node.c b/node.c
+index 6908660..16b3f67 100644
+--- a/node.c
++++ b/node.c
+@@ -184,6 +184,8 @@ agl_node_type agl_node_type_from_str (const char *str)
+ 		type = agl_hfp_downlink;
+ 	else if (pa_streq (str, "agl_hfp_uplink"))
+ 		type = agl_hfp_uplink;
++	else if (pa_streq (str, "agl_sdars_tuner_local_amp"))
++		type = agl_sdars_tuner_local_amp;
+ 	else
+ 		type = agl_node_type_unknown;
+ 
+@@ -208,6 +210,7 @@ const char *agl_node_type_str (agl_node_type type)
+ 		case agl_hfp_wb_uplink:		return "HfpUplink";
+ 		case agl_hfp_downlink:		return "HfpDownlink";
+ 		case agl_hfp_uplink:		return "HfpUplink";
++		case agl_sdars_tuner_local_amp: return "SDARS_tuner_local_amp";
+ 		default:                    return "default";
+ 	}
+ }
+diff --git a/pulseaudio-agl.cfg b/pulseaudio-agl.cfg
+index 0f39f53..86676dd 100644
+--- a/pulseaudio-agl.cfg
++++ b/pulseaudio-agl.cfg
+@@ -41,6 +41,14 @@
+  {"name":"HfpUplink",
+   "type":"OUTPUT",
+   "card":"alsa_input.HfpUplink"},
++
++ {"name":"SDARS_tuner_local_amp",
++  "type":"INPUT",
++  "card":"alsa_output.sdars_tuner_hostless"},
++
++ {"name":"SDARS_tuner_local_amp",
++  "type":"OUTPUT",
++  "card":"alsa_input.sdars_tuner_hostless"},
+ ],
+ 
+ "classmap": [
+@@ -57,6 +65,8 @@
+  {"class":    "agl_hfp_downlink", "zone":0, "type":"OUTPUT", "rtgroup":"HfpDownlink"},
+  {"class":    "agl_hfp_uplink", "zone":0, "type":"INPUT", "rtgroup":"HfpUplink"},
+  {"class":    "agl_hfp_uplink", "zone":0, "type":"OUTPUT", "rtgroup":"HfpUplink"},
++ {"class":    "agl_sdars_tuner_local_amp", "zone":0, "type":"INPUT", "rtgroup":"SDARS_tuner_local_amp"},
++ {"class":    "agl_sdars_tuner_local_amp", "zone":0, "type":"OUTPUT", "rtgroup":"SDARS_tuner_local_amp"},
+ ],
+ 
+ "typemap": [
+@@ -69,6 +79,7 @@
+  {"id":"hfp_wb_uplink", "type":"agl_hfp_wb_uplink"},
+  {"id":"hfp_downlink", "type":"agl_hfp_downlink"},
+  {"id":"hfp_uplink", "type":"agl_hfp_uplink"},
++ {"id":"sdars_tuner_local_amp", "type":"agl_sdars_tuner_local_amp"},
+ ],
+ 
+ "priormap": [
+@@ -81,6 +92,7 @@
+  {"class":   "agl_hfp_wb_uplink", "priority":4},
+  {"class":   "agl_hfp_downlink", "priority":4},
+  {"class":   "agl_hfp_uplink", "priority":4},
++ {"class":   "agl_sdars_tuner_local_amp", "priority":1},
+ ],
+ 
+ "usecasemap": [
+@@ -89,20 +101,23 @@
+  {"media_role":    "hfp_wb_downlink",  "ucm_verb":"Hfp_wb"},
+  {"media_role":    "hfp_wb_uplink",   "ucm_verb":"Hfp_wb"},
+  {"media_role":    "hfp_downlink",   "ucm_verb":"Hfp"},
+- {"media_role":    "hfp_uplink",   "ucm_verb":"Hfp"}
++ {"media_role":    "hfp_uplink",   "ucm_verb":"Hfp"},
++ {"media_role":    "sdars_tuner_local_amp",   "ucm_verb":"SDARS Tuner Local AMP"}
+ ],
+ 
+ "audio_sinks": [
+  {"name":"alsa_output.MultiMedia1", "device":"hw:0,0", "ucm_verb":"HiFi", "num_channels":2, "sampling_rate":48000, "fragment_size":4800, "fragment_count":4, "format":"s16le", "mmap":1},
+  {"name":"alsa_output.MultiMedia2", "device":"hw:0,1", "ucm_verb":"Navigation", "num_channels":2, "sampling_rate":48000, "fragment_size":4800, "fragment_count":4, "format":"s16le", "mmap":1},
+-  {"name":"alsa_output.HfpDownlink", "device":"hw:0,52", "ucm_verb":"Hfp_wb", "num_channels":1, "sampling_rate":8000, "fragment_size":240, "fragment_count":2, "format":"s16le", "mmap":0},
+-  {"name":"alsa_output.HfpUplink", "device":"hw:0,24", "ucm_verb":"Hfp_wb", "num_channels":1, "sampling_rate":8000, "fragment_size":240, "fragment_count":2, "format":"s16le" ,"mmap":0}
++ {"name":"alsa_output.HfpDownlink", "device":"hw:0,52", "ucm_verb":"Hfp_wb", "num_channels":1, "sampling_rate":8000, "fragment_size":240, "fragment_count":2, "format":"s16le", "mmap":0},
++ {"name":"alsa_output.HfpUplink", "device":"hw:0,24", "ucm_verb":"Hfp_wb", "num_channels":1, "sampling_rate":8000, "fragment_size":240, "fragment_count":2, "format":"s16le" ,"mmap":0},
++ {"name":"alsa_output.sdars_tuner_hostless", "device":"hw:0,50", "ucm_verb":"SDARS Tuner Local AMP", "num_channels":2, "sampling_rate":48000, "fragment_size":240, "fragment_count":2, "format":"s16le", "mmap":0}
+ ],
+ 
+ "audio_sources": [
+  {"name":"alsa_input.MultiMedia1", "device":"hw:0,0", "ucm_verb":"Record", "num_channels":2, "sampling_rate":48000, "fragment_size":4800, "fragment_count":4, "format":"s16le","mmap":1},
+-   {"name":"alsa_input.HfpDownlink", "device":"hw:0,23", "ucm_verb":"Hfp_wb", "num_channels":1, "sampling_rate":8000, "fragment_size":240, "fragment_count":2, "format":"s16le","mmap":0},
+-  {"name":"alsa_input.HfpUplink", "device":"hw:0,24", "ucm_verb":"Hfp_wb", "num_channels":1, "sampling_rate":8000, "fragment_size":240, "fragment_count":2, "format":"s16le","mmap":0}
++ {"name":"alsa_input.HfpDownlink", "device":"hw:0,23", "ucm_verb":"Hfp_wb", "num_channels":1, "sampling_rate":8000, "fragment_size":240, "fragment_count":2, "format":"s16le","mmap":0},
++ {"name":"alsa_input.HfpUplink", "device":"hw:0,24", "ucm_verb":"Hfp_wb", "num_channels":1, "sampling_rate":8000, "fragment_size":240, "fragment_count":2, "format":"s16le","mmap":0},
++ {"name":"alsa_input.sdars_tuner_hostless", "device":"hw:0,59", "ucm_verb":"SDARS Tuner Local AMP", "num_channels":2, "sampling_rate":48000, "fragment_size":240, "fragment_count":2, "format":"s16le", "mmap":0}
+ ],
+ 
+ }}
+diff --git a/userdata.h b/userdata.h
+index 11a7d27..50c2185 100644
+--- a/userdata.h
++++ b/userdata.h
+@@ -98,6 +98,7 @@ typedef enum agl_node_type {
+ 	agl_hfp_wb_uplink,
+ 	agl_hfp_downlink,
+ 	agl_hfp_uplink,
++	agl_sdars_tuner_local_amp,
+ 	agl_application_class_end,
+ } agl_node_type;
+ 
+-- 
+1.9.1
+
