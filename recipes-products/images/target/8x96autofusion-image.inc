@@ -7,6 +7,7 @@ IMAGE_INSTALL += "packagegroup-agl-core"
 IMAGE_INSTALL += "packagegroup-agl-ivi"
 IMAGE_INSTALL += "packagegroup-ivi-common-core"
 IMAGE_INSTALL += "packagegroup-agl-demo-platform"
+IMAGE_INSTALL += "gstreamer1.0-mprtp"
 
 IMAGE_ROOTFS_SIZE = "2097152"
 
