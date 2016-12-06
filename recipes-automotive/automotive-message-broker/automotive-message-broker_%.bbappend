@@ -8,6 +8,7 @@ SRC_URI_append = "\
     file://0004-make-library-ambqt-support-setting-property-value.patch \
     file://0005-add-canplugin-to-support-self-defined-can-frame.patch \
     file://0006-support-all-demo-properties-and-fix-some-bugs.patch \
+    file://0007-adjust-zone-mapping-policy-and-some-error-handling.patch \
 "
 do_install_append() {
 cp -r  ${D}/usr/lib/* ${D}${libdir}
