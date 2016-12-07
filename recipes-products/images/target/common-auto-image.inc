@@ -48,6 +48,23 @@ IMAGE_INSTALL += "sigma-dut"
 #BT
 IMAGE_INSTALL += "synergy-opensource"
 
+#Location
+IMAGE_INSTALL += "positioning"
+IMAGE_INSTALL += "positioning-gnss"
+IMAGE_INSTALL += "positioning-gnss-test"
+IMAGE_INSTALL += "positioning-sns"
+IMAGE_INSTALL += "positioning-sns-test"
+IMAGE_INSTALL += "positioning-repl"
+IMAGE_INSTALL += "positioning-repl-test"
+IMAGE_INSTALL += "positioning-enhpos"
+IMAGE_INSTALL += "positioning-enhpos-test"
+IMAGE_INSTALL += "positioning-dbg"
+
+#dbus-C++
+IMAGE_INSTALL += "dbus"
+IMAGE_INSTALL += "dbus-c++"
+IMAGE_INSTALL += "dbus-glib"
+
 # Add Persistence Storage related components
 IMAGE_INSTALL += "dlt-daemon"
 IMAGE_INSTALL += "persistence-common-object"
