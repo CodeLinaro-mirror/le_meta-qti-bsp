@@ -127,6 +127,7 @@ esac
 cd /
 
 #Autoprobe Wlan module here after firmware link is ready
-modprobe wlan
+#Move this to init_qti_wlan.service
+#modprobe wlan
 
 exit 0

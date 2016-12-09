@@ -9,6 +9,7 @@ FILESPATH =+ "${WORKSPACE}:"
 SRC_URI = "file://wlan/qcacld-2.0/ \
            file://wifi_on.sh \
            file://wifi_off.sh \
+           file://init_qti_wlan.service \
           "
 DEPENDS = "virtual/kernel"
 
@@ -17,6 +18,10 @@ S = "${WORKDIR}/wlan/qcacld-2.0"
 inherit module kernel-arch
 inherit module update-rc.d
 INITSCRIPT_NAME = "wifi_on.sh"
+
+inherit systemd
+SYSTEMD_SERVICE_${PN} = "init_qti_wlan.service"
+SYSTEMD_AUTO_ENABLE_${PN} = "enable"
 
 INHIBIT_PACKAGE_STRIP = "1"
 
@@ -46,6 +51,11 @@ do_install () {
     install -d ${D}/usr/sbin
     install -D -m 0544 ${WORKDIR}/wifi_on.sh ${D}/usr/sbin/
     install -D -m 0544 ${WORKDIR}/wifi_off.sh ${D}/usr/sbin/
+
+    #install systemd service file
+    if ${@base_contains('DISTRO_FEATURES','systemd','true','false',d)}; then
+        install -m 0644 ${WORKDIR}/init_qti_wlan.service -D ${D}${systemd_unitdir}/system/init_qti_wlan.service
+    fi
 }
 
 FILES_${PN} = "/usr/sbin/\
