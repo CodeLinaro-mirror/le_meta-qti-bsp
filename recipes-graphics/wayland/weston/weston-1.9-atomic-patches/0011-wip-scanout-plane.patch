@@ -1,0 +1,40 @@
+From 4614b2ed95fcbacae1f5b1462ca5e55c9ea693c4 Mon Sep 17 00:00:00 2001
+From: Bharathraj Nagaraju <snbraj@codeaurora.org>
+Date: Thu, 21 Jul 2016 15:08:12 +0530
+Subject: [PATCH 11/11] wip-scanout-plane
+
+Signed-off-by: Bharathraj Nagaraju <snbraj@codeaurora.org>
+(cherry picked from commit 9aeea0d7474b4825e55d5711e5a506a4bce9ebe2)
+
+Change-Id: I0d746ad230ee427fd1ee4a490f89ce2a00bfa5d4
+---
+ src/compositor-drm.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/src/compositor-drm.c b/src/compositor-drm.c
+index b25c865..9bb060a 100644
+--- a/src/compositor-drm.c
++++ b/src/compositor-drm.c
+@@ -1260,6 +1260,11 @@ drm_output_prepare_scanout_view(struct drm_output *output,
+ 	if (ev->geometry.scissor_enabled)
+ 		return NULL;
+ 
++	if (output->primary_plane->current &&
++	    output->primary_plane->current->buffer_ref.buffer == buffer) {
++		output->primary_plane->next = output->primary_plane->current;
++		goto out;
++	}
+ 	bo = gbm_bo_import(b->gbm, GBM_BO_IMPORT_WL_BUFFER,
+ 			   buffer->resource, GBM_BO_USE_SCANOUT);
+ 
+@@ -1281,6 +1286,7 @@ drm_output_prepare_scanout_view(struct drm_output *output,
+ 
+ 	drm_fb_set_buffer(output->primary_plane->next, buffer);
+ 
++out:
+ 	return &output->fb_plane;
+ }
+ 
+-- 
+2.10.1
+

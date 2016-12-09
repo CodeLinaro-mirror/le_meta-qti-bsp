@@ -10,6 +10,8 @@ PR = "r1"
 
 DEPENDS += "liblog"
 
+INSANE_SKIP_${PN} += "installed-vs-shipped"
+
 BBCLASSEXTEND = "native"
 
 FILESPATH =+ "${WORKSPACE}/system/core/:"

@@ -4,6 +4,8 @@ PR = "r4"
 
 MY_PN = "dtbtool"
 
+S = "${WORKDIR}"
+
 DESCRIPTION = "Boot image creation tool from Android"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\

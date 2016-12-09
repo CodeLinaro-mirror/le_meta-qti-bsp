@@ -1,0 +1,65 @@
+From 7faab654f09c4311a5108aff32eb815eb1162eea Mon Sep 17 00:00:00 2001
+From: Avinash Nalluri <anallu@codeaurora.org>
+Date: Tue, 14 Jun 2016 16:21:04 -0700
+Subject: [PATCH] Update header file with 4.1 kernel header.
+
+This is to resolve glibc-2.22 compilation issue
+with 3.18 kernel.
+
+Change-Id: Iea9bec22d90964a838e5c07929b8929462c13b60
+Signed-off-by: Avinash Nalluri <anallu@codeaurora.org>
+---
+ arch/arm64/include/uapi/asm/sigcontext.h | 32 --------------------------------
+ 1 file changed, 32 deletions(-)
+
+diff --git a/arch/arm64/include/uapi/asm/sigcontext.h b/arch/arm64/include/uapi/asm/sigcontext.h
+index c731ca0..ee469be 100644
+--- a/arch/arm64/include/uapi/asm/sigcontext.h
++++ b/arch/arm64/include/uapi/asm/sigcontext.h
+@@ -16,7 +16,6 @@
+ #ifndef _UAPI__ASM_SIGCONTEXT_H
+ #define _UAPI__ASM_SIGCONTEXT_H
+ 
+-#ifdef CONFIG_64BIT
+ #include <linux/types.h>
+ 
+ /*
+@@ -62,35 +61,4 @@ struct esr_context {
+ 	__u64 esr;
+ };
+ 
+-#else /* CONFIG_64BIT */
+-
+-/*
+- * Signal context structure - contains all info to do with the state
+- * before the signal handler was invoked.  Note: only add new entries
+- * to the end of the structure.
+- */
+-struct sigcontext {
+-	unsigned long trap_no;
+-	unsigned long error_code;
+-	unsigned long oldmask;
+-	unsigned long arm_r0;
+-	unsigned long arm_r1;
+-	unsigned long arm_r2;
+-	unsigned long arm_r3;
+-	unsigned long arm_r4;
+-	unsigned long arm_r5;
+-	unsigned long arm_r6;
+-	unsigned long arm_r7;
+-	unsigned long arm_r8;
+-	unsigned long arm_r9;
+-	unsigned long arm_r10;
+-	unsigned long arm_fp;
+-	unsigned long arm_ip;
+-	unsigned long arm_sp;
+-	unsigned long arm_lr;
+-	unsigned long arm_pc;
+-	unsigned long arm_cpsr;
+-	unsigned long fault_address;
+-};
+-#endif /* CONFIG_64BIT */
+ #endif /* _UAPI__ASM_SIGCONTEXT_H */
+-- 
+2.5.1
+

@@ -1,5 +1,7 @@
 require iproute2.inc
 
+INSANE_SKIP_${PN} += "installed-vs-shipped"
+
 SRC_URI = "${KERNELORG_MIRROR}/linux/utils/net/${BPN}/${BPN}-${PV}.tar.xz \
            file://configure-cross.patch \
            file://iproute2_config_to_data.patch \

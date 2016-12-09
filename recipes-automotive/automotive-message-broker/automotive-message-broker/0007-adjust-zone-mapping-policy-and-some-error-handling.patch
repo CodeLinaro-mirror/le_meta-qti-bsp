@@ -1,0 +1,273 @@
+From 8ab54edec102ac26a1b1dc418d2b8b012833d455 Mon Sep 17 00:00:00 2001
+From: Jiang Xincong <xincongj@codeaurora.org>
+Date: Tue, 6 Dec 2016 19:32:20 +0800
+Subject: [PATCH] adjust zone mapping policy and some error handling
+
+Signed-off-by: Jiang Xincong <xincongj@codeaurora.org>
+---
+ lib/abstractpropertytype.cpp    |  2 ++
+ lib/abstractpropertytype.h      |  5 ++++-
+ plugins/canplugin/canframe.cpp  | 37 ++++++++++++++++++-------------------
+ plugins/canplugin/canframe.h    |  4 ++++
+ plugins/canplugin/canplugin.cpp | 31 +++++++++++++++++++++++++++----
+ plugins/dbus/amb-qt/ambqt.cpp   |  6 +++---
+ 6 files changed, 58 insertions(+), 27 deletions(-)
+
+diff --git a/lib/abstractpropertytype.cpp b/lib/abstractpropertytype.cpp
+index 62321bf..031c541 100644
+--- a/lib/abstractpropertytype.cpp
++++ b/lib/abstractpropertytype.cpp
+@@ -6,6 +6,8 @@ const Zone::Type Zone::MiddleRight = Zone::Type(Zone::Middle | Zone::Right);
+ const Zone::Type Zone::MiddleLeft = Zone::Type(Zone::Middle | Zone::Left);
+ const Zone::Type Zone::RearRight = Zone::Type(Zone::Rear | Zone::Right);
+ const Zone::Type Zone::RearLeft = Zone::Type(Zone::Rear | Zone::Left);
++const Zone::Type Zone::DriverRight = Zone::Type(Zone::DriverSide | Zone::Right);
++const Zone::Type Zone::DriverLeft = Zone::Type(Zone::DriverSide | Zone::Left);
+ 
+ 
+ const picojson::value AbstractPropertyType::toJson()
+diff --git a/lib/abstractpropertytype.h b/lib/abstractpropertytype.h
+index 21f3d64..e5ef25d 100644
+--- a/lib/abstractpropertytype.h
++++ b/lib/abstractpropertytype.h
+@@ -58,7 +58,8 @@ public:
+ 		LeftSide = 1 << 6,
+ 		RightSide = 1 << 7,
+ 		FrontSide = 1 << 8,
+-		BackSide = 1 << 9
++		BackSide = 1 << 9,
++		DriverSide = 1 << 10
+ 	};
+ 
+ static const Zone::Type FrontRight;
+@@ -67,6 +68,8 @@ static const Zone::Type MiddleRight;
+ static const Zone::Type MiddleLeft;
+ static const Zone::Type RearRight;
+ static const Zone::Type RearLeft;
++static const Zone::Type DriverLeft;
++static const Zone::Type DriverRight;
+ 
+ typedef std::vector<Zone::Type> ZoneList;
+ 
+diff --git a/plugins/canplugin/canframe.cpp b/plugins/canplugin/canframe.cpp
+index b4b80fb..a633bf9 100644
+--- a/plugins/canplugin/canframe.cpp
++++ b/plugins/canplugin/canframe.cpp
+@@ -112,29 +112,31 @@ int canframe_init(int mode)
+ 
+ int canframe_send(can_ts_rw_property* f)
+ {
+-        int len = sendto(sockcan_fd, f, sizeof(can_ts_rw_property),
+-                        0, (struct sockaddr*)&g_addr, sizeof(g_addr));
+-        if (len < 0) {
+-	    DebugOut(DebugOut::Warning)<<"transmit frame: "<<len<<strerror(errno)<<endl;
++        int ret;
++        do { ret = sendto(sockcan_fd, f, sizeof(can_ts_rw_property),
++                        0, (struct sockaddr*)&g_addr, sizeof(g_addr));} while ( ret < 0 && errno == EINTR);
++        if (ret < 0) {
++	    DebugOut(DebugOut::Warning)<<"transmit frame: "<<ret<<strerror(errno)<<endl;
+         }
+ 
+-        return len;
++        return ret;
+ }
+ 
+ int canframe_recv(can_ts_rw_property* f)
+ {
+         struct sockaddr_can addr;
+         socklen_t addrl = sizeof(addr);
+-        int len = recvfrom(sockcan_fd, f, sizeof(can_ts_rw_property),
+-                            0, (struct sockaddr*)&addr, &addrl);
+-        if (len < 0) {
+-	    DebugOut(DebugOut::Warning)<<"receiving frame: "<<len<<strerror(errno)<<endl;
++        int ret;
++        do { ret = recvfrom(sockcan_fd, f, sizeof(can_ts_rw_property),
++                        0, (struct sockaddr*)&addr, &addrl);} while ( ret < 0 && errno == EINTR);
++        if (ret < 0) {
++	    DebugOut(DebugOut::Warning)<<"receiving frame: "<<ret<<strerror(errno)<<endl;
+         } else {
+-	    DebugOut(DebugOut::Warning)<<"receiving frame success: "<<len<<endl;
++	    DebugOut(DebugOut::Warning)<<"receiving frame success: "<<ret<<endl;
+             printFrameData(*f);
+         }
+ 
+-        return len;
++        return ret;
+ }
+ 
+ // can_id to index of caninfo
+@@ -182,12 +184,11 @@ int pzone2fzone(int zone, int type)
+             else if (zone == Zone::RearRight) return REAR_RIGHT;
+             else return ZONE_N_SUP;
+         } else if (type == SEAT) {
+-            if (zone == Zone::FrontLeft) return SEAT_DRIVER_LHD;
+-            else if (zone == Zone::FrontRight) return SEAT_DRIVER_RHD;
+-            else if (zone == Zone::MiddleLeft) return SEAT_ROW_1_PASSENGER_LEFT;
+-            else if (zone == Zone::MiddleRight) return SEAT_ROW_1_PASSENGER_RIGHT;
++            if (zone == Zone::FrontLeft) return SEAT_ROW_1_PASSENGER_LEFT;
++            else if (zone == Zone::FrontRight) return SEAT_ROW_1_PASSENGER_RIGHT;
+             else if (zone == Zone::RearLeft) return SEAT_ROW_2_PASSENGER_LEFT;
+             else if (zone == Zone::RearRight) return SEAT_ROW_2_PASSENGER_RIGHT;
++            else if (zone == Zone::DriverLeft) return SEAT_DRIVER_LHD;
+             else return ZONE_N_SUP;
+         } else if (type == DOOR) {
+             if (zone == Zone::FrontLeft) return DOOR_ROW_1_LEFT;
+@@ -223,10 +224,8 @@ int fzone2pzone(int zone, int type)
+             else if (zone == REAR_RIGHT) return  Zone::RearRight;
+             else return ZONE_N_SUP;
+         } else if (type == SEAT) {
+-            if (zone == SEAT_DRIVER_LHD) return Zone::FrontLeft;
+-            else if (zone == SEAT_DRIVER_RHD) return Zone::FrontRight;
+-            else if (zone == SEAT_ROW_1_PASSENGER_LEFT) return Zone::MiddleLeft;
+-            else if (zone == SEAT_ROW_1_PASSENGER_RIGHT) return Zone::MiddleRight;
++            if (zone == SEAT_ROW_1_PASSENGER_LEFT) return Zone::FrontLeft;
++            else if (zone == SEAT_ROW_1_PASSENGER_RIGHT) return Zone::FrontRight;
+             else if (zone == SEAT_ROW_2_PASSENGER_LEFT) return Zone::RearLeft;
+             else if (zone == SEAT_ROW_2_PASSENGER_RIGHT) return  Zone::RearRight;
+             else return ZONE_N_SUP;
+diff --git a/plugins/canplugin/canframe.h b/plugins/canplugin/canframe.h
+index 638439d..db8dece 100644
+--- a/plugins/canplugin/canframe.h
++++ b/plugins/canplugin/canframe.h
+@@ -214,6 +214,10 @@ struct vehicle_property {
+ 
+ typedef struct vehicle_property can_ts_rw_property __attribute__((packed, aligned(4)));
+ 
++// in this platform&setting, canfd_frame has size 72, prefix&suffix padding has size 12
++// all these padding will be stripped by firmware when parsing, so we need to set frame size to 60
++#define CAN_FRAME_LEN 60
++
+ 
+ int findInterface(char * pname, int sock);
+ 
+diff --git a/plugins/canplugin/canplugin.cpp b/plugins/canplugin/canplugin.cpp
+index 8a86480..7f08c22 100644
+--- a/plugins/canplugin/canplugin.cpp
++++ b/plugins/canplugin/canplugin.cpp
+@@ -88,16 +88,22 @@ void CANDataGen::stop()
+ void CANDataGen::run()
+ {
+     while(isRunnable()) {
+-        /*mode 2*/
++        //socketcan works in mode 2
++        //receive thread catches EINTR error
+         can_ts_rw_property f;
+-        canframe_recv(&f);
++        if (canframe_recv(&f) < 0) {
++            DebugOut(DebugOut::Warning)<<"receive error occurs, retry"<<endl;
++            continue;
++        }
+ 
++        //finding property index
+         int idx;
+         if((idx = id2idx(f.id)) == -1) {
+             DebugOut(DebugOut::Warning)<<"receiving wrong id: "<<f.id<<endl;
+             continue;
+         }
+ 
++        //create property
+         AbstractPropertyType* value = caninfo[idx].v;
+         if (value == NULL) {
+             DebugOut(DebugOut::Warning)<<"VALUE IS NULL"<<endl;
+@@ -105,22 +111,29 @@ void CANDataGen::run()
+         }
+ 
+         //TODO: supporting all value type
++        //set property value
+         if (f.val_type == VALUE_BOOL) {
+             ((BasicPropertyType<bool>*)value)->setValue((bool)f.bval);
+             DebugOut(DebugOut::Warning)<<"receive bool is "<<f.bval<<endl;
+         } else if (f.val_type == VALUE_FLOAT) {
+             ((BasicPropertyType<double>*)value)->setValue((double)((float)f.f_value));
+             DebugOut(DebugOut::Warning)<<"receive float is "<<f.f_value<<endl;
++        } else if (f.val_type == VALUE_INT32) {
++            ((BasicPropertyType<int32_t>*)value)->setValue((int32_t)f.val);
++            DebugOut(DebugOut::Warning)<<"receive int32 is "<<f.val<<endl;
+         } else {
+ 	    DebugOut(DebugOut::Warning)<<"no matching value type"<<endl;
+             continue;
+         }
+ 
++        //set property zone
+         if ((value->zone = fzone2pzone(f.zone, caninfo[idx].region_t)) == ZONE_N_SUP) {
+ 	    DebugOut(DebugOut::Warning)<<"don't support zone value: "<<f.zone<<endl;
+             continue;
+         }
+ 	DebugOut(DebugOut::Warning)<<"zone value: "<<value->zone<<endl;
++
++        //set other field
+         value->priority = AbstractPropertyType::Instant;
+ 
+ 
+@@ -186,6 +199,9 @@ CANPlugin::CANPlugin(AbstractRoutingEngine* re, const map<string, string>& confi
+         }
+ #include "canmatrix.h"
+ 
++        // add special handling of driver seat
++        ADDPROPERTY(VehicleProperty::SeatHeat, 0, Zone::DriverLeft);
++
+         if (canframe_init(mode) != 0)
+             return;
+ 
+@@ -223,25 +239,32 @@ AsyncPropertyReply *CANPlugin::setProperty(const AsyncSetPropertyRequest &reques
+                 break;
+             }
+         }
+-        if (i == K_PROP_COUNT)
++        if (i == K_PROP_COUNT) {
++	    DebugOut(DebugOut::Warning)<<"don't support property: "<<request.value->name.c_str()<<endl;
+             return AmbPluginImpl::setProperty(request);
++        }
+ 
++        // prepare frame zone
+         if ((f->zone = pzone2fzone(request.zoneFilter, caninfo[i].region_t)) == ZONE_N_SUP) {
+ 	    DebugOut(DebugOut::Warning)<<"don't support zone value: "<<request.zoneFilter<<endl;
+             return AmbPluginImpl::setProperty(request);
+         }
+ 
+         //TODO: supporting all value type
++        // prepare frame value
+         if (caninfo[i].value_t == VALUE_BOOL) {
+             f->bval = (bool)((BasicPropertyType<bool>*)request.value)->basicValue();
+         } else if (caninfo[i].value_t == VALUE_INT32) {
+             f->val = (int32_t)((BasicPropertyType<int32_t>*)request.value)->basicValue();
++        } else if (caninfo[i].value_t == VALUE_FLOAT) {
++            f->f_value = (double)((BasicPropertyType<double>*)request.value)->basicValue();
+         } else {
+ 	    DebugOut(DebugOut::Warning)<<"no matching value type: "<<caninfo[i].value_t<<endl;
+ 	    return AmbPluginImpl::setProperty(request);
+         }
+ 
+-        f->len = 60;
++        // prepare the rest
++        f->len = CAN_FRAME_LEN;
+         f->id = caninfo[i].can_id;
+         f->ts = 0;
+         f->val_type = caninfo[i].value_t;
+diff --git a/plugins/dbus/amb-qt/ambqt.cpp b/plugins/dbus/amb-qt/ambqt.cpp
+index f94ce57..3ab54dc 100644
+--- a/plugins/dbus/amb-qt/ambqt.cpp
++++ b/plugins/dbus/amb-qt/ambqt.cpp
+@@ -50,8 +50,7 @@ void AmbProperty::propertyChangedSlot(QString, QVariantMap values, QStringList )
+ 
+ void AmbProperty::connect()
+ {
+-    if (managerIface)
+-        disconnect();
++    ServerProperties.clear();
+ 
+     managerIface = new QDBusInterface("org.automotive.message.broker","/","org.automotive.Manager", QDBusConnection::systemBus(), this);
+ 
+@@ -183,7 +182,8 @@ void AmbProperty::setValue(QVariant v)
+ 
+         // interface send
+         if (i == ServerProperties.size() - 1) {
+-            ServerProperties[i]->setProperty(propertyName().toUtf8(), v);
++            if (ServerProperties[i] != NULL)
++                ServerProperties[i]->setProperty(propertyName().toUtf8(), v);
+         }
+     }
+ }
+-- 
+1.9.1
+

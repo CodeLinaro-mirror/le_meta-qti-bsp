@@ -1,0 +1,96 @@
+From 611e3c6308feb1ef8d2e47fab18c5ac3aa422fb3 Mon Sep 17 00:00:00 2001
+From: Jiang Xincong <xincongj@codeaurora.org>
+Date: Wed, 9 Nov 2016 15:43:47 +0800
+Subject: [PATCH 5/5] make library ambqt support setting property value
+
+ambqt library is used as a proxy between qt app and dbus sink
+
+Signed-off-by: Jiang Xincong <xincongj@codeaurora.org>
+---
+ plugins/dbus/amb-qt/ambqt.cpp | 33 +++++++++++++++++----------------
+ plugins/dbus/amb-qt/ambqt.h   |  5 ++---
+ 2 files changed, 19 insertions(+), 19 deletions(-)
+
+diff --git a/plugins/dbus/amb-qt/ambqt.cpp b/plugins/dbus/amb-qt/ambqt.cpp
+index c8f1faf..f94ce57 100644
+--- a/plugins/dbus/amb-qt/ambqt.cpp
++++ b/plugins/dbus/amb-qt/ambqt.cpp
+@@ -99,26 +99,24 @@ void AmbProperty::connect()
+                 qDebug()<<"property: "<< propertyName();
+                 qDebug()<<"Error: "<< QDBusConnection::systemBus().lastError().message();
+             }
+-        }
+-    }
+ 
+-    //    if(mInterfaceName.isEmpty())
+-    //        mInterfaceName = "org.automotive."+mPropertyName;
++            QString mInterfaceName = "org.automotive."+ mObjectName;
+ 
+-    //    mDBusInterface = new QDBusInterface("org.automotive.message.broker",objectPath(), interfaceName(), QDBusConnection::systemBus(),this);
+-
+-    //    if(!mDBusInterface->isValid())
+-    //    {
+-    //        qDebug()<<"Failed to create dbus interface for property "<<propertyName();
+-    //        qDebug()<<"Path: "<<objectPath();
+-    //        qDebug()<<"Interface: "<<interfaceName();
+-    //        qDebug()<<"Error: "<<QDBusConnection::systemBus().lastError().message();
+-    //    }
++            QDBusInterface* mDBusInterfaceSend = new QDBusInterface("org.automotive.message.broker",
++                            reply.value().at(i).path(), mInterfaceName, QDBusConnection::systemBus(),this);
++            ServerProperties.append(mDBusInterfaceSend);
+ 
++            if(!mDBusInterface->isValid())
++            {
++                qDebug()<<"Failed to create dbus interface for property "<<propertyName();
++                qDebug()<<"Path: "<<reply.value().at(i).path();
++                qDebug()<<"Interface: "<<mInterfaceName;
++                qDebug()<<"Error: "<<QDBusConnection::systemBus().lastError().message();
++            }
++        }
++    }
+     //    QString signalName = propertyName() + "Changed";
+ 
+-
+-
+     //    ///TODO: only use PropertiesChanged...  treat AmbProperty like an object rather than a representation of just a single property in the object
+ 
+     //    if(!QDBusConnection::systemBus().connect("org.automotive.message.broker", objectPath(), mInterfaceName,
+@@ -183,7 +181,10 @@ void AmbProperty::setValue(QVariant v)
+             qDebug()<<"error Interface is not valid "<<ServerProperties[i]->objectName();
+         }
+ 
+-        ServerProperties[i]->setProperty(propertyName().toUtf8(), v);
++        // interface send
++        if (i == ServerProperties.size() - 1) {
++            ServerProperties[i]->setProperty(propertyName().toUtf8(), v);
++        }
+     }
+ }
+ 
+diff --git a/plugins/dbus/amb-qt/ambqt.h b/plugins/dbus/amb-qt/ambqt.h
+index 6510daa..8cc689e 100644
+--- a/plugins/dbus/amb-qt/ambqt.h
++++ b/plugins/dbus/amb-qt/ambqt.h
+@@ -55,17 +55,16 @@ public:
+ 		return mValue;
+ 	}
+ 
+-    void setValue(QVariant v);
+-
+ 	double time(){ return mTime; }
+ 
+ signals:
+ 	void valueChanged(QVariant val);
+ 
+ public Q_SLOTS:
+-	void connect();
++    void connect();
+     QVariant updateValue();
+     void disconnect();
++    void setValue(QVariant v);
+ 
+ private Q_SLOTS:
+     void propertyChangedSlot(QString, QVariantMap values, QStringList);
+-- 
+1.9.1
+

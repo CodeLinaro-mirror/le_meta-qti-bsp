@@ -11,6 +11,8 @@ DEPENDS = "libmincrypt-native"
 
 PR = "r6"
 
+S = "${WORKDIR}"
+
 MY_PN = "mkbootimg"
 
 # Handle do_fetch ourselves...  The automated tools don't work nicely with this...
@@ -28,3 +30,5 @@ do_install() {
 }
 
 NATIVE_INSTALL_WORKS = "1"
+
+

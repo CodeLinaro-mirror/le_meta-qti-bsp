@@ -1,0 +1,33 @@
+From be3c9efaed6737e74f7cd7de45a4633588d3fefe Mon Sep 17 00:00:00 2001
+From: Daniel Stone <daniels@collabora.com>
+Date: Thu, 18 Jun 2015 09:47:05 +0100
+Subject: [PATCH 06/11] compositor-drm: Don't flip planes from other outputs
+
+If a plane is currently active on another output, don't steal it away.
+
+Signed-off-by: Daniel Stone <daniels@collabora.com>
+Signed-off-by: Bharathraj Nagaraju <snbraj@codeaurora.org>
+(cherry picked from commit bbb2907a2729adbbd929a386e6ecaf6b8f48d4fa)
+
+Change-Id: I80e0ee9cceb517b902f6da7a4f4acc69db34e12a
+---
+ src/compositor-drm.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/compositor-drm.c b/src/compositor-drm.c
+index 7d22c0d..90ad27a 100644
+--- a/src/compositor-drm.c
++++ b/src/compositor-drm.c
+@@ -1085,6 +1085,9 @@ drm_output_repaint(struct weston_output *output_base,
+ 		if (s->type != WDRM_PLANE_TYPE_OVERLAY)
+ 			continue;
+ 
++		if (s->output != output)
++			continue;
++
+ 		if ((!s->current && !s->next) ||
+ 		    !drm_plane_crtc_supported(output, s->possible_crtcs))
+ 			continue;
+-- 
+2.10.1
+

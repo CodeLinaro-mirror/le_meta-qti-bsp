@@ -1,0 +1,33 @@
+DEFAULT_PREFERENCE = "-1"
+
+require recipes-multimedia/gstreamer/gstreamer1.0-plugins-base.inc
+
+LIC_FILES_CHKSUM = "file://COPYING;md5=c54ce9345727175ff66d17b67ff51f58 \
+                    file://common/coverage/coverage-report.pl;beginline=2;endline=17;md5=a4e1830fce078028c8f0974161272607 \
+                    file://COPYING.LIB;md5=6762ed442b3822387a51c92d928ead0d \
+                   "
+
+FILESEXTRAPATHS =+ "${COREBASE}/meta/recipes-multimedia/gstreamer/files:"
+FILESPATH =+ "${WORKSPACE}:"
+SRC_URI = "file://gstreamer/gst-plugins-base"
+SRC_URI += "git://anongit.freedesktop.org/gstreamer/common;destsuffix=gstreamer/gst-plugins-base/common;branch=master;name=common"
+SRCREV_common = "6f2d2093e84cc0eb99b634fa281822ebb9507285"
+S = "${WORKDIR}/gstreamer/gst-plugins-base"
+
+SRC_URI_remove = "\
+    file://0001-Makefile.am-don-t-hardcode-libtool-name-when-running.patch \
+    file://0002-Makefile.am-prefix-calls-to-pkg-config-with-PKG_CONF.patch \
+    file://0003-riff-add-missing-include-directories-when-calling-in.patch \
+    file://0004-rtsp-drop-incorrect-reference-to-gstreamer-sdp-in-Ma.patch \
+"
+
+EXTRA_OECONF += " \
+    --disable-introspection \
+"
+
+do_configure_prepend() {
+	cd ${S}
+	./autogen.sh --noconfigure
+	cd ${B}
+}
+
