@@ -24,8 +24,7 @@ do_configure_prepend() {
 }
 
 do_install() {
-   mkdir -p ${D}/${libdir}/gstreamer-mprtp
-   install ${S}/plugins/.libs/libgstmprtp.so  ${D}/${libdir}/gstreamer-mprtp/
+   install ${S}/plugins/.libs/libgstmprtp.so  ${D}/${libdir}/gstreamer-1.0/
 }
 
 FILES_${PN} =+ "${libdir}/gstreamer-mprtp/*"
