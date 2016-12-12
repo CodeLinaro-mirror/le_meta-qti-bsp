@@ -24,11 +24,11 @@ do_configure_prepend() {
 }
 
 do_install() {
-   install ${S}/plugins/.libs/libgstmprtp.so  ${D}/${libdir}/gstreamer-1.0/
+    mkdir -p ${D}/${libdir}/gstreamer-1.0
+    install ${S}/plugins/.libs/libgstmprtp.so  ${D}/${libdir}/gstreamer-1.0/
 }
 
-FILES_${PN} =+ "${libdir}/gstreamer-mprtp/*"
-FILES_${PN}-dbg += "${libdir}/gstreamer-mprtp/.debug/*"
+FILES_${PN} =+ "${libdir}/gstreamer-1.0/*"
+FILES_${PN}-dbg += "${libdir}/gstreamer-1.0/.debug/*"
 
 INSANE_SKIP_${PN} += " useless-rpaths"
-
