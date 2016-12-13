@@ -33,14 +33,21 @@ set -e
 
 export KERNEL=`uname -r`
 AUDIO_PROC=/proc/asound/apq8096adpagave/
+TIMEOUT=50
 
 case "$1" in
 start)
     echo -n "Starting init_qcom_audio: "
     echo 0 > /sys/module/subsystem_restart/parameters/enable_debug
-    echo 1 > /sys/kernel/boot_adsp/boot 
+    echo 1 > /sys/kernel/boot_adsp/boot
     while [ ! -d "$AUDIO_PROC" ]; do
-        sleep 1
+        sleep 0.1
+        TIMEOUT=$[$TIMEOUT - 1]
+        if [ "$TIMEOUT" -eq 0 ]
+        then
+            echo "Init failed: TIMEOUT"
+            exit 1
+        fi
     done
     echo "done"
     ;;
