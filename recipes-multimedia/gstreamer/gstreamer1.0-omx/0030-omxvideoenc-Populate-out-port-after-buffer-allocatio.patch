@@ -1,0 +1,43 @@
+From 9c354fb9c987be104da67dc513e15e13b6e975bc Mon Sep 17 00:00:00 2001
+From: Yiming Cao <cyiming@codeaurora.org>
+Date: Tue, 13 Dec 2016 15:48:20 +0800
+Subject: [PATCH] omxvideoenc: Populate out port after buffer allocation
+
+Populate out port to feed all pending buffers on out port to openmax
+component in order to make sure the buffer acquired from out port is
+filled at first to avoid there is no frame when to handle the filled
+buffer, that means "No corresponding frame found" happens. And if this
+happens at the beginning, then for specific encoder, e.g. h264enc and
+h265enc, the sps/pps header would not be pushed before an IDR frame
+because the header is handled in the base class, i.e. videoencoder.
+
+Change-Id: Ie5a7b9db0574719fd9efc30fc1918ec064ab2913
+Signed-off-by: Yiming Cao <cyiming@codeaurora.org>
+---
+ omx/gstomxvideoenc.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/omx/gstomxvideoenc.c b/omx/gstomxvideoenc.c
+index 7d42560..e9b8a78 100644
+--- a/omx/gstomxvideoenc.c
++++ b/omx/gstomxvideoenc.c
+@@ -1189,6 +1189,16 @@ gst_omx_video_enc_set_format (GstVideoEncoder * encoder,
+     gst_video_codec_state_unref (self->input_state);
+   self->input_state = gst_video_codec_state_ref (state);
+ 
++  /* make sure buffer acquired from out port is filled to eliminate
++   * the race condition of buffer incoming and outgoing at first, the race
++   * condition may cause the stream is out of order for specific encoder,
++   * e.g h264enc and h265enc. That results in the beginning frames cannot
++   * be properly decoded for missing sps/pps before IDR frame. */
++  if (OMX_ErrorNone != gst_omx_port_populate (self->enc_out_port)) {
++    GST_ERROR_OBJECT (self, "Failed to populate out port");
++    return FALSE;
++  }
++
+   /* Start the srcpad loop again */
+   GST_DEBUG_OBJECT (self, "Starting task again");
+   self->downstream_flow_ret = GST_FLOW_OK;
+-- 
+1.9.1
+

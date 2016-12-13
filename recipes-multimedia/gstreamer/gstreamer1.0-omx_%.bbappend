@@ -38,6 +38,7 @@ SRC_URI_append += " \
    file://0027-gstomx-increase-one-buffer-for-weston-atomic-modeset.patch \
    file://0028-gst-omx-Fix-video-hang-issue.patch \
    file://0029-Enable-feature-SPS-PPS-generation-with-IDR-frames.patch \
+   file://0030-omxvideoenc-Populate-out-port-after-buffer-allocatio.patch \
 "
 
 do_configure_prepend() {
