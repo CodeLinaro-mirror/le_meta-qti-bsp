@@ -35,6 +35,13 @@ COMPOSITION_apq8096 = "901D"
 do_install_append() {
    install -m 0755 ${S}/adb/start_adbd -D ${D}${sysconfdir}/init.d/adbd
    install -m 0755 ${S}/usb/start_usb -D ${D}${sysconfdir}/init.d/usb
+   if ${@base_contains('DISTRO_FEATURES','systemd','true','false',d)}; then
+       # Install systemd unit files
+       install -d ${D}${systemd_unitdir}/system
+       install -d ${D}${systemd_unitdir}/system/multi-user.target.wants/
+       install -m 0644 ${S}/usb/usb.service -D ${D}${systemd_unitdir}/system/usb.service
+       ln -sf ${systemd_unitdir}/system/usb.service ${D}${systemd_unitdir}/system/multi-user.target.wants/usb.service
+   fi
    install -m 0755 ${S}/rootdir/etc/init.qcom.post_boot.sh -D ${D}${sysconfdir}/init.d/init_qcom_post
    install -m 0755 ${S}/usb/usb_composition -D ${D}${base_sbindir}/
    install -d ${D}${base_sbindir}/usb/compositions/
@@ -71,6 +78,7 @@ pkg_postinst_${PN} () {
 INITSCRIPT_PACKAGES =+ "${PN}-usb"
 INITSCRIPT_NAME_${PN}-usb = "usb"
 INITSCRIPT_PARAMS_${PN}-usb = "defaults"
+FILES_${PN}-usb     += "${systemd_unitdir}/system/usb.service ${systemd_unitdir}/system/multi-user.target.wants"
 
 PACKAGES =+ "${PN}-adbd-dbg ${PN}-adbd ${PN}-adbd-dev"
 FILES_${PN}-adbd-dbg += "${base_sbindir}/.debug/adbd ${libdir}/.debug/libadbd.*"
