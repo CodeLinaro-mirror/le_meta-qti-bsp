@@ -30,8 +30,6 @@ IMAGE_INSTALL += "lib32-lk"
 IMAGE_INSTALL += "init-audio"
 IMAGE_INSTALL += "pulseaudio-module-acdb"
 IMAGE_INSTALL += "pulseaudio-module-codec-control"
-IMAGE_INSTALL += "start-scripts-firmware-links"
-IMAGE_INSTALL += "start-scripts-find-partitions"
 IMAGE_INSTALL += "neutrino-eth"
 IMAGE_INSTALL += "open-avb"
 IMAGE_INSTALL += "iperf3"
@@ -48,6 +46,8 @@ IMAGE_INSTALL += "ltp"
 
 #RESIZE
 IMAGE_INSTALL += "resize-service"
+#Firmware-links
+IMAGE_INSTALL += "firmware-links"
 #Camera modules
 IMAGE_INSTALL += "lib32-androidcompat"
 IMAGE_INSTALL += "init-can"
