@@ -28,103 +28,104 @@
 #
 # firmware-links        init.d script to install the firmware links
 #
-
+# move this part to firmware-links.service and bt-firmware-links.service
+#
 # Check for images and set up symlinks
-cd /firmware/image
-
-# Get the list of files in /firmware/image
-# for which sym links have to be created
-
-fwfiles=$(ls)
-
-# Check if the links with similar names
-# have been created in /lib/firmware
-
-mkdir -p /lib/firmware
-cd /lib/firmware
-linksNeeded=0
-
-# For everyfile in fwfiles check if
-# the corresponding file exists
-for fwfile in $fwfiles
-do
-   # if (condition) does not seem to work
-   # with the android shell. Therefore
-   # make do with case statements instead.
-   # if a file named $fwfile is present
-   # no need to create links. If the file
-   # with the name $fwfile is not present
-   # need to create links.
-
-   fw_file=$(ls $fwfile 2>/dev/null)
-   if [ "$fw_file" == "$fwfile" ]
-   then
-      continue
-   else
-      linksNeeded=1
-      break
-   fi
-done
-
-case $linksNeeded in
-   1)
-      cd /firmware/image
-
-      for imgfile in `ls`
-            do
-               ln -s /firmware/image/$imgfile /lib/firmware/$imgfile 2>/dev/null
-            done
-      ;;
-   *)
-      echo "Nothing to do. No firmware links needed."
-      ;;
-esac
-
-# add bluetooh firmware link
-cd /bluetooth/image
-
-fwfiles=$(ls)
-cd /lib/firmware
-linksNeeded=0
-
-# For everyfile in fwfiles check if
-# the corresponding file exists
-for fwfile in $fwfiles
-do
-   # if (condition) does not seem to work
-   # with the android shell. Therefore
-   # make do with case statements instead.
-   # if a file named $fwfile is present
-   # no need to create links. If the file
-   # with the name $fwfile is not present
-   # need to create links.
-
-   fw_file=$(ls $fwfile 2>/dev/null)
-   if [ "$fw_file" == "$fwfile" ]
-   then
-      continue
-   else
-      linksNeeded=1
-      break
-   fi
-done
-
-case $linksNeeded in
-   1)
-      cd /bluetooth/image
-
-      for imgfile in `ls`
-            do
-               ln -s /bluetooth/image/$imgfile /lib/firmware/$imgfile 2>/dev/null
-            done
-      ;;
-   *)
-      echo "Nothing to do. No firmware links needed."
-      ;;
-esac
-
-
-cd /
+#cd /firmware/image
+#
+## Get the list of files in /firmware/image
+## for which sym links have to be created
+#
+#fwfiles=$(ls)
+#
+## Check if the links with similar names
+## have been created in /lib/firmware
+#
+#mkdir -p /lib/firmware
+#cd /lib/firmware
+#linksNeeded=0
+#
+## For everyfile in fwfiles check if
+## the corresponding file exists
+#for fwfile in $fwfiles
+#do
+#   # if (condition) does not seem to work
+#   # with the android shell. Therefore
+#   # make do with case statements instead.
+#   # if a file named $fwfile is present
+#   # no need to create links. If the file
+#   # with the name $fwfile is not present
+#   # need to create links.
+#
+#   fw_file=$(ls $fwfile 2>/dev/null)
+#   if [ "$fw_file" == "$fwfile" ]
+#   then
+#      continue
+#   else
+#      linksNeeded=1
+#      break
+#   fi
+#done
+#
+#case $linksNeeded in
+#   1)
+#      cd /firmware/image
+#
+#      for imgfile in `ls`
+#            do
+#               ln -s /firmware/image/$imgfile /lib/firmware/$imgfile 2>/dev/null
+#            done
+#      ;;
+#   *)
+#      echo "Nothing to do. No firmware links needed."
+#      ;;
+#esac
+#
+## add bluetooh firmware link
+#cd /bluetooth/image
+#
+#fwfiles=$(ls)
+#cd /lib/firmware
+#linksNeeded=0
+#
+## For everyfile in fwfiles check if
+## the corresponding file exists
+#for fwfile in $fwfiles
+#do
+#   # if (condition) does not seem to work
+#   # with the android shell. Therefore
+#   # make do with case statements instead.
+#   # if a file named $fwfile is present
+#   # no need to create links. If the file
+#   # with the name $fwfile is not present
+#   # need to create links.
+#
+#   fw_file=$(ls $fwfile 2>/dev/null)
+#   if [ "$fw_file" == "$fwfile" ]
+#   then
+#      continue
+#   else
+#      linksNeeded=1
+#      break
+#   fi
+#done
+#
+#case $linksNeeded in
+#   1)
+#      cd /bluetooth/image
+#
+#      for imgfile in `ls`
+#            do
+#               ln -s /bluetooth/image/$imgfile /lib/firmware/$imgfile 2>/dev/null
+#            done
+#      ;;
+#   *)
+#      echo "Nothing to do. No firmware links needed."
+#      ;;
+#esac
+#
+#
+#cd /
 
 #Autoprobe Wlan module here after firmware link is ready
 #Move this to init_qti_wlan.service
