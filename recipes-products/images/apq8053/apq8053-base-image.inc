@@ -75,6 +75,7 @@ IMAGE_INSTALL += "libpagemap"
 IMAGE_INSTALL += "procrank"
 
 IMAGE_INSTALL += "libuv"
+IMAGE_INSTALL += "ipmon"
 
 # Below is to generate sparse ext4 system image (OE by default supports raw ext4 images)
 do_makesystem() {
