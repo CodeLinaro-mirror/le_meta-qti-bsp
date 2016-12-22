@@ -13,7 +13,7 @@ S = "${WORKDIR}/gst-plugins-ugly"
 
 DEPENDS += "opencore-amr"
 
-PACKAGECONFIG ??= ""
+PACKAGECONFIG ??= "orc"
 
 EXTRA_OECONF += " \
     --disable-a52dec \
