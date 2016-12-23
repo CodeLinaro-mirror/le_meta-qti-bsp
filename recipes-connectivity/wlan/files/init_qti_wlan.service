@@ -31,7 +31,7 @@ After=firmware-links.service firmware.mount
 Conflicts=shutdown.target
 
 [Service]
-Type=oneshot
+Type=simple
 RemainAfterExit=yes
 ExecStart=/usr/sbin/wifi_on.sh
 ExecStop=/usr/sbin/wifi_off.sh
