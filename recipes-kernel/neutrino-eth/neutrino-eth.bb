@@ -8,7 +8,9 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/GPL-2.0;md5=80
 DEPENDS = "virtual/kernel"
 
 FILESEXTRAPATHS_prepend := "${WORKSPACE}/:"
+
 SRC_URI = "file://vehiclenetwork/ethernet"
+SRC_URI += "file://neutrino-eth.service"
 
 PR = "r0"
 PV = "0.1"
@@ -17,7 +19,10 @@ S =  "${WORKDIR}/ethernet"
 
 INHIBIT_PACKAGE_STRIP = "1"
 
-inherit module 
+inherit module systemd
+
+SYSTEMD_SERVICE_${PN} = "neutrino-eth.service"
+SYSTEMD_AUTO_ENABLE_${PN} = "enable"
 
 do_compile_append () {
     KMOD_SIG_ALL=`cat ${TMPDIR}/work/${MACHINE}-poky-linux/linux-yocto-msm8996/3.18-r2/linux-${MACHINE}-standard-build/.config | grep CONFIG_MODULE_SIG_ALL | cut -d'=' -f2`
@@ -31,5 +36,9 @@ do_compile_append () {
 }
 
 
+do_install_append() {
+    install -d ${D}${systemd_unitdir}/system
+    install -m 0644 ${WORKDIR}/neutrino-eth.service ${D}${systemd_unitdir}/system/neutrino-eth.service
+}
 
-                            
+FILES_${PN} += "${systemd_unitdir}/system/neutrino-eth.service"
