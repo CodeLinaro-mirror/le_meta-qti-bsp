@@ -39,6 +39,7 @@ SRC_URI_append += " \
    file://0028-gst-omx-Fix-video-hang-issue.patch \
    file://0029-Enable-feature-SPS-PPS-generation-with-IDR-frames.patch \
    file://0030-omxvideoenc-Populate-out-port-after-buffer-allocatio.patch \
+   file://0031-gst-omx-Dynamic-framerate-setting-support-for-omx-vi.patch \
 "
 
 do_configure_prepend() {

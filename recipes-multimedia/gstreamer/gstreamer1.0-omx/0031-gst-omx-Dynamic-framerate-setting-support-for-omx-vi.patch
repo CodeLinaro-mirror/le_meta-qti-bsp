@@ -1,0 +1,67 @@
+From b230276f9299ea7676fa9d666fa62e8f150b0392 Mon Sep 17 00:00:00 2001
+From: Alan Wang <wbo@codeaurora.org>
+Date: Mon, 26 Dec 2016 20:19:00 +0800
+Subject: [PATCH] gst-omx: Dynamic framerate setting support for omx video
+ encoder.
+
+When video format changed in Executing state, OMX video encoder could set
+new framerate through OMX_SetConfig interface.
+
+Signed-off-by: Alan Wang <wbo@codeaurora.org>
+---
+ omx/gstomxvideoenc.c | 39 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 39 insertions(+)
+
+diff --git a/omx/gstomxvideoenc.c b/omx/gstomxvideoenc.c
+index e9b8a78..2eeedb0 100644
+--- a/omx/gstomxvideoenc.c
++++ b/omx/gstomxvideoenc.c
+@@ -944,6 +944,45 @@ gst_omx_video_enc_set_format (GstVideoEncoder * encoder,
+   GST_DEBUG_OBJECT (self, "Setting new format %s",
+       gst_video_format_to_string (info->finfo->format));
+ 
++  // If framerate changed during Executing state set new framerate through
++  // OMX_SetConfig
++  if (gst_omx_component_get_state (self->enc,
++      GST_CLOCK_TIME_NONE) == OMX_StateExecuting && self->input_state) {
++    OMX_U32 prevFramerate;
++    OMX_U32 currentFramerate;
++    GstVideoCodecState *prevState = self->input_state;
++    GstVideoInfo *prevInfo = &prevState->info;
++
++    if (!(klass->cdata.hacks & GST_OMX_HACK_VIDEO_FRAMERATE_INTEGER)) {
++      prevFramerate = (prevInfo->fps_n << 16) / (prevInfo->fps_d);
++      currentFramerate = (info->fps_n << 16) / (info->fps_d);
++    } else {
++      prevFramerate = (prevInfo->fps_n) / (prevInfo->fps_d);
++      currentFramerate = (info->fps_n) / (info->fps_d);
++    }
++
++    if (prevFramerate != currentFramerate) {
++      GST_DEBUG_OBJECT (self, "Frame rate changed from %u to %u",
++              prevFramerate, currentFramerate);
++      OMX_CONFIG_FRAMERATETYPE enc_framerate;
++      OMX_ERRORTYPE err;
++
++      gst_omx_video_enc_flush (encoder);
++
++      GST_OMX_INIT_STRUCT (&enc_framerate);
++      enc_framerate.nPortIndex = self->enc_out_port->index;
++      FractionToQ16(enc_framerate.xEncodeFramerate,
++              (int) (currentFramerate * 2), 2);
++      err =
++         gst_omx_component_set_config (self->enc,
++         OMX_IndexConfigVideoFramerate, &enc_framerate);
++      GST_DEBUG_OBJECT (self, " Setting Video fps with err: %s (0x%08x)",
++          gst_omx_error_to_string (err), err);
++
++      return TRUE;
++    }
++  }
++
+   gst_omx_port_get_port_definition (self->enc_in_port, &port_def);
+ 
+   needs_disable =
+-- 
+1.9.1
+
