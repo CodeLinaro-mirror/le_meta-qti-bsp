@@ -12,18 +12,34 @@ SRC_URI = "file://mdm-init/"
 # Update for each machine
 S = "${WORKDIR}/mdm-init/"
 
-do_install_append(){
-   install -m 0755 ${S}/wlan_daemon -D ${D}${sysconfdir}/init.d/wlan_daemon
+do_install_append_apq8009(){
+  install -m 0755 ${S}/wlan_daemon -D ${D}${sysconfdir}/init.d/wlan_daemon
 }
 
-FILES_${PN} += "${base_libdir}/firmware/wlan/qca_cld/* ${sysconfdir}/init.d/* "
+do_install_append_apq8053(){
+  install -m 0755 ${S}/wlan_daemon -D ${D}${sysconfdir}/init.d/wlan_daemon
+}
+
+do_install_append_apq8017(){
+  install -m 0755 ${S}/wlan_daemon -D ${D}${sysconfdir}/init.d/wlan_daemon
+}
+
+do_install_append_apq8096(){
+  install -m 0755 ${S}/wlan_daemon -D ${D}${sysconfdir}/init.d/wlan_daemon
+}
+
 FILES_${PN} += "${userfsdatadir}/misc/wifi/*"
+FILES_${PN} += "${base_libdir}/firmware/wlan/qca_cld/*"
+FILES_${PN} += "${nonarch_base_libdir}/firmware/wlan/qca_cld/* ${sysconfdir}/init.d/* "
 
 BASEPRODUCT = "${@d.getVar('PRODUCT', False)}"
 
 EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'mdm9607', '--enable-target-mdm9607=yes', '', d)}"
 EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'mdmcalifornium', '--enable-target-mdmcalifornium=yes', '', d)}"
 EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'apq8096', '--enable-target-apq8096=yes', '', d)}"
+EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'apq8009', '--enable-target-apq8009=yes', '', d)}"
+EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'apq8017', '--enable-target-apq8017=yes', '', d)}"
+
 EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'apq8009', '--enable-pronto-wlan=yes', '', d)}"
 EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'apq8053', '--enable-pronto-wlan=yes', '', d)}"
 EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'apq8017', '--enable-pronto-wlan=yes', '', d)}"
@@ -31,14 +47,12 @@ EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'apq8017', '--enable-pronto-
 # Enable drone-wlan in place of pronto-wlan for Drones
 EXTRA_OECONF_remove = "${@base_conditional('BASEPRODUCT', 'drone', '--enable-pronto-wlan=yes', '', d)}"
 EXTRA_OECONF += "${@base_conditional('BASEPRODUCT', 'drone', '--enable-drone-wlan=yes', '', d)}"
+EXTRA_OECONF_remove = "${@base_conditional('BASEPRODUCT', 'snap', '--enable-pronto-wlan=yes', '', d)}"
+EXTRA_OECONF += "${@base_conditional('BASEPRODUCT', 'snap', '--enable-snap-wlan=yes', '', d)}"
 
 INITSCRIPT_NAME   = "wlan_daemon"
+INITSCRIPT_PARAMS = "remove"
 INITSCRIPT_PARAMS_apq8009 = "start 98 5 . stop 2 0 1 6 ."
 INITSCRIPT_PARAMS_apq8053 = "start 98 5 . stop 2 0 1 6 ."
 INITSCRIPT_PARAMS_apq8017 = "start 98 5 . stop 2 0 1 6 ."
 INITSCRIPT_PARAMS_apq8096 = "${@base_conditional('BASEPRODUCT', 'drone', 'start 01 5 . stop 2 0 1 6 .', 'start 98 5 . stop 2 0 1 6 .', d)}"
-
-pkg_postinst_${PN} () {
-        [ -n "$D" ] && OPT="-r $D" || OPT="-s"
-        update-rc.d $OPT -f wlan_daemon remove
-}
