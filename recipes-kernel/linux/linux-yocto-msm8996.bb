@@ -32,7 +32,7 @@ require recipes-kernel/linux/linux-yocto.inc
 require recipes-kernel/linux/linux-msm.inc
 
 
-DEPENDS += "mkbootimg-native"
+DEPENDS += "mkbootimg-native packkernelimg"
 
 
 KBUILD_DEFCONFIG = "msm-auto_defconfig"
@@ -49,6 +49,11 @@ PR = "r2"
 
 KCONFIG_MODE="--alldefconfig"
 
+KERNEL_DTB_LIST = "${@d.getVar('KERNEL_DEVICETREE', True).replace('qcom/', '')}"
+
+do_compile_prepend() {
+	mkdir -p "${B}/arch/${ARCH}/boot/dts/qcom"
+}
 
 do_shared_workdir () {
         cd ${B}
@@ -128,7 +133,6 @@ do_shared_workdir () {
         install -m 0644 vmlinux ${STAGING_DIR_TARGET}/${KERNEL_IMAGEDEST}/vmlinux
 }
 
-
 do_install_append() {
 	oe_runmake headers_install INSTALL_HDR_PATH=${STAGING_KERNEL_BUILDDIR}/usr ARCH=$ARCH
 }
@@ -136,6 +140,9 @@ do_install_append() {
 do_deploy_append() {
    rm -f  "${DEPLOYDIR}/boot.img" "{DEPLOYDIR}/initrd"
    touch "${DEPLOYDIR}/initrd"
+   if [ ${KERNEL_IMAGETYPE} == "Image" ]; then
+      packkernelimg --kernel "${DEPLOYDIR}/${KERNEL_IMAGETYPE}" --dt "${B}/arch/${ARCH}/boot/dts/qcom" --dt_list "${KERNEL_DTB_LIST}"
+   fi
    mkbootimg --kernel "${DEPLOYDIR}/${KERNEL_IMAGETYPE}" --ramdisk "${DEPLOYDIR}/initrd"  -o "${DEPLOYDIR}/boot.img" --cmdline "${KERNEL_CMDLINE}" --base "${KERNEL_BASE}"
 }
 
