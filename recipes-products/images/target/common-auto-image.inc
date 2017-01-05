@@ -82,3 +82,6 @@ IMAGE_INSTALL += "sysstat"
 
 # smack
 IMAGE_INSTALL_append_smack = " smack-userspace"
+
+#32-bit version
+IMAGE_INSTALL += "lib32-connman"
