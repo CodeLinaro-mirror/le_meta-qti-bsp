@@ -1,0 +1,8 @@
+[Unit]
+Description=Lazy application for delay start
+Requires=unfocussed.target
+After=unfocussed.target multi-user.target 
+
+[Install]
+WantedBy=multi-user.target
+
