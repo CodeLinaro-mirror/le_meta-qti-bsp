@@ -7,13 +7,6 @@ IMAGE_FSTYPES = "ext4"
 IMAGE_INSTALL += "packagegroup-core-boot"
 IMAGE_INSTALL += "${ROOTFS_PKGMANAGE_BOOTSTRAP}"
 IMAGE_INSTALL += "${CORE_IMAGE_EXTRA_INSTALL}"
-IMAGE_INSTALL += "packagegroup-core-selinux"
-IMAGE_INSTALL += "selinux-config"
-IMAGE_INSTALL += "start-scripts-firmware-links"
-IMAGE_INSTALL += "refpolicy-mls"
-IMAGE_INSTALL += "start-scripts-find-partitions"
-IMAGE_INSTALL += "start-scripts-misc-daemon"
-IMAGE_INSTALL += "selinux-labelall"
 
 # The MSM Linux minimal boot image files.
 #IMAGE_INSTALL += "alsa-intf"
@@ -145,8 +138,7 @@ IMAGE_INSTALL += "procrank"
 #IMAGE_INSTALL += "${@base_conditional('DATA_DIR_PRESENT', 'True', 'miniupnpd', '', d)}"
 
 # Below is to generate sparse ext4 system image (OE by default supports raw ext4 images)
-SELINUX_FILE_CONTEXTS = "${IMAGE_ROOTFS}/etc/selinux/mls/contexts/files/file_contexts"
 do_makesystem() {
 
-    make_ext4fs -s -a / -S ${SELINUX_FILE_CONTEXTS} -l ${SYSTEM_SIZE_EXT4} ${DEPLOY_DIR_IMAGE}/${MACHINE}-sysfs.ext4 ${IMAGE_ROOTFS}
+    make_ext4fs -s -a / -l ${SYSTEM_SIZE_EXT4} ${DEPLOY_DIR_IMAGE}/${MACHINE}-sysfs.ext4 ${IMAGE_ROOTFS}
 }
