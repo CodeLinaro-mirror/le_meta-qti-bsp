@@ -87,3 +87,5 @@ IMAGE_INSTALL_append_smack = " smack-userspace"
 
 #32-bit version
 IMAGE_INSTALL += "lib32-connman"
+
+IMAGE_INSTALL += "open-source-kernel-tests"

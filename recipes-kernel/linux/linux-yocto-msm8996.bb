@@ -49,6 +49,86 @@ PR = "r2"
 
 KCONFIG_MODE="--alldefconfig"
 
+
+do_shared_workdir () {
+        cd ${B}
+
+        kerneldir=${STAGING_KERNEL_BUILDDIR}
+        install -d $kerneldir
+
+        #
+        # Store the kernel version in sysroots for module-base.bbclass
+        #
+
+        echo "${KERNEL_VERSION}" > $kerneldir/kernel-abiversion
+
+        # Copy files required for module builds
+        cp System.map $kerneldir/System.map-${KERNEL_VERSION}
+        cp Module.symvers $kerneldir/Module.symvers
+        cp Makefile $kerneldir/
+        cp .config $kerneldir/
+        cp -fR usr $kerneldir/
+
+        # Signing keys may not be present
+        [ -f signing_key.priv ] && cp signing_key.priv $kerneldir/
+        [ -f signing_key.x509 ] && cp signing_key.x509 $kerneldir/
+
+        # include/config
+        mkdir -p $kerneldir/include/config
+        cp include/config/kernel.release $kerneldir/include/config/kernel.release
+        cp include/config/auto.conf $kerneldir/include/config/auto.conf
+
+        # We can also copy over all the generated files and avoid special cases
+        # like version.h, but we've opted to keep this small until file creep starts
+        # to happen
+        if [ -e include/linux/version.h ]; then
+                mkdir -p $kerneldir/include/linux
+                cp include/linux/version.h $kerneldir/include/linux/version.h
+        fi
+
+        mkdir -p $kerneldir/include/generated/
+        cp -fR include/generated/* $kerneldir/include/generated/
+
+        if [ -d arch/${ARCH}/include ]; then
+                mkdir -p $kerneldir/arch/${ARCH}/include/
+                cp -fR arch/${ARCH}/include/* $kerneldir/arch/${ARCH}/include/
+        fi
+
+        if [ -d arch/${ARCH}/boot ]; then
+                mkdir -p $kerneldir/arch/${ARCH}/boot/
+                cp -fR arch/${ARCH}/boot/* $kerneldir/arch/${ARCH}/boot/
+        fi
+
+        if [ -d scripts ]; then
+            for i in \
+                scripts/basic/bin2c \
+                scripts/basic/fixdep \
+                scripts/conmakehash \
+                scripts/dtc/dtc \
+                scripts/kallsyms \
+                scripts/kconfig/conf \
+                scripts/mod/mk_elfconfig \
+                scripts/mod/modpost \
+                scripts/sign-file \
+                scripts/sortextable;
+            do
+                if [ -e $i ]; then
+                    mkdir -p $kerneldir/`dirname $i`
+                    cp $i $kerneldir/$i
+                fi
+            done
+        fi
+
+        cp ${STAGING_KERNEL_DIR}/scripts/gen_initramfs_list.sh $kerneldir/scripts/
+
+        # Make vmlinux available as soon as possible
+        install -d ${STAGING_DIR_TARGET}/${KERNEL_IMAGEDEST}
+        install -m 0644 ${KERNEL_OUTPUT} ${STAGING_DIR_TARGET}/${KERNEL_IMAGEDEST}/${zImage_VAR}-${KERNEL_VERSION}
+        install -m 0644 vmlinux ${STAGING_DIR_TARGET}/${KERNEL_IMAGEDEST}/vmlinux-${KERNEL_VERSION}
+        install -m 0644 vmlinux ${STAGING_DIR_TARGET}/${KERNEL_IMAGEDEST}/vmlinux
+}
+
+
 do_install_append() {
 	oe_runmake headers_install INSTALL_HDR_PATH=${STAGING_KERNEL_BUILDDIR}/usr ARCH=$ARCH
 }
