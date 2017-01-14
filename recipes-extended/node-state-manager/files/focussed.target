@@ -1,0 +1,9 @@
+[Unit]
+Description=Boot Manager
+Requires=basic.target node-startup-controller.service
+After=basic.target node-startup-controller.service
+Before=multi-user.target
+
+[Install]
+WantedBy=basic.target
+
