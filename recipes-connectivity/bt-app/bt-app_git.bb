@@ -11,9 +11,15 @@ SRC_URI = "file://qcom-opensource/bt/bt-app/"
 
 S = "${WORKDIR}/qcom-opensource/bt/bt-app/"
 
-DEPENDS += "libhardware gen-gatt glib-2.0 btobex"
+def get_depends():
+    if "$(BASEMACHINE)" == "mdm9607":
+        return  "libhardware gen-gatt glib-2.0 btobex"
+    else:
+        return   "libhardware gen-gatt glib-2.0 btobex audiohal"
 
-CPPFLAGS_append = " -DBT_AUDIO_HAL_INTEGRATION -DUSE_ANDROID_LOGGING -DUSE_BT_OBEX "
+DEPENDS  += "${@get_depends()}"
+
+CPPFLAGS_append = " -DUSE_ANDROID_LOGGING -DUSE_BT_OBEX "
 CFLAGS_append = " -DUSE_ANDROID_LOGGING "
 LDFLAGS_append = " -llog "
 
@@ -24,11 +30,18 @@ EXTRA_OECONF = " \
                 --with-btobex \
                 --with-gengatt \
                "
+EXTRA_OECONF += "--enable-target=${BASEMACHINE}"
+
+FILES_${PN} += "${userfsdatadir}/misc/bluetooth/*"
 
 do_install_append() {
-        install -d ${D}${sysconfdir}/bluetooth/
+        install -d ${D}${userfsdatadir}/misc/bluetooth/
 
         if [ -f ${S}conf/bt_app.conf ]; then
-           install -m 0660 ${S}conf/bt_app.conf ${D}${sysconfdir}/bluetooth/
+           install -m 0660 ${S}conf/bt_app.conf ${D}${userfsdatadir}/misc/bluetooth/
+        fi
+
+        if [ -f ${S}conf/ext_to_mimetype.conf ]; then
+           install -m 0660 ${S}conf/ext_to_mimetype.conf ${D}${userfsdatadir}/misc/bluetooth/
         fi
 }

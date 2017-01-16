@@ -12,7 +12,7 @@ SRC_URI   = "file://system/core/"
 S = "${WORKDIR}/system/core"
 PR = "r19"
 
-DEPENDS = "virtual/kernel openssl glib-2.0 libselinux safe-iop ext4-utils libunwind libcutils"
+DEPENDS = "virtual/kernel openssl glib-2.0 libselinux safe-iop ext4-utils libunwind libcutils libmincrypt"
 
 EXTRA_OECONF = " --with-host-os=${HOST_OS} --with-glib"
 EXTRA_OECONF_append = " --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
@@ -30,6 +30,7 @@ COMPOSITION_apq8009 = "9091"
 COMPOSITION_apq8053 = "901D"
 COMPOSITION_apq8096 = "901D"
 COMPOSITION_sdxhedgehog = "901D"
+COMPOSITION_apq8098 = "901D"
 
 do_install_append() {
    install -m 0755 ${S}/adb/start_adbd -D ${D}${sysconfdir}/init.d/adbd
@@ -39,13 +40,18 @@ do_install_append() {
    install -m 0755 ${S}/usb/usb_composition -D ${D}${base_sbindir}/
    install -d ${D}${base_sbindir}/usb/compositions/
    install -m 0755 ${S}/usb/compositions/* -D ${D}${base_sbindir}/usb/compositions/
+   install -d ${D}${userfsdatadir}/usb/
+   install -m 0755 ${S}/usb/compositions/hsic_next -D ${D}${userfsdatadir}/usb/
+   install -m 0755 ${S}/usb/compositions/hsusb_next -D ${D}${userfsdatadir}/usb/
+   rm ${S}/usb/compositions/hsic_next
+   rm ${S}/usb/compositions/hsusb_next
    install -m 0755 ${S}/usb/target -D ${D}${base_sbindir}/usb/
    install -d ${D}${base_sbindir}/usb/debuger/
    install -m 0755 ${S}/usb/debuger/debugFiles -D ${D}${base_sbindir}/usb/debuger/
    install -m 0755 ${S}/usb/debuger/help -D ${D}${base_sbindir}/usb/debuger/
    install -m 0755 ${S}/usb/debuger/usb_debug -D ${D}${base_sbindir}/
-   ln -s  /sbin/usb/compositions/${COMPOSITION} ${D}${base_sbindir}/usb/boot_hsusb_composition
-   ln -s  /sbin/usb/compositions/empty ${D}${base_sbindir}/usb/boot_hsic_composition
+   ln -s  /sbin/usb/compositions/${COMPOSITION} ${D}${userfsdatadir}/usb/boot_hsusb_composition
+   ln -s  /sbin/usb/compositions/empty ${D}${userfsdatadir}/usb/boot_hsic_composition
    if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
       install -d ${D}${systemd_unitdir}/system/
       install -d ${D}${systemd_unitdir}/system/multi-user.target.wants/
@@ -102,6 +108,7 @@ FILES_${PN}-adbd-dev = "${libdir}/libadbd.so ${libdir}/libadbd.la"
 PACKAGES =+ "${PN}-usb-dbg ${PN}-usb"
 FILES_${PN}-usb-dbg  = "${bindir}/.debug/usb_composition_switch"
 FILES_${PN}-usb      = "${sysconfdir}/init.d/usb ${base_sbindir}/usb_composition ${bindir}/usb_composition_switch ${base_sbindir}/usb/compositions/*"
+FILES_${PN}-usb     += "${userfsdatadir}/usb/*"
 FILES_${PN}-usb     += "${base_sbindir}/usb/* ${base_sbindir}/usb_debug ${base_sbindir}/usb/debuger/*"
 FILES_${PN}-usb     += "${systemd_unitdir}/system/usb.service ${systemd_unitdir}/system/multi-user.target.wants/usb.service"
 
