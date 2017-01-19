@@ -17,7 +17,7 @@ SRCREV_common = "1f5d3c3163cc3399251827235355087c2affa790"
 S = "${WORKDIR}/gst-omx"
 
 EXTRA_OECONF = " \
-               --with-omx-target=bellagio --with-omx-header-path=${STAGING_INCDIR}/mm-core \
+               --with-omx-target=qti --with-omx-header-path=${STAGING_INCDIR}/mm-core \
                "
 
 do_configure_prepend() {
