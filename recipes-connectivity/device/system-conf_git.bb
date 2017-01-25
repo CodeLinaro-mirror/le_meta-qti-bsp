@@ -1,5 +1,4 @@
 inherit autotools update-rc.d
-
 DESCRIPTION = "Device specific config"
 LICENSE = "ISC"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=f3b90e78ea0cffb20bf5cca7947a896d"
@@ -8,24 +7,21 @@ PR = "r3"
 FILESPATH =+ "${WORKSPACE}:"
 # Provide a baseline
 SRC_URI = "file://mdm-init/"
+SRC_URI += "file://wlan_daemon.service"
 
 # Update for each machine
 S = "${WORKDIR}/mdm-init/"
 
-do_install_append_apq8009(){
+do_install_append_msm(){
   install -m 0755 ${S}/wlan_daemon -D ${D}${sysconfdir}/init.d/wlan_daemon
-}
-
-do_install_append_apq8053(){
-  install -m 0755 ${S}/wlan_daemon -D ${D}${sysconfdir}/init.d/wlan_daemon
-}
-
-do_install_append_apq8017(){
-  install -m 0755 ${S}/wlan_daemon -D ${D}${sysconfdir}/init.d/wlan_daemon
-}
-
-do_install_append_apq8096(){
-  install -m 0755 ${S}/wlan_daemon -D ${D}${sysconfdir}/init.d/wlan_daemon
+  if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
+      install -d ${D}/etc/systemd/system/
+      install -m 0644 ${WORKDIR}/wlan_daemon.service -D ${D}/etc/systemd/system/wlan_daemon.service
+      install -d ${D}/etc/systemd/system/multi-user.target.wants/
+      # enable the service for multi-user.target
+      ln -sf /etc/systemd/wlan_daemon.service \
+         ${D}/etc/systemd/system/multi-user.target.wants/wlan_daemon.service
+  fi
 }
 
 FILES_${PN} += "${userfsdatadir}/misc/wifi/*"
@@ -47,8 +43,9 @@ EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'apq8017', '--enable-pronto-
 # Enable drone-wlan in place of pronto-wlan for Drones
 EXTRA_OECONF_remove = "${@base_conditional('BASEPRODUCT', 'drone', '--enable-pronto-wlan=yes', '', d)}"
 EXTRA_OECONF += "${@base_conditional('BASEPRODUCT', 'drone', '--enable-drone-wlan=yes', '', d)}"
-EXTRA_OECONF_remove = "${@base_conditional('BASEPRODUCT', 'snap', '--enable-pronto-wlan=yes', '', d)}"
-EXTRA_OECONF += "${@base_conditional('BASEPRODUCT', 'snap', '--enable-snap-wlan=yes', '', d)}"
+EXTRA_OECONF_remove = "${@base_conditional('BASEPRODUCT', 'qsap', '--enable-pronto-wlan=yes', '', d)}"
+EXTRA_OECONF += "${@base_conditional('BASEPRODUCT', 'qsap', '--enable-snap-wlan=yes', '', d)}"
+EXTRA_OECONF += "${@base_conditional('BASEPRODUCT', 'qsap', '--enable-qsap-wlan=yes', '', d)}"
 
 INITSCRIPT_NAME   = "wlan_daemon"
 INITSCRIPT_PARAMS = "remove"
