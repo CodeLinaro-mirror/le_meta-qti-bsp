@@ -11,6 +11,7 @@ FILESEXTRAPATHS_prepend := "${WORKSPACE}/:"
 
 SRC_URI = "file://vehiclenetwork/ethernet"
 SRC_URI += "file://neutrino-eth.service"
+SRC_URI += "file://neutrino-eth-8x96autofusion.service"
 
 PR = "r0"
 PV = "0.1"
@@ -38,7 +39,15 @@ do_compile_append () {
 
 do_install_append() {
     install -d ${D}${systemd_unitdir}/system
-    install -m 0644 ${WORKDIR}/neutrino-eth.service ${D}${systemd_unitdir}/system/neutrino-eth.service
+    install -d ${D}/etc
+    install ${WORKDIR}/ethernet/config.ini ${D}/etc/ntn_config.ini
+    if [ "${MACHINE}" == "8x96autofusion" ]; then
+        install -m 0644 ${WORKDIR}/neutrino-eth-8x96autofusion.service ${D}${systemd_unitdir}/system/neutrino-eth.service
+    else
+        install -m 0644 ${WORKDIR}/neutrino-eth.service ${D}${systemd_unitdir}/system/neutrino-eth.service
+    fi
 }
 
-FILES_${PN} += "${systemd_unitdir}/system/neutrino-eth.service"
+FILES_${PN} += "${systemd_unitdir}/system/neutrino-eth.service \
+                /etc/* \
+"
