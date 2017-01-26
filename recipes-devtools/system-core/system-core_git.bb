@@ -31,6 +31,7 @@ COMPOSITION         = "9025"
 COMPOSITION_apq8009 = "9091"
 COMPOSITION_apq8053 = "901D"
 COMPOSITION_apq8096 = "901D"
+COMPOSITION_8x96autofusion = "901D"
 
 do_install_append() {
    install -m 0755 ${S}/adb/start_adbd -D ${D}${sysconfdir}/init.d/adbd
@@ -54,7 +55,11 @@ do_install_append() {
    install -m 0755 ${S}/usb/debuger/debugFiles -D ${D}${base_sbindir}/usb/debuger/
    install -m 0755 ${S}/usb/debuger/help -D ${D}${base_sbindir}/usb/debuger/
    install -m 0755 ${S}/usb/debuger/usb_debug -D ${D}${base_sbindir}/
-   ln -s  /sbin/usb/compositions/${COMPOSITION} ${D}${userfsdatadir}/usb/boot_hsusb_composition
+   if [ "${MACHINE}" == "8x96autofusion" ]; then
+       ln -s  /sbin/usb/compositions/${COMPOSITION_8x96autofusion} ${D}${userfsdatadir}/usb/boot_hsusb_composition
+   else
+       ln -s  /sbin/usb/compositions/${COMPOSITION} ${D}${userfsdatadir}/usb/boot_hsusb_composition
+   fi
    ln -s  /sbin/usb/compositions/empty ${D}${userfsdatadir}/usb/boot_hsic_composition
 }
 
