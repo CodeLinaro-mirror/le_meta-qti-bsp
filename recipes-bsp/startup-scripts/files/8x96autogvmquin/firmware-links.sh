@@ -29,6 +29,7 @@
 # firmware-links        init.d script to install the firmware links
 #
 
+
 # Check for images and set up symlinks
 cd /firmware/image
 

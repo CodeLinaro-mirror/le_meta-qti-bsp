@@ -4,6 +4,5 @@
 #{MACHINE}-image.inc file
 
 require target/${MACHINE}-image.inc
-require target/common-auto-image.inc
 
 include machine-image.bb

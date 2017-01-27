@@ -2,6 +2,7 @@
 
 # Base image
 require recipes-ivi/images/agl-image-ivi.inc
+require common-auto-image.inc
 
 IMAGE_INSTALL += "packagegroup-agl-core"
 IMAGE_INSTALL += "packagegroup-agl-ivi"
