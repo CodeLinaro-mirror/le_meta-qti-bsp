@@ -17,3 +17,7 @@ INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autofusion', 'libunwind_aut
 include ${INCSUFFIX}.inc
 INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96auto44', 'libunwind_auto', 'none',d)}"
 include ${INCSUFFIX}.inc
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmquin', 'libunwind_auto', 'none',d)}"
+include ${INCSUFFIX}.inc
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmred', 'libunwind_auto', 'none',d)}"
+include ${INCSUFFIX}.inc

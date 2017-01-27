@@ -164,3 +164,7 @@ INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autofusion', 'system-core_a
 include ${INCSUFFIX}.inc
 INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96auto44', 'system-core_auto', 'none',d)}"
 include ${INCSUFFIX}.inc
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmquin', 'system-core_auto', 'none',d)}"
+include ${INCSUFFIX}.inc
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmred', 'system-core_auto', 'none',d)}"
+include ${INCSUFFIX}.inc

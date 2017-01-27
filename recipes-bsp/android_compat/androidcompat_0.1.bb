@@ -28,3 +28,7 @@ INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autofusion', 'androidcompat
 include ${INCSUFFIX}.inc
 INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96auto44', 'androidcompat_auto', 'none',d)}"
 include ${INCSUFFIX}.inc
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmquin', 'androidcompat_auto', 'none',d)}"
+include ${INCSUFFIX}.inc
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmred', 'androidcompat_auto', 'none',d)}"
+include ${INCSUFFIX}.inc

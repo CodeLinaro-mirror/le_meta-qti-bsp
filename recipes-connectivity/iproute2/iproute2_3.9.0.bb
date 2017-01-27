@@ -19,3 +19,7 @@ INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autofusion', 'iproute2_auto
 include ${INCSUFFIX}.inc
 INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96auto44', 'iproute2_auto', 'none',d)}"
 include ${INCSUFFIX}.inc
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmquin', 'iproute2_auto', 'none',d)}"
+include ${INCSUFFIX}.inc
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmred', 'iproute2_auto', 'none',d)}"
+include ${INCSUFFIX}.inc

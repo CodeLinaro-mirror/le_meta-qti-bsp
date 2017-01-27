@@ -36,3 +36,7 @@ INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autofusion', 'mkbootimg-nat
 include ${INCSUFFIX}.inc
 INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96auto44', 'mkbootimg-native_auto', 'none',d)}"
 include ${INCSUFFIX}.inc
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmquin', 'mkbootimg-native_auto', 'none',d)}"
+include ${INCSUFFIX}.inc
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmred', 'mkbootimg-native_auto', 'none',d)}"
+include ${INCSUFFIX}.inc

@@ -37,3 +37,7 @@ INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autofusion', 'dtbtool-nativ
 include ${INCSUFFIX}.inc
 INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96auto44', 'dtbtool-native_auto', 'none',d)}"
 include ${INCSUFFIX}.inc
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmquin', 'dtbtool-native_auto', 'none',d)}"
+include ${INCSUFFIX}.inc
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmred', 'dtbtool-native_auto', 'none',d)}"
+include ${INCSUFFIX}.inc

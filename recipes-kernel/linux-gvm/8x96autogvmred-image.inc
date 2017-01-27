@@ -1,0 +1,28 @@
+INSANE_SKIP_${PN} += "installed-vs-shipped"
+
+do_defconfig_patch () {
+cat >> ${S}/arch/${ARCH}/configs/${KERNEL_CONFIG} <<KERNEL_EXTRACONFIGS
+CONFIG_DEVTMPFS=y
+CONFIG_SYSVIPC=y
+CONFIG_MSM_GVM_RED=y
+CONFIG_MSM_GVM=y
+CONFIG_FHANDLE=y
+CONFIG_SECURITY_SMACK=y
+CONFIG_TMPFS_XATTR=y
+CONFIG_DEFAULT_SECURITY="smack"
+CONFIG_DEFAULT_SECURITY_SMACK=y
+KERNEL_EXTRACONFIGS
+}
+
+do_deploy_rename () {
+    mv ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img ${DEPLOY_DIR_IMAGE}/boot.img
+}
+addtask deploy_rename after do_deploy before do_packagedata
+
+do_add_gitinfor() {
+    cd ${S}/.git
+    rm -rf ./*
+    cd ${WORKSPACE}/kernel/msm-3.18/.git/
+    cp config  description  HEAD  hooks  index  info  logs  objects  packed-refs  refs  rr-cache  svn  ${S}/.git -fpPRHL
+}
+addtask add_gitinfor after do_unpack before do_patch

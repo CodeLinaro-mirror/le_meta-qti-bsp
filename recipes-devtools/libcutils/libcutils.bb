@@ -38,3 +38,7 @@ INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autofusion', 'libcutils_aut
 include ${INCSUFFIX}.inc
 INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96auto44', 'libcutils_auto', 'none',d)}"
 include ${INCSUFFIX}.inc
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmquin', 'libcutils_auto', 'none',d)}"
+include ${INCSUFFIX}.inc
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmred', 'libcutils_auto', 'none',d)}"
+include ${INCSUFFIX}.inc

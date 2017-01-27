@@ -2,6 +2,7 @@ DESCRIPTION = "AGL Demo Platform image currently contains a simple HMI and \
 demos."
 
 require recipes-platform/images/agl-demo-platform.bb
+require ../common-auto-image.inc
 
 
 IMAGE_INSTALL_remove = "pulseaudio-module-codec-control"

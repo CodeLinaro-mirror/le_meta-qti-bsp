@@ -19,8 +19,10 @@ INITSCRIPT_NAME_8x96auto = "init_qcom_audio"
 INITSCRIPT_PARAMS_8x96auto = "start 99 2 3 4 5 . stop 1 0 1 6 ."
 INITSCRIPT_NAME_8x96autofusion = "init_qcom_audio"
 INITSCRIPT_PARAMS_8x96autofusion = "start 99 2 3 4 5 . stop 1 0 1 6 ."
-INITSCRIPT_NAME_8x96hyp = "init_qcom_audio"
-INITSCRIPT_PARAMS_8x96hyp = "start 99 2 3 4 5 . stop 1 0 1 6 ."
+INITSCRIPT_NAME_8x96autogvmquin = "init_qcom_audio"
+INITSCRIPT_PARAMS_8x96autogvmquin = "start 99 2 3 4 5 . stop 1 0 1 6 ."
+INITSCRIPT_NAME_8x96autogvmred = "init_qcom_audio"
+INITSCRIPT_PARAMS_8x96autogvmred = "start 99 2 3 4 5 . stop 1 0 1 6 ."
 INITSCRIPT_NAME_msm8996 = "init_qcom_audio"
 INITSCRIPT_PARAMS_msm8996 = "start 99 2 3 4 5 . stop 1 0 1 6 ."
 INITSCRIPT_NAME_8x96mctm = "init_qcom_audio"
@@ -48,7 +50,9 @@ INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autofusion', 'init-audio_au
 include ${INCSUFFIX}.inc
 INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96auto44', 'init-audio_auto', 'none',d)}"
 include ${INCSUFFIX}.inc
-INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96hyp', 'init-audio_auto', 'none',d)}"
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmquin', 'init-audio_auto', 'none',d)}"
+include ${INCSUFFIX}.inc
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmred', 'init-audio_auto', 'none',d)}"
 include ${INCSUFFIX}.inc
 INCSUFFIX = "${@base_conditional('BASEMACHINE', 'msm8996', 'init-audio_auto', 'none',d)}"
 include ${INCSUFFIX}.inc
