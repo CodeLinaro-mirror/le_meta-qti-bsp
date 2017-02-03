@@ -34,6 +34,8 @@ BASEMACHINE = "msm8974"
 #EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm8655', ' --enable-target-msm7630=yes', '', d)} "
 #EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm8960', ' --enable-target-msm8960=yes', '', d)} "
 EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm8974', ' --enable-target-msm8974=yes', '', d)} "
+EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96quinhyp', ' --enable-target-hypervisor=yes', '', d)} "
+EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96redhyp', ' --enable-target-hypervisor=yes', '', d)} "
 
 CPPFLAGS += "-I${STAGING_INCDIR} \
              -I${STAGING_INCDIR}/glib-2.0 \
