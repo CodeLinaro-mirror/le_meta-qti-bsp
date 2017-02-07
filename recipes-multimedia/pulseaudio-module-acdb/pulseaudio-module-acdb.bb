@@ -7,13 +7,14 @@ PR = "r0"
 
 DEPENDS = "glib-2.0 pulseaudio acdbloader audcal"
 
+PACKAGE_ARCH = "${MACHINE_ARCH}"
+
 FILESEXTRAPATHS_prepend := "${WORKSPACE}/:"
 SRC_URI = "file://audio/mm-audio-opensource/pulseaudio-module-acdb/"
 S = "${WORKDIR}/audio/mm-audio-opensource/pulseaudio-module-acdb/"
 
 EXTRA_OECONF += "--with-glib \
                  --enable-target=${BASEMACHINE}"
-
 
 FILES_${PN} += "${libdir}/pulse-8.0/modules/"
 FILES_${PN}-staticdev += "${libdir}/pulse-8.0/modules/*.a"
