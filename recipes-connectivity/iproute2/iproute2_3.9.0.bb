@@ -1,7 +1,5 @@
 require iproute2.inc
 
-INSANE_SKIP_${PN} += "installed-vs-shipped"
-
 SRC_URI = "${KERNELORG_MIRROR}/linux/utils/net/${BPN}/${BPN}-${PV}.tar.xz \
            file://configure-cross.patch \
            file://iproute2_config_to_data.patch \
@@ -13,3 +11,11 @@ SRC_URI[sha256sum] = "16f027af432a05085813a2f859b7d42dafd29b8c035ead830d37565b73
 # CFLAGS are computed in Makefile and reference CCOPTS
 #
 EXTRA_OEMAKE_append = " CCOPTS='${CFLAGS}'"
+
+# Including the file depends on chipset
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96auto', 'iproute2_auto', 'none',d)}"
+include ${INCSUFFIX}.inc
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autofusion', 'iproute2_auto', 'none',d)}"
+include ${INCSUFFIX}.inc
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96auto44', 'iproute2_auto', 'none',d)}"
+include ${INCSUFFIX}.inc

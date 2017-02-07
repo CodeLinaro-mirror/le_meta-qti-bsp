@@ -10,5 +10,10 @@ FILESPATH =+ "${WORKSPACE}:"
 SRC_URI = "file://external/libunwind/"
 S = "${WORKDIR}/external/libunwind"
 
-PACKAGECONFIG ??= ""
-PACKAGECONFIG[lzma] = "--enable-minidebuginfo,--disable-minidebuginfo,xz"
+# Including the file depends on chipset
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96auto', 'libunwind_auto', 'none',d)}"
+include ${INCSUFFIX}.inc
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autofusion', 'libunwind_auto', 'none',d)}"
+include ${INCSUFFIX}.inc
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96auto44', 'libunwind_auto', 'none',d)}"
+include ${INCSUFFIX}.inc

@@ -11,8 +11,6 @@ DEPENDS = "libmincrypt-native"
 
 PR = "r6"
 
-S = "${WORKDIR}"
-
 MY_PN = "mkbootimg"
 
 # Handle do_fetch ourselves...  The automated tools don't work nicely with this...
@@ -31,4 +29,10 @@ do_install() {
 
 NATIVE_INSTALL_WORKS = "1"
 
-
+# Including the file depends on chipset
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96auto', 'mkbootimg-native_auto', 'none',d)}"
+include ${INCSUFFIX}.inc
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autofusion', 'mkbootimg-native_auto', 'none',d)}"
+include ${INCSUFFIX}.inc
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96auto44', 'mkbootimg-native_auto', 'none',d)}"
+include ${INCSUFFIX}.inc

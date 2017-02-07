@@ -4,8 +4,6 @@ PR = "r4"
 
 MY_PN = "dtbtool"
 
-S = "${WORKDIR}"
-
 DESCRIPTION = "Boot image creation tool from Android"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
@@ -31,3 +29,11 @@ do_install() {
 }
 
 NATIVE_INSTALL_WORKS = "1"
+
+# Including the file depends on chipset
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96auto', 'dtbtool-native_auto', 'none',d)}"
+include ${INCSUFFIX}.inc
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autofusion', 'dtbtool-native_auto', 'none',d)}"
+include ${INCSUFFIX}.inc
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96auto44', 'dtbtool-native_auto', 'none',d)}"
+include ${INCSUFFIX}.inc

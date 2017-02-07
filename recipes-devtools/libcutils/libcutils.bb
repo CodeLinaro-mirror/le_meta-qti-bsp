@@ -10,8 +10,6 @@ PR = "r1"
 
 DEPENDS += "liblog"
 
-INSANE_SKIP_${PN} += "installed-vs-shipped"
-
 BBCLASSEXTEND = "native"
 
 FILESPATH =+ "${WORKSPACE}/system/core/:"
@@ -32,3 +30,11 @@ EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'apq8098', ' LE_PROPERTIES_E
 FILES_${PN}-dbg    = "${libdir}/.debug/libcutils.*"
 FILES_${PN}        = "${libdir}/libcutils.so.* ${libdir}/pkgconfig/*"
 FILES_${PN}-dev    = "${libdir}/libcutils.so ${libdir}/libcutils.la ${includedir}"
+
+# Including the file depends on chipset
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96auto', 'libcutils_auto', 'none',d)}"
+include ${INCSUFFIX}.inc
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autofusion', 'libcutils_auto', 'none',d)}"
+include ${INCSUFFIX}.inc
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96auto44', 'libcutils_auto', 'none',d)}"
+include ${INCSUFFIX}.inc

@@ -16,6 +16,7 @@ DEPENDS = "virtual/kernel openssl glib-2.0 libselinux safe-iop ext4-utils libunw
 
 EXTRA_OECONF = " --with-host-os=${HOST_OS} --with-glib"
 EXTRA_OECONF_append = " --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
+EXTRA_OECONF_append = " --with-logd-logging"
 
 CPPFLAGS += "-I${STAGING_INCDIR}/ext4_utils"
 CPPFLAGS += "-I${STAGING_INCDIR}/libselinux"
@@ -32,6 +33,7 @@ COMPOSITION_apq8098 = "901D"
 
 do_install_append() {
    install -m 0755 ${S}/adb/start_adbd -D ${D}${sysconfdir}/init.d/adbd
+   install -m 0755 ${S}/logd/start_logd -D ${D}${sysconfdir}/init.d/logd
    install -m 0755 ${S}/usb/start_usb -D ${D}${sysconfdir}/init.d/usb
    install -m 0755 ${S}/rootdir/etc/init.qcom.post_boot.sh -D ${D}${sysconfdir}/init.d/init_post_boot
    install -m 0755 ${S}/usb/usb_composition -D ${D}${base_sbindir}/
@@ -54,6 +56,8 @@ do_install_append() {
       install -d ${D}${systemd_unitdir}/system/multi-user.target.wants/
       install -m 0644 ${S}/adb/adbd.service -D ${D}${systemd_unitdir}/system/adbd.service
       ln -sf ${systemd_unitdir}/system/adbd.service ${D}${systemd_unitdir}/system/multi-user.target.wants/adbd.service
+      install -m 0644 ${S}/logd/logd.service -D ${D}${systemd_unitdir}/system/logd.service
+      ln -sf ${systemd_unitdir}/system/logd.service ${D}${systemd_unitdir}/system/multi-user.target.wants/logd.service
       install -m 0644 ${S}/usb/usb.service -D ${D}${systemd_unitdir}/system/usb.service
       ln -sf ${systemd_unitdir}/system/usb.service ${D}${systemd_unitdir}/system/multi-user.target.wants/usb.service
       install -m 0644 ${S}/rootdir/etc/init_post_boot.service -D ${D}${systemd_unitdir}/system/init_post_boot.service
@@ -89,6 +93,9 @@ INITSCRIPT_PACKAGES =+ "${PN}-debuggerd"
 INITSCRIPT_NAME_${PN}-debuggerd = "init_debuggerd"
 INITSCRIPT_PARAMS_${PN}-debuggerd = "start 31 2 3 4 5 ."
 
+INITSCRIPT_PACKAGES =+ "${PN}-logd"
+INITSCRIPT_NAME_${PN}-logd = "logd"
+INITSCRIPT_PARAMS_${PN}-logd = "start 10  2 3 4 5 ."
 
 INITSCRIPT_PACKAGES =+ "${PN}-post-boot"
 INITSCRIPT_NAME_${PN}-post-boot = "init_post_boot"
@@ -112,6 +119,10 @@ FILES_${PN}-post-boot  = "${sysconfdir}/init.d/init_post_boot"
 FILES_${PN}-post-boot += "${systemd_unitdir}/system/init_post_boot.service ${systemd_unitdir}/system/multi-user.target.wants/init_post_boot.service"
 INSANE_SKIP_${PN}-post-boot = "file-rdeps"
 
+PACKAGES =+ "${PN}-logd-dbg ${PN}-logd"
+FILES_${PN}-logd-dbg  = "${base_sbindir}/.debug/logd"
+FILES_${PN}-logd      = "${sysconfdir}/init.d/logd ${base_sbindir}/logd"
+FILES_${PN}-logd     += "${systemd_unitdir}/system/logd.service ${systemd_unitdir}/system/multi-user.target.wants/logd.service"
 
 PACKAGES =+ "${PN}-debuggerd-dbg ${PN}-debuggerd"
 FILES_${PN}-debuggerd-dbg  = "${base_sbindir}/.debug/debuggerd ${base_sbindir}/.debug/debuggerd64 "
@@ -126,3 +137,11 @@ FILES_${PN}-leprop     += "${systemd_unitdir}/system/leprop.service ${systemd_un
 FILES_${PN}-dbg  = "${bindir}/.debug/* ${libdir}/.debug/*"
 FILES_${PN}      = "${bindir}/* ${libdir}/pkgconfig/* ${libdir}/*.so.* "
 FILES_${PN}-dev  = "${libdir}/*.so ${libdir}/*.la ${includedir}*"
+
+# Including the file depends on chipset
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96auto', 'system-core_auto', 'none',d)}"
+include ${INCSUFFIX}.inc
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autofusion', 'system-core_auto', 'none',d)}"
+include ${INCSUFFIX}.inc
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96auto44', 'system-core_auto', 'none',d)}"
+include ${INCSUFFIX}.inc
