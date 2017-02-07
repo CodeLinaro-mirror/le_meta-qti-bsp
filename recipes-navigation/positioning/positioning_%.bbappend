@@ -1,2 +1,2 @@
-SRC_URI = "git://git.projects.genivi.org/lbs/positioning.git;protocol=http"
+SRC_URI = "git://github.com/GENIVI/positioning.git;protocol=git"
 PACKAGECONFIG[qt] = ""

@@ -1,6 +1,6 @@
 #package libs from correct libdir after adding mulitilib support.
 
-SRC_URI = "git://git.projects.genivi.org/${PN}.git;protocol=http \
+SRC_URI = "git://github.com/GENIVI/${PN}.git;protocol=git \
           "
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"

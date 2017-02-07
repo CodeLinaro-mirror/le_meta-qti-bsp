@@ -1,6 +1,6 @@
 FILESPATH =+ "${WORKSPACE}/poky/meta-qti-bsp/recipes-extended/node-state-manager/files/:"
 
-SRC_URI = "git://git.projects.genivi.org/lifecycle/${PN}.git;tag=${PV};protocol=http \
+SRC_URI = "git://github.com/GENIVI/node-state-manager.git;tag=${PV};protocol=git \
            file://nsm-fix-systemd-service-dep.patch \
            file://nsm-fix-no-libsystemd-daemon.patch \
            file://link-with-gio.patch \

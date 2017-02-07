@@ -1,3 +1,3 @@
-SRC_URI = "git://git.projects.genivi.org/lifecycle/${PN}.git;tag=${PV};protocol=http \
+SRC_URI = "git://github.com/GENIVI/${PN}.git;tag=${PV};protocol=git \
            file://fix-no-libsystemd-daemon.patch \
           "
