@@ -6,16 +6,25 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 HOMEPAGE = "https://www.codeaurora.org/gitweb/quic/la?p=platform/bootable/recovery.git"
-DEPENDS = "libmincrypt-native system-core"
+DEPENDS = "libmincrypt-native system-core oem-recovery"
 RDEPENDS_${PN} = "zlib bzip2"
 
+LDFLAGS += "-Wl,--start-group"
+
 FILESPATH =+ "${WORKSPACE}:"
-SRC_URI = "file://bootable/recovery/"
+SRC_URI = "\
+	file://bootable/recovery/ \
+	file://0001-recovery-Added-access-mode-for-open-system-call.patch \
+"
 
 S = "${WORKDIR}/bootable/${PN}/"
 
 EXTRA_OECONF = "--with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include \
-                --with-core-headers=${STAGING_INCDIR_NATIVE}"
+                --with-core-headers=${STAGING_INCDIR}"
+
+do_compile_prepend() {
+export WORKSPACE="${WORKSPACE}"
+}
 
 PARALLEL_MAKE = ""
 INITSCRIPT_NAME = "recovery"
