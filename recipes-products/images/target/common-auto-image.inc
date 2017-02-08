@@ -35,6 +35,10 @@ IMAGE_INSTALL += "vlan"
 IMAGE_INSTALL += "bridge-utils"
 IMAGE_INSTALL += "wqy-microhei"
 
+#SDM modules
+IMAGE_INSTALL += "sdm"
+IMAGE_INSTALL += "sdm-noship"
+
 #Firmware-links
 IMAGE_INSTALL += "firmware-links"
 #Resize
