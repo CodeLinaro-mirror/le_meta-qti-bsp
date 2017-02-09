@@ -13,7 +13,6 @@ SRC_URI += " \
              file://0002-default.pa-Load-acdb-and-codec-control-modules.patch \
              file://0003-default.pa-Load-agl-audio-plugin-module.patch \
              file://0004-udev-Add-rules-for-QTI-MSM8996.patch \
-             file://0005-default.pa-Disable-module-suspend-on-idle.patch \
              file://0006-Support-PulseAudio-Client-API-for-Module-Codec-Control.patch \
            "
 
