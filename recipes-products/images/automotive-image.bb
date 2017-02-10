@@ -5,8 +5,5 @@
 
 require ${MACHINE}/${MACHINE}-image.inc
 require common-auto-image.inc
-
-#include machine-auto-image.bb
-
-
-#IMAGE_INSTALL += "packagegroup-agl-ivi"
+include machine-auto-image.bb
+IMAGE_INSTALL += "packagegroup-agl-ivi"

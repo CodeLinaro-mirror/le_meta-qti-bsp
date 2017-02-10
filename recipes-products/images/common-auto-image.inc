@@ -4,14 +4,14 @@ EXTRA_IMAGE_FEATURES += "package-management"
 EXTRA_IMAGE_FEATURES += "tools-debug"
 
 
-#IMAGE_INSTALL += "weston"
-#IMAGE_INSTALL += "weston-examples"
-#IMAGE_INSTALL += "qtbase-examples"
-#IMAGE_INSTALL += "qtwebkit"
-#IMAGE_INSTALL += "qtwebkit-examples-examples"
-#IMAGE_INSTALL += "qtmultimedia"
-#IMAGE_INSTALL += "qtmultimedia-plugins"
-#IMAGE_INSTALL += "qtmultimedia-qmlplugins"
+IMAGE_INSTALL += "weston"
+IMAGE_INSTALL += "weston-examples"
+IMAGE_INSTALL += "qtbase-examples"
+IMAGE_INSTALL += "qtwebkit"
+IMAGE_INSTALL += "qtwebkit-examples-examples"
+IMAGE_INSTALL += "qtmultimedia"
+IMAGE_INSTALL += "qtmultimedia-plugins"
+IMAGE_INSTALL += "qtmultimedia-qmlplugins"
 IMAGE_INSTALL += "lmbench"
 IMAGE_INSTALL += "libcutils"
 IMAGE_INSTALL += "liblog"
@@ -34,7 +34,7 @@ IMAGE_INSTALL += "vlan"
 IMAGE_INSTALL += "bridge-utils"
 
 #Camera modules
-#IMAGE_INSTALL += "lib32-androidcompat"
+IMAGE_INSTALL += "lib32-androidcompat"
 #IMAGE_INSTALL += "init-can"
 
 #WiFi
