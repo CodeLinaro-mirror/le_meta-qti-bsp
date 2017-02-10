@@ -35,8 +35,8 @@ do_install_opensource () {
     install -d ${D}${bindir}
 
 # [TODO] Install bt_audio_service which can support HF and A2DP audio. Currently, HF audio is verified through "bt_hf_audio.sh".
-if [ -f "${B}/synergy-opensource/platform/msm/bt_audio_service/bt_audio_service" ]; then
-    install ${B}/synergy-opensource/platform/msm/bt_audio_service/bt_audio_service ${D}${bindir}
+if [ -f "${B}/synergy-opensource/platform/msm/bt_audio_service/output/bin/bt_audio_service" ]; then
+    install ${B}/synergy-opensource/platform/msm/bt_audio_service/output/bin/bt_audio_service ${D}${bindir}
 fi
 }
 
