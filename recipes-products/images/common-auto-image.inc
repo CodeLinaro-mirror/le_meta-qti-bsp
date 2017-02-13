@@ -37,6 +37,8 @@ IMAGE_INSTALL += "bridge-utils"
 IMAGE_INSTALL += "cryptsetup"
 IMAGE_INSTALL += "lvm2"
 
+#RESIZE
+IMAGE_INSTALL += "resize-service"
 #Camera modules
 IMAGE_INSTALL += "lib32-androidcompat"
 IMAGE_INSTALL += "init-can"
