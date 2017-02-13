@@ -36,6 +36,8 @@ IMAGE_INSTALL += "wqy-microhei"
 
 #Firmware-links
 IMAGE_INSTALL += "firmware-links"
+#Resize
+IMAGE_INSTALL += "resize-service"
 #Camera modules
 IMAGE_INSTALL += "lib32-androidcompat"
 IMAGE_INSTALL += "init-can"
