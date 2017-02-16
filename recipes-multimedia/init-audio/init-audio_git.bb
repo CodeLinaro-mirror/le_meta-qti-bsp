@@ -15,6 +15,16 @@ S = "${WORKDIR}"
 S_msm8974 = "${WORKDIR}/${BASEMACHINE}"
 S_msm8610 = "${WORKDIR}/${BASEMACHINE}"
 
+INITSCRIPT_NAME_8x96auto = "init_qcom_audio"
+INITSCRIPT_PARAMS_8x96auto = "start 99 2 3 4 5 . stop 1 0 1 6 ."
+INITSCRIPT_NAME_8x96autofusion = "init_qcom_audio"
+INITSCRIPT_PARAMS_8x96autofusion = "start 99 2 3 4 5 . stop 1 0 1 6 ."
+INITSCRIPT_NAME_8x96hyp = "init_qcom_audio"
+INITSCRIPT_PARAMS_8x96hyp = "start 99 2 3 4 5 . stop 1 0 1 6 ."
+INITSCRIPT_NAME_msm8996 = "init_qcom_audio"
+INITSCRIPT_PARAMS_msm8996 = "start 99 2 3 4 5 . stop 1 0 1 6 ."
+INITSCRIPT_NAME_8x96mctm = "init_qcom_audio"
+INITSCRIPT_PARAMS_8x96mctm = "start 99 2 3 4 5 . stop 1 0 1 6 ."
 INITSCRIPT_NAME_msm8974 = "init_qcom_audio"
 INITSCRIPT_PARAMS_msm8974 = "start 99 2 3 4 5 . stop 1 0 1 6 ."
 INITSCRIPT_NAME_msm8610 = "init_qcom_audio"
@@ -31,3 +41,17 @@ do_install_msm8974() {
 do_install_msm8610() {
     install -m 0755 ${S}/${BASEMACHINE}/init_qcom_audio -D ${D}${sysconfdir}/init.d/init_qcom_audio
 }
+
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96auto', 'init-audio_auto', 'none',d)}"
+include ${INCSUFFIX}.inc
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autofusion', 'init-audio_auto', 'none',d)}"
+include ${INCSUFFIX}.inc
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96auto44', 'init-audio_auto', 'none',d)}"
+include ${INCSUFFIX}.inc
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96hyp', 'init-audio_auto', 'none',d)}"
+include ${INCSUFFIX}.inc
+INCSUFFIX = "${@base_conditional('BASEMACHINE', 'msm8996', 'init-audio_auto', 'none',d)}"
+include ${INCSUFFIX}.inc
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96mctm', 'init-audio_auto', 'none',d)}"
+include ${INCSUFFIX}.inc
+
