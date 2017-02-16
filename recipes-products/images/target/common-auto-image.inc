@@ -81,6 +81,7 @@ IMAGE_INSTALL += "node-startup-controller-nsm-dummy"
 IMAGE_INSTALL += "usbutils"
 IMAGE_INSTALL += "sysstat"
 IMAGE_INSTALL += "glib-2.0-utils"
+IMAGE_INSTALL += "smem"
 
 # smack
 IMAGE_INSTALL_append_smack = " smack-userspace"
