@@ -1,13 +1,17 @@
-inherit autotools qcommon
+inherit autotools-brokensep pkgconfig
 
 DESCRIPTION = "Pluseaudio codec control module"
+LICENSE = "BSD"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
+${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 PR = "r0"
 
 DEPENDS = "glib-2.0 pulseaudio audio-hal-plugin-noship"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-SRC_DIR = "${WORKSPACE}/audio/mm-audio-opensource/pulseaudio-module-codec-control/"
+FILESEXTRAPATHS_prepend := "${WORKSPACE}/:"
+SRC_URI = "file://audio/mm-audio-opensource/pulseaudio-module-codec-control/"
 S = "${WORKDIR}/audio/mm-audio-opensource/pulseaudio-module-codec-control/"
 
 EXTRA_OECONF += "--with-glib \
