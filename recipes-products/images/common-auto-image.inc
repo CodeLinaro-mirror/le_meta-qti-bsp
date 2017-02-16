@@ -58,6 +58,7 @@ IMAGE_INSTALL += "node-startup-controller"
 
 IMAGE_INSTALL += "usbutils"
 IMAGE_INSTALL += "sysstat"
+IMAGE_INSTALL += "smem"
 
 # smack support
 IMAGE_INSTALL_append_smack = " smack-userspace"
