@@ -29,14 +29,14 @@
 # find_partitions        init.d script to dynamically find partitions
 #
 
-mkdir -p /dsp
-mkdir -p /data
-mkdir -p /persist
-mkdir -p /firmware
+#mkdir -p /dsp
+#mkdir -p /data
+#mkdir -p /persist
+#mkdir -p /firmware
 
-mount /dsp
-mount /data
-mount /persist
-mount /firmware
+#mount /dsp
+#mount /data
+#mount /persist
+#mount /firmware
 
 exit 0
