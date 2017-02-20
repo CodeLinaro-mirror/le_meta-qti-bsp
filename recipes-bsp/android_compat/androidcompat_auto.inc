@@ -9,6 +9,8 @@ LDFLAGS_prepend = " -lcutils "
 
 PACKAGES = "${PN} ${PN}-dev"
 
+EXTRA_OEMAKE += "-e MAKEFLAGS="
+
 python do_patch_append() {
     import re,os
     if d.getVar('PN', True).find("lib32") >= 0:
@@ -21,12 +23,3 @@ python do_patch_append() {
         f.write(c)
         f.close()
 }
-
-do_install () {
-    install -d ${D}${bindir}
-    install -m 0755 ${LA_OUT_DIR}/target/product/msm8996/obj/EXECUTABLES/check_prereq_intermediates/check_prereq ${D}${bindir}/
-    install -m 0755 ${LA_OUT_DIR}/target/product/msm8996/obj/EXECUTABLES/n_smux_intermediates/n_smux ${D}${bindir}/
-    install -d ${D}/usr/include/common/inc
-    install -m 0644 ${LA_COMPAT_DIR}/common/inc/*.h ${D}${includedir}/
-}
-

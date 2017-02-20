@@ -97,3 +97,10 @@ do_install () {
     oe_runmake -f ${LA_COMPAT_DIR}/build/core/main.mk BUILD_MODULES_IN_PATHS=${S} \
         all_modules SHOW_COMMANDS=true USE_INSTALL=true || die "make failed"
 }
+
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96auto', 'camera_auto', 'none',d)}"
+include ${INCSUFFIX}.inc
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autofusion', 'camera_auto', 'none',d)}"
+include ${INCSUFFIX}.inc
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96auto44', 'camera_auto', 'none',d)}"
+include ${INCSUFFIX}.inc
