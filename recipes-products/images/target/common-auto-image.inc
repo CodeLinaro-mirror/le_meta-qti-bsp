@@ -55,9 +55,6 @@ IMAGE_INSTALL += "iw"
 IMAGE_INSTALL += "wireless-tools"
 IMAGE_INSTALL += "sigma-dut"
 
-#BT
-IMAGE_INSTALL += "synergy-opensource"
-
 #Location
 IMAGE_INSTALL += "positioning"
 IMAGE_INSTALL += "positioning-gnss"
