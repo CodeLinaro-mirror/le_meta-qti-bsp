@@ -38,12 +38,12 @@ IMAGE_INSTALL += "bridge-utils"
 #IMAGE_INSTALL += "init-can"
 
 #WiFi
-#IMAGE_INSTALL += "qcacld"
-#IMAGE_INSTALL += "wpa-supplicant"
-#IMAGE_INSTALL += "hostapd"
-#IMAGE_INSTALL += "iw"
-#IMAGE_INSTALL += "wireless-tools"
-#IMAGE_INSTALL += "sigma-dut"
+IMAGE_INSTALL += "qcacld"
+IMAGE_INSTALL += "wpa-supplicant"
+IMAGE_INSTALL += "hostapd"
+IMAGE_INSTALL += "iw"
+IMAGE_INSTALL += "wireless-tools"
+IMAGE_INSTALL += "sigma-dut"
 
 #BT
 #IMAGE_INSTALL += "synergy-opensource"
