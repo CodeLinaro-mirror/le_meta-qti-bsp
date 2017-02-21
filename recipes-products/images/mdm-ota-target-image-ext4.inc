@@ -27,6 +27,7 @@ mkdir -p ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/SYSTEM
 mkdir -p ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RADIO
 
 echo "base image rootfs: ${BASE_IMAGE_ROOTFS_EXT4}"
+
 # copy radio directory content into RADIO directory
 cp -r ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/base-files-recovery/${MACHINE}/radio/. ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RADIO/.
 
@@ -38,10 +39,8 @@ cp ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/BOOTA
 
 # copy the contents of system rootfs
 cp -r ${BASE_IMAGE_ROOTFS_EXT4}/. ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/SYSTEM/.
-
 #copy contents of recovery rootfs
 cp -r ${IMAGE_ROOTFS}/. ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/.
-
 #generate recovery.fstab which is used by the updater-script
 #echo #mount point fstype device [device2] >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/recovery.fstab
 echo /boot     emmc  /dev/block/bootdevice/by-name/boot >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/recovery.fstab
@@ -61,7 +60,6 @@ cp   ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/usr/bin/applypatch ${OTA_TARGET_IM
 
 cp   ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/usr/bin/updater ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/OTA/bin/.
 
-
 # copy contents of META folder
 #recovery_api_version is from recovery module
 echo recovery_api_version=3 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
@@ -69,11 +67,19 @@ echo recovery_api_version=3 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.tx
 #blocksize = BOARD_FLASH_BLOCK_SIZE
 echo blocksize=131072 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 
-#boot_size: Size of boot partition from partition.xml
-echo boot_size=0x00F00000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
+if [ "${MACHINE}" == "apq8053" ]; then
+   #boot_size: Size of boot partition from partition.xml
+   echo boot_size=0x01800000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 
-#recovery_size : Size of recovery partition from partition.xml
-echo recovery_size=0x00F00000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
+   #recovery_size : Size of recovery partition from partition.xml
+   echo recovery_size=0x01800000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
+else
+   #boot_size: Size of boot partition from partition.xml
+   echo boot_size=0x00F00000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
+
+   #recovery_size : Size of recovery partition from partition.xml
+   echo recovery_size=0x00F00000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
+fi
 
 #system_size : Size of system partition from partition.xml
 echo system_size=0x00A00000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
@@ -96,5 +102,8 @@ echo default_system_dev_certificate=build/abcd >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4
 #delete old files
 rm -rf ${DEPLOY_DIR_IMAGE}/${OTA_TARGET_BASENAME_EXT4}
 # Pack the files into the deploy dir
+cd  ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/SYSTEM
+rm -rf var/run
+ln -snf ../run var/run
 cp -r ${OTA_TARGET_IMAGE_ROOTFS_EXT4} ${DEPLOY_DIR_IMAGE}
 }
