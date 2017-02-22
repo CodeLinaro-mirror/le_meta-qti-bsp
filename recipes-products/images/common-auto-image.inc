@@ -46,7 +46,7 @@ IMAGE_INSTALL += "wireless-tools"
 IMAGE_INSTALL += "sigma-dut"
 
 #BT
-#IMAGE_INSTALL += "synergy-opensource"
+IMAGE_INSTALL += "synergy-opensource"
 
 # Add Persistence Storage related components
 IMAGE_INSTALL += "dlt-daemon"
