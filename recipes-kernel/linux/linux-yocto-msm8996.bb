@@ -144,6 +144,7 @@ do_deploy_append() {
       packkernelimg --kernel "${DEPLOYDIR}/${KERNEL_IMAGETYPE}" --dt "${B}/arch/${ARCH}/boot/dts/qcom" --dt_list "${KERNEL_DTB_LIST}"
    fi
    mkbootimg --kernel "${DEPLOYDIR}/${KERNEL_IMAGETYPE}" --ramdisk "${DEPLOYDIR}/initrd"  -o "${DEPLOYDIR}/boot.img" --cmdline "${KERNEL_CMDLINE}" --base "${KERNEL_BASE}"
+   cp vmlinux "${DEPLOYDIR}/vmlinux"
 }
 
 do_removegit () {
