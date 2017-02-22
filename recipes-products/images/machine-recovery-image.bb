@@ -1,5 +1,7 @@
-# List of FOSS packages installed onto the root file system as specified by the user.
-include ${MACHINE}-recovery-image.inc
+include target/${BASEMACHINE}-recovery-image.inc
+
+IMAGE_FSTYPES = "${INITRAMFS_FSTYPES}"
+PACKAGE_INSTALL = "${IMAGE_INSTALL}"
 
 IMAGE_LINGUAS = ""
 
@@ -11,13 +13,10 @@ IMAGE_DEV_MANAGER = "busybox-static-mdev"
 IMAGE_INIT_MANAGER = "sysvinit sysvinit-pidof"
 IMAGE_INITSCRIPTS = ""
 
-include mdm-ota-target-image-ubi.inc
-include mdm-ota-target-image-ext4.inc
-
 inherit core-image
+inherit deploy
 
-do_rootfs[nostamp] = "1"
-do_build[nostamp]  = "1"
+include target/${BASEMACHINE}-ota-target-image-ext4.inc
 
-# Call function makesystem to generate sparse ext4 image
-addtask makesystem after do_rootfs before do_build
+addtask makerecovery after do_rootfs before do_build
+addtask makeota_image after do_makerecovery before do_build

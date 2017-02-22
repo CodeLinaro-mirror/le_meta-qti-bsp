@@ -1,0 +1,27 @@
+From 35ab232cd82f9e74f754d89069e23a4b664b5b21 Mon Sep 17 00:00:00 2001
+From: Bharathraj Nagaraju <snbraj@codeaurora.org>
+Date: Tue, 7 Feb 2017 18:25:07 -0800
+Subject: [PATCH] recovery: Added access mode for open system call.
+
+Change-Id: I1dad6b63cc3b8b09817ab91e7dab187c559c82b3
+Signed-off-by: Bharathraj Nagaraju <snbraj@codeaurora.org>
+---
+ recovery.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/recovery.cpp b/recovery.cpp
+index 08a5a2b..6daba10 100644
+--- a/recovery.cpp
++++ b/recovery.cpp
+@@ -413,7 +413,7 @@ static void copy_logs() {
+ static int set_ota_cookie() {
+     int fd = -1;
+     int rcode = 0;
+-    fd = open(STATUS_COOKIE_FILE, O_CREAT | O_RDWR);
++    fd = open(STATUS_COOKIE_FILE, O_CREAT | O_RDWR, 0600);
+     if (fd < 0) {
+         LOGE("Failed to open %s : %s\n",
+              STATUS_COOKIE_FILE,
+-- 
+2.9.0.137.gcf4c2cf
+
