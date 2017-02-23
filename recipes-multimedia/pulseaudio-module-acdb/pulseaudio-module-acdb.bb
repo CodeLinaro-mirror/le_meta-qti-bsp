@@ -1,13 +1,17 @@
-inherit autotools qcommon
+inherit autotools-brokensep pkgconfig
 
 DESCRIPTION = "Pluseaudio module for audio calibration data"
+LICENSE = "BSD"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
+${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 PR = "r0"
 
 DEPENDS = "glib-2.0 pulseaudio acdbloader audcal"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-SRC_DIR = "${WORKSPACE}/audio/mm-audio-opensource/pulseaudio-module-acdb/"
+FILESEXTRAPATHS_prepend := "${WORKSPACE}/:"
+SRC_URI = "file://audio/mm-audio-opensource/pulseaudio-module-acdb/"
 S = "${WORKDIR}/audio/mm-audio-opensource/pulseaudio-module-acdb/"
 
 EXTRA_OECONF += "--with-glib \
