@@ -29,7 +29,8 @@
 [Unit]
 Description=Wlan Service
 SourcePath=/etc/init.d/wlan
-After=persist.mount firmware-links.service
+Requires=wcnss_wlan.service
+After=persist.mount firmware-links.service wcnss_wlan.service
 
 [Service]
 Restart=no
