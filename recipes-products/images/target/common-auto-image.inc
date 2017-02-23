@@ -97,3 +97,4 @@ IMAGE_INSTALL_append_smack = " smack-userspace"
 IMAGE_INSTALL += "lib32-connman"
 
 IMAGE_INSTALL += "open-source-kernel-tests"
+IMAGE_INSTALL += "cryptsetup lvm2"
