@@ -16,6 +16,7 @@ SRC_URI = "\
 	file://bootable/recovery/ \
 	file://0001-recovery-Added-access-mode-for-open-system-call.patch \
 	file://recovery.service \
+        file://recovery.timer \
 "
 
 S = "${WORKDIR}/bootable/${PN}/"
@@ -48,8 +49,9 @@ do_install_append() {
         install -m 0755 ${S}/start_recovery -D ${D}${sysconfdir}/init.d/recovery
 	install -d ${D}${systemd_unitdir}/system/
               install -m 0644 ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/recovery/recovery/recovery.service -D ${D}${systemd_unitdir}/system/recovery.service
+              install -m 0644 ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/recovery/recovery/recovery.timer -D ${D}${systemd_unitdir}/system/recovery.timer
               install -d ${D}${systemd_unitdir}/system/multi-user.target.wants/
               # enable the service for multi-user.target
-              ln -sf ${systemd_unitdir}/system/recovery.service \
-                            ${D}${systemd_unitdir}/system/multi-user.target.wants/recovery.service
+              ln -sf ${systemd_unitdir}/system/recovery.timer \
+                            ${D}${systemd_unitdir}/system/multi-user.target.wants/recovery.timer
 }
