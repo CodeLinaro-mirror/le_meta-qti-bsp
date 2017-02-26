@@ -1,0 +1,9 @@
+[Unit]
+Description=Run recovery service after 20 sec
+
+[Timer]
+OnBootSec=20sec
+Unit=recovery.service
+
+[Install]
+WantedBy=multi-user.target
