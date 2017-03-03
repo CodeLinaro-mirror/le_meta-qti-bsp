@@ -1,0 +1,58 @@
+require conf/distro/include/security_flags.inc
+
+require conf/machine/include/basemachine.inc
+
+SOC_FAMILY ?= "msm8996"
+include conf/machine/include/soc-family.inc
+
+# Use non-perf settings for the perf build.
+BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
+
+TMPDIR = "${TOPDIR}/tmp-glibc"
+
+require conf/machine/include/arm/arch-armv8.inc
+
+SERIAL_CONSOLE ?= "115200 ttyHSL0"
+
+#DISTRO ?= "msm"
+DISTRO_FEATURES_BACKFILL_remove = "gobject-introspection-data"
+DISTRO_FEATURES_BACKFILL_CONSIDERED_remove = "gobject-introspection-data"
+DISTRO_FEATURES_append = " emmc-boot "
+DISTRO_FEATURES_append += "persist-image"
+
+PAGE_SIZE ?= '4096'
+
+# Max supported inodes
+#EXTRA_IMAGECMD ?= "-N 2048"
+
+# Sizes for EXT4 (in bytes)
+#SYSTEM_SIZE_EXT4 ?= "3000000000"
+USERDATA_SIZE_EXT4 ?= "5000000000"
+CACHE_SIZE_EXT4 ?= "65536000"
+
+#
+# Multilib configuration
+#
+# This sets any packages preprended with lib32- to be built with
+# the armv7a tuning (32 bit) instead of 64 bit aarch.
+require conf/multilib.conf
+MULTILIBS = "multilib:lib32"
+DEFAULTTUNE_virtclass-multilib-lib32 = "armv7a"
+
+EXTRA_IMAGE_FEATURES = "debug-tweaks"
+
+PREFERRED_VERSION_weston = "1.9.0"
+PREFERRED_VERSION_wayland = "1.9.0"
+PREFERRED_VERSION_wayland-native = "1.9.0"
+PREFERRED_VERSION_wayland-ivi-extension = "1.9.1"
+PREFERRED_VERSION_libdrm = "2.4.62"
+PREFERRED_VERSION_gtest = "1.7.0"
+
+# Prefer GStreamer 1.8.x by default
+PREFERRED_VERSION_gstreamer1.0              ?= "1.8.%"
+PREFERRED_VERSION_gstreamer1.0-plugins-bad  ?= "1.8.%"
+PREFERRED_VERSION_gstreamer1.0-plugins-base ?= "1.8.%"
+PREFERRED_VERSION_gstreamer1.0-plugins-good ?= "1.8.%"
+PREFERRED_VERSION_gstreamer1.0-plugins-ugly ?= "1.8.%"
+PREFERRED_VERSION_gstreamer1.0-libav        ?= "1.8.%"
+PREFERRED_VERSION_gstreamer1.0-omx          ?= "1.2.%"
