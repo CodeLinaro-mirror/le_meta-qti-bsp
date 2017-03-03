@@ -112,6 +112,8 @@ IMAGE_INSTALL += "lib32-bt-app"
 IMAGE_INSTALL += "lib32-bt-property"
 IMAGE_INSTALL += "lib32-fluoride"
 IMAGE_INSTALL += "lib32-libbt-vendor"
+IMAGE_INSTALL += "display-hal-linux"
+IMAGE_INSTALL += "lib32-display-hal-linux"
 #IMAGE_PREPROCESS_COMMAND += "echo ${MACHINE} >> ${IMAGE_ROOTFS}/target;"
 
 # Below packages are open source packages that depend on proprietary packages

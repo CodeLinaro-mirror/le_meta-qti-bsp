@@ -34,7 +34,10 @@ CPPFLAGS += "-I${WORKSPACE}/system/core/include"
 do_install_append () {
     # libhardware expects to find /usr/lib/hw/gralloc.*.so
     install -d ${D}/usr/lib/hw
+    install -d ${D}/usr/lib64/hw
+
     ln -s /usr/lib/libgralloc.so ${D}/usr/lib/hw/gralloc.default.so
+    ln -s /usr/lib64/libgralloc.so ${D}/usr/lib64/hw/gralloc.default.so
 }
 
 FILES_${PN} = "${libdir}/*.so"
