@@ -26,6 +26,9 @@ MY_TARGET_apq8096  = "msm8996"
 MY_TARGET_mdm9607  = "mdm9607"
 MY_TARGET_apq8053  = "msm8953"
 MY_TARGET_apq8017  = "msm8952"
+MY_TARGET_8x96auto  = "msm8996"
+MY_TARGET_8x96auto44  = "msm8996"
+MY_TARGET_8x96autofusion  = "msm8996"
 MY_TARGET         ?= "${BASEMACHINE}"
 
 BOOTLOADER_NAME = "${@base_contains('DISTRO_FEATURES', 'emmc-boot', 'emmc_appsboot', 'appsboot', d)}"
@@ -34,7 +37,10 @@ LIBGCC = "${STAGING_LIBDIR}/${TARGET_SYS}/4.9.3/libgcc.a"
 
 DISPLAY_SCREEN = "${@base_conditional('PRODUCT', 'drone', '0', '1', d)}"
 
-EXTRA_OEMAKE = "${MY_TARGET} TOOLCHAIN_PREFIX='${TARGET_PREFIX}'  LIBGCC='${LIBGCC}' DISPLAY_SCREEN=${DISPLAY_SCREEN}"
+EXTRA_OEMAKE ?= "${MY_TARGET} TOOLCHAIN_PREFIX='${TARGET_PREFIX}'  LIBGCC='${LIBGCC}' DISPLAY_SCREEN=${DISPLAY_SCREEN}"
+EXTRA_OEMAKE_8x96auto = "${MY_TARGET} TOOLCHAIN_PREFIX='${TARGET_PREFIX}' LIBGCC='${LIBGCC}' EMMC_BOOT=1 SIGNED_KERNEL=1 VERIFIED_BOOT=1 DEFAULT_UNLOCK=true"
+EXTRA_OEMAKE_8x96autofusion = "${MY_TARGET} TOOLCHAIN_PREFIX='${TARGET_PREFIX}' LIBGCC='${LIBGCC}' EMMC_BOOT=1 SIGNED_KERNEL=1 VERIFIED_BOOT=1 DEFAULT_UNLOCK=true"
+EXTRA_OEMAKE_8x96auto44 = "${MY_TARGET} TOOLCHAIN_PREFIX='${TARGET_PREFIX}' LIBGCC='${LIBGCC}' EMMC_BOOT=1 SIGNED_KERNEL=1 VERIFIED_BOOT=1 DEFAULT_UNLOCK=true"
 
 EXTRA_OEMAKE_append_emmc-boot = " VERIFIED_BOOT=0 DEFAULT_UNLOCK=true EMMC_BOOT=1"
 
@@ -55,3 +61,11 @@ do_deploy[dirs] = "${S} ${DEPLOYDIR}"
 addtask deploy before do_build after do_install
 
 PACKAGE_STRIP = "no"
+
+# Including the file depends on chipset
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96auto', 'lk_auto', 'none',d)}"
+include ${INCSUFFIX}.inc
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autofusion', 'lk_auto', 'none',d)}"
+include ${INCSUFFIX}.inc
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96auto44', 'lk_auto', 'none',d)}"
+include ${INCSUFFIX}.inc

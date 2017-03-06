@@ -4,7 +4,7 @@ DESCRIPTION = "QuIC Linux Kernel"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 
-COMPATIBLE_MACHINE = "(mdm9607|mdmcalifornium|apq8009|apq8096|apq8053|apq8017|msm8909w|sdxhedgehog)"
+COMPATIBLE_MACHINE = "(mdm9607|mdmcalifornium|apq8009|apq8096|apq8053|apq8017|msm8909w|sdxhedgehog|8x96auto|8x96autofusion)"
 
 # Default image type is zImage, change it in machine conf if needed.
 KERNEL_IMAGETYPE ?= "zImage"
@@ -213,3 +213,8 @@ do_deploy () {
         ${extra_mkbootimg_params} --output ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img
 }
 
+# Including the file depends on chipset
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96auto', 'linux-quic_auto', 'none',d)}"
+include ${INCSUFFIX}.inc
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autofusion', 'linux-quic_auto', 'none',d)}"
+include ${INCSUFFIX}.inc
