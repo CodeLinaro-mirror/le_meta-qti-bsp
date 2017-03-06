@@ -1,4 +1,4 @@
-inherit kernel
+inherit kernel qperf
 
 DESCRIPTION = "QuIC Linux Kernel"
 LICENSE = "GPLv2"
@@ -44,13 +44,12 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI   =  "file://kernel"
-SRC_URI   +=  "file://0001-Revert-msm-cpp-Add-support-pagefault-handler-in-CPP.patch"
 
 SRC_DIR   =  "${WORKSPACE}/kernel/msm-3.18"
 S         =  "${WORKDIR}/kernel/msm-3.18"
 GITVER    =  "${@base_get_metadata_git_revision('${SRC_DIR}',d)}"
 PV = "git"
-PR = "r5-${DISTRO}"
+PR = "r5"
 
 DEPENDS += "dtbtool-native mkbootimg-native"
 DEPENDS_apq8096 += "mkbootimg-native dtc-native"
@@ -150,7 +149,7 @@ do_shared_workdir () {
         cp ${STAGING_KERNEL_DIR}/scripts/gen_initramfs_list.sh $kerneldir/scripts/
 
         # Make vmlinux available as soon as possible
-	if [ ${DISTRO} == "mdm-perf" ]; then
+	if ${@bb.utils.contains('DISTRO_FEATURES', 'qti-perf', 'true', 'false', d)}; then
 		install -d ${STAGING_DIR_TARGET}-perf/${KERNEL_IMAGEDEST}
 	        install -m 0644 ${KERNEL_OUTPUT} ${STAGING_DIR_TARGET}-perf/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}
 	        install -m 0644 vmlinux ${STAGING_DIR_TARGET}-perf/${KERNEL_IMAGEDEST}/vmlinux-${KERNEL_VERSION}
