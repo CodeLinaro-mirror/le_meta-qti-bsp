@@ -7,16 +7,15 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=73a5855a8119deb017f5f13cf327095d \
                     file://COPYING.LIB;md5=21682e4e8fea52413fd26c60acb907e5 \
                     file://gst/tta/crc32.h;beginline=12;endline=29;md5=27db269c575d1e5317fffca2d33b3b50"
 
-FILESEXTRAPATHS =+ "${COREBASE}/meta/recipes-multimedia/gstreamer/files:"
-FILESPATH =+ "${WORKSPACE}:"
-SRC_URI = "file://gstreamer/gst-plugins-bad"
-SRC_URI += "git://anongit.freedesktop.org/gstreamer/common;destsuffix=gstreamer/gst-plugins-bad/common;branch=master;name=common"
-SRCREV_common = "6f2d2093e84cc0eb99b634fa281822ebb9507285"
-S = "${WORKDIR}/gstreamer/gst-plugins-bad"
-
+FILESPATH =+ "${WORKSPACE}/gstreamer:"
+SRC_URI = "file://gst-plugins-bad"
+SRC_URI += "git://anongit.freedesktop.org/gstreamer/common;destsuffix=gst-plugins-bad/common;branch=master;name=common"
 SRC_URI_remove = " \
+    file://0001-introspection.m4-prefix-pkgconfig-paths-with-PKG_CON.patch \
     file://0001-Makefile.am-don-t-hardcode-libtool-name-when-running.patch \
 "
+SRCREV_common = "6f2d2093e84cc0eb99b634fa281822ebb9507285"
+S = "${WORKDIR}/gst-plugins-bad"
 
 PACKAGECONFIG = " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'wayland', '', d)} \
@@ -191,7 +190,6 @@ EXTRA_OECONF = " \
                 --disable-y4m \
                 --disable-yadif \
                 --disable-zbar \
-                --disable-introspection \
                 "
 
 do_configure_prepend() {

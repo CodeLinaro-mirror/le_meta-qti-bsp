@@ -1,63 +1,63 @@
-inherit autotools pkgconfig qlicense
-DESCRIPTION = "media"
+SUMMARY = "Multimedia libraries and SDK"
+SECTION = "multimedia"
+LICENSE = "BSD-3-Clause"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
 
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI = "file://hardware/qcom/media/"
-
 S = "${WORKDIR}/hardware/qcom/media"
 
-DEPENDS = "adreno200"
-DEPENDS += "display-hal"
-DEPENDS += "system-media"
-DEPENDS += "av-frameworks"
+PR = "r1"
+
+DEPENDS = "virtual/kernel"
 DEPENDS += "glib-2.0"
-DEPENDS += "mm-video-noship"
+DEPENDS += "virtual/libc"
+DEPENDS += "libcutils liblog liblog-native system-core"
+#DEPENDS += "adreno"
+#RDEPENDS_{PN} = "mm-video-prop"
+#INSANE_SKIP = 1
 
-# 8909 don't need dispaly-ha to compile. 
-DEPENDS_remove_msm8909 = "display-hal mm-video-noship"
+# Need the kernel headers
+PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-# configure features
-EXTRA_OECONF_append =" --enable-use-glib="yes""
-EXTRA_OECONF_append =" --enable-target-uses-ion="yes""
-EXTRA_OECONF_append =" --enable-target-${SOC_FAMILY}="yes""
-EXTRA_OECONF_append =" --enable-target-uses-media-extensions="no""
-EXTRA_OECONF_append_msm8909 =" --enable-targets-that-use-flag-msm8226="yes""
-EXTRA_OECONF_append_msm8916 =" --enable-targets-that-use-flag-msm8226="yes""
-EXTRA_OECONF_append_msm8953 =" --enable-build-mm-video="yes""
-EXTRA_OECONF_append_msm8953 =" --enable-targets-that-support-pq="yes""
-EXTRA_OECONF_append_msm8996 =" --enable-build-mm-video="yes""
-EXTRA_OECONF_append_msm8996 =" --enable-is-ubwc-supported="yes""
-EXTRA_OECONF_append_msm8996 =" --enable-targets-that-support-pq="yes""
-EXTRA_OECONF_append_msm8996 =" --enable-master-side-cp-target-list="yes""
-EXTRA_OECONF_append_msmcobalt =" --enable-is-ubwc-supported="yes""
+LV = "1.0.0"
 
-# configure headers
-EXTRA_OECONF_append ="--with-glib"
-EXTRA_OECONF_append =" --with-ui-headers=${STAGING_INCDIR}/ui/"
-EXTRA_OECONF_append =" --with-android-headers=${STAGING_INCDIR}/"
-#EXTRA_OECONF_append =" --with-utils-headers=${STAGING_INCDIR}/utils/"
-#EXTRA_OECONF_append =" --with-cutils-headers=${STAGING_INCDIR}/cutils/"
-EXTRA_OECONF_append =" --with-glib-headers=${STAGING_INCDIR}/glib-2.0/"
-EXTRA_OECONF_append =" --with-binder-headers=${STAGING_INCDIR}/binder/"
-EXTRA_OECONF_append =" --with-adreno-headers=${STAGING_INCDIR}/adreno/"
-EXTRA_OECONF_append =" --with-glib-lib-dir=${STAGING_LIBDIR}/glib-2.0/include"
-EXTRA_OECONF_append =" --with-gralloc-headers=${STAGING_INCDIR}/libgralloc/"
-EXTRA_OECONF_append =" --with-qdutils-headers=${STAGING_INCDIR}/libqdutils/"
-EXTRA_OECONF_append =" --with-libgpustats-headers=${STAGING_INCDIR}/libgpustats/"
-EXTRA_OECONF_append =" --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
-EXTRA_OECONF_append =" --with-display-headers=${STAGING_INCDIR}/qcom/display"
+inherit autotools
 
-FILES_${PN}-dbg  = "${libdir}/.debug/*"
-FILES_${PN}      = "${libdir}/*.so ${libdir}/*.so.* ${libdir}/*.so.*.*.* ${sysconfdir}/* ${bindir}/* ${libdir}/pkgconfig/*"
-FILES_${PN}-dev  = "${libdir}/*.la ${includedir}"
+#re-use non-perf settings
+#BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
+BASEMACHINE = "msm8974"
 
-do_install_append() {
-    oe_runmake DESTDIR="${D}/" LIBVER="${LV}" install
-    mkdir -p ${STAGING_INCDIR}/mm-core
-	mkdir -p ${STAGING_INCDIR}/libstagefrighthw
+#EXTRA_OECONF_append = "--with-libhardware-headers=${WORKSPACE}/hardware/libhardware "
+#EXTRA_OECONF_append = "--with-sanitized-headers=${STAGING_KERNEL_DIR}/include/uapi "
+#EXTRA_OECONF_append = "--with-common-includes=${STAGING_KERNEL_DIR}/include "
+#EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm8655', ' --enable-target-msm7630=yes', '', d)} "
+#EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm8960', ' --enable-target-msm8960=yes', '', d)} "
+EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm8974', ' --enable-target-msm8974=yes', '', d)} "
+
+CPPFLAGS += "-I${STAGING_INCDIR} \
+             -I${STAGING_INCDIR}/glib-2.0 \
+             -I${STAGING_LIBDIR}/glib-2.0/include \
+             -I${STAGING_INCDIR}/c++ \
+             -I${STAGING_INCDIR}/c++/${TARGET_SYS}"
+CPPFLAGS += "-include stdint.h"
+
+LDFLAGS += "-lglib-2.0"
+
+FILES_${PN}-dev = "\
+    ${includedir}/* \
+    ${libdir}/*.la"
+
+FILES_${PN} = "\
+    ${libdir}/* \
+    ${bindir}/* \
+    ${datadir}/*"
+
+#Skips check for .so symlinks
+INSANE_SKIP_${PN} = "dev-so"
+
+do_install() {
+	oe_runmake DESTDIR="${D}/" LIBVER="${LV}" install
+	mkdir -p ${STAGING_INCDIR}/mm-core
 	install -m 0644 ${S}/mm-core/inc/*.h ${STAGING_INCDIR}/mm-core
-    install -m 0644 ${S}/libstagefrighthw/*.h ${STAGING_INCDIR}/libstagefrighthw
 }
-
-INSANE_SKIP_${PN} += "dev-so"
-EXCLUDE_FROM_SHLIBS = "1"

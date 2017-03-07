@@ -5,12 +5,14 @@ require recipes-multimedia/gstreamer/gstreamer1.0-plugins-ugly.inc
 LIC_FILES_CHKSUM = "file://COPYING;md5=a6f89e2100d9b6cdffcea4f398e37343 \
                     file://tests/check/elements/xingmux.c;beginline=1;endline=21;md5=4c771b8af188724855cb99cadd390068 "
 
-FILESEXTRAPATHS =+ "${COREBASE}/meta/recipes-multimedia/gstreamer/files:"
-FILESPATH =+ "${WORKSPACE}:"
-SRC_URI = "file://gstreamer/gst-plugins-ugly"
-SRC_URI += "git://anongit.freedesktop.org/gstreamer/common;destsuffix=gstreamer/gst-plugins-ugly/common;branch=master;name=common"
+FILESPATH =+ "${WORKSPACE}/gstreamer:"
+SRC_URI = "file://gst-plugins-ugly"
+SRC_URI += "git://anongit.freedesktop.org/gstreamer/common;destsuffix=gst-plugins-ugly/common;branch=master;name=common"
+SRC_URI_remove = " \
+    file://0001-introspection.m4-prefix-pkgconfig-paths-with-PKG_CON.patch \
+"
 SRCREV_common = "6f2d2093e84cc0eb99b634fa281822ebb9507285"
-S = "${WORKDIR}/gstreamer/gst-plugins-ugly"
+S = "${WORKDIR}/gst-plugins-ugly"
 
 DEPENDS += "opencore-amr"
 
