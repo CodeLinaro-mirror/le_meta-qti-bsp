@@ -19,18 +19,11 @@ CFLAGS += "-idirafter ${STAGING_KERNEL_DIR}/include/"
 #
 DEPENDS += "sdm scalar sdm-noship"
 
-EXTRA_OECMAKE += "-DSDM_PUBLIC_HEADER_INC:STRING=${STAGING_INCDIR}/sdm/include"
-EXTRA_OECMAKE += "-DSDM_PROPRIETARY_HEADER_INC:STRING=${WORKSPACE}/display-noship/sdm"
-EXTRA_OECMAKE += "-DSCALAR_HEADER_INC:STRING=${WORKSPACE}/display-noship/scalar"
-EXTRA_OECMAKE += "-DSYSROOTINC_PATH:STRING=${STAGING_INCDIR}"
-EXTRA_OECMAKE += "-DCMAKE_CURRENT_SOURCE_DIR:STRING=${S}/sdm_plugin"
-EXTRA_OECMAKE += "-DSYSROOT_LIBDIR:STRING=${D}"
-
 do_compile_prepend () {
     if [ -d "${S}/sdm_plugin" ]; then
         # Use cmake compile sdm strategy plugin
         cd ${S}/sdm_plugin
-        cmake -DCMAKE_INSTALL_LIBDIR=${STAGING_LIBDIR} -DCMAKE_CURRENT_SOURCE_DIR=${S}/sdm_plugin -DSYSROOT_LIBDIR=${STAGING_INCDIR} -DSYSROOTINC_PATH=${STAGING_INCDIR} -DSCALAR_HEADER_INC=${WORKSPACE}/display-noship/scalar -DSDM_PROPRIETARY_HEADER_INC=${WORKSPACE}/display-noship/sdm -DSDM_PUBLIC_HEADER_INC=${STAGING_INCDIR}/sdm/include .
+        cmake -DCMAKE_INSTALL_LIBDIR=${STAGING_LIBDIR} -DCMAKE_CURRENT_SOURCE_DIR=${S}/sdm_plugin -DSYSROOT_LIBDIR=${STAGING_LIBDIR} -DSYSROOTINC_PATH=${STAGING_INCDIR} -DSCALAR_HEADER_INC=${WORKSPACE}/display-noship/scalar -DSDM_HEADER_INC=${WORKSPACE}/display-noship/sdm -DSDM_PUBLIC_HEADER_INC=${STAGING_INCDIR}/sdm/include .
         make
 
         # Install SDM strategy plugin header file for compiling
