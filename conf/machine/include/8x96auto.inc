@@ -59,3 +59,7 @@ PREFERRED_VERSION_gstreamer1.0-plugins-good ?= "1.8.%"
 PREFERRED_VERSION_gstreamer1.0-plugins-ugly ?= "1.8.%"
 PREFERRED_VERSION_gstreamer1.0-libav        ?= "1.8.%"
 PREFERRED_VERSION_gstreamer1.0-omx          ?= "1.2.%"
+
+# Smack
+OVERRIDES .= ":smack"
+DISTRO_FEATURES_append = " smack"
