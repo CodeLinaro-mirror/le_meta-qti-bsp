@@ -7,6 +7,15 @@ ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 
 PR = "r0"
 
+def get_product_extras(d):
+        if d.getVar('MACHINE', True) == 'apq8096':
+                if d.getVar('PRODUCT', True) == 'drone':
+                        return " --with-drone-target=true"
+                else:
+                        return ""
+        else:
+                return ""
+
 DEPENDS = "liblog"
 DEPENDS += "libcutils"
 DEPENDS += "native-frameworks"
@@ -34,6 +43,7 @@ EXTRA_OECONF += " --with-gralloc-library=${WORKSPACE}/display/display-hal"
 EXTRA_OECONF += " --with-mm-core=${WORKSPACE}/hardware/qcom/media/mm-core/inc"
 EXTRA_OECONF += " --with-camerahal=${WORKSPACE}/camera/lib/QCamera2/HAL3"
 EXTRA_OECONF += " --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
+EXTRA_OECONF += "${@get_product_extras(d)}"
 EXTRA_OECONF += " --with-camcommon=${WORKSPACE}/camera/lib/QCamera2/stack/common"
 EXTRA_OECONF += " --with-camifaceinc=${WORKSPACE}/camera/lib/QCamera2/stack/mm-camera-interface/inc"
 EXTRA_OECONF += " --with-exif=${WORKSPACE}/camera/lib/mm-image-codec/qexif"
