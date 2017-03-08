@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (c) 2013, The Linux Foundation. All rights reserved.
+# Copyright (c) 2013, 2017, The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -29,16 +29,70 @@
 # find_partitions        init.d script to dynamically find partitions
 #
 
+FindAndMountUBI () {
+   partition=$1
+   dir=$2
+
+   mtd_block_number=`cat $mtd_file | grep -i $partition | sed 's/^mtd//' | awk -F ':' '{print $1}'`
+   echo "MTD : Detected block device : $dir for $partition"
+   mkdir -p $dir
+   if [ $partition = "modem" ]
+   then
+       device=/dev/ubi1_0
+       ubiattach -m $mtd_block_number -d 1 /dev/ubi_ctrl
+   else
+       device=/dev/ubi2_0
+       ubiattach -m $mtd_block_number -d 2 /dev/ubi_ctrl
+   fi
+
+   while [ 1 ]
+    do
+        if [ -c $device ]
+        then
+            mount -t ubifs $device $dir -o bulk_read
+            break
+        else
+            sleep 0.010
+        fi
+    done
+}
+
+FindAndMountVolumeUBI () {
+   volume_name=$1
+   dir=$2
+   if [ ! -d $dir ]
+   then
+       mkdir -p $dir
+   fi
+   mount -t ubifs ubi0:$volume_name $dir -o bulk_read
+}
+
 FindAndMountEXT4 () {
    partition=$1
    dir=$2
    mmc_block_device=/dev/block/bootdevice/by-name/$partition
-   mkdir -p $dir
+   echo "EMMC : Detected block device : $dir for $partition"
+   if [ ! -d $dir ]
+   then
+       mkdir -p $dir
+   fi
    mount -t ext4 $mmc_block_device $dir -o relatime,data=ordered,noauto_da_alloc,discard
+   echo "EMMC : Mounting of $mmc_block_device on $dir done"
 }
 
-FindAndMountEXT4 userdata /data
-FindAndMountEXT4 persist /persist
-FindAndMountEXT4 cache  /cache
+emmc_dir=/dev/block/bootdevice/by-name
+mtd_file=/proc/mtd
 
+#if [ -d $emmc_dir ]
+#then
+#        fstype="EXT4"
+#        eval FindAndMount${fstype} userdata /data
+#        eval FindAndMount${fstype} cache /cache
+#else
+fstype="UBI"
+eval FindAndMountVolume${fstype} usrfs /data
+#fi
+eval FindAndMount${fstype} persist /persist
+
+eval FindAndMount${fstype} modem /firmware
 exit 0
