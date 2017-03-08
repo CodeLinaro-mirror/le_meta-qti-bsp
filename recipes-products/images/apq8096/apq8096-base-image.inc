@@ -1,5 +1,5 @@
 # Rootfs creation.
-
+require ../../../recipes-ss-mgr/packagegroup/ss-mgr.inc
 DEPENDS_append += "lib32-lk"
 # The OE-Core minimal boot image files.
 IMAGE_FSTYPES = "ext4"
@@ -62,7 +62,6 @@ IMAGE_INSTALL += "glib-2.0"
 #IMAGE_INSTALL += "initscripts-msm"
 #IMAGE_INSTALL += "init-audio"
 IMAGE_INSTALL += "iproute2"
-IMAGE_INSTALL += "init-mss"
 IMAGE_INSTALL += "iptables"
 #IMAGE_INSTALL += "iw"
 #IMAGE_INSTALL += "jquery"
@@ -92,7 +91,6 @@ IMAGE_INSTALL += "iptables"
 #IMAGE_INSTALL += "perl"
 IMAGE_INSTALL += "qcacld-ll"
 #IMAGE_INSTALL += "qrngd"
-IMAGE_INSTALL += "reboot-daemon"
 #IMAGE_INSTALL += "rtsp-alg"
 IMAGE_INSTALL += "start-scripts-find-partitions"
 IMAGE_INSTALL += "start-scripts-firmware-links"
@@ -128,8 +126,8 @@ IMAGE_INSTALL += "lib32-gtest"
 IMAGE_INSTALL += "lib32-qmmf-sdk"
 
 # Below is to generate sparse ext4 system image (OE by default supports raw ext4 images)
-
+SELINUX_FILE_CONTEXTS = "${IMAGE_ROOTFS}/etc/selinux/mls/contexts/files/file_contexts"
 do_makesystem() {
 
-    make_ext4fs -s -l ${SYSTEM_SIZE_EXT4} ${DEPLOY_DIR_IMAGE}/${MACHINE}-sysfs.ext4 ${IMAGE_ROOTFS}
+    make_ext4fs -s -a / -S ${SELINUX_FILE_CONTEXTS} -l ${SYSTEM_SIZE_EXT4} ${DEPLOY_DIR_IMAGE}/${MACHINE}-sysfs.ext4 ${IMAGE_ROOTFS}
 }

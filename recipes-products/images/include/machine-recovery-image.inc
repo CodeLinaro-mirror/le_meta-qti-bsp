@@ -1,14 +1,13 @@
 # The mkbootimg production process.
-require ../include/mdm-recovery-bootimg.inc
+require machine-recovery-bootimg.inc
 
 DEPENDS += "bzip2 fsconfig-native applypatch-native bsdiff-native"
 
-# Image output types
-IMAGE_FSTYPES += "ubi"
+IMAGE_FSTYPES += "${@base_contains('DISTRO', 'mdm', 'ubi', '', d)}"
 
-MKUBIFS_ARGS = "-m 4096 -e 253952 -c 83 -F"
+MKUBIFS_ARGS = "${@base_contains('DISTRO', 'mdm', '-m 4096 -e 253952 -c 83 -F', '', d)}"
 
-UBI_VOLNAME = "rootfs"
+UBI_VOLNAME = "${@base_contains('DISTRO', 'mdm', 'rootfs', '', d)}"
 
 # The OE-Core minimal boot image files.
 IMAGE_INSTALL += "packagegroup-core-boot"
@@ -19,6 +18,7 @@ IMAGE_INSTALL += "${CORE_IMAGE_EXTRA_INSTALL}"
 IMAGE_INSTALL += "base-files"
 IMAGE_INSTALL += "base-passwd"
 IMAGE_INSTALL += "system-core-adbd"
+IMAGE_INSTALL += "system-core-logd"
 IMAGE_INSTALL += "system-core-usb"
 IMAGE_INSTALL += "recovery"
 IMAGE_INSTALL += "powerapp"
@@ -34,3 +34,14 @@ IMAGE_INSTALL += "libcomerr"
 IMAGE_INSTALL += "libss"
 IMAGE_INSTALL += "libe2p"
 IMAGE_INSTALL += "libext2fs"
+
+# Below is to generate sparse ext4 recovery image (OE by default supports raw ext4 images)
+do_makesystem() {
+if [ "${MACHINE}" != "mdm9607" ]; then
+	make_ext4fs -s -l ${SYSTEM_SIZE_EXT4} ${DEPLOY_DIR_IMAGE}/${MACHINE}-recovery.ext4 ${IMAGE_ROOTFS}
+fi
+#rename machine-recovery-image.ubi if exists
+if [ -f "${DEPLOY_DIR_IMAGE}/machine-recovery-image-${MACHINE}.ubi" ]; then
+mv ${DEPLOY_DIR_IMAGE}/machine-recovery-image-${MACHINE}.ubi ${DEPLOY_DIR_IMAGE}/${MACHINE}-recovery.ubi
+fi
+}
