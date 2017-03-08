@@ -12,10 +12,8 @@ IMAGE_INSTALL += "gstreamer1.0-mprtp"
 IMAGE_INSTALL += "sofia-sip"
 IMAGE_INSTALL += "iproute2"
 
-IMAGE_INSTALL += "iproute2"
-
 IMAGE_INSTALL += "multimodule-mgr-oss"
-
+IMAGE_INSTALL += "strongswan"
 
 IMAGE_ROOTFS_SIZE = "2097152"
 
