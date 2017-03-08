@@ -31,13 +31,19 @@
 inherit kernel
 require recipes-kernel/linux/linux-yocto.inc
 require recipes-kernel/linux/linux-msm.inc
-require ${MACHINE}-image.inc
 
 DEPENDS += "mkbootimg-native"
 COMPATIBLE_MACHINE = "(8x96autogvmquin|8x96autogvmred)"
 
 LINUX_VERSION ?= "3.18"
 LINUX_VERSION_EXTENSION ?= "8996"
+
+SRC_URI_8x96autogvmquin += " \
+    file://gvm-delta-quin.cfg \
+"
+SRC_URI_8x96autogvmred += " \
+    file://gvm-delta-red.cfg \
+"
 
 PV = "${LINUX_VERSION}"
 PR = "r2"
