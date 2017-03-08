@@ -59,5 +59,18 @@ IMAGE_INSTALL += "node-startup-controller"
 IMAGE_INSTALL += "usbutils"
 IMAGE_INSTALL += "sysstat"
 
-#smack
+# smack support
 IMAGE_INSTALL_append_smack = " smack-userspace"
+
+# AFM and Security
+IMAGE_INSTALL += "af-main"
+IMAGE_INSTALL += "af-binder"
+IMAGE_INSTALL += "af-binder-binding-afb-dbus-binding"
+IMAGE_INSTALL += "af-binder-binding-authlogin"
+IMAGE_INSTALL += "libafbwsc"
+IMAGE_INSTALL += "web-runtime"
+IMAGE_INSTALL += "xmlsec1"
+IMAGE_INSTALL += "cynara"
+IMAGE_INSTALL += "security-manager"
+IMAGE_INSTALL += "security-manager-policy"
+IMAGE_INSTALL += "agl-users"
