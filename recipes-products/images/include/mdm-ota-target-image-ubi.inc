@@ -1,4 +1,4 @@
-DEPENDS += "machine-image"
+DEPENDS += "${@base_contains('PRODUCT','base','machine-image','machine-${PRODUCT}-image',d)}"
 
 OTA_TARGET_BASENAME_UBI     = "${MACHINE}-ota-target-image-ubi"
 OTA_TARGET_IMAGE_ROOTFS_UBI = "${IMAGE_ROOTFS}/../${OTA_TARGET_BASENAME_UBI}"
