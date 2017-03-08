@@ -3,6 +3,8 @@
 #modules needs to added in specific machine related
 #{MACHINE}-image.inc file
 
+inherit qperf
+
 require ${MACHINE}/${MACHINE}-image.inc
 require common-auto-image.inc
 include machine-auto-image.bb

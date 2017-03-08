@@ -15,7 +15,7 @@ DEPENDS = "virtual/kernel"
 
 S = "${WORKDIR}/wlan/qcacld-2.0"
 
-inherit module kernel-arch
+inherit module kernel-arch qperf
 inherit module update-rc.d
 INITSCRIPT_NAME = "wifi_on.sh"
 

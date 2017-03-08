@@ -19,7 +19,7 @@ S =  "${WORKDIR}/ethernet"
 
 INHIBIT_PACKAGE_STRIP = "1"
 
-inherit module 
+inherit module systemd qperf
 
 SYSTEMD_SERVICE_${PN} = "neutrino-eth.service"
 SYSTEMD_AUTO_ENABLE_${PN} = "enable"
