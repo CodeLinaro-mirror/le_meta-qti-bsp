@@ -1,0 +1,31 @@
+From 2ae6e9a6745759e24ddadb44fef62ce5f4fbd7ce Mon Sep 17 00:00:00 2001
+From: Bharathraj Nagaraju <snbraj@codeaurora.org>
+Date: Sat, 21 Jan 2017 19:26:01 -0800
+Subject: [PATCH] Removed checks for static flag
+
+Signed-off-by: Bharathraj Nagaraju <snbraj@codeaurora.org>
+---
+ m4/libtool.m4 | 7 -------
+ 1 file changed, 7 deletions(-)
+
+diff --git a/m4/libtool.m4 b/m4/libtool.m4
+index 36a43e2..27c45f9 100644
+--- a/m4/libtool.m4
++++ b/m4/libtool.m4
+@@ -4886,13 +4886,6 @@ _LT_TAGDECL([wl], [lt_prog_compiler_wl], [1],
+ # Check to make sure the static flag actually works.
+ #
+ wl=$_LT_TAGVAR(lt_prog_compiler_wl, $1) eval lt_tmp_static_flag=\"$_LT_TAGVAR(lt_prog_compiler_static, $1)\"
+-_LT_LINKER_OPTION([if $compiler static flag $lt_tmp_static_flag works],
+-  _LT_TAGVAR(lt_cv_prog_compiler_static_works, $1),
+-  $lt_tmp_static_flag,
+-  [],
+-  [_LT_TAGVAR(lt_prog_compiler_static, $1)=])
+-_LT_TAGDECL([link_static_flag], [lt_prog_compiler_static], [1],
+-	[Compiler flag to prevent dynamic linking])
+ ])# _LT_COMPILER_PIC
+ 
+ 
+-- 
+2.9.0.137.gcf4c2cf
+
