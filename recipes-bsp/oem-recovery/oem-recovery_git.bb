@@ -2,13 +2,14 @@ inherit autotools-brokensep pkgconfig update-rc.d
 PR = "r1"
 
 DESCRIPTION = "OEM Recovery"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
-${LICENSE};md5=3775480a712fc46a69647678acb234cb"
+${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
 HOMEPAGE = "https://www.codeaurora.org/gitweb/quic/la?p=device/qcom/common.git"
 
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI = "file://android_compat/device/qcom/common/recovery/oem-recovery/"
+SRC_URI += "file://0001-common-oem-recovery-Add-partition-label-path.patch"
 
 S = "${WORKDIR}/android_compat/device/qcom/common/recovery/oem-recovery/"
 
