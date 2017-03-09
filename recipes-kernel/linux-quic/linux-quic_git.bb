@@ -51,10 +51,16 @@ GITVER    =  "${@base_get_metadata_git_revision('${SRC_DIR}',d)}"
 PV = "git"
 PR = "r5"
 
-DEPENDS += "dtbtool-native mkbootimg-native"
+DEPENDS += "dtbtool-native mkbootimg-native packkernelimg"
 DEPENDS_apq8096 += "mkbootimg-native dtc-native"
 PACKAGES = "kernel kernel-base kernel-vmlinux kernel-dev kernel-modules"
 RDEPENDS_kernel-base = ""
+
+KERNEL_DTB_LIST = "${@d.getVar('KERNEL_DEVICETREE', True).replace('qcom/', '')}"
+
+do_compile_prepend() {
+	mkdir -p "${B}/arch/${ARCH}/boot/dts/qcom"
+}
 
 # Put the zImage in the kernel-dev pkg
 FILES_kernel-dev += "/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}"
@@ -201,6 +207,9 @@ do_deploy () {
     fi
 
     mkdir -p ${DEPLOY_DIR_IMAGE}
+    if [ ${KERNEL_IMAGETYPE} == "Image" ]; then
+	packkernelimg --kernel "${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}" --dt "${B}/arch/${ARCH}/boot/dts/qcom" --dt_list "${KERNEL_DTB_LIST}"
+    fi
 
     # Make bootimage
     ${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} \
@@ -210,6 +219,7 @@ do_deploy () {
         --base ${KERNEL_BASE} \
         --ramdisk_offset 0x0 \
         ${extra_mkbootimg_params} --output ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img
+   cp ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} "${DEPLOY_DIR_IMAGE}/"
 }
 
 # Including the file depends on chipset
