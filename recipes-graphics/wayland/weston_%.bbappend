@@ -6,7 +6,20 @@ REPO_SRC_URI = "file://${@d.getVar('SRC_DIR',True).replace('${WORKSPACE}/display
 S = "${WORKDIR}/weston"
 
 FILESEXTRAPATHS_append := ":${THISDIR}/${PN}"
-RDEPENDS_${PN} = "gbm"
+
+DEPENDS = "gbm"
+DEPENDS += "libdrm"
+DEPENDS += "udev"
+DEPENDS += "libinput"
+DEPENDS += "libxkbcommon"
+DEPENDS += "cairo"
+DEPENDS += "pixman"
+DEPENDS += "libpng"
+DEPENDS += "jpeg"
+DEPENDS += "wayland"
+DEPENDS += "adreno"
+DEPENDS += "pango"
+
 EXTRA_OECONF_append = "\
 	--enable-drm-compositor \
 	"
