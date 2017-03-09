@@ -7,18 +7,7 @@ S = "${WORKDIR}/weston"
 
 FILESEXTRAPATHS_append := ":${THISDIR}/${PN}"
 
-DEPENDS = "gbm"
-DEPENDS += "libdrm"
-DEPENDS += "udev"
-DEPENDS += "libinput"
-DEPENDS += "libxkbcommon"
-DEPENDS += "cairo"
-DEPENDS += "pixman"
-DEPENDS += "libpng"
-DEPENDS += "jpeg"
-DEPENDS += "wayland"
-DEPENDS += "adreno"
-DEPENDS += "pango"
+DEPENDS += "gbm"
 
 EXTRA_OECONF_append = "\
 	--enable-drm-compositor \
