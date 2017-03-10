@@ -49,7 +49,7 @@ SRC_DIR   =  "${WORKSPACE}/kernel/msm-4.4"
 S         =  "${WORKDIR}/kernel/msm-4.4"
 GITVER    =  "${@base_get_metadata_git_revision('${SRC_DIR}',d)}"
 PV = "git"
-PR = "r5-${GITVER}"
+PR = "r5"
 
 DEPENDS += "dtbtool-native mkbootimg-native"
 DEPENDS += "mkbootimg-native dtc-native"
