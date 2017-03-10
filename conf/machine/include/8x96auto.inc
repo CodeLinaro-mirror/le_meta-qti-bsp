@@ -41,6 +41,9 @@ DEFAULTTUNE_virtclass-multilib-lib32 = "armv7a"
 
 EXTRA_IMAGE_FEATURES = "debug-tweaks"
 
+#Krogoth default GCC version
+GCCVERSION = "5.3.0"
+
 PREFERRED_VERSION_weston = "1.9.0"
 PREFERRED_VERSION_wayland = "1.9.0"
 PREFERRED_VERSION_wayland-native = "1.9.0"
