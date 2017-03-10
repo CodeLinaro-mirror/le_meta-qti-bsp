@@ -1,6 +1,6 @@
 DEFAULT_PREFERENCE = "-1"
 
-require recipes-multimedia/gstreamer/gstreamer1.0-omx.inc
+require ${COREBASE}/meta/recipes-multimedia/gstreamer/gstreamer1.0-omx.inc
 
 DEPENDS_${PN} += "media"
 RDEPENDS_${PN} = "media"
