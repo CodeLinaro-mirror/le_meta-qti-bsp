@@ -25,6 +25,9 @@ mkdir -p ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/OTA
 mkdir -p ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY
 mkdir -p ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/SYSTEM
 mkdir -p ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RADIO
+#Create this folder just for saving file_contexts(SElinux security context file),
+#It will be used to generate OTA packages when selinux_fc is set.
+mkdir -p ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/BOOT/RAMDISK
 
 echo "base image rootfs: ${BASE_IMAGE_ROOTFS_EXT4}"
 
@@ -59,6 +62,15 @@ mkdir -p ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/OTA/bin
 cp   ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/usr/bin/applypatch ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/OTA/bin/.
 
 cp   ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/usr/bin/updater ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/OTA/bin/.
+
+#cp and modify file_contexts to BOOT/RAMDISK and recoveryfs
+if [[ "${DISTRO_FEATURES}" =~ "selinux" ]]; then
+    cp ${BASE_IMAGE_ROOTFS_EXT4}/etc/selinux/mls/contexts/files/file_contexts ${IMAGE_ROOTFS}/.
+    sed -i 's#^/#/system/#g' ${IMAGE_ROOTFS}/file_contexts
+    cp ${IMAGE_ROOTFS}/file_contexts ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/BOOT/RAMDISK/.
+    #set selinux_fc
+    echo selinux_fc=BOOT/RAMDISK/file_contexts >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
+fi
 
 # copy contents of META folder
 #recovery_api_version is from recovery module
