@@ -97,8 +97,9 @@ do_shared_workdir () {
         cp -fR usr $kerneldir/
 
         # Signing keys may not be present
-        [ -f signing_key.priv ] && cp signing_key.priv $kerneldir/
-        [ -f signing_key.x509 ] && cp signing_key.x509 $kerneldir/
+        mkdir -p $kerneldir/certs
+        cp certs/signing_key.pem $kerneldir/certs/signing_key.pem
+        cp certs/signing_key.x509 $kerneldir/certs/signing_key.x509
 
         # include/config
         mkdir -p $kerneldir/include/config
