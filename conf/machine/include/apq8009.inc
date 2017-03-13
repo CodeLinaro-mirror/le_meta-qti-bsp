@@ -24,7 +24,18 @@ DISTRO_FEATURES += "persist-image"
 
 MACHINE_FEATURES += "kernel26 keyboard"
 
-PAGE_SIZE ?= '4096'
+PAGE_SIZE ?= '2048'
+
+#UBINIZE Args
+UBINIZE_ARGS ?= "-m 2048 -p 128KiB"
+#MKUBIFS Args
+MKUBIFS_ARGS ?= "-m 2048 -e 126976 -c 4096 -F"
+#PERSIST UBI Args
+MKUBIFS_PERSIST_ARGS ?= "-m 2048 -e 126976 -c 4096 -j 2MiB -F -v"
+
+#Volume sizes
+SYSTEM_VOLUME_SIZE ?= "130MiB"
+CACHE_VOLUME_SIZE ?= "70MiB"
 
 # Max supported inodes
 EXTRA_IMAGECMD ?= "-N 2048"
