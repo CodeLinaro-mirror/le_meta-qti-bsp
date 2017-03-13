@@ -8,8 +8,12 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
                     file://gst-libs/ext/libav/COPYING.LGPLv2.1;md5=bd7a443320af8c812e4c18d1b79df004 \
                     file://gst-libs/ext/libav/COPYING.LGPLv3;md5=e6a600fd5e1d9cbde2d983680233ad02"
 
+SRC_URI = " \
+    http://gstreamer.freedesktop.org/src/gst-libav/gst-libav-${PV}.tar.xz \
+    "
 SRC_URI[md5sum] = "b51a736147bacb40f85827a4e0ae0d2c"
 SRC_URI[sha256sum] = "9006a05990089f7155ee0e848042f6bb24e52ab1d0a59ff8d1b5d7e33001a495"
+S = "${WORKDIR}/gst-libav-${PV}"
 
 EXTRA_OECONF += "--without-system-libav"
 LIBAV_EXTRA_CONFIGURE_COMMON_ARG += "--disable-everything \
