@@ -10,8 +10,7 @@ SRC_URI = "file://Open-AVB"
 PR = "r0"
 PV = "0.1"
 
-#DEPENDS += "alsa-lib alsa-intf libpcap pciutils cmake-native"
-DEPENDS += "alsa-lib libpcap pciutils cmake-native glib-2.0 gstreamer1.0"
+DEPENDS += "alsa-lib libpcap pciutils cmake-native glib-2.0 gstreamer1.0 gstreamer1.0-plugins-base"
 
 S = "${WORKDIR}/Open-AVB"
 
