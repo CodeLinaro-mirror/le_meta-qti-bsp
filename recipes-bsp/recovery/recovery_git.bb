@@ -12,7 +12,10 @@ RDEPENDS_${PN} = "zlib bzip2"
 LDFLAGS += "-Wl,--start-group"
 
 FILESPATH =+ "${WORKSPACE}:"
-SRC_URI = "file://bootable/recovery/"
+SRC_URI = "\
+	file://bootable/recovery/ \
+	file://recovery.service \
+"
 
 S = "${WORKDIR}/bootable/${PN}/"
 
@@ -30,6 +33,7 @@ FILES_${PN} += "/system"
 FILES_${PN} += "/tmp"
 FILES_${PN} += "/res"
 FILES_${PN} += "/data"
+FILES_${PN} += "/lib"
 do_install_append() {
         install -d ${D}/cache/
         install -d ${D}/tmp/
@@ -38,10 +42,14 @@ do_install_append() {
         install -d ${D}/system/
         install -m 0755 ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/base-files-recovery/fstab -D ${D}/res/recovery_volume_config
         install -m 0755 ${S}/start_recovery -D ${D}${sysconfdir}/init.d/recovery
-
+	install -d ${D}${systemd_unitdir}/system/
         if [ "${SYSTEMD_SUPPORT}" == "systemd" ]; then
               install -m  0755 ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/recovery/files/fstab -D ${D}${sysconfdir}/fstab
-              install -m 0755 ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/recovery/files/fstab -D ${D}/res/recovery_volume_config
+	      install -m 0644 ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/recovery/files/recovery.service -D ${D}${systemd_unitdir}/system/recovery.service              
+	      install -d ${D}${systemd_unitdir}/system/multi-user.target.wants/
+              # enable the service for multi-user.target
+              ln -sf ${systemd_unitdir}/system/recovery.service \
+                            ${D}${systemd_unitdir}/system/multi-user.target.wants/recovery.service	
         else
               install -m  0755 ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/base-files-recovery/fstab -D ${D}${sysconfdir}/fstab
               install -m 0755 ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/base-files-recovery/fstab -D ${D}/res/recovery_volume_config
