@@ -20,6 +20,7 @@ DEPENDS += "mm-parser"
 DEPENDS += "mm-osal"
 DEPENDS += "audiohal"
 DEPENDS += "fastcv-noship"
+DEPENDS += "vam-engines"
 
 CFLAGS += "-I${STAGING_INCDIR}"
 CFLAGS += "-I${STAGING_INCDIR}/mm-parser/include"
