@@ -24,14 +24,12 @@ DISTRO_FEATURES += "persist-image"
 
 MACHINE_FEATURES += "kernel26 keyboard"
 
-PAGE_SIZE ?= '2048'
+PAGE_SIZE ?= "${@base_contains('DISTRO_FEATURES','nand-boot','2048','4096',d)}"
 
 #UBINIZE Args
 UBINIZE_ARGS ?= "-m 2048 -p 128KiB"
 #MKUBIFS Args
-MKUBIFS_ARGS ?= "-m 2048 -e 126976 -c 4096 -F"
-#PERSIST UBI Args
-MKUBIFS_PERSIST_ARGS ?= "-m 2048 -e 126976 -c 4096 -j 2MiB -F -v"
+MKUBIFS_ARGS ?= "-m 2048 -e 126976 -c 4096 -F -v"
 
 #Volume sizes
 SYSTEM_VOLUME_SIZE ?= "130MiB"

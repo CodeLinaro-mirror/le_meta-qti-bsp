@@ -13,11 +13,7 @@ do_install_append(){
     install -m 755 -o diag -g diag -d ${D}/media
     install -m 755 -o diag -g diag -d ${D}/mnt/sdcard
     if ${@base_contains('DISTRO_FEATURES','ro-rootfs','true','false',d)}; then
-        if ${@base_contains('DISTRO_FEATURES','nand-boot','true','false',d)}; then
-            install -m 0644 ${WORKDIR}/fstab ${D}${sysconfdir}/fstab
-        else
             install -m 0644 ${WORKDIR}/ro/fstab ${D}${sysconfdir}/fstab
-        fi
     else
         install -m 0644 ${WORKDIR}/fstab ${D}${sysconfdir}/fstab
     fi

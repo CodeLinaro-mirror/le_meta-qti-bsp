@@ -80,19 +80,20 @@ FindAndMountEXT4 () {
    echo "EMMC : Mounting of $mmc_block_device on $dir done"
 }
 
-emmc_dir=/dev/block/bootdevice/by-name
 mtd_file=/proc/mtd
 
-#if [ -d $emmc_dir ]
-#then
-#        fstype="EXT4"
-#        eval FindAndMount${fstype} userdata /data
-#        eval FindAndMount${fstype} cache /cache
-#else
-fstype="UBI"
-eval FindAndMountVolume${fstype} usrfs /data
-#fi
-eval FindAndMount${fstype} persist /persist
+ubifs_cmdline_flag=`cat /proc/cmdline`
 
-eval FindAndMount${fstype} modem /firmware
+if echo "$ubifs_cmdline_flag" | grep -i "emmc=true" >/dev/null 2>&1
+then
+    eval FindAndMountEXT4 userdata /data
+    eval FindAndMountEXT4 cache /cache
+    eval FindAndMountEXT4 persist /persist
+    eval FindAndMountEXT4 modem /firmware
+else
+    eval FindAndMountVolumeUBI usrfs /data
+    eval FindAndMountUBI persist /persist
+    eval FindAndMountUBI modem /firmware
+fi
+
 exit 0
