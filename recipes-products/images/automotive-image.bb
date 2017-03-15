@@ -3,6 +3,8 @@
 #modules needs to added in specific machine related
 #{MACHINE}-image.inc file
 
+MACHINE ??= "8x96auto"
+
 inherit qperf
 
 require ${MACHINE}/${MACHINE}-image.inc
