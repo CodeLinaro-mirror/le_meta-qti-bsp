@@ -9,6 +9,8 @@ HOMEPAGE = "https://www.codeaurora.org/gitweb/quic/la?p=platform/bootable/recove
 DEPENDS = "libmincrypt-native system-core oem-recovery"
 RDEPENDS_${PN} = "zlib bzip2"
 
+LDFLAGS += "-Wl,--start-group"
+
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI = "file://bootable/recovery/"
 
@@ -34,6 +36,7 @@ do_install_append() {
         install -d ${D}/res/
         install -d ${D}/data/
         install -d ${D}/system/
+        install -m 0755 ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/base-files-recovery/fstab -D ${D}/res/recovery_volume_config
         install -m 0755 ${S}/start_recovery -D ${D}${sysconfdir}/init.d/recovery
 
         if [ "${SYSTEMD_SUPPORT}" == "systemd" ]; then

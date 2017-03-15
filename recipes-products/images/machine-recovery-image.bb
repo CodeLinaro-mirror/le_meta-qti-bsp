@@ -1,5 +1,11 @@
 # List of packages installed onto the root file system as specified by the user.
-include ${BASEMACHINE}/${BASEMACHINE}-recovery-image.inc
+inherit module
+
+DEPENDS = "virtual/kernel"
+
+include ${MACHINE}/${MACHINE}-recovery-image.inc
+IMAGE_FSTYPES = "${INITRAMFS_FSTYPES}"
+PACKAGE_INSTALL = "${IMAGE_INSTALL}"
 
 IMAGE_LINGUAS = ""
 
@@ -11,13 +17,11 @@ IMAGE_DEV_MANAGER = "busybox-static-mdev"
 IMAGE_INIT_MANAGER = "sysvinit sysvinit-pidof"
 IMAGE_INITSCRIPTS = ""
 
-include mdm-ota-target-image-ubi.inc
-include mdm-ota-target-image-ext4.inc
-
 inherit core-image
+inherit deploy
+#inherit kernel
 
-do_rootfs[nostamp] = "1"
-do_build[nostamp]  = "1"
+include ${MACHINE}/${MACHINE}-ota-target-image-ext4.inc
 
-# Call function makesystem to generate sparse ext4 image
-addtask makesystem after do_rootfs before do_build
+addtask makerecovery after do_rootfs before do_build
+addtask makeota_image after do_makerecovery before do_build
