@@ -29,9 +29,9 @@ echo "base image rootfs: ${BASE_IMAGE_ROOTFS_EXT4}"
 cp -r ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/base-files-recovery/${MACHINE}/radio/. ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RADIO/.
 
 # copy the boot\recovery images
-cp ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/BOOTABLE_IMAGES/boot.img
+cp ${DEPLOY_DIR_IMAGE}/boot.img ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/BOOTABLE_IMAGES/boot.img
 
-cp ${DEPLOY_DIR_IMAGE}/${MACHINE}-recovery.img ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/BOOTABLE_IMAGES/recovery.img
+cp ${DEPLOY_DIR_IMAGE}/recovery.img ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/BOOTABLE_IMAGES/recovery.img
 
 
 # copy the contents of system rootfs

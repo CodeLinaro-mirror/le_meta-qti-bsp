@@ -24,5 +24,5 @@ IMAGE_INSTALL += "libext2fs"
 do_makerecovery() {
         echo "Deploy image : ${DEPLOY_DIR_IMAGE}"
 	sleep 5
-	mkbootimg --kernel "${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}" --ramdisk "${DEPLOY_DIR_IMAGE}/machine-recovery-image-8x96auto.cpio.gz"  -o "${DEPLOY_DIR_IMAGE}/${MACHINE}-recovery.img" --cmdline "${RECOVERY_CMD_PARAMS}" --base "${KERNEL_BASE}"
+	mkbootimg --kernel "${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}" --ramdisk "${DEPLOY_DIR_IMAGE}/machine-recovery-image-8x96auto.cpio.gz"  -o "${DEPLOY_DIR_IMAGE}/recovery.img" --cmdline "${RECOVERY_CMD_PARAMS}" --base "${KERNEL_BASE}"
 }
