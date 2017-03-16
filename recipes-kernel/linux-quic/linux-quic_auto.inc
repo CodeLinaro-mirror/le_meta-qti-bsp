@@ -38,3 +38,8 @@ CONFIG_DEFAULT_SECURITY="smack"
 CONFIG_DEFAULT_SECURITY_SMACK=y
 KERNEL_EXTRACONFIGS
 }
+
+do_deploy_rename () {
+    mv ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img ${DEPLOY_DIR_IMAGE}/boot.img
+}
+addtask deploy_rename after do_deploy before do_packagedata
