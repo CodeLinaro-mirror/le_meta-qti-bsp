@@ -1,6 +1,8 @@
 require conf/distro/include/security_flags.inc
-
 require conf/machine/include/basemachine.inc
+
+# For new yocto UNINATIVE_CHECKSUM
+UNINATIVE_CHECKSUM[x86_64] = "26d46c61ad88cc245e31c88549717c0092a838d111b93ec169d88b08cc027581"
 
 SOC_FAMILY ?= "msm8996"
 include conf/machine/include/soc-family.inc
@@ -14,7 +16,6 @@ require conf/machine/include/arm/arch-armv8.inc
 
 SERIAL_CONSOLE ?= "115200 ttyHSL0"
 
-#DISTRO ?= "msm"
 DISTRO_FEATURES_BACKFILL_remove = "gobject-introspection-data"
 DISTRO_FEATURES_BACKFILL_CONSIDERED_remove = "gobject-introspection-data"
 DISTRO_FEATURES_append = " emmc-boot "
