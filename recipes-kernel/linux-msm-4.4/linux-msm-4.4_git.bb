@@ -202,5 +202,6 @@ do_deploy () {
         --ramdisk_offset 0x0 \
         ${extra_mkbootimg_params} --output ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img
     cp ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} "${DEPLOY_DIR_IMAGE}/"
+    cp ${B}/vmlinux "${DEPLOY_DIR_IMAGE}/"
 }
 
