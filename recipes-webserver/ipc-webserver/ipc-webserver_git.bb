@@ -28,35 +28,35 @@ do_compile() {
 }
 
 do_install() {
-  install -d ${D}/webserver
-  install -d ${D}/webserver/channel1
-  install -d ${D}/webserver/channel2
-  install -d ${D}/webserver/channel3
-  install -d ${D}/webserver/vam
-  install -d ${D}/webserver/image
-  install -d ${D}/webserver/video
+  install -d ${D}/data/ipc_webserver
+  install -d ${D}/data/ipc_webserver/channel1
+  install -d ${D}/data/ipc_webserver/channel2
+  install -d ${D}/data/ipc_webserver/channel3
+  install -d ${D}/data/ipc_webserver/vam
+  install -d ${D}/data/ipc_webserver/image
+  install -d ${D}/data/ipc_webserver/video
   install -d ${D}/${bindir}
 
   install -m 0755 ipc-webserver ${D}/${bindir}
-  install -m 0444 ${S}/res_config ${D}/webserver
-  install -m 0444 ${S}/net_config ${D}/webserver
+  install -m 0444 ${S}/res_config ${D}/data/ipc_webserver
+  install -m 0444 ${S}/net_config ${D}/data/ipc_webserver
 }
 
 sysroot_preprocess() {
-  install -d ${SYSROOT_DESTDIR}/webserver
-  install -d ${SYSROOT_DESTDIR}/webserver/channel1
-  install -d ${SYSROOT_DESTDIR}/webserver/channel2
-  install -d ${SYSROOT_DESTDIR}/webserver/channel3
-  install -d ${SYSROOT_DESTDIR}/webserver/vam
-  install -d ${SYSROOT_DESTDIR}/webserver/image
-  install -d ${SYSROOT_DESTDIR}/webserver/video
+  install -d ${SYSROOT_DESTDIR}/data/ipc_webserver
+  install -d ${SYSROOT_DESTDIR}/data/ipc_webserver/channel1
+  install -d ${SYSROOT_DESTDIR}/data/ipc_webserver/channel2
+  install -d ${SYSROOT_DESTDIR}/data/ipc_webserver/channel3
+  install -d ${SYSROOT_DESTDIR}/data/ipc_webserver/vam
+  install -d ${SYSROOT_DESTDIR}/data/ipc_webserver/image
+  install -d ${SYSROOT_DESTDIR}/data/ipc_webserver/video
   install -d ${SYSROOT_DESTDIR}/${bindir}
 
   install -m 0755 ${S}/ipc-webserver ${SYSROOT_DESTDIR}/${bindir}
-  install -m 0444 ${S}/res_config ${SYSROOT_DESTDIR}/webserver
-  install -m 0444 ${S}/net_config ${SYSROOT_DESTDIR}/webserver
+  install -m 0444 ${S}/res_config ${SYSROOT_DESTDIR}/data/ipc_webserver
+  install -m 0444 ${S}/net_config ${SYSROOT_DESTDIR}/data/ipc_webserver
 }
 
 SYSROOT_PREPROCESS_FUNCS += "sysroot_preprocess"
 
-FILES_${PN} += "/webserver/*"
+FILES_${PN} += "/data/ipc_webserver/*"
