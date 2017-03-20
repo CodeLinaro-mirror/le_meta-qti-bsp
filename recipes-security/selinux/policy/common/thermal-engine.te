@@ -66,3 +66,4 @@ manage_sock_files_pattern(thermal-engine_t, device_t, device_t)
 dev_rw_null(thermal-engine_t)
 read_proc_enrty(thermal-engine_t)
 allow thermal-engine_t sysfs_t:file write;
+open_proc_enrty(thermal-engine_t)
