@@ -18,3 +18,6 @@ FILES_${PN} += "${libdir}/*.so"
 PACKAGES = "${PN} ${PN}-dev ${PN}-dbg ${PN}-staticdev ${PN}-doc ${PN}-locale"
 INSANE_SKIP_${PN} += " dev-so"
 
+do_install_append() {
+    install -m 644 ${WORKDIR}/multimodule-mgr-oss/mdmmgr_client/src/mdmmgr_client.conf -D ${D}${sysconfdir}/dbus-1/system.d/mdmmgr_client.conf
+}
