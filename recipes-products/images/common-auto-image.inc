@@ -36,6 +36,7 @@ IMAGE_INSTALL += "vlan"
 IMAGE_INSTALL += "bridge-utils"
 IMAGE_INSTALL += "cryptsetup"
 IMAGE_INSTALL += "lvm2"
+IMAGE_INSTALL += "wqy-microhei"
 
 #RESIZE
 IMAGE_INSTALL += "resize-service"
