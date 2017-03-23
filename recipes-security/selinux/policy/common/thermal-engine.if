@@ -103,3 +103,23 @@ interface(`open_proc_enrty',`
     allow $1 proc_t:dir search;
     allow $1 proc_t:file open;
 ')
+
+########################################
+## <summary>
+##      getattr proc file system and search it
+## </summary>
+## <param name="domain">
+##      <summary>
+##      Domain allowed access.
+##      </summary>
+## </param>
+#
+interface(`getattr_proc_entry',`
+    gen_require(`
+        type proc_t, thermal_etc_t;
+    ')
+
+    allow $1 proc_t:dir search;
+    allow $1 proc_t:file getattr;
+')
+
