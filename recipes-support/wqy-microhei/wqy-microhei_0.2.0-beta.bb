@@ -12,8 +12,8 @@ SRC_URI[sha256sum] = "2802ac8023aa36a66ea6e7445854e3a078d377ffff42169341bd237871
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 do_install() {
-        mkdir -p ${D}/${libdir}/fonts
-        install -m 0644 ${WORKDIR}/wqy-microhei/wqy-microhei.ttc ${D}/${libdir}/fonts/
+        mkdir -p ${D}/${datadir}/fonts
+        install -m 0644 ${WORKDIR}/wqy-microhei/wqy-microhei.ttc ${D}/${datadir}/fonts/
 }
 
-FILES_${PN} = "${libdir}/fonts/wqy-microhei.ttc"
+FILES_${PN} = "${datadir}/fonts/wqy-microhei.ttc"
