@@ -71,6 +71,7 @@ IMAGE_INSTALL += "persistence-administrator"
 IMAGE_INSTALL += "node-state-manager"
 IMAGE_INSTALL += "node-health-monitor"
 IMAGE_INSTALL += "node-startup-controller"
+IMAGE_INSTALL += "node-startup-controller-nsm-dummy"
 
 IMAGE_INSTALL += "usbutils"
 IMAGE_INSTALL += "sysstat"
