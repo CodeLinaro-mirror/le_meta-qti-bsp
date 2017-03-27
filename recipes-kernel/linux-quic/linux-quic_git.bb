@@ -224,7 +224,6 @@ do_deploy () {
 }
 
 # Including the file depends on chipset
-INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96auto', 'linux-quic_auto', 'none',d)}"
+INCSUFFIX = "${@base_conditional('MACHINEGROUP', 'auto', 'linux-quic_auto', 'none',d)}"
 include ${INCSUFFIX}.inc
-INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autofusion', 'linux-quic_auto', 'none',d)}"
-include ${INCSUFFIX}.inc
+

@@ -67,13 +67,6 @@ addtask deploy before do_build after do_install
 PACKAGE_STRIP = "no"
 
 # Including the file depends on chipset
-INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96auto', 'lk_auto', 'none',d)}"
+INCSUFFIX = "${@base_conditional('MACHINEGROUP', 'auto', 'lk_auto', 'none',d)}"
 include ${INCSUFFIX}.inc
-INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autofusion', 'lk_auto', 'none',d)}"
-include ${INCSUFFIX}.inc
-INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96auto44', 'lk_auto', 'none',d)}"
-include ${INCSUFFIX}.inc
-INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmquin', 'lk_auto', 'none',d)}"
-include ${INCSUFFIX}.inc
-INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmred', 'lk_auto', 'none',d)}"
-include ${INCSUFFIX}.inc
+

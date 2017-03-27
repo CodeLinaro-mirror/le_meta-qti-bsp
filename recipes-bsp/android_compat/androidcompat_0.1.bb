@@ -22,13 +22,6 @@ CFLAGS += "-I${STAGING_INCDIR}/cutils"
 LDFLAGS += "-lcutils"
 
 # Including the file depends on chipset
-INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96auto', 'androidcompat_auto', 'none',d)}"
+INCSUFFIX = "${@base_conditional('MACHINEGROUP', 'auto', 'androidcompat_auto', 'none',d)}"
 include ${INCSUFFIX}.inc
-INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autofusion', 'androidcompat_auto', 'none',d)}"
-include ${INCSUFFIX}.inc
-INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96auto44', 'androidcompat_auto', 'none',d)}"
-include ${INCSUFFIX}.inc
-INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmquin', 'androidcompat_auto', 'none',d)}"
-include ${INCSUFFIX}.inc
-INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmred', 'androidcompat_auto', 'none',d)}"
-include ${INCSUFFIX}.inc
+

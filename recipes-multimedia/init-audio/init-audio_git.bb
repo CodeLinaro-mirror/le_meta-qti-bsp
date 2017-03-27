@@ -44,18 +44,7 @@ do_install_msm8610() {
     install -m 0755 ${S}/${BASEMACHINE}/init_qcom_audio -D ${D}${sysconfdir}/init.d/init_qcom_audio
 }
 
-INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96auto', 'init-audio_auto', 'none',d)}"
-include ${INCSUFFIX}.inc
-INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autofusion', 'init-audio_auto', 'none',d)}"
-include ${INCSUFFIX}.inc
-INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96auto44', 'init-audio_auto', 'none',d)}"
-include ${INCSUFFIX}.inc
-INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmquin', 'init-audio_auto', 'none',d)}"
-include ${INCSUFFIX}.inc
-INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmred', 'init-audio_auto', 'none',d)}"
-include ${INCSUFFIX}.inc
-INCSUFFIX = "${@base_conditional('BASEMACHINE', 'msm8996', 'init-audio_auto', 'none',d)}"
-include ${INCSUFFIX}.inc
-INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96mctm', 'init-audio_auto', 'none',d)}"
+
+INCSUFFIX = "${@base_conditional('MACHINEGROUP', 'auto', 'init-audio_auto', 'none',d)}"
 include ${INCSUFFIX}.inc
 

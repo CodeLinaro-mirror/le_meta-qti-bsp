@@ -13,13 +13,6 @@ SRC_URI[sha256sum] = "16f027af432a05085813a2f859b7d42dafd29b8c035ead830d37565b73
 EXTRA_OEMAKE_append = " CCOPTS='${CFLAGS}'"
 
 # Including the file depends on chipset
-INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96auto', 'iproute2_auto', 'none',d)}"
+INCSUFFIX = "${@base_conditional('MACHINEGROUP', 'auto', 'iproute2_auto', 'none',d)}"
 include ${INCSUFFIX}.inc
-INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autofusion', 'iproute2_auto', 'none',d)}"
-include ${INCSUFFIX}.inc
-INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96auto44', 'iproute2_auto', 'none',d)}"
-include ${INCSUFFIX}.inc
-INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmquin', 'iproute2_auto', 'none',d)}"
-include ${INCSUFFIX}.inc
-INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmred', 'iproute2_auto', 'none',d)}"
-include ${INCSUFFIX}.inc
+

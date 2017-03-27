@@ -9,6 +9,7 @@ include conf/machine/include/soc-family.inc
 
 # Use non-perf settings for the perf build.
 BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
+MACHINEGROUP = "auto"
 
 TMPDIR = "${TOPDIR}/tmp-glibc"
 
@@ -19,7 +20,7 @@ SERIAL_CONSOLE ?= "115200 ttyHSL0"
 DISTRO_FEATURES_BACKFILL_remove = "gobject-introspection-data"
 DISTRO_FEATURES_BACKFILL_CONSIDERED_remove = "gobject-introspection-data"
 DISTRO_FEATURES_append = " emmc-boot "
-DISTRO_FEATURES_append += "persist-image"
+DISTRO_FEATURES_append = " persist-image "
 
 PAGE_SIZE ?= '4096'
 
@@ -30,6 +31,13 @@ PAGE_SIZE ?= '4096'
 #SYSTEM_SIZE_EXT4 ?= "3000000000"
 USERDATA_SIZE_EXT4 ?= "5000000000"
 CACHE_SIZE_EXT4 ?= "65536000"
+
+KERNEL_DEFCONFIG = "msm-auto_defconfig"
+KERNEL_PERF_DEFCONFIG = "msm-auto-perf_defconfig"
+
+# Sizes for EXT4 (in bytes)
+USERDATA_SIZE_EXT4 = "2000000000"
+CACHE_SIZE_EXT4 = "80000000"
 
 #
 # Multilib configuration
@@ -44,6 +52,14 @@ EXTRA_IMAGE_FEATURES = "debug-tweaks"
 
 #Krogoth default GCC version
 GCCVERSION = "5.3.0"
+
+IMAGE_FSTYPES += "tar.bz2 ext4"
+
+# Graphics driver essentials
+PREFERRED_PROVIDER_virtual/wayland-egl  = "adreno"
+PREFERRED_PROVIDER_virtual/egl          = "adreno"
+PREFERRED_PROVIDER_virtual/libgles1     = "adreno"
+PREFERRED_PROVIDER_virtual/libgles2     = "adreno"
 
 PREFERRED_VERSION_weston = "1.9.0"
 PREFERRED_VERSION_wayland = "1.9.0"

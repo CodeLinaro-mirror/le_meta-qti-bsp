@@ -10,6 +10,7 @@ BBCLASSEXTEND = ""
 
 do_install_append() {
    install -m 0644 -D ../50-log.rules ${D}${sysconfdir}/udev/rules.d/50-log.rules
+   echo "============auto"
 }
 
 FILES_${PN}-dbg    += "${libdir}/.debug/liblog.* ${bindir}/.debug/logcat"
