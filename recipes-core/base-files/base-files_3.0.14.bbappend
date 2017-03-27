@@ -17,6 +17,7 @@ dirs755_append_apq8009 +="/persist"
 do_install_append(){
   export REGEXP="^(8x96autogvmquin|8x96autogvmred)$"
   if [ "${MACHINEGROUP}" == "auto" ] || [[ "${BASEMACHINE}" =~ $REGEXP ]]; then
+    install -m 755 -o diag -g diag -d ${D}/media/card
     ln -s /media/card ${D}/sdcard
   else
     install -m 755 -o diag -g diag -d ${D}/media

@@ -92,3 +92,6 @@ IMAGE_INSTALL += "cynara"
 IMAGE_INSTALL += "security-manager"
 IMAGE_INSTALL += "security-manager-policy"
 IMAGE_INSTALL += "agl-users"
+
+# base passwd
+IMAGE_INSTALL += "base-passwd"
