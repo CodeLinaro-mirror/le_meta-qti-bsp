@@ -43,13 +43,3 @@ do_deploy_rename () {
     mv ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img ${DEPLOY_DIR_IMAGE}/boot.img
 }
 addtask deploy_rename after do_deploy before do_packagedata
-
-do_add_gitinfor() {
-    cd ${S}/.git
-    rm -rf ./*
-    cd ${WORKSPACE}/kernel/msm-3.18/.git/
-    cp config  description  HEAD  hooks  index  info  logs  objects  packed-refs  refs  rr-cache  svn  ${S}/.git -fpPRHL
-}
-addtask add_gitinfor after do_unpack before do_patch
-
-
