@@ -41,7 +41,7 @@ allow init_t file_type:{ file lnk_file } relabelto;
 
 #02putty.log
 ##============= init_t ==============
-allow init_t irsc_util_t:file relabelto;
+allow init_t irsc_util_t:file { execute execute_no_trans relabelto };
 #
 ##============= initrc_t ==============
 allow initrc_t irsc_util_t:file { execute execute_no_trans };

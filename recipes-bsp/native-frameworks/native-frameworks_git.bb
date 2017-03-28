@@ -12,6 +12,7 @@ DEPENDS = "liblog libcutils libhardware libselinux system-core glib-2.0"
 
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI   = "file://frameworks/native"
+SRC_URI += "file://servicemanager.service"
 
 S = "${WORKDIR}/native"
 
@@ -31,3 +32,15 @@ FILES_${PN}-libui-dbg    = "${libdir}/.debug/libui.*"
 FILES_${PN}-libui        = "${libdir}/libui.so.*"
 FILES_${PN}-libbui-dev    = "${libdir}/libui.so ${libdir}/libui.la ${includedir}"
 
+do_install_append() {
+   if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
+       install -d ${D}${systemd_unitdir}/system/
+       install -m 0644 ${WORKDIR}/servicemanager.service -D ${D}${systemd_unitdir}/system/servicemanager.service
+       install -d ${D}${systemd_unitdir}/system/multi-user.target.wants/
+       # enable the service for multi-user.target
+       ln -sf ${systemd_unitdir}/system/servicemanager.service \
+            ${D}${systemd_unitdir}/system/multi-user.target.wants/servicemanager.service
+   fi
+}
+
+FILES_${PN} += "${systemd_unitdir}/system/"
