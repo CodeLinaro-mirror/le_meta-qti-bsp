@@ -28,17 +28,17 @@ do_compile_append () {
     KMOD_SIG_ALL=`cat ${STAGING_KERNEL_BUILDDIR}/.config | grep CONFIG_MODULE_SIG_ALL | cut -d'=' -f2`
     KMOD_SIG_HASH=`cat ${STAGING_KERNEL_BUILDDIR}/.config | grep CONFIG_MODULE_SIG_HASH | cut -d'=' -f2 | sed 's/\"//g'`
     if [ "$KMOD_SIG_ALL" = "y" ] && [ -n "$KMOD_SIG_HASH" ]; then
-        if [ "${KERNEL_VERSION}" = "4.4.21+" ]; then
+        if [ "${KERNEL_VERSION:0:3}" = "4.4" ]; then
             MODSECKEY=${STAGING_KERNEL_BUILDDIR}/certs/signing_key.pem
             MODPUBKEY=${STAGING_KERNEL_BUILDDIR}/certs/signing_key.x509
         else
             MODSECKEY=${STAGING_KERNEL_BUILDDIR}/signing_key.priv
             MODPUBKEY=${STAGING_KERNEL_BUILDDIR}/signing_key.x509
-	fi
+        fi
 
         cp ${S}/DWC_ETH_QOS.ko ${S}/DWC_ETH_QOS.ko.unsigned
 
-        if [ "${KERNEL_VERSION}" = "4.4.21+" ]; then
+        if [ "${KERNEL_VERSION:0:3}" = "4.4" ]; then
             ${STAGING_KERNEL_BUILDDIR}/scripts/sign-file $KMOD_SIG_HASH $MODSECKEY $MODPUBKEY ${S}/DWC_ETH_QOS.ko
         else
             perl ${STAGING_KERNEL_DIR}/scripts/sign-file $KMOD_SIG_HASH $MODSECKEY $MODPUBKEY ${S}/DWC_ETH_QOS.ko
