@@ -5,7 +5,6 @@ require recipes-platform/images/agl-demo-platform.bb
 require ../common-auto-image.inc
 
 
-IMAGE_INSTALL_remove = "pulseaudio-module-codec-control"
 IMAGE_INSTALL_remove = "neutrino-eth"
 IMAGE_INSTALL_remove = "open-avb"
 IMAGE_INSTALL_remove = "ebtables"
