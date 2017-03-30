@@ -9,4 +9,4 @@ inherit qperf
 
 require ${MACHINE}/${MACHINE}-image.inc
 include machine-auto-image.bb
-IMAGE_INSTALL += "packagegroup-agl-ivi"
+#IMAGE_INSTALL += "packagegroup-agl-ivi"
