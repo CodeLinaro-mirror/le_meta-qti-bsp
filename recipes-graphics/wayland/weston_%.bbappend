@@ -25,21 +25,23 @@ do_compile_prepend () {
     if [ -d "${S}/sdm_plugin" ]; then
 
         if [ -d "${WORKSPACE}/display-noship" ]; then
-            export SCALAR_HEADER_INC=${WORKSPACE}/display-noship/scalar
+            export SCALAR_V1_HEADER_INC=${WORKSPACE}/display-noship/scalar/scalar_v1
+            export SCALAR_QSEED3_HEADER_INC=${WORKSPACE}/display-noship/scalar/qseed3/inc
             export SDM_HEADER_INC=${WORKSPACE}/display-noship/sdm
-	else
+        else
             export SCALAR_PREBUILT_DIR=${WORKSPACE}/prebuilt_${VARIANT}/${BASEMACHINE}/scalar
             export SDM_PREBUILT_DIR=${WORKSPACE}/prebuilt_${VARIANT}/${BASEMACHINE}/sdm-noship
-            export SCALAR_HEADER_INC=${SCALAR_PREBUILT_DIR}
+            export SCALAR_V1_HEADER_INC=${SCALAR_PREBUILT_DIR}/usr/include
+            export SCALAR_QSEED3_HEADER_INC=${SCALAR_PREBUILT_DIR}/usr/include
             export SDM_HEADER_INC=${SDM_PREBUILT_DIR}
-            export DISPLAY_VERSION_HEADER_INC=${SDM_HEADER_INC}/usr/include/display-noship
+            export DISPLAY_VERSION_HEADER_INC=${SDM_HEADER_INC}/usr/include
             export SCALAR_LIB_DIR=${SCALAR_PREBUILT_DIR}/usr/lib64
             export SDM_LIB_DIR=${SDM_PREBUILT_DIR}/usr/lib64
-	fi
+        fi
 
         # Use cmake compile sdm strategy plugin
         cd ${S}/sdm_plugin
-        cmake -DCMAKE_INSTALL_LIBDIR=${STAGING_LIBDIR} -DCMAKE_CURRENT_SOURCE_DIR=${S}/sdm_plugin -DSYSROOT_LIBDIR=${STAGING_LIBDIR} -DSYSROOTINC_PATH=${STAGING_INCDIR} -DSCALAR_HEADER_INC=${SCALAR_HEADER_INC} -DSDM_HEADER_INC=${SDM_HEADER_INC} -DSDM_PUBLIC_HEADER_INC=${STAGING_INCDIR}/sdm/include -DDISPLAY_VERSION_HEADER_INC=${DISPLAY_VERSION_HEADER_INC} -DSCALAR_LIB_DIR=${SCALAR_LIB_DIR} -DSDM_LIB_DIR=${SDM_LIB_DIR} .
+        cmake -DCMAKE_INSTALL_LIBDIR=${STAGING_LIBDIR} -DCMAKE_CURRENT_SOURCE_DIR=${S}/sdm_plugin -DSYSROOT_LIBDIR=${STAGING_LIBDIR} -DSYSROOTINC_PATH=${STAGING_INCDIR} -DSCALAR_V1_HEADER_INC=${SCALAR_V1_HEADER_INC} -DSCALAR_QSEED3_HEADER_INC=${SCALAR_QSEED3_HEADER_INC} -DSDM_HEADER_INC=${SDM_HEADER_INC} -DSDM_PUBLIC_HEADER_INC=${STAGING_INCDIR}/sdm/include -DDISPLAY_VERSION_HEADER_INC=${DISPLAY_VERSION_HEADER_INC} -DSCALAR_LIB_DIR=${SCALAR_LIB_DIR} -DSDM_LIB_DIR=${SDM_LIB_DIR} .
         make
 
         # Install SDM strategy plugin header file for compiling
