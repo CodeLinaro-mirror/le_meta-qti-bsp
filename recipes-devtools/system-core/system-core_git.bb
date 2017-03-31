@@ -160,7 +160,3 @@ FILES_${PN}-dev  = "${libdir}/*.so ${libdir}/*.la ${includedir}*"
 # Including the file depends on chipset
 INCSUFFIX = "${@base_conditional('MACHINEGROUP', 'auto', 'system-core_auto', 'none',d)}"
 include ${INCSUFFIX}.inc
-INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmquin', 'system-core_auto', 'none',d)}"
-include ${INCSUFFIX}.inc
-INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmred', 'system-core_auto', 'none',d)}"
-include ${INCSUFFIX}.inc
