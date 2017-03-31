@@ -9,6 +9,7 @@ include conf/machine/include/soc-family.inc
 
 # Use non-perf settings for the perf build.
 BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
+MACHINEGROUP = "auto"
 
 TMPDIR = "${TOPDIR}/tmp-glibc"
 
