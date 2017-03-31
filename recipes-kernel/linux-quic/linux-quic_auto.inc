@@ -48,7 +48,7 @@ do_add_gitinfor() {
     cd ${S}/.git
     rm -rf ./*
     cd ${WORKSPACE}/kernel/msm-3.18/.git/
-    cp config  description  HEAD  hooks  index  info  logs  objects  packed-refs  refs  rr-cache  svn  ${S}/.git -fpPRHL
+    cp config  HEAD  hooks  index  logs  objects  refs  rr-cache  svn  ${S}/.git -fpPRHL
 }
 addtask add_gitinfor after do_unpack before do_patch
 
