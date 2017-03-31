@@ -54,6 +54,7 @@ do_install_append () {
     fi
     install -m 0755 ${WORKDIR}/recorder_boottest.sh -D ${D}/${sysconfdir}/init.d/recorder_boottest.sh
     install -m 0755 ${WORKDIR}/boottime_config.txt -D ${D}/${sysconfdir}/boottime_config.txt
+    install -d ${D}/${userfsdatadir}/misc/qmmf
 }
 
 pkg_postinst_${PN} () {
@@ -70,6 +71,7 @@ do_package_qa () {
 FILES_${PN}-qmmf-server-dbg = "${bindir}/.debug/qmmf-server"
 FILES_${PN}-qmmf-server     = "${bindir}/qmmf-server"
 FILES_${PN}-qmmf-server    += "/etc/systemd/system/"
+FILES_${PN}-qmmf-server    += "${userfsdatadir}/*"
 
 FILES_${PN}-libqmmf_recorder_client-dbg    = "${libdir}/.debug/libqmmf_recorder_client.*"
 FILES_${PN}-libqmmf_recorder_client        = "${libdir}/libqmmf_recorder_client.so.*"
