@@ -6,6 +6,16 @@ SRC_URI_append += "file://ro-fstab"
 SRC_URI_append_apq8017 += "file://apq8017/ro-fstab"
 SRC_URI_append_apq8053 += "file://apq8053/ro-fstab"
 
+SRC_URI_append_apq8017 += "file://apq8017/cache.mount"
+SRC_URI_append_apq8017 += "file://apq8017/firmware.mount"
+SRC_URI_append_apq8017 += "file://apq8017/dsp.mount"
+SRC_URI_append_apq8017 += "file://apq8017/media-card.mount"
+SRC_URI_append_apq8017 += "file://apq8017/media-ram.mount"
+SRC_URI_append_apq8017 += "file://apq8017/persist.mount"
+SRC_URI_append_apq8017 += "file://apq8017/proc-bus-usb.mount"
+SRC_URI_append_apq8017 += "file://apq8017/var-volatile.mount"
+SRC_URI_append_apq8017 += "file://apq8017/dash.mount"
+
 dirs755 += "/media/cf /media/net /media/ram \
             /media/union /media/realroot /media/hdd \
             /media/mmc1"
@@ -20,8 +30,27 @@ do_install_append(){
     install -m 755 -o diag -g diag -d ${D}/mnt/sdcard
     if ${@base_contains('DISTRO_FEATURES','ro-rootfs','true','false',d)}; then
         # Override fstab for apq8017
-        if [ ${BASEMACHINE} == "apq8017" || ${BASEMACHINE} == "apq8053" ]; then
+        if [ ${BASEMACHINE} == "apq8053" ]; then
             install -m 0644 ${WORKDIR}/${BASEMACHINE}/ro-fstab ${D}${sysconfdir}/fstab
+        elif [ ${BASEMACHINE} == "apq8017" ]; then
+            install -m 0644 ${WORKDIR}/${BASEMACHINE}/ro-fstab ${D}${sysconfdir}/fstab
+            install -d 0644 ${D}${sysconfdir}/systemd/system
+            install -m 0644 ${WORKDIR}/apq8017/cache.mount ${D}${sysconfdir}/systemd/system/cache.mount
+            install -m 0644 ${WORKDIR}/apq8017/firmware.mount ${D}${sysconfdir}/systemd/system/firmware.mount
+            install -m 0644 ${WORKDIR}/apq8017/dsp.mount ${D}${sysconfdir}/systemd/system/dsp.mount
+            install -m 0644 ${WORKDIR}/apq8017/media-card.mount ${D}${sysconfdir}/systemd/system/media-card.mount
+            install -m 0644 ${WORKDIR}/apq8017/media-ram.mount ${D}${sysconfdir}/systemd/system/media-ram.mount
+            install -m 0644 ${WORKDIR}/apq8017/persist.mount ${D}${sysconfdir}/systemd/system/persist.mount
+            install -m 0644 ${WORKDIR}/apq8017/proc-bus-usb.mount ${D}${sysconfdir}/systemd/system/proc-bus-usb.mount
+            install -m 0644 ${WORKDIR}/apq8017/var-volatile.mount ${D}${sysconfdir}/systemd/system/var-volatile.mount
+            install -m 0644 ${WORKDIR}/apq8017/dash.mount ${D}${sysconfdir}/systemd/system/-.mount
+            install -d 0644 ${D}${sysconfdir}/systemd/system/local-fs.target.requires
+            ln -sf  ../cache.mount  ${D}${sysconfdir}/systemd/system/local-fs.target.requires/cache.mount
+            ln -sf  ../firmware.mount  ${D}${sysconfdir}/systemd/system/local-fs.target.requires/firmware.mount
+            ln -sf  ../dsp.mount  ${D}${sysconfdir}/systemd/system/local-fs.target.requires/dsp.mount
+            ln -sf  ../persist.mount  ${D}${sysconfdir}/systemd/system/local-fs.target.requires/persist.mount
+            ln -sf  ../cache.mount  ${D}${sysconfdir}/systemd/system/local-fs.target.requires/var-volatile.mount
+            ln -sf  ../-.mount  ${D}${sysconfdir}/systemd/system/local-fs.target.requires/-.mount
         else
             install -m 0644 ${WORKDIR}/ro-fstab ${D}${sysconfdir}/fstab
         fi
