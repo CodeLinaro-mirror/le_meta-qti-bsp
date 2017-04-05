@@ -28,35 +28,35 @@ do_compile() {
 }
 
 do_install() {
-  install -d ${D}/data/ipc_webserver
-  install -d ${D}/data/ipc_webserver/channel1
-  install -d ${D}/data/ipc_webserver/channel2
-  install -d ${D}/data/ipc_webserver/channel3
-  install -d ${D}/data/ipc_webserver/vam
-  install -d ${D}/data/ipc_webserver/image
-  install -d ${D}/data/ipc_webserver/video
+  install -d ${D}/data/misc/qmmf/ipc_webserver
+  install -d ${D}/data/misc/qmmf/ipc_webserver/channel1
+  install -d ${D}/data/misc/qmmf/ipc_webserver/channel2
+  install -d ${D}/data/misc/qmmf/ipc_webserver/channel3
+  install -d ${D}/data/misc/qmmf/ipc_webserver/vam
+  install -d ${D}/data/misc/qmmf/ipc_webserver/image
+  install -d ${D}/data/misc/qmmf/ipc_webserver/video
   install -d ${D}/${bindir}
 
   install -m 0755 ipc-webserver ${D}/${bindir}
-  install -m 0444 ${S}/res_config ${D}/data/ipc_webserver
-  install -m 0444 ${S}/net_config ${D}/data/ipc_webserver
+  install -m 0444 ${S}/res_config ${D}/data/misc/qmmf/ipc_webserver
+  install -m 0444 ${S}/net_config ${D}/data/misc/qmmf/ipc_webserver
 }
 
 sysroot_preprocess() {
-  install -d ${SYSROOT_DESTDIR}/data/ipc_webserver
-  install -d ${SYSROOT_DESTDIR}/data/ipc_webserver/channel1
-  install -d ${SYSROOT_DESTDIR}/data/ipc_webserver/channel2
-  install -d ${SYSROOT_DESTDIR}/data/ipc_webserver/channel3
-  install -d ${SYSROOT_DESTDIR}/data/ipc_webserver/vam
-  install -d ${SYSROOT_DESTDIR}/data/ipc_webserver/image
-  install -d ${SYSROOT_DESTDIR}/data/ipc_webserver/video
+  install -d ${SYSROOT_DESTDIR}/data/misc/qmmf/ipc_webserver
+  install -d ${SYSROOT_DESTDIR}/data/misc/qmmf/ipc_webserver/channel1
+  install -d ${SYSROOT_DESTDIR}/data/misc/qmmf/ipc_webserver/channel2
+  install -d ${SYSROOT_DESTDIR}/data/misc/qmmf/ipc_webserver/channel3
+  install -d ${SYSROOT_DESTDIR}/data/misc/qmmf/ipc_webserver/vam
+  install -d ${SYSROOT_DESTDIR}/data/misc/qmmf/ipc_webserver/image
+  install -d ${SYSROOT_DESTDIR}/data/misc/qmmf/ipc_webserver/video
   install -d ${SYSROOT_DESTDIR}/${bindir}
 
   install -m 0755 ${S}/ipc-webserver ${SYSROOT_DESTDIR}/${bindir}
-  install -m 0444 ${S}/res_config ${SYSROOT_DESTDIR}/data/ipc_webserver
-  install -m 0444 ${S}/net_config ${SYSROOT_DESTDIR}/data/ipc_webserver
+  install -m 0444 ${S}/res_config ${SYSROOT_DESTDIR}/data/misc/qmmf/ipc_webserver
+  install -m 0444 ${S}/net_config ${SYSROOT_DESTDIR}/data/misc/qmmf/ipc_webserver
 }
 
 SYSROOT_PREPROCESS_FUNCS += "sysroot_preprocess"
 
-FILES_${PN} += "/data/ipc_webserver/*"
+FILES_${PN} += "/data/misc/qmmf/ipc_webserver/*"
