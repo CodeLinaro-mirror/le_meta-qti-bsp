@@ -8,7 +8,6 @@ HOMEPAGE = "https://www.codeaurora.org/gitweb/quic/la?p=kernel/lk.git"
 
 PROVIDES = "virtual/bootloader"
 
-PV       = "3.0"
 PR       = "r1"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
