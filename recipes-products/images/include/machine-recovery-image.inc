@@ -39,7 +39,6 @@ IMAGE_INSTALL += "libext2fs"
 IMAGE_INSTALL += "${@base_contains('DISTRO_FEATURES','selinux','packagegroup-core-selinux',' ',d)}"
 IMAGE_INSTALL += "${@base_contains('DISTRO_FEATURES','selinux','selinux-config',' ',d)}"
 IMAGE_INSTALL += "${@base_contains('DISTRO_FEATURES','selinux','refpolicy-mls',' ',d)}"
-IMAGE_INSTALL += "${@base_contains('DISTRO_FEATURES','selinux','selinux-labelall',' ',d)}"
 
 # Below is to generate sparse ext4 recovery image (OE by default supports raw ext4 images)
 SELINUX_FILE_CONTEXTS = "${IMAGE_ROOTFS}/etc/selinux/mls/contexts/files/file_contexts"

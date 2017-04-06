@@ -10,8 +10,7 @@ S = "${WORKDIR}/${BASEMACHINE}"
 
 PR = "r4"
 
-inherit systemd
-inherit update-rc.d
+inherit systemd update-rc.d
 
 INITSCRIPT_NAME = "find_partitions.sh"
 INITSCRIPT_PARAMS = "start 36 S ."
@@ -25,10 +24,10 @@ do_install() {
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
        install -d  ${D}${systemd_unitdir}/system/
        install -m 0644 ${WORKDIR}/find_partitions.service -D ${D}${systemd_unitdir}/system/find_partitions.service
-       install -d ${D}${systemd_unitdir}/system/sysinit.target.wants/
-       # enable the service for sysinit.target
+       install -d ${D}${systemd_unitdir}/system/multi-user.target.wants/
+       # enable the service for multi-user.target
        ln -sf ${systemd_unitdir}/system/find_partitions.service \
-            ${D}${systemd_unitdir}/system/sysinit.target.wants/find_partitions.service
+            ${D}${systemd_unitdir}/system/multi-user.target.wants/find_partitions.service
     fi
 }
 
