@@ -1,24 +1,24 @@
-From 90ee0cde68fb00d5a51c6052b96790032349ce7c Mon Sep 17 00:00:00 2001
+From 29797e7df947173323cc15c592766421d565dc68 Mon Sep 17 00:00:00 2001
 From: Manish Dewangan <manish@codeaurora.org>
 Date: Mon, 17 Oct 2016 14:28:05 +0530
 Subject: [PATCH] new:wq
 
 ---
- include/tinyalsa/asoundlib.h | 1 +
+ git/include/tinyalsa/pcm.h | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/include/tinyalsa/asoundlib.h b/include/tinyalsa/asoundlib.h
-index fbf42cc..2abc546 100644
---- a/git/include/tinyalsa/asoundlib.h
-+++ b/git/include/tinyalsa/asoundlib.h
-@@ -66,6 +66,7 @@ struct pcm;
-
- /* Bit formats */
+diff --git a/git/include/tinyalsa/pcm.h b/git/include/tinyalsa/pcm.h
+index 5fcb7d8..58a7f56 100644
+--- a/git/include/tinyalsa/pcm.h
++++ b/git/include/tinyalsa/pcm.h
+@@ -125,6 +125,7 @@ extern "C" {
+  * @ingroup libtinyalsa-pcm
+  */
  enum pcm_format {
 +    PCM_FORMAT_INVALID = -1,
-     PCM_FORMAT_S16_LE = 0,
-     PCM_FORMAT_S32_LE,
-     PCM_FORMAT_S8,
---
+     /** Signed, 8-bit */
+     PCM_FORMAT_S8 = 1,
+     /** Signed 16-bit, little endian */
+-- 
 1.9.1
 

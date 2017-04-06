@@ -10,10 +10,13 @@ AM_CFLAGS = -Wundef \
         -fno-short-enums \
         -fpic
 
-c_sources = git/mixer.c \
-            git/pcm.c
+c_sources = git/src/mixer.c \
+            git/src/pcm.c
 
-h_sources = git/include/tinyalsa/asoundlib.h
+h_sources = git/include/tinyalsa/asoundlib.h \
+            git/include/tinyalsa/mixer.h \
+            git/include/tinyalsa/pcm.h \
+            git/include/tinyalsa/version.h
 
 library_includedir = $(includedir)/tinyalsa/
 library_include_HEADERS = $(h_sources)
@@ -26,14 +29,14 @@ libtinyalsa_la_CFLAGS = $(AM_CFLAGS)
 libtinyalsa_la_LDFLAGS = -shared -version-info 1:0:0
 
 bin_PROGRAMS = tinyplay tinycap tinymix
-tinyplay_SOURCES = git/tinyplay.c
+tinyplay_SOURCES = git/utils/tinyplay.c
 tinyplay_LDADD = libtinyalsa.la -lcutils
 tinyplay_CFLAGS = $(AM_CFLAGS)
 
-tinycap_SOURCES = git/tinycap.c
+tinycap_SOURCES = git/utils/tinycap.c
 tinycap_LDADD = libtinyalsa.la -lcutils
 tinycap_CFLAGS = $(AM_CFLAGS)
 
-tinymix_SOURCES = git/tinymix.c
+tinymix_SOURCES = git/utils/tinymix.c
 tinymix_LDADD =  libtinyalsa.la -lcutils
 tinymix_CFLAGS = $(AM_CFLAGS)

@@ -1,4 +1,4 @@
-inherit autotools update-rc.d
+inherit autotools systemd update-rc.d
 DESCRIPTION = "Device specific config"
 LICENSE = "ISC"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=f3b90e78ea0cffb20bf5cca7947a896d"
@@ -13,14 +13,17 @@ SRC_URI += "file://wlan_daemon.service"
 S = "${WORKDIR}/mdm-init/"
 
 do_install_append_msm(){
-  install -m 0755 ${S}/wlan_daemon -D ${D}${sysconfdir}/init.d/wlan_daemon
   if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
+      install -d ${D}/etc/initscripts
+      mv ${D}/etc/init.d/wlan ${D}/etc/initscripts/wlan
       install -d ${D}/etc/systemd/system/
       install -m 0644 ${WORKDIR}/wlan_daemon.service -D ${D}/etc/systemd/system/wlan_daemon.service
       install -d ${D}/etc/systemd/system/multi-user.target.wants/
       # enable the service for multi-user.target
       ln -sf /etc/systemd/wlan_daemon.service \
          ${D}/etc/systemd/system/multi-user.target.wants/wlan_daemon.service
+  else
+     install -m 0755 ${S}/wlan_daemon -D ${D}${sysconfdir}/init.d/wlan_daemon
   fi
 }
 

@@ -11,7 +11,8 @@ PR = "r3"
 SRC_URI = "http://www.thekelleys.org.uk/dnsmasq/${@['archive/', ''][float(bb.data.getVar('PV',d,1).split('.')[1]) > 15]}dnsmasq-${PV}.tar.gz;name=dnsmasq-${PV} \
            file://init \
            file://dnsmasq.conf \
-           file://dnsmasq_script.sh"
+           file://dnsmasq_script.sh\
+           file://dnsmasq.service"
 
 
 
@@ -23,7 +24,18 @@ do_install () {
         install -d ${D}${sysconfdir}/ ${D}${sysconfdir}/init.d ${D}${sysconfdir}/dnsmasq.d
         install -d ${D}${userfsdatadir}/
         install -m 644 ${WORKDIR}/dnsmasq.conf ${D}${userfsdatadir}
-        install -m 755 ${WORKDIR}/init ${D}${sysconfdir}/init.d/dnsmasq
+        if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
+         install -d ${D}/etc/initscripts
+         install -m 755 ${WORKDIR}/init ${D}${sysconfdir}/initscripts/dnsmasq
+         install -d ${D}/etc/systemd/system/
+         install -m 0644 ${WORKDIR}/dnsmasq.service -D ${D}/etc/systemd/system/dnsmasq.service
+         install -d ${D}/etc/systemd/system/multi-user.target.wants/
+         # enable the service for multi-user.target
+         ln -sf /etc/systemd/dnsmasq.service \
+               ${D}/etc/systemd/system/multi-user.target.wants/dnsmasq.service
+        else
+         install -m 755 ${WORKDIR}/init ${D}${sysconfdir}/init.d/dnsmasq
+        fi
         install -d ${D}${base_bindir}
         install -m 0755 ${WORKDIR}/dnsmasq_script.sh ${D}${base_bindir}
 }

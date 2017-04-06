@@ -1,5 +1,6 @@
 # Rootfs creation.
 require ../../../recipes-ss-mgr/packagegroup/ss-mgr.inc
+require ../../../recipes-bt/packagegroup/bt.inc
 
 DEPENDS_append += "lk"
 IMAGE_INSTALL += "packagegroup-core-boot"
@@ -18,9 +19,6 @@ IMAGE_INSTALL += "alx"
 IMAGE_INSTALL += "base-files"
 IMAGE_INSTALL += "base-passwd"
 IMAGE_INSTALL += "bluez5"
-IMAGE_INSTALL += "libbt-vendor"
-IMAGE_INSTALL += "fluoride"
-
 IMAGE_INSTALL += "conntrack-tools"
 IMAGE_INSTALL += "data-ipa-cfg-mgr"
 IMAGE_INSTALL += "data-oss"
@@ -54,6 +52,7 @@ IMAGE_INSTALL += "lighttpd"
 IMAGE_INSTALL += "loc-stub"
 IMAGE_INSTALL += "loc-pla"
 IMAGE_INSTALL += "loc-hal"
+IMAGE_INSTALL += "libsensors"
 IMAGE_INSTALL += "minidlna"
 IMAGE_INSTALL += "miniupnpd"
 IMAGE_INSTALL += "mtd-utils-ubifs"
@@ -81,8 +80,6 @@ IMAGE_INSTALL += "tcpdump"
 IMAGE_INSTALL += "wireless-tools"
 IMAGE_INSTALL += "wpa-supplicant-qcacld"
 IMAGE_INSTALL += "tinyproxy"
-IMAGE_INSTALL += "bt-property"
-IMAGE_INSTALL += "bt-app"
 IMAGE_INSTALL += "iputils"
 IMAGE_PREPROCESS_COMMAND += "echo ${MACHINE} >> ${IMAGE_ROOTFS}/target;"
 

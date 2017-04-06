@@ -1,5 +1,6 @@
 # Rootfs creation.
 require ../../../recipes-ss-mgr/packagegroup/ss-mgr.inc
+require ../../../recipes-bt/packagegroup/bt.inc
 
 DEPENDS_append += "lib32-lk"
 # The OE-Core minimal boot image files.
@@ -57,10 +58,6 @@ IMAGE_INSTALL += "wlan-opensource"
 IMAGE_INSTALL += "qcacld-utils"
 IMAGE_INSTALL += "hostap-daemon-qcacld"
 IMAGE_INSTALL += "wpa-supplicant-qcacld"
-IMAGE_INSTALL += "lib32-libbt-vendor"
-IMAGE_INSTALL += "lib32-fluoride"
-IMAGE_INSTALL += "lib32-bt-property"
-IMAGE_INSTALL += "lib32-bt-app"
 IMAGE_INSTALL += "display-hal"
 IMAGE_INSTALL += "lib32-display-hal"
 

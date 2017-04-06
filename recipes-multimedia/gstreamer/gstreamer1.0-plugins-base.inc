@@ -6,7 +6,7 @@ SRC_URI_append = "\
     file://0003-riff-add-missing-include-directories-when-calling-in.patch \
     file://0004-rtsp-drop-incorrect-reference-to-gstreamer-sdp-in-Ma.patch \
 "
-
+FILESEXTRAPATHS_prepend := "${THISDIR}/qti-patches:"
 LICENSE = "GPLv2+ & LGPLv2+"
 
 DEPENDS += "iso-codes util-linux zlib"
@@ -19,7 +19,7 @@ PACKAGECONFIG ??= " \
     ${GSTREAMER_ORC} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'alsa', 'alsa', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11', '', d)} \
-    gio-unix-2.0 ivorbis ogg pango theora vorbis \
+    gio-unix-2.0 ivorbis ogg pango theora \
 "
 
 X11DEPENDS = "virtual/libx11 libsm libxrender libxv"

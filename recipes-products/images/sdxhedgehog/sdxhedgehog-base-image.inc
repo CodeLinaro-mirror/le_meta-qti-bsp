@@ -1,5 +1,6 @@
 # Rootfs creation.
 require ../../../recipes-ss-mgr/packagegroup/ss-mgr.inc
+require ../../../recipes-bt/packagegroup/bt.inc
 DEPENDS_append_aarch64 += "lib32-lk"
 DEPENDS_append_arm += "lk"
 
@@ -78,12 +79,6 @@ IMAGE_INSTALL += "tcpdump"
 IMAGE_INSTALL += "wireless-tools"
 IMAGE_INSTALL += "wpa-supplicant-qcacld"
 IMAGE_INSTALL += "tinyproxy"
-
-# BT packages
-IMAGE_INSTALL += "bt-property"
-IMAGE_INSTALL += "bt-app"
-IMAGE_INSTALL += "fluoride"
-IMAGE_INSTALL += "libbt-vendor"
 
 IMAGE_PREPROCESS_COMMAND += "echo ${MACHINE} >> ${IMAGE_ROOTFS}/target;"
 

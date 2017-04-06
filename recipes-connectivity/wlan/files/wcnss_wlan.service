@@ -28,13 +28,13 @@
 
 [Unit]
 Description=WCNSS platform
-SourcePath=/etc/init.d/set_wcnss_mode
+SourcePath=/etc/initscripts/set_wcnss_mode
 After=persist.mount firmware-links.service
 
 [Service]
 Restart=no
 RemainAfterExit=yes
-ExecStart=/etc/init.d/set_wcnss_mode
+ExecStart=/etc/initscripts/set_wcnss_mode
 
 [Install]
 WantedBy=multi-user.target

@@ -1,6 +1,9 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}-${PV}:"
 DEPENDS = "base-passwd"
-SRC_URI_append += "${@base_contains('DISTRO_FEATURES','ro-rootfs','file://ro/fstab','file://fstab',d)}"
+
+SRC_URI_append += "file://fstab"
+SRC_URI_append += "file://ro-fstab"
+SRC_URI_append_apq8017 += "file://apq8017/ro-fstab"
 
 dirs755 += "/media/cf /media/net /media/ram \
             /media/union /media/realroot /media/hdd \
@@ -10,11 +13,17 @@ dirs755_append_apq8053 +="/persist /cache /dsp "
 #TODO Enabling systemd we need to add /firmware in dirs_755 list.
 dirs755_append_apq8009 += "/firmware /persist /cache"
 dirs755_append_apq8017 += "/firmware /persist /cache /dsp"
+
 do_install_append(){
     install -m 755 -o diag -g diag -d ${D}/media
     install -m 755 -o diag -g diag -d ${D}/mnt/sdcard
     if ${@base_contains('DISTRO_FEATURES','ro-rootfs','true','false',d)}; then
-        install -m 0644 ${WORKDIR}/ro/fstab ${D}${sysconfdir}/fstab
+        # Override fstab for apq8017
+        if [ ${BASEMACHINE} == "apq8017" ]; then
+            install -m 0644 ${WORKDIR}/apq8017/ro-fstab ${D}${sysconfdir}/fstab
+        else
+            install -m 0644 ${WORKDIR}/ro-fstab ${D}${sysconfdir}/fstab
+        fi
     else
         install -m 0644 ${WORKDIR}/fstab ${D}${sysconfdir}/fstab
     fi

@@ -28,3 +28,4 @@
 # Appended to modutils.te in refpolicy-mls
 
 load_system_module(insmod_t);
+load_system_module(init_t);
