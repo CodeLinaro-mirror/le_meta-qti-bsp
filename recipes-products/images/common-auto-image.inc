@@ -43,6 +43,7 @@ IMAGE_INSTALL += "bridge-utils"
 IMAGE_INSTALL += "cryptsetup"
 IMAGE_INSTALL += "lvm2"
 IMAGE_INSTALL += "wqy-microhei"
+IMAGE_INSTALL += "ltp"
 
 #RESIZE
 IMAGE_INSTALL += "resize-service"
