@@ -53,5 +53,5 @@ fs_getattr_tmpfs(bootlogd_t)
 term_getattr_pty_fs(bootlogd_t)
 files_rw_etc_files(bootlogd_t)
 term_setattr_generic_ptys(bootlogd_t)
-allow bootlogd_t self:capability { chown fsetid };
+allow bootlogd_t self:capability { chown fsetid sys_admin };
 term_fileops_generic_ptys(bootlogd_t)
