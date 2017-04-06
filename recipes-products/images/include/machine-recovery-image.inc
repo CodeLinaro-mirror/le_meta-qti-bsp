@@ -40,15 +40,18 @@ IMAGE_INSTALL += "${@base_contains('DISTRO_FEATURES','selinux','packagegroup-cor
 IMAGE_INSTALL += "${@base_contains('DISTRO_FEATURES','selinux','selinux-config',' ',d)}"
 IMAGE_INSTALL += "${@base_contains('DISTRO_FEATURES','selinux','refpolicy-mls',' ',d)}"
 
+# Limit the recovery image size to 136M
+RECOVERYFS_SIZE_EXT4 ?= "136000000"
+
 # Below is to generate sparse ext4 recovery image (OE by default supports raw ext4 images)
 SELINUX_FILE_CONTEXTS = "${IMAGE_ROOTFS}/etc/selinux/mls/contexts/files/file_contexts"
 do_makesystem() {
 if [ "${MACHINE}" != "mdm9607" ]; then
     # SELinux feature is enabled
     if [[ "${DISTRO_FEATURES}" =~ "selinux" ]]; then
-        make_ext4fs -s -a / -S ${SELINUX_FILE_CONTEXTS} -l ${SYSTEM_SIZE_EXT4} ${DEPLOY_DIR_IMAGE}/${MACHINE}-recovery.ext4 ${IMAGE_ROOTFS}
+        make_ext4fs -s -a / -S ${SELINUX_FILE_CONTEXTS} -l ${RECOVERYFS_SIZE_EXT4} ${DEPLOY_DIR_IMAGE}/${MACHINE}-recovery.ext4 ${IMAGE_ROOTFS}
     else
-        make_ext4fs -s -l ${SYSTEM_SIZE_EXT4} ${DEPLOY_DIR_IMAGE}/${MACHINE}-recovery.ext4 ${IMAGE_ROOTFS}
+        make_ext4fs -s -l ${RECOVERYFS_SIZE_EXT4} ${DEPLOY_DIR_IMAGE}/${MACHINE}-recovery.ext4 ${IMAGE_ROOTFS}
     fi
 fi
 #rename machine-recovery-image.ubi if exists
