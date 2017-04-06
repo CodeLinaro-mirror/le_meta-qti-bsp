@@ -25,14 +25,27 @@ SYSTEMD_AUTO_ENABLE_${PN} = "enable"
 
 INHIBIT_PACKAGE_STRIP = "1"
 
+EXTRA_OEMAKE += "CONFIG_ARCH_MSM=y"
+
 do_compile_append () {
     KMOD_SIG_ALL=`cat ${STAGING_KERNEL_BUILDDIR}/.config | grep CONFIG_MODULE_SIG_ALL | cut -d'=' -f2`
     KMOD_SIG_HASH=`cat ${STAGING_KERNEL_BUILDDIR}/.config | grep CONFIG_MODULE_SIG_HASH | cut -d'=' -f2 | sed 's/\"//g'`
     if [ "$KMOD_SIG_ALL" = "y" ] && [ -n "$KMOD_SIG_HASH" ]; then
-        MODSECKEY=${STAGING_KERNEL_BUILDDIR}/signing_key.priv
-        MODPUBKEY=${STAGING_KERNEL_BUILDDIR}/signing_key.x509
+        if [ "${KERNEL_VERSION:0:3}" = "4.4" ]; then
+            MODSECKEY=${STAGING_KERNEL_BUILDDIR}/certs/signing_key.pem
+            MODPUBKEY=${STAGING_KERNEL_BUILDDIR}/certs/signing_key.x509
+        else
+            MODSECKEY=${STAGING_KERNEL_BUILDDIR}/signing_key.priv
+            MODPUBKEY=${STAGING_KERNEL_BUILDDIR}/signing_key.x509
+        fi
+
         cp ${S}/wlan.ko ${S}/wlan.ko.unsigned
-        perl ${STAGING_KERNEL_DIR}/scripts/sign-file ${KMOD_SIG_HASH} ${MODSECKEY} ${MODPUBKEY} ${S}/wlan.ko
+
+        if [ "${KERNEL_VERSION:0:3}" = "4.4" ]; then
+            ${STAGING_KERNEL_BUILDDIR}/scripts/sign-file $KMOD_SIG_HASH $MODSECKEY $MODPUBKEY ${S}/wlan.ko
+        else
+            perl ${STAGING_KERNEL_DIR}/scripts/sign-file $KMOD_SIG_HASH $MODSECKEY $MODPUBKEY ${S}/wlan.ko
+        fi
     fi;
 }
 
