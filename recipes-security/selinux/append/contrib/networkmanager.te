@@ -43,3 +43,4 @@ files_search_default(NetworkManager_t)
 files_read_default_files(NetworkManager_t)
 allow NetworkManager_t initrc_t:unix_dgram_socket sendto;
 init_stream_connect_script(NetworkManager_t)
+allow NetworkManager_t tmpfs_t:file { create open read getattr };
