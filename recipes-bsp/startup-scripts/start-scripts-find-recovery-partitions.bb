@@ -13,6 +13,7 @@ inherit update-rc.d
 
 INITSCRIPT_NAME = "find_recovery_partitions.sh"
 INITSCRIPT_PARAMS_8x96auto = "start 01 5 ."
+INITSCRIPT_PARAMS_8x96autofusion = "start 01 5 ."
 INITSCRIPT_PARAMS_8x96autonapier = "start 01 5 ."
 
 do_install() {
