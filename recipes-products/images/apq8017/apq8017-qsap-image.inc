@@ -12,3 +12,10 @@ IMAGE_INSTALL += "qcacld-utils"
 IMAGE_INSTALL += "data"
 IMAGE_INSTALL += "wlan-services"
 IMAGE_INSTALL += "sigma-dut"
+
+#Enabling GStreamer Core
+IMAGE_INSTALL += "lib32-gstreamer1.0"
+IMAGE_INSTALL += "lib32-gstreamer1.0-plugins-base"
+IMAGE_INSTALL += "lib32-gstreamer1.0-plugins-good"
+IMAGE_INSTALL += "lib32-gstreamer1.0-rtsp-server"
+IMAGE_INSTALL += "lib32-gstreamer1.0-plugins-bad"

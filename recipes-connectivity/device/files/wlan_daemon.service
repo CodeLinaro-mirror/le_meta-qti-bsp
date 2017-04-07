@@ -30,13 +30,13 @@
 Description=Wlan Service
 SourcePath=/etc/init.d/wlan
 Requires=wcnss_wlan.service
-After=persist.mount firmware-links.service wcnss_wlan.service
+After=persist.mount firmware-links.service wcnss_wlan.service usb.service
 
 [Service]
 Restart=no
 RemainAfterExit=yes
-ExecStart=/etc/init.d/wlan start
-ExecStop=/etc/init.d/wlan stop
+ExecStart=/etc/initscripts/wlan start
+ExecStop=/etc/initscripts/wlan stop
 
 [Install]
 WantedBy=multi-user.target

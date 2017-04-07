@@ -31,14 +31,15 @@ diff -u a/dhcpcd-hooks/Makefile b/dhcpcd-hooks/Makefile
 -set -- /var/lib/dhcpcd-"$INTERFACE".info "$x"
 +set -- /data/dhcpcd-"$INTERFACE".info "$x"
 
---- a/configure	2011-01-03 16:24:58.000000000 +0530
-+++ b/configure	2017-02-08 21:05:23.730955378 +0530
-@@ -66,7 +66,7 @@
+--- a/configure	2017-03-10 15:28:27.491601787 +0530
++++ b/configure	2017-03-10 15:30:09.629944443 +0530
+@@ -66,9 +66,9 @@
  : ${SBINDIR:=$PREFIX/sbin}
  : ${LIBDIR:=$PREFIX/lib}
  : ${LIBEXECDIR:=$PREFIX/libexec}
 -: ${STATEDIR:=/var}
 +: ${STATEDIR:=/data}
  : ${DBDIR:=$STATEDIR/db}
- : ${RUNDIR:=$STATEDIR/run}
+-: ${RUNDIR:=$STATEDIR/run}
++: ${RUNDIR:=/var/run}
  : ${MANDIR:=${PREFIX:-/usr}/share/man}

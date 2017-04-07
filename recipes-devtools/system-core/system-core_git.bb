@@ -1,4 +1,4 @@
-inherit autotools pkgconfig update-rc.d
+inherit autotools pkgconfig systemd update-rc.d
 
 DESCRIPTION = "Android system/core components"
 HOMEPAGE = "http://developer.android.com/"
@@ -32,10 +32,7 @@ COMPOSITION_apq8096 = "901D"
 COMPOSITION_apq8098 = "901D"
 
 do_install_append() {
-   install -m 0755 ${S}/adb/start_adbd -D ${D}${sysconfdir}/init.d/adbd
-   install -m 0755 ${S}/logd/start_logd -D ${D}${sysconfdir}/init.d/logd
-   install -m 0755 ${S}/usb/start_usb -D ${D}${sysconfdir}/init.d/usb
-   install -m 0755 ${S}/rootdir/etc/init.qcom.post_boot.sh -D ${D}${sysconfdir}/init.d/init_post_boot
+   install -m 0755 ${S}/adb/launch_adbd -D ${D}${sysconfdir}/launch_adbd
    install -m 0755 ${S}/usb/usb_composition -D ${D}${base_sbindir}/
    install -d ${D}${base_sbindir}/usb/compositions/
    install -m 0755 ${S}/usb/compositions/* -D ${D}${base_sbindir}/usb/compositions/
@@ -52,6 +49,10 @@ do_install_append() {
    ln -s  /sbin/usb/compositions/${COMPOSITION} ${D}${userfsdatadir}/usb/boot_hsusb_composition
    ln -s  /sbin/usb/compositions/empty ${D}${userfsdatadir}/usb/boot_hsic_composition
    if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
+      install -m 0755 ${S}/adb/start_adbd -D ${D}${sysconfdir}/initscripts/adbd
+      install -m 0755 ${S}/logd/start_logd -D ${D}${sysconfdir}/initscripts/logd
+      install -m 0755 ${S}/usb/start_usb -D ${D}${sysconfdir}/initscripts/usb
+      install -m 0755 ${S}/rootdir/etc/init.qcom.post_boot.sh -D ${D}${sysconfdir}/initscripts/init_post_boot
       install -d ${D}${systemd_unitdir}/system/
       install -d ${D}${systemd_unitdir}/system/multi-user.target.wants/
       install -m 0644 ${S}/adb/adbd.service -D ${D}${systemd_unitdir}/system/adbd.service
@@ -69,20 +70,34 @@ do_install_append() {
       install -m 0644 ${S}/leproperties/leprop.service -D ${D}${systemd_unitdir}/system/leprop.service
       ln -sf ${systemd_unitdir}/system/leprop.service \
           ${D}${systemd_unitdir}/system/multi-user.target.wants/leprop.service
+
+   else
+      install -m 0755 ${S}/adb/start_adbd -D ${D}${sysconfdir}/init.d/adbd
+      install -m 0755 ${S}/logd/start_logd -D ${D}${sysconfdir}/init.d/logd
+      install -m 0755 ${S}/usb/start_usb -D ${D}${sysconfdir}/init.d/usb
+      install -m 0755 ${S}/rootdir/etc/init.qcom.post_boot.sh -D ${D}${sysconfdir}/init.d/init_post_boot
    fi
 }
 
 do_install_append_apq8009() {
-   install -m 0755 ${S}/debuggerd/start_debuggerd -D ${D}${sysconfdir}/init.d/init_debuggerd
+   if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'false', 'true', d)}; then
+    install -m 0755 ${S}/debuggerd/start_debuggerd -D ${D}${sysconfdir}/init.d/init_debuggerd
+   fi
 }
 do_install_append_apq8053(){
+  if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'false', 'true', d)}; then
    install -m 0755 ${S}/debuggerd/start_debuggerd64 -D ${D}${sysconfdir}/init.d/init_debuggerd
+  fi
 }
 do_install_append_apq8096() {
-   install -m 0755 ${S}/debuggerd/start_debuggerd64 -D ${D}${sysconfdir}/init.d/init_debuggerd
+  if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'false', 'true', d)}; then
+    install -m 0755 ${S}/debuggerd/start_debuggerd64 -D ${D}${sysconfdir}/init.d/init_debuggerd
+  fi
 }
 do_install_append_apq8017(){
+  if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'false', 'true', d)}; then
    install -m 0755 ${S}/debuggerd/start_debuggerd64 -D ${D}${sysconfdir}/init.d/init_debuggerd
+  fi
 }
 
 INITSCRIPT_PACKAGES =+ "${PN}-usb"
@@ -105,7 +120,7 @@ INITSCRIPT_PARAMS_${PN}-post-boot = "start 90 2 3 4 5 ."
 PACKAGES =+ "${PN}-adbd-dbg ${PN}-adbd ${PN}-adbd-dev"
 FILES_${PN}-adbd-dbg = "${base_sbindir}/.debug/adbd ${libdir}/.debug/libadbd.*"
 FILES_${PN}-adbd     = "${base_sbindir}/adbd ${sysconfdir}/init.d/adbd ${libdir}/libadbd.so.*"
-FILES_${PN}-adbd    += "${systemd_unitdir}/system/adbd.service ${systemd_unitdir}/system/multi-user.target.wants/adbd.service"
+FILES_${PN}-adbd    += "${systemd_unitdir}/system/adbd.service ${systemd_unitdir}/system/multi-user.target.wants/adbd.service ${sysconfdir}/launch_adbd ${sysconfdir}/initscripts/adbd"
 FILES_${PN}-adbd-dev = "${libdir}/libadbd.so ${libdir}/libadbd.la"
 
 PACKAGES =+ "${PN}-usb-dbg ${PN}-usb"
@@ -113,17 +128,17 @@ FILES_${PN}-usb-dbg  = "${bindir}/.debug/usb_composition_switch"
 FILES_${PN}-usb      = "${sysconfdir}/init.d/usb ${base_sbindir}/usb_composition ${bindir}/usb_composition_switch ${base_sbindir}/usb/compositions/*"
 FILES_${PN}-usb     += "${userfsdatadir}/usb/*"
 FILES_${PN}-usb     += "${base_sbindir}/usb/* ${base_sbindir}/usb_debug ${base_sbindir}/usb/debuger/*"
-FILES_${PN}-usb     += "${systemd_unitdir}/system/usb.service ${systemd_unitdir}/system/multi-user.target.wants/usb.service"
+FILES_${PN}-usb     += "${systemd_unitdir}/system/usb.service ${systemd_unitdir}/system/multi-user.target.wants/usb.service ${sysconfdir}/initscripts/usb"
 
 PACKAGES =+ "${PN}-post-boot"
 FILES_${PN}-post-boot  = "${sysconfdir}/init.d/init_post_boot"
-FILES_${PN}-post-boot += "${systemd_unitdir}/system/init_post_boot.service ${systemd_unitdir}/system/multi-user.target.wants/init_post_boot.service"
+FILES_${PN}-post-boot += "${systemd_unitdir}/system/init_post_boot.service ${systemd_unitdir}/system/multi-user.target.wants/init_post_boot.service ${sysconfdir}/initscripts/init_post_boot"
 INSANE_SKIP_${PN}-post-boot = "file-rdeps"
 
 PACKAGES =+ "${PN}-logd-dbg ${PN}-logd"
 FILES_${PN}-logd-dbg  = "${base_sbindir}/.debug/logd"
 FILES_${PN}-logd      = "${sysconfdir}/init.d/logd ${base_sbindir}/logd"
-FILES_${PN}-logd     += "${systemd_unitdir}/system/logd.service ${systemd_unitdir}/system/multi-user.target.wants/logd.service"
+FILES_${PN}-logd     += "${systemd_unitdir}/system/logd.service ${systemd_unitdir}/system/multi-user.target.wants/logd.service ${sysconfdir}/initscripts/logd"
 
 PACKAGES =+ "${PN}-debuggerd-dbg ${PN}-debuggerd"
 FILES_${PN}-debuggerd-dbg  = "${base_sbindir}/.debug/debuggerd ${base_sbindir}/.debug/debuggerd64 "
@@ -132,7 +147,7 @@ FILES_${PN}-debuggerd     += "${systemd_unitdir}/system/init_debuggerd.service $
 
 PACKAGES =+ "${PN}-leprop-dbg ${PN}-leprop"
 FILES_${PN}-leprop-dbg  = "${base_sbindir}/.debug/leprop-service ${bindir}/.debug/getprop ${bindir}/.debug/setprop"
-FILES_${PN}-leprop      = "${base_sbindir}/leprop-service ${bindir}/getprop ${bindir}/setprop"
+FILES_${PN}-leprop      = "${base_sbindir}/leprop-service ${bindir}/getprop ${bindir}/setprop ${sysconfdir}/proptrigger.sh ${sysconfdir}/proptrigger.conf"
 FILES_${PN}-leprop     += "${systemd_unitdir}/system/leprop.service ${systemd_unitdir}/system/multi-user.target.wants/leprop.service"
 
 FILES_${PN}-dbg  = "${bindir}/.debug/* ${libdir}/.debug/*"
