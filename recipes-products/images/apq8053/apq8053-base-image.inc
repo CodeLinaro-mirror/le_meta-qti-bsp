@@ -75,9 +75,12 @@ IMAGE_INSTALL += "libpagemap"
 IMAGE_INSTALL += "procrank"
 
 IMAGE_INSTALL += "libuv"
+
 IMAGE_INSTALL += "ipmon"
 IMAGE_INSTALL += "discovery"
 IMAGE_INSTALL += "lib32-ipc-webserver"
+IMAGE_INSTALL += "libwebsockets"
+IMAGE_INSTALL += "rtsp-proxy"
 
 # Below is to generate sparse ext4 system image (OE by default supports raw ext4 images)
 do_makesystem() {
