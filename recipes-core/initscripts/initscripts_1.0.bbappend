@@ -15,6 +15,7 @@ do_install_append() {
         update-rc.d -f -r ${D} urandom remove
         update-rc.d -f -r ${D} checkroot.sh remove
         if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
+         rm  ${D}${sysconfdir}/init.d/halt
          rm  ${D}${sysconfdir}/init.d/reboot
          rm  ${D}${sysconfdir}/init.d/save-rtc.sh
          rm  ${D}${sysconfdir}/init.d/sendsigs
