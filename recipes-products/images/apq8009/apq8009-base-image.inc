@@ -35,9 +35,7 @@ IMAGE_INSTALL += "dnsmasq"
 IMAGE_INSTALL += "ebtables"
 IMAGE_INSTALL += "ethtool"
 IMAGE_INSTALL += "native-frameworks"
-DEPENDS += "gdb-cross-arm"
 
-IMAGE_INSTALL += "gdb"
 IMAGE_INSTALL += "glib-2.0"
 
 IMAGE_INSTALL += "init-audio"
@@ -81,11 +79,14 @@ IMAGE_INSTALL += "gstreamer1.0-rtsp-server"
 IMAGE_INSTALL += "gstreamer1.0-plugins-bad"
 #IMAGE_PREPROCESS_COMMAND += "echo ${MACHINE} >> ${IMAGE_ROOTFS}/target;"
 
+# Don't install GDB and related pacakges in production builds.
+DEPENDS += "${@base_conditional('USER_BUILD', '1', '', 'gdb-cross-arm', d)}"
+IMAGE_INSTALL += "${@base_conditional('USER_BUILD', '1', '', 'gdb', d)}"
+IMAGE_INSTALL += "${@base_conditional('USER_BUILD', '1', '', 'gdbserver', d)}"
 
 # Below is to generate sparse ext4 system image (OE by default supports raw ext4 images)
 SELINUX_FILE_CONTEXTS = "${IMAGE_ROOTFS}/etc/selinux/mls/contexts/files/file_contexts"
 do_makesystem() {
 
     make_ext4fs -s -a / -S ${SELINUX_FILE_CONTEXTS} -l ${SYSTEM_SIZE_EXT4} ${DEPLOY_DIR_IMAGE}/${MACHINE}-sysfs.ext4 ${IMAGE_ROOTFS}
-#    make_ext4fs -s  -l ${SYSTEM_SIZE_EXT4} ${DEPLOY_DIR_IMAGE}/${MACHINE}-sysfs.ext4 ${IMAGE_ROOTFS}
 }
