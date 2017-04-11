@@ -80,6 +80,9 @@ IMAGE_INSTALL += "smem"
 # smack support
 IMAGE_INSTALL_append_smack = " smack-userspace"
 
+# power management
+IMAGE_INSTALL += "pm"
+
 # AFM and Security
 IMAGE_INSTALL += "af-main"
 IMAGE_INSTALL += "af-binder"

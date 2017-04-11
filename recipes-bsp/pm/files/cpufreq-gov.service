@@ -1,0 +1,10 @@
+[Unit]
+Description=Init CPUfreq gov
+After=multi-user.target
+
+[Service]
+Type=simple
+ExecStart=/bin/sh /usr/bin/cpufreq-gov.sh
+
+[Install]
+WantedBy=multi-user.target
