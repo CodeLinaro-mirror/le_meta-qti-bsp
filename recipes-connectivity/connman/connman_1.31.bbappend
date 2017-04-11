@@ -17,14 +17,3 @@ RRECOMMENDS_${PN} += "${@bb.utils.contains('PACKAGECONFIG','ipsecvici','${PN}-pl
 INSANE_SKIP_${PN}-plugin-vpn-ipsecvici += "dev-deps"
 INSANE_SKIP_${PN} += "dev-deps"
 
-PACKAGECONFIG[systemd] = "--with-systemdunitdir=${systemd_unitdir}/system/ --with-tmpfilesdir=${sysconfdir}/tmpfiles.d/,--with-systemdunitdir='' --with-tmpfilesdir=''"
-SYSTEMD_SERVICE_${PN}-wait-online = "connman-wait-online.service"
-
-FILES_${PN} =+ " ${sysconfdir}/tmpfiles.d/connman_resolvconf.conf"
-PACKAGES =+ " ${PN}-wait-online"
-SUMMARY_${PN}-wait-online = "A program that will return once ConnMan has connected to a network"
-DESCRIPTION_${PN}-wait-online = "A service that can be enabled so that \
-the system waits until a network connection is established."
-FILES_${PN}-wait-online += "${sbindir}/connmand-wait-online \
-                            ${systemd_unitdir}/system/connman-wait-online.service"
-

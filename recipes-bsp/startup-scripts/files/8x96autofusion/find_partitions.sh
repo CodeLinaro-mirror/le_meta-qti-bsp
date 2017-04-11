@@ -28,15 +28,18 @@
 #
 # find_partitions        init.d script to dynamically find partitions
 #
+# put fstab(noauto) mount here
 
-mkdir -p /dsp
-mkdir -p /data
-mkdir -p /persist
-mkdir -p /firmware
+#mkdir -p /dsp
+#mkdir -p /data
+#mkdir -p /persist
+#mkdir -p /firmware
+#mkdir -p /bluetooth
 
-mount /dsp
-mount /data
-mount /persist
-mount /firmware
+#mount /dsp
+#mount /data
+#mount /persist
+#mount /firmware
+#mount /bluetooth
 
 exit 0
