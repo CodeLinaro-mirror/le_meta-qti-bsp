@@ -17,6 +17,8 @@ python __anonymous () {
       perfconf = d.getVar("KERNEL_PERF_DEFCONFIG", True)
       if perfconf:
           d.setVar("KERNEL_CONFIG", d.getVar("KERNEL_PERF_DEFCONFIG", True))
+          d.setVar("FILESEXTRAPATHS_prepend", "${THISDIR}/kernel")
+          d.appendVar("SRC_URI", " file://0002-automotive-add-boot-marker.patch")
       perfcmd = d.getVar("KERNEL_PERF_CMD_PARAMS", True)
       if perfcmd:
           d.setVar("KERNEL_CMD_PARAMS", d.getVar("KERNEL_PERF_CMD_PARAMS", True))
