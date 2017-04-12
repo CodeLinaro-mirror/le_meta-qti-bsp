@@ -1,5 +1,5 @@
 # List of packages installed onto the root file system as specified by the user.
-inherit module
+inherit module qperf
 
 DEPENDS = "virtual/kernel"
 
