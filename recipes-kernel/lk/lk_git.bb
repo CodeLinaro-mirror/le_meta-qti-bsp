@@ -48,6 +48,11 @@ EXTRA_OEMAKE_8x96autonapier = "${MY_TARGET} TOOLCHAIN_PREFIX='${TARGET_PREFIX}' 
 
 EXTRA_OEMAKE_append_emmc-boot = " VERIFIED_BOOT=0 DEFAULT_UNLOCK=true EMMC_BOOT=1"
 
+python __anonymous () {
+  if bb.utils.contains('DISTRO_FEATURES', 'qti-perf', True, False, d):
+      d.appendVar("EXTRA_OEMAKE", " DEBUG=0");
+}
+
 do_install() {
         install -d ${D}/boot
         install build-${MY_TARGET}/*.mbn ${D}/boot
