@@ -1,0 +1,59 @@
+From 611863db5690fc85ee6644082677c4cc4a9777d9 Mon Sep 17 00:00:00 2001
+From: Xubao Jiang <xubaoj@codeaurora.org>
+Date: Wed, 12 Apr 2017 17:29:20 +0800
+Subject: [PATCH] Fix memory corruption issue
+
+Change-Id: Iff62223342e45b092528fe0efc744c1ef8f9fe30
+Signed-off-by: Xubao Jiang <xubaoj@codeaurora.org>
+---
+ binding-wifi/wifi-api.c     | 12 ++++--------
+ binding-wifi/wifi-connman.c |  2 +-
+ 2 files changed, 5 insertions(+), 9 deletions(-)
+
+diff --git a/binding-wifi/wifi-api.c b/binding-wifi/wifi-api.c
+index f6d6d52..ccdc3d3 100644
+--- a/binding-wifi/wifi-api.c
++++ b/binding-wifi/wifi-api.c
+@@ -224,7 +224,6 @@ void wifi_scanResult(struct afb_req request) /*AFB_SESSION_CHECK*/
+ {
+ 	struct wifi_profile_info *wifiProfile = NULL;
+ 	GSList *list = NULL;
+-	GSList *holdMe = NULL;
+ 	wifi_list = NULL;
+ 	char *essid = NULL;
+ 	char *address = NULL;
+@@ -299,14 +298,11 @@ void wifi_scanResult(struct afb_req request) /*AFB_SESSION_CHECK*/
+                             } else
+                               setHMIStatus(BAR_NO);
+                       }
+-
+-		}
+-		while (list != NULL) {
+-			printf("Should be freed");
+-			holdMe = list->next;
+-			g_free(list);
+-			list = holdMe;
++		      g_free(status);
++		      g_free(list->data);
+ 		}
++		
++		g_slist_free(wifi_list);
+ 		afb_req_success(request, my_array, "Wi-Fi - Scan Result is Displayed");
+ 	} else
+ 		afb_req_fail(request, "failed", error->message);
+diff --git a/binding-wifi/wifi-connman.c b/binding-wifi/wifi-connman.c
+index 68e5e3d..df3aa8f 100644
+--- a/binding-wifi/wifi-connman.c
++++ b/binding-wifi/wifi-connman.c
+@@ -270,7 +270,7 @@ GError* do_displayScan(GSList **wifi_list) {
+ 			wifiProfile = g_try_malloc0(sizeof(struct wifi_profile_info));
+ 
+ 			extract_values(content, wifiProfile);
+-			wifiProfile->NetworkPath = g_try_malloc0(strlen(object));
++			wifiProfile->NetworkPath = g_try_malloc0(strlen(object) + 1);
+ 			strcpy(wifiProfile->NetworkPath, object);
+ 			printf(
+ 					"SSID= %s, security= %s, path= %s, Strength= %d, wps support= %d\n",
+-- 
+1.9.1
+
