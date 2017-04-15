@@ -14,7 +14,7 @@ FILESPATH =+ "${WORKSPACE}:"
 SRC_URI   = "file://frameworks/native"
 SRC_URI   += "file://servicemanager.sh"
 
-S = "${WORKDIR}/native"
+S = "${WORKDIR}/frameworks/native"
 
 INITSCRIPT_NAME = "servicemanager.sh"
 

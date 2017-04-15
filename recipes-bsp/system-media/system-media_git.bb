@@ -12,7 +12,11 @@ FILESPATH =+ "${WORKSPACE}:"
 SRC_URI   = "file://system/media/"
 S = "${WORKDIR}/system/media"
 
-PR = "r1"
+CFLAGS += "-Wno-error"
+EXTRA_OECONF += " --with-glib"
+
+PR = "r2"
+INSANE_SKIP_${PN}-dev += "dev-elf"
 
 FILES_${PN}-dbg    = "${libdir}/.debug/lib*.*"
 FILES_${PN}        = "${libdir}/lib*.so.* ${libdir}/pkgconfig/*"

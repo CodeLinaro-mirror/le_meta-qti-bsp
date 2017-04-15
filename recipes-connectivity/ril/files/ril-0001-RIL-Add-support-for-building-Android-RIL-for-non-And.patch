@@ -1,0 +1,201 @@
+From 88a67831091bdeea99b954e8ddf6afb30607d7b2 Mon Sep 17 00:00:00 2001
+From: Gustavo Solaira <gustavos@codeaurora.org>
+Date: Wed, 14 Dec 2016 17:50:14 -0800
+Subject: [PATCH] RIL: Add support for building Android RIL for non-Android
+ platforms
+
+Let RIL be built for LE by modifying some incompatible code.
+
+Change-Id: Ia3b875606c63eeec630bd2c4dc7ca75716a279f4
+---
+ libril/Android.mk             |  1 +
+ libril/RilSapSocket.h         |  4 ++++
+ libril/RilSocket.cpp          |  6 ++++++
+ libril/ril.cpp                | 28 ++++++++++++++++++++++++----
+ libril/rilSocketQueue.h       |  4 ++++
+ reference-ril/reference-ril.c |  9 +++++++++
+ rild/rild.c                   |  4 ++++
+ 7 files changed, 52 insertions(+), 4 deletions(-)
+
+diff --git a/libril/Android.mk b/libril/Android.mk
+index 5984d9b..b491206 100644
+--- a/libril/Android.mk
++++ b/libril/Android.mk
+@@ -28,6 +28,7 @@ endif
+ 
+ LOCAL_C_INCLUDES += external/nanopb-c
+ LOCAL_C_INCLUDES += $(LOCAL_PATH)/../include
++LOCAL_C_INCLUDES += $(LOCAL_PATH)/../librilutils
+ LOCAL_EXPORT_C_INCLUDE_DIRS := $(LOCAL_PATH)/../include
+ 
+ LOCAL_MODULE:= libril
+diff --git a/libril/RilSapSocket.h b/libril/RilSapSocket.h
+index 75c3965..7dee56c 100644
+--- a/libril/RilSapSocket.h
++++ b/libril/RilSapSocket.h
+@@ -19,7 +19,11 @@
+ #define RIL_SHLIB
+ #include "telephony/ril.h"
+ #include "RilSocket.h"
++#ifdef ANDROID
+ #include <hardware/ril/librilutils/proto/sap-api.pb.h>
++#else
++#include <proto/sap-api.pb.h>
++#endif
+ 
+ /**
+  * RilSapSocket is a derived class, derived from the RilSocket abstract
+diff --git a/libril/RilSocket.cpp b/libril/RilSocket.cpp
+index a002d94..7ebcefc 100644
+--- a/libril/RilSocket.cpp
++++ b/libril/RilSocket.cpp
+@@ -30,6 +30,12 @@ int RilSocket::socketInit(void) {
+     commandCb = &RilSocket::sSocketRequestsHandler;
+     listenFd = android_get_control_socket(name);
+ 
++    if (listenFd < 0) {
++        listenFd = socket_local_server(name,
++                                       ANDROID_SOCKET_NAMESPACE_RESERVED,
++                                       SOCK_STREAM);
++    }
++
+     //Start listening
+     ret = listen(listenFd, SOCKET_LISTEN_BACKLOG);
+ 
+diff --git a/libril/ril.cpp b/libril/ril.cpp
+index 27ab3b8..be97eb5 100644
+--- a/libril/ril.cpp
++++ b/libril/ril.cpp
+@@ -29,7 +29,11 @@
+ #include <binder/Parcel.h>
+ #include <cutils/jstring.h>
+ #include <sys/types.h>
++#ifdef ANDROID
+ #include <sys/limits.h>
++#else
++#include <limits.h>
++#endif
+ #include <sys/system_properties.h>
+ #include <pwd.h>
+ #include <stdio.h>
+@@ -47,6 +51,7 @@
+ #include <netinet/in.h>
+ #include <cutils/properties.h>
+ #include <RilSapSocket.h>
++#include <signal.h>
+ 
+ extern "C" void
+ RIL_onRequestComplete(RIL_Token t, RIL_Errno e, void *response, size_t responselen);
+@@ -4528,6 +4533,8 @@ static void listenCallback (int fd, short flags, void *param) {
+         return;
+     }
+ 
++// Don't check uid on LE, no radio user
++#ifdef ANDROID
+     /* check the credential of the other side and only accept socket from
+      * phone process
+      */
+@@ -4572,6 +4579,7 @@ static void listenCallback (int fd, short flags, void *param) {
+ 
+         return;
+     }
++#endif
+ 
+     ret = fcntl(fdCommand, F_SETFL, O_NONBLOCK);
+ 
+@@ -4929,8 +4937,14 @@ static void startListen(RIL_SOCKET_ID socket_id, SocketListenParam* socket_liste
+ 
+     fdListen = android_get_control_socket(socket_name);
+     if (fdListen < 0) {
+-        RLOGE("Failed to get socket %s", socket_name);
+-        exit(-1);
++        RLOGW("Failed to get socket %s, creating local socket", socket_name);
++        fdListen = socket_local_server(socket_name,
++                                       ANDROID_SOCKET_NAMESPACE_RESERVED,
++                                       SOCK_STREAM);
++        if (fdListen < 0) {
++            RLOGE("Failed to create socket %s", socket_name);
++            exit(-1);
++        }
+     }
+ 
+     ret = listen(fdListen, 4);
+@@ -5087,8 +5101,14 @@ RIL_register (const RIL_RadioFunctions *callbacks) {
+ 
+     s_fdDebug = android_get_control_socket(rildebug);
+     if (s_fdDebug < 0) {
+-        RLOGE("Failed to get socket : %s errno:%d", rildebug, errno);
+-        exit(-1);
++        RLOGW("Failed to get socket : %s errno:%d, creating local socket", rildebug, errno);
++        s_fdDebug = socket_local_server(rildebug,
++                                        ANDROID_SOCKET_NAMESPACE_RESERVED,
++                                        SOCK_STREAM);
++        if (s_fdDebug < 0) {
++            RLOGW("Failed to create socket : %s errno:%d", rildebug, errno);
++            exit(-1);
++        }
+     }
+ 
+     ret = listen(s_fdDebug, 4);
+diff --git a/libril/rilSocketQueue.h b/libril/rilSocketQueue.h
+index eaa5155..7ce7b0d 100644
+--- a/libril/rilSocketQueue.h
++++ b/libril/rilSocketQueue.h
+@@ -16,7 +16,11 @@
+ 
+ #include "pb_decode.h"
+ #include <pthread.h>
++#ifdef ANDROID
+ #include <hardware/ril/librilutils/proto/sap-api.pb.h>
++#else
++#include <proto/sap-api.pb.h>
++#endif
+ #include <utils/Log.h>
+ 
+ using namespace std;
+diff --git a/reference-ril/reference-ril.c b/reference-ril/reference-ril.c
+index 27329e1..6fff49a 100644
+--- a/reference-ril/reference-ril.c
++++ b/reference-ril/reference-ril.c
+@@ -36,6 +36,9 @@
+ #include <cutils/sockets.h>
+ #include <termios.h>
+ #include <sys/system_properties.h>
++#ifndef ANDROID
++#include <limits.h>
++#endif
+ 
+ #include "ril.h"
+ #include "hardware/qemu_pipe.h"
+@@ -43,6 +46,12 @@
+ #define LOG_TAG "RIL"
+ #include <utils/Log.h>
+ 
++#ifndef ANDROID
++int __system_property_get(const char* key, char* value) {
++    return property_get(key, value);
++}
++#endif
++
+ static void *noopRemoveWarning( void *a ) { return a; }
+ #define RIL_UNUSED_PARM(a) noopRemoveWarning((void *)&(a));
+ 
+diff --git a/rild/rild.c b/rild/rild.c
+index ce1adba..cfb7d25 100644
+--- a/rild/rild.c
++++ b/rild/rild.c
+@@ -317,7 +317,11 @@ int main(int argc, char **argv) {
+     }
+ OpenLib:
+ #endif
++
++// Only switch user to radio in Android, LE doesn't use radio user
++#ifdef ANDROID
+     switchUser();
++#endif
+ 
+     dlHandle = dlopen(rilLibPath, RTLD_NOW);
+ 
+-- 
+1.9.1
+

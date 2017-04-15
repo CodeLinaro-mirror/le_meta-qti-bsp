@@ -1,0 +1,81 @@
+From 266074e0fb78de2308413fa9ea0a03777cc51422 Mon Sep 17 00:00:00 2001
+From: Gustavo Solaira <gustavos@codeaurora.org>
+Date: Wed, 14 Dec 2016 17:26:46 -0800
+Subject: [PATCH] libnetutils: Add support for building in non-Android systems
+
+Make some changes to ifc_utils to allow building in non-Android environment
+through android compat.
+
+Change-Id: I752511c45d7e8755e1d2cab1257f252c44ad76b9
+---
+ ifc_utils.c | 28 ++++++++++++++++++++--------
+ 1 file changed, 20 insertions(+), 8 deletions(-)
+
+diff --git a/ifc_utils.c b/ifc_utils.c
+index 998e7f0..704740c 100644
+--- a/ifc_utils.c
++++ b/ifc_utils.c
+@@ -23,9 +23,13 @@
+ #include <sys/socket.h>
+ #include <sys/select.h>
+ #include <sys/types.h>
++#include <sys/ioctl.h>
++#include <sys/syscall.h>
+ #include <netinet/in.h>
+ #include <arpa/inet.h>
++#ifdef ANDROID
+ #include <net/if.h>
++#endif
+ #include <netdb.h>
+ 
+ #include <linux/if.h>
+@@ -33,21 +37,29 @@
+ #include <linux/if_arp.h>
+ #include <linux/netlink.h>
+ #include <linux/route.h>
++#include <linux/ipv6.h>
+ #include <linux/ipv6_route.h>
+ #include <linux/rtnetlink.h>
+ #include <linux/sockios.h>
+ 
+ #include "netutils/ifc.h"
+ 
+-#ifdef ANDROID
+ #define LOG_TAG "NetUtils"
+ #include <cutils/log.h>
+ #include <cutils/properties.h>
+-#else
+-#include <stdio.h>
+-#include <string.h>
+-#define ALOGD printf
+-#define ALOGW printf
++
++#ifndef ANDROID
++unsigned if_nametoindex(const char *name)
++{
++    struct ifreq ifr;
++    int fd, r;
++
++    if ((fd = socket(AF_UNIX, SOCK_DGRAM|SOCK_CLOEXEC, 0)) < 0) return -1;
++    strncpy(ifr.ifr_name, name, sizeof ifr.ifr_name);
++    r = ioctl(fd, SIOCGIFINDEX, &ifr);
++    syscall(SYS_close, fd);
++    return r < 0 ? r : ifr.ifr_ifindex;
++}
+ #endif
+ 
+ #ifdef HAVE_ANDROID_OS
+@@ -671,8 +683,8 @@ ifc_configure(const char *ifname,
+         in_addr_t address,
+         uint32_t prefixLength,
+         in_addr_t gateway,
+-        in_addr_t dns1,
+-        in_addr_t dns2) {
++        in_addr_t dns1 __attribute__((unused)),
++        in_addr_t dns2 __attribute__((unused))) {
+ 
+     char dns_prop_name[PROPERTY_KEY_MAX];
+ 
+-- 
+1.9.1
+

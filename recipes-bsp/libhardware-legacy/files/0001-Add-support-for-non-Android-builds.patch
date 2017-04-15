@@ -1,0 +1,39 @@
+From a2e348a4e61452492768ba0b39fc3187566dedfd Mon Sep 17 00:00:00 2001
+From: Gustavo Solaira <gustavos@codeaurora.org>
+Date: Wed, 14 Dec 2016 17:42:27 -0800
+Subject: [PATCH] Add support for non-Android builds
+
+Check for ANDROID_COMPAT in makefile to disable certain
+features that would not work on non-Android systems.
+
+Change-Id: I46f127e31a05abfba318b7aa5cded90deadd2443
+---
+ Android.mk | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/Android.mk b/Android.mk
+index 0a82a1f..eb322cd 100644
+--- a/Android.mk
++++ b/Android.mk
+@@ -1,7 +1,11 @@
+ # Copyright 2006 The Android Open Source Project
+ 
+ # Setting LOCAL_PATH will mess up all-subdir-makefiles, so do it beforehand.
++ifneq ($(ANDROID_COMPAT),true)
+ legacy_modules := power uevent vibrator wifi qemu qemu_tracing
++else
++legacy_modules := power uevent vibrator qemu qemu_tracing
++endif
+ 
+ SAVE_MAKEFILES := $(call all-named-subdir-makefiles,$(legacy_modules))
+ LEGACY_AUDIO_MAKEFILES := $(call all-named-subdir-makefiles,audio)
+@@ -46,4 +50,6 @@ include $(BUILD_SHARED_LIBRARY)
+ 
+ # legacy_audio builds it's own set of libraries that aren't linked into
+ # hardware_legacy
++ifneq ($(ANDROID_COMPAT),true)
+ include $(LEGACY_AUDIO_MAKEFILES)
++endif
+-- 
+1.9.1
+
