@@ -1,0 +1,36 @@
+From 6c2986065c35c451f4426e64ad851b956a130009 Mon Sep 17 00:00:00 2001
+From: Gustavo Solaira <gustavos@codeaurora.org>
+Date: Tue, 13 Dec 2016 17:33:49 -0800
+Subject: [PATCH 2/6] build: Allow passing CPPFLAGS from bitbake
+
+Create a new variable that can be used to pass both
+target and host flags to the project for C++ projects.
+
+Change-Id: I23ce6a54d5b6aa36123ef9c0d4a3930d354fa1c2
+---
+ build/core/binary.mk | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/build/core/binary.mk b/build/core/binary.mk
+index c17c7d7..8fdf424 100644
+--- a/build/core/binary.mk
++++ b/build/core/binary.mk
+@@ -170,6 +170,7 @@ $(foreach lib, $(my_suppress_static_libraries), \
+ #Add CFLAGS and LDFLAGS mentioned in the recipe
+ my_ldflags += $(LDFLAGS)
+ my_cflags += $(CFLAGS)
++my_cppflags += $(CPPFLAGS)
+ else
+ # suppress host libraries
+ my_suppress_shared_libraries := $(HOST_LIBRARY_SUPPRESS_LIST)
+@@ -184,6 +185,7 @@ $(foreach lib, $(my_suppress_static_libraries), \
+ #Use LDLIBS so it goes to the end due to a finicky from GCC
+ LOCAL_LDLIBS += $(HOST_LDFLAGS)
+ my_cflags += $(HOST_CFLAGS)
++my_cppflags += $(HOST_CPPFLAGS)
+ endif
+ 
+ # Add static HAL libraries
+-- 
+1.9.1
+

@@ -1,0 +1,207 @@
+From 73114100bd5ef2fd5230a79bcb4aecb203160b91 Mon Sep 17 00:00:00 2001
+From: Gustavo Solaira <gustavos@codeaurora.org>
+Date: Tue, 13 Dec 2016 17:35:34 -0800
+Subject: [PATCH 3/6] build: Update protobuf autogen to Android N version
+
+Update the makefiles for protobuf autogen to the latest
+N version to avoid conflicts with RIL related projects which
+rely heavily on protobuf.
+
+Change-Id: I4f82e8fee4bffead7160d01392091b1356d33891
+---
+ build/core/base_rules.mk  | 45 +-------------------------------
+ build/core/binary.mk      | 66 ++++++++++++++++++++++++++++++-----------------
+ build/core/definitions.mk |  6 ++---
+ 3 files changed, 46 insertions(+), 71 deletions(-)
+
+diff --git a/build/core/base_rules.mk b/build/core/base_rules.mk
+index f95f434..55dc417 100644
+--- a/build/core/base_rules.mk
++++ b/build/core/base_rules.mk
+@@ -157,7 +157,7 @@ $(module_id) := $(LOCAL_PATH)
+ 
+ intermediates := $(call local-intermediates-dir,,$(LOCAL_2ND_ARCH_VAR_PREFIX))
+ intermediates.COMMON := $(call local-intermediates-dir,COMMON)
+-generated_sources_dir := $(call local-generated-sources-dir)
++generated_sources_dir := $(TOP)
+ 
+ ###########################################################
+ # Pick a name for the intermediate and final targets
+@@ -254,49 +254,6 @@ event_log_tags :=
+ endif
+ 
+ ###########################################################
+-## .proto files: Compile proto files to .java
+-###########################################################
+-proto_sources := $(filter %.proto,$(LOCAL_SRC_FILES))
+-# Because names of the .java files compiled from .proto files are unknown until the
+-# .proto files are compiled, we use a timestamp file as depedency.
+-proto_java_sources_file_stamp :=
+-ifneq ($(proto_sources),)
+-proto_sources_fullpath := $(addprefix $(TOP_DIR)$(LOCAL_PATH)/, $(proto_sources))
+-# By putting the generated java files into $(LOCAL_INTERMEDIATE_SOURCE_DIR), they will be
+-# automatically found by the java compiling function transform-java-to-classes.jar.
+-ifneq ($(LOCAL_INTERMEDIATE_SOURCE_DIR),)
+-proto_java_intemediate_dir := $(LOCAL_INTERMEDIATE_SOURCE_DIR)/proto
+-else
+-# LOCAL_INTERMEDIATE_SOURCE_DIR may be not defined in non-java modules.
+-proto_java_intemediate_dir := $(intermediates)/proto
+-endif
+-proto_java_sources_file_stamp := $(proto_java_intemediate_dir)/Proto.stamp
+-proto_java_sources_dir := $(proto_java_intemediate_dir)/src
+-
+-$(proto_java_sources_file_stamp): PRIVATE_PROTO_INCLUDES := $(TOP)
+-$(proto_java_sources_file_stamp): PRIVATE_PROTO_SRC_FILES := $(proto_sources_fullpath)
+-$(proto_java_sources_file_stamp): PRIVATE_PROTO_JAVA_OUTPUT_DIR := $(proto_java_sources_dir)
+-ifeq ($(LOCAL_PROTOC_OPTIMIZE_TYPE),micro)
+-$(proto_java_sources_file_stamp): PRIVATE_PROTO_JAVA_OUTPUT_OPTION := --javamicro_out
+-else
+-  ifeq ($(LOCAL_PROTOC_OPTIMIZE_TYPE),nano)
+-$(proto_java_sources_file_stamp): PRIVATE_PROTO_JAVA_OUTPUT_OPTION := --javanano_out
+-  else
+-$(proto_java_sources_file_stamp): PRIVATE_PROTO_JAVA_OUTPUT_OPTION := --java_out
+-  endif
+-endif
+-$(proto_java_sources_file_stamp): PRIVATE_PROTOC_FLAGS := $(LOCAL_PROTOC_FLAGS)
+-$(proto_java_sources_file_stamp): PRIVATE_PROTO_JAVA_OUTPUT_PARAMS := $(LOCAL_PROTO_JAVA_OUTPUT_PARAMS)
+-$(proto_java_sources_file_stamp) : $(proto_sources_fullpath) $(PROTOC)
+-	$(call transform-proto-to-java)
+-
+-#TODO: protoc should output the dependencies introduced by imports.
+-
+-LOCAL_INTERMEDIATE_TARGETS += $(proto_java_sources_file_stamp)
+-endif # proto_sources
+-
+-
+-###########################################################
+ ## Java: Compile .java files to .class
+ ###########################################################
+ #TODO: pull this into java.make once host and target are combined
+diff --git a/build/core/binary.mk b/build/core/binary.mk
+index 8fdf424..e8e61c0 100644
+--- a/build/core/binary.mk
++++ b/build/core/binary.mk
+@@ -498,55 +498,73 @@ $(my_gen_sources_copy): $(intermediates)/% : $(generated_sources_dir)/% | $(ACP)
+ 
+ my_generated_sources := $(patsubst $(generated_sources_dir)/%,$(intermediates)/%,$(my_generated_sources))
+ 
++# Generated sources that will actually produce object files.
++# Other files (like headers) are allowed in LOCAL_GENERATED_SOURCES,
++# since other compiled sources may depend on them, and we set up
++# the dependencies.
++my_gen_src_files := $(filter %.c %$(LOCAL_CPP_EXTENSION) %.S %.s,$(my_generated_sources))
++
+ ALL_GENERATED_SOURCES += $(my_generated_sources)
+ 
+ ###########################################################
+-## Compile the .proto files to .cc and then to .o
++## Compile the .proto files to .cc (or .c) and then to .o
+ ###########################################################
+ proto_sources := $(filter %.proto,$(my_src_files))
+ proto_generated_objects :=
+ proto_generated_headers :=
+ ifneq ($(proto_sources),)
++proto_generated_sources_dir := $(generated_sources_dir)
++proto_generated_obj_dir := $(intermediates)
++
++ifneq (,$(filter nanopb-c nanopb-c-enable_malloc, $(LOCAL_PROTOC_OPTIMIZE_TYPE)))
++my_proto_source_suffix := .c
++my_proto_c_includes := $(WORKSPACE)/external/nanopb-c
++my_protoc_flags := --nanopb_out=$(proto_generated_sources_dir) \
++    --plugin=$(WORKSPACE)/external/nanopb-c/generator/protoc-gen-nanopb
++else
++my_proto_source_suffix := .cc
++my_proto_c_includes := external/protobuf/src
++my_cflags += -DGOOGLE_PROTOBUF_NO_RTTI
++my_protoc_flags := --cpp_out=$(proto_generated_sources_dir)
++endif
++my_proto_c_includes += $(proto_generated_sources_dir)
++
+ proto_sources_fullpath := $(addprefix $(LOCAL_PATH)/, $(proto_sources))
+-proto_generated_cc_sources_dir := $(generated_sources_dir)/proto
+-proto_generated_cc_sources := $(addprefix $(proto_generated_cc_sources_dir)/, \
+-    $(patsubst %.proto,%.pb.cc,$(proto_sources_fullpath)))
+-proto_generated_headers := $(patsubst %.pb.cc,%.pb.h, $(proto_generated_cc_sources))
+-proto_generated_obj_dir := $(intermediates)/proto
++proto_generated_sources := $(patsubst %.proto,%.pb$(my_proto_source_suffix),$(proto_sources_fullpath))
++proto_generated_headers := $(patsubst %.pb$(my_proto_source_suffix),%.pb.h, $(proto_generated_sources))
+ proto_generated_objects := $(addprefix $(proto_generated_obj_dir)/, \
+-    $(patsubst %.proto,%.pb.o,$(proto_sources_fullpath)))
+-
+-# Auto-export the generated proto source dir.
+-LOCAL_EXPORT_C_INCLUDE_DIRS += $(proto_generated_cc_sources_dir)
++    $(patsubst %.proto,%.pb.o,$(proto_sources)))
++$(call track-src-file-obj,$(proto_sources),$(proto_generated_objects))
+ 
+ # Ensure the transform-proto-to-cc rule is only defined once in multilib build.
+ ifndef $(my_prefix)_$(LOCAL_MODULE_CLASS)_$(LOCAL_MODULE)_proto_defined
+-$(proto_generated_cc_sources): PRIVATE_PROTO_INCLUDES := $(TOP)
+-$(proto_generated_cc_sources): PRIVATE_PROTO_CC_OUTPUT_DIR := $(proto_generated_cc_sources_dir)
+-$(proto_generated_cc_sources): PRIVATE_PROTOC_FLAGS := $(LOCAL_PROTOC_FLAGS)
+-$(proto_generated_cc_sources): $(proto_generated_cc_sources_dir)/%.pb.cc: %.proto $(PROTOC)
++$(proto_generated_sources): PRIVATE_PROTO_INCLUDES := $(TOP)
++$(proto_generated_sources): PRIVATE_PROTOC_FLAGS := $(LOCAL_PROTOC_FLAGS) $(my_protoc_flags)
++$(proto_generated_sources): $(LOCAL_PATH)/%.pb$(my_proto_source_suffix): $(LOCAL_PATH)/%.proto $(PROTOC)
+ 	$(transform-proto-to-cc)
+ 
+ # This is just a dummy rule to make sure gmake doesn't skip updating the dependents.
+-$(proto_generated_headers): $(proto_generated_cc_sources_dir)/%.pb.h: $(proto_generated_cc_sources_dir)/%.pb.cc
++$(proto_generated_headers): $(LOCAL_PATH)/%.pb.h: $(LOCAL_PATH)/%.pb$(my_proto_source_suffix)
+ 	@echo "Updated header file $@."
++	$(hide) touch $@
+ 
+ $(my_prefix)_$(LOCAL_MODULE_CLASS)_$(LOCAL_MODULE)_proto_defined := true
+ endif  # transform-proto-to-cc rule included only once
+ 
+ $(proto_generated_objects): PRIVATE_ARM_MODE := $(normal_objects_mode)
+ $(proto_generated_objects): PRIVATE_ARM_CFLAGS := $(normal_objects_cflags)
+-$(proto_generated_objects): $(proto_generated_obj_dir)/%.o: $(proto_generated_cc_sources_dir)/%.cc $(proto_generated_headers)
+-	$(transform-$(PRIVATE_HOST)cpp-to-o)
+--include $(proto_generated_objects:%.o=%.P)
+-
+-my_c_includes += external/protobuf/src $(proto_generated_cc_sources_dir)
+-my_cflags += -DGOOGLE_PROTOBUF_NO_RTTI
+-ifeq ($(LOCAL_PROTOC_OPTIMIZE_TYPE),full)
+-my_static_libraries += libprotobuf-cpp-2.3.0-full
++$(proto_generated_objects): $(proto_generated_obj_dir)/%.o: $(LOCAL_PATH)/%$(my_proto_source_suffix) $(proto_generated_headers)
++ifeq ($(my_proto_source_suffix),.c)
++	$(transform-$(PRIVATE_HOST)c-to-o)
+ else
+-my_static_libraries += libprotobuf-cpp-2.3.0-lite
++	$(transform-$(PRIVATE_HOST)cpp-to-o)
+ endif
++$(call include-depfiles-for-objs, $(proto_generated_objects))
++
++my_c_includes += $(my_proto_c_includes)
++# Auto-export the generated proto source dir.
++my_export_c_include_dirs += $(my_proto_c_includes)
++
+ endif  # $(proto_sources) non-empty
+ 
+ 
+diff --git a/build/core/definitions.mk b/build/core/definitions.mk
+index 054d4e0..7c99510 100644
+--- a/build/core/definitions.mk
++++ b/build/core/definitions.mk
+@@ -953,15 +953,15 @@ $(hide) touch $@
+ endef
+ 
+ ######################################################################
+-## Commands for running protoc to compile .proto into .pb.cc and .pb.h
++## Commands for running protoc to compile .proto into .pb.cc (or.pb.c) and .pb.h
+ ######################################################################
+ define transform-proto-to-cc
+-@mkdir -p $(dir $@)
+ @echo "Protoc: $@ <= $<"
++@mkdir -p $(dir $@)
+ $(hide) $(PROTOC) \
+ 	$(addprefix --proto_path=, $(PRIVATE_PROTO_INCLUDES)) \
+ 	$(PRIVATE_PROTOC_FLAGS) \
+-	--cpp_out=$(PRIVATE_PROTO_CC_OUTPUT_DIR) $<
++	$<
+ endef
+ 
+ 
+-- 
+1.9.1
+

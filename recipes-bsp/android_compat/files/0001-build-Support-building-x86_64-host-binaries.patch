@@ -1,0 +1,77 @@
+From 56c0d77df30a7e08c237d00b1a31af6781b2202a Mon Sep 17 00:00:00 2001
+From: Gustavo Solaira <gustavos@codeaurora.org>
+Date: Tue, 13 Dec 2016 17:31:40 -0800
+Subject: [PATCH 1/6] build: Support building x86_64 host binaries
+
+Modify definitions to allow building x86_64 host binaries from
+Android and add some variables for host compilation that can be
+modified from bitbake.
+
+Change-Id: Ic6c324feadcb12432e213f9cdfb6adc03b4a64b1
+---
+ build/core/binary.mk                  | 14 ++++++++++++++
+ build/core/combo/HOST_linux-x86_64.mk | 13 ++++++++++---
+ 2 files changed, 24 insertions(+), 3 deletions(-)
+
+diff --git a/build/core/binary.mk b/build/core/binary.mk
+index 9178cdb..c17c7d7 100644
+--- a/build/core/binary.mk
++++ b/build/core/binary.mk
+@@ -170,6 +170,20 @@ $(foreach lib, $(my_suppress_static_libraries), \
+ #Add CFLAGS and LDFLAGS mentioned in the recipe
+ my_ldflags += $(LDFLAGS)
+ my_cflags += $(CFLAGS)
++else
++# suppress host libraries
++my_suppress_shared_libraries := $(HOST_LIBRARY_SUPPRESS_LIST)
++$(foreach lib, $(my_suppress_shared_libraries), \
++   $(eval my_shared_libraries := $(filter-out $(lib), $(my_shared_libraries))))
++
++my_suppress_static_libraries := $(HOST_LIBRARY_SUPPRESS_LIST)
++$(foreach lib, $(my_suppress_static_libraries), \
++   $(eval my_static_libraries := $(filter-out $(lib), $(my_static_libraries))))
++
++#Add CFLAGS and LDFLAGS mentioned in the recipe
++#Use LDLIBS so it goes to the end due to a finicky from GCC
++LOCAL_LDLIBS += $(HOST_LDFLAGS)
++my_cflags += $(HOST_CFLAGS)
+ endif
+ 
+ # Add static HAL libraries
+diff --git a/build/core/combo/HOST_linux-x86_64.mk b/build/core/combo/HOST_linux-x86_64.mk
+index 53a3ae8..836e1ac 100644
+--- a/build/core/combo/HOST_linux-x86_64.mk
++++ b/build/core/combo/HOST_linux-x86_64.mk
+@@ -18,7 +18,7 @@
+ # Included by combo/select.mk
+ 
+ ifeq ($(strip $(HOST_TOOLCHAIN_PREFIX)),)
+-HOST_TOOLCHAIN_PREFIX := prebuilts/gcc/linux-x86/host/x86_64-linux-glibc2.11-4.6/bin/x86_64-linux-
++HOST_TOOLCHAIN_PREFIX := /usr/bin/
+ endif
+ # Don't do anything if the toolchain is not there
+ ifneq (,$(strip $(wildcard $(HOST_TOOLCHAIN_PREFIX)gcc)))
+@@ -27,11 +27,18 @@ HOST_CXX := $(HOST_TOOLCHAIN_PREFIX)g++
+ HOST_AR  := $(HOST_TOOLCHAIN_PREFIX)ar
+ endif # $(HOST_TOOLCHAIN_PREFIX)gcc exists
+ 
++ifneq ($(strip $(HOST_SYSROOT)),)
++HOST_GLOBAL_CFLAGS += -I $(HOST_SYSROOT)/usr/include
++HOST_GLOBAL_CFLAGS += -DFEATURE_ANDROID_COMPAT_BUILDER
++HOST_GLOBAL_CFLAGS += -Wno-unused-result
++HOST_GLOBAL_LDFLAGS += -L $(HOST_SYSROOT)/usr/lib -lpthread -ldl
++endif
++
+ # gcc location for clang; to be updated when clang is updated
+ HOST_TOOLCHAIN_FOR_CLANG := prebuilts/gcc/linux-x86/host/x86_64-linux-glibc2.11-4.6/
+ 
+-HOST_GLOBAL_CFLAGS += -m64 -Wa,--noexecstack
+-HOST_GLOBAL_LDFLAGS += -m64 -Wl,-z,noexecstack
++HOST_GLOBAL_CFLAGS += -Wa,--noexecstack
++HOST_GLOBAL_LDFLAGS += -Wl,-z,noexecstack
+ 
+ ifneq ($(strip $(BUILD_HOST_static)),)
+ # Statically-linked binaries are desirable for sandboxed environment
+-- 
+1.9.1
+
