@@ -1,0 +1,41 @@
+From 1974933d645fc727b2529f7b46ebd308634c3954 Mon Sep 17 00:00:00 2001
+From: Bharathraj Nagaraju <snbraj@codeaurora.org>
+Date: Mon, 17 Apr 2017 12:43:11 -0700
+Subject: [PATCH 2/3] ofono: Added a change RIL to use root uid.
+
+Signed-off-by: Bharathraj Nagaraju <snbraj@codeaurora.org>
+---
+ plugins/ril.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/plugins/ril.c b/plugins/ril.c
+index a98646c..7593c4f 100644
+--- a/plugins/ril.c
++++ b/plugins/ril.c
+@@ -67,6 +67,11 @@
+ #define	RADIO_GID 1001
+ #define	RADIO_UID 1001
+ 
++#ifdef RIL_USE_ROOT_UID
++#define ROOT_UID 0
++#define ROOT_GID 0
++#endif
++
+ #define MAX_SIM_STATUS_RETRIES 15
+ 
+ /* this gives 30s for rild to initialize */
+@@ -347,7 +352,11 @@ static int create_gril(struct ofono_modem *modem)
+ 	/* RIL expects user radio to connect to the socket */
+ 	rd->ril = g_ril_new_with_ucred(RILD_CMD_SOCKET[slot_id],
+ 						OFONO_RIL_VENDOR_AOSP,
++#ifndef RIL_USE_ROOT_UID
+ 						RADIO_UID, RADIO_GID);
++#else
++						ROOT_UID, ROOT_GID);
++#endif
+ 
+ 	/* NOTE: Since AT modems open a tty, and then call
+ 	 * g_at_chat_new(), they're able to return -EIO if
+-- 
+2.9.0.137.gcf4c2cf
+
