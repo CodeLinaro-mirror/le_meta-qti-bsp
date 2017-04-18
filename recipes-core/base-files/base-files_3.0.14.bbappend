@@ -1,6 +1,9 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}-${PV}:"
 DEPENDS = "base-passwd"
-SRC_URI_append += "${@base_contains('DISTRO_FEATURES','ro-rootfs','file://ro/fstab','file://fstab',d)}"
+
+SRC_URI_append += "file://fstab"
+SRC_URI_append += "file://ro-fstab"
+SRC_URI_append_apq8053 += "file://apq8053/ro-fstab"
 
 dirs755 += "/media/cf /media/net /media/ram \
             /media/union /media/realroot /media/hdd \
@@ -14,7 +17,12 @@ do_install_append(){
     install -m 755 -o diag -g diag -d ${D}/media
     install -m 755 -o diag -g diag -d ${D}/mnt/sdcard
     if ${@base_contains('DISTRO_FEATURES','ro-rootfs','true','false',d)}; then
-        install -m 0644 ${WORKDIR}/ro/fstab ${D}${sysconfdir}/fstab
+        # Override fstab for apq8053
+        if [ ${BASEMACHINE} == "apq8053" ]; then
+            install -m 0644 ${WORKDIR}/${BASEMACHINE}/ro-fstab ${D}${sysconfdir}/fstab
+        else
+            install -m 0644 ${WORKDIR}/ro-fstab ${D}${sysconfdir}/fstab
+        fi
     else
         install -m 0644 ${WORKDIR}/fstab ${D}${sysconfdir}/fstab
     fi
