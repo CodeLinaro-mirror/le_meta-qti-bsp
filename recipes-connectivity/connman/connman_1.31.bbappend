@@ -1,5 +1,6 @@
 FILESEXTRAPATHS_prepend = "${WORKSPACE}:"
-SRC_URI = "\
+SRC_URI_remove = "${KERNELORG_MIRROR}/linux/network/${BPN}/${BP}.tar.xz"
+SRC_URI += "\
            file://external/connman/ \
           "
 
