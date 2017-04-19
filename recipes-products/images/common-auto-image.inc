@@ -98,3 +98,8 @@ IMAGE_INSTALL += "agl-users"
 
 # base passwd
 IMAGE_INSTALL += "base-passwd"
+
+# GENIVI common-api
+IMAGE_INSTALL += "common-api-c++-dbus"
+IMAGE_INSTALL += "common-api-c++"
+
