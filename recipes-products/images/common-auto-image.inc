@@ -104,3 +104,6 @@ IMAGE_INSTALL += "base-passwd"
 IMAGE_INSTALL += "common-api-c++-dbus"
 IMAGE_INSTALL += "common-api-c++"
 
+# Sqlite
+IMAGE_INSTALL += "sqlite"
+IMAGE_INSTALL += "sqlite-bin"
