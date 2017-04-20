@@ -27,11 +27,12 @@
 
 [Unit]
 Description=Firmware-links
+DefaultDependencies=no
 Before=multi-user.target
-After=local-fs.target
+After=firmware.mount
 
 [Service]
-Type=forking
+Type=oneshot
 Restart=no
 TimeoutSec=5min
 IgnoreSIGPIPE=no

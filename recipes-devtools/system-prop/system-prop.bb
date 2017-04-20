@@ -5,6 +5,7 @@ PR = "r0"
 FILESPATH =+ "${WORKSPACE}/android_compat/device/qcom/:"
 SRC_URI   = "file://${SOC_FAMILY}"
 SRC_URI  += "file://persist-prop.sh"
+SRC_URI  += "file://persist-prop.service"
 
 DESCRIPTION = "Script to populate system properties"
 
@@ -26,6 +27,14 @@ do_install() {
     install -d ${D}
     install ${S}/build.prop ${D}/build.prop
     install -m 0755 ${WORKDIR}/persist-prop.sh -D ${D}${sysconfdir}/init.d/persist-prop
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
+       install -d ${D}${systemd_unitdir}/system/
+       install -m 0644 ${WORKDIR}/persist-prop.service -D ${D}${systemd_unitdir}/system/persist-prop.service
+       install -d ${D}${systemd_unitdir}/system/multi-user.target.wants/
+       # enable the service for multi-user.target
+       ln -sf ${systemd_unitdir}/system/persist-prop.service \
+            ${D}${systemd_unitdir}/system/multi-user.target.wants/persist-prop.service
+    fi
 }
 
 pkg_postinst_${PN} () {
@@ -38,3 +47,4 @@ pkg_postinst_${PN} () {
 
 PACKAGES = "${PN}"
 FILES_${PN} += "/build.prop"
+FILES_${PN} += "${systemd_unitdir}/system/"

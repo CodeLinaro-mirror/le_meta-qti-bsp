@@ -7,6 +7,6 @@ MACHINE ??= "8x96auto"
 
 inherit qperf
 
-require ${MACHINE}/${MACHINE}-image.inc
 include machine-auto-image.bb
+require ${MACHINE}/${MACHINE}-image.inc
 #IMAGE_INSTALL += "packagegroup-agl-ivi"
