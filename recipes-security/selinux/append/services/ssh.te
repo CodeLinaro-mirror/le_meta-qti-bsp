@@ -28,3 +28,4 @@
 allow sshd_t self:capability net_raw;
 fs_search_tmpfs(ssh_keygen_t)
 allow ssh_t self:capability net_raw;
+allow sshd_t device_t:sock_file { read write open getattr };
