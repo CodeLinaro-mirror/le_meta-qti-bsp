@@ -10,7 +10,7 @@ COMPATIBLE_MACHINE = "(mdm9607|mdm9650|apq8009|apq8096|apq8053|apq8017|msm8909w|
 KERNEL_IMAGETYPE ?= "zImage"
 
 python __anonymous () {
-  if bb.utils.contains('DISTRO_FEATURES', 'qti-perf', True, False, d):
+  if (d.getVar('PERF_BUILD', True) == '1'):
       imgtype = d.getVar("KERNEL_PERF_IMAGETYPE", True)
       if imgtype:
           d.setVar("KERNEL_IMAGETYPE", d.getVar("KERNEL_PERF_IMAGETYPE", True))
@@ -149,7 +149,7 @@ do_shared_workdir () {
         cp ${STAGING_KERNEL_DIR}/scripts/gen_initramfs_list.sh $kerneldir/scripts/
 
         # Make vmlinux available as soon as possible
-        if ${@bb.utils.contains('DISTRO_FEATURES', 'qti-perf', 'true', 'false', d)}; then
+        if [ ${PERF_BUILD} == "1" ]; then
 		install -d ${STAGING_DIR_TARGET}-perf/${KERNEL_IMAGEDEST}
 	        install -m 0644 ${KERNEL_OUTPUT} ${STAGING_DIR_TARGET}-perf/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}
 	        install -m 0644 vmlinux ${STAGING_DIR_TARGET}-perf/${KERNEL_IMAGEDEST}/vmlinux-${KERNEL_VERSION}
