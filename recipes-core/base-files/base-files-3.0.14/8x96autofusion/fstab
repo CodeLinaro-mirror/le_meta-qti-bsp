@@ -8,7 +8,8 @@ PARTLABEL=modem      /firmware            auto       defaults              0  2
 PARTLABEL=persist    /persist             auto       defaults              0  2
 PARTLABEL=userdata   /data                auto       defaults              0  2
 PARTLABEL=dsp        /dsp                 auto       defaults              0  2
-PARTLABEL=bluetooth  /bluetooth           auto       defaults              0  2
+# mctm do not have bt-synergy
+#PARTLABEL=bluetooth  /bluetooth           auto       defaults              0  2
 PARTLABEL=cache      /cache               auto       defaults              0  2
 
 # uncomment this if your device has a SD/MMC/Transflash slot
