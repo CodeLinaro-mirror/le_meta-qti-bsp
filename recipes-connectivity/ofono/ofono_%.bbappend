@@ -8,6 +8,7 @@ S = "${WORKDIR}/external/ofono"
 
 PV = "1.19"
 PR = "r1"
+DEPENDS += "multimodule-mgr-oss"
 
 do_install_prepend() {
     touch ${WORKDIR}/ofono
