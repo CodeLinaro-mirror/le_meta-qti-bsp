@@ -51,6 +51,7 @@ IMAGE_INSTALL += "pixman"
 IMAGE_INSTALL += "weston"
 IMAGE_INSTALL += "weston-init"
 IMAGE_INSTALL += "libinput"
+IMAGE_INSTALL += "display-hal-linux"
 
 IMAGE_INSTALL += "gstreamer1.0"
 IMAGE_INSTALL += "gstreamer1.0-plugins-base"
