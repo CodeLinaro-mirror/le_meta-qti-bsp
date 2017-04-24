@@ -158,6 +158,7 @@ FILES_${PN}-leprop     += "${systemd_unitdir}/system/leprop.service ${systemd_un
 
 FILES_${PN}-dbg  = "${bindir}/.debug/* ${libdir}/.debug/*"
 FILES_${PN}      = "${bindir}/* ${libdir}/pkgconfig/* ${libdir}/*.so.* "
+FILES_${PN}      += "/etc/*"
 FILES_${PN}-dev  = "${libdir}/*.so ${libdir}/*.la ${includedir}*"
 
 # Including the file depends on chipset
