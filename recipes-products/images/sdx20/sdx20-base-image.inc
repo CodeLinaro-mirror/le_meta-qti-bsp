@@ -1,6 +1,8 @@
 # Rootfs creation.
 require ../../../recipes-ss-mgr/packagegroup/ss-mgr.inc
 require ../../../recipes-bt/packagegroup/bt.inc
+require ../../../recipes-audio/audio.inc
+
 DEPENDS_append_aarch64 += "lib32-lk"
 DEPENDS_append_arm += "lk"
 
@@ -9,8 +11,6 @@ IMAGE_INSTALL += "${ROOTFS_PKGMANAGE_BOOTSTRAP}"
 IMAGE_INSTALL += "${CORE_IMAGE_EXTRA_INSTALL}"
 
 # The MSM Linux minimal boot image files.
-IMAGE_INSTALL += "alsa-intf"
-
 IMAGE_INSTALL += "avahi-daemon"
 IMAGE_INSTALL += "avahi-dnsconfd"
 IMAGE_INSTALL += "avahi-autoipd"
@@ -63,8 +63,8 @@ IMAGE_INSTALL += "powerapp-reboot"
 IMAGE_INSTALL += "powerapp-shutdown"
 IMAGE_INSTALL += "ppp"
 IMAGE_INSTALL += "perl"
-IMAGE_INSTALL += "qcacld-ll"
-IMAGE_INSTALL += "qcacld-hl"
+IMAGE_INSTALL += "qcacld30-ll"
+IMAGE_INSTALL += "qcacld30-hl"
 
 IMAGE_INSTALL += "rtsp-alg"
 IMAGE_INSTALL += "sfe"

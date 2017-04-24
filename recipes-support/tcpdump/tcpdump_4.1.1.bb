@@ -24,6 +24,12 @@ PACKAGECONFIG ??= "ipv6"
 PACKAGECONFIG[openssl] = "--with-crypto=yes, --without-crypto, openssl"
 PACKAGECONFIG[ipv6] = "--enable-ipv6, --disable-ipv6,"
 
+
+do_configure_prepend () {
+        #Allow build paths with containing AU_
+        sed 's|AC_CANONICAL_HOST|m4_pattern_allow([^AU_])\nAC_CANONICAL_HOST|' -i ${S}/configure.in
+}
+
 do_configure() {
 	sed -i 's:-L/lib:-L${STAGING_LIBDIR}:g' ./configure.in
 	gnu-configize

@@ -1,5 +1,6 @@
 # Rootfs creation.
 require ../../../recipes-ss-mgr/packagegroup/ss-mgr.inc
+require ../../../recipes-audio/audio.inc
 require ../../../recipes-bt/packagegroup/bt.inc
 
 DEPENDS_append += "lib32-lk"
@@ -15,7 +16,6 @@ IMAGE_INSTALL += "start-scripts-firmware-links"
 IMAGE_INSTALL += "refpolicy-mls"
 IMAGE_INSTALL += "start-scripts-find-partitions"
 IMAGE_INSTALL += "start-scripts-misc-daemon"
-IMAGE_INSTALL += "selinux-labelall"
 
 # The MSM Linux minimal boot image files.
 IMAGE_INSTALL += "alsa-lib"
@@ -65,11 +65,7 @@ IMAGE_INSTALL += "lib32-display-hal"
 IMAGE_INSTALL += "lib32-live555-qti"
 IMAGE_INSTALL += "lib32-qmmf-support"
 IMAGE_INSTALL += "lib32-qmmf-webserver"
-IMAGE_INSTALL += "lib32-media"
 IMAGE_INSTALL += "lib32-camera"
-IMAGE_INSTALL += "lib32-tinyalsa"
-IMAGE_INSTALL += "lib32-audiohal"
-IMAGE_INSTALL += "lib32-encoders"
 IMAGE_INSTALL += "lib32-gtest"
 
 IMAGE_INSTALL += "lib32-qmmf-sdk"

@@ -27,5 +27,7 @@ RDEPENDS_${PN} = "perl perl-module-strict perl-module-dynaloader perl-module-get
 
 do_install() {
    install -m 0755 ${S}/ddclient -D ${D}${sbindir}/ddclient
-   install -m 0644 ${S}/sample-etc_ddclient.conf -D ${D}${sysconfdir}/ddclient.conf 
+   install -m 0644 ${S}/sample-etc_ddclient.conf -D ${D}${userfsdatadir}/ddclient.conf
 }
+
+FILES_${PN} += "${userfsdatadir}/ddclient.conf"
