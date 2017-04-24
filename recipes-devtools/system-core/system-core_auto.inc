@@ -3,5 +3,6 @@ EXTRA_OECONF_remove = "--with-logd-logging"
 do_install_append() {
    if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
       sed -i -e '/^ExecStart=/i\ExecStartPre=/bin/mkdir -p -m 777 /dev/socket' ${D}/${systemd_unitdir}/system/leprop.service
+      sed -i -e 's/\/etc\/init.d/\/etc\/initscripts/' ${D}/${systemd_unitdir}/system/init_post_boot.service
    fi
 }
