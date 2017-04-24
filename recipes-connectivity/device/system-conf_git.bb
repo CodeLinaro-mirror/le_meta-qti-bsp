@@ -48,6 +48,10 @@ EXTRA_OECONF_remove = "${@base_conditional('BASEPRODUCT', 'qsap', '--enable-pron
 EXTRA_OECONF += "${@base_conditional('BASEPRODUCT', 'qsap', '--enable-snap-wlan=yes', '', d)}"
 EXTRA_OECONF += "${@base_conditional('BASEPRODUCT', 'qsap', '--enable-qsap-wlan=yes', '', d)}"
 
+# Enable ipc-wlan in place of pronto-wlan for IPC
+EXTRA_OECONF_remove = "${@base_conditional('BASEPRODUCT', 'base', '--enable-pronto-wlan=yes', '', d)}"
+EXTRA_OECONF += "${@base_conditional('BASEPRODUCT', 'base', '--enable-ipc-wlan=yes', '', d)}"
+
 INITSCRIPT_NAME   = "wlan_daemon"
 INITSCRIPT_PARAMS = "remove"
 INITSCRIPT_PARAMS_apq8009 = "${@base_conditional('BASEPRODUCT', 'drone', 'start 01 2 3 4 5 . stop 2 0 1 6 .', 'start 98 5 . stop 2 0 1 6 .', d)}"
