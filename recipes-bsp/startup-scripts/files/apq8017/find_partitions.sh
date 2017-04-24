@@ -40,4 +40,7 @@ FindAndMountEXT4 () {
 FindAndMountEXT4 userdata /data
 FindAndMountEXT4 persist /persist
 FindAndMountEXT4 dsp /dsp
+FindAndMountEXT4 cache  /cache
+/sbin/restorecon -RF  /dev
+/sbin/restorecon -RF /data/misc/wifi
 exit 0

@@ -14,4 +14,3 @@ SRC_URI   = "file://applypatch"
 
 S = "${WORKDIR}/applypatch"
 
-EXTRA_OECONF = " --with-host-os=${HOST_OS}"

@@ -4,6 +4,9 @@ require conf/machine/include/basemachine.inc
 SOC_FAMILY ?= "mdm9x50"
 include conf/machine/include/soc-family.inc
 
+# Pull in security flags
+require ${COREBASE}/meta-qti-bsp/conf/distro/include/security_flags.inc
+
 # Uncomment the following line to enable the hard floating point abi. Note that
 # this breaks some binary libraries and 3D (neither of which ship with
 # meta-yocto). For maximum compatibility, leave this disabled.
@@ -12,6 +15,7 @@ include conf/machine/include/soc-family.inc
 include conf/machine/include/tune-cortexa8.inc
 
 BBMASK = ".*/*/recipes-kernel/linux-msm-4.4"
+BBMASK .= "|.*/*/recipes-security/libselinux/"
 
 MACHINE_DISPLAY_WIDTH_PIXELS ?= "480"
 MACHINE_DISPLAY_HEIGHT_PIXELS ?= "640"
@@ -20,7 +24,7 @@ SERIAL_CONSOLE ?= "115200 ttyHSL0"
 
 DISTRO ?= "mdm"
 
-MACHINE_FEATURES += "kernel26 keyboard"
+MACHINE_FEATURES += "kernel26 keyboard ipa-offload"
 
 PAGE_SIZE ?= '4096'
 

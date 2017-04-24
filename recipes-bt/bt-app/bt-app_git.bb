@@ -28,7 +28,6 @@ EXTRA_OECONF = " \
                 --with-glib \
                 --with-lib-path=${STAGING_LIBDIR} \
                 --with-btobex \
-                --with-gengatt \
                "
 EXTRA_OECONF += "--enable-target=${BASEMACHINE}"
 

@@ -30,3 +30,15 @@ INITSCRIPT_PARAMS = "start 91 5 . stop 15 0 1 6 ."
 #update-rc.d $OPT -f start_alx_le remove
 #update-rc.d $OPT start_alx_le start 91 5 . stop 15 0 1 6 .
 #}
+
+
+do_module_signing() {
+    if [ -f ${STAGING_KERNEL_BUILDDIR}/certs/signing_key.pem ]; then
+	for i in $(find ${PKGDEST} -name "*.ko"); do
+	    bbnote "Signing $(basename $i) module"
+	    ${STAGING_KERNEL_BUILDDIR}/scripts/sign-file sha512 ${STAGING_KERNEL_BUILDDIR}/certs/signing_key.pem ${STAGING_KERNEL_BUILDDIR}/certs/signing_key.x509 ${i}
+	done
+    fi
+}
+
+addtask do_module_signing after do_package before do_package_write_ipk

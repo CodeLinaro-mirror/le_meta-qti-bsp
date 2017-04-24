@@ -11,7 +11,6 @@ SRC_URI = "file://hardware/qcom/gps/"
 S = "${WORKDIR}/hardware/qcom/gps"
 DEPENDS = "glib-2.0 gps-utils qmi qmi-framework data loc-pla loc-flp-hdr"
 EXTRA_OECONF = "--with-core-includes=${WORKSPACE}/system/core/include \
-                --with-locflp-includes=${STAGING_INCDIR}/loc-flp-hdr \
                 --with-glib"
 
 
