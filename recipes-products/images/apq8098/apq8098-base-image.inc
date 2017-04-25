@@ -1,6 +1,8 @@
 # Rootfs creation.
 require ../../../recipes-ss-mgr/packagegroup/ss-mgr.inc
+require ../../../recipes-audio/audio.inc
 require ../../../recipes-bt/packagegroup/bt.inc
+
 DEPENDS_append += "edk2"
 # The OE-Core minimal boot image files.
 IMAGE_FSTYPES = "ext4"
@@ -47,18 +49,11 @@ IMAGE_INSTALL += "weston-init"
 IMAGE_INSTALL += "libinput"
 IMAGE_INSTALL += "libdrm"
 
-# 32-bit packages
-IMAGE_INSTALL += "lib32-tinyalsa"
-IMAGE_INSTALL += "lib32-audiohal"
-#IMAGE_INSTALL += "fileipc"
-#IMAGE_INSTALL += "demux"
-
 IMAGE_INSTALL += "gstreamer1.0"
 IMAGE_INSTALL += "gstreamer1.0-plugins-base"
 IMAGE_INSTALL += "gstreamer1.0-plugins-good"
 IMAGE_INSTALL += "gstreamer1.0-plugins-bad"
 IMAGE_INSTALL += "gstreamer1.0-rtsp-server"
-
 #IMAGE_PREPROCESS_COMMAND += "echo ${MACHINE} >> ${IMAGE_ROOTFS}/target;"
 
 # Below is to generate sparse ext4 system image (OE by default supports raw ext4 images)

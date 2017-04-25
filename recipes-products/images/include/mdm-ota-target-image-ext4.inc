@@ -25,11 +25,14 @@ mkdir -p ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/OTA
 mkdir -p ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY
 mkdir -p ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/SYSTEM
 mkdir -p ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RADIO
+#Create this folder just for saving file_contexts(SElinux security context file),
+#It will be used to generate OTA packages when selinux_fc is set.
+mkdir -p ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/BOOT/RAMDISK
 
 echo "base image rootfs: ${BASE_IMAGE_ROOTFS_EXT4}"
 
 # copy radio directory content into RADIO directory
-cp -r ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/base-files-recovery/${MACHINE}/radio/. ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RADIO/.
+cp -r ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/base-files-recovery/${BASEMACHINE}/radio/. ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RADIO/.
 
 # copy the boot\recovery images
 cp ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/BOOTABLE_IMAGES/boot.img
@@ -60,6 +63,15 @@ cp   ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/usr/bin/applypatch ${OTA_TARGET_IM
 
 cp   ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/usr/bin/updater ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/OTA/bin/.
 
+#cp and modify file_contexts to BOOT/RAMDISK and recoveryfs
+if [[ "${DISTRO_FEATURES}" =~ "selinux" ]]; then
+    cp ${BASE_IMAGE_ROOTFS_EXT4}/etc/selinux/mls/contexts/files/file_contexts ${IMAGE_ROOTFS}/.
+    sed -i 's#^/#/system/#g' ${IMAGE_ROOTFS}/file_contexts
+    cp ${IMAGE_ROOTFS}/file_contexts ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/BOOT/RAMDISK/.
+    #set selinux_fc
+    echo selinux_fc=BOOT/RAMDISK/file_contexts >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
+fi
+
 # copy contents of META folder
 #recovery_api_version is from recovery module
 echo recovery_api_version=3 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
@@ -67,7 +79,7 @@ echo recovery_api_version=3 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.tx
 #blocksize = BOARD_FLASH_BLOCK_SIZE
 echo blocksize=131072 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 
-if [ "${MACHINE}" == "apq8053" ] || [ "${MACHINE}" == "apq8053-iot-mtp" ]; then
+if [ "${MACHINE}" == "apq8053" ] || [ "${MACHINE}" == "apq8053-iot-mtp" ] || [ "${MACHINE}" == "apq8009-robot" ]; then
    #boot_size: Size of boot partition from partition.xml
    echo boot_size=0x01900000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 

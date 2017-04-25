@@ -1,5 +1,6 @@
 # Rootfs creation.
 require ../../../recipes-ss-mgr/packagegroup/ss-mgr.inc
+require ../../../recipes-audio/audio.inc
 require ../../../recipes-bt/packagegroup/bt.inc
 
 DEPENDS_append += "lib32-lk"
@@ -17,12 +18,6 @@ IMAGE_INSTALL += "alsa-lib"
 IMAGE_INSTALL += "alsa-utils"
 IMAGE_INSTALL += "tinycompress"
 IMAGE_INSTALL += "rmtstorage"
-
-# AUDIO HAL
-IMAGE_INSTALL += "lib32-tinyalsa"
-IMAGE_INSTALL += "lib32-audiohal"
-IMAGE_INSTALL += "lib32-encoders"
-IMAGE_INSTALL += "lib32-media"
 
 IMAGE_INSTALL += "base-files"
 IMAGE_INSTALL += "base-passwd"

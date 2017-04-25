@@ -67,3 +67,4 @@ dev_rw_null(thermal-engine_t)
 read_proc_enrty(thermal-engine_t)
 allow thermal-engine_t sysfs_t:file write;
 open_proc_enrty(thermal-engine_t)
+getattr_proc_entry(thermal-engine_t)

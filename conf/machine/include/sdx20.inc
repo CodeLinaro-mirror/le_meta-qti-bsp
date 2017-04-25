@@ -1,4 +1,4 @@
-BASEMACHINE ?= "sdxhedgehog"
+BASEMACHINE ?= "sdx20"
 require conf/machine/include/basemachine.inc
 
 SOC_FAMILY ?= "mdm9x50"
