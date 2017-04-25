@@ -9,7 +9,6 @@ HOMEPAGE = "https://www.codeaurora.org/gitweb/quic/la?p=device/qcom/common.git"
 
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI = "file://android_compat/device/qcom/common/recovery/oem-recovery/"
-SRC_URI += "file://0001-common-oem-recovery-Add-partition-label-path.patch"
 
 S = "${WORKDIR}/android_compat/device/qcom/common/recovery/oem-recovery/"
 
