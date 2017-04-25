@@ -7,26 +7,32 @@ ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 
 PR = "r0"
 
+def get_depends(d):
+  if d.getVar('MACHINE', True) == 'apq8096':
+    return "qmmf-sdk"
+  else:
+    return "media rb-camera av-frameworks"
+
 DEPENDS = "liblog"
 DEPENDS += "libcutils"
 DEPENDS += "native-frameworks"
 DEPENDS += "system-core"
 DEPENDS += "glib-2.0"
-DEPENDS += "qmmf-sdk" 
+DEPENDS += "${@get_depends(d)}"
+
+
+def get_oeconf(d):
+  if d.getVar('MACHINE', True) == 'apq8096':
+    return "--with-camerahal=${WORKSPACE}/camera/lib/QCamera2/HAL3 --with-qmmf_sdk"
+  else:
+    return "--with-camhal1"
 
 EXTRA_OECONF_append = " --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
-EXTRA_OECONF += " --with-camerahal=${WORKSPACE}/camera/lib/QCamera2/HAL3"
-
-#Buid libcamera using qmmf-sdk 
-EXTRA_OECONF += " --with-qmmf_sdk"
-
-#Libcamera can be built with either qmmf-sdk or camera-hal and not both
-#Uncomment line below to build libcamera using camera HAL 1. 
-#EXTRA_OECONF += " --with-camhal1"
+EXTRA_OECONF += "${@get_oeconf(d)}"
 
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI   = "file://vendor/qcom/opensource/libroboticscamera/"
-
+ 
 SRCREV = "${AUTOREV}"
 S      = "${WORKDIR}/vendor/qcom/opensource/libroboticscamera/"
 
