@@ -41,8 +41,6 @@ do_install_append() {
    install -d ${D}${userfsdatadir}/usb/
    install -m 0755 ${S}/usb/compositions/hsic_next -D ${D}${userfsdatadir}/usb/
    install -m 0755 ${S}/usb/compositions/hsusb_next -D ${D}${userfsdatadir}/usb/
-   rm ${S}/usb/compositions/hsic_next
-   rm ${S}/usb/compositions/hsusb_next
    install -m 0755 ${S}/usb/target -D ${D}${base_sbindir}/usb/
    install -d ${D}${base_sbindir}/usb/debuger/
    install -m 0755 ${S}/usb/debuger/debugFiles -D ${D}${base_sbindir}/usb/debuger/
