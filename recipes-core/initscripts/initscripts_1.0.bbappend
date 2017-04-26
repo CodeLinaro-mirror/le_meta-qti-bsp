@@ -47,5 +47,6 @@ do_install_append() {
          update-rc.d -r ${D} set_core_pattern.sh start 01 S 2 3 4 5 S .
         fi
 
-        echo "test ! -x /sbin/restorecon || /sbin/restorecon -F /tmp" >> ${D}${sysconfdir}/init.d/populate-volatile.sh
+        sed -i '/^test ! -x \/sbin\/restorecon/ d' ${D}${sysconfdir}/init.d/populate-volatile.sh
+        echo "test ! -x /sbin/restorecon || /sbin/restorecon -F /var/log" >> ${D}${sysconfdir}/init.d/populate-volatile.sh
 }

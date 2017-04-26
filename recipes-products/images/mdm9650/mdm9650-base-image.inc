@@ -1,5 +1,6 @@
 # Rootfs creation.
 require ../../../recipes-ss-mgr/packagegroup/ss-mgr.inc
+require ../../../recipes-audio/audio.inc
 require ../../../recipes-bt/packagegroup/bt.inc
 
 DEPENDS_append += "lk"
@@ -9,7 +10,6 @@ IMAGE_INSTALL += "${ROOTFS_PKGMANAGE_BOOTSTRAP}"
 IMAGE_INSTALL += "${CORE_IMAGE_EXTRA_INSTALL}"
 
 # The MSM Linux minimal boot image files.
-IMAGE_INSTALL += "alsa-intf"
 
 IMAGE_INSTALL += "avahi-daemon"
 IMAGE_INSTALL += "avahi-dnsconfd"
@@ -26,6 +26,7 @@ IMAGE_INSTALL += "dhcpcd"
 IMAGE_INSTALL += "dnsmasq"
 IMAGE_INSTALL += "ddclient"
 IMAGE_INSTALL += "ebtables"
+IMAGE_INSTALL += "ethernet-neutrino-pcie"
 IMAGE_INSTALL += "ethtool"
 
 IMAGE_INSTALL += "gdbserver"
@@ -56,6 +57,7 @@ IMAGE_INSTALL += "libsensors"
 IMAGE_INSTALL += "minidlna"
 IMAGE_INSTALL += "miniupnpd"
 IMAGE_INSTALL += "mtd-utils-ubifs"
+IMAGE_INSTALL += "open-avb"
 IMAGE_INSTALL += "openssl"
 IMAGE_INSTALL += "pimd"
 IMAGE_INSTALL += "powerapp"
@@ -73,7 +75,6 @@ IMAGE_INSTALL += "sigma-dut"
 IMAGE_INSTALL += "start-scripts-find-partitions"
 IMAGE_INSTALL += "start-scripts-firmware-links"
 IMAGE_INSTALL += "system-core-adbd"
-IMAGE_INSTALL += "system-core-logd"
 IMAGE_INSTALL += "system-core-usb"
 IMAGE_INSTALL += "system-conf"
 IMAGE_INSTALL += "tcpdump"

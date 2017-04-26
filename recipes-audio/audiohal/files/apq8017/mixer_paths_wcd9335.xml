@@ -1502,12 +1502,12 @@
 
 
    <path name="hfp-sco-wb">
-        <ctl name="AUXPCM SampleRate" value="BTSCO_RATE_16KHZ" />
+        <ctl name="AUXPCM SampleRate" value="SAMPLING_RATE_16KHZ" />
         <path name="hfp-sco" />
    </path>
 
     <path name="hfp-sco-wb headphones">
-        <ctl name="AUXPCM SampleRate" value="BTSCO_RATE_16KHZ" />
+        <ctl name="AUXPCM SampleRate" value="SAMPLING_RATE_16KHZ" />
         <path name="hfp-sco headphones" />
     </path>
 

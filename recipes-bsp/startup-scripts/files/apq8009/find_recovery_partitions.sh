@@ -141,4 +141,11 @@ fi
 
 eval FindAndMount${fstype} modem /firmware
 
+# TODO: recovery image should also move to enforce mode
+# till all the meta_data is updated we are moving to
+# permissive. This is the best place where selinux is
+# enabled and enforced and early startup.
+
+/usr/sbin/setenforce 0
+
 exit

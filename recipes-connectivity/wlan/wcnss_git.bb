@@ -22,9 +22,13 @@ do_install() {
 		install -d ${D}/etc/systemd/system/
 		install -m 0644 ${WORKDIR}/wcnss_wlan.service -D ${D}/etc/systemd/system/wcnss_wlan.service
 	        install -d ${D}/etc/systemd/system/multi-user.target.wants/
+	        install -d ${D}/etc/systemd/system/ffbm.target.wants/
 		# enable the service for multi-user.target
 		ln -sf /etc/systemd/wcnss_wlan.service \
 		${D}/etc/systemd/system/multi-user.target.wants/wcnss_wlan.service
+		# enable the service for ffbm.target, ffbm is used for factory
+		ln -sf /etc/systemd/wcnss_wlan.service \
+		${D}/etc/systemd/system/ffbm.target.wants/wcnss_wlan.service
         else
                install -d ${D}/etc
                install -d ${D}/etc/init.d

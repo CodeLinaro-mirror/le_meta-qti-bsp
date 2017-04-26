@@ -13,7 +13,6 @@ prefix="/etc"
 S = "${WORKDIR}/qcom-opensource/mm-audio/"
 
 EXTRA_OECONF += "--prefix=/etc \
-                 --with-kernel=${STAGING_KERNEL_DIR} \
                  --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include \
                  --with-glib"
 

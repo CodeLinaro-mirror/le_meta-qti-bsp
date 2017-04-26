@@ -1,4 +1,4 @@
-BASEMACHINE ?= "sdxhedgehog"
+BASEMACHINE ?= "sdx20"
 require conf/machine/include/basemachine.inc
 
 SOC_FAMILY ?= "mdm9x50"
@@ -12,6 +12,7 @@ include conf/machine/include/soc-family.inc
 include conf/machine/include/tune-cortexa8.inc
 
 BBMASK = ".*/*/recipes-kernel/linux-msm-4.4"
+BBMASK .= "|.*/*/recipes-security/libselinux/"
 
 MACHINE_DISPLAY_WIDTH_PIXELS ?= "480"
 MACHINE_DISPLAY_HEIGHT_PIXELS ?= "640"
