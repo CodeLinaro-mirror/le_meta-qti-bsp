@@ -27,13 +27,11 @@
 
 [Unit]
 Description=Modprobe_eth_module
-Conflicts=shutdown.target
 
 [Service]
 Type=simple
 RemainAfterExit=yes
 ExecStart=/sbin/modprobe DWC_ETH_QOS
-ExecStop=/sbin/rmmod DWC_ETH_QOS
 
 [Install]
 WantedBy=multi-user.target
