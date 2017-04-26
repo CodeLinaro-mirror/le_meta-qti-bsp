@@ -34,3 +34,4 @@ init_udgram_socket_set(sshd_t)
 #fs_allow_rw_tmpfs_files(sshd_t)
 allow sshd_t tmpfs_t:file { read write open lock getattr };
 allow sshd_t var_t:file { read write getattr open lock };
+allow sshd_t initrc_t:unix_dgram_socket { sendto };
