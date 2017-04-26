@@ -21,5 +21,5 @@ FILES_${PN}-dev    = "${libdir}/libcamera_client.so ${libdir}/libcamera_client.l
 
 
 do_configure_append() {
-    install -m 0644 ${WORKSPACE}/kernel/msm-3.18/include/uapi/linux/usb/f_mtp.h ${STAGING_INCDIR}/linux/usb/
+    install -m 0644 ${STAGING_KERNEL_DIR}/include/uapi/linux/usb/f_mtp.h ${STAGING_INCDIR}/linux/usb/
 }
