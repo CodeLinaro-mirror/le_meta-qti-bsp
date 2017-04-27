@@ -45,3 +45,14 @@ do_deploy_rename () {
     mv ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img ${DEPLOY_DIR_IMAGE}/boot.img
 }
 addtask deploy_rename after do_deploy before do_packagedata
+
+do_configure_prepend_8x96auto () {
+		mkdir -p ${S}/drivers/net/ethernet/neutrino
+		cp -f ${WORKSPACE}/vehiclenetwork/ethernet/* ${S}/drivers/net/ethernet/neutrino/
+		rm ${S}/drivers/net/ethernet/neutrino/Makefile
+		rm ${S}/drivers/net/ethernet/neutrino/Makefile.am
+		rm ${S}/drivers/net/ethernet/neutrino/Kbuild
+		mv ${S}/drivers/net/ethernet/neutrino/Makefile.builtin ${S}/drivers/net/ethernet/neutrino/Makefile
+		echo "source \"drivers/net/ethernet/neutrino/Kconfig"\" >> ${S}/drivers/net/ethernet/Kconfig
+		echo "obj-y += neutrino/" >> ${S}/drivers/net/ethernet/Makefile
+}
