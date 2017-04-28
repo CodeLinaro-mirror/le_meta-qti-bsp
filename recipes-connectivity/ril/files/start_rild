@@ -1,0 +1,33 @@
+#! /bin/sh
+#
+# rild        init.d script to start the RIL daemon service
+#
+
+set -e
+
+case "$1" in
+  start)
+        # Create folders
+        mkdir -p /dev/socket/qmux_radio
+        mkdir -p /system/vendor/CarrierConfig
+        echo -n "Starting rild: "
+        start-stop-daemon -S -b -a /usr/bin/rild -- -l /usr/lib64/libril-qc-qmi-1.so
+        echo "done"
+        ;;
+  stop)
+        echo -n "Stopping rild: "
+        start-stop-daemon -K -n rild
+        echo "done"
+        ;;
+  restart)
+        $0 stop
+        $0 start
+        ;;
+  *)
+        echo "Usage $0 { start | stop | restart}" >&2
+        exit 1
+        ;;
+esac
+
+exit 0
+
