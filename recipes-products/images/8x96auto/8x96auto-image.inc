@@ -13,6 +13,8 @@ IMAGE_INSTALL += "protobuf"
 IMAGE_INSTALL += "libhardware"
 IMAGE_INSTALL += "libhardware-legacy"
 IMAGE_INSTALL += "libcap"
+IMAGE_INSTALL += "ofono"
+IMAGE_INSTALL += "ofono-tests"
 IMAGE_INSTALL += "init-mss"
 
 IMAGE_ROOTFS_SIZE = "2097152"
