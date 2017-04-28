@@ -1,0 +1,422 @@
+From f50a9f8ffd1321e46220d469282aa6b4f690e822 Mon Sep 17 00:00:00 2001
+From: Wei Li <weili@codeaurora.org>
+Date: Thu, 27 Apr 2017 17:00:35 +0800
+Subject: [PATCH] automotive: add boot marker
+
+Add boot marker for boot KPI measurement
+
+Change-Id: Ib3d1936ad626802d84bb0651d7e34c06a2eab7c1
+Signed-off-by: Wei Li <weili@codeaurora.org>
+---
+ drivers/gpu/drm/msm/msm_drv.c                   |  7 +++++++
+ drivers/media/platform/msm/vidc/msm_v4l2_vidc.c |  3 +++
+ drivers/mmc/card/block.c                        |  3 +++
+ drivers/net/can/spi/rh850.c                     | 19 ++++++++++++++++++-
+ drivers/pci/host/pci-msm.c                      |  6 ++++++
+ drivers/scsi/scsi.c                             |  3 +++
+ drivers/spi/spi_qsd.c                           | 19 ++++++++++++++++++-
+ drivers/usb/dwc3/dwc3-msm.c                     |  8 ++++++++
+ init/do_mounts.c                                |  6 +++++-
+ init/main.c                                     |  2 ++
+ net/ipv4/af_inet.c                              |  3 +++
+ sound/soc/msm/apq8096-auto.c                    |  3 +++
+ sound/soc/msm/qdsp6v2/msm-dai-q6-v2.c           |  3 +++
+ 13 files changed, 82 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/gpu/drm/msm/msm_drv.c b/drivers/gpu/drm/msm/msm_drv.c
+index 276329b..b3423f4 100644
+--- a/drivers/gpu/drm/msm/msm_drv.c
++++ b/drivers/gpu/drm/msm/msm_drv.c
+@@ -25,6 +25,7 @@
+ #define TEARDOWN_DEADLOCK_RETRY_MAX 5
+ #include "msm_gem.h"
+ #include "msm_mmu.h"
++#include <soc/qcom/boot_stats.h>
+ 
+ static void msm_fb_output_poll_changed(struct drm_device *dev)
+ {
+@@ -377,6 +378,9 @@ static int msm_load(struct drm_device *dev, unsigned long flags)
+ 	struct msm_kms *kms;
+ 	int ret, i;
+ 
++	place_marker("M - DRIVER Display Init");
++	place_marker("M - DRIVER GPU Init");
++
+ 	priv = kzalloc(sizeof(*priv), GFP_KERNEL);
+ 	if (!priv) {
+ 		dev_err(dev->dev, "failed to allocate private data\n");
+@@ -528,6 +532,9 @@ static int msm_load(struct drm_device *dev, unsigned long flags)
+ 
+ 	drm_kms_helper_poll_init(dev);
+ 
++	place_marker("M - DRIVER Display Ready");
++	place_marker("M - DRIVER GPU Ready");
++
+ 	return 0;
+ 
+ fail:
+diff --git a/drivers/media/platform/msm/vidc/msm_v4l2_vidc.c b/drivers/media/platform/msm/vidc/msm_v4l2_vidc.c
+index a632797..3587c66 100644
+--- a/drivers/media/platform/msm/vidc/msm_v4l2_vidc.c
++++ b/drivers/media/platform/msm/vidc/msm_v4l2_vidc.c
+@@ -31,6 +31,7 @@
+ #include "msm_vidc_resources.h"
+ #include "venus_boot.h"
+ #include "vidc_hfi_api.h"
++#include <soc/qcom/boot_stats.h>
+ 
+ #define BASE_DEVICE_NUMBER 32
+ 
+@@ -747,6 +748,7 @@ static struct platform_driver msm_vidc_driver = {
+ static int __init msm_vidc_init(void)
+ {
+ 	int rc = 0;
++	place_marker("M - DRIVER Video Init");
+ 	vidc_driver = kzalloc(sizeof(*vidc_driver),
+ 						GFP_KERNEL);
+ 	if (!vidc_driver) {
+@@ -770,6 +772,7 @@ static int __init msm_vidc_init(void)
+ 		vidc_driver = NULL;
+ 	}
+ 
++	place_marker("M - DRIVER Video Ready");
+ 	return rc;
+ }
+ 
+diff --git a/drivers/mmc/card/block.c b/drivers/mmc/card/block.c
+index e9f1a19..5cec1a4 100644
+--- a/drivers/mmc/card/block.c
++++ b/drivers/mmc/card/block.c
+@@ -48,6 +48,7 @@
+ #include <linux/mmc/sd.h>
+ 
+ #include <asm/uaccess.h>
++#include <soc/qcom/boot_stats.h>
+ 
+ #include "queue.h"
+ 
+@@ -4611,6 +4612,7 @@ static int mmc_blk_probe(struct mmc_card *card)
+ 
+ 	string_get_size((u64)get_capacity(md->disk), 512, STRING_UNITS_2,
+ 			cap_str, sizeof(cap_str));
++	place_marker("M - DRIVER eMMC Ready");
+ 	pr_info("%s: %s %s %s %s\n",
+ 		md->disk->disk_name, mmc_card_id(card), mmc_card_name(card),
+ 		cap_str, md->read_only ? "(ro)" : "");
+@@ -4745,6 +4747,7 @@ static int __init mmc_blk_init(void)
+ {
+ 	int res;
+ 
++	place_marker("M - DRIVER eMMC Init");
+ 	if (perdev_minors != CONFIG_MMC_BLOCK_MINORS)
+ 		pr_info("mmcblk: using %d minors per device\n", perdev_minors);
+ 
+diff --git a/drivers/net/can/spi/rh850.c b/drivers/net/can/spi/rh850.c
+index a93f979..272e441 100644
+--- a/drivers/net/can/spi/rh850.c
++++ b/drivers/net/can/spi/rh850.c
+@@ -19,6 +19,7 @@
+ #include <linux/can.h>
+ #include <linux/can/dev.h>
+ #include <linux/completion.h>
++#include <soc/qcom/boot_stats.h>
+ 
+ #define DEBUG_RH850	0
+ #if DEBUG_RH850 == 1
+@@ -1195,7 +1196,23 @@ static struct spi_driver rh850_driver = {
+ 	.probe = rh850_probe,
+ 	.remove = rh850_remove,
+ };
+-module_spi_driver(rh850_driver);
++
++static int __init rh850_driver_init(void)
++{
++	int ret;
++
++	place_marker("M - DRIVER Can Init");
++	ret = spi_register_driver(&rh850_driver);
++	place_marker("M - DRIVER Can Ready");
++	return ret;
++}
++module_init(rh850_driver_init);
++
++static void __exit rh850_driver_exit(void)
++{
++	spi_unregister_driver(&rh850_driver);
++}
++module_exit(rh850_driver_exit);
+ 
+ MODULE_DESCRIPTION("RH850 SPI-CAN module");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/pci/host/pci-msm.c b/drivers/pci/host/pci-msm.c
+index 72695d3..f46ffc3 100644
+--- a/drivers/pci/host/pci-msm.c
++++ b/drivers/pci/host/pci-msm.c
+@@ -47,6 +47,7 @@
+ #include <soc/qcom/scm.h>
+ #include <linux/ipc_logging.h>
+ #include <linux/msm_pcie.h>
++#include <soc/qcom/boot_stats.h>
+ 
+ #ifdef CONFIG_ARCH_MDMCALIFORNIUM
+ #define PCIE_VENDOR_ID_RCP		0x17cb
+@@ -4471,6 +4472,7 @@ int msm_pcie_enable(struct msm_pcie_dev_t *dev, u32 options)
+ 	uint32_t val;
+ 	long int retries = 0;
+ 	int link_check_count = 0;
++	char boot_marker[40];
+ 
+ 	PCIE_DBG(dev, "RC%d: entry\n", dev->rc_idx);
+ 
+@@ -4651,6 +4653,9 @@ int msm_pcie_enable(struct msm_pcie_dev_t *dev, u32 options)
+ 
+ 	if ((val & XMLH_LINK_UP) &&
+ 		msm_pcie_confirm_linkup(dev, false, false, NULL)) {
++		snprintf(boot_marker, sizeof(boot_marker),
++				"M - DRIVER PCIe(RC%d) Ready", dev->rc_idx);
++		place_marker(boot_marker);
+ 		PCIE_DBG(dev, "Link is up after %d checkings\n",
+ 			link_check_count);
+ 		PCIE_INFO(dev, "PCIe RC%d link initialized\n", dev->rc_idx);
+@@ -6577,6 +6582,7 @@ int __init pcie_init(void)
+ 	char rc_name[MAX_RC_NAME_LEN];
+ 
+ 	pr_alert("pcie:%s.\n", __func__);
++	place_marker("M - DRIVER PCIe Init");
+ 
+ 	pcie_drv.rc_num = 0;
+ 	mutex_init(&pcie_drv.drv_lock);
+diff --git a/drivers/scsi/scsi.c b/drivers/scsi/scsi.c
+index d07fb65..53680ea 100644
+--- a/drivers/scsi/scsi.c
++++ b/drivers/scsi/scsi.c
+@@ -71,6 +71,7 @@
+ 
+ #define CREATE_TRACE_POINTS
+ #include <trace/events/scsi.h>
++#include <soc/qcom/boot_stats.h>
+ 
+ /*
+  * Definitions and constants.
+@@ -1150,6 +1151,7 @@ static int __init init_scsi(void)
+ {
+ 	int error;
+ 
++	place_marker("M - DRIVER SCSI Init");
+ 	error = scsi_init_queue();
+ 	if (error)
+ 		return error;
+@@ -1172,6 +1174,7 @@ static int __init init_scsi(void)
+ 	scsi_netlink_init();
+ 
+ 	printk(KERN_NOTICE "SCSI subsystem initialized\n");
++	place_marker("M - DRIVER SCSI Ready");
+ 	return 0;
+ 
+ cleanup_sysctl:
+diff --git a/drivers/spi/spi_qsd.c b/drivers/spi/spi_qsd.c
+index 6f75eee..9d806ba 100644
+--- a/drivers/spi/spi_qsd.c
++++ b/drivers/spi/spi_qsd.c
+@@ -44,6 +44,7 @@
+ #include <linux/msm-bus.h>
+ #include <linux/msm-bus-board.h>
+ #include "spi_qsd.h"
++#include <soc/qcom/boot_stats.h>
+ 
+ static int msm_spi_pm_resume_runtime(struct device *device);
+ static int msm_spi_pm_suspend_runtime(struct device *device);
+@@ -2687,7 +2688,23 @@ static struct platform_driver msm_spi_driver = {
+ 	.probe		= msm_spi_probe,
+ };
+ 
+-module_platform_driver(msm_spi_driver);
++static int __init msm_spi_init_module(void)
++{
++	int ret;
++
++	place_marker("M - DRIVER SPI Init");
++	ret = platform_driver_register(&msm_spi_driver);
++	place_marker("M - DRIVER SPI Ready");
++	return ret;
++}
++
++static void __exit msm_spi_exit_module(void)
++{
++	platform_driver_unregister(&msm_spi_driver);
++}
++
++module_init(msm_spi_init_module);
++module_exit(msm_spi_exit_module);
+ 
+ MODULE_LICENSE("GPL v2");
+ MODULE_VERSION("0.4");
+diff --git a/drivers/usb/dwc3/dwc3-msm.c b/drivers/usb/dwc3/dwc3-msm.c
+index a80fb34..3f37219 100644
+--- a/drivers/usb/dwc3/dwc3-msm.c
++++ b/drivers/usb/dwc3/dwc3-msm.c
+@@ -53,6 +53,7 @@
+ #include "dbm.h"
+ #include "debug.h"
+ #include "xhci.h"
++#include <soc/qcom/boot_stats.h>
+ 
+ /* time out to wait for USB cable status notification (in ms)*/
+ #define SM_INIT_TIMEOUT 30000
+@@ -3142,6 +3143,11 @@ static int dwc3_msm_probe(struct platform_device *pdev)
+ 		dwc3_ext_event_notify(mdwc);
+ 	}
+ 
++	if (mdwc->ss_phy_irq > 0) {
++		place_marker("M - DRIVER USB Host Ready");
++		place_marker("M - DRIVER USB Device Ready");
++	}
++
+ 	return 0;
+ 
+ put_dwc3:
+@@ -3903,6 +3909,8 @@ MODULE_DESCRIPTION("DesignWare USB3 MSM Glue Layer");
+ 
+ static int dwc3_msm_init(void)
+ {
++	place_marker("M - DRIVER USB Host Init");
++	place_marker("M - DRIVER USB Device Init");
+ 	return platform_driver_register(&dwc3_msm_driver);
+ }
+ module_init(dwc3_msm_init);
+diff --git a/init/do_mounts.c b/init/do_mounts.c
+index 1902a1c8..f6f0fc1 100644
+--- a/init/do_mounts.c
++++ b/init/do_mounts.c
+@@ -34,6 +34,7 @@
+ #include <linux/nfs_mount.h>
+ 
+ #include "do_mounts.h"
++#include <soc/qcom/boot_stats.h>
+ 
+ int __initdata rd_doload;	/* 1 = load RAM disk, 0 = don't load */
+ 
+@@ -363,7 +364,9 @@ static void __init get_fs_names(char *page)
+ static int __init do_mount_root(char *name, char *fs, int flags, void *data)
+ {
+ 	struct super_block *s;
+-	int err = sys_mount(name, "/root", fs, flags, data);
++	int err;
++	place_marker("M - DRIVER F/S Init");
++	err = sys_mount(name, "/root", fs, flags, data);
+ 	if (err)
+ 		return err;
+ 
+@@ -375,6 +378,7 @@ static int __init do_mount_root(char *name, char *fs, int flags, void *data)
+ 	       s->s_type->name,
+ 	       s->s_flags & MS_RDONLY ?  " readonly" : "",
+ 	       MAJOR(ROOT_DEV), MINOR(ROOT_DEV));
++	place_marker("M - DRIVER F/S Ready");
+ 	return 0;
+ }
+ 
+diff --git a/init/main.c b/init/main.c
+index 7d4532b..23c18d110 100644
+--- a/init/main.c
++++ b/init/main.c
+@@ -87,6 +87,7 @@
+ #include <asm/setup.h>
+ #include <asm/sections.h>
+ #include <asm/cacheflush.h>
++#include <soc/qcom/boot_stats.h>
+ 
+ static int kernel_init(void *);
+ 
+@@ -982,6 +983,7 @@ static int __ref kernel_init(void *unused)
+ 		panic("Requested init %s failed (error %d).",
+ 		      execute_command, ret);
+ 	}
++	place_marker("M - DRIVER Kernel Boot Done");
+ 	if (!try_to_run_init_process("/sbin/init") ||
+ 	    !try_to_run_init_process("/etc/init") ||
+ 	    !try_to_run_init_process("/bin/init") ||
+diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
+index fc65a01..61983c2 100644
+--- a/net/ipv4/af_inet.c
++++ b/net/ipv4/af_inet.c
+@@ -123,6 +123,7 @@
+ 
+ #ifdef CONFIG_ANDROID_PARANOID_NETWORK
+ #include <linux/android_aid.h>
++#include <soc/qcom/boot_stats.h>
+ 
+ static inline int current_has_network(void)
+ {
+@@ -1733,6 +1734,7 @@ static int __init inet_init(void)
+ 	struct list_head *r;
+ 	int rc = -EINVAL;
+ 
++	place_marker("M - DRIVER IP stack Init");
+ 	sock_skb_cb_check_size(sizeof(struct inet_skb_parm));
+ 
+ 	rc = proto_register(&tcp_prot, 1);
+@@ -1841,6 +1843,7 @@ static int __init inet_init(void)
+ 	ip_tunnel_core_init();
+ 
+ 	rc = 0;
++	place_marker("M - DRIVER IP stack Ready");
+ out:
+ 	return rc;
+ out_unregister_raw_proto:
+diff --git a/sound/soc/msm/apq8096-auto.c b/sound/soc/msm/apq8096-auto.c
+index d5dd3b0..277b896 100644
+--- a/sound/soc/msm/apq8096-auto.c
++++ b/sound/soc/msm/apq8096-auto.c
+@@ -34,6 +34,7 @@
+ #include <sound/info.h>
+ #include <device_event.h>
+ #include "qdsp6v2/msm-pcm-routing-v2.h"
++#include <soc/qcom/boot_stats.h>
+ 
+ #define DRV_NAME "apq8096-auto-asoc-snd"
+ 
+@@ -4739,6 +4740,7 @@ static int apq8096_asoc_machine_probe(struct platform_device *pdev)
+ 		goto err;
+ 	}
+ 	dev_info(&pdev->dev, "Sound card %s registered\n", card->name);
++	place_marker("M - DRIVER Audio Ready");
+ 
+ 	return 0;
+ 
+@@ -4808,6 +4810,7 @@ static struct notifier_block adsp_state_notifier_block = {
+ 
+ static int __init apq8096_soc_platform_init(void)
+ {
++	place_marker("M - DRIVER Audio Init");
+ 	adsp_state_notifier = subsys_notif_register_notifier("adsp",
+ 						&adsp_state_notifier_block);
+ 	return 0;
+diff --git a/sound/soc/msm/qdsp6v2/msm-dai-q6-v2.c b/sound/soc/msm/qdsp6v2/msm-dai-q6-v2.c
+index 201ca65..79ba31f 100644
+--- a/sound/soc/msm/qdsp6v2/msm-dai-q6-v2.c
++++ b/sound/soc/msm/qdsp6v2/msm-dai-q6-v2.c
+@@ -27,6 +27,7 @@
+ #include <sound/q6afe-v2.h>
+ #include <sound/msm-dai-q6-v2.h>
+ #include <sound/pcm_params.h>
++#include <soc/qcom/boot_stats.h>
+ 
+ #define MSM_DAI_PRI_AUXPCM_DT_DEV_ID 1
+ #define MSM_DAI_SEC_AUXPCM_DT_DEV_ID 2
+@@ -8113,11 +8114,13 @@ static int __init msm_dai_q6_init(void)
+ 		goto dai_q6_dev_fail;
+ 	}
+ 
++	place_marker("M - DRIVER I2S Init");
+ 	rc = platform_driver_register(&msm_dai_q6_mi2s_driver);
+ 	if (rc) {
+ 		pr_err("%s: fail to register dai MI2S dev drv\n", __func__);
+ 		goto dai_q6_mi2s_drv_fail;
+ 	}
++	place_marker("M - DRIVER I2S Ready");
+ 
+ 	rc = platform_driver_register(&msm_dai_mi2s_q6);
+ 	if (rc) {
+-- 
+1.9.1
+
