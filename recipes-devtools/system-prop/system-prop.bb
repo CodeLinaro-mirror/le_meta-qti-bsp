@@ -18,7 +18,10 @@ do_compile() {
     sed -e 's/#.*$//' -e '/^$/d' ${WORKDIR}/${SOC_FAMILY}/system.prop >> ${S}/build.prop
 }
 
-inherit update-rc.d
+inherit update-rc.d systemd
+
+SYSTEMD_SERVICE_${PN} = " persist-prop.service "
+SYSTEMD_AUTO_ENABLE_${pn} = "enable"
 
 INITSCRIPT_NAME   = "persist-prop.sh"
 INITSCRIPT_PARAMS = "start 50 2 3 4 5 ."
@@ -28,12 +31,10 @@ do_install() {
     install ${S}/build.prop ${D}/build.prop
     install -m 0755 ${WORKDIR}/persist-prop.sh -D ${D}${sysconfdir}/init.d/persist-prop
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
-       install -d ${D}${systemd_unitdir}/system/
-       install -m 0644 ${WORKDIR}/persist-prop.service -D ${D}${systemd_unitdir}/system/persist-prop.service
-       install -d ${D}${systemd_unitdir}/system/multi-user.target.wants/
-       # enable the service for multi-user.target
-       ln -sf ${systemd_unitdir}/system/persist-prop.service \
-            ${D}${systemd_unitdir}/system/multi-user.target.wants/persist-prop.service
+        install -d ${D}${bindir}
+        install -m 0755 ${WORKDIR}/persist-prop.sh -D ${D}${bindir}/persist-prop
+        install -d ${D}${systemd_unitdir}/system/
+        install -m 0644 ${WORKDIR}/persist-prop.service -D ${D}${systemd_unitdir}/system/persist-prop.service
     fi
 }
 

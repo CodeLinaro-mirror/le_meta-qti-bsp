@@ -1,11 +1,13 @@
 [Unit]
 Description= Persist Properties Service
-SourcePath=/etc/init.d/persist-prop
+SourcePath=/usr/bin/persist-prop
 After=data.mount
 
 [Service]
+Type=forking
 RemainAfterExit=yes
-ExecStart=/etc/init.d/persist-prop start
+ExecStart=/usr/bin/persist-prop start
+ExecStop=/usr/bin/persist-prop stop
 
 [Install]
 WantedBy=multi-user.target
