@@ -49,3 +49,26 @@ interface(`load_system_module',`
 
         allow $1 lib_t:system module_load;
 ')
+
+########################################
+## <summary>
+##      reboot recovery start
+## </summary>
+## <desc>
+##      <p>
+##      Load a system module
+##      </p>
+## </desc>
+## <param name="domain">
+##      <summary>
+##      Domain allowed access.
+##      </summary>
+## </param>
+#
+interface(`reboot_recovery_start',`
+        gen_require(`
+                type lib_t;
+        ')
+
+        allow $1 lib_t:service start;
+')

@@ -1,4 +1,4 @@
-# Copyright (c) 2016-17, The Linux Foundation. All rights reserved.
+# Copyright (c) 2017, The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -25,21 +25,15 @@
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# this rules are for wpa_supplicant which run
-# in NetworkManger context
-rw_shared_memory_dev(NetworkManager_t)
-#rw_logd_sock(NetworkManager_t)
-r_wifi_data_file(NetworkManager_t)
-#This need to be removed later
-rw_diag_dev(NetworkManager_t)
-dev_rw_null(NetworkManager_t)
-allow NetworkManager_t tmpfs_t:dir create;
-allow NetworkManager_t var_t:dir { write add_name };
-allow NetworkManager_t var_t:file { read write create open };
+# Append execute and execute_no_trans for local_login_t
+corecmd_allow_execute_no_trans_bin_files(local_login_t)
+#allow local_login_t login_exec_t:file { execute_no_trans execute }
+auth_login_exec_permissions(local_login_t)
 
-manage_sock_files_pattern(NetworkManager_t, tmpfs_t, tmpfs_t)
-manage_sock_files_pattern(NetworkManager_t, device_t, device_t)
-files_search_default(NetworkManager_t)
-files_read_default_files(NetworkManager_t)
-allow NetworkManager_t initrc_t:unix_dgram_socket sendto;
-init_stream_connect_script(NetworkManager_t)
+#allow local_login_t shadow_t:file { read getattr open };
+auth_rw_shadow(local_login_t)
+auth_allow_fileops_shadow(local_login_t)
+#allow local_login_t user_home_dir_t:file { read getattr open };
+userdom_allow_fileops(local_login_t)
+init_udgram_socket_set(local_login_t)
+allow local_login_t tmpfs_t:dir { search };

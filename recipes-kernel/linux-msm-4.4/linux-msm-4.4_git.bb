@@ -10,7 +10,7 @@ COMPATIBLE_MACHINE = "(apq8098)"
 KERNEL_IMAGETYPE ?= "zImage"
 
 python __anonymous () {
-  if bb.utils.contains('DISTRO_FEATURES', 'qti-perf', True, False, d):
+  if (d.getVar('PERF_BUILD', True) == '1'):
       imgtype = d.getVar("KERNEL_PERF_IMAGETYPE", True)
       if imgtype:
           d.setVar("KERNEL_IMAGETYPE", d.getVar("KERNEL_PERF_IMAGETYPE", True))

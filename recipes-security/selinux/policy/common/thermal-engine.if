@@ -65,3 +65,61 @@ interface(`read_thermal_config',`
     allow $1 etc_t:dir list_dir_perms;
     read_files_pattern($1, etc_t, thermal_etc_t)
 ')
+
+########################################
+## <summary>
+##      Read proc file system and search it
+## </summary>
+## <param name="domain">
+##      <summary>
+##      Domain allowed access.
+##      </summary>
+## </param>
+#
+interface(`read_proc_enrty',`
+    gen_require(`
+        type proc_t, thermal_etc_t;
+    ')
+
+    allow $1 proc_t:dir search;
+    allow $1 proc_t:file read;
+')
+
+########################################
+## <summary>
+##      open proc file system and search it
+## </summary>
+## <param name="domain">
+##      <summary>
+##      Domain allowed access.
+##      </summary>
+## </param>
+#
+interface(`open_proc_enrty',`
+    gen_require(`
+        type proc_t, thermal_etc_t;
+    ')
+
+    allow $1 proc_t:dir search;
+    allow $1 proc_t:file open;
+')
+
+########################################
+## <summary>
+##      getattr proc file system and search it
+## </summary>
+## <param name="domain">
+##      <summary>
+##      Domain allowed access.
+##      </summary>
+## </param>
+#
+interface(`getattr_proc_entry',`
+    gen_require(`
+        type proc_t, thermal_etc_t;
+    ')
+
+    allow $1 proc_t:dir search;
+    allow $1 proc_t:file getattr;
+')
+
