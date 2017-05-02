@@ -39,11 +39,13 @@
 interface(`init_udgram_socket_set',`
                 gen_require(`
                         type init_t;
+                        type initrc_t;
                 ')
 
                 # upstart uses a datagram socket instead of initctl pipe
                 allow $1 self:unix_dgram_socket create_socket_perms;
                 allow $1 init_t:unix_dgram_socket sendto;
+                allow $1 initrc_t:unix_dgram_socket sendto;
         ')
 ')
 
