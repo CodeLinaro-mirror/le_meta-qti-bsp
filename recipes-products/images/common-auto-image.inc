@@ -121,3 +121,8 @@ IMAGE_INSTALL += "common-api-c++"
 # Sqlite
 IMAGE_INSTALL += "sqlite"
 IMAGE_INSTALL += "sqlite-bin"
+
+# meta-ivi tests
+IMAGE_INSTALL += "common-api-test"
+IMAGE_INSTALL += "dlt-daemon-test"
+
