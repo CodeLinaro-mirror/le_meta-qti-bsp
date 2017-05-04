@@ -21,6 +21,7 @@ IMAGE_INSTALL += "libcomerr"
 IMAGE_INSTALL += "libss"
 IMAGE_INSTALL += "libe2p"
 IMAGE_INSTALL += "libext2fs"
+IMAGE_INSTALL += "adreno-recovery"
 
 do_makerecovery() {
         echo "Deploy image : ${DEPLOY_DIR_IMAGE}"
