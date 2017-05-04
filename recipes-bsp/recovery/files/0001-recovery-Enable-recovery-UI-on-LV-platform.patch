@@ -1,0 +1,263 @@
+From 38b4748be8789f6109365fc25a9639c22f4a2dae Mon Sep 17 00:00:00 2001
+From: Bharathraj Nagaraju <snbraj@codeaurora.org>
+Date: Wed, 3 May 2017 16:00:09 -0700
+Subject: [PATCH] recovery: Enable recovery UI on LV platform.
+
+Change-Id: I64cc7e9a6b3c3955649ac19e21223dc369a545cb
+Signed-off-by: Bharathraj Nagaraju <snbraj@codeaurora.org>
+---
+ Makefile.am              | 21 ++++++++++++++-------
+ configure.ac             |  1 +
+ minui/Makefile.am        | 46 ++++++++++++++++++++++++++++++++++++++++++++++
+ minui/graphics.cpp       | 15 ++-------------
+ minui/graphics_drm.cpp   |  8 ++++----
+ minui/graphics_fbdev.cpp |  6 +++---
+ 6 files changed, 70 insertions(+), 27 deletions(-)
+ create mode 100644 minui/Makefile.am
+
+diff --git a/Makefile.am b/Makefile.am
+index fff5249..34bc3a6 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -1,6 +1,6 @@
+ ACLOCAL_AMFLAGS := -I m4
+ 
+-SUBDIRS := minzip mtdutils edify applypatch updater minadbd
++SUBDIRS := minzip mtdutils edify applypatch updater minadbd minui
+ 
+ AM_CFLAGS := -Wundef \
+              -Wstrict-prototypes \
+@@ -13,7 +13,8 @@ AM_CFLAGS := -Wundef \
+              -Dstrlcat=strncat \
+              $(LIBSELINUX_CFLAGS) \
+              -D_GNU_SOURCE \
+-             -D_LARGEFILE64_SOURCE
++             -D_LARGEFILE64_SOURCE \
++	     -DENABLE_RECOVERY_UI
+ 
+ AM_CPPFLAGS := \
+               -I. \
+@@ -21,9 +22,11 @@ AM_CPPFLAGS := \
+               -I$(WORKSPACE)/system/core/fs_mgr/include \
+               -I$(WORKSPACE)/system/core/adb \
+               -I$(WORKSPACE)/system/extras/ext4_utils \
++              -I$(WORKSPACE)/bootable/recovery \
+               $(LIBSELINUX_CFLAGS) \
+               -std=c++11 \
+-              -Dstrlcat=strncat
++              -Dstrlcat=strncat \
++              -DENABLE_RECOVERY_UI
+ 
+ #AM_LDFLAGS := -shared -version-info 1:0:0
+ 
+@@ -51,7 +54,6 @@ cpp_sources := adb_install.cpp \
+     asn1_decoder.cpp \
+     bootloader.cpp \
+     device.cpp \
+-    default_device.cpp \
+     fuse_sdcard_provider.c \
+     install.cpp \
+     recovery.cpp \
+@@ -60,6 +62,9 @@ cpp_sources := adb_install.cpp \
+     ui.cpp \
+     verifier.cpp
+ 
++h_sources := \
++        ./minui/minui.h
++
+ requiredlibs := -lm \
+                -lpthread \
+                -lz \
+@@ -67,23 +72,25 @@ requiredlibs := -lm \
+                -lmincrypt \
+                -lselinux \
+                -lext4_utils \
++               -lrecovery_ui_msm \
+                ./mtdutils/libmtdutils.la \
+                ./minadbd/libminadbd.la \
+                ./libfusesideload.la \
+                ./edify/libedify.la \
+                ./minzip/libminzip.la \
+-               ./applypatch/libapplypatch.la
++               ./applypatch/libapplypatch.la \
++               ./minui/libminui.la
+ 
+ 
+ RECOVERY_API_VERSION := 3
+ 
+-recovery_SOURCES := $(cpp_sources)
++recovery_SOURCES := $(cpp_sources) $(h_sources)
+ recovery_CFLAGS := $(AM_CFLAGS) -DRECOVERY_API_VERSION=$(RECOVERY_API_VERSION)
+ recovery_CPPFLAGS := $(AM_CPPFLAGS) -DRECOVERY_API_VERSION=$(RECOVERY_API_VERSION)
+ recovery_LDADD := $(requiredlibs)
+ 
+ 
+-verifier_test_libs := -lmincrypt ./minzip/libminzip.la -lm -lpthread -lcutils
++verifier_test_libs := -lmincrypt ./minzip/libminzip.la ./minui/libminui.la -lm -lpthread -lcutils
+ verifier_test_CFLAGS := $(AM_CFLAGS)
+ 
+ verifier_test_CPPFLAGS := $(AM_CPPFLAGS)
+diff --git a/configure.ac b/configure.ac
+index fc8d02a..0cbc275 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -126,6 +126,7 @@ AC_CONFIG_FILES([     \
+         applypatch/Makefile \
+         updater/Makefile    \
+         minadbd/Makefile \
++        minui/Makefile \
+         recovery.pc      \
+         ])
+ AC_OUTPUT
+diff --git a/minui/Makefile.am b/minui/Makefile.am
+new file mode 100644
+index 0000000..30ea439
+--- /dev/null
++++ b/minui/Makefile.am
+@@ -0,0 +1,46 @@
++AM_CFLAGS := -Wundef \
++        -Wno-trigraphs \
++        -g -O0 \
++        -fno-inline \
++        -fno-short-enums \
++        -fpic
++
++AM_CPPFLAGS := \
++              -I. \
++              -USE_GLIB \
++              -fpermissive \
++	      -std=c++0x \
++	      -DOVERSCAN_PERCENT=0 \
++	      -DRECOVERY_RGBX
++
++AM_LDFLAGS := -shared -version-info 1:0:0
++
++cpp_sources := \
++        events.cpp \
++        graphics.cpp \
++	graphics_drm.cpp \
++        graphics_fbdev.cpp \
++	resources.cpp
++
++h_sources := \
++        font_10x18.h \
++	graphics.h \
++	minui.h
++
++library_includedir := $(pkgincludedir)
++library_include_HEADERS := $(h_sources)
++
++lib_LTLIBRARIES := libminui.la
++libminui_la_SOURCES := $(cpp_sources) $(h_sources)
++
++requiredlibs := -ldrm -lpng
++
++if USE_GLIB
++libminui_la_CFLAGS := $(AM_CFLAGS) -DUSE_GLIB @GLIB_CFLAGS@
++libminui_la_CPPFLAGS := $(AM_CPPFLAGS) -DUSE_GLIB @GLIB_CFLAGS@
++libminui_la_LIBADD := $(requiredlibs) -lm -lpthread @GLIB_LIBS@
++else
++libminui_la_CFLAGS := $(AM_CFLAGS)
++libminui_la_CPPFLAGS := $(AM_CPPFLAGS)
++libminui_la_LIBADD := $(requiredlibs) -lm -lpthread
++endif
+diff --git a/minui/graphics.cpp b/minui/graphics.cpp
+index c0eea9e..3567636 100644
+--- a/minui/graphics.cpp
++++ b/minui/graphics.cpp
+@@ -359,19 +359,8 @@ void gr_flip() {
+ int gr_init(void)
+ {
+     gr_init_font();
+-
+-    gr_backend = open_adf();
+-    if (gr_backend) {
+-        gr_draw = gr_backend->init(gr_backend);
+-        if (!gr_draw) {
+-            gr_backend->exit(gr_backend);
+-        }
+-    }
+-
+-    if (!gr_draw) {
+-        gr_backend = open_drm();
+-        gr_draw = gr_backend->init(gr_backend);
+-    }
++    gr_backend = open_drm();
++    gr_draw = gr_backend->init(gr_backend);
+ 
+     if (!gr_draw) {
+         gr_backend = open_fbdev();
+diff --git a/minui/graphics_drm.cpp b/minui/graphics_drm.cpp
+index 03e33b7..99e5691 100644
+--- a/minui/graphics_drm.cpp
++++ b/minui/graphics_drm.cpp
+@@ -73,7 +73,7 @@ static void drm_enable_crtc(int drm_fd, drmModeCrtc *crtc,
+         printf("drmModeSetCrtc failed ret=%d\n", ret);
+ }
+ 
+-static void drm_blank(minui_backend* backend __unused, bool blank) {
++static void drm_blank(minui_backend* backend __attribute__((unused)), bool blank) {
+     if (blank)
+         drm_disable_crtc(drm_fd, main_monitor_crtc);
+     else
+@@ -346,7 +346,7 @@ static void disable_non_main_crtcs(int fd,
+     }
+ }
+ 
+-static GRSurface* drm_init(minui_backend* backend __unused) {
++static GRSurface* drm_init(minui_backend* backend __attribute__((unused))) {
+     drmModeRes *res = NULL;
+     uint32_t selected_mode;
+     char *dev_name;
+@@ -441,7 +441,7 @@ static GRSurface* drm_init(minui_backend* backend __unused) {
+     return &(drm_surfaces[0]->base);
+ }
+ 
+-static GRSurface* drm_flip(minui_backend* backend __unused) {
++static GRSurface* drm_flip(minui_backend* backend __attribute__((unused))) {
+     int ret;
+ 
+     ret = drmModePageFlip(drm_fd, main_monitor_crtc->crtc_id,
+@@ -454,7 +454,7 @@ static GRSurface* drm_flip(minui_backend* backend __unused) {
+     return &(drm_surfaces[current_buffer]->base);
+ }
+ 
+-static void drm_exit(minui_backend* backend __unused) {
++static void drm_exit(minui_backend* backend __attribute__((unused))) {
+     drm_disable_crtc(drm_fd, main_monitor_crtc);
+     drm_destroy_surface(drm_surfaces[0]);
+     drm_destroy_surface(drm_surfaces[1]);
+diff --git a/minui/graphics_fbdev.cpp b/minui/graphics_fbdev.cpp
+index 997e9ca..947ae1d 100644
+--- a/minui/graphics_fbdev.cpp
++++ b/minui/graphics_fbdev.cpp
+@@ -57,7 +57,7 @@ minui_backend* open_fbdev() {
+     return &my_backend;
+ }
+ 
+-static void fbdev_blank(minui_backend* backend __unused, bool blank)
++static void fbdev_blank(minui_backend* backend __attribute__((unused)), bool blank)
+ {
+     int ret;
+ 
+@@ -174,7 +174,7 @@ static GRSurface* fbdev_init(minui_backend* backend) {
+     return gr_draw;
+ }
+ 
+-static GRSurface* fbdev_flip(minui_backend* backend __unused) {
++static GRSurface* fbdev_flip(minui_backend* backend __attribute__((unused))) {
+     if (double_buffered) {
+ #if defined(RECOVERY_BGRA)
+         // In case of BGRA, do some byte swapping
+@@ -201,7 +201,7 @@ static GRSurface* fbdev_flip(minui_backend* backend __unused) {
+     return gr_draw;
+ }
+ 
+-static void fbdev_exit(minui_backend* backend __unused) {
++static void fbdev_exit(minui_backend* backend __attribute__((unused))) {
+     close(fb_fd);
+     fb_fd = -1;
+ 
+-- 
+1.9.1
+

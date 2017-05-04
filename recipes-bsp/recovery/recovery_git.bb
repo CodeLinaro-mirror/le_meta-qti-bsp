@@ -56,3 +56,7 @@ do_install_append() {
               install -m 0755 ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/base-files-recovery/fstab -D ${D}/res/recovery_volume_config
         fi
 }
+
+# Including the file depends on MACHINE
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96auto', 'recovery-8x96auto', 'none',d)}"
+include ${INCSUFFIX}.inc
