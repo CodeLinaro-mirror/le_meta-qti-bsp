@@ -2,7 +2,7 @@
 OTA_TARGET_BASENAME_EXT4     = "${MACHINE}-ota-target-image-ext4"
 OTA_TARGET_IMAGE_ROOTFS_EXT4 = "${IMAGE_ROOTFS}/../${OTA_TARGET_BASENAME_EXT4}"
 OUTPUT_FILE_EXT4             = "${DEPLOY_DIR_IMAGE}/${OTA_TARGET_BASENAME_EXT4}.zip"
-BASE_IMAGE_ROOTFS_EXT4       = "${IMAGE_ROOTFS}/../../../automotive-image/1.0-r0/rootfs"
+BASE_IMAGE_ROOTFS_EXT4       = "$(echo ${IMAGE_ROOTFS} | sed 's/machine-recovery-image/automotive-image/g')"
 
 python do_makeota_image(){
     bb.build.exec_func('recovery_ext4', d)

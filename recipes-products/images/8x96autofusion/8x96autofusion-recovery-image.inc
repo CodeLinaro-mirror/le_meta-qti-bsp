@@ -12,7 +12,8 @@ IMAGE_INSTALL += "system-core-adbd"
 IMAGE_INSTALL += "system-core-usb"
 IMAGE_INSTALL += "recovery"
 IMAGE_INSTALL += "start-scripts-find-recovery-partitions"
-IMAGE_INSTALL += "start-scripts-firmware-links"
+#IMAGE_INSTALL += "start-scripts-firmware-links"
+IMAGE_INSTALL += "firmware-links"
 #IMAGE_INSTALL += "mtd-utils-ubifs"
 IMAGE_INSTALL += "e2fsprogs-e2fsck"
 IMAGE_INSTALL += "e2fsprogs-mke2fs"
@@ -24,5 +25,5 @@ IMAGE_INSTALL += "libext2fs"
 do_makerecovery() {
         echo "Deploy image : ${DEPLOY_DIR_IMAGE}"
 	sleep 5
-	mkbootimg --kernel "${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}" --ramdisk "${DEPLOY_DIR_IMAGE}/machine-recovery-image-8x96auto.cpio.gz"  -o "${DEPLOY_DIR_IMAGE}/recovery.img" --cmdline "${RECOVERY_CMD_PARAMS}" --base "${KERNEL_BASE}"
+	mkbootimg --kernel "${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}" --ramdisk "${DEPLOY_DIR_IMAGE}/machine-recovery-image-8x96autofusion.cpio.gz"  -o "${DEPLOY_DIR_IMAGE}/recovery.img" --cmdline "${RECOVERY_CMD_PARAMS}" --base "${KERNEL_BASE}"
 }
