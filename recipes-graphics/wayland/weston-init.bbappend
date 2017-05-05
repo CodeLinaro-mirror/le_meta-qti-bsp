@@ -6,10 +6,10 @@ S = "${WORKDIR}/weston-init"
 FILESEXTRAPATHS_append := ":${THISDIR}/${PN}"
 
 SRC_URI_append = "\
-    file://init_qc \
+    file://init_qti \
 "
 
 do_install() {
     install -d ${D}/${sysconfdir}/init.d
-    install -m755 ${WORKDIR}/init_qc ${D}/${sysconfdir}/init.d/weston
+    install -m755 ${WORKDIR}/init_qti ${D}/${sysconfdir}/init.d/weston
 }

@@ -19,6 +19,7 @@ SRC_URI += "\
             file://iio.sh \
             file://0001-Support-MTP-function.patch \
             file://0001-Fix-file-synchronization-in-mdev.patch \
+            file://fix-mdev-crash.patch \
 "
 
 prefix = ""

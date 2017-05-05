@@ -1,3 +1,4 @@
+#!/bin/sh
 # Copyright (c) 2017, The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -24,14 +25,11 @@
 # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# persist-prop      init.d script to start persist properties usage
+#
 
-allow sshd_t self:capability net_raw;
-fs_search_tmpfs(ssh_keygen_t)
-allow ssh_t self:capability net_raw;
-allow sshd_t device_t:sock_file { read write open getattr };
-allow sshd_t bin_t:file { read write open getattr execute };
-init_udgram_socket_set(sshd_t)
-#fs_allow_rw_tmpfs_files(sshd_t)
-allow sshd_t tmpfs_t:file { read write open lock getattr };
-allow sshd_t var_t:file { read write getattr open lock };
-allow sshd_t initrc_t:unix_dgram_socket { sendto };
+cap_ver=`cat /sys/devices/soc/1d00000.qcom,vidc/capability_version` 2> /dev/null
+if [ $cap_ver -eq 1 ]; then
+setprop media.msm8953.version 1;
+fi

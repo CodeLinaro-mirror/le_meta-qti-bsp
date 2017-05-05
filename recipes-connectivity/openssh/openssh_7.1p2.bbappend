@@ -1,3 +1,4 @@
+EXTRA_OECONF_append=" ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', '--with-selinux', '', d)}"
 BASEPRODUCT = "${@d.getVar('PRODUCT', False)}"
 do_install_append () {
     if [ "${BASEPRODUCT}" == "drone" ]; then

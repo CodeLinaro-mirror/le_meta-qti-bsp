@@ -7,6 +7,7 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/${LICENSE};md5=3775480a712fc46a
 
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI = "file://hardware/qcom/media/"
+SRC_URI  += "file://msm8953-version.sh"
 
 S = "${WORKDIR}/hardware/qcom/media"
 
@@ -65,9 +66,20 @@ FILES_${PN}-dev  = "${libdir}/*.la ${includedir}"
 do_install_append() {
     oe_runmake DESTDIR="${D}/" LIBVER="${LV}" install
     mkdir -p ${STAGING_INCDIR}/mm-core
-	mkdir -p ${STAGING_INCDIR}/libstagefrighthw
-	install -m 0644 ${S}/mm-core/inc/*.h ${STAGING_INCDIR}/mm-core
+    mkdir -p ${STAGING_INCDIR}/libstagefrighthw
+    install -m 0644 ${S}/mm-core/inc/*.h ${STAGING_INCDIR}/mm-core
     install -m 0644 ${S}/libstagefrighthw/*.h ${STAGING_INCDIR}/libstagefrighthw
+}
+
+do_install_append_apq8053() {
+    install -m 0755 ${WORKDIR}/msm8953-version.sh -D ${D}${sysconfdir}/init.d/msm8953-version.sh
+}
+
+pkg_postinst_${PN}_apq8053 () {
+    [ -n "$D" ] && OPT="-r $D" || OPT="-s"
+    # remove all rc.d-links potentially created from alternatives
+    update-rc.d $OPT -f msm8953-version.sh remove
+    update-rc.d $OPT msm8953-version.sh start 60 2 3 4 5 .
 }
 
 INSANE_SKIP_${PN} += "dev-so"
