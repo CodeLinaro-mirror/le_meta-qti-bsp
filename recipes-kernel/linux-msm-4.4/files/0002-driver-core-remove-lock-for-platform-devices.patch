@@ -1,0 +1,47 @@
+From 90f397ed2c66d807d0dd1a25716b9824dbb71cce Mon Sep 17 00:00:00 2001
+From: Wei Li <weili@codeaurora.org>
+Date: Fri, 7 Apr 2017 11:53:17 +0800
+Subject: [PATCH] driver-core: remove lock for platform devices during probe
+
+during driver probe procedure, lock on the parent of
+platform devices could be removed to make probe in
+parallel
+
+Change-Id: I2bfee0861547c41ee9ec9cef0380dbe7b77f4e67
+Signed-off-by: Wei Li <weili@codeaurora.org>
+---
+ drivers/base/dd.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/base/dd.c b/drivers/base/dd.c
+index af92c61..e536850 100644
+--- a/drivers/base/dd.c
++++ b/drivers/base/dd.c
+@@ -25,6 +25,7 @@
+ #include <linux/async.h>
+ #include <linux/pm_runtime.h>
+ #include <linux/pinctrl/devinfo.h>
++#include <linux/platform_device.h>
+ 
+ #include "base.h"
+ #include "power/power.h"
+@@ -613,13 +614,14 @@ static int __driver_attach(struct device *dev, void *data)
+ 	if (!driver_match_device(drv, dev))
+ 		return 0;
+ 
+-	if (dev->parent)	/* Needed for USB */
++	if (dev->parent &&
++		(dev->bus != &platform_bus_type))	/* Needed for USB */
+ 		device_lock(dev->parent);
+ 	device_lock(dev);
+ 	if (!dev->driver)
+ 		driver_probe_device(drv, dev);
+ 	device_unlock(dev);
+-	if (dev->parent)
++	if (dev->parent && (dev->bus != &platform_bus_type))
+ 		device_unlock(dev->parent);
+ 
+ 	return 0;
+-- 
+1.9.1
+
