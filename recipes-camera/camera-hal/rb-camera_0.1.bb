@@ -14,6 +14,7 @@ S      = "${WORKDIR}/lib"
 
 DEPENDS += "media"
 DEPENDS += "glib-2.0"
+DEPENDS += "display-hal-linux"
 
 EXTRA_OEMAKE += "TARGET_COMPILE_WITH_MSM_KERNEL=true"
 EXTRA_OEMAKE += "SRC_CAMERA_HAL_DIR='${S}'"
