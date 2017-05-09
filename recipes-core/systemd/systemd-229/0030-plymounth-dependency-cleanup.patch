@@ -1,0 +1,117 @@
+From 302686595f027a9a2a8e297a7bc24db9df10ad4f Mon Sep 17 00:00:00 2001
+From: Lei wang <leiwan@codeaurora.org>
+Date: Wed, 24 May 2017 19:33:36 +0800
+Subject: [PATCH] systemd: optimization remove plymouth dependence
+
+Change-Id: I2402c5c989c2e60d5738381484b9c291fec55ac6
+Signed-off-by: Lei wang <leiwan@codeaurora.org>
+---
+ 7 file changed, 7 insertions(+) 7 deletions(-)
+ create mode 100644 recipes-core/systemd/systemd-229/0030-plymounth-dependency-cleanup.patch
+
+diff --git a/units/console-getty.service.m4.in b/units/console-getty.service.m4.in
+index 413d940..a880172 100644
+--- a/units/console-getty.service.m4.in
++++ b/units/console-getty.service.m4.in
+@@ -8,7 +8,7 @@
+ [Unit]
+ Description=Console Getty
+ Documentation=man:agetty(8)
+-After=systemd-user-sessions.service plymouth-quit-wait.service
++After=systemd-user-sessions.service
+ ConditionPathExists=/dev/console
+ m4_ifdef(`HAVE_SYSV_COMPAT',
+ After=rc-local.service
+diff --git a/units/console-shell.service.m4.in b/units/console-shell.service.m4.in
+index a345ec2..f55ce28 100644
+--- a/units/console-shell.service.m4.in
++++ b/units/console-shell.service.m4.in
+@@ -8,15 +8,15 @@
+ [Unit]
+ Description=Console Shell
+ Documentation=man:sulogin(8)
+-After=systemd-user-sessions.service plymouth-quit-wait.service
++After=systemd-user-sessions.service
+ m4_ifdef(`HAVE_SYSV_COMPAT',
+ After=rc-local.service
+ )m4_dnl
+ Before=getty.target
+ 
+ [Service]
+ Environment=HOME=@roothomedir@
+ WorkingDirectory=-@roothomedir@
+ ExecStart=-@SULOGIN@
+ ExecStopPost=-@SYSTEMCTL@ poweroff
+ Type=idle
+diff --git a/units/container-getty@.service.m4.in b/units/container-getty@.service.m4.in
+index e126f3a..bd8436a 100644
+--- a/units/container-getty@.service.m4.in
++++ b/units/container-getty@.service.m4.in
+@@ -8,7 +8,7 @@
+ [Unit]
+ Description=Container Getty on /dev/pts/%I
+ Documentation=man:agetty(8) man:machinectl(1)
+-After=systemd-user-sessions.service plymouth-quit-wait.service
++After=systemd-user-sessions.service
+ m4_ifdef(`HAVE_SYSV_COMPAT',
+ After=rc-local.service
+ )m4_dnl
+diff --git a/units/getty@.service.m4 b/units/getty@.service.m4
+index 46164ab..d069a7b 100644
+--- a/units/getty@.service.m4
++++ b/units/getty@.service.m4
+@@ -9,7 +9,7 @@
+ Description=Getty on %I
+ Documentation=man:agetty(8) man:systemd-getty-generator(8)
+ Documentation=http://0pointer.de/blog/projects/serial-console.html
+-After=systemd-user-sessions.service plymouth-quit-wait.service
++After=systemd-user-sessions.service
+ m4_ifdef(`HAVE_SYSV_COMPAT',
+ After=rc-local.service
+ )m4_dnl
+diff --git a/units/rescue.service.in b/units/rescue.service.in
+index 92553f6..5e69681 100644
+--- a/units/rescue.service.in
++++ b/units/rescue.service.in
+@@ -10,12 +10,12 @@ Description=Rescue Shell
+ Documentation=man:sulogin(8)
+ DefaultDependencies=no
+ Conflicts=shutdown.target
+-After=sysinit.target plymouth-start.service
++After=sysinit.target
+ Before=shutdown.target
+ 
+ [Service]
+ Environment=HOME=@roothomedir@
+ WorkingDirectory=-@roothomedir@
+ ExecStartPre=-/bin/plymouth quit
+ ExecStartPre=-/bin/echo -e 'Welcome to rescue mode! After logging in, type "journalctl -xb" to view\\nsystem logs, "systemctl reboot" to reboot, "systemctl default" or ^D to\\nboot into default mode.'
+ ExecStart=-/bin/sh -c "@SULOGIN@; @SYSTEMCTL@ --job-mode=fail --no-block default"
+diff --git a/units/systemd-ask-password-console.path b/units/systemd-ask-password-console.path
+index 2949635..a488b75 100644
+--- a/units/systemd-ask-password-console.path
++++ b/units/systemd-ask-password-console.path
+@@ -10,7 +10,6 @@ Description=Dispatch Password Requests to Console Directory Watch
+ Documentation=man:systemd-ask-password-console.service(8)
+ DefaultDependencies=no
+ Conflicts=shutdown.target
+-After=plymouth-start.service
+ Before=paths.target shutdown.target
+ ConditionPathExists=!/run/plymouth/pid
+ 
+diff --git a/units/systemd-ask-password-console.service.in b/units/systemd-ask-password-console.service.in
+index a24fa51..205eced 100644
+--- a/units/systemd-ask-password-console.service.in
++++ b/units/systemd-ask-password-console.service.in
+@@ -10,7 +10,7 @@ Description=Dispatch Password Requests to Console
+ Documentation=man:systemd-ask-password-console.service(8)
+ DefaultDependencies=no
+ Conflicts=shutdown.target
+-After=plymouth-start.service systemd-vconsole-setup.service
++After=systemd-vconsole-setup.service
+ Before=shutdown.target
+ ConditionPathExists=!/run/plymouth/pid
+ 
+-- 
+1.9.1
+
