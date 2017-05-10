@@ -40,7 +40,7 @@ cmnlib64.mbn            /dev/disk/by-partlabel/cmnlib64
 keymaster.mbn           /dev/disk/by-partlabel/keymaster
 xbl.elf                 /dev/disk/by-partlabel/xbl
 lksecapp.mbn            /dev/disk/by-partlabel/lksecapp
-devcfg.mbn              /dev/disk/by-partlabel/devcfg
+devcfg_auto.mbn         /dev/disk/by-partlabel/devcfg
 adspso.mbn              /dev/disk/by-partlabel/dsp
 
 # filename + .bak       backup partition
