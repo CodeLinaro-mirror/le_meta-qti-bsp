@@ -16,6 +16,10 @@ CONFIG_DEFAULT_SECURITY_SMACK=y
 KERNEL_EXTRACONFIGS
 }
 
+SRC_URI_append_8x96autogvmquin += " \
+    file://amba-pl011.c \
+"
+
 do_deploy_rename () {
     mv ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img ${DEPLOY_DIR_IMAGE}/boot.img
 }
@@ -28,3 +32,8 @@ do_add_gitinfor() {
     cp config  description  HEAD  hooks  index  info  logs  objects  packed-refs  refs  rr-cache  svn  ${S}/.git -fpPRHL
 }
 addtask add_gitinfor after do_unpack before do_patch
+
+
+do_configure_append_8x96autogvmquin() {
+    cp -f ${WORKDIR}/amba-pl011.c ${S}/drivers/tty/serial/
+}
