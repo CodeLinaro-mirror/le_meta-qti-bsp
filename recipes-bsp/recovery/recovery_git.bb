@@ -15,6 +15,7 @@ FILESPATH =+ "${WORKSPACE}:"
 SRC_URI = "\
 	file://bootable/recovery/ \
 	file://recovery.service \
+        file://0001-recovery-Add-default-update-package-path.patch \
 "
 
 S = "${WORKDIR}/bootable/${PN}/"
