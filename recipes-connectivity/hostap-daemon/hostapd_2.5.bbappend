@@ -22,4 +22,5 @@ do_configure_prepend () {
     sed -i '$a\CONFIG_ACS=y' ${WORKDIR}/defconfig
     sed -i '$a\CONFIG_IEEE80211AC=y' ${WORKDIR}/defconfig
     sed -i '$a\CONFIG_IEEE80211W=y' ${WORKDIR}/defconfig
+    sed -i '$a\CONFIG_INTERWORKING=y' ${WORKDIR}/defconfig
 }
