@@ -18,6 +18,8 @@ KERNEL_EXTRACONFIGS
 
 SRC_URI_append_8x96autogvmquin += " \
     file://amba-pl011.c \
+    file://0001-ion-Add-hvenv-driver-for-ion.patch \
+    file://0002-ion-Enable-ion-to-work-with-a-carveout-heap.patch \
 "
 
 do_deploy_rename () {

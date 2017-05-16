@@ -1,0 +1,229 @@
+From efafdd20a644e78ba5a5db6401b502e6ee4e1aea Mon Sep 17 00:00:00 2001
+From: Ramachandran Venkataramani <ramavenk@codeaurora.org>
+Date: Mon, 15 May 2017 12:14:44 -0700
+Subject: [PATCH] ion: Add hvenv driver for ion
+
+Add hvenv driver for ion
+
+Change-Id: Ie99f8f839c9185f440cd7b37bd40f607de392d3d
+Signed-off-by: Ramachandran Venkataramani <ramavenk@codeaurora.org>
+---
+ drivers/staging/android/ion/ion_hvenv_driver.c | 206 +++++++++++++++++++++++++
+ 1 file changed, 206 insertions(+)
+ create mode 100644 drivers/staging/android/ion/ion_hvenv_driver.c
+
+diff --git a/drivers/staging/android/ion/ion_hvenv_driver.c b/drivers/staging/android/ion/ion_hvenv_driver.c
+new file mode 100644
+index 0000000..dbd3b4a
+--- /dev/null
++++ b/drivers/staging/android/ion/ion_hvenv_driver.c
+@@ -0,0 +1,206 @@
++/*
++ * drivers/gpu/ion/ion_dummy_driver.c
++ *
++ * Copyright (C) 2013 Linaro, Inc
++ * Copyright (C) 2011 Google, Inc.
++ * Copyright (c) 2011-2016, The Linux Foundation. All rights reserved.
++ *
++ * This software is licensed under the terms of the GNU General Public
++ * License version 2, as published by the Free Software Foundation, and
++ * may be copied, distributed, and modified under those terms.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ */
++
++#include <linux/err.h>
++#include <linux/platform_device.h>
++#include <linux/slab.h>
++#include <linux/init.h>
++#include <linux/bootmem.h>
++#include <linux/memblock.h>
++#include <linux/sizes.h>
++#include <linux/io.h>
++#include <linux/genalloc.h>
++#include "ion.h"
++#include "ion_priv.h"
++
++static struct ion_device *idev;
++static struct ion_heap **heaps;
++
++static struct ion_platform_heap dummy_heaps[] = {
++		{
++			.id	= ION_HEAP_TYPE_SYSTEM,
++			.type	= ION_HEAP_TYPE_SYSTEM,
++			.name	= "system",
++		},
++		{
++			.id	= ION_HEAP_TYPE_SYSTEM_CONTIG,
++			.type	= ION_HEAP_TYPE_SYSTEM_CONTIG,
++			.name	= "system contig",
++		},
++		{
++			.id	= ION_HEAP_TYPE_CARVEOUT,
++			.type	= ION_HEAP_TYPE_CARVEOUT,
++			.name	= "carveout",
++			.size	= SZ_4M,
++		},
++		{
++			.id	= ION_HEAP_TYPE_CHUNK,
++			.type	= ION_HEAP_TYPE_CHUNK,
++			.name	= "chunk",
++			.size	= SZ_4M,
++			.align	= SZ_16K,
++			.priv	= (void *)(SZ_16K),
++		},
++};
++
++static struct ion_platform_data dummy_ion_pdata = {
++	.nr = ARRAY_SIZE(dummy_heaps),
++	.heaps = dummy_heaps,
++};
++
++/* struct derived from ion_carveout_heap.c */
++struct ion_carveout_heap {
++	struct ion_heap heap;
++	struct gen_pool *pool;
++	ion_phys_addr_t base;
++};
++
++/* function derived from ion_carveout_heap.c */
++ion_phys_addr_t ion_carveout_allocate(struct ion_heap *heap,
++				      unsigned long size,
++				      unsigned long align)
++{
++	struct ion_carveout_heap *carveout_heap =
++		container_of(heap, struct ion_carveout_heap, heap);
++	unsigned long offset = gen_pool_alloc(carveout_heap->pool, size);
++
++	if (!offset)
++		return ION_CARVEOUT_ALLOCATE_FAIL;
++
++	return offset;
++}
++
++/* function derived from ion_carveout_heap.c */
++void ion_carveout_free(struct ion_heap *heap, ion_phys_addr_t addr,
++		       unsigned long size)
++{
++	struct ion_carveout_heap *carveout_heap =
++		container_of(heap, struct ion_carveout_heap, heap);
++
++	if (addr == ION_CARVEOUT_ALLOCATE_FAIL)
++		return;
++	gen_pool_free(carveout_heap->pool, addr, size);
++}
++
++/* function derived from msm_ion.c */
++struct ion_client *msm_ion_client_create(const char *name)
++{
++	/*
++	 * The assumption is that if there is a NULL device, the ion
++	 * driver has not yet probed.
++	 */
++	if (idev == NULL)
++		return ERR_PTR(-EPROBE_DEFER);
++
++	if (IS_ERR(idev))
++		return (struct ion_client *)idev;
++
++	return ion_client_create(idev, name);
++}
++
++static int __init ion_dummy_init(void)
++{
++	int i, err;
++
++	idev = ion_device_create(NULL);
++	heaps = kcalloc(dummy_ion_pdata.nr, sizeof(struct ion_heap *),
++			GFP_KERNEL);
++	if (!heaps)
++		return -ENOMEM;
++
++
++	/* Allocate a dummy carveout heap */
++	carveout_ptr = alloc_pages_exact(
++				dummy_heaps[ION_HEAP_TYPE_CARVEOUT].size,
++				GFP_KERNEL);
++	if (carveout_ptr)
++		dummy_heaps[ION_HEAP_TYPE_CARVEOUT].base =
++						virt_to_phys(carveout_ptr);
++	else
++		pr_err("ion_dummy: Could not allocate carveout\n");
++
++	/* Allocate a dummy chunk heap */
++	chunk_ptr = alloc_pages_exact(
++				dummy_heaps[ION_HEAP_TYPE_CHUNK].size,
++				GFP_KERNEL);
++	if (chunk_ptr)
++		dummy_heaps[ION_HEAP_TYPE_CHUNK].base = virt_to_phys(chunk_ptr);
++	else
++		pr_err("ion_dummy: Could not allocate chunk\n");
++
++	for (i = 0; i < dummy_ion_pdata.nr; i++) {
++		struct ion_platform_heap *heap_data = &dummy_ion_pdata.heaps[i];
++
++		if (heap_data->type == ION_HEAP_TYPE_CARVEOUT &&
++							!heap_data->base)
++			continue;
++
++		if (heap_data->type == ION_HEAP_TYPE_CHUNK && !heap_data->base)
++			continue;
++
++		heaps[i] = ion_heap_create(heap_data);
++		if (IS_ERR_OR_NULL(heaps[i])) {
++			err = PTR_ERR(heaps[i]);
++			goto err;
++		}
++		ion_device_add_heap(idev, heaps[i]);
++	}
++	return 0;
++err:
++	for (i = 0; i < dummy_ion_pdata.nr; i++) {
++		if (heaps[i])
++			ion_heap_destroy(heaps[i]);
++	}
++	kfree(heaps);
++
++	if (carveout_ptr) {
++		free_pages_exact(carveout_ptr,
++				dummy_heaps[ION_HEAP_TYPE_CARVEOUT].size);
++		carveout_ptr = NULL;
++	}
++	if (chunk_ptr) {
++		free_pages_exact(chunk_ptr,
++				dummy_heaps[ION_HEAP_TYPE_CHUNK].size);
++		chunk_ptr = NULL;
++	}
++	return err;
++}
++device_initcall(ion_dummy_init);
++
++static void __exit ion_dummy_exit(void)
++{
++	int i;
++
++	ion_device_destroy(idev);
++
++	for (i = 0; i < dummy_ion_pdata.nr; i++)
++		ion_heap_destroy(heaps[i]);
++	kfree(heaps);
++
++	if (carveout_ptr) {
++		free_pages_exact(carveout_ptr,
++				dummy_heaps[ION_HEAP_TYPE_CARVEOUT].size);
++		carveout_ptr = NULL;
++	}
++	if (chunk_ptr) {
++		free_pages_exact(chunk_ptr,
++				dummy_heaps[ION_HEAP_TYPE_CHUNK].size);
++		chunk_ptr = NULL;
++	}
++}
++__exitcall(ion_dummy_exit);
+-- 
+1.9.1
+
