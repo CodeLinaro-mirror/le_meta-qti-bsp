@@ -1,5 +1,4 @@
 # Rootfs creation.
-require ../../../recipes-ss-mgr/packagegroup/ss-mgr.inc
 require ../../../recipes-bt/packagegroup/bt.inc
 require ../../../recipes-audio/audio.inc
 
@@ -64,8 +63,8 @@ IMAGE_INSTALL += "powerapp-reboot"
 IMAGE_INSTALL += "powerapp-shutdown"
 IMAGE_INSTALL += "ppp"
 IMAGE_INSTALL += "perl"
-IMAGE_INSTALL += "qcacld-ll"
-IMAGE_INSTALL += "qcacld-hl"
+IMAGE_INSTALL += "qcacld30-ll"
+IMAGE_INSTALL += "qcacld30-hl"
 
 IMAGE_INSTALL += "rtsp-alg"
 IMAGE_INSTALL += "sfe"

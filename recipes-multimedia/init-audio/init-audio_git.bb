@@ -32,6 +32,8 @@ do_install() {
         install -m 0755 ${S}/init_audio.service -D ${D}${sysconfdir}/systemd/system/init_audio.service
         install -d ${D}/etc/systemd/system/multi-user.target.wants
         ln -sf /etc/systemd/system/init_audio.service ${D}/etc/systemd/system/multi-user.target.wants/init_audio.service
+        install -d ${D}/etc/systemd/system/ffbm.target.wants
+        ln -sf /etc/systemd/system/init_audio.service ${D}/etc/systemd/system/ffbm.target.wants/init_audio.service
     else
         install -m 0755 ${S}/init_qcom_audio -D ${D}${sysconfdir}/init.d/init_qcom_audio
     fi
