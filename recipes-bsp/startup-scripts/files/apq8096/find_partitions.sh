@@ -78,4 +78,6 @@ FindAndMountEXT4 dsp /dsp
 /sbin/restorecon -RF /persist
 /sbin/restorecon -RF /dsp
 /sbin/restorecon -RF /dev
+#making ssh to login as admin
+setsebool -P ssh_sysadm_login 1
 exit 0
