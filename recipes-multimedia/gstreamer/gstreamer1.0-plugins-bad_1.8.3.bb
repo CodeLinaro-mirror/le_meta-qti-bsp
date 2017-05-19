@@ -14,6 +14,7 @@ SRC_URI_remove = " \
     file://0001-introspection.m4-prefix-pkgconfig-paths-with-PKG_CON.patch \
     file://0001-Makefile.am-don-t-hardcode-libtool-name-when-running.patch \
 "
+GI_DATA_ENABLED="0"
 SRCREV_common = "6f2d2093e84cc0eb99b634fa281822ebb9507285"
 S = "${WORKDIR}/gst-plugins-bad"
 

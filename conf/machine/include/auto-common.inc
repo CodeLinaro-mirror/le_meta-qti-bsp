@@ -17,8 +17,6 @@ require conf/machine/include/arm/arch-armv8.inc
 
 SERIAL_CONSOLE ?= "115200 ttyHSL0"
 
-DISTRO_FEATURES_BACKFILL_remove = "gobject-introspection-data"
-DISTRO_FEATURES_BACKFILL_CONSIDERED_remove = "gobject-introspection-data"
 DISTRO_FEATURES_append = " emmc-boot "
 DISTRO_FEATURES_append = " persist-image "
 

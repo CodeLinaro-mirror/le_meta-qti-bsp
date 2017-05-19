@@ -20,6 +20,7 @@ SRC_URI_remove = "\
 SRCREV_common = "6f2d2093e84cc0eb99b634fa281822ebb9507285"
 S = "${WORKDIR}/gst-plugins-base"
 
+GI_DATA_ENABLED="0"
 do_configure_prepend() {
 	cd ${S}
 	./autogen.sh --noconfigure
