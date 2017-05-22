@@ -8,10 +8,12 @@ IMAGE_FSTYPES = "ext4"
 IMAGE_INSTALL += "packagegroup-core-boot"
 IMAGE_INSTALL += "${ROOTFS_PKGMANAGE_BOOTSTRAP}"
 IMAGE_INSTALL += "${CORE_IMAGE_EXTRA_INSTALL}"
-IMAGE_INSTALL += "packagegroup-core-selinux"
-IMAGE_INSTALL += "selinux-config"
+
+IMAGE_INSTALL += "${@base_contains('DISTRO_FEATURES','selinux', 'packagegroup-core-selinux', '', d)}"
+IMAGE_INSTALL += "${@base_contains('DISTRO_FEATURES','selinux', 'selinux-config', '', d)}"
+IMAGE_INSTALL += "${@base_contains('DISTRO_FEATURES','selinux', 'refpolicy-mls', '', d)}"
+
 IMAGE_INSTALL += "start-scripts-firmware-links"
-IMAGE_INSTALL += "refpolicy-mls"
 IMAGE_INSTALL += "start-scripts-find-partitions"
 IMAGE_INSTALL += "start-scripts-misc-daemon"
 
@@ -20,7 +22,6 @@ IMAGE_INSTALL += "alsa-lib"
 IMAGE_INSTALL += "alsa-utils"
 IMAGE_INSTALL += "base-files"
 IMAGE_INSTALL += "base-passwd"
-IMAGE_INSTALL += "bluez5"
 IMAGE_INSTALL += "dhcpcd"
 IMAGE_INSTALL += "dnsmasq"
 IMAGE_INSTALL += "ebtables"
@@ -36,10 +37,10 @@ IMAGE_INSTALL += "lib32-libnl"
 IMAGE_INSTALL += "libcutils"
 IMAGE_INSTALL += "liblog"
 IMAGE_INSTALL += "libxml2"
-IMAGE_INSTALL += "loc-stub"
-IMAGE_INSTALL += "loc-pla"
-IMAGE_INSTALL += "loc-hal"
-IMAGE_INSTALL += "loc-net-iface"
+IMAGE_INSTALL += "${@base_contains('DISTRO_FEATURES','location-services', 'loc-stub', '', d)}"
+IMAGE_INSTALL += "${@base_contains('DISTRO_FEATURES','location-services', 'loc-pla', '', d)}"
+IMAGE_INSTALL += "${@base_contains('DISTRO_FEATURES','location-services', 'loc-hal', '', d)}"
+IMAGE_INSTALL += "${@base_contains('DISTRO_FEATURES','location-services', 'loc-net-iface', '', d)}"
 IMAGE_INSTALL += "start-scripts-find-partitions"
 IMAGE_INSTALL += "start-scripts-firmware-links"
 IMAGE_INSTALL += "system-core-adbd"
@@ -83,6 +84,9 @@ IMAGE_INSTALL += "procrank"
 
 # Below is to generate sparse ext4 system image (OE by default supports raw ext4 images)
 SELINUX_FILE_CONTEXTS = "${IMAGE_ROOTFS}/etc/selinux/mls/contexts/files/file_contexts"
+
+IMAGE_EXT4_SELINUX_OPTIONS = "${@base_contains('DISTRO_FEATURES','selinux',' -a / -S ${SELINUX_FILE_CONTEXTS} ','',d)}"
+
 do_makesystem() {
-    make_ext4fs ${IMAGE_EXT4_EXTRA_OPTIONS} -s -a / -S ${SELINUX_FILE_CONTEXTS} -l ${SYSTEM_SIZE_EXT4} ${DEPLOY_DIR_IMAGE}/${MACHINE}-sysfs.ext4 ${IMAGE_ROOTFS}
+    make_ext4fs ${IMAGE_EXT4_EXTRA_OPTIONS} -s ${IMAGE_EXT4_SELINUX_OPTIONS} -l ${SYSTEM_SIZE_EXT4} ${DEPLOY_DIR_IMAGE}/${MACHINE}-sysfs.ext4 ${IMAGE_ROOTFS}
 }
