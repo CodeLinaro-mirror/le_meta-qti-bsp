@@ -1,0 +1,27 @@
+From 852d122beed7f54cdb1c742e455d0adb9e1bcf4f Mon Sep 17 00:00:00 2001
+From: Xubao Jiang <xubaoj@codeaurora.org>
+Date: Mon, 22 May 2017 18:51:02 +0800
+Subject: [PATCH] sysv-generator add default dependencies
+
+Change-Id: I9ae1a1cc3c58a4fc86b1b992cd147ded41a40cec
+---
+ src/sysv-generator/sysv-generator.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/sysv-generator/sysv-generator.c b/src/sysv-generator/sysv-generator.c
+index ea06d6a..074baea 100644
+--- a/src/sysv-generator/sysv-generator.c
++++ b/src/sysv-generator/sysv-generator.c
+@@ -208,6 +208,9 @@ static int generate_unit_file(SysvStub *s) {
+         STRV_FOREACH(p, s->conflicts)
+                 fprintf(f, "Conflicts=%s\n", *p);
+ 
++        if (!s->default_dependencies)
++                fprintf(f, "DefaultDependencies=no\n");
++
+         fprintf(f,
+                 "\n[Service]\n"
+                 "Type=forking\n"
+-- 
+1.9.1
+
