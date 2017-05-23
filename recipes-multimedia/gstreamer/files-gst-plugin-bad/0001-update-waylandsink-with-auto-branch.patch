@@ -1,0 +1,1351 @@
+From 420499fe3129b2b7fe3f79b63f88f0db62d76ce5 Mon Sep 17 00:00:00 2001
+From: Mohamed Moussa <mmouss@codeaurora.org>
+Date: Tue, 23 May 2017 15:26:58 -0700
+Subject: [PATCH] update waylandsink with auto branch
+
+Integrate shared buffer code from auto branch
+---
+ configure.ac                                 |  17 +-
+ ext/wayland/Makefile.am                      |   6 +-
+ ext/wayland/gstwaylandsink.c                 | 416 +++++++++++++++++++++++----
+ ext/wayland/gstwaylandsink.h                 |  17 ++
+ ext/wayland/wlbuffer.c                       |  61 ++++
+ ext/wayland/wlbuffer.h                       |   9 +-
+ ext/wayland/wlshmallocator.c                 |   6 +
+ ext/wayland/wlshmallocator.h                 |   4 +
+ ext/wayland/wlwindow.c                       |  10 +-
+ gst-libs/gst/Makefile.am                     |   4 +-
+ gst-libs/gst/Makefile.in                     |   4 +-
+ gst-libs/gst/ionbuf/Makefile.am              |  40 +++
+ gst-libs/gst/ionbuf/gstionbuf_meta.c         | 114 ++++++++
+ gst-libs/gst/ionbuf/gstionbuf_meta.h         |  72 +++++
+ gst/videoparsers/gsth264parse.c              |  11 +-
+ pkgconfig/gstreamer-ionbuf-uninstalled.pc.in |  12 +
+ pkgconfig/gstreamer-ionbuf.pc.in             |  12 +
+ 17 files changed, 742 insertions(+), 73 deletions(-)
+ create mode 100644 gst-libs/gst/ionbuf/Makefile.am
+ create mode 100644 gst-libs/gst/ionbuf/gstionbuf_meta.c
+ create mode 100644 gst-libs/gst/ionbuf/gstionbuf_meta.h
+ create mode 100644 pkgconfig/gstreamer-ionbuf-uninstalled.pc.in
+ create mode 100644 pkgconfig/gstreamer-ionbuf.pc.in
+
+diff --git a/configure.ac b/configure.ac
+index f9a3051..06ec934 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -700,6 +700,9 @@ HAVE_GL=no
+ HAVE_GLES2=no
+ HAVE_GLES3_H=no
+ HAVE_WAYLAND_EGL=no
++AC_SUBST(HAVE_GL)
++AC_SUBST(HAVE_EGL)
++AC_SUBST(HAVE_GLES2)
+ 
+ HAVE_EGL_RPI=no
+ 
+@@ -730,7 +733,7 @@ case $host in
+     if test "x$NEED_EGL" != "xno"; then
+       AG_GST_PKG_CHECK_MODULES(EGL, egl)
+       if test "x$HAVE_EGL" != "xyes"; then
+-        AG_GST_CHECK_LIBHEADER(EGL, EGL, eglGetError,, EGL/egl.h)
++        AG_GST_CHECK_LIBHEADER(EGL, EGL, eglGetError,-ldl -lglib-2.0 -lpthread, EGL/egl.h)
+       fi
+     fi
+ 
+@@ -775,7 +778,7 @@ case $host in
+             LIBS="$LIBS -lGLESv2"
+             AC_CHECK_LIB([EGL], [eglGetProcAddress],
+               [
+-                LIBS="$LIBS -lEGL"
++                LIBS="$LIBS -lEGL -ldl -lglib-2.0 -lpthread"
+                 AC_CHECK_HEADER([EGL/egl.h],
+                   [
+                     AC_CHECK_LIB([GLESv2], [glEnable],
+@@ -798,7 +801,7 @@ case $host in
+     LIBS=$old_LIBS
+     CFLAGS=$old_CFLAGS
+ 
+-    PKG_CHECK_MODULES(WAYLAND_EGL, wayland-client >= 1.0 wayland-cursor >= 1.0 wayland-egl >= 9.0, HAVE_WAYLAND_EGL=yes, HAVE_WAYLAND_EGL=no)
++    PKG_CHECK_MODULES(WAYLAND_EGL, wayland-client >= 1.0 wayland-cursor >= 1.0 wayland-egl >= 1.0.0, HAVE_WAYLAND_EGL=yes, HAVE_WAYLAND_EGL=no)
+ 
+     # OS X and iOS always have GL available
+     case $host in
+@@ -816,6 +819,7 @@ esac
+ CPPFLAGS="$save_CPPFLAGS"
+ LIBS="$save_LIBS"
+ 
++
+ USE_OPENGL=no
+ USE_GLES2=no
+ USE_GLX=no
+@@ -982,7 +986,7 @@ case $host in
+     dnl EGL
+     if test "x$HAVE_EGL" = "xyes"; then
+       if test "x$NEED_EGL" != "xno"; then
+-        GL_LIBS="$GL_LIBS -lEGL"
++        GL_LIBS="$GL_LIBS -lEGL -ldl -lglib-2.0 -lpthread"
+         USE_EGL=yes
+       fi
+     fi
+@@ -1058,7 +1062,7 @@ case $host in
+     else
+       if test "x$NEED_EGL" != "xno"; then
+         if test "x$HAVE_WINDOW_WAYLAND" = "xyes" -o "x$HAVE_WINDOW_X11" = "xyes" -o "x$HAVE_WINDOW_DISPMANX" = "xyes"; then
+-          GL_LIBS="$GL_LIBS -lEGL $EGL_LIBS"
++          GL_LIBS="$GL_LIBS -lEGL -ldl -lglib-2.0 -lpthread $EGL_LIBS"
+           GL_CFLAGS="$GL_CFLAGS $EGL_CFLAGS"
+           USE_EGL=yes
+         fi
+@@ -3710,6 +3714,7 @@ gst-libs/gst/base/Makefile
+ gst-libs/gst/player/Makefile
+ gst-libs/gst/video/Makefile
+ gst-libs/gst/audio/Makefile
++gst-libs/gst/ionbuf/Makefile
+ sys/Makefile
+ sys/dshowdecwrapper/Makefile
+ sys/acmenc/Makefile
+@@ -3867,6 +3872,8 @@ pkgconfig/gstreamer-bad-video.pc
+ pkgconfig/gstreamer-bad-video-uninstalled.pc
+ pkgconfig/gstreamer-bad-audio.pc
+ pkgconfig/gstreamer-bad-audio-uninstalled.pc
++pkgconfig/gstreamer-ionbuf.pc
++pkgconfig/gstreamer-ionbuf-uninstalled.pc
+ tools/Makefile
+ m4/Makefile
+ )
+diff --git a/ext/wayland/Makefile.am b/ext/wayland/Makefile.am
+index a23d44d..5209fe2 100644
+--- a/ext/wayland/Makefile.am
++++ b/ext/wayland/Makefile.am
+@@ -13,12 +13,14 @@ libgstwaylandsink_la_SOURCES =  \
+ nodist_libgstwaylandsink_la_SOURCES = viewporter-protocol.c
+ 
+ libgstwaylandsink_la_CFLAGS = $(GST_CFLAGS) $(GST_PLUGINS_BASE_CFLAGS) \
+-                               $(WAYLAND_CFLAGS) $(GST_PLUGINS_BAD_CFLAGS)
++                               $(WAYLAND_EGL_CFLAGS) $(GST_PLUGINS_BAD_CFLAGS)
+ libgstwaylandsink_la_LIBADD = \
+ 	$(GST_PLUGINS_BASE_LIBS) \
+ 	-lgstvideo-$(GST_API_VERSION) \
++	-lEGL \
+ 	-lgstallocators-$(GST_API_VERSION) \
+-	$(WAYLAND_LIBS) \
++	$(WAYLAND_EGL_LIBS) \
++	$(top_builddir)/gst-libs/gst/ionbuf/libgstionbuf-$(GST_API_VERSION).la \
+ 	$(top_builddir)/gst-libs/gst/wayland/libgstwayland-$(GST_API_VERSION).la
+ libgstwaylandsink_la_LDFLAGS = $(GST_PLUGIN_LDFLAGS)
+ libgstwaylandsink_la_LIBTOOLFLAGS = $(GST_PLUGIN_LIBTOOLFLAGS)
+diff --git a/ext/wayland/gstwaylandsink.c b/ext/wayland/gstwaylandsink.c
+index 4b39ae1..fa25b52 100644
+--- a/ext/wayland/gstwaylandsink.c
++++ b/ext/wayland/gstwaylandsink.c
+@@ -21,6 +21,10 @@
+  * Boston, MA 02110-1301 USA.
+  */
+ 
++/*
++ * Copyright (c) 2016, The Linux Foundation. All rights reserved.
++ */
++
+ /**
+  * SECTION:element-waylandsink
+  *
+@@ -48,6 +52,7 @@
+ 
+ #include <gst/wayland/wayland.h>
+ #include <gst/video/videooverlay.h>
++#define USE_OMX_TARGET_VENUS
+ 
+ /* signals */
+ enum
+@@ -65,6 +70,13 @@ enum
+ 
+ GST_DEBUG_CATEGORY (gstwayland_debug);
+ #define GST_CAT_DEFAULT gstwayland_debug
++#if defined(USE_OMX_TARGET_VENUS)
++#include <gst/ionbuf/gstionbuf_meta.h>
++
++#include <EGL/egl.h>
++#include <EGL/eglext.h>
++#include <drm/drm_fourcc.h>
++#endif
+ 
+ static GstStaticPadTemplate sink_template = GST_STATIC_PAD_TEMPLATE ("sink",
+     GST_PAD_SINK,
+@@ -116,6 +128,22 @@ G_DEFINE_TYPE_WITH_CODE (GstWaylandSink, gst_wayland_sink, GST_TYPE_VIDEO_SINK,
+     G_IMPLEMENT_INTERFACE (GST_TYPE_WAYLAND_VIDEO,
+         gst_wayland_sink_waylandvideo_init));
+ 
++
++#if (defined (USE_OMX_TARGET_VENUS))
++static GstIonBufFdMeta  *gst_wayland_sink_read_ionbuffd (GstWaylandSink *sink, GstBuffer * buf) {
++
++  GstIonBufFdMeta *meta = gst_buffer_get_ionfd_meta(buf);
++  if (!meta) {
++    GST_WARNING_OBJECT(sink, "Unable to read ionBufFd from buffer %p.", buf);
++    return NULL;
++  }
++
++  GST_DEBUG_OBJECT(sink,"Read buf metadata fd %u, offset %u, size %u, ubwc %d\n", meta->fd, meta->offset, meta->size, meta->ubwc);
++
++  return meta;
++}
++#endif
++
+ static void
+ gst_wayland_sink_class_init (GstWaylandSinkClass * klass)
+ {
+@@ -212,6 +240,12 @@ gst_wayland_sink_finalize (GObject * object)
+ 
+   if (sink->last_buffer)
+     gst_buffer_unref (sink->last_buffer);
++    if (sink->buffer_table)
++    g_hash_table_destroy(sink->buffer_table);
++
++  if (sink->egldpy)
++    eglTerminate(sink->egldpy);
++
+   if (sink->display)
+     g_object_unref (sink->display);
+   if (sink->window)
+@@ -219,7 +253,8 @@ gst_wayland_sink_finalize (GObject * object)
+   if (sink->pool)
+     gst_object_unref (sink->pool);
+ 
+-  g_free (sink->display_name);
++  if (sink->display_name)
++    g_free (sink->display_name);
+ 
+   g_mutex_clear (&sink->display_lock);
+   g_mutex_clear (&sink->render_lock);
+@@ -245,6 +280,41 @@ gst_wayland_sink_set_display_from_context (GstWaylandSink * sink,
+     g_error_free (error);
+   }
+ }
++#if (defined (USE_OMX_TARGET_VENUS))
++static void
++gst_wayland_sink_setup_egl (GstWaylandSink * sink)
++{
++  if (sink->display) {
++    EGLDisplay egldpy;
++    int major = 0, minor = 0;
++    /* Setup EGL */
++    egldpy = eglGetDisplay(sink->display->display);
++    if (! eglInitialize(egldpy, &major, &minor)) {
++      sink->egldpy = EGL_NO_DISPLAY;
++      GST_ERROR_OBJECT(sink, "Failed to initialise EGLDisplay");
++      return;
++    }
++
++    sink->egldpy = egldpy;
++
++    sink->eglCreateImage =
++      (PFNEGLCREATEIMAGEKHRPROC)eglGetProcAddress("eglCreateImageKHR");
++    sink->eglDestroyImage =
++      (PFNEGLDESTROYIMAGEKHRPROC)eglGetProcAddress("eglDestroyImageKHR");
++    sink->eglCreateWaylandBufferFromImage =
++      (PFNEGLCREATEWAYLANDBUFFERFROMIMAGEWL)
++        eglGetProcAddress("eglCreateWaylandBufferFromImageWL");
++
++    if (sink->eglCreateImage == NULL || sink->eglDestroyImage == NULL) {
++      GST_ERROR_OBJECT(sink, "Failed to get EGL_KHR_image_base");
++    }
++
++    if (sink->eglCreateWaylandBufferFromImage == NULL) {
++      GST_ERROR_OBJECT(sink,"Failed to get EGL_WL_create_wayland_buffer_from_image");
++    }
++  }
++}
++#endif
+ 
+ static gboolean
+ gst_wayland_sink_find_display (GstWaylandSink * sink)
+@@ -292,6 +362,9 @@ gst_wayland_sink_find_display (GstWaylandSink * sink)
+         }
+       }
+     }
++#if (defined (USE_OMX_TARGET_VENUS))
++    gst_wayland_sink_setup_egl(sink);
++#endif
+   }
+ 
+   g_mutex_unlock (&sink->display_lock);
+@@ -343,6 +416,17 @@ gst_wayland_sink_change_state (GstElement * element, GstStateChange transition)
+        * restarted (GstVideoOverlay behaves like that in other sinks)
+        */
+       if (sink->display && !sink->window) {     /* -> the window was toplevel */
++
++        /* MSM8996: Egldisplay should get destroyed before clearing the display
++         * object.
++         */
++
++        if (sink->buffer_table)
++          g_hash_table_remove_all(sink->buffer_table);
++        if (sink->egldpy) {
++          eglTerminate(sink->egldpy);
++          sink->egldpy = EGL_NO_DISPLAY;
++        }
+         g_clear_object (&sink->display);
+       }
+       g_mutex_unlock (&sink->display_lock);
+@@ -381,10 +465,11 @@ static GstCaps *
+ gst_wayland_sink_get_caps (GstBaseSink * bsink, GstCaps * filter)
+ {
+   GstWaylandSink *sink;
+-  GstCaps *caps;
++  GstCaps *caps, *temp;
+ 
+   sink = GST_WAYLAND_SINK (bsink);
+ 
++
+   caps = gst_pad_get_pad_template_caps (GST_VIDEO_SINK_PAD (sink));
+ 
+   g_mutex_lock (&sink->display_lock);
+@@ -393,11 +478,36 @@ gst_wayland_sink_get_caps (GstBaseSink * bsink, GstCaps * filter)
+     GValue list = G_VALUE_INIT;
+     GValue value = G_VALUE_INIT;
+     GArray *formats;
+-    gint i;
+-    enum wl_shm_format fmt;
+-
++    gint i,bHaveNV12 = FALSE;
++    enum wl_shm_format fmt, format;
++    GstVideoInfo info;
++    GstStructure *structure;
++    const gchar *s;
++    GstVideoFormat vformat = GST_VIDEO_FORMAT_UNKNOWN;
+     g_value_init (&list, GST_TYPE_LIST);
++    g_value_init (&value, G_TYPE_STRING);
++        structure = gst_caps_get_structure (caps, 0);
++
++#if (defined (USE_OMX_TARGET_VENUS))
++    /*currently display wl_shm have the capacity of BGRA,BRGX and RGB16
++     *(not including NV12).so waylandsink can only support system buffer
++     *(BGRA,BRGX or RGB16) and we use eglimage to support qti hw decoder
++     * output buffer for workaround
++     */
++    formats = sink->display->shm_formats;
+ 
++    for (i = 0; i < formats->len; i++) {
++      fmt = g_array_index (formats, uint32_t, i);
++      if(fmt == WL_SHM_FORMAT_NV12)
++          bHaveNV12 = TRUE;
++      g_value_set_string (&value, gst_wl_shm_format_to_string (fmt));
++      gst_value_list_append_value (&list, &value);
++    }
++    if (!bHaveNV12) {
++        g_value_set_string (&value, gst_wl_shm_format_to_string (WL_SHM_FORMAT_NV12));
++        gst_value_list_append_value (&list, &value);
++    }
++#else
+     formats = sink->display->shm_formats;
+     for (i = 0; i < formats->len; i++) {
+       g_value_init (&value, G_TYPE_STRING);
+@@ -406,15 +516,16 @@ gst_wayland_sink_get_caps (GstBaseSink * bsink, GstCaps * filter)
+       gst_value_list_append_and_take_value (&list, &value);
+     }
+ 
++#endif
+     caps = gst_caps_make_writable (caps);
+     gst_structure_take_value (gst_caps_get_structure (caps, 0), "format",
+         &list);
+ 
++
+     GST_DEBUG_OBJECT (sink, "display caps: %" GST_PTR_FORMAT, caps);
+   }
+ 
+   g_mutex_unlock (&sink->display_lock);
+-
+   if (filter) {
+     GstCaps *intersection;
+ 
+@@ -458,6 +569,8 @@ gst_wayland_sink_set_caps (GstBaseSink * bsink, GstCaps * caps)
+   enum wl_shm_format format;
+   GArray *formats;
+   gint i;
++  GstStructure *structure;
++  GstWlShmAllocator *wl_allocator;
+ 
+   sink = GST_WAYLAND_SINK (bsink);
+ 
+@@ -471,6 +584,7 @@ gst_wayland_sink_set_caps (GstBaseSink * bsink, GstCaps * caps)
+   if ((gint) format == -1)
+     goto invalid_format;
+ 
++#if (!defined (USE_OMX_TARGET_VENUS))
+   /* verify we support the requested format */
+   formats = sink->display->shm_formats;
+   for (i = 0; i < formats->len; i++) {
+@@ -480,7 +594,7 @@ gst_wayland_sink_set_caps (GstBaseSink * bsink, GstCaps * caps)
+ 
+   if (i >= formats->len)
+     goto unsupported_format;
+-
++#endif
+   /* store the video info */
+   sink->video_info = info;
+   sink->video_info_changed = TRUE;
+@@ -490,7 +604,23 @@ gst_wayland_sink_set_caps (GstBaseSink * bsink, GstCaps * caps)
+   if (!newpool)
+     goto pool_failed;
+ 
++  structure = gst_buffer_pool_get_config (newpool);
++  gst_buffer_pool_config_set_params (structure, caps, info.size, 2, 0);
++  wl_allocator = (GstWlShmAllocator *)gst_wl_shm_allocator_get ();
++  if (G_LIKELY (wl_allocator)) {
++    wl_allocator->info.width  = info.width;
++    wl_allocator->info.height  = info.height;
++    gst_buffer_pool_config_set_allocator (structure, wl_allocator,
++      NULL);
++  }
++  else
++    goto config_failed;
++  if (!gst_buffer_pool_set_config (newpool, structure))
++    goto config_failed;
+ 
++  /* store the video info */
++  sink->video_info = info;
++  sink->video_info_changed = TRUE;
+   gst_object_replace ((GstObject **) & sink->pool, (GstObject *) newpool);
+   gst_object_unref (newpool);
+ 
+@@ -513,6 +643,12 @@ pool_failed:
+     GST_ERROR_OBJECT (sink, "Failed to create new pool");
+     return FALSE;
+   }
++config_failed:
++  {
++    GST_DEBUG_OBJECT (bsink, "failed setting config");
++    gst_object_unref (newpool);
++    return FALSE;
++  }
+ }
+ 
+ static gboolean
+@@ -579,7 +715,57 @@ render_last_buffer (GstWaylandSink * sink)
+   }
+   gst_wl_window_render (sink->window, wlbuffer, info);
+ }
++#if (defined (USE_OMX_TARGET_VENUS))
++static struct wl_buffer*
++gst_wayland_sink_create_wl_buffer(GstWaylandSink *sink, GstIonBufFdMeta *ionBufFdMeta)
++{
++  GST_LOG_OBJECT (sink, "mm Inside gst_wayland_sink_create_wl_buffer()");
++  EGLImageKHR eglimg;
++  struct wl_buffer *wlbuf;
++  EGLint attribs[] = {
++    EGL_WIDTH, 0,
++    EGL_HEIGHT, 0,
++    EGL_LINUX_DRM_FOURCC_EXT, DRM_FORMAT_NV12,
++    EGL_DMA_BUF_PLANE0_FD_EXT, 0,
++    EGL_DMA_BUF_PLANE0_OFFSET_EXT, 0,
++    EGL_DMA_BUF_PLANE1_FD_EXT, 0,
++    EGL_DMA_BUF_PLANE1_OFFSET_EXT, 0,
++    EGL_NONE};
++  int w = sink->video_info.width;
++  int h = sink->video_info.height;
++
++  attribs[1]  = w;
++  attribs[3]  = h;
++  attribs[7]  = ionBufFdMeta->fd;
++  attribs[9] = ionBufFdMeta->offset;
++  attribs[11] = ionBufFdMeta->fd;
++  /* MSM8996: Updated the offset with correct width allignment */
++  attribs[13] = ionBufFdMeta->offset + ((w + 127) & ~127) * ((h + 31) & ~31);
++
++  GST_DEBUG_OBJECT(sink, "create wl buffer from elg :%p fd %d size  %d, w h %d %d",
++          sink->egldpy,ionBufFdMeta->fd,ionBufFdMeta->size,w ,h);
++
++  eglimg = sink->eglCreateImage(sink->egldpy, EGL_NO_CONTEXT, EGL_LINUX_DMA_BUF_EXT, NULL, attribs);
++  if (eglimg == EGL_NO_IMAGE_KHR) {
++    GST_WARNING_OBJECT(sink, "failed to create EGLImage");
++    return NULL;
++  }
+ 
++  wlbuf = sink->eglCreateWaylandBufferFromImage(sink->egldpy, eglimg);
++
++  wl_proxy_set_queue((struct wl_proxy*)wlbuf, sink->display->queue);
++
++  sink->eglDestroyImage(sink->egldpy, eglimg);
++GST_LOG_OBJECT (sink, "mm wlbuf is %p", wlbuf); //debug
++  return wlbuf;
++}
++#endif
++static void
++destroy_gstwl_buffer(gpointer data)
++{
++  GstWlBuffer *gstwlbuf = (GstWlBuffer *)data;
++  g_object_unref (gstwlbuf);
++}
+ static GstFlowReturn
+ gst_wayland_sink_show_frame (GstVideoSink * vsink, GstBuffer * buffer)
+ {
+@@ -588,6 +774,9 @@ gst_wayland_sink_show_frame (GstVideoSink * vsink, GstBuffer * buffer)
+   GstWlBuffer *wlbuffer;
+   GstFlowReturn ret = GST_FLOW_OK;
+ 
++#if defined(USE_OMX_TARGET_VENUS)
++  GstIonBufFdMeta *ionBufFdMeta;
++#endif
+   g_mutex_lock (&sink->render_lock);
+ 
+   GST_LOG_OBJECT (sink, "render buffer %p", buffer);
+@@ -605,10 +794,32 @@ gst_wayland_sink_show_frame (GstVideoSink * vsink, GstBuffer * buffer)
+           &sink->video_info, &sink->render_lock);
+     }
+   }
+-
++  if (sink->video_info_changed)
++  {
++     GstVideoRectangle *render_rectangle = &sink->window->render_rectangle;
++     const GstVideoInfo *info = &sink->video_info;
++     sink->window->video_width =
++        gst_util_uint64_scale_int_round (info->width, info->par_n, info->par_d);
++     sink->window->video_height = info->height;
++
++     /*reset buffer table while video info change */
++     if (sink->buffer_table)
++         g_hash_table_remove_all(sink->buffer_table);
++
++     /* set the initial size to be the same as the reported video size */
++     if (gst_wl_window_is_toplevel (sink->window))
++         gst_wl_window_set_render_rectangle (sink->window,
++            render_rectangle->x, render_rectangle->y, info->width, info->height);
++     else
++	 gst_wl_window_set_render_rectangle (sink->window,
++            render_rectangle->x, render_rectangle->y, render_rectangle->w, render_rectangle->h);
++  }
+   /* drop buffers until we get a frame callback */
+   if (sink->redraw_pending)
+-    goto done;
++  {
++	GST_WARNING_OBJECT (sink,"drop buffers until we get a frame callback");
++	 // goto done;
++  }
+ 
+   /* make sure that the application has called set_render_rectangle() */
+   if (G_UNLIKELY (sink->window->render_rectangle.w == 0))
+@@ -622,10 +833,118 @@ gst_wayland_sink_show_frame (GstVideoSink * vsink, GstBuffer * buffer)
+     to_render = buffer;
+   } else {
+     GstVideoMeta *vmeta;
+-    GstMemory *mem;
+-    struct wl_buffer *wbuf = NULL;
++     GstMemory *mem;
++     struct wl_buffer *wbuf = NULL;
++     GstWlBuffer *gstwlbuf = NULL;
++     gint64 key;
++     ionBufFdMeta = gst_wayland_sink_read_ionbuffd(sink, buffer);
++     if (!ionBufFdMeta) {
++         mem = gst_buffer_peek_memory (buffer, 0);
++
++         GST_LOG_OBJECT (sink, "software buffer %p mem size %p %d", buffer,mem, mem->size);
++         if (gst_is_wl_shm_memory (mem)) {
++            wbuf = gst_wl_shm_memory_construct_wl_buffer (mem, sink->display,
++                &sink->video_info);
++         }
++         if (wbuf) {
++            gst_buffer_add_wl_buffer (buffer, wbuf, sink->display);
++            to_render = buffer;
++         } else {
++
++///            GstMapInfo src;  ///removed
++GstVideoFrame src, dst;  ///added
++      GstVideoInfo src_info = sink->video_info;  ///added
++            /* we don't know how to create a wl_buffer directly from the provided
++            * memory, so we have to copy the data to a memory that we know how
++            * to handle... */
++//mmoussa -start
++            GST_LOG_OBJECT (sink, "buffer %p cannot have a wl_buffer, "
++               "copying to wl_shm memory", buffer);
++
++            /* sink->pool always exists (created in set_caps), but it may not
++             * be active if upstream is not using it */
++            if (!gst_buffer_pool_is_active (sink->pool) &&
++               !gst_buffer_pool_set_active (sink->pool, TRUE))
++                goto activate_failed;
++
++            ret = gst_buffer_pool_acquire_buffer (sink->pool, &to_render, NULL);
++            if (ret != GST_FLOW_OK)
++                goto no_buffer;
++
++            /* the first time we acquire a buffer,
++             * we need to attach a wl_buffer on it */
++            wlbuffer = gst_buffer_get_wl_buffer (to_render);
++            if (G_UNLIKELY (!wlbuffer)) {
++                mem = gst_buffer_peek_memory (to_render, 0);
++                wbuf = gst_wl_shm_memory_construct_wl_buffer (mem, sink->display,
++                     &sink->video_info);
++                if (G_UNLIKELY (!wbuf))
++                   goto no_wl_buffer;
++
++                gst_buffer_add_wl_buffer (to_render, wbuf, sink->display);
++            }
++
++			if (!gst_video_frame_map (&dst, &sink->video_info, to_render,
++              GST_MAP_WRITE))
++        goto dst_map_failed;
++
++      if (!gst_video_frame_map (&src, &src_info, buffer, GST_MAP_READ)) {
++        gst_video_frame_unmap (&dst);
++        goto src_map_failed;
++      }
+ 
+-    /* update video info from video meta */
++      gst_video_frame_copy (&dst, &src);
++
++      gst_video_frame_unmap (&src);
++      gst_video_frame_unmap (&dst);
++///            gst_buffer_map (buffer, &src, GST_MAP_READ);
++///            gst_buffer_fill (to_render, 0, src.data, src.size);
++///            gst_buffer_unmap (buffer, &src);
++         }
++     } else {
++
++         GST_LOG_OBJECT (sink, "buffer %p does not have a wl_buffer from our "
++                "display, creating it", buffer);
++
++         if (G_UNLIKELY (!sink->buffer_table)) {
++            sink->buffer_table = g_hash_table_new_full (g_int64_hash, g_int64_equal,
++                  g_free, destroy_gstwl_buffer);
++         }
++         /* put fd and offset into a int64 key*/
++         key = ((gint64)(ionBufFdMeta->fd & 0xFFFFFFFF) << 32) | (ionBufFdMeta->offset & 0xFFFFFFFF);
++         GST_LOG_OBJECT (sink, "egl buffer %p fd %d offset %d ", buffer,ionBufFdMeta->fd,ionBufFdMeta->offset);
++         gstwlbuf = (GstWlBuffer *) g_hash_table_lookup(sink->buffer_table, &key);
++         if (!gstwlbuf) {
++           /* create a new wl_buffer */
++           gint64 *bufkey = g_malloc(sizeof(*bufkey));
++           wbuf = gst_wayland_sink_create_wl_buffer(sink, ionBufFdMeta);
++           *bufkey = key;
++           if (wbuf)
++           {
++              gstwlbuf = gst_buffer_add_eglwl_buffer (buffer, wbuf, sink->display);
++              g_hash_table_insert(sink->buffer_table, bufkey, gstwlbuf);
++           } else {
++              /* to do :*/
++              goto no_wl_buffer;
++           }
++         } else {
++           /* if we render the same buffer continuously */
++           if(gstwlbuf->used_by_compositor ==TRUE)
++           {
++             GST_WARNING_OBJECT (sink,
++               "the last same buffer is still in rendering (e.g. changing video rate)");
++             goto done;
++           }
++           /* update userdata */
++           gst_buffer_set_eglwl_buffer (gstwlbuf,buffer);
++         }
++         if (gstwlbuf) {
++            to_render = buffer;
++         } else {
++
++///          GstMapInfo src;
++//mmoussa -end
++	/* update video info from video meta */
+     vmeta = gst_buffer_get_video_meta (buffer);
+     if (vmeta) {
+       gint i;
+@@ -636,33 +955,20 @@ gst_wayland_sink_show_frame (GstVideoSink * vsink, GstBuffer * buffer)
+       }
+     }
+ 
+-    GST_LOG_OBJECT (sink, "buffer %p does not have a wl_buffer from our "
+-        "display, creating it", buffer);
+-
+     /* FIXME check all memory when introducing DMA-Buf */
+-    mem = gst_buffer_peek_memory (buffer, 0);
+-
+-    if (gst_is_wl_shm_memory (mem)) {
+-      wbuf = gst_wl_shm_memory_construct_wl_buffer (mem, sink->display,
+-          &sink->video_info);
+-    }
+-
+-    if (wbuf) {
+-      gst_buffer_add_wl_buffer (buffer, wbuf, sink->display);
+-      to_render = buffer;
+-    } else {
+       GstVideoFrame src, dst;
+       GstVideoInfo src_info = sink->video_info;
+ 
+-      /* we don't know how to create a wl_buffer directly from the provided
+-       * memory, so we have to copy the data to a memory that we know how
+-       * to handle... */
+ 
+-      GST_LOG_OBJECT (sink, "buffer %p cannot have a wl_buffer, "
+-          "copying to wl_shm memory", buffer);
++          /* we don't know how to create a wl_buffer directly from the provided
++           * memory, so we have to copy the data to a memory that we know how
++           * to handle... */
+ 
+-      /* sink->pool always exists (created in set_caps), but it may not
+-       * be active if upstream is not using it */
++          GST_LOG_OBJECT (sink, "buffer %p cannot have a wl_buffer, "
++              "copying to wl_shm memory", buffer);
++
++          /* sink->pool always exists (created in set_caps), but it may not
++           * be active if upstream is not using it */
+       if (!gst_buffer_pool_is_active (sink->pool)) {
+         GstStructure *config;
+         GstCaps *caps;
+@@ -674,26 +980,26 @@ gst_wayland_sink_show_frame (GstVideoSink * vsink, GstBuffer * buffer)
+ 
+         /* This is a video pool, it should not fail with basic setings */
+         if (!gst_buffer_pool_set_config (sink->pool, config) ||
+-            !gst_buffer_pool_set_active (sink->pool, TRUE))
+-          goto activate_failed;
++              !gst_buffer_pool_set_active (sink->pool, TRUE))
++            goto activate_failed;
+       }
+ 
+-      ret = gst_buffer_pool_acquire_buffer (sink->pool, &to_render, NULL);
+-      if (ret != GST_FLOW_OK)
+-        goto no_buffer;
+-
+-      /* the first time we acquire a buffer,
+-       * we need to attach a wl_buffer on it */
+-      wlbuffer = gst_buffer_get_wl_buffer (to_render);
+-      if (G_UNLIKELY (!wlbuffer)) {
+-        mem = gst_buffer_peek_memory (to_render, 0);
+-        wbuf = gst_wl_shm_memory_construct_wl_buffer (mem, sink->display,
+-            &sink->video_info);
+-        if (G_UNLIKELY (!wbuf))
+-          goto no_wl_buffer;
+-
+-        gst_buffer_add_wl_buffer (to_render, wbuf, sink->display);
+-      }
++          ret = gst_buffer_pool_acquire_buffer (sink->pool, &to_render, NULL);
++          if (ret != GST_FLOW_OK)
++            goto no_buffer;
++
++          /* the first time we acquire a buffer,
++           * we need to attach a wl_buffer on it */
++          wlbuffer = gst_buffer_get_wl_buffer (to_render);
++          if (G_UNLIKELY (!wlbuffer)) {
++            mem = gst_buffer_peek_memory (to_render, 0);
++            wbuf = gst_wl_shm_memory_construct_wl_buffer (mem, sink->display,
++                &sink->video_info);
++            if (G_UNLIKELY (!wbuf))
++              goto no_wl_buffer;
++
++            gst_buffer_add_wl_buffer (to_render, wbuf, sink->display);
++          }
+ 
+       if (!gst_video_frame_map (&dst, &sink->video_info, to_render,
+               GST_MAP_WRITE))
+@@ -708,7 +1014,8 @@ gst_wayland_sink_show_frame (GstVideoSink * vsink, GstBuffer * buffer)
+ 
+       gst_video_frame_unmap (&src);
+       gst_video_frame_unmap (&dst);
+-    }
++        }
++     }
+   }
+ 
+   /* drop double rendering */
+@@ -721,7 +1028,10 @@ gst_wayland_sink_show_frame (GstVideoSink * vsink, GstBuffer * buffer)
+   render_last_buffer (sink);
+ 
+   if (buffer != to_render)
+-    gst_buffer_unref (to_render);
++  {
++        GST_WARNING_OBJECT (sink,"buffer != to_render unref!");
++	gst_buffer_unref (to_render);
++  }
+   goto done;
+ 
+ no_window_size:
+diff --git a/ext/wayland/gstwaylandsink.h b/ext/wayland/gstwaylandsink.h
+index afbed40..e9e9b73 100644
+--- a/ext/wayland/gstwaylandsink.h
++++ b/ext/wayland/gstwaylandsink.h
+@@ -19,13 +19,22 @@
+  * Boston, MA 02110-1301 USA.
+  */
+ 
++/*
++ * Copyright (c) 2016, The Linux Foundation. All rights reserved.
++ */
++
+ #ifndef __GST_WAYLAND_VIDEO_SINK_H__
+ #define __GST_WAYLAND_VIDEO_SINK_H__
+ 
+ #include <gst/gst.h>
+ #include <gst/video/video.h>
+ 
++#include <drm/drm_fourcc.h>
+ #include <wayland-client.h>
++#include <wayland-egl.h>
++#include <EGL/egl.h>
++#include <EGL/eglext.h>
++#include <EGL/eglwaylandext.h> //was not there in autocode but added for compiling the weirdly named types from EGL
+ 
+ #include "wldisplay.h"
+ #include "wlwindow.h"
+@@ -57,6 +66,14 @@ struct _GstWaylandSink
+   GstWlWindow *window;
+   GstBufferPool *pool;
+ 
++  /* EGL */
++  EGLDisplay egldpy;
++  PFNEGLCREATEIMAGEKHRPROC eglCreateImage;
++  PFNEGLDESTROYIMAGEKHRPROC eglDestroyImage;
++  PFNEGLCREATEWAYLANDBUFFERFROMIMAGEWL eglCreateWaylandBufferFromImage;
++
++  /* Map from ion_buf to wl_buffer */
++  GHashTable *buffer_table;
+   gboolean video_info_changed;
+   GstVideoInfo video_info;
+ 
+diff --git a/ext/wayland/wlbuffer.c b/ext/wayland/wlbuffer.c
+index 4ac99ef..8c232df 100644
+--- a/ext/wayland/wlbuffer.c
++++ b/ext/wayland/wlbuffer.c
+@@ -18,6 +18,10 @@
+  * Boston, MA 02110-1301 USA.
+  */
+ 
++/*
++ * Copyright (c) 2016, The Linux Foundation. All rights reserved.
++ */
++
+ /* GstWlBuffer wraps wl_buffer and provides a mechanism for preventing
+  * buffers from being re-used while the compositor is using them. This
+  * is achieved by adding a reference to the GstBuffer as soon as its
+@@ -180,6 +184,63 @@ gst_buffer_add_wl_buffer (GstBuffer * gstbuffer, struct wl_buffer *wlbuffer,
+   return self;
+ }
+ 
++static void
++eglbuffer_release (void *data, struct wl_buffer *wl_buffer)
++{
++  GstWlBuffer *self = data;
++
++  GST_LOG_OBJECT (self, "eglwl_buffer::release (GstBuffer: %p)", self->gstbuffer);
++
++  self->used_by_compositor = FALSE;
++
++  /* unref should be last, because it may end up destroying the GstWlBuffer */
++  gst_buffer_unref (self->gstbuffer);
++}
++
++static const struct wl_buffer_listener eglbuffer_listener = {
++  eglbuffer_release
++};
++static void
++eglgstbuffer_disposed (GstWlBuffer * self)
++{
++  g_assert (!self->used_by_compositor);
++  self->gstbuffer = NULL;
++
++  GST_TRACE_OBJECT (self, "eglowning GstBuffer was finalized");
++
++}
++GstWlBuffer *
++gst_buffer_add_eglwl_buffer (GstBuffer * gstbuffer, struct wl_buffer *wlbuffer,
++    GstWlDisplay * display)
++{
++  GstWlBuffer *self;
++
++  self = g_object_new (GST_TYPE_WL_BUFFER, NULL);
++  self->gstbuffer = gstbuffer;
++  self->wlbuffer = wlbuffer;
++  self->display = display;
++
++  gst_wl_display_register_buffer (self->display, self);
++
++  wl_buffer_add_listener (self->wlbuffer, &eglbuffer_listener, self);
++
++  gst_mini_object_set_qdata ((GstMiniObject *) gstbuffer,
++      gst_wl_buffer_qdata_quark (), self, (GDestroyNotify) eglgstbuffer_disposed);
++
++  return self;
++}
++
++void *
++gst_buffer_set_eglwl_buffer (GstWlBuffer *self,GstBuffer * gstbuffer)
++{
++  self->gstbuffer = gstbuffer;
++  gst_wl_display_register_buffer (self->display, self);
++  wl_buffer_set_user_data(self->wlbuffer, self);
++
++  gst_mini_object_set_qdata ((GstMiniObject *) self->gstbuffer,
++      gst_wl_buffer_qdata_quark (), self, (GDestroyNotify) eglgstbuffer_disposed);
++
++}
+ GstWlBuffer *
+ gst_buffer_get_wl_buffer (GstBuffer * gstbuffer)
+ {
+diff --git a/ext/wayland/wlbuffer.h b/ext/wayland/wlbuffer.h
+index cbb50f7..ddb3cda 100644
+--- a/ext/wayland/wlbuffer.h
++++ b/ext/wayland/wlbuffer.h
+@@ -18,6 +18,10 @@
+  * Boston, MA 02110-1301 USA.
+  */
+ 
++/*
++ * Copyright (c) 2016, The Linux Foundation. All rights reserved.
++ */
++
+ #ifndef __GST_WL_BUFFER_H__
+ #define __GST_WL_BUFFER_H__
+ 
+@@ -53,7 +57,10 @@ struct _GstWlBufferClass
+ };
+ 
+ GType gst_wl_buffer_get_type (void);
+-
++GstWlBuffer * gst_buffer_add_eglwl_buffer (GstBuffer * gstbuffer,
++    struct wl_buffer * wlbuffer, GstWlDisplay * display);
++void * gst_buffer_set_eglwl_buffer (GstWlBuffer *self,
++    GstBuffer * gstbuffer);
+ GstWlBuffer * gst_buffer_add_wl_buffer (GstBuffer * gstbuffer,
+     struct wl_buffer * wlbuffer, GstWlDisplay * display);
+ GstWlBuffer * gst_buffer_get_wl_buffer (GstBuffer * gstbuffer);
+diff --git a/ext/wayland/wlshmallocator.c b/ext/wayland/wlshmallocator.c
+index 94fbbf1..28ca6c5 100644
+--- a/ext/wayland/wlshmallocator.c
++++ b/ext/wayland/wlshmallocator.c
+@@ -20,6 +20,10 @@
+  * Boston, MA 02110-1301, USA.
+  */
+ 
++/*
++ * Copyright (c) 2016, The Linux Foundation. All rights reserved.
++ */
++
+ #include "wlshmallocator.h"
+ #include "wlvideoformat.h"
+ 
+@@ -139,11 +143,13 @@ gst_wl_shm_memory_construct_wl_buffer (GstMemory * mem, GstWlDisplay * display,
+   width = GST_VIDEO_INFO_WIDTH (info);
+   height = GST_VIDEO_INFO_HEIGHT (info);
+   stride = GST_VIDEO_INFO_PLANE_STRIDE (info, 0);
++
+   size = GST_VIDEO_INFO_SIZE (info);
+   format = gst_video_format_to_wl_shm_format (GST_VIDEO_INFO_FORMAT (info));
+ 
+   g_return_val_if_fail (gst_is_wl_shm_memory (mem), NULL);
+   g_return_val_if_fail (size <= mem->size, NULL);
++  g_return_val_if_fail (gst_fd_memory_get_fd (mem) != -1, NULL);
+ 
+   GST_DEBUG_OBJECT (mem->allocator, "Creating wl_buffer of size %"
+       G_GSSIZE_FORMAT " (%d x %d, stride %d), format %s", size, width, height,
+diff --git a/ext/wayland/wlshmallocator.h b/ext/wayland/wlshmallocator.h
+index 07ae17f..ab0cbdb 100644
+--- a/ext/wayland/wlshmallocator.h
++++ b/ext/wayland/wlshmallocator.h
+@@ -19,6 +19,9 @@
+  * Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+  * Boston, MA 02110-1301, USA.
+  */
++/*
++ * Copyright (c) 2016, The Linux Foundation. All rights reserved.
++ */
+ 
+ #ifndef __GST_WL_SHM_ALLOCATOR_H__
+ #define __GST_WL_SHM_ALLOCATOR_H__
+@@ -45,6 +48,7 @@ typedef struct _GstWlShmAllocatorClass GstWlShmAllocatorClass;
+ struct _GstWlShmAllocator
+ {
+   GstFdAllocator parent_instance;
++  GstVideoInfo info;
+ };
+ 
+ struct _GstWlShmAllocatorClass
+diff --git a/ext/wayland/wlwindow.c b/ext/wayland/wlwindow.c
+index b60f351..84b27e8 100644
+--- a/ext/wayland/wlwindow.c
++++ b/ext/wayland/wlwindow.c
+@@ -20,6 +20,10 @@
+  * Boston, MA 02110-1301 USA.
+  */
+ 
++/*
++ * Copyright (c) 2016, The Linux Foundation. All rights reserved.
++ */
++
+ #ifdef HAVE_CONFIG_H
+ #include <config.h>
+ #endif
+@@ -173,12 +177,12 @@ gst_wl_window_new_toplevel (GstWlDisplay * display, const GstVideoInfo * info,
+     g_object_unref (window);
+     return NULL;
+   }
+-
++#if 0 /* it will be set later*/
+   /* set the initial size to be the same as the reported video size */
+   width =
+       gst_util_uint64_scale_int_round (info->width, info->par_n, info->par_d);
+   gst_wl_window_set_render_rectangle (window, 0, 0, width, info->height);
+-
++#endif
+   return window;
+ }
+ 
+@@ -280,7 +284,6 @@ gst_wl_window_render (GstWlWindow * window, GstWlBuffer * buffer,
+     gst_wl_buffer_attach (buffer, window->video_surface);
+   else
+     wl_surface_attach (window->video_surface, NULL, 0, 0);
+-
+   wl_surface_damage (window->video_surface, 0, 0, window->video_rectangle.w,
+       window->video_rectangle.h);
+   wl_surface_commit (window->video_surface);
+@@ -355,6 +358,7 @@ gst_wl_window_set_render_rectangle (GstWlWindow * window, gint x, gint y,
+   window->render_rectangle.w = w;
+   window->render_rectangle.h = h;
+ 
++
+   /* position the area inside the parent - needs a parent commit to apply */
+   if (window->area_subsurface)
+     wl_subsurface_set_position (window->area_subsurface, x, y);
+diff --git a/gst-libs/gst/Makefile.am b/gst-libs/gst/Makefile.am
+index 7d0b309..fae833f 100644
+--- a/gst-libs/gst/Makefile.am
++++ b/gst-libs/gst/Makefile.am
+@@ -11,11 +11,11 @@ WAYLAND_DIR=wayland
+ endif
+ 
+ SUBDIRS = uridownloader adaptivedemux interfaces basecamerabinsrc codecparsers \
+-	 insertbin mpegts base video audio player $(GL_DIR) $(WAYLAND_DIR)
++	 insertbin mpegts base video audio player ionbuf $(GL_DIR) $(WAYLAND_DIR)
+ 
+ noinst_HEADERS = gst-i18n-plugin.h gettext.h glib-compat-private.h
+ DIST_SUBDIRS = uridownloader adaptivedemux interfaces gl basecamerabinsrc \
+-	codecparsers insertbin mpegts wayland base video audio player
++	codecparsers insertbin mpegts wayland base video audio player ionbuf
+ 
+ #dependencies
+ video, audio: base
+diff --git a/gst-libs/gst/Makefile.in b/gst-libs/gst/Makefile.in
+index 3fb0167..4aef20d 100644
+--- a/gst-libs/gst/Makefile.in
++++ b/gst-libs/gst/Makefile.in
+@@ -768,11 +768,11 @@ wayland_scanner = @wayland_scanner@
+ @USE_OPENGL_TRUE@GL_DIR = gl
+ @USE_WAYLAND_TRUE@WAYLAND_DIR = wayland
+ SUBDIRS = uridownloader adaptivedemux interfaces basecamerabinsrc codecparsers \
+-	 insertbin mpegts base video audio player $(GL_DIR) $(WAYLAND_DIR)
++	 insertbin mpegts base video audio player ionbuf $(GL_DIR) $(WAYLAND_DIR)
+ 
+ noinst_HEADERS = gst-i18n-plugin.h gettext.h glib-compat-private.h
+ DIST_SUBDIRS = uridownloader adaptivedemux interfaces gl basecamerabinsrc \
+-	codecparsers insertbin mpegts wayland base video audio player
++	codecparsers insertbin mpegts wayland base video audio player ionbuf
+ 
+ INDEPENDENT_SUBDIRS = \
+ 	interfaces basecamerabinsrc codecparsers insertbin uridownloader \
+diff --git a/gst-libs/gst/ionbuf/Makefile.am b/gst-libs/gst/ionbuf/Makefile.am
+new file mode 100644
+index 0000000..f8ece5b
+--- /dev/null
++++ b/gst-libs/gst/ionbuf/Makefile.am
+@@ -0,0 +1,40 @@
++lib_LTLIBRARIES = libgstionbuf-@GST_API_VERSION@.la
++
++libgstionbuf_@GST_API_VERSION@_la_SOURCES = \
++	gstionbuf_meta.c
++
++libgstionbuf_@GST_API_VERSION@includedir = \
++	$(includedir)/gstreamer-@GST_API_VERSION@/gst/ionbuf
++
++libgstionbuf_@GST_API_VERSION@include_HEADERS = \
++	gstionbuf_meta.h
++
++libgstionbuf_@GST_API_VERSION@_la_CFLAGS = \
++	$(GST_PLUGINS_BAD_CFLAGS) \
++	-DGST_USE_UNSTABLE_API \
++	$(GST_CFLAGS)
++
++libgstionbuf_@GST_API_VERSION@_la_LIBADD = \
++	$(GST_BASE_LIBS) \
++	$(GST_LIBS)
++
++libgstionbuf_@GST_API_VERSION@_la_LDFLAGS = \
++	$(GST_LIB_LDFLAGS) \
++	$(GST_ALL_LDFLAGS) \
++	$(GST_LT_LDFLAGS)
++
++Android.mk:  $(BUILT_SOURCES) Makefile.am
++	androgenizer -:PROJECT libgstionbuf -:STATIC libgstionbuf-@GST_API_VERSION@ \
++	 -:TAGS eng debug \
++         -:REL_TOP $(top_srcdir) -:ABS_TOP $(abs_top_srcdir) \
++	 -:SOURCES $(libgstionbuf_@GST_API_VERSION@_la_SOURCES) \
++         $(built_sources) \
++	 -:CFLAGS $(DEFS) $(libgstionbuf_@GST_API_VERSION@_la_CFLAGS) \
++	 -:LDFLAGS $(libgstionbuf_@GST_API_VERSION@_la_LDFLAGS) \
++	           $(libgstionbuf@GST_API_VERSION@_la_LIBADD) \
++	           -ldl \
++	 -:HEADER_TARGET gstreamer-@GST_API_VERSION@/gst/uridownloader \
++	 -:HEADERS $(libgstionbufinclude_HEADERS) \
++         $(built_headers) \
++	 -:PASSTHROUGH LOCAL_ARM_MODE:=arm \
++	> $@
+diff --git a/gst-libs/gst/ionbuf/gstionbuf_meta.c b/gst-libs/gst/ionbuf/gstionbuf_meta.c
+new file mode 100644
+index 0000000..e409500
+--- /dev/null
++++ b/gst-libs/gst/ionbuf/gstionbuf_meta.c
+@@ -0,0 +1,114 @@
++/*
++ * Copyright (c) 2016, The Linux Foundation. All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions are
++ * met:
++ *     * Redistributions of source code must retain the above copyright
++ *       notice, this list of conditions and the following disclaimer.
++ *     * Redistributions in binary form must reproduce the above
++ *       copyright notice, this list of conditions and the following
++ *       disclaimer in the documentation and/or other materials provided
++ *       with the distribution.
++ *     * Neither the name of The Linux Foundation nor the names of its
++ *       contributors may be used to endorse or promote products derived
++ *       from this software without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
++ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
++ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT
++ * ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
++ * BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
++ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
++ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
++ * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
++ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
++ * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
++ * (IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ *
++ */
++
++#include "gstionbuf_meta.h"
++
++GType
++gst_ionBufFd_meta_api_get_type (void)
++{
++  static volatile GType type;
++  static const gchar *tags[] = { NULL };
++  if (g_once_init_enter (&type)) {
++    GType _type = gst_meta_api_type_register ("ION_BUF_FD_META_API", tags);
++    g_once_init_leave (&type, _type);
++  }
++  return type;
++}
++
++/* initialize HEAD of list of GstMeta items */
++static gboolean
++ionBufFd_meta_init (GstMeta * meta, gpointer params, GstBuffer * buffer)
++{
++  GstIonBufFdMeta *newmeta = (GstIonBufFdMeta *) meta;
++  newmeta->fd = 0;              /* dangerous: stdin */
++  newmeta->offset = 0;
++  newmeta->size = 0;
++  newmeta->ubwc = 0;
++
++  return TRUE;
++}
++
++static void
++ionBufFd_meta_free (GstMeta * meta, GstBuffer * buffer)
++{
++  return;
++}
++
++static gboolean
++ionBufFd_meta_transform (GstBuffer * transbuf, GstMeta * meta,
++    GstBuffer * buffer, GQuark type, gpointer data)
++{
++  GstIonBufFdMeta *newmeta = (GstIonBufFdMeta *) meta;
++  gst_buffer_add_ionbuf_meta (transbuf, newmeta->fd, newmeta->offset,
++				newmeta->size, newmeta->ubwc);
++  return TRUE;
++}
++
++const GstMetaInfo *
++gst_ionBufFd_meta_get_info (void)
++{
++  static const GstMetaInfo *meta_info = NULL;
++
++  if (g_once_init_enter (&meta_info)) {
++    const GstMetaInfo *mi =
++        gst_meta_register (ION_BUF_FD_META_API_TYPE, "ionBufFdMeta",
++        sizeof (GstIonBufFdMeta), ionBufFd_meta_init, ionBufFd_meta_free,
++        ionBufFd_meta_transform);
++    g_once_init_leave (&meta_info, mi);
++  }
++  return meta_info;
++}
++
++/******************************************************************************
++ * gst_buffer_add_ionbuf_meta:
++ * Updating the MSM8996 IONBuferFd "fd" type to "int" as per the changes made
++ * in the msm-omx video decoder.
++ ******************************************************************************/
++GstIonBufFdMeta *
++gst_buffer_add_ionbuf_meta (GstBuffer * buffer, int fd,
++			      unsigned int offset, unsigned int size, gboolean ubwc)
++{
++  GstIonBufFdMeta *meta;
++  g_return_val_if_fail (GST_IS_BUFFER (buffer), NULL);
++
++  meta =
++      (GstIonBufFdMeta *) gst_buffer_add_meta (buffer, ION_BUF_FD_META_INFO,
++      NULL);
++  meta->fd = fd;
++  meta->offset = offset;
++  meta->size = size;
++
++  meta->ubwc = ubwc;
++
++  GST_DEBUG("Adding ionBufFd metadata fd %d, offset %u, size %u, ubwc %d", fd, offset,
++	   size, ubwc);
++
++  return meta;
++}
+diff --git a/gst-libs/gst/ionbuf/gstionbuf_meta.h b/gst-libs/gst/ionbuf/gstionbuf_meta.h
+new file mode 100644
+index 0000000..9b33dad
+--- /dev/null
++++ b/gst-libs/gst/ionbuf/gstionbuf_meta.h
+@@ -0,0 +1,72 @@
++/*
++ * Copyright (c) 2016, The Linux Foundation. All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions are
++ * met:
++ *     * Redistributions of source code must retain the above copyright
++ *       notice, this list of conditions and the following disclaimer.
++ *     * Redistributions in binary form must reproduce the above
++ *       copyright notice, this list of conditions and the following
++ *       disclaimer in the documentation and/or other materials provided
++ *       with the distribution.
++ *     * Neither the name of The Linux Foundation nor the names of its
++ *       contributors may be used to endorse or promote products derived
++ *       from this software without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
++ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
++ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT
++ * ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
++ * BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
++ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
++ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
++ * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
++ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
++ * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
++ * (IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ *
++ */
++
++#ifndef __GSTIONBUF_META_H__
++#define __GSTIONBUF_META_H__
++
++#include <gst/gst.h>
++#include <gst/video/gstvideometa.h>
++
++G_BEGIN_DECLS
++
++struct _GstIonBufFdMeta {
++  GstMeta meta;
++  /** ion buffer file descriptor */
++  /**MSM 8996: Update type of "fd" to correct "signed int" type to support the
++   * new updates at msm-omx decoder.
++  */
++  int fd;
++  /** Offset from ion buffer base address */
++  unsigned int offset;
++  /** Size of ion buffer */
++  unsigned int size;
++  /** ubwc flag **/
++  gboolean ubwc;
++};
++
++typedef struct _GstIonBufFdMeta GstIonBufFdMeta;
++
++GType gst_ionBufFd_meta_api_get_type (void);
++const GstMetaInfo * gst_ionBufFd_meta_get_info (void);
++
++#define ION_BUF_FD_META_API_TYPE (gst_ionBufFd_meta_api_get_type())
++#define gst_buffer_get_ionfd_meta(b)		\
++  ((GstIonBufFdMeta*)gst_buffer_get_meta((b),ION_BUF_FD_META_API_TYPE))
++#define ION_BUF_FD_META_INFO (gst_ionBufFd_meta_get_info ())
++
++/**MSM 8996: Update type of "fd" to correct "signed int" type to support the
++  * new updates at msm-omx decoder.
++*/
++GstIonBufFdMeta * gst_buffer_add_ionbuf_meta (GstBuffer * buffer,
++						int fd, unsigned int offset, unsigned int size, gboolean ubwc);
++
++G_END_DECLS
++
++#endif /* __GSTIONBUF_META_H__ */
+diff --git a/gst/videoparsers/gsth264parse.c b/gst/videoparsers/gsth264parse.c
+index 3153c2b..038cc86 100644
+--- a/gst/videoparsers/gsth264parse.c
++++ b/gst/videoparsers/gsth264parse.c
+@@ -1108,12 +1108,12 @@ gst_h264_parse_handle_frame (GstBaseParse * parse,
+         if (nalu.sc_offset > 0) {
+           int i;
+           gboolean is_filler_data = TRUE;
+-          /* Handle filler data */
++          /* the output filler bytes shouldn't cause a discontinuity.*/
+           for (i = 0; i < nalu.sc_offset; i++) {
+-            if (data[i] != 0x00) {
+-              is_filler_data = FALSE;
+-              break;
+-            }
++             if (data[i] != 0x00) {
++                is_filler_data = FALSE;
++                break;
++             }
+           }
+           if (is_filler_data) {
+             GST_DEBUG_OBJECT (parse, "Dropping filler data %d", nalu.sc_offset);
+@@ -1263,6 +1263,7 @@ drop:
+   GST_DEBUG_OBJECT (h264parse, "Dropped data");
+   return ret;
+ 
++
+ skip:
+   GST_DEBUG_OBJECT (h264parse, "skipping %d", *skipsize);
+   /* If we are collecting access units, we need to preserve the initial
+diff --git a/pkgconfig/gstreamer-ionbuf-uninstalled.pc.in b/pkgconfig/gstreamer-ionbuf-uninstalled.pc.in
+new file mode 100644
+index 0000000..bf31951
+--- /dev/null
++++ b/pkgconfig/gstreamer-ionbuf-uninstalled.pc.in
+@@ -0,0 +1,12 @@
++prefix=
++exec_prefix=
++libdir=${pcfiledir}/../gst-libs/gst/ionbuf
++includedir=${pcfiledir}/../gst-libs
++
++Name: GStreamer IonBuf,Uninstalled
++Description: GStreamer ionbuf support,uninstalled
++Requires: gstreamer-@GST_API_VERSION@ gstreamer-video-@GST_API_VERSION@
++Version: @VERSION@
++Libs: -L${libdir} ${libdir}/libgstionbuf-@GST_API_VERSION@.la
++Cflags: -I${includedir}
++
+diff --git a/pkgconfig/gstreamer-ionbuf.pc.in b/pkgconfig/gstreamer-ionbuf.pc.in
+new file mode 100644
+index 0000000..abeb8b3
+--- /dev/null
++++ b/pkgconfig/gstreamer-ionbuf.pc.in
+@@ -0,0 +1,12 @@
++prefix=@prefix@
++exec_prefix=@exec_prefix@
++libdir=@libdir@
++includedir=@includedir@/gstreamer-@GST_API_VERSION@
++
++Name: GStreamer IonBuf
++Description: GStreamer ionbuf support
++Requires: gstreamer-@GST_API_VERSION@ gstreamer-video-@GST_API_VERSION@
++Version: @VERSION@
++Libs: -L${libdir} -lgstionbuf-@GST_API_VERSION@
++Cflags: -I${includedir}
++
+-- 
+1.9.1
+
