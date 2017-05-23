@@ -19,3 +19,8 @@ EXTRA_OECONF += "--with-glib \
 FILES_${PN} += "${libdir}/pulse-8.0/modules/"
 FILES_${PN}-staticdev += "${libdir}/pulse-8.0/modules/*.a"
 FILES_${PN}-dbg += "${libdir}/pulse-8.0/modules/.debug"
+
+do_install_append() {
+         mkdir -p ${D}${sysconfdir}/pulse/
+         install -m 0755 ${S}/*.cfg  -D ${D}${sysconfdir}/pulse/
+}
