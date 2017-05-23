@@ -1,0 +1,1162 @@
+From 1c9140b108fd812be51dc1a01317a08b888a4a86 Mon Sep 17 00:00:00 2001
+From: Mohamed Moussa <mmouss@codeaurora.org>
+Date: Mon, 22 May 2017 18:45:08 -0700
+Subject: [PATCH] add changes for QTI HW decoder
+
+---
+ gst/v4l2dec/Makefile.am  |   2 +
+ gst/v4l2dec/gstv4l2dec.c | 652 ++++++++++++++++++++++++++++++-----------------
+ gst/v4l2dec/gstv4l2dec.h |  36 +++
+ 3 files changed, 454 insertions(+), 236 deletions(-)
+
+diff --git a/gst/v4l2dec/Makefile.am b/gst/v4l2dec/Makefile.am
+index f8f453b..60ab2de 100644
+--- a/gst/v4l2dec/Makefile.am
++++ b/gst/v4l2dec/Makefile.am
+@@ -11,12 +11,14 @@ noinst_HEADERS = \
+ libgstv4l2dec_la_CFLAGS = $(GST_PLUGINS_BASE_CFLAGS) \
+ 			  $(GST_BASE_CFLAGS) \
+ 			  $(GST_CFLAGS) \
++			  $(GST_IONBUF_CFLAGS) \
+ 			  $(LIBV4L2_CFLAGS)
+ 
+ libgstv4l2dec_la_LIBADD = $(GST_PLUGINS_BASE_LIBS) \
+ 			  $(GST_BASE_LIBS) \
+ 			  $(GST_LIBS) \
+ 			  -lgstvideo-$(GST_API_VERSION) \
++			  -lgstionbuf-@GST_API_VERSION@ \
+ 			  -lgstallocators-$(GST_API_VERSION) \
+ 			  $(LIBV4L2_LIBS)
+ 
+diff --git a/gst/v4l2dec/gstv4l2dec.c b/gst/v4l2dec/gstv4l2dec.c
+index c3df2c2..4cd7688 100644
+--- a/gst/v4l2dec/gstv4l2dec.c
++++ b/gst/v4l2dec/gstv4l2dec.c
+@@ -18,8 +18,12 @@
+ #include <poll.h>
+ 
+ #include <linux/videodev2.h>
++#include <linux/msm_ion.h>
++#include <media/msm_media_info.h>
++
+ #include "gstv4l2dec.h"
+ #include <gst/gst.h>
++#include <gst/ionbuf/gstionbuf_meta.h>
+ 
+ 
+ GST_DEBUG_CATEGORY (gst_v4l2dec_debug);
+@@ -28,10 +32,10 @@ GST_DEBUG_CATEGORY (gst_v4l2dec_debug);
+ #define MAX_DEVICES 33          /* Max V4L2 device instances tried */
+ 
+ #define NB_BUF_INPUT 1
+-#define NB_BUF_OUTPUT 2         /* nb frames necessary for display pipeline */
++#define NB_BUF_OUTPUT 32         /* nb frames necessary for display pipeline */
+ 
+-#define OUT_PLANES 1
+-#define CAP_PLANES 1
++/* #define OUT_PLANES 1
++#define CAP_PLANES 1 */
+ 
+ #define ARRAY_SIZE(x) (sizeof(x)/sizeof(x[0]))
+ 
+@@ -57,8 +61,8 @@ static gboolean gst_v4l2dec_set_format (GstVideoDecoder * decoder,
+ static GstFlowReturn gst_v4l2dec_handle_frame (GstVideoDecoder * decoder,
+     GstVideoCodecFrame * frame);
+ static void gst_v4l2dec_finalize (GObject * object);
+-static gboolean gst_v4l2dec_decide_allocation (GstVideoDecoder * decoder,
+-    GstQuery * query);
++//static gboolean gst_v4l2dec_decide_allocation (GstVideoDecoder * decoder,
++//    GstQuery * query);
+ 
+ static void unmap_input_buf (GstV4L2Dec * dec);
+ static __u32 to_v4l2_streamformat (GstStructure * s);
+@@ -70,6 +74,10 @@ gst_v4l2dec_decode (GstVideoDecoder * decoder, GstVideoCodecFrame * frame);
+ static void frame_push_thread (void *arg);
+ static void frame_recycle_thread (void *arg);
+ gboolean plugin_init (GstPlugin * plugin);
++static int alloc_ion_buffer(size_t size, GstVideoDecoder * decoder);
++int queue_buf_cap(GstVideoDecoder * decoder, int n);
++int video_set_control(GstVideoDecoder * decoder);
++static void return_capture_buffer (GstVideoDecoder *decoder, GstBuffer *output_buffer);
+ 
+ struct pixel_format
+ {
+@@ -299,18 +307,17 @@ gst_v4l2dec_open_device (GstV4L2Dec * dec, __u32 fmt, __u32 width, __u32 height,
+   gchar path[100];
+   struct v4l2_format s_fmt;
+   int libv4l2_fd;
+-
++  GST_INFO_OBJECT (dec, "mm inside gst_v4l2dec_open_device");
+   memset (&s_fmt, 0, sizeof s_fmt);
+   s_fmt.fmt.pix_mp.width = width;
+   s_fmt.fmt.pix_mp.height = height;
+   s_fmt.type = V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE;
+ 
+-  /* particular case of MJPEG : pixel format could be different that YUV420 */
+-  if (fmt == V4L2_PIX_FMT_MJPEG)
+-    s_fmt.fmt.pix_mp.plane_fmt[0].sizeimage = (width * height); /* for MJPEG, let's take YUV422 (w*h*2) largely with /2 compression (so w*h *2 / 2) */
+-  else
+-    s_fmt.fmt.pix_mp.plane_fmt[0].sizeimage = ((width * height * 3 / 2) / 2);   /* expecting video compression to acheive /2 */
+-
++ /* particular case of MJPEG : pixel format could be different that YUV420 */
++ /*  if (fmt == V4L2_PIX_FMT_MJPEG) */
++ /*   s_fmt.fmt.pix_mp.plane_fmt[0].sizeimage = (width * height);*/ /* for MJPEG, let's take YUV422 (w*h*2) largely with /2 compression (so w*h *2 / 2) */
++ /* else */
++ /*   s_fmt.fmt.pix_mp.plane_fmt[0].sizeimage = ((width * height * 3 / 2) / 2);*/   /* expecting video compression to acheive /2 */ 
+   s_fmt.fmt.pix_mp.pixelformat = fmt;
+ 
+   if (interlace_mode == GST_VIDEO_INTERLACE_MODE_PROGRESSIVE)
+@@ -335,7 +342,9 @@ gst_v4l2dec_open_device (GstV4L2Dec * dec, __u32 fmt, __u32 width, __u32 height,
+       v4l2_close (fd);
+       continue;
+     }
+-
++	GST_INFO_OBJECT(dec, "mm sucess set format sizeimage %d", s_fmt.fmt.pix_mp.plane_fmt[0].sizeimage);
++	dec->out_buf_size = s_fmt.fmt.pix_mp.plane_fmt[0].sizeimage;
++  
+     found = TRUE;
+     break;
+   }
+@@ -364,7 +373,7 @@ gst_v4l2dec_process_codec_data (GstV4L2Dec * dec,
+     GstMapInfo mapinfo = { 0, };
+     unsigned char *codec_data_ptr;
+     unsigned char *sps_pps_ptr;
+-
++	GST_INFO_OBJECT (dec, "mm inside gst_v4l2dec_process_codec_data");
+     header = gst_buffer_new_and_alloc (gst_buffer_get_size (codec_data));
+     gst_buffer_map (header, &header_mapinfo, GST_MAP_WRITE);
+     sps_pps_ptr = header_mapinfo.data;
+@@ -451,16 +460,16 @@ gst_v4l2dec_class_init (GstV4L2DecClass * klass)
+   video_decoder_class->set_format = GST_DEBUG_FUNCPTR (gst_v4l2dec_set_format);
+   video_decoder_class->handle_frame =
+       GST_DEBUG_FUNCPTR (gst_v4l2dec_handle_frame);
+-  video_decoder_class->decide_allocation =
+-      GST_DEBUG_FUNCPTR (gst_v4l2dec_decide_allocation);
++//  video_decoder_class->decide_allocation =
++//      GST_DEBUG_FUNCPTR (gst_v4l2dec_decide_allocation);
+ 
+   GST_DEBUG_CATEGORY_INIT (gst_v4l2dec_debug, "v4l2dec", 0,
+       "ST v4l2 video decoder");
+ 
+   gst_element_class_set_static_metadata (element_class,
+-      "V4L2 decoder", "Decoder/Video", "A v4l2 decoder", "STMicroelectronics");
+-}
+-
++  "V4L2 decoder", "Decoder/Video", "A v4l2 decoder", "STMicroelectronics");
++  }
++#if 0
+ static gboolean
+ gst_v4l2dec_decide_allocation (GstVideoDecoder * decoder, GstQuery * query)
+ {
+@@ -471,7 +480,7 @@ gst_v4l2dec_decide_allocation (GstVideoDecoder * decoder, GstQuery * query)
+   GstAllocationParams params;
+   GstStructure *config;
+   struct v4l2_requestbuffers reqbufs;
+-
++GST_INFO_OBJECT (dec, "mm inside gst_v4l2dec_decide_allocation");
+   gst_query_parse_allocation (query, &outcaps, NULL);
+ 
+   /* get the allocator array size */
+@@ -581,7 +590,7 @@ error_ioc_reqbufs:
+     return FALSE;
+   }
+ }
+-
++#endif
+ /* Init the v4l2dec structure */
+ static void
+ gst_v4l2dec_init (GstV4L2Dec * dec)
+@@ -650,7 +659,7 @@ gst_v4l2dec_start (GstVideoDecoder * decoder)
+ {
+   GstV4L2Dec *dec = GST_V4L2DEC (decoder);
+   GST_DEBUG_OBJECT (dec, "Starting");
+-
++  GST_INFO_OBJECT (dec, "mm inside gst_v4l2dec_start");
+   pthread_mutex_init (&dec->lock, 0);
+   sem_init (&dec->sem_done, 0, 0);
+ 
+@@ -668,7 +677,7 @@ static int decoder_flush_and_stop(GstV4L2Dec *dec)
+ {
+   struct v4l2_decoder_cmd cmd;
+   int ret;
+-
++  GST_INFO_OBJECT (dec, "mm inside decoder_flush_and_stop");
+   memset (&cmd, 0, sizeof cmd);
+ 
+   cmd.cmd = V4L2_DEC_QCOM_CMD_FLUSH;
+@@ -680,13 +689,13 @@ static int decoder_flush_and_stop(GstV4L2Dec *dec)
+     GST_WARNING_OBJECT (dec, "Unable to flush decoder (%s)",
+       strerror(errno));
+ 
+-  memset (&cmd, 0, sizeof cmd);
+-  cmd.cmd = V4L2_DEC_CMD_STOP;
++//  memset (&cmd, 0, sizeof cmd);
++//  cmd.cmd = V4L2_DEC_CMD_STOP;
+ 
+-  ret = v4l2_ioctl (dec->fd, VIDIOC_DECODER_CMD, &cmd);
+-  if (ret < 0)
+-    GST_WARNING_OBJECT (dec, "Unable to stop decoder (%s)",
+-      strerror(errno));
++//  ret = v4l2_ioctl (dec->fd, VIDIOC_DECODER_CMD, &cmd);
++//  if (ret < 0)
++//    GST_WARNING_OBJECT (dec, "Unable to stop decoder (%s)",
++//      strerror(errno));
+ 
+   return ret;
+ }
+@@ -698,7 +707,7 @@ gst_v4l2dec_stop (GstVideoDecoder * decoder)
+   GstV4L2Dec *dec = GST_V4L2DEC (decoder);
+   gint type;
+   GST_DEBUG_OBJECT (dec, "Stopping");
+-
++  GST_INFO_OBJECT (dec, "mm inside gst_v4l2dec_stop");
+   dec->input_setup = FALSE;
+   dec->output_setup = FALSE;
+ 
+@@ -799,7 +808,7 @@ gst_v4l2dec_release_pending_buffers (GstVideoDecoder * decoder)
+   GstV4L2Dec *dec = GST_V4L2DEC (decoder);
+   GstV4L2DecDownstreamMeta *meta = NULL;
+   gint i;
+-
++  GST_INFO_OBJECT (dec, "mm inside gst_v4l2dec_release_pending_buffers");
+   for (i = 0; i < ARRAY_SIZE (dec->downstream_buffers); i++) {
+     GstBuffer *buffer = dec->downstream_buffers[i];
+     if (buffer) {
+@@ -814,6 +823,158 @@ gst_v4l2dec_release_pending_buffers (GstVideoDecoder * decoder)
+   return;
+ }
+ 
++
++/* add video_set_control */
++int video_set_control(GstVideoDecoder * decoder)
++{
++	GstV4L2Dec *dec = GST_V4L2DEC (decoder);
++	struct v4l2_control control = {0};
++
++/*	if (i->decode_order) {*/
++		control.id = V4L2_CID_MPEG_VIDC_VIDEO_OUTPUT_ORDER;
++		control.value = V4L2_MPEG_VIDC_VIDEO_OUTPUT_ORDER_DECODE;
++
++		if (ioctl(dec->fd, VIDIOC_S_CTRL, &control) < 0) {
++			GST_DEBUG_OBJECT (dec, "failed to set output order");
++			return -1;
++		}
++/*	}*/
++
++/*	if (i->skip_frames) {*/
++		control.id = V4L2_CID_MPEG_VIDC_VIDEO_PICTYPE_DEC_MODE;
++		control.value = V4L2_MPEG_VIDC_VIDEO_PICTYPE_DECODE_ON;
++
++		if (ioctl(dec->fd, VIDIOC_S_CTRL, &control) < 0) {
++			GST_DEBUG_OBJECT (dec, "failed to set skip mode");
++			return -1;
++		}
++/*	}*/
++
++	control.id = V4L2_CID_MPEG_VIDC_VIDEO_CONTINUE_DATA_TRANSFER;
++	control.value = 1;
++
++	if (ioctl(dec->fd, VIDIOC_S_CTRL, &control) < 0) {
++		GST_DEBUG_OBJECT (dec, "failed to set data transfer mode");
++		return -1;
++	}
++
++	control.id = V4L2_CID_MPEG_VIDC_SET_PERF_LEVEL;
++	control.value = V4L2_CID_MPEG_VIDC_PERF_LEVEL_TURBO;
++
++	if (ioctl(dec->fd, VIDIOC_S_CTRL, &control) < 0) {
++		GST_DEBUG_OBJECT (dec, "failed to set perf level");
++		return -1;
++	}
++
++	control.id = V4L2_CID_MPEG_VIDC_VIDEO_CONCEAL_COLOR;
++	control.value = 0x00ff;
++
++	if (ioctl(dec->fd, VIDIOC_S_CTRL, &control) < 0) {
++		GST_DEBUG_OBJECT (dec, "failed to set conceal color");
++		return -1;
++	}
++
++	return 0;
++}
++
++
++/* add queue_buf_cap */
++int queue_buf_cap(GstVideoDecoder * decoder, int n)
++{
++	GstV4L2Dec *dec = GST_V4L2DEC (decoder);
++	enum v4l2_buf_type type;
++	struct v4l2_buffer buf;
++	struct v4l2_plane planes[2];
++
++	type = V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE;
++
++	if (n >= dec->cap_buf_cnt) {
++		GST_DEBUG_OBJECT (dec, "tried to queue a non existing");
++		return -1;
++	}
++
++	memset(&buf, 0, sizeof buf);
++	memset(planes, 0, sizeof(planes));
++	buf.type = type;
++	buf.memory = V4L2_MEMORY_USERPTR;
++	buf.index = n;
++	buf.length = 2;
++	buf.m.planes = planes;
++
++	buf.m.planes[0].m.userptr = (unsigned long)dec->cap_buf_addr[n];
++	buf.m.planes[0].reserved[0] = dec->cap_buf_fd[n];
++	buf.m.planes[0].reserved[1] = 0;
++	buf.m.planes[0].length = dec->cap_buf_size[0];
++	buf.m.planes[0].data_offset = 0;
++
++	buf.m.planes[1].m.userptr = (unsigned long)dec->cap_buf_addr[n];
++	buf.m.planes[1].reserved[0] = dec->cap_buf_fd[n];
++	buf.m.planes[1].reserved[1] = 0;
++	buf.m.planes[1].length = dec->cap_buf_size[1];
++	buf.m.planes[1].data_offset = 0; 
++
++ 	if (ioctl(dec->fd, VIDIOC_QBUF, &buf) < 0) {
++		GST_DEBUG_OBJECT (dec, "failed to QBUF cap buffer");
++		return -1;
++	}
++
++	GST_DEBUG_OBJECT (dec, "mm buf.m.planes[0].length -2 %d", buf.m.planes[0].length);
++	GST_DEBUG_OBJECT (dec, "mm buf.m.planes[0].bytesused -2 %d", buf.m.planes[0].bytesused);
++	GST_DEBUG_OBJECT (dec, "mm buf.m.planes[1].length -2 %d", buf.m.planes[1].length);
++	GST_DEBUG_OBJECT (dec, "mm buf.m.planes[1].bytesused -2 %d", buf.m.planes[1].bytesused);
++	
++	dec->cap_buf_flag[n] = 1;
++
++	return 0;
++}
++
++/* add alloc_ion_buffer */
++static int
++alloc_ion_buffer(size_t size, GstVideoDecoder * decoder)
++{
++	GstV4L2Dec *dec = GST_V4L2DEC (decoder);
++	struct ion_allocation_data ion_alloc = { 0 };
++	struct ion_fd_data ion_fd_data = { 0 };
++	/* struct ion_handle_data ion_handle_data = { 0 }; */
++	static int ion_fd = -1;
++	int ret;
++    GST_INFO_OBJECT (dec, "mm inside alloc_ion_buffer");
++	if (ion_fd < 0) {
++		ion_fd = open("/dev/ion", O_RDONLY);
++		if (ion_fd < 0) {
++			GST_ERROR_OBJECT (dec, "Cannot open ion device");
++		return -1;
++		}
++	}
++
++	ion_alloc.len = size;
++	ion_alloc.align = 4096;
++	ion_alloc.heap_id_mask = ION_HEAP(ION_IOMMU_HEAP_ID);
++	ion_alloc.flags = 0;
++	ion_alloc.handle = -1;
++
++	if (v4l2_ioctl(ion_fd, ION_IOC_ALLOC, &ion_alloc) < 0) {
++		GST_DEBUG_OBJECT (dec, "mm Failed to allocate ion buffer");
++		return -1;
++	}
++
++	ion_fd_data.handle = ion_alloc.handle;
++	ion_fd_data.fd = -1;
++	GST_DEBUG_OBJECT (dec, "mm Allocated %zd bytes ION buffer %d", ion_alloc.len, ion_alloc.handle);
++	if (v4l2_ioctl(ion_fd, ION_IOC_MAP, &ion_fd_data) < 0) {
++		GST_DEBUG_OBJECT (dec, "mm Failed to map ion buffer");
++		ret = -1;
++	} else {
++		GST_DEBUG_OBJECT (dec, "mm success to map ion buffer");
++		ret = ion_fd_data.fd;
++	}
++
++	/* ion_handle_data.handle = ion_alloc.handle;
++	 if (ioctl(ion_fd, ION_IOC_FREE, &ion_handle_data) < 0)
++		GST_DEBUG_OBJECT (dec, "mm Failed to free ion buffer"); */
++	return ret;
++}
++
+ /* Setup input (Output for V4L2) */
+ static gboolean
+ gst_v4l2dec_set_format (GstVideoDecoder * decoder, GstVideoCodecState * state)
+@@ -821,18 +982,21 @@ gst_v4l2dec_set_format (GstVideoDecoder * decoder, GstVideoCodecState * state)
+   GstV4L2Dec *dec = GST_V4L2DEC (decoder);
+   GstStructure *structure;
+   const gchar *s;
+-  gint i;
++  int ion_fd;
++  void *buf_addr;
++  int n;
++  
+   gint retval = 0;
+   gint width = 0;
+   gint height = 0;
+   GstVideoInterlaceMode interlace_mode;
+-  struct v4l2_plane planes[OUT_PLANES];
++
+ 
+   __u32 streamformat;
+   int fd;
+   struct v4l2_requestbuffers reqbuf;
+-  struct v4l2_buffer querybuf;
+ 
++  GST_INFO_OBJECT (dec, "mm inside gst_v4l2dec_set_format");
+   GST_DEBUG_OBJECT (dec, "Setting format: %" GST_PTR_FORMAT, state->caps);
+ 
+   structure = gst_caps_get_structure (state->caps, 0);
+@@ -890,37 +1054,45 @@ gst_v4l2dec_set_format (GstVideoDecoder * decoder, GstVideoCodecState * state)
+   memset (&reqbuf, 0, sizeof reqbuf);
+   reqbuf.type = V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE;
+   reqbuf.count = NB_BUF_INPUT;
+-  reqbuf.memory = V4L2_MEMORY_MMAP;
++  reqbuf.memory = V4L2_MEMORY_USERPTR;
+   if (v4l2_ioctl (dec->fd, VIDIOC_REQBUFS, &reqbuf) < 0)
+     goto error_ioc_reqbufs;
+ 
++  dec->out_buf_cnt = reqbuf.count;
++  
+   dec->mmap_virtual_input = malloc (sizeof (void *) * reqbuf.count);
+   dec->mmap_size_input = malloc (sizeof (void *) * reqbuf.count);
+-  dec->out_buf_cnt = reqbuf.count;
+ 
+-  memset (&querybuf, 0, sizeof querybuf);
+-  querybuf.type = V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE;
+-  querybuf.memory = V4L2_MEMORY_MMAP;
+-  querybuf.m.planes = planes;
+-  querybuf.length = OUT_PLANES;
+-
+-  for (i = 0; i < reqbuf.count; i++) {
+-    void *ptr;
+-    querybuf.index = i;
+-    dec->current_nb_buf_input++;
+-    memset(planes, 0, sizeof(planes));
+-
+-    /* Memory mapping for input buffers in GStreamer */
+-    if (v4l2_ioctl (dec->fd, VIDIOC_QUERYBUF, &querybuf) < 0)
+-      goto error_ioc_querybuf;
+-    ptr = v4l2_mmap (NULL, querybuf.m.planes[0].length, PROT_READ | PROT_WRITE,
+-        MAP_SHARED, dec->fd, querybuf.m.planes[0].m.mem_offset);
+-    if (ptr == MAP_FAILED)
++  GST_INFO_OBJECT(dec, "mm requested %d out buffers, got %d", NB_BUF_INPUT, reqbuf.count);
++	ion_fd = alloc_ion_buffer(dec->out_buf_cnt * dec->out_buf_size, decoder);
++	if (ion_fd < 0){
++	GST_DEBUG_OBJECT (dec, "mm ion alloc failed ion_fd=%d, out_buf_size=%d, out_buf_cnt=%d", ion_fd, dec->out_buf_size, dec->out_buf_cnt);
++	return -1;
++	}
++	GST_DEBUG_OBJECT (dec, "mm ion alloc success for out buffer ion_fd=%d, out_buf_size=%d, out_buf_cnt=%d", ion_fd, dec->out_buf_size, dec->out_buf_cnt);
++  
++    buf_addr = v4l2_mmap(NULL, dec->out_buf_cnt * dec->out_buf_size,
++			PROT_READ | PROT_WRITE, MAP_SHARED, ion_fd, 0);
++    if (buf_addr == MAP_FAILED){
++	GST_DEBUG_OBJECT (dec, "mm mmap failed for out buffer ion_fd=%d, out_buf_size=%d, dec->out_buf_cnt=%d", ion_fd, dec->out_buf_size, dec->out_buf_cnt);
+       goto error_map_fail;
+-
+-    dec->mmap_virtual_input[i] = ptr;
+-    dec->mmap_size_input[i] = querybuf.m.planes[0].length;
+-  }
++	}
++    GST_DEBUG_OBJECT (dec, "mm mmap success for out buffer buf_addr=%p, out_buf_size=%d, dec->out_buf_cnt=%d", buf_addr, dec->out_buf_size, dec->out_buf_cnt); 
++	 
++	dec->out_ion_fd = ion_fd;
++	dec->out_ion_addr = buf_addr;
++
++	for (n = 0; n < dec->out_buf_cnt; n++) {
++		dec->out_buf_off[n] = n * dec->out_buf_size;
++		dec->mmap_virtual_input[n] = (char *)buf_addr + dec->out_buf_off[n];
++		dec->out_buf_flag[n] = 0;
++    	dec->mmap_size_input[n] = dec->out_buf_size;
++	}
++
++	GST_DEBUG_OBJECT (dec, "mmap success ion_fd=%d, out_buf_size=%d, out_buf_cnt=%d", ion_fd, dec->out_buf_size, dec->out_buf_cnt);
++    
++	/*video_set_control(decoder);*/
++	
+ 
+   dec->input_setup = TRUE;
+ 
+@@ -949,12 +1121,6 @@ error_ioc_reqbufs:
+         strerror (errno));
+     return FALSE;
+   }
+-error_ioc_querybuf:
+-  {
+-    GST_ERROR_OBJECT (dec, "Query of input buffer failed err=%s",
+-        strerror (errno));
+-    return FALSE;
+-  }
+ error_map_fail:
+   {
+     GST_ERROR_OBJECT (dec, "Failed to map input buffer");
+@@ -968,34 +1134,59 @@ unmap_input_buf (GstV4L2Dec * dec)
+   if (dec->mmap_virtual_input)
+     for (int i = 0; i < dec->current_nb_buf_input; i++)
+       v4l2_munmap (dec->mmap_virtual_input[i], dec->mmap_size_input[i]);
++  GST_INFO_OBJECT (dec, "mm inside unmap_input_buf");
+ }
+ 
+ static GstFlowReturn
+ acquire_from_downstream(GstVideoDecoder *decoder)
+ {
+   GstV4L2Dec *dec = GST_V4L2DEC (decoder);
++  
+   GstBuffer *output_buffer;
++  GstBuffer *out_buf;
++  GstIonBufFdMeta *meta;
++
+   struct v4l2_buffer dqbuf;
++  struct v4l2_plane planes[CAP_PLANES];
++  GST_INFO_OBJECT (dec, "mm inside acquire_from_downstreamr");
+ 
+-  if (!dec->downstream_pool)
+-    return GST_FLOW_ERROR;
+ 
+   GST_DEBUG_OBJECT (dec, "trying to dequeue frame");
+ 
+   memset (&dqbuf, 0, sizeof dqbuf);
+   dqbuf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE;
+-  dqbuf.memory = V4L2_MEMORY_DMABUF;
++  dqbuf.memory = V4L2_MEMORY_USERPTR;
++  dqbuf.m.planes = planes;
++  dqbuf.length = CAP_PLANES;
+ 
+   GST_DEBUG_OBJECT (dec, "dequeue buffer (capture type)");
+ 
+-  if (v4l2_ioctl (dec->fd, VIDIOC_DQBUF, &dqbuf) < 0)
++  if (v4l2_ioctl (dec->fd, VIDIOC_DQBUF, &dqbuf) < 0){
++	  GST_DEBUG_OBJECT (dec, "mm failed dequeue buffer (capture type)");
+     goto out; /* STREAMOFF */
++  }
+ 
+   GST_DEBUG_OBJECT (dec, "dequeue buffer (capture type) dqbuf.index %d",
+                     dqbuf.index);
+ 
+-  /* get back GstBuffer from V4L2 index */
+-  output_buffer = dec->downstream_buffers[dqbuf.index];
++  out_buf = gst_buffer_new ();	
++  if (out_buf) {
++  meta = gst_buffer_add_ionbuf_meta(out_buf, dec->cap_buf_fd[dqbuf.index], 0, dec->cap_buf_size[0], FALSE);
++
++  if (!meta) {
++      GST_ERROR_OBJECT (dec, "Addition of ionBufInfo metadata to decoder output buffer failed.\n");
++      goto out;
++   }
++	GST_DEBUG_OBJECT (dec, "mm inside meta. dqbuf.index=%d, cap_buf_fd[dqbuf.index]=%d  \
++	 cap_buf_size[0]=%d, out_buf=%p \
++	 dqbuf.m.planes[0].m.userptr=%lu \
++	 dqbuf.m.planes[0].reserved[0]=%d", dqbuf.index, dec->cap_buf_fd[dqbuf.index], \
++	 dec->cap_buf_size[0], out_buf, \
++	 dqbuf.m.planes[0].m.userptr, dqbuf.m.planes[0].reserved[0]);
++  }  
++
++  output_buffer = out_buf;
++#if 0
+   GST_BUFFER_TIMESTAMP(output_buffer) = GST_TIMEVAL_TO_TIME(dqbuf.timestamp);
+ 
+   /* set top/bottom field first if v4l2_buffer has the information */
+@@ -1011,6 +1202,15 @@ acquire_from_downstream(GstVideoDecoder *decoder)
+     GST_BUFFER_FLAG_UNSET (output_buffer, GST_VIDEO_BUFFER_FLAG_INTERLACED);
+     GST_BUFFER_FLAG_UNSET (output_buffer, GST_VIDEO_BUFFER_FLAG_TFF);
+   }
++#endif
++
++return_capture_buffer(decoder, output_buffer);
++
++	if (queue_buf_cap(decoder, dqbuf.index)){
++			GST_DEBUG_OBJECT (dec, "Enqueuing of cap buffers failed after save frame"); 
++			return -1;
++		}
++	GST_DEBUG_OBJECT (dec, "Enqueuing of cap buffers success after save frame"); 
+ 
+   return GST_FLOW_OK;
+ 
+@@ -1025,13 +1225,16 @@ return_capture_buffer (GstVideoDecoder *decoder, GstBuffer *output_buffer)
+   GstVideoInfo *info = &dec->output_state->info;
+   GstVideoCodecFrame *frame;
+   GstVideoFrameFlags flags = 0;
+-
+   frame = gst_video_decoder_get_oldest_frame (decoder);
+-
++	GST_INFO_OBJECT (dec, "mm inside return_capture_buffer-1");
++	GST_INFO_OBJECT (dec, "oldest_frame is = %p", frame);
++	
+   if (frame == NULL) {
+-    if (dec->pool) {
+-      gst_buffer_pool_release_buffer (dec->pool, output_buffer);
+-    }
++	  GST_INFO_OBJECT (dec, "frame is NULL. mm inside return_capture_buffer-2");
++//    if (dec->pool) {
++//		GST_INFO_OBJECT (dec, "mm inside return_capture_buffer-3");
++//      gst_buffer_pool_release_buffer (dec->pool, output_buffer);
++//    }
+     return;
+   }
+ 
+@@ -1055,7 +1258,7 @@ return_capture_buffer (GstVideoDecoder *decoder, GstBuffer *output_buffer)
+ 
+     info->offset[CHROMA_PLANE] = chroma_offset;
+   }
+-
++	GST_INFO_OBJECT (dec, "mm inside return_capture_buffer-4");
+   /* Add alignment info */
+   gst_buffer_add_video_meta_full (output_buffer,
+                                   flags,
+@@ -1068,13 +1271,15 @@ return_capture_buffer (GstVideoDecoder *decoder, GstBuffer *output_buffer)
+   frame->output_buffer = output_buffer;
+   frame->pts = output_buffer->pts;
+ 
++  GST_INFO_OBJECT (dec, "mm inside return_capture_buffer-5");
++  
+   /* Decrease the refcount of the frame so that the frame is released by the
+    * gst_video_decoder_finish_frame function and so that the output buffer is
+    * writable when it's pushed downstream */
+   gst_video_codec_frame_unref (frame);
+-
++	GST_INFO_OBJECT (dec, "mm inside return_capture_buffer-6");
+   gst_video_decoder_finish_frame (decoder, frame);
+-
++	GST_INFO_OBJECT (dec, "mm inside return_capture_buffer-7");
+   GST_DEBUG_OBJECT (dec, "-->Frame pushed buffer %p", output_buffer);
+ }
+ 
+@@ -1091,7 +1296,7 @@ poll_out_thread (void *arg)
+   short revents;
+   struct v4l2_buffer dqbuf;
+   struct v4l2_plane planes[OUT_PLANES];
+-
++  GST_INFO_OBJECT (dec, "mm inside poll_out_thread");
+   GST_DEBUG_OBJECT (dec, "Poll out thread started");
+ 
+   pfd.fd = dec->fd;
+@@ -1107,50 +1312,43 @@ poll_out_thread (void *arg)
+       GST_ERROR_OBJECT (dec, "Poll error %s", strerror (errno));
+       break;
+     }
+-
++	GST_LOG_OBJECT (dec, "mm inside poll_out_thread-1");
+     revents = pfd.revents;
+ 
+     if (revents & (POLLIN | POLLRDNORM)) {
+-      GstBuffer *output_buffer;
+ 
+       GST_DEBUG_OBJECT (dec, "revent for capture buffer type");
+-
+-      if (dec->pool) {
+-        ret = gst_buffer_pool_acquire_buffer (dec->pool, &output_buffer, NULL);
+-        if (ret != GST_FLOW_OK) { /* logically caused by STREAMOFF */
+-          GST_LOG_OBJECT (dec, "The pool is no more active %d", ret);
+-        }
+-      } else if (dec->downstream_pool) {
++	  GST_LOG_OBJECT (dec, "mm inside poll_out_thread-3");
+         ret = acquire_from_downstream (decoder);
+         if (ret != GST_FLOW_OK)
+-          GST_LOG_OBJECT (dec, "The pool is no more active %d", ret);
+-      }
+-
+-      return_capture_buffer(decoder, output_buffer);
++          GST_LOG_OBJECT (dec, "The pool is no more active %d", ret);	
++	GST_LOG_OBJECT (dec, "mm inside poll_out_thread-4");
+     }
+ 
+     if (revents & (POLLOUT | POLLWRNORM)) {
++		
++		GST_DEBUG_OBJECT (dec, "revent for output buffer type");
+ 
+       /* Dequeue a V4L2 buffer where to write */
+       memset (&dqbuf, 0, sizeof dqbuf);
+       memset (planes, 0, sizeof(planes));
+       dqbuf.type = V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE;
+-      dqbuf.memory = V4L2_MEMORY_MMAP;
++	  dqbuf.memory = V4L2_MEMORY_USERPTR;
+       dqbuf.m.planes = planes;
+       dqbuf.length = OUT_PLANES;
+-
++  
+       if (v4l2_ioctl (dec->fd, VIDIOC_DQBUF, &dqbuf) < 0) {
+         GST_ERROR_OBJECT (dec, "Error on output dqbuf %s", strerror (errno));
+         continue;
+       }
+-
++	GST_DEBUG_OBJECT (dec, "dequeued out buffer %d", dqbuf.index);
++	
+       pthread_mutex_lock(&dec->lock);
+       dec->out_buf_flag[dqbuf.index] = 0;
+       pthread_mutex_unlock(&dec->lock);
+ 
+       sem_post (&dec->sem_done);
+-
+-      GST_DEBUG_OBJECT (dec, "dequeued output buffer %d", dqbuf.index);
++	  
+     }
+ 
+   }
+@@ -1162,8 +1360,6 @@ poll_out_thread (void *arg)
+ 
+ #define V4L2_CID_MPEG_MSM_VIDC_BASE (V4L2_CTRL_CLASS_MPEG | 0x2000)
+ 
+-#define V4L2_CID_MPEG_VIDC_VIDEO_CONTINUE_DATA_TRANSFER \
+-        (V4L2_CID_MPEG_MSM_VIDC_BASE + 5)
+ 
+ /* setup output (Capture for V4L2) with the Header if not yet done
+  * else : go to decode for each AU available */
+@@ -1177,16 +1373,19 @@ gst_v4l2dec_setup_output (GstVideoDecoder * decoder, GstVideoCodecFrame * frame)
+   struct v4l2_crop g_crop;
+   struct v4l2_requestbuffers reqbufs;
+   gint type;
+-  GstBufferPool *pool;
+   __u32 width, height, aligned_width, aligned_height;
+   __u32 fmt;
+   __u32 size;
+   struct v4l2_control control;
++  
++  int ion_fd;
++  void *buf_addr;
++  int n;
+ 
++  GST_INFO_OBJECT (dec, "mm inside gst_v4l2dec_setup_output");
+   control.id = V4L2_CID_MPEG_VIDC_VIDEO_CONTINUE_DATA_TRANSFER;
+   control.value = 1;
+-
+-  if (ioctl(dec->fd, VIDIOC_S_CTRL, &control))
++   if (ioctl(dec->fd, VIDIOC_S_CTRL, &control))
+     goto error_ioc_s_ctrl;
+ 
+   /* Start stream on input */
+@@ -1283,115 +1482,80 @@ gst_v4l2dec_setup_output (GstVideoDecoder * decoder, GstVideoCodecFrame * frame)
+ 
+   /* Set buffer size */
+   dec->size_image = size;
+-
+-  gst_video_decoder_negotiate (decoder);        /* will call gst_v4l2dec_decide_allocation */
+-
+-  pool = dec->downstream_pool;
+-
+-  if (!pool) {
+-    /* Request output buffers needed (MMAP mode) */
+-    memset (&reqbufs, 0, sizeof reqbufs);
+-    reqbufs.type = V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE;
+-    reqbufs.count = NB_BUF_OUTPUT;
+-    reqbufs.memory = V4L2_MEMORY_MMAP;
+-
+-    if (v4l2_ioctl (dec->fd, VIDIOC_REQBUFS, &reqbufs) < 0)
+-      goto error_ioc_reqbufs;
+-
+-    /* construct a new buffer pool */
+-    dec->pool = gst_v4l2dec_buffer_pool_new (dec, NULL, reqbufs.count, /* driver nb of buffers needed */
+-        g_fmt.fmt.pix_mp.plane_fmt[0].sizeimage, &align);
+-    if (dec->pool == NULL)
+-      goto error_new_pool;
+-
+-    /* activate the pool: the buffers are allocated */
+-    if (gst_buffer_pool_set_active (dec->pool, TRUE) == FALSE)
+-      goto error_activate_pool;
+-
+-  } else {
+-    GstStructure *config = gst_buffer_pool_get_config (pool);
+-    guint size, min_buffers, max_buffers;
+-    struct v4l2_buffer qbuf;
+-    GstV4L2DecDownstreamMeta *meta = NULL;
+-    GstCaps *caps;
+-    gint i;
+-
+-    gst_buffer_pool_config_get_params (config, &caps, &size, &min_buffers,
+-        &max_buffers);
+-
+-    GST_DEBUG_OBJECT (dec, "Use downstream pool %p min %d max %d", pool,
+-        min_buffers, max_buffers);
+-
+-    for (i = 0; i < ARRAY_SIZE (dec->downstream_buffers); i++)
+-      dec->downstream_buffers[i] = NULL;
+-
+-    /* Queue output buffers in order that decoder driver
+-     * is ready to decode up to dpb frames */
+-    for (i = 0; i < min_buffers; i++) {
+-      GstBuffer *buffer;
+-      GstMemory *gmem = NULL;
+-      GstBufferPoolAcquireParams params = {.flags =
+-            GST_BUFFER_POOL_ACQUIRE_FLAG_DONTWAIT
+-      };
+-      gint fd = -1;
+-
+-      ret = gst_buffer_pool_acquire_buffer (pool, &buffer, &params);
+-      if (ret == GST_FLOW_EOS) {        /* No more buffers available (max reached) */
+-        GST_LOG_OBJECT (dec, "%d buffers available over %d buffers requested",
+-            i, min_buffers);
+-        /* FIXME, this situation occurs if the sink (e.g. encoder) reserves some buffers
+-         * for its internal need */
+-        break;
+-      }
+-      if (ret != GST_FLOW_OK)   /* logically caused by STREAMOFF */
+-        goto out;
+-
+-      dec->downstream_buffers[i] = buffer;
+-      meta = GST_V4L2DEC_DOWNSTREAM_META_ADD (buffer);
+-      if (meta) {
+-        GST_META_FLAG_SET (meta, GST_META_FLAG_POOLED);
+-        GST_META_FLAG_SET (meta, GST_META_FLAG_LOCKED);
+-        meta->acquired = TRUE;
+-        GST_LOG_OBJECT (dec,
+-            "set acquire TRUE: dmabuf fd %d, buffer %p, index %d", fd, buffer,
+-            i);
+-      }
+-
+-      gmem = gst_buffer_get_memory (buffer, 0);
+-      if ((gmem != NULL) && (gst_is_dmabuf_memory (gmem) == TRUE)) {
+-        fd = gst_dmabuf_memory_get_fd (gmem);
+-        GST_INFO_OBJECT (dec,
+-            "Setup output buffer: dmabuf fd %d, buffer %p, index %d", fd,
+-            buffer, i);
+-      }
+-      gst_memory_unref (gmem);
+-
+-      GST_DEBUG_OBJECT (dec, "Queue buffer (capture type)");
+-      memset (&qbuf, 0, sizeof qbuf);
+-      qbuf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE;
+-      qbuf.memory = V4L2_MEMORY_DMABUF;
+-      qbuf.index = i;
+-      qbuf.m.fd = fd;
+-      qbuf.bytesused = dec->size_image;
+-      qbuf.length = dec->size_image;
+-      if (v4l2_ioctl (dec->fd, VIDIOC_QBUF, &qbuf) < 0)
+-        goto queue_failed;
+-    }
+-  }
++  dec->cap_buf_format = fmt;
++  dec->cap_w = width;
++  dec->cap_h = height;
++  dec->cap_buf_stride[0] = g_fmt.fmt.pix_mp.plane_fmt[0].bytesperline;
++  dec->cap_buf_size[0] = g_fmt.fmt.pix_mp.plane_fmt[0].sizeimage;
++  dec->cap_buf_stride[1] = g_fmt.fmt.pix_mp.plane_fmt[1].bytesperline;
++  dec->cap_buf_size[1] = g_fmt.fmt.pix_mp.plane_fmt[1].sizeimage;
++	
++  GST_DEBUG_OBJECT (dec, "mm g_fmt.fmt.pix_mp.plane_fmt[0].sizeimage=%d", g_fmt.fmt.pix_mp.plane_fmt[0].sizeimage);
++  GST_DEBUG_OBJECT (dec, "mm g_fmt.fmt.pix_mp.plane_fmt[0].bytesperline=%d", g_fmt.fmt.pix_mp.plane_fmt[0].bytesperline);
++  GST_DEBUG_OBJECT (dec, "mm g_fmt.fmt.pix_mp.plane_fmt[1].sizeimage=%d", g_fmt.fmt.pix_mp.plane_fmt[1].sizeimage);
++  GST_DEBUG_OBJECT (dec, "mm g_fmt.fmt.pix_mp.plane_fmt[1].bytesperline=%d", g_fmt.fmt.pix_mp.plane_fmt[1].bytesperline);
++  
++  memset (&reqbufs, 0, sizeof reqbufs);
++  reqbufs.type = V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE;
++  reqbufs.count = NB_BUF_OUTPUT;	
++  reqbufs.memory = V4L2_MEMORY_USERPTR;
++	
++  if (v4l2_ioctl (dec->fd, VIDIOC_REQBUFS, &reqbufs) < 0){
++  GST_INFO_OBJECT(dec, "mm failed VIDIOC_REQBUFS");
++  goto error_ioc_reqbufs;
++  }
++	
++  dec->cap_buf_cnt = reqbufs.count;
++  GST_INFO_OBJECT(dec, "mm requested %d cap buffers, got %d", NB_BUF_OUTPUT, reqbufs.count);
++  
++  for (n = 0; n < dec->cap_buf_cnt; n++) {  
++	ion_fd = alloc_ion_buffer(dec->cap_buf_size[0], decoder);
++	if (ion_fd < 0){
++	GST_DEBUG_OBJECT (dec, "mm failed ion alloc for cap buffers ion_fd=%d, cap_buf_size=%d, cap_buf_cnt=%d", ion_fd, dec->cap_buf_size[0], dec->cap_buf_cnt);
++		return -1;
++		}
++	GST_DEBUG_OBJECT (dec, "mm success ion alloc for cap buffers ion_fd=%d, cap_buf_size=%d, cap_buf_cnt=%d", ion_fd, dec->cap_buf_size[0], dec->cap_buf_cnt);
++
++	buf_addr = mmap(NULL, dec->cap_buf_size[0],
++			PROT_READ, MAP_SHARED, ion_fd, 0);
++	if (buf_addr == MAP_FAILED) {
++	GST_DEBUG_OBJECT (dec, "mm mmap failed for cap buffers ion_fd=%d, cap_buf_size=%d, cap_buf_cnt=%d", ion_fd, dec->cap_buf_size[0], dec->cap_buf_cnt);
++		return -1;
++		}
++	GST_DEBUG_OBJECT (dec, "mm mmap success for cap buffers buf_addr=%p, cap_buf_size=%d, cap_buf_cnt=%d", buf_addr, dec->cap_buf_size[0], dec->cap_buf_cnt);
++	
++	dec->cap_buf_fd[n] = ion_fd;
++	dec->cap_buf_addr[n] = buf_addr;
++	}
++
++  /* Queue all capture buffers */
++  for (n = 0; n < dec->cap_buf_cnt; n++) {
++		if (queue_buf_cap(decoder, n)){
++			GST_DEBUG_OBJECT (dec, "Enqueuing of cap buffers failed"); 
++			return -1;
++		}
++  }
++  GST_DEBUG_OBJECT (dec, "Enqueuing of cap buffers success"); 
++  
++/*  gst_video_decoder_negotiate (decoder); */       /* will call gst_v4l2dec_decide_allocation */
+ 
+   /* Start streaming on output */
+   type = V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE;
+   if (v4l2_ioctl (dec->fd, VIDIOC_STREAMON, &type) < 0)
+     goto error_ioc_streamon;
+ 
++  GST_DEBUG_OBJECT (dec, "streamon on capture queue - success");
++
+   pthread_create (&dec->poll_out_thread, 0, poll_out_thread, decoder);
+ 
+   /* Everything is ready, start the frame push thread */
+ //  gst_task_start (dec->frame_push_task);
+ 
+   /* Start the frame recycle thread */
+-  if (dec->downstream_pool)
+-    gst_task_start (dec->frame_recycle_task);
++  
++  /*mmoussa*/
++ /*  if (dec->downstream_pool)
++    gst_task_start (dec->frame_recycle_task); */
+ 
+   dec->output_setup = TRUE;
+ 
+@@ -1399,7 +1563,7 @@ done:
+   return GST_FLOW_OK;
+ 
+   /* Errors */
+-error_ioc_s_ctrl:
++ error_ioc_s_ctrl:
+   {
+     GST_ERROR_OBJECT (dec, "Set control failed err=%s", strerror (errno));
+     return GST_FLOW_ERROR;
+@@ -1415,17 +1579,6 @@ error_ioc_reqbufs:
+         strerror (errno));
+     return GST_FLOW_ERROR;
+   }
+-error_new_pool:
+-  {
+-    GST_ERROR_OBJECT (dec, "Unable to construct a new buffer pool");
+-    return GST_FLOW_ERROR;
+-  }
+-error_activate_pool:
+-  {
+-    GST_ERROR_OBJECT (dec, "Unable to activate the pool");
+-    gst_object_unref (dec->pool);
+-    return GST_FLOW_ERROR;
+-  }
+ error_ioc_streamon:
+   {
+     GST_ERROR_OBJECT (dec, "Streamon failed err=%s", strerror (errno));
+@@ -1433,13 +1586,6 @@ error_ioc_streamon:
+     gst_object_unref (dec->pool);
+     return GST_FLOW_ERROR;
+   }
+-queue_failed:
+-  {
+-    GST_ERROR_OBJECT (dec, "Queuing input failed err=%s", strerror (errno));
+-    return GST_FLOW_ERROR;
+-  }
+-
+-out:
+   return GST_FLOW_OK;
+ }
+ 
+@@ -1451,7 +1597,7 @@ gst_v4l2dec_handle_frame (GstVideoDecoder * decoder, GstVideoCodecFrame * frame)
+ {
+   GstV4L2Dec *dec = GST_V4L2DEC (decoder);
+   GstFlowReturn ret = GST_FLOW_OK;
+-
++	GST_INFO_OBJECT (dec, "mm inside gst_v4l2dec_handle_frame-1");
+   if (!dec->input_setup)
+     return GST_FLOW_OK;
+ 
+@@ -1462,6 +1608,12 @@ gst_v4l2dec_handle_frame (GstVideoDecoder * decoder, GstVideoCodecFrame * frame)
+       return ret;
+   }
+ 
++  GST_INFO_OBJECT (dec, "mm inside gst_v4l2dec_handle_frame-2 frame address is %p", frame);
++  GST_DEBUG ("Enter with frame number : %d, TS: %"
++      GST_TIME_FORMAT ", system_frame_number: %d, distance: %d, count: %d",
++      frame->system_frame_number, GST_TIME_ARGS (frame->pts),
++      frame->system_frame_number, frame->distance_from_sync, frame->ref_count);
++  
+   /* For every frame, decode */
+   ret = gst_v4l2dec_decode (decoder, frame);
+ 
+@@ -1481,12 +1633,13 @@ gst_v4l2dec_decode (GstVideoDecoder * decoder, GstVideoCodecFrame * frame)
+   struct v4l2_buffer qbuf;
+   struct v4l2_plane planes[OUT_PLANES];
+   GstV4L2Dec *dec = GST_V4L2DEC (decoder);
+-  gint n;
+-
++  static gint n =0;
++  #define AV_NOPTS_VALUE   ((int64_t)(0x8000000000000000))
++  uint flags = 0;
++  GST_INFO_OBJECT (dec, "mm inside gst_v4l2dec_decode");
+   pthread_mutex_lock(&dec->lock);
+-  n = 0;
+-  while (n < dec->out_buf_cnt && dec->out_buf_flag[n])
+-    n++;
++  n = n % dec->out_buf_cnt;
++  GST_DEBUG_OBJECT (dec, "inside gst_v4l2dec_decode - n = %d, ", n);
+   pthread_mutex_unlock(&dec->lock);
+ 
+   if (n >= dec->out_buf_cnt) {
+@@ -1507,9 +1660,10 @@ gst_v4l2dec_decode (GstVideoDecoder * decoder, GstVideoCodecFrame * frame)
+     gst_buffer_unmap (buf, &mapinfo);
+     return GST_FLOW_ERROR;
+   } else {
+-    memcpy (dec->mmap_virtual_input[n], gstdata, gstsize);
++      memcpy (dec->mmap_virtual_input[n], gstdata, gstsize);
+   }
+-
++	GST_DEBUG_OBJECT (dec, "mm memcpy dec->mmap_virtual_input[%d]=%p, gstdata=%p, gstsize (%" G_GSIZE_FORMAT ")", n, dec->mmap_virtual_input[n], gstdata, gstsize);
++	GST_INFO_OBJECT (dec, "mm inside gst_v4l2dec_decode frame address is %p", frame);
+   gst_buffer_unmap (buf, &mapinfo);
+ 
+   /* Unlock decoder before qbuf call:
+@@ -1524,20 +1678,39 @@ gst_v4l2dec_decode (GstVideoDecoder * decoder, GstVideoCodecFrame * frame)
+   memset(&qbuf, 0, sizeof(qbuf));
+   memset(planes, 0, sizeof(planes));
+   qbuf.type = V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE;
+-  qbuf.memory = V4L2_MEMORY_MMAP;
++  qbuf.memory = V4L2_MEMORY_USERPTR;
+   qbuf.index = n;
+   qbuf.length = OUT_PLANES;
+   qbuf.m.planes = planes;
+   qbuf.m.planes[0].length = dec->mmap_size_input[qbuf.index];
+   qbuf.m.planes[0].bytesused = gstsize;     /* access unit size */
+ 
++  qbuf.m.planes[0].m.userptr = (unsigned long)dec->out_ion_addr;
++  qbuf.m.planes[0].reserved[0] = dec->out_ion_fd;
++  qbuf.m.planes[0].reserved[1] = dec->out_buf_off[n];
++  qbuf.m.planes[0].data_offset = 0;
++  
+   /* access unit timestamp */
+-  if (GST_CLOCK_TIME_IS_VALID (frame->dts))
++  if (GST_CLOCK_TIME_IS_VALID (frame->dts)){
+     GST_TIME_TO_TIMEVAL (frame->dts, qbuf.timestamp);
+-  else
++	GST_INFO_OBJECT (dec, "frame->dts (%" G_GUINT64_FORMAT ")", frame->dts);
++  }else{
+     GST_TIME_TO_TIMEVAL (frame->pts, qbuf.timestamp);
+-
+-  if (v4l2_ioctl (dec->fd, VIDIOC_QBUF, &qbuf) < 0) {
++	GST_INFO_OBJECT (dec, "frame->pts (%" G_GUINT64_FORMAT ")", frame->pts);
++  }
++
++/*   if (frame->pts != AV_NOPTS_VALUE) {
++	GST_INFO_OBJECT (dec, "flags =0");
++  }else{
++	  GST_INFO_OBJECT (dec, "flags |= V4L2_QCOM_BUF_TIMESTAMP_INVALID");
++	flags |= V4L2_QCOM_BUF_TIMESTAMP_INVALID;
++  } */
++  flags |= V4L2_QCOM_BUF_TIMESTAMP_INVALID;
++  qbuf.flags = flags;
++  
++   if (v4l2_ioctl (dec->fd, VIDIOC_QBUF, &qbuf) < 0) {
++	GST_DEBUG_OBJECT (dec, "Enqueuing of out buffers failed"); 
++	GST_INFO_OBJECT (dec, "n=%d", n);   
+     GST_VIDEO_DECODER_STREAM_LOCK (decoder);
+     goto error_ioctl_enqueue;
+   }
+@@ -1546,7 +1719,11 @@ gst_v4l2dec_decode (GstVideoDecoder * decoder, GstVideoCodecFrame * frame)
+   dec->out_buf_flag[n] = 1;
+   pthread_mutex_unlock(&dec->lock);
+ 
++  GST_DEBUG_OBJECT (dec, "Enqueuing of out buffers success out_buf_flag[%d]=%d, ", n, dec->out_buf_flag[n]); 
++  
+   if (qbuf.flags & V4L2_BUF_FLAG_ERROR) {
++  GST_DEBUG_OBJECT (dec, "qbuf.flags & V4L2_BUF_FLAG_ERROR"); 
++	
+     /* either the decoded frame is corrupted (decoding error)
+      * or it should not be displayed (e.g. "invisible" VP8 frame) */
+     GST_VIDEO_CODEC_FRAME_SET_DECODE_ONLY (frame);
+@@ -1558,9 +1735,12 @@ gst_v4l2dec_decode (GstVideoDecoder * decoder, GstVideoCodecFrame * frame)
+    * found better solution till now.
+    */
+   sem_wait (&dec->sem_done);
++  GST_DEBUG_OBJECT (dec, "mm inside gst_v4l2dec_decode -1"); 
+ 
+   GST_VIDEO_DECODER_STREAM_LOCK (decoder);
+-
++  
++  GST_DEBUG_OBJECT (dec, "mm inside gst_v4l2dec_decode -2");
++  n++;
+   return ret;
+ 
+   /* ERRORS */
+@@ -1569,7 +1749,7 @@ error_no_bufs:
+     GST_ERROR_OBJECT (dec, "No output buffers");
+     return GST_FLOW_ERROR;
+   }
+-error_ioctl_enqueue:
++ error_ioctl_enqueue:
+   {
+     GST_ERROR_OBJECT (dec, "Enqueuing failed err=%s", strerror (errno));
+     return GST_FLOW_ERROR;
+@@ -1593,7 +1773,7 @@ frame_recycle_thread (void *arg)
+   GstBuffer *buffer;
+   int i;
+   int ret;
+-
++  GST_INFO_OBJECT (dec, "mm inside frame_recycle_thread");
+   ret = gst_buffer_pool_acquire_buffer (dec->downstream_pool, &buffer, &params);
+   if (ret != GST_FLOW_OK) {     /* logically caused by STREAMOFF */
+     GST_LOG_OBJECT (dec, "The pool is no more active %d", ret);
+@@ -1640,7 +1820,7 @@ frame_recycle_thread (void *arg)
+   qbuf.length = dec->size_image;
+ 
+   GST_DEBUG_OBJECT (dec, "Queue output buffer %p, index %d", buffer, i);
+-  if (v4l2_ioctl (dec->fd, VIDIOC_QBUF, &qbuf) < 0) {
++   if (v4l2_ioctl (dec->fd, VIDIOC_QBUF, &qbuf) < 0) {
+     GST_ERROR_OBJECT (dec, "Queuing output buffer failed err=%s",
+         strerror (errno));
+     goto out;
+@@ -1668,7 +1848,7 @@ frame_push_thread (void *arg)
+   GstVideoFrameFlags flags = 0;
+   gint fd = -1;
+   gint index = 0;
+-
++	GST_INFO_OBJECT (dec, "mm inside frame_push_thread");
+   if (dec->pool) {
+     ret = gst_buffer_pool_acquire_buffer (dec->pool, &output_buffer, NULL);
+     if (ret != GST_FLOW_OK)     /* logically caused by STREAMOFF */
+diff --git a/gst/v4l2dec/gstv4l2dec.h b/gst/v4l2dec/gstv4l2dec.h
+index e769f3a..1e95135 100644
+--- a/gst/v4l2dec/gstv4l2dec.h
++++ b/gst/v4l2dec/gstv4l2dec.h
+@@ -47,6 +47,21 @@ typedef struct _GstV4L2DecDownstreamMeta GstV4L2DecDownstreamMeta;
+ 
+ #define MAX_BUFFERS 30
+ 
++/* Maximum number of output buffers */
++#define MAX_OUT_BUF		16
++
++/* Maximum number of capture buffers (32 is the limit imposed by MFC */
++#define MAX_CAP_BUF		32
++
++/* Number of output planes */
++#define OUT_PLANES		1
++
++/* Number of capture planes */
++#define CAP_PLANES		2
++
++/* Maximum number of planes used in the application */
++#define MAX_PLANES		CAP_PLANES
++
+ struct _GstV4L2Dec
+ {
+   GstVideoDecoder parent;
+@@ -101,6 +116,27 @@ struct _GstV4L2Dec
+   gint size_image;
+ 
+   GstBuffer *downstream_buffers[MAX_BUFFERS];
++  
++  /* Output queue related */
++	int out_buf_size;
++	int out_buf_off[MAX_OUT_BUF];
++	int out_ion_fd;
++	void *out_ion_addr;
++	
++	/* Capture queue related */
++	int cap_w;
++	int cap_h;
++	int cap_buf_cnt;
++	int cap_buf_format;
++	int cap_buf_fd[MAX_CAP_BUF];
++	void *cap_buf_addr[MAX_CAP_BUF];
++	int cap_buf_size[CAP_PLANES];
++	int cap_buf_stride[CAP_PLANES];
++	int cap_buf_off[MAX_CAP_BUF][CAP_PLANES];
++	int cap_buf_flag[MAX_CAP_BUF];
++	int cap_ion_fd;
++	void *cap_ion_addr;
++	unsigned long total_captured;
+ };
+ 
+ struct _GstV4L2DecClass
+-- 
+1.9.1
+
