@@ -1,0 +1,166 @@
+From 5e4e48918c4966bc8b994842ad654e508951926c Mon Sep 17 00:00:00 2001
+From: Lei wang <leiwan@codeaurora.org>
+Date: Wed, 24 May 2017 13:40:53 +0800
+Subject: [PATCH] connman-test: fix connman test script failed
+
+Change-Id: Idd789360d01313e717f3e73c91afb6bb28894566
+Signed-off-by: Lei wang <leiwan@codeaurora.org>
+---
+ test/monitor-connman   | 4 ++--
+ test/monitor-services  | 4 ++--
+ test/monitor-vpn       | 4 ++--
+ test/p2p-on-supplicant | 4 ++--
+ test/simple-agent      | 4 ++--
+ test/test-counter      | 4 ++--
+ test/test-session      | 4 ++--
+ 7 files changed, 14 insertions(+), 14 deletions(-)
+
+diff --git a/test/monitor-connman b/test/monitor-connman
+index 1b3b84c..c6b53b6 100755
+--- a/test/monitor-connman
++++ b/test/monitor-connman
+@@ -1,6 +1,6 @@
+ #!/usr/bin/python
+ 
+-import gobject
++from   gi.repository import GLib
+ 
+ import dbus
+ import dbus.mainloop.glib
+@@ -82,6 +82,6 @@ if __name__ == '__main__':
+ 	bus.add_match_string("member=Update,interface=net.connman.Notification")
+ 	bus.add_message_filter(message_filter)
+ 
+-	mainloop = gobject.MainLoop()
++	mainloop = GLib.MainLoop()
+ 
+ 	mainloop.run()
+diff --git a/test/monitor-services b/test/monitor-services
+index 9476bf8..0072e41 100755
+--- a/test/monitor-services
++++ b/test/monitor-services
+@@ -1,6 +1,6 @@
+ #!/usr/bin/python
+ 
+-import gobject
++from   gi.repository import GLib
+ 
+ import dbus
+ import dbus.mainloop.glib
+@@ -102,5 +102,5 @@ if __name__ == '__main__':
+ 				signal_name="PropertyChanged",
+ 				path_keyword="path")
+ 
+-	mainloop = gobject.MainLoop()
++	mainloop = GLib.MainLoop()
+ 	mainloop.run()
+diff --git a/test/monitor-vpn b/test/monitor-vpn
+index 2b63687..94c4cd2 100755
+--- a/test/monitor-vpn
++++ b/test/monitor-vpn
+@@ -1,6 +1,6 @@
+ #!/usr/bin/python
+ 
+-import gobject
++from   gi.repository import GLib
+ 
+ import dbus
+ import dbus.mainloop.glib
+@@ -76,6 +76,6 @@ if __name__ == '__main__':
+ 
+ 	bus.add_message_filter(message_filter)
+ 
+-	mainloop = gobject.MainLoop()
++	mainloop = GLib.MainLoop()
+ 
+ 	mainloop.run()
+diff --git a/test/p2p-on-supplicant b/test/p2p-on-supplicant
+index 8cc76e8..25de12e 100755
+--- a/test/p2p-on-supplicant
++++ b/test/p2p-on-supplicant
+@@ -6,7 +6,7 @@ from fcntl import fcntl, F_GETFL, F_SETFL
+ import glib
+ import dbus
+ import dbus.mainloop.glib
+-import gobject
++from   gi.repository import GLib
+ import argparse
+ 
+ WPA_NAME='fi.w1.wpa_supplicant1'
+@@ -634,7 +634,7 @@ def main():
+ 
+     bus = dbus.SystemBus()
+ 
+-    mainloop = gobject.MainLoop()
++    mainloop = GLib.MainLoop()
+ 
+     wpa_s = Wpa_s(bus, args.ifname, args.command + params)
+ 
+diff --git a/test/simple-agent b/test/simple-agent
+index 01c82ba..d52eaac 100755
+--- a/test/simple-agent
++++ b/test/simple-agent
+@@ -1,6 +1,6 @@
+ #!/usr/bin/python
+ 
+-import gobject
++from   gi.repository import GLib
+ 
+ import dbus
+ import dbus.service
+@@ -351,7 +351,7 @@ if __name__ == '__main__':
+ 		except:
+ 			"Cannot register vpn agent"
+ 
+-	mainloop = gobject.MainLoop()
++	mainloop = GLib.MainLoop()
+ 	mainloop.run()
+ 
+ 	#manager.UnregisterAgent(path)
+diff --git a/test/test-counter b/test/test-counter
+index ce83580..d3a3785 100755
+--- a/test/test-counter
++++ b/test/test-counter
+@@ -1,7 +1,7 @@
+ #!/usr/bin/python
+ 
+ import sys
+-import gobject
++from   gi.repository import GLib
+ 
+ import dbus
+ import dbus.service
+@@ -73,7 +73,7 @@ if __name__ == '__main__':
+ 
+ 	manager.RegisterCounter(path, dbus.UInt32(10), dbus.UInt32(period))
+ 
+-	mainloop = gobject.MainLoop()
++	mainloop = GLib.MainLoop()
+ 	mainloop.run()
+ 
+ 	#manager.UnregisterCounter(path)
+diff --git a/test/test-session b/test/test-session
+index 2d82fb6..bf4da7d 100755
+--- a/test/test-session
++++ b/test/test-session
+@@ -1,7 +1,7 @@
+ #!/usr/bin/python
+ 
+ import sys
+-import gobject
++from   gi.repository import GLib
+ import string
+ 
+ import dbus
+@@ -297,7 +297,7 @@ def main():
+ 
+ 	if sys.argv[1] == "run":
+ 		name = dbus.service.BusName(app_name, bus)
+-		mainloop = gobject.MainLoop()
++		mainloop = GLib.MainLoop()
+ 
+ 		app = SessionApplication(bus, app_path, mainloop)
+ 
+-- 
+1.9.1
+
