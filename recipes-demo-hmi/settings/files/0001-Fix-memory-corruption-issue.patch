@@ -1,20 +1,65 @@
-From 611863db5690fc85ee6644082677c4cc4a9777d9 Mon Sep 17 00:00:00 2001
+From fe7fc8347ace19fe1a323ebc0c934eececf98315 Mon Sep 17 00:00:00 2001
 From: Xubao Jiang <xubaoj@codeaurora.org>
-Date: Wed, 12 Apr 2017 17:29:20 +0800
+Date: Thu, 25 May 2017 18:24:17 +0800
 Subject: [PATCH] Fix memory corruption issue
 
-Change-Id: Iff62223342e45b092528fe0efc744c1ef8f9fe30
-Signed-off-by: Xubao Jiang <xubaoj@codeaurora.org>
+Change-Id: I2eb130873f3691280edae03f5dd5c69529382c31
 ---
- binding-wifi/wifi-api.c     | 12 ++++--------
+ app/wifi/Wifi.qml           |  2 +-
+ binding-wifi/wifi-api.c     | 32 +++++++++++++++++++++++---------
  binding-wifi/wifi-connman.c |  2 +-
- 2 files changed, 5 insertions(+), 9 deletions(-)
+ 3 files changed, 25 insertions(+), 11 deletions(-)
 
+diff --git a/app/wifi/Wifi.qml b/app/wifi/Wifi.qml
+index 52cd44d..9ba1551 100644
+--- a/app/wifi/Wifi.qml
++++ b/app/wifi/Wifi.qml
+@@ -255,7 +255,7 @@ SettingPage {
+     //Timer for periodic refresh; this is BAD solution, need to figure out how to subscribe for events
+     Timer {
+         id: periodicRefresh
+-        interval: 1000 // 1second
++        interval: 3000 // 3second
+         running: !dialog.visible
+         onTriggered: {
+ 
 diff --git a/binding-wifi/wifi-api.c b/binding-wifi/wifi-api.c
-index f6d6d52..ccdc3d3 100644
+index f6d6d52..3e0c8db 100644
 --- a/binding-wifi/wifi-api.c
 +++ b/binding-wifi/wifi-api.c
-@@ -224,7 +224,6 @@ void wifi_scanResult(struct afb_req request) /*AFB_SESSION_CHECK*/
+@@ -46,6 +46,23 @@ callback ptr_my_callback;
+ GSList *wifi_list = NULL;
+ 
+ /**
++ * \brief Clean wifi_list to avoid memory leak
++ *
++ * */
++void clean_wifi_list() {
++	
++	GSList *list = NULL;
++	
++	for (list = wifi_list; list; list = list->next)
++		g_free(list->data);
++
++	g_slist_free(wifi_list);
++
++	wifi_list = NULL;
++}
++
++
++/**
+  * \brief Read out the passkey from the use and pass it to Agent
+  *
+  * \todo Since I do not know how to subscribe for the events from framework,
+@@ -158,7 +175,6 @@ static void wifi_activate(struct afb_req request) /*AFB_SESSION_CHECK*/
+ 	} else
+ 
+ 		afb_req_fail(request, "failed", error->message);
+-
+ }
+ 
+ /**
+@@ -224,7 +240,6 @@ void wifi_scanResult(struct afb_req request) /*AFB_SESSION_CHECK*/
  {
  	struct wifi_profile_info *wifiProfile = NULL;
  	GSList *list = NULL;
@@ -22,7 +67,16 @@ index f6d6d52..ccdc3d3 100644
  	wifi_list = NULL;
  	char *essid = NULL;
  	char *address = NULL;
-@@ -299,14 +298,11 @@ void wifi_scanResult(struct afb_req request) /*AFB_SESSION_CHECK*/
+@@ -233,6 +248,8 @@ void wifi_scanResult(struct afb_req request) /*AFB_SESSION_CHECK*/
+ 	int strength = 0;
+ 	int number = 0;
+ 	GError *error = NULL;
++	
++	clean_wifi_list();
+ 
+ 	error = do_displayScan(&wifi_list); /*Get wifi scan list*/
+ 	if (error == NULL) {
+@@ -299,14 +316,11 @@ void wifi_scanResult(struct afb_req request) /*AFB_SESSION_CHECK*/
                              } else
                                setHMIStatus(BAR_NO);
                        }
@@ -34,10 +88,10 @@ index f6d6d52..ccdc3d3 100644
 -			g_free(list);
 -			list = holdMe;
 +		      g_free(status);
-+		      g_free(list->data);
++		      //g_free(list->data);
  		}
 +		
-+		g_slist_free(wifi_list);
++		//g_slist_free(wifi_list);
  		afb_req_success(request, my_array, "Wi-Fi - Scan Result is Displayed");
  	} else
  		afb_req_fail(request, "failed", error->message);
