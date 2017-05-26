@@ -6,3 +6,13 @@ do_install_append() {
       sed -i -e 's/\/etc\/init.d/\/etc\/initscripts/' ${D}/${systemd_unitdir}/system/init_post_boot.service
    fi
 }
+
+pkg_postinst_${PN}-adbd () {
+    if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
+        if [ -n "$D" ]; then
+            OPTS="--root=$D"
+        fi
+        systemctl $OPTS mask adbd.service
+    fi
+}
+
