@@ -1,5 +1,4 @@
 # Rootfs creation.
-require ../../../recipes-ss-mgr/packagegroup/ss-mgr.inc
 require ../../../recipes-audio/audio.inc
 require ../../../recipes-bt/packagegroup/bt.inc
 
@@ -25,6 +24,10 @@ IMAGE_INSTALL += "bluez5"
 
 IMAGE_INSTALL += "dhcpcd"
 IMAGE_INSTALL += "dnsmasq"
+IMAGE_INSTALL += "ebtables"
+IMAGE_INSTALL += "ethtool"
+IMAGE_INSTALL += "iproute2"
+IMAGE_INSTALL += "iptables"
 
 DEPENDS += "gdb-cross-aarch64"
 

@@ -1,5 +1,4 @@
 # Rootfs creation.
-require ../../../recipes-ss-mgr/packagegroup/ss-mgr.inc
 require ../../../recipes-audio/audio.inc
 require ../../../recipes-bt/packagegroup/bt.inc
 
@@ -41,19 +40,21 @@ IMAGE_INSTALL += "libcutils"
 IMAGE_INSTALL += "system-conf"
 IMAGE_INSTALL += "system-prop"
 IMAGE_INSTALL += "tcpdump"
+IMAGE_INSTALL += "trace-cmd"
 IMAGE_INSTALL += "wireless-tools"
 IMAGE_INSTALL += "hostap-daemon-qcacld"
 IMAGE_INSTALL += "wpa-supplicant-qcacld"
+IMAGE_INSTALL += "libdrm"
 IMAGE_INSTALL += "wayland"
 IMAGE_INSTALL += "pixman"
 IMAGE_INSTALL += "weston"
 IMAGE_INSTALL += "weston-init"
 IMAGE_INSTALL += "libinput"
-IMAGE_INSTALL += "libdrm"
 
 IMAGE_INSTALL += "gstreamer1.0"
 IMAGE_INSTALL += "gstreamer1.0-plugins-base"
 IMAGE_INSTALL += "gstreamer1.0-plugins-good"
+IMAGE_INSTALL += "gstreamer1.0-plugins-bad"
 IMAGE_INSTALL += "gstreamer1.0-rtsp-server"
 #IMAGE_PREPROCESS_COMMAND += "echo ${MACHINE} >> ${IMAGE_ROOTFS}/target;"
 

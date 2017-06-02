@@ -44,3 +44,5 @@ files_read_default_files(NetworkManager_t)
 allow NetworkManager_t initrc_t:unix_dgram_socket sendto;
 init_stream_connect_script(NetworkManager_t)
 allow NetworkManager_t tmpfs_t:file { create open read getattr };
+allow wpa_cli_t tmpfs_t:dir { write search read remove_name open getattr add_name };
+allow wpa_cli_t tmpfs_t:sock_file { write create unlink };

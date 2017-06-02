@@ -25,6 +25,7 @@ EXTRA_OECONF = "--with-common-includes="${WORKSPACE}/vendor/qcom/opensource/blue
                 --with-lib-path=${STAGING_LIBDIR} \
                 --enable-target=${BASEMACHINE} \
                 --enable-rome=${BASEPRODUCT} \
+                --with-glib \
                "
 
 FILES_${PN} += "${userfsdatadir}/misc/bluetooth/*"

@@ -1,5 +1,4 @@
 # Rootfs creation.
-require ../../../recipes-ss-mgr/packagegroup/ss-mgr.inc
 require ../../../recipes-audio/audio.inc
 require ../../../recipes-bt/packagegroup/bt.inc
 
@@ -53,6 +52,7 @@ IMAGE_INSTALL += "lighttpd"
 IMAGE_INSTALL += "loc-stub"
 IMAGE_INSTALL += "loc-pla"
 IMAGE_INSTALL += "loc-hal"
+IMAGE_INSTALL += "loc-net-iface"
 IMAGE_INSTALL += "libsensors"
 IMAGE_INSTALL += "minidlna"
 IMAGE_INSTALL += "miniupnpd"

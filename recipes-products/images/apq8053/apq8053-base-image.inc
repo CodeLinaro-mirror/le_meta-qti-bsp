@@ -1,5 +1,4 @@
 # Rootfs creation.
-require ../../../recipes-ss-mgr/packagegroup/ss-mgr.inc
 require ../../../recipes-audio/audio.inc
 require ../../../recipes-bt/packagegroup/bt.inc
 
@@ -24,7 +23,6 @@ IMAGE_INSTALL += "alsa-lib"
 IMAGE_INSTALL += "alsa-utils"
 IMAGE_INSTALL += "base-files"
 IMAGE_INSTALL += "base-passwd"
-IMAGE_INSTALL += "bluez5"
 IMAGE_INSTALL += "dhcpcd"
 IMAGE_INSTALL += "dnsmasq"
 IMAGE_INSTALL += "ebtables"
@@ -40,9 +38,10 @@ IMAGE_INSTALL += "lib32-libnl"
 IMAGE_INSTALL += "libcutils"
 IMAGE_INSTALL += "liblog"
 IMAGE_INSTALL += "libxml2"
-IMAGE_INSTALL += "loc-stub"
-IMAGE_INSTALL += "loc-pla"
-IMAGE_INSTALL += "loc-hal"
+IMAGE_INSTALL += "${@base_contains('DISTRO_FEATURES','location-services', 'loc-stub', '', d)}"
+IMAGE_INSTALL += "${@base_contains('DISTRO_FEATURES','location-services', 'loc-pla', '', d)}"
+IMAGE_INSTALL += "${@base_contains('DISTRO_FEATURES','location-services', 'loc-hal', '', d)}"
+IMAGE_INSTALL += "${@base_contains('DISTRO_FEATURES','location-services', 'loc-net-iface', '', d)}"
 IMAGE_INSTALL += "start-scripts-find-partitions"
 IMAGE_INSTALL += "start-scripts-firmware-links"
 IMAGE_INSTALL += "system-core-adbd"

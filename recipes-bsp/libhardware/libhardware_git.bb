@@ -32,8 +32,6 @@ do_install_append () {
         install -m 0644 ${S}/include/hardware/audio_alsaops.h -D ${D}${includedir}/hardware/audio_alsaops.h
         install -m 0644 ${S}/include/hardware/audio_effect.h -D ${D}${includedir}/hardware/audio_effect.h
         install -m 0644 ${S}/include/hardware/audio_policy.h -D ${D}${includedir}/hardware/audio_policy.h
-        install -m 0644 ${S}/include/hardware/bluetooth.h -D ${D}${includedir}/hardware/bluetooth.h
-        install -m 0644 ${S}/include/hardware/bt_*.h -D ${D}${includedir}/hardware/
         install -m 0644 ${S}/modules/gralloc/gralloc_priv.h -D ${D}${includedir}/
         install -m 0644 ${S}/include/hardware/sensors.h -D ${D}${includedir}/hardware/sensors.h
 }

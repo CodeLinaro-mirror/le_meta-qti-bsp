@@ -39,6 +39,8 @@ EXTRA_OEMAKE = "${MY_TARGET} TOOLCHAIN_PREFIX='${TARGET_PREFIX}'  LIBGCC='${LIBG
 
 EXTRA_OEMAKE_append = " VERIFIED_BOOT=0 DEFAULT_UNLOCK=true EMMC_BOOT=${emmc_bootloader} APPEND_CMDLINE=${emmc_bootloader}"
 
+EXTRA_OEMAKE_append = " ${@base_contains('DISTRO_FEATURES', 'systemd', 'USE_LE_SYSTEMD=true', '', d)}"
+
 do_install() {
         install -d ${D}/boot
         install build-${MY_TARGET}/*.mbn ${D}/boot
