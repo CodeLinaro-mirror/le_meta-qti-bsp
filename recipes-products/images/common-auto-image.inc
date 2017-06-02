@@ -127,3 +127,6 @@ IMAGE_INSTALL += "sqlite-bin"
 IMAGE_INSTALL += "common-api-test"
 IMAGE_INSTALL += "dlt-daemon-test"
 
+# libcap
+IMAGE_INSTALL += "libcap"
+IMAGE_INSTALL += "libcap-bin"
