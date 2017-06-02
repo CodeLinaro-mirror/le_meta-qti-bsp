@@ -21,6 +21,17 @@ EXTRA_OEMAKE += "CONFIG_PRONTO_WLAN=m \
 
 PACKAGES += "kernel-module-wlan"
 
+python __anonymous () {
+  # Process this recipe as 64-bit if lib64- variant is explicitly specified as the
+  # PREFERRED_PROVIDER for virtual/kernel. This is needed because kernel is forced
+  # to build in 64-bit. So kernel modules should also build for same arch.
+  if d.getVar("PREFERRED_PROVIDER_virtual/kernel", True) == "lib64-linux-quic":
+      d.setVar("TARGET_ARCH", d.getVar('TUNE_ARCH_64', True))
+      d.setVar("TARGET_OS", "linux")
+      # Exclude default toolchain dependencies
+      d.setVar("INHIBIT_DEFAULT_DEPS", "1")
+}
+
 do_compile () {
     unset CFLAGS CPPFLAGS CXXFLAGS LDFLAGS CC CPP LD
     oe_runmake 'MODPATH="${base_libdir}/modules/wlan/prima"' \
@@ -32,21 +43,21 @@ do_compile () {
 }
 
 do_install () {
-	module_do_install
-	install -m 0644 CORE/SVC/external/wlan_nlink_common.h -D ${D}${includedir}/prima/wlan_nlink_common.h
+    module_do_install
+    install -m 0644 CORE/SVC/external/wlan_nlink_common.h -D ${D}${includedir}/prima/wlan_nlink_common.h
 }
 
 # Remove dependency for wrong kernel version
 python split_kernel_module_packages_append() {
         if modules:
-                metapkg = d.getVar('KERNEL_MODULES_META_PACKAGE', True)
-                d.delVar('RDEPENDS_' + metapkg)
-                d.delVar('RDEPENDS_kernel-module-wlan')
+            metapkg = d.getVar('KERNEL_MODULES_META_PACKAGE', True)
+            d.delVar('RDEPENDS_' + metapkg)
+            d.delVar('RDEPENDS_kernel-module-wlan')
 }
 
 do_module_signing() {
     if [ -f ${STAGING_KERNEL_BUILDDIR}/signing_key.priv ]; then
-	${STAGING_KERNEL_DIR}/scripts/sign-file sha512 ${STAGING_KERNEL_BUILDDIR}/signing_key.priv ${STAGING_KERNEL_BUILDDIR}/signing_key.x509 ${PKGDEST}/${PN}/${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/wlan.ko
+        ${STAGING_KERNEL_DIR}/scripts/sign-file sha512 ${STAGING_KERNEL_BUILDDIR}/signing_key.priv ${STAGING_KERNEL_BUILDDIR}/signing_key.x509 ${PKGDEST}/${PN}/${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/wlan.ko
     fi
 }
 
