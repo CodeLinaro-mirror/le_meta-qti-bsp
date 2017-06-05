@@ -43,8 +43,6 @@ SRC_URI[security.sha256sum] = "2174c4c82d24ec91e94949a3d1eb4fac29cc657b3e35c662c
 
 S_SECURITY="${WORKDIR}/security"
 
-export JAVA_HOME="/usr/lib/jvm/java-7-openjdk-amd64"
-
 #######################################
 #  build
 #    - source
@@ -53,19 +51,29 @@ export JAVA_HOME="/usr/lib/jvm/java-7-openjdk-amd64"
 #######################################
 BC_BUILD="${WORKDIR}/build"
 
-
-
 check_java_version() {
 
-    TMP=`java -version 2>&1 | grep -oP "([1-1]{1,}\.)+([2-8]{1,})"`
-    version=`echo ${TMP} | grep -oP "^1\.[1-8]{1,}"`
     valid_version="1.7"
+    ver=`java -version 2>&1 | grep -oP "([1-1]{1,}\.)+([2-8]{1,})"`
+    version=`echo $ver | grep -oP "^1\.[1-8]{1,}"`
 
     if [ "$valid_version" = "$version" ]; then
         echo "Found Java $version"
     else
-        echo "Invalid version $version, Please install Java 1.7"
-        exit 1
+        echo "Checking if Java 1.7 is installed"
+        if [ -d /usr/lib/jvm/java-1.7.0-openjdk-amd64/bin ]; then
+            echo "Java 1.7 is present using it temporarily"
+            export PATH=/usr/lib/jvm/java-1.7.0-openjdk-amd64/bin:$PATH
+        fi
+
+        ver=`java -version 2>&1 | grep -oP "([1-1]{1,}\.)+([2-8]{1,})"`
+        version=`echo $ver | grep -oP "^1\.[1-8]{1,}"`
+        if [ "$valid_version" = "$version" ]; then
+             echo "Found valid Java $version"
+        else
+             echo "Invalid version $version, Please install Java 1.7"
+             exit 1
+        fi
     fi
 }
 

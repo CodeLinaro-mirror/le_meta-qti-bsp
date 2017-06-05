@@ -58,6 +58,7 @@ IMAGE_INSTALL += "minidlna"
 IMAGE_INSTALL += "miniupnpd"
 IMAGE_INSTALL += "mtd-utils-ubifs"
 IMAGE_INSTALL += "openssl"
+IMAGE_INSTALL += "open-avb"
 IMAGE_INSTALL += "powerapp"
 IMAGE_INSTALL += "powerapp-powerconfig"
 IMAGE_INSTALL += "powerapp-reboot"
@@ -80,6 +81,7 @@ IMAGE_INSTALL += "wireless-tools"
 IMAGE_INSTALL += "sfe"
 IMAGE_INSTALL += "tinyproxy"
 IMAGE_INSTALL += "iputils"
+IMAGE_INSTALL += "ethernet-neutrino-hsic"
 
 # Below packages are open source packages that depend on proprietary packages
 
