@@ -1,0 +1,243 @@
+From 83a927e558de371a984240b76400f7d28763e1bc Mon Sep 17 00:00:00 2001
+From: Wei Li <weili@codeaurora.org>
+Date: Tue, 18 Apr 2017 09:53:17 +0800
+Subject: [PATCH] init: mount rootfs earlier to launch an early user space
+ application
+
+Initialization of initcall level6 driver takes much time.To make user
+space application run earlier, root filesystem could be mounted right
+after initcall level5 driver initialization is completed. An early
+user space application could be launched as soon as root filesystem
+is mounted.
+
+Change-Id: Ib532745d52a98b695a39bd5a4421dfd8804b51c8
+Signed-off-by: Wei Li <weili@codeaurora.org>
+---
+ block/cfq-iosched.c          |  2 +-
+ crypto/crc32c_generic.c      |  2 +-
+ drivers/Makefile             |  2 +-
+ drivers/crypto/msm/ice.c     | 14 +++++++++++++-
+ drivers/mmc/card/block.c     |  2 +-
+ drivers/mmc/host/sdhci-msm.c | 12 +++++++++++-
+ fs/ext4/super.c              |  2 +-
+ fs/jbd2/journal.c            |  2 +-
+ init/do_mounts.c             |  4 ++--
+ init/main.c                  | 23 ++++++++++++++++++++++-
+ 10 files changed, 54 insertions(+), 11 deletions(-)
+
+diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
+index e04a7b8..658dcf9 100644
+--- a/block/cfq-iosched.c
++++ b/block/cfq-iosched.c
+@@ -4808,7 +4808,7 @@ static void __exit cfq_exit(void)
+ 	kmem_cache_destroy(cfq_pool);
+ }
+ 
+-module_init(cfq_init);
++fs_initcall(cfq_init);
+ module_exit(cfq_exit);
+ 
+ MODULE_AUTHOR("Jens Axboe");
+diff --git a/crypto/crc32c_generic.c b/crypto/crc32c_generic.c
+index 4c0a0e2..b71a418 100644
+--- a/crypto/crc32c_generic.c
++++ b/crypto/crc32c_generic.c
+@@ -164,7 +164,7 @@ static void __exit crc32c_mod_fini(void)
+ 	crypto_unregister_shash(&alg);
+ }
+ 
+-module_init(crc32c_mod_init);
++fs_initcall(crc32c_mod_init);
+ module_exit(crc32c_mod_fini);
+ 
+ MODULE_AUTHOR("Clay Haapala <chaapala@cisco.com>");
+diff --git a/drivers/Makefile b/drivers/Makefile
+index eb67aad..ecc06c4 100644
+--- a/drivers/Makefile
++++ b/drivers/Makefile
+@@ -13,6 +13,7 @@ obj-$(CONFIG_GENERIC_PHY)	+= phy/
+ # GPIO must come after pinctrl as gpios may need to mux pins etc
+ obj-$(CONFIG_PINCTRL)		+= pinctrl/
+ obj-y				+= gpio/
++obj-y				+= mmc/
+ obj-y				+= pwm/
+ obj-$(CONFIG_PCI)		+= pci/
+ obj-$(CONFIG_PARISC)		+= parisc/
+@@ -120,7 +121,6 @@ obj-$(CONFIG_EISA)		+= eisa/
+ obj-y				+= lguest/
+ obj-$(CONFIG_CPU_FREQ)		+= cpufreq/
+ obj-$(CONFIG_CPU_IDLE)		+= cpuidle/
+-obj-y				+= mmc/
+ obj-$(CONFIG_MEMSTICK)		+= memstick/
+ obj-y				+= leds/
+ obj-$(CONFIG_SWITCH)		+= switch/
+diff --git a/drivers/crypto/msm/ice.c b/drivers/crypto/msm/ice.c
+index 4002a5b..104b2cd 100644
+--- a/drivers/crypto/msm/ice.c
++++ b/drivers/crypto/msm/ice.c
+@@ -1753,7 +1753,19 @@ static struct platform_driver qcom_ice_driver = {
+ 		.of_match_table = qcom_ice_match,
+ 	},
+ };
+-module_platform_driver(qcom_ice_driver);
++
++static int __init qcom_ice_driver_init(void)
++{
++	return platform_driver_register(&qcom_ice_driver);
++}
++fs_initcall(qcom_ice_driver_init);
++
++static void __exit qcom_ice_driver_exit(void)
++{
++	return platform_driver_unregister(&qcom_ice_driver);
++}
++module_exit(qcom_ice_driver_exit);
++
+ 
+ MODULE_LICENSE("GPL v2");
+ MODULE_DESCRIPTION("QTI Inline Crypto Engine driver");
+diff --git a/drivers/mmc/card/block.c b/drivers/mmc/card/block.c
+index e9f1a19..9c95d22 100644
+--- a/drivers/mmc/card/block.c
++++ b/drivers/mmc/card/block.c
+@@ -4771,7 +4771,7 @@ static void __exit mmc_blk_exit(void)
+ 	unregister_blkdev(MMC_BLOCK_MAJOR, "mmc");
+ }
+ 
+-module_init(mmc_blk_init);
++fs_initcall(mmc_blk_init);
+ module_exit(mmc_blk_exit);
+ 
+ MODULE_LICENSE("GPL");
+diff --git a/drivers/mmc/host/sdhci-msm.c b/drivers/mmc/host/sdhci-msm.c
+index ca72ebf..1a8748e 100644
+--- a/drivers/mmc/host/sdhci-msm.c
++++ b/drivers/mmc/host/sdhci-msm.c
+@@ -5010,7 +5010,17 @@ static struct platform_driver sdhci_msm_driver = {
+ 	},
+ };
+ 
+-module_platform_driver(sdhci_msm_driver);
++static int __init sdhci_msm_driver_init(void)
++{
++	return platform_driver_register(&sdhci_msm_driver);
++}
++fs_initcall(sdhci_msm_driver_init);
++
++static void __exit sdhci_msm_driver_exit(void)
++{
++	platform_driver_unregister(&sdhci_msm_driver);
++}
++module_exit(sdhci_msm_driver_exit);
+ 
+ MODULE_DESCRIPTION("Qualcomm Technologies, Inc. Secure Digital Host Controller Interface driver");
+ MODULE_LICENSE("GPL v2");
+diff --git a/fs/ext4/super.c b/fs/ext4/super.c
+index 6fe8e30..a48bdd4 100644
+--- a/fs/ext4/super.c
++++ b/fs/ext4/super.c
+@@ -5417,5 +5417,5 @@ static void __exit ext4_exit_fs(void)
+ MODULE_AUTHOR("Remy Card, Stephen Tweedie, Andrew Morton, Andreas Dilger, Theodore Ts'o and others");
+ MODULE_DESCRIPTION("Fourth Extended Filesystem");
+ MODULE_LICENSE("GPL");
+-module_init(ext4_init_fs)
++fs_initcall(ext4_init_fs)
+ module_exit(ext4_exit_fs)
+diff --git a/fs/jbd2/journal.c b/fs/jbd2/journal.c
+index c6a499b..a091146 100644
+--- a/fs/jbd2/journal.c
++++ b/fs/jbd2/journal.c
+@@ -2694,6 +2694,6 @@ static void __exit journal_exit(void)
+ }
+ 
+ MODULE_LICENSE("GPL");
+-module_init(journal_init);
++fs_initcall(journal_init);
+ module_exit(journal_exit);
+ 
+diff --git a/init/do_mounts.c b/init/do_mounts.c
+index 1902a1c8..b19c748 100644
+--- a/init/do_mounts.c
++++ b/init/do_mounts.c
+@@ -37,7 +37,7 @@
+ 
+ int __initdata rd_doload;	/* 1 = load RAM disk, 0 = don't load */
+ 
+-int root_mountflags = MS_RDONLY | MS_SILENT;
++int root_mountflags = MS_SILENT;
+ static char * __initdata root_device_name;
+ static char __initdata saved_root_name[64];
+ static int root_wait;
+@@ -589,7 +589,7 @@ void __init prepare_namespace(void)
+ 			saved_root_name);
+ 		while (driver_probe_done() != 0 ||
+ 			(ROOT_DEV = name_to_dev_t(saved_root_name)) == 0)
+-			msleep(100);
++			msleep(20);
+ 		async_synchronize_full();
+ 	}
+ 
+diff --git a/init/main.c b/init/main.c
+index 7d4532b..aa48db3 100644
+--- a/init/main.c
++++ b/init/main.c
+@@ -840,6 +840,9 @@ static char *initcall_level_names[] __initdata = {
+ 	"late",
+ };
+ 
++static char init_prog[128] = "/usr/sbin/early_init";
++static char *init_prog_argv[2] = { init_prog, NULL };
++
+ static void __init do_initcall_level(int level)
+ {
+ 	initcall_t *fn;
+@@ -853,13 +856,22 @@ static void __init do_initcall_level(int level)
+ 
+ 	for (fn = initcall_levels[level]; fn < initcall_levels[level+1]; fn++)
+ 		do_one_initcall(*fn);
++
+ }
+ 
+ static void __init do_initcalls(void)
+ {
+ 	int level;
+ 
+-	for (level = 0; level < ARRAY_SIZE(initcall_levels) - 1; level++)
++	for (level = 0; level < 6; level++)
++		do_initcall_level(level);
++}
++
++static void __init do_initcalls_late(void)
++{
++	int level;
++
++	for (level = 6; level < ARRAY_SIZE(initcall_levels) - 1; level++)
+ 		do_initcall_level(level);
+ }
+ 
+@@ -994,6 +1006,7 @@ static int __ref kernel_init(void *unused)
+ 
+ static noinline void __init kernel_init_freeable(void)
+ {
++	int rc;
+ 	/*
+ 	 * Wait until kthreadd is all set-up.
+ 	 */
+@@ -1044,6 +1057,14 @@ static noinline void __init kernel_init_freeable(void)
+ 		prepare_namespace();
+ 	}
+ 
++	rc = call_usermodehelper(init_prog, init_prog_argv, NULL, 0);
++	if (!rc)
++		pr_info("early_init launched\n");
++	else
++		pr_err("early_init failed\n");
++
++	do_initcalls_late();
++
+ 	/*
+ 	 * Ok, we have completed the initial bootup, and
+ 	 * we're essentially up and running. Get rid of the
+-- 
+1.9.1
+
