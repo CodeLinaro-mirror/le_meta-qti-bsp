@@ -14,6 +14,7 @@ S = "${WORKDIR}/hardware/qcom/audio/"
 PR = "r0"
 
 DEPENDS = "glib-2.0 tinycompress tinyalsa expat system-media libhardware acdbloader surround-sound-3mic"
+DEPENDS_append_apq8098 = " audio-qaf"
 
 EXTRA_OEMAKE = "DEFAULT_INCLUDES= CPPFLAGS="-I. -I${STAGING_KERNEL_BUILDDIR}/usr/include -I${STAGING_INCDIR}/surround_sound_3mic -I${STAGING_INCDIR}/sound_trigger""
 EXTRA_OECONF = "--with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
@@ -47,13 +48,14 @@ EXTRA_OECONF += "AUDIO_FEATURE_ENABLED_MULTI_RECORD=true"
 EXTRA_OECONF += "AUDIO_FEATURE_ENABLED_PROXY_DEVICE=true"
 EXTRA_OECONF += "AUDIO_FEATURE_ENABLED_COMPRESS_INPUT=true"
 EXTRA_OECONF += "AUDIO_FEATURE_ENABLED_HDMI_PASSTHROUGH=true"
-EXTRA_OECONF += "AUDIO_FEATURE_ENABLED_KEEP_ALIVE=false"
+EXTRA_OECONF += "AUDIO_FEATURE_ENABLED_KEEP_ALIVE=true"
 EXTRA_OECONF += "AUDIO_FEATURE_ENABLED_APTX_DECODER=true"
 EXTRA_OECONF += "AUDIO_FEATURE_ENABLED_GEF_SUPPORT=true"
-EXTRA_OECONF += "AUDIO_FEATURE_ENABLED_QAF=true"
+EXTRA_OECONF_append_apq8098 = " AUDIO_FEATURE_ENABLED_QAF=true"
 EXTRA_OECONF_append_apq8098 = " AUDIO_FEATURE_ADSP_HDLR_ENABLED=true"
 EXTRA_OECONF_append_apq8098 = " AUDIO_FEATURE_ENABLED_SPLIT_A2DP=true"
 EXTRA_OECONF_append_apq8098 = " AUDIO_FEATURE_IP_HDLR_ENABLED=true"
+EXTRA_OECONF_append_apq8098 = " AUDIO_FEATURE_ENABLED_AUDIO_HW_LOOPBACK=true"
 
 do_install_append() {
    if [ -d "${WORKDIR}/${BASEMACHINE}" ] && [ $(ls -1  ${WORKDIR}/${BASEMACHINE} | wc -l) -ne 0 ]; then
@@ -61,11 +63,14 @@ do_install_append() {
       install -m 0755 ${WORKDIR}/${BASEMACHINE}/* ${D}${sysconfdir}/
    fi
 
+   #create /data/audio folder
+   install -d ${D}${userfsdatadir}/audio
+
    #Userspace expects hal name to be audio.primary.default
    cd  ${D}/${libdir}/ && ln -s audio_primary_default.so audio.primary.default.so
 }
 
 FILES_${PN}-dbg  = "${libdir}/.debug/*"
-FILES_${PN}      = "${libdir}/*.so ${libdir}/*.so.* ${sysconfdir}/* ${libdir}/pkgconfig/* ${bindir}/*"
+FILES_${PN}      = "${libdir}/*.so ${libdir}/*.so.* ${sysconfdir}/* ${libdir}/pkgconfig/* ${bindir}/* ${userfsdatadir}/*"
 FILES_${PN}-dev  = "${libdir}/*.la ${includedir}"
 INSANE_SKIP_${PN} = "dev-so"

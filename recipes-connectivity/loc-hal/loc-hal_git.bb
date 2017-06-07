@@ -19,6 +19,8 @@ CPPFLAGS += "-I${WORKSPACE}/base/include"
 PACKAGES = "${PN}"
 INHIBIT_PACKAGE_DEBUG_SPLIT = "1"
 FILES_${PN} = "${libdir}/* ${sysconfdir}"
+FILES_${PN} += "/usr/include/*"
+FILES_${PN} += "/usr/include/loc-hal/*"
 # The loc-hal package contains symlinks that trip up insane
 INSANE_SKIP_${PN} = "dev-so"
 
