@@ -1,4 +1,4 @@
-From f50a9f8ffd1321e46220d469282aa6b4f690e822 Mon Sep 17 00:00:00 2001
+From d7df3f00868e02ada953454b21305fd80d74de2f Mon Sep 17 00:00:00 2001
 From: Wei Li <weili@codeaurora.org>
 Date: Thu, 27 Apr 2017 17:00:35 +0800
 Subject: [PATCH] automotive: add boot marker
@@ -8,20 +8,22 @@ Add boot marker for boot KPI measurement
 Change-Id: Ib3d1936ad626802d84bb0651d7e34c06a2eab7c1
 Signed-off-by: Wei Li <weili@codeaurora.org>
 ---
- drivers/gpu/drm/msm/msm_drv.c                   |  7 +++++++
- drivers/media/platform/msm/vidc/msm_v4l2_vidc.c |  3 +++
- drivers/mmc/card/block.c                        |  3 +++
- drivers/net/can/spi/rh850.c                     | 19 ++++++++++++++++++-
- drivers/pci/host/pci-msm.c                      |  6 ++++++
- drivers/scsi/scsi.c                             |  3 +++
- drivers/spi/spi_qsd.c                           | 19 ++++++++++++++++++-
- drivers/usb/dwc3/dwc3-msm.c                     |  8 ++++++++
- init/do_mounts.c                                |  6 +++++-
- init/main.c                                     |  2 ++
- net/ipv4/af_inet.c                              |  3 +++
- sound/soc/msm/apq8096-auto.c                    |  3 +++
- sound/soc/msm/qdsp6v2/msm-dai-q6-v2.c           |  3 +++
- 13 files changed, 82 insertions(+), 3 deletions(-)
+ drivers/gpu/drm/msm/msm_drv.c                         |  7 +++++++
+ drivers/media/platform/msm/ais/common/cam_smmu_api.c  |  2 ++
+ .../msm/ais/msm_buf_mgr/msm_generic_buf_mgr.c         |  2 ++
+ drivers/media/platform/msm/vidc/msm_v4l2_vidc.c       |  3 +++
+ drivers/mmc/card/block.c                              |  3 +++
+ drivers/net/can/spi/rh850.c                           | 19 ++++++++++++++++++-
+ drivers/pci/host/pci-msm.c                            |  6 ++++++
+ drivers/scsi/scsi.c                                   |  3 +++
+ drivers/spi/spi_qsd.c                                 | 19 ++++++++++++++++++-
+ drivers/usb/dwc3/dwc3-msm.c                           |  8 ++++++++
+ init/do_mounts.c                                      |  6 +++++-
+ init/main.c                                           |  2 ++
+ net/ipv4/af_inet.c                                    |  3 +++
+ sound/soc/msm/apq8096-auto.c                          |  3 +++
+ sound/soc/msm/qdsp6v2/msm-dai-q6-v2.c                 |  3 +++
+ 15 files changed, 86 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/gpu/drm/msm/msm_drv.c b/drivers/gpu/drm/msm/msm_drv.c
 index 276329b..b3423f4 100644
@@ -55,8 +57,48 @@ index 276329b..b3423f4 100644
  	return 0;
  
  fail:
+diff --git a/drivers/media/platform/msm/ais/common/cam_smmu_api.c b/drivers/media/platform/msm/ais/common/cam_smmu_api.c
+index 33b864c..1b8dbb3 100644
+--- a/drivers/media/platform/msm/ais/common/cam_smmu_api.c
++++ b/drivers/media/platform/msm/ais/common/cam_smmu_api.c
+@@ -25,6 +25,7 @@
+ #include <linux/msm_dma_iommu_mapping.h>
+ #include <linux/workqueue.h>
+ #include "cam_smmu_api.h"
++#include <soc/qcom/boot_stats.h>
+ 
+ #define SCRATCH_ALLOC_START SZ_128K
+ #define SCRATCH_ALLOC_END   SZ_256M
+@@ -1664,6 +1665,7 @@ static struct platform_driver cam_smmu_driver = {
+ 
+ static int __init cam_smmu_init_module(void)
+ {
++	place_marker("M - DRIVER Camera Init");
+ 	return platform_driver_register(&cam_smmu_driver);
+ }
+ 
+diff --git a/drivers/media/platform/msm/ais/msm_buf_mgr/msm_generic_buf_mgr.c b/drivers/media/platform/msm/ais/msm_buf_mgr/msm_generic_buf_mgr.c
+index 6e491f8..d078184 100644
+--- a/drivers/media/platform/msm/ais/msm_buf_mgr/msm_generic_buf_mgr.c
++++ b/drivers/media/platform/msm/ais/msm_buf_mgr/msm_generic_buf_mgr.c
+@@ -13,6 +13,7 @@
+ #define pr_fmt(fmt) "CAM-BUFMGR %s:%d " fmt, __func__, __LINE__
+ 
+ #include "msm_generic_buf_mgr.h"
++#include <soc/qcom/boot_stats.h>
+ 
+ static struct msm_buf_mngr_device *msm_buf_mngr_dev;
+ 
+@@ -879,6 +880,7 @@ static int32_t __init msm_buf_mngr_init(void)
+ 	}
+ 
+ end:
++	place_marker("M - DRIVER Camera Ready");
+ 	return rc;
+ }
+ 
 diff --git a/drivers/media/platform/msm/vidc/msm_v4l2_vidc.c b/drivers/media/platform/msm/vidc/msm_v4l2_vidc.c
-index a632797..3587c66 100644
+index a8dc1d0..cc939f6 100644
 --- a/drivers/media/platform/msm/vidc/msm_v4l2_vidc.c
 +++ b/drivers/media/platform/msm/vidc/msm_v4l2_vidc.c
 @@ -31,6 +31,7 @@
@@ -75,7 +117,7 @@ index a632797..3587c66 100644
  	vidc_driver = kzalloc(sizeof(*vidc_driver),
  						GFP_KERNEL);
  	if (!vidc_driver) {
-@@ -770,6 +772,7 @@ static int __init msm_vidc_init(void)
+@@ -772,6 +774,7 @@ static int __init msm_vidc_init(void)
  		vidc_driver = NULL;
  	}
  
