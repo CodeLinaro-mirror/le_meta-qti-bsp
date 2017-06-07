@@ -27,3 +27,6 @@ do_install_append() {
 MASKED_SCRIPTS += " \
   bsp_paths \
   set_core_pattern"
+# Including the file depends on chipset
+INCSUFFIX = "${@base_conditional('MACHINEGROUP', 'auto', 'initscripts_auto', 'none',d)}"
+include ${INCSUFFIX}.inc
