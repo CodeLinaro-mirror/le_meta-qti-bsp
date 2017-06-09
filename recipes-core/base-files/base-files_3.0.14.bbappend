@@ -6,6 +6,7 @@ SRC_URI_append_mdm9607 +="file://${BASEMACHINE}/fstab"
 SRC_URI_append_8x96auto += "file://${BASEMACHINE}/fstab"
 SRC_URI_append_8x96autofusion += "file://${BASEMACHINE}/fstab"
 SRC_URI_append_8x96autogvmquin += "file://${BASEMACHINE}/fstab"
+SRC_URI_append_8x96autogvmquin44 += "file://${BASEMACHINE}/fstab"
 SRC_URI_append_8x96autogvmred += "file://${BASEMACHINE}/fstab"
 SRC_URI_append_8x96autonapier +="file://${BASEMACHINE}/fstab"
 
@@ -15,7 +16,7 @@ dirs755 += "/media/cf /media/net /media/ram \
 dirs755_append_apq8009 +="/persist"
 
 do_install_append(){
-  export REGEXP="^(8x96autogvmquin|8x96autogvmred)$"
+  export REGEXP="^(8x96autogvmquin|8x96autogvmquin44|8x96autogvmred)$"
   if [ "${MACHINEGROUP}" == "auto" ] || [[ "${BASEMACHINE}" =~ $REGEXP ]]; then
     install -m 755 -o diag -g diag -d ${D}/media/card
     ln -s /media/card ${D}/sdcard
