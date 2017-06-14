@@ -56,6 +56,9 @@ do_install () {
     #Disbale Runtime PM to fix PCIE AER issue
     sed -i -e 's/^gRuntimePM=1/gRuntimePM=0/g' ${S}/firmware_bin/WCNSS_qcom_cfg.ini
 
+    #Change Default Power Save Offload configuration
+    sed -i -e 's/^gEnablePowerSaveOffload=2/gEnablePowerSaveOffload=1/g' ${S}/firmware_bin/WCNSS_qcom_cfg.ini
+
     install -d ${D}/lib/firmware/wlan/qca_cld
     install -D -m 0644 ${S}/firmware_bin/WCNSS_qcom_cfg.ini ${D}/lib/firmware/wlan/qca_cld/
     install -D -m 0644 ${S}/firmware_bin/WCNSS_qcom_cfg.ini ${D}/lib/firmware/wlan/qcom_cfg.ini
