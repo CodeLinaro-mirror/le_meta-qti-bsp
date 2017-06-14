@@ -11,6 +11,10 @@ B = "${WORKDIR}/external/strongswan"
 PV = "5.5.2"
 PR = "r0"
 
-SYSTEMD_SERVICE_${PN} = "${BPN}-swanctl.service ${BPN}.service"
+do_install_append() {
+  rm -f ${D}/lib/systemd/system/strongswan.service
+}
+
+SYSTEMD_SERVICE_${PN} = "${BPN}-swanctl.service"
 
 FILES_{PN} += "/lib/systemd/system/strongswan-swanctl.service"
