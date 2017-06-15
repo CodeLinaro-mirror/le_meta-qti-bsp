@@ -49,7 +49,7 @@ SRC_DIR   =  "${WORKSPACE}/kernel/msm-3.18"
 S         =  "${WORKDIR}/kernel/msm-3.18"
 GITVER    =  "${@base_get_metadata_git_revision('${SRC_DIR}',d)}"
 PV = "git"
-PR = "r5"
+PR = "${@base_conditional('PRODUCT', 'psm', 'r5-psm', 'r5', d)}"
 
 DEPENDS += "dtbtool-native mkbootimg-native"
 DEPENDS_apq8096 += "mkbootimg-native dtc-native"
@@ -149,17 +149,11 @@ do_shared_workdir () {
         cp ${STAGING_KERNEL_DIR}/scripts/gen_initramfs_list.sh $kerneldir/scripts/
 
         # Make vmlinux available as soon as possible
-        if [ ${PERF_BUILD} == "1" ]; then
-		install -d ${STAGING_DIR_TARGET}-perf/${KERNEL_IMAGEDEST}
-	        install -m 0644 ${KERNEL_OUTPUT} ${STAGING_DIR_TARGET}-perf/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}
-	        install -m 0644 vmlinux ${STAGING_DIR_TARGET}-perf/${KERNEL_IMAGEDEST}/vmlinux-${KERNEL_VERSION}
-	        install -m 0644 vmlinux ${STAGING_DIR_TARGET}-perf/${KERNEL_IMAGEDEST}/vmlinux
-	else
-	        install -d ${STAGING_DIR_TARGET}/${KERNEL_IMAGEDEST}
-	        install -m 0644 ${KERNEL_OUTPUT} ${STAGING_DIR_TARGET}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}
-	        install -m 0644 vmlinux ${STAGING_DIR_TARGET}/${KERNEL_IMAGEDEST}/vmlinux-${KERNEL_VERSION}
-	        install -m 0644 vmlinux ${STAGING_DIR_TARGET}/${KERNEL_IMAGEDEST}/vmlinux
-	fi
+        VMLINUX_DIR=${@base_conditional('PERF_BUILD', '1', '${STAGING_DIR_TARGET}-perf', base_conditional('PRODUCT', 'psm', '${STAGING_DIR_TARGET}-psm', '${STAGING_DIR_TARGET}', d), d)}
+        install -d ${VMLINUX_DIR}/${KERNEL_IMAGEDEST}
+        install -m 0644 ${KERNEL_OUTPUT} ${VMLINUX_DIR}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}
+        install -m 0644 vmlinux ${VMLINUX_DIR}/${KERNEL_IMAGEDEST}/vmlinux-${KERNEL_VERSION}
+        install -m 0644 vmlinux ${VMLINUX_DIR}/${KERNEL_IMAGEDEST}/vmlinux
 }
 
 do_install_append() {
@@ -210,5 +204,24 @@ do_deploy () {
         --base ${KERNEL_BASE} \
         --ramdisk_offset 0x0 \
         ${extra_mkbootimg_params} --output ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img
+
+    # Make 2K bootimage
+    if [ "${MACHINE}" == "mdm9607" ]; then
+
+        if [ ${qcom_check} == "qcom" ]; then
+            cat ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} ${B}/arch/${ARCH}/boot/dts/${d}.dtb > ${B}/arch/${ARCH}/boot/dts/qcom/dtb-${KERNEL_IMAGETYPE}-${KERNEL_VERSION}-${targets}
+            ${STAGING_BINDIR_NATIVE}/dtbtool ${B}/arch/${ARCH}/boot/dts/qcom/ -s ${PAGE_SIZE-2K} -o ${D}/${KERNEL_IMAGEDEST}/masterDTB -p ${B}/scripts/dtc/ -v
+        else
+            cat ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} ${B}/arch/${ARCH}/boot/dts/${d}.dtb > ${B}/arch/${ARCH}/boot/dts/dtb-${KERNEL_IMAGETYPE}-${KERNEL_VERSION}-${targets}
+            ${STAGING_BINDIR_NATIVE}/dtbtool ${B}/arch/${ARCH}/boot/dts/ -s ${PAGE_SIZE_2K} -o ${D}/${KERNEL_IMAGEDEST}/masterDTB -p ${B}/scripts/dtc/ -v
+        fi
+        ${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} \
+            --ramdisk /dev/null \
+            --cmdline "${KERNEL_CMD_PARAMS}" \
+            --pagesize ${PAGE_SIZE_2K} \
+            --base ${KERNEL_BASE} \
+            --ramdisk_offset 0x0 \
+            ${extra_mkbootimg_params} --output ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot-2K.img
+    fi
 }
 
