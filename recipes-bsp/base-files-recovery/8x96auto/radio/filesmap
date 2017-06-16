@@ -34,14 +34,14 @@ tz.mbn                  /dev/disk/by-partlabel/tz
 rpm.mbn                 /dev/disk/by-partlabel/rpm
 emmc_appsboot.mbn       /dev/disk/by-partlabel/aboot
 hyp.mbn                 /dev/disk/by-partlabel/hyp
-pmic.mbn                /dev/disk/by-partlabel/pmic
+pmic.elf                /dev/disk/by-partlabel/pmic
 cmnlib.mbn              /dev/disk/by-partlabel/cmnlib
 cmnlib64.mbn            /dev/disk/by-partlabel/cmnlib64
 keymaster.mbn           /dev/disk/by-partlabel/keymaster
 xbl.elf                 /dev/disk/by-partlabel/xbl
 lksecapp.mbn            /dev/disk/by-partlabel/lksecapp
 devcfg_auto.mbn         /dev/disk/by-partlabel/devcfg
-adspso.mbn              /dev/disk/by-partlabel/dsp
+adspso.bin              /dev/disk/by-partlabel/dsp
 
 # filename + .bak       backup partition
 
@@ -50,7 +50,7 @@ tz.mbn.bak              /dev/disk/by-partlabel/tzbak
 rpm.mbn.bak             /dev/disk/by-partlabel/rpmbak
 emmc_appsboot.mbn.bak   /dev/disk/by-partlabel/abootbak
 hyp.mbn.bak             /dev/disk/by-partlabel/hypbak
-pmic.mbn.bak            /dev/disk/by-partlabel/pmicbak
+pmic.elf.bak            /dev/disk/by-partlabel/pmicbak
 cmnlib.mbn.bak          /dev/disk/by-partlabel/cmnlibbak
 cmnlib64.mbn.bak        /dev/disk/by-partlabel/cmnlib64bak
 keymaster.mbn.bak       /dev/disk/by-partlabel/keymasterbak
