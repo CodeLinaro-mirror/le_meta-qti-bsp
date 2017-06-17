@@ -1,0 +1,8 @@
+111c111
+<     # install_routes = yes
+---
+>     install_routes = no
+114c114
+<     # install_virtual_ip = yes
+---
+>     install_virtual_ip = no
