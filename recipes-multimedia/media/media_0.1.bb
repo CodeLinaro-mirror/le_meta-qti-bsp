@@ -8,12 +8,11 @@ SRC_URI = "file://hardware/qcom/media/"
 S = "${WORKDIR}/hardware/qcom/media"
 
 PR = "r1"
-
 DEPENDS = "virtual/kernel"
 DEPENDS += "glib-2.0"
 DEPENDS += "virtual/libc"
 DEPENDS += "libcutils liblog liblog-native system-core"
-#DEPENDS += "adreno"
+DEPENDS += "weston"
 #RDEPENDS_{PN} = "mm-video-prop"
 #INSANE_SKIP = 1
 
@@ -38,13 +37,21 @@ EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96quinhyp', ' --enable-
 EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96redhyp', ' --enable-target-hypervisor=yes', '', d)} "
 
 CPPFLAGS += "-I${STAGING_INCDIR} \
+             -I${STAGING_INCDIR}/drm \
+             -I${STAGING_INCDIR}/EGL \
+             -I${STAGING_INCDIR}/GLES2 \
              -I${STAGING_INCDIR}/glib-2.0 \
              -I${STAGING_LIBDIR}/glib-2.0/include \
+             -I${STAGING_LIBDIR}/glib-2.0/glib \
              -I${STAGING_INCDIR}/c++ \
              -I${STAGING_INCDIR}/c++/${TARGET_SYS}"
 CPPFLAGS += "-include stdint.h"
 
 LDFLAGS += "-lglib-2.0"
+LDFLAGS += "-lgbm"
+LDFLAGS += "-ldrm"
+LDFLAGS += "-lwayland-client"
+LDFLAGS += "-lEGL"
 
 FILES_${PN}-dev = "\
     ${includedir}/* \
