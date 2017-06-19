@@ -1,4 +1,4 @@
-inherit autotools pkgconfig update-rc.d
+inherit autotools pkgconfig update-rc.d systemd
 
 DESCRIPTION = "Android IPC utilities"
 HOMEPAGE = "http://developer.android.com/"
@@ -13,10 +13,13 @@ DEPENDS = "liblog libcutils libhardware libselinux system-core glib-2.0"
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI   = "file://frameworks/native"
 SRC_URI   += "file://servicemanager.sh"
+SRC_URI   += "file://servicemanager.service"
 
 S = "${WORKDIR}/frameworks/native"
 
 INITSCRIPT_NAME = "servicemanager.sh"
+SYSTEMD_SERVICE_${PN} = " servicemanager.service "
+SYSTEMD_AUTO_ENABLE_${pn} = "enable"
 
 EXTRA_OECONF = " --with-core-includes=${WORKSPACE}/system/core/include --with-glib"
 
@@ -24,6 +27,10 @@ CFLAGS += "-I${STAGING_INCDIR}/libselinux"
 
 do_install_append() {
     install -m 0755 ${WORKDIR}/servicemanager.sh -D ${D}/${sysconfdir}/init.d/servicemanager.sh
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
+        install -d ${D}${systemd_unitdir}/system/
+        install -m 0644 ${WORKDIR}/servicemanager.service -D ${D}${systemd_unitdir}/system/servicemanager.service
+    fi
 }
 
 pkg_postinst_${PN} () {
@@ -45,4 +52,6 @@ FILES_${PN}-libbinder-static = "${libdir}/libbinder.a"
 FILES_${PN}-libui-dbg    = "${libdir}/.debug/libui.*"
 FILES_${PN}-libui        = "${libdir}/libui.so.*"
 FILES_${PN}-libbui-dev    = "${libdir}/libui.so ${libdir}/libui.la ${includedir}"
+
+FILES_${PN} += "${systemd_unitdir}/system/"
 

@@ -1,4 +1,4 @@
-inherit androidmk deploy update-rc.d
+inherit androidmk deploy update-rc.d systemd
 
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
@@ -8,8 +8,11 @@ FILESPATH =+ "${WORKSPACE}:"
 SRC_URI = "file://telephony/ril/"
 SRC_URI += "file://ril-0001-RIL-Add-support-for-building-Android-RIL-for-non-And.patch"
 SRC_URI += "file://start_rild"
+SRC_URI += "file://rild.service"
 
 FILES_${PN} += "/etc/init.d/*"
+FILES_${PN} += "${systemd_unitdir}/system/*"
+INSANE_SKIP_${PN} += "installed-vs-shipped"
 
 SRC_DIR = "${WORKSPACE}/telephony/ril"
 
@@ -32,6 +35,9 @@ do_compile_prepend() {
 	rm -rf ${S}/.pc
 }
 
+SYSTEMD_SERVICE_${PN} = " rild.service "
+SYSTEMD_AUTO_ENABLE_${pn} = "enable"
+
 do_install_append() {
 	install -d ${D}${includedir}/telephony
 	install -m 0644 ${S}/include/telephony/*.h -D ${D}${includedir}/telephony/
@@ -39,4 +45,10 @@ do_install_append() {
 	install -m 0644 ${S}/librilutils/proto/sap-api.pb.h -D \
 		${D}${includedir}/hardware/ril/librilutils/proto/sap-api.pb.h
 	install -m 0755 ${WORKDIR}/start_rild -D ${D}${sysconfdir}/init.d/${INITSCRIPT_NAME}
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
+        install -d ${D}${bindir}
+        install -m 0755 ${WORKDIR}/start_rild -D ${D}${bindir}/start_rild
+        install -d ${D}${systemd_unitdir}/system/
+        install -m 0644 ${WORKDIR}/rild.service -D ${D}${systemd_unitdir}/system/rild.service
+    fi
 }
