@@ -10,6 +10,15 @@ COMPATIBLE_MACHINE = "(mdm9607|mdm9650|apq8009|apq8096|apq8053|apq8017|msm8909w|
 KERNEL_IMAGETYPE ?= "zImage"
 
 python __anonymous () {
+  # Process this recipe as 64-bit if lib64- variant is explicitly specified as the
+  # PREFERRED_PROVIDER for virtual/kernel. This is needed to build kernel in 64-bit
+  # even when default tool chain set to build rest of the userspace in 32-bit.
+  if d.getVar("PREFERRED_PROVIDER_virtual/kernel", True) == "lib64-linux-quic":
+      d.setVar("PN", "lib64-" + d.getVar("PN", True))
+      d.setVar("ARCH", "${@map_kernel_arch(d.getVar('TUNE_ARCH_64', True), d)}")
+      d.setVar("TARGET_ARCH", d.getVar('TUNE_ARCH_64', True))
+      d.setVar("TARGET_OS", "linux")
+
   if (d.getVar('PERF_BUILD', True) == '1'):
       imgtype = d.getVar("KERNEL_PERF_IMAGETYPE", True)
       if imgtype:
@@ -53,6 +62,12 @@ PR = "${@base_conditional('PRODUCT', 'psm', 'r5-psm', 'r5', d)}"
 
 DEPENDS += "dtbtool-native mkbootimg-native"
 DEPENDS_apq8096 += "mkbootimg-native dtc-native"
+
+# Force dependencies on 64-bit toolchain when building 64-bit.
+DEPENDS_remove_pn-lib64-linux-quic = "virtual/${TARGET_PREFIX}binutils"
+DEPENDS_remove_pn-lib64-linux-quic = "virtual/${TARGET_PREFIX}gcc"
+DEPENDS_append_pn-lib64-linux-quic = " lib64-binutils-cross-aarch64 lib64-gcc-cross-aarch64"
+
 PACKAGES = "kernel kernel-base kernel-vmlinux kernel-dev kernel-modules"
 RDEPENDS_kernel-base = ""
 
