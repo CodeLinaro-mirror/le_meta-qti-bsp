@@ -1,5 +1,4 @@
 # Rootfs creation.
-require ../../../recipes-audio/audio.inc
 require ../../../recipes-bt/packagegroup/bt.inc
 
 DEPENDS_append += "lib32-lk"
@@ -19,8 +18,6 @@ IMAGE_INSTALL += "start-scripts-find-partitions"
 IMAGE_INSTALL += "start-scripts-misc-daemon"
 
 # The MSM Linux minimal boot image files.
-IMAGE_INSTALL += "alsa-lib"
-IMAGE_INSTALL += "alsa-utils"
 IMAGE_INSTALL += "base-files"
 IMAGE_INSTALL += "base-passwd"
 IMAGE_INSTALL += "dhcpcd"
@@ -31,17 +28,12 @@ IMAGE_INSTALL += "native-frameworks"
 DEPENDS += "gdb-cross-aarch64"
 
 IMAGE_INSTALL += "glib-2.0"
-IMAGE_INSTALL += "init-audio"
 IMAGE_INSTALL += "iproute2"
 IMAGE_INSTALL += "iptables"
 IMAGE_INSTALL += "lib32-libnl"
 IMAGE_INSTALL += "libcutils"
 IMAGE_INSTALL += "liblog"
 IMAGE_INSTALL += "libxml2"
-IMAGE_INSTALL += "${@base_contains('DISTRO_FEATURES','location-services', 'loc-stub', '', d)}"
-IMAGE_INSTALL += "${@base_contains('DISTRO_FEATURES','location-services', 'loc-pla', '', d)}"
-IMAGE_INSTALL += "${@base_contains('DISTRO_FEATURES','location-services', 'loc-hal', '', d)}"
-IMAGE_INSTALL += "${@base_contains('DISTRO_FEATURES','location-services', 'loc-net-iface', '', d)}"
 IMAGE_INSTALL += "start-scripts-find-partitions"
 IMAGE_INSTALL += "start-scripts-firmware-links"
 IMAGE_INSTALL += "system-core-adbd"
@@ -74,6 +66,13 @@ IMAGE_INSTALL += "lib32-cairo"
 
 IMAGE_INSTALL += "libpagemap"
 IMAGE_INSTALL += "procrank"
+
+IMAGE_INSTALL += "libuv"
+IMAGE_INSTALL += "libwebsockets"
+IMAGE_INSTALL += "ipmon"
+IMAGE_INSTALL += "discovery"
+IMAGE_INSTALL += "rtsp-proxy"
+IMAGE_INSTALL += "lib32-ipc-webserver"
 
 # Below is to generate sparse ext4 system image (OE by default supports raw ext4 images)
 SELINUX_FILE_CONTEXTS = "${IMAGE_ROOTFS}/etc/selinux/mls/contexts/files/file_contexts"

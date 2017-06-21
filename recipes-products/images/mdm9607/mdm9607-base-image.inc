@@ -1,5 +1,4 @@
 # Rootfs creation.
-require ../../../recipes-audio/audio.inc
 require ../../../recipes-bt/packagegroup/bt.inc
 
 DEPENDS_append += "lk"
@@ -49,11 +48,6 @@ IMAGE_INSTALL += "liblog"
 IMAGE_INSTALL += "libstdc++"
 IMAGE_INSTALL += "libxml2"
 IMAGE_INSTALL += "lighttpd"
-IMAGE_INSTALL += "loc-stub"
-IMAGE_INSTALL += "loc-pla"
-IMAGE_INSTALL += "loc-hal"
-IMAGE_INSTALL += "loc-net-iface"
-IMAGE_INSTALL += "libsensors"
 IMAGE_INSTALL += "minidlna"
 IMAGE_INSTALL += "miniupnpd"
 IMAGE_INSTALL += "mtd-utils-ubifs"
@@ -70,7 +64,6 @@ IMAGE_INSTALL += "rtsp-alg"
 IMAGE_INSTALL += "sigma-dut"
 IMAGE_INSTALL += "start-scripts-find-partitions"
 IMAGE_INSTALL += "start-scripts-firmware-links"
-IMAGE_INSTALL += "start-scripts-init-can"
 IMAGE_INSTALL += "system-core-adbd"
 IMAGE_INSTALL += "system-core-usb"
 IMAGE_INSTALL += "system-conf"

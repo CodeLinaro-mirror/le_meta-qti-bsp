@@ -1,5 +1,4 @@
 # Rootfs creation.
-require ../../../recipes-audio/audio.inc
 require ../../../recipes-bt/packagegroup/bt.inc
 
 DEPENDS_append += "lk"
@@ -17,7 +16,6 @@ IMAGE_INSTALL += "avahi-utils"
 IMAGE_INSTALL += "alx"
 IMAGE_INSTALL += "base-files"
 IMAGE_INSTALL += "base-passwd"
-IMAGE_INSTALL += "bluez5"
 IMAGE_INSTALL += "conntrack-tools"
 IMAGE_INSTALL += "data-ipa-cfg-mgr"
 IMAGE_INSTALL += "data-oss"
@@ -25,7 +23,6 @@ IMAGE_INSTALL += "dhcpcd"
 IMAGE_INSTALL += "dnsmasq"
 IMAGE_INSTALL += "ddclient"
 IMAGE_INSTALL += "ebtables"
-IMAGE_INSTALL += "ethernet-neutrino-pcie"
 IMAGE_INSTALL += "ethtool"
 
 IMAGE_INSTALL += "gdbserver"
@@ -49,15 +46,10 @@ IMAGE_INSTALL += "liblog"
 IMAGE_INSTALL += "libstdc++"
 IMAGE_INSTALL += "libxml2"
 IMAGE_INSTALL += "lighttpd"
-IMAGE_INSTALL += "loc-stub"
-IMAGE_INSTALL += "loc-pla"
-IMAGE_INSTALL += "loc-hal"
-IMAGE_INSTALL += "loc-net-iface"
-IMAGE_INSTALL += "libsensors"
 IMAGE_INSTALL += "minidlna"
 IMAGE_INSTALL += "miniupnpd"
 IMAGE_INSTALL += "mtd-utils-ubifs"
-IMAGE_INSTALL += "open-avb"
+
 IMAGE_INSTALL += "openssl"
 IMAGE_INSTALL += "pimd"
 IMAGE_INSTALL += "powerapp"
@@ -82,6 +74,8 @@ IMAGE_INSTALL += "wireless-tools"
 IMAGE_INSTALL += "wpa-supplicant-qcacld"
 IMAGE_INSTALL += "tinyproxy"
 IMAGE_INSTALL += "iputils"
+IMAGE_INSTALL += "alsa-lib"
+
 IMAGE_PREPROCESS_COMMAND += "echo ${MACHINE} >> ${IMAGE_ROOTFS}/target;"
 
 # Below is to generate sparse ext4 system image (OE by default supports raw ext4 images)

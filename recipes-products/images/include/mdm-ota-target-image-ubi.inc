@@ -1,4 +1,11 @@
-DEPENDS += "${@base_contains('PRODUCT','base','machine-image','machine-${PRODUCT}-image',d)}"
+def get_depends(d):
+    if d.getVar('PRODUCT', True) == 'robot-rome':
+        return  "machine-robot-image"
+    else:
+        return  "${@base_contains('PRODUCT','base','machine-image','machine-${PRODUCT}-image',d)}"
+
+DEPENDS  += "${@get_depends(d)}"
+#DEPENDS += "${@base_contains('PRODUCT','base','machine-image','machine-${PRODUCT}-image',d)}"
 
 OTA_TARGET_BASENAME_UBI     = "${MACHINE}-ota-target-image-ubi"
 OTA_TARGET_IMAGE_ROOTFS_UBI = "${IMAGE_ROOTFS}/../${OTA_TARGET_BASENAME_UBI}"

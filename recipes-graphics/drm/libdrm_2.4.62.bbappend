@@ -3,6 +3,6 @@ SRC_URI   = "file://display/libdrm"
 SRCREV = "${AUTOREV}"
 S      = "${WORKDIR}/libdrm"
 
-do_packagedata_append() {
-cp -rf ${S}/libdrm_macros.h ${STAGING_INCDIR}/libdrm/
+do_install_append() {
+cp -rf ${S}/libdrm_macros.h ${D}${includedir}/libdrm/
 }

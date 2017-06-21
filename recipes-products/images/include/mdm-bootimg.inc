@@ -29,6 +29,6 @@ EXTRA_IMAGE_FEATURES += "${@base_contains('DISTRO_FEATURES','ro-rootfs','read-on
 gen_buildprop() {
    mkdir -p ${IMAGE_ROOTFS}/cache
    echo ro.build.version.release=`cat ${IMAGE_ROOTFS}/etc/version ` >> ${IMAGE_ROOTFS}/build.prop
-   echo ro.product.name=${MACHINE}-${PRODUCT} >> ${IMAGE_ROOTFS}/build.prop
+   echo ro.product.name=${BASEMACHINE}-${PRODUCT} >> ${IMAGE_ROOTFS}/build.prop
    echo ${MACHINE} >> ${IMAGE_ROOTFS}/target
 }

@@ -1,5 +1,4 @@
 # Rootfs creation.
-require ../../../recipes-audio/audio.inc
 
 DEPENDS_append += "lib32-lk"
 # The OE-Core minimal boot image files.
@@ -18,13 +17,6 @@ IMAGE_INSTALL += "start-scripts-find-partitions"
 IMAGE_INSTALL += "start-scripts-misc-daemon"
 
 # The MSM Linux minimal boot image files.
-IMAGE_INSTALL += "alsa-lib"
-IMAGE_INSTALL += "alsa-utils"
-
-IMAGE_INSTALL += "loc-stub"
-IMAGE_INSTALL += "loc-pla"
-IMAGE_INSTALL += "loc-hal"
-IMAGE_INSTALL += "loc-net-iface"
 
 IMAGE_INSTALL += "base-files"
 IMAGE_INSTALL += "base-passwd"
