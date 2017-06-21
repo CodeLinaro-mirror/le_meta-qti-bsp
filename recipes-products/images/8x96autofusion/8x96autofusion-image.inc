@@ -14,8 +14,16 @@ IMAGE_INSTALL += "iproute2"
 IMAGE_INSTALL += "multimodule-mgr-oss"
 IMAGE_INSTALL += "strongswan"
 
-IMAGE_INSTALL_remove = "synergy-opensource"
-IMAGE_INSTALL_remove = "bluez5"
+IMAGE_INSTALL_remove += "synergy-opensource"
+IMAGE_INSTALL_remove += "bluez5"
+
+IMAGE_INSTALL_remove += "qtwebengine"
+IMAGE_INSTALL_remove += "qtwebengine-qmlplugins"
+IMAGE_INSTALL_remove += "qtwebengine-examples"
+IMAGE_INSTALL_remove += "qtwebsockets"
+IMAGE_INSTALL_remove += "qtwebchannel"
+
+
 
 IMAGE_ROOTFS_SIZE = "2097152"
 IMAGE_ROOTFS_EXTRA_SPACE_append = "${@bb.utils.contains("DISTRO_FEATURES", "systemd", " + 4096", "" ,d)}"

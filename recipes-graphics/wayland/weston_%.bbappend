@@ -88,6 +88,18 @@ do_install_append() {
     cp -r ${S}/sdm_plugin/libsdm_strategy_plugin.so ${D}${libdir}
 }
 
+
+pkg_postinst_${PN} () {
+    if ${@bb.utils.contains('BASEMACHINE', '8x96autofusion', 'true', 'false', d)}; then
+        if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
+            if [ -n "$D" ]; then
+                OPTS="--root=$D"
+            fi
+            systemctl $OPTS mask weston.service
+        fi
+    fi
+}
+
 FILES_${PN} += "${includedir}/sdm_strategy_plugin/*"
 FILES_${PN} += "${libdir}/libsdm_strategy_plugin.so"
 FILES_SOLIBSDEV = ""
