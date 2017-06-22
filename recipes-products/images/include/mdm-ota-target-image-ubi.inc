@@ -1,9 +1,9 @@
-DEPENDS += "${@base_contains('PRODUCT','base','machine-image','machine-${PRODUCT}-image',d)}"
+DEPENDS += "${@base_contains('PRODUCT','base',bb.utils.contains('PRODUCT_SUBTYPE', 'minimal', 'machine-minimal-image', 'machine-image', d),'machine-${PRODUCT}-image',d)}"
 
 OTA_TARGET_BASENAME_UBI     = "${MACHINE}-ota-target-image-ubi"
 OTA_TARGET_IMAGE_ROOTFS_UBI = "${IMAGE_ROOTFS}/../${OTA_TARGET_BASENAME_UBI}"
 OUTPUT_FILE_UBI             = "${DEPLOY_DIR_IMAGE}/${OTA_TARGET_BASENAME_UBI}.zip"
-BASE_IMAGE_ROOTFS_UBI       = "$(echo ${IMAGE_ROOTFS} | sed 's#-recovery##')"
+BASE_IMAGE_ROOTFS_UBI       = "$(echo ${IMAGE_ROOTFS} | awk -v type=${PRODUCT_SUBTYPE} '{ img = type == "minimal" ? "machine-minimal-image" : "machine-image"; sub("machine-recovery-image", img); print $0; }')"
 #OUTPUT_FILE_UBI = "${OTA_TARGET_BASENAME_UBI}.zip"
 
 python do_rootfs_append(){
