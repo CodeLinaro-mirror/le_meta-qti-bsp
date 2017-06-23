@@ -19,6 +19,7 @@ KERNEL_EXTRACONFIGS
 SRC_URI_append += " \
     file://0001-ion-Add-hvenv-driver-for-ion.patch \
     file://0002-ION-Enable-ION-to-work-with-a-carveout-heap.patch \
+    file://0003-amba-skip-clock-calls-on-msm-virtual-platform.patch \
 "
 
 do_deploy_rename () {

@@ -1,0 +1,57 @@
+From af290d10042b62f900e167337ac12034a90311a7 Mon Sep 17 00:00:00 2001
+From: Zhiqiang Tu <ztu@codeaurora.org>
+Date: Fri, 23 Jun 2017 13:13:49 +0800
+Subject: [PATCH] amba: skip clock calls on msm virtual platform
+
+Skip clock calls on msm virtual platform since msm clock drivers
+is initialized after amba.
+
+Change-Id: I58cfad817c0d16db8f9b0676f53afa8e3e3388fb
+Signed-off-by: Zhiqiang Tu <ztu@codeaurora.org>
+---
+ drivers/amba/bus.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/drivers/amba/bus.c b/drivers/amba/bus.c
+index f009936..6cabafc 100644
+--- a/drivers/amba/bus.c
++++ b/drivers/amba/bus.c
+@@ -208,6 +208,11 @@ static int amba_get_enable_pclk(struct amba_device *pcdev)
+ {
+ 	int ret;
+ 
++#ifndef CONFIG_MSM_GVM_QUIN
++	/* The msm-clock driver is not initialized at this time
++	   and so, the clk_get below fails. This clock is only
++	   used to the peripheral ID and hence not required for
++	   quin platforms. So, skip this code below */
+ 	pcdev->pclk = clk_get(&pcdev->dev, "apb_pclk");
+ 	if (IS_ERR(pcdev->pclk))
+ 		return PTR_ERR(pcdev->pclk);
+@@ -215,14 +220,23 @@ static int amba_get_enable_pclk(struct amba_device *pcdev)
+ 	ret = clk_prepare_enable(pcdev->pclk);
+ 	if (ret)
+ 		clk_put(pcdev->pclk);
++#else
++	ret = 0;
++#endif
+ 
+ 	return ret;
+ }
+ 
+ static void amba_put_disable_pclk(struct amba_device *pcdev)
+ {
++#ifndef CONFIG_MSM_GVM_QUIN
++	/* The msm-clock driver is not initialized at this time
++	   and so, the clk_get below fails. This clock is only
++	   used to the peripheral ID and hence not required for
++	   quin platforms. So, skip this code below */
+ 	clk_disable_unprepare(pcdev->pclk);
+ 	clk_put(pcdev->pclk);
++#endif
+ }
+ 
+ /*
+-- 
+1.9.1
+
