@@ -1,0 +1,72 @@
+From 377c77247c9081cb3999d5705b27b510e06e65d0 Mon Sep 17 00:00:00 2001
+From: Zhiqiang Tu <ztu@codeaurora.org>
+Date: Fri, 23 Jun 2017 14:19:57 +0800
+Subject: [PATCH] interrupt workaround for virtual plaform
+
+Change-Id: I48f1b56bae92f7f5abfb58a72ee70444dc73239f
+Signed-off-by: Zhiqiang Tu <ztu@codeaurora.org>
+---
+ drivers/i2c/busses/i2c-msm-v2.c | 5 +++++
+ drivers/net/can/spi/rh850.c     | 6 ++++++
+ drivers/spi/spi_qsd.h           | 5 +++++
+ 3 files changed, 16 insertions(+)
+
+diff --git a/drivers/i2c/busses/i2c-msm-v2.c b/drivers/i2c/busses/i2c-msm-v2.c
+index 7f98d9f..313ffd8 100644
+--- a/drivers/i2c/busses/i2c-msm-v2.c
++++ b/drivers/i2c/busses/i2c-msm-v2.c
+@@ -2566,8 +2566,13 @@ static int i2c_msm_rsrcs_irq_init(struct platform_device *pdev,
+ 		return irq;
+ 	}
+ 
++#ifndef CONFIG_MSM_GVM_QUIN
+ 	ret = request_irq(irq, i2c_msm_qup_isr, IRQF_TRIGGER_HIGH,
+ 						"i2c-msm-v2-irq", ctrl);
++#else
++	ret = request_irq(irq, i2c_msm_qup_isr, IRQF_TRIGGER_HIGH |
++					IRQF_ONESHOT, "i2c-msm-v2-irq", ctrl);
++#endif
+ 	if (ret) {
+ 		dev_err(ctrl->dev, "error request_irq(irq_num:%d ) ret:%d\n",
+ 								irq, ret);
+diff --git a/drivers/net/can/spi/rh850.c b/drivers/net/can/spi/rh850.c
+index a93f979..bd1090f 100644
+--- a/drivers/net/can/spi/rh850.c
++++ b/drivers/net/can/spi/rh850.c
+@@ -1132,9 +1132,15 @@ static int rh850_probe(struct spi_device *spi)
+ 		}
+ 	}
+ 
++#ifndef CONFIG_MSM_GVM_QUIN
+ 	err = request_threaded_irq(spi->irq, NULL, rh850_irq,
+ 				   IRQF_TRIGGER_FALLING | IRQF_ONESHOT,
+ 				   "rh850", priv_data);
++#else
++	err = request_threaded_irq(spi->irq, NULL, rh850_irq,
++			IRQF_TRIGGER_HIGH | IRQF_ONESHOT,
++			"rh850", priv_data);
++#endif
+ 	if (err) {
+ 		dev_err(dev, "Failed to request irq: %d", err);
+ 		goto unregister_candev;
+diff --git a/drivers/spi/spi_qsd.h b/drivers/spi/spi_qsd.h
+index 47d6996..0451b9b 100644
+--- a/drivers/spi/spi_qsd.h
++++ b/drivers/spi/spi_qsd.h
+@@ -470,8 +470,13 @@ static inline int msm_spi_request_irq(struct msm_spi *dd,
+ 	if (dd->irq_in < 0)
+ 		return -EINVAL;
+ 
++#ifndef CONFIG_MSM_GVM_QUIN
+ 	return devm_request_irq(dd->dev, dd->irq_in, msm_spi_qup_irq,
+ 		IRQF_TRIGGER_HIGH, pdev->name, dd);
++#else
++	return devm_request_irq(dd->dev, dd->irq_in, msm_spi_qup_irq,
++		IRQF_TRIGGER_HIGH | IRQF_ONESHOT, pdev->name, dd);
++#endif
+ }
+ 
+ static inline void msm_spi_disable_irqs(struct msm_spi *dd)
+-- 
+1.9.1
+
