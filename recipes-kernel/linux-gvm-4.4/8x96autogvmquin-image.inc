@@ -16,6 +16,11 @@ CONFIG_DEFAULT_SECURITY_SMACK=y
 KERNEL_EXTRACONFIGS
 }
 
+SRC_URI_append += " \
+    file://0001-ion-Add-hvenv-driver-for-ion.patch \
+    file://0002-ION-Enable-ION-to-work-with-a-carveout-heap.patch \
+"
+
 do_deploy_rename () {
     mv ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img ${DEPLOY_DIR_IMAGE}/boot.img
 }

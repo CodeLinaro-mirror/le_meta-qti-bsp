@@ -1,0 +1,750 @@
+From c3adbaadab3d3fdf8ac7d0b1a0d316af37a26a05 Mon Sep 17 00:00:00 2001
+From: Zhiqiang Tu <ztu@codeaurora.org>
+Date: Fri, 23 Jun 2017 09:53:45 +0800
+Subject: [PATCH] ION: Enable ION to work with a carveout heap
+
+Enables ION to use the reserved ION memory
+
+Change-Id: Iab21d1bee6f2193106aaaa4b589d69e87e0f67b9
+Signed-off-by: Zhiqiang Tu <ztu@codeaurora.org>
+---
+ drivers/staging/android/ion/Makefile               |   2 +-
+ drivers/staging/android/ion/ion_carveout_heap.c    |   4 +
+ drivers/staging/android/ion/ion_hvenv_driver.c     | 189 ++++++++++++---------
+ drivers/staging/android/ion/ion_hvenv_driver.h     |  26 +++
+ drivers/staging/android/ion/ion_page_pool.c        |   4 +
+ drivers/staging/android/ion/ion_system_heap.c      |  69 +++++++-
+ .../staging/android/ion/ion_system_secure_heap.c   |   9 +-
+ 7 files changed, 219 insertions(+), 84 deletions(-)
+ create mode 100644 drivers/staging/android/ion/ion_hvenv_driver.h
+
+diff --git a/drivers/staging/android/ion/Makefile b/drivers/staging/android/ion/Makefile
+index 5ce962d..83162d6 100644
+--- a/drivers/staging/android/ion/Makefile
++++ b/drivers/staging/android/ion/Makefile
+@@ -7,7 +7,7 @@ obj-$(CONFIG_ION_TEST) += ion_test.o
+ ifdef CONFIG_COMPAT
+ obj-$(CONFIG_ION) += compat_ion.o
+ endif
+-obj-$(CONFIG_ION_DUMMY) += ion_dummy_driver.o
++obj-$(CONFIG_ION_DUMMY) += ion_hvenv_driver.o
+ obj-$(CONFIG_ION_TEGRA) += tegra/
+ obj-$(CONFIG_ION_MSM) += msm/
+ obj-$(CONFIG_ION_MSM) += ion_system_secure_heap.o
+diff --git a/drivers/staging/android/ion/ion_carveout_heap.c b/drivers/staging/android/ion/ion_carveout_heap.c
+index eab137a..e09caca 100644
+--- a/drivers/staging/android/ion/ion_carveout_heap.c
++++ b/drivers/staging/android/ion/ion_carveout_heap.c
+@@ -155,12 +155,16 @@ struct ion_heap *ion_carveout_heap_create(struct ion_platform_heap *heap_data)
+ 
+ 	struct page *page;
+ 	size_t size;
++#ifndef CONFIG_MSM_GVM_QUIN
+ 	struct device *dev = heap_data->priv;
++#endif
+ 
+ 	page = pfn_to_page(PFN_DOWN(heap_data->base));
+ 	size = heap_data->size;
+ 
++#ifndef CONFIG_MSM_GVM_QUIN
+ 	ion_pages_sync_for_device(dev, page, size, DMA_BIDIRECTIONAL);
++#endif
+ 
+ 	ret = ion_heap_pages_zero(page, size, pgprot_writecombine(PAGE_KERNEL));
+ 	if (ret)
+diff --git a/drivers/staging/android/ion/ion_hvenv_driver.c b/drivers/staging/android/ion/ion_hvenv_driver.c
+index dbd3b4a..d66e716 100644
+--- a/drivers/staging/android/ion/ion_hvenv_driver.c
++++ b/drivers/staging/android/ion/ion_hvenv_driver.c
+@@ -27,35 +27,29 @@
+ #include <linux/genalloc.h>
+ #include "ion.h"
+ #include "ion_priv.h"
++#include "ion_hvenv_driver.h"
++
++#define ION_SYSTEM_HEAP_ID 25
++#define ION_AUDIO_HEAP_ID 28
+ 
+ static struct ion_device *idev;
+ static struct ion_heap **heaps;
+ 
+ static struct ion_platform_heap dummy_heaps[] = {
+-		{
+-			.id	= ION_HEAP_TYPE_SYSTEM,
+-			.type	= ION_HEAP_TYPE_SYSTEM,
+-			.name	= "system",
+-		},
+-		{
+-			.id	= ION_HEAP_TYPE_SYSTEM_CONTIG,
+-			.type	= ION_HEAP_TYPE_SYSTEM_CONTIG,
+-			.name	= "system contig",
+-		},
+-		{
+-			.id	= ION_HEAP_TYPE_CARVEOUT,
+-			.type	= ION_HEAP_TYPE_CARVEOUT,
+-			.name	= "carveout",
+-			.size	= SZ_4M,
+-		},
+-		{
+-			.id	= ION_HEAP_TYPE_CHUNK,
+-			.type	= ION_HEAP_TYPE_CHUNK,
+-			.name	= "chunk",
+-			.size	= SZ_4M,
+-			.align	= SZ_16K,
+-			.priv	= (void *)(SZ_16K),
+-		},
++	{
++		.id	= ION_SYSTEM_HEAP_ID,
++		.type	= ION_HEAP_TYPE_CARVEOUT,
++		.name	= "ion_system_heap",
++		.base	= 0x100000000,
++		.size	= 0x10000000,
++	},
++	{
++		.id	= ION_AUDIO_HEAP_ID,
++		.type	= ION_HEAP_TYPE_CARVEOUT,
++		.name	= "ion_audio_heap",
++		.base	= 0xc8000000,
++		.size	= 0x00400000,
++	},
+ };
+ 
+ static struct ion_platform_data dummy_ion_pdata = {
+@@ -71,7 +65,7 @@ struct ion_carveout_heap {
+ };
+ 
+ /* function derived from ion_carveout_heap.c */
+-ion_phys_addr_t ion_carveout_allocate(struct ion_heap *heap,
++static ion_phys_addr_t hvenv_carveout_allocate(struct ion_heap *heap,
+ 				      unsigned long size,
+ 				      unsigned long align)
+ {
+@@ -86,7 +80,7 @@ ion_phys_addr_t ion_carveout_allocate(struct ion_heap *heap,
+ }
+ 
+ /* function derived from ion_carveout_heap.c */
+-void ion_carveout_free(struct ion_heap *heap, ion_phys_addr_t addr,
++static void hvenv_carveout_free(struct ion_heap *heap, ion_phys_addr_t addr,
+ 		       unsigned long size)
+ {
+ 	struct ion_carveout_heap *carveout_heap =
+@@ -97,12 +91,68 @@ void ion_carveout_free(struct ion_heap *heap, ion_phys_addr_t addr,
+ 	gen_pool_free(carveout_heap->pool, addr, size);
+ }
+ 
++struct page *hvenv_alloc_pages(int flags, unsigned long num_pages)
++{
++	unsigned long pfn;
++
++	pfn = hvenv_alloc_shm_pages(num_pages);
++
++	return pfn_to_page(pfn);
++}
++
++int hvenv_free_pages(struct page *page, unsigned long num_pages)
++{
++	unsigned long pfn;
++
++	pfn = page_to_pfn(page);
++
++	return hvenv_free_shm_pages(pfn, num_pages);
++}
++
++int hvenv_init(void)
++{
++	return 0;
++}
++EXPORT_SYMBOL(hvenv_init);
++
++unsigned long hvenv_alloc_shm_pages(unsigned long num_pages)
++{
++	unsigned long pfn = 0;
++	ion_phys_addr_t paddr;
++	struct ion_heap *heap = heaps[0];
++	unsigned long size = num_pages*PAGE_SIZE;
++
++	paddr = hvenv_carveout_allocate(heap, size, 0);
++
++	if (paddr != ION_CARVEOUT_ALLOCATE_FAIL)
++		pfn = PFN_DOWN(paddr);
++
++	pr_info("%s: size = %ld paddr = 0x%llx pfn = 0x%lx\n",
++	__func__, size, paddr, pfn);
++
++	return pfn;
++}
++EXPORT_SYMBOL(hvenv_alloc_shm_pages);
++
++int hvenv_free_shm_pages(unsigned long pfn, unsigned long num_pages)
++{
++	struct ion_heap *heap = heaps[0];
++	unsigned long size = num_pages*PAGE_SIZE;
++
++	pr_info("%s: pfn = 0x%lx size = %ld\n", __func__, pfn, size);
++
++	hvenv_carveout_free(heap, PFN_PHYS(pfn), size);
++
++	return 0;
++}
++EXPORT_SYMBOL(hvenv_free_shm_pages);
++
+ /* function derived from msm_ion.c */
+-struct ion_client *msm_ion_client_create(const char *name)
++struct ion_client *hvenv_ion_client_create(const char *name)
+ {
+ 	/*
+ 	 * The assumption is that if there is a NULL device, the ion
+-	 * driver has not yet probed.
++	 * driver has not yet initialized.
+ 	 */
+ 	if (idev == NULL)
+ 		return ERR_PTR(-EPROBE_DEFER);
+@@ -112,72 +162,59 @@ struct ion_client *msm_ion_client_create(const char *name)
+ 
+ 	return ion_client_create(idev, name);
+ }
++EXPORT_SYMBOL(hvenv_ion_client_create);
+ 
+ static int __init ion_dummy_init(void)
+ {
+ 	int i, err;
+ 
+ 	idev = ion_device_create(NULL);
++	if (IS_ERR_OR_NULL(idev)) {
++		/*
++		 * set this to the ERR to indicate to the clients
++		 * that Ion failed to initialize.
++		 */
++		err = PTR_ERR(idev);
++		pr_err("%s: ion_device_create failed %d\n",
++			__func__, err);
++		return err;
++	}
++
+ 	heaps = kcalloc(dummy_ion_pdata.nr, sizeof(struct ion_heap *),
+ 			GFP_KERNEL);
+-	if (!heaps)
+-		return -ENOMEM;
+-
+-
+-	/* Allocate a dummy carveout heap */
+-	carveout_ptr = alloc_pages_exact(
+-				dummy_heaps[ION_HEAP_TYPE_CARVEOUT].size,
+-				GFP_KERNEL);
+-	if (carveout_ptr)
+-		dummy_heaps[ION_HEAP_TYPE_CARVEOUT].base =
+-						virt_to_phys(carveout_ptr);
+-	else
+-		pr_err("ion_dummy: Could not allocate carveout\n");
+-
+-	/* Allocate a dummy chunk heap */
+-	chunk_ptr = alloc_pages_exact(
+-				dummy_heaps[ION_HEAP_TYPE_CHUNK].size,
+-				GFP_KERNEL);
+-	if (chunk_ptr)
+-		dummy_heaps[ION_HEAP_TYPE_CHUNK].base = virt_to_phys(chunk_ptr);
+-	else
+-		pr_err("ion_dummy: Could not allocate chunk\n");
++	if (!heaps) {
++		err = -ENOMEM;
++		pr_err("%s: heaps kcalloc failed %d\n",
++			__func__, err);
++		goto err1;
++	}
+ 
+ 	for (i = 0; i < dummy_ion_pdata.nr; i++) {
+ 		struct ion_platform_heap *heap_data = &dummy_ion_pdata.heaps[i];
+ 
+-		if (heap_data->type == ION_HEAP_TYPE_CARVEOUT &&
+-							!heap_data->base)
+-			continue;
+-
+-		if (heap_data->type == ION_HEAP_TYPE_CHUNK && !heap_data->base)
+-			continue;
+-
+ 		heaps[i] = ion_heap_create(heap_data);
+ 		if (IS_ERR_OR_NULL(heaps[i])) {
+ 			err = PTR_ERR(heaps[i]);
+-			goto err;
++			goto err2;
+ 		}
+ 		ion_device_add_heap(idev, heaps[i]);
++
++		pr_info("%s: ion_heap_create id: %d type: %d name: %s\n",
++			__func__, heap_data->id,
++			heap_data->type, heap_data->name);
+ 	}
++
+ 	return 0;
+-err:
++
++err2:
+ 	for (i = 0; i < dummy_ion_pdata.nr; i++) {
+ 		if (heaps[i])
+ 			ion_heap_destroy(heaps[i]);
+ 	}
+ 	kfree(heaps);
++err1:
++	ion_device_destroy(idev);
+ 
+-	if (carveout_ptr) {
+-		free_pages_exact(carveout_ptr,
+-				dummy_heaps[ION_HEAP_TYPE_CARVEOUT].size);
+-		carveout_ptr = NULL;
+-	}
+-	if (chunk_ptr) {
+-		free_pages_exact(chunk_ptr,
+-				dummy_heaps[ION_HEAP_TYPE_CHUNK].size);
+-		chunk_ptr = NULL;
+-	}
+ 	return err;
+ }
+ device_initcall(ion_dummy_init);
+@@ -186,21 +223,11 @@ static void __exit ion_dummy_exit(void)
+ {
+ 	int i;
+ 
+-	ion_device_destroy(idev);
+-
+ 	for (i = 0; i < dummy_ion_pdata.nr; i++)
+ 		ion_heap_destroy(heaps[i]);
+ 	kfree(heaps);
+ 
+-	if (carveout_ptr) {
+-		free_pages_exact(carveout_ptr,
+-				dummy_heaps[ION_HEAP_TYPE_CARVEOUT].size);
+-		carveout_ptr = NULL;
+-	}
+-	if (chunk_ptr) {
+-		free_pages_exact(chunk_ptr,
+-				dummy_heaps[ION_HEAP_TYPE_CHUNK].size);
+-		chunk_ptr = NULL;
+-	}
++	ion_device_destroy(idev);
+ }
+ __exitcall(ion_dummy_exit);
++
+diff --git a/drivers/staging/android/ion/ion_hvenv_driver.h b/drivers/staging/android/ion/ion_hvenv_driver.h
+new file mode 100644
+index 0000000..0ba9097
+--- /dev/null
++++ b/drivers/staging/android/ion/ion_hvenv_driver.h
+@@ -0,0 +1,26 @@
++/* Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 and
++ * only version 2 as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ */
++
++#ifdef CONFIG_ION_DUMMY
++#define CONFIG_ION_HVENV
++#include <linux/mm_types.h>
++
++struct page *hvenv_alloc_pages(int flags, unsigned long num_pages);
++int hvenv_free_pages(struct page *page, unsigned long num_pages);
++struct ion_client *hvenv_ion_client_create(const char *);
++
++int hvenv_init(void);
++unsigned long hvenv_alloc_shm_pages(unsigned long num_pages);
++int hvenv_free_shm_pages(unsigned long pfn, unsigned long num_pages);
++
++#endif
+diff --git a/drivers/staging/android/ion/ion_page_pool.c b/drivers/staging/android/ion/ion_page_pool.c
+index 513d015..174453f 100644
+--- a/drivers/staging/android/ion/ion_page_pool.c
++++ b/drivers/staging/android/ion/ion_page_pool.c
+@@ -34,17 +34,21 @@ static void *ion_page_pool_alloc_pages(struct ion_page_pool *pool)
+ 	if (!page)
+ 		return NULL;
+ 
++#ifndef CONFIG_MSM_GVM_QUIN
+ 	if (pool->gfp_mask & __GFP_ZERO)
+ 		if (msm_ion_heap_high_order_page_zero(pool->dev, page,
+ 						      pool->order))
+ 			goto error_free_pages;
++#endif
+ 
+ 	ion_page_pool_alloc_set_cache_policy(pool, page);
+ 
+ 	return page;
++#ifndef CONFIG_MSM_GVM_QUIN
+ error_free_pages:
+ 	__free_pages(page, pool->order);
+ 	return NULL;
++#endif
+ }
+ 
+ static void ion_page_pool_free_pages(struct ion_page_pool *pool,
+diff --git a/drivers/staging/android/ion/ion_system_heap.c b/drivers/staging/android/ion/ion_system_heap.c
+index 2ad4cc7..e3db481 100644
+--- a/drivers/staging/android/ion/ion_system_heap.c
++++ b/drivers/staging/android/ion/ion_system_heap.c
+@@ -87,9 +87,16 @@ size_t ion_system_heap_secure_page_pool_total(struct ion_heap *heap,
+ 	int vmid, i;
+ 
+ 	sys_heap = container_of(heap, struct ion_system_heap, heap);
++#ifndef CONFIG_MSM_GVM_QUIN
+ 	vmid = get_secure_vmid(vmid_flags);
++#else
++	vmid = 0;
++#endif
++
++#ifndef CONFIG_MSM_GVM_QUIN
+ 	if (!is_secure_vmid_valid(vmid))
+ 		return 0;
++#endif
+ 
+ 	for (i = 0; i < num_orders; i++) {
+ 		pool = sys_heap->secure_pools[vmid][i];
+@@ -107,7 +114,11 @@ static struct page *alloc_buffer_page(struct ion_system_heap *heap,
+ 	bool cached = ion_buffer_cached(buffer);
+ 	struct page *page;
+ 	struct ion_page_pool *pool;
++#ifndef CONFIG_MSM_GVM_QUIN
+ 	int vmid = get_secure_vmid(buffer->flags);
++#else
++	int vmid = 0;
++#endif
+ 	struct device *dev = heap->heap.priv;
+ 
+ 	if (*from_pool) {
+@@ -144,7 +155,11 @@ static void free_buffer_page(struct ion_system_heap *heap,
+ 			     unsigned int order)
+ {
+ 	bool cached = ion_buffer_cached(buffer);
++#ifndef CONFIG_MSM_GVM_QUIN
+ 	int vmid = get_secure_vmid(buffer->flags);
++#else
++	int vmid = 0;
++#endif
+ 
+ 	if (!(buffer->flags & ION_FLAG_POOL_FORCE_ALLOC)) {
+ 		struct ion_page_pool *pool;
+@@ -164,6 +179,7 @@ static void free_buffer_page(struct ion_system_heap *heap,
+ 	}
+ }
+ 
++#ifndef CONFIG_MSM_GVM_QUIN
+ static struct page *alloc_from_secure_pool_order(struct ion_system_heap *heap,
+ 						 struct ion_buffer *buffer,
+ 						 unsigned long order)
+@@ -177,7 +193,9 @@ static struct page *alloc_from_secure_pool_order(struct ion_system_heap *heap,
+ 	pool = heap->secure_pools[vmid][order_to_index(order)];
+ 	return ion_page_pool_alloc_pool_only(pool);
+ }
++#endif
+ 
++#ifndef CONFIG_MSM_GVM_QUIN
+ static struct page *split_page_from_secure_pool(struct ion_system_heap *heap,
+ 						struct ion_buffer *buffer)
+ {
+@@ -221,6 +239,7 @@ got_page:
+ 
+ 	return page;
+ }
++#endif
+ 
+ static struct page_info *alloc_largest_available(struct ion_system_heap *heap,
+ 						 struct ion_buffer *buffer,
+@@ -257,6 +276,7 @@ static struct page_info *alloc_largest_available(struct ion_system_heap *heap,
+ 	return NULL;
+ }
+ 
++#ifndef CONFIG_MSM_GVM_QUIN
+ static struct page_info *alloc_from_pool_preferred(
+ 		struct ion_system_heap *heap, struct ion_buffer *buffer,
+ 		unsigned long size, unsigned int max_order)
+@@ -298,6 +318,7 @@ static struct page_info *alloc_from_pool_preferred(
+ 	kfree(info);
+ 	return alloc_largest_available(heap, buffer, size, max_order);
+ }
++#endif
+ 
+ static unsigned int process_info(struct page_info *info,
+ 				 struct scatterlist *sg,
+@@ -349,7 +370,12 @@ static int ion_system_heap_allocate(struct ion_heap *heap,
+ 	unsigned int max_order = orders[0];
+ 	struct pages_mem data;
+ 	unsigned int sz;
++
++#ifndef CONFIG_MSM_GVM_QUIN
+ 	int vmid = get_secure_vmid(buffer->flags);
++#else
++	int vmid = 0;
++#endif
+ 	struct device *dev = heap->priv;
+ 
+ 	if (align > PAGE_SIZE)
+@@ -363,11 +389,13 @@ static int ion_system_heap_allocate(struct ion_heap *heap,
+ 	INIT_LIST_HEAD(&pages_from_pool);
+ 
+ 	while (size_remaining > 0) {
++#ifndef CONFIG_MSM_GVM_QUIN
+ 		if (is_secure_vmid_valid(vmid))
+ 			info = alloc_from_pool_preferred(
+ 					sys_heap, buffer, size_remaining,
+ 					max_order);
+ 		else
++#endif
+ 			info = alloc_largest_available(
+ 					sys_heap, buffer, size_remaining,
+ 					max_order);
+@@ -388,8 +416,9 @@ static int ion_system_heap_allocate(struct ion_heap *heap,
+ 		max_order = info->order;
+ 		i++;
+ 	}
+-
++#ifndef CONFIG_MSM_GVM_QUIN
+ 	ret = msm_ion_heap_alloc_pages_mem(&data);
++#endif
+ 
+ 	if (ret)
+ 		goto err;
+@@ -441,7 +470,10 @@ static int ion_system_heap_allocate(struct ion_heap *heap,
+ 
+ 	} while (sg);
+ 
++#ifndef CONFIG_MSM_GVM_QUIN
+ 	ret = msm_ion_heap_pages_zero(data.pages, data.size >> PAGE_SHIFT);
++#endif
++
+ 	if (ret) {
+ 		pr_err("Unable to zero pages\n");
+ 		goto err_free_sg2;
+@@ -461,7 +493,10 @@ static int ion_system_heap_allocate(struct ion_heap *heap,
+ 	buffer->priv_virt = table;
+ 	if (nents_sync)
+ 		sg_free_table(&table_sync);
++#ifndef CONFIG_MSM_GVM_QUIN
+ 	msm_ion_heap_free_pages_mem(&data);
++#endif
++
+ 	return 0;
+ 
+ err_free_sg2:
+@@ -481,7 +516,9 @@ err_free_sg:
+ err1:
+ 	kfree(table);
+ err_free_data_pages:
++#ifndef CONFIG_MSM_GVM_QUIN
+ 	msm_ion_heap_free_pages_mem(&data);
++#endif
+ err:
+ 	list_for_each_entry_safe(info, tmp_info, &pages, list) {
+ 		free_buffer_page(sys_heap, buffer, info->page, info->order);
+@@ -504,13 +541,19 @@ void ion_system_heap_free(struct ion_buffer *buffer)
+ 	struct scatterlist *sg;
+ 	LIST_HEAD(pages);
+ 	int i;
++#ifndef CONFIG_MSM_GVM_QUIN
+ 	int vmid = get_secure_vmid(buffer->flags);
+ 	struct device *dev = heap->priv;
++#else
++	int vmid = 0;
++#endif
+ 
+ 	if (!(buffer->private_flags & ION_PRIV_FLAG_SHRINKER_FREE) &&
+ 	    !(buffer->flags & ION_FLAG_POOL_FORCE_ALLOC)) {
++#ifndef CONFIG_MSM_GVM_QUIN
+ 		if (vmid < 0)
+ 			msm_ion_heap_sg_table_zero(dev, table, buffer->size);
++#endif
+ 	} else if (vmid > 0) {
+ 		if (ion_system_secure_heap_unassign_sg(table, vmid))
+ 			return;
+@@ -534,6 +577,7 @@ void ion_system_heap_unmap_dma(struct ion_heap *heap,
+ {
+ }
+ 
++#ifndef CONFIG_MSM_GVM_QUIN
+ static int ion_secure_page_pool_shrink(
+ 		struct ion_system_heap *sys_heap,
+ 		int vmid, int order_idx, int nr_to_scan)
+@@ -596,13 +640,18 @@ out2:
+ 	sg_free_table(&sgt);
+ 	return 0;
+ }
++#endif
+ 
+ static int ion_system_heap_shrink(struct ion_heap *heap, gfp_t gfp_mask,
+ 					int nr_to_scan)
+ {
+ 	struct ion_system_heap *sys_heap;
+ 	int nr_total = 0;
++#ifndef CONFIG_MSM_GVM_QUIN
+ 	int i, j, nr_freed = 0;
++#else
++	int i, nr_freed = 0;
++#endif
+ 	int only_scan = 0;
+ 	struct ion_page_pool *pool;
+ 
+@@ -614,11 +663,13 @@ static int ion_system_heap_shrink(struct ion_heap *heap, gfp_t gfp_mask,
+ 	for (i = 0; i < num_orders; i++) {
+ 		nr_freed = 0;
+ 
++#ifndef CONFIG_MSM_GVM_QUIN
+ 		for (j = 0; j < VMID_LAST; j++) {
+ 			if (is_secure_vmid_valid(j))
+ 				nr_freed += ion_secure_page_pool_shrink(
+ 						sys_heap, j, i, nr_to_scan);
+ 		}
++#endif
+ 
+ 		pool = sys_heap->uncached_pools[i];
+ 		nr_freed += ion_page_pool_shrink(pool, gfp_mask, nr_to_scan);
+@@ -661,7 +712,12 @@ static int ion_system_heap_debug_show(struct ion_heap *heap, struct seq_file *s,
+ 	unsigned long cached_total = 0;
+ 	unsigned long secure_total = 0;
+ 	struct ion_page_pool *pool;
++
++#ifndef CONFIG_MSM_GVM_QUIN
+ 	int i, j;
++#else
++	int i;
++#endif
+ 
+ 	for (i = 0; i < num_orders; i++) {
+ 		pool = sys_heap->uncached_pools[i];
+@@ -704,6 +760,7 @@ static int ion_system_heap_debug_show(struct ion_heap *heap, struct seq_file *s,
+ 			pool->low_count;
+ 	}
+ 
++#ifndef CONFIG_MSM_GVM_QUIN
+ 	for (i = 0; i < num_orders; i++) {
+ 		for (j = 0; j < VMID_LAST; j++) {
+ 			if (!is_secure_vmid_valid(j))
+@@ -729,6 +786,7 @@ static int ion_system_heap_debug_show(struct ion_heap *heap, struct seq_file *s,
+ 					 pool->low_count;
+ 		}
+ 	}
++#endif
+ 
+ 	if (use_seq) {
+ 		seq_puts(s, "--------------------------------------------\n");
+@@ -789,7 +847,9 @@ err_create_pool:
+ struct ion_heap *ion_system_heap_create(struct ion_platform_heap *data)
+ {
+ 	struct ion_system_heap *heap;
++#ifndef CONFIG_MSM_GVM_QUIN
+ 	int i;
++#endif
+ 	int pools_size = sizeof(struct ion_page_pool *) * num_orders;
+ 	struct device *dev = data->priv;
+ 
+@@ -808,6 +868,7 @@ struct ion_heap *ion_system_heap_create(struct ion_platform_heap *data)
+ 	if (!heap->cached_pools)
+ 		goto err_alloc_cached_pools;
+ 
++#ifndef CONFIG_MSM_GVM_QUIN
+ 	for (i = 0; i < VMID_LAST; i++) {
+ 		if (is_secure_vmid_valid(i)) {
+ 			heap->secure_pools[i] = kzalloc(pools_size, GFP_KERNEL);
+@@ -818,6 +879,7 @@ struct ion_heap *ion_system_heap_create(struct ion_platform_heap *data)
+ 				goto err_create_secure_pools;
+ 		}
+ 	}
++#endif
+ 
+ 	if (ion_system_heap_create_pools(dev, heap->uncached_pools))
+ 		goto err_create_uncached_pools;
+@@ -834,6 +896,7 @@ err_create_cached_pools:
+ 	ion_system_heap_destroy_pools(heap->uncached_pools);
+ err_create_uncached_pools:
+ 	kfree(heap->cached_pools);
++#ifndef CONFIG_MSM_GVM_QUIN
+ err_create_secure_pools:
+ 	for (i = 0; i < VMID_LAST; i++) {
+ 		if (heap->secure_pools[i]) {
+@@ -841,6 +904,7 @@ err_create_secure_pools:
+ 			kfree(heap->secure_pools[i]);
+ 		}
+ 	}
++#endif
+ err_alloc_cached_pools:
+ 	kfree(heap->uncached_pools);
+ err_alloc_uncached_pools:
+@@ -853,6 +917,8 @@ void ion_system_heap_destroy(struct ion_heap *heap)
+ 	struct ion_system_heap *sys_heap = container_of(heap,
+ 							struct ion_system_heap,
+ 							heap);
++
++#ifndef CONFIG_MSM_GVM_QUIN
+ 	int i, j;
+ 
+ 	for (i = 0; i < VMID_LAST; i++) {
+@@ -863,6 +929,7 @@ void ion_system_heap_destroy(struct ion_heap *heap)
+ 
+ 		ion_system_heap_destroy_pools(sys_heap->secure_pools[i]);
+ 	}
++#endif
+ 	ion_system_heap_destroy_pools(sys_heap->uncached_pools);
+ 	ion_system_heap_destroy_pools(sys_heap->cached_pools);
+ 	kfree(sys_heap->uncached_pools);
+diff --git a/drivers/staging/android/ion/ion_system_secure_heap.c b/drivers/staging/android/ion/ion_system_secure_heap.c
+index 8038115..b2b9674 100644
+--- a/drivers/staging/android/ion/ion_system_secure_heap.c
++++ b/drivers/staging/android/ion/ion_system_secure_heap.c
+@@ -47,6 +47,7 @@ struct prefetch_info {
+  */
+ #define SHRINK_DELAY 1000
+ 
++#ifndef CONFIG_MSM_GVM_QUIN
+ static bool is_cp_flag_present(unsigned long flags)
+ {
+ 	return flags && (ION_FLAG_CP_TOUCH ||
+@@ -55,6 +56,7 @@ static bool is_cp_flag_present(unsigned long flags)
+ 			ION_FLAG_CP_NON_PIXEL ||
+ 			ION_FLAG_CP_CAMERA);
+ }
++#endif
+ 
+ int ion_system_secure_heap_unassign_sg(struct sg_table *sgt, int source_vmid)
+ {
+@@ -116,12 +118,14 @@ static int ion_system_secure_heap_allocate(struct ion_heap *heap,
+ 						struct ion_system_secure_heap,
+ 						heap);
+ 
++#ifndef CONFIG_MSM_GVM_QUIN
+ 	if (!ion_heap_is_system_secure_heap_type(secure_heap->heap.type) ||
+ 		!is_cp_flag_present(flags)) {
+ 		pr_info("%s: Incorrect heap type or incorrect flags\n",
+ 								__func__);
+ 		return -EINVAL;
+ 	}
++#endif
+ 
+ 	ret = secure_heap->sys_heap->ops->allocate(secure_heap->sys_heap,
+ 						buffer, size, align, flags);
+@@ -236,8 +240,10 @@ static int alloc_prefetch_info(
+ 	if (err)
+ 		return -EFAULT;
+ 
++#ifndef CONFIG_MSM_GVM_QUIN
+ 	if (!is_secure_vmid_valid(get_secure_vmid(vmid)))
+ 		return -EINVAL;
++#endif
+ 
+ 	if (nr_sizes > 0x10)
+ 		return -EINVAL;
+@@ -391,8 +397,9 @@ struct ion_heap *ion_system_secure_heap_create(struct ion_platform_heap *unused)
+ 		return ERR_PTR(-ENOMEM);
+ 	heap->heap.ops = &system_secure_heap_ops;
+ 	heap->heap.type = ION_HEAP_TYPE_SYSTEM_SECURE;
++#ifndef CONFIG_MSM_GVM_QUIN
+ 	heap->sys_heap = get_ion_heap(ION_SYSTEM_HEAP_ID);
+-
++#endif
+ 	heap->destroy_heap = false;
+ 	heap->work_lock = __SPIN_LOCK_UNLOCKED(heap->work_lock);
+ 	INIT_LIST_HEAD(&heap->prefetch_list);
+-- 
+1.9.1
+
