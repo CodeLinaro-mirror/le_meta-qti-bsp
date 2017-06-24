@@ -15,6 +15,7 @@ SRC_URI += " \
              file://0004-udev-Add-rules-for-QTI-MSM8996.patch \
              file://0006-Support-PulseAudio-Client-API-for-Module-Codec-Control.patch \
              file://0007-stream-event-extension.patch \
+             file://0008-Pulseaudio-service-need-to-wait-for-sound-card-ready.patch \
            "
 
 RDEPENDS_pulseaudio-server += "\
