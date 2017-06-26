@@ -1,5 +1,4 @@
 # Rootfs creation.
-require ../../../recipes-bt/packagegroup/bt.inc
 
 DEPENDS_append += "edk2"
 # The OE-Core minimal boot image files.

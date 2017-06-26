@@ -1,5 +1,4 @@
 # Rootfs creation.
-require ../../../recipes-bt/packagegroup/bt.inc
 
 DEPENDS_append += "lib32-lk"
 # The OE-Core minimal boot image files.
@@ -58,7 +57,6 @@ IMAGE_INSTALL += "lib32-display-hal"
 IMAGE_INSTALL += "lib32-live555-qti"
 IMAGE_INSTALL += "lib32-qmmf-support"
 IMAGE_INSTALL += "lib32-qmmf-webserver"
-IMAGE_INSTALL += "lib32-camera"
 IMAGE_INSTALL += "lib32-gtest"
 
 IMAGE_INSTALL += "lib32-qmmf-sdk"

@@ -1,5 +1,4 @@
 # Rootfs creation.
-require ../../../recipes-bt/packagegroup/bt.inc
 
 DEPENDS_append += "lk"
 IMAGE_INSTALL += "packagegroup-core-boot"
@@ -48,7 +47,6 @@ IMAGE_INSTALL += "libxml2"
 IMAGE_INSTALL += "lighttpd"
 IMAGE_INSTALL += "minidlna"
 IMAGE_INSTALL += "miniupnpd"
-IMAGE_INSTALL += "mtd-utils-ubifs"
 
 IMAGE_INSTALL += "openssl"
 IMAGE_INSTALL += "pimd"

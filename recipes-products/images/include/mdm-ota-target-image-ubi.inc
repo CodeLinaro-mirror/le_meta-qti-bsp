@@ -78,6 +78,9 @@ if [[ "${DISTRO_FEATURES}" =~ "selinux" ]]; then
     cp ${IMAGE_ROOTFS}/file_contexts ${OTA_TARGET_IMAGE_ROOTFS_UBI}/BOOT/RAMDISK/.
     #set selinux_fc
     echo selinux_fc=BOOT/RAMDISK/file_contexts >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
+    #set use_set_metadata to 1 so that updater-script
+    #will have rules to apply selabels
+    echo use_set_metadata=1 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
 fi
 
 # copy contents of META folder

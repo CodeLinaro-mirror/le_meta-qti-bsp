@@ -10,7 +10,6 @@ IMAGE_INSTALL += "reboot-daemon"
 IMAGE_INSTALL += "chrony"
 IMAGE_INSTALL += "chronyc"
 
-IMAGE_INSTALL += "rb-camera"
 IMAGE_INSTALL += "openssh"
 IMAGE_INSTALL += "${@base_conditional('PRODUCT','robot-rome', 'qcacld-hl', '', d)}"
 IMAGE_INSTALL += "${@base_conditional('PRODUCT','robot-rome', 'iw', '', d)}"

@@ -1,5 +1,4 @@
 # Rootfs creation.
-require ../../../recipes-bt/packagegroup/bt.inc
 
 DEPENDS_append_aarch64 += "lib32-lk"
 DEPENDS_append_arm += "lk"
@@ -49,7 +48,6 @@ IMAGE_INSTALL += "libxml2"
 IMAGE_INSTALL += "lighttpd"
 IMAGE_INSTALL += "minidlna"
 IMAGE_INSTALL += "miniupnpd"
-IMAGE_INSTALL += "mtd-utils-ubifs"
 IMAGE_INSTALL += "openssl"
 IMAGE_INSTALL += "pimd"
 IMAGE_INSTALL += "powerapp"

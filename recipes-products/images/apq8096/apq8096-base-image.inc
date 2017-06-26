@@ -83,7 +83,6 @@ IMAGE_INSTALL += "wpa-supplicant-qcacld"
 IMAGE_INSTALL += "lib32-live555-qti"
 IMAGE_INSTALL += "lib32-qmmf-support"
 IMAGE_INSTALL += "lib32-qmmf-webserver"
-IMAGE_INSTALL += "lib32-camera"
 IMAGE_INSTALL += "lib32-gtest"
 IMAGE_INSTALL += "lib32-qmmf-sdk"
 

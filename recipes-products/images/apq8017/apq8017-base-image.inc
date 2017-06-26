@@ -1,5 +1,4 @@
 # Rootfs creation.
-require ../../../recipes-bt/packagegroup/bt.inc
 
 DEPENDS_append += "lib32-lk"
 
@@ -21,7 +20,7 @@ IMAGE_INSTALL += "rmtstorage"
 
 IMAGE_INSTALL += "base-files"
 IMAGE_INSTALL += "base-passwd"
-IMAGE_INSTALL += "bluez5"
+
 
 IMAGE_INSTALL += "dhcpcd"
 IMAGE_INSTALL += "dnsmasq"

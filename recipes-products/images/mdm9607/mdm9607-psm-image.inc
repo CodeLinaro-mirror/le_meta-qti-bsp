@@ -1,11 +1,7 @@
 #packages installed to root file system of PSM build
 require mdm9607-base-image.inc
 
-# The MSM Linux minimal boot image files.
-PACKAGE_EXCLUDE += "alsa-intf"
-
 #Excluding Audio packages
-PACKAGE_EXCLUDE += "audiohal"
 PACKAGE_EXCLUDE += "avahi-systemd"
 PACKAGE_EXCLUDE += "avahi-daemon"
 PACKAGE_EXCLUDE += "avahi-dnsconfd"
@@ -40,5 +36,4 @@ PACKAGE_EXCLUDE+= "fluoride"
 PACKAGE_EXCLUDE += "libbt-vendor"
 
 PACKAGE_EXCLUDE += "libsensors"
-PACKAGE_EXCLUDE += "loc-net-iface"
 PACKAGE_EXCLUDE += "start-scripts-init-can"

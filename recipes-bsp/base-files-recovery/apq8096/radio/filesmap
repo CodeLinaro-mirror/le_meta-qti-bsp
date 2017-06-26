@@ -1,4 +1,4 @@
-# Copyright (c) 2016-17, The Linux Foundation. All rights reserved.
+# Copyright (c) 2013-2016, The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -25,31 +25,37 @@
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-policy_module(bootlogd, 1.0)
+# filename              partition
 
-########################################
-#
-# Declarations
-#
+NON-HLOS.ubi            modem
+NON-HLOS.bin            /dev/block/bootdevice/by-name/modem
 
-type bootlogd_t;
-type bootlogd_exec_t;
-init_daemon_domain(bootlogd_t, bootlogd_exec_t)
-init_getattr_initctl(bootlogd_t);
-allow bootlogd_t device_t:chr_file getattr;
-allow bootlogd_t device_t:file { read write getattr };
+sbl1.mbn                /dev/block/bootdevice/by-name/sbl1
+tz.mbn                  /dev/block/bootdevice/by-name/tz
+rpm.mbn                 /dev/block/bootdevice/by-name/rpm
+emmc_appsboot.mbn       /dev/block/bootdevice/by-name/aboot
 
-# Full access to /var/log
-logging_log_file(bootlogd_t);
+# filename + .bak       backup partition
 
-#used for index reading
-fs_getattr_all_chr_files(bootlogd_t)
-dev_getattr_all_blk_files(bootlogd_t)
-dev_getattr_all_chr_files(bootlogd_t)
-term_dontaudit_use_ptmx(bootlogd_t)
-dev_rw_null(bootlogd_t)
-term_getattr_pty_fs(bootlogd_t)
-files_rw_etc_files(bootlogd_t)
-term_setattr_generic_ptys(bootlogd_t)
-allow bootlogd_t self:capability { chown fsetid sys_admin };
-term_fileops_generic_ptys(bootlogd_t)
+#sbl1.mbn.bak            sbl1bak
+#tz.mbn.bak              tzbak
+#rpm.mbn.bak             rpmbak
+#appsboot.mbn.bak        abootbak
+
+# For multiple file firmware images that differ from *.mbn and *.bin
+# you can specify filename.* to direct all files to the same location.
+# For example for modem.mdt, modem.b00, modem.b01,... modem.bxx files
+# writting 'modem.*   location' will direct all files to 'location'.
+# If still some files need to go to different location give the full
+# file name also, for example 'modem.b01   other_location'
+
+# filename              location
+
+mba.*                   /firmware/image
+modem.*                 /firmware/image
+bdwlan30.bin            /firmware/image
+nvm_tlv_3.0.bin         /firmware/image
+otp30.bin               /firmware/image
+qwlan30.bin             /firmware/image
+rampatch_tlv_3.0.tlv    /firmware/image
+utf30.bin               /firmware/image

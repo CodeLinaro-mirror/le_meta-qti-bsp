@@ -1,5 +1,4 @@
 # Rootfs creation.
-require ../../../recipes-bt/packagegroup/bt.inc
 
 DEPENDS_append += "lk"
 IMAGE_INSTALL += "packagegroup-core-boot"
