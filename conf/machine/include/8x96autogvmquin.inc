@@ -2,7 +2,7 @@ require conf/distro/include/security_flags.inc
 require conf/machine/include/basemachine.inc
 
 # For new yocto UNINATIVE_CHECKSUM
-UNINATIVE_CHECKSUM[x86_64] = "26d46c61ad88cc245e31c88549717c0092a838d111b93ec169d88b08cc027581"
+UNINATIVE_CHECKSUM[x86_64] = "acf1e44a0ac2e855e81da6426197d36358bf7b4e88e552ef933128498c8910f8"
 
 SOC_FAMILY ?= "msm8996"
 include conf/machine/include/soc-family.inc
