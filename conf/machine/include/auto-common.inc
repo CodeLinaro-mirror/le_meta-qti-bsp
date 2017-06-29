@@ -34,8 +34,8 @@ KERNEL_DEFCONFIG = "msm-auto_defconfig"
 KERNEL_PERF_DEFCONFIG = "msm-auto-perf_defconfig"
 
 # Sizes for EXT4 (in bytes)
-USERDATA_SIZE_EXT4 = "2000000000"
-CACHE_SIZE_EXT4 = "80000000"
+USERDATA_SIZE_EXT4 ?= "2000000000"
+CACHE_SIZE_EXT4 ?= "80000000"
 
 #
 # Multilib configuration
