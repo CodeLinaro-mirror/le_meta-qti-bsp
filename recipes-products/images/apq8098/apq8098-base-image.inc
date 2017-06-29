@@ -1,6 +1,7 @@
 # Rootfs creation.
 require ../../../recipes-ss-mgr/packagegroup/ss-mgr.inc
 DEPENDS_append += "edk2"
+
 # The OE-Core minimal boot image files.
 IMAGE_FSTYPES = "ext4"
 
