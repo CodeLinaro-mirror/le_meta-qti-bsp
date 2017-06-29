@@ -1,9 +1,9 @@
-DEPENDS += "${@base_contains('PRODUCT','base','machine-image','machine-${PRODUCT}-image',d)}"
+DEPENDS += "${@base_contains('PRODUCT','base',bb.utils.contains('PRODUCT_SUBTYPE', 'minimal', 'machine-minimal-image', 'machine-image', d),'machine-${PRODUCT}-image',d)}"
 
 OTA_TARGET_BASENAME_EXT4     = "${MACHINE}-ota-target-image-ext4"
 OTA_TARGET_IMAGE_ROOTFS_EXT4 = "${IMAGE_ROOTFS}/../${OTA_TARGET_BASENAME_EXT4}"
 OUTPUT_FILE_EXT4             = "${DEPLOY_DIR_IMAGE}/${OTA_TARGET_BASENAME_EXT4}.zip"
-BASE_IMAGE_ROOTFS_EXT4       = "$(echo ${IMAGE_ROOTFS} | sed 's#-recovery##')"
+BASE_IMAGE_ROOTFS_EXT4       = "$(echo ${IMAGE_ROOTFS} | awk -v type=${PRODUCT_SUBTYPE} '{ img = type == "minimal" ? "machine-minimal-image" : "machine-image"; sub("machine-recovery-image", img); print $0; }')"
 #OUTPUT_FILE_EXT4 = "${OTA_TARGET_BASENAME_EXT4}.zip"
 
 python do_rootfs_append(){
@@ -82,7 +82,7 @@ echo recovery_api_version=3 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.tx
 #blocksize = BOARD_FLASH_BLOCK_SIZE
 echo blocksize=131072 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 
-if [ "${MACHINE}" == "apq8053" ] || [ "${MACHINE}" == "apq8053-iot-mtp" ]; then
+if [ "${BASEMACHINE}" == "apq8053" ] ; then
    #boot_size: Size of boot partition from partition.xml
    echo boot_size=0x01900000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 
