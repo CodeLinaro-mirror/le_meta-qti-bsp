@@ -40,5 +40,5 @@ interface(`term_fileops_generic_ptys',`
         type devpts_t;
     ')
 
-    allow $1 devpts_t:chr_file { getattr read write open };
+    allow $1 devpts_t:chr_file { getattr read write open ioctl };
 ')

@@ -12,6 +12,7 @@ include conf/machine/include/soc-family.inc
 require conf/machine/include/tune-cortexa8.inc
 
 BBMASK = ".*/*/recipes-kernel/linux-msm-4.4"
+BBMASK .= "|.*/*/recipes-security/libselinux/"
 
 MACHINE_DISPLAY_WIDTH_PIXELS ?= "480"
 MACHINE_DISPLAY_HEIGHT_PIXELS ?= "640"
@@ -23,14 +24,19 @@ DISTRO ?= "mdm"
 MACHINE_FEATURES += "kernel26 keyboard"
 
 PAGE_SIZE ?= '4096'
+PAGE_SIZE_2K ?= '2048'
 
 # Max supported inodes
 EXTRA_IMAGECMD ?= "-N 2048"
 
 #UBINIZE Args
 UBINIZE_ARGS ?= "-m 4096 -p 256KiB -s 4096"
+UBINIZE_ARGS_2K ?= "-m 2048 -p 131072 -s 2048"
 #MKUBIFS Arg
 MKUBIFS_ARGS ?= "-m 4096 -e 253952 -c 2146 -F"
+MKUBIFS_ARGS_2K ?= "-m 2048 -e 126976 -c 2146 -F"
 #Volume sizes
-SYSTEM_VOLUME_SIZE ?= "63MiB"
-CACHE_VOLUME_SIZE ?= "55MiB"
+SYSTEM_VOLUME_SIZE ?= "74MiB"
+SYSTEM_VOLUME_SIZE_2K ?= "57MiB"
+CACHE_VOLUME_SIZE ?= "37MiB"
+CACHE_VOLUME_SIZE_2K ?= "1MiB"

@@ -29,18 +29,26 @@ DEPENDS += "mm-parser"
 DEPENDS += "mm-osal"
 DEPENDS += "audiohal"
 DEPENDS += "fastcv-noship"
+DEPENDS_append_apq8053 += "vam-engines"
 
 CFLAGS += "-I${STAGING_INCDIR}"
 CFLAGS += "-I${STAGING_INCDIR}/mm-parser/include"
 CFLAGS += "-I${STAGING_INCDIR}/mm-osal/include"
 CFLAGS += "-I${STAGING_INCDIR}/fastcv"
 TARGET_CFLAGS += "-I${STAGING_INCDIR}/qcom/display"
+TARGET_CFLAGS += "-I${STAGING_INCDIR}/qmmf-alg"
 
+EXTRA_OECONF += " --with-basemachine=${BASEMACHINE}"
 EXTRA_OECONF += " --with-gralloc-library=${WORKSPACE}/display/display-hal"
 EXTRA_OECONF += " --with-mm-core=${WORKSPACE}/hardware/qcom/media/mm-core/inc"
 EXTRA_OECONF += " --with-camerahal=${WORKSPACE}/camera/lib/QCamera2/HAL3"
-EXTRA_OECONF_append = " --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
+EXTRA_OECONF += " --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
 EXTRA_OECONF += "${@get_product_extras(d)}"
+EXTRA_OECONF += " --with-camcommon=${WORKSPACE}/camera/lib/QCamera2/stack/common"
+EXTRA_OECONF += " --with-camifaceinc=${WORKSPACE}/camera/lib/QCamera2/stack/mm-camera-interface/inc"
+EXTRA_OECONF += " --with-exif=${WORKSPACE}/camera/lib/mm-image-codec/qexif"
+EXTRA_OECONF += " --with-omxcore=${WORKSPACE}/camera/lib/mm-image-codec/qomx_core"
+EXTRA_OECONF += " --with-openmax=${WORKSPACE}/frameworks/native/include/media/openmax"
 
 FILESPATH =+ "${WORKSPACE}/vendor/qcom/opensource/:"
 SRC_URI  := "file://qmmf-sdk"
@@ -64,6 +72,7 @@ do_install_append () {
     fi
     install -m 0755 ${WORKDIR}/recorder_boottest.sh -D ${D}/${sysconfdir}/init.d/recorder_boottest.sh
     install -m 0755 ${WORKDIR}/boottime_config.txt -D ${D}/${sysconfdir}/boottime_config.txt
+    install -d ${D}/${userfsdatadir}/misc/qmmf
 }
 
 pkg_postinst_${PN} () {
@@ -80,6 +89,7 @@ do_package_qa () {
 FILES_${PN}-qmmf-server-dbg = "${bindir}/.debug/qmmf-server"
 FILES_${PN}-qmmf-server     = "${bindir}/qmmf-server"
 FILES_${PN}-qmmf-server    += "/etc/systemd/system/"
+FILES_${PN}-qmmf-server    += "${userfsdatadir}/*"
 
 FILES_${PN}-libqmmf_recorder_client-dbg    = "${libdir}/.debug/libqmmf_recorder_client.*"
 FILES_${PN}-libqmmf_recorder_client        = "${libdir}/libqmmf_recorder_client.so.*"

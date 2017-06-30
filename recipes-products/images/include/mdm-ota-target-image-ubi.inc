@@ -1,4 +1,4 @@
-DEPENDS += "machine-image"
+DEPENDS += "${@base_contains('PRODUCT','base','machine-image','machine-${PRODUCT}-image',d)}"
 
 OTA_TARGET_BASENAME_UBI     = "${MACHINE}-ota-target-image-ubi"
 OTA_TARGET_IMAGE_ROOTFS_UBI = "${IMAGE_ROOTFS}/../${OTA_TARGET_BASENAME_UBI}"
@@ -25,10 +25,13 @@ mkdir -p ${OTA_TARGET_IMAGE_ROOTFS_UBI}/OTA
 mkdir -p ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RECOVERY
 mkdir -p ${OTA_TARGET_IMAGE_ROOTFS_UBI}/SYSTEM
 mkdir -p ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RADIO
+#Create this folder just for saving file_contexts(SElinux security context file),
+#It will be used to generate OTA packages when selinux_fc is set.
+mkdir -p ${OTA_TARGET_IMAGE_ROOTFS_UBI}/BOOT/RAMDISK
 
 echo "base image rootfs: ${BASE_IMAGE_ROOTFS_UBI}"
 # copy radio directory content into RADIO directory
-cp -r ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/base-files-recovery/${MACHINE}/radio/. ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RADIO/.
+cp -r ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/base-files-recovery/${BASEMACHINE}/radio/. ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RADIO/.
 
 # copy the boot\recovery images
 cp ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img ${OTA_TARGET_IMAGE_ROOTFS_UBI}/BOOTABLE_IMAGES/boot.img
@@ -61,6 +64,17 @@ cp   ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RECOVERY/usr/bin/applypatch ${OTA_TARGET_IMA
 
 cp   ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RECOVERY/usr/bin/updater ${OTA_TARGET_IMAGE_ROOTFS_UBI}/OTA/bin/.
 
+#cp and modify file_contexts to BOOT/RAMDISK folder
+if [[ "${DISTRO_FEATURES}" =~ "selinux" ]]; then
+    cp ${BASE_IMAGE_ROOTFS_UBI}/etc/selinux/mls/contexts/files/file_contexts ${IMAGE_ROOTFS}/.
+    sed -i 's#^/#/system/#g' ${IMAGE_ROOTFS}/file_contexts
+    cp ${IMAGE_ROOTFS}/file_contexts ${OTA_TARGET_IMAGE_ROOTFS_UBI}/BOOT/RAMDISK/.
+    #set selinux_fc
+    echo selinux_fc=BOOT/RAMDISK/file_contexts >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
+    #set use_set_metadata to 1 so that updater-script
+    #will have rules to apply selabels
+    echo use_set_metadata=1 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
+fi
 
 # copy contents of META folder
 #recovery_api_version is from recovery module

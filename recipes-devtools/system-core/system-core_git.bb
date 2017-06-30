@@ -1,4 +1,4 @@
-inherit autotools pkgconfig update-rc.d
+inherit autotools pkgconfig systemd update-rc.d qperf
 
 DESCRIPTION = "Android system/core components"
 HOMEPAGE = "http://developer.android.com/"
@@ -17,6 +17,9 @@ DEPENDS = "virtual/kernel openssl glib-2.0 libselinux safe-iop ext4-utils libunw
 EXTRA_OECONF = " --with-host-os=${HOST_OS} --with-glib"
 EXTRA_OECONF_append = " --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
 EXTRA_OECONF_append = " --with-logd-logging"
+
+# Disable adb root privileges in USER builds for msm targets
+EXTRA_OECONF_append_msm = "${@base_conditional('USER_BUILD','1',' --disable-adb-root','',d)}"
 
 CPPFLAGS += "-I${STAGING_INCDIR}/ext4_utils"
 CPPFLAGS += "-I${STAGING_INCDIR}/libselinux"
@@ -93,10 +96,12 @@ INITSCRIPT_PARAMS_${PN}-usb_mdm = "start 30 S ."
 INITSCRIPT_PACKAGES =+ "${PN}-debuggerd"
 INITSCRIPT_NAME_${PN}-debuggerd = "init_debuggerd"
 INITSCRIPT_PARAMS_${PN}-debuggerd = "start 31 2 3 4 5 ."
+INITSCRIPT_PARAMS_${PN}-debuggerd += "stop 38 6 ."
 
 INITSCRIPT_PACKAGES =+ "${PN}-logd"
 INITSCRIPT_NAME_${PN}-logd = "logd"
 INITSCRIPT_PARAMS_${PN}-logd = "start 10  2 3 4 5 ."
+INITSCRIPT_PARAMS_${PN}-logd += "stop 39  6 ."
 
 INITSCRIPT_PACKAGES =+ "${PN}-post-boot"
 INITSCRIPT_NAME_${PN}-post-boot = "init_post_boot"
@@ -132,7 +137,7 @@ FILES_${PN}-debuggerd     += "${systemd_unitdir}/system/init_debuggerd.service $
 
 PACKAGES =+ "${PN}-leprop-dbg ${PN}-leprop"
 FILES_${PN}-leprop-dbg  = "${base_sbindir}/.debug/leprop-service ${bindir}/.debug/getprop ${bindir}/.debug/setprop"
-FILES_${PN}-leprop      = "${base_sbindir}/leprop-service ${bindir}/getprop ${bindir}/setprop"
+FILES_${PN}-leprop      = "${base_sbindir}/leprop-service ${bindir}/getprop ${bindir}/setprop ${sysconfdir}/proptrigger.sh ${sysconfdir}/proptrigger.conf"
 FILES_${PN}-leprop     += "${systemd_unitdir}/system/leprop.service ${systemd_unitdir}/system/multi-user.target.wants/leprop.service"
 
 FILES_${PN}-dbg  = "${bindir}/.debug/* ${libdir}/.debug/*"

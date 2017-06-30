@@ -1,4 +1,4 @@
-inherit deploy
+inherit deploy qperf
 
 DESCRIPTION = "Little Kernel bootloader"
 LICENSE = "MIT"
@@ -8,7 +8,6 @@ HOMEPAGE = "https://www.codeaurora.org/gitweb/quic/la?p=kernel/lk.git"
 
 PROVIDES = "virtual/bootloader"
 
-PV       = "3.0"
 PR       = "r1"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
@@ -50,7 +49,8 @@ FILES_${PN} = "/boot"
 FILES_${PN}-dbg = "/boot/.debug"
 
 do_deploy() {
-        install ${S}/build-${MY_TARGET}/*.mbn ${DEPLOYDIR}
+        mkdir -p ${DEPLOY_DIR_IMAGE}
+        install ${S}/build-${MY_TARGET}/*.mbn ${DEPLOY_DIR_IMAGE}
 }
 
 do_deploy[dirs] = "${S} ${DEPLOYDIR}"

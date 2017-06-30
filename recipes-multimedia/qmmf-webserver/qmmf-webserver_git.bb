@@ -34,10 +34,13 @@ do_install() {
       ln -sf /etc/systemd/qmmf-webserver.service \
           ${D}/etc/systemd/system/multi-user.target.wants/qmmf-webserver.service
   fi
+  # Location for user configs
+  install -d ${D}/${userfsdatadir}/misc/qmmf
 }
 
 FILES_${PN} = "${bindir}/qmmf-webserver"
 FILES_${PN} += "/etc/systemd/system/"
+FILES_${PN} += "${userfsdatadir}/*"
 
 # Avoid QA Issue: No GNU_HASH in the elf binary
 INSANE_SKIP_${PN} = "ldflags"

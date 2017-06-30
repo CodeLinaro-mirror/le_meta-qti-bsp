@@ -6,7 +6,7 @@ SRC_URI_append = "\
     file://0003-riff-add-missing-include-directories-when-calling-in.patch \
     file://0004-rtsp-drop-incorrect-reference-to-gstreamer-sdp-in-Ma.patch \
 "
-
+FILESEXTRAPATHS_prepend := "${THISDIR}/qti-patches:"
 LICENSE = "GPLv2+ & LGPLv2+"
 
 DEPENDS += "iso-codes util-linux zlib"
