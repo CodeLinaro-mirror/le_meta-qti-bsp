@@ -49,7 +49,6 @@ IMAGE_INSTALL += "resize-service"
 #Firmware-links
 IMAGE_INSTALL += "firmware-links"
 #Camera modules
-IMAGE_INSTALL += "lib32-androidcompat"
 IMAGE_INSTALL += "init-can"
 
 #WiFi
