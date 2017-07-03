@@ -1,0 +1,11 @@
+[Unit]
+Description=Check for firmware corruption
+
+[Service]
+Type=simple
+Restart=no
+RemainAfterExit=yes
+ExecStart=/etc/initscripts/check_for_firmware_corruption.sh
+
+[Install]
+WantedBy=multi-user.target
