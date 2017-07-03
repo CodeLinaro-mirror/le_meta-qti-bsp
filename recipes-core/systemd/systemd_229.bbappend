@@ -7,6 +7,7 @@ SRC_URI_append += "file://70-net-setup-link.rules \
                    file://systemd-udev-trigger-full.service \
                    file://0001-sysv-generator-add-default-dependencies.patch \
                    file://0031-udev-trigger-only-enable-must-part-while-leave-other.patch \
+                   file://0032-systemd-add-bootkpi-marker-for-login-user-session.patch \
                    file://0030-plymounth-dependency-cleanup.patch"
 
 do_install_append () {
