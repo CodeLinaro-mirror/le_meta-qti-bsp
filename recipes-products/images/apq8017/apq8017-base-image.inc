@@ -3,8 +3,8 @@ require ../../../recipes-ss-mgr/packagegroup/ss-mgr.inc
 
 DEPENDS += "lib32-lk"
 
-# The OE-Core minimal boot image files.
-IMAGE_FSTYPES = "ext4"
+# Formats of root filesystem images.
+IMAGE_FSTYPES += "ext4"
 
 IMAGE_INSTALL += "packagegroup-core-boot"
 IMAGE_INSTALL += "${ROOTFS_PKGMANAGE_BOOTSTRAP}"
