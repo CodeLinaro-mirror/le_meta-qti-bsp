@@ -3,6 +3,9 @@
 DEPENDS_append_aarch64 += " lib32-lk"
 DEPENDS_append_arm += " lk"
 
+# Formats of root filesystem images.
+IMAGE_FSTYPES += "ext4 ubi"
+
 IMAGE_INSTALL += "packagegroup-core-boot"
 IMAGE_INSTALL += "${ROOTFS_PKGMANAGE_BOOTSTRAP}"
 IMAGE_INSTALL += "${CORE_IMAGE_EXTRA_INSTALL}"

@@ -2,7 +2,7 @@ DEPENDS += "${@["","machine-recovery-image"][(d.getVar('RECOVERY_IMAGE', True) =
 
 # Add task to generate recovery image
 python __anonymous () {
-    if (d.getVar('RECOVERY_IMAGE', True) == '1'):
+    if d.getVar('RECOVERY_IMAGE', True) == '1' and bb.utils.contains('IMAGE_FSTYPES', 'ubi', True, False, d):
         bb.build.addtask('do_recovery_ubi', 'do_build', 'do_rootfs', d)
 }
 
