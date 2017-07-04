@@ -16,3 +16,5 @@ EXTRA_OECMAKE += "${@base_conditional('MACHINE', '8x96autogvmgh', ' -DGVM_TYPE:S
 DEPENDS += "${@base_conditional('MACHINE', '8x96autogvmquin', 'vapm-lib', '', d)}"
 DEPENDS += "${@base_conditional('MACHINE', '8x96autogvmred', 'vapm-lib', '', d)}"
 DEPENDS += "${@base_conditional('MACHINE', '8x96autogvmgh', 'vapm-lib', '', d)}"
+
+PULSE_PV="8.0"
