@@ -16,6 +16,7 @@ IMAGE_INSTALL += "strongswan"
 
 IMAGE_INSTALL_remove += "synergy-opensource"
 IMAGE_INSTALL_remove += "bluez5"
+IMAGE_INSTALL_remove += "init-can"
 
 IMAGE_INSTALL_remove += "qtwebengine"
 IMAGE_INSTALL_remove += "qtwebengine-qmlplugins"
