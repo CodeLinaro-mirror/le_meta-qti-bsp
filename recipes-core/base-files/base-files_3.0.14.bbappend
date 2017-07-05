@@ -29,3 +29,6 @@ do_install_append(){
     ln -s /var/run/resolv.conf ${D}/etc/resolv.conf
   fi
 }
+
+INCSUFFIX = "${@base_conditional('MACHINEGROUP', 'auto', 'base-files_auto', 'none',d)}"
+include ${INCSUFFIX}.inc
