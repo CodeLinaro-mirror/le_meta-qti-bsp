@@ -13,6 +13,7 @@ IMAGE_INSTALL += "sofia-sip"
 IMAGE_INSTALL += "iproute2"
 IMAGE_INSTALL += "multimodule-mgr-oss"
 IMAGE_INSTALL += "strongswan"
+IMAGE_INSTALL += "start-scripts-check-firmware-corruption"
 
 IMAGE_INSTALL_remove += "synergy-opensource"
 IMAGE_INSTALL_remove += "bluez5"
