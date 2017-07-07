@@ -1,8 +1,8 @@
 
 [Unit]
 Description=INIT_AUDIO
-Before=systemd-user-sessions.service sound.target multi-user.target
-After=find_partitions.service firmware-links.service
+Before=multi-user.target
+After=firmware-links.service
 Conflicts=shutdown.target
 
 [Service]
