@@ -34,11 +34,14 @@ do_install_append() {
 }
 
 pkg_postinst_${PN} () {
-  update-alternatives --install ${sysconfdir}/init.d/servicemanager.sh servicemanager.sh servicemanager 60
+        if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
+        else
+        update-alternatives --install ${sysconfdir}/init.d/servicemanager.sh servicemanager.sh servicemanager 60
         [ -n "$D" ] && OPT="-r $D" || OPT="-s"
         # remove all rc.d-links potentially created from alternatives
         update-rc.d $OPT -f servicemanager remove
         update-rc.d $OPT servicemanager start 25 S 2 3 4 5 S . stop 75 0 1 6 .
+        fi
 }
 
 FILES_${PN}-servicemanager-dbg = "${bindir}/.debug/servicemanager"

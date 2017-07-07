@@ -39,11 +39,15 @@ do_install() {
 }
 
 pkg_postinst_${PN} () {
+        # Cleanup sysvinitscript postinst
+        if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
+        else
         update-alternatives --install ${sysconfdir}/init.d/persist-prop.sh persist-prop.sh  persist-prop 50
         [ -n "$D" ] && OPT="-r $D" || OPT="-s"
         # remove all rc.d-links potentially created from alternatives
         update-rc.d $OPT -f persist-prop.sh remove
         update-rc.d $OPT persist-prop.sh multiuser
+        fi
 }
 
 PACKAGES = "${PN}"
