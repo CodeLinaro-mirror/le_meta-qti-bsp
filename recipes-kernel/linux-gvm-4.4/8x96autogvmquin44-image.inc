@@ -24,6 +24,7 @@ SRC_URI_append += " \
     file://0004-interrupt-workaround-for-virtual-plaform.patch \
     file://0005-Revert-soc-qcom-remove-debugfs-interface-from-ssr-se.patch \
     file://0006-drivers-char-diag-Enable-diag-over-IP.patch \
+    file://0007-disable-scm-for-pil-new.patch \
 "
 
 do_deploy_rename () {

@@ -1,0 +1,400 @@
+From 015e9d88ae6c4cdae93abe815b2a10a5f02f2d59 Mon Sep 17 00:00:00 2001
+From: Yimin Peng <yiminp@codeaurora.org>
+Date: Fri, 7 Jul 2017 19:48:59 +0800
+Subject: [PATCH] disable scm for pil new
+
+Change-Id: Iebc13e512b01f5485d61057c143a0d162acb7add
+Signed-off-by: Yimin Peng <yiminp@codeaurora.org>
+---
+ drivers/soc/qcom/peripheral-loader.c | 11 +++++++++++
+ drivers/soc/qcom/pil-msa.c           | 33 +++++++++++++++++++++++++++++----
+ drivers/soc/qcom/pil-q6v5-mss.c      |  4 ++--
+ drivers/soc/qcom/pil-q6v5.c          | 14 ++++++++++++--
+ 4 files changed, 54 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/soc/qcom/peripheral-loader.c b/drivers/soc/qcom/peripheral-loader.c
+index ace2bc4..1367786 100644
+--- a/drivers/soc/qcom/peripheral-loader.c
++++ b/drivers/soc/qcom/peripheral-loader.c
+@@ -14,6 +14,7 @@
+ #include <linux/string.h>
+ #include <linux/firmware.h>
+ #include <linux/io.h>
++#include <linux/delay.h>
+ #include <linux/elf.h>
+ #include <linux/mutex.h>
+ #include <linux/memblock.h>
+@@ -778,8 +779,10 @@ int pil_boot(struct pil_desc *desc)
+ 	struct pil_seg *seg;
+ 	const struct firmware *fw;
+ 	struct pil_priv *priv = desc->priv;
++#ifdef SCM_FE
+ 	bool mem_protect = false;
+ 	bool hyp_assign = false;
++#endif
+ 
+ 	if (desc->shutdown_fail)
+ 		pil_err(desc, "Subsystem shutdown failed previously!\n");
+@@ -855,6 +858,7 @@ int pil_boot(struct pil_desc *desc)
+ 		goto err_deinit_image;
+ 	}
+ 
++#ifdef SCM_FE
+ 	if (desc->subsys_vmid > 0) {
+ 		/**
+ 		 * In case of modem ssr, we need to assign memory back to linux.
+@@ -880,6 +884,7 @@ int pil_boot(struct pil_desc *desc)
+ 		}
+ 		hyp_assign = true;
+ 	}
++#endif
+ 
+ 	trace_pil_event("before_load_seg", desc);
+ 	list_for_each_entry(seg, &desc->priv->segs, list) {
+@@ -888,6 +893,7 @@ int pil_boot(struct pil_desc *desc)
+ 			goto err_deinit_image;
+ 	}
+ 
++#ifdef SCM_FE
+ 	if (desc->subsys_vmid > 0) {
+ 		trace_pil_event("before_reclaim_mem", desc);
+ 		ret =  pil_reclaim_mem(desc, priv->region_start,
+@@ -900,6 +906,7 @@ int pil_boot(struct pil_desc *desc)
+ 		}
+ 		hyp_assign = false;
+ 	}
++#endif
+ 
+ 	trace_pil_event("before_auth_reset", desc);
+ 	ret = desc->ops->auth_and_reset(desc);
+@@ -912,11 +919,13 @@ int pil_boot(struct pil_desc *desc)
+ 	pil_info(desc, "Brought out of reset\n");
+ 	desc->modem_ssr = false;
+ err_auth_and_reset:
++#ifdef SCM_FE
+ 	if (ret && desc->subsys_vmid > 0) {
+ 		pil_assign_mem_to_linux(desc, priv->region_start,
+ 				(priv->region_end - priv->region_start));
+ 		mem_protect = true;
+ 	}
++#endif
+ err_deinit_image:
+ 	if (ret && desc->ops->deinit_image)
+ 		desc->ops->deinit_image(desc);
+@@ -930,6 +939,7 @@ out:
+ 	up_read(&pil_pm_rwsem);
+ 	if (ret) {
+ 		if (priv->region) {
++#ifdef SCM_FE
+ 			if (desc->subsys_vmid > 0 && !mem_protect &&
+ 					hyp_assign) {
+ 				pil_reclaim_mem(desc, priv->region_start,
+@@ -937,6 +947,7 @@ out:
+ 						priv->region_start),
+ 					VMID_HLOS);
+ 			}
++#endif
+ 			if (desc->clear_fw_region && priv->region_start)
+ 				pil_clear_segment(desc);
+ 			dma_free_attrs(desc->dev, priv->region_size,
+diff --git a/drivers/soc/qcom/pil-msa.c b/drivers/soc/qcom/pil-msa.c
+index 5fcb0f9..9a80da6 100644
+--- a/drivers/soc/qcom/pil-msa.c
++++ b/drivers/soc/qcom/pil-msa.c
+@@ -153,8 +153,10 @@ static int pil_mss_power_down(struct q6v5_data *drv)
+ 		writel_relaxed(regval, drv->cxrail_bhs);
+ 	}
+ 
++#ifdef FIX_STUB_REG
+ 	if (drv->vreg)
+ 		return regulator_disable(drv->vreg);
++#endif
+ 
+ 	return 0;
+ }
+@@ -359,9 +361,11 @@ int __pil_mss_deinit_image(struct pil_desc *pil, bool err_path)
+ 	/* In case of any failure where reclaiming MBA and DP memory
+ 	 * could not happen, free the memory here */
+ 	if (drv->q6->mba_dp_virt) {
++#ifdef USE_SCM_FE
+ 		if (pil->subsys_vmid > 0)
+ 			pil_assign_mem_to_linux(pil, drv->q6->mba_dp_phys,
+ 						drv->q6->mba_dp_size);
++#endif
+ 		dma_free_attrs(dma_dev, drv->q6->mba_dp_size,
+ 				drv->q6->mba_dp_virt, drv->q6->mba_dp_phys,
+ 				&drv->attrs_dma);
+@@ -388,6 +392,7 @@ int pil_mss_make_proxy_votes(struct pil_desc *pil)
+ 		return ret;
+ 	}
+ 
++#ifdef FIX_STUB_REG
+ 	ret = regulator_set_voltage(drv->vreg_mx, uv, INT_MAX);
+ 	if (ret) {
+ 		dev_err(pil->dev, "Failed to request vreg_mx voltage(rc:%d)\n",
+@@ -401,6 +406,7 @@ int pil_mss_make_proxy_votes(struct pil_desc *pil)
+ 		regulator_set_voltage(drv->vreg_mx, 0, INT_MAX);
+ 		return ret;
+ 	}
++#endif
+ 
+ 	ret = pil_q6v5_make_proxy_votes(pil);
+ 	if (ret) {
+@@ -413,10 +419,14 @@ int pil_mss_make_proxy_votes(struct pil_desc *pil)
+ 
+ void pil_mss_remove_proxy_votes(struct pil_desc *pil)
+ {
++#ifdef FIX_STUB_REG
+ 	struct q6v5_data *drv = container_of(pil, struct q6v5_data, desc);
++#endif
+ 	pil_q6v5_remove_proxy_votes(pil);
++#ifdef FIX_STUB_REG
+ 	regulator_disable(drv->vreg_mx);
+ 	regulator_set_voltage(drv->vreg_mx, 0, INT_MAX);
++#endif
+ }
+ 
+ static int pil_mss_mem_setup(struct pil_desc *pil,
+@@ -578,6 +588,7 @@ int pil_mss_reset_load_mba(struct pil_desc *pil)
+ 	arch_setup_dma_ops(dma_dev, 0, 0, NULL, 0);
+ 
+ 	dma_dev->coherent_dma_mask = DMA_BIT_MASK(sizeof(dma_addr_t) * 8);
++	dma_dev->coherent_dma_mask = DMA_BIT_MASK(32);
+ 
+ 	init_dma_attrs(&md->attrs_dma);
+ 	dma_set_attr(DMA_ATTR_SKIP_ZEROING, &md->attrs_dma);
+@@ -599,6 +610,7 @@ int pil_mss_reset_load_mba(struct pil_desc *pil)
+ 
+ 	mba_dp_virt = dma_alloc_attrs(dma_dev, drv->mba_dp_size, &mba_dp_phys,
+ 				   GFP_KERNEL, &md->attrs_dma);
++	msleep(25*1000);
+ 	if (!mba_dp_virt) {
+ 		dev_err(pil->dev, "%s MBA/DP buffer allocation %zx bytes failed\n",
+ 				 __func__, drv->mba_dp_size);
+@@ -638,6 +650,7 @@ int pil_mss_reset_load_mba(struct pil_desc *pil)
+ 		wmb();
+ 	}
+ 
++#ifdef USE_SCM_FE
+ 	if (pil->subsys_vmid > 0) {
+ 		ret = pil_assign_mem_to_subsys(pil, drv->mba_dp_phys,
+ 							drv->mba_dp_size);
+@@ -647,7 +660,7 @@ int pil_mss_reset_load_mba(struct pil_desc *pil)
+ 			goto err_mba_data;
+ 		}
+ 	}
+-
++#endif
+ 	ret = pil_mss_reset(pil);
+ 	if (ret) {
+ 		dev_err(pil->dev, "MBA boot failed(rc:%d)\n", ret);
+@@ -661,9 +674,11 @@ int pil_mss_reset_load_mba(struct pil_desc *pil)
+ 	return 0;
+ 
+ err_mss_reset:
++#ifdef FIX_STUB_REG
+ 	if (pil->subsys_vmid > 0)
+ 		pil_assign_mem_to_linux(pil, drv->mba_dp_phys,
+ 							drv->mba_dp_size);
++#endif
+ err_mba_data:
+ 	dma_free_attrs(dma_dev, drv->mba_dp_size, drv->mba_dp_virt,
+ 				drv->mba_dp_phys, &md->attrs_dma);
+@@ -689,11 +704,11 @@ static int pil_msa_auth_modem_mdt(struct pil_desc *pil, const u8 *metadata,
+ 
+ 
+ 	trace_pil_func(__func__);
+-	dma_dev->coherent_dma_mask = DMA_BIT_MASK(sizeof(dma_addr_t) * 8);
++	dma_dev->coherent_dma_mask = DMA_BIT_MASK(32);
+ 	dma_set_attr(DMA_ATTR_SKIP_ZEROING, &attrs);
+ 	dma_set_attr(DMA_ATTR_STRONGLY_ORDERED, &attrs);
+ 	/* Make metadata physically contiguous and 4K aligned. */
+-	mdata_virt = dma_alloc_attrs(dma_dev, size, &mdata_phys, GFP_KERNEL,
++	mdata_virt = dma_alloc_attrs(dma_dev, SZ_1M, &mdata_phys, GFP_KERNEL,
+ 				     &attrs);
+ 	if (!mdata_virt) {
+ 		dev_err(pil->dev, "%s MBA metadata buffer allocation %zx bytes failed\n",
+@@ -704,7 +719,9 @@ static int pil_msa_auth_modem_mdt(struct pil_desc *pil, const u8 *metadata,
+ 	memcpy(mdata_virt, metadata, size);
+ 	/* wmb() ensures copy completes prior to starting authentication. */
+ 	wmb();
++	msleep(50);
+ 
++#ifdef USE_SCM_FE
+ 	if (pil->subsys_vmid > 0) {
+ 		ret = pil_assign_mem_to_subsys(pil, mdata_phys,
+ 							ALIGN(size, SZ_4K));
+@@ -716,6 +733,7 @@ static int pil_msa_auth_modem_mdt(struct pil_desc *pil, const u8 *metadata,
+ 			goto fail;
+ 		}
+ 	}
++#endif
+ 
+ 	/* Initialize length counter to 0 */
+ 	writel_relaxed(0, drv->rmb_base + RMB_PMI_CODE_LENGTH);
+@@ -735,8 +753,10 @@ static int pil_msa_auth_modem_mdt(struct pil_desc *pil, const u8 *metadata,
+ 		ret = -EINVAL;
+ 	}
+ 
++#ifdef USE_SCM_FE
+ 	if (pil->subsys_vmid > 0)
+ 		pil_assign_mem_to_linux(pil, mdata_phys, ALIGN(size, SZ_4K));
++#endif
+ 
+ 	dma_free_attrs(dma_dev, size, mdata_virt, mdata_phys, &attrs);
+ 
+@@ -747,9 +767,11 @@ fail:
+ 	modem_log_rmb_regs(drv->rmb_base);
+ 	if (drv->q6) {
+ 		pil_mss_shutdown(pil);
++#ifdef USE_SCM_FE
+ 		if (pil->subsys_vmid > 0)
+ 			pil_assign_mem_to_linux(pil, drv->q6->mba_dp_phys,
+ 						drv->q6->mba_dp_size);
++#endif
+ 		dma_free_attrs(dma_dev, drv->q6->mba_dp_size,
+ 				drv->q6->mba_dp_virt, drv->q6->mba_dp_phys,
+ 				&drv->attrs_dma);
+@@ -802,7 +824,9 @@ static int pil_msa_mba_auth(struct pil_desc *pil)
+ 	struct modem_data *drv = dev_get_drvdata(pil->dev);
+ 	struct q6v5_data *q6_drv = container_of(pil, struct q6v5_data, desc);
+ 	int ret;
++#ifdef USE_SCM_FE
+ 	struct device *dma_dev = drv->mba_mem_dev_fixed ?: &drv->mba_mem_dev;
++#endif
+ 	s32 status;
+ 	u64 val = is_timeout_disabled() ? 0 : modem_auth_timeout_ms * 1000;
+ 
+@@ -820,6 +844,7 @@ static int pil_msa_mba_auth(struct pil_desc *pil)
+ 	if (drv->q6) {
+ 		if (drv->q6->mba_dp_virt) {
+ 			/* Reclaim MBA and DP (if allocated) memory. */
++#ifdef USE_SCM_FE
+ 			if (pil->subsys_vmid > 0)
+ 				pil_assign_mem_to_linux(pil,
+ 					drv->q6->mba_dp_phys,
+@@ -829,13 +854,13 @@ static int pil_msa_mba_auth(struct pil_desc *pil)
+ 				&drv->attrs_dma);
+ 
+ 			drv->q6->mba_dp_virt = NULL;
++#endif
+ 		}
+ 	}
+ 	if (ret)
+ 		modem_log_rmb_regs(drv->rmb_base);
+ 	if (q6_drv->ahb_clk_vote)
+ 		clk_disable_unprepare(q6_drv->ahb_clk);
+-
+ 	return ret;
+ }
+ 
+diff --git a/drivers/soc/qcom/pil-q6v5-mss.c b/drivers/soc/qcom/pil-q6v5-mss.c
+index bbcff59..57aa022 100644
+--- a/drivers/soc/qcom/pil-q6v5-mss.c
++++ b/drivers/soc/qcom/pil-q6v5-mss.c
+@@ -326,6 +326,7 @@ static int pil_mss_loadable_init(struct modem_data *drv,
+ 		}
+ 	}
+ 
++#ifdef FIX_STUB_REG
+ 	q6->vreg_mx = devm_regulator_get(&pdev->dev, "vdd_mx");
+ 	if (IS_ERR(q6->vreg_mx))
+ 		return PTR_ERR(q6->vreg_mx);
+@@ -334,7 +335,7 @@ static int pil_mss_loadable_init(struct modem_data *drv,
+ 		dev_err(&pdev->dev, "Missing vdd_mx-uV property\n");
+ 		return -EINVAL;
+ 	}
+-
++#endif
+ 	res = platform_get_resource_byname(pdev, IORESOURCE_MEM,
+ 		"cxrail_bhs_reg");
+ 	if (res)
+@@ -388,7 +389,6 @@ static int pil_mss_driver_probe(struct platform_device *pdev)
+ 	if (!drv)
+ 		return -ENOMEM;
+ 	platform_set_drvdata(pdev, drv);
+-
+ 	is_not_loadable = of_property_read_bool(pdev->dev.of_node,
+ 							"qcom,is-not-loadable");
+ 	if (is_not_loadable) {
+diff --git a/drivers/soc/qcom/pil-q6v5.c b/drivers/soc/qcom/pil-q6v5.c
+index 15415e7..d10f59d 100644
+--- a/drivers/soc/qcom/pil-q6v5.c
++++ b/drivers/soc/qcom/pil-q6v5.c
+@@ -115,6 +115,7 @@ int pil_q6v5_make_proxy_votes(struct pil_desc *pil)
+ 		goto err_qdss_vote;
+ 	}
+ 
++#ifdef FIX_STUB_REG
+ 	ret = regulator_set_voltage(drv->vreg_cx, uv, INT_MAX);
+ 	if (ret) {
+ 		dev_err(pil->dev, "Failed to request vdd_cx voltage(rc:%d)\n",
+@@ -142,9 +143,10 @@ int pil_q6v5_make_proxy_votes(struct pil_desc *pil)
+ 			goto err_vreg_pll;
+ 		}
+ 	}
+-
++#endif
+ 	return 0;
+ 
++#ifdef FIX_STUB_REG
+ err_vreg_pll:
+ 	regulator_disable(drv->vreg_cx);
+ err_cx_enable:
+@@ -152,6 +154,7 @@ err_cx_enable:
+ err_cx_mode:
+ 	regulator_set_voltage(drv->vreg_cx, RPM_REGULATOR_CORNER_NONE, INT_MAX);
+ err_cx_voltage:
++#endif
+ 	clk_disable_unprepare(drv->qdss_clk);
+ err_qdss_vote:
+ 	clk_disable_unprepare(drv->pnoc_clk);
+@@ -174,6 +177,7 @@ void pil_q6v5_remove_proxy_votes(struct pil_desc *pil)
+ 		return;
+ 	}
+ 
++#ifdef FIX_STUB_REG
+ 	if (drv->vreg_pll) {
+ 		regulator_disable(drv->vreg_pll);
+ 		regulator_set_load(drv->vreg_pll, 0);
+@@ -181,6 +185,7 @@ void pil_q6v5_remove_proxy_votes(struct pil_desc *pil)
+ 	regulator_disable(drv->vreg_cx);
+ 	regulator_set_load(drv->vreg_cx, 0);
+ 	regulator_set_voltage(drv->vreg_cx, RPM_REGULATOR_CORNER_NONE, INT_MAX);
++#endif
+ 	clk_disable_unprepare(drv->xo);
+ 	clk_disable_unprepare(drv->pnoc_clk);
+ 	clk_disable_unprepare(drv->qdss_clk);
+@@ -572,9 +577,12 @@ struct q6v5_data *pil_q6v5_init(struct platform_device *pdev)
+ 	struct q6v5_data *drv;
+ 	struct resource *res;
+ 	struct pil_desc *desc;
++	int ret;
++#ifdef FIX_STUB_REG
+ 	struct property *prop;
+-	int ret, vdd_pll;
++	int vdd_pll;
+ 
++#endif
+ 	drv = devm_kzalloc(&pdev->dev, sizeof(*drv), GFP_KERNEL);
+ 	if (!drv)
+ 		return ERR_PTR(-ENOMEM);
+@@ -710,6 +718,7 @@ struct q6v5_data *pil_q6v5_init(struct platform_device *pdev)
+ 		drv->qdss_clk = NULL;
+ 	}
+ 
++#ifdef FIX_STUB_REG
+ 	drv->vreg_cx = devm_regulator_get(&pdev->dev, "vdd_cx");
+ 	if (IS_ERR(drv->vreg_cx))
+ 		return ERR_CAST(drv->vreg_cx);
+@@ -741,6 +750,7 @@ struct q6v5_data *pil_q6v5_init(struct platform_device *pdev)
+ 		} else
+ 			drv->vreg_pll = NULL;
+ 	}
++#endif
+ 
+ 	return drv;
+ }
+-- 
+1.9.1
+
