@@ -48,6 +48,10 @@ do_install_append() {
          update-rc.d -r ${D} set_core_pattern.sh start 01 S 2 3 4 5 S .
         fi
 
+        # Remove recursive restorecon calls from populate_volatile.sh
         sed -i '/^test ! -x \/sbin\/restorecon/ d' ${D}${sysconfdir}/init.d/populate-volatile.sh
-        echo "test ! -x /sbin/restorecon || /sbin/restorecon -F /var/log" >> ${D}${sysconfdir}/init.d/populate-volatile.sh
+        # read_only_rootfs_hook does not mount fstab and therefore will not
+        #  have the correct context when writing to /var/log/lastlog. Attempt
+        #  to label this, but do not abort on failure.
+        echo "/sbin/restorecon -F /var/log || true" >> ${D}${sysconfdir}/init.d/populate-volatile.sh
 }

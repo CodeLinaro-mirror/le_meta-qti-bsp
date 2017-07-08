@@ -1,6 +1,4 @@
 # Rootfs creation.
-require ../../../recipes-audio/audio.inc
-require ../../../recipes-bt/packagegroup/bt.inc
 
 DEPENDS_append += "edk2"
 # The OE-Core minimal boot image files.
@@ -16,22 +14,15 @@ IMAGE_INSTALL += "refpolicy-mls"
 IMAGE_INSTALL += "selinux-config"
 
 # The MSM Linux minimal boot image files.
-IMAGE_INSTALL += "alsa-lib"
-IMAGE_INSTALL += "alsa-utils"
-IMAGE_INSTALL += "tinycompress"
 
 IMAGE_INSTALL += "alx"
 
 IMAGE_INSTALL += "base-files"
 IMAGE_INSTALL += "base-passwd"
 
-IMAGE_INSTALL += "dhcpcd"
-IMAGE_INSTALL += "dnsmasq"
-
 DEPENDS += "gdb-cross-aarch64"
 
 IMAGE_INSTALL += "glib-2.0"
-IMAGE_INSTALL += "init-audio"
 IMAGE_INSTALL += "iw"
 IMAGE_INSTALL += "kernel-modules"
 IMAGE_INSTALL += "start-scripts-find-partitions"
@@ -47,15 +38,8 @@ IMAGE_INSTALL += "system-prop"
 IMAGE_INSTALL += "tcpdump"
 IMAGE_INSTALL += "trace-cmd"
 IMAGE_INSTALL += "wireless-tools"
-IMAGE_INSTALL += "hostap-daemon-qcacld"
-IMAGE_INSTALL += "wpa-supplicant-qcacld"
-IMAGE_INSTALL += "libdrm"
-IMAGE_INSTALL += "wayland"
 IMAGE_INSTALL += "pixman"
-IMAGE_INSTALL += "weston"
-IMAGE_INSTALL += "weston-init"
 IMAGE_INSTALL += "libinput"
-IMAGE_INSTALL += "display-hal-linux"
 
 IMAGE_INSTALL += "gstreamer1.0"
 IMAGE_INSTALL += "gstreamer1.0-plugins-base"

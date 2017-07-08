@@ -39,6 +39,9 @@ init_getattr_initctl(bootlogd_t);
 allow bootlogd_t device_t:chr_file getattr;
 allow bootlogd_t device_t:file { read write getattr };
 
+# Full access to /var/log
+logging_log_file(bootlogd_t);
+
 #used for index reading
 fs_getattr_all_chr_files(bootlogd_t)
 dev_getattr_all_blk_files(bootlogd_t)

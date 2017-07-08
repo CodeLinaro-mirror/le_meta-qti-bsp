@@ -15,8 +15,7 @@ IMAGE_INSTALL += "tinycompress"
 IMAGE_INSTALL += "base-files"
 IMAGE_INSTALL += "base-passwd"
 IMAGE_INSTALL += "bluez5"
-IMAGE_INSTALL += "dhcpcd"
-IMAGE_INSTALL += "dnsmasq"
+
 DEPENDS += "gdb-cross-arm"
 IMAGE_INSTALL += "glib-2.0"
 IMAGE_INSTALL += "init-audio"
@@ -27,10 +26,6 @@ IMAGE_INSTALL += "system-core-usb"
 IMAGE_INSTALL += "system-conf"
 IMAGE_INSTALL += "tcpdump"
 IMAGE_INSTALL += "wireless-tools"
-IMAGE_INSTALL += "wcnss"
-IMAGE_INSTALL += "wlan-opensource"
-IMAGE_INSTALL += "hostap-daemon-qcacld"
-IMAGE_INSTALL += "wpa-supplicant-qcacld"
 
 # Below is to generate sparse ext4 system image (OE by default supports raw ext4 images)
 

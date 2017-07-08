@@ -33,7 +33,7 @@ do_install_append(){
     install -m 755 -o diag -g diag -d ${D}/mnt/sdcard
     if ${@base_contains('DISTRO_FEATURES','ro-rootfs','true','false',d)}; then
         # Override fstab for apq8017
-        if [ ${BASEMACHINE} == "apq8053" || ${BASEMACHINE} == "mdm9607" || ${BASEMACHINE} == "sdx20" || ${BASEMACHINE} == "mdm9650" ]; then
+        if [ ${BASEMACHINE} == "apq8009" || ${BASEMACHINE} == "apq8053" || ${BASEMACHINE} == "mdm9607" || ${BASEMACHINE} == "sdx20" || ${BASEMACHINE} == "mdm9650" ]; then
             install -m 0644 ${WORKDIR}/${BASEMACHINE}/ro-fstab ${D}${sysconfdir}/fstab
         elif [ ${BASEMACHINE} == "apq8017" ]; then
             install -m 0644 ${WORKDIR}/${BASEMACHINE}/ro-fstab ${D}${sysconfdir}/fstab

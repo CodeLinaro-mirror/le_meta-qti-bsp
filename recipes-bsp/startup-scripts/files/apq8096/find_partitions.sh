@@ -72,12 +72,11 @@ FindAndMountVFAT () {
 FindAndMountEXT4 userdata /data
 FindAndMountVFAT modem   /firmware
 FindAndMountEXT4 persist /persist
+FindAndMountEXT4 cache  /cache
 FindAndMountEXT4 dsp /dsp
 
 /sbin/restorecon -RF /data/misc/wifi
 /sbin/restorecon -RF /persist
 /sbin/restorecon -RF /dsp
 /sbin/restorecon -RF /dev
-#making ssh to login as admin
-setsebool -P ssh_sysadm_login 1
 exit 0

@@ -77,6 +77,9 @@ if [[ "${DISTRO_FEATURES}" =~ "selinux" ]]; then
     cp ${IMAGE_ROOTFS}/file_contexts ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/BOOT/RAMDISK/.
     #set selinux_fc
     echo selinux_fc=BOOT/RAMDISK/file_contexts >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
+    #set use_set_metadata to 1 so that updater-script
+    #will have rules to apply selabels
+    echo use_set_metadata=1 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 fi
 
 # copy contents of META folder
@@ -98,6 +101,12 @@ elif [ "${MACHINE}" == "apq8017" ]; then
 
    #recovery_size : Size of recovery partition from partition.xml
    echo recovery_size=0x01E00000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
+elif [ "${MACHINE}" == "apq8096" ]; then
+   #boot_size: Size of boot partition from partition.xml
+   echo boot_size=0x04000000  >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
+
+   #recovery_size : Size of recovery partition from partition.xml
+   echo recovery_size=0x04000000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 else
    #boot_size: Size of boot partition from partition.xml
    echo boot_size=0x00F00000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
