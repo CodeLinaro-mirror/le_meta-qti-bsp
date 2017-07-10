@@ -1,0 +1,31 @@
+From 3c71ce5c82aceafa35caff65b3aa593cdddb018d Mon Sep 17 00:00:00 2001
+From: Bharathraj Nagaraju <snbraj@codeaurora.org>
+Date: Mon, 19 Jun 2017 19:55:52 -0700
+Subject: [PATCH] post_boot: Run install-recovery.sh to update recovery
+ partition.
+
+Change-Id: I34c020e7f7b814db1be5b53809a82e5ab77709a1
+Signed-off-by: Bharathraj Nagaraju <snbraj@codeaurora.org>
+---
+ rootdir/etc/init.qcom.post_boot.sh | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/rootdir/etc/init.qcom.post_boot.sh b/rootdir/etc/init.qcom.post_boot.sh
+index 1143e95..293b1bc 100644
+--- a/rootdir/etc/init.qcom.post_boot.sh
++++ b/rootdir/etc/init.qcom.post_boot.sh
+@@ -650,6 +650,11 @@ case "$target" in
+ ;;
+ esac
+ 
++if [ -f /recovery-from-boot.p ]; then
++        /etc/install-recovery.sh
++	rm -f /recovery-from-boot.p
++fi
++
+ echo "init_qcom_post_boot completed"
+ ;;
+ stop)
+-- 
+1.9.1
+
