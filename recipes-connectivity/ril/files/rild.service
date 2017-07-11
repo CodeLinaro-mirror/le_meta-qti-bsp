@@ -1,13 +1,11 @@
 [Unit]
 Description=rild Service Script
-SourcePath=/usr/bin/start_rild
 After=sysinit.target
 
 [Service]
-Type=forking
-RemainAfterExit=yes
-ExecStart=/usr/bin/start_rild start
-ExecStop=/usr/bin/start_rild stop
+Type=simple
+ExecStart=/usr/bin/rild -l /usr/lib64/libril-qc-qmi-1.so
+Restart=always
 
 [Install]
 WantedBy=multi-user.target
