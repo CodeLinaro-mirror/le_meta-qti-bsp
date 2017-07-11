@@ -46,8 +46,6 @@ do_install_append() {
 		${D}${includedir}/hardware/ril/librilutils/proto/sap-api.pb.h
 	install -m 0755 ${WORKDIR}/start_rild -D ${D}${sysconfdir}/init.d/${INITSCRIPT_NAME}
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
-        install -d ${D}${bindir}
-        install -m 0755 ${WORKDIR}/start_rild -D ${D}${bindir}/start_rild
         install -d ${D}${systemd_unitdir}/system/
         install -m 0644 ${WORKDIR}/rild.service -D ${D}${systemd_unitdir}/system/rild.service
     fi
