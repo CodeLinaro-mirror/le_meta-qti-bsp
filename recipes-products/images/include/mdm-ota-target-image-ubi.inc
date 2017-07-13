@@ -8,7 +8,8 @@ python __anonymous () {
 
 OTA_TARGET_BASENAME_UBI     = "${MACHINE}-ota-target-image-ubi"
 OTA_TARGET_IMAGE_ROOTFS_UBI = "${IMAGE_ROOTFS}/../${OTA_TARGET_BASENAME_UBI}"
-RECOVERY_IMAGE_ROOTFS       = "$(echo ${IMAGE_ROOTFS} | sed 's#${PN}#machine-recovery-image#')"
+OUTPUT_FILE_UBI             = "${DEPLOY_DIR_IMAGE}/${OTA_TARGET_BASENAME_UBI}.zip"
+RECOVERY_IMAGE_ROOTFS        = "$(echo ${IMAGE_ROOTFS} | sed 's#${PN}#machine-recovery-image#')"
 
 #Create directory structure for targetfiles.zip
 do_recovery_ubi[cleandirs] += "${OTA_TARGET_IMAGE_ROOTFS_UBI}"
@@ -110,9 +111,6 @@ do_recovery_ubi() {
 
     #default_system_dev_certificate : Dummy location
     echo default_system_dev_certificate=build/abcd >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
-
-    # Remove empty files and folders
-    find ${OTA_TARGET_IMAGE_ROOTFS_UBI} -empty -delete
 
     # Pack the files into the deploy dir
     cp -r ${OTA_TARGET_IMAGE_ROOTFS_UBI} ${DEPLOY_DIR_IMAGE}
