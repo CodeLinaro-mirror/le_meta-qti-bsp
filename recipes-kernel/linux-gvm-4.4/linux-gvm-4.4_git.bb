@@ -215,6 +215,8 @@ do_deploy () {
         ${extra_mkbootimg_params} --output ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img
     cp ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} "${DEPLOY_DIR_IMAGE}/"
     cp ${B}/vmlinux "${DEPLOY_DIR_IMAGE}/"
+    cp -f ${B}/arch/${ARCH}/boot/dts/qcom/*.dtb "${DEPLOY_DIR_IMAGE}/"
+    cp -f ${B}/arch/${ARCH}/boot/Image "${DEPLOY_DIR_IMAGE}/linux.img"
 }
 
 # Including the file depends on chipset
