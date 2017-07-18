@@ -1,11 +1,11 @@
 [Unit]
 Description=Android Binder IPC
+DefaultDependencies=no
 
 [Service]
 Type=simple
-TimeoutSec=5min
-RemainAfterExit=yes
 ExecStart=/usr/bin/servicemanager
+Restart=always
 
 [Install]
 WantedBy=sysinit.target

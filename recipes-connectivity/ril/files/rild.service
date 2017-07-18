@@ -1,6 +1,8 @@
 [Unit]
 Description=rild Service Script
+DefaultDependencies=no
 After=sysinit.target
+Before=basic.target
 
 [Service]
 Type=simple
@@ -8,4 +10,4 @@ ExecStart=/usr/bin/rild -l /usr/lib64/libril-qc-qmi-1.so
 Restart=always
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=basic.target
