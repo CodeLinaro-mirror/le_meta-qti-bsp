@@ -34,7 +34,9 @@ do_install() {
         install -d ${D}${bindir}
         install -m 0755 ${WORKDIR}/persist-prop.sh -D ${D}${bindir}/persist-prop
         install -d ${D}${systemd_unitdir}/system/
+        install -d ${D}${systemd_unitdir}/system/multi-user.target.wants/
         install -m 0644 ${WORKDIR}/persist-prop.service -D ${D}${systemd_unitdir}/system/persist-prop.service
+        ln -sf ${systemd_unitdir}/system/persist-prop.service ${D}${systemd_unitdir}/system/multi-user.target.wants/persist-prop.service
     fi
 }
 
