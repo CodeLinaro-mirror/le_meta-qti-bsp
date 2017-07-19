@@ -1,6 +1,7 @@
 # Rootfs creation.
 
-DEPENDS_append += "edk2"
+DEPENDS += "edk2"
+
 # The OE-Core minimal boot image files.
 IMAGE_FSTYPES = "ext4"
 

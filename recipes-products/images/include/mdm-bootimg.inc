@@ -1,7 +1,7 @@
 # Force a few additional dependencies in the mix so that we get the needed
 # recipes to build in the right order so we can make the bootimg file and
 # our images...
-DEPENDS = " \
+DEPENDS += " \
              virtual/kernel \
              pkgconfig-native \
              gtk-doc-native \

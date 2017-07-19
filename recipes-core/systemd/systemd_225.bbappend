@@ -6,6 +6,7 @@ SRC_URI += "file://systemd-udevd.service"
 SRC_URI += "file://ffbm.target"
 SRC_URI += "file://mount-data"
 SRC_URI += "file://mount-data.service"
+SRC_URI += "file://mtpserver.rules"
 
 EXTRA_OECONF += " --disable-efi"
 

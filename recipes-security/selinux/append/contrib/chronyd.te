@@ -36,3 +36,5 @@ allow chronyd_t var_log_t:lnk_file read;
 allow chronyd_t etc_runtime_t:file read;
 allow chronyd_t initrc_t:unix_dgram_socket sendto;
 allow chronyd_t urandom_device_t:chr_file { open read ioctl getattr lock };
+init_write_utmp(chronyd_t);
+init_read_utmp(chronyd_t);

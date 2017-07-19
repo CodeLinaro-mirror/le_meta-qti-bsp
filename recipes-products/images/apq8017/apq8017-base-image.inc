@@ -1,6 +1,6 @@
 # Rootfs creation.
 
-DEPENDS_append += "lib32-lk"
+DEPENDS += "lib32-lk"
 
 # The OE-Core minimal boot image files.
 IMAGE_FSTYPES = "ext4"

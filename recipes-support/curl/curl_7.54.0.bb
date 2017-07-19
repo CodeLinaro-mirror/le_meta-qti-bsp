@@ -69,7 +69,6 @@ do_install_append_class-target() {
 PACKAGES =+ "lib${BPN}"
 
 FILES_lib${BPN} = "${libdir}/lib*.so.*"
-RRECOMMENDS_lib${BPN} += "ca-certificates"
 
 FILES_${PN} += "${datadir}/zsh"
 

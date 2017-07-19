@@ -15,7 +15,6 @@ IMAGE_INSTALL += "${@base_conditional('PRODUCT','robot-rome', 'qcacld-hl', '', d
 IMAGE_INSTALL += "${@base_conditional('PRODUCT','robot-rome', 'iw', '', d)}"
 IMAGE_INSTALL_remove = "${@base_conditional('PRODUCT','robot-rome', 'wlan-opensource', '', d)}"
 IMAGE_INSTALL += "${@base_conditional('PRODUCT','robot-rome', 'sigma-dut', '', d)}"
-IMAGE_INSTALL += "${@base_conditional('PRODUCT','robot-rome', 'data', '', d)}"
 IMAGE_INSTALL += "${@base_conditional('PRODUCT','robot-rome', 'wlan-services', '', d)}"
 IMAGE_INSTALL += "${@base_conditional('PRODUCT','robot-rome', 'libcap', '', d)}"
 IMAGE_INSTALL += "${@base_conditional('PRODUCT','robot-rome', 'attr', '', d)}"

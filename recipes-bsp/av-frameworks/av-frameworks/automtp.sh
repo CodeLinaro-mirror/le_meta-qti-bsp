@@ -1,4 +1,6 @@
-# Copyright (c) 2013-2016, The Linux Foundation. All rights reserved.
+#! /bin/sh
+#
+# Copyright (c) 2017, The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -25,37 +27,44 @@
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# filename              partition
 
-NON-HLOS.ubi            modem
-NON-HLOS.bin            /dev/block/bootdevice/by-name/modem
 
-sbl1.mbn                /dev/block/bootdevice/by-name/sbl1
-tz.mbn                  /dev/block/bootdevice/by-name/tz
-rpm.mbn                 /dev/block/bootdevice/by-name/rpm
-emmc_appsboot.mbn       /dev/block/bootdevice/by-name/aboot
 
-# filename + .bak       backup partition
+check_if_configured()
+{
+                ret_val=`cat /sys/class/android_usb/android0/state | grep "CONFIGURED" |wc -l`
+                echo $ret_val
+}
 
-#sbl1.mbn.bak            sbl1bak
-#tz.mbn.bak              tzbak
-#rpm.mbn.bak             rpmbak
-#appsboot.mbn.bak        abootbak
+check_if_disconnected()
+{
+                ret_val=`cat /sys/class/android_usb/android0/state | grep "DISCONNECTED" |wc -l`
+                echo $ret_val
+}
 
-# For multiple file firmware images that differ from *.mbn and *.bin
-# you can specify filename.* to direct all files to the same location.
-# For example for modem.mdt, modem.b00, modem.b01,... modem.bxx files
-# writting 'modem.*   location' will direct all files to 'location'.
-# If still some files need to go to different location give the full
-# file name also, for example 'modem.b01   other_location'
+check_if_started()
+{
+                ret_val=`ps -fe | grep "mtpserver" | grep -v grep |wc -l`
+                echo $ret_val
+}
 
-# filename              location
 
-mba.*                   /firmware/image
-modem.*                 /firmware/image
-bdwlan30.bin            /firmware/image
-nvm_tlv_3.0.bin         /firmware/image
-otp30.bin               /firmware/image
-qwlan30.bin             /firmware/image
-rampatch_tlv_3.0.tlv    /firmware/image
-utf30.bin               /firmware/image
+ret_val=`cat /sys/class/android_usb/android0/functions | grep "mtp" |wc -l`
+if [ $ret_val -eq 1 ]; then
+
+        result=`check_if_configured`
+        result2=`check_if_started`
+        if [ $result -eq 1 ] && [ $result2 -eq 0 ]; then
+                echo -n "Starting mtpserver: " > /dev/kmsg
+                /usr/bin/mtpserver &
+                echo "done" > /dev/kmsg
+        fi
+
+        result=`check_if_disconnected`
+        if [ $result -eq 1 ]; then
+            echo -n "Stoping mtpserver: " > /dev/kmsg
+            killall mtpserver
+            echo "done" > /dev/kmsg
+        fi
+fi
+

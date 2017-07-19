@@ -1,6 +1,7 @@
 # Rootfs creation.
 
-DEPENDS_append += "lk"
+DEPENDS += "lk"
+
 IMAGE_INSTALL += "packagegroup-core-boot"
 
 IMAGE_INSTALL += "${ROOTFS_PKGMANAGE_BOOTSTRAP}"

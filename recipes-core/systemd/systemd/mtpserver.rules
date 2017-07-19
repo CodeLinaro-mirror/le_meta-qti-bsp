@@ -1,4 +1,4 @@
-# Copyright (c) 2013-2016, The Linux Foundation. All rights reserved.
+# Copyright (c) 2017, The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -25,37 +25,22 @@
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# filename              partition
 
-NON-HLOS.ubi            modem
-NON-HLOS.bin            /dev/block/bootdevice/by-name/modem
 
-sbl1.mbn                /dev/block/bootdevice/by-name/sbl1
-tz.mbn                  /dev/block/bootdevice/by-name/tz
-rpm.mbn                 /dev/block/bootdevice/by-name/rpm
-emmc_appsboot.mbn       /dev/block/bootdevice/by-name/aboot
 
-# filename + .bak       backup partition
+# There are a number of modifiers are allowed to be used in some
+# of the different fields. They provide the following subsitutions:
+#
+# %n the "kernel number" of the device.
+#    For example, 'sda3' has a "kernel number" of '3'
+# %e the smallest number for that name which does not matches an existing node
+# %k the kernel name for the device
+# %M the kernel major number for the device
+# %m the kernel minor number for the device
+# %b the bus id for the device
+# %c the string returned by the PROGRAM
+# %s{filename} the content of a sysfs attribute
+# %% the '%' char itself
+#
 
-#sbl1.mbn.bak            sbl1bak
-#tz.mbn.bak              tzbak
-#rpm.mbn.bak             rpmbak
-#appsboot.mbn.bak        abootbak
-
-# For multiple file firmware images that differ from *.mbn and *.bin
-# you can specify filename.* to direct all files to the same location.
-# For example for modem.mdt, modem.b00, modem.b01,... modem.bxx files
-# writting 'modem.*   location' will direct all files to 'location'.
-# If still some files need to go to different location give the full
-# file name also, for example 'modem.b01   other_location'
-
-# filename              location
-
-mba.*                   /firmware/image
-modem.*                 /firmware/image
-bdwlan30.bin            /firmware/image
-nvm_tlv_3.0.bin         /firmware/image
-otp30.bin               /firmware/image
-qwlan30.bin             /firmware/image
-rampatch_tlv_3.0.tlv    /firmware/image
-utf30.bin               /firmware/image
+SUBSYSTEM=="android_usb",      ACTION=="change",   RUN+="/etc/udev/scripts/automtp.sh"

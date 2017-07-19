@@ -1,7 +1,7 @@
 # Rootfs creation.
 
-DEPENDS_append_aarch64 += "lib32-lk"
-DEPENDS_append_arm += "lk"
+DEPENDS_append_aarch64 += " lib32-lk"
+DEPENDS_append_arm += " lk"
 
 IMAGE_INSTALL += "packagegroup-core-boot"
 IMAGE_INSTALL += "${ROOTFS_PKGMANAGE_BOOTSTRAP}"
@@ -40,7 +40,6 @@ IMAGE_INSTALL += "sigma-dut"
 IMAGE_INSTALL += "start-scripts-find-partitions"
 IMAGE_INSTALL += "start-scripts-firmware-links"
 IMAGE_INSTALL += "system-core-adbd"
-IMAGE_INSTALL += "system-core-logd"
 IMAGE_INSTALL += "system-core-usb"
 IMAGE_INSTALL += "system-conf"
 IMAGE_INSTALL += "tcpdump"
