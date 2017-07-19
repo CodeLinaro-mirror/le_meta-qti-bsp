@@ -6,9 +6,7 @@ python __anonymous () {
         bb.build.addtask('do_recovery_ext4', 'do_build', 'do_rootfs', d)
 }
 
-OTA_TARGET_BASENAME_EXT4     = "${MACHINE}-ota-target-image-ext4"
-OTA_TARGET_IMAGE_ROOTFS_EXT4 = "${IMAGE_ROOTFS}/../${OTA_TARGET_BASENAME_EXT4}"
-OUTPUT_FILE_EXT4             = "${DEPLOY_DIR_IMAGE}/${OTA_TARGET_BASENAME_EXT4}.zip"
+OTA_TARGET_IMAGE_ROOTFS_EXT4 = "${IMAGE_ROOTFS}/../${MACHINE}-ota-target-image-ext4"
 RECOVERY_IMAGE_ROOTFS        = "$(echo ${IMAGE_ROOTFS} | sed 's#${PN}#machine-recovery-image#')"
 
 #Create directory structure for targetfiles.zip
@@ -20,7 +18,6 @@ do_recovery_ext4[cleandirs] += "${OTA_TARGET_IMAGE_ROOTFS_EXT4}/OTA"
 do_recovery_ext4[cleandirs] += "${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY"
 do_recovery_ext4[cleandirs] += "${OTA_TARGET_IMAGE_ROOTFS_EXT4}/SYSTEM"
 do_recovery_ext4[cleandirs] += "${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RADIO"
-do_recovery_ext4[cleandirs] += "${DEPLOY_DIR_IMAGE}/${OTA_TARGET_BASENAME_EXT4}"
 
 # Create this folder just for saving file_contexts(SElinux security context file),
 # It will be used to generate OTA packages when selinux_fc is set.
@@ -88,19 +85,19 @@ do_recovery_ext4() {
     #blocksize = BOARD_FLASH_BLOCK_SIZE
     echo blocksize=131072 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 
-    if [ "${MACHINE}" == "apq8053" ] || [ "${MACHINE}" == "apq8053-iot-mtp" ] || [ "${MACHINE}" == "apq8009-robot" ]; then
+    if [ "${BASEMACHINE}" == "apq8053" ] || [ "${BASEMACHINE}" == "apq8009" ]; then
        #boot_size: Size of boot partition from partition.xml
        echo boot_size=0x01900000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 
        #recovery_size : Size of recovery partition from partition.xml
        echo recovery_size=0x01900000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
-    elif [ "${MACHINE}" == "apq8017" ]; then
+    elif [ "${BASEMACHINE}" == "apq8017" ]; then
        #boot_size: Size of boot partition from partition.xml
        echo boot_size=0x01E00000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 
        #recovery_size : Size of recovery partition from partition.xml
        echo recovery_size=0x01E00000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
-    elif [ "${MACHINE}" == "apq8096" ]; then
+    elif [ "${BASEMACHINE}" == "apq8096" ]; then
        #boot_size: Size of boot partition from partition.xml
        echo boot_size=0x04000000  >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 
@@ -131,7 +128,4 @@ do_recovery_ext4() {
 
     #default_system_dev_certificate : Dummy location
     echo default_system_dev_certificate=build/abcd >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
-
-    # Pack the target files zip into the deploy dir
-    zip ${DEPLOY_DIR_IMAGE}/target-files-ext4.zip --symlinks -r ${OTA_TARGET_IMAGE_ROOTFS_EXT4}
 }
