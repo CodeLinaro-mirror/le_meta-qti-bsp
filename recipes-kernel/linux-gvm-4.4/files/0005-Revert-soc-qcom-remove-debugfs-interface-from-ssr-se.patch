@@ -1,0 +1,567 @@
+From 52791fdc1d5bdf081629ee455ba9e5fe896a71d9 Mon Sep 17 00:00:00 2001
+From: Atul Raut <araut@codeaurora.org>
+Date: Thu, 29 Jun 2017 15:31:18 -0700
+Subject: [PATCH 1/6] Revert "soc: qcom: remove debugfs interface from ssr,
+ service locator & notifier"
+
+This reverts commit bfd0d96f4be07baaefc5563c8a6d0311c6131799.
+
+Change-Id: I10f2db6e6c301d35556fe903003fc84d7955b503
+Signed-off-by: Atul Raut <araut@codeaurora.org>
+---
+ drivers/soc/qcom/service-locator.c   | 138 +++++++++++++++++++++++++++
+ drivers/soc/qcom/service-notifier.c  | 177 +++++++++++++++++++++++++++++++++++
+ drivers/soc/qcom/subsystem_restart.c | 105 ++++++++++++++++++++-
+ include/soc/qcom/subsystem_restart.h |   3 +-
+ 4 files changed, 419 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/soc/qcom/service-locator.c b/drivers/soc/qcom/service-locator.c
+index f19db5f..045285f 100644
+--- a/drivers/soc/qcom/service-locator.c
++++ b/drivers/soc/qcom/service-locator.c
+@@ -24,6 +24,7 @@
+ #include <linux/device.h>
+ #include <linux/delay.h>
+ #include <linux/workqueue.h>
++#include <linux/debugfs.h>
+ 
+ #include <soc/qcom/msm_qmi_interface.h>
+ #include <soc/qcom/service-locator.h>
+@@ -438,3 +439,140 @@ int find_subsys(const char *pd_path, char *subsys)
+ 	return 0;
+ }
+ EXPORT_SYMBOL(find_subsys);
++
++static struct pd_qmi_client_data test_data;
++
++static int servloc_test_pdr_cb(struct notifier_block *this,
++			unsigned long opcode, void *ptr)
++{
++	int i, rc = 0;
++	char subsys[QMI_SERVREG_LOC_NAME_LENGTH_V01];
++	struct pd_qmi_client_data *return_data;
++
++	return_data = (struct pd_qmi_client_data *)ptr;
++
++	if (opcode) {
++		pr_err("%s: Failed to get process domain!, opcode = %lu\n",
++			__func__, opcode);
++		return -EIO;
++	}
++
++		pr_err("Service Name: %s\tTotal Domains: %d\n",
++			return_data->service_name, return_data->total_domains);
++
++		for (i = 0; i < return_data->total_domains; i++) {
++			pr_err("Instance ID: %d\t ",
++				return_data->domain_list[i].instance_id);
++			pr_err("Domain Name: %s\n",
++				return_data->domain_list[i].name);
++			rc = find_subsys(return_data->domain_list[i].name,
++					subsys);
++		if (rc < 0)
++			pr_err("No valid subsys found for %s!\n",
++				return_data->domain_list[i].name);
++		else
++			pr_err("Subsys: %s\n", subsys);
++		}
++	return 0;
++}
++
++static struct notifier_block pdr_service_nb = {
++		.notifier_call  = servloc_test_pdr_cb,
++};
++
++static ssize_t servloc_read(struct file *filp, char __user *ubuf,
++		size_t cnt, loff_t *ppos)
++{
++	int rc = 0;
++	char *node_name = filp->private_data;
++
++	if (!strcmp(node_name, "test_servloc_get"))
++		rc = get_service_location(test_data.client_name,
++				test_data.service_name, &pdr_service_nb);
++
++	return rc;
++}
++
++static ssize_t servloc_write(struct file *fp, const char __user *buf,
++				size_t count, loff_t *unused)
++{
++	char *node_name = fp->private_data;
++
++	if (!buf)
++		return -EIO;
++	if (!strcmp(node_name, "service_name")) {
++		snprintf(test_data.service_name, sizeof(test_data.service_name),
++			"%.*s", (int) min((size_t)count - 1,
++			(sizeof(test_data.service_name) - 1)), buf);
++	} else {
++		snprintf(test_data.client_name, sizeof(test_data.client_name),
++			"%.*s", (int) min((size_t)count - 1,
++			(sizeof(test_data.client_name) - 1)), buf);
++	}
++	return count;
++}
++
++static const struct file_operations servloc_fops = {
++	.open	= simple_open,
++	.read	= servloc_read,
++	.write	= servloc_write,
++};
++
++static struct dentry *servloc_base_dir;
++static struct dentry *test_servloc_file;
++
++static int __init servloc_debugfs_init(void)
++{
++	servloc_base_dir = debugfs_create_dir("test_servloc", NULL);
++	return !servloc_base_dir ? -ENOMEM : 0;
++}
++
++static void servloc_debugfs_exit(void)
++{
++	debugfs_remove_recursive(servloc_base_dir);
++}
++
++static int servloc_debugfs_add(void)
++{
++	int rc;
++
++	if (!servloc_base_dir)
++		return -ENOMEM;
++
++	test_servloc_file = debugfs_create_file("client_name",
++				S_IRUGO | S_IWUSR, servloc_base_dir,
++				"client_name", &servloc_fops);
++	rc = !test_servloc_file ? -ENOMEM : 0;
++
++	if (rc == 0) {
++		test_servloc_file = debugfs_create_file("service_name",
++				S_IRUGO | S_IWUSR, servloc_base_dir,
++				"service_name", &servloc_fops);
++		rc = !test_servloc_file ? -ENOMEM : 0;
++	}
++
++	if (rc == 0) {
++		test_servloc_file = debugfs_create_file("test_servloc_get",
++				S_IRUGO | S_IWUSR, servloc_base_dir,
++				"test_servloc_get", &servloc_fops);
++		rc = !test_servloc_file ? -ENOMEM : 0;
++	}
++	return rc;
++}
++
++static int __init service_locator_init(void)
++{
++	pr_debug("service_locator_status = %d\n", locator_status);
++	if (servloc_debugfs_init())
++		pr_err("Could not create test_servloc base directory!");
++	if (servloc_debugfs_add())
++		pr_err("Could not create test_servloc node entries!");
++	return 0;
++}
++
++static void __exit service_locator_exit(void)
++{
++	servloc_debugfs_exit();
++}
++module_init(service_locator_init);
++module_exit(service_locator_exit);
+diff --git a/drivers/soc/qcom/service-notifier.c b/drivers/soc/qcom/service-notifier.c
+index 221ae0c..1e9375e 100644
+--- a/drivers/soc/qcom/service-notifier.c
++++ b/drivers/soc/qcom/service-notifier.c
+@@ -21,6 +21,7 @@
+ #include <linux/slab.h>
+ #include <linux/of.h>
+ #include <linux/err.h>
++#include <linux/debugfs.h>
+ #include <linux/uaccess.h>
+ 
+ #include <soc/qcom/subsystem_restart.h>
+@@ -747,3 +748,179 @@ int service_notif_unregister_notifier(void *service_notif_handle,
+ 				&service_notif->service_notif_rcvr_list, nb);
+ }
+ EXPORT_SYMBOL(service_notif_unregister_notifier);
++
++struct service_notifier_test_data {
++	char service_path[MAX_STRING_LEN];
++	int instance_id;
++	struct notifier_block nb;
++	void *service_notif_handle;
++};
++
++static struct service_notifier_test_data test_data;
++
++static void print_service_provider_state(int notification, char *type)
++{
++	if (notification == SERVREG_NOTIF_SERVICE_STATE_DOWN_V01)
++		pr_info("%s: Service %s down!\n", type, test_data.service_path);
++	else if (notification == SERVREG_NOTIF_SERVICE_STATE_UP_V01)
++		pr_info("%s: Service %s up!\n", type, test_data.service_path);
++	else if (notification == SERVREG_NOTIF_SERVICE_STATE_UNINIT_V01)
++		pr_info("%s: Service %s state uninit!\n", type,
++						test_data.service_path);
++	else
++		pr_info("%s: Service %s state Unknown 0x%x!\n", type,
++					test_data.service_path, notification);
++}
++
++static int nb_callback(struct notifier_block *nb,
++				  unsigned long notification,
++				  void *data)
++{
++	print_service_provider_state((int)notification, "Notification:");
++	return 0;
++}
++
++static ssize_t show_service_path(struct seq_file *f, void *unused)
++{
++	if (test_data.service_notif_handle)
++		seq_printf(f, "Service Path: %s\n", test_data.service_path);
++	else
++		seq_puts(f, "No existing notifier\n");
++	return 0;
++}
++
++
++static ssize_t set_service_notifier_register(struct file *fp,
++						const char __user *buf,
++						size_t count, loff_t *ppos)
++{
++	int curr_state = INT_MAX, rc;
++
++	if (!buf)
++		return -EIO;
++	if (test_data.service_notif_handle) {
++		service_notif_unregister_notifier(
++						test_data.service_notif_handle,
++						&test_data.nb);
++		test_data.service_notif_handle = NULL;
++		pr_info("Unregistering existing notifier for %s\n",
++							test_data.service_path);
++	}
++	rc = simple_write_to_buffer(test_data.service_path, MAX_STRING_LEN,
++							ppos, buf, count - 1);
++	if (rc != count - 1) {
++		pr_err("Unable to read data into kernel buffer\n");
++		goto err;
++	}
++	test_data.nb.notifier_call = nb_callback;
++	test_data.service_notif_handle = service_notif_register_notifier(
++					test_data.service_path,
++					test_data.instance_id, &test_data.nb,
++					&curr_state);
++	if (!IS_ERR(test_data.service_notif_handle)) {
++		pr_info("Notifier Registered for service %s\n",
++						test_data.service_path);
++		print_service_provider_state(curr_state, "Initial State");
++		return count;
++	}
++err:
++	test_data.service_notif_handle = NULL;
++	pr_err("Unable to register notifier for %s\n", test_data.service_path);
++	return -EIO;
++}
++
++static int open_service_notifier_register(struct inode *inode, struct file *f)
++{
++	return single_open(f, (void *) show_service_path,
++							inode->i_private);
++}
++
++static const struct file_operations service_notifier_register_fops = {
++	.open = open_service_notifier_register,
++	.read = seq_read,
++	.write = set_service_notifier_register,
++	.llseek = seq_lseek,
++	.release = seq_release,
++};
++
++static ssize_t show_service_notifier_id(struct seq_file *f, void *unused)
++{
++	seq_printf(f, "Service instance ID: %d\n", test_data.instance_id);
++	return 0;
++}
++
++static ssize_t set_service_notifier_id(struct file *fp,
++						const char __user *buf,
++						size_t count, loff_t *unused)
++{
++	int val, rc;
++	char kbuf[MAX_STRING_LEN];
++
++	if (count > MAX_STRING_LEN) {
++		rc = -EIO;
++		goto err;
++	}
++	rc = copy_from_user(kbuf, buf, count);
++	if (rc != 0) {
++		rc = -EFAULT;
++		goto err;
++	}
++
++	kbuf[count - 1] = '\0';
++	rc = kstrtoint(kbuf, 0, &val);
++	if (rc < 0)
++		goto err;
++
++	test_data.instance_id = val;
++	return count;
++err:
++	pr_err("Invalid input parameters: rc = %d\n", rc);
++	return rc;
++}
++
++static int open_service_notifier_id(struct inode *inode, struct file *f)
++{
++	return single_open(f, (void *) show_service_notifier_id,
++							inode->i_private);
++}
++
++static const struct file_operations service_notifier_id_fops = {
++	.open = open_service_notifier_id,
++	.read = seq_read,
++	.write = set_service_notifier_id,
++	.llseek = seq_lseek,
++	.release = seq_release,
++};
++
++static struct dentry *service_notifier_dir;
++static struct dentry *service_path_file;
++static struct dentry *service_id_file;
++
++static int __init service_notifier_init(void)
++{
++	service_notifier_dir = debugfs_create_dir("service_notifier", NULL);
++	if (service_notifier_dir) {
++		service_path_file = debugfs_create_file("service_path",
++				S_IRUGO | S_IWUSR, service_notifier_dir, NULL,
++				&service_notifier_register_fops);
++		if (!service_path_file)
++			goto err;
++		service_id_file = debugfs_create_file("service_id",
++				S_IRUGO | S_IWUSR, service_notifier_dir, NULL,
++				&service_notifier_id_fops);
++		if (!service_id_file)
++			goto err;
++	}
++	return 0;
++err:
++	debugfs_remove_recursive(service_notifier_dir);
++	return 0;
++}
++
++static void __exit service_notifier_exit(void)
++{
++	debugfs_remove_recursive(service_notifier_dir);
++	test_data.nb.notifier_call = nb_callback;
++}
++module_init(service_notifier_init);
++module_exit(service_notifier_exit);
+diff --git a/drivers/soc/qcom/subsystem_restart.c b/drivers/soc/qcom/subsystem_restart.c
+index 6afe2fb8..b1b46ba 100644
+--- a/drivers/soc/qcom/subsystem_restart.c
++++ b/drivers/soc/qcom/subsystem_restart.c
+@@ -28,6 +28,7 @@
+ #include <linux/spinlock.h>
+ #include <linux/device.h>
+ #include <linux/idr.h>
++#include <linux/debugfs.h>
+ #include <linux/interrupt.h>
+ #include <linux/of_gpio.h>
+ #include <linux/cdev.h>
+@@ -148,6 +149,7 @@ struct restart_log {
+  * @restart_level: restart level (0 - panic, 1 - related, 2 - independent, etc.)
+  * @restart_order: order of other devices this devices restarts with
+  * @crash_count: number of times the device has crashed
++ * @dentry: debugfs directory for this device
+  * @do_ramdump_on_put: ramdump on subsystem_put() if true
+  * @err_ready: completion variable to record error ready from subsystem
+  * @crashed: indicates if subsystem has crashed
+@@ -170,6 +172,9 @@ struct subsys_device {
+ 	int restart_level;
+ 	int crash_count;
+ 	struct subsys_soc_restart_order *restart_order;
++#ifdef CONFIG_DEBUG_FS
++	struct dentry *dentry;
++#endif
+ 	bool do_ramdump_on_put;
+ 	struct cdev char_dev;
+ 	dev_t dev_no;
+@@ -355,11 +360,10 @@ static struct device_attribute subsys_attrs[] = {
+ 	__ATTR_NULL,
+ };
+ 
+-struct bus_type subsys_bus_type = {
++static struct bus_type subsys_bus_type = {
+ 	.name		= "msm_subsys",
+ 	.dev_attrs	= subsys_attrs,
+ };
+-EXPORT_SYMBOL(subsys_bus_type);
+ 
+ static DEFINE_IDA(subsys_ida);
+ 
+@@ -1216,6 +1220,87 @@ void notify_proxy_unvote(struct device *device)
+ 		notify_each_subsys_device(&dev, 1, SUBSYS_PROXY_UNVOTE, NULL);
+ }
+ 
++#ifdef CONFIG_DEBUG_FS
++static ssize_t subsys_debugfs_read(struct file *filp, char __user *ubuf,
++		size_t cnt, loff_t *ppos)
++{
++	int r;
++	char buf[40];
++	struct subsys_device *subsys = filp->private_data;
++
++	r = snprintf(buf, sizeof(buf), "%d\n", subsys->count);
++	return simple_read_from_buffer(ubuf, cnt, ppos, buf, r);
++}
++
++static ssize_t subsys_debugfs_write(struct file *filp,
++		const char __user *ubuf, size_t cnt, loff_t *ppos)
++{
++	struct subsys_device *subsys = filp->private_data;
++	char buf[10];
++	char *cmp;
++
++	cnt = min(cnt, sizeof(buf) - 1);
++	if (copy_from_user(&buf, ubuf, cnt))
++		return -EFAULT;
++	buf[cnt] = '\0';
++	cmp = strstrip(buf);
++
++	if (!strcmp(cmp, "restart")) {
++		if (subsystem_restart_dev(subsys))
++			return -EIO;
++	} else if (!strcmp(cmp, "get")) {
++		if (subsystem_get(subsys->desc->name))
++			return -EIO;
++	} else if (!strcmp(cmp, "put")) {
++		subsystem_put(subsys);
++	} else {
++		return -EINVAL;
++	}
++
++	return cnt;
++}
++
++static const struct file_operations subsys_debugfs_fops = {
++	.open	= simple_open,
++	.read	= subsys_debugfs_read,
++	.write	= subsys_debugfs_write,
++};
++
++static struct dentry *subsys_base_dir;
++
++static int __init subsys_debugfs_init(void)
++{
++	subsys_base_dir = debugfs_create_dir("msm_subsys", NULL);
++	return !subsys_base_dir ? -ENOMEM : 0;
++}
++
++static void subsys_debugfs_exit(void)
++{
++	debugfs_remove_recursive(subsys_base_dir);
++}
++
++static int subsys_debugfs_add(struct subsys_device *subsys)
++{
++	if (!subsys_base_dir)
++		return -ENOMEM;
++
++	subsys->dentry = debugfs_create_file(subsys->desc->name,
++				S_IRUGO | S_IWUSR, subsys_base_dir,
++				subsys, &subsys_debugfs_fops);
++	return !subsys->dentry ? -ENOMEM : 0;
++}
++
++static void subsys_debugfs_remove(struct subsys_device *subsys)
++{
++	debugfs_remove(subsys->dentry);
++}
++#else
++static int __init subsys_debugfs_init(void) { return 0; };
++static void subsys_debugfs_exit(void) { }
++static int subsys_debugfs_add(struct subsys_device *subsys) { return 0; }
++static void subsys_debugfs_remove(struct subsys_device *subsys) { }
++#endif
++
+ static int subsys_device_open(struct inode *inode, struct file *file)
+ {
+ 	struct subsys_device *device, *subsys_dev = 0;
+@@ -1655,8 +1740,17 @@ struct subsys_device *subsys_register(struct subsys_desc *desc)
+ 
+ 	mutex_init(&subsys->track.lock);
+ 
++	ret = subsys_debugfs_add(subsys);
++	if (ret) {
++		ida_simple_remove(&subsys_ida, subsys->id);
++		wakeup_source_trash(&subsys->ssr_wlock);
++		kfree(subsys);
++		return ERR_PTR(ret);
++	}
++
+ 	ret = device_register(&subsys->dev);
+ 	if (ret) {
++		subsys_debugfs_remove(subsys);
+ 		put_device(&subsys->dev);
+ 		return ERR_PTR(ret);
+ 	}
+@@ -1718,6 +1812,7 @@ err_setup_irqs:
+ 	if (ofnode)
+ 		subsys_remove_restart_order(ofnode);
+ err_register:
++	subsys_debugfs_remove(subsys);
+ 	device_unregister(&subsys->dev);
+ 	return ERR_PTR(ret);
+ }
+@@ -1746,6 +1841,7 @@ void subsys_unregister(struct subsys_device *subsys)
+ 		WARN_ON(subsys->count);
+ 		device_unregister(&subsys->dev);
+ 		mutex_unlock(&subsys->track.lock);
++		subsys_debugfs_remove(subsys);
+ 		subsys_char_device_remove(subsys);
+ 		sysmon_notifier_unregister(subsys->desc);
+ 		if (subsys->desc->edge)
+@@ -1785,6 +1881,9 @@ static int __init subsys_restart_init(void)
+ 	ret = bus_register(&subsys_bus_type);
+ 	if (ret)
+ 		goto err_bus;
++	ret = subsys_debugfs_init();
++	if (ret)
++		goto err_debugfs;
+ 
+ 	char_class = class_create(THIS_MODULE, "subsys");
+ 	if (IS_ERR(char_class)) {
+@@ -1803,6 +1902,8 @@ static int __init subsys_restart_init(void)
+ err_soc:
+ 	class_destroy(char_class);
+ err_class:
++	subsys_debugfs_exit();
++err_debugfs:
+ 	bus_unregister(&subsys_bus_type);
+ err_bus:
+ 	destroy_workqueue(ssr_wq);
+diff --git a/include/soc/qcom/subsystem_restart.h b/include/soc/qcom/subsystem_restart.h
+index 9a4d013..b9feffd 100644
+--- a/include/soc/qcom/subsystem_restart.h
++++ b/include/soc/qcom/subsystem_restart.h
+@@ -1,4 +1,4 @@
+-/* Copyright (c) 2014-2017, The Linux Foundation. All rights reserved.
++/* Copyright (c) 2014-2016, The Linux Foundation. All rights reserved.
+  *
+  * This program is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License version 2 and
+@@ -18,7 +18,6 @@
+ #include <linux/interrupt.h>
+ 
+ struct subsys_device;
+-extern struct bus_type subsys_bus_type;
+ 
+ enum {
+ 	RESET_SOC = 0,
+-- 
+1.9.1
+

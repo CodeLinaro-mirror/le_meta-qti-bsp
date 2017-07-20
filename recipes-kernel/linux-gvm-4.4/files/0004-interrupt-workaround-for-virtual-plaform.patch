@@ -1,4 +1,4 @@
-From 377c77247c9081cb3999d5705b27b510e06e65d0 Mon Sep 17 00:00:00 2001
+From 35599e39a0eaaada28724f332c572d0d24e8dbbe Mon Sep 17 00:00:00 2001
 From: Zhiqiang Tu <ztu@codeaurora.org>
 Date: Fri, 23 Jun 2017 14:19:57 +0800
 Subject: [PATCH] interrupt workaround for virtual plaform
@@ -6,10 +6,16 @@ Subject: [PATCH] interrupt workaround for virtual plaform
 Change-Id: I48f1b56bae92f7f5abfb58a72ee70444dc73239f
 Signed-off-by: Zhiqiang Tu <ztu@codeaurora.org>
 ---
- drivers/i2c/busses/i2c-msm-v2.c | 5 +++++
- drivers/net/can/spi/rh850.c     | 6 ++++++
- drivers/spi/spi_qsd.h           | 5 +++++
- 3 files changed, 16 insertions(+)
+ drivers/i2c/busses/i2c-msm-v2.c                  |  5 ++++
+ drivers/net/can/spi/rh850.c                      |  6 +++++
+ drivers/platform/msm/ipa/ipa_v2/ipa_interrupts.c |  5 ++++
+ drivers/platform/msm/sps/sps_bam.c               | 12 +++++++++
+ drivers/soc/qcom/glink_smem_native_xprt.c        | 18 +++++++++++++
+ drivers/soc/qcom/smd_init_dt.c                   | 16 ++++++++++++
+ drivers/soc/qcom/smp2p.c                         |  5 ++++
+ drivers/soc/qcom/subsystem_restart.c             | 32 ++++++++++++++++++++++++
+ drivers/spi/spi_qsd.h                            |  5 ++++
+ 9 files changed, 104 insertions(+)
 
 diff --git a/drivers/i2c/busses/i2c-msm-v2.c b/drivers/i2c/busses/i2c-msm-v2.c
 index 7f98d9f..313ffd8 100644
@@ -49,6 +55,259 @@ index a93f979..bd1090f 100644
  	if (err) {
  		dev_err(dev, "Failed to request irq: %d", err);
  		goto unregister_candev;
+diff --git a/drivers/platform/msm/ipa/ipa_v2/ipa_interrupts.c b/drivers/platform/msm/ipa/ipa_v2/ipa_interrupts.c
+index c17dee9..7db2770 100644
+--- a/drivers/platform/msm/ipa/ipa_v2/ipa_interrupts.c
++++ b/drivers/platform/msm/ipa/ipa_v2/ipa_interrupts.c
+@@ -366,8 +366,13 @@ int ipa_interrupts_init(u32 ipa_irq, u32 ee, struct device *ipa_dev)
+ 	/*Clearing interrupts status*/
+ 	ipa_write_reg(ipa_ctx->mmio, IPA_IRQ_CLR_EE_n_ADDR(ipa_ee), reg);
+ 
++#ifndef CONFIG_MSM_GVM_QUIN
+ 	res = request_irq(ipa_irq, (irq_handler_t) ipa_isr,
+ 				IRQF_TRIGGER_RISING, "ipa", ipa_dev);
++#else
++	res = request_irq(ipa_irq, (irq_handler_t) ipa_isr,
++				IRQF_TRIGGER_RISING | IRQF_ONESHOT, "ipa", ipa_dev);
++#endif
+ 	if (res) {
+ 		IPAERR("fail to register IPA IRQ handler irq=%d\n", ipa_irq);
+ 		return -ENODEV;
+diff --git a/drivers/platform/msm/sps/sps_bam.c b/drivers/platform/msm/sps/sps_bam.c
+index 38a6474..2b24da2 100644
+--- a/drivers/platform/msm/sps/sps_bam.c
++++ b/drivers/platform/msm/sps/sps_bam.c
+@@ -295,16 +295,28 @@ int sps_bam_enable(struct sps_bam *dev)
+ 		/* Register BAM ISR */
+ 		if (dev->props.irq > 0) {
+ 			if (dev->props.options & SPS_BAM_RES_CONFIRM) {
++#ifndef CONFIG_MSM_GVM_QUIN
+ 				result = request_irq(dev->props.irq,
+ 					(irq_handler_t) bam_isr,
+ 					IRQF_TRIGGER_RISING, "sps", dev);
++#else
++				result = request_irq(dev->props.irq,
++					(irq_handler_t) bam_isr,
++					IRQF_TRIGGER_RISING | IRQF_ONESHOT, "sps", dev);
++#endif
+ 				SPS_DBG3(dev,
+ 					"sps:BAM %pa uses edge for IRQ# %d\n",
+ 					BAM_ID(dev), dev->props.irq);
+ 			} else {
++#ifndef CONFIG_MSM_GVM_QUIN
+ 				result = request_irq(dev->props.irq,
+ 					(irq_handler_t) bam_isr,
+ 					IRQF_TRIGGER_HIGH, "sps", dev);
++#else
++				result = request_irq(dev->props.irq,
++					(irq_handler_t) bam_isr,
++					IRQF_TRIGGER_HIGH | IRQF_ONESHOT, "sps", dev);
++#endif
+ 				SPS_DBG3(dev,
+ 					"sps:BAM %pa uses level for IRQ# %d\n",
+ 					BAM_ID(dev), dev->props.irq);
+diff --git a/drivers/soc/qcom/glink_smem_native_xprt.c b/drivers/soc/qcom/glink_smem_native_xprt.c
+index 8385987..ab69035 100644
+--- a/drivers/soc/qcom/glink_smem_native_xprt.c
++++ b/drivers/soc/qcom/glink_smem_native_xprt.c
+@@ -2434,9 +2434,15 @@ static int glink_smem_native_probe(struct platform_device *pdev)
+ 	}
+ 
+ 	einfo->irq_line = irq_line;
++#ifndef CONFIG_MSM_GVM_QUIN
+ 	rc = request_irq(irq_line, irq_handler,
+ 			IRQF_TRIGGER_RISING | IRQF_NO_SUSPEND | IRQF_SHARED,
+ 			node->name, einfo);
++#else
++	rc = request_irq(irq_line, irq_handler,
++			IRQF_ONESHOT | IRQF_TRIGGER_RISING | IRQF_NO_SUSPEND | IRQF_SHARED,
++			node->name, einfo);
++#endif
+ 	if (rc < 0) {
+ 		pr_err("%s: request_irq on %d failed: %d\n", __func__, irq_line,
+ 									rc);
+@@ -2685,9 +2691,15 @@ static int glink_rpm_native_probe(struct platform_device *pdev)
+ 	}
+ 
+ 	einfo->irq_line = irq_line;
++#ifndef CONFIG_MSM_GVM_QUIN
+ 	rc = request_irq(irq_line, irq_handler,
+ 			IRQF_TRIGGER_RISING | IRQF_NO_SUSPEND | IRQF_SHARED,
+ 			node->name, einfo);
++#else
++	rc = request_irq(irq_line, irq_handler,
++			IRQF_ONESHOT | IRQF_TRIGGER_RISING | IRQF_NO_SUSPEND | IRQF_SHARED,
++			node->name, einfo);
++#endif
+ 	if (rc < 0) {
+ 		pr_err("%s: request_irq on %d failed: %d\n", __func__, irq_line,
+ 									rc);
+@@ -2931,9 +2943,15 @@ static int glink_mailbox_probe(struct platform_device *pdev)
+ 	}
+ 
+ 	einfo->irq_line = irq_line;
++#ifndef CONFIG_MSM_GVM_QUIN
+ 	rc = request_irq(irq_line, irq_handler,
+ 			IRQF_TRIGGER_HIGH | IRQF_NO_SUSPEND | IRQF_SHARED,
+ 			node->name, einfo);
++#else
++	rc = request_irq(irq_line, irq_handler,
++			IRQF_ONESHOT | IRQF_TRIGGER_HIGH | IRQF_NO_SUSPEND | IRQF_SHARED,
++			node->name, einfo);
++#endif
+ 	if (rc < 0) {
+ 		pr_err("%s: request_irq on %d failed: %d\n", __func__, irq_line,
+ 									rc);
+diff --git a/drivers/soc/qcom/smd_init_dt.c b/drivers/soc/qcom/smd_init_dt.c
+index 1d722d8..c2b0521 100644
+--- a/drivers/soc/qcom/smd_init_dt.c
++++ b/drivers/soc/qcom/smd_init_dt.c
+@@ -124,11 +124,19 @@ static int msm_smsm_probe(struct platform_device *pdev)
+ 	remote_pid = smd_edge_to_remote_pid(edge);
+ 	interrupt_stats[remote_pid].smsm_interrupt_id = irq_line;
+ 
++#ifndef CONFIG_MSM_GVM_QUIN
+ 	ret = request_irq(irq_line,
+ 				private_irq->irq_handler,
+ 				IRQF_TRIGGER_RISING | IRQF_NO_SUSPEND,
+ 				node->name,
+ 				NULL);
++#else
++	ret = request_irq(irq_line,
++				private_irq->irq_handler,
++				IRQF_ONESHOT | IRQF_TRIGGER_RISING | IRQF_NO_SUSPEND,
++				node->name,
++				NULL);
++#endif
+ 	if (ret < 0) {
+ 		pr_err("%s: request_irq() failed on %d\n", __func__, irq_line);
+ 		return ret;
+@@ -259,11 +267,19 @@ static int msm_smd_probe(struct platform_device *pdev)
+ 	remote_pid = smd_edge_to_remote_pid(edge);
+ 	interrupt_stats[remote_pid].smd_interrupt_id = irq_line;
+ 
++#ifndef CONFIG_MSM_GVM_QUIN
+ 	ret = request_irq(irq_line,
+ 			private_irq->irq_handler,
+ 			IRQF_TRIGGER_RISING | IRQF_NO_SUSPEND | IRQF_SHARED,
+ 			node->name,
+ 			&pdev->dev);
++#else
++	ret = request_irq(irq_line,
++			private_irq->irq_handler,
++			IRQF_ONESHOT | IRQF_TRIGGER_RISING | IRQF_NO_SUSPEND | IRQF_SHARED,
++			node->name,
++			&pdev->dev);
++#endif
+ 	if (ret < 0) {
+ 		pr_err("%s: request_irq() failed on %d\n", __func__, irq_line);
+ 		return ret;
+diff --git a/drivers/soc/qcom/smp2p.c b/drivers/soc/qcom/smp2p.c
+index 1de38bf..8ff82dc 100644
+--- a/drivers/soc/qcom/smp2p.c
++++ b/drivers/soc/qcom/smp2p.c
+@@ -1865,8 +1865,13 @@ static int msm_smp2p_probe(struct platform_device *pdev)
+ 		goto fail;
+ 	}
+ 
++#ifndef CONFIG_MSM_GVM_QUIN
+ 	ret = request_irq(irq_line, smp2p_interrupt_handler,
+ 			IRQF_TRIGGER_RISING, "smp2p", (void *)(uintptr_t)edge);
++#else
++	ret = request_irq(irq_line, smp2p_interrupt_handler,
++			IRQF_TRIGGER_RISING | IRQF_ONESHOT, "smp2p", (void *)(uintptr_t)edge);
++#endif
+ 	if (ret < 0) {
+ 		SMP2P_ERR("%s: request_irq() failed on %d (edge %d)\n",
+ 				__func__, irq_line, edge);
+diff --git a/drivers/soc/qcom/subsystem_restart.c b/drivers/soc/qcom/subsystem_restart.c
+index ae249f3..625ce71 100644
+--- a/drivers/soc/qcom/subsystem_restart.c
++++ b/drivers/soc/qcom/subsystem_restart.c
+@@ -1539,9 +1539,15 @@ static int subsys_setup_irqs(struct subsys_device *subsys)
+ 	int ret;
+ 
+ 	if (desc->err_fatal_irq && desc->err_fatal_handler) {
++#ifndef CONFIG_MSM_GVM_QUIN
+ 		ret = devm_request_irq(desc->dev, desc->err_fatal_irq,
+ 				desc->err_fatal_handler,
+ 				IRQF_TRIGGER_RISING, desc->name, desc);
++#else
++		ret = devm_request_irq(desc->dev, desc->err_fatal_irq,
++				desc->err_fatal_handler,
++				IRQF_ONESHOT | IRQF_TRIGGER_RISING, desc->name, desc);
++#endif
+ 		if (ret < 0) {
+ 			dev_err(desc->dev, "[%s]: Unable to register error fatal IRQ handler!: %d\n",
+ 				desc->name, ret);
+@@ -1551,9 +1557,15 @@ static int subsys_setup_irqs(struct subsys_device *subsys)
+ 	}
+ 
+ 	if (desc->stop_ack_irq && desc->stop_ack_handler) {
++#ifndef CONFIG_MSM_GVM_QUIN
+ 		ret = devm_request_irq(desc->dev, desc->stop_ack_irq,
+ 			desc->stop_ack_handler,
+ 			IRQF_TRIGGER_RISING, desc->name, desc);
++#else
++		ret = devm_request_irq(desc->dev, desc->stop_ack_irq,
++			desc->stop_ack_handler,
++			IRQF_ONESHOT | IRQF_TRIGGER_RISING, desc->name, desc);
++#endif
+ 		if (ret < 0) {
+ 			dev_err(desc->dev, "[%s]: Unable to register stop ack handler!: %d\n",
+ 				desc->name, ret);
+@@ -1563,9 +1575,15 @@ static int subsys_setup_irqs(struct subsys_device *subsys)
+ 	}
+ 
+ 	if (desc->wdog_bite_irq && desc->wdog_bite_handler) {
++#ifndef CONFIG_MSM_GVM_QUIN
+ 		ret = devm_request_irq(desc->dev, desc->wdog_bite_irq,
+ 			desc->wdog_bite_handler,
+ 			IRQF_TRIGGER_RISING, desc->name, desc);
++#else
++		ret = devm_request_irq(desc->dev, desc->wdog_bite_irq,
++			desc->wdog_bite_handler,
++			IRQF_ONESHOT | IRQF_TRIGGER_RISING, desc->name, desc);
++#endif
+ 		if (ret < 0) {
+ 			dev_err(desc->dev, "[%s]: Unable to register wdog bite handler!: %d\n",
+ 				desc->name, ret);
+@@ -1575,9 +1593,15 @@ static int subsys_setup_irqs(struct subsys_device *subsys)
+ 	}
+ 
+ 	if (desc->generic_irq && desc->generic_handler) {
++#ifndef CONFIG_MSM_GVM_QUIN
+ 		ret = devm_request_irq(desc->dev, desc->generic_irq,
+ 			desc->generic_handler,
+ 			IRQF_TRIGGER_HIGH, desc->name, desc);
++#else
++		ret = devm_request_irq(desc->dev, desc->generic_irq,
++			desc->generic_handler,
++			IRQF_ONESHOT | IRQF_TRIGGER_HIGH, desc->name, desc);
++#endif
+ 		if (ret < 0) {
+ 			dev_err(desc->dev, "[%s]: Unable to register generic irq handler!: %d\n",
+ 				desc->name, ret);
+@@ -1587,11 +1611,19 @@ static int subsys_setup_irqs(struct subsys_device *subsys)
+ 	}
+ 
+ 	if (desc->err_ready_irq) {
++#ifndef CONFIG_MSM_GVM_QUIN
+ 		ret = devm_request_irq(desc->dev,
+ 					desc->err_ready_irq,
+ 					subsys_err_ready_intr_handler,
+ 					IRQF_TRIGGER_RISING,
+ 					"error_ready_interrupt", subsys);
++#else
++		ret = devm_request_irq(desc->dev,
++					desc->err_ready_irq,
++					subsys_err_ready_intr_handler,
++					IRQF_ONESHOT | IRQF_TRIGGER_RISING,
++					"error_ready_interrupt", subsys);
++#endif
+ 		if (ret < 0) {
+ 			dev_err(desc->dev,
+ 				"[%s]: Unable to register err ready handler\n",
 diff --git a/drivers/spi/spi_qsd.h b/drivers/spi/spi_qsd.h
 index 47d6996..0451b9b 100644
 --- a/drivers/spi/spi_qsd.h
