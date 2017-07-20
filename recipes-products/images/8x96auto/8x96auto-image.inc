@@ -17,6 +17,7 @@ IMAGE_INSTALL += "ofono"
 IMAGE_INSTALL += "ofono-tests"
 IMAGE_INSTALL += "init-mss"
 IMAGE_INSTALL += "strongswan"
+IMAGE_INSTALL += "gst-multisend"
 
 IMAGE_ROOTFS_SIZE = "2097152"
 IMAGE_ROOTFS_EXTRA_SPACE_append = "${@bb.utils.contains("DISTRO_FEATURES", "systemd", " + 4096", "" ,d)}"
