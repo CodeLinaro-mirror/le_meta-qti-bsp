@@ -1,0 +1,381 @@
+From 4f312030c9c5b45e5d10f41f6281b3c2a2364e8a Mon Sep 17 00:00:00 2001
+From: Atul Raut <araut@codeaurora.org>
+Date: Fri, 30 Jun 2017 17:31:14 -0700
+Subject: [PATCH] drivers:char:diag: Enable diag over IP.
+
+Enable support for diag over IP.
+
+Change-Id: I28fce6416ffc96835e80a03eceafb93e84cf3595
+Signed-off-by: Atul Raut <araut@codeaurora.org>
+---
+ drivers/char/diag/Kconfig              |  4 ++--
+ drivers/char/diag/Makefile             |  3 ++-
+ drivers/char/diag/diag_debugfs.c       | 13 ++++++++++++-
+ drivers/char/diag/diag_mux.c           | 21 +++++++++++----------
+ drivers/char/diag/diagchar_core.c      |  7 ++++++-
+ drivers/char/diag/diagfwd.c            | 13 ++++++++++++-
+ drivers/char/diag/diagfwd_cntl.c       |  3 ++-
+ drivers/char/diag/diagfwd_peripheral.c |  2 ++
+ drivers/char/diag/diagfwd_smux.c       |  3 ++-
+ 9 files changed, 51 insertions(+), 18 deletions(-)
+
+diff --git a/drivers/char/diag/Kconfig b/drivers/char/diag/Kconfig
+index ba629ab..5241499 100644
+--- a/drivers/char/diag/Kconfig
++++ b/drivers/char/diag/Kconfig
+@@ -3,7 +3,7 @@ menu "Diag Support"
+ config DIAG_CHAR
+ 	tristate "char driver interface and diag forwarding to/from modem"
+ 	default m
+-	depends on USB_CONFIGFS_F_DIAG || USB_FUNCTION_DIAG || USB_QCOM_MAEMO
++#	depends on USB_CONFIGFS_F_DIAG || USB_FUNCTION_DIAG || USB_QCOM_MAEMO
+ 	depends on ARCH_QCOM
+ 	depends on POWER_RESET_QCOM
+ 	select CRC_CCITT
+@@ -17,7 +17,7 @@ menu "DIAG traffic over USB"
+ config DIAG_OVER_USB
+ 	bool "Enable DIAG traffic to go over USB"
+         depends on ARCH_QCOM
+-	default y
++	default n
+ 	help
+ 	 This feature helps segregate code required for DIAG traffic to go over USB.
+ endmenu
+diff --git a/drivers/char/diag/Makefile b/drivers/char/diag/Makefile
+index c5ec4f0..adfb21f 100644
+--- a/drivers/char/diag/Makefile
++++ b/drivers/char/diag/Makefile
+@@ -3,4 +3,5 @@ obj-$(CONFIG_DIAGFWD_BRIDGE_CODE) += diagfwd_bridge.o
+ obj-$(CONFIG_USB_QCOM_DIAG_BRIDGE) += diagfwd_hsic.o
+ obj-$(CONFIG_USB_QCOM_DIAG_BRIDGE) += diagfwd_smux.o
+ obj-$(CONFIG_MSM_MHI) += diagfwd_mhi.o
+-diagchar-objs := diagchar_core.o diagchar_hdlc.o diagfwd.o diagfwd_glink.o diagfwd_peripheral.o diagfwd_smd.o diagfwd_socket.o diag_mux.o diag_memorydevice.o diag_usb.o diagmem.o diagfwd_cntl.o diag_dci.o diag_masks.o diag_debugfs.o
++obj-$(CONFIG_DIAG_OVER_USB) += diag_usb.o
++diagchar-objs := diagchar_core.o diagchar_hdlc.o diagfwd.o diagfwd_glink.o diagfwd_peripheral.o diagfwd_smd.o diagfwd_socket.o diag_mux.o diag_memorydevice.o diagmem.o diagfwd_cntl.o diag_dci.o diag_masks.o diag_debugfs.o
+diff --git a/drivers/char/diag/diag_debugfs.c b/drivers/char/diag/diag_debugfs.c
+index c963e46..5e397d7 100644
+--- a/drivers/char/diag/diag_debugfs.c
++++ b/drivers/char/diag/diag_debugfs.c
+@@ -30,7 +30,9 @@
+ #endif
+ #include "diagmem.h"
+ #include "diag_dci.h"
++#ifdef CONFIG_DIAG_OVER_USB
+ #include "diag_usb.h"
++#endif
+ #include "diagfwd_peripheral.h"
+ #include "diagfwd_smd.h"
+ #include "diagfwd_socket.h"
+@@ -42,7 +44,9 @@
+ static struct dentry *diag_dbgfs_dent;
+ static int diag_dbgfs_table_index;
+ static int diag_dbgfs_mempool_index;
++#ifdef CONFIG_DIAG_OVER_USB
+ static int diag_dbgfs_usbinfo_index;
++#endif
+ static int diag_dbgfs_smdinfo_index;
+ static int diag_dbgfs_socketinfo_index;
+ static int diag_dbgfs_glinkinfo_index;
+@@ -407,6 +411,7 @@ static ssize_t diag_dbgfs_read_mempool(struct file *file, char __user *ubuf,
+ 	return ret;
+ }
+ 
++#ifdef CONFIG_DIAG_OVER_USB
+ static ssize_t diag_dbgfs_read_usbinfo(struct file *file, char __user *ubuf,
+ 				       size_t count, loff_t *ppos)
+ {
+@@ -483,6 +488,7 @@ static ssize_t diag_dbgfs_read_usbinfo(struct file *file, char __user *ubuf,
+ 	kfree(buf);
+ 	return ret;
+ }
++#endif
+ 
+ static ssize_t diag_dbgfs_read_smdinfo(struct file *file, char __user *ubuf,
+ 				       size_t count, loff_t *ppos)
+@@ -1075,9 +1081,11 @@ const struct file_operations diag_dbgfs_mempool_ops = {
+ 	.read = diag_dbgfs_read_mempool,
+ };
+ 
++#ifdef CONFIG_DIAG_OVER_USB
+ const struct file_operations diag_dbgfs_usbinfo_ops = {
+ 	.read = diag_dbgfs_read_usbinfo,
+ };
++#endif
+ 
+ const struct file_operations diag_dbgfs_dcistats_ops = {
+ 	.read = diag_dbgfs_read_dcistats,
+@@ -1129,11 +1137,12 @@ int diag_debugfs_init(void)
+ 	if (!entry)
+ 		goto err;
+ 
++#ifdef CONFIG_DIAG_OVER_USB
+ 	entry = debugfs_create_file("usbinfo", 0444, diag_dbgfs_dent, 0,
+ 				    &diag_dbgfs_usbinfo_ops);
+ 	if (!entry)
+ 		goto err;
+-
++#endif
+ 	entry = debugfs_create_file("dci_stats", 0444, diag_dbgfs_dent, 0,
+ 				    &diag_dbgfs_dcistats_ops);
+ 	if (!entry)
+@@ -1169,7 +1178,9 @@ int diag_debugfs_init(void)
+ #endif
+ 	diag_dbgfs_table_index = 0;
+ 	diag_dbgfs_mempool_index = 0;
++#ifdef CONFIG_DIAG_OVER_USB
+ 	diag_dbgfs_usbinfo_index = 0;
++#endif
+ 	diag_dbgfs_smdinfo_index = 0;
+ 	diag_dbgfs_socketinfo_index = 0;
+ 	diag_dbgfs_hsicinfo_index = 0;
+diff --git a/drivers/char/diag/diag_mux.c b/drivers/char/diag/diag_mux.c
+index d6f6ea7..d6aea60 100644
+--- a/drivers/char/diag/diag_mux.c
++++ b/drivers/char/diag/diag_mux.c
+@@ -30,9 +30,16 @@
+ #include "diag_ipc_logging.h"
+ 
+ struct diag_mux_state_t *diag_mux;
+-static struct diag_logger_t usb_logger;
+ static struct diag_logger_t md_logger;
++static struct diag_logger_ops md_log_ops = {
++	.open = diag_md_open_all,
++	.close = diag_md_close_all,
++	.queue_read = NULL,
++	.write = diag_md_write,
++	.close_peripheral = diag_md_close_peripheral,
++};
+ 
++static struct diag_logger_t usb_logger;
+ static struct diag_logger_ops usb_log_ops = {
+ 	.open = diag_usb_connect_all,
+ 	.close = diag_usb_disconnect_all,
+@@ -41,14 +48,6 @@ static struct diag_logger_ops usb_log_ops = {
+ 	.close_peripheral = NULL
+ };
+ 
+-static struct diag_logger_ops md_log_ops = {
+-	.open = diag_md_open_all,
+-	.close = diag_md_close_all,
+-	.queue_read = NULL,
+-	.write = diag_md_write,
+-	.close_peripheral = diag_md_close_peripheral,
+-};
+-
+ int diag_mux_init()
+ {
+ 	diag_mux = kzalloc(sizeof(struct diag_mux_state_t),
+@@ -90,7 +89,8 @@ int diag_mux_register(int proc, int ctx, struct diag_mux_ops *ops)
+ 	if (proc < 0 || proc >= NUM_MUX_PROC)
+ 		return 0;
+ 
+-	/* Register with USB logger */
++/* Register with USB logger */
++#ifdef CONFIG_DIAG_OVER_USB
+ 	usb_logger.ops[proc] = ops;
+ 	err = diag_usb_register(proc, ctx, ops);
+ 	if (err) {
+@@ -98,6 +98,7 @@ int diag_mux_register(int proc, int ctx, struct diag_mux_ops *ops)
+ 		       proc, err);
+ 		return err;
+ 	}
++#endif
+ 
+ 	md_logger.ops[proc] = ops;
+ 	err = diag_md_register(proc, ctx, ops);
+diff --git a/drivers/char/diag/diagchar_core.c b/drivers/char/diag/diagchar_core.c
+index 6be7c48..86bd2fe 100644
+--- a/drivers/char/diag/diagchar_core.c
++++ b/drivers/char/diag/diagchar_core.c
+@@ -24,6 +24,7 @@
+ #include <linux/timer.h>
+ #ifdef CONFIG_DIAG_OVER_USB
+ #include <linux/usb/usbdiag.h>
++#include "diag_usb.h"
+ #endif
+ #include <asm/current.h>
+ #include "diagchar_hdlc.h"
+@@ -35,7 +36,6 @@
+ #include "diag_debugfs.h"
+ #include "diag_masks.h"
+ #include "diagfwd_bridge.h"
+-#include "diag_usb.h"
+ #include "diag_memorydevice.h"
+ #include "diag_mux.h"
+ #include "diag_ipc_logging.h"
+@@ -3225,6 +3225,7 @@ static ssize_t diagchar_write(struct file *file, const char __user *buf,
+ 		return -EIO;
+ 	}
+ 
++#ifdef CONFIG_DIAG_OVER_USB
+ 	if (driver->logging_mode == DIAG_USB_MODE && !driver->usb_connected) {
+ 		if (!((pkt_type == DCI_DATA_TYPE) ||
+ 		    (pkt_type == DCI_PKT_TYPE) ||
+@@ -3235,6 +3236,7 @@ static ssize_t diagchar_write(struct file *file, const char __user *buf,
+ 			return -EIO;
+ 		}
+ 	}
++#endif
+ 
+ 	payload_buf = buf + sizeof(int);
+ 	payload_len = count - sizeof(int);
+@@ -3258,6 +3260,8 @@ static ssize_t diagchar_write(struct file *file, const char __user *buf,
+ 			pkt_type ^= DATA_TYPE_DCI_LOG;
+ 		if (pkt_type & DATA_TYPE_DCI_EVENT)
+ 			pkt_type ^= DATA_TYPE_DCI_EVENT;
++
++#ifdef CONFIG_DIAG_OVER_USB
+ 		/*
+ 		 * Check if the log or event is selected even on the regular
+ 		 * stream. If USB is not connected and we are not in memory
+@@ -3266,6 +3270,7 @@ static ssize_t diagchar_write(struct file *file, const char __user *buf,
+ 		if (pkt_type && driver->logging_mode == DIAG_USB_MODE &&
+ 		    !driver->usb_connected)
+ 			return err;
++#endif
+ 	}
+ 
+ 	switch (pkt_type) {
+diff --git a/drivers/char/diag/diagfwd.c b/drivers/char/diag/diagfwd.c
+index 019bf19..d67baae 100644
+--- a/drivers/char/diag/diagfwd.c
++++ b/drivers/char/diag/diagfwd.c
+@@ -25,6 +25,7 @@
+ #include <linux/kmemleak.h>
+ #ifdef CONFIG_DIAG_OVER_USB
+ #include <linux/usb/usbdiag.h>
++#include "diag_usb.h"
+ #endif
+ #include <soc/qcom/socinfo.h>
+ #include <soc/qcom/restart.h>
+@@ -36,7 +37,6 @@
+ #include "diagchar_hdlc.h"
+ #include "diag_dci.h"
+ #include "diag_masks.h"
+-#include "diag_usb.h"
+ #include "diag_mux.h"
+ #include "diag_ipc_logging.h"
+ 
+@@ -812,6 +812,7 @@ int diag_check_common_cmd(struct diag_pkt_header_t *header)
+ 	return 0;
+ }
+ 
++#ifdef CONFIG_DIAG_OVER_USB
+ static int diag_cmd_chk_stats(unsigned char *src_buf, int src_len,
+ 			      unsigned char *dest_buf, int dest_len)
+ {
+@@ -870,6 +871,7 @@ static int diag_cmd_chk_stats(unsigned char *src_buf, int src_len,
+ 	return write_len;
+ }
+ 
++
+ static int diag_cmd_disable_hdlc(unsigned char *src_buf, int src_len,
+ 				 unsigned char *dest_buf, int dest_len)
+ {
+@@ -897,6 +899,7 @@ static int diag_cmd_disable_hdlc(unsigned char *src_buf, int src_len,
+ 
+ 	return write_len;
+ }
++#endif
+ 
+ void diag_send_error_rsp(unsigned char *buf, int len,
+ 			struct diag_md_session_t *info)
+@@ -915,7 +918,9 @@ void diag_send_error_rsp(unsigned char *buf, int len,
+ int diag_process_apps_pkt(unsigned char *buf, int len,
+ 			struct diag_md_session_t *info)
+ {
++#ifdef CONFIG_DIAG_OVER_USB
+ 	int i;
++#endif
+ 	int mask_ret;
+ 	int write_len = 0;
+ 	unsigned char *temp = NULL;
+@@ -1237,7 +1242,9 @@ static int diagfwd_mux_open(int id, int mode)
+ 
+ 	switch (mode) {
+ 	case DIAG_USB_MODE:
++#ifdef CONFIG_DIAG_OVER_USB
+ 		driver->usb_connected = 1;
++#endif
+ 		break;
+ 	case DIAG_MEMORY_DEVICE_MODE:
+ 		break;
+@@ -1270,7 +1277,9 @@ static int diagfwd_mux_close(int id, int mode)
+ 
+ 	switch (mode) {
+ 	case DIAG_USB_MODE:
++#ifdef CONFIG_DIAG_OVER_USB
+ 		driver->usb_connected = 0;
++#endif
+ 		break;
+ 	case DIAG_MEMORY_DEVICE_MODE:
+ 		break;
+@@ -1708,7 +1717,9 @@ int diagfwd_init(void)
+ err:
+ 	pr_err("diag: In %s, couldn't initialize diag\n", __func__);
+ 
++#ifdef CONFIG_DIAG_OVER_USB
+ 	diag_usb_exit(DIAG_USB_LOCAL);
++#endif
+ 	kfree(driver->encoded_rsp_buf);
+ 	kfree(driver->hdlc_buf);
+ 	kfree(driver->client_map);
+diff --git a/drivers/char/diag/diagfwd_cntl.c b/drivers/char/diag/diagfwd_cntl.c
+index 4ae2158..5639e6a 100644
+--- a/drivers/char/diag/diagfwd_cntl.c
++++ b/drivers/char/diag/diagfwd_cntl.c
+@@ -756,6 +756,7 @@ void diag_cntl_process_read_data(struct diagfwd_info *p_info, void *buf,
+ 	return;
+ }
+ 
++#ifdef CONFIG_DIAG_OVER_USB
+ static int diag_compute_real_time(int idx)
+ {
+ 	int real_time = MODE_REALTIME;
+@@ -792,7 +793,7 @@ static int diag_compute_real_time(int idx)
+ 	}
+ 	return real_time;
+ }
+-
++#endif
+ static void diag_create_diag_mode_ctrl_pkt(unsigned char *dest_buf,
+ 					   uint8_t diag_id, int real_time)
+ {
+diff --git a/drivers/char/diag/diagfwd_peripheral.c b/drivers/char/diag/diagfwd_peripheral.c
+index e86dc82..3668c08 100644
+--- a/drivers/char/diag/diagfwd_peripheral.c
++++ b/drivers/char/diag/diagfwd_peripheral.c
+@@ -1101,6 +1101,7 @@ static void __diag_fwd_open(struct diagfwd_info *fwd_info)
+ 	 * Keeping the buffers busy for Memory Device Mode.
+ 	 */
+ 
++#ifdef CONFIG_DIAG_OVER_USB
+ 	if ((driver->logging_mode != DIAG_USB_MODE) ||
+ 		driver->usb_connected) {
+ 		if (fwd_info->buf_1)
+@@ -1108,6 +1109,7 @@ static void __diag_fwd_open(struct diagfwd_info *fwd_info)
+ 		if (fwd_info->buf_2)
+ 			atomic_set(&fwd_info->buf_2->in_busy, 0);
+ 	}
++#endif
+ 
+ 	if (fwd_info->p_ops && fwd_info->p_ops->open)
+ 		fwd_info->p_ops->open(fwd_info->ctxt);
+diff --git a/drivers/char/diag/diagfwd_smux.c b/drivers/char/diag/diagfwd_smux.c
+index 6297438..759deff 100644
+--- a/drivers/char/diag/diagfwd_smux.c
++++ b/drivers/char/diag/diagfwd_smux.c
+@@ -14,8 +14,9 @@
+ #include <linux/diagchar.h>
+ #include <linux/platform_device.h>
+ #include <linux/pm_runtime.h>
++#ifdef CONFIG_DIAG_OVER_USB
+ #include <linux/usb/usbdiag.h>
+-
++#endif
+ #include "diagchar.h"
+ #include "diagfwd_bridge.h"
+ #include "diagfwd_smux.h"
+-- 
+1.9.1
+
