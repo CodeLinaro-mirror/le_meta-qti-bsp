@@ -1,4 +1,4 @@
-From 35599e39a0eaaada28724f332c572d0d24e8dbbe Mon Sep 17 00:00:00 2001
+From 102386aeaf99d0721b079f200f1c6ae7674881d2 Mon Sep 17 00:00:00 2001
 From: Zhiqiang Tu <ztu@codeaurora.org>
 Date: Fri, 23 Jun 2017 14:19:57 +0800
 Subject: [PATCH] interrupt workaround for virtual plaform
@@ -15,7 +15,8 @@ Signed-off-by: Zhiqiang Tu <ztu@codeaurora.org>
  drivers/soc/qcom/smp2p.c                         |  5 ++++
  drivers/soc/qcom/subsystem_restart.c             | 32 ++++++++++++++++++++++++
  drivers/spi/spi_qsd.h                            |  5 ++++
- 9 files changed, 104 insertions(+)
+ drivers/tty/serial/msm_serial_hs.c               | 12 +++++++++
+ 10 files changed, 116 insertions(+)
 
 diff --git a/drivers/i2c/busses/i2c-msm-v2.c b/drivers/i2c/busses/i2c-msm-v2.c
 index 7f98d9f..313ffd8 100644
@@ -326,6 +327,42 @@ index 47d6996..0451b9b 100644
  }
  
  static inline void msm_spi_disable_irqs(struct msm_spi *dd)
+diff --git a/drivers/tty/serial/msm_serial_hs.c b/drivers/tty/serial/msm_serial_hs.c
+index 830ef92..819147b 100644
+--- a/drivers/tty/serial/msm_serial_hs.c
++++ b/drivers/tty/serial/msm_serial_hs.c
+@@ -2614,10 +2614,17 @@ static int msm_hs_startup(struct uart_port *uport)
+ 	msm_hs_resource_vote(msm_uport);
+ 
+ 	if (is_use_low_power_wakeup(msm_uport)) {
++#ifndef CONFIG_MSM_GVM_QUIN
+ 		ret = request_threaded_irq(msm_uport->wakeup.irq, NULL,
+ 					msm_hs_wakeup_isr,
+ 					IRQF_TRIGGER_FALLING | IRQF_ONESHOT,
+ 					"msm_hs_wakeup", msm_uport);
++#else
++		ret = request_threaded_irq(msm_uport->wakeup.irq, NULL,
++					msm_hs_wakeup_isr,
++					IRQF_TRIGGER_HIGH | IRQF_ONESHOT,
++					"msm_hs_wakeup", msm_uport);
++#endif
+ 		if (unlikely(ret)) {
+ 			MSM_HS_ERR("%s():Err getting uart wakeup_irq %d\n",
+ 				  __func__, ret);
+@@ -2717,8 +2724,13 @@ static int msm_hs_startup(struct uart_port *uport)
+ 	 */
+ 	mb();
+ 
++#ifndef CONFIG_MSM_GVM_QUIN
+ 	ret = request_irq(uport->irq, msm_hs_isr, IRQF_TRIGGER_HIGH,
+ 			  "msm_hs_uart", msm_uport);
++#else
++	ret = request_irq(uport->irq, msm_hs_isr, IRQF_TRIGGER_HIGH |
++			IRQF_ONESHOT, "msm_hs_uart", msm_uport);
++#endif
+ 	if (unlikely(ret)) {
+ 		MSM_HS_ERR("%s():Error %d getting uart irq\n", __func__, ret);
+ 		goto sps_disconnect_rx;
 -- 
 1.9.1
 
