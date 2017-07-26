@@ -33,7 +33,6 @@ IMAGE_INSTALL += "powerapp-powerconfig"
 IMAGE_INSTALL += "powerapp-reboot"
 IMAGE_INSTALL += "powerapp-shutdown"
 IMAGE_INSTALL += "perl"
-IMAGE_INSTALL += "qcacld-hl"
 
 IMAGE_INSTALL += "sigma-dut"
 IMAGE_INSTALL += "start-scripts-find-partitions"
@@ -47,5 +46,4 @@ IMAGE_INSTALL += "wireless-tools"
 # Below packages are open source packages that depend on proprietary packages
 
 QMI_DIR_PRESENT = "${@os.path.exists('${WORKSPACE}/qmi')}"
-IMAGE_INSTALL += "${@base_conditional('QMI_DIR_PRESENT', 'True', 'wpa-supplicant-qcacld', '', d)}"
 

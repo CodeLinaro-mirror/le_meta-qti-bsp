@@ -132,6 +132,6 @@ do_recovery_ext4() {
     #default_system_dev_certificate : Dummy location
     echo default_system_dev_certificate=build/abcd >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 
-    # Pack the files into the deploy dir
-    cp -r ${OTA_TARGET_IMAGE_ROOTFS_EXT4} ${DEPLOY_DIR_IMAGE}
+    # Pack the target files zip into the deploy dir
+    zip ${DEPLOY_DIR_IMAGE}/target-files-ext4.zip --symlinks -r ${OTA_TARGET_IMAGE_ROOTFS_EXT4}
 }

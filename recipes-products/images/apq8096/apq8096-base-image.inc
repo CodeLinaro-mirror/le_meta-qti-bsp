@@ -26,7 +26,6 @@ IMAGE_INSTALL += "e2fsprogs-e2fsck"
 IMAGE_INSTALL += "e2fsprogs-resize2fs"
 DEPENDS += "gdb-cross-aarch64"
 IMAGE_INSTALL += "glib-2.0"
-IMAGE_INSTALL += "qcacld-ll"
 
 IMAGE_INSTALL += "start-scripts-find-partitions"
 IMAGE_INSTALL += "start-scripts-firmware-links"
