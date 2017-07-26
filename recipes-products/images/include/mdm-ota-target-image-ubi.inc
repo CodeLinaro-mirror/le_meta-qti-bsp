@@ -108,4 +108,6 @@ do_recovery_ubi() {
 
     #default_system_dev_certificate : Dummy location
     echo default_system_dev_certificate=build/abcd >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
+
+    cp -r ${OTA_TARGET_IMAGE_ROOTFS_UBI} ${DEPLOY_DIR_IMAGE}
 }
