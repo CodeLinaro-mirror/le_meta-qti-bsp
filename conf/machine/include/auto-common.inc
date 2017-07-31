@@ -51,10 +51,10 @@ GCCVERSION = "5.3.0"
 IMAGE_FSTYPES += "tar.bz2 ext4"
 
 # Graphics driver essentials
-PREFERRED_PROVIDER_virtual/wayland-egl  = "adreno"
-PREFERRED_PROVIDER_virtual/egl          = "adreno"
-PREFERRED_PROVIDER_virtual/libgles1     = "adreno"
-PREFERRED_PROVIDER_virtual/libgles2     = "adreno"
+PREFERRED_PROVIDER_virtual/wayland-egl  ?= "mesa"
+PREFERRED_PROVIDER_virtual/egl          ?= "mesa"
+PREFERRED_PROVIDER_virtual/libgles1     ?= "mesa"
+PREFERRED_PROVIDER_virtual/libgles2     ?= "mesa"
 
 PREFERRED_VERSION_weston = "1.9.0"
 PREFERRED_VERSION_wayland = "1.9.0"
