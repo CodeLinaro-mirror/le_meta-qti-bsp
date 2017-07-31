@@ -4,13 +4,14 @@ require conf/machine/include/basemachine.inc
 SOC_FAMILY ?= "msm8996"
 include conf/machine/include/soc-family.inc
 
+require conf/machine/include/arm/arch-armv8.inc
+
 # Use non-perf settings for the perf build.
 BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
 MACHINEGROUP = "auto"
+WITH_PROP_LAYER ?= "no"
 
 TMPDIR = "${TOPDIR}/tmp-glibc"
-
-require conf/machine/include/arm/arch-armv8.inc
 
 SERIAL_CONSOLE ?= "115200 ttyHSL0"
 
@@ -94,3 +95,6 @@ BB_HASHBASE_WHITELIST = "TMPDIR FILE PATH PWD BB_TASKHASH BBPATH DL_DIR \
 # Cynara
 DISTRO_FEATURES_append = " dbus-cynara "
 
+# If non "meta-qti-bsp-prop" layer, add below path to BBMASK.
+BBMASK_append = "${@base_conditional('WITH_PROP_LAYER', 'no', '|meta-qti-bsp/recipes-qt/qt5/', '',d)}"
+BBMASK_append = "${@base_conditional('WITH_PROP_LAYER', 'no', '|meta-qti-bsp/recipes-graphics/xorg-proto/dri2proto_2.8.bb', '',d)}"
