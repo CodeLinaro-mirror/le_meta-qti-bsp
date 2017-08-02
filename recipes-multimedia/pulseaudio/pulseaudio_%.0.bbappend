@@ -10,7 +10,7 @@ PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'zeroconf', 'avahi', 
 
 SRC_URI += " \
              file://0001-disable-timer-based-scheduling.patch \
-             file://0002-default.pa-Load-acdb-and-codec-control-modules.patch \
+             file://0002-default.pa-Load-acdb-module.patch \
              file://0003-default.pa-Load-agl-audio-plugin-module.patch \
              file://0004-udev-Add-rules-for-QTI-MSM8996.patch \
              file://0006-Support-PulseAudio-Client-API-for-Module-Codec-Control.patch \
