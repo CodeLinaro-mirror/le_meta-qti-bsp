@@ -6,7 +6,6 @@ IMAGE_INSTALL += "iw"
 IMAGE_INSTALL += "data"
 IMAGE_INSTALL += "sigma-dut"
 IMAGE_INSTALL += "lib32-ffmpeg"
-IMAGE_INSTALL += "lib32-gst-bt-app"
 
 #Enabling GStreamer Core
 IMAGE_INSTALL += "lib32-gstreamer1.0"

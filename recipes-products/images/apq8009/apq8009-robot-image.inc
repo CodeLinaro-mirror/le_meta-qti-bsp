@@ -6,7 +6,8 @@ require apq8009-base-image.inc
 # since packagegroup-ss-mgr just include reboot-daemon and init-mss
 IMAGE_INSTALL_remove = "packagegroup-ss-mgr"
 IMAGE_INSTALL += "reboot-daemon"
-
+IMAGE_INSTALL += "e2fsprogs"
+IMAGE_INSTALL += "start-scripts-userfs-reset"
 IMAGE_INSTALL += "chrony"
 IMAGE_INSTALL += "chronyc"
 

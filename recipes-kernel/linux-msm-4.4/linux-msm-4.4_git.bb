@@ -192,9 +192,8 @@ do_deploy () {
         --pagesize ${PAGE_SIZE} \
         --base ${KERNEL_BASE} \
         --ramdisk_offset 0x0 \
-        ${extra_mkbootimg_params} --output ${DEPLOY_DIR_IMAGE}/boot.img
+        ${extra_mkbootimg_params} --output ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img
 
-    boot_signing
 }
 
 do_module_signing() {

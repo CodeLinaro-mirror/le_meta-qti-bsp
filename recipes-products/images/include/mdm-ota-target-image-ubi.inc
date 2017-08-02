@@ -2,13 +2,11 @@ DEPENDS += "${@["","machine-recovery-image"][(d.getVar('RECOVERY_IMAGE', True) =
 
 # Add task to generate recovery image
 python __anonymous () {
-    if (d.getVar('RECOVERY_IMAGE', True) == '1'):
+    if d.getVar('RECOVERY_IMAGE', True) == '1' and bb.utils.contains('IMAGE_FSTYPES', 'ubi', True, False, d):
         bb.build.addtask('do_recovery_ubi', 'do_build', 'do_rootfs', d)
 }
 
-OTA_TARGET_BASENAME_UBI     = "${MACHINE}-ota-target-image-ubi"
-OTA_TARGET_IMAGE_ROOTFS_UBI = "${IMAGE_ROOTFS}/../${OTA_TARGET_BASENAME_UBI}"
-OUTPUT_FILE_UBI             = "${DEPLOY_DIR_IMAGE}/${OTA_TARGET_BASENAME_UBI}.zip"
+OTA_TARGET_IMAGE_ROOTFS_UBI = "${IMAGE_ROOTFS}/../${MACHINE}-ota-target-image-ubi"
 RECOVERY_IMAGE_ROOTFS        = "$(echo ${IMAGE_ROOTFS} | sed 's#${PN}#machine-recovery-image#')"
 
 #Create directory structure for targetfiles.zip
@@ -20,7 +18,6 @@ do_recovery_ubi[cleandirs] += "${OTA_TARGET_IMAGE_ROOTFS_UBI}/OTA"
 do_recovery_ubi[cleandirs] += "${OTA_TARGET_IMAGE_ROOTFS_UBI}/RECOVERY"
 do_recovery_ubi[cleandirs] += "${OTA_TARGET_IMAGE_ROOTFS_UBI}/SYSTEM"
 do_recovery_ubi[cleandirs] += "${OTA_TARGET_IMAGE_ROOTFS_UBI}/RADIO"
-do_recovery_ubi[cleandirs] += "${DEPLOY_DIR_IMAGE}/${OTA_TARGET_BASENAME_UBI}"
 
 # Create this folder just for saving file_contexts(SElinux security context file),
 # It will be used to generate OTA packages when selinux_fc is set.
@@ -111,7 +108,4 @@ do_recovery_ubi() {
 
     #default_system_dev_certificate : Dummy location
     echo default_system_dev_certificate=build/abcd >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
-
-    # Pack the target files zip into the deploy dir
-    zip ${DEPLOY_DIR_IMAGE}/target-files-ubi.zip --symlinks -r ${OTA_TARGET_IMAGE_ROOTFS_UBI}
 }

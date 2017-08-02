@@ -34,17 +34,17 @@ case "$1" in
     ;;
 
   stop )
-    echo "Unmounting /data" > /dev/console
+    echo "Unmounting /data"
     sync
-    umount /data/ &>/dev/console
+    umount /data/
 
     if [ -f /var/volatile/userfs-reset-cookie ]; then
-      echo "Cookie is present" > /dev/console
+      echo "Cookie is present"
       target=$(cat /target)
       if [ "$(cat /var/volatile/userfs-reset-cookie)" = "1" ]; then
-        echo "Cookie is set" > /dev/console
-        mkfs.ext4 -d /var/volatile/usrfs-defaults/ /dev/disk/by-partlabel/userdata &> /dev/console
-        echo "Formating done" > /dev/console
+        echo "Cookie is set"
+        mkfs.ext4 -d /var/volatile/usrfs-defaults/ /dev/disk/by-partlabel/userdata
+        echo "Formating done"
       else
         echo "Cookie not set"
         exit 1

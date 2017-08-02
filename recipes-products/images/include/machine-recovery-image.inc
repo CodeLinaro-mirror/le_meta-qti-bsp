@@ -3,17 +3,8 @@ DEPENDS_append_arm += " lk"
 
 DEPENDS += "virtual/kernel"
 
-# Image output types
-IMAGE_FSTYPES = "tar.gz"
-
 DEPENDS += "pkgconfig-native gtk-doc-native gettext-native mkbootimg-native dtbtool-native"
 DEPENDS += "bzip2 fsconfig-native applypatch-native bsdiff-native ext4-utils-native"
-
-IMAGE_FSTYPES += "${@base_contains('DISTRO', 'mdm', 'ubi', '', d)}"
-
-MKUBIFS_ARGS = "${@base_contains('DISTRO', 'mdm', '-m 4096 -e 253952 -c 83 -F', '', d)}"
-
-UBI_VOLNAME = "${@base_contains('DISTRO', 'mdm', 'rootfs', '', d)}"
 
 # The OE-Core minimal boot image files.
 IMAGE_INSTALL += "packagegroup-core-boot"
@@ -48,6 +39,10 @@ IMAGE_INSTALL += "${@base_contains('DISTRO_FEATURES','selinux','refpolicy-mls','
 
 # Limit the recovery image size to 136M
 RECOVERYFS_SIZE_EXT4 ?= "136000000"
+
+# Needed for generating recovery.ubi ignored for ext4
+MKUBIFS_ARGS = "${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', '-m 4096 -e 253952 -c 83 -F', '', d)}"
+UBI_VOLNAME  = "${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', 'rootfs', '', d)}"
 
 SELINUX_FILE_CONTEXTS = "${IMAGE_ROOTFS}/etc/selinux/mls/contexts/files/file_contexts"
 
