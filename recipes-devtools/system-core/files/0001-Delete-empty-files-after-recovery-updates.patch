@@ -1,0 +1,26 @@
+From 8b8a3e72d20ad5cb8055337719ea296aee1fd54b Mon Sep 17 00:00:00 2001
+From: Bharathraj Nagaraju <snbraj@codeaurora.org>
+Date: Mon, 17 Jul 2017 10:48:59 -0700
+Subject: [PATCH] Delete empty files after recovery updates.
+
+Change-Id: I8721ea60f1230c7d17b3c6ebe713b588edf24df2
+Signed-off-by: Bharathraj Nagaraju <snbraj@codeaurora.org>
+---
+ rootdir/etc/init.qcom.post_boot.sh | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/rootdir/etc/init.qcom.post_boot.sh b/rootdir/etc/init.qcom.post_boot.sh
+index 8bdfc37..6eeea78 100644
+--- a/rootdir/etc/init.qcom.post_boot.sh
++++ b/rootdir/etc/init.qcom.post_boot.sh
+@@ -652,6 +652,7 @@ esac
+ if [ -f /recovery-from-boot.p ]; then
+         /etc/install-recovery.sh
+ 	rm -f /recovery-from-boot.p
++	find / -name  "__emptyfile__" | xargs rm
+ fi
+ 
+ echo "init_qcom_post_boot completed"
+-- 
+1.9.1
+

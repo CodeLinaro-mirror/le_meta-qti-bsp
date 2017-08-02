@@ -5,6 +5,7 @@ SRC_URI += "file://0001-Fix-adb-shell-env-issue.patch"
 EXTRA_OECONF_remove = "--with-logd-logging"
 
 SRC_URI += "file://0001-post_boot-Run-install-recovery.sh-to-update-recovery.patch"
+SRC_URI += "file://0001-Delete-empty-files-after-recovery-updates.patch"
 
 do_install_append() {
    if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then

@@ -29,11 +29,13 @@ do_install_append() {
     install -m 0755 ${WORKDIR}/servicemanager.sh -D ${D}/${sysconfdir}/init.d/servicemanager.sh
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
         install -d ${D}${systemd_unitdir}/system/
+        install -d ${D}${systemd_unitdir}/system/sysinit.target.wants/
         install -m 0644 ${WORKDIR}/servicemanager.service -D ${D}${systemd_unitdir}/system/servicemanager.service
+        ln -sf ${systemd_unitdir}/system/servicemanager.service ${D}${systemd_unitdir}/system/sysinit.target.wants/servicemanager.service
     fi
 }
 
-pkg_postinst_${PN} () {
+pkg_postinst_${PN}_append () {
         if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
         else
         update-alternatives --install ${sysconfdir}/init.d/servicemanager.sh servicemanager.sh servicemanager 60

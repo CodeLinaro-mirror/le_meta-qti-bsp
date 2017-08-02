@@ -10,6 +10,7 @@ SRC_URI_append = "\
     file://weston.ini_caf \
     file://0001-outpub_fbdev-follow-the-work-flow-of-MSM8996.patch \
     file://0001-configure-don-t-control-egl-version.patch \
+    file://drm_firmware_load_trigger.service \
 "
 CFLAGS += "-idirafter ${STAGING_KERNEL_DIR}/include/"
 
@@ -86,6 +87,14 @@ do_install_append() {
     # Install SDM strategy plugin library
     install -d ${D}${libdir}/
     cp -r ${S}/sdm_plugin/libsdm_strategy_plugin.so ${D}${libdir}
+    if ${@bb.utils.contains('BASEMACHINE', '8x96autofusion', 'true', 'false', d)}; then
+        if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
+            install -d ${D}${systemd_unitdir}/system
+            install -d ${D}${systemd_unitdir}/system/multi-user.target.wants/
+            install -m 0644 ${WORKDIR}/drm_firmware_load_trigger.service ${D}${systemd_unitdir}/system/drm_firmware_load_trigger.service
+            ln -sf ${systemd_unitdir}/system/drm_firmware_load_trigger.service ${D}${systemd_unitdir}/system/multi-user.target.wants/drm_firmware_load_trigger.service
+        fi
+    fi
 }
 
 
@@ -102,4 +111,5 @@ pkg_postinst_${PN} () {
 
 FILES_${PN} += "${includedir}/sdm_strategy_plugin/*"
 FILES_${PN} += "${libdir}/libsdm_strategy_plugin.so"
+FILES_${PN} += "${systemd_unitdir}/system/"
 FILES_SOLIBSDEV = ""
