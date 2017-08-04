@@ -1,0 +1,15 @@
+
+[Unit]
+Description=INIT_AUDIO
+Before=multi-user.target
+After=firmware-links.service
+Conflicts=shutdown.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/init_qcom_audio start
+ExecStop=/bin/init_qcom_audio stop
+
+[Install]
+WantedBy=default.target
