@@ -49,6 +49,8 @@ IMAGE_INSTALL += "applypatch-recovery"
 IMAGE_INSTALL += "resize-service"
 #Firmware-links
 IMAGE_INSTALL += "firmware-links"
+#Support vfat
+IMAGE_INSTALL += "dosfstools"
 #Camera modules
 IMAGE_INSTALL += "init-can"
 
