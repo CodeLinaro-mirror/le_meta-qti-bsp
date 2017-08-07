@@ -18,6 +18,9 @@ S = "${WORKDIR}/native"
 
 EXTRA_OECONF += " --with-core-includes=${WORKSPACE}/system/core/include --with-glib"
 
+# apq8053-32 compiles kernel in 32bit. So enable binder IPC also in 32bit mode.
+EXTRA_OECONF_append_apq8053-32 += " --enable-32bit-binder-ipc"
+
 CFLAGS += "-I${STAGING_INCDIR}/libselinux"
 
 FILES_${PN}-servicemanager-dbg = "${bindir}/.debug/servicemanager"

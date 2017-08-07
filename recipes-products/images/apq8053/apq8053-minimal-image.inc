@@ -1,4 +1,4 @@
-# The MSM Linux image rootfs creation files.
+# The MSM Linux minimal image rootfs creation files.
 
 # lk supports only 32-bit compilation.
 DEPENDS_append_arm += " lk"
@@ -23,8 +23,6 @@ IMAGE_INSTALL += "base-files"
 IMAGE_INSTALL += "base-passwd"
 IMAGE_INSTALL += "native-frameworks"
 
-DEPENDS_append_aarch64 += " gdb-cross-aarch64"
-
 IMAGE_INSTALL += "glib-2.0"
 IMAGE_INSTALL += "libcutils"
 IMAGE_INSTALL += "liblog"
@@ -45,17 +43,8 @@ IMAGE_INSTALL += "${@base_contains('MULTILIB_VARIANTS', 'lib32', 'lib32-libnl', 
 IMAGE_INSTALL += "${@base_contains('MULTILIB_VARIANTS', 'lib32', 'lib32-live555-qti', 'live555-qti', d)}"
 IMAGE_INSTALL += "${@base_contains('MULTILIB_VARIANTS', 'lib32', 'lib32-gtest', 'gtest', d)}"
 IMAGE_INSTALL += "${@base_contains('MULTILIB_VARIANTS', 'lib32', 'lib32-cairo', 'cairo', d)}"
-IMAGE_INSTALL += "${@base_contains('MULTILIB_VARIANTS', 'lib32', 'lib32-ipc-webserver', 'ipc-webserver', d)}"
 
 IMAGE_INSTALL += "libpagemap"
-IMAGE_INSTALL += "procrank"
-
-IMAGE_INSTALL += "libuv"
-IMAGE_INSTALL += "libwebsockets"
-IMAGE_INSTALL += "ipmon"
-IMAGE_INSTALL += "discovery"
-IMAGE_INSTALL += "rtsp-proxy"
-IMAGE_INSTALL += "webui"
 
 # Below is to generate sparse ext4 system image (OE by default supports raw ext4 images)
 SELINUX_FILE_CONTEXTS = "${IMAGE_ROOTFS}/etc/selinux/mls/contexts/files/file_contexts"

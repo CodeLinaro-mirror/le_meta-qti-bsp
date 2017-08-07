@@ -2,6 +2,9 @@
 
 DEPENDS += "lk"
 
+# Formats of root filesystem images.
+IMAGE_FSTYPES += "ext4 ubi"
+
 IMAGE_INSTALL += "packagegroup-core-boot"
 
 IMAGE_INSTALL += "${ROOTFS_PKGMANAGE_BOOTSTRAP}"
@@ -33,8 +36,6 @@ IMAGE_INSTALL += "powerapp-powerconfig"
 IMAGE_INSTALL += "powerapp-reboot"
 IMAGE_INSTALL += "powerapp-shutdown"
 IMAGE_INSTALL += "perl"
-IMAGE_INSTALL += "qcacld-ll"
-IMAGE_INSTALL += "qcacld-hl"
 IMAGE_INSTALL += "sigma-dut"
 IMAGE_INSTALL += "start-scripts-find-partitions"
 IMAGE_INSTALL += "start-scripts-firmware-links"
@@ -43,8 +44,6 @@ IMAGE_INSTALL += "system-core-usb"
 IMAGE_INSTALL += "system-conf"
 IMAGE_INSTALL += "tcpdump"
 IMAGE_INSTALL += "wireless-tools"
-IMAGE_INSTALL += "wpa-supplicant-qcacld"
-IMAGE_INSTALL += "alsa-lib"
 
 IMAGE_PREPROCESS_COMMAND += "echo ${MACHINE} >> ${IMAGE_ROOTFS}/target;"
 

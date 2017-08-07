@@ -26,12 +26,11 @@ CPPFLAGS += "-I ${PKG_CONFIG_SYSROOT_DIR}/usr/include"
 LDFLAGS += "-L ${PKG_CONFIG_SYSROOT_DIR}/usr/lib/hw"
 
 do_compile() {
-    # Current support is limited to msm8996 32-bit build
-    #
-    if [ "${MLPREFIX}" = "lib32-" ];  then
+    # Current support is limited to 32-bit build
+    if [ "${MLPREFIX}" == "lib32-" ] || [ "${MLPREFIX}" == "" -a "${TUNE_ARCH}" == "arm" ]; then
         make -C ${S}/fpvdaemon/
     else
-        die "not supported"
+        die "64-bit build not supported"
     fi
 }
 
