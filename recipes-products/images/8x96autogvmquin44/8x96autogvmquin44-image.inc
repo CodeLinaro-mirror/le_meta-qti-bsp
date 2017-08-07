@@ -90,6 +90,14 @@ IMAGE_INSTALL += "security-manager"
 IMAGE_INSTALL += "security-manager-policy"
 IMAGE_INSTALL += "agl-users"
 
+#Location
+IMAGE_INSTALL += "loc-stub"
+IMAGE_INSTALL += "loc-pla"
+IMAGE_INSTALL += "location-api-iface"
+IMAGE_INSTALL += "gps-utils"
+IMAGE_INSTALL += "loc-hal"
+IMAGE_INSTALL += "loc-net-iface"
+
 # modem pass through
 IMAGE_INSTALL += "ril"
 IMAGE_INSTALL += "sqlite3"
