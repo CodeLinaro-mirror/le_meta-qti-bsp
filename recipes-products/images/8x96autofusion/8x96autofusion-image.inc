@@ -18,6 +18,7 @@ IMAGE_INSTALL += "multimodule-mgr-oss"
 IMAGE_INSTALL += "start-scripts-mhi-ip-config"
 IMAGE_INSTALL += "strongswan"
 IMAGE_INSTALL += "start-scripts-check-firmware-corruption"
+IMAGE_INSTALL += "gst-multisend"
 
 IMAGE_INSTALL_remove = "synergy-opensource"
 IMAGE_INSTALL_remove = "bluez5"
@@ -35,6 +36,7 @@ IMAGE_INSTALL_remove = "qtwebengine-examples"
 IMAGE_INSTALL_remove = "qtwebsockets"
 IMAGE_INSTALL_remove = "qtwebchannel"
 IMAGE_INSTALL_remove = "web-runtime"
+
 
 IMAGE_ROOTFS_SIZE = "2097152"
 IMAGE_ROOTFS_EXTRA_SPACE_append = "${@bb.utils.contains("DISTRO_FEATURES", "systemd", " + 4096", "" ,d)}"
