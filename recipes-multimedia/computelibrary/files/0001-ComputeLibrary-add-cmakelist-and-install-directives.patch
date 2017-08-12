@@ -1,0 +1,141 @@
+From a964ea9f29223f36fdea37befd0b1bf55e4d69f7 Mon Sep 17 00:00:00 2001
+From: vpalvai <vpalvai@codeaurora.org>
+Date: Tue, 1 Aug 2017 18:55:31 -0700
+Subject: [PATCH 1/2] ComputeLibrary: add cmakelist and install directives
+
+ - add CMakelist file and install directives to compile arm
+   compute library
+---
+ CMakeLists.txt                  | 90 +++++++++++++++++++++++++++++++++++++++++
+ src/core/CL/CLKernelLibrary.cpp |  2 +-
+ src/core/Utils.cpp              |  4 +-
+ 3 files changed, 92 insertions(+), 4 deletions(-)
+ create mode 100644 CMakeLists.txt
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+new file mode 100644
+index 0000000..012922e
+--- /dev/null
++++ b/CMakeLists.txt
+@@ -0,0 +1,90 @@
++cmake_minimum_required(VERSION 2.8)
++
++# set target name
++SET(TARGET_NAME arm_compute)
++
++option( ACL_NEON OFF )
++option( ACL_OPENCL OFF )
++
++set( ACL_NEON ON )
++set( ACL_OPENCL ON )
++
++FILE(GLOB core_files 
++     "src/core/*.cpp" 
++     "src/core/CPP/*.cpp" 
++     "src/core/CPP/kernels/*.cpp" 
++     "src/runtime/CPP/CPPScheduler.cpp")
++
++FILE(GLOB runtime_files "src/runtime/*.cpp")
++
++INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_SOURCE_DIR})
++
++set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_GLIBCXX_USE_NANOSLEEP")
++set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DARCH_ARM")
++set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic")
++set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
++set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
++set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I=/usr/include/adreno")
++
++
++set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-deprecated-declarations")
++set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra -Wno-unused-parameter")
++set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Winit-self -Wmissing-include-dirs")
++set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-strict-overflow -Wswitch-default")
++set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-vla -Woverloaded-virtual")
++set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wctor-dtor-privacy -Wsign-promo")
++#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weffc++")
++set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-ignored-qualifiers")
++set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-overlength-strings -Wlogical-op")
++set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wnoexcept -Wstrict-null-sentinel")
++
++if (CMAKE_BUILD_TYPE EQUAL Debug)
++    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g -gdwarf-2")
++else(CMAKE_BUILD_TYPE EQUAL Debug)
++    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -ftree-vectorize")
++endif (CMAKE_BUILD_TYPE EQUAL Debug)
++
++if (ACL_OPENCL)
++
++    FILE(GLOB core_cl_files 
++         "src/core/CL/*.cpp" 
++         "src/core/CL/kernels/*.cpp")
++
++    FILE(GLOB runtime_cl_files 
++         "src/runtime/CL/*.cpp" 
++         "src/runtime/CL/functions/*.cpp")
++
++    LIST(APPEND core_files ${core_cl_files})
++    LIST(APPEND runtime_files ${runtime_cl_files})
++
++endif (ACL_OPENCL)
++
++if (ACL_NEON)
++
++    FILE(GLOB core_neon_files 
++         "src/core/NEON/*.cpp" 
++         "src/core/NEON/kernels/*.cpp")
++
++    FILE(GLOB runtime_neon_files 
++         "src/runtime/NEON/*.cpp" 
++         "src/runtime/NEON/functions/*.cpp")
++
++    LIST(APPEND core_files ${core_neon_files})
++    LIST(APPEND runtime_files ${runtime_neon_files})
++
++endif (ACL_NEON)
++
++# add a target named ${TARGET_NAME}
++ADD_LIBRARY (${TARGET_NAME} SHARED ${core_files} ${runtime_files})
++INSTALL (TARGETS ${TARGET_NAME} DESTINATION lib64)
++INSTALL (DIRECTORY arm_compute DESTINATION include)
++
++add_executable (neon_convolution examples/neon_convolution.cpp test_helpers/Utils.cpp)
++target_link_libraries(neon_convolution arm_compute OpenCL)
++set_target_properties(neon_convolution PROPERTIES LINK_FLAGS "-lpthread")
++INSTALL (TARGETS neon_convolution DESTINATION bin)
++
++add_executable (cl_convolution examples/cl_convolution.cpp test_helpers/Utils.cpp)
++target_link_libraries(cl_convolution OpenCL arm_compute)
++set_target_properties(cl_convolution PROPERTIES LINK_FLAGS "-lpthread")
++INSTALL (TARGETS cl_convolution DESTINATION bin)
+diff --git a/src/core/CL/CLKernelLibrary.cpp b/src/core/CL/CLKernelLibrary.cpp
+index 2f97aad..5e792d3 100644
+--- a/src/core/CL/CLKernelLibrary.cpp
++++ b/src/core/CL/CLKernelLibrary.cpp
+@@ -562,7 +562,7 @@ const Program &CLKernelLibrary::load_program(const std::string &program_name) co
+ 
+ std::string CLKernelLibrary::stringify_set(const StringSet &s) const
+ {
+-    std::string concat_set = "-cl-arm-non-uniform-work-group-size ";
++    std::string concat_set = "-cl-std=CL2.0 ";
+ 
+ #ifndef EMBEDDED_KERNELS
+     concat_set += "-I" + _kernel_path + " ";
+diff --git a/src/core/Utils.cpp b/src/core/Utils.cpp
+index a4b8cec..75c34db 100644
+--- a/src/core/Utils.cpp
++++ b/src/core/Utils.cpp
+@@ -33,9 +33,7 @@ using namespace arm_compute;
+ 
+ std::string arm_compute::build_information()
+ {
+-    static const std::string information =
+-#include "arm_compute_version.embed"
+-        ;
++    static const std::string information = "arm_compute_version.embed";
+     return information;
+ }
+ 
+-- 
+2.13.0
+
