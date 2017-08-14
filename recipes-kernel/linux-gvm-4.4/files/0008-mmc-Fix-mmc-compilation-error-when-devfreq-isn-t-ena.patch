@@ -1,0 +1,66 @@
+From d019e607b7a56b731f79ffaf74e07ab88b158156 Mon Sep 17 00:00:00 2001
+From: Zhiqiang Tu <ztu@codeaurora.org>
+Date: Thu, 13 Jul 2017 14:49:50 +0800
+Subject: [PATCH] mmc: Fix mmc compilation error when devfreq isn't enabled
+
+This change is for WLAN (CNSS) pass through. CNSS depends
+on mmc. mmc will fail to compile when devfreq isn't enabled.
+
+Change-Id: I08743aeb03579261d37d52f1ecf47ea6dbdc75a8
+Signed-off-by: Zhiqiang Tu <ztu@codeaurora.org>
+---
+ drivers/mmc/core/core.c  | 4 ++++
+ include/linux/mmc/host.h | 2 ++
+ 2 files changed, 6 insertions(+)
+
+diff --git a/drivers/mmc/core/core.c b/drivers/mmc/core/core.c
+index 2cb0ea0..0b71e85 100644
+--- a/drivers/mmc/core/core.c
++++ b/drivers/mmc/core/core.c
+@@ -729,11 +729,13 @@ int mmc_init_clk_scaling(struct mmc_host *host)
+ 	host->clk_scaling.devfreq_profile.target = mmc_devfreq_set_target;
+ 	host->clk_scaling.devfreq_profile.initial_freq = host->ios.clock;
+ 
++#if IS_ENABLED(CONFIG_DEVFREQ_GOV_SIMPLE_ONDEMAND)
+ 	host->clk_scaling.ondemand_gov_data.simple_scaling = true;
+ 	host->clk_scaling.ondemand_gov_data.upthreshold =
+ 		host->clk_scaling.upthreshold;
+ 	host->clk_scaling.ondemand_gov_data.downdifferential =
+ 		host->clk_scaling.upthreshold - host->clk_scaling.downthreshold;
++#endif
+ 
+ 	err = mmc_devfreq_create_freq_table(host);
+ 	if (err) {
+@@ -742,6 +744,7 @@ int mmc_init_clk_scaling(struct mmc_host *host)
+ 		return err;
+ 	}
+ 
++#if IS_ENABLED(CONFIG_DEVFREQ_GOV_SIMPLE_ONDEMAND)
+ 	pr_debug("%s: adding devfreq with: upthreshold=%u downthreshold=%u polling=%u\n",
+ 		mmc_hostname(host),
+ 		host->clk_scaling.ondemand_gov_data.upthreshold,
+@@ -752,6 +755,7 @@ int mmc_init_clk_scaling(struct mmc_host *host)
+ 		&host->clk_scaling.devfreq_profile,
+ 		"simple_ondemand",
+ 		&host->clk_scaling.ondemand_gov_data);
++#endif
+ 	if (!host->clk_scaling.devfreq) {
+ 		pr_err("%s: unable to register with devfreq\n",
+ 			mmc_hostname(host));
+diff --git a/include/linux/mmc/host.h b/include/linux/mmc/host.h
+index 279411c..49a56da 100644
+--- a/include/linux/mmc/host.h
++++ b/include/linux/mmc/host.h
+@@ -323,7 +323,9 @@ struct mmc_devfeq_clk_scaling {
+ 	spinlock_t	lock;
+ 	struct		devfreq *devfreq;
+ 	struct		devfreq_dev_profile devfreq_profile;
++#if IS_ENABLED(CONFIG_DEVFREQ_GOV_SIMPLE_ONDEMAND)
+ 	struct		devfreq_simple_ondemand_data ondemand_gov_data;
++#endif
+ 	enum mmc_load	state;
+ 	ktime_t		start_busy;
+ 	ktime_t		measure_interval_start;
+-- 
+1.9.1
+

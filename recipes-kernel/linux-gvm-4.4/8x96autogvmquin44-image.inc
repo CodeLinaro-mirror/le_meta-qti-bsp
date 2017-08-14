@@ -25,6 +25,22 @@ CONFIG_WCD9XXX_CODEC_UTIL=y
 CONFIG_WCD9335_CODEC=y
 CONFIG_SND_SOC_MSM8996=y
 CONFIG_MSM_ADSP_LOADER=y
+CONFIG_WIRELESS=y
+CONFIG_WIRELESS_EXT=y
+CONFIG_WEXT_CORE=y
+CONFIG_WEXT_PROC=y
+CONFIG_WEXT_SPY=y
+CONFIG_WEXT_PRIV=y
+CONFIG_CFG80211=y
+CONFIG_NL80211_TESTMODE=y
+CONFIG_CFG80211_INTERNAL_REGDB=y
+CONFIG_CNSS=y
+CONFIG_WCNSS_MEM_PRE_ALLOC=y
+CONFIG_CNSS_CRYPTO=y
+CONFIG_ATH_CARDS=y
+CONFIG_CNSS_ASYNC=y
+CONFIG_CLD_LL_CORE=y
+CONFIG_MMC=y
 KERNEL_EXTRACONFIGS
 }
 
@@ -34,6 +50,8 @@ SRC_URI_append += " \
     file://0005-Revert-soc-qcom-remove-debugfs-interface-from-ssr-se.patch \
     file://0006-drivers-char-diag-Enable-diag-over-IP.patch \
     file://0007-disable-scm-for-pil-new.patch \
+    file://0008-mmc-Fix-mmc-compilation-error-when-devfreq-isn-t-ena.patch \
+    file://0009-cnss-Adapt-cnss-to-virtual-platform.patch \
 "
 
 do_deploy_rename () {
