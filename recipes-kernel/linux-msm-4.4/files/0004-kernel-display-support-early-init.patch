@@ -1,0 +1,294 @@
+From 7de31447eac2ccee0a4623b094ee23c8eb3f9fb0 Mon Sep 17 00:00:00 2001
+From: "Daocai.yang" <daocai@codeaurora.org>
+Date: Mon, 14 Aug 2017 15:52:15 +0800
+Subject: [PATCH] kernel: display support early init
+
+Change-Id: Ibce2e6a2661468f74e23e03fa31290a335a9fa4b
+Signen-off-by: Daocai.yang <daocai@codeaurora.org>
+---
+ arch/arm/boot/dts/qcom/dsi-adv7533-1080p.dtsi |  9 +--------
+ arch/arm/boot/dts/qcom/dsi-adv7533-720p.dtsi  |  9 +--------
+ drivers/gpu/drm/drm_drv.c                     |  2 +-
+ drivers/gpu/drm/drm_fb_helper.c               |  2 +-
+ drivers/gpu/drm/drm_fops.c                    |  4 ++--
+ drivers/gpu/drm/msm/dsi-staging/dsi_display.c |  2 +-
+ drivers/gpu/drm/msm/hdmi-staging/sde_hdmi.c   |  2 +-
+ drivers/gpu/drm/msm/msm_atomic.c              |  7 +++++++
+ drivers/gpu/drm/msm/msm_drv.c                 |  2 +-
+ drivers/gpu/drm/msm/msm_smmu.c                |  1 +
+ drivers/gpu/drm/msm/sde/sde_wb.c              |  2 +-
+ drivers/input/input-leds.c                    |  2 +-
+ drivers/input/keyboard/gpio_keys.c            |  2 +-
+ drivers/input/misc/hbtp_vm.c                  |  2 +-
+ drivers/input/misc/uinput.c                   |  2 +-
+ drivers/regulator/fan53555.c                  | 17 ++++++++++++++++-
+ drivers/video/fbdev/msm/msm_dba/adv7533.c     |  2 +-
+ 17 files changed, 39 insertions(+), 30 deletions(-)
+
+diff --git a/arch/arm/boot/dts/qcom/dsi-adv7533-1080p.dtsi b/arch/arm/boot/dts/qcom/dsi-adv7533-1080p.dtsi
+index 7994285..6cf9ed1 100644
+--- a/arch/arm/boot/dts/qcom/dsi-adv7533-1080p.dtsi
++++ b/arch/arm/boot/dts/qcom/dsi-adv7533-1080p.dtsi
+@@ -1,4 +1,4 @@
+-/* Copyright (c) 2015-2016, The Linux Foundation. All rights reserved.
++/* Copyright (c) 2015-2017, The Linux Foundation. All rights reserved.
+  *
+  * This program is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License version 2 and
+@@ -36,13 +36,6 @@
+ 		qcom,mdss-dsi-bpp = <24>;
+ 		qcom,mdss-dsi-underflow-color = <0xff>;
+ 		qcom,mdss-dsi-border-color = <0>;
+-		qcom,mdss-dsi-on-command = [
+-				05 01 00 00 c8 00 02 11 00
+-				05 01 00 00 0a 00 02 29 00];
+-		qcom,mdss-dsi-off-command = [05 01 00 00 00 00 02 28 00
+-				05 01 00 00 00 00 02 10 00];
+-		qcom,mdss-dsi-on-command-state = "dsi_lp_mode";
+-		qcom,mdss-dsi-off-command-state = "dsi_hs_mode";
+ 		qcom,mdss-dsi-h-sync-pulse = <1>;
+ 		qcom,mdss-dsi-traffic-mode = "non_burst_sync_pulse";
+ 		qcom,mdss-dsi-bllp-eof-power-mode;
+diff --git a/arch/arm/boot/dts/qcom/dsi-adv7533-720p.dtsi b/arch/arm/boot/dts/qcom/dsi-adv7533-720p.dtsi
+index b84488c..a3bbc6f 100644
+--- a/arch/arm/boot/dts/qcom/dsi-adv7533-720p.dtsi
++++ b/arch/arm/boot/dts/qcom/dsi-adv7533-720p.dtsi
+@@ -1,4 +1,4 @@
+-/* Copyright (c) 2015-2016, The Linux Foundation. All rights reserved.
++/* Copyright (c) 2015-2017, The Linux Foundation. All rights reserved.
+  *
+  * This program is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License version 2 and
+@@ -36,13 +36,6 @@ dsi_adv7533_720p: qcom,mdss_dsi_adv7533_720p {
+ 		qcom,mdss-dsi-bpp = <24>;
+ 		qcom,mdss-dsi-underflow-color = <0xff>;
+ 		qcom,mdss-dsi-border-color = <0>;
+-		qcom,mdss-dsi-on-command = [
+-				05 01 00 00 c8 00 02 11 00
+-				05 01 00 00 0a 00 02 29 00];
+-		qcom,mdss-dsi-off-command = [05 01 00 00 00 00 02 28 00
+-				05 01 00 00 00 00 02 10 00];
+-		qcom,mdss-dsi-on-command-state = "dsi_lp_mode";
+-		qcom,mdss-dsi-off-command-state = "dsi_hs_mode";
+ 		qcom,mdss-dsi-h-sync-pulse = <1>;
+ 		qcom,mdss-dsi-traffic-mode = "non_burst_sync_pulse";
+ 		qcom,mdss-dsi-bllp-eof-power-mode;
+diff --git a/drivers/gpu/drm/drm_drv.c b/drivers/gpu/drm/drm_drv.c
+index 7dd6728..329e8cf 100644
+--- a/drivers/gpu/drm/drm_drv.c
++++ b/drivers/gpu/drm/drm_drv.c
+@@ -927,5 +927,5 @@ static void __exit drm_core_exit(void)
+ 	idr_destroy(&drm_minors_idr);
+ }
+ 
+-module_init(drm_core_init);
++fs_initcall(drm_core_init);
+ module_exit(drm_core_exit);
+diff --git a/drivers/gpu/drm/drm_fb_helper.c b/drivers/gpu/drm/drm_fb_helper.c
+index 5ad0367..b9d2b76 100644
+--- a/drivers/gpu/drm/drm_fb_helper.c
++++ b/drivers/gpu/drm/drm_fb_helper.c
+@@ -2189,5 +2189,5 @@ static int __init drm_fb_helper_modinit(void)
+ 	return 0;
+ }
+ 
+-module_init(drm_fb_helper_modinit);
++fs_initcall(drm_fb_helper_modinit);
+ #endif
+diff --git a/drivers/gpu/drm/drm_fops.c b/drivers/gpu/drm/drm_fops.c
+index 6b5625e..2d55851 100644
+--- a/drivers/gpu/drm/drm_fops.c
++++ b/drivers/gpu/drm/drm_fops.c
+@@ -477,8 +477,8 @@ int drm_release(struct inode *inode, struct file *filp)
+ 	file_priv->is_master = 0;
+ 	mutex_unlock(&dev->master_mutex);
+ 
+-	if (dev->driver->postclose)
+-		dev->driver->postclose(dev, file_priv);
++	//if (dev->driver->postclose)
++	//	dev->driver->postclose(dev, file_priv);
+ 
+ 
+ 	if (drm_core_check_feature(dev, DRIVER_PRIME))
+diff --git a/drivers/gpu/drm/msm/dsi-staging/dsi_display.c b/drivers/gpu/drm/msm/dsi-staging/dsi_display.c
+index f2412da..0ad2d1e 100644
+--- a/drivers/gpu/drm/msm/dsi-staging/dsi_display.c
++++ b/drivers/gpu/drm/msm/dsi-staging/dsi_display.c
+@@ -2769,5 +2769,5 @@ static void __exit dsi_display_unregister(void)
+ 	dsi_phy_drv_unregister();
+ }
+ 
+-module_init(dsi_display_register);
++fs_initcall(dsi_display_register);
+ module_exit(dsi_display_unregister);
+diff --git a/drivers/gpu/drm/msm/hdmi-staging/sde_hdmi.c b/drivers/gpu/drm/msm/hdmi-staging/sde_hdmi.c
+index f1c44b3..a84ade4 100644
+--- a/drivers/gpu/drm/msm/hdmi-staging/sde_hdmi.c
++++ b/drivers/gpu/drm/msm/hdmi-staging/sde_hdmi.c
+@@ -2986,5 +2986,5 @@ static void __exit sde_hdmi_unregister(void)
+ 	platform_driver_unregister(&sde_hdmi_driver);
+ }
+ 
+-module_init(sde_hdmi_register);
++fs_initcall(sde_hdmi_register);
+ module_exit(sde_hdmi_unregister);
+diff --git a/drivers/gpu/drm/msm/msm_atomic.c b/drivers/gpu/drm/msm/msm_atomic.c
+index 0c119ec..a659367 100644
+--- a/drivers/gpu/drm/msm/msm_atomic.c
++++ b/drivers/gpu/drm/msm/msm_atomic.c
+@@ -20,6 +20,7 @@
+ #include "msm_kms.h"
+ #include "msm_gem.h"
+ #include "sde_trace.h"
++#include <soc/qcom/boot_stats.h>
+ 
+ struct msm_commit {
+ 	struct drm_device *dev;
+@@ -403,6 +404,7 @@ static void complete_commit(struct msm_commit *commit)
+ 	struct drm_device *dev = state->dev;
+ 	struct msm_drm_private *priv = dev->dev_private;
+ 	struct msm_kms *kms = priv->kms;
++	static int commit_count = 0;
+ 
+ 	kms->funcs->prepare_commit(kms, state);
+ 
+@@ -431,6 +433,11 @@ static void complete_commit(struct msm_commit *commit)
+ 
+ 	kms->funcs->complete_commit(kms, state);
+ 
++	if(commit_count++ < 3)
++	{
++	    place_marker("M - Commit finished");
++	}
++
+ 	drm_atomic_state_free(state);
+ 
+ 	commit_destroy(commit);
+diff --git a/drivers/gpu/drm/msm/msm_drv.c b/drivers/gpu/drm/msm/msm_drv.c
+index c8b1142..c1187a6 100644
+--- a/drivers/gpu/drm/msm/msm_drv.c
++++ b/drivers/gpu/drm/msm/msm_drv.c
+@@ -2232,7 +2232,7 @@ static void __exit msm_drm_unregister(void)
+ 	msm_smmu_driver_cleanup();
+ }
+ 
+-module_init(msm_drm_register);
++fs_initcall(msm_drm_register);
+ module_exit(msm_drm_unregister);
+ 
+ MODULE_AUTHOR("Rob Clark <robdclark@gmail.com");
+diff --git a/drivers/gpu/drm/msm/msm_smmu.c b/drivers/gpu/drm/msm/msm_smmu.c
+index 4247243..d9ebc8d 100644
+--- a/drivers/gpu/drm/msm/msm_smmu.c
++++ b/drivers/gpu/drm/msm/msm_smmu.c
+@@ -442,6 +442,7 @@ int __init msm_smmu_driver_init(void)
+ 
+ 	return ret;
+ }
++fs_initcall(msm_smmu_driver_init);
+ 
+ void __exit msm_smmu_driver_cleanup(void)
+ {
+diff --git a/drivers/gpu/drm/msm/sde/sde_wb.c b/drivers/gpu/drm/msm/sde/sde_wb.c
+index 647cb58..af91691 100644
+--- a/drivers/gpu/drm/msm/sde/sde_wb.c
++++ b/drivers/gpu/drm/msm/sde/sde_wb.c
+@@ -741,5 +741,5 @@ static void __exit sde_wb_unregister(void)
+ 	platform_driver_unregister(&sde_wb_driver);
+ }
+ 
+-module_init(sde_wb_register);
++fs_initcall(sde_wb_register);
+ module_exit(sde_wb_unregister);
+diff --git a/drivers/input/input-leds.c b/drivers/input/input-leds.c
+index 766bf26..c610180 100644
+--- a/drivers/input/input-leds.c
++++ b/drivers/input/input-leds.c
+@@ -210,7 +210,7 @@ static int __init input_leds_init(void)
+ {
+ 	return input_register_handler(&input_leds_handler);
+ }
+-module_init(input_leds_init);
++fs_initcall(input_leds_init);
+ 
+ static void __exit input_leds_exit(void)
+ {
+diff --git a/drivers/input/keyboard/gpio_keys.c b/drivers/input/keyboard/gpio_keys.c
+index c93dd19..80f9a02 100644
+--- a/drivers/input/keyboard/gpio_keys.c
++++ b/drivers/input/keyboard/gpio_keys.c
+@@ -1023,7 +1023,7 @@ static void __exit gpio_keys_exit(void)
+ 	platform_driver_unregister(&gpio_keys_device_driver);
+ }
+ 
+-late_initcall(gpio_keys_init);
++fs_initcall(gpio_keys_init);
+ module_exit(gpio_keys_exit);
+ 
+ MODULE_LICENSE("GPL");
+diff --git a/drivers/input/misc/hbtp_vm.c b/drivers/input/misc/hbtp_vm.c
+index 408bf5d..859ffff 100644
+--- a/drivers/input/misc/hbtp_vm.c
++++ b/drivers/input/misc/hbtp_vm.c
+@@ -289,5 +289,5 @@ MODULE_ALIAS_MISCDEV(MISC_DYNAMIC_MINOR);
+ MODULE_ALIAS("devname:" hbtp_vm_name);
+ MODULE_DESCRIPTION("kernel module to support virtual mouse");
+ MODULE_LICENSE("GPL v2");
+-module_init(hbtp_vm_init);
++fs_initcall(hbtp_vm_init);
+ module_exit(hbtp_vm_exit);
+diff --git a/drivers/input/misc/uinput.c b/drivers/input/misc/uinput.c
+index 2bb4c86..9d5d0c7 100644
+--- a/drivers/input/misc/uinput.c
++++ b/drivers/input/misc/uinput.c
+@@ -943,5 +943,5 @@ MODULE_DESCRIPTION("User level driver support for input subsystem");
+ MODULE_LICENSE("GPL");
+ MODULE_VERSION("0.3");
+ 
+-module_init(uinput_init);
++fs_initcall(uinput_init);
+ module_exit(uinput_exit);
+diff --git a/drivers/regulator/fan53555.c b/drivers/regulator/fan53555.c
+index 28a2619..5b7c7e4 100644
+--- a/drivers/regulator/fan53555.c
++++ b/drivers/regulator/fan53555.c
+@@ -468,7 +468,22 @@ static struct i2c_driver fan53555_regulator_driver = {
+ 	.id_table = fan53555_id,
+ };
+ 
+-module_i2c_driver(fan53555_regulator_driver);
++//module_i2c_driver(fan53555_regulator_driver);
++
++static int __init fan53555_regulator_driver_init(void)
++{
++    return i2c_add_driver(&fan53555_regulator_driver);
++}
++
++fs_initcall(fan53555_regulator_driver_init);
++
++static void __exit fan53555_regulator_driver_exit(void)
++{
++    return i2c_del_driver(&fan53555_regulator_driver);
++}
++
++module_exit(fan53555_regulator_driver_exit);
++
+ 
+ MODULE_AUTHOR("Yunfan Zhang <yfzhang@marvell.com>");
+ MODULE_DESCRIPTION("FAN53555 regulator driver");
+diff --git a/drivers/video/fbdev/msm/msm_dba/adv7533.c b/drivers/video/fbdev/msm/msm_dba/adv7533.c
+index 09632b4..08df6d4 100644
+--- a/drivers/video/fbdev/msm/msm_dba/adv7533.c
++++ b/drivers/video/fbdev/msm/msm_dba/adv7533.c
+@@ -2137,7 +2137,7 @@ static void __exit adv7533_exit(void)
+ 
+ module_param_string(panel, mdss_mdp_panel, MDSS_MAX_PANEL_LEN, 0);
+ 
+-module_init(adv7533_init);
++fs_initcall(adv7533_init);
+ module_exit(adv7533_exit);
+ MODULE_LICENSE("GPL v2");
+ MODULE_DESCRIPTION("adv7533 driver");
+-- 
+1.9.1
+
