@@ -5,7 +5,6 @@ cat >> ${S}/arch/${ARCH}/configs/${KERNEL_CONFIG} <<KERNEL_EXTRACONFIGS
 CONFIG_DEVTMPFS=y
 CONFIG_SYSVIPC=y
 CONFIG_ION=y
-CONFIG_ION_DUMMY=y
 CONFIG_MSM_GVM_QUIN=y
 CONFIG_MSM_GVM=y
 CONFIG_DIAG_CHAR=y
@@ -14,12 +13,22 @@ CONFIG_SECURITY_SMACK=y
 CONFIG_TMPFS_XATTR=y
 CONFIG_DEFAULT_SECURITY="smack"
 CONFIG_DEFAULT_SECURITY_SMACK=y
+CONFIG_ION_MSM=y
+CONFIG_CMA=y
+CONFIG_MSM_PIL_SSR_GENERIC=y
+CONFIG_SLIMBUS=y
+CONFIG_SLIMBUS_MSM_NGD=y
+CONFIG_SOUNDWIRE=y
+CONFIG_SOUNDWIRE_WCD_CTRL=y
+CONFIG_SWITCH=y
+CONFIG_WCD9XXX_CODEC_UTIL=y
+CONFIG_WCD9335_CODEC=y
+CONFIG_SND_SOC_MSM8996=y
+CONFIG_MSM_ADSP_LOADER=y
 KERNEL_EXTRACONFIGS
 }
 
 SRC_URI_append += " \
-    file://0001-ion-Add-hvenv-driver-for-ion.patch \
-    file://0002-ION-Enable-ION-to-work-with-a-carveout-heap.patch \
     file://0003-amba-skip-clock-calls-on-msm-virtual-platform.patch \
     file://0004-interrupt-workaround-for-virtual-plaform.patch \
     file://0005-Revert-soc-qcom-remove-debugfs-interface-from-ssr-se.patch \
