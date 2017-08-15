@@ -30,6 +30,9 @@ python __anonymous () {
       d.appendVar("SRC_URI", " file://0003-init-early-user-space.patch")
       d.appendVar("SRC_URI", " file://0004-kernel-display-support-early-init.patch")
 
+  if bb.utils.contains('DISTRO_FEATURES', 'early_init', True, False, d):
+      d.appendVar("SRC_URI", " file://0006-camera-kernel-changes-for-early-CVBS-case.patch")
+
   # Override KERNEL_IMAGETYPE_FOR_MAKE variable, which is internal
   # to kernel.bbclass. We override the variable as msm kernel can't
   # support alternate image builds
