@@ -1,0 +1,57 @@
+From d3c5cce7836d2cdf5a3ca5748bc1abb899f9140c Mon Sep 17 00:00:00 2001
+From: Shiju Mathew <shijum@codeaurora.org>
+Date: Thu, 1 Jun 2017 15:40:21 -0400
+Subject: [PATCH] msm: vidc: changes for early video app launched at early_init
+
+Load video driver before video test app is launched at early_init.
+
+Change-Id: Ia295fc95f30fe2b493f6e36a5e0550339e5c7cc1
+Signed-off-by: Shiju Mathew <shijum@codeaurora.org>
+---
+ drivers/media/platform/msm/vidc/governors/msm_vidc_dyn_gov.c | 2 +-
+ drivers/media/platform/msm/vidc/msm_v4l2_vidc.c              | 2 +-
+ drivers/media/platform/msm/vidc/vmem/vmem.c                  | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/media/platform/msm/vidc/governors/msm_vidc_dyn_gov.c b/drivers/media/platform/msm/vidc/governors/msm_vidc_dyn_gov.c
+index 78d3dd9..07889be 100644
+--- a/drivers/media/platform/msm/vidc/governors/msm_vidc_dyn_gov.c
++++ b/drivers/media/platform/msm/vidc/governors/msm_vidc_dyn_gov.c
+@@ -1137,7 +1137,7 @@ static int __init msm_vidc_bw_gov_init(void)
+ 
+ 	return rc;
+ }
+-module_init(msm_vidc_bw_gov_init);
++fs_initcall(msm_vidc_bw_gov_init);
+ 
+ static void __exit msm_vidc_bw_gov_exit(void)
+ {
+diff --git a/drivers/media/platform/msm/vidc/msm_v4l2_vidc.c b/drivers/media/platform/msm/vidc/msm_v4l2_vidc.c
+index a8dc1d0..7d9c6be 100644
+--- a/drivers/media/platform/msm/vidc/msm_v4l2_vidc.c
++++ b/drivers/media/platform/msm/vidc/msm_v4l2_vidc.c
+@@ -785,7 +785,7 @@ static void __exit msm_vidc_exit(void)
+ 	vidc_driver = NULL;
+ }
+ 
+-module_init(msm_vidc_init);
++fs_initcall(msm_vidc_init);
+ module_exit(msm_vidc_exit);
+ 
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/media/platform/msm/vidc/vmem/vmem.c b/drivers/media/platform/msm/vidc/vmem/vmem.c
+index 4285246..3325acb 100644
+--- a/drivers/media/platform/msm/vidc/vmem/vmem.c
++++ b/drivers/media/platform/msm/vidc/vmem/vmem.c
+@@ -733,7 +733,7 @@ static void __exit vmem_exit(void)
+ 	platform_driver_unregister(&vmem_driver);
+ }
+ 
+-module_init(vmem_init);
++fs_initcall(vmem_init);
+ module_exit(vmem_exit);
+ 
+ MODULE_LICENSE("GPL v2");
+-- 
+1.9.1
+
