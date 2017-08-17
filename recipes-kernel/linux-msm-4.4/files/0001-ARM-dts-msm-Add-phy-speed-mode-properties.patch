@@ -1,0 +1,37 @@
+From 8fe4145507cb84681d3af64ff33fe0000710a02a Mon Sep 17 00:00:00 2001
+From: Zou Shunxiang <shunxian@codeaurora.org>
+Date: Mon, 7 Aug 2017 18:57:19 +0800
+Subject: [PATCH] ARM: dts: msm: Add phy speed mode properties for ethernet on
+ msm8996
+
+This change is only for reference on how to setup
+for example qcom,ntn-phy-speed-mode = <2>
+detail definition as below:
+typedef enum {
+	DWC_ETH_QOS_PHY_SPEED_AUTO = 0x0,
+	DWC_ETH_QOS_PHY_SPEED_1000M = 0x1,
+	DWC_ETH_QOS_PHY_SPEED_100M = 0x2,
+	DWC_ETH_QOS_PHY_SPEED_10M = 0x3,
+} DWC_ETH_QOS_phy_speed_mode;
+
+Change-Id: Ied28420182ec6ab034dd685b84aa31adabd10e21
+Signed-off-by: Zou Shunxiang <shunxian@codeaurora.org>
+---
+ arch/arm/boot/dts/qcom/msm8996-agave-adp.dtsi | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/arm/boot/dts/qcom/msm8996-agave-adp.dtsi b/arch/arm/boot/dts/qcom/msm8996-agave-adp.dtsi
+index 2dc5c91..d037fc0 100644
+--- a/arch/arm/boot/dts/qcom/msm8996-agave-adp.dtsi
++++ b/arch/arm/boot/dts/qcom/msm8996-agave-adp.dtsi
+@@ -872,6 +872,7 @@
+ 		qcom,ntn-bus-num = <1>;
+ 		qcom,ntn-mdio-bus-id = <1>;
+ 		qcom,ntn-phy-addr = <7>;
++		qcom,ntn-phy-speed-mode = <2>;
+ 
+ 		qcom,msm-bus,name = "ntn";
+ 		qcom,msm-bus,num-cases = <2>;
+-- 
+1.9.1
+
