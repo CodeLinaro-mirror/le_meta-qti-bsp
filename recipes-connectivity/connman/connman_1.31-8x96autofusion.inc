@@ -17,4 +17,4 @@ RDEPENDS_${PN}-plugin-vpn-ipsecvici += "${PN}-vpn strongswan-dev"
 RRECOMMENDS_${PN} += "${@bb.utils.contains('PACKAGECONFIG','ipsecvici','${PN}-plugin-vpn-ipsecvici', '', d)}"
 INSANE_SKIP_${PN}-plugin-vpn-ipsecvici += "dev-deps"
 INSANE_SKIP_${PN} += "dev-deps"
-
+PACKAGECONFIG[ipsecvici] = "--enable-ipsecvici"
