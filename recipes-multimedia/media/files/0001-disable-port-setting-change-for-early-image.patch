@@ -1,0 +1,47 @@
+From 9c688674059cf0e343627860b2727f43a116f163 Mon Sep 17 00:00:00 2001
+From: Laisheng Hu <laisheng@codeaurora.org>
+Date: Wed, 16 Aug 2017 11:30:13 +0800
+Subject: [PATCH] vdec:optimize 720p decoder with no port-setting-change
+
+Change-Id: Ia6624e4b82d6f186aec6c63d6b9111d1b2006c24
+Signed-off-by: Laisheng Hu <laisheng@codeaurora.org>
+---
+ mm-video-v4l2/vidc/vdec/src/omx_vdec_v4l2.cpp | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
+
+diff --git a/mm-video-v4l2/vidc/vdec/src/omx_vdec_v4l2.cpp b/mm-video-v4l2/vidc/vdec/src/omx_vdec_v4l2.cpp
+index 7b62fba..0c3ca80 100644
+--- a/mm-video-v4l2/vidc/vdec/src/omx_vdec_v4l2.cpp
++++ b/mm-video-v4l2/vidc/vdec/src/omx_vdec_v4l2.cpp
+@@ -4150,8 +4150,11 @@ OMX_ERRORTYPE  omx_vdec::set_parameter(OMX_IN OMX_HANDLETYPE     hComp,
+                                        // Based on whether c2d is enabled, requirements will be handed
+                                        // to the vidc driver appropriately
+ #ifdef _LINUX_
+-                                       if ( portDefn->nBufferCountActual >= drv_ctx.op_buf.mincount &&
+-                                               portDefn->nBufferSize >=  drv_ctx.op_buf.buffer_size ) {
++                                       // if ( portDefn->nBufferCountActual >= drv_ctx.op_buf.mincount &&
++                                      //         portDefn->nBufferSize >=  drv_ctx.op_buf.buffer_size ) 
++                                      {
++                                            //laisheng
++                                           drv_ctx.op_buf.mincount = drv_ctx.op_buf.mincount < portDefn->nBufferCountActual ?	drv_ctx.op_buf.mincount : portDefn->nBufferCountActual;
+                                            drv_ctx.op_buf.actualcount = portDefn->nBufferCountActual;
+                                            drv_ctx.op_buf.buffer_size = portDefn->nBufferSize;
+                                            drv_ctx.extradata_info.count = drv_ctx.op_buf.actualcount;
+@@ -8890,10 +8893,11 @@ int omx_vdec::async_message_process (void *context, void* message)
+ 
+                    /* Post event if resolution OR crop changed */
+                    /* filled length will be changed if resolution changed */
+-                   /* Crop parameters can be changed even without resolution change */
++                   /* Crop parameters can be changed even without resolution change */ //laisheng
+                    if (omxhdr->nFilledLen
+-                       && ((omx->prev_n_filled_len != omxhdr->nFilledLen)
+-                       || (omx->drv_ctx.frame_size.left != vdec_msg->msgdata.output_frame.framesize.left)
++                            && (((omx->prev_n_filled_len != omxhdr->nFilledLen) && (omx->prev_n_filled_len  > 0))
++        //                   &&((omx->prev_n_filled_len != omxhdr->nFilledLen) 
++ || (omx->drv_ctx.frame_size.left != vdec_msg->msgdata.output_frame.framesize.left)
+                        || (omx->drv_ctx.frame_size.top != vdec_msg->msgdata.output_frame.framesize.top)
+                        || (omx->drv_ctx.frame_size.right != vdec_msg->msgdata.output_frame.framesize.right)
+                        || (omx->drv_ctx.frame_size.bottom != vdec_msg->msgdata.output_frame.framesize.bottom)
+-- 
+2.9.2
+
