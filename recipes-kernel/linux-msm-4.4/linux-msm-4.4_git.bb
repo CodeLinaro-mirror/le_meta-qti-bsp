@@ -29,6 +29,9 @@ python __anonymous () {
   if bb.utils.contains('DISTRO_FEATURES', 'early_init', True, False, d):
       d.appendVar("SRC_URI", " file://0003-init-early-user-space.patch")
 
+  if bb.utils.contains('DISTRO_FEATURES', 'early-ethernet', True, False, d):
+      d.appendVar("SRC_URI", " file://0001-ARM-dts-msm-Add-phy-speed-mode-properties.patch")
+
   # Override KERNEL_IMAGETYPE_FOR_MAKE variable, which is internal
   # to kernel.bbclass. We override the variable as msm kernel can't
   # support alternate image builds
