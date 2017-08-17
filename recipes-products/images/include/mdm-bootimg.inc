@@ -13,8 +13,8 @@ DEPENDS += " \
 
 IMAGE_LINGUAS = ""
 
-# Image output types
-IMAGE_FSTYPES = "tar.gz ${INITRAMFS_FSTYPES}"
+# Default image output types
+IMAGE_FSTYPES ?= "tar.gz ${INITRAMFS_FSTYPES}"
 
 # Use busybox as login manager
 IMAGE_LOGIN_MANAGER = "busybox-static"

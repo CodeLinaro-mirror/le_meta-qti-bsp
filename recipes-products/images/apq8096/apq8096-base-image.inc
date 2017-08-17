@@ -2,8 +2,7 @@
 
 DEPENDS += "lib32-lk"
 
-# The OE-Core minimal boot image files.
-IMAGE_FSTYPES = "ext4"
+# Formats of root filesystem images. 
 
 IMAGE_INSTALL += "packagegroup-core-boot"
 IMAGE_INSTALL += "${ROOTFS_PKGMANAGE_BOOTSTRAP}"
@@ -26,7 +25,6 @@ IMAGE_INSTALL += "e2fsprogs-e2fsck"
 IMAGE_INSTALL += "e2fsprogs-resize2fs"
 DEPENDS += "gdb-cross-aarch64"
 IMAGE_INSTALL += "glib-2.0"
-IMAGE_INSTALL += "qcacld-ll"
 
 IMAGE_INSTALL += "start-scripts-find-partitions"
 IMAGE_INSTALL += "start-scripts-firmware-links"
