@@ -20,5 +20,8 @@ IMAGE_INSTALL += "strongswan"
 
 IMAGE_INSTALL_remove += "neutrino-eth"
 
+# Early init
+IMAGE_INSTALL += "early-init"
+
 IMAGE_ROOTFS_SIZE = "2097152"
 IMAGE_ROOTFS_EXTRA_SPACE_append = "${@bb.utils.contains("DISTRO_FEATURES", "systemd", " + 4096", "" ,d)}"
