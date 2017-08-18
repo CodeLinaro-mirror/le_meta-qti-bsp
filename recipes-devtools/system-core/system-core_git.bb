@@ -32,6 +32,7 @@ COMPOSITION_apq8096 = "901D"
 COMPOSITION_apq8098 = "901D"
 COMPOSITION_8x96autofusion = "901D"
 COMPOSITION_8x96auto = "901D"
+COMPOSITION_8x96autocv2x = "901D"
 
 do_install_append() {
    install -m 0755 ${S}/adb/launch_adbd -D ${D}${sysconfdir}/launch_adbd
