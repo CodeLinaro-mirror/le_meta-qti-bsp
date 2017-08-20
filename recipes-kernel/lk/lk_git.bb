@@ -31,7 +31,7 @@ BOOTLOADER_NAME = "${@base_contains('DISTRO_FEATURES', 'emmc-boot', 'emmc_appsbo
 
 emmc_bootloader = "${@base_contains('DISTRO_FEATURES', 'emmc-boot', '1', '0', d)}"
 
-LIBGCC = "${STAGING_LIBDIR}/${TARGET_SYS}/4.9.3/libgcc.a"
+LIBGCC = "${@base_contains('GCCVERSION', '5.2%', '${STAGING_LIBDIR}/${TARGET_SYS}/5.2.0/libgcc.a', '${STAGING_LIBDIR}/${TARGET_SYS}/4.9.3/libgcc.a', d)}"
 
 DISPLAY_SCREEN = "${@base_conditional('PRODUCT', 'drone', '0', '1', d)}"
 
@@ -44,6 +44,8 @@ EXTRA_OEMAKE_append_mdm9650 = " ENABLE_EARLY_ETHERNET=1"
 EXTRA_OEMAKE_append = " VERIFIED_BOOT=0 DEFAULT_UNLOCK=true EMMC_BOOT=${emmc_bootloader} APPEND_CMDLINE=${emmc_bootloader}"
 
 EXTRA_OEMAKE_append = " ${@base_contains('DISTRO_FEATURES', 'systemd', 'USE_LE_SYSTEMD=true', '', d)}"
+
+EXTRA_OEMAKE_append = " ${@base_contains('DISTRO_FEATURES', 'vble', 'VERIFIED_BOOT_LE=1', '', d)}"
 
 do_install() {
         install -d ${D}/boot
