@@ -9,9 +9,8 @@ ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI = "file://hardware/qcom/gps/"
 S = "${WORKDIR}/hardware/qcom/gps"
-DEPENDS = "glib-2.0 libhardware qmi qmi-framework data loc-pla loc-flp-hdr"
-EXTRA_OECONF = "--with-libhardware-includes=${STAGING_INCDIR} \
-                --with-core-includes=${WORKSPACE}/system/core/include \
+DEPENDS = "glib-2.0 gps-utils qmi qmi-framework data loc-pla loc-flp-hdr"
+EXTRA_OECONF = "--with-core-includes=${WORKSPACE}/system/core/include \
                 --with-locflp-includes=${STAGING_INCDIR}/loc-flp-hdr \
                 --with-glib"
 
@@ -21,6 +20,8 @@ CPPFLAGS += "-I${WORKSPACE}/base/include"
 PACKAGES = "${PN}"
 INHIBIT_PACKAGE_DEBUG_SPLIT = "1"
 FILES_${PN} = "${libdir}/* ${sysconfdir}"
+FILES_${PN} += "${libdir}/include/${PN}/*"
+FILES_${PN} += "/usr/include/${PN}/*"
 # The loc-hal package contains symlinks that trip up insane
 INSANE_SKIP_${PN} = "dev-so"
 
