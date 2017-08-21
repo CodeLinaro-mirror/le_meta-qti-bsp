@@ -20,8 +20,6 @@ IMAGE_INSTALL += "strongswan"
 IMAGE_INSTALL += "gst-multisend"
 IMAGE_INSTALL += "reboot-daemon"
 
-IMAGE_INSTALL_remove = "packagegroup-agl-demo-platform"
-IMAGE_INSTALL += "packagegroup-agl-appfw"
 IMAGE_INSTALL_remove += "neutrino-eth"
 
 IMAGE_INSTALL_remove = "qtwebengine"
