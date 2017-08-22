@@ -29,7 +29,7 @@
 Description=Firmware-links
 DefaultDependencies=no
 Before=multi-user.target
-After=firmware.mount
+After=firmware.mount find_partitions.service
 
 [Service]
 Type=oneshot
