@@ -7,7 +7,7 @@ tmpfs                /var/volatile        tmpfs      defaults              0  0
 /dev/vda             /firmware            auto       defaults,noauto       0  2
 PARTLABEL=persist    /persist             auto       defaults,noauto       0  2
 PARTLABEL=userdata   /data                auto       defaults,noauto       0  2
-PARTLABEL=dsp        /dsp                 auto       defaults,noauto       0  2
+/dev/vdg             /dsp                 auto       defaults,noauto       0  2
 
 # uncomment this if your device has a SD/MMC/Transflash slot
 #/dev/mmcblk0p1       /media/card          auto       defaults,sync,noauto  0  0
