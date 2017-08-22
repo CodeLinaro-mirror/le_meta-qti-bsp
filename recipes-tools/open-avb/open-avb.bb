@@ -40,8 +40,11 @@ do_install() {
 	install ${S}/daemons/mrpd/mrpctl ${D}/${bindir}/avb
 	install ${S}/daemons/gptp/linux/build/obj/daemon_cl ${D}/${bindir}/avb
 	install ${S}/lib/avtp_pipeline/build/bin/* ${D}/${bindir}/avb
+	mkdir -p ${D}/${libdir}/
+	install ${S}/lib/avtp_pipeline/build/lib/*.so ${D}/${libdir}
 }
 
 FILES_${PN} =+ "${bindir}/avb/*"
-
+FILES_${PN} =+ "${libdir}/*"
+FILES_${PN}-dev = ""
 FILES_${PN}-dbg += "${bindir}/avb/.debug/*"
