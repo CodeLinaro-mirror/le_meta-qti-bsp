@@ -2,8 +2,6 @@
 
 DEPENDS += "lk"
 
-# Formats of root filesystem images.
-IMAGE_FSTYPES += "ubi"
 
 IMAGE_INSTALL += "packagegroup-core-boot"
 IMAGE_INSTALL += "${ROOTFS_PKGMANAGE_BOOTSTRAP}"

@@ -2,8 +2,6 @@
 
 DEPENDS += "lk"
 
-# Formats of root filesystem images.
-IMAGE_FSTYPES += "ext4"
 
 IMAGE_INSTALL += "packagegroup-core-boot"
 
@@ -39,7 +37,6 @@ IMAGE_INSTALL += "system-core-adbd"
 IMAGE_INSTALL += "system-core-logd"
 IMAGE_INSTALL += "system-core-leprop"
 IMAGE_INSTALL += "system-core-usb"
-IMAGE_INSTALL += "system-core-debuggerd"
 IMAGE_INSTALL += "system-core-post-boot"
 IMAGE_INSTALL += "system-conf"
 IMAGE_INSTALL += "system-prop"

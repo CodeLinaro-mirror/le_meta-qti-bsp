@@ -4,8 +4,6 @@
 DEPENDS_append_arm += " lk"
 DEPENDS_append_aarch64 += " lib32-lk"
 
-# Formats of root filesystem images.
-IMAGE_FSTYPES += "ext4"
 
 IMAGE_INSTALL += "packagegroup-core-boot"
 IMAGE_INSTALL += "${ROOTFS_PKGMANAGE_BOOTSTRAP}"
@@ -33,7 +31,6 @@ IMAGE_INSTALL += "system-core-adbd"
 IMAGE_INSTALL += "system-core-logd"
 IMAGE_INSTALL += "system-core-leprop"
 IMAGE_INSTALL += "system-core-usb"
-IMAGE_INSTALL += "system-core-debuggerd"
 IMAGE_INSTALL += "system-core-post-boot"
 IMAGE_INSTALL += "system-conf"
 IMAGE_INSTALL += "system-prop"
@@ -52,10 +49,6 @@ IMAGE_INSTALL += "procrank"
 
 IMAGE_INSTALL += "libuv"
 IMAGE_INSTALL += "libwebsockets"
-IMAGE_INSTALL += "ipmon"
-IMAGE_INSTALL += "discovery"
-IMAGE_INSTALL += "rtsp-proxy"
-IMAGE_INSTALL += "webui"
 
 # Below is to generate sparse ext4 system image (OE by default supports raw ext4 images)
 SELINUX_FILE_CONTEXTS = "${IMAGE_ROOTFS}/etc/selinux/mls/contexts/files/file_contexts"

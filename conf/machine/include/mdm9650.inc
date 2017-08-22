@@ -47,3 +47,6 @@ CACHE_SIZE_EXT4 ?= "80000000"
 
 #Enable SDK feature
 SDK_IMAGE ?= "1"
+
+# Formats of root filesystem images. 
+IMAGE_FSTYPES += "ext4 ubi"

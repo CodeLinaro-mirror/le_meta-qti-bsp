@@ -11,6 +11,7 @@ DEPENDS := "go-cross"
 DEPENDS += "github.com-gorilla-muxer"
 DEPENDS += "github.com-gorilla-websocket"
 DEPENDS += "github.com-bitly-simplejson"
+DEPENDS += "libcutils"
 
 FILESPATH =+ "${WORKSPACE}/vendor/qcom/opensource/qmmf-webserver:"
 SRC_URI = "file://ipc-webserver"
