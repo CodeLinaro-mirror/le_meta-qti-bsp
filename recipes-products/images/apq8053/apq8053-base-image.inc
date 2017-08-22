@@ -42,7 +42,6 @@ IMAGE_INSTALL += "${@base_contains('MULTILIB_VARIANTS', 'lib32', 'lib32-libnl', 
 IMAGE_INSTALL += "${@base_contains('MULTILIB_VARIANTS', 'lib32', 'lib32-live555-qti', 'live555-qti', d)}"
 IMAGE_INSTALL += "${@base_contains('MULTILIB_VARIANTS', 'lib32', 'lib32-gtest', 'gtest', d)}"
 IMAGE_INSTALL += "${@base_contains('MULTILIB_VARIANTS', 'lib32', 'lib32-cairo', 'cairo', d)}"
-IMAGE_INSTALL += "${@base_contains('MULTILIB_VARIANTS', 'lib32', 'lib32-ipc-webserver', 'ipc-webserver', d)}"
 
 IMAGE_INSTALL += "libpagemap"
 IMAGE_INSTALL += "procrank"
