@@ -4,6 +4,14 @@ SRC_URI = "file://${@d.getVar('SRC_DIR', True).replace('${WORKSPACE}/graphics/',
 REPO_SRC_URI = "file://${@d.getVar('SRC_DIR', True).replace('${WORKSPACE}/graphics/', '')}"
 S = "${WORKDIR}/weston"
 
+python __anonymous () {
+
+    # add early_init to DISTRO_FEATURES to use early user space feature
+    if bb.utils.contains('DISTRO_FEATURES', 'early_init', True, False, d) or bb.utils.contains('DISTRO_FEATURES', 'early-ethernet', True, False, d):
+        d.appendVar("SRC_URI", " file://0001-weston-early-init-support.patch")
+
+}
+
 FILESEXTRAPATHS_append := ":${THISDIR}/${PN}"
 SRC_URI_append = "\
     file://weston.service_caf \
@@ -12,6 +20,7 @@ SRC_URI_append = "\
     file://0001-configure-don-t-control-egl-version.patch \
     file://drm_firmware_load_trigger.service \
 "
+
 CFLAGS += "-idirafter ${STAGING_KERNEL_DIR}/include/"
 
 # Remove community patch which is conflict with Weston SDM optimization
