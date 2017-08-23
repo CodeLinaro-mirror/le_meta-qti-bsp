@@ -55,4 +55,5 @@ IMAGE_PREPROCESS_COMMAND += "echo ${MACHINE} >> ${IMAGE_ROOTFS}/target;"
 
 do_makesystem() {
     make_ext4fs -s -l ${SYSTEM_SIZE_EXT4} ${DEPLOY_DIR_IMAGE}/${MACHINE}-${PRODUCT}-sysfs.ext4 ${IMAGE_ROOTFS}
+    make_ext4fs -s -l ${SYSTEMRW_SIZE_EXT4} ${DEPLOY_DIR_IMAGE}/${MACHINE}-${PRODUCT}-systemrw.ext4
 }
