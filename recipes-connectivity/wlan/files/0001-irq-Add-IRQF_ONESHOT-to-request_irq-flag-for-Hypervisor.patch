@@ -1,0 +1,13 @@
+diff --git a/CORE/SERVICES/HIF/PCIe/if_pci.c b/CORE/SERVICES/HIF/PCIe/if_pci.c
+index 311fd56..756b451 100644
+--- a/CORE/SERVICES/HIF/PCIe/if_pci.c
++++ b/CORE/SERVICES/HIF/PCIe/if_pci.c
+@@ -2365,7 +2365,7 @@ hif_pci_configure(struct hif_pci_softc *sc, hif_handle_t *hif_hdl)
+ 	    /* We are here because we want to multiplex a single host interrupt among all
+ 	     * Target interrupt sources
+ 	     */
+-	    ret = request_irq(sc->pdev->irq, hif_pci_interrupt_handler, IRQF_SHARED,
++	    ret = request_irq(sc->pdev->irq, hif_pci_interrupt_handler, IRQF_SHARED | IRQF_ONESHOT,
+ 			      "wlan_pci", sc);
+ 	    if(ret) {
+ 		    dev_err(&sc->pdev->dev, "request_irq failed\n");

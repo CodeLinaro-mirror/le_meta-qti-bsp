@@ -83,3 +83,6 @@ FILES_${PN} = "/usr/sbin/\
 
 PACKAGES =+ "kernel-module-wlan"
 FILES_kernel-module-wlan = "/lib/modules/${KERNEL_VERSION}/extra/wlan.ko"
+
+INCSUFFIX = "${@base_conditional('MACHINEGROUP', 'auto', 'qcacld-2.0_auto', 'none',d)}"
+include ${INCSUFFIX}.inc
