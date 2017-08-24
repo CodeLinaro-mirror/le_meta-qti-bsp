@@ -25,9 +25,9 @@ python __anonymous () {
   else:
       d.setVar("KERNEL_CONFIG", d.getVar("KERNEL_DEFCONFIG", True))
 
-  # uncomment following two lines to use early user space feature
-  #if d.getVar("MACHINE", True) == "8x96auto":
-  #    d.appendVar("SRC_URI", " file://0003-init-early-user-space.patch")
+  # add early_init to DISTRO_FEATURES to use early user space feature
+  if bb.utils.contains('DISTRO_FEATURES', 'early_init', True, False, d):
+      d.appendVar("SRC_URI", " file://0003-init-early-user-space.patch")
 
   # Override KERNEL_IMAGETYPE_FOR_MAKE variable, which is internal
   # to kernel.bbclass. We override the variable as msm kernel can't
