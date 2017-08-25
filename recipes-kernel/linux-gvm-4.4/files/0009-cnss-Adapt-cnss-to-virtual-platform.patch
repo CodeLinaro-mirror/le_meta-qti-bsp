@@ -1,7 +1,7 @@
-From 5b6159d0725226bd7c73aff11fdb8cca028f2665 Mon Sep 17 00:00:00 2001
+From e2943c31e3bb091f64c36ede0af6ec0445f5fbe4 Mon Sep 17 00:00:00 2001
 From: Zhiqiang Tu <ztu@codeaurora.org>
-Date: Thu, 13 Jul 2017 16:12:07 +0800
-Subject: [PATCH] DO NOT MERGE: adapt cnss to virtual platform
+Date: Fri, 25 Aug 2017 10:17:22 +0800
+Subject: [PATCH] cnss_pci: adapt cnss to virtual platform
 
 Change-Id: I1ac3f58186c421fe60eabd5c45574fee12df3ce2
 Signed-off-by: Zhiqiang Tu <ztu@codeaurora.org>
@@ -10,10 +10,10 @@ Signed-off-by: Zhiqiang Tu <ztu@codeaurora.org>
  1 file changed, 55 insertions(+)
 
 diff --git a/drivers/net/wireless/cnss/cnss_pci.c b/drivers/net/wireless/cnss/cnss_pci.c
-index 48d358c..9f16861 100644
+index af92f00..611ece9 100644
 --- a/drivers/net/wireless/cnss/cnss_pci.c
 +++ b/drivers/net/wireless/cnss/cnss_pci.c
-@@ -549,6 +549,7 @@ out:
+@@ -569,6 +569,7 @@ out:
  
  static void cnss_wlan_gpio_set(struct cnss_wlan_gpio_info *info, bool state)
  {
@@ -21,7 +21,7 @@ index 48d358c..9f16861 100644
  	if (!info->prop)
  		return;
  
-@@ -568,6 +569,9 @@ static void cnss_wlan_gpio_set(struct cnss_wlan_gpio_info *info, bool state)
+@@ -588,6 +589,9 @@ static void cnss_wlan_gpio_set(struct cnss_wlan_gpio_info *info, bool state)
  
  	pr_debug("%s: %s gpio is now %s\n", __func__,
  		 info->name, info->state ? "enabled" : "disabled");
@@ -30,8 +30,8 @@ index 48d358c..9f16861 100644
 +#endif
  }
  
- static int cnss_pinctrl_init(struct cnss_wlan_gpio_info *gpio_info,
-@@ -1493,6 +1497,51 @@ int cnss_msm_pcie_enumerate(u32 rc_idx)
+ static int cnss_configure_wlan_en_gpio(bool state)
+@@ -1559,6 +1563,51 @@ int cnss_msm_pcie_enumerate(u32 rc_idx)
  {
  	return msm_pcie_enumerate(rc_idx);
  }
@@ -83,7 +83,7 @@ index 48d358c..9f16861 100644
  #else /* !defined CONFIG_PCI_MSM */
  
  struct pci_saved_state *cnss_pci_store_saved_state(struct pci_dev *dev)
-@@ -2788,7 +2837,9 @@ static int cnss_probe(struct platform_device *pdev)
+@@ -2870,7 +2919,9 @@ static int cnss_probe(struct platform_device *pdev)
  	struct esoc_desc *desc;
  	const char *client_desc;
  	struct device *dev = &pdev->dev;
@@ -93,15 +93,15 @@ index 48d358c..9f16861 100644
  	struct resource *res;
  	u32 ramdump_size = 0;
  	u32 smmu_iova_address[2];
-@@ -2819,6 +2870,7 @@ static int cnss_probe(struct platform_device *pdev)
- 	cnss_wlan_gpio_set(&penv->gpio_info, WLAN_EN_HIGH);
- 	msleep(WLAN_ENABLE_DELAY);
+@@ -2905,6 +2956,7 @@ static int cnss_probe(struct platform_device *pdev)
+ 		goto err_get_rc;
+ 	}
  
 +#ifndef CONFIG_MSM_GVM_QUIN
  	ret = of_property_read_u32(dev->of_node, "qcom,wlan-rc-num", &rc_num);
  	if (ret) {
  		pr_err("%s: Failed to find PCIe RC number!\n", __func__);
-@@ -2830,6 +2882,7 @@ static int cnss_probe(struct platform_device *pdev)
+@@ -2916,6 +2968,7 @@ static int cnss_probe(struct platform_device *pdev)
  		pr_err("%s: Failed to enable PCIe RC%x!\n", __func__, rc_num);
  		goto err_pcie_enumerate;
  	}
@@ -109,16 +109,16 @@ index 48d358c..9f16861 100644
  
  	penv->pcie_link_state = PCIE_LINK_UP;
  
-@@ -3010,8 +3063,10 @@ err_subsys_reg:
+@@ -3096,7 +3149,9 @@ err_subsys_reg:
  		devm_unregister_esoc_client(&pdev->dev, penv->esoc_desc);
  
  err_esoc_reg:
 +#ifndef CONFIG_MSM_GVM_QUIN
  err_pcie_enumerate:
- err_get_rc:
 +#endif
- 	cnss_wlan_gpio_set(&penv->gpio_info, WLAN_EN_LOW);
+ err_get_rc:
+ 	cnss_configure_wlan_en_gpio(WLAN_EN_LOW);
  	cnss_wlan_release_resources();
- 
 -- 
-1.8.2.1
+1.9.1
+
