@@ -6,6 +6,9 @@ LICENSE = "BSD"
 SRC_URI +="file://${BASEMACHINE}/firmware-links.sh"
 SRC_URI +="file://firmware-links.service"
 
+SRC_URI_remove_8x96autogvmquin44 += "file://firmware-links.service"
+SRC_URI_append_8x96autogvmquin44 +="file://${BASEMACHINE}/firmware-links.service"
+
 S = "${WORKDIR}/${BASEMACHINE}"
 
 PR = "r5"
@@ -21,7 +24,11 @@ do_install() {
     install -m 0755 ${WORKDIR}/${BASEMACHINE}/firmware-links.sh -D ${D}${sysconfdir}/init.d/firmware-links.sh
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
        install -d ${D}${systemd_unitdir}/system/
-       install -m 0644 ${WORKDIR}/firmware-links.service -D ${D}${systemd_unitdir}/system/firmware-links.service
+       if [ "${BASEMACHINE}" == "8x96autogvmquin44" ]; then
+           install -m 0644 ${WORKDIR}/${BASEMACHINE}/firmware-links.service -D ${D}${systemd_unitdir}/system/firmware-links.service
+       else
+           install -m 0644 ${WORKDIR}/firmware-links.service -D ${D}${systemd_unitdir}/system/firmware-links.service
+       fi
        install -d ${D}${systemd_unitdir}/system/sysinit.target.wants/
        # enable the service for sysinit.target
        ln -sf ${systemd_unitdir}/system/firmware-links.service \
