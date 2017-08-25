@@ -1,0 +1,26 @@
+From 2e315d5d5670c3d300fb41a43bca73af75db3a19 Mon Sep 17 00:00:00 2001
+From: Lei wang <leiwan@qti.qualcomm.com>
+Date: Thu, 24 Aug 2017 17:54:51 +0800
+Subject: [PATCH] systemd: reduce service stop timeout to 10s
+
+Signed-off-by: Lei wang <leiwan@codeaurea.org>
+---
+ src/core/system.conf | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/core/system.conf b/src/core/system.conf
+index e2ded2733..d7540beca 100644
+--- a/src/core/system.conf
++++ b/src/core/system.conf
+@@ -32,7 +32,7 @@
+ #DefaultStandardOutput=journal
+ #DefaultStandardError=inherit
+ #DefaultTimeoutStartSec=90s
+-#DefaultTimeoutStopSec=90s
++DefaultTimeoutStopSec=10s
+ #DefaultRestartSec=100ms
+ #DefaultStartLimitInterval=10s
+ #DefaultStartLimitBurst=5
+-- 
+2.14.0.rc1.14.gc3eb4e6bf
+
