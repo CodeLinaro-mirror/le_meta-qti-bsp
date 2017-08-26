@@ -38,7 +38,12 @@ echo -n "M - early_init begin" > /debug/bootkpi/kpi_values
 mount -t sysfs sysfs /sys
 echo 105 > /sys/class/gpio/export
 
-export XDG_RUNTIME_DIR=/home/root/
+mkdir -p /early
+mount -t tmpfs tmpfs /early
+mkdir -p /early/user/0
+chmod 700 /early/user/0
+
+export XDG_RUNTIME_DIR=/early/user/0/
 weston --tty=1 > /server.log  2>&1 &
 
 echo -n "M - ais_server" > /debug/bootkpi/kpi_values
