@@ -38,8 +38,13 @@ echo 105 > /sys/class/gpio/export
 ifconfig eth0 192.168.2.2 up &
 
 mount -t sysfs sysfs /sys
+mkdir -p /early
+mount -t tmpfs tmpfs /early
+mkdir -p /early/user/0
+chmod 700 /early/user/0
 
-export XDG_RUNTIME_DIR=/home/root/
+export XDG_RUNTIME_DIR=/early/user/0/
+
 weston --tty=1 > /server.log  2>&1 &
 
 /usr/bin/mm-vdec-omx-test 0 50001 1 0 1 1 0 0 0 0 0
