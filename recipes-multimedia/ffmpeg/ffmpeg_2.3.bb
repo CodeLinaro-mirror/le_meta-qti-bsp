@@ -18,13 +18,18 @@ FILES_${PN} += "/lib/pkgconfig/*"
 FILES_${PN}-dev += "/usr/share/*"
 FILES_${PN}-dev += "/lib/lib*.so"
 
+EXTRA_CFLAGS +="-fPIC"
+
+#enable hardfloat
+EXTRA_CFLAGS +="${@base_conditional('ARM_FLOAT_ABI', 'hard', '-march=armv7-a -mfloat-abi=hard -mfpu=neon -mtune=cortex-a8', '', d)}"
+
 do_configure () {
     ./configure --enable-cross-compile --cross-prefix=${TARGET_PREFIX} \
     --cpu=armv7-a --target-os=linux --sysroot=${STAGING_DIR_TARGET} --arch=${TARGET_ARCH} --disable-mmx \
     --enable-shared --disable-doc --disable-htmlpages --disable-manpages --disable-podpages \
     --disable-txtpages --disable-avdevice --disable-swresample --disable-swscale \
     --disable-postproc --enable-small --disable-avfilter --disable-debug --disable-ffserver --disable-ffplay \
-    --extra-cflags=-fPIC --enable-gpl --disable-network --disable-zlib --disable-ffmpeg --disable-encoders \
+    --extra-cflags="${EXTRA_CFLAGS}" --enable-gpl --disable-network --disable-zlib --disable-ffmpeg --disable-encoders \
     --disable-decoders --disable-muxers --disable-bsfs --disable-devices --disable-protocol=udp \
     --disable-protocol=tcp --disable-protocol=rtp --disable-protocol=pipe --disable-protocol=http \
     --disable-parser=cavsvideo --disable-parser=dca --disable-parser=dirac --disable-parser=dnxhd --disable-parser=mjpeg \
@@ -51,4 +56,4 @@ do_install() {
     if [ -e "${D}${infodir}/dir" ]; then
     rm -f ${D}${infodir}/dir
     fi
-} 
+}
