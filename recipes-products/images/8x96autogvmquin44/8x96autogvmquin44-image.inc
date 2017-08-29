@@ -4,6 +4,7 @@ require recipes-platform/images/agl-demo-platform.bb
 
 EXTRA_IMAGE_FEATURES += "package-management"
 EXTRA_IMAGE_FEATURES += "tools-debug"
+EXTRA_IMAGE_FEATURES += "ssh-server-openssh"
 
 IMAGE_INSTALL += "packagegroup-agl-core"
 IMAGE_INSTALL += "packagegroup-agl-ivi"
