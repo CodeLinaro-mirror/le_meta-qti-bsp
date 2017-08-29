@@ -1,5 +1,6 @@
 [core]
 shell=desktop-shell.so
+idle-time=99999999
 
 [shell]
 locking=true
