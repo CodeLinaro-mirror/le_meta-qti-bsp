@@ -28,3 +28,17 @@ EXTRA_OECONF +="${@bb.utils.contains('USE_CLANG', 'true','${CLANG_CPP}', ' ',d)}
 EXTRA_OECONF +="${@bb.utils.contains('USE_CLANG', 'true','${CLANG_CC}', ' ',d)}"
 
 EXTRA_OECONF +="${@bb.utils.contains('USE_CLANG', 'true','${CLANG_CXX}', ' ',d)}"
+
+COMPILER_C_CMAKE = "${@bb.utils.contains('USE_CLANG', 'true','"${STAGING_BINDIR_TOOLCHAIN}/../llvm-arm-toolchain/bin/clang"', '',d)}"
+
+COMPILER_CPP_CMAKE = "${@bb.utils.contains('USE_CLANG', 'true','"${STAGING_BINDIR_TOOLCHAIN}/../llvm-arm-toolchain/bin/clang++"', '',d)}"
+
+COMPILER_C_CMAKE_FLAGS =  "${@bb.utils.contains('USE_CLANG', 'true','-target ${TARGET_ARCH}${TARGET_VENDOR}-${TARGET_OS} ${NEON_FLAGS} ', '',d)}"
+
+OECMAKE_C_COMPILER = "${COMPILER_C_CMAKE}"
+
+OECMAKE_CXX_COMPILER = "${COMPILER_CPP_CMAKE}"
+
+OECMAKE_C_FLAGS += "${COMPILER_C_CMAKE_FLAGS}"
+
+OECMAKE_CXX_FLAGS += "${COMPILER_C_CMAKE_FLAGS}"
