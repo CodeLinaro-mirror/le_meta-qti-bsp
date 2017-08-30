@@ -9,6 +9,7 @@ SRC_URI_append_8x96autogvmquin += "file://${BASEMACHINE}/fstab"
 SRC_URI_append_8x96autogvmquin44 += "file://${BASEMACHINE}/fstab"
 SRC_URI_append_8x96autogvmred += "file://${BASEMACHINE}/fstab"
 SRC_URI_append_8x96autonapier +="file://${BASEMACHINE}/fstab"
+SRC_URI_append_8x96autocv2x += "file://${BASEMACHINE}/fstab"
 
 dirs755 += "/media/cf /media/net /media/ram \
             /media/union /media/realroot /media/hdd \
