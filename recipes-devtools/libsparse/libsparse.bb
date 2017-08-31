@@ -1,4 +1,4 @@
-inherit autotools pkgconfig
+inherit autotools pkgconfig qcommon
 
 DESCRIPTION = "Build Android libsprase"
 HOMEPAGE = "http://developer.android.com/"
@@ -10,7 +10,8 @@ PR = "r0"
 
 DEPENDS += "zlib"
 
-FILESPATH =+ "${WORKSPACE}/system/core/:"
-SRC_URI   = "file://libsparse"
+SRC_URI = " \
+    ${CAF_LA_GIT}/platform/system/core.git;protocol=git;nobranch=1;tag=${CAF_TAG};subpath=${BPN};destsuffix=system/core/${BPN} \
+"
 
-S = "${WORKDIR}/libsparse"
+S = "${WORKDIR}/system/core/${BPN}"
