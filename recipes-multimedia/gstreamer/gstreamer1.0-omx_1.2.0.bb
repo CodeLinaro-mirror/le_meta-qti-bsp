@@ -2,7 +2,7 @@ DEFAULT_PREFERENCE = "-1"
 
 require ${COREBASE}/meta/recipes-multimedia/gstreamer/gstreamer1.0-omx.inc
 
-DEPENDS_${PN} += "media"
+DEPENDS += "media"
 RDEPENDS_${PN} = "media"
 GSTREAMER_1_0_OMX_TARGET = "generic"
 GSTREAMER_1_0_OMX_CORE_NAME = "${libdir}/libOmxCore.so"
