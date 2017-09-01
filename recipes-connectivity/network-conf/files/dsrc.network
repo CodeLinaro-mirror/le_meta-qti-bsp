@@ -1,0 +1,6 @@
+[Match]
+Name=wlan0
+Driver=cnss_ar6k_wlan
+
+[Network]
+DHCP=no
