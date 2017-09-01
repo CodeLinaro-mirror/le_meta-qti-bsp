@@ -1,4 +1,4 @@
-From 70c791e77423c7dbcfec0b380baa8d3977d6323c Mon Sep 17 00:00:00 2001
+From f0e65c31227ff1528a929cb40bba7de520452a04 Mon Sep 17 00:00:00 2001
 From: Wei Li <weili@codeaurora.org>
 Date: Thu, 27 Apr 2017 17:00:35 +0800
 Subject: [PATCH] automotive: add boot marker
@@ -26,7 +26,7 @@ Signed-off-by: Wei Li <weili@codeaurora.org>
  15 files changed, 86 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/gpu/drm/msm/msm_drv.c b/drivers/gpu/drm/msm/msm_drv.c
-index 665f8db..d6a0e4e 100644
+index c8b1142..402d330 100644
 --- a/drivers/gpu/drm/msm/msm_drv.c
 +++ b/drivers/gpu/drm/msm/msm_drv.c
 @@ -25,6 +25,7 @@
@@ -35,9 +35,9 @@ index 665f8db..d6a0e4e 100644
  #include "msm_mmu.h"
 +#include <soc/qcom/boot_stats.h>
  
- static void msm_fb_output_poll_changed(struct drm_device *dev)
+ static void msm_drm_helper_hotplug_event(struct drm_device *dev)
  {
-@@ -372,6 +373,9 @@ static int msm_load(struct drm_device *dev, unsigned long flags)
+@@ -430,6 +431,9 @@ static int msm_load(struct drm_device *dev, unsigned long flags)
  	struct msm_kms *kms;
  	int ret, i;
  
@@ -47,7 +47,7 @@ index 665f8db..d6a0e4e 100644
  	priv = kzalloc(sizeof(*priv), GFP_KERNEL);
  	if (!priv) {
  		dev_err(dev->dev, "failed to allocate private data\n");
-@@ -520,6 +524,9 @@ static int msm_load(struct drm_device *dev, unsigned long flags)
+@@ -580,6 +584,9 @@ static int msm_load(struct drm_device *dev, unsigned long flags)
  
  	drm_kms_helper_poll_init(dev);
  
@@ -58,7 +58,7 @@ index 665f8db..d6a0e4e 100644
  
  fail:
 diff --git a/drivers/media/platform/msm/ais/common/cam_smmu_api.c b/drivers/media/platform/msm/ais/common/cam_smmu_api.c
-index d3b239e..a427fc1 100644
+index 0f0e145..9803e6c 100644
 --- a/drivers/media/platform/msm/ais/common/cam_smmu_api.c
 +++ b/drivers/media/platform/msm/ais/common/cam_smmu_api.c
 @@ -25,6 +25,7 @@
@@ -78,7 +78,7 @@ index d3b239e..a427fc1 100644
  }
  
 diff --git a/drivers/media/platform/msm/ais/msm_buf_mgr/msm_generic_buf_mgr.c b/drivers/media/platform/msm/ais/msm_buf_mgr/msm_generic_buf_mgr.c
-index 675bf6b..e882e52 100644
+index 66751b1..0277f15 100644
 --- a/drivers/media/platform/msm/ais/msm_buf_mgr/msm_generic_buf_mgr.c
 +++ b/drivers/media/platform/msm/ais/msm_buf_mgr/msm_generic_buf_mgr.c
 @@ -13,6 +13,7 @@
@@ -98,7 +98,7 @@ index 675bf6b..e882e52 100644
  }
  
 diff --git a/drivers/media/platform/msm/vidc/msm_v4l2_vidc.c b/drivers/media/platform/msm/vidc/msm_v4l2_vidc.c
-index a8dc1d0..cc939f6 100644
+index de5a2de..40800d0 100644
 --- a/drivers/media/platform/msm/vidc/msm_v4l2_vidc.c
 +++ b/drivers/media/platform/msm/vidc/msm_v4l2_vidc.c
 @@ -31,6 +31,7 @@
@@ -109,7 +109,7 @@ index a8dc1d0..cc939f6 100644
  
  #define BASE_DEVICE_NUMBER 32
  
-@@ -747,6 +748,7 @@ static struct platform_driver msm_vidc_driver = {
+@@ -757,6 +758,7 @@ static struct platform_driver msm_vidc_driver = {
  static int __init msm_vidc_init(void)
  {
  	int rc = 0;
@@ -117,7 +117,7 @@ index a8dc1d0..cc939f6 100644
  	vidc_driver = kzalloc(sizeof(*vidc_driver),
  						GFP_KERNEL);
  	if (!vidc_driver) {
-@@ -772,6 +774,7 @@ static int __init msm_vidc_init(void)
+@@ -781,6 +783,7 @@ static int __init msm_vidc_init(void)
  		vidc_driver = NULL;
  	}
  
@@ -126,7 +126,7 @@ index a8dc1d0..cc939f6 100644
  }
  
 diff --git a/drivers/mmc/card/block.c b/drivers/mmc/card/block.c
-index a22defe..8e2fde4 100644
+index d39b4056..0921da3 100644
 --- a/drivers/mmc/card/block.c
 +++ b/drivers/mmc/card/block.c
 @@ -48,6 +48,7 @@
@@ -137,7 +137,7 @@ index a22defe..8e2fde4 100644
  
  #include "queue.h"
  
-@@ -4611,6 +4612,7 @@ static int mmc_blk_probe(struct mmc_card *card)
+@@ -4614,6 +4615,7 @@ static int mmc_blk_probe(struct mmc_card *card)
  
  	string_get_size((u64)get_capacity(md->disk), 512, STRING_UNITS_2,
  			cap_str, sizeof(cap_str));
@@ -145,7 +145,7 @@ index a22defe..8e2fde4 100644
  	pr_info("%s: %s %s %s %s\n",
  		md->disk->disk_name, mmc_card_id(card), mmc_card_name(card),
  		cap_str, md->read_only ? "(ro)" : "");
-@@ -4741,6 +4743,7 @@ static int __init mmc_blk_init(void)
+@@ -4751,6 +4753,7 @@ static int __init mmc_blk_init(void)
  {
  	int res;
  
@@ -191,7 +191,7 @@ index a93f979..272e441 100644
  MODULE_DESCRIPTION("RH850 SPI-CAN module");
  MODULE_LICENSE("GPL v2");
 diff --git a/drivers/pci/host/pci-msm.c b/drivers/pci/host/pci-msm.c
-index 8bb759d..0d1551a 100644
+index 8e66cd5..9443a0f 100644
 --- a/drivers/pci/host/pci-msm.c
 +++ b/drivers/pci/host/pci-msm.c
 @@ -47,6 +47,7 @@
@@ -202,7 +202,7 @@ index 8bb759d..0d1551a 100644
  
  #ifdef CONFIG_ARCH_MDMCALIFORNIUM
  #define PCIE_VENDOR_ID_RCP		0x17cb
-@@ -4481,6 +4482,7 @@ int msm_pcie_enable(struct msm_pcie_dev_t *dev, u32 options)
+@@ -4486,6 +4487,7 @@ int msm_pcie_enable(struct msm_pcie_dev_t *dev, u32 options)
  	uint32_t val;
  	long int retries = 0;
  	int link_check_count = 0;
@@ -210,7 +210,7 @@ index 8bb759d..0d1551a 100644
  
  	PCIE_DBG(dev, "RC%d: entry\n", dev->rc_idx);
  
-@@ -4661,6 +4663,9 @@ int msm_pcie_enable(struct msm_pcie_dev_t *dev, u32 options)
+@@ -4666,6 +4668,9 @@ int msm_pcie_enable(struct msm_pcie_dev_t *dev, u32 options)
  
  	if ((val & XMLH_LINK_UP) &&
  		msm_pcie_confirm_linkup(dev, false, false, NULL)) {
@@ -220,7 +220,7 @@ index 8bb759d..0d1551a 100644
  		PCIE_DBG(dev, "Link is up after %d checkings\n",
  			link_check_count);
  		PCIE_INFO(dev, "PCIe RC%d link initialized\n", dev->rc_idx);
-@@ -6597,6 +6602,7 @@ int __init pcie_init(void)
+@@ -6627,6 +6632,7 @@ int __init pcie_init(void)
  	char rc_name[MAX_RC_NAME_LEN];
  
  	pr_alert("pcie:%s.\n", __func__);
@@ -257,7 +257,7 @@ index d07fb65..53680ea 100644
  
  cleanup_sysctl:
 diff --git a/drivers/spi/spi_qsd.c b/drivers/spi/spi_qsd.c
-index 548efd1..4a7aad8 100644
+index 4499dd3..300c47b 100644
 --- a/drivers/spi/spi_qsd.c
 +++ b/drivers/spi/spi_qsd.c
 @@ -44,6 +44,7 @@
@@ -268,7 +268,7 @@ index 548efd1..4a7aad8 100644
  
  #define SPI_MAX_BYTES_PER_WORD			(4)
  
-@@ -2763,7 +2764,23 @@ static struct platform_driver msm_spi_driver = {
+@@ -2776,7 +2777,23 @@ static struct platform_driver msm_spi_driver = {
  	.probe		= msm_spi_probe,
  };
  
@@ -294,7 +294,7 @@ index 548efd1..4a7aad8 100644
  MODULE_LICENSE("GPL v2");
  MODULE_VERSION("0.4");
 diff --git a/drivers/usb/dwc3/dwc3-msm.c b/drivers/usb/dwc3/dwc3-msm.c
-index 4ed46d9..3955dfaf 100644
+index 70db070..aa5a393 100644
 --- a/drivers/usb/dwc3/dwc3-msm.c
 +++ b/drivers/usb/dwc3/dwc3-msm.c
 @@ -53,6 +53,7 @@
@@ -303,9 +303,9 @@ index 4ed46d9..3955dfaf 100644
  #include "xhci.h"
 +#include <soc/qcom/boot_stats.h>
  
- /* time out to wait for USB cable status notification (in ms)*/
- #define SM_INIT_TIMEOUT 30000
-@@ -3143,6 +3144,11 @@ static int dwc3_msm_probe(struct platform_device *pdev)
+ #define SDP_CONNETION_CHECK_TIME 10000 /* in ms */
+ 
+@@ -3203,6 +3204,11 @@ static int dwc3_msm_probe(struct platform_device *pdev)
  		dwc3_ext_event_notify(mdwc);
  	}
  
@@ -317,7 +317,7 @@ index 4ed46d9..3955dfaf 100644
  	return 0;
  
  put_dwc3:
-@@ -3908,6 +3914,8 @@ MODULE_DESCRIPTION("DesignWare USB3 MSM Glue Layer");
+@@ -4006,6 +4012,8 @@ MODULE_DESCRIPTION("DesignWare USB3 MSM Glue Layer");
  
  static int dwc3_msm_init(void)
  {
@@ -378,17 +378,17 @@ index 7d4532b..23c18d110 100644
  	    !try_to_run_init_process("/etc/init") ||
  	    !try_to_run_init_process("/bin/init") ||
 diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
-index c9ef99f..0440eed 100644
+index aad274c..eed912a 100644
 --- a/net/ipv4/af_inet.c
 +++ b/net/ipv4/af_inet.c
-@@ -124,6 +124,7 @@
+@@ -121,6 +121,7 @@
+ #include <linux/mroute.h>
+ #endif
+ #include <net/l3mdev.h>
++#include <soc/qcom/boot_stats.h>
  
  #ifdef CONFIG_ANDROID_PARANOID_NETWORK
  #include <linux/android_aid.h>
-+#include <soc/qcom/boot_stats.h>
- 
- static inline int current_has_network(void)
- {
 @@ -1737,6 +1738,7 @@ static int __init inet_init(void)
  	struct list_head *r;
  	int rc = -EINVAL;
@@ -406,7 +406,7 @@ index c9ef99f..0440eed 100644
  	return rc;
  out_unregister_raw_proto:
 diff --git a/sound/soc/msm/apq8096-auto.c b/sound/soc/msm/apq8096-auto.c
-index e1baca3..02a3537 100644
+index b1dff87..bb63dc1 100644
 --- a/sound/soc/msm/apq8096-auto.c
 +++ b/sound/soc/msm/apq8096-auto.c
 @@ -35,6 +35,7 @@
@@ -417,7 +417,7 @@ index e1baca3..02a3537 100644
  
  #define DRV_NAME "apq8096-auto-asoc-snd"
  
-@@ -4749,6 +4750,7 @@ static int apq8096_asoc_machine_probe(struct platform_device *pdev)
+@@ -4795,6 +4796,7 @@ static int apq8096_asoc_machine_probe(struct platform_device *pdev)
  		goto err;
  	}
  	dev_info(&pdev->dev, "Sound card %s registered\n", card->name);
@@ -425,7 +425,7 @@ index e1baca3..02a3537 100644
  
  	return 0;
  
-@@ -4818,6 +4820,7 @@ static struct notifier_block adsp_state_notifier_block = {
+@@ -4864,6 +4866,7 @@ static struct notifier_block adsp_state_notifier_block = {
  
  static int __init apq8096_soc_platform_init(void)
  {
@@ -434,7 +434,7 @@ index e1baca3..02a3537 100644
  						&adsp_state_notifier_block);
  	return 0;
 diff --git a/sound/soc/msm/qdsp6v2/msm-dai-q6-v2.c b/sound/soc/msm/qdsp6v2/msm-dai-q6-v2.c
-index 64b1961..695b1ae 100644
+index 3610901..ce9ded8 100644
 --- a/sound/soc/msm/qdsp6v2/msm-dai-q6-v2.c
 +++ b/sound/soc/msm/qdsp6v2/msm-dai-q6-v2.c
 @@ -27,6 +27,7 @@
@@ -445,7 +445,7 @@ index 64b1961..695b1ae 100644
  
  #define MSM_DAI_PRI_AUXPCM_DT_DEV_ID 1
  #define MSM_DAI_SEC_AUXPCM_DT_DEV_ID 2
-@@ -8206,11 +8207,13 @@ static int __init msm_dai_q6_init(void)
+@@ -8266,11 +8267,13 @@ static int __init msm_dai_q6_init(void)
  		goto dai_q6_dev_fail;
  	}
  
