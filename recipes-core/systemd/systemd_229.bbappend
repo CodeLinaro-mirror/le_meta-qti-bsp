@@ -11,6 +11,11 @@ SRC_URI_append += "file://70-net-setup-link.rules \
                    file://0030-plymounth-dependency-cleanup.patch \
                    file://0033-systemd-reduce-service-stop-timeout-to-10s.patch"
 
+python __anonymous () {
+    if bb.utils.contains('DISTRO_FEATURES', 'early_init', True, False, d) or bb.utils.contains('DISTRO_FEATURES', 'early-ethernet', True, False, d):
+        d.appendVar("SRC_URI", " file://0034-systemd-make-early-init-socket-visible-for-systemd.patch")
+}
+
 do_install_append () {
   install -m 0644 ${WORKDIR}/70-net-setup-link.rules ${D}${sysconfdir}/udev/rules.d/
   install -m 0644 ${WORKDIR}/60-persistent-v4l.rules ${D}${sysconfdir}/udev/rules.d/
