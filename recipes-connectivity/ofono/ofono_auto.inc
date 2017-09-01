@@ -24,3 +24,6 @@ include ${INCSUFFIX}.inc
 
 INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96mizar', 'ofono_auto_nofusion', 'none',d)}"
 include ${INCSUFFIX}.inc
+
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autocv2x', 'ofono_auto_fusion', 'none',d)}"
+include ${INCSUFFIX}.inc
