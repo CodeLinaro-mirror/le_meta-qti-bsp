@@ -51,7 +51,7 @@ do_install_append() {
     install -d ${D}${systemd_unitdir}/system
     install -d ${D}/etc
     install ${WORKDIR}/ethernet/config.ini ${D}/etc/ntn_config.ini
-    if [ "${BASEMACHINE}" == "8x96autofusion" ]; then
+    if [ "${BASEMACHINE}" == "8x96autofusion" ] || [ "${BASEMACHINE}" == "8x96autocv2x" ]; then
         install -m 0644 ${WORKDIR}/neutrino-eth-8x96autofusion.service ${D}${systemd_unitdir}/system/neutrino-eth.service
     else
         install -m 0644 ${WORKDIR}/neutrino-eth.service ${D}${systemd_unitdir}/system/neutrino-eth.service
