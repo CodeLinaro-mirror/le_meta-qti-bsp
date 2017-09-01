@@ -1,8 +1,28 @@
-111c111
-<     # install_routes = yes
----
->     install_routes = no
-114c114
-<     # install_virtual_ip = yes
----
->     install_virtual_ip = no
+--- charon.conf	2017-09-12 12:55:40.471689202 -0700
++++ charon.con_bak	2017-09-12 12:58:21.611835145 -0700
+@@ -108,10 +108,10 @@
+
+     # Install routes into a separate routing table for established IPsec
+     # tunnels.
+-    # install_routes = yes
++     install_routes = no
+
+     # Install virtual IP addresses.
+-    # install_virtual_ip = yes
++     install_virtual_ip = no
+
+     # The name of the interface on which virtual IP addresses should be
+     # installed.
+@@ -200,10 +200,10 @@
+     # retransmit_base = 1.8
+
+     # Timeout in seconds before sending first retransmit.
+-    # retransmit_timeout = 4.0
++     retransmit_timeout = 1.0
+
+     # Number of times to retransmit a packet before giving up.
+-    # retransmit_tries = 5
++     retransmit_tries = 4
+
+     # Interval in seconds to use when retrying to initiate an IKE_SA (e.g. if
+     # DNS resolution failed), 0 to disable retries.
