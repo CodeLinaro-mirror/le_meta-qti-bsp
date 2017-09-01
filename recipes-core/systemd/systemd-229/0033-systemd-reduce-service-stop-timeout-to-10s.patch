@@ -1,9 +1,9 @@
 From 2e315d5d5670c3d300fb41a43bca73af75db3a19 Mon Sep 17 00:00:00 2001
-From: Lei wang <leiwan@qti.qualcomm.com>
+From: Lei wang <leiwan@codeaurora.org>
 Date: Thu, 24 Aug 2017 17:54:51 +0800
 Subject: [PATCH] systemd: reduce service stop timeout to 10s
 
-Signed-off-by: Lei wang <leiwan@codeaurea.org>
+Signed-off-by: Lei wang <leiwan@codeaurora.org>
 ---
  src/core/system.conf | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
