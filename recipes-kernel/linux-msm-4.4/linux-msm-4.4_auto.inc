@@ -46,13 +46,17 @@ do_deploy_rename () {
 }
 addtask deploy_rename after do_deploy before do_packagedata
 
-do_configure_prepend_8x96auto () {
-		mkdir -p ${S}/drivers/net/ethernet/neutrino
-		cp -f ${WORKSPACE}/vehiclenetwork/ethernet/* ${S}/drivers/net/ethernet/neutrino/
-		rm ${S}/drivers/net/ethernet/neutrino/Makefile
-		rm ${S}/drivers/net/ethernet/neutrino/Makefile.am
-		rm ${S}/drivers/net/ethernet/neutrino/Kbuild
-		mv ${S}/drivers/net/ethernet/neutrino/Makefile.builtin ${S}/drivers/net/ethernet/neutrino/Makefile
-		echo "source \"drivers/net/ethernet/neutrino/Kconfig"\" >> ${S}/drivers/net/ethernet/Kconfig
-		echo "obj-y += neutrino/" >> ${S}/drivers/net/ethernet/Makefile
+do_unpack_extra () {
+    if [ ${@d.getVar("MACHINE", True)} == "8x96auto" ]; then
+        mkdir -p ${S}/drivers/net/ethernet/neutrino
+        cp -f ${WORKSPACE}/vehiclenetwork/ethernet/* ${S}/drivers/net/ethernet/neutrino/
+        rm ${S}/drivers/net/ethernet/neutrino/Makefile
+        rm ${S}/drivers/net/ethernet/neutrino/Makefile.am
+        rm ${S}/drivers/net/ethernet/neutrino/Kbuild
+        mv ${S}/drivers/net/ethernet/neutrino/Makefile.builtin ${S}/drivers/net/ethernet/neutrino/Makefile
+        echo "source \"drivers/net/ethernet/neutrino/Kconfig"\" >> ${S}/drivers/net/ethernet/Kconfig
+        echo "obj-y += neutrino/" >> ${S}/drivers/net/ethernet/Makefile
+    fi
 }
+
+addtask unpack_extra after do_unpack before do_patch

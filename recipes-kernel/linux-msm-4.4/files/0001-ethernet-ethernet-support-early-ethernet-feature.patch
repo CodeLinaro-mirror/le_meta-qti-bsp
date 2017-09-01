@@ -1,0 +1,50 @@
+From 76981914270247750cf24797c51b4a40b8e0ad06 Mon Sep 17 00:00:00 2001
+From: Lei wang <leiwan@codeaurora.org>
+Date: Wed, 23 Aug 2017 08:36:29 +0800
+Subject: [PATCH] ethernet: ethernet support early-ethernet feature
+
+Change-Id: I013653671edb2f8bc4cf1073ae1a714acf3bc1cb
+Signed-off-by: Lei wang <leiwan@codeaurora.org>
+---
+ drivers/net/ethernet/neutrino/DWC_ETH_QOS_plt_init.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/neutrino/DWC_ETH_QOS_plt_init.c b/drivers/net/ethernet/neutrino/DWC_ETH_QOS_plt_init.c
+index 7b178e923a4d..d8b209c025c9 100644
+--- a/drivers/net/ethernet/neutrino/DWC_ETH_QOS_plt_init.c
++++ b/drivers/net/ethernet/neutrino/DWC_ETH_QOS_plt_init.c
+@@ -29,6 +29,7 @@
+ #include <linux/esoc_client.h>
+ #include <linux/pinctrl/consumer.h>
+ #include "DWC_ETH_QOS_yheader.h"
++#include <soc/qcom/boot_stats.h>
+ 
+ #ifdef CONFIG_PCI_MSM
+ #include <linux/msm_pcie.h>
+@@ -386,6 +387,7 @@ static int __init DWC_ETH_QOS_pcie_init(void)
+ 
+ 	INIT_LIST_HEAD(&ntn_plt_data_list);
+ 	DBGPR("Entry:%s.\n", __func__);
++	place_marker("M - DRIVER Ethernet Init");
+ 	ret = platform_driver_register(&DWC_ETH_QOS_pcie_driver);
+ 
+ 	if (ret == 0) {
+@@ -393,7 +395,7 @@ static int __init DWC_ETH_QOS_pcie_init(void)
+ 		ret = DWC_ETH_QOS_init_module();
+ 	}
+ 
+-
++	place_marker("M - DRIVER Ethernet Ready");
+ 	DBGPR( "Exit:%s.\n", __func__);
+ 	return ret;
+ }
+@@ -406,5 +408,5 @@ static void __exit DWC_ETH_QOS_pcie_exit(void)
+ 	DBGPR( "Exit:%s.\n", __func__);
+ }
+ 
+-module_init(DWC_ETH_QOS_pcie_init);
++fs_initcall(DWC_ETH_QOS_pcie_init);
+ module_exit(DWC_ETH_QOS_pcie_exit);
+-- 
+2.14.0.rc1.14.gc3eb4e6bf
+

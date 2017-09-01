@@ -31,6 +31,7 @@ python __anonymous () {
 
   if bb.utils.contains('DISTRO_FEATURES', 'early-ethernet', True, False, d):
       d.appendVar("SRC_URI", " file://0001-ARM-dts-msm-Add-phy-speed-mode-properties.patch")
+      d.appendVar("SRC_URI", " file://0001-ethernet-ethernet-support-early-ethernet-feature.patch")
 
   # Override KERNEL_IMAGETYPE_FOR_MAKE variable, which is internal
   # to kernel.bbclass. We override the variable as msm kernel can't
