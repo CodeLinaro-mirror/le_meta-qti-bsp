@@ -4,7 +4,7 @@ include ${INCSUFFIX}.inc
 INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autofusion', 'linux-libc-headers_auto_kernel4.4', 'none',d)}"
 include ${INCSUFFIX}.inc
 
-INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autonapier', 'linux-libc-headers_auto_kernel3.18', 'none',d)}"
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autonapier', 'linux-libc-headers_auto_8x96autonapier', 'none',d)}"
 include ${INCSUFFIX}.inc
 
 INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmred', 'linux-libc-headers_auto_kernel3.18', 'none',d)}"

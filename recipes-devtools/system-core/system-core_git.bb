@@ -32,6 +32,7 @@ COMPOSITION_apq8096 = "901D"
 COMPOSITION_apq8098 = "901D"
 COMPOSITION_8x96autofusion = "901D"
 COMPOSITION_8x96auto = "901D"
+COMPOSITION_8x96autonapier = "901D"
 COMPOSITION_8x96autocv2x = "901D"
 
 do_install_append() {
@@ -51,6 +52,8 @@ do_install_append() {
        ln -s  /sbin/usb/compositions/${COMPOSITION_8x96autofusion} ${D}${userfsdatadir}/usb/boot_hsusb_composition
    elif [ "${MACHINE}" == "8x96auto" ]; then
        ln -s  /sbin/usb/compositions/${COMPOSITION_8x96auto} ${D}${userfsdatadir}/usb/boot_hsusb_composition
+   elif [ "${MACHINE}" == "8x96autonapier" ]; then
+       ln -s  /sbin/usb/compositions/${COMPOSITION_8x96autonapier} ${D}${userfsdatadir}/usb/boot_hsusb_composition
    else
        ln -s  /sbin/usb/compositions/${COMPOSITION} ${D}${userfsdatadir}/usb/boot_hsusb_composition
    fi
