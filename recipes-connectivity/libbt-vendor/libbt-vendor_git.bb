@@ -1,4 +1,4 @@
-inherit autotools-brokensep pkgconfig
+inherit autotools-brokensep pkgconfig qcommon
 
 DESCRIPTION = "Bluetooth Vendor Library"
 HOMEPAGE = "http://codeaurora.org/"
@@ -11,8 +11,11 @@ DEPENDS = "common system-core hci-qcomm-init glib-2.0"
 
 RDEPENDS_${PN} = "libcutils"
 
-FILESPATH =+ "${WORKSPACE}:"
-SRC_URI = "file://hardware/qcom/bt/libbt-vendor/"
+
+SRC_URI=" \
+    ${CAF_LA_GIT}/platform/hardware/qcom/bt.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=hardware/qcom/bt/libbt-vendor;subpath=libbt-vendor \
+    ${CAF_LA_GIT}/platform/vendor/qcom-opensource/bluetooth.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=hal/include;subpath=hal/include \
+"
 
 S = "${WORKDIR}/hardware/qcom/bt/libbt-vendor/"
 
@@ -21,9 +24,8 @@ LDFLAGS_append = " -llog "
 
 BASEPRODUCT = "${@d.getVar('PRODUCT', False)}"
 
-EXTRA_OECONF = "--with-common-includes="${WORKSPACE}/vendor/qcom/opensource/bluetooth/hal/include/" \
+EXTRA_OECONF = "--with-common-includes="${WORKDIR}/hal/include/" \
                 --with-lib-path=${STAGING_LIBDIR} \
-                --with-glib \
                 --enable-target=${BASEMACHINE} \
                 --enable-rome=${BASEPRODUCT} \
                "
