@@ -26,12 +26,13 @@ python __anonymous () {
       d.setVar("KERNEL_CONFIG", d.getVar("KERNEL_DEFCONFIG", True))
 
   # add early_init to DISTRO_FEATURES to use early user space feature
-  if bb.utils.contains('DISTRO_FEATURES', 'early_init', True, False, d):
+  if bb.utils.contains('DISTRO_FEATURES', 'early_init', True, False, d) or bb.utils.contains('DISTRO_FEATURES', 'early-ethernet', True, False, d):
       d.appendVar("SRC_URI", " file://0003-init-early-user-space.patch")
 
   if bb.utils.contains('DISTRO_FEATURES', 'early-ethernet', True, False, d):
       d.appendVar("SRC_URI", " file://0001-ARM-dts-msm-Add-phy-speed-mode-properties.patch")
       d.appendVar("SRC_URI", " file://0001-ethernet-ethernet-support-early-ethernet-feature.patch")
+      d.appendVar("SRC_URI", " file://0005-msm-vidc-changes-for-early-init.patch")
 
   # Override KERNEL_IMAGETYPE_FOR_MAKE variable, which is internal
   # to kernel.bbclass. We override the variable as msm kernel can't
