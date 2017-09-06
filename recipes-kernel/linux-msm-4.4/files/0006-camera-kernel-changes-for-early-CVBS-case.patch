@@ -1,0 +1,449 @@
+From 6dbe53e4b925ca93d3002bd779dc00107559112a Mon Sep 17 00:00:00 2001
+From: Andy Sun <bins@codeaurora.org>
+Date: Mon, 14 Aug 2017 11:32:34 +0800
+Subject: [PATCH 1/1] camera: changes for early CVBS case
+
+ais: disable TI960s and actuators for FPD-LINK camera
+ais: comment dump camif registers on camif error
+make camera & CVBS kernel drivers load earlier
+adv7481: optimizations
+
+Change-Id: If27c0ef150b0c411d8fc56f9c6cad1a3d5bae27f
+Signed-off-by: Andy Sun <bins@codeaurora.org>
+---
+ .../boot/dts/qcom/msm8996-camera-sensor-adp.dtsi   |  6 ++-
+ drivers/media/i2c/adv7481.c                        | 60 ++++++++++++++++++++--
+ .../media/platform/msm/ais/common/cam_smmu_api.c   |  2 +-
+ drivers/media/platform/msm/ais/isp/msm_isp.c       |  7 ++-
+ drivers/media/platform/msm/ais/isp/msm_isp47.c     |  4 +-
+ drivers/media/platform/msm/ais/ispif/msm_ispif.c   |  7 ++-
+ drivers/media/platform/msm/ais/msm.c               |  4 +-
+ .../msm/ais/msm_buf_mgr/msm_generic_buf_mgr.c      |  2 +-
+ .../media/platform/msm/ais/sensor/cci/msm_cci.c    |  2 +-
+ .../media/platform/msm/ais/sensor/csid/msm_csid.c  |  2 +-
+ .../platform/msm/ais/sensor/csiphy/msm_csiphy.c    |  2 +-
+ .../platform/msm/ais/sensor/msm_sensor_driver.c    |  2 +-
+ .../platform/msm/ais/sensor/msm_sensor_init.c      |  2 +-
+ drivers/video/msm/ba/msm_v4l2_ba.c                 |  8 ++-
+ 14 files changed, 90 insertions(+), 20 deletions(-)
+
+diff --git a/arch/arm/boot/dts/qcom/msm8996-camera-sensor-adp.dtsi b/arch/arm/boot/dts/qcom/msm8996-camera-sensor-adp.dtsi
+index 31139c0..386907d 100644
+--- a/arch/arm/boot/dts/qcom/msm8996-camera-sensor-adp.dtsi
++++ b/arch/arm/boot/dts/qcom/msm8996-camera-sensor-adp.dtsi
+@@ -25,6 +25,7 @@
+ 	actuator0: qcom,actuator@0 {
+ 		cell-index = <0>;
+ 		reg = <0x0>;
++		status = "disabled";
+ 		compatible = "qcom,actuator";
+ 		qcom,cci-master = <0>;
+ 		cam_vaf-supply = <&pm8994_l23>;
+@@ -37,6 +38,7 @@
+ 	actuator1: qcom,actuator@1 {
+ 		cell-index = <1>;
+ 		reg = <0x1>;
++		status = "disabled";
+ 		compatible = "qcom,actuator";
+ 		qcom,cci-master = <1>;
+ 		cam_vaf-supply = <&pm8994_l23>;
+@@ -149,7 +151,7 @@
+ 		qcom,sensor-position = <0>;
+ 		qcom,sensor-mode = <0>;
+ 		qcom,cci-master = <1>;
+-		status = "ok";
++		status = "disabled";
+ 		clocks = <&clock_mmss clk_mclk0_clk_src>,
+ 				<&clock_mmss clk_camss_mclk0_clk>;
+ 		clock-names = "cam_src_clk", "cam_clk";
+@@ -229,7 +231,7 @@
+ 		qcom,sensor-position = <1>;
+ 		qcom,sensor-mode = <0>;
+ 		qcom,cci-master = <1>;
+-		status = "ok";
++		status = "disabled";
+ 		clocks = <&clock_mmss clk_mclk2_clk_src>,
+ 			<&clock_mmss clk_camss_mclk2_clk>;
+ 		clock-names = "cam_src_clk", "cam_clk";
+diff --git a/drivers/media/i2c/adv7481.c b/drivers/media/i2c/adv7481.c
+index b382a1d..0d0adb3 100644
+--- a/drivers/media/i2c/adv7481.c
++++ b/drivers/media/i2c/adv7481.c
+@@ -35,6 +35,8 @@
+ #include <media/adv7481.h>
+ #include <media/msm_ba.h>
+ 
++#include <soc/qcom/boot_stats.h>
++
+ #include "adv7481_reg.h"
+ 
+ #include "msm_cci.h"
+@@ -344,6 +346,35 @@ static uint16_t adv7481_rd_word(struct msm_camera_i2c_client *c_i2c_client,
+ 	return data;
+ }
+ 
++static int adv7481_set_fast_switch_mode(struct adv7481_state *state)
++{
++	int ret = 0;
++	/* set CVBS fast switch mode */
++	ret = adv7481_wr_byte(&state->i2c_client, state->i2c_sdp_addr,
++				SDP_RW_MAP_REG, 0x80);
++	ret |= adv7481_wr_byte(&state->i2c_client, state->i2c_sdp_addr,
++				0xD9, 0x44);
++	/* Select SDP MAP 2 */
++	ret |= adv7481_wr_byte(&state->i2c_client, state->i2c_sdp_addr,
++				SDP_RW_MAP_REG, 0x40);
++	/* set fl_enable to enable fast locking of the SD core */
++	ret |= adv7481_wr_byte(&state->i2c_client, state->i2c_sdp_addr,
++				0xe0, 0x01);
++	ret |= adv7481_wr_byte(&state->i2c_client, state->i2c_sdp_addr,
++				SDP_RW_MAP_REG, 0x00);
++
++	/* optimize the lock time when switching from no input */
++	/* to an input with a dark video image */
++	ret |= adv7481_wr_byte(&state->i2c_client, state->i2c_sdp_addr,
++				0x9C, 0x00);
++	ret |= adv7481_wr_byte(&state->i2c_client, state->i2c_sdp_addr,
++				0x9C, 0xFF);
++	ret |= adv7481_wr_byte(&state->i2c_client, state->i2c_sdp_addr,
++				SDP_RW_MAP_REG, 0x00);
++
++	return ret;
++}
++
+ static int adv7481_set_irq(struct adv7481_state *state)
+ {
+ 	int ret = 0;
+@@ -1168,6 +1199,8 @@ static int adv7481_set_cvbs_mode(struct adv7481_state *state)
+ 	ret |= adv7481_wr_byte(&state->i2c_client, state->i2c_io_addr,
+ 				IO_REG_CSI_PIX_EN_SEL_ADDR, val);
+ 
++	ret |= adv7481_set_fast_switch_mode(state);
++
+ 	return ret;
+ }
+ 
+@@ -2024,17 +2057,17 @@ static int adv7481_csi_powerup(struct adv7481_state *state,
+ 	/* DPHY and CSI Tx A Power up Sequence */
+ 	/* CSI TxA: MIPI PLL EN */
+ 	ret |= adv7481_wr_byte(&state->i2c_client, csi_map, 0xda, 0x01);
+-	msleep(200);
++	/* msleep(200);*/
+ 	/* CSI TxA: # MIPI Lane : Power ON */
+ 	val = ADV_REG_SETFIELD(0, CSI_CTRL_TX_PWRDN) |
+ 			ADV_REG_SETFIELD(1, CSI_CTRL_AUTO_PARAMS) |
+ 			ADV_REG_SETFIELD(state->tx_lanes, CSI_CTRL_NUM_LANES);
+ 	ret |= adv7481_wr_byte(&state->i2c_client, csi_map,
+ 			CSI_REG_TX_CFG1_ADDR, val);
+-	msleep(100);
++	/* msleep(100); */
+ 	/* ADI Required Write */
+ 	ret |= adv7481_wr_byte(&state->i2c_client, csi_map, 0xc1, 0x2b);
+-	msleep(100);
++	/* msleep(100); */
+ 	/* ADI Required Write */
+ 	ret |= adv7481_wr_byte(&state->i2c_client, csi_map, 0x31, 0x80);
+ 
+@@ -2317,6 +2350,8 @@ static int adv7481_probe(struct platform_device *pdev)
+ 	struct v4l2_subdev *sd;
+ 	int ret;
+ 
++	place_marker("# adv7481 probe");
++
+ 	device_id = of_match_device(adv7481_id, &pdev->dev);
+ 	if (!device_id) {
+ 		pr_err("%s: device_id is NULL\n", __func__);
+@@ -2429,6 +2464,9 @@ static int adv7481_probe(struct platform_device *pdev)
+ 	enable_irq(state->irq);
+ 	pr_debug("Probe successful!\n");
+ 
++	ret |= adv7481_set_cvbs_mode(state);
++	place_marker("# adv7481 out");
++
+ 	return ret;
+ 
+ err_media_entity:
+@@ -2516,7 +2554,19 @@ static struct platform_driver adv7481_driver = {
+ 	.remove = adv7481_remove,
+ };
+ 
+-module_driver(adv7481_driver, platform_driver_register,
+-		platform_driver_unregister);
++static int __init adv7481_init_module(void)
++{
++	place_marker("# adv7481 in");
++	return platform_driver_register(&adv7481_driver);
++}
++
++static void __exit adv7481_exit_module(void)
++{
++	platform_driver_unregister(&adv7481_driver);
++}
++
++fs_initcall_sync(adv7481_init_module);
++module_exit(adv7481_exit_module);
++
+ 
+ MODULE_DESCRIPTION("ADI ADV7481 HDMI/MHL/SD video receiver");
+diff --git a/drivers/media/platform/msm/ais/common/cam_smmu_api.c b/drivers/media/platform/msm/ais/common/cam_smmu_api.c
+index 0f0e145..66a7843 100644
+--- a/drivers/media/platform/msm/ais/common/cam_smmu_api.c
++++ b/drivers/media/platform/msm/ais/common/cam_smmu_api.c
+@@ -1674,7 +1674,7 @@ static void __exit cam_smmu_exit_module(void)
+ 	platform_driver_unregister(&cam_smmu_driver);
+ }
+ 
+-module_init(cam_smmu_init_module);
++fs_initcall(cam_smmu_init_module);
+ module_exit(cam_smmu_exit_module);
+ MODULE_DESCRIPTION("MSM Camera SMMU driver");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/media/platform/msm/ais/isp/msm_isp.c b/drivers/media/platform/msm/ais/isp/msm_isp.c
+index d62b830..60a9d84 100644
+--- a/drivers/media/platform/msm/ais/isp/msm_isp.c
++++ b/drivers/media/platform/msm/ais/isp/msm_isp.c
+@@ -24,6 +24,8 @@
+ #include <media/v4l2-ioctl.h>
+ #include <media/v4l2-event.h>
+ 
++#include <soc/qcom/boot_stats.h>
++
+ #include "msm_isp.h"
+ #include "msm_isp_util.h"
+ #include "msm_isp_axi_util.h"
+@@ -503,6 +505,8 @@ static int vfe_probe(struct platform_device *pdev)
+ 			break;
+ 	}
+ 
++	place_marker("# isp out");
++
+ 	return rc;
+ }
+ 
+@@ -641,6 +645,7 @@ static struct platform_driver vfe_driver = {
+ 
+ static int __init msm_vfe_init_module(void)
+ {
++	place_marker("# isp in");
+ 	return platform_driver_register(&vfe_driver);
+ }
+ 
+@@ -649,7 +654,7 @@ static void __exit msm_vfe_exit_module(void)
+ 	platform_driver_unregister(&vfe_driver);
+ }
+ 
+-late_initcall(msm_vfe_init_module);
++fs_initcall_sync(msm_vfe_init_module);
+ module_exit(msm_vfe_exit_module);
+ MODULE_DESCRIPTION("MSM VFE driver");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/media/platform/msm/ais/isp/msm_isp47.c b/drivers/media/platform/msm/ais/isp/msm_isp47.c
+index d63282f..1cadff5 100644
+--- a/drivers/media/platform/msm/ais/isp/msm_isp47.c
++++ b/drivers/media/platform/msm/ais/isp/msm_isp47.c
+@@ -480,7 +480,7 @@ void msm_vfe47_process_error_status(struct vfe_device *vfe_dev)
+ 		pr_err("%s: camif error status: 0x%x\n",
+ 			__func__, vfe_dev->error_info.camif_status);
+ 		/* dump camif registers on camif error */
+-		msm_camera_io_dump(vfe_dev->vfe_base + 0x478, 0x3C, 1);
++		/* msm_camera_io_dump(vfe_dev->vfe_base + 0x478, 0x3C, 1); */
+ 		/* testgen */
+ 		if (vfe_dev->axi_data.src_info[VFE_PIX_0].input_mux == TESTGEN)
+ 			msm_camera_io_dump(vfe_dev->vfe_base + 0xC58, 0x28, 1);
+@@ -2844,7 +2844,7 @@ static void __exit msm_vfe47_exit_module(void)
+ 	platform_driver_unregister(&vfe47_driver);
+ }
+ 
+-module_init(msm_vfe47_init_module);
++fs_initcall(msm_vfe47_init_module);
+ module_exit(msm_vfe47_exit_module);
+ MODULE_DESCRIPTION("MSM VFE47 driver");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/media/platform/msm/ais/ispif/msm_ispif.c b/drivers/media/platform/msm/ais/ispif/msm_ispif.c
+index c41f454..1170fc2 100644
+--- a/drivers/media/platform/msm/ais/ispif/msm_ispif.c
++++ b/drivers/media/platform/msm/ais/ispif/msm_ispif.c
+@@ -23,6 +23,8 @@
+ #include <media/ais/msm_ais_isp.h>
+ #include <linux/ratelimit.h>
+ 
++#include <soc/qcom/boot_stats.h>
++
+ #include "msm_ispif.h"
+ #include "msm.h"
+ #include "msm_sd.h"
+@@ -1757,6 +1759,8 @@ static int ispif_probe(struct platform_device *pdev)
+ 	memset(&ispif->vfe_info, 0, sizeof(struct msm_ispif_vfe_info));
+ 	ispif->vfe_info.num_vfe = 2;
+ 
++	place_marker("# ispif out");
++
+ 	return 0;
+ 
+ sd_reg_fail:
+@@ -1793,6 +1797,7 @@ static struct platform_driver ispif_driver = {
+ 
+ static int __init msm_ispif_init_module(void)
+ {
++	place_marker("# ispif in");
+ 	return platform_driver_register(&ispif_driver);
+ }
+ 
+@@ -1801,7 +1806,7 @@ static void __exit msm_ispif_exit_module(void)
+ 	platform_driver_unregister(&ispif_driver);
+ }
+ 
+-module_init(msm_ispif_init_module);
++fs_initcall(msm_ispif_init_module);
+ module_exit(msm_ispif_exit_module);
+ MODULE_DESCRIPTION("MSM ISP Interface driver");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/media/platform/msm/ais/msm.c b/drivers/media/platform/msm/ais/msm.c
+index 2a1ec86..2f9e0ed 100644
+--- a/drivers/media/platform/msm/ais/msm.c
++++ b/drivers/media/platform/msm/ais/msm.c
+@@ -26,6 +26,7 @@
+ #include <linux/platform_device.h>
+ #include <linux/debugfs.h>
+ #include <media/v4l2-fh.h>
++#include <soc/qcom/boot_stats.h>
+ #include "msm.h"
+ #include "msm_vb2.h"
+ #include "msm_sd.h"
+@@ -1407,6 +1408,7 @@ static struct platform_driver msm_driver = {
+ 
+ static int __init msm_init(void)
+ {
++	place_marker("# msm in");
+ 	return platform_driver_register(&msm_driver);
+ }
+ 
+@@ -1416,7 +1418,7 @@ static void __exit msm_exit(void)
+ }
+ 
+ 
+-module_init(msm_init);
++fs_initcall(msm_init);
+ module_exit(msm_exit);
+ MODULE_DESCRIPTION("MSM V4L2 Camera");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/media/platform/msm/ais/msm_buf_mgr/msm_generic_buf_mgr.c b/drivers/media/platform/msm/ais/msm_buf_mgr/msm_generic_buf_mgr.c
+index 66751b1..c3b531f 100644
+--- a/drivers/media/platform/msm/ais/msm_buf_mgr/msm_generic_buf_mgr.c
++++ b/drivers/media/platform/msm/ais/msm_buf_mgr/msm_generic_buf_mgr.c
+@@ -890,7 +890,7 @@ static void __exit msm_buf_mngr_exit(void)
+ 	kfree(msm_buf_mngr_dev);
+ }
+ 
+-module_init(msm_buf_mngr_init);
++fs_initcall(msm_buf_mngr_init);
+ module_exit(msm_buf_mngr_exit);
+ MODULE_DESCRIPTION("MSM Buffer Manager");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/media/platform/msm/ais/sensor/cci/msm_cci.c b/drivers/media/platform/msm/ais/sensor/cci/msm_cci.c
+index 42f8c4d..d86ccd0 100644
+--- a/drivers/media/platform/msm/ais/sensor/cci/msm_cci.c
++++ b/drivers/media/platform/msm/ais/sensor/cci/msm_cci.c
+@@ -2161,7 +2161,7 @@ static void __exit msm_cci_exit_module(void)
+ 	platform_driver_unregister(&cci_driver);
+ }
+ 
+-module_init(msm_cci_init_module);
++fs_initcall(msm_cci_init_module);
+ module_exit(msm_cci_exit_module);
+ MODULE_DESCRIPTION("MSM CCI driver");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/media/platform/msm/ais/sensor/csid/msm_csid.c b/drivers/media/platform/msm/ais/sensor/csid/msm_csid.c
+index 2b3eefa..7d1386a 100644
+--- a/drivers/media/platform/msm/ais/sensor/csid/msm_csid.c
++++ b/drivers/media/platform/msm/ais/sensor/csid/msm_csid.c
+@@ -1336,7 +1336,7 @@ static void __exit msm_csid_exit_module(void)
+ 	platform_driver_unregister(&csid_driver);
+ }
+ 
+-module_init(msm_csid_init_module);
++fs_initcall(msm_csid_init_module);
+ module_exit(msm_csid_exit_module);
+ MODULE_DESCRIPTION("MSM CSID driver");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/media/platform/msm/ais/sensor/csiphy/msm_csiphy.c b/drivers/media/platform/msm/ais/sensor/csiphy/msm_csiphy.c
+index c3b087f..7d0d317 100644
+--- a/drivers/media/platform/msm/ais/sensor/csiphy/msm_csiphy.c
++++ b/drivers/media/platform/msm/ais/sensor/csiphy/msm_csiphy.c
+@@ -1656,7 +1656,7 @@ static void __exit msm_csiphy_exit_module(void)
+ 	platform_driver_unregister(&csiphy_driver);
+ }
+ 
+-module_init(msm_csiphy_init_module);
++fs_initcall(msm_csiphy_init_module);
+ module_exit(msm_csiphy_exit_module);
+ MODULE_DESCRIPTION("MSM CSIPHY driver");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/media/platform/msm/ais/sensor/msm_sensor_driver.c b/drivers/media/platform/msm/ais/sensor/msm_sensor_driver.c
+index c02972e..6c6f58c 100644
+--- a/drivers/media/platform/msm/ais/sensor/msm_sensor_driver.c
++++ b/drivers/media/platform/msm/ais/sensor/msm_sensor_driver.c
+@@ -1301,7 +1301,7 @@ static void __exit msm_sensor_driver_exit(void)
+ 	i2c_del_driver(&msm_sensor_driver_i2c);
+ }
+ 
+-module_init(msm_sensor_driver_init);
++fs_initcall(msm_sensor_driver_init);
+ module_exit(msm_sensor_driver_exit);
+ MODULE_DESCRIPTION("msm_sensor_driver");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/media/platform/msm/ais/sensor/msm_sensor_init.c b/drivers/media/platform/msm/ais/sensor/msm_sensor_init.c
+index c3943be..754de2c 100644
+--- a/drivers/media/platform/msm/ais/sensor/msm_sensor_init.c
++++ b/drivers/media/platform/msm/ais/sensor/msm_sensor_init.c
+@@ -108,7 +108,7 @@ static void __exit msm_sensor_exit_module(void)
+ 	kfree(s_init);
+ }
+ 
+-module_init(msm_sensor_init_module);
++fs_initcall(msm_sensor_init_module);
+ module_exit(msm_sensor_exit_module);
+ MODULE_DESCRIPTION("msm_sensor_init");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/video/msm/ba/msm_v4l2_ba.c b/drivers/video/msm/ba/msm_v4l2_ba.c
+index 89fc08dd..be3f170 100644
+--- a/drivers/video/msm/ba/msm_v4l2_ba.c
++++ b/drivers/video/msm/ba/msm_v4l2_ba.c
+@@ -25,6 +25,8 @@
+ #include <media/v4l2-device.h>
+ #include <media/msm_ba.h>
+ 
++#include <soc/qcom/boot_stats.h>
++
+ #include "msm_ba_internal.h"
+ #include "msm_ba_debug.h"
+ 
+@@ -474,6 +476,8 @@ static int msm_ba_probe(struct platform_device *pdev)
+ 	}
+ 	dprintk(BA_INFO, "Exit %s with error %d", __func__, rc);
+ 
++	place_marker("# ba out");
++
+ 	return rc;
+ }
+ 
+@@ -584,6 +588,8 @@ static int __init msm_ba_mod_init(void)
+ {
+ 	int rc = 0;
+ 
++	place_marker("# ba in");
++
+ 	dprintk(BA_INFO, "Enter %s", __func__);
+ 	rc = msm_ba_create();
+ 	if (!rc) {
+@@ -609,6 +615,6 @@ static void __exit msm_ba_mod_exit(void)
+ 	dprintk(BA_INFO, "Exit %s", __func__);
+ }
+ 
+-module_init(msm_ba_mod_init);
++fs_initcall(msm_ba_mod_init);
+ module_exit(msm_ba_mod_exit);
+ 
+-- 
+1.9.1
+
