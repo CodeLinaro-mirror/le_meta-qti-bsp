@@ -13,6 +13,9 @@ DEPENDS_remove_8x96autogvmquin = "multimodule-mgr-oss"
 INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96auto', 'ofono_auto_nofusion', 'none',d)}"
 include ${INCSUFFIX}.inc
 
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autonapier', 'ofono_auto_nofusion', 'none',d)}"
+include ${INCSUFFIX}.inc
+
 INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autofusion', 'ofono_auto_fusion', 'none',d)}"
 include ${INCSUFFIX}.inc
 
