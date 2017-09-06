@@ -17,6 +17,9 @@ S = "${WORKDIR}/frameworks/native"
 EXTRA_OECONF += " --with-core-includes=${STAGING_INCDIR}"
 EXTRA_OECONF += " --with-glib"
 
+# Following machines compile kernel in 32bit. So enable binder IPC also in 32bit mode.
+EXTRA_OECONF_append_apq8009    += " --enable-32bit-binder-ipc"
+
 CFLAGS += "-I${STAGING_INCDIR}/libselinux"
 
 FILES_${PN}-servicemanager-dbg = "${bindir}/.debug/servicemanager"
