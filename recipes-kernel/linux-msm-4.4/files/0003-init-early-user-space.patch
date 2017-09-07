@@ -1,8 +1,8 @@
-From 83a927e558de371a984240b76400f7d28763e1bc Mon Sep 17 00:00:00 2001
-From: Wei Li <weili@codeaurora.org>
-Date: Tue, 18 Apr 2017 09:53:17 +0800
-Subject: [PATCH] init: mount rootfs earlier to launch an early user space
- application
+From 410fc81439678eb134d0b792764dfbcc0efc431a Mon Sep 17 00:00:00 2001
+From: Lei wang <leiwan@codeaurora.org>
+Date: Thu, 7 Sep 2017 13:42:31 +0800
+Subject: [PATCH] init: mount rootfs earlier to launch an early user
+ space application
 
 Initialization of initcall level6 driver takes much time.To make user
 space application run earlier, root filesystem could be mounted right
@@ -10,8 +10,9 @@ after initcall level5 driver initialization is completed. An early
 user space application could be launched as soon as root filesystem
 is mounted.
 
-Change-Id: Ib532745d52a98b695a39bd5a4421dfd8804b51c8
+Change-Id: If33c36370815038ccdd824e260aa5b0def219794
 Signed-off-by: Wei Li <weili@codeaurora.org>
+Signed-off-by: Lei wang <leiwan@codeaurora.org>
 ---
  block/cfq-iosched.c          |  2 +-
  crypto/crc32c_generic.c      |  2 +-
@@ -21,9 +22,9 @@ Signed-off-by: Wei Li <weili@codeaurora.org>
  drivers/mmc/host/sdhci-msm.c | 12 +++++++++++-
  fs/ext4/super.c              |  2 +-
  fs/jbd2/journal.c            |  2 +-
- init/do_mounts.c             |  4 ++--
- init/main.c                  | 23 ++++++++++++++++++++++-
- 10 files changed, 54 insertions(+), 11 deletions(-)
+ init/do_mounts.c             |  7 ++++---
+ init/main.c                  | 32 +++++++++++++++++++++++++++++++-
+ 10 files changed, 65 insertions(+), 12 deletions(-)
 
 diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
 index e04a7b8..658dcf9 100644
@@ -52,7 +53,7 @@ index 4c0a0e2..b71a418 100644
  
  MODULE_AUTHOR("Clay Haapala <chaapala@cisco.com>");
 diff --git a/drivers/Makefile b/drivers/Makefile
-index eb67aad..ecc06c4 100644
+index 2545cf9..caec702 100644
 --- a/drivers/Makefile
 +++ b/drivers/Makefile
 @@ -13,6 +13,7 @@ obj-$(CONFIG_GENERIC_PHY)	+= phy/
@@ -63,7 +64,7 @@ index eb67aad..ecc06c4 100644
  obj-y				+= pwm/
  obj-$(CONFIG_PCI)		+= pci/
  obj-$(CONFIG_PARISC)		+= parisc/
-@@ -120,7 +121,6 @@ obj-$(CONFIG_EISA)		+= eisa/
+@@ -121,7 +122,6 @@ obj-$(CONFIG_EISA)		+= eisa/
  obj-y				+= lguest/
  obj-$(CONFIG_CPU_FREQ)		+= cpufreq/
  obj-$(CONFIG_CPU_IDLE)		+= cpuidle/
@@ -72,10 +73,10 @@ index eb67aad..ecc06c4 100644
  obj-y				+= leds/
  obj-$(CONFIG_SWITCH)		+= switch/
 diff --git a/drivers/crypto/msm/ice.c b/drivers/crypto/msm/ice.c
-index 4002a5b..104b2cd 100644
+index 490f8d9..3e65d29 100644
 --- a/drivers/crypto/msm/ice.c
 +++ b/drivers/crypto/msm/ice.c
-@@ -1753,7 +1753,19 @@ static struct platform_driver qcom_ice_driver = {
+@@ -1758,7 +1758,19 @@ static struct platform_driver qcom_ice_driver = {
  		.of_match_table = qcom_ice_match,
  	},
  };
@@ -97,10 +98,10 @@ index 4002a5b..104b2cd 100644
  MODULE_LICENSE("GPL v2");
  MODULE_DESCRIPTION("QTI Inline Crypto Engine driver");
 diff --git a/drivers/mmc/card/block.c b/drivers/mmc/card/block.c
-index e9f1a19..9c95d22 100644
+index d39b4056..3e78930 100644
 --- a/drivers/mmc/card/block.c
 +++ b/drivers/mmc/card/block.c
-@@ -4771,7 +4771,7 @@ static void __exit mmc_blk_exit(void)
+@@ -4777,7 +4777,7 @@ static void __exit mmc_blk_exit(void)
  	unregister_blkdev(MMC_BLOCK_MAJOR, "mmc");
  }
  
@@ -110,10 +111,10 @@ index e9f1a19..9c95d22 100644
  
  MODULE_LICENSE("GPL");
 diff --git a/drivers/mmc/host/sdhci-msm.c b/drivers/mmc/host/sdhci-msm.c
-index ca72ebf..1a8748e 100644
+index 907763d..a4a9555 100644
 --- a/drivers/mmc/host/sdhci-msm.c
 +++ b/drivers/mmc/host/sdhci-msm.c
-@@ -5010,7 +5010,17 @@ static struct platform_driver sdhci_msm_driver = {
+@@ -5039,7 +5039,17 @@ static struct platform_driver sdhci_msm_driver = {
  	},
  };
  
@@ -133,10 +134,10 @@ index ca72ebf..1a8748e 100644
  MODULE_DESCRIPTION("Qualcomm Technologies, Inc. Secure Digital Host Controller Interface driver");
  MODULE_LICENSE("GPL v2");
 diff --git a/fs/ext4/super.c b/fs/ext4/super.c
-index 6fe8e30..a48bdd4 100644
+index bd8831b..bfa7dcc 100644
 --- a/fs/ext4/super.c
 +++ b/fs/ext4/super.c
-@@ -5417,5 +5417,5 @@ static void __exit ext4_exit_fs(void)
+@@ -5420,5 +5420,5 @@ static void __exit ext4_exit_fs(void)
  MODULE_AUTHOR("Remy Card, Stephen Tweedie, Andrew Morton, Andreas Dilger, Theodore Ts'o and others");
  MODULE_DESCRIPTION("Fourth Extended Filesystem");
  MODULE_LICENSE("GPL");
@@ -156,7 +157,7 @@ index c6a499b..a091146 100644
  module_exit(journal_exit);
  
 diff --git a/init/do_mounts.c b/init/do_mounts.c
-index 1902a1c8..b19c748 100644
+index 1902a1c8..1bbc506 100644
 --- a/init/do_mounts.c
 +++ b/init/do_mounts.c
 @@ -37,7 +37,7 @@
@@ -168,7 +169,17 @@ index 1902a1c8..b19c748 100644
  static char * __initdata root_device_name;
  static char __initdata saved_root_name[64];
  static int root_wait;
-@@ -589,7 +589,7 @@ void __init prepare_namespace(void)
+@@ -563,7 +563,8 @@ void __init prepare_namespace(void)
+ 	 * For example, it is not atypical to wait 5 seconds here
+ 	 * for the touchpad of a laptop to initialize.
+ 	 */
+-	wait_for_device_probe();
++	/* Move this wait later */
++	/* wait_for_device_probe(); */
+ 
+ 	md_run_setup();
+ 	dm_run_setup();
+@@ -589,7 +590,7 @@ void __init prepare_namespace(void)
  			saved_root_name);
  		while (driver_probe_done() != 0 ||
  			(ROOT_DEV = name_to_dev_t(saved_root_name)) == 0)
@@ -178,20 +189,23 @@ index 1902a1c8..b19c748 100644
  	}
  
 diff --git a/init/main.c b/init/main.c
-index 7d4532b..aa48db3 100644
+index 7d4532b..70c1b0d 100644
 --- a/init/main.c
 +++ b/init/main.c
-@@ -840,6 +840,9 @@ static char *initcall_level_names[] __initdata = {
+@@ -840,6 +840,12 @@ static char *initcall_level_names[] __initdata = {
  	"late",
  };
  
 +static char init_prog[128] = "/usr/sbin/early_init";
 +static char *init_prog_argv[2] = { init_prog, NULL };
 +
++static char touch_early_done[128] = "/bin/touch";
++static char *touch_early_done_argv[3] = { touch_early_done, "/dev/early_driver_done", NULL };
++
  static void __init do_initcall_level(int level)
  {
  	initcall_t *fn;
-@@ -853,13 +856,22 @@ static void __init do_initcall_level(int level)
+@@ -853,13 +859,22 @@ static void __init do_initcall_level(int level)
  
  	for (fn = initcall_levels[level]; fn < initcall_levels[level+1]; fn++)
  		do_one_initcall(*fn);
@@ -215,7 +229,7 @@ index 7d4532b..aa48db3 100644
  		do_initcall_level(level);
  }
  
-@@ -994,6 +1006,7 @@ static int __ref kernel_init(void *unused)
+@@ -994,6 +1009,7 @@ static int __ref kernel_init(void *unused)
  
  static noinline void __init kernel_init_freeable(void)
  {
@@ -223,7 +237,7 @@ index 7d4532b..aa48db3 100644
  	/*
  	 * Wait until kthreadd is all set-up.
  	 */
-@@ -1044,6 +1057,14 @@ static noinline void __init kernel_init_freeable(void)
+@@ -1044,6 +1060,20 @@ static noinline void __init kernel_init_freeable(void)
  		prepare_namespace();
  	}
  
@@ -233,6 +247,12 @@ index 7d4532b..aa48db3 100644
 +	else
 +		pr_err("early_init failed\n");
 +
++	wait_for_device_probe();
++	rc = call_usermodehelper(touch_early_done, touch_early_done_argv, NULL, 0);
++	if (!rc)
++		pr_err("early driver done \n");
++	else
++		pr_err("early driver failed to sign success\n");
 +	do_initcalls_late();
 +
  	/*
