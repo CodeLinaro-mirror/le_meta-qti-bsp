@@ -8,6 +8,9 @@ IMAGE_INSTALL += "packagegroup-agl-core"
 IMAGE_INSTALL += "iproute2"
 IMAGE_INSTALL += "pciutils"
 IMAGE_INSTALL += "spitools"
+IMAGE_INSTALL += "chrony"
+IMAGE_INSTALL += "pps-tools"
+IMAGE_INSTALL += "network-conf"
 
 IMAGE_ROOTFS_SIZE = "2097152"
 IMAGE_ROOTFS_EXTRA_SPACE_append = "${@bb.utils.contains("DISTRO_FEATURES", "systemd", " + 4096", "" ,d)}"
@@ -41,11 +44,13 @@ IMAGE_INSTALL += "firmware-links"
 
 #WiFi
 IMAGE_INSTALL += "qcacld"
+IMAGE_INSTALL += "qcacld-hl"
 IMAGE_INSTALL += "wpa-supplicant"
 IMAGE_INSTALL += "hostapd"
 IMAGE_INSTALL += "iw"
 IMAGE_INSTALL += "wireless-tools"
 IMAGE_INSTALL += "sigma-dut"
+IMAGE_INSTALL += "dsrc-tools"
 
 IMAGE_INSTALL += "dbus"
 IMAGE_INSTALL += "dbus-glib"
