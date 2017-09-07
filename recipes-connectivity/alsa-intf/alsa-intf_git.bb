@@ -7,7 +7,9 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5
 
 DEPENDS = "acdbloader glib-2.0"
 
-SRC_URI = "file://qcom-opensource/mm-audio/"
+SRC_URI = " \
+    ${CAF_LA_GIT}/platform/vendor/qcom-opensource/kernel-tests/mm-audio.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=qcom-opensource/mm-audio \
+"
 prefix="/etc"
 
 S = "${WORKDIR}/qcom-opensource/mm-audio/"

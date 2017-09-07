@@ -11,8 +11,9 @@ PR = "r2"
 
 DEPENDS = "virtual/kernel wireless-tools"
 
-FILESPATH =+ "${WORKSPACE}:"
-SRC_URI = "file://qcom-opensource/wlan/prima"
+SRC_URI = " \
+    ${CAF_LA_GIT}/platform/vendor/qcom-opensource/wlan/prima.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=qcom-opensource/prima \
+"
 
 S = "${WORKDIR}/qcom-opensource/prima"
 

@@ -1,17 +1,18 @@
+inherit update-rc.d qcommon
+
 DESCRIPTION = "WCNSS platform"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/BSD;md5=3775480a712fc46a69647678acb234cb"
 LICENSE = "BSD"
 
 PR = "r1"
 
-FILESPATH =+ "${WORKSPACE}:"
-SRC_URI = "file://qcom-opensource/wlan/prima/firmware_bin \
-           file://set_wcnss_mode"
+SRC_URI = " \
+    ${CAF_LA_GIT}/platform/vendor/qcom-opensource/wlan/prima.git;protocol=git;nobranch=1;tag=${CAF_TAG};subpath=firmware_bin;destsuffix=qcom-opensource/wlan/firmware_bin \
+"
+SRC_URI += "file://set_wcnss_mode"
 SRC_URI += "file://wcnss_wlan.service"
 
 S = "${WORKDIR}/qcom-opensource/wlan/firmware_bin"
-
-inherit update-rc.d
 
 do_install() {
     install -d ${D}/etc
