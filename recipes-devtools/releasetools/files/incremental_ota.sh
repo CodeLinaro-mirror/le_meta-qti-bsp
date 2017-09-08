@@ -42,6 +42,9 @@ fi
 export PATH=.:${STAGING_BINDIR_NATIVE}:$PATH
 export OUT_HOST_ROOT=.
 export LD_LIBRARY_PATH=${STAGING_LIBDIR_NATIVE}
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+export LANGUAGE=en_US.UTF-8
 
 # Specify MMC or MTD type device. MTD by default
 [[ $4 = "ext4" ]] && device_type="MMC" || device_type="MTD"

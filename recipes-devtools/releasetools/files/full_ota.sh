@@ -42,6 +42,9 @@ fi
 export PATH=.:${STAGING_BINDIR_NATIVE}:$PATH
 export OUT_HOST_ROOT=.
 export LD_LIBRARY_PATH=${STAGING_LIBDIR_NATIVE}
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+export LANGUAGE=en_US.UTF-8
 
 # Specify MMC or MTD type device. MTD by default
 [[ $3 = "ext4" ]] && device_type="MMC" || device_type="MTD"
@@ -61,4 +64,13 @@ fi
 
 cd target_files && zip -q ../$1 META/*filesystem_config.txt SYSTEM/build.prop && cd ..
 
-python3 ./ota_from_target_files -n -v -d $device_type -p . -s "${WORKSPACE}/android_compat/device/qcom/common" --no_signing  $1 update_$3.zip
+python3 ./ota_from_target_files -n -v -d $device_type -p . -s "${WORKSPACE}/android_compat/device/qcom/common" --no_signing  $1 update_$3.zip > ota_debug.txt 2>&1
+
+if [[ $? = 0 ]]; then
+    echo "update.zip generation was successful"
+else
+    echo "update.zip generation failed"
+    # Add the python script errors back into the target-files zip
+    zip -q $1 ota_debug.txt
+    rm update_$3.zip # delete the half-baked update.zip if any;
+fi
