@@ -36,7 +36,7 @@ mount -t tmpfs tmpfs /dev/shm
 echo -n "M - early_init begin" > /debug/bootkpi/kpi_values
 
 mount -t sysfs sysfs /sys
-echo 105 > /sys/class/gpio/export
+echo 109 > /sys/class/gpio/export
 
 mkdir -p /early
 mount -t tmpfs tmpfs /early
