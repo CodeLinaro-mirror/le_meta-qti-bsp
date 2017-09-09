@@ -37,6 +37,7 @@ python __anonymous () {
 
   if bb.utils.contains('DISTRO_FEATURES', 'early_init', True, False, d):
       d.appendVar("SRC_URI", " file://0006-camera-kernel-changes-for-early-CVBS-case.patch")
+      d.appendVar("SRC_URI", " file://0007-Add-RVC-trigger-gpio-in-early-usespace.patch")
 
   # Override KERNEL_IMAGETYPE_FOR_MAKE variable, which is internal
   # to kernel.bbclass. We override the variable as msm kernel can't

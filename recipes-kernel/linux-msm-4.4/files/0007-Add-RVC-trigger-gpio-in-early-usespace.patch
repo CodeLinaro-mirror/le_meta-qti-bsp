@@ -1,0 +1,162 @@
+From bcd192ae08d42a54f4b8d28b9fd8294e1025e247 Mon Sep 17 00:00:00 2001
+From: Yimin Peng <yiminp@codeaurora.org>
+Date: Tue, 22 Aug 2017 15:57:46 +0800
+Subject: [PATCH] Add RVC trigger gpio in early usespace.
+
+Enable ldo9 and config gpio109 pinctrl.
+
+Change-Id: I4c3832cb227b7e3db88561051f1eb8d0c42b9f4d
+Signed-off-by: Yimin Peng <yiminp@codeaurora.org>
+---
+ arch/arm/boot/dts/qcom/msm8996-agave-adp.dtsi |  7 +++
+ arch/arm/boot/dts/qcom/msm8996-pinctrl.dtsi   | 16 ++++++
+ drivers/media/i2c/adv7481.c                   | 74 +++++++++++++++++++++++++++
+ 3 files changed, 97 insertions(+)
+
+diff --git a/arch/arm/boot/dts/qcom/msm8996-agave-adp.dtsi b/arch/arm/boot/dts/qcom/msm8996-agave-adp.dtsi
+index 2dc5c91..6d8060f 100644
+--- a/arch/arm/boot/dts/qcom/msm8996-agave-adp.dtsi
++++ b/arch/arm/boot/dts/qcom/msm8996-agave-adp.dtsi
+@@ -1114,6 +1114,8 @@
+ 	qcom,adv7481@70 {
+ 		compatible = "qcom,adv7481";
+ 		reg = <0x70 0xff>;
++		/* uim1 ldo */
++		vdd-supply = <&pm8994_l9>;
+ 		cam_vdig-supply = <&pm8994_s3>;
+ 		/* Cameras powered by PMIC: */
+ 		cam_vio-supply = <&pm8994_lvs1>;
+@@ -1131,6 +1133,11 @@
+ 			<&pm8994_gpios 5 0>,   /* INT1    */
+ 			<&pm8994_gpios 6 0>,   /* INT2    */
+ 			<&pm8994_gpios 7 0>;   /* INT3    */
++
++		pinctrl-names = "pmx_adv7481_active";
++		pinctrl-0 = <&adv7481_0_switch_active>;
++
++		adi,switch-gpio = <&tlmm 109 0x1>;
+ 	};
+ 
+ 	qcom,msm-ba {
+diff --git a/arch/arm/boot/dts/qcom/msm8996-pinctrl.dtsi b/arch/arm/boot/dts/qcom/msm8996-pinctrl.dtsi
+index 316859a..34aab90 100644
+--- a/arch/arm/boot/dts/qcom/msm8996-pinctrl.dtsi
++++ b/arch/arm/boot/dts/qcom/msm8996-pinctrl.dtsi
+@@ -192,6 +192,22 @@
+ 			};
+ 		};
+ 
++		pmx_adv7481: pmx_adv7481 {
++			adv7481_0_switch_active: adv7481_0_switch_active {
++				mux {
++					pins = "gpio109";
++					function = "gpio";
++					bias-pull-down; /* pull down */
++				};
++
++				config {
++					pins = "gpio109";
++					drive-strength = <4>; /* 16 mA */
++					bias-pull-down; /* pull down */
++				};
++			};
++		};
++
+ 		uart_console_active: uart_console_active {
+ 			mux {
+ 				pins = "gpio4", "gpio5";
+diff --git a/drivers/media/i2c/adv7481.c b/drivers/media/i2c/adv7481.c
+index b382a1d..658715c 100644
+--- a/drivers/media/i2c/adv7481.c
++++ b/drivers/media/i2c/adv7481.c
+@@ -2254,6 +2254,78 @@ err_cci_init:
+ 	return ret;
+ }
+ 
++static int  rvc_parse_dt(struct device *dev)
++{
++	struct device_node *np = dev->of_node;
++	struct device_node *reg_node = NULL;
++	struct regulator *reg = NULL;
++	int ret = 0;
++
++	struct pinctrl *ts_pinctrl = NULL;
++	struct pinctrl_state *pinctrl_state_active = NULL;
++
++	u32 switch_gpio;
++	u32 switch_flags;
++
++	reg_node = of_parse_phandle(np, "vdd-supply", 0);
++	if (reg_node) {
++		reg = devm_regulator_get(dev, "vdd");
++		if (IS_ERR(reg)) {
++			printk("%s: no vdd!\n", __func__);
++		} else {
++			printk("%s: found vdd!\n", __func__);
++			regulator_set_voltage(reg, 1800000, 1800000);
++			ret = regulator_enable(reg);
++			if (ret)
++				printk("fail to enable ldo for rvc trigger gpio\n");
++		}
++		of_node_put(reg_node);
++	}
++
++	/* Get pinctrl if target uses pinctrl */
++	ts_pinctrl = devm_pinctrl_get(dev);
++	if (IS_ERR_OR_NULL(ts_pinctrl)) {
++		ret = PTR_ERR(ts_pinctrl);
++		printk("%s: Pincontrol DT property returned %X\n",
++			__func__, ret);
++	}
++
++	pinctrl_state_active = pinctrl_lookup_state(ts_pinctrl,
++		"pmx_adv7481_active");
++	if (IS_ERR_OR_NULL(pinctrl_state_active)) {
++		ret = PTR_ERR(pinctrl_state_active);
++		printk("Can not lookup pmx_adv7481_active pinstate %d\n", ret);
++	}
++
++	ret = pinctrl_select_state(ts_pinctrl, pinctrl_state_active);
++	if (ret < 0)
++		printk("%s: Failed to select pmx_adv7481_active pinstate %d\n",
++			__func__, ret);
++
++	switch_gpio = of_get_named_gpio_flags(np,
++				"adi,switch-gpio", 0, &switch_flags);
++	if (gpio_is_valid(switch_gpio)) {
++		ret = gpio_request(switch_gpio,
++			"adv7481_switch_gpio");
++		if (ret) {
++			printk("%d unable to request gpio [%d] ret=%d\n",
++					__LINE__, switch_gpio, ret);
++			goto exit;
++		}
++
++		ret = gpio_direction_input(switch_gpio);
++		if (ret) {
++			printk("unable to set dir for gpio [%d]\n",
++					switch_gpio);
++		}
++
++		gpio_free(switch_gpio);
++	}
++
++exit:
++	return ret;
++}
++
+ static int adv7481_parse_dt(struct platform_device *pdev,
+ 			struct adv7481_state *state)
+ {
+@@ -2300,6 +2372,8 @@ static int adv7481_parse_dt(struct platform_device *pdev,
+ 			state->gpio_array[i].gpio, state->gpio_array[i].flags);
+ 	}
+ 
++	rvc_parse_dt(state->dev);
++
+ exit:
+ 	return ret;
+ }
+-- 
+1.9.1
+
