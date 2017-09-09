@@ -45,8 +45,8 @@ chmod 700 /early/user/0
 
 export XDG_RUNTIME_DIR=/early/user/0/
 
-weston --tty=1 > /server.log  2>&1 &
+weston --tty=1 > /dev/null  2>&1 &
 
-/usr/bin/mm-vdec-omx-test 0 50001 1 0 1 1 0 0 0 0 0
+/usr/bin/mm-vdec-omx-test 0 50001 1 0 1 1 0 0 0 0 0 > /dev/null 2>&1 &
 
 echo -n "M - early_init end" > /debug/bootkpi/kpi_values

@@ -44,11 +44,11 @@ mkdir -p /early/user/0
 chmod 700 /early/user/0
 
 export XDG_RUNTIME_DIR=/early/user/0/
-weston --tty=1 > /server.log  2>&1 &
+weston --tty=1 > /dev/null  2>&1 &
 
 echo -n "M - ais_server" > /debug/bootkpi/kpi_values
-ais_server > /ais_server.log  2>&1 &
+ais_server > /dev/null  2>&1 &
 
-/usr/bin/cvbs -display
+/usr/bin/cvbs -display > /dev/null 2>&1 &
 
 echo -n "M - early_init end" > /debug/bootkpi/kpi_values
