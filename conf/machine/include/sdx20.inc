@@ -41,3 +41,8 @@ CACHE_VOLUME_SIZE ?= "70MiB"
 SYSTEM_SIZE_EXT4 ?= "200000000"
 USERDATA_SIZE_EXT4 ?= "2000000000"
 CACHE_SIZE_EXT4 ?= "80000000"
+
+
+# Formats of root filesystem images.
+IMAGE_FSTYPES += "ext4 ubi"
+

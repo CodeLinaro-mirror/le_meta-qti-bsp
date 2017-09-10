@@ -10,12 +10,12 @@ PR = "r0"
 
 TARGET_CC_ARCH += "${LDFLAGS}"
 
-SRC_URI = "	https://github.com/zeux/pugixml/archive/v${PV}.zip \
-		file://001_Makefile.patch \
+SRC_URI = "  https://github.com/zeux/pugixml/archive/v${PV}.zip \
+    file://001_Makefile.patch \
 "
 
-SRC_URI[md5sum] = "634c5df78cf0ba08c151c06a9f4c733d"
-SRC_URI[sha256sum] = "e7fa883c53fd67443bd47829eba943c15bfc7d170f245fa78db13f1db4c7fc70"
+SRC_URI[md5sum] = "5229b9f38f938ee935f32ac63328fa18"
+SRC_URI[sha256sum] = "2ee334c7e09c5d1f0db8ef0db71a8fad73a3ab838795bc9189b6194b5e194ffd"
 
 S = "${WORKDIR}/${PN}-${PV}"
 
@@ -25,4 +25,3 @@ do_compile () {
     oe_runmake
     rm -f *.o
 }
-
