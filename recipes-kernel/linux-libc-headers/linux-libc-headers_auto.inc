@@ -13,7 +13,7 @@ include ${INCSUFFIX}.inc
 INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmquin', 'linux-libc-headers_auto_kernel3.18', 'none',d)}"
 include ${INCSUFFIX}.inc
 
-INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmquin44', 'linux-libc-headers-8x96autogvmquin44', 'none',d)}"
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmquintcu', 'linux-libc-headers-8x96autogvmquintcu', 'none',d)}"
 include ${INCSUFFIX}.inc
 
 INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autocv2x', 'linux-libc-headers_auto_kernel4.4', 'none',d)}"

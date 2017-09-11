@@ -22,7 +22,7 @@ include ${INCSUFFIX}.inc
 INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmquin', 'ofono_auto_nofusion', 'none',d)}"
 include ${INCSUFFIX}.inc
 
-INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmquin44', 'ofono_auto_nofusion', 'none',d)}"
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmquintcu', 'ofono_auto_nofusion', 'none',d)}"
 include ${INCSUFFIX}.inc
 
 INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96mizar', 'ofono_auto_nofusion', 'none',d)}"
