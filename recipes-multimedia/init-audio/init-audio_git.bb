@@ -1,4 +1,4 @@
-inherit autotools
+inherit autotools pkgconfig systemd
 
 DESCRIPTION = "Installing audio init script"
 LICENSE = "BSD"
@@ -8,26 +8,35 @@ PR = "r5"
 DEPENDS_append_mdm9635 +="alsa-intf"
 
 SRC_URI = "file://init_qcom_audio"
-SRC_URI_msm8974 = "file://${BASEMACHINE}/init_qcom_audio"
-SRC_URI_msm8610 = "file://${BASEMACHINE}/init_qcom_audio"
+SRC_URI += "file://init_audio.service"
 
 S = "${WORKDIR}"
-S_msm8974 = "${WORKDIR}/${BASEMACHINE}"
-S_msm8610 = "${WORKDIR}/${BASEMACHINE}"
 
-INITSCRIPT_NAME_msm8974 = "init_qcom_audio"
-INITSCRIPT_PARAMS_msm8974 = "start 99 2 3 4 5 . stop 1 0 1 6 ."
-INITSCRIPT_NAME_msm8610 = "init_qcom_audio"
-INITSCRIPT_PARAMS_msm8610 = "start 99 2 3 4 5 . stop 1 0 1 6 ."
+INITSCRIPT_NAME = "init_qcom_audio"
+INITSCRIPT_PARAMS = "start 99 2 3 4 5 . stop 1 0 1 6 ."
+INITSCRIPT_PARAMS_apq8009 = "start 38 2 3 4 5 . stop 1 0 1 6 ."
 
 do_install() {
-    install -m 0755 ${S}/init_qcom_audio -D ${D}${sysconfdir}/init.d/init_qcom_audio
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
+        install -m 0755 ${S}/init_qcom_audio -D ${D}${sysconfdir}/initscripts/init_qcom_audio
+        install -d ${D}/etc/systemd/system/
+        install -m 0755 ${S}/init_audio.service -D ${D}${sysconfdir}/systemd/system/init_audio.service
+        install -d ${D}/etc/systemd/system/multi-user.target.wants/
+        ln -sf /etc/systemd/system/init_audio.service \
+              ${D}/etc/systemd/system/multi-user.target.wants/init_audio.service
+    else
+        install -m 0755 ${S}/init_qcom_audio -D ${D}${sysconfdir}/init.d/${INITSCRIPT_NAME}
+    fi
+
 }
 
-do_install_msm8974() {
-    install -m 0755 ${S}/${BASEMACHINE}/init_qcom_audio -D ${D}${sysconfdir}/init.d/init_qcom_audio
+pkg_postinst_${PN} () {
+
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'false', 'true', d)}; then
+        [ -n "$D" ] && OPT="-r $D" || OPT="-s"
+        update-rc.d $OPT -f ${INITSCRIPT_NAME} remove
+        update-rc.d $OPT ${INITSCRIPT_NAME} ${INITSCRIPT_PARAMS}
+    fi
 }
 
-do_install_msm8610() {
-    install -m 0755 ${S}/${BASEMACHINE}/init_qcom_audio -D ${D}${sysconfdir}/init.d/init_qcom_audio
-}
+FILES_${PN} += "${systemd_unitdir}/system/"
