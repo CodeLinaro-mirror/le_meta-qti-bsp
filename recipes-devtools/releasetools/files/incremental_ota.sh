@@ -62,4 +62,4 @@ fi
 
 cd target_files && zip -q ../$2 META/*filesystem_config.txt SYSTEM/build.prop && cd ..
 
-./ota_from_target_files -n -v -d $device_type -v -p . -s "${WORKSPACE}/android_compat/device/qcom/common" --no_signing -i $1 $2 update_incr_$4.zip
+python3 ./ota_from_target_files -n -v -d $device_type -v -p . -s "${WORKSPACE}/android_compat/device/qcom/common" --no_signing -i $1 $2 update_incr_$4.zip

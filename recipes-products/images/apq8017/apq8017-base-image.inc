@@ -41,8 +41,6 @@ IMAGE_INSTALL += "wireless-tools"
 #IMAGE_PREPROCESS_COMMAND += "echo ${MACHINE} >> ${IMAGE_ROOTFS}/target;"
 
 IMAGE_INSTALL += "ca-certificates"
-IMAGE_INSTALL += "nghttp2"
-IMAGE_INSTALL += "curl"
 
 IMAGE_INSTALL += "e2fsprogs"
 IMAGE_INSTALL += "start-scripts-userfs-reset"
