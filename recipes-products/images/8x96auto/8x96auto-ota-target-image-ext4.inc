@@ -33,34 +33,48 @@ cp ${DEPLOY_DIR_IMAGE}/boot.img ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/BOOTABLE_IMAGES/
 
 cp ${DEPLOY_DIR_IMAGE}/recovery.img ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/BOOTABLE_IMAGES/recovery.img
 
+#copy contents of recovery image
+mkdir -p ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/RAMDISK
+cp -r ${IMAGE_ROOTFS}/. ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/RAMDISK/.
+cp ${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/kernel
+echo ${RECOVERY_CMD_PARAMS} >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/cmdline
+echo ${KERNEL_BASE} >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/base
+echo ${PAGE_SIZE} > ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/pagesize
 
-# copy the contents of system rootfs
+#copy contents of Boot image
+mkdir -p ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/BOOT/RAMDISK
+#cp -r /dev/null ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/BOOT/RAMDISK/.
+cp ${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/BOOT/kernel
+echo ${KERNEL_CMD_PARAMS} >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/BOOT/cmdline
+echo ${KERNEL_BASE} >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/BOOT/base
+echo ${PAGE_SIZE} > ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/BOOT/pagesize
+
+# copy the contents of system image
 cp -r ${BASE_IMAGE_ROOTFS_EXT4}/. ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/SYSTEM/.
 
-#copy contents of recovery rootfs
-cp -r ${IMAGE_ROOTFS}/. ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/.
-
-#generate recovery.fstab which is used by the updater-script
-echo #mount point fstype device [device2] >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/recovery.fstab
-echo /boot     emmc  /dev/disk/by-partlabel/boot >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/recovery.fstab
-echo /cache    ext4  cache >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/recovery.fstab
-echo /data     ext4  userdata >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/recovery.fstab
-echo /recovery emmc  /dev/disk/by-partlabel/recovery >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/recovery.fstab
-echo /system   ext4  system >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/recovery.fstab
-
-#Copy contents of userdata rootfs
+#Copy contents of userdata image
 if [ -d ${TMPDIR}/rootfs/${MACHINE}-usrfs/ ]; then
    cp -r ${TMPDIR}/rootfs/${MACHINE}-usrfs/. ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/DATA/.
 fi
 
-#Getting content for OTA folder
+#Getting content for OTA package
 mkdir -p ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/OTA/bin
-cp   ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/usr/bin/applypatch ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/OTA/bin/.
+cp   ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/RAMDISK/usr/bin/applypatch ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/OTA/bin/.
+cp   ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/RAMDISK/usr/bin/updater ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/OTA/bin/.
 
-cp   ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/usr/bin/updater ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/OTA/bin/.
-
+#generate recovery.fstab which is used by the updater-script
+echo #mount point fstype device [device2] >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/recovery.fstab
+echo /boot     emmc  /dev/disk/by-partlabel/boot >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/recovery.fstab
+echo /cache    ext4  /dev/disk/by-partlabel/cache >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/recovery.fstab
+echo /data     ext4  /dev/disk/by-partlabel/userdata >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/recovery.fstab
+echo /recovery emmc  /dev/disk/by-partlabel/recovery >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/recovery.fstab
+echo /system   ext4  /dev/disk/by-partlabel/system >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/recovery.fstab
 
 # copy contents of META folder
+cp ${DEPLOY_DIR_IMAGE}/../../../../../../android_compat/device/qcom/common/releasetools.py ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/
+
+echo "blockimgdiff_versions=1,2" >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
+
 #recovery_api_version is from recovery module
 echo recovery_api_version=3 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 
@@ -90,6 +104,16 @@ echo extfs_sparse_flags=-s >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 
 #default_system_dev_certificate : Dummy location
 echo default_system_dev_certificate=build/abcd >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
+
+${DEPLOY_DIR_IMAGE}/../../../../../../android_compat/build/tools/releasetools/make_recovery_patch.py ${OTA_TARGET_IMAGE_ROOTFS_EXT4} ${OTA_TARGET_IMAGE_ROOTFS_EXT4}
+
+mkdir -p ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/IMAGES
+cp ${DEPLOY_DIR_IMAGE}/boot.img ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/IMAGES/boot.img
+cp ${DEPLOY_DIR_IMAGE}/recovery.img ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/IMAGES/recovery.img
+make_ext4fs -s -B ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/IMAGES/system.map -l 3000000000 ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/IMAGES/system.img ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/SYSTEM
+
+#mkdir -p ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/RAMDISK
+#mkdir -p ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/RAMDISK
 
 #delete old files
 rm -rf ${DEPLOY_DIR_IMAGE}/${OTA_TARGET_BASENAME_EXT4}
