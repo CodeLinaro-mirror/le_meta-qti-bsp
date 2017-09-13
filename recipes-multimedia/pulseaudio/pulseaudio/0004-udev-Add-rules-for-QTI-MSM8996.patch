@@ -21,7 +21,7 @@ index eeb6ac4..c86c47f 100644
  SUBSYSTEMS=="platform", DRIVERS=="thinkpad_acpi", ENV{PULSE_IGNORE}="1"
  
 +# QTI MSM8996
-+ATTRS{id}=="apq8096adpagave", ENV{PULSE_IGNORE}="1"
++DRIVERS=="apq8096-auto-asoc-snd", ENV{PULSE_IGNORE}="1"
 +
  # Force enable speaker and internal mic for some laptops
  # This should only be necessary for kernels 3.3, 3.4 and 3.5 (as they are lacking the phantom jack kctls).
