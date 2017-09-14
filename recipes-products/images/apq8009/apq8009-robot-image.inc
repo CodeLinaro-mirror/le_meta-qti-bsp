@@ -17,3 +17,4 @@ IMAGE_INSTALL += "${@base_conditional('PRODUCT','robot-rome', 'sigma-dut', '', d
 IMAGE_INSTALL += "${@base_conditional('PRODUCT','robot-rome', 'libcap', '', d)}"
 IMAGE_INSTALL += "${@base_conditional('PRODUCT','robot-rome', 'attr', '', d)}"
 IMAGE_INSTALL += "mtd-utils-ubifs"
+IMAGE_INSTALL += "start-scripts-storage-mount"
