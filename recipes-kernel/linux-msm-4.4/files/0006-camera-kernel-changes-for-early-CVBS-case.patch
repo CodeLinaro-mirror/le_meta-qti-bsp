@@ -1,21 +1,22 @@
-From 6dbe53e4b925ca93d3002bd779dc00107559112a Mon Sep 17 00:00:00 2001
-From: Andy Sun <bins@codeaurora.org>
-Date: Mon, 14 Aug 2017 11:32:34 +0800
-Subject: [PATCH 1/1] camera: changes for early CVBS case
+From 5b4dc4df1896463928cb167dee88d78bea099f31 Mon Sep 17 00:00:00 2001
+From: Lei wang <leiwan@codeaurora.org>
+Date: Fri, 15 Sep 2017 08:47:06 +0800
+Subject: [PATCH] camera: changes for early CVBS case
 
 ais: disable TI960s and actuators for FPD-LINK camera
 ais: comment dump camif registers on camif error
 make camera & CVBS kernel drivers load earlier
 adv7481: optimizations
 
-Change-Id: If27c0ef150b0c411d8fc56f9c6cad1a3d5bae27f
+Change-Id: Ia1731b05c200dabf446ad9abdb7b244507b566f4
 Signed-off-by: Andy Sun <bins@codeaurora.org>
+Signed-off-by: Lei wang <leiwan@codeaurora.org>
 ---
  .../boot/dts/qcom/msm8996-camera-sensor-adp.dtsi   |  6 ++-
- drivers/media/i2c/adv7481.c                        | 60 ++++++++++++++++++++--
+ drivers/media/i2c/adv7481.c                        | 61 ++++++++++++++++++++--
  .../media/platform/msm/ais/common/cam_smmu_api.c   |  2 +-
- drivers/media/platform/msm/ais/isp/msm_isp.c       |  7 ++-
- drivers/media/platform/msm/ais/isp/msm_isp47.c     |  4 +-
+ drivers/media/platform/msm/ais/isp/msm_isp.c       |  8 ++-
+ drivers/media/platform/msm/ais/isp/msm_isp47.c     |  2 +-
  drivers/media/platform/msm/ais/ispif/msm_ispif.c   |  7 ++-
  drivers/media/platform/msm/ais/msm.c               |  4 +-
  .../msm/ais/msm_buf_mgr/msm_generic_buf_mgr.c      |  2 +-
@@ -25,7 +26,7 @@ Signed-off-by: Andy Sun <bins@codeaurora.org>
  .../platform/msm/ais/sensor/msm_sensor_driver.c    |  2 +-
  .../platform/msm/ais/sensor/msm_sensor_init.c      |  2 +-
  drivers/video/msm/ba/msm_v4l2_ba.c                 |  8 ++-
- 14 files changed, 90 insertions(+), 20 deletions(-)
+ 14 files changed, 91 insertions(+), 19 deletions(-)
 
 diff --git a/arch/arm/boot/dts/qcom/msm8996-camera-sensor-adp.dtsi b/arch/arm/boot/dts/qcom/msm8996-camera-sensor-adp.dtsi
 index 31139c0..386907d 100644
@@ -66,7 +67,7 @@ index 31139c0..386907d 100644
  			<&clock_mmss clk_camss_mclk2_clk>;
  		clock-names = "cam_src_clk", "cam_clk";
 diff --git a/drivers/media/i2c/adv7481.c b/drivers/media/i2c/adv7481.c
-index b382a1d..0d0adb3 100644
+index b382a1d..79634a9 100644
 --- a/drivers/media/i2c/adv7481.c
 +++ b/drivers/media/i2c/adv7481.c
 @@ -35,6 +35,8 @@
@@ -163,7 +164,15 @@ index b382a1d..0d0adb3 100644
  	return ret;
  
  err_media_entity:
-@@ -2516,7 +2554,19 @@ static struct platform_driver adv7481_driver = {
+@@ -2509,6 +2547,7 @@ static struct platform_driver adv7481_driver = {
+ 	.driver = {
+ 		.owner = THIS_MODULE,
+ 		.name = KBUILD_MODNAME,
++		.probe_type = PROBE_PREFER_ASYNCHRONOUS,
+ 		.of_match_table = adv7481_id,
+ 		.pm = ADV7481_PM_OPS,
+ 	},
+@@ -2516,7 +2555,19 @@ static struct platform_driver adv7481_driver = {
  	.remove = adv7481_remove,
  };
  
@@ -199,7 +208,7 @@ index 0f0e145..66a7843 100644
  MODULE_DESCRIPTION("MSM Camera SMMU driver");
  MODULE_LICENSE("GPL v2");
 diff --git a/drivers/media/platform/msm/ais/isp/msm_isp.c b/drivers/media/platform/msm/ais/isp/msm_isp.c
-index d62b830..60a9d84 100644
+index d62b830..7ef4afb 100644
 --- a/drivers/media/platform/msm/ais/isp/msm_isp.c
 +++ b/drivers/media/platform/msm/ais/isp/msm_isp.c
 @@ -24,6 +24,8 @@
@@ -220,7 +229,14 @@ index d62b830..60a9d84 100644
  	return rc;
  }
  
-@@ -641,6 +645,7 @@ static struct platform_driver vfe_driver = {
+@@ -635,12 +639,14 @@ static struct platform_driver vfe_driver = {
+ 	.driver = {
+ 		.name = "msm_vfe",
+ 		.owner = THIS_MODULE,
++		.probe_type = PROBE_PREFER_ASYNCHRONOUS,
+ 		.of_match_table = msm_vfe_dt_match,
+ 	},
+ };
  
  static int __init msm_vfe_init_module(void)
  {
@@ -228,7 +244,7 @@ index d62b830..60a9d84 100644
  	return platform_driver_register(&vfe_driver);
  }
  
-@@ -649,7 +654,7 @@ static void __exit msm_vfe_exit_module(void)
+@@ -649,7 +655,7 @@ static void __exit msm_vfe_exit_module(void)
  	platform_driver_unregister(&vfe_driver);
  }
  
@@ -238,10 +254,10 @@ index d62b830..60a9d84 100644
  MODULE_DESCRIPTION("MSM VFE driver");
  MODULE_LICENSE("GPL v2");
 diff --git a/drivers/media/platform/msm/ais/isp/msm_isp47.c b/drivers/media/platform/msm/ais/isp/msm_isp47.c
-index d63282f..1cadff5 100644
+index 04e879f..fc4f773 100644
 --- a/drivers/media/platform/msm/ais/isp/msm_isp47.c
 +++ b/drivers/media/platform/msm/ais/isp/msm_isp47.c
-@@ -2844,7 +2844,7 @@ static void __exit msm_vfe47_exit_module(void)
+@@ -2850,7 +2850,7 @@ static void __exit msm_vfe47_exit_module(void)
  	platform_driver_unregister(&vfe47_driver);
  }
  
@@ -290,7 +306,7 @@ index c41f454..1170fc2 100644
  MODULE_DESCRIPTION("MSM ISP Interface driver");
  MODULE_LICENSE("GPL v2");
 diff --git a/drivers/media/platform/msm/ais/msm.c b/drivers/media/platform/msm/ais/msm.c
-index 2a1ec86..2f9e0ed 100644
+index a3a7421..b942ed8 100644
 --- a/drivers/media/platform/msm/ais/msm.c
 +++ b/drivers/media/platform/msm/ais/msm.c
 @@ -26,6 +26,7 @@
@@ -301,7 +317,7 @@ index 2a1ec86..2f9e0ed 100644
  #include "msm.h"
  #include "msm_vb2.h"
  #include "msm_sd.h"
-@@ -1407,6 +1408,7 @@ static struct platform_driver msm_driver = {
+@@ -1410,6 +1411,7 @@ static struct platform_driver msm_driver = {
  
  static int __init msm_init(void)
  {
@@ -309,7 +325,7 @@ index 2a1ec86..2f9e0ed 100644
  	return platform_driver_register(&msm_driver);
  }
  
-@@ -1416,7 +1418,7 @@ static void __exit msm_exit(void)
+@@ -1419,7 +1421,7 @@ static void __exit msm_exit(void)
  }
  
  
@@ -371,10 +387,10 @@ index c3b087f..7d0d317 100644
  MODULE_DESCRIPTION("MSM CSIPHY driver");
  MODULE_LICENSE("GPL v2");
 diff --git a/drivers/media/platform/msm/ais/sensor/msm_sensor_driver.c b/drivers/media/platform/msm/ais/sensor/msm_sensor_driver.c
-index c02972e..6c6f58c 100644
+index 5e34016..fb2ffc9 100644
 --- a/drivers/media/platform/msm/ais/sensor/msm_sensor_driver.c
 +++ b/drivers/media/platform/msm/ais/sensor/msm_sensor_driver.c
-@@ -1301,7 +1301,7 @@ static void __exit msm_sensor_driver_exit(void)
+@@ -1413,7 +1413,7 @@ static void __exit msm_sensor_driver_exit(void)
  	i2c_del_driver(&msm_sensor_driver_i2c);
  }
  
@@ -384,10 +400,10 @@ index c02972e..6c6f58c 100644
  MODULE_DESCRIPTION("msm_sensor_driver");
  MODULE_LICENSE("GPL v2");
 diff --git a/drivers/media/platform/msm/ais/sensor/msm_sensor_init.c b/drivers/media/platform/msm/ais/sensor/msm_sensor_init.c
-index c3943be..754de2c 100644
+index ffbf963..cdf4830 100644
 --- a/drivers/media/platform/msm/ais/sensor/msm_sensor_init.c
 +++ b/drivers/media/platform/msm/ais/sensor/msm_sensor_init.c
-@@ -108,7 +108,7 @@ static void __exit msm_sensor_exit_module(void)
+@@ -141,7 +141,7 @@ static void __exit msm_sensor_exit_module(void)
  	kfree(s_init);
  }
  
