@@ -1,0 +1,835 @@
+From 3ede842797706a3586c38b3b4871a97500ea8aa2 Mon Sep 17 00:00:00 2001
+From: Ramachandran Venkataramani <ramavenk@codeaurora.org>
+Date: Fri, 15 Sep 2017 00:00:56 -0700
+Subject: [PATCH] Add support for USB pass through device on GVM
+
+Add device tree and driver changes to support USB
+as a pass through device on GVM for MSM8996
+
+Change-Id: Id1e9f0467bcce96ba0cca61a3844d222659fef55
+Signed-off-by: Ramachandran Venkataramani <ramavenk@codeaurora.org>
+---
+ .../boot/dts/qcom/vplatform-lfv-msm8996-usb.dtsi   | 304 +++++++++++++++++++++
+ arch/arm/boot/dts/qcom/vplatform-lfv-msm8996.dts   |   2 +
+ arch/arm64/configs/msm-auto-gvm_defconfig          |  54 ++++
+ drivers/clk/msm/clock-dummy.c                      |  56 +++-
+ drivers/platform/msm/gpio-usbdetect.c              | 116 +++++---
+ drivers/usb/core/hcd.c                             |   4 +
+ drivers/usb/dwc3/core.c                            |   9 +-
+ drivers/usb/dwc3/dwc3-msm.c                        |  10 +
+ drivers/usb/host/xhci-plat.c                       |   8 +
+ drivers/usb/host/xhci.c                            |   5 +
+ drivers/usb/phy/phy-msm-ssusb-qmp.c                |  32 ++-
+ 11 files changed, 544 insertions(+), 56 deletions(-)
+ create mode 100644 arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-usb.dtsi
+
+diff --git a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-usb.dtsi b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-usb.dtsi
+new file mode 100644
+index 0000000..7b1989f
+--- /dev/null
++++ b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-usb.dtsi
+@@ -0,0 +1,304 @@
++/* Copyright (c) 2014-2017, The Linux Foundation. All rights reserved.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 and
++ * only version 2 as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ */
++
++#include <dt-bindings/interrupt-controller/arm-gic.h>
++
++&soc {
++	gdsc_usb30: qcom,gdsc@30f004 {
++		compatible = "qcom,stub-regulator";
++		regulator-name = "gdsc_usb30";
++		regulator-min-microvolt = <3150000>;
++		regulator-max-microvolt = <3600000>;
++		qcom,init-voltage = <3150000>;
++	};
++
++	pm8994_l24: regulator-l24 {
++		compatible = "qcom,stub-regulator";
++		regulator-name = "pm8994_l24";
++		regulator-min-microvolt = <3075000>;
++		regulator-max-microvolt = <3075000>;
++		qcom,init-voltage = <3075000>;
++		status = "okay";
++	};
++
++	pm8994_l28: regulator-l28 {
++		compatible = "qcom,stub-regulator";
++		regulator-name = "pm8994_l28";
++		regulator-min-microvolt = <925000>;
++		regulator-max-microvolt = <925000>;
++		qcom,init-voltage = <925000>;
++		proxy-supply = <&pm8994_l28>;
++		qcom,proxy-consumer-enable;
++		qcom,proxy-consumer-current = <10000>;
++		status = "okay";
++	};
++
++	usb_detect: usb_detect {
++		compatible = "qcom,gpio-usbdetect";
++		qcom,skip-vbus-detect;
++		qcom,force-vbus-status-on;
++	};
++
++	usb3: ssusb@6a00000{
++		compatible = "qcom,dwc-usb3-msm";
++		reg = <0x06a00000 0xfc000>,
++			<0x07416000 0x400>;
++		reg-names = "core_base",
++			"ahb2phy_base";
++		#address-cells = <1>;
++		#size-cells = <1>;
++		ranges;
++
++		interrupts = <0 347 0>, <0 243 0>, <0 180 0>;
++		interrupt-names = "hs_phy_irq", "ss_phy_irq", "pwr_event_irq";
++
++		USB3_GDSC-supply = <&gdsc_usb30>;
++		extcon = <&usb_detect>;
++		qcom,usb-dbm = <&dbm_1p5>;
++		qcom,msm-bus,name = "usb3";
++		qcom,msm-bus,num-cases = <2>;
++		qcom,msm-bus,num-paths = <1>;
++		qcom,msm-bus,vectors-KBps =
++					<61 512 0 0>,
++					<61 512 240000 800000>;
++
++		qcom,dwc-usb3-msm-tx-fifo-size = <21288>;
++		qcom,disable-host-mode-pm;
++		qcom,disable-dev-mode-pm;
++
++		clocks = <&clock_gcc clk_gcc_usb30_master_clk>,
++			<&clock_gcc clk_gcc_sys_noc_usb3_axi_clk>,
++			<&clock_gcc clk_gcc_aggre2_usb3_axi_clk>,
++			<&clock_gcc clk_gcc_usb30_mock_utmi_clk>,
++			<&clock_gcc clk_gcc_usb30_sleep_clk>,
++			<&clock_gcc clk_cxo_dwc3_clk>,
++			<&clock_gcc clk_gcc_usb_phy_cfg_ahb2phy_clk>;
++
++		clock-names = "core_clk", "iface_clk", "bus_aggr_clk", "utmi_clk",
++				"sleep_clk", "xo", "cfg_ahb_clk";
++
++		qcom,core-clk-rate = <120000000>;
++
++		resets = <&clock_gcc USB_30_BCR>;
++		reset-names = "core_reset";
++
++		dwc3@6a00000 {
++			compatible = "snps,dwc3";
++			reg = <0x06a00000 0xc8d0>;
++			interrupts = <0 131 0>;
++			usb-phy = <&qusb_phy0>, <&ssphy>;
++			tx-fifo-resize;
++			snps,usb3-u1u2-disable;
++			snps,nominal-elastic-buffer;
++			snps,is-utmi-l1-suspend;
++			snps,hird-threshold = /bits/ 8 <0x0>;
++		};
++
++		qcom,usbbam@6b04000 {
++			compatible = "qcom,usb-bam-msm";
++			reg = <0x06b04000 0x1a934>;
++			interrupts = <0 132 0>;
++
++			qcom,bam-type = <0>;
++			qcom,usb-bam-fifo-baseaddr = <0x066bb000>;
++			qcom,usb-bam-num-pipes = <8>;
++			qcom,ignore-core-reset-ack;
++			qcom,disable-clk-gating;
++			qcom,usb-bam-override-threshold = <0x4001>;
++			qcom,usb-bam-max-mbps-highspeed = <400>;
++			qcom,usb-bam-max-mbps-superspeed = <3600>;
++			qcom,reset-bam-on-connect;
++
++			qcom,pipe0 {
++				label = "ssusb-ipa-out-0";
++				qcom,usb-bam-mem-type = <1>;
++				qcom,dir = <0>;
++				qcom,pipe-num = <0>;
++				qcom,peer-bam = <1>;
++				qcom,src-bam-pipe-index = <1>;
++				qcom,data-fifo-size = <0x8000>;
++				qcom,descriptor-fifo-size = <0x2000>;
++			};
++			qcom,pipe1 {
++				label = "ssusb-ipa-in-0";
++				qcom,usb-bam-mem-type = <1>;
++				qcom,dir = <1>;
++				qcom,pipe-num = <0>;
++				qcom,peer-bam = <1>;
++				qcom,dst-bam-pipe-index = <0>;
++				qcom,data-fifo-size = <0x8000>;
++				qcom,descriptor-fifo-size = <0x2000>;
++			};
++			qcom,pipe2 {
++				label = "ssusb-qdss-in-0";
++				qcom,usb-bam-mem-type = <2>;
++				qcom,dir = <1>;
++				qcom,pipe-num = <0>;
++				qcom,peer-bam = <0>;
++				qcom,peer-bam-physical-address = <0x03084000>;
++				qcom,src-bam-pipe-index = <0>;
++				qcom,dst-bam-pipe-index = <2>;
++				qcom,data-fifo-offset = <0x0>;
++				qcom,data-fifo-size = <0x1800>;
++				qcom,descriptor-fifo-offset = <0x1800>;
++				qcom,descriptor-fifo-size = <0x800>;
++			};
++			qcom,pipe3 {
++				label = "ssusb-dpl-ipa-in-1";
++				qcom,usb-bam-mem-type = <1>;
++				qcom,dir = <1>;
++				qcom,pipe-num = <1>;
++				qcom,peer-bam = <1>;
++				qcom,dst-bam-pipe-index = <2>;
++				qcom,data-fifo-size = <0x8000>;
++				qcom,descriptor-fifo-size = <0x2000>;
++			};
++		};
++	};
++
++	android_usb@66bf0c8 {
++		compatible = "qcom,android-usb";
++		reg = <0x066bf0c8 0xc8>;
++		qcom,pm-qos-latency = <301 701 801>;
++	};
++
++	qusb_phy0: qusb@7411000 {
++		compatible = "qcom,qusb2phy";
++		reg = <0x07411000 0x180>,
++			<0x0007024c 0x4>,
++			<0x00388018 0x4>;
++		reg-names = "qusb_phy_base",
++			"tune2_efuse_addr",
++			"ref_clk_addr";
++		vdd-supply = <&pm8994_s2_corner>;
++		vdda18-supply = <&pm8994_l12>;
++		vdda33-supply = <&pm8994_l24>;
++		qcom,vdd-voltage-level = <1 5 7>;
++		qcom,tune2-efuse-bit-pos = <21>;
++		qcom,tune2-efuse-num-bits = <4>;
++		qcom,qusb-phy-init-seq = <0xF8 0x80
++					0xB3 0x84
++					0x83 0x88
++					0xC0 0x8C
++					0x30 0x08
++					0x79 0x0C
++					0x21 0x10
++					0x14 0x9C
++					0x9F 0x1C
++					0x00 0x18>;
++		phy_type= "utmi";
++		qcom,phy-clk-scheme = "cmos";
++		qcom,major-rev = <1>;
++
++		clocks = <&clock_gcc clk_gcc_usb_phy_cfg_ahb2phy_clk>,
++			 <&clock_gcc clk_ln_bb_clk>;
++		clock-names = "cfg_ahb_clk", "ref_clk_src";
++
++		resets = <&clock_gcc QUSB2PHY_PRIM_BCR>;
++		reset-names = "phy_reset";
++	};
++
++	ssphy: ssphy@7410000 {
++		compatible = "qcom,usb-ssphy-qmp-v2";
++		reg = <0x07410000 0x7a8>;
++		reg-names = "qmp_phy_base";
++		vdd-supply = <&pm8994_l28>;
++		core-supply = <&pm8994_l12>;
++		qcom,core-voltage-level = <0 1800000 1800000>;
++		qcom,vdd-voltage-level = <0 925000 925000>;
++		qcom,vbus-valid-override;
++		qcom,qmp-phy-init-seq =
++			/* <reg_offset, value, delay> */
++				<0xac  0x14 0x00 /* common block settings */
++				 0x34  0x08 0x00
++				 0x174 0x30 0x00
++				 0x194 0x06 0x00
++				 0x19c 0x01 0x00
++				 0x178 0x00 0x00
++				 0x70  0x0f 0x00
++				 0x48  0x0f 0x00
++				 0x3c  0x04 0x00
++				 0xd0  0x82 0x00 /* pll and loop filter settings*/
++				 0xdc  0x55 0x00
++				 0xe0  0x55 0x00
++				 0xe4  0x03 0x00
++				 0x78  0x0b 0x00
++				 0x84  0x16 0x00
++				 0x90  0x28 0x00
++				 0x108 0x80 0x00
++				 0x124 0x00 0x00
++				 0x4c  0x15 0x00
++				 0x50  0x34 0x00
++				 0x18c 0x00 0x00
++				 0xcc  0x00 0x00
++				 0x128 0x00 0x00
++				 0x0c  0x0a 0x00
++				 0x10  0x01 0x00 /* ssc settings */
++				 0x1c  0x31 0x00
++				 0x20  0x01 0x00
++				 0x14  0x00 0x00
++				 0x18  0x00 0x00
++				 0x24  0xde 0x00
++				 0x28  0x07 0x00
++				 0x440 0x0b 0x00 /* Rx settings */
++				 0x41c 0x04 0x00
++				 0x4d8 0x02 0x00
++				 0x4dc 0x4c 0x00
++				 0x4e0 0xbb 0x00
++				 0x508 0x77 0x00
++				 0x50c 0x80 0x00
++				 0x514 0x03 0x00
++				 0x518 0x18 0x00
++				 0x51c 0x16 0x00
++				 0x268 0x45 0x00 /* Tx settings */
++				 0x2ac 0x12 0x00
++				 0x294 0x06 0x00
++				 0x6c4 0x03 0x00 /* FLL settings */
++				 0x6c0 0x02 0x00
++				 0x6c8 0x09 0x00
++				 0x6cc 0x42 0x00
++				 0x6d0 0x85 0x00
++				 0x680 0xd1 0x00 /* Lock Det settings */
++				 0x684 0x1f 0x00
++				 0x688 0x47 0x00
++				 0x664 0x08 0x00
++				 0xffffffff 0xffffffff 0x00>;
++
++		qcom,qmp-phy-reg-offset =
++				<0x77c /* USB3_PHY_PCS_STATUS */
++				 0x6d4 /* USB3_PHY_AUTONOMOUS_MODE_CTRL */
++				 0x6d8 /* USB3_PHY_LFPS_RXTERM_IRQ_CLEAR */
++				 0x604 /* USB3_PHY_POWER_DOWN_CONTROL */
++				 0x600 /* USB3_PHY_SW_RESET */
++				 0x608>; /* USB3_PHY_START */
++
++		clocks = <&clock_gcc clk_gcc_usb3_phy_aux_clk>,
++			 <&clock_gcc clk_gcc_usb3_phy_pipe_clk>,
++			 <&clock_gcc clk_gcc_usb_phy_cfg_ahb2phy_clk>,
++			 <&clock_gcc clk_ln_bb_clk>,
++			 <&clock_gcc clk_gcc_usb3_clkref_clk>;
++
++		clock-names = "aux_clk", "pipe_clk", "cfg_ahb_clk",
++				"ref_clk_src", "ref_clk";
++
++		resets = <&clock_gcc USB3_PHY_BCR>,
++			 <&clock_gcc USB3PHY_PHY_BCR>;
++		reset-names = "phy_reset", "phy_phy_reset";
++		qcom,disable-autonomous-mode;
++	};
++
++	dbm_1p5: dbm@6af8000 {
++		compatible = "qcom,usb-dbm-1p5";
++		reg = <0x06af8000 0x300>;
++		qcom,reset-ep-after-lpm-resume;
++	};
++};
+diff --git a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996.dts b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996.dts
+index e6d9f7b..3cab278 100644
+--- a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996.dts
++++ b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996.dts
+@@ -1197,3 +1197,5 @@
+ 	};
+ };
+ #include "vplatform-lfv-agave.dtsi"
++#include "vplatform-lfv-msm8996-usb.dtsi"
++
+diff --git a/arch/arm64/configs/msm-auto-gvm_defconfig b/arch/arm64/configs/msm-auto-gvm_defconfig
+index a6d36c3..be8ff75 100644
+--- a/arch/arm64/configs/msm-auto-gvm_defconfig
++++ b/arch/arm64/configs/msm-auto-gvm_defconfig
+@@ -314,3 +314,57 @@ CONFIG_CRYPTO_MD4=y
+ CONFIG_CRYPTO_ARC4=y
+ CONFIG_CRYPTO_TWOFISH=y
+ CONFIG_QMI_ENCDEC=y
++CONFIG_USB=y
++CONFIG_USB_XHCI_HCD=y
++CONFIG_USB_EHCI_HCD=y
++CONFIG_USB_EHCI_HCD_PLATFORM=y
++CONFIG_USB_OHCI_HCD=y
++CONFIG_USB_OHCI_HCD_PLATFORM=y
++CONFIG_USB_STORAGE=y
++CONFIG_USB_DWC3=y
++CONFIG_USB_ISP1760=y
++CONFIG_USB_QTI_KS_BRIDGE=y
++CONFIG_NOP_USB_XCEIV=y
++CONFIG_USB_MSM_SSPHY_QMP=y
++CONFIG_MSM_QUSB_PHY=y
++CONFIG_USB_ULPI=y
++CONFIG_USB_GADGET=y
++CONFIG_USB_GADGET_VBUS_DRAW=500
++CONFIG_USB_CONFIGFS=y
++CONFIG_USB_CONFIGFS_SERIAL=y
++CONFIG_USB_CONFIGFS_NCM=y
++CONFIG_USB_CONFIGFS_ECM=y
++CONFIG_USB_CONFIGFS_MASS_STORAGE=y
++CONFIG_USB_CONFIGFS_F_FS=y
++CONFIG_USB_CONFIGFS_F_MTP=y
++CONFIG_USB_CONFIGFS_F_PTP=y
++CONFIG_USB_CONFIGFS_F_ACC=y
++CONFIG_USB_CONFIGFS_UEVENT=y
++CONFIG_USB_CONFIGFS_F_DIAG=y
++CONFIG_USB_CONFIGFS_F_CDEV=y
++CONFIG_USB_CONFIGFS_F_QDSS=y
++CONFIG_GPIO_USB_DETECT=y
++CONFIG_USB_USBNET=y
++CONFIG_USB_BAM=y
++CONFIG_USB_CONFIGFS_QCRNDIS=y
++CONFIG_USB_CONFIGFS_RMNET_BAM=y
++CONFIG_USB_F_QCRNDIS=y
++CONFIG_USB_F_RMNET_BAM=y
++CONFIG_DIAG_OVER_USB=y
++CONFIG_EXTCON=y
++CONFIG_RNDIS_IPA=y
++CONFIG_SCSI=y
++CONFIG_BLK_DEV_SD=y
++CONFIG_CHR_DEV_SG=y
++CONFIG_CHR_DEV_SCH=y
++CONFIG_SCSI_CONSTANTS=y
++CONFIG_SCSI_LOGGING=y
++CONFIG_SCSI_SCAN_ASYNC=y
++CONFIG_SCSI_UFSHCD=y
++CONFIG_SCSI_UFSHCD_PLATFORM=y
++CONFIG_SCSI_UFS_QCOM=y
++CONFIG_SCSI_UFS_QCOM_ICE=y
++CONFIG_USB_DWC3_PCI=y
++CONFIG_USB_XHCI_PCI=y
++CONFIG_USB_EHCI_PCI=y
++CONFIG_USB_OHCI_HCD_PCI=y
+diff --git a/drivers/clk/msm/clock-dummy.c b/drivers/clk/msm/clock-dummy.c
+index caa6a6a..bcbf806 100644
+--- a/drivers/clk/msm/clock-dummy.c
++++ b/drivers/clk/msm/clock-dummy.c
+@@ -14,6 +14,51 @@
+ #include <linux/platform_device.h>
+ #include <linux/of.h>
+ #include <soc/qcom/msm-clock-controller.h>
++#include <linux/reset-controller.h>
++
++static int dummy_reset_assert(struct reset_controller_dev *rcdev,
++				unsigned long id)
++{
++	return 0;
++}
++
++static int dummy_reset_deassert(struct reset_controller_dev *rcdev,
++				unsigned long id)
++{
++	return 0;
++}
++
++static int dummy_reset(struct reset_controller_dev *rcdev, unsigned long id)
++{
++	return 0;
++}
++
++struct reset_control_ops dummy_reset_ops = {
++	.reset = dummy_reset,
++	.assert = dummy_reset_assert,
++	.deassert = dummy_reset_deassert,
++};
++
++int dummy_reset_controller_register(struct platform_device *pdev)
++{
++	struct reset_controller_dev *prcdev;
++	int ret = 0;
++
++	prcdev = devm_kzalloc(&pdev->dev, sizeof(*prcdev), GFP_KERNEL);
++	if (!prcdev)
++		return -ENOMEM;
++
++	prcdev->of_node = pdev->dev.of_node;
++	prcdev->ops = &dummy_reset_ops;
++	prcdev->owner = pdev->dev.driver->owner;
++	prcdev->nr_resets = 17; // based on size of gcc_msm8996_resets
++
++	ret = reset_controller_register(prcdev);
++	if (ret)
++		dev_err(&pdev->dev, "%s: Failed to register with reset controller %d\n", __func__, ret);
++
++	return ret;
++}
+ 
+ static int dummy_clk_reset(struct clk *clk, enum clk_reset_action action)
+ {
+@@ -97,10 +142,19 @@ static int msm_clock_dummy_probe(struct platform_device *pdev)
+ 	int ret;
+ 
+ 	ret = of_clk_add_provider(pdev->dev.of_node, of_dummy_get, NULL);
+-	if (ret)
++	if (ret) {
++		dev_err(&pdev->dev, "%s: of_clk_add_provider error %d", __func__, ret);
+ 		return -ENOMEM;
++	}
++
++	ret = dummy_reset_controller_register(pdev);
++	if (ret) {
++		dev_err(&pdev->dev, "%s: dummy_reset_controller_register error %d", __func__, ret);
++		return -ENOMEM;
++	}
+ 
+ 	dev_info(&pdev->dev, "Registered DUMMY provider.\n");
++
+ 	return ret;
+ }
+ 
+diff --git a/drivers/platform/msm/gpio-usbdetect.c b/drivers/platform/msm/gpio-usbdetect.c
+index dc05d71..301487f 100644
+--- a/drivers/platform/msm/gpio-usbdetect.c
++++ b/drivers/platform/msm/gpio-usbdetect.c
+@@ -46,6 +46,9 @@ static irqreturn_t gpio_usbdetect_vbus_irq(int irq, void *data)
+ {
+ 	struct gpio_usbdetect *usb = data;
+ 
++	if (!usb->gpio)
++		return IRQ_HANDLED;
++
+ 	usb->vbus_state = gpio_get_value(usb->gpio);
+ 	if (usb->vbus_state) {
+ 		dev_dbg(&usb->pdev->dev, "setting vbus notification\n");
+@@ -95,6 +98,7 @@ static int gpio_usbdetect_probe(struct platform_device *pdev)
+ {
+ 	struct gpio_usbdetect *usb;
+ 	int rc;
++	bool skip_vbus_detect;
+ 
+ 	usb = devm_kzalloc(&pdev->dev, sizeof(*usb), GFP_KERNEL);
+ 	if (!usb)
+@@ -134,60 +138,82 @@ static int gpio_usbdetect_probe(struct platform_device *pdev)
+ 		}
+ 	}
+ 
+-	usb->gpio = of_get_named_gpio(pdev->dev.of_node,
+-				"qcom,vbus-det-gpio", 0);
+-	if (usb->gpio < 0) {
+-		dev_err(&pdev->dev, "Failed to get gpio: %d\n", usb->gpio);
+-		rc = usb->gpio;
+-		goto error;
+-	}
++	skip_vbus_detect = of_property_read_bool(pdev->dev.of_node,
++		"qcom,skip-vbus-detect");
++	if(!skip_vbus_detect) {
++		usb->gpio = of_get_named_gpio(pdev->dev.of_node,
++					"qcom,vbus-det-gpio", 0);
++		if (usb->gpio < 0) {
++			dev_err(&pdev->dev, "Failed to get gpio: %d\n", usb->gpio);
++			rc = usb->gpio;
++			goto error;
++		}
+ 
+-	rc = gpio_request(usb->gpio, "vbus-det-gpio");
+-	if (rc < 0) {
+-		dev_err(&pdev->dev, "Failed to request gpio: %d\n", rc);
+-		goto error;
+-	}
++		rc = gpio_request(usb->gpio, "vbus-det-gpio");
++		if (rc < 0) {
++			dev_err(&pdev->dev, "Failed to request gpio: %d\n", rc);
++			goto error;
++		}
+ 
+-	usb->vbus_det_irq = gpio_to_irq(usb->gpio);
+-	if (usb->vbus_det_irq < 0) {
+-		dev_err(&pdev->dev, "get vbus_det_irq failed\n");
+-		rc = usb->vbus_det_irq;
+-		goto error;
+-	}
++		usb->vbus_det_irq = gpio_to_irq(usb->gpio);
++		if (usb->vbus_det_irq < 0) {
++			dev_err(&pdev->dev, "get vbus_det_irq failed\n");
++			rc = usb->vbus_det_irq;
++			goto error;
++		}
+ 
+-	rc = devm_request_threaded_irq(&pdev->dev, usb->vbus_det_irq,
+-				NULL, gpio_usbdetect_vbus_irq,
+-			      IRQF_TRIGGER_RISING | IRQF_TRIGGER_FALLING |
+-			      IRQF_ONESHOT, "vbus_det_irq", usb);
+-	if (rc) {
+-		dev_err(&pdev->dev, "request for vbus_det_irq failed: %d\n",
+-			rc);
+-		goto error;
+-	}
++		rc = devm_request_threaded_irq(&pdev->dev, usb->vbus_det_irq,
++					NULL, gpio_usbdetect_vbus_irq,
++				      IRQF_TRIGGER_RISING | IRQF_TRIGGER_FALLING |
++				      IRQF_ONESHOT, "vbus_det_irq", usb);
++		if (rc) {
++			dev_err(&pdev->dev, "request for vbus_det_irq failed: %d\n",
++				rc);
++			goto error;
++		}
+ 
+-	usb->id_det_irq = platform_get_irq_byname(pdev, "pmic_id_irq");
+-	if (usb->id_det_irq < 0) {
+-		dev_err(&pdev->dev, "get id_det_irq failed\n");
+-		rc = usb->id_det_irq;
+-		goto error;
+-	}
++		usb->id_det_irq = platform_get_irq_byname(pdev, "pmic_id_irq");
++		if (usb->id_det_irq < 0) {
++			dev_err(&pdev->dev, "get id_det_irq failed\n");
++			rc = usb->id_det_irq;
++			goto error;
++		}
+ 
+-	rc = devm_request_threaded_irq(&pdev->dev, usb->id_det_irq,
+-				gpio_usbdetect_id_irq,
+-				gpio_usbdetect_id_irq_thread,
+-				IRQF_TRIGGER_RISING | IRQF_TRIGGER_FALLING |
+-				IRQF_ONESHOT, "id_det_irq", usb);
+-	if (rc) {
+-		dev_err(&pdev->dev, "request for id_det_irq failed: %d\n", rc);
+-		goto error;
++		rc = devm_request_threaded_irq(&pdev->dev, usb->id_det_irq,
++					gpio_usbdetect_id_irq,
++					gpio_usbdetect_id_irq_thread,
++					IRQF_TRIGGER_RISING | IRQF_TRIGGER_FALLING |
++					IRQF_ONESHOT, "id_det_irq", usb);
++		if (rc) {
++			dev_err(&pdev->dev, "request for id_det_irq failed: %d\n", rc);
++			goto error;
++		}
++
++		enable_irq_wake(usb->vbus_det_irq);
++		enable_irq_wake(usb->id_det_irq);
++	}
++	else
++	{
++		dev_info(&pdev->dev, "%s: skipping vbus_detect\n", __func__);
++		usb->vbus_det_irq = 0;
++		usb->id_det_irq = 0;
++		usb->gpio = 0;
+ 	}
+ 
+-	enable_irq_wake(usb->vbus_det_irq);
+-	enable_irq_wake(usb->id_det_irq);
+ 	dev_set_drvdata(&pdev->dev, usb);
+ 
+-	/* Read and report initial VBUS state */
+-	gpio_usbdetect_vbus_irq(usb->vbus_det_irq, usb);
++	if (!skip_vbus_detect) {
++		/* Read and report initial VBUS state */
++		gpio_usbdetect_vbus_irq(usb->vbus_det_irq, usb);
++	}
++
++	if(skip_vbus_detect && of_property_read_bool(pdev->dev.of_node,
++		"qcom,force-vbus-status-on"))
++	{
++		dev_info(&pdev->dev, "%s: force vbus status to ON\n", __func__);
++		extcon_set_cable_state_(usb->extcon_dev, EXTCON_USB_HOST, 0);
++		extcon_set_cable_state_(usb->extcon_dev, EXTCON_USB, 1);
++	}
+ 
+ 	return 0;
+ 
+diff --git a/drivers/usb/core/hcd.c b/drivers/usb/core/hcd.c
+index bc5a696..3c3b3c0 100644
+--- a/drivers/usb/core/hcd.c
++++ b/drivers/usb/core/hcd.c
+@@ -2695,6 +2695,10 @@ static int usb_hcd_request_irqs(struct usb_hcd *hcd,
+ 
+ 	if (hcd->driver->irq) {
+ 
++#ifdef CONFIG_MSM_GVM_QUIN
++		irqflags |= IRQF_ONESHOT;
++#endif
++
+ 		snprintf(hcd->irq_descr, sizeof(hcd->irq_descr), "%s:usb%d",
+ 				hcd->driver->description, hcd->self.busnum);
+ 		retval = request_irq(irqnum, &usb_hcd_irq, irqflags,
+diff --git a/drivers/usb/dwc3/core.c b/drivers/usb/dwc3/core.c
+index 0744b14..a2c78be 100644
+--- a/drivers/usb/dwc3/core.c
++++ b/drivers/usb/dwc3/core.c
+@@ -1059,8 +1059,13 @@ static int dwc3_probe(struct platform_device *pdev)
+ 
+ 	/* will be enabled in dwc3_msm_resume() */
+ 	irq_set_status_flags(irq, IRQ_NOAUTOEN);
++#ifdef CONFIG_MSM_GVM_QUIN
++	ret = devm_request_irq(dev, irq, dwc3_interrupt, IRQF_SHARED|IRQF_ONESHOT, "dwc3",
++			dwc);
++#else
+ 	ret = devm_request_irq(dev, irq, dwc3_interrupt, IRQF_SHARED, "dwc3",
+ 			dwc);
++#endif
+ 	if (ret) {
+ 		dev_err(dwc->dev, "failed to request irq #%d --> %d\n",
+ 				irq, ret);
+@@ -1311,7 +1316,9 @@ err0:
+ 	 * memory region the next time probe is called.
+ 	 */
+ 	res->start -= DWC3_GLOBALS_REGS_START;
+-	destroy_workqueue(dwc->dwc_wq);
++	if (dwc->dwc_wq) {
++		destroy_workqueue(dwc->dwc_wq);
++	}
+ 
+ 	return ret;
+ }
+diff --git a/drivers/usb/dwc3/dwc3-msm.c b/drivers/usb/dwc3/dwc3-msm.c
+index 5ad68df..9dc47bf 100644
+--- a/drivers/usb/dwc3/dwc3-msm.c
++++ b/drivers/usb/dwc3/dwc3-msm.c
+@@ -1650,6 +1650,7 @@ static int dwc3_msm_link_clk_reset(struct dwc3_msm *mdwc, bool assert)
+ 		clk_disable_unprepare(mdwc->sleep_clk);
+ 		clk_disable_unprepare(mdwc->core_clk);
+ 		clk_disable_unprepare(mdwc->iface_clk);
++
+ 		ret = reset_control_assert(mdwc->core_reset);
+ 		if (ret)
+ 			dev_err(mdwc->dev, "dwc3 core_reset assert failed\n");
+@@ -1991,6 +1992,8 @@ static void msm_dwc3_perf_vote_update(struct dwc3_msm *mdwc,
+ 
+ static int dwc3_msm_suspend(struct dwc3_msm *mdwc)
+ {
++
++#ifdef ENABLE_MSM_DWC3_USB_SUSPEND
+ 	int ret, i;
+ 	bool can_suspend_ssphy;
+ 	struct dwc3 *dwc = platform_get_drvdata(mdwc->dwc3);
+@@ -2153,6 +2156,7 @@ static int dwc3_msm_suspend(struct dwc3_msm *mdwc)
+ 	}
+ 
+ 	dev_info(mdwc->dev, "DWC3 in low power mode\n");
++#endif
+ 	return 0;
+ }
+ 
+@@ -2187,6 +2191,7 @@ static int dwc3_msm_resume(struct dwc3_msm *mdwc)
+ 	if (mdwc->lpm_flags & MDWC3_POWER_COLLAPSE) {
+ 		dev_dbg(mdwc->dev, "%s: exit power collapse\n", __func__);
+ 		dwc3_msm_config_gdsc(mdwc, 1);
++
+ 		ret = reset_control_assert(mdwc->core_reset);
+ 		if (ret)
+ 			dev_err(mdwc->dev, "%s:core_reset assert failed\n",
+@@ -2968,7 +2973,11 @@ static int dwc3_msm_probe(struct platform_device *pdev)
+ 		ret = devm_request_threaded_irq(&pdev->dev, mdwc->pwr_event_irq,
+ 					msm_dwc3_pwr_irq,
+ 					msm_dwc3_pwr_irq_thread,
++#ifdef CONFIG_MSM_GVM_QUIN
++					IRQF_TRIGGER_RISING | IRQF_EARLY_RESUME | IRQF_ONESHOT,
++#else
+ 					IRQF_TRIGGER_RISING | IRQF_EARLY_RESUME,
++#endif
+ 					"msm_dwc3", mdwc);
+ 		if (ret) {
+ 			dev_err(&pdev->dev, "irqreq pwr_event_irq failed: %d\n",
+@@ -3337,6 +3346,7 @@ static int dwc3_msm_host_notifier(struct notifier_block *nb,
+ 
+ 			/* inform PMIC of max power so it can optimize boost */
+ 			pval.intval = max_power * 1000;
++
+ 			power_supply_set_property(mdwc->usb_psy,
+ 					POWER_SUPPLY_PROP_BOOST_CURRENT, &pval);
+ 		} else {
+diff --git a/drivers/usb/host/xhci-plat.c b/drivers/usb/host/xhci-plat.c
+index 56a9cd6..9d892fd 100644
+--- a/drivers/usb/host/xhci-plat.c
++++ b/drivers/usb/host/xhci-plat.c
+@@ -245,7 +245,11 @@ static int xhci_plat_probe(struct platform_device *pdev)
+ 			goto put_usb3_hcd;
+ 	}
+ 
++#ifdef CONFIG_MSM_GVM_QUIN
++	ret = usb_add_hcd(hcd, irq, IRQF_SHARED|IRQF_ONESHOT);
++#else
+ 	ret = usb_add_hcd(hcd, irq, IRQF_SHARED);
++#endif
+ 	if (ret)
+ 		goto disable_usb_phy;
+ 
+@@ -254,7 +258,11 @@ static int xhci_plat_probe(struct platform_device *pdev)
+ 	if (HCC_MAX_PSA(xhci->hcc_params) >= 4)
+ 		xhci->shared_hcd->can_do_streams = 1;
+ 
++#ifdef CONFIG_MSM_GVM_QUIN
++	ret = usb_add_hcd(xhci->shared_hcd, irq, IRQF_SHARED|IRQF_ONESHOT);
++#else
+ 	ret = usb_add_hcd(xhci->shared_hcd, irq, IRQF_SHARED);
++#endif
+ 	if (ret)
+ 		goto dealloc_usb2_hcd;
+ 
+diff --git a/drivers/usb/host/xhci.c b/drivers/usb/host/xhci.c
+index aab1c79..1d8ad06 100644
+--- a/drivers/usb/host/xhci.c
++++ b/drivers/usb/host/xhci.c
+@@ -426,8 +426,13 @@ static int xhci_try_enable_msi(struct usb_hcd *hcd)
+ 			 hcd->driver->description, hcd->self.busnum);
+ 
+ 	/* fall back to legacy interrupt*/
++#ifdef CONFIG_MSM_GVM_QUIN
++	ret = request_irq(pdev->irq, &usb_hcd_irq, IRQF_SHARED | IRQF_ONESHOT,
++			hcd->irq_descr, hcd);
++#else
+ 	ret = request_irq(pdev->irq, &usb_hcd_irq, IRQF_SHARED,
+ 			hcd->irq_descr, hcd);
++#endif
+ 	if (ret) {
+ 		xhci_err(xhci, "request interrupt %d failed\n",
+ 				pdev->irq);
+diff --git a/drivers/usb/phy/phy-msm-ssusb-qmp.c b/drivers/usb/phy/phy-msm-ssusb-qmp.c
+index 2bc3c6f..5ded50e 100644
+--- a/drivers/usb/phy/phy-msm-ssusb-qmp.c
++++ b/drivers/usb/phy/phy-msm-ssusb-qmp.c
+@@ -144,6 +144,11 @@ static void msm_ssusb_qmp_enable_autonomous(struct msm_ssphy_qmp *phy,
+ 	unsigned int autonomous_mode_offset =
+ 			phy->phy_reg[USB3_PHY_AUTONOMOUS_MODE_CTRL];
+ 
++	if(!phy->vls_clamp_reg)	{
++		dev_dbg(phy->phy.dev, "vls_clamp_reg not available\n");
++		return;
++	}
++
+ 	dev_dbg(phy->phy.dev, "enabling QMP autonomous mode with cable %s\n",
+ 			get_cable_status_str(phy));
+ 
+@@ -641,16 +646,25 @@ static int msm_ssphy_qmp_probe(struct platform_device *pdev)
+ 		goto err;
+ 	}
+ 
+-	res = platform_get_resource_byname(pdev, IORESOURCE_MEM,
+-			"vls_clamp_reg");
+-	if (!res) {
+-		dev_err(dev, "failed getting vls_clamp_reg\n");
+-		return -ENODEV;
++	if (!of_property_read_bool(dev->of_node, "qcom,disable-autonomous-mode")) {
++		dev_err(dev, "%s: autonomous mode enabled!\n", __func__);
++		res = platform_get_resource_byname(pdev, IORESOURCE_MEM,
++				"vls_clamp_reg");
++		if (!res) {
++			dev_err(dev, "failed getting vls_clamp_reg\n");
++			return -ENODEV;
++		}
++
++		phy->vls_clamp_reg = devm_ioremap_resource(dev, res);
++		if (IS_ERR(phy->vls_clamp_reg)) {
++			dev_err(dev, "couldn't find vls_clamp_reg address.\n");
++			return PTR_ERR(phy->vls_clamp_reg);
++		}
+ 	}
+-	phy->vls_clamp_reg = devm_ioremap_resource(dev, res);
+-	if (IS_ERR(phy->vls_clamp_reg)) {
+-		dev_err(dev, "couldn't find vls_clamp_reg address.\n");
+-		return PTR_ERR(phy->vls_clamp_reg);
++	else
++	{
++		dev_err(dev, "%s: autonomous mode disabled!\n", __func__);
++		phy->vls_clamp_reg = NULL;
+ 	}
+ 
+ 	res = platform_get_resource_byname(pdev, IORESOURCE_MEM,
+-- 
+1.9.1
+
