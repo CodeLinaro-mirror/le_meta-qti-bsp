@@ -1,10 +1,11 @@
-From c463ee5a8429c6fab8a55cf91fac0f7a697a6905 Mon Sep 17 00:00:00 2001
-From: Daocai <daocai@codeaurora.org>
-Date: Mon, 14 Aug 2017 15:52:15 +0800
+From 0b3c80980815ab447145cb3b9411d35c0b204ffb Mon Sep 17 00:00:00 2001
+From: Lei wang <leiwan@codeaurora.org>
+Date: Mon, 18 Sep 2017 14:54:42 +0800
 Subject: [PATCH] kernel: display support early init
 
-Change-Id: Ibce2e6a2661468f74e23e03fa31290a335a9fa4b
-Signen-off-by: Daocai <daocai@codeaurora.org>
+Change-Id: Ib862c843f5800426ea3fcb519474423337230051
+Signed-off-by: Daocai <daocai@codeaurora.org>
+Signed-off-by: Lei wang <leiwan@codeaurora.org>
 ---
  arch/arm/boot/dts/qcom/dsi-adv7533-1080p.dtsi |  9 +--------
  arch/arm/boot/dts/qcom/dsi-adv7533-720p.dtsi  |  9 +--------
@@ -17,8 +18,9 @@ Signen-off-by: Daocai <daocai@codeaurora.org>
  drivers/gpu/drm/msm/msm_smmu.c                |  1 +
  drivers/gpu/drm/msm/sde/sde_wb.c              |  2 +-
  drivers/regulator/fan53555.c                  | 17 ++++++++++++++++-
+ drivers/soc/qcom/subsys-pil-tz.c              |  2 +-
  drivers/video/fbdev/msm/msm_dba/adv7533.c     |  2 +-
- 12 files changed, 33 insertions(+), 24 deletions(-)
+ 13 files changed, 34 insertions(+), 25 deletions(-)
 
 diff --git a/arch/arm/boot/dts/qcom/dsi-adv7533-1080p.dtsi b/arch/arm/boot/dts/qcom/dsi-adv7533-1080p.dtsi
 index 7994285..6cf9ed1 100644
@@ -145,10 +147,10 @@ index 0c119ec..a659367 100644
  
  	commit_destroy(commit);
 diff --git a/drivers/gpu/drm/msm/msm_drv.c b/drivers/gpu/drm/msm/msm_drv.c
-index c8b1142..c1187a6 100644
+index 969af4c..1e03c25 100644
 --- a/drivers/gpu/drm/msm/msm_drv.c
 +++ b/drivers/gpu/drm/msm/msm_drv.c
-@@ -2232,7 +2232,7 @@ static void __exit msm_drm_unregister(void)
+@@ -2242,7 +2242,7 @@ static void __exit msm_drm_unregister(void)
  	msm_smmu_driver_cleanup();
  }
  
@@ -208,6 +210,19 @@ index 28a2619..5b7c7e4 100644
  
  MODULE_AUTHOR("Yunfan Zhang <yfzhang@marvell.com>");
  MODULE_DESCRIPTION("FAN53555 regulator driver");
+diff --git a/drivers/soc/qcom/subsys-pil-tz.c b/drivers/soc/qcom/subsys-pil-tz.c
+index f85c4ba..6b85757 100644
+--- a/drivers/soc/qcom/subsys-pil-tz.c
++++ b/drivers/soc/qcom/subsys-pil-tz.c
+@@ -1154,7 +1154,7 @@ static int __init pil_tz_init(void)
+ {
+ 	return platform_driver_register(&pil_tz_driver);
+ }
+-module_init(pil_tz_init);
++fs_initcall(pil_tz_init);
+ 
+ static void __exit pil_tz_exit(void)
+ {
 diff --git a/drivers/video/fbdev/msm/msm_dba/adv7533.c b/drivers/video/fbdev/msm/msm_dba/adv7533.c
 index 09632b4..08df6d4 100644
 --- a/drivers/video/fbdev/msm/msm_dba/adv7533.c
