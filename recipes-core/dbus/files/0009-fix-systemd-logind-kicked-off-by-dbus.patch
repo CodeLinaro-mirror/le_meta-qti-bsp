@@ -1,0 +1,38 @@
+From 9dfaf350daa550b8e143611776ab98353da4f4d1 Mon Sep 17 00:00:00 2001
+From: Lei wang <leiwan@codeaurora.org>
+Date: Tue, 19 Sep 2017 08:31:40 +0800
+Subject: [PATCH] fix systemd-logind kicked off by dbus (workaroud for root)
+
+Dbus mainline fix this by 1.11.x, did not propagate this to earlier
+version. dbus-cynara uses 1.8.18 which is quite old, Juse make a
+workaround fix for this issue.
+Two many dbus connection cause dbus think it a DOS attack, dbus kick
+off systemd-logind. systemd-logind always run as uid=0, so just ignore
+root user for this timeout checking.
+
+Signed-off-by: Lei wang <leiwan@codeaurora.org>
+---
+ bus/connection.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/bus/connection.c b/bus/connection.c
+index d2ebe82..6f3b21e 100644
+--- a/bus/connection.c
++++ b/bus/connection.c
+@@ -652,6 +652,13 @@ static dbus_bool_t
+ pending_unix_fds_timeout_cb (void *data)
+ {
+   DBusConnection *connection = data;
++  unsigned long uid;
++
++  if (dbus_connection_get_unix_user (connection, &uid) && uid == 0)
++    {
++      return TRUE;
++    }
++
+   dbus_connection_close (connection);
+   return TRUE;
+ }
+-- 
+1.9.1
+
