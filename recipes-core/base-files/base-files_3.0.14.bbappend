@@ -18,6 +18,8 @@ SRC_URI_append_apq8017 += "file://apq8017/persist.mount"
 SRC_URI_append_apq8017 += "file://apq8017/proc-bus-usb.mount"
 SRC_URI_append_apq8017 += "file://apq8017/var-volatile.mount"
 SRC_URI_append_apq8017 += "file://apq8017/dash.mount"
+SRC_URI_append_apq8009 += "file://apq8009/robot-fstab"
+SRC_URI_append_apq8009 += "file://apq8009/ro-fstab"
 
 dirs755 += "/media/cf /media/net /media/ram \
             /media/union /media/realroot /media/hdd \
@@ -33,8 +35,14 @@ do_install_append(){
     install -m 755 -o diag -g diag -d ${D}/mnt/sdcard
     if ${@base_contains('DISTRO_FEATURES','ro-rootfs','true','false',d)}; then
         # Override fstab for apq8017
-        if [ ${BASEMACHINE} == "apq8009" || ${BASEMACHINE} == "apq8053" || ${BASEMACHINE} == "mdm9607" || ${BASEMACHINE} == "sdx20" || ${BASEMACHINE} == "mdm9650" ]; then
+        if [ ${BASEMACHINE} == "apq8053" || ${BASEMACHINE} == "mdm9607" || ${BASEMACHINE} == "sdx20" || ${BASEMACHINE} == "mdm9650" ]; then
             install -m 0644 ${WORKDIR}/${BASEMACHINE}/ro-fstab ${D}${sysconfdir}/fstab
+        elif [  ${BASEMACHINE} == "apq8009" ]; then
+            if [ "${PRODUCT}" == "robot" ] || [ "${PRODUCT}" == "robot-rome" ]; then
+                install -m 0644 ${WORKDIR}/${BASEMACHINE}/robot-fstab ${D}${sysconfdir}/fstab
+            else
+                install -m 0644 ${WORKDIR}/${BASEMACHINE}/ro-fstab ${D}${sysconfdir}/fstab
+            fi
         elif [ ${BASEMACHINE} == "apq8017" ]; then
             install -m 0644 ${WORKDIR}/${BASEMACHINE}/ro-fstab ${D}${sysconfdir}/fstab
             install -d 0644 ${D}${sysconfdir}/systemd/system

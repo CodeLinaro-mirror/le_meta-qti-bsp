@@ -19,6 +19,7 @@ IMAGE_INSTALL += "start-scripts-misc-daemon"
 
 IMAGE_INSTALL += "base-files"
 IMAGE_INSTALL += "base-passwd"
+IMAGE_INSTALL += "dhcpcd"
 IMAGE_INSTALL += "native-frameworks"
 
 IMAGE_INSTALL += "glib-2.0"

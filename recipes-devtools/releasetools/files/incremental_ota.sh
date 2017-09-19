@@ -42,6 +42,9 @@ fi
 export PATH=.:${STAGING_BINDIR_NATIVE}:$PATH
 export OUT_HOST_ROOT=.
 export LD_LIBRARY_PATH=${STAGING_LIBDIR_NATIVE}
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+export LANGUAGE=en_US.UTF-8
 
 # Specify MMC or MTD type device. MTD by default
 [[ $4 = "ext4" ]] && device_type="MMC" || device_type="MTD"
@@ -62,4 +65,4 @@ fi
 
 cd target_files && zip -q ../$2 META/*filesystem_config.txt SYSTEM/build.prop && cd ..
 
-./ota_from_target_files -n -v -d $device_type -v -p . -s "${WORKSPACE}/android_compat/device/qcom/common" --no_signing -i $1 $2 update_incr_$4.zip
+python3 ./ota_from_target_files -n -v -d $device_type -v -p . -s "${WORKSPACE}/android_compat/device/qcom/common" --no_signing -i $1 $2 update_incr_$4.zip
