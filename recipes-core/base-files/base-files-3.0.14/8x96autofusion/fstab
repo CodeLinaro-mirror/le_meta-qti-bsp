@@ -13,4 +13,4 @@ PARTLABEL=dsp        /dsp                 auto       defaults              0  2
 PARTLABEL=cache      /cache               auto       defaults              0  2
 
 # uncomment this if your device has a SD/MMC/Transflash slot
-#/dev/mmcblk0p1       /media/card          auto       defaults,sync,noauto  0  0
+/dev/mmcblk1p1       /media/card          auto       defaults,x-systemd.automount  0  1
