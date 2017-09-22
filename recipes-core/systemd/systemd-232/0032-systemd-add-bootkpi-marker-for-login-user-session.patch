@@ -1,0 +1,84 @@
+From cffee340418b75732f3edecdc62e0f5be826bb41 Mon Sep 17 00:00:00 2001
+From: Lei wang <leiwan@codeaurora.org>
+Date: Fri, 23 Jun 2017 16:41:07 +0800
+Subject: [PATCH] systemd: add bootkpi marker for login/user-session
+
+Signed-off-by: Lei wang <leiwan@codeaurora.org>
+---
+ src/core/job.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 46 insertions(+)
+
+diff --git a/src/core/job.c b/src/core/job.c
+index 97304c4..e79fe1f 100644
+--- a/src/core/job.c
++++ b/src/core/job.c
+@@ -41,6 +41,36 @@
+ #include "unit.h"
+ #include "virt.h"
+ 
++#define KPI_VALUE_PATH "/sys/kernel/debug/bootkpi/kpi_values"
++
++#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
++const static char* bootkpi_unit_list[]= {
++        "systemd-logind.service",
++        "systemd-user-sessions.service"
++};
++
++static void inline write_marker(const char* name, bool start)
++{
++        int fd = -1;
++        static char markername[60];
++
++        memset(markername, 0,  sizeof(markername));
++        fd = open(KPI_VALUE_PATH, O_WRONLY);
++        if (fd > 0)
++        {
++                if (start && name)
++                        snprintf(markername, 50 ,"%s-start", name);
++                else if (!start && name)
++                        snprintf(markername, 50 ,"%s-stop", name);
++                write(fd, markername, strlen(markername));
++        } else {
++                log_error("open bootkpi_values failed");
++        }
++
++        close(fd);
++        return;
++}
++
+ Job* job_new_raw(Unit *unit) {
+         Job *j;
+ 
+@@ -546,6 +576,14 @@ static int job_perform_on_unit(Job **j) {
+                         assert_not_reached("Invalid job type");
+         }
+ 
++        if (t == JOB_START && u->type == UNIT_SERVICE) {
++                for (int i = 0; i < ARRAY_SIZE(bootkpi_unit_list); i++) {
++                        if (strneq(u->id, bootkpi_unit_list[i], strlen(u->id))) {
++                                write_marker(u->id, true);
++                        }
++                }
++        }
++
+         /* Log if the job still exists and the start/stop/reload function
+          * actually did something. */
+         *j = manager_get_job(m, id);
+@@ -801,6 +839,14 @@ static void job_emit_status_message(Unit *u, JobType t, JobResult result) {
+         if (t == JOB_START && result == JOB_DONE && !u->condition_result)
+                 return;
+ 
++        if (t == JOB_DONE && u->type == UNIT_SERVICE) {
++                for (int i = 0; i < ARRAY_SIZE(bootkpi_unit_list); i++) {
++                        if (strneq(u->id, bootkpi_unit_list[i], strlen(u->id))) {
++                                write_marker(u->id, false);
++                        }
++                }
++        }
++
+         job_log_status_message(u, t, result);
+         job_print_status_message(u, t, result);
+ }
+-- 
+1.9.1
+

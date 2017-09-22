@@ -1,0 +1,23 @@
+From 90277f4600878e8e7362efb47e2fb434e6a7a721 Mon Sep 17 00:00:00 2001
+From: Lei wang <leiwan@codeaurora.org>
+Date: Wed, 14 Jun 2017 14:58:57 +0800
+Subject: [PATCH] udev-trigger: only enable must part while leave others later
+
+Signed-off-by: Lei wang <leiwan@codeaurora.org>
+---
+ units/systemd-udev-trigger.service.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/units/systemd-udev-trigger.service.in b/units/systemd-udev-trigger.service.in
+index 1e04d11..fa5bda9 100644
+--- a/units/systemd-udev-trigger.service.in
++++ b/units/systemd-udev-trigger.service.in
+@@ -17,4 +17,4 @@ ConditionPathIsReadWrite=/sys
+ [Service]
+ Type=oneshot
+ RemainAfterExit=yes
+-ExecStart=@rootbindir@/udevadm trigger --type=subsystems --action=add ; @rootbindir@/udevadm trigger --type=devices --action=add
++ExecStart=@rootbindir@/udevadm trigger --subsystem-match=block --type=devices --action=add
+-- 
+1.9.1
+
