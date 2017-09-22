@@ -81,6 +81,7 @@ IMAGE_INSTALL += "lib32-cairo"
 
 IMAGE_INSTALL += "libpagemap"
 IMAGE_INSTALL += "procrank"
+IMAGE_INSTALL += "${@base_contains('MULTILIB_VARIANTS', 'lib32', 'lib32-qahw', 'qahw', d)}"
 
 # Below is to generate sparse ext4 system image (OE by default supports raw ext4 images)
 SELINUX_FILE_CONTEXTS = "${IMAGE_ROOTFS}/etc/selinux/mls/contexts/files/file_contexts"
