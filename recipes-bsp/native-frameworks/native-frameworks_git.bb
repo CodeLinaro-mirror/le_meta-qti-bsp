@@ -11,6 +11,7 @@ PR = "r1"
 DEPENDS += "liblog libcutils libhardware libselinux system-core glib-2.0"
 
 SRC_URI="${CAF_LE_GIT}/platform/vendor/qcom-opensource/le-framework.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=frameworks/native;subpath=native"
+SRC_URI  += "file://servicemanager.service"
 
 S = "${WORKDIR}/frameworks/native"
 
@@ -30,3 +31,14 @@ FILES_${PN}-libbinder-static = "${libdir}/libbinder.a"
 FILES_${PN}-libui-dbg    = "${libdir}/.debug/libui.*"
 FILES_${PN}-libui        = "${libdir}/libui.so.*"
 FILES_${PN}-libbui-dev    = "${libdir}/libui.so ${libdir}/libui.la ${includedir}"
+
+do_install_append() {
+       install -d ${D}${systemd_unitdir}/system/
+       install -m 0644 ${WORKDIR}/servicemanager.service -D ${D}${systemd_unitdir}/system/servicemanager.service
+       install -d ${D}${systemd_unitdir}/system/multi-user.target.wants/
+       # enable the service for multi-user.target
+       ln -sf ${systemd_unitdir}/system/servicemanager.service \
+            ${D}${systemd_unitdir}/system/multi-user.target.wants/servicemanager.service
+}
+
+FILES_${PN} += "${systemd_unitdir}/system/"
