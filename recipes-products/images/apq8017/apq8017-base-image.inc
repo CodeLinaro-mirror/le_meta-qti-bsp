@@ -41,10 +41,11 @@ IMAGE_INSTALL += "wireless-tools"
 #IMAGE_PREPROCESS_COMMAND += "echo ${MACHINE} >> ${IMAGE_ROOTFS}/target;"
 
 IMAGE_INSTALL += "ca-certificates"
-IMAGE_INSTALL += "nghttp2"
-IMAGE_INSTALL += "curl"
 
 IMAGE_INSTALL += "e2fsprogs"
+IMAGE_INSTALL += "e2fsprogs-e2fsck"
+IMAGE_INSTALL += "e2fsprogs-resize2fs"
+
 IMAGE_INSTALL += "start-scripts-userfs-reset"
 
 # Below is to generate sparse ext4 system image (OE by default supports raw ext4 images)

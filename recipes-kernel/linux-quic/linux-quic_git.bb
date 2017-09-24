@@ -206,14 +206,3 @@ do_deploy () {
         ${extra_mkbootimg_params} --output ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img
 }
 
-
-do_configure_prepend_mdm9650 () {
-		mkdir -p ${S}/drivers/net/ethernet/neutrino
-		cp -f ${WORKSPACE}/qcom-opensource/ethernet/neutrino-pcie/driver/* ${S}/drivers/net/ethernet/neutrino/
-		rm ${S}/drivers/net/ethernet/neutrino/Makefile
-		rm ${S}/drivers/net/ethernet/neutrino/Makefile.am
-		rm ${S}/drivers/net/ethernet/neutrino/Kbuild
-		mv ${S}/drivers/net/ethernet/neutrino/Makefile.builtin ${S}/drivers/net/ethernet/neutrino/Makefile
-		echo "source \"drivers/net/ethernet/neutrino/Kconfig"\" >> ${S}/drivers/net/ethernet/Kconfig
-		echo "obj-y += neutrino/" >> ${S}/drivers/net/ethernet/Makefile
-}

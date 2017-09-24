@@ -19,6 +19,7 @@ IMAGE_INSTALL += "start-scripts-misc-daemon"
 
 IMAGE_INSTALL += "base-files"
 IMAGE_INSTALL += "base-passwd"
+IMAGE_INSTALL += "dhcpcd"
 IMAGE_INSTALL += "native-frameworks"
 
 IMAGE_INSTALL += "glib-2.0"
@@ -43,6 +44,9 @@ IMAGE_INSTALL += "${@base_contains('MULTILIB_VARIANTS', 'lib32', 'lib32-gtest', 
 IMAGE_INSTALL += "${@base_contains('MULTILIB_VARIANTS', 'lib32', 'lib32-cairo', 'cairo', d)}"
 
 IMAGE_INSTALL += "libpagemap"
+
+IMAGE_INSTALL += "libuv"
+IMAGE_INSTALL += "libwebsockets"
 
 # Below is to generate sparse ext4 system image (OE by default supports raw ext4 images)
 SELINUX_FILE_CONTEXTS = "${IMAGE_ROOTFS}/etc/selinux/mls/contexts/files/file_contexts"
