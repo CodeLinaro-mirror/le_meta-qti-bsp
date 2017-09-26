@@ -11,6 +11,12 @@ SRC_URI_append += "file://70-net-setup-link.rules \
                    file://0030-plymounth-dependency-cleanup.patch \
                    file://0033-systemd-reduce-service-stop-timeout-to-10s.patch"
 
+
+python __anonymous () {
+    if bb.utils.contains('BASEMACHINE', '8x96autofusion', 'true', 'false', d) and bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d):
+        d.appendVar("SRC_URI", " file://0037-systemd-make-root-user-session-lingered-for-early.patch")
+}
+
 do_install_append () {
   install -m 0644 ${WORKDIR}/70-net-setup-link.rules ${D}${sysconfdir}/udev/rules.d/
   install -m 0644 ${WORKDIR}/60-persistent-v4l.rules ${D}${sysconfdir}/udev/rules.d/
