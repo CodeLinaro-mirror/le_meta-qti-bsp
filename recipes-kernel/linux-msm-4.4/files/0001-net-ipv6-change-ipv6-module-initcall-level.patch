@@ -1,0 +1,46 @@
+From fa5424d1f468b6362f3eea56616b920c3c42e311 Mon Sep 17 00:00:00 2001
+From: Zou Shunxiang <shunxian@codeaurora.org>
+Date: Tue, 26 Sep 2017 11:40:05 +0800
+Subject: [PATCH] net:ipv6: change ipv6 module initcall level
+
+For early ethernet feature, modify ipv6 module initcall
+level from module_init for fs_initcall to support IPv6
+during early ethernet process.
+
+Change-Id: I21c1fef88c3d212d1e1e6767251e5712c3acec21
+Signed-off-by: Zou Shunxiang <shunxian@codeaurora.org>
+---
+ net/ipv6/af_inet6.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/net/ipv6/af_inet6.c b/net/ipv6/af_inet6.c
+index 1604163..3683cb3 100644
+--- a/net/ipv6/af_inet6.c
++++ b/net/ipv6/af_inet6.c
+@@ -61,6 +61,7 @@
+ #include <net/ip6_tunnel.h>
+ #endif
+ 
++#include <soc/qcom/boot_stats.h>
+ #include <asm/uaccess.h>
+ #include <linux/mroute6.h>
+ 
+@@ -989,6 +990,7 @@ static int __init inet6_init(void)
+ 		goto sysctl_fail;
+ #endif
+ out:
++	place_marker("M - DRIVER IPv6 stack Ready");
+ 	return err;
+ 
+ #ifdef CONFIG_SYSCTL
+@@ -1054,6 +1056,6 @@ out_unregister_tcp_proto:
+ 	proto_unregister(&tcpv6_prot);
+ 	goto out;
+ }
+-module_init(inet6_init);
++fs_initcall(inet6_init);
+ 
+ MODULE_ALIAS_NETPROTO(PF_INET6);
+-- 
+1.9.1
+
