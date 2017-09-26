@@ -18,6 +18,7 @@ IMAGE_INSTALL += "ofono-tests"
 IMAGE_INSTALL += "init-mss"
 IMAGE_INSTALL += "strongswan"
 IMAGE_INSTALL += "gst-multisend"
+IMAGE_INSTALL += "reboot-daemon"
 
 IMAGE_INSTALL_remove = "packagegroup-agl-demo-platform"
 IMAGE_INSTALL += "packagegroup-agl-appfw"

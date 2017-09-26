@@ -1,22 +1,24 @@
-inherit autotools-brokensep
+inherit autotools
 
 DESCRIPTION = "Rebooter daemon"
 LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 PR = "r4"
 
-FILESPATH =+ "${WORKSPACE}:"
+SRC_DIR = "${WORKSPACE}/mdm-ss-mgr/reboot-daemon/"
+
+FILESPATH =+ "${WORKSPACE}/:"
 
 SRC_URI = "file://mdm-ss-mgr/reboot-daemon"
 SRC_URI += "file://reboot-daemon.service"
 
-S = "${WORKDIR}/reboot-daemon"
+S = "${WORKDIR}/mdm-ss-mgr/reboot-daemon"
 
 EXTRA_OEMAKE_append = " CROSS=${HOST_PREFIX}"
 FILES_${PN} += "${systemd_unitdir}/system/"
 
 do_install() {
-    install -m 0755 ${S}/reboot-daemon -D ${D}/sbin/reboot-daemon
+    install -m 0755 ${WORKDIR}/build/reboot-daemon -D ${D}/sbin/reboot-daemon
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
       install -d ${D}${systemd_unitdir}/system/
       install -m 0644 ${WORKDIR}/reboot-daemon.service -D ${D}${systemd_unitdir}/system/reboot-daemon.service
