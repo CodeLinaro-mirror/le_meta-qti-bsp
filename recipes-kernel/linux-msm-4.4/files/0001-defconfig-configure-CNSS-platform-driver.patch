@@ -1,0 +1,28 @@
+From 4fab9c155d977488cea297872b8317e8939f1ee8 Mon Sep 17 00:00:00 2001
+From: Vijaykumar Badiger <vbadig@codeaurora.org>
+Date: Mon, 2 Oct 2017 17:14:34 -0700
+Subject: [PATCH] defconfig: configure CNSS platform driver
+
+Change-Id: I1aad888deaf99308a7af6e101c9d6d4e6a0f721a
+---
+ arch/arm64/configs/msm-auto_defconfig | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64/configs/msm-auto_defconfig b/arch/arm64/configs/msm-auto_defconfig
+index 85916a5..0ac4d0e 100644
+--- a/arch/arm64/configs/msm-auto_defconfig
++++ b/arch/arm64/configs/msm-auto_defconfig
+@@ -280,8 +280,8 @@ CONFIG_ATH_CARDS=y
+ CONFIG_WIL6210=m
+ CONFIG_CLD_LL_CORE=y
+ CONFIG_BUS_AUTO_SUSPEND=y
+-CONFIG_CNSS2=y
+-CONFIG_CNSS2_DEBUG=y
++CONFIG_CNSS=y
++CONFIG_CNSS_ASYNC=y
+ CONFIG_INPUT_EVDEV=y
+ CONFIG_INPUT_KEYRESET=y
+ CONFIG_KEYBOARD_GPIO=y
+-- 
+1.9.1
+
