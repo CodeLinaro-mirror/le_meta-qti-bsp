@@ -22,7 +22,6 @@ IMAGE_INSTALL += "tinycompress"
 # AUDIO HAL
 IMAGE_INSTALL += "audiohal"
 IMAGE_INSTALL += "encoders"
-IMAGE_INSTALL += "media"
 IMAGE_INSTALL += "usbaudio"
 
 IMAGE_INSTALL += "base-files"
@@ -71,13 +70,6 @@ IMAGE_INSTALL += "bt-property"
 IMAGE_INSTALL += "fluoride"
 IMAGE_INSTALL += "libbt-vendor"
 IMAGE_INSTALL += "display-hal-linux"
-
-IMAGE_INSTALL += "gstreamer1.0"
-IMAGE_INSTALL += "gstreamer1.0-plugins-base"
-IMAGE_INSTALL += "gstreamer1.0-plugins-good"
-IMAGE_INSTALL += "gstreamer1.0-rtsp-server"
-IMAGE_INSTALL += "gstreamer1.0-plugins-bad"
-#IMAGE_PREPROCESS_COMMAND += "echo ${MACHINE} >> ${IMAGE_ROOTFS}/target;"
 
 # Don't install GDB and related pacakges in production builds.
 DEPENDS += "${@base_conditional('USER_BUILD', '1', '', 'gdb-cross-arm', d)}"
