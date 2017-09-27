@@ -16,6 +16,7 @@ python __anonymous () {
     if bb.utils.contains('DISTRO_FEATURES', 'early_init', True, False, d) or bb.utils.contains('DISTRO_FEATURES', 'early-ethernet', True, False, d):
         d.appendVar("SRC_URI", " file://0034-systemd-make-early-init-socket-visible-for-systemd.patch")
         d.appendVar("SRC_URI", " file://0035-systemd-add-handover-support-for-early-service.patch")
+        d.appendVar("SRC_URI", " file://0037-systemd-make-root-user-session-lingered-for-early.patch")
 }
 
 do_install_append () {
