@@ -1,4 +1,4 @@
-inherit autotools pkgconfig
+inherit autotools pkgconfig qcommon
 
 DESCRIPTION = "Bluetooth OBEX"
 LICENSE = "BSD"
@@ -11,8 +11,9 @@ DEPENDS += "glib-2.0 btvendorhal"
 CFLAGS_append = " -DUSE_ANDROID_LOGGING "
 LDFLAGS_append = " -llog "
 
-FILESPATH =+ "${WORKSPACE}:"
-SRC_URI = "file://qcom-opensource/bt/obex_profiles/"
+SRC_URI = " \
+    ${CAF_LE_GIT}/platform/qcom-opensource/bt.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=qcom-opensource/bt/obex_profiles;subpath=obex_profiles \
+"
 
 S = "${WORKDIR}/qcom-opensource/bt/obex_profiles/"
 
