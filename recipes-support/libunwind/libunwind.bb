@@ -1,4 +1,4 @@
-inherit autotools-brokensep pkgconfig
+inherit qcommon 
 
 DESCRIPTION = "Libunwind"
 LICENSE = "MIT"
@@ -6,8 +6,6 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/MIT;md5=0835ad
 DEPENDS = "libatomic-ops"
 
 PR = "r0"
-FILESPATH =+ "${WORKSPACE}:"
-SRC_URI = "file://external/libunwind/"
+SRC_URI = "${CAF_LA_GIT}/platform/external/libunwind.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=external/libunwind"
+
 S = "${WORKDIR}/external/libunwind"
-
-
