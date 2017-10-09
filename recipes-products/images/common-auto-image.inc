@@ -44,6 +44,9 @@ IMAGE_INSTALL += "lvm2"
 IMAGE_INSTALL += "wqy-microhei"
 IMAGE_INSTALL += "ltp"
 IMAGE_INSTALL += "applypatch-recovery"
+IMAGE_INSTALL += "iproute2"
+IMAGE_INSTALL += "iproute2-tc"
+IMAGE_INSTALL += "iproute2-ss"
 
 #RESIZE
 IMAGE_INSTALL += "resize-service"
