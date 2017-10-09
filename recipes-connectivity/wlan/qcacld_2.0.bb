@@ -59,6 +59,11 @@ do_install () {
     #Change Default Power Save Offload configuration
     sed -i -e 's/^gEnablePowerSaveOffload=2/gEnablePowerSaveOffload=1/g' ${S}/firmware_bin/WCNSS_qcom_cfg.ini
 
+    #Change default parameter to improve 11AC KPI TPUT
+    sed -i -e 's/^WmmIsEnabled=0/WmmIsEnabled=1/g' ${S}/firmware_bin/WCNSS_qcom_cfg.ini
+    sed -i -e 's/^rxhandle=2/rxhandle=1/g' ${S}/firmware_bin/WCNSS_qcom_cfg.ini
+    sed -i -e '/^gVhtMpduLen=2/a\gMaxAmsduNum=3' ${S}/firmware_bin/WCNSS_qcom_cfg.ini
+
     install -d ${D}/lib/firmware/wlan/qca_cld
     install -D -m 0644 ${S}/firmware_bin/WCNSS_qcom_cfg.ini ${D}/lib/firmware/wlan/qca_cld/
     install -D -m 0644 ${S}/firmware_bin/WCNSS_qcom_cfg.ini ${D}/lib/firmware/wlan/qcom_cfg.ini
