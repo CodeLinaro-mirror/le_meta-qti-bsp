@@ -90,7 +90,7 @@ IMAGE_INSTALL += "security-manager-policy"
 IMAGE_INSTALL += "agl-users"
 
 # Hypervisor
-IMAGE_INSTALL += "libuhab"
+#IMAGE_INSTALL += "libuhab"
 #IMAGE_INSTALL += "uhabtest"
 
 IMAGE_ROOTFS_SIZE = "2097152"
