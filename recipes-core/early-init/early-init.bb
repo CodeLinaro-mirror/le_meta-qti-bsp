@@ -18,6 +18,8 @@ do_compile() {
 do_install() {
     # Add early_init script for early_init feature
     if ${@bb.utils.contains('DISTRO_FEATURES', 'early_init', 'true', 'false', d)} || ${@bb.utils.contains('DISTRO_FEATURES', 'early-ethernet', 'true', 'false', d)}; then
+        install -d ${D}/early
+        install -d ${D}/debug
         install -d ${D}${sbindir}
         install -m 0755 ${S}/early_init  ${D}${sbindir}/early_init
         install -d ${D}${sysconfdir}
@@ -30,3 +32,5 @@ do_install() {
 }
 
 FILES_${PN} += " ${sbindir}/early_init"
+FILES_${PN} += " /early"
+FILES_${PN} += " /debug"

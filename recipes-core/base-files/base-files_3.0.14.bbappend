@@ -19,6 +19,12 @@ dirs755_append_apq8009 +="/persist"
 do_install_append(){
   export REGEXP="^(8x96autogvmquin|8x96autogvmquintcu|8x96autogvmred)$"
   if [ "${MACHINEGROUP}" == "auto" ] || [[ "${BASEMACHINE}" =~ $REGEXP ]]; then
+    # Prepare mountpoint in case rootfs is readonly
+    install -d ${D}/firmware
+    install -d ${D}/bluetooth
+    install -d ${D}/dsp
+    install -d ${D}/persist
+    install -d ${D}/cache
     install -m 755 -o diag -g diag -d ${D}/media/card
     ln -s /media/card ${D}/sdcard
   else
