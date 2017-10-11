@@ -63,6 +63,10 @@ PREFERRED_VERSION_gstreamer1.0-plugins-ugly ?= "1.8.%"
 PREFERRED_VERSION_gstreamer1.0-libav        ?= "1.8.%"
 PREFERRED_VERSION_gstreamer1.0-omx          ?= "1.2.%"
 
+LICENSE_FLAGS_WHITELIST = "commercial_gstreamer1.0-libav commercial_gstreamer1.0-omx"
+LICENSE_FLAGS_WHITELIST += "commercial_gstreamer1.0-plugins-ugly commercial_opencore-amr"
+LICENSE_FLAGS_WHITELIST += "commercial_libomxil"
+
 # Smack
 OVERRIDES .= ":smack"
 DISTRO_FEATURES_append = " smack"
