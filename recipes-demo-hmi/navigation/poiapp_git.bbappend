@@ -1,0 +1,1 @@
+REMOVE_LIBTOOL_LA = "0"
