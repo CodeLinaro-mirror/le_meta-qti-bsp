@@ -1,4 +1,4 @@
-From 013af68116f866612be1ff51058b5a7619d40374 Mon Sep 17 00:00:00 2001
+From f81b4e4b698146c8f48d61bffb40f847d411467e Mon Sep 17 00:00:00 2001
 From: Daocai <daocai@codeaurora.org>
 Date: Mon, 18 Sep 2017 14:54:42 +0800
 Subject: [PATCH] kernel: display support early init
@@ -16,12 +16,13 @@ Signed-off-by: Lei wang <leiwan@codeaurora.org>
  drivers/gpu/drm/msm/msm_atomic.c              |  7 +++++++
  drivers/gpu/drm/msm/msm_drv.c                 |  2 +-
  drivers/gpu/drm/msm/msm_smmu.c                |  1 +
+ drivers/gpu/drm/msm/sde/sde_kms.c             |  2 +-
  drivers/gpu/drm/msm/sde/sde_plane.c           |  6 +++---
  drivers/gpu/drm/msm/sde/sde_wb.c              |  2 +-
  drivers/regulator/fan53555.c                  | 17 ++++++++++++++++-
  drivers/soc/qcom/subsys-pil-tz.c              |  2 +-
  drivers/video/fbdev/msm/msm_dba/adv7533.c     |  2 +-
- 14 files changed, 37 insertions(+), 28 deletions(-)
+ 15 files changed, 38 insertions(+), 29 deletions(-)
 
 diff --git a/arch/arm/boot/dts/qcom/dsi-adv7533-1080p.dtsi b/arch/arm/boot/dts/qcom/dsi-adv7533-1080p.dtsi
 index 7994285..6cf9ed1 100644
@@ -105,10 +106,10 @@ index f2412da..0ad2d1e 100644
 +fs_initcall(dsi_display_register);
  module_exit(dsi_display_unregister);
 diff --git a/drivers/gpu/drm/msm/hdmi-staging/sde_hdmi.c b/drivers/gpu/drm/msm/hdmi-staging/sde_hdmi.c
-index c98f451..8e3f7bf 100644
+index fa111d5..f2a57e6 100644
 --- a/drivers/gpu/drm/msm/hdmi-staging/sde_hdmi.c
 +++ b/drivers/gpu/drm/msm/hdmi-staging/sde_hdmi.c
-@@ -3181,5 +3181,5 @@ static void __exit sde_hdmi_unregister(void)
+@@ -3183,5 +3183,5 @@ static void __exit sde_hdmi_unregister(void)
  	platform_driver_unregister(&sde_hdmi_driver);
  }
  
@@ -148,10 +149,10 @@ index 0c119ec..a659367 100644
  
  	commit_destroy(commit);
 diff --git a/drivers/gpu/drm/msm/msm_drv.c b/drivers/gpu/drm/msm/msm_drv.c
-index 83b34a0..7ad0b77 100644
+index c617533..f2adf26 100644
 --- a/drivers/gpu/drm/msm/msm_drv.c
 +++ b/drivers/gpu/drm/msm/msm_drv.c
-@@ -2248,7 +2248,7 @@ static void __exit msm_drm_unregister(void)
+@@ -2255,7 +2255,7 @@ static void __exit msm_drm_unregister(void)
  	msm_smmu_driver_cleanup();
  }
  
@@ -172,6 +173,19 @@ index 4247243..d9ebc8d 100644
  
  void __exit msm_smmu_driver_cleanup(void)
  {
+diff --git a/drivers/gpu/drm/msm/sde/sde_kms.c b/drivers/gpu/drm/msm/sde/sde_kms.c
+index 34a32d7..bf8c798 100644
+--- a/drivers/gpu/drm/msm/sde/sde_kms.c
++++ b/drivers/gpu/drm/msm/sde/sde_kms.c
+@@ -69,7 +69,7 @@
+  *
+  *	This is disabled by default.
+  */
+-static bool sdecustom = true;
++static bool sdecustom;
+ module_param(sdecustom, bool, 0400);
+ MODULE_PARM_DESC(sdecustom, "Enable customizations for sde clients");
+ 
 diff --git a/drivers/gpu/drm/msm/sde/sde_plane.c b/drivers/gpu/drm/msm/sde/sde_plane.c
 index 6e2ccfa..7596c0f 100644
 --- a/drivers/gpu/drm/msm/sde/sde_plane.c
