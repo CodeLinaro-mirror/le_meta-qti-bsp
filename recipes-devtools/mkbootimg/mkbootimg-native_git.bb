@@ -1,30 +1,33 @@
-inherit native
+inherit native qcommon
 
 DESCRIPTION = "Boot image creation tool from Android"
+HOMEPAGE = "http://developer.android.com/"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
-HOMEPAGE = "http://android.git.kernel.org/?p=platform/system/core.git"
-PROVIDES = "mkbootimg-native"
 
-DEPENDS = "libmincrypt-native"
+DEPENDS += "libmincrypt-native"
 
 PR = "r6"
 
-MY_PN = "mkbootimg"
+SRC_URI = " \
+    ${CAF_LA_GIT}/platform/system/core.git;protocol=git;nobranch=1;tag=${CAF_TAG};subpath=${BPN};destsuffix=system/core/${BPN} \
+"
+SRC_URI  += "file://makefile"
 
-# Handle do_fetch ourselves...  The automated tools don't work nicely with this...
-do_fetch () {
-	install -d ${S}
-	cp -rf ${WORKSPACE}/system/core/${MY_PN}/* ${S}
-	cp -f ${THISDIR}/files/makefile ${S}
+S = "${WORKDIR}/system/core/${BPN}"
+
+do_patch_append () {
+    bb.build.exec_func('do_copy_make', d)
 }
 
-EXTRA_OEMAKE = "INCLUDES='-Imincrypt' LIBS='${libdir}/libmincrypt.a'"
-
-do_install() {
-	install -d ${D}${bindir}
-	install ${MY_PN} ${D}${bindir}
+do_copy_make () {
+    cp -f ${WORKDIR}/makefile ${S}
 }
 
-NATIVE_INSTALL_WORKS = "1"
+EXTRA_OEMAKE += "INCLUDES='-Imincrypt' LIBS='${libdir}/libmincrypt.a'"
+
+do_install () {
+       install -d ${D}${bindir}
+       install ${BPN} ${D}${bindir}
+}

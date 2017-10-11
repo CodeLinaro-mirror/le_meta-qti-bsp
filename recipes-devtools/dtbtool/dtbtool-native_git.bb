@@ -1,31 +1,29 @@
-inherit native
-
-PR = "r4"
-
-MY_PN = "dtbtool"
+inherit native qcommon
 
 DESCRIPTION = "Boot image creation tool from Android"
+HOMEPAGE = "http://developer.android.com/"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
-PROVIDES = "dtbtool-native"
 
-# Handle do_fetch ourselves...  The automated tools don't work nicely with this...
-do_fetch () {
-	install -d ${S}
-	cp -rf ${WORKSPACE}/android_compat/device/qcom/common/${MY_PN}/* ${S}
-	cp -f ${THISDIR}/files/makefile ${S}
+PR = "r4"
+
+SRC_URI = " \
+    ${CAF_LA_GIT}/device/qcom/common.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=android_compat/device/qcom/common/${BPN};subpath=${BPN} \
+"
+SRC_URI  += "file://makefile"
+
+S = "${WORKDIR}/android_compat/device/qcom/common/${BPN}"
+
+do_patch_append () {
+    bb.build.exec_func('do_copy_make', d)
 }
 
-do_fetch_msm8974 () {
-        install -d ${S}
-        cp -rf ${WORKSPACE}/system/core/${MY_PN}/* ${S}
-        cp -f ${THISDIR}/files/makefile ${S}
+do_copy_make () {
+    cp -f ${WORKDIR}/makefile ${S}
 }
 
 do_install() {
-	install -d ${D}${bindir}
-	install ${MY_PN} ${D}${bindir}
+    install -d ${D}${bindir}
+    install ${BPN} ${D}${bindir}
 }
-
-NATIVE_INSTALL_WORKS = "1"

@@ -1,4 +1,4 @@
-inherit autotools-brokensep pkgconfig
+inherit autotools-brokensep pkgconfig qcommon
 
 DESCRIPTION = "Bluetooth Fluoride Stack"
 HOMEPAGE = "http://codeaurora.org/"
@@ -9,8 +9,10 @@ ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 
 DEPENDS = "common zlib btvendorhal libbt-vendor"
 
-FILESPATH =+ "${WORKSPACE}:"
-SRC_URI = "file://system/bt/"
+SRC_URI=" \
+          ${CAF_LA_GIT}/platform/system/bt.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=system/bt \
+          ${CAF_LA_GIT}/platform/vendor/qcom-opensource/bluetooth.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=hal/include;subpath=hal/include \
+        "
 
 S = "${WORKDIR}/system/bt/"
 
@@ -25,7 +27,7 @@ BASEPRODUCT = "${@d.getVar('PRODUCT', False)}"
 
 EXTRA_OECONF = " \
                 --with-zlib \
-                --with-common-includes="${WORKSPACE}/vendor/qcom/opensource/bluetooth/hal/include/" \
+                --with-common-includes="${WORKDIR}/hal/include/" \
                 --with-lib-path=${STAGING_LIBDIR} \
                 --enable-target=${BASEMACHINE} \
                 --enable-rome=${BASEPRODUCT} \

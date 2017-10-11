@@ -1,4 +1,4 @@
-inherit autotools pkgconfig
+inherit autotools pkgconfig qcommon
 
 DESCRIPTION = "Bluetooth application layer"
 LICENSE = "Apache-2.0"
@@ -6,9 +6,10 @@ HOMEPAGE = "https://www.codeaurora.org/"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 
-FILESPATH =+ "${WORKSPACE}:"
-SRC_URI = "file://qcom-opensource/bt/bt-app/"
-
+SRC_URI = " \
+    ${CAF_LE_GIT}/platform/qcom-opensource/bt.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=qcom-opensource/bt/bt-app;subpath=bt-app \
+    ${CAF_LA_GIT}/platform/vendor/qcom-opensource/bluetooth.git;protocol=git;nobranch=1;tag=${CAF_TAG};subpath=hal/include;destsuffix=vendor/qcom/opensource/bluetooth/hal/include \
+"
 S = "${WORKDIR}/qcom-opensource/bt/bt-app/"
 
 def get_depends():
@@ -24,7 +25,7 @@ CFLAGS_append = " -DUSE_ANDROID_LOGGING "
 LDFLAGS_append = " -llog "
 
 EXTRA_OECONF = " \
-                --with-common-includes="${WORKSPACE}/vendor/qcom/opensource/bluetooth/hal/include/" \
+                --with-common-includes="${WORKDIR}/vendor/qcom/opensource/bluetooth/hal/include" \
                 --with-glib \
                 --with-lib-path=${STAGING_LIBDIR} \
                 --with-btobex \

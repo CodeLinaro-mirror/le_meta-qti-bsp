@@ -1,4 +1,4 @@
-inherit native autotools pkgconfig
+inherit native autotools pkgconfig qcommon
 
 DESCRIPTION = "Build Android libsprase"
 HOMEPAGE = "http://developer.android.com/"
@@ -8,7 +8,8 @@ ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 
 PR = "r1"
 
-FILESPATH =+ "${WORKSPACE}/system/core/:"
-SRC_URI   = "file://libsparse"
+SRC_URI = " \
+    ${CAF_LA_GIT}/platform/system/core.git;protocol=git;nobranch=1;tag=${CAF_TAG};subpath=${BPN};destsuffix=system/core/${BPN} \
+"
 
-S = "${WORKDIR}/libsparse"
+S = "${WORKDIR}/system/core/${BPN}"

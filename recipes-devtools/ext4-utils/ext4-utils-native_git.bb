@@ -1,4 +1,4 @@
-inherit native autotools pkgconfig
+inherit native autotools pkgconfig qcommon
 
 DESCRIPTION = "EXT4 UTILS"
 HOMEPAGE = "http://developer.android.com/"
@@ -10,11 +10,13 @@ PR = "r1"
 
 DEPENDS = "libselinux-native libsparse-native libcutils-native libpcre-native"
 
-FILESPATH =+ "${WORKSPACE}/system/extras/:"
-SRC_URI = "file://ext4_utils"
+SRC_URI = " \
+    ${CAF_LA_GIT}/platform/system/extras.git;protocol=git;nobranch=1;tag=${CAF_TAG};subpath=ext4_utils;destsuffix=extras/ext4_utils \
+"
 
-S = "${WORKDIR}/ext4_utils"
+S = "${WORKDIR}/system/extras/ext4_utils"
 
+#EXTRA_OECONF = " --with-core-includes=${STAGING_INCDIR_NATIVE}"
 EXTRA_OECONF = "--with-core-includes=${WORKSPACE}/system/core/include"
 
-CPPFLAGS += "-I${STAGING_INCDIR}/libselinux"
+CPPFLAS += "-I${STAGING_INCDIR}/libselinux"
