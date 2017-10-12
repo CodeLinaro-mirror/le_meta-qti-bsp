@@ -116,15 +116,6 @@ pkg_postinst_${PN} () {
             systemctl $OPTS mask weston.service
         fi
     fi
-    if ${@bb.utils.contains('DISTRO_FEATURES', 'early_init', 'true', 'false', d)} || ${@bb.utils.contains('DISTRO_FEATURES', 'early-ethernet', 'true', 'false', d)}; then
-        # Disable normal weston.service
-        if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
-            if [ -n "$D" ]; then
-                OPTS="--root=$D"
-            fi
-            systemctl $OPTS mask weston.service
-        fi
-    fi
 }
 
 FILES_${PN} += "${includedir}/sdm_strategy_plugin/*"
