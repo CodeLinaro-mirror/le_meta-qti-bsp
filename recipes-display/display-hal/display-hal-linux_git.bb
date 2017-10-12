@@ -25,11 +25,11 @@ LDFLAGS += "-llog -lhardware -lutils -lcutils"
 CPPFLAGS += "-DTARGET_HEADLESS"
 CPPFLAGS += "-DVENUS_COLOR_FORMAT"
 CPPFLAGS += "-DPAGE_SIZE=4096"
-CPPFLAGS += "-I${WORKDIR}/display/display-hal/libqdutils"
-CPPFLAGS += "-I${WORKDIR}/display/display-hal/libqservice"
-CPPFLAGS += "-I${WORKDIR}/display/display-hal/sdm/include"
-CPPFLAGS += "-I${WORKDIR}/display/display-hal/include"
-CPPFLAGS += "-I${WORKDIR}/display/display-hal/libgralloc"
+CXXFLAGS += "-I${S}/libqdutils"
+CXXFLAGS += "-I${S}/libqservice"
+CXXFLAGS += "-I${S}/sdm/include"
+CXXFLAGS += "-I${S}/include"
+CXXFLAGS += "-I${S}/libgralloc"
 
 do_install_append () {
     # libhardware expects to find /usr/lib/hw/gralloc.*.so
