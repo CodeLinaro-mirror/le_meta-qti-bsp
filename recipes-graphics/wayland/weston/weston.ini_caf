@@ -1,10 +1,8 @@
 [core]
-shell=ivi-shell.so
+shell=desktop-shell.so
 idle-time=99999999
 
-[ivi-shell]
-ivi-module=ivi-controller.so,wl-shell-emulator.so
-
-[output]
-name=DSI-1
-transform=270
+[shell]
+locking=true
+# Uncomment below to hide panel
+#panel-location=none
