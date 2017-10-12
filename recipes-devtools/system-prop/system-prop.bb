@@ -1,11 +1,14 @@
-inherit autotools-brokensep
+inherit qcommon
 
 PR = "r0"
 
-FILESPATH =+ "${WORKSPACE}/android_compat/device/qcom/:"
-SRC_URI   = "file://${SOC_FAMILY}"
+SRC_URI = " \
+    ${CAF_LA_GIT}/device/qcom/common.git;protocol=git;tag=${CAF_TAG};nobranch=1;destsuffix=android_compat/device/qcom/common \
+    ${CAF_LA_GIT}/platform/vendor/qcom/ferrum.git;protocol=git;tag=${CAF_TAG};nobranch=1;destsuffix=android_compat/device/qcom/msm8909 \
+"
 SRC_URI  += "file://persist-prop.sh"
 
+S="${WORKDIR}/android_compat/device/qcom/${SOC_FAMILY}"
 DESCRIPTION = "Script to populate system properties"
 
 LICENSE = "BSD"
@@ -14,7 +17,7 @@ ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 
 do_compile() {
     # Remove empty lines and lines starting with '#'
-    sed -e 's/#.*$//' -e '/^$/d' ${WORKDIR}/${SOC_FAMILY}/system.prop >> ${S}/build.prop
+    sed -e 's/#.*$//' -e '/^$/d' ${WORKDIR}/android_compat/device/qcom/${SOC_FAMILY}/system.prop >> ${S}/build.prop
 }
 
 inherit update-rc.d

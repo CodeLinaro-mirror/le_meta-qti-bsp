@@ -1,4 +1,4 @@
-inherit autotools-brokensep module qperf
+inherit autotools-brokensep module qperf qcommon
 
 DESCRIPTION = "Qualcomm Atheros WLAN CLD high latency driver"
 LICENSE = "ISC"
@@ -33,8 +33,8 @@ PR = "r0"
 #This DEPENDS is to serialize kernel module builds
 DEPENDS = "rtsp-alg"
 
-FILESPATH =+ "${WORKSPACE}:"
-SRC_URI = "file://wlan/qcacld-2.0/"
+
+SRC_URI="${CAF_LA_GIT}/platform/vendor/qcom-opensource/wlan/qcacld-2.0.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=wlan/qcacld-2.0"
 
 S = "${WORKDIR}/wlan/qcacld-2.0/"
 

@@ -1,4 +1,4 @@
-inherit autotools-brokensep module update-rc.d qperf
+inherit autotools-brokensep module update-rc.d qperf qcommon
 
 DESCRIPTION = "Qualcomm Atheros Gigabit Ethernet Driver"
 LICENSE = "ISC"
@@ -9,9 +9,9 @@ DEPENDS = "virtual/kernel"
 do_unpack[deptask] = "do_populate_sysroot"
 PR = "r4"
 
-FILESPATH =+ "${WORKSPACE}:"
-SRC_URI = "file://external/compat-wireless/drivers/net/ethernet/atheros/alx/ \
-           file://start_alx_le"
+SRC_URI = "${CAF_LA_GIT}/platform/external/compat-wireless.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=external/compat-wireless/drivers/net/ethernet/atheros/alx;subpath=drivers/net/ethernet/atheros/alx"
+SRC_URI += "file://start_alx_le"
+
 S = "${WORKDIR}/external/compat-wireless/drivers/net/ethernet/atheros/alx/"
 
 FILES_${PN}="/etc/init.d/start_alx_le"

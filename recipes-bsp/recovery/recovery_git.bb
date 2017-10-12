@@ -1,4 +1,4 @@
-inherit autotools-brokensep pkgconfig update-rc.d
+inherit update-rc.d qcommon
 PR = "r7"
 
 DESCRIPTION = "Recovery bootloader"
@@ -9,9 +9,9 @@ HOMEPAGE = "https://www.codeaurora.org/gitweb/quic/la?p=platform/bootable/recove
 DEPENDS = "libmincrypt-native system-core oem-recovery"
 RDEPENDS_${PN} = "zlib bzip2"
 
-FILESPATH =+ "${WORKSPACE}:"
-SRC_URI = "file://bootable/recovery/"
-SRC_URI += "file://poky/meta-qti-bsp/recipes-bsp/recovery/files/recovery.service"
+SRC_URI="${CAF_LA_GIT}/platform/bootable/recovery.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=bootable/recovery"
+SRC_URI += "file://recovery.service"
+SRC_URI += "file://fstab"
 
 S = "${WORKDIR}/bootable/${PN}/"
 
@@ -39,10 +39,10 @@ do_install_append() {
         install -m 0755 ${S}/start_recovery -D ${D}${sysconfdir}/init.d/recovery
 
         if [ "${SYSTEMD_SUPPORT}" == "systemd" ]; then
-              install -m  0755 ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/recovery/files/fstab -D ${D}${sysconfdir}/fstab
+              install -m  0755 ${WORKDIR}/fstab -D ${D}${sysconfdir}/fstab
               install -m 0755 ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/base-files-recovery/fstab -D ${D}/res/recovery_volume_config
               install -d ${D}${systemd_unitdir}/system/
-              install -m 0644 ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/recovery/files/recovery.service -D ${D}${systemd_unitdir}/system/recovery.service
+              install -m 0644 ${WORKDIR}/recovery.service -D ${D}${systemd_unitdir}/system/recovery.service
               install -d ${D}${systemd_unitdir}/system/multi-user.target.wants/
               # enable the service for multi-user.target
               ln -sf ${systemd_unitdir}/system/recovery.service \

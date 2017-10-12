@@ -8,6 +8,7 @@ PR = "r1"
 
 SRC_URI = " \
     ${CAF_LA_GIT}/platform/vendor/qcom-opensource/wlan/prima.git;protocol=git;nobranch=1;tag=${CAF_TAG};subpath=firmware_bin;destsuffix=qcom-opensource/wlan/firmware_bin \
+    ${CAF_LA_GIT}/platform/vendor/qcom/ferrum.git;protocol=git;tag=${CAF_TAG};nobranch=1;destsuffix=android_compat/device/qcom/msm8909 \
 "
 SRC_URI += "file://set_wcnss_mode"
 SRC_URI += "file://wcnss_wlan.service"
@@ -29,7 +30,7 @@ do_install() {
 	fi
 
     mkdir -p ${D}/lib/firmware/wlan/prima
-    cp -pP ${WORKSPACE}/android_compat/device/qcom/${SOC_FAMILY}/WCNSS_qcom_cfg.ini ${D}/lib/firmware/wlan/prima
+    cp -pP ${WORKDIR}/android_compat/device/qcom/${SOC_FAMILY}/WCNSS_qcom_cfg.ini ${D}/lib/firmware/wlan/prima
 }
 do_install_append() {
    install -d ${D}/lib/firmware/wlan/prima

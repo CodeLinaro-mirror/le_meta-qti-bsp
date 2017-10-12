@@ -1,4 +1,4 @@
-inherit autotools-brokensep qcommon
+inherit qcommon
 
 DESCRIPTION = "hardware btvendorhal headers"
 HOMEPAGE = "http://codeaurora.org/"
