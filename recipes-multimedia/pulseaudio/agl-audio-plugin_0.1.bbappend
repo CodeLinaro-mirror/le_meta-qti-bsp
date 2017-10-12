@@ -6,4 +6,3 @@ FILESPATH =+ "${WORKSPACE}:"
 SRC_URI = "file://audio/agl-audio-plugin"
 S = "${WORKDIR}/audio/agl-audio-plugin/"
 
-PULSE_PV="8.0"
