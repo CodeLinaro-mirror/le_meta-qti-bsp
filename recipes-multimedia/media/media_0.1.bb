@@ -36,6 +36,12 @@ EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm8974', ' --enable-
 EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96quinhyp', ' --enable-target-hypervisor=yes', '', d)} "
 EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96redhyp', ' --enable-target-hypervisor=yes', '', d)} "
 
+python __anonymous () {
+  # add early_init specified patch
+  if bb.utils.contains('DISTRO_FEATURES', 'early-ethernet', True, False, d):
+      d.appendVar("SRC_URI", " file://0001-disable-port-setting-change-for-early-image.patch")
+}
+
 CPPFLAGS += "-I${STAGING_INCDIR} \
              -I${STAGING_INCDIR}/drm \
              -I${STAGING_INCDIR}/EGL \
