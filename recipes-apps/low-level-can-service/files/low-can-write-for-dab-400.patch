@@ -1,0 +1,86 @@
+diff --git a/low-can-binding/binding/application-generated.cpp b/low-can-binding/binding/application-generated.cpp
+index 876b95b..acc6cc9 100644
+--- a/low-can-binding/binding/application-generated.cpp
++++ b/low-can-binding/binding/application-generated.cpp
+@@ -21,7 +21,7 @@ application_t::application_t()
+ 							false,
+ 							{
+ 							},
+-							false,
++							true,
+ 							nullptr,
+ 							nullptr,
+ 							false
+@@ -39,7 +39,7 @@ application_t::application_t()
+ 							false,
+ 							{
+ 							},
+-							false,
++							true,
+ 							nullptr,
+ 							nullptr,
+ 							false
+@@ -57,7 +57,7 @@ application_t::application_t()
+ 							false,
+ 							{
+ 							},
+-							false,
++							true,
+ 							nullptr,
+ 							nullptr,
+ 							false
+@@ -75,7 +75,7 @@ application_t::application_t()
+ 							false,
+ 							{
+ 							},
+-							false,
++							true,
+ 							nullptr,
+ 							nullptr,
+ 							false
+diff --git a/low-can-binding/binding/low-can-cb.cpp b/low-can-binding/binding/low-can-cb.cpp
+index a190b2a..166e1e6 100644
+--- a/low-can-binding/binding/low-can-cb.cpp
++++ b/low-can-binding/binding/low-can-cb.cpp
+@@ -431,7 +431,11 @@ static int write_signal(const std::string& name, uint64_t value)
+ 			{
+ 				cf = encoder_t::build_frame(sig, value);
+ 				const std::string bus_name = sig->get_message()->get_bus_name();
+-				rc = send_frame(bus_name, cf);
++				const std::string found_device = application_t::instance().get_can_bus_manager().get_can_device_name(bus_name);
++				if( ! found_device.empty())
++				{
++					rc = send_frame(found_device, cf);
++				}
+ 			}
+ 			else
+ 				{AFB_NOTICE("%s isn't writable. Message not sent.", sig->get_name().c_str());}
+diff --git a/low-can-binding/can/can-encoder.cpp b/low-can-binding/can/can-encoder.cpp
+index 9ba8531..c397974 100644
+--- a/low-can-binding/can/can-encoder.cpp
++++ b/low-can-binding/can/can-encoder.cpp
+@@ -37,13 +37,19 @@ const can_frame encoder_t::build_frame(const std::shared_ptr<can_signal_t>& sign
+ 
+ 	cf.can_id = signal->get_message()->get_id();
+ 	cf.can_dlc = CAN_MAX_DLEN;
+-	bitfield_encode_float((float)value,
+-						signal->get_bit_position(),
+-						signal->get_bit_size(),
+-						signal->get_factor(),
+-						signal->get_offset(),
++
++	signal->set_last_value((float)value);
++
++	for(const auto& sig: signal->get_message()->get_can_signals())
++	{
++		bitfield_encode_float(sig->get_last_value(),
++						sig->get_bit_position(),
++						sig->get_bit_size(),
++						sig->get_factor(),
++						sig->get_offset(),
+ 						cf.data,
+ 						CAN_MAX_DLEN);
++	}
+ 
+ 	return cf;
+ }
