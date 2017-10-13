@@ -1,0 +1,22 @@
+diff --git a/low-can-binding/binding/low-can-hat.cpp b/low-can-binding/binding/low-can-hat.cpp
+index ae16f5d..dd795cf 100644
+--- a/low-can-binding/binding/low-can-hat.cpp
++++ b/low-can-binding/binding/low-can-hat.cpp
+@@ -32,7 +32,7 @@ extern "C"
+ {
+ 	static int initv2();
+ 
+-	static constexpr struct afb_auth loa_afb_auth(const unsigned loa)
++	static /*constexpr*/ struct afb_auth loa_afb_auth(const unsigned loa)
+ 	{
+ 		struct afb_auth a = {};
+ 		a.type = afb_auth_LOA;
+@@ -40,7 +40,7 @@ extern "C"
+ 		return a;
+ 	}
+ 
+-	static constexpr struct afb_auth perm_afb_auth(const char* permission)
++	static /*constexpr*/ struct afb_auth perm_afb_auth(const char* permission)
+ 	{
+ 		struct afb_auth a = {};
+ 		a.type = afb_auth_Permission;
