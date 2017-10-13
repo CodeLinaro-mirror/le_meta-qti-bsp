@@ -1,4 +1,4 @@
-inherit autotools-brokensep pkgconfig qcommon
+inherit qcommon
 
 DESCRIPTION = "GPS Loc Stub"
 PR = "r1"

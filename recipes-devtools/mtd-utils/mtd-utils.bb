@@ -1,3 +1,5 @@
+inherit qcommon
+
 DESCRIPTION = "Tools for managing memory technology devices."
 SECTION = "base"
 DEPENDS = "zlib lzo e2fsprogs util-linux"
@@ -5,10 +7,9 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=0636e73ff0215e8d672dc4c32c317bb3 \
                     file://include/common.h;beginline=1;endline=17;md5=ba05b07912a44ea2bf81ce409380049c"
 
-FILESPATH =+ "${WORKSPACE}/filesystems:"
-SRC_URI = "file://mtd-utils"
+SRC_URI="${CAF_FS_GIT}/fs/external/mtd-utils.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=filesystems/mtd-utils"
 
-S = "${WORKDIR}/mtd-utils"
+S = "${WORKDIR}/filesystems/mtd-utils"
 
 PR = "r1"
 
@@ -36,7 +37,7 @@ checkfs_tests = " \
 	makefiles \
 	"
 
-MTD_TEST_BIN_PATH = "${WORKSPACE}/filesystems/bin/target/mtd-utils"
+MTD_TEST_BIN_PATH = "${WORKDIR}/filesystems/bin/target/mtd-utils"
 do_install () {
 	oe_runmake install DESTDIR=${D} SBINDIR=${sbindir} MANDIR=${mandir} INCLUDEDIR=${includedir}
 

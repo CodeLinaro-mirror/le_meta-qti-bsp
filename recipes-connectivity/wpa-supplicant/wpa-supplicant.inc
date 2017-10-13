@@ -1,4 +1,4 @@
-inherit autotools-brokensep linux-kernel-base
+inherit autotools-brokensep linux-kernel-base qcommon
 
 DESCRIPTION = "Wi-Fi Protected Access(WPA) Supplicant"
 LICENSE = "BSD"
@@ -14,9 +14,8 @@ INC_PR = "r4"
 
 DEPENDS = "openssl libnl"
 
-SRC_URI = "file://${WORKSPACE}/external/hostap"
-
-S = "${WORKDIR}/hostap/wpa_supplicant"
+SRC_URI="${CAF_LA_GIT}/platform/external/hostap.git;tag=${CAF_TAG};protocol=git;nobranch=1;destsuffix=external/hostap"
+S = "${WORKDIR}/external/hostap/wpa_supplicant"
 
 do_install() {
     make install DESTDIR=${D} BINDIR=${sbindir} LIBDIR=${libdir} INCDIR=${includedir}

@@ -1,4 +1,4 @@
-inherit autotools pkgconfig
+inherit autotools pkgconfig qcommon
 
 DESCRIPTION = "Android Multimedia Framework"
 HOMEPAGE = "http://developer.android.com/"
@@ -10,8 +10,7 @@ PR = "r1"
 
 DEPENDS = "native-frameworks libhardware system-media"
 
-FILESPATH =+ "${WORKSPACE}:"
-SRC_URI   = "file://frameworks/av/"
+SRC_URI= "${CAF_LE_GIT}/platform/vendor/qcom-opensource/le-framework.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=frameworks/av;subpath=av"
 
 S = "${WORKDIR}/frameworks/av"
 

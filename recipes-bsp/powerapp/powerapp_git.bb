@@ -1,4 +1,4 @@
-inherit autotools-brokensep
+inherit qcommon
 
 DESCRIPTION = "Powerapp tools"
 HOMEPAGE = "http://codeaurora.org/"
@@ -6,8 +6,8 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 
-FILESPATH =+ "${WORKSPACE}:"
-SRC_URI = "file://system/core/powerapp/"
+SRC_URI="${CAF_LA_GIT}/platform/system/core.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=system/core/powerapp;subpath=powerapp"
+
 S = "${WORKDIR}/system/core/powerapp/"
 
 PACKAGES =+ "${PN}-reboot ${PN}-shutdown ${PN}-powerconfig"

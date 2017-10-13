@@ -1,4 +1,4 @@
-inherit pkgconfig native autotools
+inherit pkgconfig native autotools qcommon
 
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
@@ -9,9 +9,8 @@ RDEPENDS_${PN} = "zlib bzip2"
 
 PR = "r1"
 
-FILESPATH =+ "${WORKSPACE}/bootable/recovery/:"
-SRC_URI   = "file://applypatch"
+SRC_URI="${CAF_LA_GIT}/platform/bootable/recovery.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=bootable/recovery/applypatch;subpath=applypatch;"
 
-S = "${WORKDIR}/applypatch"
+S = "${WORKDIR}/bootable/recovery/applypatch"
 
 EXTRA_OECONF = " --with-host-os=${HOST_OS}"

@@ -1,3 +1,5 @@
+inherit qcommon
+
 SUMMARY = "Linux Bluetooth Stack Userland V5"
 DESCRIPTION = "Linux Bluetooth stack V5 userland components.  These include a system configurations, daemons, tools and system libraries."
 HOMEPAGE = "http://www.bluez.org"
@@ -12,12 +14,9 @@ DEPENDS = "udev alsa-lib libusb dbus-glib glib-2.0 libical"
 
 ASNEEDED = ""
 
-FILESPATH =+ "${WORKSPACE}:"
-SRC_URI = "file://external/bluetooth/bluez/"
+SRC_URI="${CAF_LA_GIT}/platform/external/bluetooth/bluez.git;nobranch=1;protocol=git;tag=${CAF_TAG};destsuffix=external/bluetooth/bluez"
 
 S = "${WORKDIR}/external/bluetooth/bluez/"
-
-inherit autotools-brokensep pkgconfig
 
 EXTRA_OECONF = "\
   --enable-tools \

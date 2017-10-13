@@ -1,4 +1,4 @@
-inherit deploy qperf
+inherit deploy qperf qcommon
 
 DESCRIPTION = "Little Kernel bootloader"
 LICENSE = "MIT"
@@ -11,10 +11,9 @@ PROVIDES = "virtual/bootloader"
 PR       = "r1"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
-FILESPATH =+ "${WORKSPACE}:"
+SRC_URI="${CAF_LA_GIT}/kernel/lk.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=bootable/bootloader/lk"
 
-SRC_URI   =  "file://bootable/bootloader/lk"
-S         =  "${WORKDIR}/bootable/lk"
+S         =  "${WORKDIR}/bootable/bootloader/lk"
 
 MY_TARGET_mdm9650 = "mdm9640"
 MY_TARGET_sdxhedgehog = "mdm9640"

@@ -1,4 +1,4 @@
-inherit autotools-brokensep pkgconfig qcommon
+inherit qcommon
 
 DESCRIPTION = "Bluetooth Property Daemon"
 HOMEPAGE = "http://codeaurora.org/"

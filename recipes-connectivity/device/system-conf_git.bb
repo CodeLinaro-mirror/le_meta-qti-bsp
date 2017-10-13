@@ -1,12 +1,12 @@
-inherit autotools update-rc.d
+inherit autotools update-rc.d qcommon
 DESCRIPTION = "Device specific config"
 LICENSE = "ISC"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=f3b90e78ea0cffb20bf5cca7947a896d"
 PR = "r3"
 
-FILESPATH =+ "${WORKSPACE}:"
 # Provide a baseline
-SRC_URI = "file://mdm-init/"
+
+SRC_URI="${CAF_LE_GIT}/qcom-opensource/mdm-init.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=mdm-init"
 SRC_URI += "file://wlan_daemon.service"
 
 # Update for each machine

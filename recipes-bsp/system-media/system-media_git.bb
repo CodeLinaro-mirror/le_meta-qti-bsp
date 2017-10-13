@@ -1,4 +1,4 @@
-inherit autotools pkgconfig
+inherit autotools pkgconfig qcommon
 
 DESCRIPTION = "system media headers"
 HOMEPAGE = "http://developer.android.com/"
@@ -8,8 +8,8 @@ ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 
 DEPENDS = "system-core tinyalsa expat"
 
-FILESPATH =+ "${WORKSPACE}:"
-SRC_URI   = "file://system/media/"
+SRC_URI="${CAF_LA_GIT}/platform/system/media.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=system/media;"
+
 S = "${WORKDIR}/system/media"
 
 EXTRA_OECONF += " --with-glib"

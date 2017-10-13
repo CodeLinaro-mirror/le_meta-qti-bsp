@@ -51,15 +51,15 @@ KERNEL_EXTRA_ARGS        += "O=${B}"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-FILESPATH =+ "${WORKSPACE}:"
-SRC_URI   =  "file://kernel"
+SRC_URI="${CAF_LA_GIT}/kernel/msm-3.18.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=kernel/msm-3.18"
 
-SRC_DIR   =  "${WORKSPACE}/kernel/msm-3.18"
+SRC_DIR   =  "${WORKDIR}/kernel/msm-3.18"
 S         =  "${WORKDIR}/kernel/msm-3.18"
 GITVER    =  "${@base_get_metadata_git_revision('${SRC_DIR}',d)}"
 PV = "git"
 PR = "${@base_conditional('PRODUCT', 'psm', 'r5-psm', 'r5', d)}"
 
+EXTRA_OEMAKE += 'WORKSPACE="${WORKDIR}"'
 DEPENDS += "dtbtool-native mkbootimg-native"
 DEPENDS_apq8096 += "mkbootimg-native dtc-native"
 

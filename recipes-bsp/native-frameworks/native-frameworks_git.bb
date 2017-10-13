@@ -1,4 +1,4 @@
-inherit autotools pkgconfig
+inherit autotools pkgconfig qcommon
 
 DESCRIPTION = "Android IPC utilities"
 HOMEPAGE = "http://developer.android.com/"
@@ -10,10 +10,10 @@ PR = "r1"
 
 DEPENDS = "liblog libcutils libhardware libselinux system-core glib-2.0"
 
-FILESPATH =+ "${WORKSPACE}:"
-SRC_URI   = "file://frameworks/native"
+SRC_URI="${CAF_LE_GIT}/platform/vendor/qcom-opensource/le-framework.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=frameworks/native;subpath=native"
 
-S = "${WORKDIR}/native"
+
+S = "${WORKDIR}/frameworks/native"
 
 EXTRA_OECONF = " --with-core-includes=${WORKSPACE}/system/core/include --with-glib"
 

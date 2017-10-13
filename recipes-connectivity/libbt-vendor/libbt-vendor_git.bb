@@ -1,4 +1,4 @@
-inherit autotools-brokensep pkgconfig qcommon
+inherit qcommon
 
 DESCRIPTION = "Bluetooth Vendor Library"
 HOMEPAGE = "http://codeaurora.org/"
@@ -10,7 +10,6 @@ ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 DEPENDS = "common system-core hci-qcomm-init glib-2.0"
 
 RDEPENDS_${PN} = "libcutils"
-
 
 SRC_URI=" \
     ${CAF_LA_GIT}/platform/hardware/qcom/bt.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=hardware/qcom/bt/libbt-vendor;subpath=libbt-vendor \

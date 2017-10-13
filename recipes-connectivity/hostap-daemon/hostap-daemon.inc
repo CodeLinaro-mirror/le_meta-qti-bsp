@@ -1,4 +1,4 @@
-inherit autotools-brokensep linux-kernel-base
+inherit linux-kernel-base qcommon
 
 DESCRIPTION = "Hostap Daemon"
 LICENSE = "BSD"
@@ -12,7 +12,7 @@ INC_PR = "r4"
 
 DEPENDS = "openssl libnl"
 
-SRC_URI = "file://${WORKSPACE}/external/hostap/"
+SRC_URI="${CAF_LA_GIT}/platform/external/hostap.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=external/hostap"
 
 S = "${WORKDIR}/external/hostap/hostapd/"
 
