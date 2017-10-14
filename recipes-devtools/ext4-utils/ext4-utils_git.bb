@@ -16,8 +16,7 @@ SRC_URI = " \
 
 S = "${WORKDIR}/system/extras/ext4_utils"
 
-#EXTRA_OECONF = " --with-core-includes=${STAGING_INCDIR}"
-EXTRA_OECONF = "--with-core-includes=${WORKSPACE}/system/core/include"
+EXTRA_OECONF = " --with-core-includes=${STAGING_INCDIR}"
 
 CPPFLAGS += "-I${STAGING_INCDIR}/libselinux"
 CPPFLAGS += "-I${STAGING_INCDIR}/cutils"

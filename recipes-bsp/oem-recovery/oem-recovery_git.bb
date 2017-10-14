@@ -1,4 +1,4 @@
-inherit autotools-brokensep pkgconfig update-rc.d
+inherit qcommon update-rc.d
 PR = "r1"
 
 DESCRIPTION = "OEM Recovery"
@@ -7,13 +7,14 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 HOMEPAGE = "https://www.codeaurora.org/gitweb/quic/la?p=device/qcom/common.git"
 
-FILESPATH =+ "${WORKSPACE}:"
-SRC_URI = "file://android_compat/device/qcom/common/recovery/oem-recovery/"
+SRC_URI="${CAF_LA_GIT}/device/qcom/common.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=android_compat/device/qcom/common/recovery/oem-recovery;subpath=recovery/oem-recovery"
 
 S = "${WORKDIR}/android_compat/device/qcom/common/recovery/oem-recovery/"
 
-EXTRA_OECONF = "--with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include \
-                --with-core-headers=${STAGING_INCDIR_NATIVE}"
+EXTRA_OECONF_append_class-native = " --with-core-headers=${STAGING_INCDIR_NATIVE}i/sparse"
+
+EXTRA_OECONF_append_class-target = " --with-core-headers=${STAGING_INCDIR}/sparse"
+EXTRA_OECONF_append_class-target += " --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include" 
 
 PARALLEL_MAKE = ""
 INITSCRIPT_NAME = "oem-recovery"
