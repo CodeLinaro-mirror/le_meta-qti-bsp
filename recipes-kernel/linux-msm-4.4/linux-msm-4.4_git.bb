@@ -37,6 +37,7 @@ python __anonymous () {
       d.appendVar("SRC_URI", " file://0001-ethernet-ethernet-support-early-ethernet-feature.patch")
       d.appendVar("SRC_URI", " file://0005-msm-vidc-changes-for-early-init.patch")
       d.appendVar("SRC_URI", " file://0001-net-ipv6-change-ipv6-module-initcall-level.patch")
+      d.appendVar("SRC_URI", " file://0001-8021q-net-kernel-move-8021q-module-as-fs_initcall.patch")
 
   if bb.utils.contains('DISTRO_FEATURES', 'early_init', True, False, d):
       d.appendVar("SRC_URI", " file://0006-camera-kernel-changes-for-early-CVBS-case.patch")
