@@ -9,6 +9,7 @@ IMAGE_INSTALL += "iproute2"
 IMAGE_INSTALL += "pciutils"
 IMAGE_INSTALL += "spitools"
 IMAGE_INSTALL += "chrony"
+IMAGE_INSTALL += "chronyc"
 IMAGE_INSTALL += "pps-tools"
 IMAGE_INSTALL += "network-conf"
 
