@@ -8,8 +8,12 @@ ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 
 SRC_URI = " \
     ${CAF_LE_GIT}/platform/qcom-opensource/bt.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=qcom-opensource/bt/bt-app;subpath=bt-app \
+    ${CAF_LE_GIT}/platform/qcom-opensource/bt.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=qcom-opensource/bt/obex_profiles;subpath=obex_profiles \
+    ${CAF_LE_GIT}/platform/qcom-opensource/bt.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=qcom-opensource/bt/gatt/include;subpath=gatt/include \
     ${CAF_LA_GIT}/platform/vendor/qcom-opensource/bluetooth.git;protocol=git;nobranch=1;tag=${CAF_TAG};subpath=hal/include;destsuffix=vendor/qcom/opensource/bluetooth/hal/include \
+    ${CAF_LA_GIT}/platform/vendor/qcom-opensource/bluetooth.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=vendor/qcom/opensource/bluetooth/vhal/include;subpath=vhal/include \
 "
+
 S = "${WORKDIR}/qcom-opensource/bt/bt-app/"
 
 def get_depends():

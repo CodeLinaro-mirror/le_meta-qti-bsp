@@ -9,10 +9,16 @@ ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 
 DEPENDS = "common zlib btvendorhal libbt-vendor"
 
+# This recipe builds sources from both system/bt and qcom-opensource/bluetooth git projects.
+# Hence fetching both projects. Also added a patch to update paths in Makefile relative to ${S}.
 SRC_URI=" \
-          ${CAF_LA_GIT}/platform/system/bt.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=system/bt \
-          ${CAF_LA_GIT}/platform/vendor/qcom-opensource/bluetooth.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=hal/include;subpath=hal/include \
-        "
+    ${CAF_LA_GIT}/platform/system/bt.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=system/bt \
+    ${CAF_LA_GIT}/platform/vendor/qcom-opensource/bluetooth.git;protocol=git;nobranch=1;tag=${CAF_TAG};subpath=hal/include;destsuffix=vendor/qcom/opensource/bluetooth/hal/include \
+    ${CAF_LA_GIT}/platform/vendor/qcom-opensource/bluetooth.git;protocol=git;nobranch=1;tag=${CAF_TAG};subpath=system_bt_ext;destsuffix=vendor/qcom/opensource/bluetooth/system_bt_ext \ 
+    ${CAF_LA_GIT}/platform/vendor/qcom-opensource/bluetooth.git;protocol=git;nobranch=1;tag=${CAF_TAG};subpath=vhal/include;destsuffix=vendor/qcom/opensource/bluetooth/vhal/include \
+"
+
+SRC_URI += "file://0001-Change-WORKSPACE-references-relative-to-srcdir.patch"
 
 S = "${WORKDIR}/system/bt/"
 
@@ -27,7 +33,7 @@ BASEPRODUCT = "${@d.getVar('PRODUCT', False)}"
 
 EXTRA_OECONF = " \
                 --with-zlib \
-                --with-common-includes="${WORKDIR}/hal/include/" \
+                --with-common-includes="${WORKDIR}/vendor/qcom/opensource/bluetooth/hal/include/" \
                 --with-lib-path=${STAGING_LIBDIR} \
                 --enable-target=${BASEMACHINE} \
                 --enable-rome=${BASEPRODUCT} \
