@@ -77,20 +77,20 @@ IMAGE_INSTALL += "glib-2.0-utils"
 IMAGE_INSTALL += "smem"
 
 # smack support
-IMAGE_INSTALL_append_smack = " smack-userspace"
+#IMAGE_INSTALL_append_smack = " smack-userspace"
 
 # AFM and Security
-IMAGE_INSTALL += "af-main"
-IMAGE_INSTALL += "af-binder"
-IMAGE_INSTALL += "af-binder-binding-afb-dbus-binding"
-IMAGE_INSTALL += "af-binder-binding-authlogin"
-IMAGE_INSTALL += "libafbwsc"
-IMAGE_INSTALL += "web-runtime"
-IMAGE_INSTALL += "xmlsec1"
-IMAGE_INSTALL += "cynara"
-IMAGE_INSTALL += "security-manager"
-IMAGE_INSTALL += "security-manager-policy"
-IMAGE_INSTALL += "agl-users"
+#IMAGE_INSTALL += "af-main"
+#IMAGE_INSTALL += "af-binder"
+#IMAGE_INSTALL += "af-binder-binding-afb-dbus-binding"
+#IMAGE_INSTALL += "af-binder-binding-authlogin"
+#IMAGE_INSTALL += "libafbwsc"
+#IMAGE_INSTALL += "web-runtime"
+#IMAGE_INSTALL += "xmlsec1"
+#IMAGE_INSTALL += "cynara"
+#IMAGE_INSTALL += "security-manager"
+#IMAGE_INSTALL += "security-manager-policy"
+#IMAGE_INSTALL += "agl-users"
 
 #Location
 IMAGE_INSTALL += "loc-stub"
