@@ -1,0 +1,46 @@
+From dbdef437e3bf4f49f010d8d56e10113ca3cedc11 Mon Sep 17 00:00:00 2001
+From: Zou Shunxiang <shunxian@codeaurora.org>
+Date: Mon, 16 Oct 2017 13:53:28 +0800
+Subject: [PATCH] 8021q: net: kernel: move 8021q module as fs_initcall
+
+Adjust 8021q module as fs_initcall to support early
+ethernet for vlan feature.
+
+Change-Id: Ia6ee95fcfd71d490adcc0fab679c9afcbd7d0187
+Signed-off-by: Zou Shunxiang <shunxian@codeaurora.org>
+---
+ net/8021q/vlan.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/net/8021q/vlan.c b/net/8021q/vlan.c
+index 5e4199d..7c82136 100644
+--- a/net/8021q/vlan.c
++++ b/net/8021q/vlan.c
+@@ -39,6 +39,7 @@
+ #include <linux/if_vlan.h>
+ #include "vlan.h"
+ #include "vlanproc.h"
++#include <soc/qcom/boot_stats.h>
+ 
+ #define DRV_VERSION "1.8"
+ 
+@@ -765,6 +766,7 @@ static int __init vlan_proto_init(void)
+ 		dev_add_offload(&vlan_packet_offloads[i]);
+ 
+ 	vlan_ioctl_set(vlan_ioctl_handler);
++	place_marker("M - DRIVER 8021Q module Ready");
+ 	return 0;
+ 
+ err5:
+@@ -799,7 +801,7 @@ static void __exit vlan_cleanup_module(void)
+ 	vlan_gvrp_uninit();
+ }
+ 
+-module_init(vlan_proto_init);
++fs_initcall(vlan_proto_init);
+ module_exit(vlan_cleanup_module);
+ 
+ MODULE_LICENSE("GPL");
+-- 
+1.9.1
+
