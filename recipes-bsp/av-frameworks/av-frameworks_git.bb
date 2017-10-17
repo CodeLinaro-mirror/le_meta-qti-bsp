@@ -14,11 +14,8 @@ SRC_URI= "${CAF_LE_GIT}/platform/vendor/qcom-opensource/le-framework.git;protoco
 
 S = "${WORKDIR}/frameworks/av"
 
-FILES_${PN}-dbg    = "${libdir}/.debug/libcamera_client.*"
+EXTRA_OECONF += " --with-kernel-headers=${STAGING_KERNEL_DIR}/include/uapi"
+
+FILES_${PN}-dbg    = "${libdir}/.debug/libcamera_client.* ${bindir}/.debug/*"
 FILES_${PN}        = "${libdir}/libcamera_client.so.* ${libdir}/pkgconfig/* ${bindir}/mtpserver"
 FILES_${PN}-dev    = "${libdir}/libcamera_client.so ${libdir}/libcamera_client.la ${includedir}"
-
-
-do_configure_append() {
-    install -m 0644 ${WORKSPACE}/kernel/msm-3.18/include/uapi/linux/usb/f_mtp.h ${STAGING_INCDIR}/linux/usb/
-}
