@@ -78,6 +78,7 @@ IMAGE_INSTALL += "gstreamer1.0-plugins-good"
 IMAGE_INSTALL += "gstreamer1.0-rtsp-server"
 IMAGE_INSTALL += "gstreamer1.0-plugins-bad"
 #IMAGE_PREPROCESS_COMMAND += "echo ${MACHINE} >> ${IMAGE_ROOTFS}/target;"
+IMAGE_INSTALL += "qahw"
 
 # Don't install GDB and related pacakges in production builds.
 DEPENDS += "${@base_conditional('USER_BUILD', '1', '', 'gdb-cross-arm', d)}"
