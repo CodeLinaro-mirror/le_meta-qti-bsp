@@ -1,0 +1,32 @@
+From 55155122b45b8545e03eb67307cefc4d77fd3f38 Mon Sep 17 00:00:00 2001
+From: Harikrishnan Hariharan <hahariha@codeaurora.org>
+Date: Sat, 22 Jul 2017 09:17:39 +0530
+Subject: [PATCH] Disable creation of QCMAP_Client
+
+Disable creation of QCMAP_Client since it is not supported
+in this target.
+
+Change-Id: I40cb491dd55c83bc1f2f7db65bd5688f01bd265e
+CRs-Fixed: 2080877
+---
+ le/LocNetIface.cpp | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/le/LocNetIface.cpp b/le/LocNetIface.cpp
+index c9a41e5..5621d05 100644
+--- a/le/LocNetIface.cpp
++++ b/le/LocNetIface.cpp
+@@ -135,7 +135,9 @@ void LocNetIface::subscribeWithQcmap () {
+     }
+ 
+     /* Create a QCMAP Client instance */
+-    mQcmapClientPtr = new QCMAP_Client(qcmapClientCallback);
++    // TODO: PL does not have support for QCMAP_client.
++    // Uncomment it when QCMAP is enabled.
++    // mQcmapClientPtr = new QCMAP_Client(qcmapClientCallback);
+     if (mQcmapClientPtr == NULL) {
+         LOC_LOGE("Failed to allocate QCMAP instance !");
+         return;
+-- 
+1.9.1
+
