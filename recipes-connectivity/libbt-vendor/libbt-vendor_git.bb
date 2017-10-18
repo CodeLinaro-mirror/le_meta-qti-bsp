@@ -14,6 +14,7 @@ RDEPENDS_${PN} = "libcutils"
 SRC_URI=" \
     ${CAF_LA_GIT}/platform/hardware/qcom/bt.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=hardware/qcom/bt/libbt-vendor;subpath=libbt-vendor \
     ${CAF_LA_GIT}/platform/vendor/qcom-opensource/bluetooth.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=hal/include;subpath=hal/include \
+    ${CAF_LA_GIT}/platform/system/bt.git;protocol=git;nobranch=1;tag=${CAF_TAG};subpath=hci/include;destsuffix=system/bt/hci/include \
 "
 
 S = "${WORKDIR}/hardware/qcom/bt/libbt-vendor/"
@@ -21,9 +22,11 @@ S = "${WORKDIR}/hardware/qcom/bt/libbt-vendor/"
 CFLAGS_append = " -DUSE_ANDROID_LOGGING "
 LDFLAGS_append = " -llog "
 
+CPPFLAGS += "-I${STAGING_INCDIR}/hci-qcomm-init"
+
 BASEPRODUCT = "${@d.getVar('PRODUCT', False)}"
 
-EXTRA_OECONF = "--with-common-includes="${WORKDIR}/hal/include/" \
+EXTRA_OECONF = "--with-common-includes="${WORKDIR}/vendor/qcom/opensource/bluetooth/hal/include/" \
                 --with-lib-path=${STAGING_LIBDIR} \
                 --enable-target=${BASEMACHINE} \
                 --enable-rome=${BASEPRODUCT} \

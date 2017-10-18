@@ -15,6 +15,8 @@ SRC_URI += "file://wcnss_wlan.service"
 
 S = "${WORKDIR}/qcom-opensource/wlan/firmware_bin"
 
+do_install[cleandirs] += "${TMPDIR}/work-shared/${MACHINE}/wcnss-bins"
+
 do_install() {
     install -d ${D}/etc
     install -d ${D}/etc/init.d
@@ -31,12 +33,24 @@ do_install() {
 
     mkdir -p ${D}/lib/firmware/wlan/prima
     cp -pP ${WORKDIR}/android_compat/device/qcom/${SOC_FAMILY}/WCNSS_qcom_cfg.ini ${D}/lib/firmware/wlan/prima
+
+    # Copy WCNSS bins into work-shared dir to include in /persist during image creation.
+    if [ -e "${WORKDIR}/android_compat/device/qcom/${SOC_FAMILY}/WCNSS_qcom_wlan_nv.bin" ];then
+        cp -pP ${WORKDIR}/android_compat/device/qcom/${SOC_FAMILY}/WCNSS_qcom_wlan_nv.bin ${TMPDIR}/work-shared/${MACHINE}/wcnss-bins
+    fi
+
+    if [ -e "${WORKDIR}/android_compat/device/qcom/${SOC_FAMILY}/WCNSS_wlan_dictionary.dat" ]; then
+        cp -pP ${WORKDIR}/android_compat/device/qcom/${SOC_FAMILY}/WCNSS_wlan_dictionary.dat ${TMPDIR}/work-shared/${MACHINE}/wcnss-bins
+    elif [ -e "${WORKDIR}/android_compat/device/qcom/${SOC_FAMILY}_32/WCNSS_wlan_dictionary.dat" ]; then
+        cp -pP ${WORKDIR}/android_compat/device/qcom/${SOC_FAMILY}_32/WCNSS_wlan_dictionary.dat ${TMPDIR}/work-shared/${MACHINE}/wcnss-bins
+    fi
+
+    # Create symlinks to /persist path. Actual files will be placed in /persist during image creation.
+    install -d ${D}/lib/firmware/wlan/prima
+    ln -s /persist/WCNSS_qcom_wlan_nv.bin ${D}/lib/firmware/wlan/prima/WCNSS_qcom_wlan_nv.bin
+    ln -s /persist/WCNSS_wlan_dictionary.dat ${D}/lib/firmware/wlan/prima/WCNSS_wlan_dictionary.dat
 }
-do_install_append() {
-   install -d ${D}/lib/firmware/wlan/prima
-   ln -s /persist/WCNSS_qcom_wlan_nv.bin ${D}/lib/firmware/wlan/prima/WCNSS_qcom_wlan_nv.bin
-   ln -s /persist/WCNSS_wlan_dictionary.dat ${D}/lib/firmware/wlan/prima/WCNSS_wlan_dictionary.dat
-}
+
 INITSCRIPT_NAME = "set_wcnss_mode"
 INITSCRIPT_PARAMS = "start 60 2 3 4 5 . stop 20 0 1 6 ."
 

@@ -1,0 +1,164 @@
+From 563fda76bf6eb3b8accdabe59a4117ac0256c5d1 Mon Sep 17 00:00:00 2001
+From: Viswanath Kraleti <vkraleti@codeaurora.org>
+Date: Mon, 16 Oct 2017 19:24:34 +0530
+Subject: [PATCH] Change WORKSPACE references relative to srcdir
+
+In place of direct workspace references use build dir relative paths.
+---
+ audio_a2dp_hw/Makefile.am |  6 ++++--
+ bta/Makefile.am           | 24 +++++++++++++-----------
+ hci/Makefile.am           |  4 +++-
+ main/Makefile.am          | 30 +++++++++++++++---------------
+ 4 files changed, 35 insertions(+), 29 deletions(-)
+
+diff --git a/audio_a2dp_hw/Makefile.am b/audio_a2dp_hw/Makefile.am
+index 8859554..4eb627a 100644
+--- a/audio_a2dp_hw/Makefile.am
++++ b/audio_a2dp_hw/Makefile.am
+@@ -1,5 +1,7 @@
+ # sources and intermediate files are separated
+ 
++oss_bt_path := $(top_srcdir)/../../vendor/qcom/opensource/bluetooth
++
+ AM_CFLAGS = -Wall \
+         -Wundef \
+         -Wstrict-prototypes \
+@@ -12,8 +14,8 @@ AM_CPPFLAGS= \
+         -I../ \
+         -I../utils/include \
+         -I${WORKSPACE}/system/media/audio/include \
+-        -I${WORKSPACE}/vendor/qcom/opensource/bluetooth/hal/include/ \
+-        -I${WORKSPACE}/vendor/qcom/opensource/bluetooth/vhal/include/ \
++        -I$(oss_bt_path)/hal/include/ \
++        -I$(oss_bt_path)/vhal/include/ \
+         -I$(bdroid_C_INCLUDES)
+ 
+ c_sources = \
+diff --git a/bta/Makefile.am b/bta/Makefile.am
+index 1dbabfb..6a78d48 100644
+--- a/bta/Makefile.am
++++ b/bta/Makefile.am
+@@ -1,5 +1,7 @@
+ # sources and intermediate files are separated
+ 
++oss_bt_path := $(top_srcdir)/../../vendor/qcom/opensource/bluetooth
++
+ AM_CFLAGS = -Wall \
+         -Wundef \
+         -Wstrict-prototypes \
+@@ -23,7 +25,7 @@ AM_CPPFLAGS = -Iinclude \
+         -I../udrv/include \
+         -I../vnd/include \
+         -I../utils/include \
+-        -I${WORKSPACE}/vendor/qcom/opensource/bluetooth/system_bt_ext/bta/include
++        -I$(oss_bt_path)/system_bt_ext/bta/include
+ 
+ c_sources = \
+         dm/bta_dm_ci.c \
+@@ -102,16 +104,16 @@ c_sources = \
+         jv/bta_jv_api.c
+ 
+ c_sources+= \
+-        ${WORKSPACE}/vendor/qcom/opensource/bluetooth/system_bt_ext/bta/avk/bta_avk_act.c \
+-        ${WORKSPACE}/vendor/qcom/opensource/bluetooth/system_bt_ext/bta/avk/bta_avk_ci.c \
+-        ${WORKSPACE}/vendor/qcom/opensource/bluetooth/system_bt_ext/bta/avk/bta_avk_api.c \
+-        ${WORKSPACE}/vendor/qcom/opensource/bluetooth/system_bt_ext/bta/avk/bta_avk_aact.c \
+-        ${WORKSPACE}/vendor/qcom/opensource/bluetooth/system_bt_ext/bta/avk/bta_avk_main.c \
+-        ${WORKSPACE}/vendor/qcom/opensource/bluetooth/system_bt_ext/bta/avk/bta_avk_cfg.c \
+-        ${WORKSPACE}/vendor/qcom/opensource/bluetooth/system_bt_ext/bta/avk/bta_avk_ssm.c \
+-        ${WORKSPACE}/vendor/qcom/opensource/bluetooth/system_bt_ext/bta/avk/bta_avk_sbc.c \
+-        ${WORKSPACE}/vendor/qcom/opensource/bluetooth/system_bt_ext/bta/avk/bta_avk_aac.c \
+-        ${WORKSPACE}/vendor/qcom/opensource/bluetooth/system_bt_ext/bta/avk/bta_avk_mp3.c
++        $(oss_bt_path)/system_bt_ext/bta/avk/bta_avk_act.c \
++        $(oss_bt_path)/system_bt_ext/bta/avk/bta_avk_ci.c \
++        $(oss_bt_path)/system_bt_ext/bta/avk/bta_avk_api.c \
++        $(oss_bt_path)/system_bt_ext/bta/avk/bta_avk_aact.c \
++        $(oss_bt_path)/system_bt_ext/bta/avk/bta_avk_main.c \
++        $(oss_bt_path)/system_bt_ext/bta/avk/bta_avk_cfg.c \
++        $(oss_bt_path)/system_bt_ext/bta/avk/bta_avk_ssm.c \
++        $(oss_bt_path)/system_bt_ext/bta/avk/bta_avk_sbc.c \
++        $(oss_bt_path)/system_bt_ext/bta/avk/bta_avk_aac.c \
++        $(oss_bt_path)/system_bt_ext/bta/avk/bta_avk_mp3.c
+ 
+ common_LDFLAGS = -lpthread  -lrt ../stack/libbtstack.la
+ common_CFLAGS =  $(AM_CFLAGS) -fPIC -D_GNU_SOURCE
+diff --git a/hci/Makefile.am b/hci/Makefile.am
+index ff23d47..bba2f74 100644
+--- a/hci/Makefile.am
++++ b/hci/Makefile.am
+@@ -54,7 +54,9 @@ c_sources = \
+ common_LDFLAGS = -lpthread -lrt
+ common_CFLAGS =  $(AM_CFLAGS) -fPIC -D_GNU_SOURCE -DBTSNOOP_DEFAULT=TRUE -DBT_NET_DEBUG=TRUE
+ 
+-library_includedir = $(pkgincludedir)\
++h_sources = include/bt_vendor_lib.h
++
++library_includedir = $(pkgincludedir)
+ library_include_HEADERS = $(h_sources)
+ lib_LTLIBRARIES = libbt-hci.la
+ libbt_hci_la_CC = @CC@
+diff --git a/main/Makefile.am b/main/Makefile.am
+index 1f13f6b..9a82948 100644
+--- a/main/Makefile.am
++++ b/main/Makefile.am
+@@ -1,5 +1,7 @@
+ # sources and intermediate files are separated
+ 
++oss_bt_path := $(top_srcdir)/../../vendor/qcom/opensource/bluetooth
++
+ AM_CFLAGS = -Wall \
+         -Wundef \
+         -Wstrict-prototypes \
+@@ -35,12 +37,10 @@ AM_CPPFLAGS= \
+         -I../embdrv/sbc/decoder/include \
+         -I../audio_a2dp_hw \
+         -I../utils/include \
+-        -I${WORKSPACE}/vendor/qcom/opensource/bluetooth/system_bt_ext/bta/include \
+-        -I${WORKSPACE}/vendor/qcom/opensource/bluetooth/system_bt_ext/btif/include \
+-        -I${WORKSPACE}/external/tinyxml2 \
+-        -I${WORKSPACE}/external/zlib \
+-        -I${WORKSPACE}/vendor/qcom/opensource/bluetooth/hal/include \
+-        -I${WORKSPACE}/vendor/qcom/opensource/bluetooth/vhal/include
++        -I$(oss_bt_path)/system_bt_ext/bta/include \
++        -I$(oss_bt_path)/system_bt_ext/btif/include \
++        -I$(oss_bt_path)/hal/include \
++        -I$(oss_bt_path)/vhal/include
+ 
+ if MDM_ROME
+ AM_CFLAGS += -DBT_SOC_TYPE_ROME
+@@ -67,9 +67,9 @@ c_sources+= \
+ # BTC
+ if BTC_SUPPORT
+ AM_CFLAGS += -DBTC_INCLUDED=TRUE
+-AM_CPPFLAGS += -DBTC_INCLUDED=TRUE -I${WORKSPACE}/vendor/qcom/opensource/bluetooth/system_bt_ext/btc/include
++AM_CPPFLAGS += -DBTC_INCLUDED=TRUE -I$(oss_bt_path)/system_bt_ext/btc/include
+ c_sources+= \
+-        ${WORKSPACE}/vendor/qcom/opensource/bluetooth/system_bt_ext/btc/src/btc_common.c
++        $(oss_bt_path)/system_bt_ext/btc/src/btc_common.c
+ endif
+ 
+ 
+@@ -163,13 +163,13 @@ c_sources+= \
+         ../udrv/ulinux/uipc.c
+ 
+ c_sources+= \
+-        ${WORKSPACE}/vendor/qcom/opensource/bluetooth/system_bt_ext/btif/src/btif_avk_media_task.c \
+-        ${WORKSPACE}/vendor/qcom/opensource/bluetooth/system_bt_ext/btif/src/btif_avk.c \
+-        ${WORKSPACE}/vendor/qcom/opensource/bluetooth/system_bt_ext/btif/src/btif_avk_rc.c \
+-        ${WORKSPACE}/vendor/qcom/opensource/bluetooth/system_bt_ext/btif/src/btif_avk_media_aac.c \
+-        ${WORKSPACE}/vendor/qcom/opensource/bluetooth/system_bt_ext/btif/src/btif_avk_media_mp3.c \
+-        ${WORKSPACE}/vendor/qcom/opensource/bluetooth/system_bt_ext/btif/src/btif_avk_media_aptx.c \
+-        ${WORKSPACE}/vendor/qcom/opensource/bluetooth/system_bt_ext/btif/co/bta_avk_co.c
++        $(oss_bt_path)/system_bt_ext/btif/src/btif_avk_media_task.c \
++        $(oss_bt_path)/system_bt_ext/btif/src/btif_avk.c \
++        $(oss_bt_path)/system_bt_ext/btif/src/btif_avk_rc.c \
++        $(oss_bt_path)/system_bt_ext/btif/src/btif_avk_media_aac.c \
++        $(oss_bt_path)/system_bt_ext/btif/src/btif_avk_media_mp3.c \
++        $(oss_bt_path)/system_bt_ext/btif/src/btif_avk_media_aptx.c \
++        $(oss_bt_path)/system_bt_ext/btif/co/bta_avk_co.c
+ 
+ common_LDFLAGS = -ldl -lrt -lresolv ../hci/libbt-hci.la \
+         ../utils/libbtutils.la ../osi/libbtosi.la ../gki/libbtgki.la \
+-- 
+1.9.1
+

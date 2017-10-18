@@ -8,14 +8,14 @@ ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 
 PR = "r1"
 
-DEPENDS = "liblog libcutils libhardware libselinux system-core glib-2.0"
+DEPENDS += "liblog libcutils libhardware libselinux system-core glib-2.0"
 
 SRC_URI="${CAF_LE_GIT}/platform/vendor/qcom-opensource/le-framework.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=frameworks/native;subpath=native"
 
-
 S = "${WORKDIR}/frameworks/native"
 
-EXTRA_OECONF = " --with-core-includes=${WORKSPACE}/system/core/include --with-glib"
+EXTRA_OECONF += " --with-core-includes=${STAGING_INCDIR}"
+EXTRA_OECONF += " --with-glib"
 
 CFLAGS += "-I${STAGING_INCDIR}/libselinux"
 
@@ -30,4 +30,3 @@ FILES_${PN}-libbinder-static = "${libdir}/libbinder.a"
 FILES_${PN}-libui-dbg    = "${libdir}/.debug/libui.*"
 FILES_${PN}-libui        = "${libdir}/libui.so.*"
 FILES_${PN}-libbui-dev    = "${libdir}/libui.so ${libdir}/libui.la ${includedir}"
-

@@ -1,12 +1,11 @@
-inherit autotools pkgconfig
+inherit autotools pkgconfig qcommon
 
 DESCRIPTION = "media"
 
 LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 
-FILESPATH =+ "${WORKSPACE}:"
-SRC_URI = "file://hardware/qcom/media/"
+SRC_URI="${CAF_LA_GIT}/platform/hardware/qcom/media.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=hardware/qcom/media"
 
 S = "${WORKDIR}/hardware/qcom/media"
 

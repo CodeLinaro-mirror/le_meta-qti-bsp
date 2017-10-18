@@ -6,10 +6,16 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 HOMEPAGE = "https://www.codeaurora.org/gitweb/quic/la?p=platform/bootable/recovery.git"
-DEPENDS = "libmincrypt-native system-core oem-recovery"
+
+DEPENDS += "libmincrypt-native system-core oem-recovery ext4-utils"
 RDEPENDS_${PN} = "zlib bzip2"
 
-SRC_URI="${CAF_LA_GIT}/platform/bootable/recovery.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=bootable/recovery"
+# minadbd need adb headers from system-core project to compile.
+SRC_URI = " \
+    ${CAF_LA_GIT}/platform/bootable/recovery.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=bootable/recovery \
+    ${CAF_LA_GIT}/platform/system/core.git;nobranch=1;protocol=git;tag=${CAF_TAG};destsuffix=system/core/adb;subpath=adb \
+"
+
 SRC_URI += "file://recovery.service"
 SRC_URI += "file://fstab"
 
@@ -17,6 +23,11 @@ S = "${WORKDIR}/bootable/${PN}/"
 
 EXTRA_OECONF = "--with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include \
                 --with-core-headers=${STAGING_INCDIR}"
+
+CPPFLAGS += "-I${STAGING_INCDIR}/fs_mgr"
+CPPFLAGS += "-I${STAGING_INCDIR}/mincrypt"
+CPPFLAGS += "-I${STAGING_INCDIR}/ext4_utils"
+CPPFLAGS += "-I${WORKDIR}/system/core/adb"
 
 SYSTEMD_SUPPORT = "${@base_contains('DISTRO_FEATURES', 'systemd', 'systemd', '', d)}"
 

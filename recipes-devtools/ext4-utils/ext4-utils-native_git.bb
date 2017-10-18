@@ -11,7 +11,7 @@ PR = "r1"
 DEPENDS = "libselinux-native libsparse-native libcutils-native libpcre-native"
 
 SRC_URI = " \
-    ${CAF_LA_GIT}/platform/system/extras.git;protocol=git;nobranch=1;tag=${CAF_TAG};subpath=ext4_utils;destsuffix=extras/ext4_utils \
+    ${CAF_LA_GIT}/platform/system/extras.git;protocol=git;nobranch=1;tag=${CAF_TAG};subpath=ext4_utils;destsuffix=system/extras/ext4_utils \
 "
 
 S = "${WORKDIR}/system/extras/ext4_utils"
