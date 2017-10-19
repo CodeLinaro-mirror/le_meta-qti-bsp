@@ -10,8 +10,9 @@ Signed-off-by: Daocai <daocai@codeaurora.org>
  src/compositor-drm.c  | 170 +++++++++++++++++++++++++++++++-------------------
  src/compositor.c      |  53 +++++++++++++++-
  src/compositor.h      |  14 +++++
+ src/libinput-seat.c   |   2 +
  src/main.c            | 128 ++++++++++++++++++-------------------
- 5 files changed, 242 insertions(+), 135 deletions(-)
+ 6 files changed, 244 insertions(+), 135 deletions(-)
 
 diff --git a/desktop-shell/shell.c b/desktop-shell/shell.c
 index 3c6a3da..319b2d8 100644
@@ -592,6 +593,19 @@ index c4c81f0..9af53cb 100644
  weston_load_module(const char *name, const char *entrypoint);
  
  int
+diff --git a/src/libinput-seat.c b/src/libinput-seat.c
+index c9f9ed2..74f6db7 100644
+--- a/src/libinput-seat.c
++++ b/src/libinput-seat.c
+@@ -258,6 +258,8 @@ udev_input_enable(struct udev_input *input)
+ 			"\t- seats misconfigured "
+ 			"(Weston backend option 'seat', "
+ 			"udev device property ID_SEAT)\n");
++		wl_event_source_remove(input->libinput_source);
++		input->libinput_source = NULL;
+ 		return -1;
+ 	}
+ 
 diff --git a/src/main.c b/src/main.c
 index a98570e..a902fd8 100644
 --- a/src/main.c
