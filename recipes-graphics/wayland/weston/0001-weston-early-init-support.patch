@@ -7,12 +7,12 @@ Change-Id: I95e1485996d1f6d040b6baeb39aa3eeff4916f50
 Signed-off-by: Daocai <daocai@codeaurora.org>
 ---
  desktop-shell/shell.c |  12 +++-
- src/compositor-drm.c  | 170 +++++++++++++++++++++++++++++++-------------------
- src/compositor.c      |  53 +++++++++++++++-
- src/compositor.h      |  14 +++++
+ src/compositor-drm.c  | 174 +++++++++++++++++++++++++++++++-------------------
+ src/compositor.c      |  53 ++++++++++++++-
+ src/compositor.h      |  14 ++++
  src/libinput-seat.c   |   2 +
- src/main.c            | 128 ++++++++++++++++++-------------------
- 6 files changed, 244 insertions(+), 135 deletions(-)
+ src/main.c            | 128 +++++++++++++++++--------------------
+ 6 files changed, 246 insertions(+), 137 deletions(-)
 
 diff --git a/desktop-shell/shell.c b/desktop-shell/shell.c
 index 3c6a3da..319b2d8 100644
@@ -51,7 +51,7 @@ index 3c6a3da..319b2d8 100644
  	return 0;
  }
 diff --git a/src/compositor-drm.c b/src/compositor-drm.c
-index 9eeff75..30fc6ec 100644
+index 9eeff75..bbfac73 100644
 --- a/src/compositor-drm.c
 +++ b/src/compositor-drm.c
 @@ -60,7 +60,8 @@
@@ -217,6 +217,19 @@ index 9eeff75..30fc6ec 100644
  		/* XXX: TODO:
  		 *
  		 * Use AddFB2 directly, do not go via GBM.
+@@ -2173,10 +2169,10 @@ drm_output_prepare_overlay_view(struct drm_output *output,
+ 			.stride = dmabuf->stride[0],
+ 			.format = dmabuf->format
+ 		};
+-
++		/* Let NV12 use overlay plane
+ 		if (dmabuf->n_planes != 1 || dmabuf->offset[0] != 0)
+ 			return NULL;
+-
++		*/
+ 		bo = gbm_bo_import(b->gbm, GBM_BO_IMPORT_FD, &gbm_dmabuf,
+ 				   GBM_BO_USE_SCANOUT);
+ #else
 @@ -2209,6 +2205,13 @@ drm_output_prepare_overlay_view(struct drm_output *output,
  			found = 1;
  			break;
