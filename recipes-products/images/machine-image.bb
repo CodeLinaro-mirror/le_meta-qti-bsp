@@ -9,6 +9,7 @@ MULTILIBRE_ALLOW_REP =. "/usr/include/python2.7/*|${base_bindir}|${base_sbindir}
 
 do_fsconfig() {
    mkdir -p ${IMAGE_ROOTFS}/data/
+   chmod go-r ${IMAGE_ROOTFS}/etc/passwd
 }
 
 ROOTFS_POSTPROCESS_COMMAND += "do_fsconfig; "

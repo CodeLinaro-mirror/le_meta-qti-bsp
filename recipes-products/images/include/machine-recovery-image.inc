@@ -43,6 +43,19 @@ IMAGE_INSTALL += "${@base_contains('DISTRO_FEATURES','selinux','refpolicy-mls','
 # Limit the recovery image size to 136M
 RECOVERYFS_SIZE_EXT4 ?= "136000000"
 
+
+do_fsconfig() {
+ chmod go-r ${IMAGE_ROOTFS}/etc/passwd
+ if ${@bb.utils.contains('DISTRO_FEATURES','systemd','false','true',d)}; then
+  if [ "${DISTRO_NAME}" == "msm-user" ]; then
+   if [ -e ${IMAGE_ROOTFS}/etc/init.d/sysfs.sh]; then
+    sed -i '/mount -t debugfs/ d' ${IMAGE_ROOTFS}/etc/init.d/sysfs.sh
+   fi
+  fi
+  chmod -R o-rwx ${IMAGE_ROOTFS}/etc/init.d/
+ fi
+}
+
 # Below is to generate sparse ext4 recovery image (OE by default supports raw ext4 images)
 SELINUX_FILE_CONTEXTS = "${IMAGE_ROOTFS}/etc/selinux/mls/contexts/files/file_contexts"
 do_makesystem() {
@@ -59,3 +72,8 @@ if [ -f "${DEPLOY_DIR_IMAGE}/machine-recovery-image-${MACHINE}.ubi" ]; then
 mv ${DEPLOY_DIR_IMAGE}/machine-recovery-image-${MACHINE}.ubi ${DEPLOY_DIR_IMAGE}/${MACHINE}-recovery.ubi
 fi
 }
+
+ROOTFS_POSTPROCESS_COMMAND += "do_fsconfig; "
+
+# Call function makesystem to generate sparse ext4 image
+addtask makesystem after do_rootfs before do_build
