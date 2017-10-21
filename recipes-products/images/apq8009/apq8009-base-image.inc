@@ -71,6 +71,8 @@ IMAGE_INSTALL += "fluoride"
 IMAGE_INSTALL += "libbt-vendor"
 IMAGE_INSTALL += "display-hal-linux"
 
+IMAGE_INSTALL += "qahw"
+
 # Don't install GDB and related pacakges in production builds.
 DEPENDS += "${@base_conditional('USER_BUILD', '1', '', 'gdb-cross-arm', d)}"
 IMAGE_INSTALL += "${@base_conditional('USER_BUILD', '1', '', 'gdb', d)}"
