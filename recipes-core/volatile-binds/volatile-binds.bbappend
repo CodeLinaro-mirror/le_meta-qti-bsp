@@ -24,6 +24,10 @@ VOLATILE_BINDS = "\
 /persist/bootmisc.sh /etc/init.d/bootmisc.sh\n\
 /var/volatile/lib /var/lib\n\
 "
+VOLATILE_BINDS_append_apq8017 += "\
+/systemrw/AlexaClientSDKConfig.json  /etc/AlexaClientSDKConfig.json \n\
+"
+
 INITSCRIPT_PACKAGES =+ "${PN}"
 INITSCRIPT_NAME_${PN} = "robind"
 INITSCRIPT_PARAMS_${PN} = "start 91 2 3 4 5 ."
