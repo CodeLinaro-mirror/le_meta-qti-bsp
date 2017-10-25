@@ -12,8 +12,16 @@ SRC_URI_append += "file://70-net-setup-link.rules \
                    file://0030-plymounth-dependency-cleanup.patch \
                    file://0031-udev-trigger-only-enable-must-part-while-leave-other.patch \
                    file://0032-systemd-add-bootkpi-marker-for-login-user-session.patch \
-                   file://0033-no-pam_loginuid-in-current-build-comment-it-out.patch"
+                   file://0033-no-pam_loginuid-in-current-build-comment-it-out.patch \
+                   file://0033-systemd-reduce-service-stop-timeout-to-10s.patch \
+                   file://0036-systemd-udev-rules-add-Tag-to-diag-device.patch"
 
+python __anonymous () {
+    if bb.utils.contains('DISTRO_FEATURES', 'early_init', True, False, d) or bb.utils.contains('DISTRO_FEATURES', 'early-ethernet', True, False, d):
+        d.appendVar("SRC_URI", " file://0034-systemd-make-early-init-socket-visible-for-systemd.patch")
+        d.appendVar("SRC_URI", " file://0035-systemd-add-handover-support-for-early-service.patch")
+        d.appendVar("SRC_URI", " file://0037-systemd-make-root-user-session-lingered-for-early.patch")
+}
 
 do_install_append () {
   install -m 0644 ${WORKDIR}/70-net-setup-link.rules ${D}${sysconfdir}/udev/rules.d/

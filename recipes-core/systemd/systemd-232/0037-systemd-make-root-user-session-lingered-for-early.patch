@@ -1,0 +1,23 @@
+From 40be7563d892aa1a524d343563a38067bcd82f31 Mon Sep 17 00:00:00 2001
+From: Lei wang <leiwan@codeaurora.org>
+Date: Tue, 26 Sep 2017 10:33:55 +0800
+Subject: [PATCH] systemd: make root user-session lingered for early
+
+Signed-off-by: Lei wang <leiwan@codeaurora.org>
+---
+ units/systemd-user-sessions.service.in | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/units/systemd-user-sessions.service.in b/units/systemd-user-sessions.service.in
+index c09c05d..6302257 100644
+--- a/units/systemd-user-sessions.service.in
++++ b/units/systemd-user-sessions.service.in
+@@ -14,4 +14,5 @@ After=remote-fs.target nss-user-lookup.target
+ Type=oneshot
+ RemainAfterExit=yes
+ ExecStart=@rootlibexecdir@/systemd-user-sessions start
++ExecStartPost=/bin/loginctl enable-linger root
+ ExecStop=@rootlibexecdir@/systemd-user-sessions stop
+-- 
+1.9.1
+
