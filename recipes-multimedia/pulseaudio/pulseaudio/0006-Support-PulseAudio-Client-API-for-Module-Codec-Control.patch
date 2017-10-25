@@ -1,6 +1,6 @@
-From 74d6ea7bbb4ba35fa1bbeabcfb6bac4f93382f46 Mon Sep 17 00:00:00 2001
+From 48c70b937d08ef2c62f0186e3db529533ee0e6d9 Mon Sep 17 00:00:00 2001
 From: Cong Tang <congt@codeaurora.org>
-Date: Mon, 26 Dec 2016 14:29:57 +0800
+Date: Wed, 25 Oct 2017 15:01:14 +0800
 Subject: [PATCH] Support PulseAudio Client API for Module Codec Control
 
 ---
@@ -13,10 +13,10 @@ Subject: [PATCH] Support PulseAudio Client API for Module Codec Control
  create mode 100644 src/pulse/ext-codec-control.h
 
 diff --git a/src/Makefile.am b/src/Makefile.am
-index 5cb5564..301d533 100644
+index 498a386..4aaad37 100644
 --- a/src/Makefile.am
 +++ b/src/Makefile.am
-@@ -791,6 +791,7 @@ pulseinclude_HEADERS = \
+@@ -825,6 +825,7 @@ pulseinclude_HEADERS = \
  		pulse/error.h \
  		pulse/ext-device-manager.h \
  		pulse/ext-device-restore.h \
@@ -24,7 +24,7 @@ index 5cb5564..301d533 100644
  		pulse/ext-stream-restore.h \
  		pulse/format.h \
  		pulse/gccmacro.h \
-@@ -837,6 +838,7 @@ libpulse_la_SOURCES = \
+@@ -871,6 +872,7 @@ libpulse_la_SOURCES = \
  		pulse/error.c pulse/error.h \
  		pulse/ext-device-manager.c pulse/ext-device-manager.h \
  		pulse/ext-device-restore.c pulse/ext-device-restore.h \
@@ -33,10 +33,10 @@ index 5cb5564..301d533 100644
  		pulse/format.c pulse/format.h \
  		pulse/gccmacro.h \
 diff --git a/src/map-file b/src/map-file
-index 5159829..cb6788b 100644
+index 93a62b8..c783254 100644
 --- a/src/map-file
 +++ b/src/map-file
-@@ -163,6 +163,20 @@ pa_ext_device_restore_save_formats;
+@@ -166,6 +166,20 @@ pa_ext_device_restore_save_formats;
  pa_ext_device_restore_set_subscribe_cb;
  pa_ext_device_restore_subscribe;
  pa_ext_device_restore_test;
@@ -59,7 +59,7 @@ index 5159829..cb6788b 100644
  pa_ext_stream_restore_set_subscribe_cb;
 diff --git a/src/pulse/ext-codec-control.c b/src/pulse/ext-codec-control.c
 new file mode 100644
-index 0000000..59aa0ec
+index 0000000..db7b07c
 --- /dev/null
 +++ b/src/pulse/ext-codec-control.c
 @@ -0,0 +1,845 @@
@@ -852,13 +852,13 @@ index 0000000..59aa0ec
 +            goto finish;
 +    } else {
 +        codec_control_tunnel_cmd_t i;
-+        uint32_t output_size, j;
++        uint32_t j;
 +        pa_zero(i);
 +
 +        pa_tagstruct_getu32(t, &i.output_size);
 +
 +        i.output_data = pa_xnew0(uint8_t, i.output_size);
-+        for (j=0; j< output_size; j++)
++        for (j=0; j< i.output_size; j++)
 +          pa_tagstruct_getu8(t, &i.output_data[j]);
 +
 +        if (o->callback) {
