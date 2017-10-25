@@ -1,9 +1,10 @@
 [Unit]
 SourcePath=/sbin/reboot-daemon
 Description= reboot-daemon service
+After=diag-reboot-app.service
 
 [Service]
-Type=forking
+Type=simple
 Restart=always
 ExecStart=/sbin/reboot-daemon
 
