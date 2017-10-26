@@ -9,4 +9,9 @@ do_install_append () {
     if ${@bb.utils.contains('DISTRO_FEATURES', 'early_init', 'true', 'false', d)}; then
         sed -i '/\/dev\/root/d' ${D}/${sysconfdir}/fstab
     fi
+
+    if ${@bb.utils.contains('IMAGE_FEATURES', 'read-only-rootfs', 'true', 'false', d)}; then
+        ln -sf ../usr/share/zoneinfo/UTC ${D}/etc/localtime
+        ln -sf ../proc/self/mounts       ${D}/etc/mtab
+    fi
 }

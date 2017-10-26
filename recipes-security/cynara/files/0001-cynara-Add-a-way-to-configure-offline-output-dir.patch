@@ -1,0 +1,33 @@
+From ec4134c4d8d35309e248c33db3c51c0f7bdb444d Mon Sep 17 00:00:00 2001
+From: Lei wang <leiwan@codeaurora.org>
+Date: Thu, 26 Oct 2017 12:58:56 +0800
+Subject: [PATCH] cynara: Add a way to configure offline output dir
+
+Signed-off-by: Lei wang <leiwan@codeaurora.org>
+---
+ src/admin/logic/OfflineLogic.cpp | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/src/admin/logic/OfflineLogic.cpp b/src/admin/logic/OfflineLogic.cpp
+index fc0b6a7..a69cdf8 100644
+--- a/src/admin/logic/OfflineLogic.cpp
++++ b/src/admin/logic/OfflineLogic.cpp
+@@ -54,6 +54,15 @@ OfflineLogic::OfflineLogic() {}
+ 
+ void OfflineLogic::acquireDatabase(void) {
+     m_storageBackend.reset(new InMemoryStorageBackend(PathConfig::StoragePath::dbDir));
++    // Add a way to configure output dir
++    const char* envp;
++    if (NULL != (envp = std::getenv("CYNARA_POLICY_PATH"))) {
++        std::string cynaraPolicyPath(envp);
++        m_storageBackend.reset(new InMemoryStorageBackend(cynaraPolicyPath));
++        std::cerr << "rheagarmama" << envp <<std::endl;
++    } else {
++        m_storageBackend.reset(new InMemoryStorageBackend(PathConfig::StoragePath::dbDir));
++    }
+     m_storage.reset(new Storage(*m_storageBackend));
+     m_storage->load();
+ }
+-- 
+1.9.1
+
