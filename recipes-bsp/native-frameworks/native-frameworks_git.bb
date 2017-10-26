@@ -10,7 +10,7 @@ PR = "r1"
 
 DEPENDS += "liblog libcutils libhardware libselinux system-core glib-2.0"
 
-SRC_URI="${CAF_LE_GIT}/platform/vendor/qcom-opensource/le-framework.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=frameworks/native;subpath=native"
+SRC_URI="${CAF_LE_GIT}/platform/vendor/qcom-opensource/le-framework.git;protocol=${CAF_PROT};nobranch=1;tag=${CAF_TAG};destsuffix=frameworks/native;subpath=native"
 SRC_URI  += "file://servicemanager.service"
 
 S = "${WORKDIR}/frameworks/native"

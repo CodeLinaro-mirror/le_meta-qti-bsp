@@ -12,7 +12,7 @@ PR = "r2"
 DEPENDS = "virtual/kernel wireless-tools"
 
 SRC_URI = " \
-    ${CAF_LA_GIT}/platform/vendor/qcom-opensource/wlan/prima.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=qcom-opensource/prima \
+    ${CAF_LA_GIT}/platform/vendor/qcom-opensource/wlan/prima.git;protocol=${CAF_PROT};nobranch=1;tag=${CAF_TAG};destsuffix=qcom-opensource/prima \
 "
 
 S = "${WORKDIR}/qcom-opensource/prima"

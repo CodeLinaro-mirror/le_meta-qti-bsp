@@ -12,8 +12,8 @@ DEPENDS = "common system-core hci-qcomm-init glib-2.0"
 RDEPENDS_${PN} = "libcutils"
 
 SRC_URI=" \
-    ${CAF_LA_GIT}/platform/hardware/qcom/bt.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=hardware/qcom/bt \
-    ${CAF_LA_GIT}/platform/system/bt.git;protocol=git;nobranch=1;tag=${CAF_TAG};subpath=hci/include;destsuffix=system/bt/hci/include \
+    ${CAF_LA_GIT}/platform/hardware/qcom/bt.git;protocol=${CAF_PROT};nobranch=1;tag=${CAF_TAG};destsuffix=hardware/qcom/bt \
+    ${CAF_LA_GIT}/platform/system/bt.git;protocol=${CAF_PROT};nobranch=1;tag=${CAF_TAG};subpath=hci/include;destsuffix=system/bt/hci/include \
 "
 
 S = "${WORKDIR}/hardware/qcom/bt/libbt-vendor/"

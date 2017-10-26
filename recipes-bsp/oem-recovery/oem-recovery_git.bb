@@ -9,8 +9,8 @@ HOMEPAGE = "https://www.codeaurora.org/gitweb/quic/la?p=device/qcom/common.git"
 
 # "edify/expr.h" from bootable/recovery is required for oem-recovery to compile.
 SRC_URI = " \
-    ${CAF_LA_GIT}/device/qcom/common.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=android_compat/device/qcom/common/recovery/oem-recovery;subpath=recovery/oem-recovery  \
-    ${CAF_LA_GIT}/platform/bootable/recovery.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=bootable/recovery/edify;subpath=edify \
+    ${CAF_LA_GIT}/device/qcom/common.git;protocol=${CAF_PROT};nobranch=1;tag=${CAF_TAG};destsuffix=android_compat/device/qcom/common/recovery/oem-recovery;subpath=recovery/oem-recovery  \
+    ${CAF_LA_GIT}/platform/bootable/recovery.git;protocol=${CAF_PROT};nobranch=1;tag=${CAF_TAG};destsuffix=bootable/recovery/edify;subpath=edify \
 "
 
 S = "${WORKDIR}/android_compat/device/qcom/common/recovery/oem-recovery/"

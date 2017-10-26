@@ -7,8 +7,8 @@ LICENSE = "BSD"
 PR = "r1"
 
 SRC_URI = " \
-    ${CAF_LA_GIT}/platform/vendor/qcom-opensource/wlan/prima.git;protocol=git;nobranch=1;tag=${CAF_TAG};subpath=firmware_bin;destsuffix=qcom-opensource/wlan/firmware_bin \
-    ${CAF_LA_GIT}/platform/vendor/qcom/ferrum.git;protocol=git;tag=${CAF_TAG};nobranch=1;destsuffix=android_compat/device/qcom/msm8909 \
+    ${CAF_LA_GIT}/platform/vendor/qcom-opensource/wlan/prima.git;protocol=${CAF_PROT};nobranch=1;tag=${CAF_TAG};subpath=firmware_bin;destsuffix=qcom-opensource/wlan/firmware_bin \
+    ${CAF_LA_GIT}/platform/vendor/qcom/ferrum.git;protocol=${CAF_PROT};tag=${CAF_TAG};nobranch=1;destsuffix=android_compat/device/qcom/msm8909 \
 "
 SRC_URI += "file://set_wcnss_mode"
 SRC_URI += "file://wcnss_wlan.service"

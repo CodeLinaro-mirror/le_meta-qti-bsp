@@ -11,7 +11,7 @@ PROVIDES = "virtual/bootloader"
 PR       = "r1"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
-SRC_URI="${CAF_LA_GIT}/kernel/lk.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=bootable/bootloader/lk"
+SRC_URI="${CAF_LA_GIT}/kernel/lk.git;protocol=${CAF_PROT};nobranch=1;tag=${CAF_TAG};destsuffix=bootable/bootloader/lk"
 
 S         =  "${WORKDIR}/bootable/bootloader/lk"
 

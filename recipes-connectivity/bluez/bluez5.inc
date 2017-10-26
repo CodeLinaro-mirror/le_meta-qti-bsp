@@ -14,7 +14,7 @@ DEPENDS = "udev alsa-lib libusb dbus-glib glib-2.0 libical"
 
 ASNEEDED = ""
 
-SRC_URI="${CAF_LA_GIT}/platform/external/bluetooth/bluez.git;nobranch=1;protocol=git;tag=${CAF_TAG};destsuffix=external/bluetooth/bluez"
+SRC_URI="${CAF_LA_GIT}/platform/external/bluetooth/bluez.git;nobranch=1;protocol=${CAF_PROT};tag=${CAF_TAG};destsuffix=external/bluetooth/bluez"
 
 S = "${WORKDIR}/external/bluetooth/bluez/"
 

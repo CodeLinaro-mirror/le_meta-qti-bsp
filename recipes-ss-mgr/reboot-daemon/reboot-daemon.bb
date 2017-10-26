@@ -5,7 +5,7 @@ LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 PR = "r4"
 
-SRC_URI="${CAF_LE_GIT}/mdm/reboot-daemon.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=mdm-ss-mgr/reboot-daemon"
+SRC_URI="${CAF_LE_GIT}/mdm/reboot-daemon.git;protocol=${CAF_PROT};nobranch=1;tag=${CAF_TAG};destsuffix=mdm-ss-mgr/reboot-daemon"
 SRC_URI += "file://reboot-daemon.service"
 
 S = "${WORKDIR}/mdm-ss-mgr/reboot-daemon"

@@ -12,10 +12,10 @@ DEPENDS = "common zlib btvendorhal libbt-vendor"
 # This recipe builds sources from both system/bt and qcom-opensource/bluetooth git projects.
 # Hence fetching both projects. Also added a patch to update paths in Makefile relative to ${S}.
 SRC_URI=" \
-    ${CAF_LA_GIT}/platform/system/bt.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=system/bt \
-    ${CAF_LA_GIT}/platform/vendor/qcom-opensource/bluetooth.git;protocol=git;nobranch=1;tag=${CAF_TAG};subpath=hal/include;destsuffix=vendor/qcom/opensource/bluetooth/hal/include \
-    ${CAF_LA_GIT}/platform/vendor/qcom-opensource/bluetooth.git;protocol=git;nobranch=1;tag=${CAF_TAG};subpath=system_bt_ext;destsuffix=vendor/qcom/opensource/bluetooth/system_bt_ext \ 
-    ${CAF_LA_GIT}/platform/vendor/qcom-opensource/bluetooth.git;protocol=git;nobranch=1;tag=${CAF_TAG};subpath=vhal/include;destsuffix=vendor/qcom/opensource/bluetooth/vhal/include \
+    ${CAF_LA_GIT}/platform/system/bt.git;protocol=${CAF_PROT};nobranch=1;tag=${CAF_TAG};destsuffix=system/bt \
+    ${CAF_LA_GIT}/platform/vendor/qcom-opensource/bluetooth.git;protocol=${CAF_PROT};nobranch=1;tag=${CAF_TAG};subpath=hal/include;destsuffix=vendor/qcom/opensource/bluetooth/hal/include \
+    ${CAF_LA_GIT}/platform/vendor/qcom-opensource/bluetooth.git;protocol=${CAF_PROT};nobranch=1;tag=${CAF_TAG};subpath=system_bt_ext;destsuffix=vendor/qcom/opensource/bluetooth/system_bt_ext \
+    ${CAF_LA_GIT}/platform/vendor/qcom-opensource/bluetooth.git;protocol=${CAF_PROT};nobranch=1;tag=${CAF_TAG};subpath=vhal/include;destsuffix=vendor/qcom/opensource/bluetooth/vhal/include \
 "
 
 SRC_URI += "file://0001-Change-WORKSPACE-references-relative-to-srcdir.patch"

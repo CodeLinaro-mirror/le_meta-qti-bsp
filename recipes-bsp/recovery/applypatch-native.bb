@@ -9,7 +9,7 @@ RDEPENDS_${PN} = "zlib bzip2"
 
 PR = "r1"
 
-SRC_URI="${CAF_LA_GIT}/platform/bootable/recovery.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=bootable/recovery/applypatch;subpath=applypatch;"
+SRC_URI="${CAF_LA_GIT}/platform/bootable/recovery.git;protocol=${CAF_PROT};nobranch=1;tag=${CAF_TAG};destsuffix=bootable/recovery/applypatch;subpath=applypatch;"
 
 S = "${WORKDIR}/bootable/recovery/applypatch"
 

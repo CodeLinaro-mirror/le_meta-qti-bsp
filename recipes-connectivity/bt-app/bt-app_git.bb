@@ -7,9 +7,9 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 
 SRC_URI =" \
-    ${CAF_LE_GIT}/platform/qcom-opensource/bt.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=qcom-opensource/bt \
-    ${CAF_LA_GIT}/platform/vendor/qcom-opensource/bluetooth.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=vendor/qcom/opensource/bluetooth/hal/include;subpath=hal/include \
-    ${CAF_LA_GIT}/platform/vendor/qcom-opensource/bluetooth.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=vendor/qcom/opensource/bluetooth/vhal/include;subpath=vhal/include \
+    ${CAF_LE_GIT}/platform/qcom-opensource/bt.git;protocol=${CAF_PROT};nobranch=1;tag=${CAF_TAG};destsuffix=qcom-opensource/bt \
+    ${CAF_LA_GIT}/platform/vendor/qcom-opensource/bluetooth.git;protocol=${CAF_PROT};nobranch=1;tag=${CAF_TAG};destsuffix=vendor/qcom/opensource/bluetooth/hal/include;subpath=hal/include \
+    ${CAF_LA_GIT}/platform/vendor/qcom-opensource/bluetooth.git;protocol=${CAF_PROT};nobranch=1;tag=${CAF_TAG};destsuffix=vendor/qcom/opensource/bluetooth/vhal/include;subpath=vhal/include \
 "
 SRC_URI += "file://0001-Use-srcdir-relative-paths-in-place-of-WORKSPACE.patch"
 

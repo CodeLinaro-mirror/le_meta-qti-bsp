@@ -9,7 +9,7 @@ ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 PR = "r4"
 
 SRC_URI = " \
-    ${CAF_LA_GIT}/device/qcom/common.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=android_compat/device/qcom/common/${BPN};subpath=${BPN} \
+    ${CAF_LA_GIT}/device/qcom/common.git;protocol=${CAF_PROT};nobranch=1;tag=${CAF_TAG};destsuffix=android_compat/device/qcom/common/${BPN};subpath=${BPN} \
 "
 SRC_URI  += "file://makefile"
 

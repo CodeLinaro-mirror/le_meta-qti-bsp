@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 
 SRC_URI = " \
-    ${CAF_LA_GIT}/platform/vendor/qcom-opensource/bluetooth.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=vendor/qcom/opensource/bluetooth \
+    ${CAF_LA_GIT}/platform/vendor/qcom-opensource/bluetooth.git;protocol=${CAF_PROT};nobranch=1;tag=${CAF_TAG};destsuffix=vendor/qcom/opensource/bluetooth \
 "
 
 S = "${WORKDIR}/vendor/qcom/opensource/bluetooth/"

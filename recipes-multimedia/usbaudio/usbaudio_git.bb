@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 
 SRC_URI   = " \
-    ${CAF_LA_GIT}/platform/hardware/libhardware.git;protocol=git;nobranch=1;tag=${CAF_TAG};subpath=modules/usbaudio;destsuffix=hardware/libhardware/modules/usbaudio \
+    ${CAF_LA_GIT}/platform/hardware/libhardware.git;protocol=${CAF_PROT};nobranch=1;tag=${CAF_TAG};subpath=modules/usbaudio;destsuffix=hardware/libhardware/modules/usbaudio \
 "
 
 S = "${WORKDIR}/hardware/libhardware/modules/usbaudio/"

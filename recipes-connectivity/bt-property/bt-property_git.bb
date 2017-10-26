@@ -10,7 +10,7 @@ ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 DEPENDS = "common glib-2.0"
 
 SRC_URI = " \
-    ${CAF_LE_GIT}/platform/qcom-opensource/bt.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=qcom-opensource/bt/property-ops;subpath=property-ops \
+    ${CAF_LE_GIT}/platform/qcom-opensource/bt.git;protocol=${CAF_PROT};nobranch=1;tag=${CAF_TAG};destsuffix=qcom-opensource/bt/property-ops;subpath=property-ops \
 "
 
 EXTRA_OECONF = " \

@@ -8,7 +8,7 @@ ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 PR = "r0"
 
 SRC_URI = " \
-    ${CAF_LA_GIT}/platform/hardware/qcom/audio.git;protocol=git;nobranch=1;tag=${CAF_TAG};subpath=mm-audio;destsuffix=hardware/qcom/audio/mm-audio \
+    ${CAF_LA_GIT}/platform/hardware/qcom/audio.git;protocol=${CAF_PROT};nobranch=1;tag=${CAF_TAG};subpath=mm-audio;destsuffix=hardware/qcom/audio/mm-audio \
 "
 
 S = "${WORKDIR}/hardware/qcom/audio/mm-audio/"

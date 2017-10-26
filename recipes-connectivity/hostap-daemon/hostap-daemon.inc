@@ -12,7 +12,7 @@ INC_PR = "r4"
 
 DEPENDS = "openssl libnl"
 
-SRC_URI="${CAF_LA_GIT}/platform/external/hostap.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=external/hostap"
+SRC_URI="${CAF_LA_GIT}/platform/external/hostap.git;protocol=${CAF_PROT};nobranch=1;tag=${CAF_TAG};destsuffix=external/hostap"
 
 S = "${WORKDIR}/external/hostap/hostapd/"
 
