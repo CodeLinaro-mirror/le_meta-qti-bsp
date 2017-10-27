@@ -5,7 +5,7 @@ LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/BSD;md5=3775480a712fc46a69647678acb234cb"
 PR = "r7"
 
-SRC_URI="${CAF_LE_GIT}/platform/init_mss.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=mdm-ss-mgr/init_mss"
+SRC_URI="${CAF_LE_GIT}/platform/init_mss.git;protocol=${CAF_PROT};nobranch=1;tag=${CAF_TAG};destsuffix=mdm-ss-mgr/init_mss"
 SRC_URI += "file://init_sys_mss.service"
 
 S = "${WORKDIR}/mdm-ss-mgr/init_mss/"

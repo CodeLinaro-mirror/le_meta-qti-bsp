@@ -1,0 +1,56 @@
+From 2be9ae2675269ac5acad4827ea20a0d4b34ee387 Mon Sep 17 00:00:00 2001
+From: Viswanath Kraleti <vkraleti@codeaurora.org>
+Date: Sat, 21 Oct 2017 19:01:39 +0530
+Subject: [PATCH] Use srcdir relative paths in place of WORKSPACE
+
+---
+ main/Makefile.am | 23 +++++++++++------------
+ 1 file changed, 11 insertions(+), 12 deletions(-)
+
+diff --git a/bt-app/main/Makefile.am b/bt-app/main/Makefile.am
+index 97b5daf..f2169c6 100644
+--- a/main/Makefile.am
++++ b/main/Makefile.am
+@@ -1,3 +1,5 @@
++oss_bt_path := $(top_srcdir)/../../../vendor/qcom/opensource/bluetooth
++
+ AM_CPPFLAGS = -O2 \
+             -D_GNU_SOURCE
+
+@@ -29,24 +31,21 @@ AM_CPPFLAGS += -I$(top_srcdir) \
+                -I$(top_srcdir)/hfp_ag/include \
+                -I$(top_srcdir)/include \
+                -I$(top_srcdir)/sdp_client/include \
+-               -I${WORKSPACE}/qcom-opensource/bt/gatt/include \
+-               -I${WORKSPACE}/system/media/audio/include \
+-               -I${WORKSPACE}/hardware/qcom/audio/qahw_api/inc \
+-               -I${WORKSPACE}/vendor/qcom/opensource/bluetooth/hal/include \
+-               -I${WORKSPACE}/vendor/qcom/opensource/bluetooth/vhal/include \
+-               -I${WORKSPACE}/mcm-api/api
++               -I$(top_srcdir)/../gatt/include \
++               -I$(oss_bt_path)/hal/include \
++               -I$(oss_bt_path)/vhal/include
+
+ if PLATFORM_USE_OBEX
+ AM_CPPFLAGS += -DOI_CPU_TYPE=19 \
+                -DUSE_OBEX \
+                -I$(top_srcdir)/pbap_client/include \
+                -I$(top_srcdir)/opp/include \
+-               -I${WORKSPACE}/qcom-opensource/bt/obex_profiles/include \
+-               -I${WORKSPACE}/qcom-opensource/bt/obex_profiles/include/profiles \
+-               -I${WORKSPACE}/qcom-opensource/bt/obex_profiles/profiles/obex \
+-               -I${WORKSPACE}/qcom-opensource/bt/obex_profiles/sdk/include \
+-               -I${WORKSPACE}/qcom-opensource/bt/obex_profiles/sdk/include/profiles \
+-               -I${WORKSPACE}/qcom-opensource/bt/obex_profiles/sdk/oem
++               -I$(top_srcdir)/../obex_profiles/include \
++               -I$(top_srcdir)/../obex_profiles/include/profiles \
++               -I$(top_srcdir)/../obex_profiles/profiles/obex \
++               -I$(top_srcdir)/../obex_profiles/sdk/include \
++               -I$(top_srcdir)/../obex_profiles/sdk/include/profiles \
++               -I$(top_srcdir)/../obex_profiles/sdk/oem
+
+ endif
+
+--
+1.9.1
+

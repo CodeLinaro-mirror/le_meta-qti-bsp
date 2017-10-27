@@ -6,7 +6,7 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 
-SRC_URI = "${CAF_LA_GIT}/platform/system/core.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=system/core"
+SRC_URI = "${CAF_LA_GIT}/platform/system/core.git;protocol=${CAF_PROT};nobranch=1;tag=${CAF_TAG};destsuffix=system/core"
 
 S = "${WORKDIR}/system/core"
 PR = "r19"

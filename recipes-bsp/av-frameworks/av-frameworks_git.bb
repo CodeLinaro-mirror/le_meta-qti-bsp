@@ -10,7 +10,7 @@ PR = "r1"
 
 DEPENDS = "native-frameworks libhardware system-media"
 
-SRC_URI= "${CAF_LE_GIT}/platform/vendor/qcom-opensource/le-framework.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=frameworks/av;subpath=av"
+SRC_URI= "${CAF_LE_GIT}/platform/vendor/qcom-opensource/le-framework.git;protocol=${CAF_PROT};nobranch=1;tag=${CAF_TAG};destsuffix=frameworks/av;subpath=av"
 
 S = "${WORKDIR}/frameworks/av"
 

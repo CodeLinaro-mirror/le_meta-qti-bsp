@@ -7,7 +7,7 @@ LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 BSD;md5=3775480a712fc46a69647678acb234cb"
 
-SRC_URI="${CAF_LA_GIT}/platform/external/bsdiff.git;tag=${CAF_TAG};nobranch=1;protocol=git;destsuffix=external/bsdiff"
+SRC_URI="${CAF_LA_GIT}/platform/external/bsdiff.git;tag=${CAF_TAG};nobranch=1;protocol=${CAF_PROT};destsuffix=external/bsdiff"
 
 S = "${WORKDIR}/external/bsdiff/"
 

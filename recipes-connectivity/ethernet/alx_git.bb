@@ -9,7 +9,7 @@ DEPENDS = "virtual/kernel"
 do_unpack[deptask] = "do_populate_sysroot"
 PR = "r4"
 
-SRC_URI = "${CAF_LA_GIT}/platform/external/compat-wireless.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=external/compat-wireless/drivers/net/ethernet/atheros/alx;subpath=drivers/net/ethernet/atheros/alx"
+SRC_URI = "${CAF_LA_GIT}/platform/external/compat-wireless.git;protocol=${CAF_PROT};nobranch=1;tag=${CAF_TAG};destsuffix=external/compat-wireless/drivers/net/ethernet/atheros/alx;subpath=drivers/net/ethernet/atheros/alx"
 SRC_URI += "file://start_alx_le"
 
 S = "${WORKDIR}/external/compat-wireless/drivers/net/ethernet/atheros/alx/"

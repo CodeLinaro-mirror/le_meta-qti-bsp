@@ -34,7 +34,7 @@ PR = "r0"
 DEPENDS = "rtsp-alg"
 
 
-SRC_URI="${CAF_LA_GIT}/platform/vendor/qcom-opensource/wlan/qcacld-2.0.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=wlan/qcacld-2.0"
+SRC_URI="${CAF_LA_GIT}/platform/vendor/qcom-opensource/wlan/qcacld-2.0.git;protocol=${CAF_PROT};nobranch=1;tag=${CAF_TAG};destsuffix=wlan/qcacld-2.0"
 
 S = "${WORKDIR}/wlan/qcacld-2.0/"
 

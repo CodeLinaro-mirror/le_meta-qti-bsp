@@ -12,8 +12,8 @@ RDEPENDS_${PN} = "zlib bzip2"
 
 # minadbd need adb headers from system-core project to compile.
 SRC_URI = " \
-    ${CAF_LA_GIT}/platform/bootable/recovery.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=bootable/recovery \
-    ${CAF_LA_GIT}/platform/system/core.git;nobranch=1;protocol=git;tag=${CAF_TAG};destsuffix=system/core/adb;subpath=adb \
+    ${CAF_LA_GIT}/platform/bootable/recovery.git;protocol=${CAF_PROT};nobranch=1;tag=${CAF_TAG};destsuffix=bootable/recovery \
+    ${CAF_LA_GIT}/platform/system/core.git;nobranch=1;protocol=${CAF_PROT};tag=${CAF_TAG};destsuffix=system/core/adb;subpath=adb \
 "
 
 SRC_URI += "file://recovery.service"

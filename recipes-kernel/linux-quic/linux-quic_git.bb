@@ -51,7 +51,7 @@ KERNEL_EXTRA_ARGS        += "O=${B}"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-SRC_URI="${CAF_LA_GIT}/kernel/msm-3.18.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=kernel/msm-3.18"
+SRC_URI="${CAF_LA_GIT}/kernel/msm-3.18.git;protocol=${CAF_PROT};nobranch=1;tag=${CAF_TAG};destsuffix=kernel/msm-3.18"
 
 SRC_DIR   =  "${WORKDIR}/kernel/msm-3.18"
 S         =  "${WORKDIR}/kernel/msm-3.18"

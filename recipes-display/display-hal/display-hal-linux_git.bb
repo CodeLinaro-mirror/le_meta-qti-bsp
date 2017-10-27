@@ -8,7 +8,7 @@ ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 PR = "r8"
 
 SRC_URI = " \
-    ${CAF_LA_GIT}/platform/hardware/qcom/display.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=display/display-hal \
+    ${CAF_LA_GIT}/platform/hardware/qcom/display.git;protocol=${CAF_PROT};nobranch=1;tag=${CAF_TAG};destsuffix=display/display-hal \
 "
 
 S = "${WORKDIR}/display/display-hal/"

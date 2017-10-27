@@ -3,8 +3,8 @@ inherit qcommon
 PR = "r0"
 
 SRC_URI = " \
-    ${CAF_LA_GIT}/device/qcom/common.git;protocol=git;tag=${CAF_TAG};nobranch=1;destsuffix=android_compat/device/qcom/common \
-    ${CAF_LA_GIT}/platform/vendor/qcom/ferrum.git;protocol=git;tag=${CAF_TAG};nobranch=1;destsuffix=android_compat/device/qcom/msm8909 \
+    ${CAF_LA_GIT}/device/qcom/common.git;protocol=${CAF_PROT};tag=${CAF_TAG};nobranch=1;destsuffix=android_compat/device/qcom/common \
+    ${CAF_LA_GIT}/platform/vendor/qcom/ferrum.git;protocol=${CAF_PROT};tag=${CAF_TAG};nobranch=1;destsuffix=android_compat/device/qcom/msm8909 \
 "
 SRC_URI  += "file://persist-prop.sh"
 

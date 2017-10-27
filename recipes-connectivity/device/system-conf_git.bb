@@ -6,7 +6,7 @@ PR = "r3"
 
 # Provide a baseline
 
-SRC_URI="${CAF_LE_GIT}/qcom-opensource/mdm-init.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=mdm-init"
+SRC_URI="${CAF_LE_GIT}/qcom-opensource/mdm-init.git;protocol=${CAF_PROT};nobranch=1;tag=${CAF_TAG};destsuffix=mdm-init"
 SRC_URI += "file://wlan_daemon.service"
 
 # Update for each machine

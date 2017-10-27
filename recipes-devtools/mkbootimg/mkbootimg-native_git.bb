@@ -11,7 +11,7 @@ DEPENDS += "libmincrypt-native"
 PR = "r6"
 
 SRC_URI = " \
-    ${CAF_LA_GIT}/platform/system/core.git;protocol=git;nobranch=1;tag=${CAF_TAG};subpath=${BPN};destsuffix=system/core/${BPN} \
+    ${CAF_LA_GIT}/platform/system/core.git;protocol=${CAF_PROT};nobranch=1;tag=${CAF_TAG};subpath=${BPN};destsuffix=system/core/${BPN} \
 "
 SRC_URI  += "file://makefile"
 

@@ -9,8 +9,8 @@ PR = "r0"
 DEPENDS = "libpcre libmincrypt liblog libcutils"
 
 SRC_URI = "\
-    ${CAF_LA_GIT}/platform/external/libselinux.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=external/libselinux \
-    ${CAF_LA_GIT}/platform/system/core.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=system/core/include;subpath=include \
+    ${CAF_LA_GIT}/platform/external/libselinux.git;protocol=${CAF_PROT};nobranch=1;tag=${CAF_TAG};destsuffix=external/libselinux \
+    ${CAF_LA_GIT}/platform/system/core.git;protocol=${CAF_PROT};nobranch=1;tag=${CAF_TAG};destsuffix=system/core/include;subpath=include \
 "
 S = "${WORKDIR}/external/libselinux"
 

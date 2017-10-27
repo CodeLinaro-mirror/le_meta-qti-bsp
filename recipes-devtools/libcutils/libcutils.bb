@@ -13,8 +13,8 @@ DEPENDS += "liblog"
 BBCLASSEXTEND = "native"
 
 SRC_URI = "\
-    ${CAF_LA_GIT}/platform/system/core.git;protocol=git;nobranch=1;tag=${CAF_TAG};subpath=${BPN};destsuffix=system/core/${BPN} \
-    ${CAF_LA_GIT}/platform/system/core.git;protocol=git;nobranch=1;tag=${CAF_TAG};subpath=include;destsuffix=system/core/include \
+    ${CAF_LA_GIT}/platform/system/core.git;protocol=${CAF_PROT};nobranch=1;tag=${CAF_TAG};subpath=${BPN};destsuffix=system/core/${BPN} \
+    ${CAF_LA_GIT}/platform/system/core.git;protocol=${CAF_PROT};nobranch=1;tag=${CAF_TAG};subpath=include;destsuffix=system/core/include \
 "
 
 S = "${WORKDIR}/system/core/${BPN}"

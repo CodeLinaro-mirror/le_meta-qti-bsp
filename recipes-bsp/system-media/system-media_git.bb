@@ -8,7 +8,7 @@ ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 
 DEPENDS = "system-core tinyalsa expat"
 
-SRC_URI="${CAF_LA_GIT}/platform/system/media.git;protocol=git;nobranch=1;tag=${CAF_TAG};destsuffix=system/media;"
+SRC_URI="${CAF_LA_GIT}/platform/system/media.git;protocol=${CAF_PROT};nobranch=1;tag=${CAF_TAG};destsuffix=system/media;"
 
 S = "${WORKDIR}/system/media"
 

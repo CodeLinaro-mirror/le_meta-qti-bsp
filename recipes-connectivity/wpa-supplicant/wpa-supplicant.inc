@@ -14,7 +14,7 @@ INC_PR = "r4"
 
 DEPENDS = "openssl libnl"
 
-SRC_URI="${CAF_LA_GIT}/platform/external/hostap.git;tag=${CAF_TAG};protocol=git;nobranch=1;destsuffix=external/hostap"
+SRC_URI="${CAF_LA_GIT}/platform/external/hostap.git;tag=${CAF_TAG};protocol=${CAF_PROT};nobranch=1;destsuffix=external/hostap"
 S = "${WORKDIR}/external/hostap/wpa_supplicant"
 
 do_install() {
