@@ -34,7 +34,7 @@ Before=systemd-fsck@dev-disk-by\x2dpartlabel-userdata.service
 
 [Service]
 Type=oneshot
-ExecStart=/sbin/e2fsck -fy /dev/disk/by-partlabel/userdata ; /sbin/resize2fs -f /dev/disk/by-partlabel/userdata
+ExecStart=/lib/systemd/systemd-fsck /dev/disk/by-partlabel/userdata ; /sbin/resize2fs -f /dev/disk/by-partlabel/userdata
 ExecStartPost=/bin/systemctl disable resize-userdata.service
 
 [Install]
