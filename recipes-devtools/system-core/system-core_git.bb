@@ -17,6 +17,8 @@ DEPENDS = "virtual/kernel openssl glib-2.0 libselinux safe-iop ext4-utils libunw
 EXTRA_OECONF = " --with-host-os=${HOST_OS} --with-glib"
 EXTRA_OECONF_append = " --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
 EXTRA_OECONF_append = " --with-logd-logging"
+EXTRA_OECONF_append = "${@base_conditional('USER_BUILD','1',' --disable-debuggerd','',d)}"
+EXTRA_OECONF_append_apq8053 = " --enable-logd-privs"
 
 # Disable adb root privileges in USER builds for msm targets
 EXTRA_OECONF_append_msm = "${@base_conditional('USER_BUILD','1',' --disable-adb-root','',d)}"
@@ -72,15 +74,32 @@ do_install_append() {
       install -m 0644 ${S}/leproperties/leprop.service -D ${D}${systemd_unitdir}/system/leprop.service
       ln -sf ${systemd_unitdir}/system/leprop.service \
           ${D}${systemd_unitdir}/system/multi-user.target.wants/leprop.service
+   else
+      install -m 0755 ${S}/adb/start_adbd -D ${D}${sysconfdir}/init.d/adbd
+      if [ ${BASEMACHINE} != "apq8053" ]; then
+          install -m 0755 ${S}/logd/start_logd -D ${D}${sysconfdir}/init.d/logd
+      fi
    fi
 }
 
 do_install_append_apq8009() {
    install -m 0755 ${S}/debuggerd/start_debuggerd -D ${D}${sysconfdir}/init.d/init_debuggerd
 }
+
+#Install rules specific to apq8053 target
 do_install_append_apq8053(){
    install -m 0755 ${S}/debuggerd/start_debuggerd64 -D ${D}${sysconfdir}/init.d/init_debuggerd
+
+  DEBUGGERD_NO_INSTALL=${@base_conditional('USER_BUILD','1','no-debuggerd','',d)}
+  if [ "x$DEBUGGERD_NO_INSTALL" == "x" ]; then
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'false', 'true', d)}; then
+      install -m 0755 ${S}/debuggerd/start_debuggerd64 -D ${D}${sysconfdir}/init.d/init_debuggerd
+    else
+      install -m 0755 ${S}/debuggerd/start_debuggerd64 -D ${D}${sysconfdir}/initscripts/init_debuggerd
+    fi
+  fi
 }
+
 do_install_append_apq8096() {
    install -m 0755 ${S}/debuggerd/start_debuggerd64 -D ${D}${sysconfdir}/init.d/init_debuggerd
 }
@@ -102,6 +121,9 @@ INITSCRIPT_PACKAGES =+ "${PN}-logd"
 INITSCRIPT_NAME_${PN}-logd = "logd"
 INITSCRIPT_PARAMS_${PN}-logd = "start 10  2 3 4 5 ."
 INITSCRIPT_PARAMS_${PN}-logd += "stop 39  6 ."
+
+INITSCRIPT_PACKAGES_remove_apq8053 = "${PN}-logd"
+INITSCRIPT_PACKAGES_remove_apq8053-32 = "${PN}-logd"
 
 INITSCRIPT_PACKAGES =+ "${PN}-post-boot"
 INITSCRIPT_NAME_${PN}-post-boot = "init_post_boot"

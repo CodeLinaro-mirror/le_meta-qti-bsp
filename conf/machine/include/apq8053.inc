@@ -43,3 +43,12 @@ DEFAULTTUNE_virtclass-multilib-lib32 ?= "armv7a-neon"
 
 #Enable SDK feature
 SDK_IMAGE ?= "1"
+
+#Enable Recovery image generation
+RECOVERY_IMAGE ?= "1"
+
+# Formats of root filesystem images.
+IMAGE_FSTYPES += "ext4"
+
+#Extra fsconfig related options for ota package generator scripts.
+OTA_EXTRA_OPTS ?= "1"
