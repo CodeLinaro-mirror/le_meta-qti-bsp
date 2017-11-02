@@ -15,11 +15,14 @@ do_install_append() {
 }
 
 pkg_postinst_${PN}-adbd () {
-    if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
-        if [ -n "$D" ]; then
-            OPTS="--root=$D"
+    if [ "${BASEMACHINE}" == "8x96autogvmquin" ] || [ "${BASEMACHINE}" == "8x96autogvmquintcu" ]; then
+    else
+        if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
+            if [ -n "$D" ]; then
+                OPTS="--root=$D"
+            fi
+            systemctl $OPTS mask adbd.service
         fi
-        systemctl $OPTS mask adbd.service
     fi
 }
 
