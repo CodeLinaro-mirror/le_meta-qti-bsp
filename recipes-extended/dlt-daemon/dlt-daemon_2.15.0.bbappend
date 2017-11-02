@@ -1,4 +1,4 @@
-SRC_URI = "git://github.com/GENIVI/${BPN}.git;protocol=https \
+SRC_URI = "${CAF_GIT}/genivi/dlt-daemon;protocol=git;branch=github/master \
     file://0002-Don-t-execute-processes-as-a-specific-user.patch \
     file://0004-Modify-systemd-config-directory.patch \
     "

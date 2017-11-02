@@ -1,3 +1,3 @@
 SRC_URI = " \
-    git://github.com/GENIVI/persistence-administrator.git;protocol=git \
+    ${CAF_GIT}/genivi/persistence/persistence-administrator;protocol=git;branch=genivi/persistence-administrator/master \
     "
