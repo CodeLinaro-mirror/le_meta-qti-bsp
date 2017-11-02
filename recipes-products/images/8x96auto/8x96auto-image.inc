@@ -4,12 +4,10 @@ demos."
 require recipes-platform/images/agl-demo-platform.bb
 require ../common-auto-image.inc
 
-IMAGE_INSTALL += "ril"
 IMAGE_INSTALL += "sqlite3"
 IMAGE_INSTALL += "system-core"
 IMAGE_INSTALL += "system-prop"
 IMAGE_INSTALL += "native-frameworks"
-IMAGE_INSTALL += "protobuf"
 IMAGE_INSTALL += "libhardware"
 IMAGE_INSTALL += "libhardware-legacy"
 IMAGE_INSTALL += "libcap"
@@ -30,6 +28,7 @@ IMAGE_INSTALL_remove = "qtwebengine-qmlplugins"
 IMAGE_INSTALL_remove = "qtwebengine-examples"
 IMAGE_INSTALL_remove = "qtwebsockets"
 IMAGE_INSTALL_remove = "qtwebchannel"
+IMAGE_INSTALL_remove = "web-runtime"
 
 # Early init
 IMAGE_INSTALL += "${@bb.utils.contains("DISTRO_FEATURES", "early_init", "early-init", "" ,d)}"
