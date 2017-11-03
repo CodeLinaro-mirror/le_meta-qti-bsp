@@ -14,6 +14,7 @@ IMAGE_INSTALL += "pps-tools"
 IMAGE_INSTALL += "network-conf"
 IMAGE_INSTALL += "can-utils"
 IMAGE_INSTALL += "socat"
+IMAGE_INSTALL += "libevent"
 
 IMAGE_INSTALL += "gps-utils"
 IMAGE_INSTALL += "loc-hal"
