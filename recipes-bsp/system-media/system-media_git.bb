@@ -9,8 +9,8 @@ ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 DEPENDS = "system-core tinyalsa expat"
 
 FILESPATH =+ "${WORKSPACE}:"
-SRC_URI   = "file://system/media/"
-S = "${WORKDIR}/system/media"
+SRC_URI   = "file://frameworks/system/media/"
+S = "${WORKDIR}/frameworks/system/media"
 
 CFLAGS += "-Wno-error"
 EXTRA_OECONF += " --with-glib"
