@@ -116,6 +116,7 @@ IMAGE_INSTALL += "dbus-cynara"
 IMAGE_INSTALL += "security-manager"
 IMAGE_INSTALL += "security-manager-policy"
 IMAGE_INSTALL += "agl-users"
+IMAGE_INSTALL += "low-level-can-service"
 
 # base passwd
 IMAGE_INSTALL += "base-passwd"
