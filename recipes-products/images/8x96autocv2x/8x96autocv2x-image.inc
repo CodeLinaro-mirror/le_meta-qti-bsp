@@ -3,7 +3,7 @@ DESCRIPTION = "AGL image for CV2X fusion headless board"
 # Base image
 require recipes-ivi/images/agl-image-ivi.inc
 
-IMAGE_INSTALL += "packagegroup-agl-core"
+IMAGE_INSTALL += "packagegroup-agl-image-minimal"
 
 IMAGE_INSTALL += "iproute2"
 IMAGE_INSTALL += "pciutils"
