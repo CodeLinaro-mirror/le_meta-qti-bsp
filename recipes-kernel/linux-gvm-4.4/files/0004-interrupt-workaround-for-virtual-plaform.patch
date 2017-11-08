@@ -1,4 +1,4 @@
-From 93df4ea9136e5e5eb90297bf3e8e1dc6dc3f9442 Mon Sep 17 00:00:00 2001
+From ecec4064a49847d7e321cfae66a7c81c4c4a3f2b Mon Sep 17 00:00:00 2001
 From: Zhiqiang Tu <ztu@codeaurora.org>
 Date: Tue, 15 Aug 2017 14:32:35 +0800
 Subject: [PATCH] interrupt workaround for virtual plaform
@@ -7,6 +7,8 @@ Change-Id: I349ecd2b87c1c85b72c1f3870052f610b13d803a
 Signed-off-by: Zhiqiang Tu <ztu@codeaurora.org>
 ---
  drivers/i2c/busses/i2c-msm-v2.c                  |  5 ++++
+ drivers/mmc/host/sdhci-msm.c                     |  7 ++++++
+ drivers/mmc/host/sdhci.c                         | 11 ++++++++
  drivers/net/can/spi/rh850.c                      |  6 +++++
  drivers/platform/msm/ipa/ipa_v2/ipa_interrupts.c |  5 ++++
  drivers/platform/msm/sps/sps_bam.c               | 12 +++++++++
@@ -16,7 +18,7 @@ Signed-off-by: Zhiqiang Tu <ztu@codeaurora.org>
  drivers/soc/qcom/subsystem_restart.c             | 32 ++++++++++++++++++++++++
  drivers/spi/spi_qsd.h                            |  5 ++++
  drivers/tty/serial/msm_serial_hs.c               | 11 ++++++++
- 10 files changed, 115 insertions(+)
+ 12 files changed, 133 insertions(+)
 
 diff --git a/drivers/i2c/busses/i2c-msm-v2.c b/drivers/i2c/busses/i2c-msm-v2.c
 index f4ed71f..d738dc9 100644
@@ -36,11 +38,67 @@ index f4ed71f..d738dc9 100644
  	if (ret) {
  		dev_err(ctrl->dev, "error request_irq(irq_num:%d ) ret:%d\n",
  								irq, ret);
+diff --git a/drivers/mmc/host/sdhci-msm.c b/drivers/mmc/host/sdhci-msm.c
+index 45d2f69..a982ee8 100644
+--- a/drivers/mmc/host/sdhci-msm.c
++++ b/drivers/mmc/host/sdhci-msm.c
+@@ -4683,10 +4683,17 @@ static int sdhci_msm_probe(struct platform_device *pdev)
+ 		dev_info(&pdev->dev, "%s: sdiowakeup_irq = %d\n", __func__,
+ 				msm_host->pdata->sdiowakeup_irq);
+ 		msm_host->is_sdiowakeup_enabled = true;
++#ifndef CONFIG_MSM_GVM_QUIN
+ 		ret = request_irq(msm_host->pdata->sdiowakeup_irq,
+ 				  sdhci_msm_sdiowakeup_irq,
+ 				  IRQF_SHARED | IRQF_TRIGGER_HIGH,
+ 				  "sdhci-msm sdiowakeup", host);
++#else
++		ret = request_irq(msm_host->pdata->sdiowakeup_irq,
++				  sdhci_msm_sdiowakeup_irq,
++				  IRQF_SHARED | IRQF_TRIGGER_HIGH | IRQF_ONESHOT,
++				  "sdhci-msm sdiowakeup", host);
++#endif
+ 		if (ret) {
+ 			dev_err(&pdev->dev, "%s: request sdiowakeup IRQ %d: failed: %d\n",
+ 				__func__, msm_host->pdata->sdiowakeup_irq, ret);
+diff --git a/drivers/mmc/host/sdhci.c b/drivers/mmc/host/sdhci.c
+index 5906bba..fe64786 100644
+--- a/drivers/mmc/host/sdhci.c
++++ b/drivers/mmc/host/sdhci.c
+@@ -3482,9 +3482,15 @@ int sdhci_resume_host(struct sdhci_host *host)
+ 	}
+ 
+ 	if (!device_may_wakeup(mmc_dev(host->mmc))) {
++#ifndef CONFIG_MSM_GVM_QUIN
+ 		ret = request_threaded_irq(host->irq, sdhci_irq,
+ 					   sdhci_thread_irq, IRQF_SHARED,
+ 					   mmc_hostname(host->mmc), host);
++#else
++		ret = request_threaded_irq(host->irq, sdhci_irq,
++					   sdhci_thread_irq, IRQF_SHARED | IRQF_ONESHOT,
++					   mmc_hostname(host->mmc), host);
++#endif
+ 		if (ret)
+ 			return ret;
+ 	} else {
+@@ -4367,8 +4373,13 @@ int sdhci_add_host(struct sdhci_host *host)
+ 
+ 	sdhci_init(host, 0);
+ 
++#ifndef CONFIG_MSM_GVM_QUIN
+ 	ret = request_threaded_irq(host->irq, sdhci_irq, sdhci_thread_irq,
+ 				   IRQF_SHARED,	mmc_hostname(mmc), host);
++#else
++	ret = request_threaded_irq(host->irq, sdhci_irq, sdhci_thread_irq,
++				   IRQF_SHARED | IRQF_ONESHOT, mmc_hostname(mmc), host);
++#endif
+ 	if (ret) {
+ 		pr_err("%s: Failed to request IRQ %d: %d\n",
+ 		       mmc_hostname(mmc), host->irq, ret);
 diff --git a/drivers/net/can/spi/rh850.c b/drivers/net/can/spi/rh850.c
-index a93f979..bd1090f 100644
+index d2b6e8c..9d9c21d 100644
 --- a/drivers/net/can/spi/rh850.c
 +++ b/drivers/net/can/spi/rh850.c
-@@ -1132,9 +1132,15 @@ static int rh850_probe(struct spi_device *spi)
+@@ -1134,9 +1134,15 @@ static int rh850_probe(struct spi_device *spi)
  		}
  	}
  
@@ -108,10 +166,10 @@ index 38a6474..2b24da2 100644
  					"sps:BAM %pa uses level for IRQ# %d\n",
  					BAM_ID(dev), dev->props.irq);
 diff --git a/drivers/soc/qcom/glink_smem_native_xprt.c b/drivers/soc/qcom/glink_smem_native_xprt.c
-index 37193bb..5ad05b2 100644
+index 042108d..290ec00 100644
 --- a/drivers/soc/qcom/glink_smem_native_xprt.c
 +++ b/drivers/soc/qcom/glink_smem_native_xprt.c
-@@ -2425,9 +2425,15 @@ static int glink_smem_native_probe(struct platform_device *pdev)
+@@ -2426,9 +2426,15 @@ static int glink_smem_native_probe(struct platform_device *pdev)
  	}
  
  	einfo->irq_line = irq_line;
@@ -127,7 +185,7 @@ index 37193bb..5ad05b2 100644
  	if (rc < 0) {
  		pr_err("%s: request_irq on %d failed: %d\n", __func__, irq_line,
  									rc);
-@@ -2674,9 +2680,15 @@ static int glink_rpm_native_probe(struct platform_device *pdev)
+@@ -2675,9 +2681,15 @@ static int glink_rpm_native_probe(struct platform_device *pdev)
  	}
  
  	einfo->irq_line = irq_line;
@@ -143,7 +201,7 @@ index 37193bb..5ad05b2 100644
  	if (rc < 0) {
  		pr_err("%s: request_irq on %d failed: %d\n", __func__, irq_line,
  									rc);
-@@ -2918,9 +2930,15 @@ static int glink_mailbox_probe(struct platform_device *pdev)
+@@ -2919,9 +2931,15 @@ static int glink_mailbox_probe(struct platform_device *pdev)
  	}
  
  	einfo->irq_line = irq_line;
@@ -328,10 +386,10 @@ index 47d6996..0451b9b 100644
  
  static inline void msm_spi_disable_irqs(struct msm_spi *dd)
 diff --git a/drivers/tty/serial/msm_serial_hs.c b/drivers/tty/serial/msm_serial_hs.c
-index b80e75f..74de8b7 100644
+index 416006a..e93b5f1 100644
 --- a/drivers/tty/serial/msm_serial_hs.c
 +++ b/drivers/tty/serial/msm_serial_hs.c
-@@ -2614,9 +2614,15 @@ static int msm_hs_startup(struct uart_port *uport)
+@@ -2691,9 +2691,15 @@ static int msm_hs_startup(struct uart_port *uport)
  	msm_hs_resource_vote(msm_uport);
  
  	if (is_use_low_power_wakeup(msm_uport)) {
@@ -347,7 +405,7 @@ index b80e75f..74de8b7 100644
  		if (unlikely(ret)) {
  			MSM_HS_ERR("%s():Err getting uart wakeup_irq %d\n",
  				  __func__, ret);
-@@ -2716,8 +2722,13 @@ static int msm_hs_startup(struct uart_port *uport)
+@@ -2796,8 +2802,13 @@ static int msm_hs_startup(struct uart_port *uport)
  	 */
  	mb();
  
