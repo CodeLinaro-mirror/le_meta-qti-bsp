@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 
 include ${MACHINE}-image.inc
 
-COMPATIBLE_MACHINE = "(8x96auto|8x96autogvmquin|8x96autogvmred)"
+COMPATIBLE_MACHINE = "(8x96auto|8x96autogvmquin|8x96autogvmred|8x96autogvmgh)"
 
 # Default image type is zImage, change it in machine conf if needed.
 KERNEL_IMAGETYPE ?= "zImage"
@@ -220,4 +220,6 @@ do_deploy () {
 INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmquin', '8x96autogvmquin-image.inc', 'none',d)}"
 include ${INCSUFFIX}.inc
 INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autored', '8x96autogvmred-image.inc', 'none',d)}"
+include ${INCSUFFIX}.inc
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmgh', '8x96autogvmgh-image.inc', 'none',d)}"
 include ${INCSUFFIX}.inc
