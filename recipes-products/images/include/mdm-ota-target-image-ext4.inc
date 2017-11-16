@@ -128,7 +128,7 @@ do_recovery_ext4() {
 python do_gen_otazip_ext4() {
     import subprocess
 
-    cmd1 = "cd ${IMAGE_ROOTFS}/../${MACHINE}-ota-target-image-ext4 && zip -qry ${TMPDIR}/work/x86_64-linux/releasetools-native/1.0-r0/releasetools/target-files-ext4.zip *"
+    cmd1 = "cd ${IMAGE_ROOTFS}/../${MACHINE}-ota-target-image-ext4 && zip -qry -FS ${TMPDIR}/work/x86_64-linux/releasetools-native/1.0-r0/releasetools/target-files-ext4.zip *"
     subprocess.call(cmd1, shell=True)
 
     cmd2 = "cd ${TMPDIR}/work/x86_64-linux/releasetools-native/1.0-r0/releasetools && ./full_ota.sh target-files-ext4.zip ${IMAGE_ROOTFS} ext4"
