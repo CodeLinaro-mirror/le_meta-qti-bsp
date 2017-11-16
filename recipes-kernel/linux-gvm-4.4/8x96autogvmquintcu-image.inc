@@ -56,6 +56,7 @@ SRC_URI_append += " \
     file://0004-interrupt-workaround-for-virtual-plaform.patch \
     file://0005-Revert-soc-qcom-remove-debugfs-interface-from-ssr-se.patch \
     file://0006-drivers-char-diag-Enable-diag-over-IP.patch \
+    file://0007-mmc-sdhci-msm-clock-workaround-for-virtual-platform.patch \
     file://0008-mmc-Fix-mmc-compilation-error-when-devfreq-isn-t-ena.patch \
     file://0009-cnss-Adapt-cnss-to-virtual-platform.patch \
 "
