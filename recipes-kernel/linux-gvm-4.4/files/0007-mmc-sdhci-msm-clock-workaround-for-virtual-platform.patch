@@ -1,0 +1,45 @@
+From a0327e916c5d74d139359cbc079b53174cab6ee2 Mon Sep 17 00:00:00 2001
+From: Zhiqiang Tu <ztu@codeaurora.org>
+Date: Mon, 6 Nov 2017 10:29:29 +0800
+Subject: [PATCH] mmc: sdhci-msm: clock workaround for virtual platform
+
+Workaround for clock rate setting.
+
+Change-Id: Ieea6ff65a532c77b9fcf61673db4f12100db99fb
+Signed-off-by: Zhiqiang Tu <ztu@codeaurora.org>
+---
+ drivers/mmc/host/sdhci-msm.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/drivers/mmc/host/sdhci-msm.c b/drivers/mmc/host/sdhci-msm.c
+index 45d2f69..203d1fe 100644
+--- a/drivers/mmc/host/sdhci-msm.c
++++ b/drivers/mmc/host/sdhci-msm.c
+@@ -3213,8 +3213,14 @@ static void sdhci_msm_set_clock(struct sdhci_host *host, unsigned int clock)
+ 	mb();
+ 
+ 	if (sup_clock != msm_host->clk_rate) {
++#ifndef CONFIG_MSM_GVM_QUIN
+ 		pr_debug("%s: %s: setting clk rate to %u\n",
+ 				mmc_hostname(host->mmc), __func__, sup_clock);
++#else
++		pr_info("%s: %s: setting clk rate to %u\n",
++				mmc_hostname(host->mmc), __func__, sup_clock);
++		msleep(5 * 1000);
++#endif
+ 		rc = clk_set_rate(msm_host->clk, sup_clock);
+ 		if (rc) {
+ 			pr_err("%s: %s: Failed to set rate %u for host-clk : %d\n",
+@@ -4611,7 +4617,9 @@ static int sdhci_msm_probe(struct platform_device *pdev)
+ 	msm_host->mmc->caps2 |= msm_host->pdata->caps2;
+ 	msm_host->mmc->caps2 |= MMC_CAP2_BOOTPART_NOACC;
+ 	msm_host->mmc->caps2 |= MMC_CAP2_HS400_POST_TUNING;
++#ifndef CONFIG_MSM_GVM_QUIN
+ 	msm_host->mmc->caps2 |= MMC_CAP2_CLK_SCALE;
++#endif
+ 	msm_host->mmc->caps2 |= MMC_CAP2_SANITIZE;
+ 	msm_host->mmc->caps2 |= MMC_CAP2_MAX_DISCARD_SIZE;
+ 	msm_host->mmc->caps2 |= MMC_CAP2_SLEEP_AWAKE;
+-- 
+1.9.1
+
