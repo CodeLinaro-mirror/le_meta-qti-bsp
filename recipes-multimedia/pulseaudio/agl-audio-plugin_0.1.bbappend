@@ -12,3 +12,6 @@ EXTRA_OECMAKE += "${@base_conditional('MACHINE', '8x96autogvmquin', ' -DGVM_TYPE
 EXTRA_OECMAKE += "${@base_conditional('MACHINE', '8x96autogvmquin44', ' -DGVM_TYPE:STRING=${GVM_TYPE_AUTO}', '', d)} "
 EXTRA_OECMAKE += "${@base_conditional('MACHINE', '8x96autogvmred', ' -DGVM_TYPE:STRING=${GVM_TYPE_AUTO}', '', d)} "
 
+DEPENDS += "${@base_conditional('MACHINE', '8x96autogvmquin', 'vapm-lib', '', d)}"
+DEPENDS += "${@base_conditional('MACHINE', '8x96autogvmred', 'vapm-lib', '', d)}"
+DEPENDS += "${@base_conditional('MACHINE', '8x96autogvmgh', 'vapm-lib', '', d)}"
