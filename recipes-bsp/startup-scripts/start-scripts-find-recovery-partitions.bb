@@ -17,6 +17,11 @@ INITSCRIPT_PARAMS_8x96autofusion = "start 01 5 ."
 INITSCRIPT_PARAMS_8x96autonapier = "start 01 5 ."
 
 do_install() {
+    # find-recovery-partitons need a writable rootfs
+    if ${@bb.utils.contains('IMAGE_FEATURES','read-only-rootfs','true','false',d)}; then
+        sed -i '/mount -o remount,rw \/.*$/d' ${WORKDIR}/${BASEMACHINE}/find_recovery_partitions.sh
+        sed -i '/^emmc_dir=.*$/i\mount -o remount,rw \/' ${WORKDIR}/${BASEMACHINE}/find_recovery_partitions.sh
+    fi
     install -m 0755 ${WORKDIR}/${BASEMACHINE}/find_recovery_partitions.sh -D ${D}${sysconfdir}/init.d/find_recovery_partitions.sh
     install -d ${D}${systemd_unitdir}/system/
     install -m 0644 ${WORKDIR}/find-recovery-partitions.service -D ${D}${systemd_unitdir}/system/find-recovery-partitions.service
