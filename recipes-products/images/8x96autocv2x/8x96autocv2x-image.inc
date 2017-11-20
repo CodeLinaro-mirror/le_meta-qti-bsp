@@ -113,3 +113,6 @@ IMAGE_INSTALL += "sqlite-bin"
 # libcap
 IMAGE_INSTALL += "libcap"
 IMAGE_INSTALL += "libcap-bin"
+
+# If non "meta-qti-bsp-prop" layer, skip build below modules.
+IMAGE_INSTALL_remove += "${@base_conditional('WITH_PROP_LAYER', 'no', 'loc-hal', '',d)}"
