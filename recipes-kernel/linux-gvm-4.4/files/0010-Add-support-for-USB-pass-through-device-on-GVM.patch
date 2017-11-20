@@ -1,4 +1,4 @@
-From 8a85a2c3bcf5830466a4da9bcd5e5f23b1ed031f Mon Sep 17 00:00:00 2001
+From e0dc8cc4679ea02ea94a48ff57ff90a3a3369903 Mon Sep 17 00:00:00 2001
 From: Ramachandran Venkataramani <ramavenk@codeaurora.org>
 Date: Fri, 15 Sep 2017 00:00:56 -0700
 Subject: [PATCH] Add support for USB pass through device on GVM
@@ -9,26 +9,55 @@ as a pass through device on GVM for MSM8996
 Change-Id: Id1e9f0467bcce96ba0cca61a3844d222659fef55
 Signed-off-by: Ramachandran Venkataramani <ramavenk@codeaurora.org>
 ---
- .../boot/dts/qcom/vplatform-lfv-msm8996-usb.dtsi   | 304 +++++++++++++++++++++
- arch/arm/boot/dts/qcom/vplatform-lfv-msm8996.dts   |   2 +
- arch/arm64/configs/msm-auto-gvm_defconfig          |  54 ++++
+ .../boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts    |   6 +
+ .../dts/qcom/vplatform-lfv-msm8996-telematics.dts  |   6 +
+ .../boot/dts/qcom/vplatform-lfv-msm8996-usb.dtsi   | 303 +++++++++++++++++++++
+ arch/arm64/configs/msm-auto-gvm_defconfig          |  55 ++++
  drivers/clk/msm/clock-dummy.c                      |  56 +++-
- drivers/platform/msm/gpio-usbdetect.c              | 116 +++++---
+ drivers/platform/msm/gpio-usbdetect.c              | 133 +++++----
  drivers/usb/core/hcd.c                             |   4 +
  drivers/usb/dwc3/core.c                            |   9 +-
  drivers/usb/dwc3/dwc3-msm.c                        |  10 +
  drivers/usb/host/xhci-plat.c                       |   8 +
  drivers/usb/host/xhci.c                            |   5 +
  drivers/usb/phy/phy-msm-ssusb-qmp.c                |  32 ++-
- 11 files changed, 544 insertions(+), 56 deletions(-)
+ 12 files changed, 566 insertions(+), 61 deletions(-)
  create mode 100644 arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-usb.dtsi
 
+diff --git a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts
+index 7543950..44d6f11 100644
+--- a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts
++++ b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts
+@@ -41,3 +41,9 @@
+ &blsp1_uart2 {
+ 	status = "okay";
+ };
++
++#include "vplatform-lfv-msm8996-usb.dtsi"
++
++&usb_detect {
++	qcom,force-vbus-status-off;
++};
+diff --git a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-telematics.dts b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-telematics.dts
+index 9057fb3..d3156aa 100644
+--- a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-telematics.dts
++++ b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-telematics.dts
+@@ -146,3 +146,9 @@
+ 
+ 	status = "okay";
+ };
++
++#include "vplatform-lfv-msm8996-usb.dtsi"
++
++&usb_detect {
++	qcom,force-vbus-status-on;
++};
 diff --git a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-usb.dtsi b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-usb.dtsi
 new file mode 100644
-index 0000000..7b1989f
+index 0000000..f966685
 --- /dev/null
 +++ b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-usb.dtsi
-@@ -0,0 +1,304 @@
+@@ -0,0 +1,303 @@
 +/* Copyright (c) 2014-2017, The Linux Foundation. All rights reserved.
 + *
 + * This program is free software; you can redistribute it and/or modify
@@ -76,7 +105,6 @@ index 0000000..7b1989f
 +	usb_detect: usb_detect {
 +		compatible = "qcom,gpio-usbdetect";
 +		qcom,skip-vbus-detect;
-+		qcom,force-vbus-status-on;
 +	};
 +
 +	usb3: ssusb@6a00000{
@@ -333,21 +361,11 @@ index 0000000..7b1989f
 +		qcom,reset-ep-after-lpm-resume;
 +	};
 +};
-diff --git a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996.dts b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996.dts
-index e6d9f7b..3cab278 100644
---- a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996.dts
-+++ b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996.dts
-@@ -1197,3 +1197,5 @@
- 	};
- };
- #include "vplatform-lfv-agave.dtsi"
-+#include "vplatform-lfv-msm8996-usb.dtsi"
-+
 diff --git a/arch/arm64/configs/msm-auto-gvm_defconfig b/arch/arm64/configs/msm-auto-gvm_defconfig
-index a6d36c3..be8ff75 100644
+index 05ade77..2e2f913 100644
 --- a/arch/arm64/configs/msm-auto-gvm_defconfig
 +++ b/arch/arm64/configs/msm-auto-gvm_defconfig
-@@ -314,3 +314,57 @@ CONFIG_CRYPTO_MD4=y
+@@ -329,3 +329,58 @@ CONFIG_CRYPTO_MD4=y
  CONFIG_CRYPTO_ARC4=y
  CONFIG_CRYPTO_TWOFISH=y
  CONFIG_QMI_ENCDEC=y
@@ -405,8 +423,9 @@ index a6d36c3..be8ff75 100644
 +CONFIG_USB_XHCI_PCI=y
 +CONFIG_USB_EHCI_PCI=y
 +CONFIG_USB_OHCI_HCD_PCI=y
++CONFIG_DIAG_CHAR=y
 diff --git a/drivers/clk/msm/clock-dummy.c b/drivers/clk/msm/clock-dummy.c
-index caa6a6a..bcbf806 100644
+index e874fcc..9206a6d 100644
 --- a/drivers/clk/msm/clock-dummy.c
 +++ b/drivers/clk/msm/clock-dummy.c
 @@ -14,6 +14,51 @@
@@ -461,7 +480,7 @@ index caa6a6a..bcbf806 100644
  
  static int dummy_clk_reset(struct clk *clk, enum clk_reset_action action)
  {
-@@ -97,10 +142,19 @@ static int msm_clock_dummy_probe(struct platform_device *pdev)
+@@ -98,10 +143,19 @@ static int msm_clock_dummy_probe(struct platform_device *pdev)
  	int ret;
  
  	ret = of_clk_add_provider(pdev->dev.of_node, of_dummy_get, NULL);
@@ -483,7 +502,7 @@ index caa6a6a..bcbf806 100644
  }
  
 diff --git a/drivers/platform/msm/gpio-usbdetect.c b/drivers/platform/msm/gpio-usbdetect.c
-index dc05d71..301487f 100644
+index adf47fc3..fe953e2 100644
 --- a/drivers/platform/msm/gpio-usbdetect.c
 +++ b/drivers/platform/msm/gpio-usbdetect.c
 @@ -46,6 +46,9 @@ static irqreturn_t gpio_usbdetect_vbus_irq(int irq, void *data)
@@ -496,7 +515,7 @@ index dc05d71..301487f 100644
  	usb->vbus_state = gpio_get_value(usb->gpio);
  	if (usb->vbus_state) {
  		dev_dbg(&usb->pdev->dev, "setting vbus notification\n");
-@@ -95,6 +98,7 @@ static int gpio_usbdetect_probe(struct platform_device *pdev)
+@@ -97,6 +100,7 @@ static int gpio_usbdetect_probe(struct platform_device *pdev)
  {
  	struct gpio_usbdetect *usb;
  	int rc;
@@ -504,7 +523,7 @@ index dc05d71..301487f 100644
  
  	usb = devm_kzalloc(&pdev->dev, sizeof(*usb), GFP_KERNEL);
  	if (!usb)
-@@ -134,60 +138,82 @@ static int gpio_usbdetect_probe(struct platform_device *pdev)
+@@ -136,68 +140,97 @@ static int gpio_usbdetect_probe(struct platform_device *pdev)
  		}
  	}
  
@@ -615,19 +634,39 @@ index dc05d71..301487f 100644
 -	enable_irq_wake(usb->id_det_irq);
  	dev_set_drvdata(&pdev->dev, usb);
  
--	/* Read and report initial VBUS state */
--	gpio_usbdetect_vbus_irq(usb->vbus_det_irq, usb);
+-	if (usb->id_det_irq) {
+-		gpio_usbdetect_id_irq(usb->id_det_irq, usb);
+-		if (!usb->id_state) {
+-			gpio_usbdetect_id_irq_thread(usb->id_det_irq, usb);
+-			return 0;
 +	if (!skip_vbus_detect) {
++		if (usb->id_det_irq) {
++			gpio_usbdetect_id_irq(usb->id_det_irq, usb);
++			if (!usb->id_state) {
++				gpio_usbdetect_id_irq_thread(usb->id_det_irq, usb);
++				return 0;
++			}
+ 		}
++
 +		/* Read and report initial VBUS state */
 +		gpio_usbdetect_vbus_irq(usb->vbus_det_irq, usb);
-+	}
-+
+ 	}
+ 
+-	/* Read and report initial VBUS state */
+-	gpio_usbdetect_vbus_irq(usb->vbus_det_irq, usb);
 +	if(skip_vbus_detect && of_property_read_bool(pdev->dev.of_node,
 +		"qcom,force-vbus-status-on"))
 +	{
 +		dev_info(&pdev->dev, "%s: force vbus status to ON\n", __func__);
 +		extcon_set_cable_state_(usb->extcon_dev, EXTCON_USB_HOST, 0);
 +		extcon_set_cable_state_(usb->extcon_dev, EXTCON_USB, 1);
++	}
++	else if(skip_vbus_detect && of_property_read_bool(pdev->dev.of_node,
++		"qcom,force-vbus-status-off"))
++	{
++		dev_info(&pdev->dev, "%s: force vbus status to OFF\n", __func__);
++		extcon_set_cable_state_(usb->extcon_dev, EXTCON_USB_HOST, 1);
++		extcon_set_cable_state_(usb->extcon_dev, EXTCON_USB, 0);
 +	}
  
  	return 0;
@@ -677,10 +716,10 @@ index 0744b14..a2c78be 100644
  	return ret;
  }
 diff --git a/drivers/usb/dwc3/dwc3-msm.c b/drivers/usb/dwc3/dwc3-msm.c
-index 3c0f68d..84789d0 100644
+index 26422a6..5cfaa23 100644
 --- a/drivers/usb/dwc3/dwc3-msm.c
 +++ b/drivers/usb/dwc3/dwc3-msm.c
-@@ -1651,6 +1651,7 @@ static int dwc3_msm_link_clk_reset(struct dwc3_msm *mdwc, bool assert)
+@@ -1653,6 +1653,7 @@ static int dwc3_msm_link_clk_reset(struct dwc3_msm *mdwc, bool assert)
  		clk_disable_unprepare(mdwc->sleep_clk);
  		clk_disable_unprepare(mdwc->core_clk);
  		clk_disable_unprepare(mdwc->iface_clk);
@@ -688,7 +727,7 @@ index 3c0f68d..84789d0 100644
  		ret = reset_control_assert(mdwc->core_reset);
  		if (ret)
  			dev_err(mdwc->dev, "dwc3 core_reset assert failed\n");
-@@ -1992,6 +1993,8 @@ static void msm_dwc3_perf_vote_update(struct dwc3_msm *mdwc,
+@@ -1994,6 +1995,8 @@ static void msm_dwc3_perf_vote_update(struct dwc3_msm *mdwc,
  
  static int dwc3_msm_suspend(struct dwc3_msm *mdwc)
  {
@@ -697,7 +736,7 @@ index 3c0f68d..84789d0 100644
  	int ret, i;
  	bool can_suspend_ssphy;
  	struct dwc3 *dwc = platform_get_drvdata(mdwc->dwc3);
-@@ -2162,6 +2165,7 @@ static int dwc3_msm_suspend(struct dwc3_msm *mdwc)
+@@ -2164,6 +2167,7 @@ static int dwc3_msm_suspend(struct dwc3_msm *mdwc)
  
  	dev_info(mdwc->dev, "DWC3 in low power mode\n");
  	mutex_unlock(&mdwc->suspend_resume_mutex);
@@ -705,7 +744,7 @@ index 3c0f68d..84789d0 100644
  	return 0;
  }
  
-@@ -2198,6 +2202,7 @@ static int dwc3_msm_resume(struct dwc3_msm *mdwc)
+@@ -2200,6 +2204,7 @@ static int dwc3_msm_resume(struct dwc3_msm *mdwc)
  	if (mdwc->lpm_flags & MDWC3_POWER_COLLAPSE) {
  		dev_dbg(mdwc->dev, "%s: exit power collapse\n", __func__);
  		dwc3_msm_config_gdsc(mdwc, 1);
@@ -713,7 +752,7 @@ index 3c0f68d..84789d0 100644
  		ret = reset_control_assert(mdwc->core_reset);
  		if (ret)
  			dev_err(mdwc->dev, "%s:core_reset assert failed\n",
-@@ -2980,7 +2985,11 @@ static int dwc3_msm_probe(struct platform_device *pdev)
+@@ -2985,7 +2990,11 @@ static int dwc3_msm_probe(struct platform_device *pdev)
  		ret = devm_request_threaded_irq(&pdev->dev, mdwc->pwr_event_irq,
  					msm_dwc3_pwr_irq,
  					msm_dwc3_pwr_irq_thread,
@@ -725,7 +764,7 @@ index 3c0f68d..84789d0 100644
  					"msm_dwc3", mdwc);
  		if (ret) {
  			dev_err(&pdev->dev, "irqreq pwr_event_irq failed: %d\n",
-@@ -3350,6 +3359,7 @@ static int dwc3_msm_host_notifier(struct notifier_block *nb,
+@@ -3361,6 +3370,7 @@ static int dwc3_msm_host_notifier(struct notifier_block *nb,
  
  			/* inform PMIC of max power so it can optimize boost */
  			pval.intval = max_power * 1000;
@@ -734,7 +773,7 @@ index 3c0f68d..84789d0 100644
  					POWER_SUPPLY_PROP_BOOST_CURRENT, &pval);
  		} else {
 diff --git a/drivers/usb/host/xhci-plat.c b/drivers/usb/host/xhci-plat.c
-index 56a9cd6..9d892fd 100644
+index c6998f0..8598054 100644
 --- a/drivers/usb/host/xhci-plat.c
 +++ b/drivers/usb/host/xhci-plat.c
 @@ -245,7 +245,11 @@ static int xhci_plat_probe(struct platform_device *pdev)
@@ -762,7 +801,7 @@ index 56a9cd6..9d892fd 100644
  		goto dealloc_usb2_hcd;
  
 diff --git a/drivers/usb/host/xhci.c b/drivers/usb/host/xhci.c
-index aab1c79..1d8ad06 100644
+index 641e028..6231bb2 100644
 --- a/drivers/usb/host/xhci.c
 +++ b/drivers/usb/host/xhci.c
 @@ -426,8 +426,13 @@ static int xhci_try_enable_msi(struct usb_hcd *hcd)
