@@ -222,3 +222,5 @@ INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmquin', '8x96autogvmq
 include ${INCSUFFIX}.inc
 INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmquintcu', '8x96autogvmquintcu-image', 'none',d)}"
 include ${INCSUFFIX}.inc
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmgh', '8x96autogvmgh-image', 'none',d)}"
+include ${INCSUFFIX}.inc
