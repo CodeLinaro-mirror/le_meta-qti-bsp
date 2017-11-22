@@ -58,7 +58,5 @@ IMAGE_INSTALL_remove = "common-api-test"
 IMAGE_INSTALL_remove = "rh850-firmware"
 IMAGE_INSTALL_remove = "rh850-flash"
 
-IMAGE_INSTALL_remove = "synergy"
-IMAGE_INSTALL_remove = "synergy-opensource"
-IMAGE_INSTALL_remove = "synergy-bt-app"
+
 
