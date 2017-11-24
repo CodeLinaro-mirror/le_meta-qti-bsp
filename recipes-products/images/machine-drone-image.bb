@@ -4,3 +4,6 @@ include ${BASEMACHINE}/${BASEMACHINE}-drone-image.inc
 require mdm-bootimg.inc
 
 inherit core-image
+
+do_makesystem(){
+}

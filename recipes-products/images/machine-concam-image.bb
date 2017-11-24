@@ -4,3 +4,7 @@ include ${BASEMACHINE}/${BASEMACHINE}-concam-image.inc
 require mdm-bootimg.inc
 
 inherit core-image
+
+do_makesystem(){
+}
+
