@@ -49,7 +49,7 @@ DEFAULTTUNE_virtclass-multilib-lib32 = "armv7a"
 EXTRA_IMAGE_FEATURES = "debug-tweaks"
 
 #Krogoth default GCC version
-GCCVERSION = "5.3.0"
+GCCVERSION = "5.4.0"
 
 IMAGE_FSTYPES += "tar.bz2 ext4"
 
