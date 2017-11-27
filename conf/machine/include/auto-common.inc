@@ -10,6 +10,7 @@ require conf/machine/include/arm/arch-armv8.inc
 BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
 MACHINEGROUP = "auto"
 WITH_PROP_LAYER ?= "no"
+WITH_INTERNAL_LAYER ?= "no"
 
 TMPDIR = "${TOPDIR}/tmp-glibc"
 
