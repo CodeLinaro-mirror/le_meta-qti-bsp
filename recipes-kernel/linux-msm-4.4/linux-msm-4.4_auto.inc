@@ -1,5 +1,7 @@
 INSANE_SKIP_${PN} += "installed-vs-shipped"
 
+DEPENDS += " openssl-native"
+
 do_defconfig_patch () {
 cat >> ${S}/arch/${ARCH}/configs/${KERNEL_CONFIG} <<KERNEL_EXTRACONFIGS
 # CONFIG_DEBUG_STACK_USAGE is not set
@@ -65,6 +67,7 @@ do_deploy_rename () {
 }
 
 addtask deploy_rename after do_deploy before do_packagedata
+
 
 do_unpack_extra () {
     if [ ${@d.getVar("MACHINE", True)} == "8x96auto" ]; then
