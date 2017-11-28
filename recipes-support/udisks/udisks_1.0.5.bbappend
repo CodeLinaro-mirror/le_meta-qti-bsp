@@ -7,3 +7,12 @@ do_install_append () {
     install -m 0644 ${WORKDIR}/udisks.service ${D}${systemd_unitdir}/system/udisks.service
     install -m 0644 ${WORKDIR}/automount.service ${D}${systemd_unitdir}/system/automount.service
 }
+
+do_patch_append() {
+    bb.build.exec_func('do_fix_rw', d)
+}
+
+do_fix_rw() {
+    sed -i -e 's/MOUNT_OPTIONS="ro,sync"/MOUNT_OPTIONS="rw,sync"/' ${WORKDIR}/automount.sh
+}
+
