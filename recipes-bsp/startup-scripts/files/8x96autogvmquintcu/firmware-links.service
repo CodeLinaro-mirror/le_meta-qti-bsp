@@ -30,7 +30,7 @@ SourcePath=/etc/init.d/firmware-links.sh
 Description= Firmwarelinks Service
 DefaultDependencies=no
 Before=sysinit.target
-After=firmware.mount find_partitions.service
+After=firmware.mount
 
 [Service]
 Type=forking
