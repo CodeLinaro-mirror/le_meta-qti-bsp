@@ -81,8 +81,8 @@ LICENSE_FLAGS_WHITELIST += "commercial_gstreamer1.0-plugins-ugly commercial_open
 LICENSE_FLAGS_WHITELIST += "commercial_libomxil"
 
 # Smack
-OVERRIDES .= ":smack"
-DISTRO_FEATURES_append = " smack"
+#OVERRIDES .= ":smack"
+#DISTRO_FEATURES_append = " smack"
 
 BB_SIGNATURE_HANDLER = "OEBasicHash"
 BB_HASHBASE_WHITELIST = "TMPDIR FILE PATH PWD BB_TASKHASH BBPATH DL_DIR \
@@ -94,7 +94,7 @@ BB_HASHBASE_WHITELIST = "TMPDIR FILE PATH PWD BB_TASKHASH BBPATH DL_DIR \
     BB_WORKERCONTEXT"
 
 # Cynara
-DISTRO_FEATURES_append = " dbus-cynara "
+#DISTRO_FEATURES_append = " dbus-cynara "
 
 # If non "meta-qti-bsp-prop" layer, add below path to BBMASK.
 BBMASK_append = "${@base_conditional('WITH_PROP_LAYER', 'no', '|meta-qti-bsp/recipes-qt/qt5/', '',d)}"
