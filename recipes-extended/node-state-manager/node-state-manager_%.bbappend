@@ -11,6 +11,7 @@ SRC_URI += "file://lazy.target"
 
 do_install_append() {
     install -m 644 ${WORKDIR}/*.target ${D}/${systemd_unitdir}/system
+    rm ${D}/etc/dbus-1/system.d/org.genivi.NodeStateManager.conf
 }
 
 FILES_${PN} += "${systemd_unitdir}/system/focussed.target \
@@ -18,3 +19,4 @@ FILES_${PN} += "${systemd_unitdir}/system/focussed.target \
     ${systemd_unitdir}/system/lazy.target \
     "
 
+DEPENDS += " glib-2.0-native"
