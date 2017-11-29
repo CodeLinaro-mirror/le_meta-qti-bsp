@@ -17,7 +17,7 @@ SRC_URI = "file://wlan/qcacld-2.0/ \
 DEPENDS = "virtual/kernel"
 
 S = "${WORKDIR}/wlan/qcacld-2.0"
-S_STRIPPED = "${WORKDIR}/packages-split/kernel-module-${WLAN_MODULE_NAME}/lib/modules/${KERNEL_VERSION}/extra"
+S_STRIPPED = "${WORKDIR}/packages-split/${PN}/lib/modules/${KERNEL_VERSION}/extra"
 
 inherit module kernel-arch qperf
 inherit module update-rc.d
@@ -86,8 +86,8 @@ FILES_${PN} = "/usr/sbin/\
                etc/init.d/\
                etc/dbus-1/system.d/"
 
-PACKAGES =+ "kernel-module-${WLAN_MODULE_NAME}"
-FILES_kernel-module-${WLAN_MODULE_NAME} = "/lib/modules/${KERNEL_VERSION}/extra/${WLAN_MODULE_NAME}.ko"
+#PACKAGES =+ "kernel-module-wlan"
+FILES_kernel-module-${WLAN_MODULE_NAME}-${KERNEL_VERSION} = "/lib/modules/${KERNEL_VERSION}/extra/wlan.ko"
 
 INCSUFFIX = "${@base_conditional('MACHINEGROUP', 'auto', 'qcacld-2.0_auto', 'none',d)}"
 include ${INCSUFFIX}.inc
