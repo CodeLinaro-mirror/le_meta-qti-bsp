@@ -81,8 +81,8 @@ FILES_${PN} = "/usr/sbin/\
                etc/init.d/\
                etc/dbus-1/system.d/"
 
-PACKAGES =+ "kernel-module-wlan"
-FILES_kernel-module-wlan = "/lib/modules/${KERNEL_VERSION}/extra/wlan.ko"
+#PACKAGES =+ "kernel-module-wlan"
+FILES_kernel-module-wlan-${KERNEL_VERSION} = "/lib/modules/${KERNEL_VERSION}/extra/wlan.ko"
 
 INCSUFFIX = "${@base_conditional('MACHINEGROUP', 'auto', 'qcacld-2.0_auto', 'none',d)}"
 include ${INCSUFFIX}.inc
