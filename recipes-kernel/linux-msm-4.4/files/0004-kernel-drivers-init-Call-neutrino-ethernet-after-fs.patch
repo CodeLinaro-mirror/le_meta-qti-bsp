@@ -1,0 +1,41 @@
+From 5ab840721b5e9cf5e20f585b972b563ad6d552ba Mon Sep 17 00:00:00 2001
+From: Zou Shunxiang <shunxian@codeaurora.org>
+Date: Wed, 29 Nov 2017 17:16:10 +0800
+Subject: [PATCH] drivers:net:ethernet: Call neutrino ethernet after fs ready
+
+Call neutrino ethernet after fs ready
+
+Change-Id: If2c04f202e5024e851dcadb6b14425b2896d7dc5
+Signed-off-by: Zou Shunxiang <shunxian@codeaurora.org>
+---
+ init/main.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/init/main.c b/init/main.c
+index 4e3c24c..3706dcd 100644
+--- a/init/main.c
++++ b/init/main.c
+@@ -840,6 +840,7 @@ static char *initcall_level_names[] __initdata = {
+ 	"late",
+ };
+ 
++extern int __DWC_ETH_QOS_pcie_init(void);
+ static char init_prog[128] = "/usr/sbin/early_init";
+ static char *init_prog_argv[2] = { init_prog, NULL };
+ 
+@@ -1060,6 +1061,12 @@ static noinline void __init kernel_init_freeable(void)
+ 		prepare_namespace();
+ 	}
+ 
++	rc = __DWC_ETH_QOS_pcie_init();
++	if (!rc)
++		pr_info("__DWC_ETH_QOS_pcie_init launched\n");
++	else
++		pr_err("__DWC_ETH_QOS_pcie_init failed\n");
++
+ 	rc = call_usermodehelper(init_prog, init_prog_argv, NULL, 0);
+ 	if (!rc)
+ 		pr_info("early_init launched\n");
+-- 
+1.9.1
+
