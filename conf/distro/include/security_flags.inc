@@ -11,3 +11,14 @@ SECURITY_LDFLAGS_pn-androidcompat = ""
 
 SECURITY_CFLAGS_pn-dbus-c++ = ""
 
+# packages to use -fPIC in security flags instead of -fpie
+SECURITY_CFLAGS_pn-gtest = "${SECURITY_PIC_CFLAGS}"
+SECURITY_CFLAGS_pn-libcutils  = "${SECURITY_PIC_CFLAGS}"
+SECURITY_CFLAGS_pn-liblog  = "${SECURITY_PIC_CFLAGS}"
+
+# libutils to use -fPIC in security flags instead of -fpie
+SECURITY_CFLAGS_pn-system-core = "${SECURITY_PIC_CFLAGS}"
+
+# libbinder to use -fPIC in security flags instead of -fpie
+SECURITY_CFLAGS_pn-native-frameworks  = "${SECURITY_PIC_CFLAGS}"
+
