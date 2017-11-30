@@ -1,0 +1,160 @@
+From 77339ac461a57ac084d5f310581713a54e00114a Mon Sep 17 00:00:00 2001
+From: Yimin Peng <yiminp@codeaurora.org>
+Date: Wed, 15 Nov 2017 16:23:30 +0800
+Subject: [PATCH] unmask net irq to wake up system.
+
+add set_irq_wake support for virtual platform.
+
+Change-Id: I402fcf262911e5ff8103e42fd71f09566d7a9546
+Signed-off-by: Yimin Peng <yiminp@codeaurora.org>
+---
+ drivers/irqchip/irq-gic.c    | 45 ++++++++++++++++++++++++++++++++++++++++++++
+ drivers/virtio/virtio_mmio.c |  7 +++++++
+ kernel/irq/pm.c              | 12 ++++++++++++
+ 3 files changed, 64 insertions(+)
+
+diff --git a/drivers/irqchip/irq-gic.c b/drivers/irqchip/irq-gic.c
+index 10b73d9..493ec4e 100644
+--- a/drivers/irqchip/irq-gic.c
++++ b/drivers/irqchip/irq-gic.c
+@@ -85,6 +85,9 @@ struct gic_chip_data {
+ #ifdef CONFIG_GIC_NON_BANKED
+ 	void __iomem *(*get_base)(union gic_base *);
+ #endif
++#ifdef CONFIG_MSM_GVM_QUIN
++	unsigned int wakeup_irqs[32];
++#endif
+ };
+ 
+ static DEFINE_RAW_SPINLOCK(irq_controller_lock);
+@@ -373,6 +376,28 @@ static int gic_set_affinity(struct irq_data *d, const struct cpumask *mask_val,
+ static int gic_set_wake(struct irq_data *d, unsigned int on)
+ {
+ 	int ret = -ENXIO;
++#ifdef CONFIG_MSM_GVM_QUIN
++	unsigned int reg_offset, bit_offset;
++	unsigned int gicirq = gic_irq(d);
++	struct gic_chip_data *gic_data = irq_data_get_irq_chip_data(d);
++
++	/* per-cpu interrupts cannot be wakeup interrupts */
++	WARN_ON(gicirq < 32);
++
++	reg_offset = gicirq / 32;
++	bit_offset = gicirq % 32;
++
++	pr_info("GIC set wake irq %u to %s\n", gicirq, (on? "on": "off"));
++	if (on)
++		gic_data->wakeup_irqs[reg_offset] |=  1 << bit_offset;
++	else
++		gic_data->wakeup_irqs[reg_offset] &=  ~(1 << bit_offset);
++
++	/* IRQCHIP_SKIP_SET_WAKE is set by default. Those module called
++	 * enable_irq_wake always return 0 directly. Changing return value
++	 * aligned with those places.*/
++	ret = 0;
++#endif
+ 
+ 	if (gic_arch_extn.irq_set_wake)
+ 		ret = gic_arch_extn.irq_set_wake(d, on);
+@@ -380,6 +405,21 @@ static int gic_set_wake(struct irq_data *d, unsigned int on)
+ 	return ret;
+ }
+ 
++#ifdef CONFIG_MSM_GVM_QUIN
++bool vgic_get_wake(struct irq_data *d)
++{
++	unsigned int reg_offset, bit_offset;
++	unsigned int gicirq = gic_irq(d);
++	struct gic_chip_data *gic_data = irq_data_get_irq_chip_data(d);
++
++	reg_offset = gicirq / 32;
++	bit_offset = gicirq % 32;
++
++	return (gic_data->wakeup_irqs[reg_offset] & (1 << bit_offset));
++}
++EXPORT_SYMBOL(vgic_get_wake);
++#endif
++
+ #else
+ #define gic_set_wake	NULL
+ #endif
+@@ -461,9 +501,14 @@ static struct irq_chip gic_chip = {
+ 	.irq_set_wake		= gic_set_wake,
+ 	.irq_get_irqchip_state	= gic_irq_get_irqchip_state,
+ 	.irq_set_irqchip_state	= gic_irq_set_irqchip_state,
++#ifdef CONFIG_MSM_GVM_QUIN
++	.flags			= IRQCHIP_SET_TYPE_MASKED |
++				  IRQCHIP_MASK_ON_SUSPEND,
++#else
+ 	.flags			= IRQCHIP_SET_TYPE_MASKED |
+ 				  IRQCHIP_SKIP_SET_WAKE |
+ 				  IRQCHIP_MASK_ON_SUSPEND,
++#endif
+ };
+ 
+ static struct irq_chip gic_eoimode1_chip = {
+diff --git a/drivers/virtio/virtio_mmio.c b/drivers/virtio/virtio_mmio.c
+index f499d9d..c9c87dc 100644
+--- a/drivers/virtio/virtio_mmio.c
++++ b/drivers/virtio/virtio_mmio.c
+@@ -73,6 +73,9 @@
+ #include <linux/virtio_ring.h>
+ 
+ 
++#ifdef CONFIG_MSM_GVM_QUIN
++#include <linux/virtio_ids.h>
++#endif
+ 
+ /* The alignment to use between consumer and producer parts of vring.
+  * Currently hardcoded to the page size. */
+@@ -493,6 +496,10 @@ static int vm_find_vqs(struct virtio_device *vdev, unsigned nvqs,
+ 	if (err)
+ 		return err;
+ 
++#ifdef CONFIG_MSM_GVM_QUIN
++	if (vdev && (vdev->id.device == VIRTIO_ID_NET))
++		enable_irq_wake(irq);
++#endif
+ 	for (i = 0; i < nvqs; ++i) {
+ 		vqs[i] = vm_setup_vq(vdev, i, callbacks[i], names[i]);
+ 		if (IS_ERR(vqs[i])) {
+diff --git a/kernel/irq/pm.c b/kernel/irq/pm.c
+index cea1de0..f3b9441 100644
+--- a/kernel/irq/pm.c
++++ b/kernel/irq/pm.c
+@@ -14,6 +14,10 @@
+ 
+ #include "internals.h"
+ 
++#ifdef CONFIG_MSM_GVM_QUIN
++extern bool vgic_get_wake(struct irq_data *d);
++#endif
++
+ bool irq_pm_check_wakeup(struct irq_desc *desc)
+ {
+ 	if (irqd_is_wakeup_armed(&desc->irq_data)) {
+@@ -70,6 +74,10 @@ void irq_pm_remove_action(struct irq_desc *desc, struct irqaction *action)
+ 
+ static bool suspend_device_irq(struct irq_desc *desc)
+ {
++#ifdef CONFIG_MSM_GVM_QUIN
++	if (vgic_get_wake(&desc->irq_data))
++		return false;
++#endif
+ 	if (!desc->action || irq_desc_is_chained(desc) ||
+ 	    desc->no_suspend_depth)
+ 		return false;
+@@ -138,6 +146,10 @@ EXPORT_SYMBOL_GPL(suspend_device_irqs);
+ 
+ static void resume_irq(struct irq_desc *desc)
+ {
++#ifdef CONFIG_MSM_GVM_QUIN
++	if (vgic_get_wake(&desc->irq_data))
++		return;
++#endif
+ 	irqd_clear(&desc->irq_data, IRQD_WAKEUP_ARMED);
+ 
+ 	if (desc->istate & IRQS_SUSPENDED)
+-- 
+1.9.1
+
