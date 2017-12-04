@@ -45,6 +45,8 @@ do_install_append(){
       ln -sf  ../dsp.mount  ${D}${sysconfdir}/systemd/system/local-fs.target.requires/dsp.mount
       ln -sf  ../persist.mount  ${D}${sysconfdir}/systemd/system/local-fs.target.requires/persist.mount
       if [  ${BASEMACHINE} == "apq8017" ]; then
+        install -m 0644 ${WORKDIR}/systemd/var-volatile.mount  ${D}${sysconfdir}/systemd/system/var-volatile.mount
+        ln -sf  ../var-volatile.mount ${D}${sysconfdir}/systemd/system/local-fs.target.requires/var-volatile.mount
         install -m 0644 ${WORKDIR}/systemd/systemrw.mount ${D}${sysconfdir}/systemd/system/systemrw.mount
         ln -sf  ../systemrw.mount  ${D}${sysconfdir}/systemd/system/local-fs.target.requires/systemrw.mount
       fi
