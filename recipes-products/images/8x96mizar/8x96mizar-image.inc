@@ -4,12 +4,10 @@ demos."
 require recipes-platform/images/agl-demo-platform.bb
 require ../common-auto-image.inc
 
-IMAGE_INSTALL += "ril"
 IMAGE_INSTALL += "sqlite3"
 IMAGE_INSTALL += "system-core"
 IMAGE_INSTALL += "system-prop"
 IMAGE_INSTALL += "native-frameworks"
-IMAGE_INSTALL += "protobuf"
 IMAGE_INSTALL += "libhardware"
 IMAGE_INSTALL += "libhardware-legacy"
 IMAGE_INSTALL += "libcap"
