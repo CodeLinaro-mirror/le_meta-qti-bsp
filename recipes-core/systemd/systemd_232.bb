@@ -95,6 +95,9 @@ PACKAGECONFIG ??= "xz \
 PACKAGECONFIG_remove_libc-musl = "selinux"
 PACKAGECONFIG_remove_libc-musl = "smack"
 
+# remove timesyncd
+PACKAGECONFIG_remove += "timesyncd"
+
 # Use the upstream systemd serial-getty@.service and rely on
 # systemd-getty-generator instead of using the OE-core specific
 # systemd-serialgetty.bb - not enabled by default.
