@@ -1,14 +1,11 @@
 From f81b4e4b698146c8f48d61bffb40f847d411467e Mon Sep 17 00:00:00 2001
 From: Daocai <daocai@codeaurora.org>
-Date: Mon, 18 Sep 2017 14:54:42 +0800
+Date: Wed, 6 Dec 2017 13:33:16 +0800
 Subject: [PATCH] kernel: display support early init
 
 Change-Id: Ib862c843f5800426ea3fcb519474423337230051
 Signed-off-by: Daocai <daocai@codeaurora.org>
-Signed-off-by: Lei wang <leiwan@codeaurora.org>
 ---
- arch/arm/boot/dts/qcom/dsi-adv7533-1080p.dtsi |  9 +--------
- arch/arm/boot/dts/qcom/dsi-adv7533-720p.dtsi  |  9 +--------
  drivers/gpu/drm/drm_drv.c                     |  2 +-
  drivers/gpu/drm/drm_fb_helper.c               |  2 +-
  drivers/gpu/drm/msm/dsi-staging/dsi_display.c |  2 +-
@@ -22,56 +19,8 @@ Signed-off-by: Lei wang <leiwan@codeaurora.org>
  drivers/regulator/fan53555.c                  | 17 ++++++++++++++++-
  drivers/soc/qcom/subsys-pil-tz.c              |  2 +-
  drivers/video/fbdev/msm/msm_dba/adv7533.c     |  2 +-
- 15 files changed, 38 insertions(+), 29 deletions(-)
+ 13 files changed, 36 insertions(+), 13 deletions(-)
 
-diff --git a/arch/arm/boot/dts/qcom/dsi-adv7533-1080p.dtsi b/arch/arm/boot/dts/qcom/dsi-adv7533-1080p.dtsi
-index 7994285..6cf9ed1 100644
---- a/arch/arm/boot/dts/qcom/dsi-adv7533-1080p.dtsi
-+++ b/arch/arm/boot/dts/qcom/dsi-adv7533-1080p.dtsi
-@@ -1,4 +1,4 @@
--/* Copyright (c) 2015-2016, The Linux Foundation. All rights reserved.
-+/* Copyright (c) 2015-2017, The Linux Foundation. All rights reserved.
-  *
-  * This program is free software; you can redistribute it and/or modify
-  * it under the terms of the GNU General Public License version 2 and
-@@ -36,13 +36,6 @@
- 		qcom,mdss-dsi-bpp = <24>;
- 		qcom,mdss-dsi-underflow-color = <0xff>;
- 		qcom,mdss-dsi-border-color = <0>;
--		qcom,mdss-dsi-on-command = [
--				05 01 00 00 c8 00 02 11 00
--				05 01 00 00 0a 00 02 29 00];
--		qcom,mdss-dsi-off-command = [05 01 00 00 00 00 02 28 00
--				05 01 00 00 00 00 02 10 00];
--		qcom,mdss-dsi-on-command-state = "dsi_lp_mode";
--		qcom,mdss-dsi-off-command-state = "dsi_hs_mode";
- 		qcom,mdss-dsi-h-sync-pulse = <1>;
- 		qcom,mdss-dsi-traffic-mode = "non_burst_sync_pulse";
- 		qcom,mdss-dsi-bllp-eof-power-mode;
-diff --git a/arch/arm/boot/dts/qcom/dsi-adv7533-720p.dtsi b/arch/arm/boot/dts/qcom/dsi-adv7533-720p.dtsi
-index b84488c..a3bbc6f 100644
---- a/arch/arm/boot/dts/qcom/dsi-adv7533-720p.dtsi
-+++ b/arch/arm/boot/dts/qcom/dsi-adv7533-720p.dtsi
-@@ -1,4 +1,4 @@
--/* Copyright (c) 2015-2016, The Linux Foundation. All rights reserved.
-+/* Copyright (c) 2015-2017, The Linux Foundation. All rights reserved.
-  *
-  * This program is free software; you can redistribute it and/or modify
-  * it under the terms of the GNU General Public License version 2 and
-@@ -36,13 +36,6 @@ dsi_adv7533_720p: qcom,mdss_dsi_adv7533_720p {
- 		qcom,mdss-dsi-bpp = <24>;
- 		qcom,mdss-dsi-underflow-color = <0xff>;
- 		qcom,mdss-dsi-border-color = <0>;
--		qcom,mdss-dsi-on-command = [
--				05 01 00 00 c8 00 02 11 00
--				05 01 00 00 0a 00 02 29 00];
--		qcom,mdss-dsi-off-command = [05 01 00 00 00 00 02 28 00
--				05 01 00 00 00 00 02 10 00];
--		qcom,mdss-dsi-on-command-state = "dsi_lp_mode";
--		qcom,mdss-dsi-off-command-state = "dsi_hs_mode";
- 		qcom,mdss-dsi-h-sync-pulse = <1>;
- 		qcom,mdss-dsi-traffic-mode = "non_burst_sync_pulse";
- 		qcom,mdss-dsi-bllp-eof-power-mode;
 diff --git a/drivers/gpu/drm/drm_drv.c b/drivers/gpu/drm/drm_drv.c
 index 7dd6728..329e8cf 100644
 --- a/drivers/gpu/drm/drm_drv.c
@@ -106,10 +55,10 @@ index f2412da..0ad2d1e 100644
 +fs_initcall(dsi_display_register);
  module_exit(dsi_display_unregister);
 diff --git a/drivers/gpu/drm/msm/hdmi-staging/sde_hdmi.c b/drivers/gpu/drm/msm/hdmi-staging/sde_hdmi.c
-index fa111d5..f2a57e6 100644
+index 35ba396..168fdb2 100644
 --- a/drivers/gpu/drm/msm/hdmi-staging/sde_hdmi.c
 +++ b/drivers/gpu/drm/msm/hdmi-staging/sde_hdmi.c
-@@ -3183,5 +3183,5 @@ static void __exit sde_hdmi_unregister(void)
+@@ -3191,5 +3191,5 @@ static void __exit sde_hdmi_unregister(void)
  	platform_driver_unregister(&sde_hdmi_driver);
  }
  
@@ -149,10 +98,10 @@ index 0c119ec..a659367 100644
  
  	commit_destroy(commit);
 diff --git a/drivers/gpu/drm/msm/msm_drv.c b/drivers/gpu/drm/msm/msm_drv.c
-index c617533..f2adf26 100644
+index 6f968e9..e186e56 100644
 --- a/drivers/gpu/drm/msm/msm_drv.c
 +++ b/drivers/gpu/drm/msm/msm_drv.c
-@@ -2255,7 +2255,7 @@ static void __exit msm_drm_unregister(void)
+@@ -2250,7 +2250,7 @@ static void __exit msm_drm_unregister(void)
  	msm_smmu_driver_cleanup();
  }
  
@@ -174,7 +123,7 @@ index 4247243..d9ebc8d 100644
  void __exit msm_smmu_driver_cleanup(void)
  {
 diff --git a/drivers/gpu/drm/msm/sde/sde_kms.c b/drivers/gpu/drm/msm/sde/sde_kms.c
-index 34a32d7..bf8c798 100644
+index 34a32d7..8d821e43 100644
 --- a/drivers/gpu/drm/msm/sde/sde_kms.c
 +++ b/drivers/gpu/drm/msm/sde/sde_kms.c
 @@ -69,7 +69,7 @@
@@ -187,10 +136,10 @@ index 34a32d7..bf8c798 100644
  MODULE_PARM_DESC(sdecustom, "Enable customizations for sde clients");
  
 diff --git a/drivers/gpu/drm/msm/sde/sde_plane.c b/drivers/gpu/drm/msm/sde/sde_plane.c
-index 6e2ccfa..7596c0f 100644
+index f5f125c..fe45510 100644
 --- a/drivers/gpu/drm/msm/sde/sde_plane.c
 +++ b/drivers/gpu/drm/msm/sde/sde_plane.c
-@@ -1642,9 +1642,9 @@ static int sde_plane_atomic_check(struct drm_plane *plane,
+@@ -1646,9 +1646,9 @@ static int sde_plane_atomic_check(struct drm_plane *plane,
  			ret = -E2BIG;
  
  		/* valid yuv image */
@@ -243,10 +192,10 @@ index 28a2619..5b7c7e4 100644
  MODULE_AUTHOR("Yunfan Zhang <yfzhang@marvell.com>");
  MODULE_DESCRIPTION("FAN53555 regulator driver");
 diff --git a/drivers/soc/qcom/subsys-pil-tz.c b/drivers/soc/qcom/subsys-pil-tz.c
-index f85c4ba..6b85757 100644
+index b448f52..04db137 100644
 --- a/drivers/soc/qcom/subsys-pil-tz.c
 +++ b/drivers/soc/qcom/subsys-pil-tz.c
-@@ -1154,7 +1154,7 @@ static int __init pil_tz_init(void)
+@@ -1207,7 +1207,7 @@ static int __init pil_tz_init(void)
  {
  	return platform_driver_register(&pil_tz_driver);
  }
