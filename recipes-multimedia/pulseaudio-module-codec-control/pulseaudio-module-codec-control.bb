@@ -13,9 +13,12 @@ FILESEXTRAPATHS_prepend := "${WORKSPACE}/:"
 SRC_URI = "file://audio/mm-audio-opensource/pulseaudio-module-codec-control/"
 S = "${WORKDIR}/audio/mm-audio-opensource/pulseaudio-module-codec-control/"
 
+LDFLAGS += " -ldl"
+
 EXTRA_OECONF += "--with-glib \
                  --enable-target=${BASEMACHINE}"
 
 FILES_${PN} += "${libdir}/pulse-8.0/modules/"
 FILES_${PN}-staticdev += "${libdir}/pulse-8.0/modules/*.a"
 FILES_${PN}-dbg += "${libdir}/pulse-8.0/modules/.debug"
+

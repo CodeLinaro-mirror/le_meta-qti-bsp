@@ -16,8 +16,6 @@ RDEPENDS_${PN} = " \
         gstreamer1.0-libav \
         gstreamer1.0-omx \
         gstreamer1.0-plugins-ugly \
-        \
-        alsa-lib \
         alsa-utils \
         alsa-plugins \
 "
