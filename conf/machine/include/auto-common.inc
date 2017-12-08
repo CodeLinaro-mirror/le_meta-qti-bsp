@@ -63,7 +63,7 @@ PREFERRED_VERSION_wayland-native = "1.9.0"
 PREFERRED_VERSION_wayland-ivi-extension = "1.9.1"
 PREFERRED_VERSION_libdrm = "2.4.62"
 PREFERRED_VERSION_gtest = "1.7.0"
-PREFERRED_VERSION_protobuf = "0.1"
+PREFERRED_VERSION_protobuf = "3.3.0"
 
 PREFERRED_VERSION_avahi = "0.6.32"
 # PREFERRED_VERSION_systemd = "1:229+gitAUTOINC+714c62b463"
