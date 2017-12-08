@@ -19,7 +19,6 @@ RDEPENDS_${PN} = " \
         gdk-pixbuf-loader-bmp \
         gdk-pixbuf-loader-gif \
         gdk-pixbuf-loader-tiff \
-        alsa-lib \
         alsa-utils \
         alsa-plugins \
 "

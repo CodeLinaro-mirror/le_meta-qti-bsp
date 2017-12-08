@@ -99,4 +99,6 @@ do_install() {
 	install -m 0644 ${S}/mm-core/inc/*.h ${STAGING_INCDIR}/mm-core
 	mkdir -p ${STAGING_INCDIR}/libstagefrighthw
 	install -m 0644 ${S}/libstagefrighthw/QComOMXMetadata.h ${STAGING_INCDIR}/libstagefrighthw
+	mkdir -p ${D}/${includedir}/mm-core
+	install -m 0644 ${S}/mm-core/inc/*.h ${D}/${includedir}/mm-core
 }
