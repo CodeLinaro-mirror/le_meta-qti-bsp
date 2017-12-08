@@ -14,6 +14,7 @@ IMAGE_INSTALL += "libcap"
 IMAGE_INSTALL += "init-mss"
 IMAGE_INSTALL += "ofono"
 IMAGE_INSTALL += "ofono-tests"
+IMAGE_INSTALL += "telephony-service"
 
 IMAGE_INSTALL_remove += "init-audio"
 IMAGE_INSTALL_remove += "pulseaudio-module-acdb"
