@@ -88,4 +88,6 @@ do_install() {
 	oe_runmake DESTDIR="${D}/" LIBVER="${LV}" install
 	mkdir -p ${STAGING_INCDIR}/mm-core
 	install -m 0644 ${S}/mm-core/inc/*.h ${STAGING_INCDIR}/mm-core
+	mkdir -p ${D}/${includedir}/mm-core
+	install -m 0644 ${S}/mm-core/inc/*.h ${D}/${includedir}/mm-core
 }
