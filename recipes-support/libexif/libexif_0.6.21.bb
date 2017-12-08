@@ -17,3 +17,5 @@ SRC_URI[md5sum] = "9321c409a3e588d4a99d63063ef4bbb7"
 SRC_URI[sha256sum] = "edb7eb13664cf950a6edd132b75e99afe61c5effe2f16494e6d27bc404b287bf"
 
 EXTRA_OECONF = "--libdir=${base_libdir}"
+
+INSANE_SKIP_${PN} += " installed-vs-shipped"
