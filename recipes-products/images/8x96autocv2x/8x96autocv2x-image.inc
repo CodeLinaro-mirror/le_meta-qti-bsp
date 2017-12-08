@@ -54,13 +54,11 @@ IMAGE_INSTALL += "firmware-links"
 
 #WiFi
 IMAGE_INSTALL += "qcacld"
-IMAGE_INSTALL += "qcacld-hl"
 IMAGE_INSTALL += "wpa-supplicant"
 IMAGE_INSTALL += "hostapd"
 IMAGE_INSTALL += "iw"
 IMAGE_INSTALL += "wireless-tools"
 IMAGE_INSTALL += "sigma-dut"
-#IMAGE_INSTALL += "dsrc-tools"
 
 IMAGE_INSTALL += "dbus"
 IMAGE_INSTALL += "dbus-glib"
