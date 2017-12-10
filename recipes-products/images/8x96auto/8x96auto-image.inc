@@ -22,11 +22,11 @@ IMAGE_INSTALL += "reboot-daemon"
 IMAGE_INSTALL += "computelibrary"
 IMAGE_INSTALL_remove += "neutrino-eth"
 
-IMAGE_INSTALL_remove = "qtwebengine"
-IMAGE_INSTALL_remove = "qtwebengine-qmlplugins"
-IMAGE_INSTALL_remove = "qtwebengine-examples"
-IMAGE_INSTALL_remove = "qtwebsockets"
-IMAGE_INSTALL_remove = "qtwebchannel"
+#IMAGE_INSTALL_remove = "qtwebengine"
+#IMAGE_INSTALL_remove = "qtwebengine-qmlplugins"
+#IMAGE_INSTALL_remove = "qtwebengine-examples"
+#IMAGE_INSTALL_remove = "qtwebsockets"
+#IMAGE_INSTALL_remove = "qtwebchannel"
 
 # Early init
 IMAGE_INSTALL += "${@bb.utils.contains("DISTRO_FEATURES", "early_init", "early-init", "" ,d)}"
