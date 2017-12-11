@@ -27,41 +27,20 @@ IMAGE_INSTALL += "${@bb.utils.contains("DISTRO_FEATURES", "early-ethernet", "ear
 IMAGE_ROOTFS_SIZE = "2097152"
 IMAGE_ROOTFS_EXTRA_SPACE_append = "${@bb.utils.contains("DISTRO_FEATURES", "systemd", " + 4096", "" ,d)}"
 
-###########################################################
-## If WITH_INTERNAL_LAYER, enable below modules for test ##
-###########################################################
-IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'ofono', '',d)}"
-IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'ofono-tests', '',d)}"
-IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'gst-multisend', '',d)}"
-IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'packagegroup-agl-appfw', '',d)}"
-# Add Persistence Storage related components
-IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'dlt-daemon', '',d)}"
-IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'persistence-common-object', '',d)}"
-IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'persistence-client-library', '',d)}"
-IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'persistence-administrator', '',d)}"
-IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'node-state-manager', '',d)}"
-IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'node-health-monitor', '',d)}"
-IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'node-startup-controller', '',d)}"
-IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'node-startup-controller-nsm-dummy', '',d)}"
 
-IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'ces2017-demo', '',d)}"
-IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'can-utils', '',d)}"
-IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'init-can', '',d)}"
-IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'navigation', '',d)}"
-IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'mediaplayer', '',d)}"
-IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'settings', '',d)}"
-IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'mixer', '',d)}"
-IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'hvac', '',d)}"
-IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'poiapp', '',d)}"
-IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'dlt-daemon-test', '',d)}"
-IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'common-api-c++', '',d)}"
-IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'common-api-c++-dbus', '',d)}"
-IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'common-api-test', '',d)}"
-IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'rh850-firmware', '',d)}"
-IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'rh850-flash', '',d)}"
-IMAGE_INSTALL_remove += "packagegroup-agl-demo-platform"
-IMAGE_INSTALL_remove += "neutrino-eth"
-IMAGE_INSTALL_remove += "web-runtime"
+IMAGE_INSTALL += "ofono"
+IMAGE_INSTALL += "ofono-tests"
+IMAGE_INSTALL += "gst-multisend"
+IMAGE_INSTALL += "packagegroup-agl-appfw"
+# Add Persistence Storage related components
+IMAGE_INSTALL += "dlt-daemon"
+IMAGE_INSTALL += "persistence-common-object"
+IMAGE_INSTALL += "persistence-client-library"
+IMAGE_INSTALL += "persistence-administrator"
+IMAGE_INSTALL += "node-state-manager"
+IMAGE_INSTALL += "node-health-monitor"
+IMAGE_INSTALL += "node-startup-controller"
+IMAGE_INSTALL += "node-startup-controller-nsm-dummy"
 
 
 
