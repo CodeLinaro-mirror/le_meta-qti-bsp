@@ -31,7 +31,6 @@ IMAGE_ROOTFS_EXTRA_SPACE_append = "${@bb.utils.contains("DISTRO_FEATURES", "syst
 IMAGE_INSTALL += "ofono"
 IMAGE_INSTALL += "ofono-tests"
 IMAGE_INSTALL += "gst-multisend"
-IMAGE_INSTALL += "packagegroup-agl-appfw"
 # Add Persistence Storage related components
 IMAGE_INSTALL += "dlt-daemon"
 IMAGE_INSTALL += "persistence-common-object"
