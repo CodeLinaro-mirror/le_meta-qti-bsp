@@ -1,0 +1,30 @@
+From f2b76f99cabc49ca5dfa86b31e16992d4927ae44 Mon Sep 17 00:00:00 2001
+From: Zhiqiang Tu <ztu@codeaurora.org>
+Date: Tue, 12 Dec 2017 09:18:08 +0800
+Subject: [PATCH] i2c-msm-v2: adjust initcall level
+
+Move i2c initialization after HAB and virtual clock,
+then i2c can use virtual clock.
+
+Change-Id: I71f347e269af110f3ee0302e3c74edc2fc7c1e8a
+Signed-off-by: Zhiqiang Tu <ztu@codeaurora.org>
+---
+ drivers/i2c/busses/i2c-msm-v2.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/i2c/busses/i2c-msm-v2.c b/drivers/i2c/busses/i2c-msm-v2.c
+index f4ed71f..d05fa57 100644
+--- a/drivers/i2c/busses/i2c-msm-v2.c
++++ b/drivers/i2c/busses/i2c-msm-v2.c
+@@ -3018,7 +3018,7 @@ static int i2c_msm_init(void)
+ {
+ 	return platform_driver_register(&i2c_msm_driver);
+ }
+-arch_initcall(i2c_msm_init);
++subsys_initcall(i2c_msm_init);
+ 
+ static void i2c_msm_exit(void)
+ {
+-- 
+1.9.1
+
