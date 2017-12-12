@@ -17,6 +17,8 @@ SERIAL_CONSOLE ?= "115200 ttyHSL0"
 
 DISTRO_FEATURES_append = " emmc-boot "
 DISTRO_FEATURES_append = " persist-image "
+DISTRO_FEATURES_append = " data-image "
+DISTRO_FEATURES_append = " cache-image "
 
 PAGE_SIZE ?= '4096'
 
