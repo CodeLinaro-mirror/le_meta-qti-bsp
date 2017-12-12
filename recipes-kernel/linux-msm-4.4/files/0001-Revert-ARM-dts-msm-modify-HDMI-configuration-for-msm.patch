@@ -1,0 +1,79 @@
+From 096789bae7a99aa9498178f01f32fce5b09de973 Mon Sep 17 00:00:00 2001
+From: Bharathraj Nagaraju <snbraj@codeaurora.org>
+Date: Mon, 11 Dec 2017 16:54:29 -0800
+Subject: [PATCH] Revert "ARM: dts: msm: modify HDMI configuration for msm8996
+ auto ADP/CDP"
+
+This reverts commit 4b94735d8536298cac6d326e074389bc30bf2b2c.
+---
+ arch/arm/boot/dts/qcom/msm8996-agave-adp.dtsi | 21 ---------------------
+ arch/arm/boot/dts/qcom/msm8996-auto-cdp.dtsi  | 21 ---------------------
+ 2 files changed, 42 deletions(-)
+
+diff --git a/arch/arm/boot/dts/qcom/msm8996-agave-adp.dtsi b/arch/arm/boot/dts/qcom/msm8996-agave-adp.dtsi
+index 44d60f6..3a907fe 100644
+--- a/arch/arm/boot/dts/qcom/msm8996-agave-adp.dtsi
++++ b/arch/arm/boot/dts/qcom/msm8996-agave-adp.dtsi
+@@ -607,27 +607,6 @@
+ 	};
+ };
+ 
+-&sde_hdmi {
+-	qcom,non-pluggable;
+-	qcom,customize-modes {
+-		qcom,customize-mode-id@0 {
+-			qcom,mode-name = "1920x1080@60Hz";
+-			qcom,mode-h-active = <1920>;
+-			qcom,mode-h-front-porch = <88>;
+-			qcom,mode-h-pulse-width = <44>;
+-			qcom,mode-h-back-porch = <148>;
+-			qcom,mode-h-active-high;
+-			qcom,mode-v-active = <1080>;
+-			qcom,mode-v-front-porch = <4>;
+-			qcom,mode-v-pulse-width = <5>;
+-			qcom,mode-v-back-porch = <36>;
+-			qcom,mode-v-active-high;
+-			qcom,mode-refresh-rate = <60>;
+-			qcom,mode-clock-in-khz = <148500>;
+-		};
+-	};
+-};
+-
+ &mdss_dsi {
+ 	hw-config = "dual_dsi";
+ };
+diff --git a/arch/arm/boot/dts/qcom/msm8996-auto-cdp.dtsi b/arch/arm/boot/dts/qcom/msm8996-auto-cdp.dtsi
+index ae61b38..c649e89 100644
+--- a/arch/arm/boot/dts/qcom/msm8996-auto-cdp.dtsi
++++ b/arch/arm/boot/dts/qcom/msm8996-auto-cdp.dtsi
+@@ -393,27 +393,6 @@
+ 	};
+ };
+ 
+-&sde_hdmi {
+-	qcom,non-pluggable;
+-	qcom,customize-modes {
+-		qcom,customize-mode-id@0 {
+-			qcom,mode-name = "1920x1080@60Hz";
+-			qcom,mode-h-active = <1920>;
+-			qcom,mode-h-front-porch = <88>;
+-			qcom,mode-h-pulse-width = <44>;
+-			qcom,mode-h-back-porch = <148>;
+-			qcom,mode-h-active-high;
+-			qcom,mode-v-active = <1080>;
+-			qcom,mode-v-front-porch = <4>;
+-			qcom,mode-v-pulse-width = <5>;
+-			qcom,mode-v-back-porch = <36>;
+-			qcom,mode-v-active-high;
+-			qcom,mode-refresh-rate = <60>;
+-			qcom,mode-clock-in-khz = <148500>;
+-		};
+-	};
+-};
+-
+ &mdss_dsi {
+ 	hw-config = "dual_dsi";
+ };
+-- 
+1.9.1
+
