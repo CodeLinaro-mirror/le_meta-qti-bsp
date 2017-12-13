@@ -1,4 +1,4 @@
-From 31c047f9b6da623f626119e559295989b91f8a73 Mon Sep 17 00:00:00 2001
+From c516ae22aef133c267fe9a39c9fe1a606fed59d6 Mon Sep 17 00:00:00 2001
 From: Bharathraj Nagaraju <snbraj@codeaurora.org>
 Date: Thu, 26 Oct 2017 18:48:13 -0700
 Subject: [PATCH] defconfig: Enable NTB framework and IDT hw driver.
@@ -13,19 +13,19 @@ Signed-off-by: Bharathraj Nagaraju <snbraj@codeaurora.org>
  1 file changed, 7 insertions(+)
 
 diff --git a/arch/arm64/configs/msm-auto_defconfig b/arch/arm64/configs/msm-auto_defconfig
-index 8f8e696..4604b33 100644
+index 4677d30..42d7823 100644
 --- a/arch/arm64/configs/msm-auto_defconfig
 +++ b/arch/arm64/configs/msm-auto_defconfig
-@@ -659,3 +659,10 @@ CONFIG_CRYPTO_AES_ARM64_NEON_BLK=y
+@@ -661,3 +661,10 @@ CONFIG_CRYPTO_AES_ARM64_NEON_BLK=y
  CONFIG_CRYPTO_CRC32_ARM64=y
  CONFIG_XZ_DEC=y
  CONFIG_QMI_ENCDEC=y
-+CONFIG_NTB_NETDEV=y
-+CONFIG_NTB=y
-+CONFIG_NTB_IDT=y
++CONFIG_NTB_NETDEV=m
++CONFIG_NTB=m
++CONFIG_NTB_IDT=m
 +CONFIG_NTB_PINGPONG=m
 +CONFIG_NTB_TOOL=m
-+CONFIG_NTB_TRANSPORT=y
++CONFIG_NTB_TRANSPORT=m
 +CONFIG_NTB_PERF=m
 -- 
 1.9.1
