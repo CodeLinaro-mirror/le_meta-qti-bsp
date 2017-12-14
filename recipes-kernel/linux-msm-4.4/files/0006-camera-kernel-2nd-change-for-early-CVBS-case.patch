@@ -1,0 +1,32 @@
+From adad7603dcc3267e2bf7e2d13da39778e1d8b7c4 Mon Sep 17 00:00:00 2001
+From: Andy Sun <bins@codeaurora.org>
+Date: Thu, 14 Dec 2017 10:36:46 +0800
+Subject: [PATCH] camera: the 2nd change for early CVBS case
+
+ais: load early_cam module earlier for early CVBS case
+
+Have to make early_cam loaded as others with same level, otherwise
+will conflict with early user space operation.
+
+Change-Id: Icdfaf1f32f2ac0db17fc821055785d8c0d54ccbe
+Signed-off-by: Andy Sun <bins@codeaurora.org>
+---
+ drivers/media/platform/msm/ais/sensor/cci/msm_early_cam.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/media/platform/msm/ais/sensor/cci/msm_early_cam.c b/drivers/media/platform/msm/ais/sensor/cci/msm_early_cam.c
+index 00ec613..54e84d0 100644
+--- a/drivers/media/platform/msm/ais/sensor/cci/msm_early_cam.c
++++ b/drivers/media/platform/msm/ais/sensor/cci/msm_early_cam.c
+@@ -273,7 +273,7 @@ static struct platform_driver msm_early_camera_driver = {
+ 
+ MODULE_DEVICE_TABLE(of, msm_early_camera_match_table);
+ 
+-module_init(msm_early_cam_init_module);
++fs_initcall(msm_early_cam_init_module);
+ module_exit(msm_early_cam_exit_module);
+ MODULE_DESCRIPTION("MSM early camera driver");
+ MODULE_LICENSE("GPL v2");
+-- 
+1.9.1
+
