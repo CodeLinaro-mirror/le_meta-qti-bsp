@@ -1,6 +1,9 @@
 # List of packages installed onto the root file system as specified by the user.
 inherit module qperf
 
+#LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
+
 DEPENDS = "virtual/kernel"
 
 include ${MACHINE}/${MACHINE}-recovery-image.inc
@@ -28,3 +31,4 @@ addtask makeota_image after do_makerecovery before do_build
 
 # For non "prop" layer settings.
 IMAGE_INSTALL_remove += "${@base_conditional('WITH_PROP_LAYER', 'no', 'adreno-recovery', '',d)}"
+

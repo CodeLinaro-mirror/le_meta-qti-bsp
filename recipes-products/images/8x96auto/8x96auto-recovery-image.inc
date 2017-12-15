@@ -2,6 +2,8 @@ DEPENDS += "bzip2 applypatch-native fsconfig-native bsdiff-native mkbootimg-nati
 
 IMAGE_ROOTFS_EXTRA_SPACE_append = "${@bb.utils.contains("DISTRO_FEATURES", "systemd", " + 4096", "" ,d)}"
 
+ROOTFS_PKGMANAGE_BOOTSTRAP = "run-postinsts"
+
 # The OE-Core minimal boot image files.
 IMAGE_INSTALL += "packagegroup-core-boot"
 IMAGE_INSTALL += "${ROOTFS_PKGMANAGE_BOOTSTRAP}"
