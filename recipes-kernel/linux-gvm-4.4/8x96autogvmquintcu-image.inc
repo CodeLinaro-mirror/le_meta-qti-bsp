@@ -63,6 +63,7 @@ SRC_URI_append += " \
     file://0011-Add-psci-workaround-for-gvm-suspend.patch \
     file://0012-unmask-virtio-net-irq-to-wake-up-system.patch \
     file://0013-i2c-msm-v2-adjust-initcall-level.patch \
+    file://0014-psci-Forbid-psci-reset-call.patch \
     file://0021-automotive-add-boot-time-marker-for-LV-GVM.patch \
 "
 
