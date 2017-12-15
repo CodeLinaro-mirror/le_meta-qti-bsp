@@ -1,4 +1,4 @@
-From e0dc8cc4679ea02ea94a48ff57ff90a3a3369903 Mon Sep 17 00:00:00 2001
+From 54296d2fb30e78d062495c19624857081bafaf08 Mon Sep 17 00:00:00 2001
 From: Ramachandran Venkataramani <ramavenk@codeaurora.org>
 Date: Fri, 15 Sep 2017 00:00:56 -0700
 Subject: [PATCH] Add support for USB pass through device on GVM
@@ -11,21 +11,21 @@ Signed-off-by: Ramachandran Venkataramani <ramavenk@codeaurora.org>
 ---
  .../boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts    |   6 +
  .../dts/qcom/vplatform-lfv-msm8996-telematics.dts  |   6 +
- .../boot/dts/qcom/vplatform-lfv-msm8996-usb.dtsi   | 303 +++++++++++++++++++++
- arch/arm64/configs/msm-auto-gvm_defconfig          |  55 ++++
- drivers/clk/msm/clock-dummy.c                      |  56 +++-
- drivers/platform/msm/gpio-usbdetect.c              | 133 +++++----
+ .../boot/dts/qcom/vplatform-lfv-msm8996-usb.dtsi   | 390 +++++++++++++++++++++
+ arch/arm64/configs/msm-auto-gvm_defconfig          |  55 +++
+ drivers/clk/msm/clock-dummy.c                      |  56 ++-
+ drivers/platform/msm/gpio-usbdetect.c              | 133 ++++---
  drivers/usb/core/hcd.c                             |   4 +
  drivers/usb/dwc3/core.c                            |   9 +-
  drivers/usb/dwc3/dwc3-msm.c                        |  10 +
  drivers/usb/host/xhci-plat.c                       |   8 +
  drivers/usb/host/xhci.c                            |   5 +
- drivers/usb/phy/phy-msm-ssusb-qmp.c                |  32 ++-
- 12 files changed, 566 insertions(+), 61 deletions(-)
+ drivers/usb/phy/phy-msm-ssusb-qmp.c                |  32 +-
+ 12 files changed, 653 insertions(+), 61 deletions(-)
  create mode 100644 arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-usb.dtsi
 
 diff --git a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts
-index 7543950..44d6f11 100644
+index 7543950..3fafe42 100644
 --- a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts
 +++ b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts
 @@ -41,3 +41,9 @@
@@ -39,7 +39,7 @@ index 7543950..44d6f11 100644
 +	qcom,force-vbus-status-off;
 +};
 diff --git a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-telematics.dts b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-telematics.dts
-index 9057fb3..d3156aa 100644
+index 9057fb3..9199a4f 100644
 --- a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-telematics.dts
 +++ b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-telematics.dts
 @@ -146,3 +146,9 @@
@@ -54,10 +54,10 @@ index 9057fb3..d3156aa 100644
 +};
 diff --git a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-usb.dtsi b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-usb.dtsi
 new file mode 100644
-index 0000000..f966685
+index 0000000..f675f33
 --- /dev/null
 +++ b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-usb.dtsi
-@@ -0,0 +1,303 @@
+@@ -0,0 +1,390 @@
 +/* Copyright (c) 2014-2017, The Linux Foundation. All rights reserved.
 + *
 + * This program is free software; you can redistribute it and/or modify
@@ -224,6 +224,52 @@ index 0000000..f966685
 +		};
 +	};
 +
++	usb2s: hsusb@7600000 {
++		compatible = "qcom,dwc-usb3-msm";
++		reg = <0x07600000 0xfc000>,
++			<0x7416000 0x400>;
++		reg-names = "core_base",
++			"ahb2phy_base";
++		#address-cells = <1>;
++		#size-cells = <1>;
++		ranges;
++		status = "okay";
++
++		interrupts = <0 352 0>, <0 140 0>;
++		interrupt-names = "hs_phy_irq", "pwr_event_irq";
++
++		qcom,msm-bus,name = "usb-hs";
++		qcom,msm-bus,num-cases = <2>;
++		qcom,msm-bus,num-paths = <1>;
++		qcom,msm-bus,vectors-KBps =
++					<87 512 0 0>,
++					<87 512 60000 960000>;
++
++		clocks = <&clock_gcc clk_gcc_usb20_master_clk>,
++			 <&clock_gcc clk_gcc_periph_noc_usb20_ahb_clk>,
++			 <&clock_gcc clk_gcc_usb20_mock_utmi_clk>,
++			 <&clock_gcc clk_gcc_usb20_sleep_clk>,
++			 <&clock_gcc clk_cxo_dwc3_clk>,
++			 <&clock_gcc clk_gcc_usb_phy_cfg_ahb2phy_clk>;
++		clock-names = "core_clk", "iface_clk", "utmi_clk", "sleep_clk",
++				"xo", "cfg_ahb_clk";
++		qcom,core-clk-rate = <60000000>;
++		resets = <&clock_gcc USB_20_BCR>;
++		reset-names = "core_reset";
++		qcom,disable-host-mode-pm;
++
++		dwc3@7600000 {
++			compatible = "snps,dwc3";
++			reg = <0x07600000 0xc8d0>;
++			interrupts = <0 138 0>;
++			usb-phy = <&qusb_phy1>, <&usb_nop_phy>;
++			maximum-speed = "high-speed";
++			snps,nominal-elastic-buffer;
++			snps,is-utmi-l1-suspend;
++			snps,hird-threshold = /bits/ 8 <0x0>;
++		};
++	};
++
 +	android_usb@66bf0c8 {
 +		compatible = "qcom,android-usb";
 +		reg = <0x066bf0c8 0xc8>;
@@ -263,6 +309,43 @@ index 0000000..f966685
 +		clock-names = "cfg_ahb_clk", "ref_clk_src";
 +
 +		resets = <&clock_gcc QUSB2PHY_PRIM_BCR>;
++		reset-names = "phy_reset";
++	};
++
++	qusb_phy1: qusb@7412000 {
++		compatible = "qcom,qusb2phy";
++		reg = <0x07412000 0x180>,
++			<0x0007024c 0x4>,
++			<0x00388014 0x4>;
++		reg-names = "qusb_phy_base",
++			"tune2_efuse_addr",
++			"ref_clk_addr";
++		vdd-supply = <&pm8994_s2_corner>;
++		vdda18-supply = <&pm8994_l12>;
++		vdda33-supply = <&pm8994_l24>;
++		qcom,vdd-voltage-level = <1 5 7>;
++		qcom,tune2-efuse-bit-pos = <25>;
++		qcom,tune2-efuse-num-bits = <4>;
++		qcom,qusb-phy-init-seq = <0xF8 0x80
++					0xB3 0x84
++					0x83 0x88
++					0xC0 0x8C
++					0x30 0x08
++					0x79 0x0C
++					0x21 0x10
++					0x14 0x9C
++					0x9F 0x1C
++					0x00 0x18>;
++		phy_type = "utmi";
++		qcom,phy-clk-scheme = "cmos";
++		qcom,major-rev = <1>;
++		qcom,hold-reset;
++
++		clocks = <&clock_gcc clk_gcc_usb_phy_cfg_ahb2phy_clk>,
++			<&clock_gcc clk_ln_bb_clk>;
++		clock-names = "cfg_ahb_clk", "ref_clk_src";
++
++		resets = <&clock_gcc QUSB2PHY_SEC_BCR>;
 +		reset-names = "phy_reset";
 +	};
 +
@@ -355,6 +438,10 @@ index 0000000..f966685
 +		qcom,disable-autonomous-mode;
 +	};
 +
++	usb_nop_phy: usb_nop_phy {
++		compatible = "usb-nop-xceiv";
++	};
++
 +	dbm_1p5: dbm@6af8000 {
 +		compatible = "qcom,usb-dbm-1p5";
 +		reg = <0x06af8000 0x300>;
@@ -362,10 +449,10 @@ index 0000000..f966685
 +	};
 +};
 diff --git a/arch/arm64/configs/msm-auto-gvm_defconfig b/arch/arm64/configs/msm-auto-gvm_defconfig
-index 05ade77..2e2f913 100644
+index d79a2f7..1f11b83 100644
 --- a/arch/arm64/configs/msm-auto-gvm_defconfig
 +++ b/arch/arm64/configs/msm-auto-gvm_defconfig
-@@ -329,3 +329,58 @@ CONFIG_CRYPTO_MD4=y
+@@ -334,3 +334,58 @@ CONFIG_CRYPTO_MD4=y
  CONFIG_CRYPTO_ARC4=y
  CONFIG_CRYPTO_TWOFISH=y
  CONFIG_QMI_ENCDEC=y
@@ -502,7 +589,7 @@ index e874fcc..9206a6d 100644
  }
  
 diff --git a/drivers/platform/msm/gpio-usbdetect.c b/drivers/platform/msm/gpio-usbdetect.c
-index adf47fc3..fe953e2 100644
+index adf47fc..fe953e2 100644
 --- a/drivers/platform/msm/gpio-usbdetect.c
 +++ b/drivers/platform/msm/gpio-usbdetect.c
 @@ -46,6 +46,9 @@ static irqreturn_t gpio_usbdetect_vbus_irq(int irq, void *data)
