@@ -51,6 +51,7 @@ SRC_URI_append_8x96mizar += " \
     file://0001-Revert-ntb-add-DMA-error-handling-for-RX-DMA.patch \
     file://0001-Revert-ntb-add-DMA-error-handling-for-TX-DMA.patch \
     file://0001-drivers-ntb-fix-compilation-issue-in-transport-layer.patch \
+    file://0001-Revert-ARM-dts-msm-modify-HDMI-configuration-for-msm.patch \
 "
 do_deploy_rename () {
     mv ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img ${DEPLOY_DIR_IMAGE}/boot.img
