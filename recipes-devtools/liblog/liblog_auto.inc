@@ -2,6 +2,8 @@ PR = "r0"
 
 DEPENDS += "glib-2.0"
 
+EXTRA_OECONF_remove_class-target = " --with-logd-logging"
+
 CFLAGS_append_pn-liblog = " -Dstrlcpy=g_strlcpy "
 CFLAGS_append_pn-liblog = " -Dstrlcat=g_strlcat "
 LDFLAGS_append_pn-liblog = " -lglib-2.0 -shared "
