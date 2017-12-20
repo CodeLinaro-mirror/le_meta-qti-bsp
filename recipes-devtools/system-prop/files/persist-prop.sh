@@ -36,3 +36,4 @@ fi
 
 # Start using persist properties
 setprop le.persistprop.enable true
+setprop service.adb.tcp.port 5555
