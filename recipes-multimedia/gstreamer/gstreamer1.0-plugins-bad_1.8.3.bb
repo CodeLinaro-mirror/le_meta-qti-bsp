@@ -21,6 +21,7 @@ S = "${WORKDIR}/gst-plugins-bad"
 PACKAGECONFIG = " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'wayland', '', d)} \
     orc \
+    hls \
     "
 
 PACKAGECONFIG[wayland] = "--enable-wayland --enable-egl,--disable-wayland --disable-egl,wayland virtual/egl"
@@ -89,7 +90,6 @@ EXTRA_OECONF = " \
                 --disable-gsm \
                 --disable-gtk3 \
                 --disable-hdvparse \
-                --disable-hls \
                 --enable-id3tag \
                 --disable-inter \
                 --disable-interlace \
