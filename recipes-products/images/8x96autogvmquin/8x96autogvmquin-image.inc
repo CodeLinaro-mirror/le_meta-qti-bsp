@@ -9,6 +9,7 @@ EXTRA_IMAGE_FEATURES += "ssh-server-openssh"
 IMAGE_INSTALL += "packagegroup-agl-core"
 IMAGE_INSTALL += "packagegroup-agl-ivi"
 IMAGE_INSTALL += "packagegroup-ivi-common-core"
+IMAGE_INSTALL_remove += "packagegroup-agl-demo-platform"
 IMAGE_INSTALL += "packagegroup-agl-appfw"
 
 IMAGE_INSTALL += "weston"
