@@ -43,6 +43,10 @@ CONFIG_POSIX_MQUEUE=y
 KERNEL_EXTRACONFIGS
 }
 
+SRC_URI_append_8x96autocv2x += " \
+    file://0001-esoc-Disable-access-check-for-ESOC-IOCTLs.patch \
+"
+
 do_deploy_rename () {
     mv ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img ${DEPLOY_DIR_IMAGE}/boot.img
 }
