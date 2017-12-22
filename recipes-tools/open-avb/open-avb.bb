@@ -16,6 +16,8 @@ S = "${WORKDIR}/Open-AVB"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
+TARGET_CC_ARCH += "${LDFLAGS}"
+
 do_compile_prepend() {
 }
 
