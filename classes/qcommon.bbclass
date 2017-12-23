@@ -12,14 +12,14 @@ python __anonymous() {
     # For parsing manifest xml file
     import xml.etree.ElementTree as ET
 
-    workspace = d.getVar('WORKSPACE', True)
-    f = open(workspace + "/.repo/manifests/default.xml")
-    manifest = f.read()
-    f.close()
-
-    root = ET.fromstring(manifest)
-
     if (d.getVar('USE_LOCAL_FILE_FETCHER', True) == '1'):
+        workspace = d.getVar('WORKSPACE', True)
+        f = open(workspace + "/.repo/manifest.xml")
+        manifest = f.read()
+        f.close()
+
+        root = ET.fromstring(manifest)
+
         # Convert SRC_URI as 'file' type and point to local repo paths.
         srcuri = (d.getVar('SRC_URI', True) or "").split()
         if len(srcuri) == 0:
