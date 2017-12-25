@@ -44,12 +44,18 @@ python __anonymous () {
       d.appendVar("SRC_URI", " file://0006-camera-kernel-2nd-change-for-early-CVBS-case.patch")
       d.appendVar("SRC_URI", " file://0007-Add-RVC-trigger-gpio-in-early-usespace.patch")
 
+  if bb.utils.contains('DISTRO_FEATURES', 'msm_11ad', True, False, d):
+      d.appendVar("SRC_URI", " file://0001-defconfig-Enable-80211AD-WiFi-driver-support.patch")
+
   # Override KERNEL_IMAGETYPE_FOR_MAKE variable, which is internal
   # to kernel.bbclass. We override the variable as msm kernel can't
   # support alternate image builds
   if d.getVar("KERNEL_IMAGETYPE", True):
       d.setVar("KERNEL_IMAGETYPE_FOR_MAKE", "")
 }
+
+# Prevent Kernel Moudles are stripped when doing package
+INHIBIT_PACKAGE_STRIP = "1"
 
 KERNEL_IMAGEDEST = "boot"
 
