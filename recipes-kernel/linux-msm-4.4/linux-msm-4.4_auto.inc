@@ -2,6 +2,8 @@ INSANE_SKIP_${PN} += "installed-vs-shipped"
 
 do_defconfig_patch () {
 cat >> ${S}/arch/${ARCH}/configs/${KERNEL_CONFIG} <<KERNEL_EXTRACONFIGS
+# CONFIG_DEBUG_STACK_USAGE is not set
+# CONFIG_IRQSOFF_TRACER is not set
 CONFIG_DEVTMPFS=y
 CONFIG_DEVTMPFS_MOUNT=y
 CONFIG_FHANDLE=y
