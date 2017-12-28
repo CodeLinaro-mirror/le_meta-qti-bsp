@@ -9,9 +9,11 @@ USE_CLANG = "${@bb.utils.contains('DISTRO_FEATURES', 'le-clang','true','${RECIPE
 DEPENDS +="${@bb.utils.contains('USE_CLANG', 'true','llvm-arm-toolchain-native','',d)}"
 
 FULL_OPTIMIZATION = "${@bb.utils.contains('USE_CLANG', 'true',\
-  '-O2  -fomit-frame-pointer -Wno-error=maybe-uninitialized  -Wno-error=unused-result -Wno-error=unknown-warning-option -Wno-error=unused-comparison \
+  '-O2  -fomit-frame-pointer -Wno-error=maybe-uninitialized  -Wno-error=unused-result -Wno-error=unknown-warning-option -Wno-error=unused-comparison -Wno-error=unused-command-line-argument \
     -Wno-error=unused-private-field -Wno-error=undefined-optimized -Wno-error=format -Wno-error=inconsistent-missing-override', \
-  '-O2 -fexpensive-optimizations -frename-registers -fomit-frame-pointer -ftree-vectorize   -Wno-error=maybe-uninitialized -finline-functions -finline-limit=64', d)}"
+  '-O2 -fexpensive-optimizations -frename-registers -fomit-frame-pointer -ftree-vectorize   -Wno-error=maybe-uninitialized -finline-functions -finline-limit=64 -Wno-error=unused-command-line-argument', d)}"
+
+FULL_OPTIMIZATION += "-Wno-error=unused-command-line-argument"
 
 NEON_FLAGS = "${@bb.utils.contains('TARGET_ARCH', 'arm', '-march=armv7-a -mfloat-abi=softfp -mfpu=neon -ftree-vectorize ', ' ',d)}"
 
