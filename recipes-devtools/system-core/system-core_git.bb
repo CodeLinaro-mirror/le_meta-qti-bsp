@@ -37,27 +37,18 @@ COMPOSITION_8x96autocv2x = "901D"
 
 do_install_append() {
    install -m 0755 ${S}/adb/launch_adbd -D ${D}${sysconfdir}/launch_adbd
+   install -d ${D}${sysconfdir}/usb/
+   install -b -m 0644 /dev/null ${D}${sysconfdir}/usb/boot_hsusb_comp
+   install -b -m 0644 /dev/null ${D}${sysconfdir}/usb/boot_hsic_comp
+   echo ${COMPOSITION} > ${D}${sysconfdir}/usb/boot_hsusb_comp
    install -m 0755 ${S}/usb/usb_composition -D ${D}${base_sbindir}/
    install -d ${D}${base_sbindir}/usb/compositions/
    install -m 0755 ${S}/usb/compositions/* -D ${D}${base_sbindir}/usb/compositions/
-   install -d ${D}${userfsdatadir}/usb/
-   install -m 0755 ${S}/usb/compositions/hsic_next -D ${D}${userfsdatadir}/usb/
-   install -m 0755 ${S}/usb/compositions/hsusb_next -D ${D}${userfsdatadir}/usb/
    install -m 0755 ${S}/usb/target -D ${D}${base_sbindir}/usb/
    install -d ${D}${base_sbindir}/usb/debuger/
    install -m 0755 ${S}/usb/debuger/debugFiles -D ${D}${base_sbindir}/usb/debuger/
    install -m 0755 ${S}/usb/debuger/help -D ${D}${base_sbindir}/usb/debuger/
    install -m 0755 ${S}/usb/debuger/usb_debug -D ${D}${base_sbindir}/
-   if [ "${MACHINE}" == "8x96autofusion" ]; then
-       ln -s  /sbin/usb/compositions/${COMPOSITION_8x96autofusion} ${D}${userfsdatadir}/usb/boot_hsusb_composition
-   elif [ "${MACHINE}" == "8x96auto" ]; then
-       ln -s  /sbin/usb/compositions/${COMPOSITION_8x96auto} ${D}${userfsdatadir}/usb/boot_hsusb_composition
-   elif [ "${MACHINE}" == "8x96autonapier" ]; then
-       ln -s  /sbin/usb/compositions/${COMPOSITION_8x96autonapier} ${D}${userfsdatadir}/usb/boot_hsusb_composition
-   else
-       ln -s  /sbin/usb/compositions/${COMPOSITION} ${D}${userfsdatadir}/usb/boot_hsusb_composition
-   fi
-   ln -s  /sbin/usb/compositions/empty ${D}${userfsdatadir}/usb/boot_hsic_composition
    if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
       install -m 0755 ${S}/adb/start_adbd -D ${D}${sysconfdir}/initscripts/adbd
       install -m 0755 ${S}/logd/start_logd -D ${D}${sysconfdir}/initscripts/logd
