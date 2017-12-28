@@ -31,6 +31,7 @@ python __anonymous () {
   if bb.utils.contains('DISTRO_FEATURES', 'early_init', True, False, d) or bb.utils.contains('DISTRO_FEATURES', 'early-ethernet', True, False, d):
       d.appendVar("SRC_URI", " file://0003-init-early-user-space.patch")
       d.appendVar("SRC_URI", " file://0004-kernel-display-support-early-init.patch")
+      d.appendVar("KERNEL_CMD_PARAMS", " mem=1G")
 
   if bb.utils.contains('DISTRO_FEATURES', 'early-ethernet', True, False, d):
       d.appendVar("SRC_URI", " file://0001-ARM-dts-msm-Add-phy-speed-mode-properties.patch")
