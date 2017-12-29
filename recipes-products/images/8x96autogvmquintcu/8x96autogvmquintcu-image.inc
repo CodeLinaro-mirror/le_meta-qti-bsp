@@ -1,6 +1,7 @@
 #add packages on top of root file system
 
 require recipes-platform/images/agl-demo-platform.bb
+require 8x96autogvmquintcu-image-check-size.bb
 
 EXTRA_IMAGE_FEATURES += "package-management"
 #EXTRA_IMAGE_FEATURES += "tools-debug"
@@ -114,7 +115,8 @@ IMAGE_INSTALL += "libcap"
 #IMAGE_INSTALL += "ofono-tests"
 IMAGE_INSTALL += "init-mss"
 
-IMAGE_ROOTFS_SIZE = "460800"
+IMAGE_ROOTFS_SIZE = "344064"
+IMAGE_OVERHEAD_FACTOR = "1"
 IMAGE_ROOTFS_EXTRA_SPACE_append = "${@bb.utils.contains("DISTRO_FEATURES", "systemd", " + 4096", "" ,d)}"
 
 IMAGE_INSTALL_remove += "pulseaudio-module-codec-control"
