@@ -1,0 +1,48 @@
+From 3aa9465ba065d4e61b5bde30b95e68374ed7d2d9 Mon Sep 17 00:00:00 2001
+From: Yimin Peng <yiminp@codeaurora.org>
+Date: Wed, 13 Dec 2017 14:36:14 +0800
+Subject: [PATCH] ofono: Add boot marker for modem function.
+
+Change-Id: I9598de319a411c926e2aa6c842060231d609613c
+Signed-off-by: Yimin Peng <yiminp@codeaurora.org>
+---
+ plugins/ril.c        | 2 ++
+ src/ofono.service.in | 2 +-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/plugins/ril.c b/plugins/ril.c
+index 7593c4f..788ac06 100644
+--- a/plugins/ril.c
++++ b/plugins/ril.c
+@@ -57,6 +57,7 @@
+ #include <ofono/types.h>
+ 
+ #include <gril/gril.h>
++#include <systemd/sd-daemon.h>
+ 
+ #include "ofono.h"
+ 
+@@ -384,6 +385,7 @@ static int create_gril(struct ofono_modem *modem)
+ 	g_ril_register(rd->ril, RIL_UNSOL_RESPONSE_RADIO_STATE_CHANGED,
+ 			ril_radio_state_changed, modem);
+ 
++	sd_notify(0, "READY=1\n");
+ 	return 0;
+ }
+ 
+diff --git a/src/ofono.service.in b/src/ofono.service.in
+index d9edb2c..e7f35b5 100644
+--- a/src/ofono.service.in
++++ b/src/ofono.service.in
+@@ -3,7 +3,7 @@ Description=Telephony service
+ After=syslog.target
+ 
+ [Service]
+-Type=dbus
++Type=notify
+ BusName=org.ofono
+ Environment="OFONO_RIL_DEVICE=ril"
+ Environment="OFONO_RIL_NUM_SIM_SLOTS=1"
+-- 
+1.9.1
+
