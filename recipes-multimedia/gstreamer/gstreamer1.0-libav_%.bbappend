@@ -17,5 +17,5 @@ S = "${WORKDIR}/gst-libav-${PV}"
 
 EXTRA_OECONF += "--without-system-libav"
 LIBAV_EXTRA_CONFIGURE_COMMON_ARG += "--disable-everything \
-                                     --enable-decoder=aac,alac,mp3,wmalossless,wmapro,wmav1,wmav2,wmavoice,dca \
+                                     --enable-decoder=aac,alac,mp3,wmalossless,wmapro,wmav1,wmav2,wmavoice,dca,eac3 \
                                      "
