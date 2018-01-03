@@ -6,6 +6,7 @@ SRC_URI_append += "file://ro-fstab"
 SRC_URI_append_apq8017 += "file://apq8017/ro-fstab"
 SRC_URI_append_apq8053 += "file://apq8053/ro-fstab"
 SRC_URI_append_mdm9607 += "file://mdm9607/ro-fstab"
+SRC_URI_append_mdm9607-hf += "file://mdm9607/ro-fstab"
 SRC_URI_append_sdx20 += "file://sdx20/ro-fstab"
 
 SRC_URI_append_apq8017 += "file://apq8017/cache.mount"
