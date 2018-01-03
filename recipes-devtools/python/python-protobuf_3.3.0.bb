@@ -10,7 +10,7 @@ SRCNAME = "protobuf"
 
 PACKAGE_BEFORE_PN = "${PN}-compiler"
 
-DEPENDS = "zlib python-setuptools-native python-native protobuf-native"
+DEPENDS = "zlib python-setuptools-native python-native protobuf-native python-six-native"
 
 LIC_FILES_CHKSUM = "file://setup.py;begineline=237;endline=237;md5=280e00a114b06867a5b7ec32779b6c61"
 
@@ -30,20 +30,20 @@ inherit distutils
 # Cherry-pick the files after the `setup.py install` and copy them to ${D}.
 do_install() {
     install -d ${D}${PYTHON_SITEPACKAGES_DIR}
-
+ 
     # this run installs the egg file in to python2.7/site-packages folder
     STAGING_INCDIR=${STAGING_INCDIR} \
     STAGING_LIBDIR=${STAGING_LIBDIR} \
     PYTHONPATH=${D}${PYTHON_SITEPACKAGES_DIR} \
-    BUILD_SYS=${BUILD_SYS} HOST_SYS=${HOST_SYS} \
-    ${STAGING_BINDIR_NATIVE}/${PYTHON_PN}-native/${PYTHON_PN} setup.py install || \
+    ${STAGING_BINDIR_NATIVE}/${PYTHON_PN}-native/${PYTHON_PN} setup.py install --install-lib=${D}/${PYTHON_SITEPACKAGES_DIR} ${DISTUTILS_INSTALL_ARGS} || \
         bbfatal "${PYTHON_PN} setup.py install execution failed."
 
     # the above fails to add the path, just install that into ${D}
-    rm -f ${D}${PYTHON_SITEPACKAGES_DIR}/protobuf.pth
-    echo "./${SRCNAME}-${PV}-py${PYTHON_BASEVERSION}.egg" > ${D}${PYTHON_SITEPACKAGES_DIR}/protobuf.pth
-#    cp "${S}/dist/${SRCNAME}-${PV}-py${PYTHON_BASEVERSION}.egg" ${D}${PYTHON_SITEPACKAGES_DIR}
-#    cp "${S}/${SRCNAME}.egg-info/PKG-INFO" "${D}${PYTHON_SITEPACKAGES_DIR}/${SRCNAME}-${PV}-py${PYTHON_BASEVERSION}.egg-info"
+     rm -f ${D}${RECIPE_SYSROOT_NATIVE}/usr/bin/easy_install 
+     rm -f ${D}${RECIPE_SYSROOT_NATIVE}/usr/bin/easy_install-2.7 
+
+     rm -f ${D}${PYTHON_SITEPACKAGES_DIR}/setuptools.pth
+     echo "./${SRCNAME}-${PV}-py${PYTHON_BASEVERSION}.egg" > ${D}${PYTHON_SITEPACKAGES_DIR}/protobuf.pth
 }
 
 
