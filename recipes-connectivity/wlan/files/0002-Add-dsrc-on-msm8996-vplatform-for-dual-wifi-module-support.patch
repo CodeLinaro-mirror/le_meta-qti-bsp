@@ -1,0 +1,22 @@
+diff --git a/Kbuild b/Kbuild
+index 6cb1b87..c0cf3a0 100644
+--- a/Kbuild
++++ b/Kbuild
+@@ -338,7 +338,7 @@ CONFIG_FEATURE_STATS_EXT := 1
+
+ #Flag to force the inclusion of the 802.11p channels because support
+ #for these channels has not yet been added to the kernel.
+-CONFIG_STATICALLY_ADD_11P_CHANNELS := n
++CONFIG_STATICALLY_ADD_11P_CHANNELS := y
+
+ ifeq ($(CONFIG_CFG80211),y)
+ HAVE_CFG80211 := 1
+@@ -1691,7 +1691,7 @@ endif
+ # This allows multiple instances of the driver with different module names.
+ # If the module name is wlan, leave MULTI_IF_NAME undefined and the code will
+ # treat the driver as the primary driver.
+-ifneq ($(MODNAME), wlan)
++ifneq ($(MODNAME), wldsrc)
+ CHIP_NAME ?= $(MODNAME)
+ CDEFINES += -DMULTI_IF_NAME=\"$(CHIP_NAME)\"
+ endif

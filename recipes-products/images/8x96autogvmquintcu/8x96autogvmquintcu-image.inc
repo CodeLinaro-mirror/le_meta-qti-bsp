@@ -54,6 +54,7 @@ IMAGE_INSTALL += "audiohal"
 
 #WiFi
 IMAGE_INSTALL += "qcacld"
+IMAGE_INSTALL += "qcacld-dsrc"
 IMAGE_INSTALL += "wpa-supplicant"
 IMAGE_INSTALL += "hostapd"
 IMAGE_INSTALL += "iw"
