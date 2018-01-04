@@ -41,17 +41,10 @@ EXTRA_OECONF_append =" --enable-target-uses-ion="yes""
 EXTRA_OECONF_append =" --enable-target-${SOC_FAMILY}="yes""
 EXTRA_OECONF_append =" --enable-target-uses-media-extensions="no""
 EXTRA_OECONF_append_msm8996 =" --enable-build-mm-video="yes""
-EXTRA_OECONF_append_msm8996 =" --enable-is-ubwc-supported="yes""
+#EXTRA_OECONF_append_msm8996 =" --enable-is-ubwc-supported="yes""
 EXTRA_OECONF_append_msm8996 =" --enable-master-side-cp-target-list="yes""
-
-
-EXTRA_OECONF_append =" --enable-use-glib="yes""
-EXTRA_OECONF_append =" --enable-target-uses-ion="yes""
-EXTRA_OECONF_append =" --enable-target-${SOC_FAMILY}="yes""
-EXTRA_OECONF_append =" --enable-target-uses-media-extensions="no""
-EXTRA_OECONF_append_msm8996 =" --enable-build-mm-video="yes""
-EXTRA_OECONF_append_msm8996 =" --enable-is-ubwc-supported="yes""
-EXTRA_OECONF_append_msm8996 =" --enable-master-side-cp-target-list="yes""
+#EXTRA_OECONF_append_msm8996 =" --enable-targets-that-support-pq="yes""
+#EXTRA_OECONF_append_msm8996 =" --enable-targets-that-support-adsp-pq="yes""
 
 python __anonymous () {
   # add early_init specified patch
