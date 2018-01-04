@@ -21,3 +21,7 @@ do_install() {
         install -m 0644 ${S}/init_qti_audio.service -D ${D}${systemd_unitdir}/system/init_qti_audio.service
     fi
 }
+
+do_compile() {
+    base_do_compile
+}
