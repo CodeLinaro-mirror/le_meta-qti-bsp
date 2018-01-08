@@ -11,7 +11,7 @@ IMAGE_INSTALL += "native-frameworks"
 IMAGE_INSTALL += "libhardware"
 IMAGE_INSTALL += "libhardware-legacy"
 IMAGE_INSTALL += "libcap"
-IMAGE_INSTALL += "init-mss"
+#IMAGE_INSTALL += "init-mss"
 IMAGE_INSTALL += "strongswan"
 IMAGE_INSTALL += "reboot-daemon"
 
