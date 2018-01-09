@@ -1,0 +1,33 @@
+From db918952fbc22776a264efe203f3299d32469c6b Mon Sep 17 00:00:00 2001
+From: Yunyun Cao <yunyunc@codeaurora.org>
+Date: Tue, 9 Jan 2018 11:03:49 +0800
+Subject: [PATCH] drm: msm: workaround for saving 1.5s of HDMI bridge
+ initialization
+
+Change-Id: Ifcb719833cab5a5c4a9f4627551cbb49430610f7
+Signed-off-by: Yunyun Cao <yunyunc@codeaurora.org>
+---
+ drivers/gpu/drm/msm/hdmi-staging/sde_hdmi_bridge.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/gpu/drm/msm/hdmi-staging/sde_hdmi_bridge.c b/drivers/gpu/drm/msm/hdmi-staging/sde_hdmi_bridge.c
+index 5fbe476..70d03d6 100644
+--- a/drivers/gpu/drm/msm/hdmi-staging/sde_hdmi_bridge.c
++++ b/drivers/gpu/drm/msm/hdmi-staging/sde_hdmi_bridge.c
+@@ -527,10 +527,9 @@ static void sde_hdmi_update_hdcp_info(struct drm_connector *connector)
+ 		display->src_hdcp22_support = true;
+ 
+ 	if (!display->hdcp22_present) {
+-		if (display->hdcp1_use_sw_keys) {
+-			display->hdcp14_present =
+-				hdcp1_check_if_supported_load_app();
+-		}
++		if (display->hdcp1_use_sw_keys)
++			display->hdcp14_present = false;
++
+ 		if (display->hdcp14_present) {
+ 			fd = display->hdcp_feat_data[SDE_HDCP_1x];
+ 			if (fd)
+-- 
+1.9.1
+
