@@ -1,4 +1,4 @@
-From 082081512820284467cf3fd3a79344f76600d0cc Mon Sep 17 00:00:00 2001
+From 0ef3b0c1cfb4dda309313cf3ed400f9886bb37ee Mon Sep 17 00:00:00 2001
 From: Yong Ding <yongding@codeaurora.org>
 Date: Thu, 19 Oct 2017 20:34:44 +0800
 Subject: [PATCH] HAB: upgrade to the internal latest dev version
@@ -8,28 +8,29 @@ updated to the mainlined HAB driver. They include multi-GVMs
 support, performance optimization, and also some stability issues
 fixes.
 2. This will be used for meta-qti-bsp
+3. Add dts-based parsing capability into hab driver
 
 Change-Id: I9832949340fd709d6cb7a4b824b0550ae971c438
 Signed-off-by: Yong Ding <yongding@codeaurora.org>
 ---
  drivers/soc/qcom/hab/Makefile        |   3 +-
- drivers/soc/qcom/hab/hab.c           | 406 ++++++++++++++++++++++++++++++-----
+ drivers/soc/qcom/hab/hab.c           | 409 ++++++++++++++++++++++++++++++-----
  drivers/soc/qcom/hab/hab.h           | 155 ++++++++++---
  drivers/soc/qcom/hab/hab_log.h       |  32 +++
  drivers/soc/qcom/hab/hab_mem_linux.c |  65 ++++--
  drivers/soc/qcom/hab/hab_mimex.c     |  44 ++--
  drivers/soc/qcom/hab/hab_msg.c       | 118 ++++++++--
  drivers/soc/qcom/hab/hab_open.c      |   9 +-
- drivers/soc/qcom/hab/hab_parser.c    |  67 ++++++
+ drivers/soc/qcom/hab/hab_parser.c    | 164 ++++++++++++++
  drivers/soc/qcom/hab/hab_pchan.c     |  11 +-
  drivers/soc/qcom/hab/hab_qvm.c       | 296 ++++++++++++++++++++-----
  drivers/soc/qcom/hab/hab_qvm.h       |   7 +-
  drivers/soc/qcom/hab/hab_vchan.c     |  49 ++++-
  drivers/soc/qcom/hab/khab.c          |   2 +-
- drivers/soc/qcom/hab/qvm_comm.c      |  36 ++++
+ drivers/soc/qcom/hab/qvm_comm.c      |  36 +++
  include/linux/habmm.h                |  25 ---
  include/uapi/linux/habmm.h           |  41 +++-
- 17 files changed, 1128 insertions(+), 238 deletions(-)
+ 17 files changed, 1228 insertions(+), 238 deletions(-)
  create mode 100644 drivers/soc/qcom/hab/hab_log.h
  create mode 100644 drivers/soc/qcom/hab/hab_parser.c
 
@@ -47,7 +48,7 @@ index 83fc54d..77825be 100644
  
  obj-$(CONFIG_MSM_HAB) += msm_hab.o
 diff --git a/drivers/soc/qcom/hab/hab.c b/drivers/soc/qcom/hab/hab.c
-index c6df36f..c761fd5 100644
+index c6df36f..fa4efb0 100644
 --- a/drivers/soc/qcom/hab/hab.c
 +++ b/drivers/soc/qcom/hab/hab.c
 @@ -12,6 +12,7 @@
@@ -370,7 +371,7 @@ index c6df36f..c761fd5 100644
  		physical_channel_send(vchan->pchan, &header, NULL);
  	}
  }
-@@ -442,6 +502,235 @@ void hab_vchan_close(struct uhab_context *ctx, int32_t vcid)
+@@ -442,6 +502,238 @@ void hab_vchan_close(struct uhab_context *ctx, int32_t vcid)
  	write_unlock(&ctx->ctx_lock);
  }
  
@@ -583,9 +584,12 @@ index c6df36f..c761fd5 100644
 +	memset(&hab_driver.settings, HABCFG_VMID_INVALID,
 +				sizeof(hab_driver.settings));
 +
-+	HAB_LOG_INFO("prepare default gvm 2 settings...\n");
-+	fill_default_gvm_settings(&hab_driver.settings, 2,
++	result = hab_parse(&hab_driver.settings);
++	if (result) {
++		pr_warn("hab_parse failed and use the default settings\n");
++		fill_default_gvm_settings(&hab_driver.settings, 2,
 +					MM_AUD_START, MM_ID_MAX);
++	}
 +
 +	/* now generate hab pchan list */
 +	result  = hab_generate_pchan_list(&hab_driver.settings);
@@ -606,7 +610,7 @@ index c6df36f..c761fd5 100644
  static int hab_open(struct inode *inodep, struct file *filep)
  {
  	int result = 0;
-@@ -450,7 +739,7 @@ static int hab_open(struct inode *inodep, struct file *filep)
+@@ -450,7 +742,7 @@ static int hab_open(struct inode *inodep, struct file *filep)
  	ctx = hab_ctx_alloc(0);
  
  	if (!ctx) {
@@ -615,7 +619,7 @@ index c6df36f..c761fd5 100644
  		filep->private_data = NULL;
  		return -ENOMEM;
  	}
-@@ -468,6 +757,8 @@ static int hab_release(struct inode *inodep, struct file *filep)
+@@ -468,6 +760,8 @@ static int hab_release(struct inode *inodep, struct file *filep)
  	if (!ctx)
  		return 0;
  
@@ -624,7 +628,7 @@ index c6df36f..c761fd5 100644
  	write_lock(&ctx->ctx_lock);
  
  	list_for_each_entry_safe(vchan, tmp, &ctx->vchannels, node) {
-@@ -501,7 +792,7 @@ static long hab_ioctl(struct file *filep, unsigned int cmd, unsigned long arg)
+@@ -501,7 +795,7 @@ static long hab_ioctl(struct file *filep, unsigned int cmd, unsigned long arg)
  			return -EINVAL;
  
  		if (copy_from_user(data, (void __user *)arg, _IOC_SIZE(cmd))) {
@@ -633,7 +637,7 @@ index c6df36f..c761fd5 100644
  				cmd, _IOC_SIZE(cmd));
  			return -EFAULT;
  		}
-@@ -590,7 +881,7 @@ static long hab_ioctl(struct file *filep, unsigned int cmd, unsigned long arg)
+@@ -590,7 +884,7 @@ static long hab_ioctl(struct file *filep, unsigned int cmd, unsigned long arg)
  
  	if (ret == 0 && _IOC_SIZE(cmd) && (cmd & IOC_OUT))
  		if (copy_to_user((void __user *) arg, data, _IOC_SIZE(cmd))) {
@@ -642,7 +646,7 @@ index c6df36f..c761fd5 100644
  			ret = -EFAULT;
  		}
  
-@@ -635,14 +926,12 @@ static const struct dma_map_ops hab_dma_ops = {
+@@ -635,14 +929,12 @@ static const struct dma_map_ops hab_dma_ops = {
  static int __init hab_init(void)
  {
  	int result;
@@ -658,7 +662,7 @@ index c6df36f..c761fd5 100644
  		return result;
  	}
  
-@@ -663,7 +952,7 @@ static int __init hab_init(void)
+@@ -663,7 +955,7 @@ static int __init hab_init(void)
  
  	if (IS_ERR(hab_driver.class)) {
  		result = PTR_ERR(hab_driver.class);
@@ -667,7 +671,7 @@ index c6df36f..c761fd5 100644
  		goto err;
  	}
  
-@@ -672,28 +961,26 @@ static int __init hab_init(void)
+@@ -672,28 +964,26 @@ static int __init hab_init(void)
  
  	if (IS_ERR(hab_driver.dev)) {
  		result = PTR_ERR(hab_driver.dev);
@@ -710,7 +714,7 @@ index c6df36f..c761fd5 100644
  
  err:
  	if (!IS_ERR_OR_NULL(hab_driver.dev))
-@@ -703,6 +990,7 @@ err:
+@@ -703,6 +993,7 @@ err:
  	cdev_del(&hab_driver.cdev);
  	unregister_chrdev_region(dev, 1);
  
@@ -1698,10 +1702,10 @@ index 66468aa..b7326bb 100644
  	return ret;
 diff --git a/drivers/soc/qcom/hab/hab_parser.c b/drivers/soc/qcom/hab/hab_parser.c
 new file mode 100644
-index 0000000..9cc53e4
+index 0000000..57ba984
 --- /dev/null
 +++ b/drivers/soc/qcom/hab/hab_parser.c
-@@ -0,0 +1,67 @@
+@@ -0,0 +1,164 @@
 +/* Copyright (c) 2017, The Linux Foundation. All rights reserved.
 + *
 + * This program is free software; you can redistribute it and/or modify
@@ -1716,6 +1720,7 @@ index 0000000..9cc53e4
 + */
 +
 +#include "hab.h"
++#include <linux/of.h>
 +
 +/*
 + * set valid mmid value in tbl to show this is valid entry. All inputs here are
@@ -1768,6 +1773,102 @@ index 0000000..9cc53e4
 +	/* default gvm always talks to host as vm0 */
 +	return fill_vmid_mmid_tbl(settings->vmid_mmid_list, 0, 1,
 +		mmid_start/100, (mmid_end-mmid_start)/100+1, HABCFG_BE_FALSE);
++}
++
++static int hab_parse_dt(struct local_vmid *settings)
++{
++	int result, i;
++	struct device_node *hab_node = NULL;
++	struct device_node *mmid_grp_node = NULL;
++	const char *role = NULL;
++	int tmp = -1, vmids_num;
++	u32 vmids[16];
++	int32_t grp_start_id, be;
++
++	/* parse device tree*/
++	pr_info("parsing hab node in device tree...\n");
++	hab_node = of_find_compatible_node(NULL, NULL, "qcom,hab");
++	if (!hab_node) {
++		pr_err("no hab device tree node\n");
++		return -ENODEV;
++	}
++
++	/* read the local vmid of this VM, like 0 for host, 1 for AGL GVM */
++	result = of_property_read_u32(hab_node, "vmid", &tmp);
++	if (result) {
++		pr_err("failed to read local vmid, result = %d\n", result);
++		return result;
++	} else {
++		pr_info("local vmid = %d\n", tmp);
++		settings->self = tmp;
++	}
++
++	for_each_child_of_node(hab_node, mmid_grp_node) {
++		/* read the group starting id */
++		result = of_property_read_u32(mmid_grp_node,
++				"grp-start-id", &tmp);
++		if (result) {
++			pr_err("failed to read grp-start-id, result = %d\n",
++				result);
++			return result;
++		} else {
++			pr_info("grp-start-id = %d\n", tmp);
++			grp_start_id = tmp;
++		}
++
++		/* read the role(fe/be) of these pchans in this mmid group */
++		result = of_property_read_string(mmid_grp_node, "role", &role);
++		if (result) {
++			pr_err("failed to get role, result = %d\n", result);
++			return result;
++		} else {
++			pr_info("local role of this mmid group is %s\n", role);
++
++			if (!strcmp(role, "be")) {
++				be = 1;
++			} else {
++				be = 0;
++			}
++		}
++
++		/* read the remote vmids for these pchans in this mmid group */
++		vmids_num = of_property_count_elems_of_size(mmid_grp_node,
++					"remote-vmids", sizeof(u32));
++
++		result = of_property_read_u32_array(mmid_grp_node,
++					"remote-vmids", vmids, vmids_num);
++		if (result) {
++			pr_err("failed to read remote-vmids, result = %d\n",
++				result);
++			return result;
++		} else {
++			for (i = 0; i < vmids_num; i++) {
++				pr_info("vmids_num = %d, vmids[%d] = %d\n",
++					vmids_num, i, vmids[i]);
++
++				result = fill_vmid_mmid_tbl(
++						settings->vmid_mmid_list,
++						vmids[i], 1,
++						grp_start_id/100, 1, be);
++				if (result) {
++					pr_err("fill_vmid_mmid_tbl failed\n");
++					return result;
++				}
++			}
++		}
++	}
++
++	dump_settings(settings);
++	return 0;
++}
++
++int hab_parse(struct local_vmid *settings)
++{
++	int ret;
++
++	ret = hab_parse_dt(settings);
++
++	return ret;
 +}
 diff --git a/drivers/soc/qcom/hab/hab_pchan.c b/drivers/soc/qcom/hab/hab_pchan.c
 index 1ad727f7..eef839f 100644
