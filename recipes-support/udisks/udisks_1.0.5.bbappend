@@ -13,6 +13,6 @@ do_patch_append() {
 }
 
 do_fix_rw() {
-    sed -i -e 's/MOUNT_OPTIONS="ro,sync"/MOUNT_OPTIONS="rw,sync"/' ${WORKDIR}/automount.sh
+    sed -i -e 's/MOUNT_OPTIONS="ro/MOUNT_OPTIONS="rw/' ${WORKDIR}/automount.sh
 }
 
