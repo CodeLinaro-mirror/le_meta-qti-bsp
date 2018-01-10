@@ -15,6 +15,9 @@ RDEPENDS_ofono_append_8x96autogvmquintcu += " mobile-broadband-provider-info"
 INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96auto', 'ofono_auto_nofusion', 'none',d)}"
 include ${INCSUFFIX}.inc
 
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autodvrs', 'ofono_auto_nofusion', 'none',d)}"
+include ${INCSUFFIX}.inc
+
 INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autonapier', 'ofono_auto_nofusion', 'none',d)}"
 include ${INCSUFFIX}.inc
 

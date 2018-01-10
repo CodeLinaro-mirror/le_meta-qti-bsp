@@ -51,7 +51,7 @@ do_deploy_rename () {
 addtask deploy_rename after do_deploy before do_packagedata
 
 do_unpack_extra () {
-    if [ ${@d.getVar("MACHINE", True)} == "8x96auto" ]; then
+    if [ ${@d.getVar("MACHINE", True)} == "8x96auto" ] || [ ${@d.getVar("MACHINE", True)} == "8x96autodvrs" ]; then
         mkdir -p ${S}/drivers/net/ethernet/neutrino
         cp -f ${WORKSPACE}/vehiclenetwork/ethernet/* ${S}/drivers/net/ethernet/neutrino/
         rm ${S}/drivers/net/ethernet/neutrino/Makefile
