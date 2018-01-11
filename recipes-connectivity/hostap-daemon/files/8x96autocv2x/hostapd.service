@@ -1,0 +1,14 @@
+[Unit]
+Description=Hostapd IEEE 802.11 AP, IEEE 802.1X/WPA/WPA2/EAP/RADIUS Authenticator
+Requires=sys-subsystem-net-devices-wlan0.device
+After=sys-subsystem-net-devices-wlan0.device
+
+[Service]
+Type=forking
+PIDFile=/run/hostapd.pid
+ExecStartPre=@SBINDIR@/iw dev wlan0 interface add wlan1 type __ap
+ExecStart=@SBINDIR@/hostapd @SYSCONFDIR@/hostapd-wlan1.conf -P /run/hostapd.pid -B
+ExecStopPost=@SBINDIR@/iw dev wlan1 del
+
+[Install]
+WantedBy=multi-user.target

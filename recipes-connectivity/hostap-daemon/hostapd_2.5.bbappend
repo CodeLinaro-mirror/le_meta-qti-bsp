@@ -4,6 +4,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 
 FILESEXTRAPATHS_prepend := "${WORKSPACE}:"
+FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 SRC_URI = "file://external/wpa_supplicant_8/ \
            file://defconfig \
            file://init \
