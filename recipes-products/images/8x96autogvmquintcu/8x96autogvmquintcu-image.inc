@@ -115,8 +115,7 @@ IMAGE_INSTALL += "libcap"
 #IMAGE_INSTALL += "ofono-tests"
 IMAGE_INSTALL += "init-mss"
 
-IMAGE_ROOTFS_SIZE = "344064"
-IMAGE_OVERHEAD_FACTOR = "1"
+IMAGE_ROOTFS_SIZE = "700000"
 IMAGE_ROOTFS_EXTRA_SPACE_append = "${@bb.utils.contains("DISTRO_FEATURES", "systemd", " + 4096", "" ,d)}"
 
 IMAGE_INSTALL_remove += "pulseaudio-module-codec-control"
