@@ -78,6 +78,9 @@ IMAGE_INSTALL += "smem"
 
 # smack support
 IMAGE_INSTALL_append_smack = " smack-userspace"
+# libcap
+IMAGE_INSTALL += "libcap"
+IMAGE_INSTALL += "libcap-bin"
 
 # AFM and Security
 IMAGE_INSTALL += "af-main"
