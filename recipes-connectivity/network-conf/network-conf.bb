@@ -7,6 +7,8 @@ SRC_URI += "file://mhi_swip.network"
 SRC_URI += "file://wlan.network"
 SRC_URI += "file://wpa_supplicant@wlan0.service"
 SRC_URI += "file://wpa_supplicant-wlan0.conf"
+SRC_URI += "file://hostapd.network"
+SRC_URI += "file://hostapd-wlan1.conf"
 
 FILES_${PN} += "${sysconfdir}/systemd/network/"
 FILES_${PN} += "${sysconfdir}/systemd/system/"
@@ -24,4 +26,6 @@ do_install() {
     # wpa_supplicant conf
     install -d ${D}${sysconfdir}/wpa_supplicant
     install -m 0644 ${WORKDIR}/wpa_supplicant-wlan0.conf ${D}${sysconfdir}/wpa_supplicant
+    # hostapd conf
+    install -m 0644 ${WORKDIR}/hostapd-wlan1.conf ${D}${sysconfdir}/
 }
