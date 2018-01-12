@@ -21,6 +21,7 @@ CONFIG_QCOM_SCM_QCPE=y
 CONFIG_SND_SOC_MSM8996_VM=y
 CONFIG_PTP_1588_CLOCK=y
 CONFIG_MSM_VIRTCLK_FRONTEND_8996=y
+CONFIG_CRYPTO_SHA256=y
 KERNEL_EXTRACONFIGS
 }
 
@@ -36,6 +37,7 @@ SRC_URI_append += " \
     file://0013-i2c-msm-v2-adjust-initcall-level.patch \
     file://0014-psci-Forbid-psci-reset-call.patch \
     file://0021-automotive-add-boot-time-marker-for-LV-GVM.patch \
+    file://0001-enable-rootfs-mount-as-dm-verity-target-during-boot.patch \
 "
 
 do_deploy_rename () {

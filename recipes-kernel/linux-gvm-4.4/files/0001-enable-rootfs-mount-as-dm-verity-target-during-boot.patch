@@ -1,0 +1,456 @@
+From 56f33fa9120f0a83e44cd305160595953a2eda84 Mon Sep 17 00:00:00 2001
+From: Parai Wang <fpwang@codeaurora.org>
+Date: Mon, 8 Jan 2018 17:04:53 +0800
+Subject: [PATCH] enable rootfs mount as dm-verity target during boot without
+ support of ramdisk
+
+Change-Id: Iae8446c8b1f65aa65c8c11bd0f720731d46e9be6
+Signed-off-by: Parai Wang <fpwang@codeaurora.org>
+---
+ arch/arm/boot/dts/qcom/dm-verity-boot.dtsi        |  27 ++
+ arch/arm/boot/dts/qcom/vplatform-lfv-msm8996.dtsi |   2 +
+ drivers/md/dm-ioctl.c                             |  33 +++
+ init/Makefile                                     |   1 +
+ init/do_mounts.c                                  |   1 +
+ init/do_mounts.h                                  |  10 +
+ init/do_mounts_verity.c                           | 298 ++++++++++++++++++++++
+ 7 files changed, 372 insertions(+)
+ create mode 100644 arch/arm/boot/dts/qcom/dm-verity-boot.dtsi
+ create mode 100644 init/do_mounts_verity.c
+
+diff --git a/arch/arm/boot/dts/qcom/dm-verity-boot.dtsi b/arch/arm/boot/dts/qcom/dm-verity-boot.dtsi
+new file mode 100644
+index 0000000..fe8be7d
+--- /dev/null
++++ b/arch/arm/boot/dts/qcom/dm-verity-boot.dtsi
+@@ -0,0 +1,27 @@
++/* Copyright (c) 2017, The Linux Foundation. All rights reserved.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 and
++ * only version 2 as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ */
++dm_verity {
++	dmname="disabled";
++	version="1";
++	data_device="/dev/vda";
++	hash_device="/dev/vda";
++	data_block_size="4096";
++	hash_block_size="4096";
++	number_of_data_blocks="262144";
++	hash_start_block="262144";
++	algorithm="sha256";
++	// root hash: 64 bytes long
++	digest="ffa13227f1c5d20b22709cd16590050f1af8dd06b8b6ca5fba281f6e315ead72";
++	salt="324c85923c69d4f52154318915a8d81c194717a17406f4a482e060ac64658bd8";
++	// restart_on_corruption ignore_corruption ignore_zero_blocks
++	opt="restart_on_corruption";
++};
+diff --git a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996.dtsi b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996.dtsi
+index a845a56..49acf56 100644
+--- a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996.dtsi
++++ b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996.dtsi
+@@ -33,6 +33,8 @@
+ 
+ 	soc: soc { };
+ 
++	/include/ "dm-verity-boot.dtsi"
++
+ 	reserved_memory: reserved-memory {
+ 		#address-cells = <2>;
+ 		#size-cells = <2>;
+diff --git a/drivers/md/dm-ioctl.c b/drivers/md/dm-ioctl.c
+index 7baeeaf..1f8375c 100644
+--- a/drivers/md/dm-ioctl.c
++++ b/drivers/md/dm-ioctl.c
+@@ -1993,3 +1993,36 @@ out:
+ 
+ 	return r;
+ }
++
++int __init dm_ioctrl(uint cmd, struct dm_ioctl *param)
++{
++	int r = 0;
++	int ioctl_flags;
++	ioctl_fn fn = NULL;
++	size_t input_param_size;
++
++	/*
++	 * Nothing more to do for the version command.
++	 */
++	if (cmd == DM_VERSION_CMD)
++		return 0;
++
++	DMDEBUG("dm_ctl_ioctl: command 0x%x", cmd);
++
++	fn = lookup_ioctl(cmd, &ioctl_flags);
++	if (!fn) {
++		DMWARN("dm_ctl_ioctl: unknown command 0x%x", cmd);
++		return -ENOTTY;
++	}
++
++	input_param_size = param->data_size;
++	param->data_size = sizeof(*param);
++
++	r = fn(param, input_param_size);
++
++	if (unlikely(param->flags & DM_BUFFER_FULL_FLAG) &&
++		unlikely(ioctl_flags & IOCTL_FLAGS_NO_PARAMS))
++		DMERR("ioctl %d tried to output some data but has IOCTL_FLAGS_NO_PARAMS set", cmd);
++
++	return r;
++}
+diff --git a/init/Makefile b/init/Makefile
+index 243f61d..e96f022 100644
+--- a/init/Makefile
++++ b/init/Makefile
+@@ -16,6 +16,7 @@ mounts-$(CONFIG_BLK_DEV_RAM)	+= do_mounts_rd.o
+ mounts-$(CONFIG_BLK_DEV_INITRD)	+= do_mounts_initrd.o
+ mounts-$(CONFIG_BLK_DEV_MD)	+= do_mounts_md.o
+ mounts-$(CONFIG_BLK_DEV_DM)	+= do_mounts_dm.o
++mounts-$(CONFIG_BLK_DEV_DM)	+= do_mounts_verity.o
+ 
+ # dependencies on generated files need to be listed explicitly
+ $(obj)/version.o: include/generated/compile.h
+diff --git a/init/do_mounts.c b/init/do_mounts.c
+index 1902a1c8..8070243 100644
+--- a/init/do_mounts.c
++++ b/init/do_mounts.c
+@@ -567,6 +567,7 @@ void __init prepare_namespace(void)
+ 
+ 	md_run_setup();
+ 	dm_run_setup();
++	dm_verity_setup();
+ 
+ 	if (saved_root_name[0]) {
+ 		root_device_name = saved_root_name;
+diff --git a/init/do_mounts.h b/init/do_mounts.h
+index 09d2286..7fcabee 100644
+--- a/init/do_mounts.h
++++ b/init/do_mounts.h
+@@ -84,3 +84,13 @@ void dm_run_setup(void);
+ static inline void dm_run_setup(void) {}
+ 
+ #endif
++
++#ifdef CONFIG_BLK_DEV_DM
++
++void dm_verity_setup(void);
++
++#else
++
++static inline void dm_verity_setup(void) {}
++
++#endif
+diff --git a/init/do_mounts_verity.c b/init/do_mounts_verity.c
+new file mode 100644
+index 0000000..c1979c0
+--- /dev/null
++++ b/init/do_mounts_verity.c
+@@ -0,0 +1,298 @@
++/* Copyright (c) 2017, The Linux Foundation. All rights reserved.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 and
++ * only version 2 as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ */
++#include <linux/device-mapper.h>
++#include <linux/fs.h>
++#include <linux/string.h>
++#include "uapi/linux/dm-ioctl.h"
++#include <linux/of_device.h>
++#include <linux/of_platform.h>
++#include <linux/reboot.h>
++#include "do_mounts.h"
++
++extern void dm_table_destroy(struct dm_table *t);
++extern int dm_ioctrl(uint cmd, struct dm_ioctl *param);
++extern dev_t name_to_dev_t(const char *name);
++
++#define DM_BUF_SIZE 4096
++
++#define DM_MSG_PREFIX "verity"
++
++static __initdata int dm_early_setup = 0;
++static __initdata char dm_misc_dev[64] = "/dev/vdb";
++
++static void __init init_param(struct dm_ioctl *param, const char* name)
++{
++	memset(param, 0, DM_BUF_SIZE);
++    param->data_size = DM_BUF_SIZE;
++    param->data_start = sizeof(struct dm_ioctl);
++    param->version[0] = 4;
++    param->version[1] = 0;
++    param->version[2] = 0;
++    param->flags = DM_READONLY_FLAG;
++	strlcpy(param->name, name, sizeof(param->name));
++}
++
++static int __init dm_setup_misc(char *str)
++{
++	strlcpy(dm_misc_dev, str, sizeof(dm_misc_dev));
++	return 0;
++}
++
++__setup("misc=", dm_setup_misc);
++
++static int dm_restart(struct notifier_block *this, unsigned long mode,
++			     void *cmd)
++{
++	int f;
++	int r;
++
++    if(0 == strcmp(cmd, "dm-verity device corrupted"))
++    {
++		f = sys_open(dm_misc_dev, O_WRONLY, 0);
++		if(f < 0)
++		{
++			/* too early, udev is not ready, create node in kernel space */
++			r = create_dev(dm_misc_dev, name_to_dev_t(dm_misc_dev));
++
++			if (r < 0)
++			{
++				printk(KERN_ERR "dm: failed to create %s: %d\n", dm_misc_dev, r);
++			}
++
++			/* retry */
++			f = sys_open(dm_misc_dev, O_WRONLY, 0);
++			if(f < 0)
++			{
++				printk(KERN_ERR "dm: can't open /misc(%s) partition, ercd is %d!", dm_misc_dev, f);
++			}
++		}
++
++		if(f >= 0)
++		{
++			r = sys_write(f, "boot-recovery", 14);
++			if( 14 == r)
++			{
++				printk(KERN_INFO "dm: set boot-recovery in /misc partition");
++			}
++			else
++			{
++				printk(KERN_ERR "dm: write /misc partition failed!(%d)", r);
++			}
++
++			sys_close(f);
++		}
++    }
++
++	return NOTIFY_DONE;
++}
++
++static struct notifier_block dm_restart_nb = {
++	.notifier_call = dm_restart,
++	.priority = 255,
++};
++
++
++static void __init dm_setup_drive(void)
++{
++	struct device_node *dt_node;
++	const char *name;
++	const char *version;
++	const char *data_device;
++	const char *hash_device;
++	const char *data_block_size;
++	const char *hash_block_size;
++	const char *number_of_data_blocks;
++	const char *hash_start_block;
++	const char *algorithm;
++	const char *digest;
++	const char *salt;
++	const char *opt;
++	int len;
++	unsigned long long data_blocks;
++	char dummy;
++	char *verity_params;
++	size_t bufsize;
++	char buffer[DM_BUF_SIZE];
++	struct dm_ioctl *param = (struct dm_ioctl *) buffer;
++	struct dm_target_spec *tgt = (struct dm_target_spec *) &buffer[sizeof(struct dm_ioctl)];
++
++	dt_node = of_find_node_by_path("/dm_verity");
++	if (!dt_node) {
++		DMERR("(E) Failed to find device-tree node: /dm_verity");
++		goto fail;
++	}
++
++	name = of_get_property(dt_node, "dmname", &len);
++	if(NULL == name)
++	{
++		goto fail;
++	}
++	DMDEBUG("(I) name=%s", name);
++
++	if(0 == strcmp(name,"disabled"))
++	{
++		printk(KERN_INFO "dm: dm-verity is disabled.");
++		return;
++	}
++
++	version = of_get_property(dt_node, "version", &len);
++	if(NULL == version)
++	{
++		goto fail;
++	}
++	DMDEBUG("(I) version=%s", version);
++
++	data_device = of_get_property(dt_node, "data_device", &len);
++	if(NULL == data_device)
++	{
++		goto fail;
++	}
++	DMDEBUG("(I) data_device=%s", data_device);
++
++	hash_device = of_get_property(dt_node, "hash_device", &len);
++	if(NULL == hash_device)
++	{
++		goto fail;
++	}
++	DMDEBUG("(I) hash_device=%s", hash_device);
++
++	data_block_size = of_get_property(dt_node, "data_block_size", &len);
++	if(NULL == data_block_size)
++	{
++		goto fail;
++	}
++	DMDEBUG("(I) data_block_size=%s", data_block_size);
++
++	hash_block_size = of_get_property(dt_node, "hash_block_size", &len);
++	if(NULL == hash_block_size)
++	{
++		goto fail;
++	}
++	DMDEBUG("(I) hash_block_size=%s", hash_block_size);
++
++	number_of_data_blocks = of_get_property(dt_node, "number_of_data_blocks", &len);
++	if(NULL == number_of_data_blocks)
++	{
++		goto fail;
++	}
++	DMDEBUG("(I) number_of_data_blocks=%s", number_of_data_blocks);
++
++	hash_start_block = of_get_property(dt_node, "hash_start_block", &len);
++	if(NULL == hash_start_block)
++	{
++		goto fail;
++	}
++	DMDEBUG("(I) hash_start_block=%s", hash_start_block);
++
++	algorithm = of_get_property(dt_node, "algorithm", &len);
++	if(NULL == algorithm)
++	{
++		goto fail;
++	}
++	DMDEBUG("(I) algorithm=%s", algorithm);
++
++	digest = of_get_property(dt_node, "digest", &len);
++	if(NULL == digest)
++	{
++		goto fail;
++	}
++	DMDEBUG("(I) digest=%s", digest);
++
++	salt = of_get_property(dt_node, "salt", &len);
++	if(NULL == salt)
++	{
++		goto fail;
++	}
++	DMDEBUG("(I) salt=%s", salt);
++
++	opt = of_get_property(dt_node, "opt", &len);
++	if(NULL == opt)
++	{
++		goto fail;
++	}
++	DMDEBUG("(I) opt=%s", opt);
++
++	init_param(param, name);
++	if (dm_ioctrl(DM_DEV_CREATE_CMD, param)) {
++		DMERR("(E) failed to create the device");
++		goto fail;
++	}
++
++	init_param(param, name);
++    param->target_count = 1;
++	/* set tgt arguments */
++    tgt->status=0;
++    tgt->sector_start=0;
++	if (sscanf(number_of_data_blocks, "%llu%c", &data_blocks, &dummy) != 1) {
++		DMERR("(E) invalid number of data blocks");
++		goto fail;
++	}
++
++    tgt->length=data_blocks*4096/512; /* size in sector(512b) of data dev */
++    strcpy(tgt->target_type, "verity");
++	/* build the verity params here */
++	verity_params = buffer + sizeof(struct dm_ioctl) + sizeof(struct dm_target_spec);
++    bufsize = DM_BUF_SIZE - (verity_params - buffer);
++
++	verity_params += snprintf(verity_params, bufsize, "%s %s %s %s %s %s %s %s %s %s 1 %s",
++							  version,
++							  data_device, hash_device,
++							  data_block_size, hash_block_size,
++							  number_of_data_blocks, hash_start_block,
++							  algorithm, digest, salt, opt);
++
++    tgt->next = verity_params - buffer;
++
++	/* before load verity, register error handler */
++	if (register_reboot_notifier(&dm_restart_nb))
++	{
++		DMERR("(E) failed to register restart handler, ignore...");
++	}
++
++
++	if (dm_ioctrl(DM_TABLE_LOAD_CMD, param)) {
++	 	DMERR("(E) failed to load the device");
++		goto fail;
++	}
++
++	init_param(param, name);
++	if (dm_ioctrl(DM_DEV_SUSPEND_CMD, param)) {
++		DMERR("(E) failed to suspend the device");
++		goto fail;
++	}
++
++	printk(KERN_INFO "dm: dm-0 (%s) is ready", data_device);
++	return;
++
++fail:
++	printk(KERN_WARNING "dm: starting dm-0 failed");
++	return;
++
++}
++
++/* verity enabled */
++static int __init dm_setup(char *str)
++{
++	(void) str;
++	dm_early_setup = 1;
++	return 0;
++}
++
++__setup("verity", dm_setup);
++
++void __init dm_verity_setup(void)
++{
++	if (!dm_early_setup)
++		return;
++	printk(KERN_INFO "dm: attempting early device configuration.");
++	dm_setup_drive();
++}
+-- 
+1.9.1
+
