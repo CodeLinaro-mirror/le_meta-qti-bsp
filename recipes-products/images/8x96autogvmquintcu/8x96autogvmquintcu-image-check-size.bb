@@ -9,4 +9,4 @@ python do_check_rootfs_size () {
         bb.fatal ("Too large rootfs image size\n")
 }
 
-addtask do_check_rootfs_size after do_image before do_image_complete 
+addtask do_check_rootfs_size after do_rootfs before do_image
