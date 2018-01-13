@@ -1,34 +1,27 @@
-DESCRIPTION = "wifi drivers for QCA6574A-1 on AGL platform"
+DESCRIPTION = "Qualcomm Atheros WLAN CLD driver for SDIO on AGL Platform"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 LICENSE = "ISC"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=f3b90e78ea0cffb20bf5cca7947a896d"
 
-WLAN_MODULE_NAME = "${@base_conditional('BASEMACHINE', '8x96autogvmquintcu', 'wlpcie', 'none', d)}"
-CHIP_NAME = "${@base_conditional('BASEMACHINE', '8x96autogvmquintcu', 'pcie', 'none', d)}"
+WLAN_MODULE_NAME = "${@base_conditional('BASEMACHINE', '8x96autogvmquintcu', 'wldsrc', 'none', d)}"
+CHIP_NAME = "${@base_conditional('BASEMACHINE', '8x96autogvmquintcu', 'qca6584', 'none', d)}"
 
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI = "file://wlan/qcacld-2.0/ \
-           file://wifi_on.sh \
-           file://wifi_off.sh \
-           file://init_qti_wlan.service \
           "
+
 DEPENDS = "virtual/kernel"
 
 S = "${WORKDIR}/wlan/qcacld-2.0"
 
 inherit module kernel-arch qperf
-inherit module update-rc.d
-INITSCRIPT_NAME = "wifi_on.sh"
-
-inherit systemd
-SYSTEMD_SERVICE_${PN} = "init_qti_wlan.service"
-SYSTEMD_AUTO_ENABLE_${PN} = "enable"
 
 INHIBIT_PACKAGE_STRIP = "1"
 
 EXTRA_OEMAKE += "CONFIG_ARCH_MSM=y"
+EXTRA_OEMAKE += "CONFIG_CLD_HL_SDIO_CORE=y CONFIG_BUS_AUTO_SUSPEND=n"
 EXTRA_OEMAKE += "MODNAME=${WLAN_MODULE_NAME} CHIP_NAME=${CHIP_NAME}"
 
 do_compile_append () {
@@ -57,36 +50,20 @@ do_install () {
     install -d ${D}/lib/modules/${KERNEL_VERSION}/extra
     install -D -m 0644 ${S}/${WLAN_MODULE_NAME}.ko ${D}/lib/modules/${KERNEL_VERSION}/extra/
 
-    #Disbale Runtime PM to fix PCIE AER issue
-    sed -i -e 's/^gRuntimePM=1/gRuntimePM=0/g' ${S}/firmware_bin/WCNSS_qcom_cfg.ini
+    # Enable 802.11p (DSRC) standalone mode
+    sed -i -e 's/^END/# OCB mode - 1=standalone\ngDot11PMode=1\n\nEND/g' ${S}/firmware_bin/WCNSS_qcom_cfg.ini
 
-    #Change Default Power Save Offload configuration
-    sed -i -e 's/^gEnablePowerSaveOffload=2/gEnablePowerSaveOffload=1/g' ${S}/firmware_bin/WCNSS_qcom_cfg.ini
-
-    install -d ${D}/lib/firmware/wlan/qca_cld/${CHIP_NAME}
-    install -D -m 0644 ${S}/firmware_bin/WCNSS_qcom_cfg.ini ${D}/lib/firmware/wlan/qca_cld/${CHIP_NAME}
-    install -D -m 0644 ${S}/firmware_bin/WCNSS_qcom_cfg.ini ${D}/lib/firmware/wlan/qcom_cfg.ini
-    install -D -m 0644 ${S}/firmware_bin/WCNSS_cfg.dat ${D}/lib/firmware/wlan/qca_cld/${CHIP_NAME}
-    install -D -m 0644 ${S}/firmware_bin/WCNSS_cfg.dat ${D}/lib/firmware/wlan/cfg.dat
-
-    install -d ${D}/usr/sbin
-    install -D -m 0544 ${WORKDIR}/wifi_on.sh ${D}/usr/sbin/
-    install -D -m 0544 ${WORKDIR}/wifi_off.sh ${D}/usr/sbin/
-
-    #install systemd service file
-    if ${@base_contains('DISTRO_FEATURES','systemd','true','false',d)}; then
-        install -m 0644 ${WORKDIR}/init_qti_wlan.service -D ${D}${systemd_unitdir}/system/init_qti_wlan.service
-    fi
+    install -d ${D}/lib/firmware/wlan/qca_cld
+    install -D -m 0644 ${S}/firmware_bin/WCNSS_qcom_cfg.ini ${D}/lib/firmware/wlan/qca_cld/
+    install -D -m 0644 ${S}/firmware_bin/WCNSS_cfg.dat ${D}/lib/firmware/wlan/qca_cld/
 }
 
 FILES_${PN} = "/usr/sbin/\
                lib/modules/${KERNEL_VERSION}/extra/\
-               lib/firmware/\
-               etc/init.d/\
-               etc/dbus-1/system.d/"
+               lib/firmware/"
 
 PACKAGES =+ "kernel-module-${WLAN_MODULE_NAME}"
 FILES_kernel-module-${WLAN_MODULE_NAME} = "/lib/modules/${KERNEL_VERSION}/extra/${WLAN_MODULE_NAME}.ko"
 
-INCSUFFIX = "${@base_conditional('MACHINEGROUP', 'auto', 'qcacld-2.0_auto', 'none',d)}"
+INCSUFFIX = "${@base_conditional('MACHINEGROUP', 'auto', 'qcacld-dsrc-2.0_auto', 'none',d)}"
 include ${INCSUFFIX}.inc
