@@ -192,11 +192,12 @@ EXTRA_OECONF = " \
                 --disable-yadif \
                 --disable-zbar \
                 "
-
+EXTRA_OECONF_append =" --with-protocal-xml-path=${STAGING_DATADIR}/weston"
 do_configure_prepend() {
 	cd ${S}
 	./autogen.sh --noconfigure
 	cd ${B}
 }
+
 
 INSANE_SKIP_${PN} += "installed-vs-shipped"
