@@ -66,8 +66,13 @@ EXTRA_USERS_PARAMS = "\
  useradd -u 1005 -g audio audio; \
  useradd -u 1006 -U camera;\
  useradd -u 1021 -U gps; \
+ useradd -u 1010 -U wifi; \
+ useradd -u 1013 -U media; \
  useradd -u 1036 -U logd;\
  useradd -u 2000 -U adb; \
+ useradd -u 3005 -U net_admin; \
+ useradd -u 3009 -U readproc; \
+ useradd -u 3010 -U wakelock; \
  useradd -u 3011 -U sensors; \
  useradd -u 4000 -U apps; \
  useradd -u 4021 -U locclient; \
@@ -82,9 +87,11 @@ EXTRA_USERS_PARAMS = "\
  usermod -L -e 1 input; \
  usermod -L -e 1 audio; \
  usermod -L -e 1 camera; \
+ usermod -L -e 1 wifi; \
+ usermod -L -e 1 media; \
  usermod -L -e 1 adb; \
  usermod -L -e 1 sensors; \
- usermod -L -e 1 Apps; \
+ usermod -L -e 1 apps; \
  usermod -L -e 1 nobody; \
  usermod -L -e 1 qmmfsvr; \
  usermod -L -e 1 qmmfwebsvr; \
