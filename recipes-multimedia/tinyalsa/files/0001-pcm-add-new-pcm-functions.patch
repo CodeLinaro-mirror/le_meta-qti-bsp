@@ -1,0 +1,79 @@
+From e55e5a561b61d1f337428ab7fef0e975888188da Mon Sep 17 00:00:00 2001
+From: Honghao Liu <honghaol@codeaurora.org>
+Date: Thu, 11 Jan 2018 14:32:06 -0500
+Subject: [PATCH] audio: Add new pcm functions
+
+Add pcm_get_poll_fd, pcm_mmap_get_Hw_ptr function definition
+for audio.
+---
+ include/tinyalsa/asoundlib.h | 14 ++++++++++----
+ pcm.c                        | 39 ++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 48 insertions(+), 5 deletions(-)
+
+diff --git a/git/include/tinyalsa/asoundlib.h b/git/include/tinyalsa/asoundlib.h
+index 8fb7c95..fa68e7c 100644
+--- a/git/include/tinyalsa/asoundlib.h
++++ b/git/include/tinyalsa/asoundlib.h
+@@ -206,7 +212,7 @@ int pcm_stop(struct pcm *pcm);
+ 
+ /* Interrupt driven API */
+ int pcm_wait(struct pcm *pcm, int timeout);
+-
++int pcm_get_poll_fd(struct pcm *pcm);
+ 
+ /* Get the pcm delay */
+ long pcm_get_delay(struct pcm *pcm);
+diff --git a/git/pcm.c b/git/pcm.c
+index 2c1308d..e6733d9 100644
+--- a/git/pcm.c
++++ b/git/pcm.c
+@@ -827,6 +831,34 @@ int pcm_stop(struct pcm *pcm)
+     return 0;
+ }
+ 
++int pcm_mmap_get_hw_ptr(struct pcm* pcm, unsigned int *hw_ptr, struct timespec *tstamp)
++{
++    int frames;
++    int rc;
++
++    if (pcm == NULL || hw_ptr == NULL || tstamp == NULL)
++        return oops(pcm, EINVAL, "pcm %p, hw_ptr %p, tstamp %p", pcm, hw_ptr, tstamp);
++
++    if (!pcm_is_ready(pcm))
++        return oops(pcm, errno, "pcm_is_ready failed");
++
++    rc = pcm_sync_ptr(pcm, SNDRV_PCM_SYNC_PTR_HWSYNC);
++    if (rc < 0)
++        return oops(pcm, errno, "pcm_sync_ptr failed");
++
++    if ((pcm->mmap_status->state != PCM_STATE_RUNNING) &&
++            (pcm->mmap_status->state != PCM_STATE_DRAINING))
++        return oops(pcm, ENOSYS, "invalid stream state %d", pcm->mmap_status->state);
++
++    *tstamp = pcm->mmap_status->tstamp;
++    if (tstamp->tv_sec == 0 && tstamp->tv_nsec == 0)
++        return oops(pcm, errno, "invalid time stamp");
++
++    *hw_ptr = pcm->mmap_status->hw_ptr;
++
++    return 0;
++}
++
+ static inline int pcm_mmap_playback_avail(struct pcm *pcm)
+ {
+     int avail;
+@@ -961,6 +993,11 @@ int pcm_wait(struct pcm *pcm, int timeout)
+     return 1;
+ }
+ 
++int pcm_get_poll_fd(struct pcm *pcm)
++{
++    return pcm->fd;
++}
++
+ int pcm_mmap_transfer(struct pcm *pcm, const void *buffer, unsigned int bytes)
+ {
+     int err = 0, frames, avail;
+-- 
+1.9.1
+
