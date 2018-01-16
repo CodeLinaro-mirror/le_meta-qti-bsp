@@ -63,6 +63,7 @@ SRC_URI_append += " \
     file://0013-i2c-msm-v2-adjust-initcall-level.patch \
     file://0014-psci-Forbid-psci-reset-call.patch \
     file://0021-automotive-add-boot-time-marker-for-LV-GVM.patch \
+    file://0022-cnss-change-pcie-fw-path-for-dual-wifi-support.patch \
 "
 
 do_deploy_rename () {
