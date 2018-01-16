@@ -5,8 +5,8 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 LICENSE = "ISC"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=f3b90e78ea0cffb20bf5cca7947a896d"
 
-WLAN_MODULE_NAME = "${@base_conditional('BASEMACHINE', '8x96autogvmquintcu', 'wlpcie', 'none', d)}"
-CHIP_NAME = "${@base_conditional('BASEMACHINE', '8x96autogvmquintcu', 'pcie', 'none', d)}"
+WLAN_MODULE_NAME = "${@base_conditional('BASEMACHINE', '8x96autogvmquintcu', 'wlpcie', 'wlan', d)}"
+WLAN_CHIP_NAME = "${@base_conditional('BASEMACHINE', '8x96autogvmquintcu', 'pcie', 'none', d)}"
 
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI = "file://wlan/qcacld-2.0/ \
@@ -29,7 +29,9 @@ SYSTEMD_AUTO_ENABLE_${PN} = "enable"
 INHIBIT_PACKAGE_STRIP = "1"
 
 EXTRA_OEMAKE += "CONFIG_ARCH_MSM=y"
-EXTRA_OEMAKE += "MODNAME=${WLAN_MODULE_NAME} CHIP_NAME=${CHIP_NAME}"
+EXTRA_OEMAKE += "MODNAME=${WLAN_MODULE_NAME} CHIP_NAME=${WLAN_CHIP_NAME}"
+
+CHIP_NAME = "${@base_conditional('BASEMACHINE', '8x96autogvmquintcu', 'pcie', '', d)}"
 
 do_compile_append () {
     KMOD_SIG_ALL=`cat ${STAGING_KERNEL_BUILDDIR}/.config | grep CONFIG_MODULE_SIG_ALL | cut -d'=' -f2`
