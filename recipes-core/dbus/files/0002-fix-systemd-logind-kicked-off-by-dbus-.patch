@@ -1,0 +1,31 @@
+From 1c45884065de1e4d3c91204fe765ce797118a5b6 Mon Sep 17 00:00:00 2001
+From: Lei wang <leiwan@codeaurora.org>
+Date: Mon, 11 Dec 2017 11:14:50 +0800
+Subject: [PATCH] fix systemd-logind kicked off by dbus (workaroud for root)
+
+Signed-off-by: Lei wang <leiwan@codeaurora.org>
+---
+ bus/connection.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/bus/connection.c b/bus/connection.c
+index 95e20a6..58aec53 100644
+--- a/bus/connection.c
++++ b/bus/connection.c
+@@ -671,6 +671,13 @@ static dbus_bool_t
+ pending_unix_fds_timeout_cb (void *data)
+ {
+   DBusConnection *connection = data;
++  unsigned long uid;
++
++  if (dbus_connection_get_unix_user (connection, &uid) && uid == 0)
++    {
++      return TRUE;
++    }
++
+   dbus_connection_close (connection);
+   return TRUE;
+ }
+-- 
+1.9.1
+
