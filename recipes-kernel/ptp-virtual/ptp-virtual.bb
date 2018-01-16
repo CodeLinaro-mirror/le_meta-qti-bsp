@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5
 FILESEXTRAPATHS_prepend := "${WORKSPACE}/vehiclenetwork:"
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI = "file://ptp-virtual"
-
+SRC_URI += "file://ptp-virtual.service"
 DEPENDS = "virtual/kernel"
 
 S = "${WORKDIR}/ptp-virtual"
@@ -39,3 +39,13 @@ do_compile_append () {
 
     fi;
 }
+
+do_install_append() {
+    install -d ${D}${systemd_unitdir}/system
+    install -d ${D}/etc
+        install -m 0644 ${WORKDIR}/ptp-virtual.service ${D}${systemd_unitdir}/system/ptp-virtual.service
+}
+
+FILES_${PN} += "${systemd_unitdir}/system/ptp-virtual.service \
+                /etc/* \
+"
