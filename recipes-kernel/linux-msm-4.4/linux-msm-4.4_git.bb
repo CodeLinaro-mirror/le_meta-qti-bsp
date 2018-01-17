@@ -11,6 +11,7 @@ KERNEL_IMAGETYPE ?= "zImage"
 
 python __anonymous () {
   if bb.utils.contains('DISTRO_FEATURES', 'qti-perf', True, False, d):
+      d.appendVar("SRC_URI", " file://0001-net-ipv6-change-ipv6-module-initcall-level.patch")
       imgtype = d.getVar("KERNEL_PERF_IMAGETYPE", True)
       if imgtype:
           d.setVar("KERNEL_IMAGETYPE", d.getVar("KERNEL_PERF_IMAGETYPE", True))
@@ -26,6 +27,7 @@ python __anonymous () {
   else:
       d.setVar("KERNEL_CONFIG", d.getVar("KERNEL_DEFCONFIG", True))
       d.appendVar("SRC_URI", " file://0001-defconfig-configure-CNSS-platform-driver.patch")
+      d.appendVar("SRC_URI", " file://0001-net-ipv6-change-ipv6-module-initcall-level.patch")
 
   # add early_init to DISTRO_FEATURES to use early user space feature
   if bb.utils.contains('DISTRO_FEATURES', 'early_init', True, False, d) or bb.utils.contains('DISTRO_FEATURES', 'early-ethernet', True, False, d):
@@ -38,7 +40,6 @@ python __anonymous () {
       d.appendVar("SRC_URI", " file://0001-ethernet-driver-support-early-ethernet-call-after-fs-init.patch")
       d.appendVar("SRC_URI", " file://0004-kernel-drivers-init-Call-neutrino-ethernet-after-fs.patch")
       d.appendVar("SRC_URI", " file://0005-msm-vidc-changes-for-early-init.patch")
-      d.appendVar("SRC_URI", " file://0001-net-ipv6-change-ipv6-module-initcall-level.patch")
       d.appendVar("SRC_URI", " file://0001-net-ipv6-Disable-dad-to-run-ipv6-at-early-stage.patch")
       d.appendVar("SRC_URI", " file://0001-8021q-net-kernel-move-8021q-module-as-fs_initcall.patch")
 
