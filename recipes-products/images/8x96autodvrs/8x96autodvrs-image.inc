@@ -27,8 +27,6 @@ IMAGE_ROOTFS_SIZE = "2097152"
 IMAGE_ROOTFS_EXTRA_SPACE_append = "${@bb.utils.contains("DISTRO_FEATURES", "systemd", " + 4096", "" ,d)}"
 
 
-IMAGE_INSTALL += "ofono"
-IMAGE_INSTALL += "ofono-tests"
 IMAGE_INSTALL += "gst-multisend"
 IMAGE_INSTALL += "packagegroup-agl-appfw"
 # Add Persistence Storage related components
@@ -41,6 +39,17 @@ IMAGE_INSTALL += "node-health-monitor"
 IMAGE_INSTALL += "node-startup-controller"
 IMAGE_INSTALL += "node-startup-controller-nsm-dummy"
 
-
-
-
+IMAGE_INSTALL_remove += "synergy synergy-opensource synergy-bt-app"
+IMAGE_INSTALL_remove += "pulseaudio-module-acdb pulseaudio-module-codec-control"
+IMAGE_INSTALL_remove += "init-can"
+IMAGE_INSTALL_remove += "af-main af-binder af-binder-binding-afb-dbus-binding af-binder-binding-authlogin libafbwsc"
+IMAGE_INSTALL_remove += "mediaplayer"
+IMAGE_INSTALL_remove += "ces2017-demo"
+IMAGE_INSTALL_remove += "qtwebkit web-runtime"
+IMAGE_INSTALL_remove += "packagegroup-agl-appfw"
+IMAGE_INSTALL_remove += "packagegroup-agl-demo-platform"
+IMAGE_INSTALL_remove += "packagegroup-ivi-common-core"
+IMAGE_INSTALL_remove += "packagegroup-agl-ivi" 
+IMAGE_INSTALL_remove += "apm-test-framework"
+IMAGE_INSTALL_remove += "settings mixer hvac"
+IMAGE_INSTALL_remove += "pa-test-utils"

@@ -21,3 +21,5 @@ RDEPENDS_${PN} = " \
         alsa-utils \
         alsa-plugins \
 "
+
+RDEPENDS_${PN}_remove_8x96autodvrs = "alsa-lib alsa-utils alsa-plugins"
