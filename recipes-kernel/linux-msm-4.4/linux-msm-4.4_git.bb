@@ -103,6 +103,8 @@ KERNEL_EXTRACONFIGS
 do_patch_append () {
     if bb.utils.contains('DISTRO_FEATURES', 'systemd', True, False, d):
         bb.build.exec_func('do_defconfig_patch',d)
+    if bb.utils.contains('DISTRO_FEATURES', 'early_init', True, False, d) or bb.utils.contains('DISTRO_FEATURES', 'early-ethernet', True, False, d):
+        bb.build.exec_func('do_defconfig_tiny_patch',d)
 }
 
 do_configure () {
