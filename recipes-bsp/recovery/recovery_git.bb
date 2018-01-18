@@ -60,3 +60,5 @@ do_install_append() {
 # Including the file depends on MACHINE
 INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96auto', 'recovery-8x96auto', 'none',d)}"
 include ${INCSUFFIX}.inc
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autodvrs', 'recovery-8x96auto', 'none',d)}"
+include ${INCSUFFIX}.inc

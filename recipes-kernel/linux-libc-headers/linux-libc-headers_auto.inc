@@ -1,6 +1,9 @@
 INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96auto', 'linux-libc-headers_auto_8x96auto', 'none',d)}"
 include ${INCSUFFIX}.inc
 
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autodvrs', 'linux-libc-headers_auto_8x96auto', 'none',d)}"
+include ${INCSUFFIX}.inc
+
 INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autofusion', 'linux-libc-headers_auto_kernel4.4', 'none',d)}"
 include ${INCSUFFIX}.inc
 
