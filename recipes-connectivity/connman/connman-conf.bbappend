@@ -12,8 +12,13 @@ do_install_append () {
   install -d ${D}${sysconfdir}/connman/
   install -m 0644 ${WORKDIR}/main.conf ${D}${sysconfdir}/connman/
   # For early_ethernet, eth is configure in early_init. Just let connman ignore it.
-  if ${@bb.utils.contains('DISTRO_FEATURES', 'early-ethernet', 'true', 'false', d)} || [ "${MACHINE}" == "8x96autogvmquin" ] || [ "${MACHINE}" == "8x96autogvmquintcu" ]; then
+  if ${@bb.utils.contains('DISTRO_FEATURES', 'early-ethernet', 'true', 'false', d)}; then
       sed -i '/^NetworkInterfaceBlacklist/s/$/,eth0/' ${D}${sysconfdir}/connman/main.conf
+  fi
+  # static ip for gvm debug only
+  if ${@bb.utils.contains('DISTRO_FEATURES', 'qti-perf', 'false', 'true', d)} && \
+               ( [ "${BASEMACHINE}" == "8x96autogvmquin" ] || [ "${BASEMACHINE}" == "8x96autogvmquintcu" ] ); then
+      sed -i '/^NetworkInterfaceBlacklist/s/$/,eth1/' ${D}${sysconfdir}/connman/main.conf
   fi
 }
 
