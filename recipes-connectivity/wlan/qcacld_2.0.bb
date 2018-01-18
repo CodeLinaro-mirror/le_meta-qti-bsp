@@ -72,6 +72,8 @@ do_install () {
     install -D -m 0644 ${S}/firmware_bin/WCNSS_cfg.dat ${D}/lib/firmware/wlan/cfg.dat
 
     install -d ${D}/usr/sbin
+    sed -i -e 's/^modprobe wlan/modprobe ${WLAN_MODULE_NAME}/g' ${WORKDIR}/wifi_on.sh
+    sed -i -e 's/^rmmod wlan/rmmod ${WLAN_MODULE_NAME}/g' ${WORKDIR}/wifi_off.sh
     install -D -m 0544 ${WORKDIR}/wifi_on.sh ${D}/usr/sbin/
     install -D -m 0544 ${WORKDIR}/wifi_off.sh ${D}/usr/sbin/
 
