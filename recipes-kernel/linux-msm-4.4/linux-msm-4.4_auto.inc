@@ -60,6 +60,14 @@ do_unpack_extra () {
         mv ${S}/drivers/net/ethernet/neutrino/Makefile.builtin ${S}/drivers/net/ethernet/neutrino/Makefile
         echo "source \"drivers/net/ethernet/neutrino/Kconfig"\" >> ${S}/drivers/net/ethernet/Kconfig
         echo "obj-y += neutrino/" >> ${S}/drivers/net/ethernet/Makefile
+
+        mkdir -p ${S}/drivers/net/ethernet/neutrino_app
+        cp -f ${WORKSPACE}/vehiclenetwork/ethernet/DWC_ETH_QOS_app.c ${S}/drivers/net/ethernet/neutrino_app/
+        cp -f ${WORKSPACE}/vehiclenetwork/ethernet/Makefile_app ${S}/drivers/net/ethernet/neutrino_app/Makefile
+        cp -f ${WORKSPACE}/vehiclenetwork/ethernet/Kconfig_app ${S}/drivers/net/ethernet/neutrino_app/Kconfig
+        echo "source \"drivers/net/ethernet/neutrino_app/Kconfig"\" >> ${S}/drivers/net/ethernet/Kconfig
+        echo "obj-y += neutrino_app/" >> ${S}/drivers/net/ethernet/Makefile
+
     fi
 }
 
