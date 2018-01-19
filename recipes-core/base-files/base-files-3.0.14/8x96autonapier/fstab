@@ -11,5 +11,8 @@ PARTLABEL=dsp        /dsp                 auto       defaults              0  2
 PARTLABEL=bluetooth  /bluetooth           auto       defaults              0  2
 PARTLABEL=cache      /cache               auto       defaults              0  2
 
+# Bind home to /data
+/data                /home                auto       defaults,bind         0  0
+
 # uncomment this if your device has a SD/MMC/Transflash slot
 /dev/mmcblk1p1       /media/card          auto       defaults,nofail       0  1
