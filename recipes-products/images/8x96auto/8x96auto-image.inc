@@ -44,6 +44,8 @@ IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'node-state-
 IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'node-health-monitor', '',d)}"
 IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'node-startup-controller', '',d)}"
 IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'node-startup-controller-nsm-dummy', '',d)}"
+IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'mm-vdec-omx-test', '',d)}"
+IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'mm-venc-omx-test', '',d)}"
 
 IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'ces2017-demo', '',d)}"
 IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'can-utils', '',d)}"
