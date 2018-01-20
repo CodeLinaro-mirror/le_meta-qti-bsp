@@ -13,7 +13,7 @@ SRC_URI_append_8x96autocv2x += "file://${BASEMACHINE}/fstab"
 
 dirs755 += "/media/cf /media/net /media/ram \
             /media/union /media/realroot /media/hdd \
-            /media/mmc1"
+            /media/mmc1 /srv"
 dirs755_append_apq8009 +="/persist"
 
 do_install_append(){
