@@ -33,4 +33,5 @@ export LD_LIBRARY_PATH=/opt/ros/indigo/lib
 export PYTHONPATH=/opt/ros/indigo/lib/python2.7/site-packages
 export ROS_MASTER_URI=http://localhost:11311
 export CMAKE_PREFIX_PATH=/opt/ros/indigo
+export ROS_PACKAGE_PATH=/home/hjt/catkin_ws/src:/opt/ros/indigo/share:/opt/ros/indigo/stacks
 touch /opt/ros/indigo/.catkin
