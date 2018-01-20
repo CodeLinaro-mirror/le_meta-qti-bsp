@@ -10,14 +10,22 @@ S = "${WORKDIR}"
 inherit systemd
 
 SYSTEMD_SERVICE_${PN} = "resize-userdata.service"
-
 SYSTEMD_AUTO_ENABLE_${PN} = "enable"
 
 do_install() {
-        install -d ${D}${systemd_unitdir}/system
-        install -m 0644 ${S}/resize-userdata.service ${D}${systemd_unitdir}/system/resize-userdata.service
+    if ${@bb.utils.contains('IMAGE_FEATURES','read-only-rootfs','true','false',d)}; then
+        sed -i -e 's/^After=.*$/After=dev-disk-by\x2dpartlabel-userdata.device var-lib.mount/' ${S}/resize-userdata.service
+        sed -i    '/ConditionPathExists=.*$/d' ${S}/resize-userdata.service
+        sed -i    '/^Before=.*$/a\ConditionPathExists=\/var\/lib\/need_resize' ${S}/resize-userdata.service
+        sed -i -e 's/^ExecStartPost=.*$/ExecStartPost=\/bin\/rm -rf \/var\/lib\/need_resize/' ${S}/resize-userdata.service
+    fi
+    install -d ${D}${systemd_unitdir}/system
+    install -m 0644 ${S}/resize-userdata.service ${D}${systemd_unitdir}/system/resize-userdata.service
+    install -d ${D}/var/lib
+    touch ${D}/var/lib/need_resize
 }
 
 FILES_${PN} += "${systemd_unitdir}/system/resize-userdata.service"
+FILES_${PN} += "/var/lib/need_resize"
 
 RDEPENDS_${PN} += "e2fsprogs-resize2fs"
