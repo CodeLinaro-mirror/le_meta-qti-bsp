@@ -53,6 +53,9 @@ do_install () {
     # Enable 802.11p (DSRC) standalone mode
     sed -i -e 's/^END/# OCB mode - 1=standalone\ngDot11PMode=1\n\nEND/g' ${S}/firmware_bin/WCNSS_qcom_cfg.ini
 
+    # Set SoftAP Max Peer
+    sed -i -e 's/^END/# Set SoftAP Max Peer\ngSoftApMaxPeers=10\n\nEND/g' ${S}/firmware_bin/WCNSS_qcom_cfg.ini
+
     install -d ${D}/lib/firmware/wlan/qca_cld
     install -D -m 0644 ${S}/firmware_bin/WCNSS_qcom_cfg.ini ${D}/lib/firmware/wlan/qca_cld/
     install -D -m 0644 ${S}/firmware_bin/WCNSS_cfg.dat ${D}/lib/firmware/wlan/qca_cld/
