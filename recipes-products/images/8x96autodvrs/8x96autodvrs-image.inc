@@ -16,8 +16,6 @@ IMAGE_INSTALL += "strongswan"
 IMAGE_INSTALL += "reboot-daemon"
 IMAGE_INSTALL += "computelibrary"
 
-# Perf
-IMAGE_INSTALL += "${@bb.utils.contains("DISTRO_FEATURES", "qti-perf", "memory-hotplug", "" ,d)}"
 
 # Early init
 IMAGE_INSTALL += "${@bb.utils.contains("DISTRO_FEATURES", "early_init", "early-init", "" ,d)}"
