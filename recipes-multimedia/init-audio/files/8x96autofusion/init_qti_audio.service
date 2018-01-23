@@ -8,8 +8,8 @@ Conflicts=shutdown.target
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/bin/init_qcom_audio start
-ExecStop=/bin/init_qcom_audio stop
+ExecStart=/bin/init_qti_audio start
+ExecStop=/bin/init_qti_audio stop
 
 [Install]
 WantedBy=default.target
