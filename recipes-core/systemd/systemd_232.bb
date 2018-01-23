@@ -222,6 +222,11 @@ do_install() {
 		rm ${D}${systemd_unitdir}/system/serial-getty* -f
 	fi
 
+	if ${@base_conditional('BASEMACHINE', '8x96autogvmquintcu', 'true', 'false', d)}; then
+		# Do not need to fix the wlanocb0 to wlan0 for dsrc support on 8x96autogvmquintcu
+		sed -i -e 's/KERNEL=="wlan\*"/KERNEL=="wlan0"/g' ${WORKDIR}/70-net-setup-link.rules
+	fi
+
 	# Provide support for initramfs
 	[ ! -e ${D}/init ] && ln -s ${rootlibexecdir}/systemd/systemd ${D}/init
 	[ ! -e ${D}/${base_sbindir}/udevd ] && ln -s ${rootlibexecdir}/systemd/systemd-udevd ${D}/${base_sbindir}/udevd
