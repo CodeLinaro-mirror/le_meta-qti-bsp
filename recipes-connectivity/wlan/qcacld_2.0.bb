@@ -17,6 +17,7 @@ SRC_URI = "file://wlan/qcacld-2.0/ \
 DEPENDS = "virtual/kernel"
 
 S = "${WORKDIR}/wlan/qcacld-2.0"
+S_STRIPPED = "${WORKDIR}/packages-split/kernel-module-${WLAN_MODULE_NAME}/lib/modules/${KERNEL_VERSION}/extra"
 
 inherit module kernel-arch qperf
 inherit module update-rc.d
@@ -26,14 +27,12 @@ inherit systemd
 SYSTEMD_SERVICE_${PN} = "init_qti_wlan.service"
 SYSTEMD_AUTO_ENABLE_${PN} = "enable"
 
-INHIBIT_PACKAGE_STRIP = "1"
-
 EXTRA_OEMAKE += "CONFIG_ARCH_MSM=y"
 EXTRA_OEMAKE += "MODNAME=${WLAN_MODULE_NAME} CHIP_NAME=${WLAN_CHIP_NAME}"
 
 CHIP_NAME = "${@base_conditional('BASEMACHINE', '8x96autogvmquintcu', 'pcie', '', d)}"
 
-do_compile_append () {
+do_sign () {
     KMOD_SIG_ALL=`cat ${STAGING_KERNEL_BUILDDIR}/.config | grep CONFIG_MODULE_SIG_ALL | cut -d'=' -f2`
     KMOD_SIG_HASH=`cat ${STAGING_KERNEL_BUILDDIR}/.config | grep CONFIG_MODULE_SIG_HASH | cut -d'=' -f2 | sed 's/\"//g'`
     if [ "$KMOD_SIG_ALL" = "y" ] && [ -n "$KMOD_SIG_HASH" ]; then
@@ -45,12 +44,10 @@ do_compile_append () {
             MODPUBKEY=${STAGING_KERNEL_BUILDDIR}/signing_key.x509
         fi
 
-        cp ${S}/${WLAN_MODULE_NAME}.ko ${S}/${WLAN_MODULE_NAME}.ko.unsigned
-
         if [ "${KERNEL_VERSION:0:3}" = "4.4" ]; then
-            ${STAGING_KERNEL_BUILDDIR}/scripts/sign-file $KMOD_SIG_HASH $MODSECKEY $MODPUBKEY ${S}/${WLAN_MODULE_NAME}.ko
+            ${STAGING_KERNEL_BUILDDIR}/scripts/sign-file $KMOD_SIG_HASH $MODSECKEY $MODPUBKEY ${S_STRIPPED}/${WLAN_MODULE_NAME}.ko
         else
-            perl ${STAGING_KERNEL_DIR}/scripts/sign-file $KMOD_SIG_HASH $MODSECKEY $MODPUBKEY ${S}/${WLAN_MODULE_NAME}.ko
+            perl ${STAGING_KERNEL_DIR}/scripts/sign-file $KMOD_SIG_HASH $MODSECKEY $MODPUBKEY ${S_STRIPPED}/${WLAN_MODULE_NAME}.ko
         fi
     fi;
 }
@@ -94,3 +91,5 @@ FILES_kernel-module-${WLAN_MODULE_NAME} = "/lib/modules/${KERNEL_VERSION}/extra/
 
 INCSUFFIX = "${@base_conditional('MACHINEGROUP', 'auto', 'qcacld-2.0_auto', 'none',d)}"
 include ${INCSUFFIX}.inc
+
+addtask do_sign after do_package before do_package_write_ipk
