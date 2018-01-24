@@ -5,9 +5,7 @@ cat >> ${S}/arch/${ARCH}/configs/${KERNEL_CONFIG} <<KERNEL_EXTRACONFIGS
 CONFIG_DEVTMPFS=y
 CONFIG_SYSVIPC=y
 CONFIG_ION=y
-CONFIG_ION_MSM=y
-CONFIG_CMA=y
-CONFIG_DMA_CMA=y
+CONFIG_ION_DUMMY=y
 CONFIG_MSM_GVM_QUIN=y
 CONFIG_MSM_GVM=y
 CONFIG_FHANDLE=y
@@ -39,16 +37,17 @@ KERNEL_EXTRACONFIGS
 }
 
 SRC_URI_append += " \
+    file://0001-ion-Add-hvenv-driver-for-ion.patch \
+    file://0002-ION-Enable-ION-to-work-with-a-carveout-heap.patch \
+    file://0001-Fix_the_compilation_error_for_ion_dummy_driver.patch \
     file://0003-amba-skip-clock-calls-on-msm-virtual-platform.patch \
     file://0004-interrupt-workaround-for-virtual-plaform.patch \
     file://0005-Revert-soc-qcom-remove-debugfs-interface-from-ssr-se.patch \
     file://0006-drivers-char-diag-Enable-diag-over-IP.patch \
     file://0009-cnss-Adapt-cnss-to-virtual-platform.patch \
-    file://0011-HAB-upgrade-to-the-internal-latest-dev-version.patch \
     file://0011-Add-psci-workaround-for-gvm-suspend.patch \
     file://0012-unmask-virtio-net-irq-to-wake-up-system.patch \
     file://0013-i2c-msm-v2-adjust-initcall-level.patch \
-    file://0021-automotive-add-boot-time-marker-for-LV-GVM.patch \
 "
 
 do_deploy_rename () {
