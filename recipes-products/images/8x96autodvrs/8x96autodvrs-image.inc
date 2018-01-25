@@ -53,3 +53,6 @@ IMAGE_INSTALL_remove += "packagegroup-agl-ivi"
 IMAGE_INSTALL_remove += "apm-test-framework"
 IMAGE_INSTALL_remove += "settings mixer hvac"
 IMAGE_INSTALL_remove += "pa-test-utils"
+IMAGE_INSTALL_remove += "navigation"
+
+
