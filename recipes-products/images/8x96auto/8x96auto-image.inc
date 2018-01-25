@@ -88,8 +88,9 @@ IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'af-bi
 IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'af-binder-binding-authlogin', '',d)}"
 IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'libafbwsc', '',d)}"
 IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'web-runtime', '',d)}"
-IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'neutrino-eth', '',d)}"
 IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'packagegroup-agl-demo-platform', '',d)}"
+IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'audio-nxp-auto-noship', '',d)}"
+IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'tftp-server', '',d)}"
 
-
-
+IMAGE_INSTALL_remove += "lvm2"
+IMAGE_INSTALL_remove += "cryptsetup"
