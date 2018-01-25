@@ -15,7 +15,7 @@ do_install_append() {
 }
 
 pkg_postinst_${PN}-adbd () {
-    if [ "${BASEMACHINE}" != "8x96autogvmquin" ] && [ "${BASEMACHINE}" != "8x96autogvmquintcu" ]; then
+    if [ "${BASEMACHINE}" != "8x96autogvmquin" ] && [ "${BASEMACHINE}" != "8x96autogvmquintcu" ] && [ "${BASEMACHINE}" != "8x96autogvmgh" ]; then
         if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
             if [ -n "$D" ]; then
                 OPTS="--root=$D"
