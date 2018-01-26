@@ -92,5 +92,16 @@ IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'packa
 IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'audio-nxp-auto-noship', '',d)}"
 IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'tftp-server', '',d)}"
 
+IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'qtbase-examples', '',d)}"
+IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'qtwebkit', '',d)}"
+IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'qtwebkit-examples-examples', '',d)}"
+IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'qtmultimedia', '',d)}"
+IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'qtmultimedia-plugins', '',d)}"
+IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'qtmultimedia-qmlplugins', '',d)}"
+IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'qtwebengine-qmlplugins', '',d)}"
+IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'qtwebengine-examples', '',d)}"
+IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'qtwebsockets', '',d)}"
+IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'qtwebchannel', '',d)}"
+
 IMAGE_INSTALL_remove += "lvm2"
 IMAGE_INSTALL_remove += "cryptsetup"
