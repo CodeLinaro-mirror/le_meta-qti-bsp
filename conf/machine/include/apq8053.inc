@@ -52,3 +52,8 @@ RECOVERY_IMAGE ?= "1"
 
 # Formats of root filesystem images.
 IMAGE_FSTYPES += "ext4"
+
+#Extra fsconfig related options for ota package generator scripts.
+OTA_EXTRA_OPTS ?= "1"
+
+# DISTRO_FEATURES += "ab-support"
