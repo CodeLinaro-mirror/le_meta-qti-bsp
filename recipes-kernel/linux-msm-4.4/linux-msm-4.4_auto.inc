@@ -49,9 +49,21 @@ SRC_URI_append_8x96autocv2x += " \
     file://0001-esoc-Disable-access-check-for-ESOC-IOCTLs.patch \
 "
 
+SRC_URI_append_8x96mizar += " \
+    git://source.codeaurora.org/quic/la/kernel/msm-4.4;nobranch=1;tag=22a1299ef3960e772efd205bd2e7a3494d1e9de9;protocol=git;destsuffix=drivers/ntb;subpath=drivers/ntb \
+    git://source.codeaurora.org/quic/la/kernel/msm-4.4;nobranch=1;tag=22a1299ef3960e772efd205bd2e7a3494d1e9de9;protocol=git;destsuffix=include/linux/;subpath=include/linux \
+    file://0001-defconfig-Enable-NTB-framework-and-IDT-hw-driver.patch \
+    file://0001-dirvers-ntb-Fix-isr-routine-backport-issue.patch \
+    file://0001-Revert-ntb-add-DMA-error-handling-for-RX-DMA.patch \
+    file://0001-Revert-ntb-add-DMA-error-handling-for-TX-DMA.patch \
+    file://0001-drivers-ntb-fix-compilation-issue-in-transport-layer.patch \
+    file://0001-Revert-ARM-dts-msm-modify-HDMI-configuration-for-msm.patch \
+"
+
 do_deploy_rename () {
     mv ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img ${DEPLOY_DIR_IMAGE}/boot.img
 }
+
 addtask deploy_rename after do_deploy before do_packagedata
 
 do_unpack_extra () {
@@ -64,6 +76,10 @@ do_unpack_extra () {
         mv ${S}/drivers/net/ethernet/neutrino/Makefile.builtin ${S}/drivers/net/ethernet/neutrino/Makefile
         echo "source \"drivers/net/ethernet/neutrino/Kconfig"\" >> ${S}/drivers/net/ethernet/Kconfig
         echo "obj-y += neutrino/" >> ${S}/drivers/net/ethernet/Makefile
+    fi
+    if [ ${@d.getVar("MACHINE", True)} == "8x96mizar" ]; then
+      cp -rf ${WORKDIR}/drivers/ntb/* ${S}/drivers/ntb/
+      cp -rf ${WORKDIR}/include/linux/ntb.h ${S}/include/linux/
     fi
 }
 
