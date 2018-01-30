@@ -22,6 +22,13 @@ SRC_URI_append = "\
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
+FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+SRC_URI_append = "\
+     file://0001-ivi-controller-enable-ivi-share-function.patch \
+"
+EXTRA_OECMAKE_remove = "-DIVI_SHARE=OFF"
+EXTRA_OECMAKE = "-DIVI_SHARE=ON"
+
 do_install_append() {
 install -d ${D}${libdir}/
 cp -r  ${D}/usr/lib/* ${D}${libdir}
