@@ -15,6 +15,8 @@ SRC_URI_remove = " \
 SRCREV_common = "6f2d2093e84cc0eb99b634fa281822ebb9507285"
 S = "${WORKDIR}/gst-plugins-good"
 
+SRC_URI_append_8x96autocv2x += "file://0001-Set-IPv6-TCLASS-to-a-fixed-value.patch"
+
 do_configure_prepend() {
 	cd ${S}
 	./autogen.sh --noconfigure

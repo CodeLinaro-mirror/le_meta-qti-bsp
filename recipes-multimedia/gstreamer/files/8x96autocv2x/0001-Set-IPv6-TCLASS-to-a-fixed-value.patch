@@ -1,0 +1,37 @@
+From 42c440541b78509d28214ebc95c234043570f149 Mon Sep 17 00:00:00 2001
+From: Gustavo Solaira <gustavos@codeaurora.org>
+Date: Mon, 13 Nov 2017 13:37:20 -0800
+Subject: [PATCH] Set IPv6 TCLASS to a fixed value
+
+---
+ gst/udp/gstmultiudpsink.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/gst/udp/gstmultiudpsink.c b/gst/udp/gstmultiudpsink.c
+index ab1d93a..0f4e545 100644
+--- a/gst/udp/gstmultiudpsink.c
++++ b/gst/udp/gstmultiudpsink.c
+@@ -1031,8 +1031,8 @@ static void
+ gst_multiudpsink_setup_qos_dscp (GstMultiUDPSink * sink, GSocket * socket)
+ {
+   /* don't touch on -1 */
+-  if (sink->qos_dscp < 0)
+-    return;
++  //if (sink->qos_dscp < 0)
++  //  return;
+ 
+   if (socket == NULL)
+     return;
+@@ -1047,7 +1047,8 @@ gst_multiudpsink_setup_qos_dscp (GstMultiUDPSink * sink, GSocket * socket)
+     GST_DEBUG_OBJECT (sink, "setting TOS to %d", sink->qos_dscp);
+ 
+     /* Extract and shift 6 bits of DSFIELD */
+-    tos = (sink->qos_dscp & 0x3f) << 2;
++    //tos = (sink->qos_dscp & 0x3f) << 2;
++    tos = 3;
+ 
+     if (setsockopt (fd, IPPROTO_IP, IP_TOS, &tos, sizeof (tos)) < 0) {
+       GST_ERROR_OBJECT (sink, "could not set TOS: %s", g_strerror (errno));
+-- 
+1.9.1
+
