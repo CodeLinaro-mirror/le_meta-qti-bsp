@@ -13,6 +13,8 @@ SRC_URI = "file://external/wpa_supplicant_8/ \
 S = "${WORKDIR}/external/wpa_supplicant_8/hostapd"
 B = "${WORKDIR}/external/wpa_supplicant_8/hostapd"
 
+SYSTEMD_AUTO_ENABLE_${PN}_8x96autocv2x = "enable"
+
 do_configure_prepend () {
     #Chnage defconfig file to configure specific features
     sed -i -e 's/^CONFIG_DRIVER_HOSTAP=y/#CONFIG_DRIVER_HOSTAP=y/g' ${WORKDIR}/defconfig
