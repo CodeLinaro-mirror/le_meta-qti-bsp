@@ -88,8 +88,10 @@ IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'af-bi
 IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'af-binder-binding-authlogin', '',d)}"
 IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'libafbwsc', '',d)}"
 IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'web-runtime', '',d)}"
-IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'neutrino-eth', '',d)}"
-IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'packagegroup-agl-demo-platform', '',d)}"
+
+#Always remove below modules
+IMAGE_INSTALL_remove += "neutrino-eth"
+IMAGE_INSTALL_remove += "packagegroup-agl-demo-platform"
 
 
 
