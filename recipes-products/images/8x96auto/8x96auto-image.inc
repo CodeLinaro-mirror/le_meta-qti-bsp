@@ -47,6 +47,18 @@ IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'node-startu
 IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'mm-vdec-omx-test', '',d)}"
 IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'mm-venc-omx-test', '',d)}"
 
+# Qt
+IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'qtbase-examples', '',d)}"
+IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'qtwebkit', '',d)}"
+IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'qtwebkit-examples-examples', '',d)}"
+IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'qtmultimedia', '',d)}"
+IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'qtmultimedia-plugins', '',d)}"
+IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'qtmultimedia-qmlplugins', '',d)}"
+IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'qtwebengine-qmlplugins', '',d)}"
+IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'qtwebengine-examples', '',d)}"
+IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'qtwebsockets', '',d)}"
+IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'qtwebchannel', '',d)}"
+
 IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'ces2017-demo', '',d)}"
 IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'can-utils', '',d)}"
 IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'init-can', '',d)}"
