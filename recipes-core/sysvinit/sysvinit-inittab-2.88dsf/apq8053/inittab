@@ -62,3 +62,4 @@ z6:6:respawn:/sbin/sulogin
 m1:5:respawn:start-stop-daemon -c diag -S -b -a /usr/bin/diagrebootapp
 
 ipcw:2345:respawn:start-stop-daemon -c qmmfwebsvr:system -S -b -a /usr/bin/ipc-webserver
+m4:5:respawn:/usr/bin/loc_launcher
