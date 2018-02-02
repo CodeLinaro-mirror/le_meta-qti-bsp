@@ -1,24 +1,38 @@
-From adad7603dcc3267e2bf7e2d13da39778e1d8b7c4 Mon Sep 17 00:00:00 2001
+From 20b4238b36d4188cd5897c1498baaa97372dda27 Mon Sep 17 00:00:00 2001
 From: Andy Sun <bins@codeaurora.org>
-Date: Thu, 14 Dec 2017 10:36:46 +0800
+Date: Thu, 25 Jan 2018 14:47:19 +0800
 Subject: [PATCH] camera: the 2nd change for early CVBS case
 
-ais: load early_cam module earlier for early CVBS case
+ais: load early_cam & ais_mgr modules earlier for early CVBS case
 
-Have to make early_cam loaded as others with same level, otherwise
+Have to make early_cam & ais_mgr loaded as others with same level, otherwise
 will conflict with early user space operation.
 
-Change-Id: Icdfaf1f32f2ac0db17fc821055785d8c0d54ccbe
+Change-Id: I9e34e313efd6d24a06c994a84bd7b0c05a89e718
 Signed-off-by: Andy Sun <bins@codeaurora.org>
 ---
+ drivers/media/platform/msm/ais/msm_ais_mgr/msm_ais_mgr.c  | 2 +-
  drivers/media/platform/msm/ais/sensor/cci/msm_early_cam.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/drivers/media/platform/msm/ais/msm_ais_mgr/msm_ais_mgr.c b/drivers/media/platform/msm/ais/msm_ais_mgr/msm_ais_mgr.c
+index 9391c1d..e58c041 100644
+--- a/drivers/media/platform/msm/ais/msm_ais_mgr/msm_ais_mgr.c
++++ b/drivers/media/platform/msm/ais/msm_ais_mgr/msm_ais_mgr.c
+@@ -141,7 +141,7 @@ static void __exit msm_ais_mngr_exit(void)
+ 	kfree(msm_ais_mngr_dev);
+ }
+ 
+-module_init(msm_ais_mngr_init);
++fs_initcall(msm_ais_mngr_init);
+ module_exit(msm_ais_mngr_exit);
+ MODULE_DESCRIPTION("MSM AIS Manager");
+ MODULE_LICENSE("GPL v2");
 diff --git a/drivers/media/platform/msm/ais/sensor/cci/msm_early_cam.c b/drivers/media/platform/msm/ais/sensor/cci/msm_early_cam.c
-index 00ec613..54e84d0 100644
+index fa7a933..a397a46 100644
 --- a/drivers/media/platform/msm/ais/sensor/cci/msm_early_cam.c
 +++ b/drivers/media/platform/msm/ais/sensor/cci/msm_early_cam.c
-@@ -273,7 +273,7 @@ static struct platform_driver msm_early_camera_driver = {
+@@ -466,7 +466,7 @@ static struct platform_driver msm_early_camera_driver = {
  
  MODULE_DEVICE_TABLE(of, msm_early_camera_match_table);
  
