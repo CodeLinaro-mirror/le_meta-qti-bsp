@@ -16,6 +16,9 @@ RDEPENDS_${PN} = " \
         gstreamer1.0-libav \
         gstreamer1.0-omx \
         gstreamer1.0-plugins-ugly \
+        gdk-pixbuf-loader-bmp \
+        gdk-pixbuf-loader-gif \
+        gdk-pixbuf-loader-tiff \
         alsa-utils \
         alsa-plugins \
 "
