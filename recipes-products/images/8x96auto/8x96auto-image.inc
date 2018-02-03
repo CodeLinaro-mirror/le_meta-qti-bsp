@@ -34,3 +34,9 @@ IMAGE_INSTALL += "${@bb.utils.contains("DISTRO_FEATURES", "early-ethernet", "ear
 
 IMAGE_ROOTFS_SIZE = "2097152"
 IMAGE_ROOTFS_EXTRA_SPACE_append = "${@bb.utils.contains("DISTRO_FEATURES", "systemd", " + 4096", "" ,d)}"
+
+
+IMAGE_INSTALL += "mm-vdec-omx-test"
+IMAGE_INSTALL += "mm-venc-omx-test"
+
+
