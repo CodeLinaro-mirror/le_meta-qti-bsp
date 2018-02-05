@@ -48,7 +48,6 @@ IMAGE_INSTALL_remove += "ces2017-demo"
 IMAGE_INSTALL_remove += "qtwebkit web-runtime"
 IMAGE_INSTALL_remove += "packagegroup-agl-appfw"
 IMAGE_INSTALL_remove += "packagegroup-agl-demo-platform"
-#IMAGE_INSTALL_remove += "packagegroup-ivi-common-core"
 IMAGE_INSTALL_remove += "packagegroup-agl-ivi" 
 IMAGE_INSTALL_remove += "apm-test-framework"
 IMAGE_INSTALL_remove += "settings mixer hvac"
@@ -56,4 +55,9 @@ IMAGE_INSTALL_remove += "pa-test-utils"
 IMAGE_INSTALL_remove += "navigation"
 
 IMAGE_INSTALL += "gstreamer1.0-meta-base"
+
+# disable below modules until solve 'media' build issue
+IMAGE_INSTALL_remove += "gstreamer1.0-qcarcamsrc"
+IMAGE_INSTALL_remove += "gstreamer1.0-omx"
+IMAGE_INSTALL_remove += "gstreamer1.0-qvconv"
 
