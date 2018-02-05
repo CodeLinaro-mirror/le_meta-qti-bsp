@@ -37,6 +37,7 @@ EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96autogvmgh', ' --enabl
 EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96auto', ' --enable-target-uses-gbm=yes', '', d)} "
 EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96autodvrs', ' --enable-targets-that-support-pq=yes', '', d)} "
 #EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96autodvrs', ' --enable-targets-that-support-adsp-pq=yes', '', d)} "
+EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96autodvrs', ' --enable-target-uses-gbm=yes', '', d)} "
 
 EXTRA_OECONF_append =" --enable-use-glib="yes""
 EXTRA_OECONF_append =" --enable-target-uses-ion="yes""
