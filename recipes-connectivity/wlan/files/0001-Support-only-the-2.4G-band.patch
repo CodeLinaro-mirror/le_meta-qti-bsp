@@ -1,0 +1,13 @@
+diff --git a/firmware_bin/WCNSS_qcom_cfg.ini b/firmware_bin/WCNSS_qcom_cfg.ini
+index fa852a8..b80ceeb 100755
+--- a/firmware_bin/WCNSS_qcom_cfg.ini
++++ b/firmware_bin/WCNSS_qcom_cfg.ini
+@@ -267,7 +267,7 @@ gEnablePhyAgcListenMode=128
+ 
+ #Preferred band (both or 2.4 only or 5 only)
+ 
+-BandCapability=0
++BandCapability=1
+ 
+ 
+ #Beacon Early Termination (1 = enable the BET feature, 0 = disable)
