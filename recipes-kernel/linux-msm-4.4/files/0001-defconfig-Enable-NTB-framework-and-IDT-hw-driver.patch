@@ -1,22 +1,22 @@
-From 31c047f9b6da623f626119e559295989b91f8a73 Mon Sep 17 00:00:00 2001
+From 9c9cc48271d5418935b7b371e3c2b346117da5d0 Mon Sep 17 00:00:00 2001
 From: Bharathraj Nagaraju <snbraj@codeaurora.org>
 Date: Thu, 26 Oct 2017 18:48:13 -0700
-Subject: [PATCH] defconfig: Enable NTB framework and IDT hw driver.
+Subject: [PATCH 1/1] defconfig: Enable NTB framework and IDT hw driver.
 
 Enable support for NTB framework and IDT hardware driver.
 fix adsp crash on bootup.
 
 Change-Id: I3ae6d1c05fe413bcb7f5eccdb9250fff907ce11b
-Signed-off-by: Bharathraj Nagaraju <snbraj@codeaurora.org>
+Signed-off-by: Atul Raut <araut@codeaurora.org>
 ---
- arch/arm64/configs/msm-auto_defconfig | 7 +++++++
- 1 file changed, 7 insertions(+)
+ arch/arm64/configs/msm-auto_defconfig | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
 diff --git a/arch/arm64/configs/msm-auto_defconfig b/arch/arm64/configs/msm-auto_defconfig
-index 8f8e696..4604b33 100644
+index 36833b1..29d4daf 100644
 --- a/arch/arm64/configs/msm-auto_defconfig
 +++ b/arch/arm64/configs/msm-auto_defconfig
-@@ -659,3 +659,10 @@ CONFIG_CRYPTO_AES_ARM64_NEON_BLK=y
+@@ -672,3 +672,12 @@ CONFIG_CRYPTO_AES_ARM64_NEON_BLK=y
  CONFIG_CRYPTO_CRC32_ARM64=y
  CONFIG_XZ_DEC=y
  CONFIG_QMI_ENCDEC=y
@@ -24,9 +24,11 @@ index 8f8e696..4604b33 100644
 +CONFIG_NTB=y
 +CONFIG_NTB_IDT=y
 +CONFIG_NTB_PINGPONG=m
-+CONFIG_NTB_TOOL=m
++CONFIG_NTB_TOOL=y
 +CONFIG_NTB_TRANSPORT=y
 +CONFIG_NTB_PERF=m
++CONFIG_CMDLINE="dyndbg=""file drivers/ntb/* +pf"""
++CONFIG_CMDLINE_EXTEND=y
 -- 
 1.9.1
 
