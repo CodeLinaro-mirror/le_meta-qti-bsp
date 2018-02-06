@@ -18,6 +18,7 @@ IMAGE_INSTALL += "libevent"
 IMAGE_INSTALL += "nanopb"
 IMAGE_INSTALL += "iptables"
 IMAGE_INSTALL += "packagegroup-multimedia"
+IMAGE_INSTALL += "dnsmasq"
 
 IMAGE_INSTALL += "gps-utils"
 IMAGE_INSTALL += "loc-hal"
