@@ -1,0 +1,406 @@
+From b36350cb8d5c274f3c8eef09eb14dfc65aa51486 Mon Sep 17 00:00:00 2001
+From: Atul Raut <araut@codeaurora.org>
+Date: Wed, 24 Jan 2018 12:26:01 -0800
+Subject: [PATCH 1/1] drivers:ntb : Enable NTB transport layer.
+
+Reprogram BIOS to work with NTB transport layer.
+Tweak BIOS such that messaging to work as spad registers.
+Re-program BIOS for doorbell registers.
+Reflect same changes in NTB transport layer to work.
+
+Change-Id: I26d10ad6e2f834a606c776796e15ed70dea8a4c9
+Signed-off-by: Atul Raut <araut@codeaurora.org>
+---
+ drivers/net/ntb_netdev.c        |   2 +-
+ drivers/ntb/hw/idt/ntb_hw_idt.c | 128 ++++++++++++++++++++++++++++++++++++----
+ drivers/ntb/ntb_transport.c     |  68 ++++++++++++++-------
+ 3 files changed, 163 insertions(+), 35 deletions(-)
+
+diff --git a/drivers/net/ntb_netdev.c b/drivers/net/ntb_netdev.c
+index a9acf71..589d293 100644
+--- a/drivers/net/ntb_netdev.c
++++ b/drivers/net/ntb_netdev.c
+@@ -502,7 +502,7 @@ static int __init ntb_netdev_init_module(void)
+ 		return rc;
+ 	return ntb_transport_register_client(&ntb_netdev_client);
+ }
+-module_init(ntb_netdev_init_module);
++late_initcall(ntb_netdev_init_module);
+ 
+ static void __exit ntb_netdev_exit_module(void)
+ {
+diff --git a/drivers/ntb/hw/idt/ntb_hw_idt.c b/drivers/ntb/hw/idt/ntb_hw_idt.c
+index 4be5076..ceb9888 100644
+--- a/drivers/ntb/hw/idt/ntb_hw_idt.c
++++ b/drivers/ntb/hw/idt/ntb_hw_idt.c
+@@ -1293,20 +1293,23 @@ static int idt_ntb_peer_mw_set_trans(struct ntb_dev *ntb, int pidx, int widx,
+ 	u32 data = 0, lutoff = 0;
+ 
+ 	if (pidx < 0 || ndev->peer_cnt <= pidx)
+-		return -EINVAL;
++	  //return -EINVAL;
++	  return  -1;
+ 
+ 	if (widx < 0 || ndev->mw_cnt <= widx)
+-		return -EINVAL;
+-
++	  //return -EINVAL;
++	  return -2;
+ 	/*
+ 	 * Retrieve the memory window config to make sure the passed arguments
+ 	 * fit it restrictions
+ 	 */
+ 	mw_cfg = &ndev->mws[widx];
+ 	if (!IS_ALIGNED(addr, mw_cfg->addr_align))
+-		return -EINVAL;
++	  //return -EINVAL;
++	  return -3;
+ 	if (!IS_ALIGNED(size, mw_cfg->size_align) || size > mw_cfg->size_max)
+-		return -EINVAL;
++	  //return -EINVAL;
++	  return -4;
+ 
+ 	/* DIR and LUT based translations are initialized differently */
+ 	if (mw_cfg->type == IDT_MW_DIR) {
+@@ -1416,6 +1419,18 @@ static int idt_ntb_peer_mw_clear_trans(struct ntb_dev *ntb, int pidx,
+  *=============================================================================
+  */
+ 
++/* MODIFICATION
++ *
++ * IDT switches dont assign 32 doorbells per port rather each port can set
++ * up to 32 doorbells and any port can listen to any of the 32 doorbells. this makes
++ * it rather complicating because when one client tries to set a DB it could bounce back
++ * to itself. The GDBLSTATUS is used to set which dorbells map to which partition.
++ * Modify the below API's to work with logical dorbells 0- 3 lets say and then map those
++ * to the physical 32 dorbells that map to each paritition */
++
++#define NUM_DB 4
++#define DB_MASK ((1<<NUM_DB)-1)
++
+ /*
+  * idt_db_isr() - doorbell event ISR
+  * @ndev:	IDT NTB hardware driver descriptor
+@@ -1449,7 +1464,11 @@ static void idt_db_isr(struct idt_ntb_dev *ndev, u32 ntint_sts)
+  */
+ static u64 idt_ntb_db_valid_mask(struct ntb_dev *ntb)
+ {
+-	return IDT_DBELL_MASK;
++  struct idt_ntb_dev *ndev = to_ndev_ntb(ntb);
++
++   /* Return dorbells we support per partition */
++   return DB_MASK;
++  //return IDT_DBELL_MASK;
+ }
+ 
+ /*
+@@ -1465,7 +1484,8 @@ static u64 idt_ntb_db_read(struct ntb_dev *ntb)
+ {
+ 	struct idt_ntb_dev *ndev = to_ndev_ntb(ntb);
+ 
+-	return idt_nt_read(ndev, IDT_NT_INDBELLSTS);
++	//	return idt_nt_read(ndev, IDT_NT_INDBELLSTS);
++	return idt_nt_read(ndev, IDT_NT_INDBELLSTS)>>(ndev->part*NUM_DB)&DB_MASK;
+ }
+ 
+ /*
+@@ -1485,7 +1505,8 @@ static int idt_ntb_db_clear(struct ntb_dev *ntb, u64 db_bits)
+ {
+ 	struct idt_ntb_dev *ndev = to_ndev_ntb(ntb);
+ 
+-	idt_nt_write(ndev, IDT_NT_INDBELLSTS, (u32)db_bits);
++	//	idt_nt_write(ndev, IDT_NT_INDBELLSTS, (u32)db_bits);
++	idt_nt_write(ndev, IDT_NT_INDBELLSTS, ((u32)db_bits<<(ndev->part*NUM_DB)));
+ 
+ 	return 0;
+ }
+@@ -1523,7 +1544,7 @@ static int idt_ntb_db_set_mask(struct ntb_dev *ntb, u64 db_bits)
+ 	struct idt_ntb_dev *ndev = to_ndev_ntb(ntb);
+ 
+ 	return idt_reg_set_bits(ndev, IDT_NT_INDBELLMSK, &ndev->db_mask_lock,
+-				IDT_DBELL_MASK, db_bits);
++				DB_MASK<<(ndev->part*NUM_DB), db_bits<<(ndev->part*NUM_DB));
+ }
+ 
+ /*
+@@ -1543,9 +1564,8 @@ static int idt_ntb_db_clear_mask(struct ntb_dev *ntb, u64 db_bits)
+ {
+ 	struct idt_ntb_dev *ndev = to_ndev_ntb(ntb);
+ 
+-	idt_reg_clear_bits(ndev, IDT_NT_INDBELLMSK, &ndev->db_mask_lock,
+-			   db_bits);
+-
++	idt_reg_clear_bits(ndev, DB_MASK<<(ndev->part*NUM_DB), &ndev->db_mask_lock,
++			   db_bits<<(ndev->part*NUM_DB));
+ 	return 0;
+ }
+ 
+@@ -1567,7 +1587,7 @@ static int idt_ntb_peer_db_set(struct ntb_dev *ntb, u64 db_bits)
+ 	if (db_bits & ~(u64)IDT_DBELL_MASK)
+ 		return -EINVAL;
+ 
+-	idt_nt_write(ndev, IDT_NT_OUTDBELLSET, (u32)db_bits);
++	idt_nt_write(ndev, IDT_NT_OUTDBELLSET, (u32)db_bits<<(ndev->peers[0].part*NUM_DB));
+ 	return 0;
+ }
+ 
+@@ -1881,6 +1901,82 @@ static void idt_temp_isr(struct idt_ntb_dev *ndev, u32 ntint_sts)
+ 	dev_warn(&ndev->ntb.pdev->dev, "Temperature %hhu.%hhu", val, frac);
+ }
+ 
++/*============================================================================
++ *
++ *           Add SPAD support using reserved fields of the switch. Since
++ *           NTB transport uses spad's it is needed for time being.
++ *
++ *           Since IDT doesnt have SPAD we will use unsed registers
++ *           as scratch pads
++ *
++ *
++ *           Partion 0 SPAD 0 - NUM_SPADS-1
++ *           Partion 1 SPAD 0 - NUM_SPADS-1
++ *           PArtion 2 SPAD 0 - NUM_SPADS-1
++ *           PARTION N SPAD 0 - NUM_SPADS-1
++ *
++ *           Note this only works on PES24NTAG6 switch
++ *
++ *           Each SPAD will be 32 bits
++ *            SPARE register found:
++ *
++ *            0x3e7f0, 0x3e7f4, 0x3f100, 0x3a528, 0x3a52c, 0x3a530, 0x3a534
++ *
++ *
++ *=============================================================================
++ */
++#define NUM_SPADS 3
++#define SPAD_BASE 0x3e7f0
++
++//parttition x, spad  y
++u32 spad_address[3][3]=
++{
++   {0x3e7f0, 0x3e7f4, 0x3a528}, /* PARTITION 0 */
++   {0x3f100, 0x3f100, 0x3f100}, /* PARTITION 1 */ //not supportd
++   {0x3a52C, 0x3a530, 0x3a534}, /* PARTITION 2 */
++};
++int idt_ntb_spad_is_unsafe(struct ntb_dev *ntb)
++{
++   return 0;
++}
++int idt_ntb_spad_count(struct ntb_dev *ntb)
++{
++   /* Allocate 8 SPADS for each peer */
++   return NUM_SPADS;
++}
++
++u32 idt_ntb_spad_read(struct ntb_dev *ntb, int sidx)
++{
++	struct idt_ntb_dev *ndev = to_ndev_ntb(ntb);
++   return idt_sw_read(ndev, spad_address[ndev->part][sidx]);
++}
++int idt_ntb_spad_write(struct ntb_dev *ntb, int sidx, u32 val)
++{
++	struct idt_ntb_dev *ndev = to_ndev_ntb(ntb);
++   idt_sw_write(ndev, spad_address[ndev->part][sidx], val);
++   return 0;
++}
++
++int idt_ntb_peer_spad_addr(struct ntb_dev *ntb, int pidx, int sidx,
++			      phys_addr_t *spad_addr)
++{
++   /* Not needed */
++   return 0;
++}
++u32 idt_ntb_peer_spad_read(struct ntb_dev *ntb, int pidx, int sidx)
++{
++	struct idt_ntb_dev *ndev = to_ndev_ntb(ntb);
++   return idt_sw_read(ndev, spad_address[ndev->part][sidx]);
++}
++int idt_ntb_peer_spad_write(struct ntb_dev *ntb, int pidx, int sidx,
++			       u32 val)
++{
++	struct idt_ntb_dev *ndev = to_ndev_ntb(ntb);
++   idt_sw_write(ndev, spad_address[ndev->part][sidx], val);
++
++   return 0;
++}
++
+ /*=============================================================================
+  *                           8. ISRs related operations
+  *
+@@ -2077,6 +2173,12 @@ static const struct ntb_dev_ops idt_ntb_ops = {
+ 	.db_set_mask		= idt_ntb_db_set_mask,
+ 	.db_clear_mask		= idt_ntb_db_clear_mask,
+ 	.peer_db_set		= idt_ntb_peer_db_set,
++	.spad_count             = idt_ntb_spad_count,
++	.spad_is_unsafe         = idt_ntb_spad_is_unsafe,
++	.spad_read              = idt_ntb_spad_read,
++	.spad_write             = idt_ntb_spad_write,
++	.peer_spad_read         = idt_ntb_peer_spad_read,
++	.peer_spad_write        = idt_ntb_peer_spad_write,
+ 	.msg_count		= idt_ntb_msg_count,
+ 	.msg_inbits		= idt_ntb_msg_inbits,
+ 	.msg_outbits		= idt_ntb_msg_outbits,
+diff --git a/drivers/ntb/ntb_transport.c b/drivers/ntb/ntb_transport.c
+index 92ae197..2b49143 100644
+--- a/drivers/ntb/ntb_transport.c
++++ b/drivers/ntb/ntb_transport.c
+@@ -66,7 +66,7 @@
+ #define NTB_TRANSPORT_VER	"4"
+ #define NTB_TRANSPORT_NAME	"ntb_transport"
+ #define NTB_TRANSPORT_DESC	"Software Queue-Pair Transport over NTB"
+-#define NTB_TRANSPORT_MIN_SPADS (MW0_SZ_HIGH + 2)
++#define NTB_TRANSPORT_MIN_SPADS (MW0_BASE_HIGH + 1)
+ 
+ #define DMA_RETRIES             20
+ #define DMA_OUT_RESOURCE_TO     msecs_to_jiffies(50)
+@@ -80,7 +80,8 @@ static unsigned long max_mw_size;
+ module_param(max_mw_size, ulong, 0644);
+ MODULE_PARM_DESC(max_mw_size, "Limit size of large memory windows");
+ 
+-static unsigned int transport_mtu = 0x10000;
++//static unsigned int transport_mtu = 0x10000;
++static unsigned int transport_mtu = 0x2000;
+ module_param(transport_mtu, uint, 0644);
+ MODULE_PARM_DESC(transport_mtu, "Maximum size of NTB transport packets");
+ 
+@@ -237,6 +238,7 @@ struct ntb_payload_header {
+ 	unsigned int flags;
+ };
+ 
++#if 0
+ enum {
+ 	VERSION = 0,
+ 	QP_LINKS,
+@@ -245,6 +247,13 @@ enum {
+ 	MW0_SZ_HIGH,
+ 	MW0_SZ_LOW,
+ };
++#else
++enum {
++   QP_LINKS,
++   MW0_BASE_LOW,
++   MW0_BASE_HIGH,
++};
++#endif
+ 
+ #define dev_client_dev(__dev) \
+ 	container_of((__dev), struct ntb_transport_client_dev, dev)
+@@ -723,6 +732,7 @@ static int ntb_set_mw(struct ntb_transport_ctx *nt, int num_mw,
+ 		return -ENOMEM;
+ 	}
+ 
++#if 0
+ 	/* Notify HW the memory location of the receive buffer */
+ 	rc = ntb_mw_set_trans(nt->ndev, PIDX, num_mw, mw->dma_addr,
+ 			      mw->xlat_size);
+@@ -731,7 +741,7 @@ static int ntb_set_mw(struct ntb_transport_ctx *nt, int num_mw,
+ 		ntb_free_mw(nt, num_mw);
+ 		return -EIO;
+ 	}
+-
++#endif
+ 	return 0;
+ }
+ 
+@@ -847,21 +857,25 @@ static void ntb_transport_link_work(struct work_struct *work)
+ 	resource_size_t size;
+ 	u32 val;
+ 	int rc = 0, i, spad;
++	u64 val64;
+ 
+ 	/* send the local info, in the opposite order of the way we read it */
++	/* We already have the inbound size window requirements from mw_get_align so
++	 * go ahead and allocate the  inbound memory windows. Communicate the physical
++	 * address to the peer using SPADS. The peer will get the addresses and program
++	 * his own outbound window to point to the inbound windows  */
+ 	for (i = 0; i < nt->mw_count; i++) {
+-		size = nt->mw_vec[i].phys_size;
++	  rc = ntb_set_mw(nt, i, nt->mw_vec[i].xlat_align_size);
++	  if (rc)
++	    goto out1;
+ 
+-		if (max_mw_size && size > max_mw_size)
+-			size = max_mw_size;
++	  ntb_peer_spad_write(ndev, PIDX, MW0_BASE_HIGH + (i * 2), upper_32_bits(nt->mw_vec[i].dma_addr));
++	  ntb_peer_spad_write(ndev, PIDX, MW0_BASE_LOW + (i * 2), lower_32_bits(nt->mw_vec[i].dma_addr));
+ 
+-		spad = MW0_SZ_HIGH + (i * 2);
+-		ntb_peer_spad_write(ndev, PIDX, spad, upper_32_bits(size));
+-
+-		spad = MW0_SZ_LOW + (i * 2);
+-		ntb_peer_spad_write(ndev, PIDX, spad, lower_32_bits(size));
++	  dev_dbg(&pdev->dev, "Inbound MW%d size = %#llx, address=%llx\n", i, nt->mw_vec[i].xlat_align_size, nt->mw_vec[i].dma_addr);
+ 	}
+ 
++#if 0
+ 	ntb_peer_spad_write(ndev, PIDX, NUM_MWS, nt->mw_count);
+ 
+ 	ntb_peer_spad_write(ndev, PIDX, NUM_QPS, nt->qp_count);
+@@ -883,21 +897,30 @@ static void ntb_transport_link_work(struct work_struct *work)
+ 	dev_dbg(&pdev->dev, "Remote number of mws = %d\n", val);
+ 	if (val != nt->mw_count)
+ 		goto out;
++#endif
+ 
++   /* Setup the outbound memory windows based on the peers addresses */
+ 	for (i = 0; i < nt->mw_count; i++) {
+-		u64 val64;
+ 
+-		val = ntb_spad_read(ndev, MW0_SZ_HIGH + (i * 2));
+-		val64 = (u64)val << 32;
++	  val=ntb_spad_read(ndev, MW0_BASE_HIGH + (i * 2));
++	  val64=(u64)val<<32;
+ 
+-		val = ntb_spad_read(ndev, MW0_SZ_LOW + (i * 2));
+-		val64 |= val;
++	  val=ntb_spad_read(ndev, MW0_BASE_LOW + (i * 2));
++	  val64|=val;
+ 
+-		dev_dbg(&pdev->dev, "Remote MW%d size = %#llx\n", i, val64);
++	  /* Since we dont have a spare spad where we can put a magic number for spad init, validate the address to be aligned
++       * to the size as indication that it got initialized */
++	  if (val==0 || !IS_ALIGNED(val,nt->mw_vec[i].xlat_align_size))
++	    goto out;
+ 
+-		rc = ntb_set_mw(nt, i, val64);
+-		if (rc)
+-			goto out1;
++	  dev_dbg(&pdev->dev, "Set outbound MW%d size = %#llx, addr: = %#llx\n", i, nt->mw_vec[i].xlat_size, val64);
++
++	  rc=ntb_peer_mw_set_trans(ndev, PIDX, i, val64, nt->mw_vec[i].xlat_size);
++	  if (rc)
++	  {
++	    dev_dbg(&pdev->dev, "peer mw set translation failed: %d", rc);
++	    goto out1;
++	  }
+ 	}
+ 
+ 	nt->link_is_up = true;
+@@ -1053,10 +1076,12 @@ static int ntb_transport_probe(struct ntb_client *self, struct ntb_dev *ndev)
+ 
+ 	mw_count = ntb_peer_mw_count(ndev);
+ 
++#if 0
+ 	if (!ndev->ops->mw_set_trans) {
+ 		dev_err(&ndev->dev, "Inbound MW based NTB API is required\n");
+ 		return -EINVAL;
+ 	}
++#endif
+ 
+ 	if (ntb_db_is_unsafe(ndev))
+ 		dev_dbg(&ndev->dev,
+@@ -1085,9 +1110,10 @@ static int ntb_transport_probe(struct ntb_client *self, struct ntb_dev *ndev)
+ 		goto err;
+ 	}
+ 
+-	max_mw_count_for_spads = (spad_count - MW0_SZ_HIGH) / 2;
++	max_mw_count_for_spads = 1;
+ 	nt->mw_count = min(mw_count, max_mw_count_for_spads);
+ 
++	dev_dbg(&ndev->dev, "Num of mw : %d", nt->mw_count);
+ 	nt->mw_vec = kzalloc_node(mw_count * sizeof(*nt->mw_vec),
+ 				  GFP_KERNEL, node);
+ 	if (!nt->mw_vec) {
+-- 
+1.9.1
+
