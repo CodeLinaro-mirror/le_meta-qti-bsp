@@ -139,6 +139,9 @@ IMAGE_INSTALL += "dlt-daemon-test"
 IMAGE_INSTALL += "libcap"
 IMAGE_INSTALL += "libcap-bin"
 
+#To support ivi-shell
+IMAGE_INSTALL += "packagegroup-ivi-common-core"
+
 # If non "meta-qti-bsp-prop" layer, skip build below modules.
 IMAGE_INSTALL_remove += "${@base_conditional('WITH_PROP_LAYER', 'no', 'weston', '',d)}"
 IMAGE_INSTALL_remove += "${@base_conditional('WITH_PROP_LAYER', 'no', 'weston-examples', '',d)}"
