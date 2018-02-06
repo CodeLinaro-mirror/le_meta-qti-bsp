@@ -47,7 +47,6 @@ IMAGE_INSTALL += "ethtool"
 IMAGE_INSTALL += "tcpdump"
 IMAGE_INSTALL += "cryptsetup"
 IMAGE_INSTALL += "lvm2"
-IMAGE_INSTALL += "init-can"
 
 #RESIZE
 IMAGE_INSTALL += "resize-service"
