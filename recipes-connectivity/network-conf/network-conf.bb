@@ -9,6 +9,7 @@ SRC_URI += "file://wpa_supplicant@wlan0.service"
 SRC_URI += "file://wpa_supplicant-wlan0.conf"
 SRC_URI += "file://hostapd.network"
 SRC_URI += "file://hostapd-wlan1.conf"
+SRC_URI += "file://iptables-masquerade.service"
 
 FILES_${PN} += "${sysconfdir}/systemd/network/"
 FILES_${PN} += "${sysconfdir}/systemd/system/"
@@ -28,4 +29,8 @@ do_install() {
     install -m 0644 ${WORKDIR}/wpa_supplicant-wlan0.conf ${D}${sysconfdir}/wpa_supplicant
     # hostapd conf
     install -m 0644 ${WORKDIR}/hostapd-wlan1.conf ${D}${sysconfdir}/
+    # iptables-masquerade service
+    install -m 0644 ${WORKDIR}/iptables-masquerade.service ${D}${sysconfdir}/systemd/system/
+    ln -sf ${sysconfdir}/systemd/system/iptables-masquerade.service \
+        ${D}${sysconfdir}/systemd/system/multi-user.target.wants/iptables-masquerade.service
 }
