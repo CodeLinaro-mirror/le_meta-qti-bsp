@@ -1,4 +1,4 @@
-From 7091530ee6a98623d0da870becb24ff66c3cf9e7 Mon Sep 17 00:00:00 2001
+From acb30c07208b78c61983743cd3500fb853ed4a65 Mon Sep 17 00:00:00 2001
 From: Yimin Peng <yiminp@codeaurora.org>
 Date: Fri, 2 Feb 2018 17:53:35 +0800
 Subject: [PATCH] add support for USB pass through device on GVM
@@ -10,6 +10,7 @@ Signed-off-by: Yimin Peng <yiminp@codeaurora.org>
  .../boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts    |   4 +
  .../dts/qcom/vplatform-lfv-msm8996-telematics.dts  |   4 +
  .../boot/dts/qcom/vplatform-lfv-msm8996-usb.dtsi   |   6 +
+ arch/arm64/configs/msm-auto-gvm-perf_defconfig     |  55 +++++++++
  arch/arm64/configs/msm-auto-gvm_defconfig          |  55 +++++++++
  drivers/clk/msm/clock-dummy.c                      |  56 ++++++++-
  drivers/platform/msm/gpio-usbdetect.c              | 133 +++++++++++++--------
@@ -19,7 +20,7 @@ Signed-off-by: Yimin Peng <yiminp@codeaurora.org>
  drivers/usb/host/xhci-plat.c                       |   8 ++
  drivers/usb/host/xhci.c                            |   5 +
  drivers/usb/phy/phy-msm-ssusb-qmp.c                |  32 +++--
- 13 files changed, 269 insertions(+), 61 deletions(-)
+ 14 files changed, 324 insertions(+), 61 deletions(-)
 
 diff --git a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi-lv-mt.dts b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi-lv-mt.dts
 index fd04dcf..0460431 100644
@@ -37,7 +38,7 @@ index fd04dcf..0460431 100644
  	status = "okay";
  	qcom,no-wakeup-src-in-hostmode;
 diff --git a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts
-index 9080549..08f2fae 100644
+index 7a716d8..f6da051 100644
 --- a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts
 +++ b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts
 @@ -77,6 +77,10 @@
@@ -52,7 +53,7 @@ index 9080549..08f2fae 100644
  	status = "okay";
  	qcom,no-wakeup-src-in-hostmode;
 diff --git a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-telematics.dts b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-telematics.dts
-index 7f53329..d5b3c50 100644
+index 96bd4cc..074bd6f 100644
 --- a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-telematics.dts
 +++ b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-telematics.dts
 @@ -170,6 +170,10 @@
@@ -83,11 +84,74 @@ index 764a79e..26f0c35 100644
  	qusb_phy0: qusb@7411000 {
  		compatible = "qcom,qusb2phy";
  		reg = <0x07411000 0x180>,
+diff --git a/arch/arm64/configs/msm-auto-gvm-perf_defconfig b/arch/arm64/configs/msm-auto-gvm-perf_defconfig
+index c386311..c9153d8 100644
+--- a/arch/arm64/configs/msm-auto-gvm-perf_defconfig
++++ b/arch/arm64/configs/msm-auto-gvm-perf_defconfig
+@@ -309,3 +309,58 @@ CONFIG_CRYPTO_MD4=y
+ CONFIG_CRYPTO_ARC4=y
+ CONFIG_CRYPTO_TWOFISH=y
+ CONFIG_QMI_ENCDEC=y
++CONFIG_USB=y
++CONFIG_USB_XHCI_HCD=y
++CONFIG_USB_EHCI_HCD=y
++CONFIG_USB_EHCI_HCD_PLATFORM=y
++CONFIG_USB_OHCI_HCD=y
++CONFIG_USB_OHCI_HCD_PLATFORM=y
++CONFIG_USB_STORAGE=y
++CONFIG_USB_DWC3=y
++CONFIG_USB_ISP1760=y
++CONFIG_USB_QTI_KS_BRIDGE=y
++CONFIG_NOP_USB_XCEIV=y
++CONFIG_USB_MSM_SSPHY_QMP=y
++CONFIG_MSM_QUSB_PHY=y
++CONFIG_USB_ULPI=y
++CONFIG_USB_GADGET=y
++CONFIG_USB_GADGET_VBUS_DRAW=500
++CONFIG_USB_CONFIGFS=y
++CONFIG_USB_CONFIGFS_SERIAL=y
++CONFIG_USB_CONFIGFS_NCM=y
++CONFIG_USB_CONFIGFS_ECM=y
++CONFIG_USB_CONFIGFS_MASS_STORAGE=y
++CONFIG_USB_CONFIGFS_F_FS=y
++CONFIG_USB_CONFIGFS_F_MTP=y
++CONFIG_USB_CONFIGFS_F_PTP=y
++CONFIG_USB_CONFIGFS_F_ACC=y
++CONFIG_USB_CONFIGFS_UEVENT=y
++CONFIG_USB_CONFIGFS_F_DIAG=y
++CONFIG_USB_CONFIGFS_F_CDEV=y
++CONFIG_USB_CONFIGFS_F_QDSS=y
++CONFIG_GPIO_USB_DETECT=y
++CONFIG_USB_USBNET=y
++CONFIG_USB_BAM=y
++CONFIG_USB_CONFIGFS_QCRNDIS=y
++CONFIG_USB_CONFIGFS_RMNET_BAM=y
++CONFIG_USB_F_QCRNDIS=y
++CONFIG_USB_F_RMNET_BAM=y
++CONFIG_DIAG_OVER_USB=y
++CONFIG_EXTCON=y
++CONFIG_RNDIS_IPA=y
++CONFIG_SCSI=y
++CONFIG_BLK_DEV_SD=y
++CONFIG_CHR_DEV_SG=y
++CONFIG_CHR_DEV_SCH=y
++CONFIG_SCSI_CONSTANTS=y
++CONFIG_SCSI_LOGGING=y
++CONFIG_SCSI_SCAN_ASYNC=y
++CONFIG_SCSI_UFSHCD=y
++CONFIG_SCSI_UFSHCD_PLATFORM=y
++CONFIG_SCSI_UFS_QCOM=y
++CONFIG_SCSI_UFS_QCOM_ICE=y
++CONFIG_USB_DWC3_PCI=y
++CONFIG_USB_XHCI_PCI=y
++CONFIG_USB_EHCI_PCI=y
++CONFIG_USB_OHCI_HCD_PCI=y
++CONFIG_DIAG_CHAR=y
 diff --git a/arch/arm64/configs/msm-auto-gvm_defconfig b/arch/arm64/configs/msm-auto-gvm_defconfig
-index c5d68e6..2aa7809 100644
+index 7da68bc..053b4e4 100644
 --- a/arch/arm64/configs/msm-auto-gvm_defconfig
 +++ b/arch/arm64/configs/msm-auto-gvm_defconfig
-@@ -336,3 +336,58 @@ CONFIG_CRYPTO_MD4=y
+@@ -340,3 +340,58 @@ CONFIG_CRYPTO_MD4=y
  CONFIG_CRYPTO_ARC4=y
  CONFIG_CRYPTO_TWOFISH=y
  CONFIG_QMI_ENCDEC=y
@@ -523,7 +587,7 @@ index c9596f1..3b0854f 100644
  		goto dealloc_usb2_hcd;
  
 diff --git a/drivers/usb/host/xhci.c b/drivers/usb/host/xhci.c
-index 5e133de..51dafc6 100644
+index 7e76573..6466452 100644
 --- a/drivers/usb/host/xhci.c
 +++ b/drivers/usb/host/xhci.c
 @@ -426,8 +426,13 @@ static int xhci_try_enable_msi(struct usb_hcd *hcd)
