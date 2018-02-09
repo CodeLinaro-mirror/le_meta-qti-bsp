@@ -1,5 +1,10 @@
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
+#FILESEXTRAPATHS_append := ":${THISDIR}/${PN}"
+
+inherit systemd
+
+
 FILESEXTRAPATHS_prepend := "${THISDIR}/pulseaudio:"
 FILESEXTRAPATHS_prepend := "${TOPDIR}/../../meta-agl/meta-ivi-common/recipes-multimedia/pulseaudio/pulseaudio-9.0:"
 
@@ -49,3 +54,20 @@ PACKAGES =+ " pulseaudio-module-dev"
 
 FILES_pulseaudio-module-dev = "${includedir}/pulsemodule/* ${libdir}/pkgconfig/pulseaudio-module-devel.pc"
 
+do_install_append() {
+       # Install pulseaudio systemd service
+       if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
+              install -m 644 -p -D ${WORKDIR}/build/src/pulseaudio.service ${D}${systemd_user_unitdir}/pulseaudio.service
+              install -m 644 -p -D ${WORKDIR}/pulseaudio-${PV}/src/daemon/systemd/user/pulseaudio.socket ${D}${systemd_user_unitdir}/pulseaudio.socket
+
+              # Execute these manually on behalf of systemctl script (from systemd-systemctl-native.bb)
+              # because it does not support systemd's user mode.
+              install -d ${D}${systemd_user_unitdir}/sockets.target.wants/
+              ln -sf ${systemd_user_unitdir}/pulseaudio.socket ${D}${systemd_user_unitdir}/sockets.target.wants/
+
+              install -d ${D}${systemd_user_unitdir}/default.target.wants/
+              ln -sf ${systemd_user_unitdir}/pulseaudio.service ${D}${systemd_user_unitdir}/default.target.wants/
+       fi
+       mkdir -p ${D}/${bindir}
+       install -m 755 -p -D ${WORKDIR}/build/src/.libs/pacat ${D}/${bindir}/
+}
