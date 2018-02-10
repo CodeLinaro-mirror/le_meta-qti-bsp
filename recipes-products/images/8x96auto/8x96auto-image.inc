@@ -29,7 +29,8 @@ IMAGE_INSTALL_remove += "neutrino-eth"
 #IMAGE_INSTALL_remove = "qtwebchannel"
 
 # Perf
-IMAGE_INSTALL += "${@bb.utils.contains("DISTRO_FEATURES", "qti-perf", "memory-hotplug", "" ,d)}"
+IMAGE_INSTALL += "${@bb.utils.contains("DISTRO_FEATURES", "early_init", "memory-hotplug", "" ,d)}"
+IMAGE_INSTALL += "${@bb.utils.contains("DISTRO_FEATURES", "early-ethernet", "memory-hotplug", "" ,d)}"
 
 # Early init
 IMAGE_INSTALL += "${@bb.utils.contains("DISTRO_FEATURES", "early_init", "early-init", "" ,d)}"
