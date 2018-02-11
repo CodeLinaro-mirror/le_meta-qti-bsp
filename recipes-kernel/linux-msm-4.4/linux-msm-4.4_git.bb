@@ -35,7 +35,8 @@ python __anonymous () {
 
   if bb.utils.contains('DISTRO_FEATURES', 'early-ethernet', True, False, d):
       d.appendVar("SRC_URI", " file://0001-ARM-dts-msm-Add-phy-speed-mode-properties.patch")
-      d.appendVar("SRC_URI", " file://0001-ethernet-ethernet-support-early-ethernet-feature.patch")
+      d.appendVar("SRC_URI", " file://0001-ethernet-driver-support-early-ethernet-call-after-fs-init.patch")
+      d.appendVar("SRC_URI", " file://0004-kernel-drivers-init-Call-neutrino-ethernet-after-fs.patch")
       d.appendVar("SRC_URI", " file://0005-msm-vidc-changes-for-early-init.patch")
       d.appendVar("SRC_URI", " file://0001-net-ipv6-change-ipv6-module-initcall-level.patch")
       d.appendVar("SRC_URI", " file://0001-net-ipv6-Disable-dad-to-run-ipv6-at-early-stage.patch")
