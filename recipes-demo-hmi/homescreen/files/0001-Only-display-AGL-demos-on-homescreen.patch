@@ -1,0 +1,40 @@
+From 3395c8dc0e5ba871a2b22be89f35a86ae54fd0b0 Mon Sep 17 00:00:00 2001
+From: Xubao Jiang <xubaoj@codeaurora.org>
+Date: Fri, 2 Feb 2018 14:13:14 +0800
+Subject: [PATCH] Only display AGL demos on homescreen
+
+Change-Id: Id2e50b23f73e2fe28eb78b243375ba74b3180895
+Signed-off-by: Xubao Jiang <xubaoj@codeaurora.org>
+---
+ homescreen/src/applicationmodel.cpp | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/homescreen/src/applicationmodel.cpp b/homescreen/src/applicationmodel.cpp
+index 417bc4c..49345d7 100644
+--- a/homescreen/src/applicationmodel.cpp
++++ b/homescreen/src/applicationmodel.cpp
+@@ -59,7 +59,20 @@ ApplicationModel::Private::Private()
+         auto const name = jso["name"].toString();
+         auto const id = jso["id"].toString();
+         auto const icon = get_icon_name(jso);
+-        this->data.append(AppInfo(icon, name, id));
++        // Only display AGL demos
++        if (name == "POI"
++                || name == "Phone"
++                || name == "Dashboard"
++                || name == "Mixer"
++                || name == "Navigation"
++                || name == "HVAC"
++                || name == "Settings"
++                || name == "Radio"
++                || name == "MediaPlayer") {
++            this->data.append(AppInfo(icon, name, id));
++        } else {
++            qDebug() << "Skip app: " << name;
++        }
+         qDebug() << "name:" << name << "icon:" << icon << "id:" << id;
+     }
+ }
+-- 
+1.9.1
+
