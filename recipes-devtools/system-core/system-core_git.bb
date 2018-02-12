@@ -11,7 +11,7 @@ SRC_URI   = "file://system/core/"
 S = "${WORKDIR}/system/core"
 PR = "r19"
 
-DEPENDS = "virtual/kernel openssl glib-2.0 libselinux safe-iop ext4-utils libunwind libcutils libmincrypt"
+DEPENDS = "virtual/kernel openssl glib-2.0 libselinux safe-iop ext4-utils libunwind libcutils libmincrypt libbase"
 
 EXTRA_OECONF = " --with-host-os=${HOST_OS} --with-glib"
 EXTRA_OECONF_append = " --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
@@ -21,6 +21,9 @@ EXTRA_OECONF_append_apq8053 = " --enable-logd-privs"
 
 # Disable adb root privileges in USER builds for msm targets
 EXTRA_OECONF_append_msm = "${@base_conditional('USER_BUILD','1',' --disable-adb-root','',d)}"
+
+# Pass on system partition size to adb
+EXTRA_OECONF_append = " --with-system-size=${SYSTEM_SIZE_EXT4}"
 
 CPPFLAGS += "-I${STAGING_INCDIR}/ext4_utils"
 CPPFLAGS += "-I${STAGING_INCDIR}/libselinux"
@@ -53,8 +56,8 @@ do_install_append() {
    install -m 0755 ${S}/usb/debuger/debugFiles -D ${D}${base_sbindir}/usb/debuger/
    install -m 0755 ${S}/usb/debuger/help -D ${D}${base_sbindir}/usb/debuger/
    install -m 0755 ${S}/usb/debuger/usb_debug -D ${D}${base_sbindir}/
-   install -b -m 0644 /dev/null -D ${D}${sysconfdir}/build.prop
-   chown 5002:5002 ${D}${sysconfdir}/build.prop
+   install -d ${D}${userfsdatadir}/persist
+   install -b -m 0666 /dev/null -D ${D}${userfsdatadir}/persist/build.prop
    ln -s  /sbin/usb/compositions/${COMPOSITION} ${D}${userfsdatadir}/usb/boot_hsusb_composition
    ln -s  /sbin/usb/compositions/empty ${D}${userfsdatadir}/usb/boot_hsic_composition
    if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
@@ -91,9 +94,7 @@ do_install_append() {
           ${D}${systemd_unitdir}/system/ffbm.target.wants/leprop.service
    else
       install -m 0755 ${S}/adb/start_adbd -D ${D}${sysconfdir}/init.d/adbd
-      if [ ${BASEMACHINE} != "apq8053" ]; then
-          install -m 0755 ${S}/logd/start_logd -D ${D}${sysconfdir}/init.d/logd
-      fi
+      install -m 0755 ${S}/logd/start_logd -D ${D}${sysconfdir}/init.d/logd
       install -m 0755 ${S}/usb/start_usb -D ${D}${sysconfdir}/init.d/usb
       install -m 0755 ${S}/rootdir/etc/init.qcom.post_boot.sh -D ${D}${sysconfdir}/init.d/init_post_boot
    fi
@@ -157,9 +158,6 @@ INITSCRIPT_NAME_${PN}-logd = "logd"
 INITSCRIPT_PARAMS_${PN}-logd = "start 10  2 3 4 5 ."
 INITSCRIPT_PARAMS_${PN}-logd += "stop 39  6 ."
 
-INITSCRIPT_PACKAGES_remove_apq8053 = "${PN}-logd"
-INITSCRIPT_PACKAGES_remove_apq8053-32 = "${PN}-logd"
-
 INITSCRIPT_PACKAGES =+ "${PN}-post-boot"
 INITSCRIPT_NAME_${PN}-post-boot = "init_post_boot"
 INITSCRIPT_PARAMS_${PN}-post-boot = "start 90 2 3 4 5 ."
@@ -195,7 +193,7 @@ FILES_${PN}-debuggerd     += "${systemd_unitdir}/system/init_debuggerd.service $
 PACKAGES =+ "${PN}-leprop-dbg ${PN}-leprop"
 FILES_${PN}-leprop-dbg  = "${base_sbindir}/.debug/leprop-service ${bindir}/.debug/getprop ${bindir}/.debug/setprop"
 FILES_${PN}-leprop      = "${base_sbindir}/leprop-service ${bindir}/getprop ${bindir}/setprop ${sysconfdir}/proptrigger.sh ${sysconfdir}/proptrigger.conf"
-FILES_${PN}-leprop     += "${systemd_unitdir}/system/leprop.service ${systemd_unitdir}/system/multi-user.target.wants/leprop.service ${systemd_unitdir}/system/ffbm.target.wants/leprop.service"
+FILES_${PN}-leprop     += "${systemd_unitdir}/system/leprop.service ${systemd_unitdir}/system/multi-user.target.wants/leprop.service ${systemd_unitdir}/system/ffbm.target.wants/leprop.service ${userfsdatadir}/persist/build.prop"
 
 FILES_${PN}-dbg  = "${bindir}/.debug/* ${libdir}/.debug/*"
 FILES_${PN}      = "${bindir}/* ${libdir}/pkgconfig/* ${libdir}/*.so.* "
