@@ -18,7 +18,6 @@ IMAGE_INSTALL += "telephony-service"
 IMAGE_INSTALL += "packagegroup-ros-qti"
 IMAGE_INSTALL += "libatomic"
 
-IMAGE_INSTALL_remove += "init-audio"
 IMAGE_INSTALL_remove += "pulseaudio-module-acdb"
 IMAGE_INSTALL_remove += "pulseaudio-module-codec-control"
 
