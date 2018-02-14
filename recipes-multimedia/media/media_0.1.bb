@@ -36,6 +36,8 @@ EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96autogvmred', ' --enab
 EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96autogvmgh', ' --enable-target-hypervisor=yes', '', d)} "
 EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96auto', ' --enable-target-uses-gbm=yes', '', d)} "
 
+EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96autogvmquin', ' --enable-target-uses-gbm=yes', '', d)} "
+
 EXTRA_OECONF_append =" --enable-use-glib="yes""
 EXTRA_OECONF_append =" --enable-target-uses-ion="yes""
 EXTRA_OECONF_append =" --enable-target-${SOC_FAMILY}="yes""
