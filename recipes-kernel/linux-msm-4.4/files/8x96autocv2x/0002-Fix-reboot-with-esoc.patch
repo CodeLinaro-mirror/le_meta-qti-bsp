@@ -1,0 +1,35 @@
+diff --git a/drivers/esoc/esoc-mdm-4x.c b/drivers/esoc/esoc-mdm-4x.c
+index d071e89..2522eaa 100644
+--- a/drivers/esoc/esoc-mdm-4x.c
++++ b/drivers/esoc/esoc-mdm-4x.c
+@@ -230,10 +230,15 @@ static int mdm_cmd_exe(enum esoc_cmd cmd, struct esoc_clink *esoc)
+ 			}
+ 			msleep(100);
+ 		}
+-		if (status_down)
++		if (status_down) {
+ 			dev_dbg(dev, "shutdown successful\n");
+-		else
++			esoc_clink_queue_request(ESOC_REQ_SHUTDOWN, esoc);
++		} else {
+ 			dev_err(mdm->dev, "graceful poff ipc fail\n");
++			graceful_shutdown = false;
++			goto force_poff;
++		}
++		break;
+ force_poff:
+ 	case ESOC_FORCE_PWR_OFF:
+ 		if (!graceful_shutdown) {
+diff --git a/drivers/esoc/esoc-mdm-pon.c b/drivers/esoc/esoc-mdm-pon.c
+index 4be66a1..42831e3 100644
+--- a/drivers/esoc/esoc-mdm-pon.c
++++ b/drivers/esoc/esoc-mdm-pon.c
+@@ -55,7 +55,7 @@ static int mdm9x55_toggle_soft_reset(struct mdm_ctrl *mdm, bool atomic)
+ 	if (!atomic)
+ 		usleep_range(reset_time_us, reset_time_us + 100000);
+ 	else
+-		mdelay(mdm->reset_time_ms);
++		mdelay(203);
+ 	gpio_direction_output(MDM_GPIO(mdm, AP2MDM_SOFT_RESET),
+ 			soft_reset_direction_de_assert);
+ 	return 0;

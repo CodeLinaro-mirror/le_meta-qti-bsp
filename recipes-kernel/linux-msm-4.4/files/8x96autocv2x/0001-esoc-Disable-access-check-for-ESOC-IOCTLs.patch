@@ -1,17 +1,3 @@
-From 05769d831a48967bc5b71470ff7a1e7d58a6f35b Mon Sep 17 00:00:00 2001
-From: Gustavo Solaira <gustavos@codeaurora.org>
-Date: Wed, 13 Dec 2017 13:38:48 -0800
-Subject: [PATCH] esoc: Disable access check for ESOC IOCTLs
-
-Disable the access check on the ESOC IOCTLs so they
-can be accessed by user space applications directly.
-
-Change-Id: If3c3fff06b471744e9eb41aee496bf8cd06fe7f2
-Signed-off-by: Gustavo Solaira <gustavos@codeaurora.org>
----
- drivers/esoc/esoc_dev.c | 4 ----
- 1 file changed, 4 deletions(-)
-
 diff --git a/drivers/esoc/esoc_dev.c b/drivers/esoc/esoc_dev.c
 index a1e7a52..df8688d 100644
 --- a/drivers/esoc/esoc_dev.c
@@ -30,6 +16,3 @@ index a1e7a52..df8688d 100644
  		err = wait_event_interruptible(esoc_udev->req_wait,
  					!kfifo_is_empty(&esoc_udev->req_fifo));
  		if (!err) {
--- 
-1.9.1
-
