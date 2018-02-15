@@ -121,6 +121,7 @@ IMAGE_ROOTFS_SIZE = "323584"
 IMAGE_ROOTFS_EXTRA_SPACE_append = "${@bb.utils.contains("DISTRO_FEATURES", "systemd", " + 4096", "" ,d)}"
 
 IMAGE_INSTALL_remove += "pulseaudio-module-codec-control"
+IMAGE_INSTALL_remove += "pulseaudio-module-acdb"
 
 IMAGE_INSTALL_remove += "qtmultimedia"
 IMAGE_INSTALL_remove += "poiapp"
