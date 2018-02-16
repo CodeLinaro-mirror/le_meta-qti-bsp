@@ -17,6 +17,8 @@ IMAGE_INSTALL += "ofono-tests"
 IMAGE_INSTALL += "telephony-service"
 IMAGE_INSTALL += "packagegroup-ros-qti"
 IMAGE_INSTALL += "libatomic"
+IMAGE_INSTALL += "samba"
+IMAGE_INSTALL += "cifs-utils"
 
 IMAGE_INSTALL_remove += "pulseaudio-module-acdb"
 IMAGE_INSTALL_remove += "pulseaudio-module-codec-control"
