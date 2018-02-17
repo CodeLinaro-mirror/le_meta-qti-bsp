@@ -8,10 +8,10 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 SRC_URI = "git://source.codeaurora.org/quic/le/vendor/arm/ComputeLibrary;protocol=http;branch=ComputeLibrary/master"
 
 SRC_URI += "file://0001-ComputeLibrary-add-cmakelist-and-install-directives.patch"
-SRC_URI += "file://0002-ComputeLibrary-add-absolute-path-for-cl2.hpp.patch"
+SRC_URI += "file://0002-computelibrary-allocate-tensors-from-host-pointer.patch"
 
-# commit 68a98dc29106a4c8c34e8cac542fe0bdad4ad531 > tested upstream version
-SRCREV = "68a98dc29106a4c8c34e8cac542fe0bdad4ad531"
+# commit "8a3da6f91f90c566b844d568f4ec43b946915af8" > tested upstream version
+SRCREV = "8a3da6f91f90c566b844d568f4ec43b946915af8"
 
 S      = "${WORKDIR}/git"
 

@@ -1,0 +1,147 @@
+From 502fe3bc01def2e8e09d3bee38eef75cbc27fd8f Mon Sep 17 00:00:00 2001
+From: vpalvai <vpalvai@codeaurora.org>
+Date: Mon, 2 Apr 2018 14:47:37 -0700
+Subject: [PATCH] computelibrary: allocate tensors from host pointer
+
+Compute Library interface modified to allocate Tensors from host pointer
+
+Change-Id: Ica5d3b410ac61b642b55fce8d29ba78092b5ad91
+---
+ arm_compute/runtime/CL/CLMultiImage.h      |  1 +
+ arm_compute/runtime/CL/CLTensorAllocator.h |  2 +-
+ arm_compute/runtime/ITensorAllocator.h     |  2 +-
+ arm_compute/runtime/TensorAllocator.h      |  2 +-
+ src/runtime/CL/CLMultiImage.cpp            | 34 ++++++++++++++++++++++++++++++
+ src/runtime/CL/CLTensorAllocator.cpp       |  7 ++++++
+ src/runtime/TensorAllocator.cpp            |  4 +++-
+ 7 files changed, 48 insertions(+), 4 deletions(-)
+
+diff --git a/arm_compute/runtime/CL/CLMultiImage.h b/arm_compute/runtime/CL/CLMultiImage.h
+index f70929d..cdf27eb 100644
+--- a/arm_compute/runtime/CL/CLMultiImage.h
++++ b/arm_compute/runtime/CL/CLMultiImage.h
+@@ -64,6 +64,7 @@ public:
+      *
+      **/
+     void allocate();
++    void allocateFromPtr(void* plane0, void* plane1, void* plane2);
+ 
+     // Inherited methods overridden:
+     const MultiImageInfo *info() const override;
+diff --git a/arm_compute/runtime/CL/CLTensorAllocator.h b/arm_compute/runtime/CL/CLTensorAllocator.h
+index 682de17..abdad00 100644
+--- a/arm_compute/runtime/CL/CLTensorAllocator.h
++++ b/arm_compute/runtime/CL/CLTensorAllocator.h
+@@ -84,7 +84,7 @@ public:
+      *
+      */
+     void allocate() override;
+-
++    void allocateFromPtr(void *hostPtr) override;
+     /** Free allocated OpenCL memory.
+      *
+      * @note The tensor must have been allocated when calling this function.
+diff --git a/arm_compute/runtime/ITensorAllocator.h b/arm_compute/runtime/ITensorAllocator.h
+index 6103e43..f5cc224 100644
+--- a/arm_compute/runtime/ITensorAllocator.h
++++ b/arm_compute/runtime/ITensorAllocator.h
+@@ -70,7 +70,7 @@ public:
+      * @warning The tensor must not already be allocated. Otherwise calling the function will fail.
+      */
+     virtual void allocate() = 0;
+-
++    virtual void allocateFromPtr(void *hostPtr) = 0;
+     /** Interface to be implemented by the child class to free the allocated tensor.
+      *
+      * @warning The tensor must have been allocated previously. Otherwise calling the function will fail.
+diff --git a/arm_compute/runtime/TensorAllocator.h b/arm_compute/runtime/TensorAllocator.h
+index 40704c0..4e7656e 100644
+--- a/arm_compute/runtime/TensorAllocator.h
++++ b/arm_compute/runtime/TensorAllocator.h
+@@ -79,7 +79,7 @@ public:
+      *
+      */
+     void allocate() override;
+-
++    void allocateFromPtr(void *hostPtr) override;
+     /** Free allocated CPU memory.
+      *
+      * @note The tensor must have been allocated when calling this function.
+diff --git a/src/runtime/CL/CLMultiImage.cpp b/src/runtime/CL/CLMultiImage.cpp
+index 63059cb..08b79b9 100644
+--- a/src/runtime/CL/CLMultiImage.cpp
++++ b/src/runtime/CL/CLMultiImage.cpp
+@@ -157,6 +157,40 @@ void CLMultiImage::allocate()
+     }
+ }
+ 
++void CLMultiImage::allocateFromPtr(void* plane0, void* plane1, void* plane2)
++{
++    switch(_info.format())
++    {
++        case Format::U8:
++        case Format::S16:
++        case Format::U16:
++        case Format::S32:
++        case Format::F16:
++        case Format::F32:
++        case Format::U32:
++        case Format::RGB888:
++        case Format::RGBA8888:
++        case Format::YUYV422:
++        case Format::UYVY422:
++            std::get<0>(_plane).allocator()->allocateFromPtr(plane0);
++            break;
++        case Format::NV12:
++        case Format::NV21:
++            std::get<0>(_plane).allocator()->allocateFromPtr(plane0);
++            std::get<1>(_plane).allocator()->allocateFromPtr(plane1);
++            break;
++        case Format::IYUV:
++        case Format::YUV444:
++            std::get<0>(_plane).allocator()->allocateFromPtr(plane0);
++            std::get<1>(_plane).allocator()->allocateFromPtr(plane1);
++            std::get<2>(_plane).allocator()->allocateFromPtr(plane2);
++            break;
++        default:
++            ARM_COMPUTE_ERROR("Not supported");
++            break;
++    }
++}
++
+ CLImage *CLMultiImage::cl_plane(unsigned int index)
+ {
+     return &_plane[index];
+diff --git a/src/runtime/CL/CLTensorAllocator.cpp b/src/runtime/CL/CLTensorAllocator.cpp
+index ad165fa..9b1ef4c 100644
+--- a/src/runtime/CL/CLTensorAllocator.cpp
++++ b/src/runtime/CL/CLTensorAllocator.cpp
+@@ -80,6 +80,13 @@ void CLTensorAllocator::set_associated_memory_group(CLMemoryGroup *associated_me
+     ARM_COMPUTE_ERROR_ON(_buffer.get() != nullptr);
+     _associated_memory_group = associated_memory_group;
+ }
++void CLTensorAllocator::allocateFromPtr(void *hostPtr)
++{
++    ARM_COMPUTE_ERROR_ON(_buffer.get() != nullptr);
++
++    _buffer = cl::Buffer(CLScheduler::get().context(), CL_MEM_USE_HOST_PTR | CL_MEM_READ_WRITE, info().total_size(), hostPtr);
++    info().set_is_resizable(false);
++}
+ 
+ uint8_t *CLTensorAllocator::lock()
+ {
+diff --git a/src/runtime/TensorAllocator.cpp b/src/runtime/TensorAllocator.cpp
+index 272b9f5..58ca48f 100644
+--- a/src/runtime/TensorAllocator.cpp
++++ b/src/runtime/TensorAllocator.cpp
+@@ -156,7 +156,9 @@ void TensorAllocator::free()
+         info().set_is_resizable(true);
+     }
+ }
+-
++void TensorAllocator::allocateFromPtr(void *hostPtr)
++{
++}
+ void TensorAllocator::set_associated_memory_group(MemoryGroup *associated_memory_group)
+ {
+     ARM_COMPUTE_ERROR_ON(associated_memory_group == nullptr);
