@@ -48,6 +48,7 @@ KERNEL_EXTRACONFIGS
 
 SRC_URI_append_8x96autocv2x += " \
     file://0001-esoc-Disable-access-check-for-ESOC-IOCTLs.patch \
+    file://0002-Fix-reboot-with-esoc.patch \
 "
 
 SRC_URI_append_8x96mizar += " \
