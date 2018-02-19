@@ -11,7 +11,7 @@ SRC_URI   = "file://system/core/"
 S = "${WORKDIR}/system/core"
 PR = "r19"
 
-DEPENDS = "virtual/kernel openssl glib-2.0 libselinux safe-iop ext4-utils libunwind libcutils libmincrypt"
+DEPENDS = "virtual/kernel openssl glib-2.0 libselinux safe-iop ext4-utils libunwind libcutils libmincrypt libbase"
 
 EXTRA_OECONF = " --with-host-os=${HOST_OS} --with-glib"
 EXTRA_OECONF_append = " --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
@@ -21,6 +21,9 @@ EXTRA_OECONF_append_apq8053 = " --enable-logd-privs"
 
 # Disable adb root privileges in USER builds for msm targets
 EXTRA_OECONF_append_msm = "${@base_conditional('USER_BUILD','1',' --disable-adb-root','',d)}"
+
+# Pass on system partition size to adb
+EXTRA_OECONF_append = " --with-system-size=${SYSTEM_SIZE_EXT4}"
 
 CPPFLAGS += "-I${STAGING_INCDIR}/ext4_utils"
 CPPFLAGS += "-I${STAGING_INCDIR}/libselinux"
