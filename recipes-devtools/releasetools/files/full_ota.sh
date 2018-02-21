@@ -70,6 +70,13 @@ unzip -qo $1 -d $target_files
 mkdir -p $target_files/META
 mkdir -p $target_files/SYSTEM
 
+# Workarounds for file-based OTA:
+# Set lib64 and its contents's selabel to lib_t
+# Set / (i.e. /system/ in recovery mode)'s selabel to root_t
+echo "/system/lib64/.* system_u:object_r:lib_t:s0" >> $target_files/BOOT/RAMDISK/file_contexts
+echo "/system/lib64 -d system_u:object_r:lib_t:s0" >> $target_files/BOOT/RAMDISK/file_contexts
+echo "/system -d system_u:object_r:root_t:s0" >> $target_files/BOOT/RAMDISK/file_contexts
+
 # Generate selabel rules only if file_contexts is packed in target-files
 if grep "selinux_fc" $target_files/META/misc_info.txt
 then
