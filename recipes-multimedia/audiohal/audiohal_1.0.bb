@@ -13,7 +13,7 @@ SRC_URI += "file://${BASEMACHINE}/"
 S = "${WORKDIR}/hardware/qcom/audio/"
 PR = "r0"
 
-DEPENDS = "glib-2.0 tinycompress tinyalsa expat system-media libhardware acdbloader"
+DEPENDS = "glib-2.0 tinycompress tinyalsa expat system-media libhardware acdbloader qahw"
 
 EXTRA_OEMAKE = "DEFAULT_INCLUDES= CPPFLAGS="-I. -I${STAGING_KERNEL_BUILDDIR}/usr/include -I${STAGING_INCDIR}/sound_trigger""
 EXTRA_OECONF = "--with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
