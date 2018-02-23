@@ -1,0 +1,14 @@
+[Unit]
+Description=PCAN-USB and Cannelloni
+Requires=sys-subsystem-net-devices-can0.device
+After=sys-subsystem-net-devices-can0.device
+
+[Service]
+Type=simple
+ExecStartPre=/lib/systemd/systemd-networkd-wait-online -q -i mhi_swip0
+ExecStartPre=/sbin/ip link set up can0 type can bitrate 500000
+ExecStart=/usr/bin/cannelloni -I can0 -R 192.168.100.1 -t 10000
+ExecStopPost=/sbin/ip link set down can0
+
+[Install]
+WantedBy=multi-user.target
