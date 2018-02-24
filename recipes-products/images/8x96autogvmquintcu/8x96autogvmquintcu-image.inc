@@ -47,6 +47,7 @@ IMAGE_INSTALL += "bridge-utils"
 IMAGE_INSTALL += "cryptsetup"
 IMAGE_INSTALL += "lvm2"
 IMAGE_INSTALL += "pciutils"
+IMAGE_INSTALL += "qahw"
 IMAGE_INSTALL += "audiohal"
 
 #Camera modules
