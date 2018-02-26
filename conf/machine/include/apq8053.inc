@@ -39,7 +39,7 @@ EXTRA_IMAGECMD ?= "-N 2048"
 SYSTEM_SIZE_EXT4 ?= "768000000"
 SYSTEMRW_SIZE_EXT4 ?= "8388608"
 USERDATA_SIZE_EXT4 ?= "3000000000"
-CACHE_SIZE_EXT4 ?= "65536000"
+CACHE_SIZE_EXT4 ?= "734003200"
 
 # Enable LE Verified Boot
 DISTRO_FEATURES_append = " vble"
@@ -55,3 +55,5 @@ IMAGE_FSTYPES += "ext4"
 
 #Extra fsconfig related options for ota package generator scripts.
 OTA_EXTRA_OPTS ?= "1"
+
+# DISTRO_FEATURES += "ab-support"
