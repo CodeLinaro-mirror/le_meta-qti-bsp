@@ -1,0 +1,30 @@
+From 303dd813226245c13b7ba2a60d72183577b6176a Mon Sep 17 00:00:00 2001
+From: Yimin Peng <yiminp@codeaurora.org>
+Date: Mon, 26 Feb 2018 15:54:28 +0800
+Subject: [PATCH] trigger wdog bite for panic on gvm.
+
+Change-Id: If5d695af44838326203ced3b553c74843a0c52ff
+Signed-off-by: Yimin Peng <yiminp@codeaurora.org>
+---
+ kernel/panic.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/kernel/panic.c b/kernel/panic.c
+index 75f564a..24b7360 100644
+--- a/kernel/panic.c
++++ b/kernel/panic.c
+@@ -187,7 +187,10 @@ void panic(const char *fmt, ...)
+ 	}
+ 
+ 	trace_kernel_panic_late(0);
+-
++#ifdef CONFIG_MSM_GVM_QUIN
++	pr_info("gvm delay 20s for backend wdog bite!\n");
++	mdelay(20000);
++#endif
+ 	if (panic_timeout != 0) {
+ 		/*
+ 		 * This will not be a clean reboot, with everything
+-- 
+1.9.1
+
