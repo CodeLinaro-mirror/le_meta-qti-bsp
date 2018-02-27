@@ -1,0 +1,31 @@
+From 10bef6bff02b8473d5c7a11ee8d4bf6aac8d7a9b Mon Sep 17 00:00:00 2001
+From: Atul Raut <araut@codeaurora.org>
+Date: Tue, 27 Feb 2018 09:07:53 -0800
+Subject: [PATCH] net:ntb_netdev: Change module load order
+
+Change module load order from module_init to
+late_initcall to work in tandem with ntb_transport
+layer.
+
+Change-Id: Ic3ac33efc883864ad2f9dfac92ff8cdf0eb1069c
+Signed-off-by: Atul Raut <araut@codeaurora.org>
+---
+ drivers/net/ntb_netdev.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ntb_netdev.c b/drivers/net/ntb_netdev.c
+index a9acf71..589d293 100644
+--- a/drivers/net/ntb_netdev.c
++++ b/drivers/net/ntb_netdev.c
+@@ -502,7 +502,7 @@ static int __init ntb_netdev_init_module(void)
+ 		return rc;
+ 	return ntb_transport_register_client(&ntb_netdev_client);
+ }
+-module_init(ntb_netdev_init_module);
++late_initcall(ntb_netdev_init_module);
+ 
+ static void __exit ntb_netdev_exit_module(void)
+ {
+-- 
+1.9.1
+
