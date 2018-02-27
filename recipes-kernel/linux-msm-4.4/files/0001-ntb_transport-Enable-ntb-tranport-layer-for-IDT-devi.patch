@@ -1,0 +1,768 @@
+From 7bd6b067fd452b7bdd3361deefd6d1d4e6c586a9 Mon Sep 17 00:00:00 2001
+From: Atul Raut <araut@codeaurora.org>
+Date: Tue, 27 Feb 2018 08:25:04 -0800
+Subject: [PATCH] ntb_transport: Enable ntb tranport layer for IDT devices.
+
+Add support to ntb_transport layer for IDT NTB PCIe switches.
+Add support for messaging api in ntb_transport layer needed for
+IDT swiches.
+
+Change-Id: I39b0f84d9c033ce2b92237a7b048ce63d15fbaa7
+Signed-off-by: Atul Raut <araut@codeaurora.org>
+---
+ drivers/ntb/ntb_transport.c | 557 +++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 496 insertions(+), 61 deletions(-)
+
+diff --git a/drivers/ntb/ntb_transport.c b/drivers/ntb/ntb_transport.c
+index 9878c48..7a7ef5c 100644
+--- a/drivers/ntb/ntb_transport.c
++++ b/drivers/ntb/ntb_transport.c
+@@ -77,7 +77,8 @@ static unsigned long max_mw_size;
+ module_param(max_mw_size, ulong, 0644);
+ MODULE_PARM_DESC(max_mw_size, "Limit size of large memory windows");
+ 
+-static unsigned int transport_mtu = 0x10000;
++//static unsigned int transport_mtu = 0x10000;
++static unsigned int transport_mtu = 0x2000;
+ module_param(transport_mtu, uint, 0644);
+ MODULE_PARM_DESC(transport_mtu, "Maximum size of NTB transport packets");
+ 
+@@ -189,13 +190,17 @@ struct ntb_transport_qp {
+ };
+ 
+ struct ntb_transport_mw {
++        /* Outbound MW params */
++	u64 outbuf_xlat;
+ 	phys_addr_t phys_addr;
+-	resource_size_t phys_size;
+-	void __iomem *vbase;
++        resource_size_t phys_size;
++        void __iomem *vbase;
++
++        /* Inbound MW params */
+ 	size_t xlat_size;
+-	size_t buff_size;
+-	void *virt_addr;
+-	dma_addr_t dma_addr;
++        size_t buff_size;
++        void *virt_addr;
++        dma_addr_t dma_addr;
+ };
+ 
+ struct ntb_transport_client_dev {
+@@ -222,6 +227,15 @@ struct ntb_transport_ctx {
+ 	struct work_struct link_cleanup;
+ 
+ 	struct dentry *debugfs_node_dir;
++
++        /* IDT */
++	volatile int mwidx;
++	volatile unsigned int peer_mw_count;
++	volatile unsigned int peer_qp_count;
++        volatile u32 peer_ntb_version;
++	/* NTB connection setup service */
++	struct work_struct	service;
++	volatile unsigned long	sts;
+ };
+ 
+ enum {
+@@ -244,6 +258,33 @@ enum {
+ 	MW0_SZ_LOW,
+ };
+ 
++enum nt_cmd {
++	NT_CMD_INVAL = -1,/* invalid spad command */
++	NT_CMD_SSIZE = 0, /* send out buffer size */
++	NT_CMD_RSIZE = 1, /* recv in  buffer size */
++	NT_CMD_SXLAT = 2, /* send in  buffer xlat */
++	NT_CMD_RXLAT = 3, /* recv out buffer xlat */
++	NT_CMD_CLEAR = 4, /* clear allocated memory */
++	NT_STS_DONE  = 5, /* init is done */
++	NT_STS_LNKUP = 6, /* link up state flag */
++	CMD_NUM_MWS        = 7,
++	CMD_NUM_QPS        = 8,
++	CMD_NTB_VERSION    = 9,
++};
++
++#define MSG_TRIES		500
++#define MSG_UDELAY_LOW		1000
++#define MSG_UDELAY_HIGH		2000
++
++/*
++ * Messages-base commands interface
++ */
++#define NT_MSG_CMD		0
++#define NT_MSG_CMD_WID	        1
++#define NT_MSG_LDATA		2
++#define NT_MSG_HDATA		3
++#define NT_MSG_CNT		4
++
+ #define dev_client_dev(__dev) \
+ 	container_of((__dev), struct ntb_transport_client_dev, dev)
+ 
+@@ -254,6 +295,9 @@ enum {
+ #define NTB_QP_DEF_NUM_ENTRIES	100
+ #define NTB_LINK_DOWN_TIMEOUT	10
+ 
++#define to_ntb_transport_service(__work) \
++  container_of(__work, struct ntb_transport_ctx, service)
++
+ static void ntb_transport_rxc_db(unsigned long data);
+ static const struct ntb_ctx_ops ntb_transport_ops;
+ static struct ntb_client ntb_transport_client;
+@@ -263,7 +307,6 @@ static void ntb_memcpy_tx(struct ntb_queue_entry *entry, void __iomem *offset);
+ static int ntb_async_rx_submit(struct ntb_queue_entry *entry, void *offset);
+ static void ntb_memcpy_rx(struct ntb_queue_entry *entry, void *offset);
+ 
+-
+ static int ntb_transport_bus_match(struct device *dev,
+ 				   struct device_driver *drv)
+ {
+@@ -839,10 +882,360 @@ static void ntb_transport_link_cleanup_work(struct work_struct *work)
+ 	ntb_transport_link_cleanup(nt);
+ }
+ 
++/* messaging API */
++
++static int  ntb_transport_msg_cmd_send(struct ntb_transport_ctx *nt, enum nt_cmd cmd, int cmd_wid,
++			     u64 data)
++{
++	int try, ret;
++	u64 outbits;
++
++	dev_dbg(&nt->ndev->dev, "RA CMD send: %d 0x%llx\n", cmd, data);
++
++	/*
++	 * Perform predefined number of attempts before give up. Message
++	 * registers are free of race-condition problem when accessed
++	 * from different ports, so we don't need splitting registers
++	 * by global device index. We also won't have local locking,
++	 * since the method is used from service work only.
++	 */
++	outbits = ntb_msg_outbits(nt->ndev);
++	for (try = 0; try < MSG_TRIES; try++) {
++		if (ntb_link_is_up(nt->ndev, NULL, NULL) == 0)
++			return -ENOLINK;
++
++		ret = ntb_msg_clear_sts(nt->ndev, outbits);
++		if (ret)
++			return ret;
++
++		ntb_peer_msg_write(nt->ndev, PIDX, NT_MSG_LDATA,
++			      cpu_to_le32(lower_32_bits(data)));
++
++		if (ntb_msg_read_sts(nt->ndev) & outbits) {
++			usleep_range(MSG_UDELAY_LOW, MSG_UDELAY_HIGH);
++			continue;
++		}
++
++		ntb_peer_msg_write(nt->ndev, PIDX, NT_MSG_HDATA,
++			      cpu_to_le32(upper_32_bits(data)));
++		mmiowb();
++
++		ntb_peer_msg_write(nt->ndev, PIDX, NT_MSG_CMD_WID,
++			      cpu_to_le32(cmd_wid));
++
++		/* This call shall trigger peer message event */
++		ntb_peer_msg_write(nt->ndev, PIDX, NT_MSG_CMD,
++			      cpu_to_le32(cmd));
++
++		break;
++	}
++
++	return try < MSG_TRIES ? 0 : -EAGAIN;
++}
++
++static int ntb_transport_msg_cmd_recv(struct ntb_transport_ctx *nt, int *pidx,
++			     enum nt_cmd *cmd, int *cmd_wid, u64 *data)
++{
++	u64 inbits;
++	u32 val;
++
++	struct pci_dev *pdev = nt->ndev->pdev;
++
++	inbits = ntb_msg_inbits(nt->ndev);
++
++	if (hweight64(ntb_msg_read_sts(nt->ndev) & inbits) < 4)
++		return -ENODATA;
++
++	val = ntb_msg_read(nt->ndev, pidx, NT_MSG_CMD);
++	*cmd = le32_to_cpu(val);
++
++	val = ntb_msg_read(nt->ndev, pidx, NT_MSG_CMD_WID);
++	*cmd_wid = le32_to_cpu(val);
++
++	val = ntb_msg_read(nt->ndev, pidx, NT_MSG_LDATA);
++	*data = le32_to_cpu(val);
++
++	val = ntb_msg_read(nt->ndev, pidx, NT_MSG_HDATA);
++	*data |= (u64)le32_to_cpu(val) << 32;
++
++	/* Next command can be retrieved from now */
++	ntb_msg_clear_sts(nt->ndev, inbits);
++
++	dev_dbg(&pdev->dev, "AR CMD recv: %d 0x%llx\n", *cmd, *data);
++
++	return 0;
++}
++
++static int ntb_transport_cmd_send(struct ntb_transport_ctx *nt, enum nt_cmd cmd, int cmd_wid, u64 data)
++{
++	struct pci_dev *pdev = nt->ndev->pdev;
++
++	if (cmd == NT_CMD_SSIZE || cmd == NT_CMD_SXLAT || cmd == CMD_NUM_MWS || cmd == CMD_NUM_QPS|| cmd == CMD_NTB_VERSION)
++	  return ntb_transport_msg_cmd_send(nt, cmd, cmd_wid, data);
++	
++	dev_err(&pdev->dev, "Send invalid command\n");
++	return -EINVAL;
++}
++
++static int ntb_transport_cmd_exec(struct ntb_transport_ctx *nt, enum nt_cmd cmd)
++{
++	struct pci_dev *pdev = nt->ndev->pdev;
++	switch (cmd) {
++	case NT_CMD_SSIZE:
++	case NT_CMD_RSIZE:
++	case NT_CMD_SXLAT:
++	case NT_CMD_RXLAT:
++	case NT_CMD_CLEAR:
++	case CMD_NUM_MWS:
++	case CMD_NUM_QPS:
++	case CMD_NTB_VERSION:
++		break;
++	default:
++		dev_err(&pdev->dev, "Exec invalid command\n");
++		return -EINVAL;
++	}
++
++	/* No need of memory barrier, since bit ops have invernal lock */
++	set_bit(cmd, &nt->sts);
++
++	dev_dbg(&pdev->dev, "CMD exec: %d\n", cmd);
++
++	(void)queue_work(system_highpri_wq, &nt->service);
++
++	return 0;
++}
++
++static int ntb_transport_cmd_recv(struct ntb_transport_ctx *nt)
++{
++	struct pci_dev *pdev = nt->ndev->pdev;
++	int ret, pidx, cmd, cmd_wid;
++	u64 data;
++	volatile int widx;
++
++	while (!(ret = ntb_transport_msg_cmd_recv(nt, &pidx, &cmd, &cmd_wid, &data))) {
++		switch (cmd) {
++		case NT_CMD_SSIZE:
++		  widx = cmd_wid;
++		  if (cmd_wid == (nt->mw_count-1))
++		    nt->mwidx = widx;
++		  nt->mw_vec[widx].buff_size = data;
++ 		  return ntb_transport_cmd_exec(nt, NT_CMD_RSIZE);
++		case NT_CMD_SXLAT:
++		  widx = cmd_wid;
++		  nt->mw_vec[widx].outbuf_xlat = data;
++		  if (widx ==  (nt->mw_count-1))
++		    return ntb_transport_cmd_exec(nt, NT_CMD_RXLAT);
++		case CMD_NUM_MWS:
++		 nt->peer_mw_count = data;
++		 dev_dbg(&pdev->dev, "[%s] nt->peer_mw_count=%d [%d]\n", __func__, nt->peer_mw_count, __LINE__);
++		case CMD_NUM_QPS:
++		  nt->peer_qp_count = data;
++		  dev_dbg(&pdev->dev, "[%s] nt->peer_qp_count=%d [%d]\n", __func__, nt->peer_qp_count, __LINE__);
++		case CMD_NTB_VERSION:
++		  if (data == 4)
++		    nt->peer_ntb_version  = data;
++		  dev_dbg(&pdev->dev, "[%s] nt->peer_ntb_version=%d [%d]\n", __func__, nt->peer_ntb_version, __LINE__);
++		default:
++		  dev_dbg(&pdev->dev, "[%s] Recv invalid command cmd-> %d\n", __func__, cmd);
++			return -EINVAL;
++		}
++	}
++
++	/* Return 0 if no data left to process, otherwise an error */
++	return ret == -ENODATA ? 0 : ret;
++}
++
++/* IDT Recived RSIZE using msg API */
++static int ntb_transport_setup_inbuf(struct ntb_transport_ctx *nt, int num_mw)
++{
++	struct ntb_transport_mw *mw;
++	resource_size_t xlat_align, size_align, size_max, size;
++	size_t xlat_size, buff_size;
++	struct pci_dev *pdev = nt->ndev->pdev;
++	int ret;
++
++	mw = &nt->mw_vec[num_mw];
++	size = mw->buff_size;
++
++
++	if (!size)
++	  return -EINVAL;
++
++	pr_err("[%s][IDT] num_wid= %d for mw->buff_size=0x%llx \n",__func__, num_mw, size);
++
++	/* Get inbound MW parameters */
++	ret = ntb_mw_get_align(nt->ndev, PIDX, num_mw,
++			       &xlat_align, &size_align, &size_max);
++	if (ret) {
++		dev_err(&pdev->dev, "Couldn't get inbuf restrictions\n");
++		return ret;
++	}
++
++	if (mw->buff_size > size_max) {
++		dev_err(&pdev->dev, "Too big inbuf size %pa > %pa\n",
++			&mw->buff_size, &size_max);
++		return -EINVAL;
++	}
++
++	mw->buff_size = round_up(mw->buff_size, size_align);
++	
++	xlat_size = round_up(size, size_align);
++	buff_size = round_up(size, xlat_align);
++
++	if (mw->buff_size)
++	  ntb_free_mw(nt, num_mw);
++	
++	//ntb_transport_free_inbuf(peer);
++	/* Alloc memory for receiving data.  Must be aligned */
++	mw->xlat_size = xlat_size;
++	mw->buff_size = buff_size;
++
++	mw->virt_addr = dma_alloc_coherent(&pdev->dev, mw->buff_size,
++					 &mw->dma_addr, GFP_KERNEL);
++	if (!mw->virt_addr) {
++		dev_err(&pdev->dev, "Failed to alloc inbuf of %pa\n",
++			&mw->buff_size);
++		return -ENOMEM;
++	}
++	if (!IS_ALIGNED(mw->dma_addr, xlat_align)) {
++		dev_err(&pdev->dev, "Unaligned inbuf allocated\n");
++		ntb_free_mw(nt, num_mw);
++		return -ENOMEM;
++		//goto err_free_inbuf;
++	}
++
++	ret = ntb_mw_set_trans(nt->ndev, PIDX, num_mw,
++			       mw->dma_addr, mw->xlat_size);
++	if (ret) {
++		dev_err(&pdev->dev, "Failed to set inbuf translation\n");
++		ntb_free_mw(nt, num_mw);
++		return -EIO;
++		//	goto err_free_inbuf;
++	}
++
++	/*
++	 * We submit inbuf xlat transmission cmd for execution here to follow
++	 * the code architecture, even though this method is called from service
++	 * work itself so the command will be executed right after it returns.
++	 */
++	if (num_mw ==  (nt->mw_count-1)) {
++	  set_bit(NT_STS_DONE, &nt->sts);
++	  dev_dbg(&pdev->dev, " NT_STS_DONE sts = %d\n", nt->sts);
++	  (void)ntb_transport_cmd_exec(nt, NT_CMD_SXLAT);
++	}
++	return 0;
++
++	//err_free_inbuf:
++	//	ntb_transport_free_inbuf(peer);
++
++	return ret;
++}
++
++static int ntb_transport_setup_outbuf(struct ntb_transport_ctx *nt, int num_mw)
++{
++	struct ntb_dev *ndev = nt->ndev;
++	int ret;
++	
++	/* Outbuf size can be unaligned due to custom max_mw_size */
++	ret = ntb_peer_mw_set_trans(nt->ndev, PIDX, num_mw,
++				    nt->mw_vec[num_mw].outbuf_xlat, nt->mw_vec[num_mw].phys_size);
++	if (ret) {
++		dev_err(&ndev->dev, "Failed to set outbuf translation\n");
++		return ret;
++	}
++
++	/* Initialization is finally done */
++	//	set_bit(NT_STS_DONE, &nt->sts);
++
++	return 0;
++}			
++
++static void ntb_qp_link_work(struct work_struct *work)
++{
++	struct ntb_transport_qp *qp = container_of(work,
++						   struct ntb_transport_qp,
++						   link_work.work);
++	struct pci_dev *pdev = qp->ndev->pdev;
++	struct ntb_transport_ctx *nt = qp->transport;
++	int val;
++
++	WARN_ON(!nt->link_is_up);
++
++	val = ntb_spad_read(nt->ndev, QP_LINKS);
++
++	ntb_peer_spad_write(nt->ndev, PIDX, QP_LINKS, val | BIT(qp->qp_num));
++
++	/* query remote spad for qp ready bits */
++	dev_dbg_ratelimited(&pdev->dev, "Remote QP link status = %x\n", val);
++
++	/* See if the remote side is up */
++	if (val & BIT(qp->qp_num)) {
++		dev_info(&pdev->dev, "qp %d: Link Up\n", qp->qp_num);
++		qp->link_is_up = true;
++		qp->active = true;
++
++		if (qp->event_handler)
++			qp->event_handler(qp->cb_data, qp->link_is_up);
++
++		if (qp->active)
++			tasklet_schedule(&qp->rxc_db_work);
++	} else if (nt->link_is_up)
++		schedule_delayed_work(&qp->link_work,
++				      msecs_to_jiffies(NTB_LINK_DOWN_TIMEOUT));
++}
++
++static void ntb_transport_service_work(struct work_struct *work)
++{
++  struct ntb_transport_ctx *nt = to_ntb_transport_service(work);
++  resource_size_t size;
++  int i;
++	
++	if (test_and_clear_bit(NT_CMD_SSIZE, &nt->sts)) {
++	  	for (i = 0; i < nt->mw_count; i++) {
++		  size = nt->mw_vec[i].phys_size;
++		  if (max_mw_size && size > max_mw_size)
++		    size = max_mw_size;
++		  ntb_transport_cmd_send (nt, NT_CMD_SSIZE, i, size);
++		}
++	}
++
++	if (test_and_clear_bit(NT_CMD_RSIZE, &nt->sts)) {
++	  for (i = 0; i < nt->mw_count; i++) {
++	    ntb_transport_setup_inbuf(nt, i);
++	  }
++	}
++
++	if (test_and_clear_bit(NT_CMD_SXLAT, &nt->sts)) {
++	  for (i = 0; i < nt->mw_count; i++) {
++	    ntb_transport_cmd_send(nt, NT_CMD_SXLAT, i, nt->mw_vec[i].dma_addr);
++	  }
++	}
++	if (test_and_clear_bit(NT_CMD_RXLAT, &nt->sts)) {
++	  for (i = 0; i < nt->mw_count; i++) {
++	    ntb_transport_setup_outbuf(nt, i);
++	  }
++	}
++
++	if (test_and_clear_bit(CMD_NUM_MWS, &nt->sts))
++	  ntb_transport_cmd_send(nt, CMD_NUM_MWS, 0, nt->mw_count);
++
++	if (test_and_clear_bit(CMD_NUM_QPS, &nt->sts))
++	  ntb_transport_cmd_send(nt, CMD_NUM_QPS, 0,  nt->qp_count);
++
++	if (test_and_clear_bit(CMD_NTB_VERSION, &nt->sts))
++	  ntb_transport_cmd_send(nt, CMD_NTB_VERSION, 0, NTB_TRANSPORT_VERSION);
++}
++
+ static void ntb_transport_event_callback(void *data)
+ {
+ 	struct ntb_transport_ctx *nt = data;
++	int lport;
++	int peer_port_num;
+ 
++	lport = ntb_port_number(nt->ndev);
++	peer_port_num = ntb_peer_port_number(nt->ndev, PIDX);
++	
++	pr_err ("[%s] local port num=%d peer_port_num=%d, L=%d \n",__func__, lport, peer_port_num, __LINE__);
+ 	if (ntb_link_is_up(nt->ndev, NULL, NULL) == 1)
+ 		schedule_delayed_work(&nt->link_work, 0);
+ 	else
+@@ -858,8 +1251,27 @@ static void ntb_transport_link_work(struct work_struct *work)
+ 	resource_size_t size;
+ 	u32 val;
+ 	int rc = 0, i, spad;
+-
++	
++	/* IDT PART 1 : Send mw idx & sz */
++	
+ 	/* send the local info, in the opposite order of the way we read it */
++#if	1
++	/*	
++	for (i = 0; i < nt->mw_count; i++) {
++	       size = nt->mw_vec[i].phys_size;
++	
++		if (max_mw_size && size > max_mw_size)
++			size = max_mw_size;
++*/
++		if (!test_and_set_bit(NT_STS_LNKUP, &nt->sts)) {
++			ntb_transport_cmd_exec(nt, NT_CMD_SSIZE);
++		}
++
++	ntb_transport_cmd_exec(nt, CMD_NUM_MWS);
++        ntb_transport_cmd_exec(nt, CMD_NUM_QPS);
++        ntb_transport_cmd_exec(nt, CMD_NTB_VERSION);
++
++#else	
+ 	for (i = 0; i < nt->mw_count; i++) {
+ 		size = nt->mw_vec[i].phys_size;
+ 
+@@ -878,7 +1290,7 @@ static void ntb_transport_link_work(struct work_struct *work)
+ 	ntb_peer_spad_write(ndev, PIDX, NUM_QPS, nt->qp_count);
+ 
+ 	ntb_peer_spad_write(ndev, PIDX, VERSION, NTB_TRANSPORT_VERSION);
+-
++	
+ 	/* Query the remote side for its info */
+ 	val = ntb_spad_read(ndev, VERSION);
+ 	dev_dbg(&pdev->dev, "Remote version = %d\n", val);
+@@ -895,6 +1307,22 @@ static void ntb_transport_link_work(struct work_struct *work)
+ 	if (val != nt->mw_count)
+ 		goto out;
+ 
++#endif
++	/* IDT PART 2 : Get mw idx & sz & do set up ntb_transport_setup_inbuf */
++	/* Query the remote side for its info */
++	dev_dbg(&pdev->dev, "Remote version = %d\n", nt->peer_ntb_version);
++	if (nt->peer_ntb_version != NTB_TRANSPORT_VERSION)
++		goto out;
++
++	dev_dbg(&pdev->dev, "Remote max number of qps = %d\n", nt->peer_qp_count);
++	if (nt->peer_qp_count != nt->qp_count)
++		goto out;
++
++	dev_dbg(&pdev->dev, "Remote number of mws = %d\n", nt->peer_mw_count);
++	if (nt->peer_mw_count != nt->mw_count)
++		goto out;
++	
++#if 0	
+ 	for (i = 0; i < nt->mw_count; i++) {
+ 		u64 val64;
+ 
+@@ -911,16 +1339,23 @@ static void ntb_transport_link_work(struct work_struct *work)
+ 			goto out1;
+ 	}
+ 
+-	nt->link_is_up = true;
++#endif	
++	/* IDT PART 3 : make ntb_net dev up & running */
+ 
+-	for (i = 0; i < nt->qp_count; i++) {
+-		struct ntb_transport_qp *qp = &nt->qp_vec[i];
++	if (test_and_clear_bit(NT_STS_DONE, &nt->sts)) {
++		dev_dbg(&pdev->dev, "[%s] IDT setup_qp_mw %d L=%d\n",__func__, __LINE__);
++		nt->link_is_up = true;
+ 
+-		ntb_transport_setup_qp_mw(nt, i);
++		for (i = 0; i < nt->qp_count; i++) {
++		  struct ntb_transport_qp *qp = &nt->qp_vec[i];
+ 
+-		if (qp->client_ready)
+-			schedule_delayed_work(&qp->link_work, 0);
+-	}
++		  ntb_transport_setup_qp_mw(nt, i);
++
++		  if (qp->client_ready)
++		    schedule_delayed_work(&qp->link_work, 0);
++		}
++	} else
++	    goto out;
+ 
+ 	return;
+ 
+@@ -938,40 +1373,6 @@ out:
+ 				      msecs_to_jiffies(NTB_LINK_DOWN_TIMEOUT));
+ }
+ 
+-static void ntb_qp_link_work(struct work_struct *work)
+-{
+-	struct ntb_transport_qp *qp = container_of(work,
+-						   struct ntb_transport_qp,
+-						   link_work.work);
+-	struct pci_dev *pdev = qp->ndev->pdev;
+-	struct ntb_transport_ctx *nt = qp->transport;
+-	int val;
+-
+-	WARN_ON(!nt->link_is_up);
+-
+-	val = ntb_spad_read(nt->ndev, QP_LINKS);
+-
+-	ntb_peer_spad_write(nt->ndev, PIDX, QP_LINKS, val | BIT(qp->qp_num));
+-
+-	/* query remote spad for qp ready bits */
+-	dev_dbg_ratelimited(&pdev->dev, "Remote QP link status = %x\n", val);
+-
+-	/* See if the remote side is up */
+-	if (val & BIT(qp->qp_num)) {
+-		dev_info(&pdev->dev, "qp %d: Link Up\n", qp->qp_num);
+-		qp->link_is_up = true;
+-		qp->active = true;
+-
+-		if (qp->event_handler)
+-			qp->event_handler(qp->cb_data, qp->link_is_up);
+-
+-		if (qp->active)
+-			tasklet_schedule(&qp->rxc_db_work);
+-	} else if (nt->link_is_up)
+-		schedule_delayed_work(&qp->link_work,
+-				      msecs_to_jiffies(NTB_LINK_DOWN_TIMEOUT));
+-}
+-
+ static int ntb_transport_init_queue(struct ntb_transport_ctx *nt,
+ 				    unsigned int qp_num)
+ {
+@@ -1064,12 +1465,14 @@ static int ntb_transport_probe(struct ntb_client *self, struct ntb_dev *ndev)
+ 	u64 qp_bitmap;
+ 	int node;
+ 	int rc, i;
++	u64 inbits, outbits, incmd_bit;
++	int lport;
+ 
+ 	mw_count = ntb_peer_mw_count(ndev);
+ 
+ 	if (!ndev->ops->mw_set_trans) {
+-		dev_err(&ndev->dev, "Inbound MW based NTB API is required\n");
+-		return -EINVAL;
++		dev_err(&ndev->dev, "LAB-02: Inbound MW based NTB API is required\n");
++		//return -EINVAL;
+ 	}
+ 
+ 	if (ntb_db_is_unsafe(ndev))
+@@ -1089,19 +1492,23 @@ static int ntb_transport_probe(struct ntb_client *self, struct ntb_dev *ndev)
+ 		return -ENOMEM;
+ 
+ 	nt->ndev = ndev;
++#if 1
++	spad_count = ntb_msg_count (ndev);
++#else
+ 	spad_count = ntb_spad_count(ndev);
+-
++#endif
+ 	/* Limit the MW's based on the availability of scratchpads */
+ 
+ 	if (spad_count < NTB_TRANSPORT_MIN_SPADS) {
+ 		nt->mw_count = 0;
+ 		rc = -EINVAL;
+-		goto err;
++		//		goto err;
+ 	}
+ 
+ 	max_mw_count_for_spads = (spad_count - MW0_SZ_HIGH) / 2;
+ 	nt->mw_count = min(mw_count, max_mw_count_for_spads);
+-
++	nt->mw_count = 1; //mw_count;
++	
+ 	nt->mw_vec = kzalloc_node(mw_count * sizeof(*nt->mw_vec),
+ 				  GFP_KERNEL, node);
+ 	if (!nt->mw_vec) {
+@@ -1109,6 +1516,7 @@ static int ntb_transport_probe(struct ntb_client *self, struct ntb_dev *ndev)
+ 		goto err;
+ 	}
+ 
++	pr_err ("[%s]  nt->mw_count = %d spad_count =%u L=%d \n",__func__,  nt->mw_count, spad_count, __LINE__);
+ 	for (i = 0; i < mw_count; i++) {
+ 		mw = &nt->mw_vec[i];
+ 
+@@ -1128,6 +1536,8 @@ static int ntb_transport_probe(struct ntb_client *self, struct ntb_dev *ndev)
+ 		mw->virt_addr = NULL;
+ 		mw->dma_addr = 0;
+ 	}
++	nt->mwidx = -1;
++	INIT_WORK(&nt->service, ntb_transport_service_work);
+ 
+ 	qp_bitmap = ntb_db_valid_mask(ndev);
+ 
+@@ -1143,6 +1553,7 @@ static int ntb_transport_probe(struct ntb_client *self, struct ntb_dev *ndev)
+ 	nt->qp_bitmap = qp_bitmap;
+ 	nt->qp_bitmap_free = qp_bitmap;
+ 
++	pr_err ("[%s] IDT qp_count = %u L=%d\n",__func__, qp_count, __LINE__);
+ 	nt->qp_vec = kzalloc_node(qp_count * sizeof(*nt->qp_vec),
+ 				  GFP_KERNEL, node);
+ 	if (!nt->qp_vec) {
+@@ -1155,7 +1566,7 @@ static int ntb_transport_probe(struct ntb_client *self, struct ntb_dev *ndev)
+ 			debugfs_create_dir(pci_name(ndev->pdev),
+ 					   nt_debugfs_dir);
+ 	}
+-
++	
+ 	for (i = 0; i < qp_count; i++) {
+ 		rc = ntb_transport_init_queue(nt, i);
+ 		if (rc)
+@@ -1169,15 +1580,26 @@ static int ntb_transport_probe(struct ntb_client *self, struct ntb_dev *ndev)
+ 	if (rc)
+ 		goto err2;
+ 
++	// IDT Message Support Enable
++	inbits = ntb_msg_inbits(ndev);
++	outbits = ntb_msg_outbits(ndev);
++	(void)ntb_msg_set_mask(ndev, inbits | outbits);
++
++	incmd_bit = BIT_ULL(__ffs64(inbits));
++	rc = ntb_msg_clear_mask(ndev, incmd_bit);
++
++	dev_dbg(&ndev->dev, "MSG event unmasked %#llx\n", incmd_bit);
++	// IDT Ends Message Supports
++
+ 	INIT_LIST_HEAD(&nt->client_devs);
+ 	rc = ntb_bus_init(nt);
+ 	if (rc)
+ 		goto err3;
+-
++	
+ 	nt->link_is_up = false;
+ 	ntb_link_enable(ndev, NTB_SPEED_AUTO, NTB_WIDTH_AUTO);
+ 	ntb_link_event(ndev);
+-
++	pr_err ("[%s] IDT probe sucess L=%d\n",__func__, __LINE__);
+ 	return 0;
+ 
+ err3:
+@@ -1764,6 +2186,7 @@ static bool ntb_dma_filter_fn(struct dma_chan *chan, void *node)
+  * RETURNS: pointer to newly created ntb_queue, NULL on error.
+  */
+ struct ntb_transport_qp *
++
+ ntb_transport_create_queue(void *data, struct device *client_dev,
+ 			   const struct ntb_queue_handlers *handlers)
+ {
+@@ -2185,10 +2608,10 @@ EXPORT_SYMBOL_GPL(ntb_transport_max_size);
+ 
+ unsigned int ntb_transport_tx_free_entry(struct ntb_transport_qp *qp)
+ {
+-	unsigned int head = qp->tx_index;
+-	unsigned int tail = qp->remote_rx_info->entry;
++  unsigned int head = qp->tx_index;
++  unsigned int tail = qp->remote_rx_info->entry;
+ 
+-	return tail > head ? tail - head : qp->tx_max_entry + tail - head;
++  return tail > head ? tail - head : qp->tx_max_entry + tail - head;
+ }
+ EXPORT_SYMBOL_GPL(ntb_transport_tx_free_entry);
+ 
+@@ -2213,9 +2636,21 @@ static void ntb_transport_doorbell_callback(void *data, int vector)
+ 	}
+ }
+ 
++static void ntb_transport_msg_event_callback(void *data)
++{
++	struct ntb_transport_ctx *nt = data;
++
++	dev_dbg(&nt->ndev->dev, "Msg status bits %#llx\n",
++		ntb_msg_read_sts(nt->ndev));
++
++	/* Messages are only sent one-by-one */
++	(void)ntb_transport_cmd_recv(nt);
++}
++
+ static const struct ntb_ctx_ops ntb_transport_ops = {
+ 	.link_event = ntb_transport_event_callback,
+ 	.db_event = ntb_transport_doorbell_callback,
++	.msg_event = ntb_transport_msg_event_callback,
+ };
+ 
+ static struct ntb_client ntb_transport_client = {
+-- 
+1.9.1
+
