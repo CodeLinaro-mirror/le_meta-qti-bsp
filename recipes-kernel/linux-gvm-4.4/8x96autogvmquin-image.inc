@@ -31,6 +31,8 @@ CONFIG_CRYPTO_AES_ARM64_CE_CCM=y
 CONFIG_CRYPTO_AES_ARM64_CE_BLK=y
 CONFIG_CRYPTO_AES_ARM64_NEON_BLK=y
 CONFIG_CRYPTO_CRC32_ARM64=y
+CONFIG_HW_RANDOM=y
+CONFIG_HW_RANDOM_MSM_LEGACY=y
 KERNEL_EXTRACONFIGS
 }
 
@@ -45,6 +47,7 @@ SRC_URI_append += " \
     file://0014-psci-Forbid-psci-reset-call.patch \
     file://0021-automotive-add-boot-time-marker-for-LV-GVM.patch \
     file://0001-enable-rootfs-mount-as-dm-verity-target-during-boot.patch \
+    file://0001-msm-add-dts-node-qrng.patch \
 "
 
 do_deploy_rename () {
