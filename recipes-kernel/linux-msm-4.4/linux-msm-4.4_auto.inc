@@ -52,15 +52,25 @@ SRC_URI_append_8x96autocv2x += " \
     file://0002-Fix-reboot-with-esoc.patch \
 "
 
+python do_getpatches() {
+    import os
+    cmd = "wget https://source.codeaurora.org/quic/la/kernel/msm-4.4/patch/?id=f083f557186d77de5f14bf90aec1bfe2503cf513 -O ${WORKSPACE}/poky/meta-qti-bsp/recipes-kernel/linux-msm-4.4/files/0001-dmaengine-Add-helper-function-to-prep-for-error-repo.patch"
+    os.system(cmd)
+    cmd = "wget https://source.codeaurora.org/quic/la/kernel/msm-4.4/patch/?id=f067025bc676ba8d18fba5f959598339e39b86db -O ${WORKSPACE}/poky/meta-qti-bsp/recipes-kernel/linux-msm-4.4/files/0001-dmaengine-add-support-to-provide-error-result-from-a.patch"
+    os.system(cmd)
+}
+
 SRC_URI_append_8x96mizar += " \
-    git://source.codeaurora.org/quic/la/kernel/msm-4.4;nobranch=1;tag=22a1299ef3960e772efd205bd2e7a3494d1e9de9;protocol=git;destsuffix=drivers/ntb;subpath=drivers/ntb \
-    git://source.codeaurora.org/quic/la/kernel/msm-4.4;nobranch=1;tag=22a1299ef3960e772efd205bd2e7a3494d1e9de9;protocol=git;destsuffix=include/linux/;subpath=include/linux \
+    git://source.codeaurora.org/quic/la/kernel/msm-4.4;nobranch=1;tag=8a1eab637309319aee4caa10b196eb7327b549ae;protocol=git;destsuffix=drivers/ntb;subpath=drivers/ntb \
+    git://source.codeaurora.org/quic/la/kernel/msm-4.4;nobranch=1;tag=8a1eab637309319aee4caa10b196eb7327b549ae;protocol=git;destsuffix=include/linux/;subpath=include/linux \
     file://0001-defconfig-Enable-NTB-framework-and-IDT-hw-driver.patch \
+    file://0001-dmaengine-Add-helper-function-to-prep-for-error-repo.patch \
+    file://0001-dmaengine-add-support-to-provide-error-result-from-a.patch \
+    file://0001-ntb-ntb_perf-Disable-dma-routine.patch \
+    file://0001-ntb-hw-idt-Fix-set-DMA-mask-bit-failure.patch \
     file://0001-dirvers-ntb-Fix-isr-routine-backport-issue.patch \
-    file://0001-Revert-ntb-add-DMA-error-handling-for-RX-DMA.patch \
-    file://0001-Revert-ntb-add-DMA-error-handling-for-TX-DMA.patch \
-    file://0001-drivers-ntb-fix-compilation-issue-in-transport-layer.patch \
-    file://0001-drivers-ntb-Enable-NTB-transport-layer.patch \
+    file://0001-ntb_transport-Enable-ntb-tranport-layer-for-IDT-devi.patch \
+    file://0001-net-ntb_netdev-Change-module-load-order.patch \
     file://0001-Revert-ARM-dts-msm-modify-HDMI-configuration-for-msm.patch \
 "
 
@@ -87,4 +97,5 @@ do_unpack_extra () {
     fi
 }
 
+addtask getpatches before do_fetch
 addtask unpack_extra after do_unpack before do_patch

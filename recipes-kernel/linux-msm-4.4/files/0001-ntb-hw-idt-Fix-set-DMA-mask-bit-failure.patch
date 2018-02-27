@@ -1,0 +1,31 @@
+From 3ad5ea3abe8788de6ce9d89f64771181c606dc5f Mon Sep 17 00:00:00 2001
+From: Atul Raut <araut@codeaurora.org>
+Date: Tue, 27 Feb 2018 08:22:53 -0800
+Subject: [PATCH 2/2] ntb:hw:idt: Fix set DMA mask bit failure.
+
+Dont return on failure of setting dma mask bit.
+Not using DMA, hence it is ok to continue
+probe.
+
+Change-Id: I0bef96b674dc854655485ef2786a3537cf8fbf91
+Signed-off-by: Atul Raut <araut@codeaurora.org>
+---
+ drivers/ntb/hw/idt/ntb_hw_idt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/ntb/hw/idt/ntb_hw_idt.c b/drivers/ntb/hw/idt/ntb_hw_idt.c
+index 8d98872..76c7a23 100644
+--- a/drivers/ntb/hw/idt/ntb_hw_idt.c
++++ b/drivers/ntb/hw/idt/ntb_hw_idt.c
+@@ -2451,7 +2451,7 @@ static int idt_init_pci(struct idt_ntb_dev *ndev)
+ 					   dma_get_mask(&pdev->dev));
+ 	if (ret != 0) {
+ 		dev_err(&pdev->dev, "Failed to set NTB device DMA bit mask\n");
+-		return ret;
++//		return ret;
+ 	}
+ 
+ 	/*
+-- 
+1.9.1
+

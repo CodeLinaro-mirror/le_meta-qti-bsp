@@ -1,0 +1,39 @@
+From 4481920a7c952211f3f9e9b5cd1fcd47afc1150a Mon Sep 17 00:00:00 2001
+From: Atul Raut <araut@codeaurora.org>
+Date: Fri, 2 Mar 2018 17:14:12 -0800
+Subject: [PATCH] ntb:ntb_perf: Disable dma routine
+
+dma is not using hence dislabing it
+for fixing compilatoin issue.
+
+Change-Id: Ie7fc802a8aede348c402d73661c4ff5f03e8fdac
+Signed-off-by: Atul Raut <araut@codeaurora.org>
+---
+ drivers/ntb/test/ntb_perf.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/ntb/test/ntb_perf.c b/drivers/ntb/test/ntb_perf.c
+index 2a9d6b0..22ac734 100644
+--- a/drivers/ntb/test/ntb_perf.c
++++ b/drivers/ntb/test/ntb_perf.c
+@@ -811,7 +811,7 @@ static int perf_copy_chunk(struct perf_thread *pthr,
+ 	unmap->from_cnt = 1;
+ 
+ 	do {
+-		tx = dmaengine_prep_dma_memcpy(pthr->dma_chan, unmap->addr[1],
++		tx = pthr->dma_chan->device->device_prep_dma_memcpy(pthr->dma_chan, unmap->addr[1],
+ 			unmap->addr[0], len, DMA_PREP_INTERRUPT | DMA_CTRL_ACK);
+ 		if (!tx)
+ 			msleep(DMA_MDELAY);
+@@ -972,7 +972,7 @@ static void perf_clear_test(struct perf_thread *pthr)
+ 	 * If test finished without errors, termination isn't needed.
+ 	 * We call it anyway just to be sure of the transfers completion.
+ 	 */
+-	(void)dmaengine_terminate_sync(pthr->dma_chan);
++	//(void)dmaengine_terminate_sync(pthr->dma_chan);
+ 
+ 	dma_release_channel(pthr->dma_chan);
+ 
+-- 
+1.9.1
+
