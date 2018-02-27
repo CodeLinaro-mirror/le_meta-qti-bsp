@@ -42,8 +42,38 @@ CONFIG_CRYPTO_SHA512=y
 CONFIG_CRYPTO_SHA256=y
 CONFIG_POSIX_MQUEUE=y
 CONFIG_VIDEO_ADV7481=y
+# CONFIG_ACPI is not set
+CONFIG_THERMAL=y
+CONFIG_CPU_IDLE=y
+# CONFIG_TOUCHSCREEN_SYNAPTICS_DSX_CORE_v21 is not set
+# CONFIG_TOUCHSCREEN_SYNAPTICS_DSX_FW_UPDATE_v21 is not set
+# CONFIG_TOUCHSCREEN_ATMEL_MXT is not set
+# CONFIG_TOUCHSCREEN_ATMEL_MAXTOUCH_TS is not set
 KERNEL_EXTRACONFIGS
 }
+
+# make bootimge smaller patch
+do_defconfig_tiny_patch () {
+cat >> ${S}/arch/${ARCH}/configs/${KERNEL_CONFIG} <<KERNEL_EXTRACONFIGS
+# CONFIG_CORESIGHT is not set
+# CONFIG_KALLSYMS_ALL is not set
+# CONFIG_FTRACE is not set
+# CONFIG_ARM_PMU is not set
+# CONFIG_HW_PERF_EVENTS is not set
+# CONFIG_MMC_PERF_PROFILING is not set
+# CONFIG_BLK_DEV_INITRD is not set
+# CONFIG_RD_GZIP is not set
+# CONFIG_RD_BZIP2 is not set
+# CONFIG_RD_LZMA is not set
+# CONFIG_BLK_DEV_RAM is not set
+# CONFIG_MMC_TEST is not set
+# CONFIG_PROFILER is not set
+# CONFIG_IPC_LOGGING is not set
+# CONFIG_EVENT_TRACING is not set
+CONFIG_DEBUG_FS=y
+KERNEL_EXTRACONFIGS
+}
+
 
 SRC_URI_append_8x96auto += " \
     file://0008-ARM-dts-msm-DRAM-diet-for-APQ8096.patch \
