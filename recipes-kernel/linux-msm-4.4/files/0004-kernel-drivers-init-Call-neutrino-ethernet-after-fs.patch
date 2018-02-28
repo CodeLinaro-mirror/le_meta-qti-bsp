@@ -1,21 +1,20 @@
-From 5ab840721b5e9cf5e20f585b972b563ad6d552ba Mon Sep 17 00:00:00 2001
-From: Zou Shunxiang <shunxian@codeaurora.org>
-Date: Wed, 29 Nov 2017 17:16:10 +0800
-Subject: [PATCH] drivers:net:ethernet: Call neutrino ethernet after fs ready
+From 0b5eb933fc4e928639b8c952273309aca9e7238a Mon Sep 17 00:00:00 2001
+From: Lei wang <leiwan@codeaurora.org>
+Date: Sat, 10 Feb 2018 11:14:25 +0800
+Subject: [PATCH] Call neutrino ethernet after fs ready
 
-Call neutrino ethernet after fs ready
-
-Change-Id: If2c04f202e5024e851dcadb6b14425b2896d7dc5
+Change-Id: Ide2dad4794b7a2bab8e42d4bae52b3e83a10a08d
 Signed-off-by: Zou Shunxiang <shunxian@codeaurora.org>
+Signed-off-by: Lei wang <leiwan@codeaurora.org>
 ---
  init/main.c | 7 +++++++
  1 file changed, 7 insertions(+)
 
 diff --git a/init/main.c b/init/main.c
-index 4e3c24c..3706dcd 100644
+index 562dd7e..c27bdfc 100644
 --- a/init/main.c
 +++ b/init/main.c
-@@ -840,6 +840,7 @@ static char *initcall_level_names[] __initdata = {
+@@ -842,6 +842,7 @@ static char *initcall_level_names[] __initdata = {
  	"late",
  };
  
@@ -23,9 +22,9 @@ index 4e3c24c..3706dcd 100644
  static char init_prog[128] = "/usr/sbin/early_init";
  static char *init_prog_argv[2] = { init_prog, NULL };
  
-@@ -1060,6 +1061,12 @@ static noinline void __init kernel_init_freeable(void)
- 		prepare_namespace();
- 	}
+@@ -1068,6 +1069,12 @@ static noinline void __init kernel_init_freeable(void)
+ 	else
+ 		pr_err("early_init failed\n");
  
 +	rc = __DWC_ETH_QOS_pcie_init();
 +	if (!rc)
@@ -33,9 +32,9 @@ index 4e3c24c..3706dcd 100644
 +	else
 +		pr_err("__DWC_ETH_QOS_pcie_init failed\n");
 +
- 	rc = call_usermodehelper(init_prog, init_prog_argv, NULL, 0);
+ 	wait_for_device_probe();
+ 	rc = call_usermodehelper(touch_early_done, touch_early_done_argv, NULL, 0);
  	if (!rc)
- 		pr_info("early_init launched\n");
 -- 
 1.9.1
 
