@@ -46,6 +46,7 @@ IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'node-startu
 IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'node-startup-controller-nsm-dummy', '',d)}"
 IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'mm-vdec-omx-test', '',d)}"
 IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'mm-venc-omx-test', '',d)}"
+IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'expect', '',d)}"
 
 # Qt
 IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'qtbase-examples', '',d)}"
