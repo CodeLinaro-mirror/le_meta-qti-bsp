@@ -73,6 +73,9 @@ IMAGE_INSTALL += "display-hal-linux"
 
 IMAGE_INSTALL += "qahw"
 
+IMAGE_INSTALL += "e2fsprogs"
+IMAGE_INSTALL += "start-scripts-userfs-reset"
+
 # Don't install GDB and related pacakges in production builds.
 DEPENDS += "${@base_conditional('USER_BUILD', '1', '', 'gdb-cross-arm', d)}"
 IMAGE_INSTALL += "${@base_conditional('USER_BUILD', '1', '', 'gdb', d)}"

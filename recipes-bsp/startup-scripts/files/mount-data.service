@@ -1,4 +1,4 @@
-# Copyright (c) 2016, The Linux Foundation. All rights reserved.
+# Copyright (c) 2018, The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -27,16 +27,12 @@
 
 
 [Unit]
-Description=Wlan Service
-SourcePath=/etc/init.d/wlan
-Requires=mount-data.service wcnss_wlan.service
-After=mount-data.service persist.mount firmware-links.service wcnss_wlan.service usb.service
+Description=mount-data
+SourcePath=/etc/initscripts/mount-data
+After=var-volatile.mount
 
 [Service]
 Restart=no
 RemainAfterExit=yes
-ExecStart=/etc/init.d/wlan start
-ExecStop=/etc/init.d/wlan stop
-
-[Install]
-WantedBy=multi-user.target
+ExecStart=/etc/initscripts/mount-data start
+ExecStop=/etc/initscripts/mount-data stop

@@ -5,6 +5,7 @@ SRC_URI_append += "file://fstab"
 SRC_URI_append += "file://ro-fstab"
 SRC_URI_append_apq8053 += "file://apq8053/ro-fstab"
 SRC_URI_append_mdm9607 += "file://mdm9607/ro-fstab"
+SRC_URI_append_apq8009 += "file://systemd/var-volatile.mount"
 
 dirs755 += "/media/cf /media/net /media/ram \
             /media/union /media/realroot /media/hdd \
@@ -17,6 +18,14 @@ dirs755_append_apq8017 += "/firmware /persist /cache /dsp"
 do_install_append(){
     install -m 755 -o diag -g diag -d ${D}/media
     install -m 755 -o diag -g diag -d ${D}/mnt/sdcard
+
+    if ${@base_contains('DISTRO_FEATURES','systemd','true','false',d)}; then
+      if [  ${BASEMACHINE} == "apq8017" ]; then
+        install -m 0644 ${WORKDIR}/systemd/var-volatile.mount  ${D}${sysconfdir}/systemd/system/var-volatile.mount
+        ln -sf ../var-volatile.mount ${D}${sysconfdir}/systemd/system/local-fs.target.requires/var-volatile.mount
+      fi
+    fi
+
     if ${@base_contains('DISTRO_FEATURES','ro-rootfs','true','false',d)}; then
         # Override fstab for apq8053 and mdm9607 
         if [ ${BASEMACHINE} == "apq8053" || ${BASEMACHINE} == "mdm9607" ]; then

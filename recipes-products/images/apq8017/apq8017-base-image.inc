@@ -65,6 +65,9 @@ IMAGE_INSTALL += "lib32-fluoride"
 IMAGE_INSTALL += "lib32-libbt-vendor"
 #IMAGE_PREPROCESS_COMMAND += "echo ${MACHINE} >> ${IMAGE_ROOTFS}/target;"
 
+IMAGE_INSTALL += "e2fsprogs"
+IMAGE_INSTALL += "start-scripts-userfs-reset"
+
 # Below is to generate sparse ext4 system image (OE by default supports raw ext4 images)
 
 do_makesystem() {
