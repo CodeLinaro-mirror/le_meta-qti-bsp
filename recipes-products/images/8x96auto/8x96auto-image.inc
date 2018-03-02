@@ -106,6 +106,7 @@ IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'web-r
 IMAGE_INSTALL_remove += "neutrino-eth"
 IMAGE_INSTALL_remove += "packagegroup-agl-demo-platform"
 IMAGE_INSTALL_remove += "web-runtime"
-
+IMAGE_INSTALL_remove += "lvm2"
+IMAGE_INSTALL_remove += "cryptsetup"
 
 
