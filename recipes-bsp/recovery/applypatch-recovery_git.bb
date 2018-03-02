@@ -18,3 +18,8 @@ do_install() {
         install -d ${D}/usr/bin/
 	install -m 0744 ${WORKDIR}/../../recovery/git-r7/bootable/recovery/applypatch/applypatch   ${D}/usr/bin/
 }
+
+do_compile() {
+    base_do_compile
+}
+

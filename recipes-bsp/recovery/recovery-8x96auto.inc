@@ -1,8 +1,10 @@
-DEPENDS += "miniui-recovery"
+DEPENDS += " miniui-recovery libcutils libsparse libpng"
 
 SRC_URI += "file://0001-recovery-Enable-recovery-UI-on-LV-platform.patch"
 
 CPPFLAGS += "-I${STAGING_INCDIR}/drm"
+
+LDFLAGS += "-Wl,-lsparse,-lfs_mgr"
 
 do_install_append() {
 	install -d ${D}/res/images/
@@ -12,4 +14,7 @@ do_install_append() {
 	install -m 0755 ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/recovery/files/progress_fill.png -D ${D}/res/images
 	install -m 0755 ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/recovery/files/stage_empty.png -D ${D}/res/images
 	install -m 0755 ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/recovery/files/stage_fill.png -D ${D}/res/images
+
+        rm ${D}/etc/fstab 
 }
+
