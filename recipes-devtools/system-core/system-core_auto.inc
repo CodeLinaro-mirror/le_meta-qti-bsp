@@ -12,6 +12,7 @@ do_install_append() {
       sed -i -e '/^ExecStart=/i\ExecStartPre=/bin/mkdir -p -m 777 /dev/socket' ${D}/${systemd_unitdir}/system/leprop.service
       sed -i -e 's/\/etc\/init.d/\/etc\/initscripts/' ${D}/${systemd_unitdir}/system/init_post_boot.service
       sed -i -e 's/^set -e$//' ${D}/etc/initscripts/init_post_boot
+      sed -i -e '/echo 0 > \/proc\/sys\/kernel\/panic/d' ${D}/etc/initscripts/init_post_boot
    fi
 }
 
