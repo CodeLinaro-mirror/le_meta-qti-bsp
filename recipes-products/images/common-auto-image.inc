@@ -139,8 +139,15 @@ IMAGE_INSTALL += "dlt-daemon-test"
 IMAGE_INSTALL += "libcap"
 IMAGE_INSTALL += "libcap-bin"
 
-#To support ivi-shell
-IMAGE_INSTALL += "packagegroup-ivi-common-core"
+# python
+IMAGE_INSTALL += "python-setuptools"
+IMAGE_INSTALL += "python-codecs"
+IMAGE_INSTALL += "python-importlib"
+IMAGE_INSTALL += "python-logging"
+IMAGE_INSTALL += "python-xml"
+IMAGE_INSTALL += "python-subprocess"
+IMAGE_INSTALL += "python-dbus"
+IMAGE_INSTALL += "python-pygobject"
 
 # If non "meta-qti-bsp-prop" layer, skip build below modules.
 IMAGE_INSTALL_remove += "${@base_conditional('WITH_PROP_LAYER', 'no', 'weston', '',d)}"
