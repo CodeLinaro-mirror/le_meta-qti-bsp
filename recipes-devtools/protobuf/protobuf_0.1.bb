@@ -1,7 +1,7 @@
 inherit androidmk deploy
 
 LICENSE = "BSD-3-Clause"
-LIC_FILES_CHKSUM = "file://${SRC_DIR}/LICENSE"
+LIC_FILES_CHKSUM = "file://${SRC_DIR}/LICENSE;md5=af6809583bfde9a31595a58bb4a24514"
 
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI = "file://external/protobuf/"
