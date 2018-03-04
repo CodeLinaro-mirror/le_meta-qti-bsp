@@ -4,3 +4,6 @@ include ${BASEMACHINE}/${BASEMACHINE}-psm-image.inc
 require mdm-bootimg.inc
 
 inherit core-image
+
+do_makesystem(){
+}
