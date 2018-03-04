@@ -166,6 +166,7 @@ IMAGE_INSTALL_remove += "sqlite"
 IMAGE_INSTALL_remvoe += "sqlite-bin"
 IMAGE_INSTALL_remove += "common-api-test"
 IMAGE_INSTALL_remove += "dlt-daemon-test"
+IMAGE_INSTALL_remove += "sdm"
 
 
 IMAGE_INSTALL_remove_smack = " smack-userspace"
