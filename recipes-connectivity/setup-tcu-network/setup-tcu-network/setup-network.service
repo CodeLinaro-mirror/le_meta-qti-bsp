@@ -1,0 +1,13 @@
+[Unit]
+Description=Setup Network 
+After= connman.service
+Requires= connman.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStart=/usr/bin/setup-network.sh
+
+[Install]
+WantedBy=basic.target
+
