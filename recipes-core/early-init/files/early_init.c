@@ -44,7 +44,8 @@
 #define WHITESPACE     " \t\n\r"
 #define KPI_VALUE_PATH "/debug/bootkpi/kpi_values"
 #define GPIO_EXPORT    "/sys/class/gpio/export"
-
+#define CARD_PATH      "/dev/dri/card0"
+ 
 static struct {
 	char* appname;
 	char* cmd;
@@ -404,9 +405,6 @@ static inline int parse_line(char* p)
 					safe_close(fd);
 				}
 
-				if (app_launcher.usleep > 0)
-					usleep(app_launcher.usleep);
-
 				if (app_launcher.pidfile) {
 					fd = open(app_launcher.pidfile, O_WRONLY | O_CREAT);
 					if (fd < 0)
@@ -424,25 +422,15 @@ static inline int parse_line(char* p)
 				 */
 				if (app_launcher.wait) {
 					printf("app %s waiting for %s ...\r\n", app_launcher.appname, app_launcher.wait);
-					for (i = 0; i < 50; i++) {
+					for (i = 0; i < 30; i++) {
 						if (-1 != access(app_launcher.wait, F_OK))
 							break;
-						usleep(15000);
+						usleep(5000);
 					}
 				}
-				/*
-				 * Before weston startup, trigger firmware loading
-				 */
-				/* if (0 == strncmp(app_launcher.appname, "weston", strlen("weston"))) { */
-				/* 	write_marker("early init open card0"); */
-				/* 	fd = open("/dev/dri/card0", O_CLOEXEC); */
-				/* 	if (fd > 0) { */
-				/* 		write_marker("early init open card0 finished"); */
-				/* 	} else { */
-				/* 		perror("open card0 failed"); */
-				/* 	} */
-				/* 	safe_close(fd); */
-				/* } */
+
+				if (app_launcher.usleep > 0)
+					usleep(app_launcher.usleep);
 
 				app_launcher.argv[app_launcher.argv_used] = NULL;
 				app_launcher.env[app_launcher.env_used] = NULL;
@@ -470,11 +458,33 @@ static inline bool is_empty_line(const char* p)
 	return (strspn(p, WHITESPACE) == strlen(p));
 }
 
+static inline void trigger_firmware_loading(void)
+{
+	int i = 0;
+	int fd = -1;
+
+	for (i = 0; i < 30; i++) {
+		if (-1 != access(CARD_PATH, F_OK))
+			break;
+		usleep(5000);
+	}
+	write_marker("early init open card0");
+	fd = open(CARD_PATH, O_CLOEXEC);
+	if (fd > 0) {
+		write_marker("early init open card0 finished");
+	} else {
+		perror("open card0 failed");
+	}
+	safe_close(fd);
+	exit(0);
+}
+
 int main(int argc, char* argv[])
 {
 	FILE* f;
 	char line[LINE_MAX];
 	int fd;
+	pid_t pid;
 
 	prepare_dir("debugfs");
 	prepare_dir("xdg_runtime_dir");
@@ -497,6 +507,17 @@ int main(int argc, char* argv[])
 	}
 
 	write_marker("early-init-start-up");
+
+	/* Trigger firmware loading parallelly */
+	pid = fork();
+	if (pid < 0) {
+		perror("fork child process failed \r\n");
+		goto out;
+	}
+
+	if (0 == pid) {
+		trigger_firmware_loading();
+	}
 
 	while (1) {
 
