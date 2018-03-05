@@ -18,7 +18,7 @@ GI_DATA_ENABLED="0"
 SRCREV_common = "6f2d2093e84cc0eb99b634fa281822ebb9507285"
 S = "${WORKDIR}/gst-plugins-bad"
 
-DEPENDS += " wayland-native"
+DEPENDS += " wayland-native weston"
 
 PACKAGECONFIG = " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'wayland', '', d)} \
