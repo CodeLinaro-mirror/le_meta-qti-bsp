@@ -1,0 +1,31 @@
+From 5edce75922f4f3292a8c49a2b19bbc0f2391e643 Mon Sep 17 00:00:00 2001
+From: Lisai Wang <lisaiw@codeaurora.org>
+Date: Wed, 24 Jan 2018 17:41:54 +0800
+Subject: [PATCH] Fix CS MO Call by Ofono Dial Script Failed
+
+Change-Id: Ic43db0ba61ae8a16f41ce10545a3f672c466780f
+Signed-off-by: Lisai Wang <lisaiw@codeaurora.org>
+---
+ drivers/rilmodem/voicecall.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/rilmodem/voicecall.c b/drivers/rilmodem/voicecall.c
+index b7180b9..cd53208 100644
+--- a/drivers/rilmodem/voicecall.c
++++ b/drivers/rilmodem/voicecall.c
+@@ -414,10 +414,8 @@ static void rild_cb(struct ril_msg *message, gpointer user_data)
+ 						ril_poll_clcc, vc);
+ 
+ 	/* we cannot answer just yet since we don't know the call id */
+-	vd->cb = cb;
+-	vd->data = cbd->data;
+-
+-	return;
++        cb(&error, cbd->data);
++        return;
+ 
+ out:
+ 	cb(&error, cbd->data);
+-- 
+1.9.1
+
