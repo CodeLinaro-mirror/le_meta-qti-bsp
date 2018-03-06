@@ -16,6 +16,10 @@ IMAGE_INSTALL += "strongswan"
 IMAGE_INSTALL += "reboot-daemon"
 IMAGE_INSTALL += "computelibrary"
 
+IMAGE_INSTALL += "qtbase-examples"
+IMAGE_INSTALL += "qtmultimedia"
+IMAGE_INSTALL += "qtmultimedia-plugins"
+IMAGE_INSTALL += "qtmultimedia-qmlplugins"
 
 # Early init
 IMAGE_INSTALL += "${@bb.utils.contains("DISTRO_FEATURES", "early_init", "early-init", "" ,d)}"
