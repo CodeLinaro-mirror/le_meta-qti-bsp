@@ -44,7 +44,7 @@ SRC_URI_append += " \
     file://0011-HAB-upgrade-to-the-internal-latest-dev-version.patch \
     file://0011-Add-psci-workaround-for-gvm-suspend.patch \
     file://0012-unmask-virtio-net-irq-to-wake-up-system.patch \
-    file://0014-psci-Forbid-psci-reset-call.patch \
+    file://0014-trigger-wdog-bite-for-panic-on-gvm.patch \
     file://0021-automotive-add-boot-time-marker-for-LV-GVM.patch \
     file://0001-enable-rootfs-mount-as-dm-verity-target-during-boot.patch \
     file://0001-msm-add-dts-node-qrng.patch \
