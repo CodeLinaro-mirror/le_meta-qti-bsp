@@ -36,6 +36,9 @@ python __anonymous () {
       d.appendVar("SRC_URI", " file://0001-drm-msm-workaround-for-saving-1.5s-of-HDMI-bridge-in.patch")
       d.appendVar("SRC_URI", " file://0001-kernel-sysrq-postpone-shutdown-magic-key-register.patch")
       d.appendVar("KERNEL_CMD_PARAMS", " mem=1G")
+  else:
+      d.appendVar("SRC_URI", " file://0001-ethernet-driver-support-early-ethernet-call-after-fs-init.patch")
+      d.appendVar("SRC_URI", " file://0001-init-kernel-put-neutrino-driver-after-fs-ready.patch")
 
   if bb.utils.contains('DISTRO_FEATURES', 'early-ethernet', True, False, d):
       d.appendVar("SRC_URI", " file://0001-ARM-dts-msm-Add-phy-speed-mode-properties.patch")
