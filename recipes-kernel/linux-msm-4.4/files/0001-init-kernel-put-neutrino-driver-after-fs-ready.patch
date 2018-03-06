@@ -1,0 +1,41 @@
+From 9afc7908094921ab73cf711e6c721c06813c928a Mon Sep 17 00:00:00 2001
+From: Zou Shunxiang <shunxian@codeaurora.org>
+Date: Tue, 6 Mar 2018 13:31:07 +0800
+Subject: [PATCH] init:kernel: put neutrino driver after fs ready
+
+always load neutrino ethernet driver after file
+system ready.
+
+Change-Id: Iab811aad7c0c001a0d5536f1e71f2debc834f5ce
+Signed-off-by: Zou Shunxiang <shunxian@codeaurora.org>
+---
+ init/main.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/init/main.c b/init/main.c
+index e0390d3..72a08ea 100644
+--- a/init/main.c
++++ b/init/main.c
+@@ -994,6 +994,7 @@ static int __ref kernel_init(void *unused)
+ 	      "See Linux Documentation/init.txt for guidance.");
+ }
+ 
++extern int __DWC_ETH_QOS_pcie_init(void);
+ static noinline void __init kernel_init_freeable(void)
+ {
+ 	/*
+@@ -1055,6 +1056,11 @@ static noinline void __init kernel_init_freeable(void)
+ 	 * and default modules
+ 	 */
+ 
++	if (!__DWC_ETH_QOS_pcie_init())
++		pr_info("__DWC_ETH_QOS_pcie_init launched\n");
++	else
++		pr_err("__DWC_ETH_QOS_pcie_init failed\n");
++
+ 	integrity_load_keys();
+ 	load_default_modules();
+ }
+-- 
+1.9.1
+
