@@ -14,6 +14,7 @@ IMAGE_INSTALL += "libcap"
 #IMAGE_INSTALL += "init-mss"
 IMAGE_INSTALL += "strongswan"
 IMAGE_INSTALL += "reboot-daemon"
+IMAGE_INSTALL += "procps"
 
 # Perf
 IMAGE_INSTALL += "${@bb.utils.contains("DISTRO_FEATURES", "early_init", "memory-hotplug", "" ,d)}"
