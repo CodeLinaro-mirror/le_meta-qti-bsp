@@ -40,6 +40,7 @@ python __anonymous () {
       d.appendVar("SRC_URI", " file://0005-msm-vidc-changes-for-early-init.patch")
       d.appendVar("SRC_URI", " file://0001-net-ipv6-Disable-dad-to-run-ipv6-at-early-stage.patch")
       d.appendVar("SRC_URI", " file://0001-8021q-net-kernel-move-8021q-module-as-fs_initcall.patch")
+      d.appendVar("SRC_URI", " file://0001_add_gpio_trigger_in_early_ethernet.patch")
   else:
       d.appendVar("SRC_URI", " file://0001-ethernet-driver-support-early-ethernet-call-after-fs-init.patch")
       d.appendVar("SRC_URI", " file://0001-init-kernel-put-neutrino-driver-after-fs-ready.patch")
