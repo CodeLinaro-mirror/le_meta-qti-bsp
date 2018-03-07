@@ -1,5 +1,7 @@
 INSANE_SKIP_${PN} += "installed-vs-shipped"
 
+DEPENDS += " openssl-native"
+
 do_defconfig_patch () {
 cat >> ${S}/arch/${ARCH}/configs/${KERNEL_CONFIG} <<KERNEL_EXTRACONFIGS
 CONFIG_DEVTMPFS=y
@@ -52,4 +54,26 @@ SRC_URI_append += " \
 do_deploy_rename () {
     mv ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img ${DEPLOY_DIR_IMAGE}/boot.img
 }
-addtask deploy_rename after do_deploy before do_packagedata
+addtask deploy_rename after do_deploy before do_package_write_rpm
+
+kernel_do_compile() {
+        unset CFLAGS CPPFLAGS CXXFLAGS LDFLAGS MACHINE
+        # The $use_alternate_initrd is only set from
+        # do_bundle_initramfs() This variable is specifically for the
+        # case where we are making a second pass at the kernel
+        # compilation and we want to force the kernel build to use a
+        # different initramfs image.  The way to do that in the kernel
+        # is to specify:
+        # make ...args... CONFIG_INITRAMFS_SOURCE=some_other_initramfs.cpio
+        if [ "$use_alternate_initrd" = "" ] && [ "${INITRAMFS_TASK}" != "" ] ; then
+                # The old style way of copying an prebuilt image and building it
+                # is turned on via INTIRAMFS_TASK != ""
+                copy_initramfs
+                use_alternate_initrd=CONFIG_INITRAMFS_SOURCE=${B}/usr/${INITRAMFS_IMAGE}-${MACHINE}.cpio
+        fi
+        oe_runmake ${KERNEL_IMAGETYPE_FOR_MAKE} ${KERNEL_ALT_IMAGETYPE} CC="${KERNEL_CC}" LD="${KERNEL_LD}" ${KERNEL_EXTRA_ARGS} $use_alternate_initrd
+        if test "${KERNEL_IMAGETYPE_FOR_MAKE}.gz" = "${KERNEL_IMAGETYPE}"; then
+                gzip -9c < "${KERNEL_IMAGETYPE_FOR_MAKE}" > "${KERNEL_OUTPUT}"
+        fi
+}
+

@@ -51,7 +51,7 @@ GITVER    =  "${@base_get_metadata_git_revision('${SRC_DIR}',d)}"
 PV = "git"
 PR = "r5"
 
-DEPENDS += "dtbtool-native mkbootimg-native packkernelimg"
+DEPENDS += "dtbtool-native mkbootimg-native packkernelimg-native"
 DEPENDS_apq8096 += "mkbootimg-native dtc-native"
 PACKAGES = "kernel kernel-base kernel-vmlinux kernel-dev kernel-modules"
 RDEPENDS_kernel-base = ""
@@ -149,12 +149,12 @@ do_shared_workdir () {
         # Make vmlinux available as soon as possible
 	if ${@bb.utils.contains('DISTRO_FEATURES', 'qti-perf', 'true', 'false', d)}; then
 		install -d ${STAGING_DIR_TARGET}-perf/${KERNEL_IMAGEDEST}
-	        install -m 0644 ${KERNEL_OUTPUT} ${STAGING_DIR_TARGET}-perf/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}
+	        install -m 0644 ${KERNEL_OUTPUT_DIR}/Image ${STAGING_DIR_TARGET}-perf/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}
 	        install -m 0644 vmlinux ${STAGING_DIR_TARGET}-perf/${KERNEL_IMAGEDEST}/vmlinux-${KERNEL_VERSION}
 	        install -m 0644 vmlinux ${STAGING_DIR_TARGET}-perf/${KERNEL_IMAGEDEST}/vmlinux
 	else
 	        install -d ${STAGING_DIR_TARGET}/${KERNEL_IMAGEDEST}
-	        install -m 0644 ${KERNEL_OUTPUT} ${STAGING_DIR_TARGET}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}
+	        install -m 0644 ${KERNEL_OUTPUT_DIR}/Image ${STAGING_DIR_TARGET}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}
 	        install -m 0644 vmlinux ${STAGING_DIR_TARGET}/${KERNEL_IMAGEDEST}/vmlinux-${KERNEL_VERSION}
 	        install -m 0644 vmlinux ${STAGING_DIR_TARGET}/${KERNEL_IMAGEDEST}/vmlinux
 	fi
@@ -200,7 +200,7 @@ do_deploy () {
 
     mkdir -p ${DEPLOY_DIR_IMAGE}
     if [ ${KERNEL_IMAGETYPE} == "Image" ]; then
-	packkernelimg --kernel "${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}" --dt "${B}/arch/${ARCH}/boot/dts/qcom" --dt_list "${KERNEL_DTB_LIST}"
+	${STAGING_BINDIR_NATIVE}/packkernelimg --kernel "${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}" --dt "${B}/arch/${ARCH}/boot/dts/qcom" --dt_list "${KERNEL_DTB_LIST}"
     fi
 
     # Make bootimage
