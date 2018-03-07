@@ -62,6 +62,7 @@ IMAGE_INSTALL += "hostapd"
 IMAGE_INSTALL += "iw"
 IMAGE_INSTALL += "wireless-tools"
 IMAGE_INSTALL += "sigma-dut"
+IMAGE_INSTALL += "wldsrc-tools"
 
 #BT
 #IMAGE_INSTALL += "synergy-opensource"
