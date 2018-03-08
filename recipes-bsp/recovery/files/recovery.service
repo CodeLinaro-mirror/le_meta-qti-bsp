@@ -1,6 +1,6 @@
 [Unit]
 Description= Recovery Service
-After=find-recovery-partitions.service adbd.service
+After=find-recovery-partitions.service
 
 [Service]
 Type=oneshot
