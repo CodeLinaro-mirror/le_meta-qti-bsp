@@ -13,11 +13,6 @@ S = "${WORKDIR}/${BASEMACHINE}"
 
 PR = "r5"
 
-inherit update-rc.d
-
-INITSCRIPT_NAME   = "firmware-links.sh"
-INITSCRIPT_PARAMS = "start 37 S ."
-
 do_install() {
     install -d ${D}/lib/firmware
     ln -s /firmware/image ${D}/lib/firmware/image
@@ -36,13 +31,6 @@ do_install() {
     fi
 }
 
-pkg_postinst_${PN} () {
-        update-alternatives --install ${sysconfdir}/init.d/firmware-links.sh firmware-links.sh firmware-links.sh 60
-        [ -n "$D" ] && OPT="-r $D" || OPT="-s"
-        # remove all rc.d-links potentially created from alternatives
-        update-rc.d $OPT -f firmware-links.sh remove
-        update-rc.d $OPT firmware-links.sh multiuser
-}
 
 FILES_${PN} += "/lib/firmware/*"
 FILES_${PN} += "${systemd_unitdir}/system/"
