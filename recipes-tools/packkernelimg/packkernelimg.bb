@@ -1,4 +1,4 @@
-inherit native deploy
+inherit native
 inherit qcommon
 
 DESCRIPTION = "Pack uncompressed kernel and DTBs "
@@ -20,8 +20,16 @@ do_install() {
     install -m 0755 ${S}/packkernelimg ${D}${bindir}/
 }
 
-do_deploy() {
-    install -m 0755 ${S}/packkernelimg ${DEPLOYDIR}/
+#do_deploy() {
+#    install -m 0755 ${S}/packkernelimg ${DEPLOYDIR}/
+#}
+
+#addtask deploy before do_build after do_install
+
+do_compile() {
+    base_do_compile
 }
 
-addtask deploy before do_build after do_install
+NATIVE_INSTALL_WORKS = "1"
+
+BBCLASSEXTEND = "native"
