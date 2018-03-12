@@ -9,6 +9,8 @@ DEPENDS = "glib-2.0 pulseaudio acdbloader audcal"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
+LDFLAGS += " -ldl -ljson-c"
+
 FILESEXTRAPATHS_prepend := "${WORKSPACE}/:"
 SRC_URI = "file://audio/mm-audio-opensource/pulseaudio-module-acdb/"
 S = "${WORKDIR}/audio/mm-audio-opensource/pulseaudio-module-acdb/"
