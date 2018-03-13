@@ -27,6 +27,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -36,6 +37,7 @@
 #include <sys/stat.h>
 #include <sys/mount.h>
 #include <fcntl.h>
+#include <sched.h>
 #include <errno.h>
 
 #define DEFAULT_CONF   "/etc/early_init.conf"
@@ -45,20 +47,24 @@
 #define KPI_VALUE_PATH "/debug/bootkpi/kpi_values"
 #define GPIO_EXPORT    "/sys/class/gpio/export"
 #define CARD_PATH      "/dev/dri/card0"
- 
+
 static struct {
-	char* appname;
-	char* cmd;
-	char* applog;
-	char* pidfile;
-	int   env_used;
-	char* env[32];
-	int   argv_used;
-	char* argv[32];
-	char* gpio;
-	int   usleep;
-	char* wait;
+  char* appname;
+  char* cmd;
+  char* applog;
+  char* pidfile;
+  int   env_used;
+  char* env[32];
+  int   argv_used;
+  char* argv[32];
+  char* gpio;
+  int   usleep;
+  int   bindcpumask;
+  int   priority;
+  char* wait;
 } app_launcher;
+
+#define BIT_SET(p,n) ((p) & (1 << (n)))
 
 static void inline safe_free(char** p)
 {
@@ -272,6 +278,8 @@ static void inline app_launcher_start_over(void)
 
 	app_launcher.argv_used = 0;
 	app_launcher.env_used = 0;
+	app_launcher.bindcpumask = -1;
+	app_launcher.priority = -1;
 
 	return;
 }
@@ -360,11 +368,23 @@ static inline int parse_line(char* p)
 				app_launcher.pidfile = strdup(p);
 				printf("pidfile is %s", app_launcher.pidfile);
 			}
+			if (0 == strncmp(p + 1, "riority", strlen("riority")) && 0 == find_rvalue(&p)) {
+				app_launcher.priority = atoi(p);
+				printf("priority is %d", app_launcher.priority);
+			}
 			break;
 		case 'm':/* msleep */
 			if (0 == strncmp(p + 1, "sleep", strlen("sleep")) && 0 == find_rvalue(&p)) {
 				app_launcher.usleep = atoi(p) * 1000;
 				printf("usleep is %d", app_launcher.usleep);
+			}
+			break;
+		case 'b':/* bindcpumask */
+			if (0 == strncmp(p + 1, "indcpumask", strlen("indcpumask")) && 0 == find_rvalue(&p)) {
+				app_launcher.bindcpumask = atoi(p);
+				if (app_launcher.bindcpumask < -1 || app_launcher.bindcpumask > 15)
+					app_launcher.bindcpumask = -1;
+				printf("bindcpumask is %d", app_launcher.bindcpumask);
 			}
 			break;
 		case '<':/* end */
@@ -392,6 +412,25 @@ static inline int parse_line(char* p)
 						safe_close(fd);
 						safe_close(fd);
 					}
+				}
+
+				if (app_launcher.bindcpumask != -1) {
+					cpu_set_t mask;
+					CPU_ZERO(&mask);
+					for (int i = 0; i < 4; i++) {
+						if (BIT_SET(app_launcher.bindcpumask, i))
+							CPU_SET(i, &mask);
+					}
+					if (0 != sched_setaffinity(0, sizeof(mask), &mask))
+						printf("sched_setaffinity failed %d %s\r\n", app_launcher.bindcpumask, strerror(errno));
+				}
+
+				if (app_launcher.priority > 0) {
+					struct sched_param sp;
+					memset( &sp, 0, sizeof(sp) );
+					sp.sched_priority = app_launcher.priority;
+					if (0 != sched_setscheduler( 0, SCHED_FIFO, &sp))
+						printf("sched_setparam failed %d %s\r\n", app_launcher.priority, strerror(errno));
 				}
 
 				if (app_launcher.gpio) {
