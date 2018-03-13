@@ -61,11 +61,6 @@ cat >> ${S}/arch/${ARCH}/configs/${KERNEL_CONFIG} <<KERNEL_EXTRACONFIGS
 # CONFIG_ARM_PMU is not set
 # CONFIG_HW_PERF_EVENTS is not set
 # CONFIG_MMC_PERF_PROFILING is not set
-# CONFIG_BLK_DEV_INITRD is not set
-# CONFIG_RD_GZIP is not set
-# CONFIG_RD_BZIP2 is not set
-# CONFIG_RD_LZMA is not set
-# CONFIG_BLK_DEV_RAM is not set
 # CONFIG_MMC_TEST is not set
 # CONFIG_PROFILER is not set
 # CONFIG_IPC_LOGGING is not set
