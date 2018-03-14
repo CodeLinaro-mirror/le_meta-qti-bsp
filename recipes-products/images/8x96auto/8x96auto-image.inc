@@ -16,6 +16,7 @@ IMAGE_INSTALL += "strongswan"
 IMAGE_INSTALL += "reboot-daemon"
 IMAGE_INSTALL += "computelibrary"
 IMAGE_INSTALL += "procps"
+IMAGE_INSTALL += "wldsrc-tools"
 
 # Perf
 IMAGE_INSTALL += "${@bb.utils.contains("DISTRO_FEATURES", "early_init", "memory-hotplug", "" ,d)}"
