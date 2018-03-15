@@ -102,3 +102,9 @@ DISTRO_FEATURES_append = "${@' dbus-cynara ' if '${MACHINE}' != '8x96autogvmquin
 # If non "meta-qti-bsp-prop" layer, add below path to BBMASK.
 BBMASK_append = "${@base_conditional('WITH_PROP_LAYER', 'no', '|meta-qti-bsp/recipes-qt/qt5/', '',d)}"
 BBMASK_append = "${@base_conditional('WITH_PROP_LAYER', 'no', '|meta-qti-bsp/recipes-graphics/xorg-proto/dri2proto_2.8.bb', '',d)}"
+
+
+#Reduce the number of parallel make and bb threads
+CPU_COUNT = "${@bb.utils.cpu_count()}"
+PARALLEL_MAKE = "${@base_less_or_equal('CPU_COUNT', '24', '-j ${CPU_COUNT}', '-j 24',d)}"
+BB_NUMBER_THREADS = "${@base_less_or_equal('CPU_COUNT', '24', ' ${CPU_COUNT}', ' 24',d)}"
