@@ -5,11 +5,11 @@ tmpfs                /run                 tmpfs      mode=0755,nodev,nosuid,stri
 tmpfs                /var/volatile        tmpfs      defaults              0  0
 
 PARTLABEL=modem      /firmware            auto       defaults,ro              0  2
-PARTLABEL=persist    /persist             auto       defaults              0  2
-PARTLABEL=userdata   /data                auto       defaults              0  2
+PARTLABEL=persist    /persist             auto       defaults                 0  2
+PARTLABEL=userdata   /data                auto       defaults,noauto_da_alloc,discard              0  2
 PARTLABEL=dsp        /dsp                 auto       defaults,ro              0  2
 PARTLABEL=bluetooth  /bluetooth           auto       defaults,ro              0  2
-PARTLABEL=cache      /cache               auto       defaults              0  2
+PARTLABEL=cache      /cache               auto       defaults                 0  2
 
 # Bind /home to /data
 /data                /home                auto       defaults,bind         0  0
