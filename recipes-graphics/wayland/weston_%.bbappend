@@ -76,7 +76,7 @@ SRC_URI_remove = "file://weston.ini"
 #
 # Weston strategy plugin
 #
-DEPENDS += "sdm scalar sdm-noship  cmake-native wayland-native"
+DEPENDS += "sdm scalar sdm-noship  cmake-native wayland-native gbm-headers libuhab"
 
 do_compile_prepend () {
     if [ -d "${S}/sdm_plugin" ]; then
