@@ -5,8 +5,8 @@ tmpfs                /run                 tmpfs      mode=0755,nodev,nosuid,stri
 tmpfs                /var/volatile        tmpfs      defaults              0  0
 
 /dev/vda             /firmware            auto       defaults       0  2
-PARTLABEL=persist    /persist             auto       defaults,noauto       0  2
-PARTLABEL=userdata   /data                auto       defaults,noauto       0  2
+/dev/vdi             /persist             auto       defaults,auto       0  2
+/dev/vdh             /data                auto       defaults,auto       0  2
 /dev/vdg             /dsp                 auto       defaults       0  2
 
 # uncomment this if your device has a SD/MMC/Transflash slot
