@@ -146,6 +146,8 @@ else
     eval FindAndMountUBI cachefs /cache
 fi
 
+mkdir -p /cache/recovery
+
 eval CreateSymLink misc /misc
 eval FindAndMount${fstype} modem /firmware
 
