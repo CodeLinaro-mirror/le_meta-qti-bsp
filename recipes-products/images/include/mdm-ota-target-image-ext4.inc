@@ -156,6 +156,11 @@ python do_gen_otazip_ext4() {
     if (d.getVar('OTA_EXTRA_OPTS', True) == '1'):
         cmd3 += " -p system/ -c ${WORKDIR}/rootfs-fsconfig.conf"
 
+    # enable block-based OTA package generation by default
+    # only for apq8053
+    if (d.getVar('BASEMACHINE', True) == 'apq8053'):
+        cmd3 += " --block"
+
     subprocess.call(cmd3, shell=True)
 
     cmd4 = "cd ${TMPDIR}/work/x86_64-linux/releasetools-native/1.0-r0/releasetools && cp update_ext4.zip target-files-ext4.zip ${DEPLOY_DIR_IMAGE}"

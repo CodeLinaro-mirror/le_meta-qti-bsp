@@ -80,7 +80,12 @@ fi
 
 cd $target_files && zip -q ../$1 META/*filesystem_config.txt SYSTEM/build.prop && cd ..
 
-./ota_from_target_files $block_based -n -v -d $device_type -p . -s "${WORKSPACE}/android_compat/device/qcom/common" --no_signing  $1 update_$3.zip > ota_debug.txt 2>&1
+python_version="python3" # file-based OTA scripts have migrated to python3
+if [ "${block_based}" = "--block" ]; then
+    python_version="python2" # fall back to python2 for block-based OTA scripts
+fi
+
+$python_version ./ota_from_target_files $block_based -n -v -d $device_type -p . -s "${WORKSPACE}/android_compat/device/qcom/common" --no_signing  $1 update_$3.zip > ota_debug.txt 2>&1
 
 if [[ $? = 0 ]]; then
     echo "update.zip generation was successful"
