@@ -1,6 +1,6 @@
-From 5b4dc4df1896463928cb167dee88d78bea099f31 Mon Sep 17 00:00:00 2001
+From 23e64e990300fbe7b5d10cdaad59dfaa532b66c7 Mon Sep 17 00:00:00 2001
 From: Lei wang <leiwan@codeaurora.org>
-Date: Fri, 15 Sep 2017 08:47:06 +0800
+Date: Sun, 18 Mar 2018 11:35:53 +0800
 Subject: [PATCH] camera: changes for early CVBS case
 
 ais: disable TI960s and actuators for FPD-LINK camera
@@ -8,11 +8,12 @@ ais: comment dump camif registers on camif error
 make camera & CVBS kernel drivers load earlier
 adv7481: optimizations
 
-Change-Id: Ia1731b05c200dabf446ad9abdb7b244507b566f4
+Change-Id: I431c1d09bbd2002369260f3a401c82d92eae6dd3
 Signed-off-by: Andy Sun <bins@codeaurora.org>
 Signed-off-by: Lei wang <leiwan@codeaurora.org>
 ---
  .../boot/dts/qcom/msm8996-camera-sensor-adp.dtsi   |  6 ++-
+ drivers/Makefile                                   |  2 +-
  drivers/media/i2c/adv7481.c                        | 61 ++++++++++++++++++++--
  .../media/platform/msm/ais/common/cam_smmu_api.c   |  2 +-
  drivers/media/platform/msm/ais/isp/msm_isp.c       |  8 ++-
@@ -26,7 +27,7 @@ Signed-off-by: Lei wang <leiwan@codeaurora.org>
  .../platform/msm/ais/sensor/msm_sensor_driver.c    |  2 +-
  .../platform/msm/ais/sensor/msm_sensor_init.c      |  2 +-
  drivers/video/msm/ba/msm_v4l2_ba.c                 |  8 ++-
- 14 files changed, 91 insertions(+), 19 deletions(-)
+ 15 files changed, 92 insertions(+), 20 deletions(-)
 
 diff --git a/arch/arm/boot/dts/qcom/msm8996-camera-sensor-adp.dtsi b/arch/arm/boot/dts/qcom/msm8996-camera-sensor-adp.dtsi
 index 31139c0..386907d 100644
@@ -66,8 +67,28 @@ index 31139c0..386907d 100644
  		clocks = <&clock_mmss clk_mclk2_clk_src>,
  			<&clock_mmss clk_camss_mclk2_clk>;
  		clock-names = "cam_src_clk", "cam_clk";
+diff --git a/drivers/Makefile b/drivers/Makefile
+index 869e1f8..66ce7b7 100644
+--- a/drivers/Makefile
++++ b/drivers/Makefile
+@@ -14,6 +14,7 @@ obj-$(CONFIG_GENERIC_PHY)	+= phy/
+ obj-$(CONFIG_PINCTRL)		+= pinctrl/
+ obj-y				+= gpio/
+ obj-y				+= mmc/
++obj-y				+= i2c/ media/
+ obj-y				+= pwm/
+ obj-$(CONFIG_PCI)		+= pci/
+ obj-$(CONFIG_PARISC)		+= parisc/
+@@ -106,7 +107,6 @@ obj-$(CONFIG_SERIO)		+= input/serio/
+ obj-$(CONFIG_GAMEPORT)		+= input/gameport/
+ obj-$(CONFIG_INPUT)		+= input/
+ obj-$(CONFIG_RTC_LIB)		+= rtc/
+-obj-y				+= i2c/ media/
+ obj-$(CONFIG_PPS)		+= pps/
+ obj-$(CONFIG_PTP_1588_CLOCK)	+= ptp/
+ obj-$(CONFIG_W1)		+= w1/
 diff --git a/drivers/media/i2c/adv7481.c b/drivers/media/i2c/adv7481.c
-index b382a1d..79634a9 100644
+index 7cac0a8a..580c48c 100644
 --- a/drivers/media/i2c/adv7481.c
 +++ b/drivers/media/i2c/adv7481.c
 @@ -35,6 +35,8 @@
@@ -79,7 +100,7 @@ index b382a1d..79634a9 100644
  #include "adv7481_reg.h"
  
  #include "msm_cci.h"
-@@ -344,6 +346,35 @@ static uint16_t adv7481_rd_word(struct msm_camera_i2c_client *c_i2c_client,
+@@ -365,6 +367,35 @@ static uint16_t adv7481_rd_word(struct msm_camera_i2c_client *c_i2c_client,
  	return data;
  }
  
@@ -115,7 +136,7 @@ index b382a1d..79634a9 100644
  static int adv7481_set_irq(struct adv7481_state *state)
  {
  	int ret = 0;
-@@ -1168,6 +1199,8 @@ static int adv7481_set_cvbs_mode(struct adv7481_state *state)
+@@ -1243,6 +1274,8 @@ static int adv7481_set_cvbs_mode(struct adv7481_state *state)
  	ret |= adv7481_wr_byte(&state->i2c_client, state->i2c_io_addr,
  				IO_REG_CSI_PIX_EN_SEL_ADDR, val);
  
@@ -124,7 +145,7 @@ index b382a1d..79634a9 100644
  	return ret;
  }
  
-@@ -2024,17 +2057,17 @@ static int adv7481_csi_powerup(struct adv7481_state *state,
+@@ -2146,17 +2179,17 @@ static int adv7481_csi_powerup(struct adv7481_state *state,
  	/* DPHY and CSI Tx A Power up Sequence */
  	/* CSI TxA: MIPI PLL EN */
  	ret |= adv7481_wr_byte(&state->i2c_client, csi_map, 0xda, 0x01);
@@ -145,7 +166,7 @@ index b382a1d..79634a9 100644
  	/* ADI Required Write */
  	ret |= adv7481_wr_byte(&state->i2c_client, csi_map, 0x31, 0x80);
  
-@@ -2317,6 +2350,8 @@ static int adv7481_probe(struct platform_device *pdev)
+@@ -2490,6 +2523,8 @@ static int adv7481_probe(struct platform_device *pdev)
  	struct v4l2_subdev *sd;
  	int ret;
  
@@ -154,7 +175,7 @@ index b382a1d..79634a9 100644
  	device_id = of_match_device(adv7481_id, &pdev->dev);
  	if (!device_id) {
  		pr_err("%s: device_id is NULL\n", __func__);
-@@ -2429,6 +2464,9 @@ static int adv7481_probe(struct platform_device *pdev)
+@@ -2602,6 +2637,9 @@ static int adv7481_probe(struct platform_device *pdev)
  	enable_irq(state->irq);
  	pr_debug("Probe successful!\n");
  
@@ -164,7 +185,7 @@ index b382a1d..79634a9 100644
  	return ret;
  
  err_media_entity:
-@@ -2509,6 +2547,7 @@ static struct platform_driver adv7481_driver = {
+@@ -2677,6 +2715,7 @@ static struct platform_driver adv7481_driver = {
  	.driver = {
  		.owner = THIS_MODULE,
  		.name = KBUILD_MODNAME,
@@ -172,7 +193,7 @@ index b382a1d..79634a9 100644
  		.of_match_table = adv7481_id,
  		.pm = ADV7481_PM_OPS,
  	},
-@@ -2516,7 +2555,19 @@ static struct platform_driver adv7481_driver = {
+@@ -2684,8 +2723,20 @@ static struct platform_driver adv7481_driver = {
  	.remove = adv7481_remove,
  };
  
@@ -194,6 +215,7 @@ index b382a1d..79634a9 100644
 +
  
  MODULE_DESCRIPTION("ADI ADV7481 HDMI/MHL/SD video receiver");
+ MODULE_LICENSE("GPL v2");
 diff --git a/drivers/media/platform/msm/ais/common/cam_smmu_api.c b/drivers/media/platform/msm/ais/common/cam_smmu_api.c
 index 0f0e145..66a7843 100644
 --- a/drivers/media/platform/msm/ais/common/cam_smmu_api.c
@@ -254,10 +276,10 @@ index d62b830..7ef4afb 100644
  MODULE_DESCRIPTION("MSM VFE driver");
  MODULE_LICENSE("GPL v2");
 diff --git a/drivers/media/platform/msm/ais/isp/msm_isp47.c b/drivers/media/platform/msm/ais/isp/msm_isp47.c
-index 04e879f..fc4f773 100644
+index 6ca91b4..76e27ce 100644
 --- a/drivers/media/platform/msm/ais/isp/msm_isp47.c
 +++ b/drivers/media/platform/msm/ais/isp/msm_isp47.c
-@@ -2850,7 +2850,7 @@ static void __exit msm_vfe47_exit_module(void)
+@@ -2859,7 +2859,7 @@ static void __exit msm_vfe47_exit_module(void)
  	platform_driver_unregister(&vfe47_driver);
  }
  
@@ -267,7 +289,7 @@ index 04e879f..fc4f773 100644
  MODULE_DESCRIPTION("MSM VFE47 driver");
  MODULE_LICENSE("GPL v2");
 diff --git a/drivers/media/platform/msm/ais/ispif/msm_ispif.c b/drivers/media/platform/msm/ais/ispif/msm_ispif.c
-index c41f454..1170fc2 100644
+index a72ac56..0d3fc66 100644
 --- a/drivers/media/platform/msm/ais/ispif/msm_ispif.c
 +++ b/drivers/media/platform/msm/ais/ispif/msm_ispif.c
 @@ -23,6 +23,8 @@
@@ -279,7 +301,7 @@ index c41f454..1170fc2 100644
  #include "msm_ispif.h"
  #include "msm.h"
  #include "msm_sd.h"
-@@ -1757,6 +1759,8 @@ static int ispif_probe(struct platform_device *pdev)
+@@ -1759,6 +1761,8 @@ static int ispif_probe(struct platform_device *pdev)
  	memset(&ispif->vfe_info, 0, sizeof(struct msm_ispif_vfe_info));
  	ispif->vfe_info.num_vfe = 2;
  
@@ -288,7 +310,7 @@ index c41f454..1170fc2 100644
  	return 0;
  
  sd_reg_fail:
-@@ -1793,6 +1797,7 @@ static struct platform_driver ispif_driver = {
+@@ -1795,6 +1799,7 @@ static struct platform_driver ispif_driver = {
  
  static int __init msm_ispif_init_module(void)
  {
@@ -296,7 +318,7 @@ index c41f454..1170fc2 100644
  	return platform_driver_register(&ispif_driver);
  }
  
-@@ -1801,7 +1806,7 @@ static void __exit msm_ispif_exit_module(void)
+@@ -1803,7 +1808,7 @@ static void __exit msm_ispif_exit_module(void)
  	platform_driver_unregister(&ispif_driver);
  }
  
@@ -306,7 +328,7 @@ index c41f454..1170fc2 100644
  MODULE_DESCRIPTION("MSM ISP Interface driver");
  MODULE_LICENSE("GPL v2");
 diff --git a/drivers/media/platform/msm/ais/msm.c b/drivers/media/platform/msm/ais/msm.c
-index a3a7421..b942ed8 100644
+index 902e05b..df93e32 100644
 --- a/drivers/media/platform/msm/ais/msm.c
 +++ b/drivers/media/platform/msm/ais/msm.c
 @@ -26,6 +26,7 @@
@@ -317,7 +339,7 @@ index a3a7421..b942ed8 100644
  #include "msm.h"
  #include "msm_vb2.h"
  #include "msm_sd.h"
-@@ -1410,6 +1411,7 @@ static struct platform_driver msm_driver = {
+@@ -1423,6 +1424,7 @@ static struct platform_driver msm_driver = {
  
  static int __init msm_init(void)
  {
@@ -325,7 +347,7 @@ index a3a7421..b942ed8 100644
  	return platform_driver_register(&msm_driver);
  }
  
-@@ -1419,7 +1421,7 @@ static void __exit msm_exit(void)
+@@ -1432,7 +1434,7 @@ static void __exit msm_exit(void)
  }
  
  
@@ -348,10 +370,10 @@ index 66751b1..c3b531f 100644
  MODULE_DESCRIPTION("MSM Buffer Manager");
  MODULE_LICENSE("GPL v2");
 diff --git a/drivers/media/platform/msm/ais/sensor/cci/msm_cci.c b/drivers/media/platform/msm/ais/sensor/cci/msm_cci.c
-index 42f8c4d..d86ccd0 100644
+index a777144..0ff46d7 100644
 --- a/drivers/media/platform/msm/ais/sensor/cci/msm_cci.c
 +++ b/drivers/media/platform/msm/ais/sensor/cci/msm_cci.c
-@@ -2161,7 +2161,7 @@ static void __exit msm_cci_exit_module(void)
+@@ -2162,7 +2162,7 @@ static void __exit msm_cci_exit_module(void)
  	platform_driver_unregister(&cci_driver);
  }
  
@@ -413,7 +435,7 @@ index ffbf963..cdf4830 100644
  MODULE_DESCRIPTION("msm_sensor_init");
  MODULE_LICENSE("GPL v2");
 diff --git a/drivers/video/msm/ba/msm_v4l2_ba.c b/drivers/video/msm/ba/msm_v4l2_ba.c
-index 89fc08dd..be3f170 100644
+index c50d022..1d6e723 100644
 --- a/drivers/video/msm/ba/msm_v4l2_ba.c
 +++ b/drivers/video/msm/ba/msm_v4l2_ba.c
 @@ -25,6 +25,8 @@
@@ -425,7 +447,7 @@ index 89fc08dd..be3f170 100644
  #include "msm_ba_internal.h"
  #include "msm_ba_debug.h"
  
-@@ -474,6 +476,8 @@ static int msm_ba_probe(struct platform_device *pdev)
+@@ -483,6 +485,8 @@ static int msm_ba_probe(struct platform_device *pdev)
  	}
  	dprintk(BA_INFO, "Exit %s with error %d", __func__, rc);
  
@@ -434,7 +456,7 @@ index 89fc08dd..be3f170 100644
  	return rc;
  }
  
-@@ -584,6 +588,8 @@ static int __init msm_ba_mod_init(void)
+@@ -593,6 +597,8 @@ static int __init msm_ba_mod_init(void)
  {
  	int rc = 0;
  
@@ -443,7 +465,7 @@ index 89fc08dd..be3f170 100644
  	dprintk(BA_INFO, "Enter %s", __func__);
  	rc = msm_ba_create();
  	if (!rc) {
-@@ -609,6 +615,6 @@ static void __exit msm_ba_mod_exit(void)
+@@ -618,6 +624,6 @@ static void __exit msm_ba_mod_exit(void)
  	dprintk(BA_INFO, "Exit %s", __func__);
  }
  
