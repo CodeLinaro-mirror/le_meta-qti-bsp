@@ -29,6 +29,9 @@ do_install() {
             install -m 0644 ${S}/early_init.conf  ${D}${sysconfdir}/early_init.conf
         fi
     fi
+    if ${@bb.utils.contains('BASEMACHINE', '8x96autodvrs', 'true', 'false', d)}; then
+        sed -i "s/-deinterlace=bob/-input=4/g" ${D}${sysconfdir}/early_init.conf
+    fi
 }
 
 FILES_${PN} += " ${sbindir}/early_init"
