@@ -1,6 +1,6 @@
-From 8307db2649cbd128babd1eccb3bf38de7a257985 Mon Sep 17 00:00:00 2001
+From a2d1487e7305e6f5c9c42a57e80f143d814d41ff Mon Sep 17 00:00:00 2001
 From: Zhiqiang Tu <ztu@codeaurora.org>
-Date: Tue, 14 Nov 2017 09:07:28 +0800
+Date: Mon, 19 Mar 2018 13:38:20 +0800
 Subject: [PATCH] automotive: add boot time marker for LV GVM
 
 Add boot time marker for boot KPI measurement.
@@ -22,7 +22,7 @@ Signed-off-by: Zhiqiang Tu <ztu@codeaurora.org>
  11 files changed, 57 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/mmc/host/sdhci-msm.c b/drivers/mmc/host/sdhci-msm.c
-index 45d2f69..6998e05 100644
+index aea00ce..7c996ba 100644
 --- a/drivers/mmc/host/sdhci-msm.c
 +++ b/drivers/mmc/host/sdhci-msm.c
 @@ -39,6 +39,7 @@
@@ -33,7 +33,7 @@ index 45d2f69..6998e05 100644
  
  #include "sdhci-msm.h"
  #include "sdhci-msm-ice.h"
-@@ -4252,6 +4253,7 @@ static int sdhci_msm_probe(struct platform_device *pdev)
+@@ -4251,6 +4252,7 @@ static int sdhci_msm_probe(struct platform_device *pdev)
  	unsigned long flags;
  	bool force_probe;
  
@@ -41,7 +41,7 @@ index 45d2f69..6998e05 100644
  	pr_debug("%s: Enter %s\n", dev_name(&pdev->dev), __func__);
  	msm_host = devm_kzalloc(&pdev->dev, sizeof(struct sdhci_msm_host),
  				GFP_KERNEL);
-@@ -4751,6 +4753,7 @@ static int sdhci_msm_probe(struct platform_device *pdev)
+@@ -4748,6 +4750,7 @@ static int sdhci_msm_probe(struct platform_device *pdev)
  		mmc_flush_detect_work(host->mmc);
  
  	/* Successful initialization */
@@ -109,10 +109,10 @@ index d07fb65..53680ea 100644
  
  cleanup_sysctl:
 diff --git a/drivers/spi/spi_qsd.c b/drivers/spi/spi_qsd.c
-index da58f19..6c9a1c1 100644
+index aa73863..0c6f22d 100644
 --- a/drivers/spi/spi_qsd.c
 +++ b/drivers/spi/spi_qsd.c
-@@ -44,6 +44,7 @@
+@@ -45,6 +45,7 @@
  #include <linux/msm-bus.h>
  #include <linux/msm-bus-board.h>
  #include "spi_qsd.h"
@@ -120,7 +120,7 @@ index da58f19..6c9a1c1 100644
  
  #define SPI_MAX_BYTES_PER_WORD			(4)
  
-@@ -2778,7 +2779,23 @@ static struct platform_driver msm_spi_driver = {
+@@ -2925,7 +2926,23 @@ static struct platform_driver msm_spi_driver = {
  	.probe		= msm_spi_probe,
  };
  
@@ -146,7 +146,7 @@ index da58f19..6c9a1c1 100644
  MODULE_LICENSE("GPL v2");
  MODULE_VERSION("0.4");
 diff --git a/drivers/tty/serial/msm_serial_hs.c b/drivers/tty/serial/msm_serial_hs.c
-index c2c9b93..f44a048 100644
+index 5da2f14..ddf0bef 100644
 --- a/drivers/tty/serial/msm_serial_hs.c
 +++ b/drivers/tty/serial/msm_serial_hs.c
 @@ -66,6 +66,7 @@
@@ -157,7 +157,7 @@ index c2c9b93..f44a048 100644
  
  #include "msm_serial_hs_hwreg.h"
  #define UART_SPS_CONS_PERIPHERAL 0
-@@ -3689,6 +3690,7 @@ static int __init msm_serial_hs_init(void)
+@@ -3701,6 +3702,7 @@ static int __init msm_serial_hs_init(void)
  {
  	int ret;
  
@@ -165,7 +165,7 @@ index c2c9b93..f44a048 100644
  	ret = uart_register_driver(&msm_hs_driver);
  	if (unlikely(ret)) {
  		pr_err("%s failed to load\n", __func__);
-@@ -3705,6 +3707,7 @@ static int __init msm_serial_hs_init(void)
+@@ -3717,6 +3719,7 @@ static int __init msm_serial_hs_init(void)
  		uart_unregister_driver(&msm_hs_driver);
  		return ret;
  	}
@@ -174,7 +174,7 @@ index c2c9b93..f44a048 100644
  	pr_info("msm_serial_hs module loaded\n");
  	return ret;
 diff --git a/drivers/usb/dwc3/dwc3-msm.c b/drivers/usb/dwc3/dwc3-msm.c
-index 26422a6..85f1dc7 100644
+index 2cd600a..663e393 100644
 --- a/drivers/usb/dwc3/dwc3-msm.c
 +++ b/drivers/usb/dwc3/dwc3-msm.c
 @@ -53,6 +53,7 @@
@@ -185,7 +185,7 @@ index 26422a6..85f1dc7 100644
  
  #define SDP_CONNETION_CHECK_TIME 10000 /* in ms */
  
-@@ -3230,6 +3231,11 @@ static int dwc3_msm_probe(struct platform_device *pdev)
+@@ -3258,6 +3259,11 @@ static int dwc3_msm_probe(struct platform_device *pdev)
  		dwc3_ext_event_notify(mdwc);
  	}
  
@@ -197,7 +197,7 @@ index 26422a6..85f1dc7 100644
  	return 0;
  
  put_dwc3:
-@@ -4074,6 +4080,8 @@ MODULE_DESCRIPTION("DesignWare USB3 MSM Glue Layer");
+@@ -4105,6 +4111,8 @@ MODULE_DESCRIPTION("DesignWare USB3 MSM Glue Layer");
  
  static int dwc3_msm_init(void)
  {
@@ -238,10 +238,10 @@ index 1902a1c8..f6f0fc1 100644
  }
  
 diff --git a/init/main.c b/init/main.c
-index 8c72af2..efdf3c3 100644
+index e0390d3..4b5e7c0 100644
 --- a/init/main.c
 +++ b/init/main.c
-@@ -87,6 +87,7 @@
+@@ -88,6 +88,7 @@
  #include <asm/setup.h>
  #include <asm/sections.h>
  #include <asm/cacheflush.h>
@@ -249,7 +249,7 @@ index 8c72af2..efdf3c3 100644
  
  static int kernel_init(void *);
  
-@@ -982,6 +983,7 @@ static int __ref kernel_init(void *unused)
+@@ -984,6 +985,7 @@ static int __ref kernel_init(void *unused)
  		panic("Requested init %s failed (error %d).",
  		      execute_command, ret);
  	}
@@ -286,7 +286,7 @@ index aad274c..eed912a 100644
  	return rc;
  out_unregister_raw_proto:
 diff --git a/sound/soc/msm/apq8096-auto.c b/sound/soc/msm/apq8096-auto.c
-index 1fbdc70..13d6c06 100644
+index d6473cc..c45c2ca 100644
 --- a/sound/soc/msm/apq8096-auto.c
 +++ b/sound/soc/msm/apq8096-auto.c
 @@ -35,6 +35,7 @@
@@ -297,7 +297,7 @@ index 1fbdc70..13d6c06 100644
  
  #define DRV_NAME "apq8096-auto-asoc-snd"
  
-@@ -6465,6 +6466,7 @@ static int apq8096_asoc_machine_probe(struct platform_device *pdev)
+@@ -6876,6 +6877,7 @@ static int apq8096_asoc_machine_probe(struct platform_device *pdev)
  		goto err;
  	}
  	dev_info(&pdev->dev, "Sound card %s registered\n", card->name);
@@ -305,7 +305,7 @@ index 1fbdc70..13d6c06 100644
  	return 0;
  
  err:
-@@ -6533,6 +6535,7 @@ static struct notifier_block adsp_state_notifier_block = {
+@@ -6944,6 +6946,7 @@ static struct notifier_block adsp_state_notifier_block = {
  
  static int __init apq8096_soc_platform_init(void)
  {
@@ -314,18 +314,18 @@ index 1fbdc70..13d6c06 100644
  						&adsp_state_notifier_block);
  	return 0;
 diff --git a/sound/soc/msm/qdsp6v2/msm-dai-q6-v2.c b/sound/soc/msm/qdsp6v2/msm-dai-q6-v2.c
-index 292b3d0..d403fdb 100644
+index 27daa3a..e1d2238 100644
 --- a/sound/soc/msm/qdsp6v2/msm-dai-q6-v2.c
 +++ b/sound/soc/msm/qdsp6v2/msm-dai-q6-v2.c
-@@ -27,6 +27,7 @@
- #include <sound/q6afe-v2.h>
- #include <sound/msm-dai-q6-v2.h>
- #include <sound/pcm_params.h>
+@@ -20,6 +20,7 @@
+ #include <linux/clk.h>
+ #include <linux/of_device.h>
+ #include <linux/clk/msm-clk.h>
 +#include <soc/qcom/boot_stats.h>
- 
- #define MSM_DAI_PRI_AUXPCM_DT_DEV_ID 1
- #define MSM_DAI_SEC_AUXPCM_DT_DEV_ID 2
-@@ -8267,11 +8268,13 @@ static int __init msm_dai_q6_init(void)
+ #include <sound/core.h>
+ #include <sound/pcm.h>
+ #include <sound/soc.h>
+@@ -8386,11 +8387,13 @@ static int __init msm_dai_q6_init(void)
  		goto dai_q6_dev_fail;
  	}
  
