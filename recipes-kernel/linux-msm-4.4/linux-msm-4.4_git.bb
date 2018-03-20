@@ -110,7 +110,7 @@ do_configure () {
 do_shared_workdir () {
         cd ${B}
 
-        kerneldir=${STAGING_KERNEL_BUILDDIR}
+        kerneldir=${SSTATE_KERNEL_BUILDDIR}
         install -d $kerneldir
 
         #
@@ -227,6 +227,16 @@ do_deploy () {
         ${extra_mkbootimg_params} --output ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img
     cp ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} "${DEPLOY_DIR_IMAGE}/"
     cp ${B}/vmlinux "${DEPLOY_DIR_IMAGE}/"
+}
+
+SSTATE_KERNEL_BUILDDIR="${WORKDIR}/kernel-build-artifacts"
+SSTATETASKS += "do_shared_workdir"
+do_shared_workdir[sstate-inputdirs] = "${SSTATE_KERNEL_BUILDDIR}"
+do_shared_workdir[sstate-outputdirs] = "${STAGING_KERNEL_BUILDDIR}"
+do_shared_workdir[dirs] = "${SSTATE_KERNEL_BUILDDIR}"
+
+python do_shared_workdir_setscene () {
+     sstate_setscene(d)
 }
 
 # Including the file depends on chipset
