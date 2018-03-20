@@ -29,11 +29,8 @@ do_make_system_image () {
   mkdir -p ${DEPLOY_DIR_IMAGE}/dm-verity
   dd if=/dev/zero of=${DEPLOY_DIR_IMAGE}/dm-verity/hashtable.img bs=1M count=1
   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${TMPDIR}/sysroots/${BUILD_SYS}/lib:${TMPDIR}/sysroots/${BUILD_SYS}/usr/lib
-  img_size=`wc -c ${DEPLOY_DIR_IMAGE}/automotive-image-${MACHINE}.ext4 | cut -d " " -f 1`
-  make_ext4fs -T -1 -L system -l ${img_size} ${DEPLOY_DIR_IMAGE}/dm-verity/.system.img ${TMPDIR}/work/${MACHINE}-agl-linux/automotive-image/1.0-r0/rootfs target_out
-  veritysetup format ${DEPLOY_DIR_IMAGE}/dm-verity/.system.img ${DEPLOY_DIR_IMAGE}/dm-verity/hashtable.img > ${DEPLOY_DIR_IMAGE}/dm-verity/hash_info.txt
-  cat ${DEPLOY_DIR_IMAGE}/dm-verity/.system.img ${DEPLOY_DIR_IMAGE}/dm-verity/hashtable.img > ${DEPLOY_DIR_IMAGE}/dm-verity/automotive-image-${MACHINE}.ext4
-  rm ${DEPLOY_DIR_IMAGE}/dm-verity/.system.img
+  veritysetup format ${DEPLOY_DIR_IMAGE}/automotive-image-${MACHINE}.ext4 ${DEPLOY_DIR_IMAGE}/dm-verity/hashtable.img > ${DEPLOY_DIR_IMAGE}/dm-verity/hash_info.txt
+  cat ${DEPLOY_DIR_IMAGE}/automotive-image-${MACHINE}.ext4 ${DEPLOY_DIR_IMAGE}/dm-verity/hashtable.img > ${DEPLOY_DIR_IMAGE}/dm-verity/automotive-image-${MACHINE}.ext4
 }
 
 python do_make_dm_verity_image(){
