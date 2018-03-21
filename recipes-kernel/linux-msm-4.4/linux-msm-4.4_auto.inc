@@ -74,6 +74,7 @@ SRC_URI_append_8x96mizar += " \
     file://0001-ntb_transport-Enable-ntb-tranport-layer-for-IDT-devi.patch \
     file://0001-net-ntb_netdev-Change-module-load-order.patch \
     file://0001-Revert-ARM-dts-msm-modify-HDMI-configuration-for-msm.patch \
+    file://0001-hdmi-Map-corerct-mizar-physical-lanes-to-phy.patch \
 "
 
 do_deploy_rename () {
