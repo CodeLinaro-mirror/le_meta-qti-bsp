@@ -42,3 +42,7 @@ SRC_URI_append = "\
 SRC_URI_append = " \
     file://0001-IVI-Shell-use-primary-screen-for-resolution.patch \
 "
+
+DEPENDS += "wayland-native gbm-headers"
+
+TARGET_CFLAGS += "-lwayland-client"
