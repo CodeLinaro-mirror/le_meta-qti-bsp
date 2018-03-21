@@ -46,7 +46,6 @@ SRC_URI_append_kernelpatchok += " \
     file://0011-HAB-upgrade-to-the-internal-latest-dev-version.patch \
     file://0011-Add-psci-workaround-for-gvm-suspend.patch \
     file://0012-unmask-virtio-net-irq-to-wake-up-system.patch \
-    file://0021-automotive-add-boot-time-marker-for-LV-GVM.patch \
 "
 
 do_deploy_rename () {
