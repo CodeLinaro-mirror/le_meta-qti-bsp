@@ -1,0 +1,44 @@
+From ad1edfc2fb3d88e6ba84cb5cc21dc6e53ef13d9b Mon Sep 17 00:00:00 2001
+From: Bharathraj Nagaraju <snbraj@codeaurora.org>
+Date: Tue, 20 Mar 2018 16:41:17 -0700
+Subject: [PATCH] hdmi: Map corerct mizar physical lanes to phy.
+
+Change-Id: I9a3e85fa23bdfcf761db1c649964513e44c68742
+Signed-off-by: Bharathraj Nagaraju <snbraj@codeaurora.org>
+---
+ drivers/gpu/drm/msm/hdmi-staging/sde_hdmi_bridge.c | 6 ++++++
+ drivers/gpu/drm/msm/hdmi/hdmi.xml.h                | 1 +
+ 2 files changed, 7 insertions(+)
+
+diff --git a/drivers/gpu/drm/msm/hdmi-staging/sde_hdmi_bridge.c b/drivers/gpu/drm/msm/hdmi-staging/sde_hdmi_bridge.c
+index 5a4c4b0..2f1eced 100644
+--- a/drivers/gpu/drm/msm/hdmi-staging/sde_hdmi_bridge.c
++++ b/drivers/gpu/drm/msm/hdmi-staging/sde_hdmi_bridge.c
+@@ -884,6 +884,12 @@ static void _sde_hdmi_bridge_mode_set(struct drm_bridge *bridge,
+ 			SDE_HDMI_ACTIVE_VSYNC_START(vstart) |
+ 			SDE_HDMI_ACTIVE_VSYNC_END(vend));
+ 
++	/* Mizar hack -
++	   Mizar boards have their lanes swapped. Apply patch in software to reswap lanes
++	   Note: If this is fixed in future iterations of Mizar boards, we need to undo this hack
++	*/
++	hdmi_write(hdmi, REG_HDMI_LANE_CTRL, 0x6);
++
+ 	if (mode->flags & DRM_MODE_FLAG_INTERLACE) {
+ 		hdmi_write(hdmi, REG_HDMI_VSYNC_TOTAL_F2,
+ 				SDE_HDMI_VSYNC_TOTAL_F2_V_TOTAL(mode->vtotal));
+diff --git a/drivers/gpu/drm/msm/hdmi/hdmi.xml.h b/drivers/gpu/drm/msm/hdmi/hdmi.xml.h
+index ea485a2..82af23c 100644
+--- a/drivers/gpu/drm/msm/hdmi/hdmi.xml.h
++++ b/drivers/gpu/drm/msm/hdmi/hdmi.xml.h
+@@ -73,6 +73,7 @@ enum hdmi_acr_cts {
+ #define HDMI_CTRL_ENABLE					0x00000001
+ #define HDMI_CTRL_HDMI						0x00000002
+ #define HDMI_CTRL_ENCRYPTED					0x00000004
++#define REG_HDMI_LANE_CTRL					0x00000004
+ 
+ #define REG_HDMI_AUDIO_PKT_CTRL1				0x00000020
+ #define HDMI_AUDIO_PKT_CTRL1_AUDIO_SAMPLE_SEND			0x00000001
+-- 
+1.9.1
+
