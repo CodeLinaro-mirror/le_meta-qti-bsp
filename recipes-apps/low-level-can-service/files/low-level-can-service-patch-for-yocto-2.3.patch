@@ -1,0 +1,82 @@
+diff --git a/low-can-binding/binding/application-generated.cpp b/low-can-binding/binding/application-generated.cpp
+index 876b95b..acc6cc9 100644
+--- a/low-can-binding/binding/application-generated.cpp
++++ b/low-can-binding/binding/application-generated.cpp
+@@ -21,7 +21,7 @@ application_t::application_t()
+ 							false,
+ 							{
+ 							},
+-							false,
++							true,
+ 							nullptr,
+ 							nullptr,
+ 							false
+@@ -39,7 +39,7 @@ application_t::application_t()
+ 							false,
+ 							{
+ 							},
+-							false,
++							true,
+ 							nullptr,
+ 							nullptr,
+ 							false
+@@ -57,7 +57,7 @@ application_t::application_t()
+ 							false,
+ 							{
+ 							},
+-							false,
++							true,
+ 							nullptr,
+ 							nullptr,
+ 							false
+@@ -75,7 +75,7 @@ application_t::application_t()
+ 							false,
+ 							{
+ 							},
+-							false,
++							true,
+ 							nullptr,
+ 							nullptr,
+ 							false
+diff --git a/low-can-binding/can/can-bus.cpp b/low-can-binding/can/can-bus.cpp
+index be40aab..3fec7c1 100644
+--- a/low-can-binding/can/can-bus.cpp
++++ b/low-can-binding/can/can-bus.cpp
+@@ -56,7 +56,7 @@ bool can_bus_t::apply_filter(const openxc_VehicleMessage& vehicle_message, std::
+ 		float min = std::isnan(can_subscription->get_min()) ? -INFINITY : can_subscription->get_min();
+ 		float max = std::isnan(can_subscription->get_max()) ? INFINITY : can_subscription->get_max();
+ 		double value = get_numerical_from_DynamicField(vehicle_message);
+-		send = (value < min && value > max) ? false : true;
++		send = ((value < min) || (value > max)) ? false : true;
+ 	}
+ 	return send;
+ }
+diff --git a/low-can-binding/can/can-encoder.cpp b/low-can-binding/can/can-encoder.cpp
+index 9ba8531..c397974 100644
+--- a/low-can-binding/can/can-encoder.cpp
++++ b/low-can-binding/can/can-encoder.cpp
+@@ -37,13 +37,19 @@ const can_frame encoder_t::build_frame(const std::shared_ptr<can_signal_t>& sign
+ 
+ 	cf.can_id = signal->get_message()->get_id();
+ 	cf.can_dlc = CAN_MAX_DLEN;
+-	bitfield_encode_float((float)value,
+-						signal->get_bit_position(),
+-						signal->get_bit_size(),
+-						signal->get_factor(),
+-						signal->get_offset(),
++
++	signal->set_last_value((float)value);
++
++	for(const auto& sig: signal->get_message()->get_can_signals())
++	{
++		bitfield_encode_float(sig->get_last_value(),
++						sig->get_bit_position(),
++						sig->get_bit_size(),
++						sig->get_factor(),
++						sig->get_offset(),
+ 						cf.data,
+ 						CAN_MAX_DLEN);
++	}
+ 
+ 	return cf;
+ }
