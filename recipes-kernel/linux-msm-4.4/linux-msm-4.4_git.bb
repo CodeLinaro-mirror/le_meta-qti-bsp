@@ -58,6 +58,10 @@ python __anonymous () {
   # support alternate image builds
   if d.getVar("KERNEL_IMAGETYPE", True):
       d.setVar("KERNEL_IMAGETYPE_FOR_MAKE", "")
+
+  if( (d.getVar('KERNEL_ROOTDEVICE', True) == "/dev/dm-0") and (d.getVar('MACHINE', True) == "8x96auto")):
+      d.appendVar("SRC_URI", " file://0001-enable-rootfs-mount-as-dm-verity-target-during-boot.patch")
+
 }
 
 KERNEL_IMAGEDEST = "boot"
