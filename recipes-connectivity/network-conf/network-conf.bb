@@ -38,6 +38,4 @@ do_install() {
         ${D}${sysconfdir}/systemd/system/multi-user.target.wants/iptables-masquerade.service
     # PCAN-USB/cannelloni service
     install -m 0644 ${WORKDIR}/pcan-usb.service ${D}${sysconfdir}/systemd/system/
-    ln -sf ${sysconfdir}/systemd/system/pcan-usb.service \
-        ${D}${sysconfdir}/systemd/system/multi-user.target.wants/pcan-usb.service
 }
