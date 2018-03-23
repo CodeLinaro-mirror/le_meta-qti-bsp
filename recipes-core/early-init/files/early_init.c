@@ -40,13 +40,14 @@
 #include <sched.h>
 #include <errno.h>
 
-#define DEFAULT_CONF   "/etc/early_init.conf"
-#define END_TAG        "<end>"
-#define LINE_MAX       2048
-#define WHITESPACE     " \t\n\r"
-#define KPI_VALUE_PATH "/debug/bootkpi/kpi_values"
-#define GPIO_EXPORT    "/sys/class/gpio/export"
-#define CARD_PATH      "/dev/dri/card0"
+#define DEFAULT_CONF    "/etc/early_init.conf"
+#define END_TAG         "<end>"
+#define LINE_MAX        2048
+#define WHITESPACE      " \t\n\r"
+#define KPI_VALUE_PATH  "/debug/bootkpi/kpi_values"
+#define GPIO_EXPORT     "/sys/class/gpio/export"
+#define DRM_CARD_PATH   "/dev/dri/card0"
+#define VIDEO_CARD_PATH "/dev/video32"
 
 static struct {
   char* appname;
@@ -451,7 +452,7 @@ static inline int parse_line(char* p)
 					else {
 						snprintf(pid_file, sizeof(pid_file) , "%d" ,getpid());
 						if (-1 == write(fd, pid_file, sizeof(pid_file)))
-							printf("write pidfile i%s failed: %s", app_launcher.pidfile, strerror(errno));
+							printf("write pidfile %s failed: %s", app_launcher.pidfile, strerror(errno));
 					}
 					safe_close(fd);
 				}
@@ -497,25 +498,39 @@ static inline bool is_empty_line(const char* p)
 	return (strspn(p, WHITESPACE) == strlen(p));
 }
 
-static inline void trigger_firmware_loading(void)
+static inline void trigger_firmware_loading(const char* path)
 {
 	int i = 0;
 	int fd = -1;
+	pid_t pid;
+	static char marker[50];
 
-	for (i = 0; i < 30; i++) {
-		if (-1 != access(CARD_PATH, F_OK))
-			break;
-		usleep(5000);
+	pid = fork();
+	if (pid < 0) {
+		perror("fork child process failed \r\n");
+		return;
 	}
-	write_marker("early init open card0");
-	fd = open(CARD_PATH, O_CLOEXEC);
-	if (fd > 0) {
-		write_marker("early init open card0 finished");
-	} else {
-		perror("open card0 failed");
+	if (pid == 0) {
+		memset(marker, 0, 50);
+		snprintf(marker, 49 ,"open-%s-begin", path);
+		for (i = 0; i < 30; i++) {
+			if (-1 != access(path, F_OK))
+				break;
+			usleep(5000);
+		}
+		write_marker(marker);
+		fd = open(path, O_CLOEXEC);
+		if (fd > 0) {
+			memset(marker, 0, 50);
+			snprintf(marker, 49 ,"open-%s-end", path);
+			write_marker(marker);
+		} else {
+			perror("open card0 failed");
+		}
+		safe_close(fd);
+		exit(0);
 	}
-	safe_close(fd);
-	exit(0);
+	return;
 }
 
 int main(int argc, char* argv[])
@@ -523,7 +538,6 @@ int main(int argc, char* argv[])
 	FILE* f;
 	char line[LINE_MAX];
 	int fd;
-	pid_t pid;
 
 	prepare_dir("debugfs");
 	prepare_dir("xdg_runtime_dir");
@@ -548,15 +562,10 @@ int main(int argc, char* argv[])
 	write_marker("early-init-start-up");
 
 	/* Trigger firmware loading parallelly */
-	pid = fork();
-	if (pid < 0) {
-		perror("fork child process failed \r\n");
-		goto out;
-	}
-
-	if (0 == pid) {
-		trigger_firmware_loading();
-	}
+	trigger_firmware_loading(DRM_CARD_PATH);
+#ifdef EARLY_ETHERNET
+	trigger_firmware_loading(VIDEO_CARD_PATH);
+#endif
 
 	while (1) {
 
