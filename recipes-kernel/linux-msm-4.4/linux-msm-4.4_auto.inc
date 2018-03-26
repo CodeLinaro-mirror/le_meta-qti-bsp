@@ -81,7 +81,7 @@ SRC_URI_append_8x96auto += " \
 do_deploy_rename () {
     mv ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img ${DEPLOY_DIR_IMAGE}/boot.img
 }
-addtask deploy_rename after do_deploy before do_packagedata
+do_deploy[postfuncs] += "do_deploy_rename"
 
 do_unpack_extra () {
     if [ ${@d.getVar("MACHINE", True)} == "8x96auto" ] || [ ${@d.getVar("MACHINE", True)} == "8x96autodvrs" ]; then

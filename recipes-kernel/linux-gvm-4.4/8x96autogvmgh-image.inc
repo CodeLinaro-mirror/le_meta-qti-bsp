@@ -52,4 +52,4 @@ SRC_URI_append_kernelpatchok += " \
 do_deploy_rename () {
     mv ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img ${DEPLOY_DIR_IMAGE}/boot.img
 }
-addtask deploy_rename after do_deploy before do_packagedata
+do_deploy[postfuncs] += "do_deploy_rename"
