@@ -86,7 +86,7 @@ do_deploy_rename () {
     mv ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img ${DEPLOY_DIR_IMAGE}/boot.img
 }
 
-addtask deploy_rename after do_deploy before do_package_write_rpm
+do_deploy[postfuncs] += "do_deploy_rename"
 
 
 do_unpack_extra () {
