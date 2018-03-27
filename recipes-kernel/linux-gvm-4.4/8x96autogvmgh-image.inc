@@ -44,7 +44,6 @@ KERNEL_EXTRACONFIGS
 SRC_URI_append += " \
     file://0003-amba-skip-clock-calls-on-msm-virtual-platform.patch \
     file://0004-interrupt-workaround-for-virtual-plaform.patch \
-    file://0009-cnss-Adapt-cnss-to-virtual-platform.patch \
     file://0011-HAB-upgrade-to-the-internal-latest-dev-version.patch \
     file://0011-Add-psci-workaround-for-gvm-suspend.patch \
     file://0012-unmask-virtio-net-irq-to-wake-up-system.patch \
