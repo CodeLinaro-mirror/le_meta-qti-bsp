@@ -52,7 +52,7 @@ CONFIG_MSM_VIRTCLK_FRONTEND_8996=y
 KERNEL_EXTRACONFIGS
 }
 
-SRC_URI_append += " \
+SRC_URI_append_kernelpatchok += " \
     file://0003-amba-skip-clock-calls-on-msm-virtual-platform.patch \
     file://0004-interrupt-workaround-for-virtual-plaform.patch \
     file://0009-cnss-Adapt-cnss-to-virtual-platform.patch \
