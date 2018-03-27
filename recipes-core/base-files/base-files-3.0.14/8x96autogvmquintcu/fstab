@@ -4,10 +4,10 @@ devpts               /dev/pts             devpts     mode=0620,gid=5       0  0
 tmpfs                /run                 tmpfs      mode=0755,nodev,nosuid,strictatime 0  0
 tmpfs                /var/volatile        tmpfs      defaults              0  0
 
-/dev/vda             /firmware            auto       defaults       0  2
-/dev/vdi             /persist             auto       defaults,auto       0  2
-/dev/vdh             /data                auto       defaults,auto       0  2
-/dev/vdg             /dsp                 auto       defaults       0  2
+/dev/vdd             /firmware            auto       defaults,nofail,x-systemd.device-timeout=0       0  2
+/dev/vdc             /persist             auto       defaults,auto       0  2
+/dev/vdb             /data                auto       defaults,auto       0  2
+/dev/vde             /dsp                 auto       defaults,nofail,x-systemd.device-timeout=0       0  2
 
 # uncomment this if your device has a SD/MMC/Transflash slot
 #/dev/mmcblk0p1       /media/card          auto       defaults,sync,noauto  0  0
