@@ -30,6 +30,9 @@ SECURITY_CFLAGS_pn-liblog  = "${SECURITY_PIC_CFLAGS}"
 
 # libutils to use -fPIC in security flags instead of -fpie
 SECURITY_CFLAGS_pn-system-core = "${SECURITY_PIC_CFLAGS}"
+SECURITY_CFLAGS_pn-lib32-system-core = "${SECURITY_PIC_CFLAGS}"
+SECURITY_CFLAGS_pn-libbase = "${SECURITY_PIC_CFLAGS}"
+SECURITY_CFLAGS_pn-lib32-libbase = "${SECURITY_PIC_CFLAGS}"
 SECURITY_CFLAGS_pn-event-observer = "${SECURITY_PIC_CFLAGS}"
 SECURITY_CFLAGS_pn-data-items = "${SECURITY_PIC_CFLAGS}"
 # libbinder to use -fPIC in security flags instead of -fpie
