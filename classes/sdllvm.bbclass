@@ -11,9 +11,7 @@ DEPENDS +="${@bb.utils.contains('USE_CLANG', 'true','llvm-arm-toolchain-native',
 FULL_OPTIMIZATION = "${@bb.utils.contains('USE_CLANG', 'true',\
   '-O2  -fomit-frame-pointer -Wno-error=maybe-uninitialized  -Wno-error=unused-result -Wno-error=unknown-warning-option -Wno-error=unused-comparison -Wno-error=unused-command-line-argument \
     -Wno-error=unused-private-field -Wno-error=undefined-optimized -Wno-error=format -Wno-error=inconsistent-missing-override', \
-  '-O2 -fexpensive-optimizations -frename-registers -fomit-frame-pointer -ftree-vectorize   -Wno-error=maybe-uninitialized -finline-functions -finline-limit=64 -Wno-error=unused-command-line-argument', d)}"
-
-FULL_OPTIMIZATION += "-Wno-error=unused-command-line-argument"
+  '-O2 -fexpensive-optimizations -frename-registers -fomit-frame-pointer -ftree-vectorize   -Wno-error=maybe-uninitialized -finline-functions -finline-limit=64', d)}"
 
 NEON_FLAGS = "${@bb.utils.contains('TARGET_ARCH', 'arm', '-march=armv7-a -mfloat-abi=softfp -mfpu=neon -ftree-vectorize ', ' ',d)}"
 
