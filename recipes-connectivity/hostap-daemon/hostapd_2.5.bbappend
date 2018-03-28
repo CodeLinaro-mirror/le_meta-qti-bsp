@@ -19,6 +19,7 @@ do_configure_prepend () {
     sed -i -e 's/^CONFIG_DRIVER_PRISM54=y/#CONFIG_DRIVER_PRISM54=y/g' ${WORKDIR}/defconfig
     sed -i -e 's/^CONFIG_RADIUS_SERVER=y/CONFIG_NO_RADIUS=y/g' ${WORKDIR}/defconfig
     sed -i -e 's/^CONFIG_DRIVER_RADIUS_ACL=y/#CONFIG_DRIVER_RADIUS_ACL=y/g' ${WORKDIR}/defconfig
+    sed -i -e 's/^#CONFIG_WPS_UPNP=y/CONFIG_WPS_UPNP=y/g' ${WORKDIR}/defconfig
     sed -i '$a\CONFIG_ACS=y' ${WORKDIR}/defconfig
     sed -i '$a\CONFIG_IEEE80211AC=y' ${WORKDIR}/defconfig
     sed -i '$a\CONFIG_IEEE80211W=y' ${WORKDIR}/defconfig
