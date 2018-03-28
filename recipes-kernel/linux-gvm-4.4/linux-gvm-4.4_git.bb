@@ -215,6 +215,7 @@ do_deploy () {
     cp ${B}/vmlinux "${DEPLOY_DIR_IMAGE}/"
     if [ "X${KERNEL_PATCH}" == "Xconflict" ]; then
         touch "${DEPLOY_DIR_IMAGE}/vplatform-kernel-patch-conflict.dtb"
+        echo "kernel_patch_conflict" > "${DEPLOY_DIR_IMAGE}/vplatform-error.dtb"
     else
         cp -f ${B}/arch/${ARCH}/boot/dts/qcom/*.dtb "${DEPLOY_DIR_IMAGE}/"
     fi
