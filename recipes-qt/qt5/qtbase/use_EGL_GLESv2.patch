@@ -1,10 +1,21 @@
+From 484b47631e7371fe8d0479240089a792cc93e5b2 Mon Sep 17 00:00:00 2001
+From: Xubao Jiang <xubaoj@codeaurora.org>
+Date: Wed, 28 Mar 2018 17:33:01 +0800
+Subject: [PATCH] use EGL GLESv2
+
+Change-Id: Ie55453d273f05e0388dcd56d90650950c0b81bec
+Signed-off-by: Xubao Jiang <xubaoj@codeaurora.org>
+---
+ mkspecs/linux-oe-g++/qmake.conf | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
 diff --git a/mkspecs/linux-oe-g++/qmake.conf b/mkspecs/linux-oe-g++/qmake.conf
-index ca26b10..ea442f0 100644
+index c1837e6..8734ee0 100644
 --- a/mkspecs/linux-oe-g++/qmake.conf
 +++ b/mkspecs/linux-oe-g++/qmake.conf
-@@ -37,4 +37,12 @@ QMAKE_LINK_C_SHLIB = $(OE_QMAKE_LINK)
+@@ -37,6 +37,14 @@ QMAKE_LINK_C_SHLIB = $$(OE_QMAKE_LINK)
  # for the SDK
- isEmpty(QMAKE_QT_CONFIG):QMAKE_QT_CONFIG = $(OE_QMAKE_QT_CONFIG)
+ isEmpty(QMAKE_QT_CONFIG):QMAKE_QT_CONFIG = $$(OE_QMAKE_QT_CONFIG)
  
 +QMAKE_LIBS_EGL         += -lEGL -ldl -lglib-2.0 -lpthread
 +QMAKE_LIBS_OPENGL_ES2  += -lGLESv2 -lgsl -lEGL -ldl -lglib-2.0 -lpthread
@@ -14,4 +25,9 @@ index ca26b10..ea442f0 100644
 +
 +QT_QPA_DEFAULT_PLATFORM = wayland
 +
- load(qt_config)
+ include(../oe-device-extra.pri)
+ 
+ load(device_config)
+-- 
+1.9.1
+
