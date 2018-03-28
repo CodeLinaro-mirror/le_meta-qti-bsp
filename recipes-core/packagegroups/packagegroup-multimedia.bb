@@ -25,5 +25,3 @@ RDEPENDS_${PN} = " \
 "
 
 RDEPENDS_${PN}_remove_8x96autodvrs += "alsa-lib alsa-utils alsa-plugins"
-# Disable gstreamer1.0-omx until solve media build issue.
-RDEPENDS_${PN}_remove_8x96autodvrs += "gstreamer1.0-omx"
