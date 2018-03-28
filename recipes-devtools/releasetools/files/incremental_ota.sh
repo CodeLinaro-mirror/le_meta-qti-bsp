@@ -84,7 +84,18 @@ else
     zipinfo -1 $2 |  awk 'BEGIN { FS="SYSTEM/" } /^SYSTEM\// {print "system/" $2}' | fs_config ${FSCONFIGFOPTS} -D ${3} > target_files/META/filesystem_config.txt
 fi
 
-
 cd target_files && zip -q ../$2 META/*filesystem_config.txt SYSTEM/build.prop && cd ..
 
-./ota_from_target_files $block_based -n -v -d $device_type -v -p . -s "${WORKSPACE}/android_compat/device/qcom/common" --no_signing -i $1 $2 update_incr_$4.zip
+python_version="python3" # file-based OTA scripts have migrated to python3
+if [ "${block_based}" = "--block" ]; then
+    python_version="python2" # fall back to python2 for block-based OTA scripts
+fi
+
+$python_version ./ota_from_target_files $block_based -n -v -d $device_type -v -p . -s "${WORKSPACE}/android_compat/device/qcom/common" --no_signing -i $1 $2 update_incr_$4.zip
+
+if [[ $? = 0 ]]; then
+    echo "update.zip generation was successful"
+else
+    echo "update.zip generation failed"
+    rm update_incr_$4.zip # delete the half-baked update.zip if any;
+fi

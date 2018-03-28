@@ -7,8 +7,7 @@ SRC_URI += "file://bsp_paths.sh"
 SRC_URI += "file://set_core_pattern.sh"
 SRC_URI += "file://bsp_paths.service"
 SRC_URI += "file://set_core_pattern.service"
-
-
+SRC_URI += "file://logging-restrictions.sh"
 
 do_install_append() {
         update-rc.d -f -r ${D} mountnfs.sh remove
@@ -26,10 +25,12 @@ do_install_append() {
          if [ "${TARGET_ARCH}" = "arm" ]; then
                rm  ${D}${sysconfdir}/init.d/alignment.sh
          fi
-
          install -d ${D}${sysconfdir}/initscripts
          install -m 0755 ${WORKDIR}/bsp_paths.sh  ${D}${sysconfdir}/initscripts/bsp_paths.sh
          install -m 0755 ${WORKDIR}/set_core_pattern.sh  ${D}${sysconfdir}/initscripts/set_core_pattern.sh
+         if [ "${VARIANT}" = "user" ]; then
+                install -m 0755 ${WORKDIR}/logging-restrictions.sh  ${D}${sysconfdir}/initscripts/logging-restrictions.sh
+         fi
          install -d ${D}/etc/systemd/system/
          install -m 0644 ${WORKDIR}/bsp_paths.service -D ${D}/etc/systemd/system/bsp_paths.service
          install -d ${D}/etc/systemd/system/multi-user.target.wants/
@@ -46,6 +47,11 @@ do_install_append() {
          update-rc.d -r ${D} bsp_paths.sh start 15 2 3 4 5 .
          install -m 0755 ${WORKDIR}/set_core_pattern.sh  ${D}${sysconfdir}/init.d
          update-rc.d -r ${D} set_core_pattern.sh start 01 S 2 3 4 5 S .
+         if [ "${VARIANT}" = "user" ]; then
+                install -m 0755 ${WORKDIR}/logging-restrictions.sh  ${D}${sysconfdir}/init.d/logging-restrictions.sh
+                update-rc.d -r ${D} logging-restrictions.sh start 39 S .
+         fi
+
         fi
 
         # Remove recursive restorecon calls from populate_volatile.sh
