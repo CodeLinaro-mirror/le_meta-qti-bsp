@@ -53,6 +53,8 @@ python __anonymous () {
       d.appendVar("SRC_URI", " file://0006-camera-kernel-2nd-change-for-early-CVBS-case.patch")
       d.appendVar("SRC_URI", " file://0007-Add-RVC-trigger-gpio-in-early-usespace.patch")
 
+  if bb.utils.contains('DISTRO_FEATURES', 'mm-diet', True, False, d):
+      d.appendVar("SRC_URI", " file://0009-ARM-dts-msm-DRAM-diet-for-dvrs.patch")
   # Override KERNEL_IMAGETYPE_FOR_MAKE variable, which is internal
   # to kernel.bbclass. We override the variable as msm kernel can't
   # support alternate image builds
