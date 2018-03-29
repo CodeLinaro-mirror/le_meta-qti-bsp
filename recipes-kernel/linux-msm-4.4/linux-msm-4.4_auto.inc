@@ -106,6 +106,3 @@ do_unpack_extra () {
 
 addtask unpack_extra after do_unpack before do_patch
 
-SRC_URI_append += " \
-	file://0001-enable-rootfs-mount-as-dm-verity-target-during-boot.patch \
-"
