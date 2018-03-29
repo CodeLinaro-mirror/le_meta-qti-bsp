@@ -17,13 +17,11 @@ python __anonymous () {
       perfconf = d.getVar("KERNEL_PERF_DEFCONFIG", True)
       if perfconf:
           d.setVar("KERNEL_CONFIG", d.getVar("KERNEL_PERF_DEFCONFIG", True))
-          d.appendVar("SRC_URI", " file://0001-perf-defconfig-configure-CNSS-platform-driver.patch")
       perfcmd = d.getVar("KERNEL_PERF_CMD_PARAMS", True)
       if perfcmd:
           d.setVar("KERNEL_CMD_PARAMS", d.getVar("KERNEL_PERF_CMD_PARAMS", True))
   else:
       d.setVar("KERNEL_CONFIG", d.getVar("KERNEL_DEFCONFIG", True))
-      d.appendVar("SRC_URI", " file://0001-defconfig-configure-CNSS-platform-driver.patch")
 
   # add early_init to DISTRO_FEATURES to use early user space feature
   if bb.utils.contains('DISTRO_FEATURES', 'early_init', True, False, d) or bb.utils.contains('DISTRO_FEATURES', 'early-ethernet', True, False, d):
