@@ -18,13 +18,11 @@ python __anonymous () {
       perfconf = d.getVar("KERNEL_PERF_DEFCONFIG", True)
       if perfconf:
           d.setVar("KERNEL_CONFIG", d.getVar("KERNEL_PERF_DEFCONFIG", True))
-          d.appendVar("SRC_URI", " file://0001-perf-defconfig-configure-CNSS-platform-driver.patch")
       perfcmd = d.getVar("KERNEL_PERF_CMD_PARAMS", True)
       if perfcmd:
           d.setVar("KERNEL_CMD_PARAMS", d.getVar("KERNEL_PERF_CMD_PARAMS", True))
   else:
       d.setVar("KERNEL_CONFIG", d.getVar("KERNEL_DEFCONFIG", True))
-      d.appendVar("SRC_URI", " file://0001-defconfig-configure-CNSS-platform-driver.patch")
       d.appendVar("SRC_URI", " file://0001-net-ipv6-change-ipv6-module-initcall-level.patch")
 
   # add early_init to DISTRO_FEATURES to use early user space feature
