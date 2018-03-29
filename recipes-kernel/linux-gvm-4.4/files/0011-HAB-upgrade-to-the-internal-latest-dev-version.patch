@@ -1,23 +1,23 @@
-From af819c5f02b28970fe66c384f848a8ebab7d4259 Mon Sep 17 00:00:00 2001
+From 84a9aeb9dd8340b0c2958bf35d9ec5bd230fe6d6 Mon Sep 17 00:00:00 2001
 From: Yong Ding <yongding@codeaurora.org>
-Date: Fri, 1 Dec 2017 10:50:27 +0800
-Subject: [PATCH 2/4] soc: qcom: hab: move API func declarations to uapi.
+Date: Thu, 29 Mar 2018 17:40:35 +0800
+Subject: [PATCH] soc: qcom: hab: move API func declarations to uapi
 
 This is the temp solution before user-space hab clients
 switch to use habmm.h in mm-hab.
 
-Change-Id: I1a3b18877cc849a2ca3cf2e125ef20e0b3cdbab8
+Change-Id: Ib2d01c870fcf14543e5535a13527b2d681e33b90
 Signed-off-by: Yong Ding <yongding@codeaurora.org>
 ---
- include/linux/habmm.h      | 25 -------------------------
- include/uapi/linux/habmm.h | 20 ++++++++++++++++++++
- 2 files changed, 20 insertions(+), 25 deletions(-)
+ include/linux/habmm.h      | 36 ------------------------------------
+ include/uapi/linux/habmm.h | 31 +++++++++++++++++++++++++++++++
+ 2 files changed, 31 insertions(+), 36 deletions(-)
 
 diff --git a/include/linux/habmm.h b/include/linux/habmm.h
-index 4d3a81f..9ef8e68 100644
+index 1c27ee4..b2715e7 100644
 --- a/include/linux/habmm.h
 +++ b/include/linux/habmm.h
-@@ -11,28 +11,3 @@
+@@ -11,39 +11,3 @@
   *
   */
  #include <uapi/linux/habmm.h>
@@ -45,12 +45,23 @@ index 4d3a81f..9ef8e68 100644
 -int32_t habmm_unimport(int32_t handle, uint32_t export_id, void *buff_shared,
 -		       uint32_t flags);
 -
+-struct hab_socket_info {
+-	int32_t vmid_remote; /* habmm's vmid */
+-	int32_t vmid_local;
+-	/* name from hypervisor framework if available */
+-	char    vmname_remote[12];
+-	char    vmname_local[12];
+-};
+-
+-int32_t habmm_socket_query(int32_t handle, struct hab_socket_info *info,
+-		uint32_t flags);
+-
 -#endif
 diff --git a/include/uapi/linux/habmm.h b/include/uapi/linux/habmm.h
-index 59b603a0..9081ba4 100644
+index b1b6561f..4b62f5e 100644
 --- a/include/uapi/linux/habmm.h
 +++ b/include/uapi/linux/habmm.h
-@@ -3,6 +3,26 @@
+@@ -3,6 +3,37 @@
  
  #include <linux/types.h>
  
@@ -73,6 +84,17 @@ index 59b603a0..9081ba4 100644
 +		     uint32_t export_id, uint32_t flags);
 +int32_t habmm_unimport(int32_t handle, uint32_t export_id, void *buff_shared,
 +		       uint32_t flags);
++
++struct hab_socket_info {
++	int32_t vmid_remote; /* habmm's vmid */
++	int32_t vmid_local;
++	/* name from hypervisor framework if available */
++	char    vmname_remote[12];
++	char    vmname_local[12];
++};
++
++int32_t habmm_socket_query(int32_t handle, struct hab_socket_info *info,
++		uint32_t flags);
 +
  struct hab_send {
  	__u64 data;
