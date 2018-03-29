@@ -1,4 +1,4 @@
-From 303dd813226245c13b7ba2a60d72183577b6176a Mon Sep 17 00:00:00 2001
+From ceaaddcab1ec632b1b8cadd68f5cbb282afa13f9 Mon Sep 17 00:00:00 2001
 From: Yimin Peng <yiminp@codeaurora.org>
 Date: Mon, 26 Feb 2018 15:54:28 +0800
 Subject: [PATCH] trigger wdog bite for panic on gvm.
@@ -6,21 +6,56 @@ Subject: [PATCH] trigger wdog bite for panic on gvm.
 Change-Id: If5d695af44838326203ced3b553c74843a0c52ff
 Signed-off-by: Yimin Peng <yiminp@codeaurora.org>
 ---
- kernel/panic.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ drivers/soc/qcom/watchdog_v2.c | 8 ++++++++
+ kernel/panic.c                 | 6 ++++++
+ 2 files changed, 14 insertions(+)
 
+diff --git a/drivers/soc/qcom/watchdog_v2.c b/drivers/soc/qcom/watchdog_v2.c
+index 625030f1..79115db 100644
+--- a/drivers/soc/qcom/watchdog_v2.c
++++ b/drivers/soc/qcom/watchdog_v2.c
+@@ -472,6 +472,13 @@ void msm_trigger_wdog_bite(void)
+ 	if (!wdog_data)
+ 		return;
+ 	pr_info("Causing a watchdog bite!");
++#ifdef CONFIG_MSM_GVM_QUIN
++	__raw_writel(1*WDT_HZ, wdog_data->base + WDT0_BARK_TIME);
++	__raw_writel(1*WDT_HZ, wdog_data->base + WDT0_BITE_TIME);
++	__raw_writel(1, wdog_data->base + WDT0_RST);
++	mb();
++	mdelay(1000);
++#else
+ 	__raw_writel(1, wdog_data->base + WDT0_BITE_TIME);
+ 	mb();
+ 	__raw_writel(1, wdog_data->base + WDT0_RST);
+@@ -483,6 +490,7 @@ void msm_trigger_wdog_bite(void)
+ 		__raw_readl(wdog_data->base + WDT0_EN),
+ 		__raw_readl(wdog_data->base + WDT0_BARK_TIME),
+ 		__raw_readl(wdog_data->base + WDT0_BITE_TIME));
++#endif
+ }
+ 
+ static irqreturn_t wdog_bark_handler(int irq, void *dev_id)
 diff --git a/kernel/panic.c b/kernel/panic.c
-index 75f564a..24b7360 100644
+index 75f564a..a5ab282 100644
 --- a/kernel/panic.c
 +++ b/kernel/panic.c
-@@ -187,7 +187,10 @@ void panic(const char *fmt, ...)
- 	}
+@@ -47,6 +47,9 @@ ATOMIC_NOTIFIER_HEAD(panic_notifier_list);
+ 
+ EXPORT_SYMBOL(panic_notifier_list);
+ 
++#ifdef CONFIG_MSM_GVM_QUIN
++extern void msm_trigger_wdog_bite(void);
++#endif
+ static long no_blink(int state)
+ {
+ 	return 0;
+@@ -188,6 +191,9 @@ void panic(const char *fmt, ...)
  
  	trace_kernel_panic_late(0);
--
+ 
 +#ifdef CONFIG_MSM_GVM_QUIN
-+	pr_info("gvm delay 20s for backend wdog bite!\n");
-+	mdelay(20000);
++msm_trigger_wdog_bite();
 +#endif
  	if (panic_timeout != 0) {
  		/*
