@@ -15,8 +15,6 @@ IMAGE_INSTALL += "libcap"
 IMAGE_INSTALL += "strongswan"
 IMAGE_INSTALL += "reboot-daemon"
 
-IMAGE_INSTALL += "computelibrary"
-
 # Perf
 IMAGE_INSTALL += "${@bb.utils.contains("DISTRO_FEATURES", "early_init", "memory-hotplug", "" ,d)}"
 IMAGE_INSTALL += "${@bb.utils.contains("DISTRO_FEATURES", "early-ethernet", "memory-hotplug", "" ,d)}"

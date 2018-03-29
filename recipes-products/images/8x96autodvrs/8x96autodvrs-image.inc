@@ -14,7 +14,6 @@ IMAGE_INSTALL += "libcap"
 IMAGE_INSTALL += "init-mss"
 IMAGE_INSTALL += "strongswan"
 IMAGE_INSTALL += "reboot-daemon"
-IMAGE_INSTALL += "computelibrary"
 
 IMAGE_INSTALL += "qtbase-examples"
 IMAGE_INSTALL += "qtmultimedia"
