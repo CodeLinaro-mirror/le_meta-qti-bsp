@@ -18,8 +18,6 @@ python __anonymous () {
       perfconf = d.getVar("KERNEL_PERF_DEFCONFIG", True)
       if perfconf:
           d.setVar("KERNEL_CONFIG", d.getVar("KERNEL_PERF_DEFCONFIG", True))
-          d.appendVar("SRC_URI", " file://0001-automotive-add-boot-marker.patch")
-          d.appendVar("SRC_URI", " file://0002-driver-core-remove-lock-for-platform-devices.patch")
           d.appendVar("SRC_URI", " file://0001-perf-defconfig-configure-CNSS-platform-driver.patch")
       perfcmd = d.getVar("KERNEL_PERF_CMD_PARAMS", True)
       if perfcmd:
