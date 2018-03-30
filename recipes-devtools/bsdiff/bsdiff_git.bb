@@ -16,3 +16,5 @@ EXTRA_OECONF = "--with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include 
                 --with-core-headers=${STAGING_INCDIR_NATIVE}"
 
 BBCLASSEXTEND = "native"
+
+DEPENDS += "bzip2"
