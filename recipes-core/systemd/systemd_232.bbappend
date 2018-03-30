@@ -30,14 +30,3 @@ do_install_append () {
   install -m 0644 ${WORKDIR}/systemd-udev-trigger-full.service ${D}${systemd_unitdir}/system/
   ln -sf ../systemd-udev-trigger-full.service ${D}${systemd_unitdir}/system/multi-user.target.wants/systemd-udev-trigger-full.service
 }
-
-pkg_postinst_${PN} () {
-    if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
-        if [ -n "$D" ]; then
-            OPTS="--root=$D"
-        fi
-        systemctl $OPTS mask systemd-rfkill.service
-        systemctl $OPTS mask systemd-rfkill.socket
-    fi
-}
-

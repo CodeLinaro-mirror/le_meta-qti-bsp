@@ -95,8 +95,8 @@ PACKAGECONFIG ??= "xz \
 PACKAGECONFIG_remove_libc-musl = "selinux"
 PACKAGECONFIG_remove_libc-musl = "smack"
 
-# remove timesyncd
-PACKAGECONFIG_remove += "timesyncd"
+# remove timesyncd,ima,machined,quotacheck,rfkill,backlight,binfmt
+PACKAGECONFIG_remove += "timesyncd ima machined quotacheck rfkill backlight binfmt"
 
 # Use the upstream systemd serial-getty@.service and rely on
 # systemd-getty-generator instead of using the OE-core specific
@@ -272,8 +272,8 @@ do_install() {
 
 	# Enable journal to forward message to syslog daemon
 	sed -i -e 's/.*ForwardToSyslog.*/ForwardToSyslog=yes/' ${D}${sysconfdir}/systemd/journald.conf
-	# Set the maximium size of runtime journal to 64M as default
-	sed -i -e 's/.*RuntimeMaxUse.*/RuntimeMaxUse=64M/' ${D}${sysconfdir}/systemd/journald.conf
+	# Set the maximium size of runtime journal to 512k as default
+	sed -i -e 's/.*RuntimeMaxUse.*/RuntimeMaxUse=512K/' ${D}${sysconfdir}/systemd/journald.conf
 
 	# this file is needed to exist if networkd is disabled but timesyncd is still in use since timesyncd checks it
 	# for existence else it fails

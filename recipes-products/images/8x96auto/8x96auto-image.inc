@@ -101,6 +101,7 @@ IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'libaf
 IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'web-runtime', '',d)}"
 
 #Always remove below modules
+IMAGE_INSTALL_remove += "firmware-links"
 IMAGE_INSTALL_remove += "neutrino-eth"
 IMAGE_INSTALL_remove += "packagegroup-agl-demo-platform"
 
