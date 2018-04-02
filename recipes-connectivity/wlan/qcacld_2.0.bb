@@ -17,7 +17,7 @@ SRC_URI = "file://wlan/qcacld-2.0/ \
 DEPENDS = "virtual/kernel"
 
 S = "${WORKDIR}/wlan/qcacld-2.0"
-S_STRIPPED = "${WORKDIR}/package/lib/modules/${KERNEL_VERSION}/extra"
+S_STRIPPED = "${WORKDIR}/packages-split/kernel-module-${WLAN_MODULE_NAME}-${KERNEL_VERSION}/lib/modules/${KERNEL_VERSION}/extra"
 
 inherit module kernel-arch qperf
 inherit module update-rc.d
@@ -92,4 +92,4 @@ FILES_kernel-module-${WLAN_MODULE_NAME}-${KERNEL_VERSION} = "/lib/modules/${KERN
 INCSUFFIX = "${@base_conditional('MACHINEGROUP', 'auto', 'qcacld-2.0_auto', 'none',d)}"
 include ${INCSUFFIX}.inc
 
-addtask do_sign after do_package before do_package_write_rpm
+addtask do_sign after do_package before do_package_write_ipk
