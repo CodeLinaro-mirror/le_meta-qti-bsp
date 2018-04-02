@@ -26,6 +26,7 @@ PACKAGECONFIG = " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'wayland', '', d)} \
     orc \
     hls \
+    sbc \
     "
 #rb1.4    sbc 
 
