@@ -1,3 +1,5 @@
+INSANE_SKIP_${PN} += " installed-vs-shipped"
+
 FILESEXTRAPATHS_prepend := "${WORKSPACE}:"
 
 SRC_URI = "\
@@ -10,6 +12,8 @@ B = "${WORKDIR}/external/strongswan"
 
 PV = "5.5.2"
 PR = "r0"
+
+DEPENDS += "gperf-native"
 
 FILE_DIRNAME = "${WORKSPACE}/poky/meta-qti-bsp/recipes-security/strongswan"
 
