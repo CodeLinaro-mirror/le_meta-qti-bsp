@@ -6,6 +6,7 @@ EXTRA_OECONF_remove = "--with-logd-logging"
 
 SRC_URI += "file://0001-post_boot-Run-install-recovery.sh-to-update-recovery.patch"
 SRC_URI += "file://0001-Delete-empty-files-after-recovery-updates.patch"
+SRC_URI += "file://0001-system-core-usb-Avoid-setting-serial-number-with-spa.patch"
 
 do_install_append() {
    if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then

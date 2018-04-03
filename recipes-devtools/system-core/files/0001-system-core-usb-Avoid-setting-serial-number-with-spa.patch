@@ -1,0 +1,37 @@
+From 77e7abfff82d8de82c8014f1bc7bf78e846234f4 Mon Sep 17 00:00:00 2001
+From: Gustavo Solaira <gustavos@codeaurora.org>
+Date: Tue, 20 Mar 2018 17:29:06 -0700
+Subject: [PATCH] system: core: usb: Avoid setting serial number with spaces
+
+Don't assume serial number passed via boot command line is 8
+characters. Use a more robust grep/cut sequence to extract the
+value from androidboot.serialno in the command line.
+
+Change-Id: I4d03186f2e5d8b378dba814c360dcc39e25c55d6
+---
+ usb/start_usb | 9 ++-------
+ 1 file changed, 2 insertions(+), 7 deletions(-)
+
+diff --git a/usb/start_usb b/usb/start_usb
+index a727c82..ac1c6cf 100644
+--- a/usb/start_usb
++++ b/usb/start_usb
+@@ -47,13 +47,8 @@ case "$1" in
+ 	echo "soc:" $socplatform
+ 
+ 	# find serialno from cmdline
+-	cmdline=`cat /proc/cmdline` 2> /dev/null
+-	strsearch="androidboot.serialno="
+-	if echo "$cmdline" | grep -q "$strsearch"; then
+-		startsearch=${cmdline#*$strsearch}
+-		pos=$(( ${#cmdline} - ${#startsearch}))
+-		serialno=${cmdline:$pos:8}
+-	else
++	serialno=`cat /proc/cmdline | grep -o "androidboot.serialno=[A-Za-z0-9]*" | cut -d "=" -f2`
++	if [ "$serialno" == "" ]; then
+ 		echo "serialno not found with cmdline, use default"
+ 		serialno="12345678"
+ 	fi
+-- 
+1.9.1
+
