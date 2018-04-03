@@ -132,7 +132,7 @@ IMAGE_INSTALL += "sqlite"
 IMAGE_INSTALL += "sqlite-bin"
 
 # meta-ivi tests
-IMAGE_INSTALL += "common-api-test"
+#IMAGE_INSTALL += "common-api-test"
 IMAGE_INSTALL += "dlt-daemon-test"
 
 # libcap
