@@ -1,0 +1,52 @@
+From f7ff186f7e120262464670c5f89bc944b987da09 Mon Sep 17 00:00:00 2001
+From: Baji Patthan <c_bpatth@codeaurora.org>
+Date: Tue, 9 Jan 2018 18:41:32 -0800
+Subject: [PATCH] ion_dummy chnages needed for kernel
+
+Change-Id: I60b0ecf0233b9fbcb0e880803353baa13b559119
+Signed-off-by: Baji Patthan <c_bpatth@codeaurora.org>
+---
+ drivers/soc/qcom/qdsp6v2/msm_audio_ion_vm.c | 3 ++-
+ drivers/staging/android/ion/ion.c           | 5 -----
+ 2 files changed, 2 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/soc/qcom/qdsp6v2/msm_audio_ion_vm.c b/drivers/soc/qcom/qdsp6v2/msm_audio_ion_vm.c
+index afc4046..a3aa882 100644
+--- a/drivers/soc/qcom/qdsp6v2/msm_audio_ion_vm.c
++++ b/drivers/soc/qcom/qdsp6v2/msm_audio_ion_vm.c
+@@ -22,6 +22,7 @@
+ #include <linux/msm_audio_ion.h>
+ #include <linux/habmm.h>
+ #include "../../../staging/android/ion/ion_priv.h"
++#include "../../../staging/android/ion/ion_hvenv_driver.h"
+ 
+ #define MSM_AUDIO_ION_PROBED (1 << 0)
+ 
+@@ -627,7 +628,7 @@ struct ion_client *msm_audio_ion_client_create(const char *name)
+ {
+ 	struct ion_client *pclient = NULL;
+ 
+-	pclient = msm_ion_client_create(name);
++	pclient = hvenv_ion_client_create(name);
+ 	return pclient;
+ }
+ 
+diff --git a/drivers/staging/android/ion/ion.c b/drivers/staging/android/ion/ion.c
+index f5a81fc..067cd58 100644
+--- a/drivers/staging/android/ion/ion.c
++++ b/drivers/staging/android/ion/ion.c
+@@ -1561,11 +1561,6 @@ static int ion_sync_for_device(struct ion_client *client, int fd)
+ 	}
+ 	buffer = dmabuf->priv;
+ 
+-	if (get_secure_vmid(buffer->flags) > 0) {
+-		pr_err("%s: cannot sync a secure dmabuf\n", __func__);
+-		dma_buf_put(dmabuf);
+-		return -EINVAL;
+-	}
+ 	dma_sync_sg_for_device(NULL, buffer->sg_table->sgl,
+ 			       buffer->sg_table->nents, DMA_BIDIRECTIONAL);
+ 	dma_buf_put(dmabuf);
+-- 
+1.9.1
+
