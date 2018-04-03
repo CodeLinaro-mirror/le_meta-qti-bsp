@@ -1,0 +1,62 @@
+From 18e1c5664286851be0ada079ba4c28eedda27e22 Mon Sep 17 00:00:00 2001
+From: Lei wang <leiwan@codeaurora.org>
+Date: Fri, 30 Mar 2018 18:23:34 +0800
+Subject: [PATCH] kernel: postpone some drivers for early RVC
+
+postone thermal/poweroff key/ladder/menu
+
+Change-Id: I3156d66af4cddb7ba4f94cab3fddc6d88e72b228
+Signed-off-by: Lei wang <leiwan@codeaurora.org>
+---
+ drivers/cpuidle/governors/ladder.c | 2 +-
+ drivers/cpuidle/governors/menu.c   | 2 +-
+ drivers/thermal/msm_thermal.c      | 2 +-
+ kernel/power/poweroff.c            | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/cpuidle/governors/ladder.c b/drivers/cpuidle/governors/ladder.c
+index 401c0106ed34..40cc030b3f1f 100644
+--- a/drivers/cpuidle/governors/ladder.c
++++ b/drivers/cpuidle/governors/ladder.c
+@@ -187,4 +187,4 @@ static int __init init_ladder(void)
+ 	return cpuidle_register_governor(&ladder_governor);
+ }
+ 
+-postcore_initcall(init_ladder);
++device_initcall(init_ladder);
+diff --git a/drivers/cpuidle/governors/menu.c b/drivers/cpuidle/governors/menu.c
+index 0846b39b4ca6..59711e3c4757 100644
+--- a/drivers/cpuidle/governors/menu.c
++++ b/drivers/cpuidle/governors/menu.c
+@@ -486,4 +486,4 @@ static int __init init_menu(void)
+ 	return cpuidle_register_governor(&menu_governor);
+ }
+ 
+-postcore_initcall(init_menu);
++device_initcall(init_menu);
+diff --git a/drivers/thermal/msm_thermal.c b/drivers/thermal/msm_thermal.c
+index 7beef24035f8..1f0f58c06078 100644
+--- a/drivers/thermal/msm_thermal.c
++++ b/drivers/thermal/msm_thermal.c
+@@ -7578,7 +7578,7 @@ int __init msm_thermal_device_init(void)
+ {
+ 	return platform_driver_register(&msm_thermal_device_driver);
+ }
+-arch_initcall(msm_thermal_device_init);
++device_initcall(msm_thermal_device_init);
+ 
+ int __init msm_thermal_late_init(void)
+ {
+diff --git a/kernel/power/poweroff.c b/kernel/power/poweroff.c
+index 7ef6866b521d..79d2094bcaf3 100644
+--- a/kernel/power/poweroff.c
++++ b/kernel/power/poweroff.c
+@@ -43,4 +43,4 @@ static int __init pm_sysrq_init(void)
+ 	return 0;
+ }
+ 
+-subsys_initcall(pm_sysrq_init);
++device_initcall(pm_sysrq_init);
+-- 
+2.14.0.rc1.14.gc3eb4e6
+
