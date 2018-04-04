@@ -198,7 +198,6 @@ do_deploy () {
         extra_mkbootimg_params='--dt ${D}/${KERNEL_IMAGEDEST}/masterDTB --tags-addr ${KERNEL_TAGS_OFFSET}'
     fi
 
-    mkdir -p ${DEPLOY_DIR_IMAGE}
     if [ ${KERNEL_IMAGETYPE} == "Image" ]; then
 	packkernelimg --kernel "${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}" --dt "${B}/arch/${ARCH}/boot/dts/qcom" --dt_list "${KERNEL_DTB_LIST}"
     fi
@@ -210,15 +209,15 @@ do_deploy () {
         --pagesize ${PAGE_SIZE} \
         --base ${KERNEL_BASE} \
         --ramdisk_offset 0x0 \
-        ${extra_mkbootimg_params} --output ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img
-    cp ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} "${DEPLOY_DIR_IMAGE}/"
-    cp ${B}/vmlinux "${DEPLOY_DIR_IMAGE}/"
+        ${extra_mkbootimg_params} --output ${DEPLOYDIR}/${MACHINE}-boot.img
+    cp ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} "${DEPLOYDIR}/"
+    cp ${B}/vmlinux "${DEPLOYDIR}/"
     if [ "X${KERNEL_PATCH}" == "Xconflict" ]; then
-        echo "kernel_patch_conflict" > "${DEPLOY_DIR_IMAGE}/vplatform-error.dtb"
+        echo "kernel_patch_conflict" > "${DEPLOYDIR}/vplatform-error.dtb"
     else
-        cp -f ${B}/arch/${ARCH}/boot/dts/qcom/*.dtb "${DEPLOY_DIR_IMAGE}/"
+        cp -f ${B}/arch/${ARCH}/boot/dts/qcom/*.dtb "${DEPLOYDIR}/"
     fi
-    cp -f ${B}/arch/${ARCH}/boot/Image "${DEPLOY_DIR_IMAGE}/linux.img"
+    cp -f ${B}/arch/${ARCH}/boot/Image "${DEPLOYDIR}/linux.img"
 }
 
 # Including the file depends on chipset
