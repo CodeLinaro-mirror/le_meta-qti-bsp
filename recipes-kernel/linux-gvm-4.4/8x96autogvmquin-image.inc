@@ -32,6 +32,6 @@ SRC_URI_append += " \
 "
 
 do_deploy_rename () {
-    mv ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img ${DEPLOY_DIR_IMAGE}/boot.img
+    mv ${DEPLOYDIR}/${MACHINE}-boot.img ${DEPLOYDIR}/boot.img
 }
 do_deploy[postfuncs] += "do_deploy_rename"
