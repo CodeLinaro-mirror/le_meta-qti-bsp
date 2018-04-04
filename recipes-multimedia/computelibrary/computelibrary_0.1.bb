@@ -25,3 +25,5 @@ do_install_append() {
 
 FILES_${PN} += "${libdir}/*.so"
 INSANE_SKIP_${PN}-dev += "dev-elf"
+
+ALLOW_EMPTY_${PN} = "1"
