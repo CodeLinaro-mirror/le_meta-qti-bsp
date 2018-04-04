@@ -61,7 +61,6 @@ SRC_URI_append_kernelpatchok += " \
     file://0011-Add-psci-workaround-for-gvm-suspend.patch \
     file://0012-unmask-virtio-net-irq-to-wake-up-system.patch \
     file://0014-trigger-wdog-bite-for-panic-on-gvm.patch \
-    file://0021-automotive-add-boot-time-marker-for-LV-GVM.patch \
     file://0022-cnss-change-pcie-fw-path-for-dual-wifi-support.patch \
 "
 
