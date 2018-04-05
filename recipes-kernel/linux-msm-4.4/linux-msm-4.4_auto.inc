@@ -85,22 +85,16 @@ do_deploy[postfuncs] += "do_deploy_rename"
 
 do_unpack_extra () {
     if [ ${@d.getVar("MACHINE", True)} == "8x96auto" ] || [ ${@d.getVar("MACHINE", True)} == "8x96autodvrs" ]; then
-        mkdir -p ${S}/drivers/net/ethernet/neutrino
-        cp -f ${WORKSPACE}/vehiclenetwork/ethernet/* ${S}/drivers/net/ethernet/neutrino/
-        rm ${S}/drivers/net/ethernet/neutrino/Makefile
-        rm ${S}/drivers/net/ethernet/neutrino/Makefile.am
-        rm ${S}/drivers/net/ethernet/neutrino/Kbuild
-        mv ${S}/drivers/net/ethernet/neutrino/Makefile.builtin ${S}/drivers/net/ethernet/neutrino/Makefile
-        echo "source \"drivers/net/ethernet/neutrino/Kconfig"\" >> ${S}/drivers/net/ethernet/Kconfig
-        echo "obj-y += neutrino/" >> ${S}/drivers/net/ethernet/Makefile
-
-        mkdir -p ${S}/drivers/net/ethernet/neutrino_app
-        cp -f ${WORKSPACE}/vehiclenetwork/ethernet/DWC_ETH_QOS_app.c ${S}/drivers/net/ethernet/neutrino_app/
-        cp -f ${WORKSPACE}/vehiclenetwork/ethernet/Makefile_app ${S}/drivers/net/ethernet/neutrino_app/Makefile
-        cp -f ${WORKSPACE}/vehiclenetwork/ethernet/Kconfig_app ${S}/drivers/net/ethernet/neutrino_app/Kconfig
-        echo "source \"drivers/net/ethernet/neutrino_app/Kconfig"\" >> ${S}/drivers/net/ethernet/Kconfig
-        echo "obj-y += neutrino_app/" >> ${S}/drivers/net/ethernet/Makefile
-
+        if ${@bb.utils.contains('DISTRO_FEATURES','early-ethernet','true','false',d)}; then
+            mkdir -p ${S}/drivers/net/ethernet/neutrino
+            cp -f ${WORKSPACE}/vehiclenetwork/ethernet/* ${S}/drivers/net/ethernet/neutrino/
+            rm ${S}/drivers/net/ethernet/neutrino/Makefile
+            rm ${S}/drivers/net/ethernet/neutrino/Makefile.am
+            rm ${S}/drivers/net/ethernet/neutrino/Kbuild
+            mv ${S}/drivers/net/ethernet/neutrino/Makefile.builtin ${S}/drivers/net/ethernet/neutrino/Makefile
+            echo "source \"drivers/net/ethernet/neutrino/Kconfig"\" >> ${S}/drivers/net/ethernet/Kconfig
+            echo "obj-y += neutrino/" >> ${S}/drivers/net/ethernet/Makefile
+        fi
     fi
 }
 
