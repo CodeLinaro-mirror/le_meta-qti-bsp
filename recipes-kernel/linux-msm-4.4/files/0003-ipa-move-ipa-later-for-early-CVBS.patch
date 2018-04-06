@@ -1,0 +1,27 @@
+From 30b4420a778b8e7d036448ee58cee4dd17e74eb6 Mon Sep 17 00:00:00 2001
+From: Lei wang <leiwan@codeaurora.org>
+Date: Fri, 16 Mar 2018 15:40:47 +0800
+Subject: [PATCH] ipa: move ipa later for early CVBS
+
+Change-Id: Iecb0cd8ccaf6006cacf4886a79c1ee0eeaeb2465
+Signed-off-by: Lei wang <leiwan@codeaurora.org>
+---
+ drivers/platform/msm/ipa/ipa_api.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/platform/msm/ipa/ipa_api.c b/drivers/platform/msm/ipa/ipa_api.c
+index bc0263c..35ea498 100644
+--- a/drivers/platform/msm/ipa/ipa_api.c
++++ b/drivers/platform/msm/ipa/ipa_api.c
+@@ -2984,7 +2984,7 @@ static int __init ipa_module_init(void)
+ 	/* Register as a platform device driver */
+ 	return platform_driver_register(&ipa_plat_drv);
+ }
+-subsys_initcall(ipa_module_init);
++module_init(ipa_module_init);
+ 
+ MODULE_LICENSE("GPL v2");
+ MODULE_DESCRIPTION("IPA HW device driver");
+-- 
+1.9.1
+

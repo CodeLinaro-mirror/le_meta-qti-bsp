@@ -30,7 +30,7 @@ python __anonymous () {
       d.appendVar("SRC_URI", " file://0003-init-early-user-space.patch")
       d.appendVar("SRC_URI", " file://0004-kernel-display-support-early-init.patch")
       d.appendVar("SRC_URI", " file://0001-drm-msm-workaround-for-saving-1.5s-of-HDMI-bridge-in.patch")
-      d.appendVar("SRC_URI", " file://0001-kernel-sysrq-postpone-shutdown-magic-key-register.patch")
+      d.appendVar("SRC_URI", " file://0003-kernel-postpone-some-drivers-for-early-RVC.patch")
       d.appendVar("KERNEL_CMD_PARAMS", " mem=1G")
 
   if bb.utils.contains('DISTRO_FEATURES', 'early-ethernet', True, False, d):
@@ -48,6 +48,7 @@ python __anonymous () {
       d.appendVar("SRC_URI", " file://0006-camera-kernel-changes-for-early-CVBS-case.patch")
       d.appendVar("SRC_URI", " file://0006-camera-kernel-2nd-change-for-early-CVBS-case.patch")
       d.appendVar("SRC_URI", " file://0007-Add-RVC-trigger-gpio-in-early-usespace.patch")
+      d.appendVar("SRC_URI", " file://0003-ipa-move-ipa-later-for-early-CVBS.patch")
 
   if bb.utils.contains('DISTRO_FEATURES', 'mm-diet', True, False, d):
       d.appendVar("SRC_URI", " file://0009-ARM-dts-msm-DRAM-diet-for-dvrs.patch")
