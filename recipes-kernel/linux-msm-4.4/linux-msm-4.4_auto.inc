@@ -79,9 +79,9 @@ SRC_URI_append_8x96auto += " \
     file://0008-ARM-dts-msm-DRAM-diet-for-APQ8096.patch \
 "
 do_deploy_rename () {
-    mv ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img ${DEPLOY_DIR_IMAGE}/boot.img
+    mv ${DEPLOYDIR}/${MACHINE}-boot.img ${DEPLOYDIR}/boot.img
 }
-addtask deploy_rename after do_deploy before do_packagedata
+do_deploy[postfuncs] += "do_deploy_rename"
 
 do_unpack_extra () {
     if [ ${@d.getVar("MACHINE", True)} == "8x96auto" ] || [ ${@d.getVar("MACHINE", True)} == "8x96autodvrs" ]; then
