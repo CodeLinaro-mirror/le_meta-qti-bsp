@@ -41,6 +41,7 @@ IMAGE_INSTALL += "node-startup-controller"
 IMAGE_INSTALL += "node-startup-controller-nsm-dummy"
 
 IMAGE_INSTALL_remove += "synergy synergy-opensource synergy-bt-app"
+IMAGE_INSTALL_remove += "qcacld sigma-dut hostapd wpa-supplicant iw wireless-tools"
 IMAGE_INSTALL_remove += "pulseaudio-module-acdb pulseaudio-module-codec-control"
 IMAGE_INSTALL_remove += "init-can"
 IMAGE_INSTALL_remove += "af-main af-binder af-binder-binding-afb-dbus-binding af-binder-binding-authlogin libafbwsc"
