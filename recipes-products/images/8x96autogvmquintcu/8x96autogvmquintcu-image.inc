@@ -106,7 +106,6 @@ IMAGE_INSTALL += "loc-hal"
 IMAGE_INSTALL += "loc-net-iface"
 
 # modem pass through
-IMAGE_INSTALL += "ril"
 #IMAGE_INSTALL += "sqlite3"
 IMAGE_INSTALL += "system-core"
 IMAGE_INSTALL += "system-prop"
