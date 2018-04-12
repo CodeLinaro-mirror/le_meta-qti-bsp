@@ -75,9 +75,6 @@ KERNEL_EXTRACONFIGS
 }
 
 
-SRC_URI_append_8x96auto += " \
-    file://0008-ARM-dts-msm-DRAM-diet-for-APQ8096.patch \
-"
 do_deploy_rename () {
     mv ${DEPLOYDIR}/${MACHINE}-boot.img ${DEPLOYDIR}/boot.img
 }
