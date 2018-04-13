@@ -46,8 +46,11 @@ python __anonymous () {
       d.appendVar("SRC_URI", " file://0001-init-kernel-put-neutrino-driver-after-fs-ready.patch")
 
   if bb.utils.contains('DISTRO_FEATURES', 'early_init', True, False, d):
-      d.appendVar("SRC_URI", " file://0006-camera-kernel-changes-for-early-CVBS-case.patch")
-      d.appendVar("SRC_URI", " file://0006-camera-kernel-2nd-change-for-early-CVBS-case.patch")
+      if d.getVar('BASEMACHINE', True) == '8x96autodvrs':
+	      d.appendVar("SRC_URI", " file://0006-camera-kernel-change-for-early-digital-case.patch")
+      else:
+          d.appendVar("SRC_URI", " file://0006-camera-kernel-changes-for-early-CVBS-case.patch")
+          d.appendVar("SRC_URI", " file://0006-camera-kernel-2nd-change-for-early-CVBS-case.patch")
       d.appendVar("SRC_URI", " file://0007-Add-RVC-trigger-gpio-in-early-usespace.patch")
       d.appendVar("SRC_URI", " file://0003-ipa-move-ipa-later-for-early-CVBS.patch")
 

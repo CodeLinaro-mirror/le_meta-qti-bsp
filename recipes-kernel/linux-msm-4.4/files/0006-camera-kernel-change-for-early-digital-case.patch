@@ -1,0 +1,262 @@
+From 22a466941e81711c768c22cb0cbb4b29c2a70f9b Mon Sep 17 00:00:00 2001
+From: Andy Sun <bins@codeaurora.org>
+Date: Fri, 13 Apr 2018 14:56:14 +0800
+Subject: [PATCH 1/1] camera: changes for early digital case
+
+Disable actuator and ADV bridge devices in DTS;
+Make FPD-Link camera related modules load earlier;
+Add boot marker in isp driver;
+
+Change-Id: Iaa604547c83e01595b2c57ce1b92dfb1aa89b6a8
+Signed-off-by: Andy Sun <bins@codeaurora.org>
+---
+ arch/arm/boot/dts/qcom/msm8996-camera-sensor-adp.dtsi            | 4 +++-
+ drivers/media/platform/msm/ais/common/cam_smmu_api.c             | 2 +-
+ drivers/media/platform/msm/ais/isp/msm_isp.c                     | 8 +++++++-
+ drivers/media/platform/msm/ais/isp/msm_isp47.c                   | 2 +-
+ drivers/media/platform/msm/ais/ispif/msm_ispif.c                 | 2 +-
+ drivers/media/platform/msm/ais/msm.c                             | 2 +-
+ drivers/media/platform/msm/ais/msm_ais_mgr/msm_ais_mgr.c         | 2 +-
+ drivers/media/platform/msm/ais/msm_buf_mgr/msm_generic_buf_mgr.c | 2 +-
+ drivers/media/platform/msm/ais/sensor/cci/msm_cci.c              | 2 +-
+ drivers/media/platform/msm/ais/sensor/cci/msm_early_cam.c        | 2 +-
+ drivers/media/platform/msm/ais/sensor/csid/msm_csid.c            | 2 +-
+ drivers/media/platform/msm/ais/sensor/csiphy/msm_csiphy.c        | 2 +-
+ drivers/media/platform/msm/ais/sensor/msm_sensor_driver.c        | 2 +-
+ drivers/media/platform/msm/ais/sensor/msm_sensor_init.c          | 2 +-
+ 14 files changed, 22 insertions(+), 14 deletions(-)
+
+diff --git a/arch/arm/boot/dts/qcom/msm8996-camera-sensor-adp.dtsi b/arch/arm/boot/dts/qcom/msm8996-camera-sensor-adp.dtsi
+index 31139c0..77ef34d 100644
+--- a/arch/arm/boot/dts/qcom/msm8996-camera-sensor-adp.dtsi
++++ b/arch/arm/boot/dts/qcom/msm8996-camera-sensor-adp.dtsi
+@@ -25,6 +25,7 @@
+ 	actuator0: qcom,actuator@0 {
+ 		cell-index = <0>;
+ 		reg = <0x0>;
++		status = "disabled";
+ 		compatible = "qcom,actuator";
+ 		qcom,cci-master = <0>;
+ 		cam_vaf-supply = <&pm8994_l23>;
+@@ -37,6 +38,7 @@
+ 	actuator1: qcom,actuator@1 {
+ 		cell-index = <1>;
+ 		reg = <0x1>;
++		status = "disabled";
+ 		compatible = "qcom,actuator";
+ 		qcom,cci-master = <1>;
+ 		cam_vaf-supply = <&pm8994_l23>;
+@@ -188,7 +190,7 @@
+ 		qcom,sensor-position = <0>;
+ 		qcom,sensor-mode = <0>;
+ 		qcom,cci-master = <0>;
+-		status = "ok";
++		status = "disabled";
+ 		clocks = <&clock_mmss clk_mclk1_clk_src>,
+ 			<&clock_mmss clk_camss_mclk1_clk>;
+ 		clock-names = "cam_src_clk", "cam_clk";
+diff --git a/drivers/media/platform/msm/ais/common/cam_smmu_api.c b/drivers/media/platform/msm/ais/common/cam_smmu_api.c
+index 0f0e145..66a7843 100644
+--- a/drivers/media/platform/msm/ais/common/cam_smmu_api.c
++++ b/drivers/media/platform/msm/ais/common/cam_smmu_api.c
+@@ -1674,7 +1674,7 @@ static void __exit cam_smmu_exit_module(void)
+ 	platform_driver_unregister(&cam_smmu_driver);
+ }
+ 
+-module_init(cam_smmu_init_module);
++fs_initcall(cam_smmu_init_module);
+ module_exit(cam_smmu_exit_module);
+ MODULE_DESCRIPTION("MSM Camera SMMU driver");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/media/platform/msm/ais/isp/msm_isp.c b/drivers/media/platform/msm/ais/isp/msm_isp.c
+index d62b830..7ef4afb 100644
+--- a/drivers/media/platform/msm/ais/isp/msm_isp.c
++++ b/drivers/media/platform/msm/ais/isp/msm_isp.c
+@@ -24,6 +24,8 @@
+ #include <media/v4l2-ioctl.h>
+ #include <media/v4l2-event.h>
+ 
++#include <soc/qcom/boot_stats.h>
++
+ #include "msm_isp.h"
+ #include "msm_isp_util.h"
+ #include "msm_isp_axi_util.h"
+@@ -503,6 +505,8 @@ static int vfe_probe(struct platform_device *pdev)
+ 			break;
+ 	}
+ 
++	place_marker("# isp out");
++
+ 	return rc;
+ }
+ 
+@@ -635,12 +639,14 @@ static struct platform_driver vfe_driver = {
+ 	.driver = {
+ 		.name = "msm_vfe",
+ 		.owner = THIS_MODULE,
++		.probe_type = PROBE_PREFER_ASYNCHRONOUS,
+ 		.of_match_table = msm_vfe_dt_match,
+ 	},
+ };
+ 
+ static int __init msm_vfe_init_module(void)
+ {
++	place_marker("# isp in");
+ 	return platform_driver_register(&vfe_driver);
+ }
+ 
+@@ -649,7 +655,7 @@ static void __exit msm_vfe_exit_module(void)
+ 	platform_driver_unregister(&vfe_driver);
+ }
+ 
+-late_initcall(msm_vfe_init_module);
++fs_initcall_sync(msm_vfe_init_module);
+ module_exit(msm_vfe_exit_module);
+ MODULE_DESCRIPTION("MSM VFE driver");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/media/platform/msm/ais/isp/msm_isp47.c b/drivers/media/platform/msm/ais/isp/msm_isp47.c
+index e7a3a30..6984c48 100644
+--- a/drivers/media/platform/msm/ais/isp/msm_isp47.c
++++ b/drivers/media/platform/msm/ais/isp/msm_isp47.c
+@@ -2883,7 +2883,7 @@ static void __exit msm_vfe47_exit_module(void)
+ 	platform_driver_unregister(&vfe47_driver);
+ }
+ 
+-module_init(msm_vfe47_init_module);
++fs_initcall(msm_vfe47_init_module);
+ module_exit(msm_vfe47_exit_module);
+ MODULE_DESCRIPTION("MSM VFE47 driver");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/media/platform/msm/ais/ispif/msm_ispif.c b/drivers/media/platform/msm/ais/ispif/msm_ispif.c
+index a72ac56..23a4f43 100644
+--- a/drivers/media/platform/msm/ais/ispif/msm_ispif.c
++++ b/drivers/media/platform/msm/ais/ispif/msm_ispif.c
+@@ -1803,7 +1803,7 @@ static void __exit msm_ispif_exit_module(void)
+ 	platform_driver_unregister(&ispif_driver);
+ }
+ 
+-module_init(msm_ispif_init_module);
++fs_initcall(msm_ispif_init_module);
+ module_exit(msm_ispif_exit_module);
+ MODULE_DESCRIPTION("MSM ISP Interface driver");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/media/platform/msm/ais/msm.c b/drivers/media/platform/msm/ais/msm.c
+index 902e05b..aa5ba61 100644
+--- a/drivers/media/platform/msm/ais/msm.c
++++ b/drivers/media/platform/msm/ais/msm.c
+@@ -1432,7 +1432,7 @@ static void __exit msm_exit(void)
+ }
+ 
+ 
+-module_init(msm_init);
++fs_initcall(msm_init);
+ module_exit(msm_exit);
+ MODULE_DESCRIPTION("MSM V4L2 Camera");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/media/platform/msm/ais/msm_ais_mgr/msm_ais_mgr.c b/drivers/media/platform/msm/ais/msm_ais_mgr/msm_ais_mgr.c
+index 9391c1d..e58c041 100644
+--- a/drivers/media/platform/msm/ais/msm_ais_mgr/msm_ais_mgr.c
++++ b/drivers/media/platform/msm/ais/msm_ais_mgr/msm_ais_mgr.c
+@@ -141,7 +141,7 @@ static void __exit msm_ais_mngr_exit(void)
+ 	kfree(msm_ais_mngr_dev);
+ }
+ 
+-module_init(msm_ais_mngr_init);
++fs_initcall(msm_ais_mngr_init);
+ module_exit(msm_ais_mngr_exit);
+ MODULE_DESCRIPTION("MSM AIS Manager");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/media/platform/msm/ais/msm_buf_mgr/msm_generic_buf_mgr.c b/drivers/media/platform/msm/ais/msm_buf_mgr/msm_generic_buf_mgr.c
+index 66751b1..c3b531f 100644
+--- a/drivers/media/platform/msm/ais/msm_buf_mgr/msm_generic_buf_mgr.c
++++ b/drivers/media/platform/msm/ais/msm_buf_mgr/msm_generic_buf_mgr.c
+@@ -890,7 +890,7 @@ static void __exit msm_buf_mngr_exit(void)
+ 	kfree(msm_buf_mngr_dev);
+ }
+ 
+-module_init(msm_buf_mngr_init);
++fs_initcall(msm_buf_mngr_init);
+ module_exit(msm_buf_mngr_exit);
+ MODULE_DESCRIPTION("MSM Buffer Manager");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/media/platform/msm/ais/sensor/cci/msm_cci.c b/drivers/media/platform/msm/ais/sensor/cci/msm_cci.c
+index 0c58090..cbe925a 100644
+--- a/drivers/media/platform/msm/ais/sensor/cci/msm_cci.c
++++ b/drivers/media/platform/msm/ais/sensor/cci/msm_cci.c
+@@ -2162,7 +2162,7 @@ static void __exit msm_cci_exit_module(void)
+ 	platform_driver_unregister(&cci_driver);
+ }
+ 
+-module_init(msm_cci_init_module);
++fs_initcall(msm_cci_init_module);
+ module_exit(msm_cci_exit_module);
+ MODULE_DESCRIPTION("MSM CCI driver");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/media/platform/msm/ais/sensor/cci/msm_early_cam.c b/drivers/media/platform/msm/ais/sensor/cci/msm_early_cam.c
+index 885f09c..6c7fe6e 100644
+--- a/drivers/media/platform/msm/ais/sensor/cci/msm_early_cam.c
++++ b/drivers/media/platform/msm/ais/sensor/cci/msm_early_cam.c
+@@ -411,7 +411,7 @@ static struct platform_driver msm_early_camera_driver = {
+ 
+ MODULE_DEVICE_TABLE(of, msm_early_camera_match_table);
+ 
+-module_init(msm_early_cam_init_module);
++fs_initcall(msm_early_cam_init_module);
+ module_exit(msm_early_cam_exit_module);
+ MODULE_DESCRIPTION("MSM early camera driver");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/media/platform/msm/ais/sensor/csid/msm_csid.c b/drivers/media/platform/msm/ais/sensor/csid/msm_csid.c
+index 2b3eefa..7d1386a 100644
+--- a/drivers/media/platform/msm/ais/sensor/csid/msm_csid.c
++++ b/drivers/media/platform/msm/ais/sensor/csid/msm_csid.c
+@@ -1336,7 +1336,7 @@ static void __exit msm_csid_exit_module(void)
+ 	platform_driver_unregister(&csid_driver);
+ }
+ 
+-module_init(msm_csid_init_module);
++fs_initcall(msm_csid_init_module);
+ module_exit(msm_csid_exit_module);
+ MODULE_DESCRIPTION("MSM CSID driver");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/media/platform/msm/ais/sensor/csiphy/msm_csiphy.c b/drivers/media/platform/msm/ais/sensor/csiphy/msm_csiphy.c
+index c3b087f..7d0d317 100644
+--- a/drivers/media/platform/msm/ais/sensor/csiphy/msm_csiphy.c
++++ b/drivers/media/platform/msm/ais/sensor/csiphy/msm_csiphy.c
+@@ -1656,7 +1656,7 @@ static void __exit msm_csiphy_exit_module(void)
+ 	platform_driver_unregister(&csiphy_driver);
+ }
+ 
+-module_init(msm_csiphy_init_module);
++fs_initcall(msm_csiphy_init_module);
+ module_exit(msm_csiphy_exit_module);
+ MODULE_DESCRIPTION("MSM CSIPHY driver");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/media/platform/msm/ais/sensor/msm_sensor_driver.c b/drivers/media/platform/msm/ais/sensor/msm_sensor_driver.c
+index 5e34016..fb2ffc9 100644
+--- a/drivers/media/platform/msm/ais/sensor/msm_sensor_driver.c
++++ b/drivers/media/platform/msm/ais/sensor/msm_sensor_driver.c
+@@ -1413,7 +1413,7 @@ static void __exit msm_sensor_driver_exit(void)
+ 	i2c_del_driver(&msm_sensor_driver_i2c);
+ }
+ 
+-module_init(msm_sensor_driver_init);
++fs_initcall(msm_sensor_driver_init);
+ module_exit(msm_sensor_driver_exit);
+ MODULE_DESCRIPTION("msm_sensor_driver");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/media/platform/msm/ais/sensor/msm_sensor_init.c b/drivers/media/platform/msm/ais/sensor/msm_sensor_init.c
+index ffbf963..cdf4830 100644
+--- a/drivers/media/platform/msm/ais/sensor/msm_sensor_init.c
++++ b/drivers/media/platform/msm/ais/sensor/msm_sensor_init.c
+@@ -141,7 +141,7 @@ static void __exit msm_sensor_exit_module(void)
+ 	kfree(s_init);
+ }
+ 
+-module_init(msm_sensor_init_module);
++fs_initcall(msm_sensor_init_module);
+ module_exit(msm_sensor_exit_module);
+ MODULE_DESCRIPTION("msm_sensor_init");
+ MODULE_LICENSE("GPL v2");
+-- 
+1.9.1
+
