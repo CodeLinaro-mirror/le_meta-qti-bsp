@@ -102,9 +102,7 @@ IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'libaf
 
 #Always remove below modules
 IMAGE_INSTALL_remove += "firmware-links"
-IMAGE_INSTALL_remove += "neutrino-eth"
 IMAGE_INSTALL_remove += "packagegroup-agl-demo-platform"
 IMAGE_INSTALL_remove += "web-runtime"
 
-
-
+IMAGE_INSTALL_remove += "${@bb.utils.contains("DISTRO_FEATURES", "early-ethernet", "neutrino-eth", "" ,d)}"
