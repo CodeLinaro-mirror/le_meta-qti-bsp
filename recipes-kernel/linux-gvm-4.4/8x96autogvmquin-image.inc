@@ -45,7 +45,6 @@ SRC_URI_append_kernelpatchok += " \
     file://0011-Add-psci-workaround-for-gvm-suspend.patch \
     file://0012-unmask-virtio-net-irq-to-wake-up-system.patch \
     file://0014-trigger-wdog-bite-for-panic-on-gvm.patch \
-    file://0001-msm-add-dts-node-qrng.patch \
 "
 
 do_deploy_rename () {
