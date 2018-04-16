@@ -13,6 +13,7 @@ DEPENDS += "glib-2.0"
 DEPENDS += "virtual/libc"
 DEPENDS += "libcutils liblog liblog-native system-core"
 DEPENDS += "weston"
+DEPENDS += "mm-video-noship"
 
 # Need the kernel headers
 PACKAGE_ARCH = "${MACHINE_ARCH}"
@@ -65,7 +66,8 @@ CPPFLAGS += "-I${STAGING_INCDIR} \
              -I${STAGING_INCDIR}/c++ \
              -I${STAGING_INCDIR}/c++/${TARGET_SYS} \
              -I${STAGING_INCDIR}/libqdutils \
-	     -I${STAGING_INCDIR}/qcom/display"
+	     -I${STAGING_INCDIR}/qcom/display \
+	     -I${STAGING_INCDIR}/libpqstats"
 CPPFLAGS += "-include stdint.h"
 
 LDFLAGS += "-lglib-2.0"
@@ -90,4 +92,6 @@ do_install() {
 	oe_runmake DESTDIR="${D}/" LIBVER="${LV}" install
 	mkdir -p ${STAGING_INCDIR}/mm-core
 	install -m 0644 ${S}/mm-core/inc/*.h ${STAGING_INCDIR}/mm-core
+	mkdir -p ${STAGING_INCDIR}/libstagefrighthw
+	install -m 0644 ${S}/libstagefrighthw/QComOMXMetadata.h ${STAGING_INCDIR}/libstagefrighthw
 }
