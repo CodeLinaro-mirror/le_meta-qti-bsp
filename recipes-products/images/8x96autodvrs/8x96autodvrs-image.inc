@@ -56,8 +56,3 @@ IMAGE_INSTALL_remove += "navigation"
 
 IMAGE_INSTALL += "gstreamer1.0-meta-base"
 
-# disable below modules until solve 'media' build issue
-IMAGE_INSTALL_remove += "gstreamer1.0-qcarcamsrc"
-IMAGE_INSTALL_remove += "gstreamer1.0-omx"
-IMAGE_INSTALL_remove += "gstreamer1.0-qvconv"
-
