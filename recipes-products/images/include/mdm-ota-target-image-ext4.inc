@@ -133,6 +133,9 @@ do_recovery_ext4() {
     if [ "${BASEMACHINE}" == "apq8053" ]; then
         echo recovery_upgrade_supported=1 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
     fi
+
+    # set block img diff version to v3
+    echo "blockimgdiff_versions=1,2,3" >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 }
 
 # Task to generate OTA zip files
