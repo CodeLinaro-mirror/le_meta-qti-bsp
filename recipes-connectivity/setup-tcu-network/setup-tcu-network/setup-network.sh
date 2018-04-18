@@ -75,14 +75,6 @@ function setup_network_agl_vm_1()
 {
     echo 0 > /proc/sys/net/ipv4/ip_forward
 
-    echo "Assign IP address to eth0"
-    ifconfig eth0 192.168.0.2 up
-    ifconfig eth1 up
-    ifconfig eth2 up
-    ifconfig eth3 up
-    ifconfig eth4 up
-    sleep 1
-
     echo "Setup Bridge Network"
     brctl addbr tether0
 
@@ -92,8 +84,32 @@ function setup_network_agl_vm_1()
     brctl addif tether0 eth4
     sleep 1
 
+    echo "Assign IP address to eth0"
+    ifconfig eth0 192.168.0.2 up
+    ifconfig eth1 up
+    ifconfig eth2 up
+    ifconfig eth3 up
+    ifconfig eth4 up
+    sleep 1
+
     echo "Assign IP address to Bridge"
     ifconfig tether0 192.168.1.2 up
+
+    local RETRY_CNT=0
+    for i in {1..5}
+    do
+        sleep 1
+        if [[ $(ip address show tether0 up | grep 'state UP' | wc -l) -ne 1 ]];
+        then
+            echo "tether0 is not up, try to bring up again !!"
+            ifconfig tether0 192.168.1.2 up
+            RETRY_CNT=$((RETRY_CNT+1))
+            echo "retry ${RETRY_CNT} times ..."
+        else
+            echo "tether0 is up now"
+            break
+        fi
+    done
 
     echo "Setup NAT rules"
     iptables -t nat -A POSTROUTING -s 192.168.1.0/24 -o rmnet_data0 -j MASQUERADE
