@@ -109,9 +109,6 @@ do_unpack_extra () {
 addtask getpatches before do_fetch
 addtask unpack_extra after do_unpack before do_patch
 
-SRC_URI_append += " \
-	file://0001-enable-rootfs-mount-as-dm-verity-target-during-boot.patch \
-"
 kernel_do_compile() {
         unset CFLAGS CPPFLAGS CXXFLAGS LDFLAGS MACHINE
         # The $use_alternate_initrd is only set from
