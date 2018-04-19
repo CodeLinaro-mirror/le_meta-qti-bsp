@@ -11,6 +11,16 @@ ALTERNATIVE_${PN} ="resolv-conf"
 ALTERNATIVE_TARGET[resolv-conf] = "${sysconfdir}/resolv-conf.connman"
 ALTERNATIVE_LINK_NAME[resolv-conf] = "${sysconfdir}/resolv.conf"
 
+PACKAGECONFIG_8x96autodvrs = "wispr \
+                   ${@bb.utils.contains('DISTRO_FEATURES', 'systemd','systemd', '', d)} \
+"
+
+# These used to be plugins, but now they are core
+RPROVIDES_${PN}_8x96autodvrs = "\
+	connman-plugin-loopback \
+	connman-plugin-ethernet \
+	"
+
 do_fix_connman_resolv_conf() {
     # For read-only filesystem, do not create links during bootup
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
