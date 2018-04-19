@@ -5,8 +5,8 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 LICENSE = "ISC"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=f3b90e78ea0cffb20bf5cca7947a896d"
 
-WLAN_MODULE_NAME = "${@base_conditional('BASEMACHINE', '8x96autogvmquintcu', 'wldsrc', 'none', d)}"
-CHIP_NAME = "${@base_conditional('BASEMACHINE', '8x96autogvmquintcu', 'qca6584', 'none', d)}"
+WLAN_MODULE_NAME = "dsrc"
+WLAN_MODULE_INTF = "sdio"
 
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI = "file://wlan/qcacld-2.0/ \
@@ -21,7 +21,7 @@ inherit module kernel-arch qperf
 
 EXTRA_OEMAKE += "CONFIG_ARCH_MSM=y"
 EXTRA_OEMAKE += "CONFIG_CLD_HL_SDIO_CORE=y CONFIG_BUS_AUTO_SUSPEND=n"
-EXTRA_OEMAKE += "MODNAME=${WLAN_MODULE_NAME} CHIP_NAME=${CHIP_NAME}"
+EXTRA_OEMAKE += "MODNAME=${WLAN_MODULE_NAME} CHIP_NAME=${WLAN_MODULE_INTF}"
 
 do_sign () {
     KMOD_SIG_ALL=`cat ${STAGING_KERNEL_BUILDDIR}/.config | grep CONFIG_MODULE_SIG_ALL | cut -d'=' -f2`
@@ -53,9 +53,9 @@ do_install () {
     # Set SoftAP Max Peer
     sed -i -e 's/^END/# Set SoftAP Max Peer\ngSoftApMaxPeers=10\n\nEND/g' ${S}/firmware_bin/WCNSS_qcom_cfg.ini
 
-    install -d ${D}/lib/firmware/wlan/qca_cld
-    install -D -m 0644 ${S}/firmware_bin/WCNSS_qcom_cfg.ini ${D}/lib/firmware/wlan/qca_cld/
-    install -D -m 0644 ${S}/firmware_bin/WCNSS_cfg.dat ${D}/lib/firmware/wlan/qca_cld/
+    install -d ${D}/lib/firmware/wlan/qca_cld/${WLAN_MODULE_INTF}
+    install -D -m 0644 ${S}/firmware_bin/WCNSS_qcom_cfg.ini ${D}/lib/firmware/wlan/qca_cld/${WLAN_MODULE_INTF}/
+    install -D -m 0644 ${S}/firmware_bin/WCNSS_cfg.dat ${D}/lib/firmware/wlan/qca_cld/${WLAN_MODULE_INTF}/
 }
 
 FILES_${PN} = "/usr/sbin/\

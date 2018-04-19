@@ -5,8 +5,7 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 LICENSE = "ISC"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=f3b90e78ea0cffb20bf5cca7947a896d"
 
-WLAN_MODULE_NAME = "${@base_conditional('BASEMACHINE', '8x96autogvmquintcu', 'wlpcie', 'wlan', d)}"
-WLAN_CHIP_NAME = "${@base_conditional('BASEMACHINE', '8x96autogvmquintcu', 'pcie', 'none', d)}"
+WLAN_MODULE_NAME = "wlan"
 
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI = "file://wlan/qcacld-2.0/ \
@@ -28,9 +27,6 @@ SYSTEMD_SERVICE_${PN} = "init_qti_wlan.service"
 SYSTEMD_AUTO_ENABLE_${PN} = "enable"
 
 EXTRA_OEMAKE += "CONFIG_ARCH_MSM=y"
-EXTRA_OEMAKE += "MODNAME=${WLAN_MODULE_NAME} CHIP_NAME=${WLAN_CHIP_NAME}"
-
-CHIP_NAME = "${@base_conditional('BASEMACHINE', '8x96autogvmquintcu', 'pcie', '', d)}"
 
 do_sign () {
     KMOD_SIG_ALL=`cat ${STAGING_KERNEL_BUILDDIR}/.config | grep CONFIG_MODULE_SIG_ALL | cut -d'=' -f2`
@@ -62,15 +58,11 @@ do_install () {
     #Change Default Power Save Offload configuration
     sed -i -e 's/^gEnablePowerSaveOffload=2/gEnablePowerSaveOffload=1/g' ${S}/firmware_bin/WCNSS_qcom_cfg.ini
 
-    install -d ${D}/lib/firmware/wlan/qca_cld/${CHIP_NAME}
-    install -D -m 0644 ${S}/firmware_bin/WCNSS_qcom_cfg.ini ${D}/lib/firmware/wlan/qca_cld/${CHIP_NAME}
-    install -D -m 0644 ${S}/firmware_bin/WCNSS_qcom_cfg.ini ${D}/lib/firmware/wlan/qcom_cfg.ini
-    install -D -m 0644 ${S}/firmware_bin/WCNSS_cfg.dat ${D}/lib/firmware/wlan/qca_cld/${CHIP_NAME}
-    install -D -m 0644 ${S}/firmware_bin/WCNSS_cfg.dat ${D}/lib/firmware/wlan/cfg.dat
+    install -d ${D}/lib/firmware/wlan/qca_cld
+    install -D -m 0644 ${S}/firmware_bin/WCNSS_qcom_cfg.ini ${D}/lib/firmware/wlan/qca_cld/
+    install -D -m 0644 ${S}/firmware_bin/WCNSS_cfg.dat ${D}/lib/firmware/wlan/qca_cld/
 
     install -d ${D}/usr/sbin
-    sed -i -e 's/^modprobe wlan/modprobe ${WLAN_MODULE_NAME}/g' ${WORKDIR}/wifi_on.sh
-    sed -i -e 's/^rmmod wlan/rmmod ${WLAN_MODULE_NAME}/g' ${WORKDIR}/wifi_off.sh
     install -D -m 0544 ${WORKDIR}/wifi_on.sh ${D}/usr/sbin/
     install -D -m 0544 ${WORKDIR}/wifi_off.sh ${D}/usr/sbin/
 

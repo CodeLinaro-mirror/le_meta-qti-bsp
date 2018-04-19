@@ -11,12 +11,3 @@ index 6cb1b87..c0cf3a0 100644
 
  ifeq ($(CONFIG_CFG80211),y)
  HAVE_CFG80211 := 1
-@@ -1691,7 +1691,7 @@ endif
- # This allows multiple instances of the driver with different module names.
- # If the module name is wlan, leave MULTI_IF_NAME undefined and the code will
- # treat the driver as the primary driver.
--ifneq ($(MODNAME), wlan)
-+ifneq ($(MODNAME), wldsrc)
- CHIP_NAME ?= $(MODNAME)
- CDEFINES += -DMULTI_IF_NAME=\"$(CHIP_NAME)\"
- endif
