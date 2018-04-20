@@ -63,6 +63,7 @@ SRC_URI_append_kernelpatchok += " \
     file://0012-unmask-virtio-net-irq-to-wake-up-system.patch \
     file://0014-trigger-wdog-bite-for-panic-on-gvm.patch \
     file://0022-cnss-change-pcie-fw-path-for-dual-wifi-support.patch \
+    file://0023-soc-qcom-pil-Skip-status-reg-read-for-Quin-platform.patch \
 "
 
 do_deploy_rename () {
