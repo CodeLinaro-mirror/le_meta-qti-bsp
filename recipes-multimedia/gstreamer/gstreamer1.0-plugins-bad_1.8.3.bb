@@ -24,6 +24,7 @@ PACKAGECONFIG = " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'wayland', '', d)} \
     orc \
     hls \
+    sbc \
     "
 
 PACKAGECONFIG[wayland] = "--enable-wayland --enable-egl,--disable-wayland --disable-egl,wayland virtual/egl"
