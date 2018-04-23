@@ -15,6 +15,10 @@ DEPENDS += "libcutils liblog liblog-native system-core"
 DEPENDS += "weston"
 DEPENDS += "mm-video-noship"
 
+DEPENDS_remove_8x96autogvmquin = "mm-video-noship"
+DEPENDS_remove_8x96autogvmred = "mm-video-noship"
+DEPENDS_remove_8x96autogvmgh = "mm-video-noship"
+
 # Need the kernel headers
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
