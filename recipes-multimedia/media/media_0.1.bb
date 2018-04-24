@@ -41,6 +41,7 @@ EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96autodvrs', ' --enable
 EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96autodvrs', ' --enable-target-uses-gbm=yes', '', d)} "
 
 EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96autogvmquin', ' --enable-target-uses-gbm=yes', '', d)} "
+EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96autogvmgh', ' --enable-target-uses-gbm=yes', '', d)} "
 
 EXTRA_OECONF_append =" --enable-use-glib="yes""
 EXTRA_OECONF_append =" --enable-target-uses-ion="yes""
