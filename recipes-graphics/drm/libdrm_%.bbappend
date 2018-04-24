@@ -7,4 +7,6 @@ S = "${WORKDIR}/libdrm"
 EXTRA_OECONF += "${@base_conditional('BASEMACHINE', '8x96autogvmquin', '--enable-drm_fe=yes', '', d)}"
 EXTRA_OECONF += "${@base_conditional('BASEMACHINE', '8x96autogvmgh', '--enable-drm_fe=yes', '', d)}"
 
+CFLAGS += "${@base_conditional('BASEMACHINE', '8x96auto', '-DUSE_ION', '', d)}"
+
 FILESEXTRAPATHS_append := ":${THISDIR}/${PN}"
