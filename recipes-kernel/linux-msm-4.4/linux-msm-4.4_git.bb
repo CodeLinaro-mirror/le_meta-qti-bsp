@@ -27,6 +27,7 @@ python __anonymous () {
   if bb.utils.contains('DISTRO_FEATURES', 'early_init', True, False, d) or bb.utils.contains('DISTRO_FEATURES', 'early-ethernet', True, False, d):
       d.appendVar("SRC_URI", " file://0003-init-early-user-space.patch")
       d.appendVar("SRC_URI", " file://0004-kernel-display-support-early-init.patch")
+      d.appendVar("SRC_URI", " file://0001-kernel-early-init-support-early-smack-rules.patch")
       d.appendVar("KERNEL_CMD_PARAMS", " mem=1G")
       if d.getVar('KERNEL_ROOTDEVICE', True) == "/dev/dm-0":
           d.appendVar("SRC_URI", " file://0001-enable-dm-verity-for-early-services.patch")
