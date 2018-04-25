@@ -36,18 +36,26 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/mount.h>
+#include <pwd.h>
+#include <stdint.h>
 #include <fcntl.h>
 #include <sched.h>
 #include <errno.h>
 
-#define DEFAULT_CONF    "/etc/early_init.conf"
-#define END_TAG         "<end>"
-#define LINE_MAX        2048
-#define WHITESPACE      " \t\n\r"
-#define KPI_VALUE_PATH  "/debug/bootkpi/kpi_values"
-#define GPIO_EXPORT     "/sys/class/gpio/export"
-#define DRM_CARD_PATH   "/dev/dri/card0"
-#define VIDEO_CARD_PATH "/dev/video32"
+#define DEFAULT_CONF            "/etc/early_init.conf"
+#define END_TAG                 "<end>"
+#define LINE_MAX                2048
+#define WHITESPACE              " \t\n\r"
+#define KPI_VALUE_PATH          "/debug/bootkpi/kpi_values"
+#define GPIO_EXPORT             "/sys/class/gpio/export"
+#define DRM_CARD_PATH           "/dev/dri/card0"
+#define VIDEO_CARD_PATH         "/dev/video32"
+#define DISPLAY_XDG_RUNTIME_DIR "/run/platform/weston"
+#define SMACK_LABEL_PATH        "/proc/self/attr/current"
+#define SMACK_LABEL             "System"
+
+#define STR_EXPAND(tok) #tok
+#define TO_STRING(tok) STR_EXPAND(tok)
 
 static struct {
   char* appname;
@@ -62,10 +70,14 @@ static struct {
   int   usleep;
   int   bindcpumask;
   int   priority;
+  char* username;
   char* wait;
 } app_launcher;
 
 #define BIT_SET(p,n) ((p) & (1 << (n)))
+#define uid_is_valid(uid) ((uid != (uid_t) UINT32_C(0xFFFFFFFF)) && \
+						(uid != (uid_t) UINT32_C(0xFFFF)))
+#define gid_is_valid(gid)  uid_is_valid(gid)
 
 static void inline safe_free(char** p)
 {
@@ -97,6 +109,20 @@ static void inline write_marker(const char* name)
 	return;
 }
 
+static void inline write_smack_label(char* label)
+{
+	int fd = -1;
+
+	fd = open(SMACK_LABEL_PATH, O_WRONLY);
+	if (fd > 0) {
+		write(fd, label, strlen(label));
+	} else {
+		printf("write label  %s failed %s\r\n", label, strerror(errno));
+	}
+	safe_close(fd);
+
+	return;
+}
 
 /*
  * Only support abs path
@@ -162,18 +188,27 @@ static inline void prepare_dir(char* p)
 		case 'x':
 			if (0 == strncmp(p + 1, "dg_runtime_dir", strlen("dg_runtime_dir"))) {
 				/*
-				 * Prepare dir for /early/user/0
+				 * Prepare dir for weston socket
 				 */
-				if (stat("/early", &st) == -1) {
-					mkdir("/early", 0700);
+				if (stat("/run", &st) == -1) {
+					mkdir("/run", 0700);
 				}
 
-				ret = mount("tmpfs", "/early", "tmpfs", 0, NULL);
+				ret = mount("tmpfs", "/run", "tmpfs", MS_NOSUID|MS_NODEV|MS_STRICTATIME, "mode=755,smackfsroot=*");
 				if (ret < 0) {
 					perror("mount tmpfs failed");
 				}
 
-				mkdirs("/early/user/0", 0700);
+				mkdirs(DISPLAY_XDG_RUNTIME_DIR, 0775);
+
+				struct passwd *pw;
+				pw = getpwnam(TO_STRING(WESTON_USER));
+				if (!pw) {
+					perror("username is not exist\r\n");
+				} else {
+					chown(DISPLAY_XDG_RUNTIME_DIR, pw->pw_uid, pw->pw_gid);
+				}
+				mkdirs("/run/early", 0775);
 			}
 			break;
 		case 's':
@@ -197,6 +232,17 @@ static inline void prepare_dir(char* p)
 				}
 			} else {
 				printf("warning unknown input string %s for prepare_dir", p);
+			}
+			break;
+		case 'p':
+			if (0 == strncmp(p + 1, "rocfs", strlen("rocfs"))) {
+				if (stat("/proc", &st) == -1) {
+					mkdir("/proc", 0755);
+				}
+				ret = mount("proc", "/proc", "proc", 0, NULL);
+				if (ret < 0) {
+					perror("mount procfs failed");
+				}
 			}
 			break;
 		default:
@@ -225,6 +271,34 @@ static inline char *strstrip(char *s) {
 	*(end+1) = 0;
 
 	return s;
+}
+
+// enforce_user according to user settings
+// if fail, fallback to root user
+static void inline enforce_user(char* username)
+{
+	struct passwd *pw;
+
+	pw = getpwnam(username);
+	if (!pw) {
+		perror("username is not exist\r\n");
+	}
+	// Should set group first
+	printf("gid is %d", pw->pw_gid);
+	if (!gid_is_valid(pw->pw_gid)) {
+		perror("gid is not valid\r\n");
+	}
+	if (0 != setresgid(pw->pw_gid, pw->pw_gid, pw->pw_gid)) {
+		perror("setresgid failed\r\n");
+	}
+
+	printf("uid is %d", pw->pw_uid);
+	if (!uid_is_valid(pw->pw_uid)) {
+		perror("uid is not valid\r\n");
+	}
+	if (0 != setresuid(pw->pw_uid, pw->pw_uid, pw->pw_uid)) {
+		perror("setresuid failed\r\n");
+	}
 }
 
 /*
@@ -269,6 +343,7 @@ static void inline app_launcher_start_over(void)
 	safe_free(&app_launcher.gpio);
 	safe_free(&app_launcher.pidfile);
 	safe_free(&app_launcher.wait);
+	safe_free(&app_launcher.username);
 	app_launcher.usleep = -1;
 
 	for (i = 0; i < app_launcher.argv_used; i++)
@@ -388,6 +463,12 @@ static inline int parse_line(char* p)
 				printf("bindcpumask is %d", app_launcher.bindcpumask);
 			}
 			break;
+		case 'u':
+			if (0 == strncmp(p + 1, "ser", strlen("ser")) && 0 == find_rvalue(&p)) {
+				app_launcher.username = strdup(p);
+				printf("username is %s", app_launcher.username);
+			}
+			break;
 		case '<':/* end */
 			/*
 			 * When comes to the end, start up the app
@@ -475,6 +556,12 @@ static inline int parse_line(char* p)
 				app_launcher.argv[app_launcher.argv_used] = NULL;
 				app_launcher.env[app_launcher.env_used] = NULL;
 
+				write_smack_label(SMACK_LABEL);
+
+				if (app_launcher.username) {
+					enforce_user(app_launcher.username);
+				}
+
 				if (app_launcher.cmd) {
 					execvpe(app_launcher.cmd, app_launcher.argv, app_launcher.env);
 				}
@@ -543,8 +630,9 @@ int main(int argc, char* argv[])
 	prepare_dir("xdg_runtime_dir");
 	prepare_dir("shm");
 	prepare_dir("sysfs");
+	prepare_dir("procfs");
 
-	fd = open("/early/early_init.log", O_RDWR | O_CREAT);
+	fd = open("/run/early_init.log", O_RDWR | O_CREAT);
 	if (fd < 0)
 		perror("open log file failed");
 

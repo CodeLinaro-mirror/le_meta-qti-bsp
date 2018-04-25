@@ -1,29 +1,30 @@
-From 7f16e6cbae70376a4012d48cefa57b4667485992 Mon Sep 17 00:00:00 2001
+From e2916caea38370f16d27df8ef903226295b28b3b Mon Sep 17 00:00:00 2001
 From: Lei wang <leiwan@codeaurora.org>
-Date: Wed, 30 Aug 2017 14:26:56 +0800
-Subject: [PATCH] systemd: add handover support for early-service
+Date: Mon, 30 Apr 2018 09:04:27 +0800
+Subject: [PATCH] refine early
 
+Change-Id: I556dc0aa72f06d96e2c462d7867f152cd7caf8c9
 Signed-off-by: Lei wang <leiwan@codeaurora.org>
 ---
  src/core/service.c | 21 +++++++++++++++++++++
  1 file changed, 21 insertions(+)
 
 diff --git a/src/core/service.c b/src/core/service.c
-index 1f6d821db..146d3b26d 100644
+index a7274a7..59bc3ec 100644
 --- a/src/core/service.c
 +++ b/src/core/service.c
-@@ -1719,6 +1719,27 @@ static void service_enter_start(Service *s) {
+@@ -1789,6 +1789,27 @@ static void service_enter_start(Service *s) {
          else
                  timeout = s->timeout_start_usec;
  
 +        /*
 +         * Check Early PIDFile
-+         * s->type == simple && s->PIDFile in /early path, then read from pid file
++         * s->type == simple && s->PIDFile in /run/early path, then read from pid file
 +         * first to check if this serivce has been ready.
 +         * If ready, we set the mainpid from the pidfile, remove this pidfile and mark it as successful
 +         * else, use the normal bootup sequence
 +         */
-+        if (s->pid_file && strneq(s->pid_file, "/early", strlen("/early")) && IN_SET(s->type, SERVICE_SIMPLE)) {
++        if (s->pid_file && strneq(s->pid_file, "/run/early", strlen("/run/early")) && IN_SET(s->type, SERVICE_SIMPLE)) {
 +                r = service_load_pid_file(s, false);
 +                if (0 == r) {
 +                        (void) unlink(s->pid_file);
@@ -41,5 +42,5 @@ index 1f6d821db..146d3b26d 100644
                            c,
                            timeout,
 -- 
-2.14.0.rc1.14.gc3eb4e6
+1.9.1
 
