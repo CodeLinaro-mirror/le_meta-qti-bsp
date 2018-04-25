@@ -15,11 +15,6 @@ do_install_append () {
   if ${@bb.utils.contains('DISTRO_FEATURES', 'early-ethernet', 'true', 'false', d)}; then
       sed -i '/^NetworkInterfaceBlacklist/s/$/,eth0/' ${D}${sysconfdir}/connman/main.conf
   fi
-  # static ip for gvm perf only
-  if ${@bb.utils.contains('DISTRO_FEATURES', 'qti-perf', 'true', 'false', d)} && \
-               ( [ "${BASEMACHINE}" == "8x96autogvmquin" ] || [ "${BASEMACHINE}" == "8x96autogvmquintcu" ] ); then
-      sed -i '/^NetworkInterfaceBlacklist/s/$/,eth1/' ${D}${sysconfdir}/connman/main.conf
-  fi
 }
 
 # Including the file depends on chipset
