@@ -9,20 +9,21 @@ SRC_URI += "file://early_init_eth.conf"
 
 S = "${WORKDIR}"
 
-inherit systemd
+inherit systemd agl-app-user
+DEPENDS += " agl-users"
 
 do_compile() {
         if ${@bb.utils.contains('DISTRO_FEATURES', 'early-ethernet', 'true', 'false', d)}; then
-            ${CC} ${CFLAGS} ${LDFLAGS} -static -DEARLY_ETHERNET -o ${S}/early_init ${S}/early_init.c
+            ${CC} ${CFLAGS} ${LDFLAGS} -static -D EARLY_ETHERNET -D DISPLAY_USER=${WESTONUSER} -o ${S}/early_init ${S}/early_init.c
         else
-            ${CC} ${CFLAGS} ${LDFLAGS} -static -o ${S}/early_init ${S}/early_init.c
+            ${CC} ${CFLAGS} ${LDFLAGS} -static -D WESTON_USER=${WESTONUSER} -o ${S}/early_init ${S}/early_init.c
         fi
 }
 
 do_install() {
     # Add early_init script for early_init feature
     if ${@bb.utils.contains('DISTRO_FEATURES', 'early_init', 'true', 'false', d)} || ${@bb.utils.contains('DISTRO_FEATURES', 'early-ethernet', 'true', 'false', d)}; then
-        install -d ${D}/early
+        install -d ${D}/run
         install -d ${D}/debug
         install -d ${D}${sbindir}
         install -m 0755 ${S}/early_init  ${D}${sbindir}/early_init
@@ -36,8 +37,10 @@ do_install() {
     if ${@bb.utils.contains('BASEMACHINE', '8x96autodvrs', 'true', 'false', d)}; then
         sed -i "s/-deinterlace=bob/-input=4/g" ${D}${sysconfdir}/early_init.conf
     fi
+    sed -e 's,@XDG_RUNTIME_DIR@,${DISPLAY_XDG_RUNTIME_DIR},g' \
+        -i ${D}${sysconfdir}/early_init.conf
 }
 
 FILES_${PN} += " ${sbindir}/early_init"
-FILES_${PN} += " /early"
+FILES_${PN} += " /run"
 FILES_${PN} += " /debug"
