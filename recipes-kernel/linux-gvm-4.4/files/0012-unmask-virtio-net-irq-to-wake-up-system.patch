@@ -1,4 +1,4 @@
-From d38d8345fd9090b297642f37828cb9a5cf2312b8 Mon Sep 17 00:00:00 2001
+From 890d5b3d70b9deca547dd2c9e5fc6803cbb6c539 Mon Sep 17 00:00:00 2001
 From: Yimin Peng <yiminp@codeaurora.org>
 Date: Tue, 17 Apr 2018 17:33:40 +0800
 Subject: [PATCH] unmask net irq to wake up system
@@ -8,12 +8,12 @@ add set_irq_wake support for virtual platform.
 Change-Id: If6f5dae14e34bee57a898bb2246b27e5df17d790
 Signed-off-by: Yimin Peng <yiminp@codeaurora.org>
 ---
- drivers/irqchip/irq-gic.c    | 142 ++++++++++++++++++++++++++++++++++++++++++-
+ drivers/irqchip/irq-gic.c    | 145 ++++++++++++++++++++++++++++++++++++++++++-
  drivers/virtio/virtio_mmio.c |   7 +++
- 2 files changed, 148 insertions(+), 1 deletion(-)
+ 2 files changed, 151 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/irqchip/irq-gic.c b/drivers/irqchip/irq-gic.c
-index 10b73d9..181e199 100644
+index 10b73d9..c7cdfc5 100644
 --- a/drivers/irqchip/irq-gic.c
 +++ b/drivers/irqchip/irq-gic.c
 @@ -41,6 +41,9 @@
@@ -161,7 +161,7 @@ index 10b73d9..181e199 100644
  static void gic_eoi_irq(struct irq_data *d)
  {
  	if (gic_arch_extn.irq_eoi) {
-@@ -372,14 +489,32 @@ static int gic_set_affinity(struct irq_data *d, const struct cpumask *mask_val,
+@@ -372,14 +489,35 @@ static int gic_set_affinity(struct irq_data *d, const struct cpumask *mask_val,
  #ifdef CONFIG_PM
  static int gic_set_wake(struct irq_data *d, unsigned int on)
  {
@@ -180,10 +180,13 @@ index 10b73d9..181e199 100644
 +	reg_offset = gicirq / 32;
 +	bit_offset = gicirq % 32;
 +
-+	if (on)
-+		gic_data->wakeup_irqs[reg_offset] |=  1 << bit_offset;
-+	else
-+		gic_data->wakeup_irqs[reg_offset] &=  ~(1 << bit_offset);
++	pr_info("gic_set_wake irq %u to %s, skip 40\n", gicirq, (on? "on": "off"));
++	if (gicirq != 40) {
++		if (on)
++			gic_data->wakeup_irqs[reg_offset] |=  1 << bit_offset;
++		else
++			gic_data->wakeup_irqs[reg_offset] &=  ~(1 << bit_offset);
++	}
 +#endif
  
  	if (gic_arch_extn.irq_set_wake)
@@ -195,7 +198,7 @@ index 10b73d9..181e199 100644
  #else
  #define gic_set_wake	NULL
  #endif
-@@ -461,9 +596,14 @@ static struct irq_chip gic_chip = {
+@@ -461,9 +599,14 @@ static struct irq_chip gic_chip = {
  	.irq_set_wake		= gic_set_wake,
  	.irq_get_irqchip_state	= gic_irq_get_irqchip_state,
  	.irq_set_irqchip_state	= gic_irq_set_irqchip_state,
