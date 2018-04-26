@@ -29,7 +29,6 @@ RDEPENDS_${PN} = "\
     tf2-ros \
     tf \
     image-transport \
-    nodelet-topic-tools \
     nodelet \
     pluginlib \
     cmake-modules \
