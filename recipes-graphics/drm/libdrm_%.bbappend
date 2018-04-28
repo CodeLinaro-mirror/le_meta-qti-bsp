@@ -4,4 +4,5 @@ SRC_URI = "file://${@d.getVar('SRC_DIR', True).replace('${WORKSPACE}/graphics/',
 REPO_SRC_URI = "file://${@d.getVar('SRC_DIR', True).replace('${WORKSPACE}/graphics/', '')}"
 S = "${WORKDIR}/libdrm"
 
+CFLAGS += "${@base_conditional('BASEMACHINE', '8x96auto', '-DUSE_ION', '', d)}"
 FILESEXTRAPATHS_append := ":${THISDIR}/${PN}"
