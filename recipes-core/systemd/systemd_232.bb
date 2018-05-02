@@ -10,59 +10,35 @@ SECTION = "base/shell"
 
 inherit useradd pkgconfig autotools perlnative update-rc.d update-alternatives qemu systemd ptest gettext bash-completion
 
-FILESEXTRAPATHS_append := ":${WORKDIR}/systemd-232-patches"
-
-python do_getpatches() {
-    import os,re
-
-    currdir = d.getVar("WORKDIR", True)
-    currdir = os.path.join(currdir, "systemd-232-patches")
-
-    cmd = "mkdir -p %s && (wget -nd -r  -l1 --no-parent -P %s  https://source.codeaurora.org/quic/ype/external/yoctoproject.org/poky/plain/meta/recipes-core/systemd/systemd?h=poky/pyro-next || pwd)" % (currdir, currdir)
-
-    os.system(cmd)
-
-    files = os.listdir(currdir)
-
-    for filename in files:
-        newname = re.sub(r'\?h.*$','',filename)
-        print(filename)
-        print(newname)
-        old_file = os.path.join(currdir, filename)
-        new_file = os.path.join(currdir, newname)
-        os.rename(old_file, new_file)
-
-}
-
-addtask getpatches before do_fetch
+SOURCE_SYSTEMD_PATCHES = "https://source.codeaurora.org/quic/ype/external/yoctoproject.org/poky/plain/meta/recipes-core/systemd/systemd/"
 
 SRC_URI += " \
-           file://touchscreen.rules \
-           file://00-create-volatile.conf \
-           file://init \
-           file://run-ptest \
-           file://0002-units-Prefer-getty-to-agetty-in-console-setup-system.patch \
-           file://0003-define-exp10-if-missing.patch \
-           file://0004-Use-getenv-when-secure-versions-are-not-available.patch \
-           file://0005-binfmt-Don-t-install-dependency-links-at-install-tim.patch \
-           file://0006-configure-Check-for-additional-features-that-uclibc-.patch \
-           file://0007-use-lnr-wrapper-instead-of-looking-for-relative-opti.patch \
-           file://0008-nspawn-Use-execvpe-only-when-libc-supports-it.patch \
-           file://0009-util-bypass-unimplemented-_SC_PHYS_PAGES-system-conf.patch \
-           file://0010-implment-systemd-sysv-install-for-OE.patch \
-           file://0011-nss-mymachines-Build-conditionally-when-HAVE_MYHOSTN.patch \
-           file://0012-rules-whitelist-hd-devices.patch \
-           file://0013-Make-root-s-home-directory-configurable.patch \
-           file://0014-Revert-rules-remove-firmware-loading-rules.patch \
-           file://0015-Revert-udev-remove-userspace-firmware-loading-suppor.patch \
-           file://0016-make-test-dir-configurable.patch \
-           file://0017-remove-duplicate-include-uchar.h.patch \
-           file://0018-check-for-uchar.h-in-configure.patch \
-           file://0019-socket-util-don-t-fail-if-libc-doesn-t-support-IDN.patch \
-           file://0020-back-port-233-don-t-use-the-unified-hierarchy-for-the-systemd.patch \
-           file://0001-core-load-fragment-refuse-units-with-errors-in-certa.patch \
+           ${SOURCE_SYSTEMD_PATCHES}/touchscreen.rules?h=yocto/pyro;downloadfilename=touchscreen.rules;md5sum=c4f9091e52415d87947975b6b659fac7 \
+           ${SOURCE_SYSTEMD_PATCHES}/00-create-volatile.conf?h=yocto/pyro;downloadfilename=00-create-volatile.conf;md5sum=c7b13af0e99a8a07bc7fb261d3839dcb \
+           ${SOURCE_SYSTEMD_PATCHES}/init?h=yocto/pyro;downloadfilename=init;md5sum=93e9a1eca70811c731fdcb34c82800b7 \
+           ${SOURCE_SYSTEMD_PATCHES}/run-ptest?h=yocto/pyro;downloadfilename=run-ptest;md5sum=8c94b5e6cfd634725213e8ebdd9de64d \
+           ${SOURCE_SYSTEMD_PATCHES}/0002-units-Prefer-getty-to-agetty-in-console-setup-system.patch?h=yocto/pyro;downloadfilename=0002-units-Prefer-getty-to-agetty-in-console-setup-system.patch;md5sum=5e915f1b0a98317ac4a865816a8c8672 \
+           ${SOURCE_SYSTEMD_PATCHES}/0003-define-exp10-if-missing.patch?h=yocto/pyro;downloadfilename=0003-define-exp10-if-missing.patch;md5sum=c5c712980912f47726440c97ee69b9af \
+           ${SOURCE_SYSTEMD_PATCHES}/0004-Use-getenv-when-secure-versions-are-not-available.patch?h=yocto/pyro;downloadfilename=0004-Use-getenv-when-secure-versions-are-not-available.patch;md5sum=ccae80fcbff696b58b39e46ef622256c \
+           ${SOURCE_SYSTEMD_PATCHES}/0005-binfmt-Don-t-install-dependency-links-at-install-tim.patch?h=yocto/pyro;downloadfilename=0005-binfmt-Don-t-install-dependency-links-at-install-tim.patch;md5sum=78ab57a5e746495c004112fd1bec7322 \
+           ${SOURCE_SYSTEMD_PATCHES}/0006-configure-Check-for-additional-features-that-uclibc-.patch?h=yocto/pyro;downloadfilename=0006-configure-Check-for-additional-features-that-uclibc-.patch;md5sum=70a624b40f8c79d1214e7eac35c8c3c9 \
+           ${SOURCE_SYSTEMD_PATCHES}/0007-use-lnr-wrapper-instead-of-looking-for-relative-opti.patch?h=yocto/pyro;downloadfilename=0007-use-lnr-wrapper-instead-of-looking-for-relative-opti.patch;md5sum=7f22617486e7e49323fd085f20a3b7b9 \
+           ${SOURCE_SYSTEMD_PATCHES}/0008-nspawn-Use-execvpe-only-when-libc-supports-it.patch?h=yocto/pyro;downloadfilename=0008-nspawn-Use-execvpe-only-when-libc-supports-it.patch;md5sum=68325a5e73052b1f65107b00d801aff5 \
+           ${SOURCE_SYSTEMD_PATCHES}/0009-util-bypass-unimplemented-_SC_PHYS_PAGES-system-conf.patch?h=yocto/pyro;downloadfilename=0009-util-bypass-unimplemented-_SC_PHYS_PAGES-system-conf.patch;md5sum=fa3692177004531c1ebb3c4ef0b15b5a \
+           ${SOURCE_SYSTEMD_PATCHES}/0010-implment-systemd-sysv-install-for-OE.patch?h=yocto/pyro;downloadfilename=0010-implment-systemd-sysv-install-for-OE.patch;md5sum=4b6717eb6aeb9f3fe8186deb0e41470b \
+           ${SOURCE_SYSTEMD_PATCHES}/0011-nss-mymachines-Build-conditionally-when-HAVE_MYHOSTN.patch?h=yocto/pyro;downloadfilename=0011-nss-mymachines-Build-conditionally-when-HAVE_MYHOSTN.patch;md5sum=7a15cfc395770fbf59fa43194a559850 \
+           ${SOURCE_SYSTEMD_PATCHES}/0012-rules-whitelist-hd-devices.patch?h=yocto/pyro;downloadfilename=0012-rules-whitelist-hd-devices.patch;md5sum=9bf93ad3f0224c84595ecf94ab1f3364 \
+           ${SOURCE_SYSTEMD_PATCHES}/0013-Make-root-s-home-directory-configurable.patch?h=yocto/pyro;downloadfilename=0013-Make-root-s-home-directory-configurable.patch;md5sum=a3f2e8d0de013060815a62c286fc1118 \
+           ${SOURCE_SYSTEMD_PATCHES}/0014-Revert-rules-remove-firmware-loading-rules.patch?h=yocto/pyro;downloadfilename=0014-Revert-rules-remove-firmware-loading-rules.patch;md5sum=f8dc87f8904d8c16704114b10f1d8904 \
+           ${SOURCE_SYSTEMD_PATCHES}/0015-Revert-udev-remove-userspace-firmware-loading-suppor.patch?h=yocto/pyro;downloadfilename=0015-Revert-udev-remove-userspace-firmware-loading-suppor.patch;md5sum=71621696b34e1cc63ab0f3aee20727c3 \
+           ${SOURCE_SYSTEMD_PATCHES}/0016-make-test-dir-configurable.patch?h=yocto/pyro;downloadfilename=0016-make-test-dir-configurable.patch;md5sum=cb042f2f01f0512a791c0f4e57b4ee7f \
+           ${SOURCE_SYSTEMD_PATCHES}/0017-remove-duplicate-include-uchar.h.patch?h=yocto/pyro;downloadfilename=0017-remove-duplicate-include-uchar.h.patch;md5sum=875cee9573dec01e7b901c0d923f6135 \
+           ${SOURCE_SYSTEMD_PATCHES}/0018-check-for-uchar.h-in-configure.patch?h=yocto/pyro;downloadfilename=0018-check-for-uchar.h-in-configure.patch;md5sum=b77090b6ebfc4a61fb7ee590fbf69fd7 \
+           ${SOURCE_SYSTEMD_PATCHES}/0019-socket-util-don-t-fail-if-libc-doesn-t-support-IDN.patch?h=yocto/pyro;downloadfilename=0019-socket-util-don-t-fail-if-libc-doesn-t-support-IDN.patch;md5sum=cb10493c7d0dc12f4804954e4437a4c0 \
+           ${SOURCE_SYSTEMD_PATCHES}/0020-back-port-233-don-t-use-the-unified-hierarchy-for-the-systemd.patch?h=yocto/pyro;downloadfilename=0020-back-port-233-don-t-use-the-unified-hierarchy-for-the-systemd.patch;md5sum=2ded3d8934d3f0498eee21e351db9625 \
+           ${SOURCE_SYSTEMD_PATCHES}/0001-core-load-fragment-refuse-units-with-errors-in-certa.patch?h=yocto/pyro;downloadfilename=0001-core-load-fragment-refuse-units-with-errors-in-certa.patch;md5sum=0368ab50ecc1f1749f6665cee59427bc \
            "
-SRC_URI_append_qemuall = " file://0001-core-device.c-Change-the-default-device-timeout-to-2.patch"
+SRC_URI_append_qemuall = " ${SOURCE_SYSTEMD_PATCHES}/0001-core-device.c-Change-the-default-device-timeout-to-2.patch?h=yocto/pyro;downloadfilename=0001-core-device.c-Change-the-default-device-timeout-to-2.patch;md5sum=e01761b342499b017ccbe936ba28d0a1 "
 
 PACKAGECONFIG ??= "xz \
                    ldconfig \
