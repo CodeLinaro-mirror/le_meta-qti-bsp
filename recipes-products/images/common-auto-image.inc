@@ -64,7 +64,7 @@ IMAGE_INSTALL += "hostapd"
 IMAGE_INSTALL += "iw"
 IMAGE_INSTALL += "wireless-tools"
 IMAGE_INSTALL += "sigma-dut"
-IMAGE_INSTALL += "kernel-module-wil6210"
+#IMAGE_INSTALL += "kernel-module-wil6210"
 
 #BT
 SYNERGY_DIR_PRESENT = "${@os.path.exists('${WORKSPACE}/prebuilt_HY11/8x96auto/synergy') or os.path.exists('${WORKSPACE}/prebuilt_HY22/8x96auto/synergy') or os.path.exists('${WORKSPACE}/synergy/synergy-bootstrap')}"
