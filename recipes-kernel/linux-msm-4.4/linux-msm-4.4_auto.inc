@@ -52,11 +52,6 @@ CONFIG_USB_ACM=y
 KERNEL_EXTRACONFIGS
 }
 
-SRC_URI_append_8x96autocv2x += " \
-    file://0001-esoc-Disable-access-check-for-ESOC-IOCTLs.patch \
-    file://0002-Fix-reboot-with-esoc.patch \
-"
-
 python do_getpatches() {
     import os
     cmd = "wget https://source.codeaurora.org/quic/la/kernel/msm-4.4/patch/?id=f083f557186d77de5f14bf90aec1bfe2503cf513 -O ${WORKSPACE}/poky/meta-qti-bsp/recipes-kernel/linux-msm-4.4/files/0001-dmaengine-Add-helper-function-to-prep-for-error-repo.patch"
