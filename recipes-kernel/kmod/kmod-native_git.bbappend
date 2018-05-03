@@ -1,1 +1,0 @@
-SRC_URI += " https://source.codeaurora.org/quic/la/platform/external/kmod/patch/?id=4c30a11d5fa84ebfdd3a8f05fa4ba1c16c074f43;downloadfilename=0001_depmod.patch;md5sum=6d9d47a6358ac26c8cdb03fc83d8ae45"
