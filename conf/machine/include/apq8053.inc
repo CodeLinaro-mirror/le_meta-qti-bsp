@@ -35,11 +35,24 @@ PAGE_SIZE ?= '4096'
 # Max supported inodes
 EXTRA_IMAGECMD ?= "-N 2048"
 
+# Image names
+BOOTIMAGE_TARGET = "${BASEMACHINE}-boot.img"
+CACHEIMAGE_TARGET = "${BASEMACHINE}-cache.ext4"
+PERSISTIMAGE_TARGET = "${BASEMACHINE}-persist.ext4"
+RECOVERYIMAGE_TARGET = "${BASEMACHINE}-recovery.ext4"
+SYSTEMIMAGE_TARGET = "${BASEMACHINE}-sysfs.ext4"
+SYSTEMRWIMAGE_TARGET = "${BASEMACHINE}-systemrw.ext4"
+USERDATAIMAGE_TARGET = "${BASEMACHINE}-usrfs.ext4"
+
 # Sizes for EXT4 (in bytes)
-SYSTEM_SIZE_EXT4 ?= "768000000"
+SYSTEM_SIZE_EXT4 ?= "786432000"
 SYSTEMRW_SIZE_EXT4 ?= "8388608"
 USERDATA_SIZE_EXT4 ?= "3000000000"
 CACHE_SIZE_EXT4 ?= "734003200"
+
+# FEC_SIZE depends on SYSTEM_SIZE_EXT4; command: fec -s "<SYSTEM_SIZE>"
+# If fec enable :  "6172672" ; fec disable : 0 bytes of image size
+FEC_SIZE ?= "6172672"
 
 # Enable LE Verified Boot
 DISTRO_FEATURES_append = " vble"

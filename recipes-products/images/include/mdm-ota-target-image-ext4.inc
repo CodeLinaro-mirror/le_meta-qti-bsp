@@ -37,12 +37,12 @@ do_recovery_ext4() {
     cp -r ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/base-files-recovery/${BASEMACHINE}/radio/. ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RADIO/.
 
     # copy the boot\recovery images
-    cp ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/BOOTABLE_IMAGES/boot.img
+    cp ${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET} ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/BOOTABLE_IMAGES/boot.img
 
-    cp ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/BOOTABLE_IMAGES/recovery.img
-    cp ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/IMAGES/recovery.img
-    cp ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/IMAGES/boot.img
-    cp ${DEPLOY_DIR_IMAGE}/${MACHINE}*-sysfs.ext4 ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/IMAGES/system.img
+    cp ${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET}   ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/BOOTABLE_IMAGES/recovery.img
+    cp ${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET}   ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/IMAGES/recovery.img
+    cp ${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET}   ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/IMAGES/boot.img
+    cp ${DEPLOY_DIR_IMAGE}/${SYSTEMIMAGE_TARGET} ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/IMAGES/system.img
     if [ -e ${DEPLOY_DIR_IMAGE}/system.map ]; then
        cp ${DEPLOY_DIR_IMAGE}/system.map ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/IMAGES/system.map
     fi
@@ -133,6 +133,9 @@ do_recovery_ext4() {
     if [ "${BASEMACHINE}" == "apq8053" ]; then
         echo recovery_upgrade_supported=1 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
     fi
+
+    # set block img diff version to v3
+    echo "blockimgdiff_versions=1,2,3" >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 }
 
 # Task to generate OTA zip files
@@ -155,6 +158,11 @@ python do_gen_otazip_ext4() {
 
     if (d.getVar('OTA_EXTRA_OPTS', True) == '1'):
         cmd3 += " -p system/ -c ${WORKDIR}/rootfs-fsconfig.conf"
+
+    # enable block-based OTA package generation by default
+    # only for apq8053
+    if (d.getVar('BASEMACHINE', True) == 'apq8053'):
+        cmd3 += " --block"
 
     subprocess.call(cmd3, shell=True)
 

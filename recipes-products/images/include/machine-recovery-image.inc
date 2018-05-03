@@ -17,7 +17,9 @@ IMAGE_INSTALL += "base-passwd"
 IMAGE_INSTALL += "system-core-adbd"
 IMAGE_INSTALL += "system-core-logd"
 IMAGE_INSTALL += "system-core-usb"
+IMAGE_INSTALL += "recovery-bin"
 IMAGE_INSTALL += "recovery"
+IMAGE_INSTALL += "${@base_contains('MULTILIB_VARIANTS', 'lib32', 'lib32-recovery', '', d)}"
 IMAGE_INSTALL += "powerapp"
 IMAGE_INSTALL += "powerapp-powerconfig"
 IMAGE_INSTALL += "powerapp-reboot"
@@ -70,12 +72,12 @@ do_makesystem() {
 
         # SELinux feature is enabled
         if [[ "${DISTRO_FEATURES}" =~ "selinux" ]]; then
-            make_ext4fs -s -a / -S ${SELINUX_FILE_CONTEXTS} -l ${RECOVERYFS_SIZE_EXT4} ${DEPLOY_DIR_IMAGE}/${MACHINE}-recovery.ext4 ${IMAGE_ROOTFS}
+            make_ext4fs -s -a / -S ${SELINUX_FILE_CONTEXTS} -l ${RECOVERYFS_SIZE_EXT4} ${DEPLOY_DIR_IMAGE}/${RECOVERYIMAGE_TARGET} ${IMAGE_ROOTFS}
 
             # Create an unsparse image as well to be included as part ota target-files
             make_ext4fs -a / -S ${SELINUX_FILE_CONTEXTS} -l ${RECOVERYFS_SIZE_EXT4} ${UNSPARSED_RECOVERYFS_DEST}/recovery-unsparsed.ext4 ${IMAGE_ROOTFS}
         else
-            make_ext4fs -s -l ${RECOVERYFS_SIZE_EXT4} ${DEPLOY_DIR_IMAGE}/${MACHINE}-recovery.ext4 ${IMAGE_ROOTFS}
+            make_ext4fs -s -l ${RECOVERYFS_SIZE_EXT4} ${DEPLOY_DIR_IMAGE}/${RECOVERYIMAGE_TARGET} ${IMAGE_ROOTFS}
 
             # Create an unsparse image as well to be included as part ota target-files
             make_ext4fs -l ${RECOVERYFS_SIZE_EXT4} ${UNSPARSED_RECOVERYFS_DEST}/recovery-unsparsed.ext4 ${IMAGE_ROOTFS}
