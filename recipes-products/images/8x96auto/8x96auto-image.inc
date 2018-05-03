@@ -15,6 +15,7 @@ IMAGE_INSTALL += "libcap"
 IMAGE_INSTALL += "strongswan"
 IMAGE_INSTALL += "reboot-daemon"
 IMAGE_INSTALL += "procps"
+IMAGE_INSTALL += "ltp"
 
 # Perf
 IMAGE_INSTALL += "${@bb.utils.contains("DISTRO_FEATURES", "early_init", "memory-hotplug", "" ,d)}"
@@ -59,6 +60,10 @@ IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'qtmultimedi
 #IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'qtwebsockets', '',d)}"
 #IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'qtwebchannel', '',d)}"
 
+IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'gstreamer1.0-qvconv', '',d)}"
+IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'gstreamer1.0-qcarcamsrc', '',d)}"
+IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'gstreamer1.0-cupayload', '',d)}"
+IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'tftp-server', '',d)}"
 IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'ces2017-demo', '',d)}"
 IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'can-utils', '',d)}"
 IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'init-can', '',d)}"
@@ -69,8 +74,6 @@ IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'mixer
 IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'hvac', '',d)}"
 IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'poiapp', '',d)}"
 IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'dlt-daemon-test', '',d)}"
-IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'common-api-c++', '',d)}"
-IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'common-api-c++-dbus', '',d)}"
 IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'common-api-test', '',d)}"
 IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'rh850-firmware', '',d)}"
 IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'rh850-flash', '',d)}"
@@ -104,6 +107,8 @@ IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'libaf
 #Always remove below modules
 IMAGE_INSTALL_remove += "firmware-links"
 IMAGE_INSTALL_remove += "packagegroup-agl-demo-platform"
+IMAGE_INSTALL_remove += "linux-firmware-ath9k linux-firmware-ralink"
+IMAGE_INSTALL_remove += "libhardware-legacy qmi-client-helper"
 IMAGE_INSTALL_remove += "web-runtime"
 
 IMAGE_INSTALL_remove += "${@bb.utils.contains("DISTRO_FEATURES", "early-ethernet", "neutrino-eth", "" ,d)}"
