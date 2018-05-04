@@ -36,6 +36,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/mount.h>
+#include <pwd.h>
+#include <stdint.h>
 #include <fcntl.h>
 #include <sched.h>
 #include <errno.h>
@@ -62,10 +64,13 @@ static struct {
   int   usleep;
   int   bindcpumask;
   int   priority;
+  char* username;
   char* wait;
 } app_launcher;
 
 #define BIT_SET(p,n) ((p) & (1 << (n)))
+#define uid_is_valid(uid) ((uid != (uid_t) UINT32_C(0xFFFFFFFF)) && \
+						(uid != (uid_t) UINT32_C(0xFFFF)))
 
 static void inline safe_free(char** p)
 {
@@ -227,6 +232,27 @@ static inline char *strstrip(char *s) {
 	return s;
 }
 
+// enforce_user according to user settings
+// if fail, fallback to root user
+static void inline enforce_user(char* username)
+{
+	struct passwd *pw;
+
+	pw = getpwnam(username);
+	if (!pw) {
+		perror("username is not exist\r\n");
+	}
+	printf("uid is %d", pw->pw_uid);
+	if (!uid_is_valid(pw->pw_uid)) {
+		perror("uid is not valid\r\n");
+	}
+	if (0 == setresuid(pw->pw_uid,pw->pw_uid, pw->pw_uid)) {
+		return;
+	} else {
+		perror("setresuid failed\r\n");
+	}
+}
+
 /*
  * Suceess, return 0, else return -1
  */
@@ -269,6 +295,7 @@ static void inline app_launcher_start_over(void)
 	safe_free(&app_launcher.gpio);
 	safe_free(&app_launcher.pidfile);
 	safe_free(&app_launcher.wait);
+	safe_free(&app_launcher.username);
 	app_launcher.usleep = -1;
 
 	for (i = 0; i < app_launcher.argv_used; i++)
@@ -388,6 +415,12 @@ static inline int parse_line(char* p)
 				printf("bindcpumask is %d", app_launcher.bindcpumask);
 			}
 			break;
+		case 'u':
+			if (0 == strncmp(p + 1, "ser", strlen("ser")) && 0 == find_rvalue(&p)) {
+				app_launcher.username = strdup(p);
+				printf("username is %s", app_launcher.username);
+			}
+			break;
 		case '<':/* end */
 			/*
 			 * When comes to the end, start up the app
@@ -432,6 +465,10 @@ static inline int parse_line(char* p)
 					sp.sched_priority = app_launcher.priority;
 					if (0 != sched_setscheduler( 0, SCHED_FIFO, &sp))
 						printf("sched_setparam failed %d %s\r\n", app_launcher.priority, strerror(errno));
+				}
+
+				if (app_launcher.username) {
+					enforce_user(app_launcher.username);
 				}
 
 				if (app_launcher.gpio) {
