@@ -60,10 +60,6 @@ IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'qtmultimedi
 #IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'qtwebsockets', '',d)}"
 #IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'qtwebchannel', '',d)}"
 
-IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'gstreamer1.0-qvconv', '',d)}"
-IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'gstreamer1.0-qcarcamsrc', '',d)}"
-IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'gstreamer1.0-cupayload', '',d)}"
-IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'tftp-server', '',d)}"
 IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'ces2017-demo', '',d)}"
 IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'can-utils', '',d)}"
 IMAGE_INSTALL_remove += "${@base_conditional('WITH_INTERNAL_LAYER', 'no', 'init-can', '',d)}"
