@@ -18,12 +18,21 @@ dirs755 += "/media/cf /media/net /media/ram \
             /media/mmc1 /srv"
 dirs755_append_apq8009 +="/persist"
 
+SYNERGY_DIR_PRESENT = "${@os.path.exists('${WORKSPACE}/prebuilt_HY11/8x96auto/synergy') or os.path.exists('${WORKSPACE}/prebuilt_HY22/8x96auto/synergy') or os.path.exists('${WORKSPACE}/synergy/synergy-bootstrap')}"
+
+
 do_install_append(){
+  if [ "${SYNERGY_DIR_PRESENT}" == "False" ]; then
+    sed -i -e '/^PARTLABEL=bluetooth/d' ${D}/etc/fstab
+  fi
+
   export REGEXP="^(8x96autogvmquin|8x96autogvmquintcu|8x96autogvmred)$"
   if [ "${MACHINEGROUP}" == "auto" ] || [[ "${BASEMACHINE}" =~ $REGEXP ]]; then
     # Prepare mountpoint in case rootfs is readonly
     install -d ${D}/firmware
-    install -d ${D}/bluetooth
+    if [ "${SYNERGY_DIR_PRESENT}" == "True" ]; then
+      install -d ${D}/bluetooth
+    fi
     install -d ${D}/dsp
     install -d ${D}/persist
     install -d ${D}/cache
