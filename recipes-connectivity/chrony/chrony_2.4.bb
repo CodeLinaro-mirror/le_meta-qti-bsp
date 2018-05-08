@@ -128,3 +128,12 @@ RCONFLICTS_${PN} = "ntp ntimed"
 # Separate the client program into its own package
 PACKAGES =+ "chronyc"
 FILES_chronyc = "${bindir}/chronyc"
+
+SRC_URI_append_8x96autocv2x += "file://default"
+
+FILES_${PN}_append_8x96autocv2x += "/data/chrony"
+
+do_install_append_8x96autocv2x () {
+    install -d ${D}/data/chrony
+    install -D -m 0644 ${WORKDIR}/default ${D}${sysconfdir}/default/chronyd
+}
