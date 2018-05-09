@@ -90,6 +90,8 @@ IMAGE_INSTALL += "cynara"
 IMAGE_INSTALL += "security-manager"
 IMAGE_INSTALL += "security-manager-policy"
 IMAGE_INSTALL += "agl-users"
+IMAGE_INSTALL += "busybox"
+IMAGE_INSTALL += "dhcp-client"
 
 IMAGE_ROOTFS_SIZE = "2097152"
 IMAGE_ROOTFS_EXTRA_SPACE_append = "${@bb.utils.contains("DISTRO_FEATURES", "systemd", " + 4096", "" ,d)}"
