@@ -212,7 +212,6 @@ do_deploy () {
         extra_mkbootimg_params='--dt ${D}/${KERNEL_IMAGEDEST}/masterDTB --tags-addr ${KERNEL_TAGS_OFFSET}'
     fi
 
-    mkdir -p ${DEPLOY_DIR_IMAGE}
     if [ ${KERNEL_IMAGETYPE} == "Image" ]; then
       ${STAGING_BINDIR_NATIVE}/packkernelimg --kernel "${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}" --dt "${B}/arch/${ARCH}/boot/dts/qcom" --dt_list "${KERNEL_DTB_LIST}"
     fi
@@ -224,9 +223,9 @@ do_deploy () {
         --pagesize ${PAGE_SIZE} \
         --base ${KERNEL_BASE} \
         --ramdisk_offset 0x0 \
-        ${extra_mkbootimg_params} --output ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img
-    cp ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} "${DEPLOY_DIR_IMAGE}/"
-    cp ${B}/vmlinux "${DEPLOY_DIR_IMAGE}/"
+        ${extra_mkbootimg_params} --output ${DEPLOYDIR}/${MACHINE}-boot.img
+    cp ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} "${DEPLOYDIR}/"
+    cp ${B}/vmlinux "${DEPLOYDIR}/"
 }
 
 # Including the file depends on chipset
