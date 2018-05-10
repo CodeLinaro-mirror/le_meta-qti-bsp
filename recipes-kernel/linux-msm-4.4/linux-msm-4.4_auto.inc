@@ -54,20 +54,12 @@ SRC_URI_append_8x96autocv2x += " \
     file://0001-esoc-Disable-access-check-for-ESOC-IOCTLs.patch \
 "
 
-python do_getpatches() {
-    import os
-    cmd = "wget https://source.codeaurora.org/quic/la/kernel/msm-4.4/patch/?id=f083f557186d77de5f14bf90aec1bfe2503cf513 -O ${WORKSPACE}/poky/meta-qti-bsp/recipes-kernel/linux-msm-4.4/files/0001-dmaengine-Add-helper-function-to-prep-for-error-repo.patch"
-    os.system(cmd)
-    cmd = "wget https://source.codeaurora.org/quic/la/kernel/msm-4.4/patch/?id=f067025bc676ba8d18fba5f959598339e39b86db -O ${WORKSPACE}/poky/meta-qti-bsp/recipes-kernel/linux-msm-4.4/files/0001-dmaengine-add-support-to-provide-error-result-from-a.patch"
-    os.system(cmd)
-}
-
 SRC_URI_append_8x96mizar += " \
     git://source.codeaurora.org/quic/la/kernel/msm-4.4;nobranch=1;tag=8a1eab637309319aee4caa10b196eb7327b549ae;protocol=git;destsuffix=drivers/ntb;subpath=drivers/ntb \
     git://source.codeaurora.org/quic/la/kernel/msm-4.4;nobranch=1;tag=8a1eab637309319aee4caa10b196eb7327b549ae;protocol=git;destsuffix=include/linux/;subpath=include/linux \
     file://0001-defconfig-Enable-NTB-framework-and-IDT-hw-driver.patch \
-    file://0001-dmaengine-Add-helper-function-to-prep-for-error-repo.patch \
-    file://0001-dmaengine-add-support-to-provide-error-result-from-a.patch \
+    https://source.codeaurora.org/quic/la/kernel/msm-4.4/patch/?id=f083f557186d77de5f14bf90aec1bfe2503cf513;downloadfilename=0001-dmaengine-Add-helper-function-to-prep-for-error-repo.patch;md5sum=4d8b270cb5a0efc0192b8258e3bfa228;sha256sum=c07431e5ee692f60e82f7310bd1b47787d2c588236cf42a9eeba734453e0fe32 \
+    https://source.codeaurora.org/quic/la/kernel/msm-4.4/patch/?id=f067025bc676ba8d18fba5f959598339e39b86db;downloadfilename=0001-dmaengine-add-support-to-provide-error-result-from-a.patch;md5sum=c84a235ce3b2ad450da1c27d4b790b86;sha256sum=948512ded510b2ab9121da4befd9acd3cb4e07690dd0560b7d9bdc09ba112223 \
     file://0001-ntb-ntb_perf-Disable-dma-routine.patch \
     file://0001-ntb-hw-idt-Fix-set-DMA-mask-bit-failure.patch \
     file://0001-dirvers-ntb-Fix-isr-routine-backport-issue.patch \
@@ -101,7 +93,6 @@ do_unpack_extra () {
     fi
 }
 
-addtask getpatches before do_fetch
 addtask unpack_extra after do_unpack before do_patch
 
 SRC_URI_append += " \
