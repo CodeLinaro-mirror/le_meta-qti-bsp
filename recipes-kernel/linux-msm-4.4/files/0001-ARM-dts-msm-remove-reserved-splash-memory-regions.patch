@@ -1,0 +1,75 @@
+From c3d909e181cc25d4030e658f8b4347cc08b5e41e Mon Sep 17 00:00:00 2001
+From: Guchun Chen <guchunc@codeaurora.org>
+Date: Fri, 11 May 2018 17:13:51 +0800
+Subject: [PATCH] ARM: dts: msm: remove reserved splash memory regions
+
+Required by customer as they do not use the splash feature in
+LK, so the reserved memory is not needed on msm8996 boards.
+
+Change-Id: Id5177f4af05922949262aae2bf182fcfb6894aa4
+Signed-off-by: Guchun Chen <guchunc@codeaurora.org>
+---
+ arch/arm/boot/dts/qcom/msm8996-mdss.dtsi | 7 -------
+ arch/arm/boot/dts/qcom/msm8996-sde.dtsi  | 2 --
+ arch/arm/boot/dts/qcom/msm8996.dtsi      | 9 ---------
+ 3 files changed, 18 deletions(-)
+
+diff --git a/arch/arm/boot/dts/qcom/msm8996-mdss.dtsi b/arch/arm/boot/dts/qcom/msm8996-mdss.dtsi
+index 12fa68f..11db3b6 100644
+--- a/arch/arm/boot/dts/qcom/msm8996-mdss.dtsi
++++ b/arch/arm/boot/dts/qcom/msm8996-mdss.dtsi
+@@ -260,18 +260,11 @@
+ 		mdss_fb0: qcom,mdss_fb_primary {
+ 			cell-index = <0>;
+ 			compatible = "qcom,mdss-fb";
+-			qcom,cont-splash-memory {
+-				linux,contiguous-region = <&cont_splash_mem>;
+-			};
+ 		};
+ 
+ 		mdss_fb2: qcom,mdss_fb_hdmi {
+ 			cell-index = <2>;
+ 			compatible = "qcom,mdss-fb";
+-			qcom,cont-splash-memory {
+-				linux,contiguous-region =
+-				<&cont_splash_mem_hdmi>;
+-			};
+ 		};
+ 
+ 		mdss_fb3: qcom,mdss_fb_secondary {
+diff --git a/arch/arm/boot/dts/qcom/msm8996-sde.dtsi b/arch/arm/boot/dts/qcom/msm8996-sde.dtsi
+index 11c4560..b00d2ee 100644
+--- a/arch/arm/boot/dts/qcom/msm8996-sde.dtsi
++++ b/arch/arm/boot/dts/qcom/msm8996-sde.dtsi
+@@ -20,8 +20,6 @@
+ 			"vbif_phys",
+ 			"vbif_nrt_phys";
+ 
+-		contiguous-region = <&cont_splash_mem &cont_splash_mem_hdmi>;
+-
+ 		/* clock and supply entries */
+ 		clocks = <&clock_mmss clk_mdss_ahb_clk>,
+ 			 <&clock_mmss clk_mdss_axi_clk>,
+diff --git a/arch/arm/boot/dts/qcom/msm8996.dtsi b/arch/arm/boot/dts/qcom/msm8996.dtsi
+index 3b067e6..b6a320a 100644
+--- a/arch/arm/boot/dts/qcom/msm8996.dtsi
++++ b/arch/arm/boot/dts/qcom/msm8996.dtsi
+@@ -253,15 +253,6 @@
+ 		       label = "dfps_data_mem";
+ 		};
+ 
+-		cont_splash_mem: cont_splash_mem@83401000 {
+-			reg = <0 0x83401000 0 0x23FF000>;
+-			label = "cont_splash_mem";
+-		};
+-
+-		cont_splash_mem_hdmi: cont_splash_mem_hdmi@bdd00000 {
+-			reg = <0 0xbdd00000 0 0x23ff000>;
+-			label = "cont_splash_mem_hdmi";
+-		};
+ 	};
+ };
+ 
+-- 
+1.9.1
+

@@ -53,6 +53,11 @@ python __anonymous () {
 
   if bb.utils.contains('DISTRO_FEATURES', 'mm-diet', True, False, d):
       d.appendVar("SRC_URI", " file://0009-ARM-dts-msm-DRAM-diet-for-dvrs.patch")
+
+  if oe.utils.conditional('WITH_INTERNAL_LAYER', 'no', True, False, d):
+      if d.getVar('BASEMACHINE', True) == '8x96auto':
+          d.appendVar("SRC_URI", " file://0001-ARM-dts-msm-remove-reserved-splash-memory-regions.patch")
+
   # Override KERNEL_IMAGETYPE_FOR_MAKE variable, which is internal
   # to kernel.bbclass. We override the variable as msm kernel can't
   # support alternate image builds
