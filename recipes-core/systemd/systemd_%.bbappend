@@ -33,6 +33,12 @@ do_install_append () {
    ln -sf /lib/systemd/system/systemd-logind.service ${D}/lib/systemd/system/ffbm.target.wants/systemd-logind.service
    ln -sf /lib/systemd/system/getty.target ${D}/lib/systemd/system/ffbm.target.wants/getty.target
    ln -sf /lib/systemd/system/systemd-ask-password-wall.path ${D}/lib/systemd/system/ffbm.target.wants/systemd-ask-password-wall.path
+
+   #  Mask journaling services by default.
+   #  'systemctl unmask' can be used on device to enable them if needed.
+   ln -sf /dev/null ${D}/etc/systemd/system/systemd-journald.service
+   ln -sf /dev/null ${D}${systemd_unitdir}/system/sysinit.target.wants/systemd-journal-flush.service
+   ln -sf /dev/null ${D}${systemd_unitdir}/system/sysinit.target.wants/systemd-journal-catalog-update.service
 }
 
 # Scripts for pre and post hibernate functions for BatCam
