@@ -87,4 +87,6 @@ do_install () {
         all_modules SHOW_COMMANDS=true USE_INSTALL=true || die "make failed"
 }
 
+do_compile[depends] += "virtual/kernel:do_shared_workdir"
+
 do_configure[noexec] = "1"
