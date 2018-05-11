@@ -14,6 +14,7 @@ DEPENDS += "virtual/libc"
 DEPENDS += "libcutils liblog liblog-native system-core"
 DEPENDS += "weston"
 DEPENDS += "mm-video-noship"
+DEPENDS += "adreno-headers"
 
 DEPENDS_remove_8x96autogvmquin = "mm-video-noship"
 DEPENDS_remove_8x96autogvmred = "mm-video-noship"
