@@ -59,7 +59,7 @@ do_install_append(){
     ln -s /mnt/sdcard ${D}/sdcard
     rmdir ${D}/tmp
     ln -s /var/tmp ${D}/tmp
-    if [ ${BASEMACHINE} == "mdm9650" ]; then
+    if [ ${MACHINE} == "mdm9150-cv2x" ]; then
       ln -s /etc/resolvconf/run/resolv.conf ${D}/etc/resolv.conf
     else
       ln -s /var/run/resolv.conf ${D}/etc/resolv.conf
