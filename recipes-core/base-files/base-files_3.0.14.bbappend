@@ -18,9 +18,6 @@ dirs755 += "/media/cf /media/net /media/ram \
             /media/mmc1 /srv"
 dirs755_append_apq8009 +="/persist"
 
-SYNERGY_DIR_PRESENT = "${@os.path.exists('${WORKSPACE}/prebuilt_HY11/8x96auto/synergy') or os.path.exists('${WORKSPACE}/prebuilt_HY22/8x96auto/synergy') or os.path.exists('${WORKSPACE}/synergy/synergy-bootstrap')}"
-
-
 do_install_append(){
   if [ "${SYNERGY_DIR_PRESENT}" == "False" ]; then
     sed -i -e '/^PARTLABEL=bluetooth/d' ${D}/etc/fstab
