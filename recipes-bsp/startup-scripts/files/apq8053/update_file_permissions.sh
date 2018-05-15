@@ -41,8 +41,8 @@ if [ -e "/cache/recovery/ota_status" ]; then
     if [ $ota_status == "OTA_DONE" ]; then
         set_mode "/data/misc/camera" 1006 1000 775
         set_mode "/data/misc/qmmf" 1000 1000 775
-        set_mode "/persist/sensors" 3011 0 755
-        set_mode "/persist/sensors/sensors_settings" 3011 0 640
-        set_mode "/persist/sensors/sns.reg" 3011 0 660
+        set_mode "/persist/sensors" 3011 1000 775
+        set_mode "/persist/sensors/sensors_settings" 3011 1000 660
+        set_mode "/persist/sensors/sns.reg" 3011 3011 600
     fi
 fi
