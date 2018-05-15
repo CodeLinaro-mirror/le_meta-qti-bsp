@@ -20,6 +20,10 @@ INITSCRIPT_PARAMS_mdm = "start 30 S ."
 FILES_${PN} += "${systemd_unitdir}/system/"
 
 do_install() {
+     # if full disk encryption is enabled on the target, do not mount userdata with find_partitions script.
+     if ${@bb.utils.contains('DISTRO_FEATURES', 'full-disk-encryption', 'true', 'false', d)}; then
+         sed -i -e '/userdata/d' ${S}/find_partitions.sh
+     fi
      if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
        install -m 0755 ${WORKDIR}/${BASEMACHINE}/find_partitions.sh -D ${D}${sysconfdir}/initscripts/find_partitions.sh
        install -d  ${D}${systemd_unitdir}/system/
