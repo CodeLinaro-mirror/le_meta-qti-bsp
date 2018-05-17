@@ -22,7 +22,12 @@ IMAGE_INSTALL += "cannelloni"
 
 IMAGE_INSTALL += "gstreamer"
 IMAGE_INSTALL += "gstreamer1.0"
+IMAGE_INSTALL += "gstreamer1.0-libav"
+IMAGE_INSTALL += "gstreamer1.0-omx"
+IMAGE_INSTALL += "gstreamer1.0-plugins-bad"
+IMAGE_INSTALL += "gstreamer1.0-plugins-base"
 IMAGE_INSTALL += "gstreamer1.0-plugins-good"
+IMAGE_INSTALL += "gstreamer1.0-plugins-ugly"
 
 IMAGE_INSTALL += "gps-utils"
 IMAGE_INSTALL += "loc-hal"
