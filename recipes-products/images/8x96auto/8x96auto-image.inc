@@ -15,6 +15,7 @@ IMAGE_INSTALL += "libcap"
 IMAGE_INSTALL += "strongswan"
 IMAGE_INSTALL += "reboot-daemon"
 IMAGE_INSTALL += "procps"
+IMAGE_INSTALL += "protobuf"
 
 #BT
 IMAGE_INSTALL += "${@base_conditional('SYNERGY_DIR_PRESENT', 'True', 'synergy-opensource', '', d)}"
