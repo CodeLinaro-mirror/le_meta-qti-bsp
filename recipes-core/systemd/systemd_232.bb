@@ -251,6 +251,11 @@ do_install() {
 	# Set the maximium size of runtime journal to 512k as default
 	sed -i -e 's/.*RuntimeMaxUse.*/RuntimeMaxUse=512K/' ${D}${sysconfdir}/systemd/journald.conf
 
+	if [ "${WITH_INTERNAL_LAYER}" == "no" ]; then
+		# Disable journal storage
+		sed -i -e 's/.*Storage.*/Storage=none/' ${D}${sysconfdir}/systemd/journald.conf
+	fi
+
 	# this file is needed to exist if networkd is disabled but timesyncd is still in use since timesyncd checks it
 	# for existence else it fails
 	if [ -s ${D}${exec_prefix}/lib/tmpfiles.d/systemd.conf ]; then
@@ -313,6 +318,7 @@ PACKAGES =+ "\
     ${PN}-xorg-xinitrc \
     ${PN}-container \
     ${PN}-extra-utils \
+    ${PN}-ask-password \
 "
 
 SUMMARY_${PN}-container = "Tools for containers and VMs"
@@ -415,15 +421,6 @@ FILES_${PN}-extra-utils = "\
                         ${bindir}/systemd-cgls \
                         ${bindir}/systemd-cgtop \
                         ${bindir}/systemd-stdio-bridge \
-                        ${base_bindir}/systemd-ask-password \
-                        ${base_bindir}/systemd-tty-ask-password-agent \
-                        ${systemd_unitdir}/system/systemd-ask-password-console.path \
-                        ${systemd_unitdir}/system/systemd-ask-password-console.service \
-                        ${systemd_unitdir}/system/systemd-ask-password-wall.path \
-                        ${systemd_unitdir}/system/systemd-ask-password-wall.service \
-                        ${systemd_unitdir}/system/sysinit.target.wants/systemd-ask-password-console.path \
-                        ${systemd_unitdir}/system/sysinit.target.wants/systemd-ask-password-wall.path \
-                        ${systemd_unitdir}/system/multi-user.target.wants/systemd-ask-password-wall.path \
                         ${rootlibexecdir}/systemd/systemd-resolve-host \
                         ${rootlibexecdir}/systemd/systemd-ac-power \
                         ${rootlibexecdir}/systemd/systemd-activate \
@@ -444,6 +441,17 @@ FILES_${PN}-extra-utils = "\
                         ${systemd_unitdir}/system/sockets.target.wants/systemd-initctl.socket \
                         ${rootlibexecdir}/systemd/system-generators/systemd-gpt-auto-generator \
                         ${rootlibexecdir}/systemd/systemd-cgroups-agent \
+"
+FILES_${PN}-ask-password = "\
+                        ${base_bindir}/systemd-ask-password \
+                        ${base_bindir}/systemd-tty-ask-password-agent \
+                        ${systemd_unitdir}/system/systemd-ask-password-console.path \
+                        ${systemd_unitdir}/system/systemd-ask-password-console.service \
+                        ${systemd_unitdir}/system/systemd-ask-password-wall.path \
+                        ${systemd_unitdir}/system/systemd-ask-password-wall.service \
+                        ${systemd_unitdir}/system/sysinit.target.wants/systemd-ask-password-console.path \
+                        ${systemd_unitdir}/system/sysinit.target.wants/systemd-ask-password-wall.path \
+                        ${systemd_unitdir}/system/multi-user.target.wants/systemd-ask-password-wall.path \
 "
 
 CONFFILES_${PN} = "${sysconfdir}/machine-id \
