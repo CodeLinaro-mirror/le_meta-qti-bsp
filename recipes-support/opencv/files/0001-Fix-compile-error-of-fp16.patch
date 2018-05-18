@@ -1,0 +1,56 @@
+From 5fd82a3c27e269ee2f1926ff6e989e31899faf64 Mon Sep 17 00:00:00 2001
+From: Yong Zhang <zyong@codeaurora.org>
+Date: Tue, 22 May 2018 14:05:03 +0800
+Subject: [PATCH] Fix compile error of fp16.
+
+Signed-off-by: Yong Zhang <zyong@codeaurora.org>
+---
+ modules/core/include/opencv2/core/cvdef.h | 4 +---
+ modules/core/src/convert.cpp              | 4 +---
+ 2 files changed, 2 insertions(+), 6 deletions(-)
+
+diff --git a/modules/core/include/opencv2/core/cvdef.h b/modules/core/include/opencv2/core/cvdef.h
+index a10936b..c79f7d7 100644
+--- a/modules/core/include/opencv2/core/cvdef.h
++++ b/modules/core/include/opencv2/core/cvdef.h
+@@ -312,9 +312,7 @@ enum CpuFeatures {
+ typedef union Cv16suf
+ {
+     short i;
+-#if ( defined (__arm__) || defined (__aarch64__) ) && !defined (__CUDACC__) && ( defined (__GNUC__) && ( ( ( 4 <= __GNUC__ ) && ( 7 <= __GNUC__ ) ) || ( 5 <= __GNUC__ ) ) )
+-    __fp16 h;
+-#endif
++    float h;
+     struct _fp16Format
+     {
+         unsigned int significand : 10;
+diff --git a/modules/core/src/convert.cpp b/modules/core/src/convert.cpp
+index 46db26f..5069e0f 100644
+--- a/modules/core/src/convert.cpp
++++ b/modules/core/src/convert.cpp
+@@ -4381,13 +4381,11 @@ struct Cvt_SIMD<float, int>
+ 
+ #endif
+ 
+-#if !( ( defined (__arm__) || defined (__aarch64__) ) && ( defined (__GNUC__) && ( ( ( 4 <= __GNUC__ ) && ( 7 <= __GNUC__ ) ) || ( 5 <= __GNUC__ ) ) ) )
+ // const numbers for floating points format
+ const unsigned int kShiftSignificand    = 13;
+ const unsigned int kMaskFp16Significand = 0x3ff;
+ const unsigned int kBiasFp16Exponent    = 15;
+ const unsigned int kBiasFp32Exponent    = 127;
+-#endif
+ 
+ #if ( defined (__arm__) || defined (__aarch64__) ) && ( defined (__GNUC__) && ( ( ( 4 <= __GNUC__ ) && ( 7 <= __GNUC__ ) ) || ( 5 <= __GNUC__ ) ) )
+ static float convertFp16SW(short fp16)
+@@ -4451,7 +4449,7 @@ static float convertFp16SW(short fp16)
+ }
+ #endif
+ 
+-#if ( defined (__arm__) || defined (__aarch64__) ) && ( defined (__GNUC__) && ( ( ( 4 <= __GNUC__ ) && ( 7 <= __GNUC__ ) ) || ( 5 <= __GNUC__ ) ) )
++#if ( 0 )
+ static short convertFp16SW(float fp32)
+ {
+     // Fp32 -> Fp16
+-- 
+1.9.1
+
