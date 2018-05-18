@@ -205,8 +205,9 @@ static inline void prepare_dir(char* p)
 				pw = getpwnam(TO_STRING(WESTON_USER));
 				if (!pw) {
 					perror("username is not exist\r\n");
+				} else {
+					chown(DISPLAY_XDG_RUNTIME_DIR, pw->pw_uid, pw->pw_gid);
 				}
-				chown(DISPLAY_XDG_RUNTIME_DIR, pw->pw_uid, pw->pw_gid);
 				mkdirs("/run/early", 0775);
 			}
 			break;

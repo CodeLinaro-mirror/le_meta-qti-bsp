@@ -14,7 +14,7 @@ DEPENDS += " agl-users"
 
 do_compile() {
         if ${@bb.utils.contains('DISTRO_FEATURES', 'early-ethernet', 'true', 'false', d)}; then
-            ${CC} ${CFLAGS} ${LDFLAGS} -static -D EARLY_ETHERNET -D DISPLAY_USER=${WESTONUSER} -o ${S}/early_init ${S}/early_init.c
+            ${CC} ${CFLAGS} ${LDFLAGS} -static -D EARLY_ETHERNET -D WESTON_USER=${WESTONUSER} -o ${S}/early_init ${S}/early_init.c
         else
             ${CC} ${CFLAGS} ${LDFLAGS} -static -D WESTON_USER=${WESTONUSER} -o ${S}/early_init ${S}/early_init.c
         fi
