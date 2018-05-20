@@ -42,6 +42,9 @@ SECURITY_CFLAGS_pn-native-frameworks  = "${SECURITY_PIC_CFLAGS}"
 SECURITY_CFLAGS_pn-av-frameworks  = "${SECURITY_PIC_CFLAGS}"
 
 # BT OSS packages to use -fPIC in security flags instead of -fpie
+SECURITY_CFLAGS_pn-bt-property_mdm = "${SECURITY_PIC_CFLAGS}"
+SECURITY_CFLAGS_pn-bt-app_mdm = "${SECURITY_PIC_CFLAGS}"
+SECURITY_CFLAGS_pn-libbt-vendor_mdm = "${SECURITY_PIC_CFLAGS}"
 SECURITY_CFLAGS_pn-fluoride = "${SECURITY_PIC_CFLAGS}"
 
 SECURITY_CFLAGS_pn-display-hal = "${SECURITY_PIC_CFLAGS}"
