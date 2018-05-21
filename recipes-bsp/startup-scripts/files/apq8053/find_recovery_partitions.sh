@@ -33,6 +33,8 @@ emmc_dir=/dev/block/bootdevice/by-name
 mtd_file=/proc/mtd
 fstab_file=/res/recovery_volume_detected
 
+# mount a tmpfs on /res
+mount -t tmpfs tmpfs /res
 
 ubi_device_number=1
 
