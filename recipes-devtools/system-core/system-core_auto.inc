@@ -15,15 +15,3 @@ do_install_append() {
       sed -i -e 's/echo 0 > \/proc\/sys\/kernel\/panic/:/' ${D}/etc/initscripts/init_post_boot
    fi
 }
-
-pkg_postinst_${PN}-adbd () {
-    if [ "${BASEMACHINE}" != "8x96autogvmquin" ] && [ "${BASEMACHINE}" != "8x96autogvmquintcu" ] && [ "${BASEMACHINE}" != "8x96autogvmgh" ]; then
-        if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
-            if [ -n "$D" ]; then
-                OPTS="--root=$D"
-            fi
-            systemctl $OPTS mask adbd.service
-        fi
-    fi
-}
-
