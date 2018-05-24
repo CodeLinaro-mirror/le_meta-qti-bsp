@@ -19,6 +19,7 @@ S = "${WORKDIR}/frameworks/native"
 
 INITSCRIPT_NAME = "servicemanager.sh"
 SYSTEMD_SERVICE_${PN} = " servicemanager.service "
+SYSTEMD_SERVICE_${PN}_8x96auto = " "
 SYSTEMD_AUTO_ENABLE_${PN} = "enable"
 SYSTEMD_AUTO_ENABLE_${PN}_8x96auto = "disable"
 
@@ -27,13 +28,12 @@ EXTRA_OECONF = " --with-core-includes=${WORKSPACE}/system/core/include --with-gl
 CFLAGS += "-I${STAGING_INCDIR}/libselinux"
 
 do_install_append() {
-    install -m 0755 ${WORKDIR}/servicemanager.sh -D ${D}/${sysconfdir}/init.d/servicemanager.sh
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
-        install -d ${D}${systemd_unitdir}/system/
-        install -m 0644 ${WORKDIR}/servicemanager.service -D ${D}${systemd_unitdir}/system/servicemanager.service
-
         # disable servicemanager.service for 8x96auto
-        if [ "${BASEMACHINE}" == "8x96autogvmquin" ] || [ "${BASEMACHINE}" == "8x96autogvmquintcu" ]; then
+        if [ "${BASEMACHINE}" != "8x96auto" ] ; then
+           install -m 0755 ${WORKDIR}/servicemanager.sh -D ${D}/${sysconfdir}/init.d/servicemanager.sh
+           install -d ${D}${systemd_unitdir}/system/
+           install -m 0644 ${WORKDIR}/servicemanager.service -D ${D}${systemd_unitdir}/system/servicemanager.service
            install -d ${D}${systemd_unitdir}/system/sysinit.target.wants/
            ln -sf ${systemd_unitdir}/system/servicemanager.service ${D}${systemd_unitdir}/system/sysinit.target.wants/servicemanager.service
         fi
