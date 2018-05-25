@@ -4,17 +4,19 @@ require recipes-platform/images/agl-demo-platform.bb
 
 EXTRA_IMAGE_FEATURES += "package-management"
 EXTRA_IMAGE_FEATURES += "tools-debug"
+EXTRA_IMAGE_FEATURES += "ssh-server-openssh"
 
 IMAGE_INSTALL += "packagegroup-agl-core"
 IMAGE_INSTALL += "packagegroup-agl-ivi"
 IMAGE_INSTALL += "packagegroup-ivi-common-core"
-IMAGE_INSTALL += "packagegroup-agl-demo-platform"
+IMAGE_INSTALL_remove += "packagegroup-agl-demo-platform"
+IMAGE_INSTALL += "packagegroup-agl-appfw"
 
 IMAGE_INSTALL += "weston"
 IMAGE_INSTALL += "weston-examples"
 IMAGE_INSTALL += "qtbase-examples"
-IMAGE_INSTALL += "qtwebkit"
-IMAGE_INSTALL += "qtwebkit-examples-examples"
+#IMAGE_INSTALL += "qtwebkit"
+#IMAGE_INSTALL += "qtwebkit-examples-examples"
 IMAGE_INSTALL += "qtmultimedia"
 IMAGE_INSTALL += "qtmultimedia-plugins"
 IMAGE_INSTALL += "qtmultimedia-qmlplugins"
@@ -31,7 +33,7 @@ IMAGE_INSTALL += "packagegroup-multimedia"
 IMAGE_INSTALL += "pulseaudio-module-acdb"
 IMAGE_INSTALL += "pulseaudio-module-codec-control"
 IMAGE_INSTALL += "start-scripts-firmware-links"
-IMAGE_INSTALL += "start-scripts-find-partitions"
+#IMAGE_INSTALL += "start-scripts-find-partitions"
 #IMAGE_INSTALL += "neutrino-eth"
 #IMAGE_INSTALL += "open-avb"
 IMAGE_INSTALL += "iperf3"
@@ -68,7 +70,8 @@ IMAGE_INSTALL += "persistence-administrator"
 IMAGE_INSTALL += "node-state-manager"
 IMAGE_INSTALL += "node-health-monitor"
 IMAGE_INSTALL += "node-startup-controller"
-
+IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'mm-vdec-omx-test', '',d)}"
+IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'mm-venc-omx-test', '',d)}"
 IMAGE_INSTALL += "usbutils"
 IMAGE_INSTALL += "sysstat"
 IMAGE_INSTALL += "glib-2.0-utils"
@@ -76,6 +79,9 @@ IMAGE_INSTALL += "smem"
 
 # smack support
 IMAGE_INSTALL_append_smack = " smack-userspace"
+# libcap
+IMAGE_INSTALL += "libcap"
+IMAGE_INSTALL += "libcap-bin"
 
 # AFM and Security
 IMAGE_INSTALL += "af-main"
@@ -94,5 +100,11 @@ IMAGE_INSTALL += "agl-users"
 #IMAGE_INSTALL += "libuhab"
 #IMAGE_INSTALL += "uhabtest"
 
+#PTP Virtual
+IMAGE_INSTALL += "ptp-virtual"
+
 IMAGE_ROOTFS_SIZE = "2097152"
 IMAGE_ROOTFS_EXTRA_SPACE_append = "${@bb.utils.contains("DISTRO_FEATURES", "systemd", " + 4096", "" ,d)}"
+
+USERDATA_SIZE_EXT4 = "45M"
+PERSIST_SIZE_EXT4  = "32M"

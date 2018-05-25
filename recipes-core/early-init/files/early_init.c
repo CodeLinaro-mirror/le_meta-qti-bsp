@@ -27,6 +27,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -36,28 +37,35 @@
 #include <sys/stat.h>
 #include <sys/mount.h>
 #include <fcntl.h>
+#include <sched.h>
 #include <errno.h>
 
-#define DEFAULT_CONF   "/etc/early_init.conf"
-#define END_TAG        "<end>"
-#define LINE_MAX       2048
-#define WHITESPACE     " \t\n\r"
-#define KPI_VALUE_PATH "/debug/bootkpi/kpi_values"
-#define GPIO_EXPORT    "/sys/class/gpio/export"
+#define DEFAULT_CONF    "/etc/early_init.conf"
+#define END_TAG         "<end>"
+#define LINE_MAX        2048
+#define WHITESPACE      " \t\n\r"
+#define KPI_VALUE_PATH  "/debug/bootkpi/kpi_values"
+#define GPIO_EXPORT     "/sys/class/gpio/export"
+#define DRM_CARD_PATH   "/dev/dri/card0"
+#define VIDEO_CARD_PATH "/dev/video32"
 
 static struct {
-	char* appname;
-	char* cmd;
-	char* applog;
-	char* pidfile;
-	int   env_used;
-	char* env[32];
-	int   argv_used;
-	char* argv[32];
-	char* gpio;
-	int   usleep;
-	char* wait;
+  char* appname;
+  char* cmd;
+  char* applog;
+  char* pidfile;
+  int   env_used;
+  char* env[32];
+  int   argv_used;
+  char* argv[32];
+  char* gpio;
+  int   usleep;
+  int   bindcpumask;
+  int   priority;
+  char* wait;
 } app_launcher;
+
+#define BIT_SET(p,n) ((p) & (1 << (n)))
 
 static void inline safe_free(char** p)
 {
@@ -271,6 +279,8 @@ static void inline app_launcher_start_over(void)
 
 	app_launcher.argv_used = 0;
 	app_launcher.env_used = 0;
+	app_launcher.bindcpumask = -1;
+	app_launcher.priority = -1;
 
 	return;
 }
@@ -359,11 +369,23 @@ static inline int parse_line(char* p)
 				app_launcher.pidfile = strdup(p);
 				printf("pidfile is %s", app_launcher.pidfile);
 			}
+			if (0 == strncmp(p + 1, "riority", strlen("riority")) && 0 == find_rvalue(&p)) {
+				app_launcher.priority = atoi(p);
+				printf("priority is %d", app_launcher.priority);
+			}
 			break;
 		case 'm':/* msleep */
 			if (0 == strncmp(p + 1, "sleep", strlen("sleep")) && 0 == find_rvalue(&p)) {
 				app_launcher.usleep = atoi(p) * 1000;
 				printf("usleep is %d", app_launcher.usleep);
+			}
+			break;
+		case 'b':/* bindcpumask */
+			if (0 == strncmp(p + 1, "indcpumask", strlen("indcpumask")) && 0 == find_rvalue(&p)) {
+				app_launcher.bindcpumask = atoi(p);
+				if (app_launcher.bindcpumask < -1 || app_launcher.bindcpumask > 15)
+					app_launcher.bindcpumask = -1;
+				printf("bindcpumask is %d", app_launcher.bindcpumask);
 			}
 			break;
 		case '<':/* end */
@@ -393,6 +415,25 @@ static inline int parse_line(char* p)
 					}
 				}
 
+				if (app_launcher.bindcpumask != -1) {
+					cpu_set_t mask;
+					CPU_ZERO(&mask);
+					for (int i = 0; i < 4; i++) {
+						if (BIT_SET(app_launcher.bindcpumask, i))
+							CPU_SET(i, &mask);
+					}
+					if (0 != sched_setaffinity(0, sizeof(mask), &mask))
+						printf("sched_setaffinity failed %d %s\r\n", app_launcher.bindcpumask, strerror(errno));
+				}
+
+				if (app_launcher.priority > 0) {
+					struct sched_param sp;
+					memset( &sp, 0, sizeof(sp) );
+					sp.sched_priority = app_launcher.priority;
+					if (0 != sched_setscheduler( 0, SCHED_FIFO, &sp))
+						printf("sched_setparam failed %d %s\r\n", app_launcher.priority, strerror(errno));
+				}
+
 				if (app_launcher.gpio) {
 					fd = open(GPIO_EXPORT, O_WRONLY);
 					if (fd < 0)
@@ -404,9 +445,6 @@ static inline int parse_line(char* p)
 					safe_close(fd);
 				}
 
-				if (app_launcher.usleep > 0)
-					usleep(app_launcher.usleep);
-
 				if (app_launcher.pidfile) {
 					fd = open(app_launcher.pidfile, O_WRONLY | O_CREAT);
 					if (fd < 0)
@@ -414,7 +452,7 @@ static inline int parse_line(char* p)
 					else {
 						snprintf(pid_file, sizeof(pid_file) , "%d" ,getpid());
 						if (-1 == write(fd, pid_file, sizeof(pid_file)))
-							printf("write pidfile i%s failed: %s", app_launcher.pidfile, strerror(errno));
+							printf("write pidfile %s failed: %s", app_launcher.pidfile, strerror(errno));
 					}
 					safe_close(fd);
 				}
@@ -424,25 +462,15 @@ static inline int parse_line(char* p)
 				 */
 				if (app_launcher.wait) {
 					printf("app %s waiting for %s ...\r\n", app_launcher.appname, app_launcher.wait);
-					for (i = 0; i < 50; i++) {
+					for (i = 0; i < 30; i++) {
 						if (-1 != access(app_launcher.wait, F_OK))
 							break;
-						usleep(15000);
+						usleep(5000);
 					}
 				}
-				/*
-				 * Before weston startup, trigger firmware loading
-				 */
-				/* if (0 == strncmp(app_launcher.appname, "weston", strlen("weston"))) { */
-				/* 	write_marker("early init open card0"); */
-				/* 	fd = open("/dev/dri/card0", O_CLOEXEC); */
-				/* 	if (fd > 0) { */
-				/* 		write_marker("early init open card0 finished"); */
-				/* 	} else { */
-				/* 		perror("open card0 failed"); */
-				/* 	} */
-				/* 	safe_close(fd); */
-				/* } */
+
+				if (app_launcher.usleep > 0)
+					usleep(app_launcher.usleep);
 
 				app_launcher.argv[app_launcher.argv_used] = NULL;
 				app_launcher.env[app_launcher.env_used] = NULL;
@@ -468,6 +496,41 @@ out:
 static inline bool is_empty_line(const char* p)
 {
 	return (strspn(p, WHITESPACE) == strlen(p));
+}
+
+static inline void trigger_firmware_loading(const char* path)
+{
+	int i = 0;
+	int fd = -1;
+	pid_t pid;
+	static char marker[50];
+
+	pid = fork();
+	if (pid < 0) {
+		perror("fork child process failed \r\n");
+		return;
+	}
+	if (pid == 0) {
+		memset(marker, 0, 50);
+		snprintf(marker, 49 ,"open-%s-begin", path);
+		for (i = 0; i < 30; i++) {
+			if (-1 != access(path, F_OK))
+				break;
+			usleep(5000);
+		}
+		write_marker(marker);
+		fd = open(path, O_CLOEXEC);
+		if (fd > 0) {
+			memset(marker, 0, 50);
+			snprintf(marker, 49 ,"open-%s-end", path);
+			write_marker(marker);
+		} else {
+			perror("open card0 failed");
+		}
+		safe_close(fd);
+		exit(0);
+	}
+	return;
 }
 
 int main(int argc, char* argv[])
@@ -497,6 +560,12 @@ int main(int argc, char* argv[])
 	}
 
 	write_marker("early-init-start-up");
+
+	/* Trigger firmware loading parallelly */
+	trigger_firmware_loading(DRM_CARD_PATH);
+#ifdef EARLY_ETHERNET
+	trigger_firmware_loading(VIDEO_CARD_PATH);
+#endif
 
 	while (1) {
 

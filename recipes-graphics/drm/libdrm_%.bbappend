@@ -5,4 +5,7 @@ REPO_SRC_URI = "file://${@d.getVar('SRC_DIR', True).replace('${WORKSPACE}/graphi
 S = "${WORKDIR}/libdrm"
 
 CFLAGS += "${@base_conditional('BASEMACHINE', '8x96auto', '-DUSE_ION', '', d)}"
+EXTRA_OECONF += "${@base_conditional('BASEMACHINE', '8x96autogvmquin', '--enable-drm_fe=yes', '', d)}"
+EXTRA_OECONF += "${@base_conditional('BASEMACHINE', '8x96autogvmgh', '--enable-drm_fe=yes', '', d)}"
+
 FILESEXTRAPATHS_append := ":${THISDIR}/${PN}"

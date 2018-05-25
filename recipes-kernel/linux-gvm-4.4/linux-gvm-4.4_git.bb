@@ -28,6 +28,9 @@ python __anonymous () {
   # support alternate image builds
   if d.getVar("KERNEL_IMAGETYPE", True):
       d.setVar("KERNEL_IMAGETYPE_FOR_MAKE", "")
+
+  if( (d.getVar('KERNEL_ROOTDEVICE', True) == "/dev/dm-0") and (d.getVar('MACHINE', True) == "8x96autogvmquin")):
+    d.appendVar("SRC_URI", " file://0001-enable-rootfs-mount-as-dm-verity-target-during-boot.patch")
 }
 
 KERNEL_IMAGEDEST_apq8096 = "boot"
@@ -51,7 +54,7 @@ GITVER    =  "${@base_get_metadata_git_revision('${SRC_DIR}',d)}"
 PV = "git"
 PR = "r5"
 
-DEPENDS += "dtbtool-native mkbootimg-native packkernelimg"
+DEPENDS += "dtbtool-native mkbootimg-native packkernelimg-native"
 DEPENDS_apq8096 += "mkbootimg-native dtc-native"
 PACKAGES = "kernel kernel-base kernel-vmlinux kernel-dev kernel-modules"
 RDEPENDS_kernel-base = ""
@@ -149,12 +152,12 @@ do_shared_workdir () {
         # Make vmlinux available as soon as possible
 	if ${@bb.utils.contains('DISTRO_FEATURES', 'qti-perf', 'true', 'false', d)}; then
 		install -d ${STAGING_DIR_TARGET}-perf/${KERNEL_IMAGEDEST}
-	        install -m 0644 ${KERNEL_OUTPUT} ${STAGING_DIR_TARGET}-perf/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}
+	        install -m 0644 ${KERNEL_OUTPUT_DIR}/Image ${STAGING_DIR_TARGET}-perf/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}
 	        install -m 0644 vmlinux ${STAGING_DIR_TARGET}-perf/${KERNEL_IMAGEDEST}/vmlinux-${KERNEL_VERSION}
 	        install -m 0644 vmlinux ${STAGING_DIR_TARGET}-perf/${KERNEL_IMAGEDEST}/vmlinux
 	else
 	        install -d ${STAGING_DIR_TARGET}/${KERNEL_IMAGEDEST}
-	        install -m 0644 ${KERNEL_OUTPUT} ${STAGING_DIR_TARGET}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}
+	        install -m 0644 ${KERNEL_OUTPUT_DIR}/Image ${STAGING_DIR_TARGET}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}
 	        install -m 0644 vmlinux ${STAGING_DIR_TARGET}/${KERNEL_IMAGEDEST}/vmlinux-${KERNEL_VERSION}
 	        install -m 0644 vmlinux ${STAGING_DIR_TARGET}/${KERNEL_IMAGEDEST}/vmlinux
 	fi
@@ -199,7 +202,7 @@ do_deploy () {
     fi
 
     if [ ${KERNEL_IMAGETYPE} == "Image" ]; then
-	packkernelimg --kernel "${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}" --dt "${B}/arch/${ARCH}/boot/dts/qcom" --dt_list "${KERNEL_DTB_LIST}"
+	${STAGING_BINDIR_NATIVE}/packkernelimg --kernel "${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}" --dt "${B}/arch/${ARCH}/boot/dts/qcom" --dt_list "${KERNEL_DTB_LIST}"
     fi
 
     # Make bootimage
@@ -212,9 +215,12 @@ do_deploy () {
         ${extra_mkbootimg_params} --output ${DEPLOYDIR}/${MACHINE}-boot.img
     cp ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} "${DEPLOYDIR}/"
     cp ${B}/vmlinux "${DEPLOYDIR}/"
-    cp -f ${B}/arch/${ARCH}/boot/dts/qcom/*.dtb "${DEPLOYDIR}/"
+    if [ "X${KERNEL_PATCH}" == "Xconflict" ]; then
+        echo "kernel_patch_conflict" > "${DEPLOYDIR}/vplatform-error.dtb"
+    else
+        cp -f ${B}/arch/${ARCH}/boot/dts/qcom/*.dtb "${DEPLOYDIR}/"
+    fi
     cp -f ${B}/arch/${ARCH}/boot/Image "${DEPLOYDIR}/linux.img"
-
 }
 
 SSTATE_KERNEL_BUILDDIR="${WORKDIR}/kernel-build-artifacts"
@@ -231,4 +237,6 @@ python do_shared_workdir_setscene () {
 INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmquin', '8x96autogvmquin-image', 'none',d)}"
 include ${INCSUFFIX}.inc
 INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmquintcu', '8x96autogvmquintcu-image', 'none',d)}"
+include ${INCSUFFIX}.inc
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmgh', '8x96autogvmgh-image', 'none',d)}"
 include ${INCSUFFIX}.inc

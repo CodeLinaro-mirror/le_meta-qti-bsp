@@ -1,4 +1,3 @@
-#inherit native deploy
 inherit native
 inherit qcommon
 

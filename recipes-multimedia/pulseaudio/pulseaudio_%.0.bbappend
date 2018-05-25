@@ -1,6 +1,5 @@
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-#FILESEXTRAPATHS_append := ":${THISDIR}/${PN}"
 
 inherit systemd 
 

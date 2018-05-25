@@ -10,6 +10,15 @@ SECURITY_CFLAGS_pn-lib32-androidcompat = ""
 SECURITY_LDFLAGS_pn-androidcompat = ""
 
 SECURITY_CFLAGS_pn-dbus-c++ = ""
+#SECURITY_CFLAGS_pn-pugixml = ""
+#SECURITY_CFLAGS_pn-loc-stub = ""
+#SECURITY_CFLAGS_pn-loc-pla = ""
+#SECURITY_CFLAGS_pn-gps-utils = ""
+#SECURITY_CFLAGS_pn-av-frameworks = ""
+#SECURITY_CFLAGS_pn-loc-hal = ""
+#SECURITY_CFLAGS_pn-loc-net-iface = ""
+#SECURITY_CFLAGS_pn-audiohal = ""
+SECURITY_CFLAGS_pn-protobuf = ""
 
 # packages to use -fPIC in security flags instead of -fpie
 SECURITY_CFLAGS_pn-gtest = "${SECURITY_PIC_CFLAGS}"

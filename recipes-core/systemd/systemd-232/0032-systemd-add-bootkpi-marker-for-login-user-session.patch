@@ -1,18 +1,19 @@
-From cffee340418b75732f3edecdc62e0f5be826bb41 Mon Sep 17 00:00:00 2001
+From 0352117d4d12d5dbf44da7205666ab5602994a7c Mon Sep 17 00:00:00 2001
 From: Lei wang <leiwan@codeaurora.org>
 Date: Fri, 23 Jun 2017 16:41:07 +0800
 Subject: [PATCH] systemd: add bootkpi marker for login/user-session
 
+Change-Id: I3d20a42d22d4ca1e9e566b85ef2aeff197cf5e84
 Signed-off-by: Lei wang <leiwan@codeaurora.org>
 ---
- src/core/job.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 46 insertions(+)
+ src/core/job.c | 47 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 47 insertions(+)
 
 diff --git a/src/core/job.c b/src/core/job.c
-index 97304c4..e79fe1f 100644
+index ac6910a..7523997 100644
 --- a/src/core/job.c
 +++ b/src/core/job.c
-@@ -41,6 +41,36 @@
+@@ -41,6 +41,37 @@
  #include "unit.h"
  #include "virt.h"
  
@@ -21,7 +22,8 @@ index 97304c4..e79fe1f 100644
 +#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 +const static char* bootkpi_unit_list[]= {
 +        "systemd-logind.service",
-+        "systemd-user-sessions.service"
++        "systemd-user-sessions.service",
++        "ofono.service"
 +};
 +
 +static void inline write_marker(const char* name, bool start)
@@ -49,7 +51,7 @@ index 97304c4..e79fe1f 100644
  Job* job_new_raw(Unit *unit) {
          Job *j;
  
-@@ -546,6 +576,14 @@ static int job_perform_on_unit(Job **j) {
+@@ -546,6 +577,14 @@ static int job_perform_on_unit(Job **j) {
                          assert_not_reached("Invalid job type");
          }
  
@@ -64,7 +66,7 @@ index 97304c4..e79fe1f 100644
          /* Log if the job still exists and the start/stop/reload function
           * actually did something. */
          *j = manager_get_job(m, id);
-@@ -801,6 +839,14 @@ static void job_emit_status_message(Unit *u, JobType t, JobResult result) {
+@@ -810,6 +849,14 @@ static void job_emit_status_message(Unit *u, JobType t, JobResult result) {
          if (t == JOB_START && result == JOB_DONE && !u->condition_result)
                  return;
  

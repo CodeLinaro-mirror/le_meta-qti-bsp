@@ -1,6 +1,27 @@
 
 SOURCE_WESTON_PATCHES = "https://source.codeaurora.org/quic/le/AGL/meta-agl-demo/plain/recipes-graphics/wayland/weston/"
 
+#rb1.4 #need to add into SRC_URI_append
+#rb1.4    # add early_init to DISTRO_FEATURES to use early user space feature
+#rb1.4    if bb.utils.contains('DISTRO_FEATURES', 'early_init', True, False, d) or bb.utils.contains('DISTRO_FEATURES', 'early-ethernet', True, False, d):
+#rb1.4        d.appendVar("SRC_URI", " file://0001-weston-early-init-support.patch")
+#rb1.4
+#rb1.4}
+#rb1.4
+#rb1.4FILESEXTRAPATHS_append := ":${THISDIR}/${PN}"
+#rb1.4
+#rb1.4# Get patches from meta-agl-demo chinook branch
+#rb1.4python do_getpatches() {
+#rb1.4    import os
+#rb1.4
+#rb1.4SOURCE_WESTON_PATCHES = "https://source.codeaurora.org/quic/le/AGL/meta-agl-demo/plain/recipes-graphics/wayland/weston/"
+#rb1.4
+#rb1.4SRC_URI_append = "\
+#rb1.4    file://weston.service_caf \
+#rb1.4    file://weston.ini_caf \
+#rb1.4    file://0001-outpub_fbdev-follow-the-work-flow-of-MSM8996.patch \
+#rb1.4    file://0001-configure-don-t-control-egl-version.patch \
+#rb1.4    file://drm_firmware_load_trigger.service 
 SRC_URI_append = "\
     https://source.codeaurora.org/quic/le/AGL/meta-agl/plain/meta-agl/recipes-graphics/wayland/weston/fix-touchscreen-crash.patch?h=automotivelinux/chinook;downloadfilename=fix-touchscreen-crash.patch;md5sum=62798230b8bb88f00ee43247fef61713;sha256sum=dd25f196cbe7e8b1ca59ec2b16e7f73dd43995c72ce2175447e3787b98635b28 \
 "
@@ -21,3 +42,116 @@ SRC_URI_append = " \
 DEPENDS += "wayland-native gbm-headers"
 
 TARGET_CFLAGS += "-lwayland-client"
+#rb1.4EXTRA_OECONF_append = " --enable-ivi-shell"
+#rb1.4
+#rb1.4CFLAGS += "-idirafter ${STAGING_KERNEL_DIR}/include/"
+#rb1.4
+#rb1.4# Remove community patch which is conflict with Weston SDM optimization
+#rb1.4SRC_URI_remove = "file://0001-compositor-drm.c-Launch-without-input-devices.patch"
+#rb1.4SRC_URI_remove = "file://fix-up-for-signal-11-on-qemux86.patch"
+#rb1.4SRC_URI_remove = "file://weston.service"
+#rb1.4SRC_URI_remove = "file://weston.ini"
+#rb1.4
+#rb1.4#
+#rb1.4# Weston strategy plugin
+#rb1.4#
+#rb1.4DEPENDS += "sdm scalar sdm-noship  cmake-native wayland-native"
+#rb1.4
+#rb1.4do_compile_prepend () {
+#rb1.4    if [ -d "${S}/sdm_plugin" ]; then
+#rb1.4
+#rb1.4        if [ -d "${WORKSPACE}/display-noship" ]; then
+#rb1.4            export SCALAR_V1_HEADER_INC=${WORKSPACE}/display-noship/scalar/scalar_v1
+#rb1.4            export SCALAR_QSEED3_HEADER_INC=${WORKSPACE}/display-noship/scalar/qseed3/inc
+#rb1.4            export SDM_HEADER_INC=${WORKSPACE}/display-noship/sdm
+#rb1.4        else
+#rb1.4            export SCALAR_PREBUILT_DIR=${WORKSPACE}/prebuilt_${VARIANT}/${BASEMACHINE}/scalar
+#rb1.4            export SDM_PREBUILT_DIR=${WORKSPACE}/prebuilt_${VARIANT}/${BASEMACHINE}/sdm-noship
+#rb1.4            export SCALAR_V1_HEADER_INC=${SCALAR_PREBUILT_DIR}/usr/include
+#rb1.4            export SCALAR_QSEED3_HEADER_INC=${SCALAR_PREBUILT_DIR}/usr/include
+#rb1.4            export SDM_HEADER_INC=${SDM_PREBUILT_DIR}
+#rb1.4            export DISPLAY_VERSION_HEADER_INC=${SDM_HEADER_INC}/usr/include
+#rb1.4            export SCALAR_LIB_DIR=${SCALAR_PREBUILT_DIR}/usr/lib64
+#rb1.4            export SDM_LIB_DIR=${SDM_PREBUILT_DIR}/usr/lib64
+#rb1.4        fi
+#rb1.4
+#rb1.4        # Use cmake compile sdm strategy plugin
+#rb1.4        cd ${S}/sdm_plugin
+#rb1.4        cmake -DCMAKE_INSTALL_LIBDIR=${STAGING_LIBDIR} -DCMAKE_CURRENT_SOURCE_DIR=${S}/sdm_plugin -DSYSROOT_LIBDIR=${STAGING_LIBDIR} -DSYSROOTINC_PATH=${STAGING_INCDIR} -DSCALAR_V1_HEADER_INC=${SCALAR_V1_HEADER_INC} -DSCALAR_QSEED3_HEADER_INC=${SCALAR_QSEED3_HEADER_INC} -DSDM_HEADER_INC=${SDM_HEADER_INC} -DSDM_PUBLIC_HEADER_INC=${STAGING_INCDIR}/sdm/include -DDISPLAY_VERSION_HEADER_INC=${DISPLAY_VERSION_HEADER_INC} -DSCALAR_LIB_DIR=${SCALAR_LIB_DIR} -DSDM_LIB_DIR=${SDM_LIB_DIR} .
+#rb1.4        make
+#rb1.4
+#rb1.4        # Install SDM strategy plugin header file for compiling
+#rb1.4        install -d ${STAGING_INCDIR}
+#rb1.4        install -d ${STAGING_INCDIR}/sdm_strategy_plugin
+#rb1.4        install ${S}/sdm_plugin/sdm_strategy_plugin_interface.h ${STAGING_INCDIR}/sdm_strategy_plugin
+#rb1.4
+#rb1.4        # Return to weston compile
+#rb1.4        cd -
+#rb1.4    fi
+#rb1.4}
+#rb1.4
+#rb1.4do_compile_append () {
+#rb1.4    # Remove the temp SDM header file for compiling use, or else populate sysroot will fail
+#rb1.4    if [ -d "${STAGING_INCDIR}/sdm_strategy_plugin" ]; then
+#rb1.4        rm -rf ${STAGING_INCDIR}/sdm_strategy_plugin
+#rb1.4    fi
+#rb1.4}
+#rb1.4
+#rb1.4
+#rb1.4#
+#rb1.4# Compositor choices
+#rb1.4#
+#rb1.4# Weston on KMS
+#rb1.4PACKAGECONFIG[kms] = "--enable-drm-compositor,--disable-drm-compositor,drm udev libgbm mtdev"
+#rb1.4# Weston on Wayland (nested Weston)
+#rb1.4PACKAGECONFIG[wayland] = "--enable-wayland-compositor,--disable-wayland-compositor,libgbm"
+#rb1.4
+#rb1.4inherit systemd
+#rb1.4
+#rb1.4SYSTEMD_PACKAGES = "${PN}"
+#rb1.4SYSTEMD_SERVICE_${PN} = "weston.service"
+#rb1.4
+#rb1.4do_install_append() {
+#rb1.4    # Install systemd unit files
+#rb1.4    if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
+#rb1.4        install -m 644 -p -D ${WORKDIR}/weston.service_caf ${D}${systemd_system_unitdir}/weston.service
+#rb1.4    fi
+#rb1.4
+#rb1.4    WESTON_INI_CONFIG=${sysconfdir}/xdg/weston
+#rb1.4    install -d ${D}${WESTON_INI_CONFIG}
+#rb1.4    install -m 0644 ${WORKDIR}/weston.ini_caf ${D}${WESTON_INI_CONFIG}/weston.ini
+#rb1.4
+#rb1.4    # Install SDM strategy plugin header file
+#rb1.4    install -d ${D}${includedir}/
+#rb1.4    install -d ${D}${includedir}/sdm_strategy_plugin
+#rb1.4    install ${S}/sdm_plugin/sdm_strategy_plugin_interface.h ${D}${includedir}/sdm_strategy_plugin
+#rb1.4
+#rb1.4    # Install SDM strategy plugin library
+#rb1.4    install -d ${D}${libdir}/
+#rb1.4    cp -r ${S}/sdm_plugin/libsdm_strategy_plugin.so ${D}${libdir}
+#rb1.4    if ${@bb.utils.contains('BASEMACHINE', '8x96autofusion', 'true', 'false', d)}; then
+#rb1.4        if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
+#rb1.4            install -d ${D}${systemd_unitdir}/system
+#rb1.4            install -d ${D}${systemd_unitdir}/system/multi-user.target.wants/
+#rb1.4            install -m 0644 ${WORKDIR}/drm_firmware_load_trigger.service ${D}${systemd_unitdir}/system/drm_firmware_load_trigger.service
+#rb1.4            ln -sf ${systemd_unitdir}/system/drm_firmware_load_trigger.service ${D}${systemd_unitdir}/system/multi-user.target.wants/drm_firmware_load_trigger.service
+#rb1.4        fi
+#rb1.4    fi
+#rb1.4}
+#rb1.4
+#rb1.4pkg_postinst_${PN} () {
+#rb1.4    if ${@bb.utils.contains('BASEMACHINE', '8x96autofusion', 'true', 'false', d)}; then
+#rb1.4        if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
+#rb1.4            if [ -n "$D" ]; then
+#rb1.4                OPTS="--root=$D"
+#rb1.4            fi
+#rb1.4            systemctl $OPTS mask weston.service
+#rb1.4        fi
+#rb1.4    fi
+#rb1.4}
+#rb1.4
+#rb1.4FILES_${PN} += "${includedir}/sdm_strategy_plugin/*"
+#rb1.4FILES_${PN} += "${libdir}/libsdm_strategy_plugin.so"
+#rb1.4FILES_${PN} += "${systemd_unitdir}/system/"
+#rb1.4FILES_${PN} += "${sysconfdir}/xdg/weston/weston.ini"
+#rb1.4FILES_SOLIBSDEV = ""

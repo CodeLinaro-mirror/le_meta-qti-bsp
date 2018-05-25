@@ -73,6 +73,8 @@ PACKAGECONFIG_remove_libc-musl = "smack"
 
 # remove timesyncd
 PACKAGECONFIG_remove += "timesyncd"
+#rb1.4 remove ima,machined,quotacheck,rfkill,backlight,binfmt
+PACKAGECONFIG_8x96autogvmgh_remove += "ima machined quotacheck rfkill backlight binfmt"
 
 # Use the upstream systemd serial-getty@.service and rely on
 # systemd-getty-generator instead of using the OE-core specific
@@ -198,6 +200,11 @@ do_install() {
 		rm ${D}${systemd_unitdir}/system/serial-getty* -f
 	fi
 
+	if ${@base_conditional('BASEMACHINE', '8x96autogvmquintcu', 'true', 'false', d)}; then
+		# Do not need to fix the wlanocb0 to wlan0 for dsrc support on 8x96autogvmquintcu
+		sed -i -e 's/KERNEL=="wlan\*"/KERNEL=="wlan0"/g' ${WORKDIR}/70-net-setup-link.rules
+	fi
+
 	# Provide support for initramfs
 	[ ! -e ${D}/init ] && ln -s ${rootlibexecdir}/systemd/systemd ${D}/init
 	[ ! -e ${D}/${base_sbindir}/udevd ] && ln -s ${rootlibexecdir}/systemd/systemd-udevd ${D}/${base_sbindir}/udevd
@@ -243,8 +250,8 @@ do_install() {
 
 	# Enable journal to forward message to syslog daemon
 	sed -i -e 's/.*ForwardToSyslog.*/ForwardToSyslog=yes/' ${D}${sysconfdir}/systemd/journald.conf
-	# Set the maximium size of runtime journal to 64M as default
-	sed -i -e 's/.*RuntimeMaxUse.*/RuntimeMaxUse=64M/' ${D}${sysconfdir}/systemd/journald.conf
+	# Set the maximium size of runtime journal to 512k as default
+	sed -i -e 's/.*RuntimeMaxUse.*/RuntimeMaxUse=512K/' ${D}${sysconfdir}/systemd/journald.conf
 
 	# this file is needed to exist if networkd is disabled but timesyncd is still in use since timesyncd checks it
 	# for existence else it fails

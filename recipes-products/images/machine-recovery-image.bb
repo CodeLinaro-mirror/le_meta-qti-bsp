@@ -32,4 +32,3 @@ do_makerecovery[depends] += "virtual/kernel:do_shared_workdir"
 
 # For non "prop" layer settings.
 IMAGE_INSTALL_remove += "${@base_conditional('WITH_PROP_LAYER', 'no', 'adreno-recovery', '',d)}"
-

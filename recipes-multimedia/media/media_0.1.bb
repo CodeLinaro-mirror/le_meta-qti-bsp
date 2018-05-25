@@ -38,6 +38,10 @@ EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96auto', ' --enable-tar
 EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96mizar', ' --enable-target-uses-gbm=yes', '', d)} "
 EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96autodvrs', ' --enable-targets-that-support-pq=yes', '', d)} "
 EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96autodvrs', ' --enable-targets-that-support-adsp-pq=yes', '', d)} "
+EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96autodvrs', ' --enable-target-uses-gbm=yes', '', d)} "
+
+EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96autogvmquin', ' --enable-target-uses-gbm=yes', '', d)} "
+EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96autogvmgh', ' --enable-target-uses-gbm=yes', '', d)} "
 
 EXTRA_OECONF_append =" --enable-use-glib="yes""
 EXTRA_OECONF_append =" --enable-target-uses-ion="yes""
@@ -64,6 +68,7 @@ CPPFLAGS += "-I${STAGING_INCDIR} \
              -I${STAGING_INCDIR}/c++/${TARGET_SYS} \
              -I${STAGING_INCDIR}/libqdutils \
 	     -I${STAGING_INCDIR}/qcom/display"
+#rb1.4	     -I${STAGING_INCDIR}/libpqstats"
 CPPFLAGS += "-include stdint.h"
 
 LDFLAGS += "-lglib-2.0"
@@ -88,6 +93,8 @@ do_install() {
 	oe_runmake DESTDIR="${D}/" LIBVER="${LV}" install
 	mkdir -p ${STAGING_INCDIR}/mm-core
 	install -m 0644 ${S}/mm-core/inc/*.h ${STAGING_INCDIR}/mm-core
+#rb1.4	mkdir -p ${STAGING_INCDIR}/libstagefrighthw
+#rb1.4	install -m 0644 ${S}/libstagefrighthw/QComOMXMetadata.h ${STAGING_INCDIR}/libstagefrighthw
 	mkdir -p ${D}/${includedir}/mm-core
 	install -m 0644 ${S}/mm-core/inc/*.h ${D}/${includedir}/mm-core
 }

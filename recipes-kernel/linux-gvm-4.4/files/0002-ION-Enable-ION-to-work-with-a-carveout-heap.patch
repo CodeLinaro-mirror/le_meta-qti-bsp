@@ -97,15 +97,15 @@ index dbd3b4a..d66e716 100644
 +		.id	= ION_SYSTEM_HEAP_ID,
 +		.type	= ION_HEAP_TYPE_CARVEOUT,
 +		.name	= "ion_system_heap",
-+		.base	= 0x100000000,
++		.base	= 0xF0000000,
 +		.size	= 0x10000000,
 +	},
 +	{
 +		.id	= ION_AUDIO_HEAP_ID,
 +		.type	= ION_HEAP_TYPE_CARVEOUT,
 +		.name	= "ion_audio_heap",
-+		.base	= 0xc8000000,
-+		.size	= 0x00400000,
++		.base	= 0xEF800000,
++		.size	= 0x00800000,
 +	},
  };
  

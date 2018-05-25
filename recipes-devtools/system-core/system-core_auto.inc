@@ -11,15 +11,19 @@ do_install_append() {
    if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
       sed -i -e '/^ExecStart=/i\ExecStartPre=/bin/mkdir -p -m 777 /dev/socket' ${D}/${systemd_unitdir}/system/leprop.service
       sed -i -e 's/\/etc\/init.d/\/etc\/initscripts/' ${D}/${systemd_unitdir}/system/init_post_boot.service
+      sed -i -e 's/^set -e$//' ${D}/etc/initscripts/init_post_boot
+      sed -i -e 's/echo 0 > \/proc\/sys\/kernel\/panic/:/' ${D}/etc/initscripts/init_post_boot
    fi
 }
 
 pkg_postinst_${PN}-adbd () {
-    if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
-        if [ -n "$D" ]; then
-            OPTS="--root=$D"
+    if [ "${BASEMACHINE}" != "8x96autogvmquin" ] && [ "${BASEMACHINE}" != "8x96autogvmquintcu" ] && [ "${BASEMACHINE}" != "8x96autogvmgh" ]; then
+        if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
+            if [ -n "$D" ]; then
+                OPTS="--root=$D"
+            fi
+            systemctl $OPTS mask adbd.service
         fi
-        systemctl $OPTS mask adbd.service
     fi
 }
 

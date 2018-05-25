@@ -18,3 +18,6 @@ EXTRA_OECONF = "--with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include 
 PARALLEL_MAKE = ""
 INITSCRIPT_NAME = "oem-recovery"
 INITSCRIPT_PARAMS = "start 27 5 . stop 80 0 1 6 ."
+
+CFLAGS_append_8x96autogvmquin += " -DENABLE_HQX_RECOVERY"
+CFLAGS_append_8x96autogvmquintcu += " -DENABLE_HQX_RECOVERY"

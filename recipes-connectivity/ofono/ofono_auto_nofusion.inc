@@ -1,8 +1,6 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 
 SRC_URI += "file://Revert-test-Convert-to-Python-3.patch"
-SRC_URI += "file://0002-ofono-Added-a-change-RIL-to-use-root-uid.patch"
-SRC_URI += "file://0003-ofono-Export-RIL-variables-while-starting-ofono-serv.patch"
 
 LDFLAGS += "-lcutils"
 

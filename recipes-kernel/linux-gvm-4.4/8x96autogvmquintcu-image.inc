@@ -9,10 +9,11 @@ CONFIG_MSM_GVM_QUIN=y
 CONFIG_MSM_GVM=y
 CONFIG_DIAG_CHAR=y
 CONFIG_FHANDLE=y
-CONFIG_SECURITY_SMACK=y
+#CONFIG_SECURITY_SMACK=y
 CONFIG_TMPFS_XATTR=y
-CONFIG_DEFAULT_SECURITY="smack"
-CONFIG_DEFAULT_SECURITY_SMACK=y
+# CONFIG_RT_GROUP_SCHED is not set
+#CONFIG_DEFAULT_SECURITY="smack"
+#CONFIG_DEFAULT_SECURITY_SMACK=y
 CONFIG_ION_MSM=y
 CONFIG_CMA=y
 CONFIG_DMA_CMA=y
@@ -41,23 +42,25 @@ CONFIG_CNSS_CRYPTO=y
 CONFIG_ATH_CARDS=y
 CONFIG_CNSS_ASYNC=y
 CONFIG_CLD_LL_CORE=y
-CONFIG_MMC=y
 CONFIG_MSM_HAB=y
 CONFIG_MSM_SECURE_BUFFER=y
 CONFIG_QCOM_SCM_QCPE=y
 CONFIG_QSEECOM=y
 CONFIG_MSM_PIL_SSR_GENERIC=y
 CONFIG_MSM_ADSPRPC=y
+CONFIG_MSM_VIRTCLK_FRONTEND_8996=y
+CONFIG_HW_RANDOM=y
+CONFIG_HW_RANDOM_MSM_LEGACY=y
 KERNEL_EXTRACONFIGS
 }
 
-SRC_URI_append += " \
+SRC_URI_append_kernelpatchok += " \
     file://0003-amba-skip-clock-calls-on-msm-virtual-platform.patch \
     file://0004-interrupt-workaround-for-virtual-plaform.patch \
-    file://0005-Revert-soc-qcom-remove-debugfs-interface-from-ssr-se.patch \
-    file://0006-drivers-char-diag-Enable-diag-over-IP.patch \
-    file://0008-mmc-Fix-mmc-compilation-error-when-devfreq-isn-t-ena.patch \
-    file://0009-cnss-Adapt-cnss-to-virtual-platform.patch \
+    file://0010-Add-support-for-USB-pass-through-device-on-GVM.patch \
+    file://0011-Add-psci-workaround-for-gvm-suspend.patch \
+    file://0012-unmask-virtio-net-irq-to-wake-up-system.patch \
+    file://0014-trigger-wdog-bite-for-panic-on-gvm.patch \
 "
 
 do_deploy_rename () {

@@ -30,7 +30,6 @@ inherit distutils
 # Cherry-pick the files after the `setup.py install` and copy them to ${D}.
 do_install() {
     install -d ${D}${PYTHON_SITEPACKAGES_DIR}
- 
     # this run installs the egg file in to python2.7/site-packages folder
     STAGING_INCDIR=${STAGING_INCDIR} \
     STAGING_LIBDIR=${STAGING_LIBDIR} \
@@ -44,6 +43,15 @@ do_install() {
 
      rm -f ${D}${PYTHON_SITEPACKAGES_DIR}/setuptools.pth
      echo "./${SRCNAME}-${PV}-py${PYTHON_BASEVERSION}.egg" > ${D}${PYTHON_SITEPACKAGES_DIR}/protobuf.pth
+#rb1.4    BUILD_SYS=${BUILD_SYS} HOST_SYS=${HOST_SYS} \
+#rb1.4    ${STAGING_BINDIR_NATIVE}/${PYTHON_PN}-native/${PYTHON_PN} setup.py install || \
+#rb1.4        bbfatal "${PYTHON_PN} setup.py install execution failed."
+#rb1.4
+#rb1.4    # the above fails to add the path, just install that into ${D}
+#rb1.4    rm -f ${D}${PYTHON_SITEPACKAGES_DIR}/protobuf.pth
+#rb1.4    echo "./${SRCNAME}-${PV}-py${PYTHON_BASEVERSION}.egg" > ${D}${PYTHON_SITEPACKAGES_DIR}/protobuf.pth
+#rb1.4#    cp "${S}/dist/${SRCNAME}-${PV}-py${PYTHON_BASEVERSION}.egg" ${D}${PYTHON_SITEPACKAGES_DIR}
+#rb1.4#    cp "${S}/${SRCNAME}.egg-info/PKG-INFO" "${D}${PYTHON_SITEPACKAGES_DIR}/${SRCNAME}-${PV}-py${PYTHON_BASEVERSION}.egg-info"
 }
 
 

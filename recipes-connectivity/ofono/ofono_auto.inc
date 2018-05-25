@@ -9,10 +9,15 @@ PR = "r1"
 DEPENDS += "multimodule-mgr-oss"
 
 DEPENDS_remove_8x96autogvmquin = "multimodule-mgr-oss"
+DEPENDS_remove_8x96autogvmgh = "multimodule-mgr-oss"
+RDEPENDS_ofono_append_8x96autogvmquintcu += " mobile-broadband-provider-info"
 
 RDEPENDS_ofono_append_8x96autogvmquintcu += " mobile-broadband-provider-info"
 
 INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96auto', 'ofono_auto_nofusion', 'none',d)}"
+include ${INCSUFFIX}.inc
+
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autodvrs', 'ofono_auto_nofusion', 'none',d)}"
 include ${INCSUFFIX}.inc
 
 INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autonapier', 'ofono_auto_nofusion', 'none',d)}"
@@ -25,6 +30,9 @@ INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmquin', 'ofono_auto_n
 include ${INCSUFFIX}.inc
 
 INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmquintcu', 'ofono_auto_nofusion', 'none',d)}"
+include ${INCSUFFIX}.inc
+
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmgh', 'ofono_auto_nofusion', 'none',d)}"
 include ${INCSUFFIX}.inc
 
 INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96mizar', 'ofono_auto_nofusion', 'none',d)}"
