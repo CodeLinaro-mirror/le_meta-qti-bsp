@@ -18,11 +18,18 @@ IMAGE_INSTALL += "reboot-daemon"
 IMAGE_INSTALL += "computelibrary"
 IMAGE_INSTALL_remove += "neutrino-eth"
 
-#IMAGE_INSTALL_remove = "qtwebengine"
-#IMAGE_INSTALL_remove = "qtwebengine-qmlplugins"
-#IMAGE_INSTALL_remove = "qtwebengine-examples"
-#IMAGE_INSTALL_remove = "qtwebsockets"
-#IMAGE_INSTALL_remove = "qtwebchannel"
+IMAGE_INSTALL += "qtbase-examples"
+IMAGE_INSTALL += "qtwebkit"
+IMAGE_INSTALL += "qtwebkit-examples-examples"
+IMAGE_INSTALL += "qtmultimedia"
+IMAGE_INSTALL += "qtmultimedia-plugins"
+IMAGE_INSTALL += "qtmultimedia-qmlplugins"
+IMAGE_INSTALL += "qtwebengine"
+IMAGE_INSTALL += "qtwebengine-qmlplugins"
+IMAGE_INSTALL += "qtwebengine-examples"
+IMAGE_INSTALL += "qtwebsockets"
+IMAGE_INSTALL += "qtwebchannel"
+
 
 # Perf
 IMAGE_INSTALL += "${@bb.utils.contains("DISTRO_FEATURES", "early_init", "memory-hotplug", "" ,d)}"
