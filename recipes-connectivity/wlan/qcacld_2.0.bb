@@ -62,6 +62,13 @@ do_install () {
     install -D -m 0644 ${S}/firmware_bin/WCNSS_qcom_cfg.ini ${D}/lib/firmware/wlan/qca_cld/
     install -D -m 0644 ${S}/firmware_bin/WCNSS_cfg.dat ${D}/lib/firmware/wlan/qca_cld/
 
+    if ${@base_conditional('BASEMACHINE', '8x96autogvmquintcu', 'true', 'false', d)}; then
+        # Add dsrc module load/unload in wifi_on.sh/wifi_off.sh for 8x96autogvmquintcu
+        sed -i -e '$a sleep 2' ${WORKDIR}/wifi_on.sh
+        sed -i -e '$a modprobe dsrc' ${WORKDIR}/wifi_on.sh
+        sed -i -e '$i modprobe -r dsrc' ${WORKDIR}/wifi_off.sh
+        sed -i -e '$i sleep 2' ${WORKDIR}/wifi_off.sh
+    fi
     install -d ${D}/usr/sbin
     install -D -m 0544 ${WORKDIR}/wifi_on.sh ${D}/usr/sbin/
     install -D -m 0544 ${WORKDIR}/wifi_off.sh ${D}/usr/sbin/
@@ -80,8 +87,5 @@ FILES_${PN} = "/usr/sbin/\
 
 PACKAGES =+ "kernel-module-${WLAN_MODULE_NAME}"
 FILES_kernel-module-${WLAN_MODULE_NAME} = "/lib/modules/${KERNEL_VERSION}/extra/${WLAN_MODULE_NAME}.ko"
-
-INCSUFFIX = "${@base_conditional('MACHINEGROUP', 'auto', 'qcacld-2.0_auto', 'none',d)}"
-include ${INCSUFFIX}.inc
 
 addtask do_sign after do_package before do_package_write_ipk
