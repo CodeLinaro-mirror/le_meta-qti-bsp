@@ -34,5 +34,5 @@ RDEPENDS_${PN}_remove_8x96auto += "alsa-lib"
 RDEPENDS_${PN}_remove_8x96autogvmgh += "alsa-lib"
 RDEPENDS_${PN}_remove_8x96autogvmga += "alsa-lib"
 
-RDEPENDS_${PN}_8x96autodvrs += "gstreamer1.0-qvblend"
-RDEPENDS_${PN}_8x96auto += "gstreamer1.0-qvblend"
+RDEPENDS_${PN}_append_8x96autodvrs += "gstreamer1.0-qvblend gstreamer1.0-plugins-qscreencapsrc"
+RDEPENDS_${PN}_append_8x96auto += "gstreamer1.0-qvblend gstreamer1.0-plugins-qscreencapsrc"
