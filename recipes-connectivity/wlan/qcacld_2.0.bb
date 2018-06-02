@@ -14,6 +14,8 @@ SRC_URI = "file://wlan/qcacld-2.0/ \
 DEPENDS = "virtual/kernel"
 
 S = "${WORKDIR}/wlan/qcacld-2.0"
+S_STRIPPED = "${WORKDIR}/package/lib/modules/${KERNEL_VERSION}/extra"
+S_STRIPPED_DEST = "${WORKDIR}/packages-split/qcacld/lib/modules/${KERNEL_VERSION}/extra"
 
 inherit module kernel-arch qperf
 inherit module update-rc.d
@@ -23,11 +25,11 @@ inherit systemd
 SYSTEMD_SERVICE_${PN} = "init_qti_wlan.service"
 SYSTEMD_AUTO_ENABLE_${PN} = "enable"
 
-INHIBIT_PACKAGE_STRIP = "1"
+#INHIBIT_PACKAGE_STRIP = "1"
 
 EXTRA_OEMAKE += "CONFIG_ARCH_MSM=y"
 
-do_compile_append () {
+do_sign () {
     KMOD_SIG_ALL=`cat ${STAGING_KERNEL_BUILDDIR}/.config | grep CONFIG_MODULE_SIG_ALL | cut -d'=' -f2`
     KMOD_SIG_HASH=`cat ${STAGING_KERNEL_BUILDDIR}/.config | grep CONFIG_MODULE_SIG_HASH | cut -d'=' -f2 | sed 's/\"//g'`
     if [ "$KMOD_SIG_ALL" = "y" ] && [ -n "$KMOD_SIG_HASH" ]; then
@@ -42,9 +44,10 @@ do_compile_append () {
         cp ${S}/wlan.ko ${S}/wlan.ko.unsigned
 
         if [ "${KERNEL_VERSION:0:3}" = "4.4" ]; then
-            ${STAGING_KERNEL_BUILDDIR}/scripts/sign-file $KMOD_SIG_HASH $MODSECKEY $MODPUBKEY ${S}/wlan.ko
+            ${STAGING_KERNEL_BUILDDIR}/scripts/sign-file $KMOD_SIG_HASH $MODSECKEY $MODPUBKEY ${S_STRIPPED}/wlan.ko
+            ${STAGING_KERNEL_BUILDDIR}/scripts/sign-file $KMOD_SIG_HASH $MODSECKEY $MODPUBKEY ${S_STRIPPED_DEST}/wlan.ko
         else
-            perl ${STAGING_KERNEL_DIR}/scripts/sign-file $KMOD_SIG_HASH $MODSECKEY $MODPUBKEY ${S}/wlan.ko
+            perl ${STAGING_KERNEL_DIR}/scripts/sign-file $KMOD_SIG_HASH $MODSECKEY $MODPUBKEY ${S_STRIPPED}/wlan.ko
         fi
     fi;
 }
@@ -86,3 +89,5 @@ FILES_kernel-module-wlan-${KERNEL_VERSION} = "/lib/modules/${KERNEL_VERSION}/ext
 
 INCSUFFIX = "${@base_conditional('MACHINEGROUP', 'auto', 'qcacld-2.0_auto', 'none',d)}"
 include ${INCSUFFIX}.inc
+
+addtask sign after do_package before do_package_write_ipk
