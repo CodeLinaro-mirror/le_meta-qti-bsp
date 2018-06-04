@@ -15,6 +15,9 @@ SRC_URI_remove = " \
 SRCREV_common = "6f2d2093e84cc0eb99b634fa281822ebb9507285"
 S = "${WORKDIR}/gst-plugins-good"
 
+# disable v4l2 for probing ais device, /dev/video0, will break it and we won't use this plugin
+PACKAGECONFIG[v4l2]       = "--disable-gst_v4l2"
+
 do_configure_prepend() {
 	cd ${S}
 	./autogen.sh --noconfigure
