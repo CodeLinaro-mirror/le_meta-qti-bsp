@@ -1,20 +1,20 @@
-From d8123a0ec23bb4c7c82b35227098958ee88652d6 Mon Sep 17 00:00:00 2001
+From 002f79efbfb5fd569c19f6ecd3cd8c1be837bc0a Mon Sep 17 00:00:00 2001
 From: Lei wang <leiwan@codeaurora.org>
-Date: Thu, 10 May 2018 17:53:58 +0800
+Date: Mon, 28 May 2018 15:34:00 +0800
 Subject: [PATCH] kernel: early-init: support early smack rules
 
 For early userpace, add some basic rules.
 when system rules loaded later, will switch to
 system rules
 
-Change-Id: Ie04f41c543aa6312cae5b400be6c2f3a76f50d62
+Change-Id: I36918264dc9cdef9fd551794656c39692cc538c9
 Signed-off-by: Lei wang <leiwan@codeaurora.org>
 ---
  security/smack/smack_access.c | 9 ++++++++-
  1 file changed, 8 insertions(+), 1 deletion(-)
 
 diff --git a/security/smack/smack_access.c b/security/smack/smack_access.c
-index a283f9e..ca66d00 100644
+index a283f9e..c5d06d0 100644
 --- a/security/smack/smack_access.c
 +++ b/security/smack/smack_access.c
 @@ -87,6 +87,8 @@ int log_policy = SMACK_AUDIT_DENIED;
@@ -41,7 +41,7 @@ index a283f9e..ca66d00 100644
 +	/*
 +	 * Support early userspace smack checking without rules loaded
 +	 */
-+	if (is_rule_empty && (0 == strcmp(subject_label, "System")))
++	if (is_rule_empty)
 +		may = MAY_WRITE | MAY_READ | MAY_EXEC;
  	/*
  	 * MAY_WRITE implies MAY_LOCK.
