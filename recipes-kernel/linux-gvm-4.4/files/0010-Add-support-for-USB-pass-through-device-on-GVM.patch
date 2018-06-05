@@ -1,13 +1,13 @@
-From c969bd4362638ca4ff9c65ca162880477232ed1c Mon Sep 17 00:00:00 2001
-From: Zhiqiang Tu <ztu@codeaurora.org>
-Date: Tue, 27 Feb 2018 16:34:22 +0800
+From 50a06455082fc8508d62016baf71eda731718f72 Mon Sep 17 00:00:00 2001
+From: Yong Ding <yongding@codeaurora.org>
+Date: Mon, 14 May 2018 16:31:13 +0800
 Subject: [PATCH] add support for USB pass through device on GVM
 
-Change-Id: Iad8f37780076f7eb9742e4a8f5dee5d32698a274
+Change-Id: I5d4ede841701ea36633e3e04f8ae95cb4ef4eff3
+Signed-off-by: Yong Ding <yongding@codeaurora.org>
 Signed-off-by: Yimin Peng <yiminp@codeaurora.org>
 Signed-off-by: Zhiqiang Tu <ztu@codeaurora.org>
 ---
- .../dts/qcom/vplatform-lfv-msm8996-ivi-lv-mt.dts   |   4 +
  .../boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts    |   4 +
  .../dts/qcom/vplatform-lfv-msm8996-telematics.dts  |   4 +
  .../boot/dts/qcom/vplatform-lfv-msm8996-usb.dtsi   |   6 +
@@ -15,28 +15,13 @@ Signed-off-by: Zhiqiang Tu <ztu@codeaurora.org>
  arch/arm64/configs/msm-auto-gvm_defconfig          |  55 +++++++++
  drivers/platform/msm/gpio-usbdetect.c              | 133 +++++++++++++--------
  drivers/usb/phy/phy-msm-ssusb-qmp.c                |  32 +++--
- 8 files changed, 234 insertions(+), 59 deletions(-)
+ 7 files changed, 230 insertions(+), 59 deletions(-)
 
-diff --git a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi-lv-mt.dts b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi-lv-mt.dts
-index fd04dcf..0460431 100644
---- a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi-lv-mt.dts
-+++ b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi-lv-mt.dts
-@@ -101,6 +101,10 @@
- 
- #include "vplatform-lfv-msm8996-usb.dtsi"
- 
-+&usb_detect {
-+	qcom,force-vbus-status-off;
-+};
-+
- &usb3 {
- 	status = "okay";
- 	qcom,no-wakeup-src-in-hostmode;
 diff --git a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts
-index 9080549..08f2fae 100644
+index 7314af2..a58c0b4 100644
 --- a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts
 +++ b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts
-@@ -77,6 +77,10 @@
+@@ -142,6 +142,10 @@
  
  #include "vplatform-lfv-msm8996-usb.dtsi"
  
@@ -48,10 +33,10 @@ index 9080549..08f2fae 100644
  	status = "okay";
  	qcom,no-wakeup-src-in-hostmode;
 diff --git a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-telematics.dts b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-telematics.dts
-index 7f53329..d5b3c50 100644
+index d063a88..724b463 100644
 --- a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-telematics.dts
 +++ b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-telematics.dts
-@@ -170,6 +170,10 @@
+@@ -237,6 +237,10 @@
  
  #include "vplatform-lfv-msm8996-usb.dtsi"
  
@@ -63,11 +48,11 @@ index 7f53329..d5b3c50 100644
  	status = "okay";
  	qcom,no-wakeup-src-in-hostmode;
 diff --git a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-usb.dtsi b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-usb.dtsi
-index 764a79e..26f0c35 100644
+index b750574..8a7fe96 100644
 --- a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-usb.dtsi
 +++ b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-usb.dtsi
-@@ -209,6 +209,12 @@
- 		};
+@@ -217,6 +217,12 @@
+ 
  	};
  
 +	android_usb@66bf0c8 {
@@ -80,10 +65,10 @@ index 764a79e..26f0c35 100644
  		compatible = "qcom,qusb2phy";
  		reg = <0x07411000 0x180>,
 diff --git a/arch/arm64/configs/msm-auto-gvm-perf_defconfig b/arch/arm64/configs/msm-auto-gvm-perf_defconfig
-index ef4d41e..88a6628 100644
+index 55655ac..2b1d162 100644
 --- a/arch/arm64/configs/msm-auto-gvm-perf_defconfig
 +++ b/arch/arm64/configs/msm-auto-gvm-perf_defconfig
-@@ -309,3 +309,58 @@ CONFIG_CRYPTO_MD4=y
+@@ -377,3 +377,58 @@ CONFIG_CRYPTO_MD4=y
  CONFIG_CRYPTO_ARC4=y
  CONFIG_CRYPTO_TWOFISH=y
  CONFIG_QMI_ENCDEC=y
@@ -143,10 +128,10 @@ index ef4d41e..88a6628 100644
 +CONFIG_USB_OHCI_HCD_PCI=y
 +CONFIG_DIAG_CHAR=y
 diff --git a/arch/arm64/configs/msm-auto-gvm_defconfig b/arch/arm64/configs/msm-auto-gvm_defconfig
-index 4edbc62..b697bd7 100644
+index 177ccef..1f93f8d 100644
 --- a/arch/arm64/configs/msm-auto-gvm_defconfig
 +++ b/arch/arm64/configs/msm-auto-gvm_defconfig
-@@ -340,3 +340,58 @@ CONFIG_CRYPTO_MD4=y
+@@ -408,3 +408,58 @@ CONFIG_CRYPTO_MD4=y
  CONFIG_CRYPTO_ARC4=y
  CONFIG_CRYPTO_TWOFISH=y
  CONFIG_QMI_ENCDEC=y
@@ -376,7 +361,7 @@ index 9768243..7cddd4c 100644
  	return 0;
  
 diff --git a/drivers/usb/phy/phy-msm-ssusb-qmp.c b/drivers/usb/phy/phy-msm-ssusb-qmp.c
-index 2bc3c6f..5ded50e 100644
+index a76a657..a27611f 100644
 --- a/drivers/usb/phy/phy-msm-ssusb-qmp.c
 +++ b/drivers/usb/phy/phy-msm-ssusb-qmp.c
 @@ -144,6 +144,11 @@ static void msm_ssusb_qmp_enable_autonomous(struct msm_ssphy_qmp *phy,
@@ -391,7 +376,7 @@ index 2bc3c6f..5ded50e 100644
  	dev_dbg(phy->phy.dev, "enabling QMP autonomous mode with cable %s\n",
  			get_cable_status_str(phy));
  
-@@ -641,16 +646,25 @@ static int msm_ssphy_qmp_probe(struct platform_device *pdev)
+@@ -642,16 +647,25 @@ static int msm_ssphy_qmp_probe(struct platform_device *pdev)
  		goto err;
  	}
  
