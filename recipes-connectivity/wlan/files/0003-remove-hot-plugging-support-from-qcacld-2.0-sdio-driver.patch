@@ -1,0 +1,12 @@
+diff --git a/CORE/SERVICES/HIF/sdio/linux/native_sdio/src/hif.c b/CORE/SERVICES/HIF/sdio/linux/native_sdio/src/hif.c
+index 416a682..d793695 100644
+--- a/CORE/SERVICES/HIF/sdio/linux/native_sdio/src/hif.c
++++ b/CORE/SERVICES/HIF/sdio/linux/native_sdio/src/hif.c
+@@ -239,7 +239,6 @@ static const struct sdio_device_id ar6k_id_table[] = {
+ #endif
+     { /* null */                                         },
+ };
+-MODULE_DEVICE_TABLE(sdio, ar6k_id_table);
+
+ #if defined(CONFIG_CNSS) && defined(HIF_SDIO)
+ static int hif_sdio_device_inserted(struct sdio_func *func, const struct sdio_device_id * id);
