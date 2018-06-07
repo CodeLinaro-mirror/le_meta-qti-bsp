@@ -41,4 +41,5 @@ RDEPENDS_${PN} = "\
     git \
     python-empy \
     rospy-tutorials \
+    pcl \
 "
