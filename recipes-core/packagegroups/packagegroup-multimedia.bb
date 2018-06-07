@@ -16,6 +16,7 @@ RDEPENDS_${PN} = " \
         gstreamer1.0-libav \
         gstreamer1.0-omx \
         gstreamer1.0-plugins-ugly \
+        gstreamer1.0-qvblend \
         gdk-pixbuf-loader-bmp \
         gdk-pixbuf-loader-gif \
         gdk-pixbuf-loader-tiff \
