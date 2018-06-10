@@ -40,6 +40,8 @@ KERNEL_EXTRACONFIGS
 }
 
 SRC_URI_append_kernelpatchok += " \
+    file://0001-ion-Add-hvenv-driver-for-ion.patch \
+    file://0002-ION-Enable-ION-to-work-with-a-carveout-heap.patch \
     file://0003-amba-skip-clock-calls-on-msm-virtual-platform.patch \
     file://0011-Add-psci-workaround-for-gvm-suspend.patch \
     file://0012-unmask-virtio-net-irq-to-wake-up-system.patch \
