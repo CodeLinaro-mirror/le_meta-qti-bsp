@@ -96,4 +96,5 @@ EXTRA_USERS_PARAMS = "\
  usermod -a -G inet,system,leprop camera; \
  usermod -a -G leprop bluetooth; \
  usermod -a -G system,gps,locclient gps; \
+ groupadd -g 3012 powermgr; \
 "
