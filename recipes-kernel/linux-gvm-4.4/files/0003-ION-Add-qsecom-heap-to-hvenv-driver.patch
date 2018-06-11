@@ -1,0 +1,43 @@
+From bf7b120ea6243abc4f5ff8f42ddc0e45967543e3 Mon Sep 17 00:00:00 2001
+From: ablay <ablay@codeaurora.org>
+Date: Thu, 26 Apr 2018 13:21:05 +0300
+Subject: [PATCH] ION: Add qsecom heap to hvenv driver
+
+Add QSECOM heap to hvenv driver
+
+Change-Id: I457d3863846ac83faf206fd3a44a49fd26eb7a7c
+---
+ drivers/staging/android/ion/ion_hvenv_driver.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/staging/android/ion/ion_hvenv_driver.c b/drivers/staging/android/ion/ion_hvenv_driver.c
+index 5eda72f..5b9870d 100644
+--- a/drivers/staging/android/ion/ion_hvenv_driver.c
++++ b/drivers/staging/android/ion/ion_hvenv_driver.c
+@@ -30,7 +30,8 @@
+ #include "ion_hvenv_driver.h"
+ 
+ #define ION_SYSTEM_HEAP_ID 25
+-#define ION_AUDIO_HEAP_ID 28
++#define ION_QSECOM_HEAP_ID 27
++#define ION_AUDIO_HEAP_ID  28
+ 
+ static struct ion_device *idev;
+ static struct ion_heap **heaps;
+@@ -50,6 +51,13 @@ static struct ion_platform_heap dummy_heaps[] = {
+ 		.base	= 0xEF800000,
+ 		.size	= 0x00800000,
+ 	},
++	{
++		.id	= ION_QSECOM_HEAP_ID,
++		.type	= ION_HEAP_TYPE_CARVEOUT,
++		.name	= "ion_qsecom_heap",
++		.base	= 0xEF600000,
++		.size	= 0x00200000,
++	},
+ };
+ 
+ static struct ion_platform_data dummy_ion_pdata = {
+-- 
+2.5.0
+

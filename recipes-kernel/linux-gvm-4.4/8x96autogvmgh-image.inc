@@ -6,6 +6,7 @@ CONFIG_DEVTMPFS=y
 CONFIG_SYSVIPC=y
 CONFIG_ION=y
 CONFIG_ION_MSM=y
+CONFIG_ION_DUMMY=y
 CONFIG_CMA=y
 CONFIG_DMA_CMA=y
 CONFIG_MSM_GVM_QUIN=y
@@ -36,6 +37,7 @@ CONFIG_ATH_CARDS=y
 CONFIG_CNSS_ASYNC=y
 CONFIG_CLD_LL_CORE=y
 CONFIG_MMC=y
+CONFIG_QSEECOM=y
 KERNEL_EXTRACONFIGS
 }
 
@@ -43,8 +45,10 @@ SRC_URI_append_kernelpatchok += " \
     file://0001-ion-Add-hvenv-driver-for-ion.patch \
     file://0002-ION-Enable-ION-to-work-with-a-carveout-heap.patch \
     file://0003-amba-skip-clock-calls-on-msm-virtual-platform.patch \
+    file://0003-ION-Add-qsecom-heap-to-hvenv-driver.patch \
     file://0011-Add-psci-workaround-for-gvm-suspend.patch \
     file://0012-unmask-virtio-net-irq-to-wake-up-system.patch \
+    file://0001-kernel-misc-qseecom-Use-hvenv-driver-for-ghs-lv-gvm.patch \
 "
 
 do_deploy_rename () {
