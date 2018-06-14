@@ -20,3 +20,5 @@ SRC_URI[sha256sum] = "727a932322d94287b62abb1bd2d41723eec4356a7728909e38adb65ca2
 do_fetch_prepend(){
     bb.warn('NOTE: bbappend overrides boost recipe\'s version and sets it to ' + d.getVar('PV', True))
 }
+
+BOOST_PARALLEL_MAKE = "${@base_less_or_equal('CPU_COUNT', '16', '-j${CPU_COUNT}', '-j16',d)}"
