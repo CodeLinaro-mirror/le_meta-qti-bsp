@@ -1,5 +1,6 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/connman:"
-SRC_URI += "file://0004-resolve-connman-test-script-import-gobject-failed.patch"
+SRC_URI += "file://0004-resolve-connman-test-script-import-gobject-failed.patch \
+           file://0005-dnsproxy-Fix-crash-on-malformed-DNS-response.patch"
 
 # Including the file depends on chipset
 INCSUFFIX = "${@base_conditional('MACHINE', '8x96autofusion', 'connman_1.31', 'none',d)}"
