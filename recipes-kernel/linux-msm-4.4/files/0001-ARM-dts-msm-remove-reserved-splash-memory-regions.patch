@@ -1,19 +1,47 @@
-From c3d909e181cc25d4030e658f8b4347cc08b5e41e Mon Sep 17 00:00:00 2001
+From 1d998b893c72a5de66d70d20f4ed5c4262a14681 Mon Sep 17 00:00:00 2001
 From: Guchun Chen <guchunc@codeaurora.org>
-Date: Fri, 11 May 2018 17:13:51 +0800
+Date: Thu, 14 Jun 2018 11:10:50 +0800
 Subject: [PATCH] ARM: dts: msm: remove reserved splash memory regions
 
 Required by customer as they do not use the splash feature in
 LK, so the reserved memory is not needed on msm8996 boards.
 
-Change-Id: Id5177f4af05922949262aae2bf182fcfb6894aa4
+Change-Id: I5435677a5f0e7cf853f763dfbb6b055d435e9371
 Signed-off-by: Guchun Chen <guchunc@codeaurora.org>
 ---
- arch/arm/boot/dts/qcom/msm8996-mdss.dtsi | 7 -------
- arch/arm/boot/dts/qcom/msm8996-sde.dtsi  | 2 --
- arch/arm/boot/dts/qcom/msm8996.dtsi      | 9 ---------
- 3 files changed, 18 deletions(-)
+ arch/arm/boot/dts/qcom/msm8996-agave-adp.dtsi | 5 -----
+ arch/arm/boot/dts/qcom/msm8996-auto-cdp.dtsi  | 5 -----
+ arch/arm/boot/dts/qcom/msm8996-mdss.dtsi      | 7 -------
+ arch/arm/boot/dts/qcom/msm8996-sde.dtsi       | 2 --
+ arch/arm/boot/dts/qcom/msm8996.dtsi           | 9 ---------
+ 5 files changed, 28 deletions(-)
 
+diff --git a/arch/arm/boot/dts/qcom/msm8996-agave-adp.dtsi b/arch/arm/boot/dts/qcom/msm8996-agave-adp.dtsi
+index 4b96645..5b46301 100644
+--- a/arch/arm/boot/dts/qcom/msm8996-agave-adp.dtsi
++++ b/arch/arm/boot/dts/qcom/msm8996-agave-adp.dtsi
+@@ -1556,8 +1556,3 @@
+ 		};
+ 	};
+ };
+-
+-&sde_kms {
+-	contiguous-region = <&cont_splash_mem &cont_splash_mem_hdmi
+-				&early_camera_mem>;
+-};
+diff --git a/arch/arm/boot/dts/qcom/msm8996-auto-cdp.dtsi b/arch/arm/boot/dts/qcom/msm8996-auto-cdp.dtsi
+index 554b4a3..a6f65b4 100644
+--- a/arch/arm/boot/dts/qcom/msm8996-auto-cdp.dtsi
++++ b/arch/arm/boot/dts/qcom/msm8996-auto-cdp.dtsi
+@@ -1343,8 +1343,3 @@
+ 		};
+ 	};
+ };
+-
+-&sde_kms {
+-	contiguous-region = <&cont_splash_mem &cont_splash_mem_hdmi
+-				&early_camera_mem>;
+-};
 diff --git a/arch/arm/boot/dts/qcom/msm8996-mdss.dtsi b/arch/arm/boot/dts/qcom/msm8996-mdss.dtsi
 index 12fa68f..11db3b6 100644
 --- a/arch/arm/boot/dts/qcom/msm8996-mdss.dtsi
