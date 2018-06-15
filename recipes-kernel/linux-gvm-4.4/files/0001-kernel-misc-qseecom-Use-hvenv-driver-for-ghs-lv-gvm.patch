@@ -1,0 +1,42 @@
+From 2c4d90479d21ac84fe9092eac3e66ff3d059de12 Mon Sep 17 00:00:00 2001
+From: ablay <ablay@codeaurora.org>
+Date: Mon, 30 Apr 2018 17:39:52 +0300
+Subject: [PATCH] kernel: misc: qseecom: Use hvenv driver for ghs lv gvm
+
+Use hevenv driver inplace of standard ion driver for ghs lv gvm
+
+Change-Id: I746ba5576b81cf39d2009b5647fd6a5220389722
+---
+ drivers/misc/qseecom.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/drivers/misc/qseecom.c b/drivers/misc/qseecom.c
+index 98657d0..2ad970d 100644
+--- a/drivers/misc/qseecom.c
++++ b/drivers/misc/qseecom.c
+@@ -51,6 +51,10 @@
+ #include <linux/compat.h>
+ #include "compat_qseecom.h"
+ 
++#ifdef CONFIG_GHS_VMM
++#include <../staging/android/ion/ion_hvenv_driver.h>
++#endif
++
+ #define QSEECOM_DEV			"qseecom"
+ #define QSEOS_VERSION_14		0x14
+ #define QSEEE_VERSION_00		0x400000
+@@ -8562,7 +8566,11 @@ static int qseecom_probe(struct platform_device *pdev)
+ 	qseecom.commonlib64_loaded = false;
+ 	qseecom.pdev = class_dev;
+ 	/* Create ION msm client */
++#ifdef CONFIG_GHS_VMM
++	qseecom.ion_clnt = hvenv_ion_client_create("qseecom-kernel");
++#else
+ 	qseecom.ion_clnt = msm_ion_client_create("qseecom-kernel");
++#endif
+ 	if (IS_ERR_OR_NULL(qseecom.ion_clnt)) {
+ 		pr_err("Ion client cannot be created\n");
+ 
+-- 
+2.5.0
+
