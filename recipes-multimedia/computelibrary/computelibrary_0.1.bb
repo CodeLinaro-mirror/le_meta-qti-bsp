@@ -5,7 +5,7 @@ SECTION = "multimedia"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 # fetch from server
-SRC_URI = "git://source.codeaurora.org/quic/le/vendor/arm/ComputeLibrary;protocol=http;branch=ComputeLibrary/master"
+SRC_URI = "git://source.codeaurora.org/quic/le/vendor/arm/ComputeLibrary;protocol=https;branch=ComputeLibrary/master"
 
 SRC_URI += "file://0001-ComputeLibrary-add-cmakelist-and-install-directives.patch"
 SRC_URI += "file://0002-computelibrary-allocate-tensors-from-host-pointer.patch"

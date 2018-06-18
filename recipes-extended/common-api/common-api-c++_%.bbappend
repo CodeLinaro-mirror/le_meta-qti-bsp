@@ -7,4 +7,4 @@ do_configure_prepend () {
    sed -i -e "s/install(FILES \${PROJECT_BINARY_DIR}\/CommonAPI.pc DESTINATION lib\/pkgconfig)/install(FILES \${PROJECT_BINARY_DIR}\/CommonAPI.pc DESTINATION \${INSTALL_LIB_DIR}\/pkgconfig)/g" ${S}/CMakeLists.txt
 }
 #rb1.4 SRC_URI_remove = "git://git.projects.genivi.org/ipc/common-api-runtime.git;protocol=http"
-#rb1.4 SRC_URI_append = " ${CAF_GIT}/genivi/ipc/common-api-runtime;protocol=git;branch=genivi/common-api-runtime/master "
+#rb1.4 SRC_URI_append = " ${CAF_GIT}/genivi/ipc/common-api-runtime;protocol=https;branch=genivi/common-api-runtime/master "

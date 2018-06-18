@@ -8,5 +8,5 @@ do_configure_prepend () {
     sed -i -e "s/install(FILES \${PROJECT_BINARY_DIR}\/CommonAPI-DBus.pc DESTINATION lib\/pkgconfig)/install(FILES \${PROJECT_BINARY_DIR}\/CommonAPI-DBus.pc DESTINATION \${INSTALL_LIB_DIR}\/pkgconfig)/g" ${S}/CMakeLists.txt
 }
 #rb1.4SRC_URI_remove = "git://git.projects.genivi.org/ipc/common-api-dbus-runtime.git;protocol=http"
-#rb1.4SRC_URI_append = " ${CAF_GIT}/genivi/ipc/common-api-dbus-runtime;protocol=git;branch=genivi/common-api-dbus-runtime/master "
+#rb1.4SRC_URI_append = " ${CAF_GIT}/genivi/ipc/common-api-dbus-runtime;protocol=https;branch=genivi/common-api-dbus-runtime/master "
 
