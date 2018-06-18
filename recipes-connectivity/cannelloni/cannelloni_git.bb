@@ -6,7 +6,7 @@ inherit pkgconfig cmake
 
 DEPENDS = "virtual/kernel"
 
-SRC_URI = "git://codeaurora.org/le/platform/external/cannelloni;protocol=git;branch=cannelloni/master;rev=e3ac7393b566345d057c2d17a4d328007caaacac"
+SRC_URI = "git://source.codeaurora.org/le/platform/external/cannelloni;protocol=https;branch=cannelloni/master;rev=e3ac7393b566345d057c2d17a4d328007caaacac"
 
 S = "${WORKDIR}/git"
 

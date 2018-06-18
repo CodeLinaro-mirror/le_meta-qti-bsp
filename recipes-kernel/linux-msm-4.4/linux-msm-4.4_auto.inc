@@ -61,8 +61,8 @@ python do_getpatches() {
 }
 
 SRC_URI_append_8x96mizar += " \
-    git://source.codeaurora.org/quic/la/kernel/msm-4.4;nobranch=1;tag=8a1eab637309319aee4caa10b196eb7327b549ae;protocol=git;destsuffix=drivers/ntb;subpath=drivers/ntb \
-    git://source.codeaurora.org/quic/la/kernel/msm-4.4;nobranch=1;tag=8a1eab637309319aee4caa10b196eb7327b549ae;protocol=git;destsuffix=include/linux/;subpath=include/linux \
+    git://source.codeaurora.org/quic/la/kernel/msm-4.4;nobranch=1;tag=8a1eab637309319aee4caa10b196eb7327b549ae;protocol=https;destsuffix=drivers/ntb;subpath=drivers/ntb \
+    git://source.codeaurora.org/quic/la/kernel/msm-4.4;nobranch=1;tag=8a1eab637309319aee4caa10b196eb7327b549ae;protocol=https;destsuffix=include/linux/;subpath=include/linux \
     file://0001-defconfig-Enable-NTB-framework-and-IDT-hw-driver.patch \
     file://0001-dmaengine-Add-helper-function-to-prep-for-error-repo.patch \
     file://0001-dmaengine-add-support-to-provide-error-result-from-a.patch \

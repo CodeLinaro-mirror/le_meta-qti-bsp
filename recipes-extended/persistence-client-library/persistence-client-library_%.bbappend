@@ -1,5 +1,5 @@
 SRC_URI = " \
-    ${CAF_GIT}/genivi/persistence/persistence-client-library;protocol=git;branch=genivi/persistence-client-library/master \
+    ${CAF_GIT}/genivi/persistence/persistence-client-library;protocol=https;branch=genivi/persistence-client-library/master \
     file://0001-load-correct-version-of-libpers_common.patch \
     file://0001-fix-exec-path.patch \
     "
