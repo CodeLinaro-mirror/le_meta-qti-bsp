@@ -66,7 +66,7 @@ IMAGE_INSTALL += "pciutils"
 IMAGE_INSTALL += "dlt-daemon"
 IMAGE_INSTALL += "persistence-common-object"
 IMAGE_INSTALL += "persistence-client-library"
-IMAGE_INSTALL += "persistence-administrator"
+#IMAGE_INSTALL += "persistence-administrator"
 IMAGE_INSTALL += "node-state-manager"
 IMAGE_INSTALL += "node-health-monitor"
 IMAGE_INSTALL += "node-startup-controller"
@@ -108,3 +108,5 @@ IMAGE_ROOTFS_EXTRA_SPACE_append = "${@bb.utils.contains("DISTRO_FEATURES", "syst
 
 USERDATA_SIZE_EXT4 = "45M"
 PERSIST_SIZE_EXT4  = "32M"
+
+IMAGE_INSTALL_remove += "persistence-administrator"
