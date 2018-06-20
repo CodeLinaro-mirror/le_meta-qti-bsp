@@ -26,9 +26,10 @@ inherit deploy
 
 include ${MACHINE}/${MACHINE}-ota-target-image-ext4.inc
 
-addtask makerecovery after do_rootfs before do_build
+addtask makerecovery after do_image_complete before do_build
 addtask makeota_image after do_makerecovery before do_build
 do_makerecovery[depends] += "virtual/kernel:do_shared_workdir"
 
 # For non "prop" layer settings.
 IMAGE_INSTALL_remove += "${@base_conditional('WITH_PROP_LAYER', 'no', 'adreno-recovery', '',d)}"
+
