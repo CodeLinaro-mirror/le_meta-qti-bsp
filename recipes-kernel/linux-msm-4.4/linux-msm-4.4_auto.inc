@@ -30,10 +30,6 @@ CONFIG_TMPFS_XATTR=y
 # CONFIG_SECURITY_SELINUX is not set
 # CONFIG_PFT is not set
 # CONFIG_PFK is not set
-# CONFIG_CNSS2 is not set
-# CONFIG_CNSS2_DEBUG is not set
-CONFIG_CNSS=y
-CONFIG_CNSS_ASYNC=y
 CONFIG_DEFAULT_SECURITY="smack"
 CONFIG_DEFAULT_SECURITY_SMACK=y
 CONFIG_CRYPTO_USER_API=y
@@ -50,6 +46,15 @@ CONFIG_CAN_KVASER_USB=y
 CONFIG_CIFS=y
 CONFIG_USB_ACM=y
 KERNEL_EXTRACONFIGS
+
+    if [ "${MACHINE}" == "8x96autocv2x" ]; then
+        echo "CONFIG_CNSS_GENL=y" >> ${S}/arch/${ARCH}/configs/${KERNEL_CONFIG}
+    else # !8x96autocv2x
+        echo "# CONFIG_CNSS2 is not set" >> ${S}/arch/${ARCH}/configs/${KERNEL_CONFIG}
+        echo "# CONFIG_CNSS2_DEBUG is not set" >> ${S}/arch/${ARCH}/configs/${KERNEL_CONFIG}
+        echo "CONFIG_CNSS=y" >> ${S}/arch/${ARCH}/configs/${KERNEL_CONFIG}
+        echo "CONFIG_CNSS_ASYNC=y" >> ${S}/arch/${ARCH}/configs/${KERNEL_CONFIG}
+    fi
 }
 
 python do_getpatches() {
