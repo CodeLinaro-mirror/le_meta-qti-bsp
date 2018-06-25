@@ -1,0 +1,72 @@
+From 68caed8aa09c0788498eff2c2b19050ece89063b Mon Sep 17 00:00:00 2001
+From: Parai Wang <fpwang@codeaurora.org>
+Date: Fri, 22 Jun 2018 14:03:52 +0800
+Subject: [PATCH] enable dm-verity for early services
+
+change the initialize sequence of the dm-verity and its depend
+modules to level fs_initcall
+
+Change-Id: Ie30b2bc78066707586de40f87b3d906801fcaee4
+Signed-off-by: Parai Wang <fpwang@codeaurora.org>
+---
+ arch/arm64/crypto/sha2-ce-glue.c | 2 ++
+ drivers/md/dm-bufio.c            | 2 +-
+ drivers/md/dm-verity-target.c    | 2 +-
+ drivers/md/dm.c                  | 2 +-
+ 4 files changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm64/crypto/sha2-ce-glue.c b/arch/arm64/crypto/sha2-ce-glue.c
+index 0ed9486..162c2f1 100644
+--- a/arch/arm64/crypto/sha2-ce-glue.c
++++ b/arch/arm64/crypto/sha2-ce-glue.c
+@@ -118,6 +118,8 @@ static int __init sha2_ce_mod_init(void)
+ 	return crypto_register_shashes(algs, ARRAY_SIZE(algs));
+ }
+ 
++fs_initcall(sha2_ce_mod_init);
++
+ static void __exit sha2_ce_mod_fini(void)
+ {
+ 	crypto_unregister_shashes(algs, ARRAY_SIZE(algs));
+diff --git a/drivers/md/dm-bufio.c b/drivers/md/dm-bufio.c
+index 969c815..c1f92ba 100644
+--- a/drivers/md/dm-bufio.c
++++ b/drivers/md/dm-bufio.c
+@@ -1906,7 +1906,7 @@ static void __exit dm_bufio_exit(void)
+ 		BUG();
+ }
+ 
+-module_init(dm_bufio_init)
++fs_initcall(dm_bufio_init)
+ module_exit(dm_bufio_exit)
+ 
+ module_param_named(max_cache_size_bytes, dm_bufio_cache_size, ulong, S_IRUGO | S_IWUSR);
+diff --git a/drivers/md/dm-verity-target.c b/drivers/md/dm-verity-target.c
+index e34cf53..27a9e2d 100644
+--- a/drivers/md/dm-verity-target.c
++++ b/drivers/md/dm-verity-target.c
+@@ -1101,7 +1101,7 @@ static void __exit dm_verity_exit(void)
+ 	dm_unregister_target(&verity_target);
+ }
+ 
+-module_init(dm_verity_init);
++fs_initcall(dm_verity_init);
+ module_exit(dm_verity_exit);
+ 
+ MODULE_AUTHOR("Mikulas Patocka <mpatocka@redhat.com>");
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index f7f560f..10038ae 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -3761,7 +3761,7 @@ static const struct block_device_operations dm_blk_dops = {
+ /*
+  * module hooks
+  */
+-module_init(dm_init);
++fs_initcall(dm_init);
+ module_exit(dm_exit);
+ 
+ module_param(major, uint, 0);
+-- 
+1.9.1
+
