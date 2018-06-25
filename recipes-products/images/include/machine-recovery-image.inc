@@ -43,7 +43,9 @@ IMAGE_INSTALL += "${@base_contains('DISTRO_FEATURES','selinux','refpolicy-mls','
 RECOVERYFS_SIZE_EXT4 ?= "136000000"
 
 # Needed for generating recovery.ubi ignored for ext4
-MKUBIFS_ARGS = "${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', '-m 4096 -e 253952 -c 83 -F', '', d)}"
+RECOVERY_MKUBIFS_ARGS = "${@bb.utils.contains('PAGE_SIZE', '2048', '-m 2048 -e 126976 -c 90 -F', '-m 4096 -e 253952 -c 83 -F', d)}"
+
+MKUBIFS_ARGS = "${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', '${RECOVERY_MKUBIFS_ARGS}', '', d)}"
 UBI_VOLNAME  = "${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', 'rootfs', '', d)}"
 
 SELINUX_FILE_CONTEXTS = "${IMAGE_ROOTFS}/etc/selinux/mls/contexts/files/file_contexts"
