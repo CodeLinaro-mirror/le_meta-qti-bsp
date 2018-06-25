@@ -33,6 +33,8 @@ python __anonymous () {
       d.appendVar("SRC_URI", " file://0003-kernel-postpone-some-drivers-for-early-RVC.patch")
       d.appendVar("SRC_URI", " file://0001-kernel-early-init-support-early-smack-rules.patch")
       d.appendVar("KERNEL_CMD_PARAMS", " mem=1G")
+      if d.getVar('KERNEL_ROOTDEVICE', True) == "/dev/dm-0":
+          d.appendVar("SRC_URI", " file://0001-enable-dm-verity-for-early-services.patch")
 
   if bb.utils.contains('DISTRO_FEATURES', 'early-ethernet', True, False, d):
       d.appendVar("SRC_URI", " file://0001-net-ipv6-change-ipv6-module-initcall-level.patch")
