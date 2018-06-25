@@ -32,6 +32,7 @@ IMAGE_INSTALL += "native-frameworks"
 
 DEPENDS_append_aarch64 += " gdb-cross-aarch64"
 
+IMAGE_INSTALL += "openssl"
 IMAGE_INSTALL += "glib-2.0"
 IMAGE_INSTALL += "libcutils"
 IMAGE_INSTALL += "liblog"
@@ -58,6 +59,8 @@ IMAGE_INSTALL += "procrank"
 IMAGE_INSTALL += "libuv"
 IMAGE_INSTALL += "libwebsockets"
 
+IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'full-disk-encryption', 'libscrypt', '', d)}"
+IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'full-disk-encryption', 'fdeinvoke', '', d)}"
 # Below is to generate sparse ext4 system image (OE by default supports raw ext4 images)
 SELINUX_FILE_CONTEXTS = "${IMAGE_ROOTFS}/etc/selinux/mls/contexts/files/file_contexts"
 

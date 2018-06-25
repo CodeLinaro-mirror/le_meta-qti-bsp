@@ -22,10 +22,12 @@ test -x $DAEMON -a -r /etc/chrony.conf || exit 0
 # Source function library.
 . /etc/init.d/functions
 
+test -f /etc/default/chronyd && . /etc/default/chronyd
+
 # Functions to do individual actions
 startdaemon(){
     echo -n "Starting chronyd: "
-    start-stop-daemon --start --quiet --oknodo --pidfile $PIDFILE --startas $DAEMON -- "$@"
+    start-stop-daemon --start --quiet --oknodo --pidfile $PIDFILE --startas $DAEMON -- $OPTIONS "$@"
     echo "done"
 }
 stopdaemon(){

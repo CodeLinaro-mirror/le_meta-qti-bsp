@@ -25,7 +25,7 @@ EXTRA_CFLAGS +="${@base_conditional('ARM_FLOAT_ABI', 'hard', '-march=armv7-a -mf
 
 do_configure () {
     ./configure --enable-cross-compile --cross-prefix=${TARGET_PREFIX} \
-    --cpu=armv7-a --target-os=linux --sysroot=${STAGING_DIR_TARGET} --arch=${TARGET_ARCH} --disable-mmx \
+    --target-os=linux --sysroot=${STAGING_DIR_TARGET} --arch=${TARGET_ARCH} --disable-mmx \
     --enable-shared --disable-doc --disable-htmlpages --disable-manpages --disable-podpages \
     --disable-txtpages --disable-avdevice --disable-swresample --disable-swscale \
     --disable-postproc --enable-small --disable-avfilter --disable-debug --disable-ffserver --disable-ffplay \
