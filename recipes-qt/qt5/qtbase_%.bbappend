@@ -10,6 +10,6 @@ SRC_URI_append = "\
 
 DEPENDS += "gbm wayland"
 
-DEPENDS_class-target += " virtual/egl gbm-headers adreno-native virtual/kernel glib-2.0 wayland gbm adreno-headers wayland-native"
-DEPENDS += "${@base_conditional('BASEMACHINE', '8x96autogvmquin', 'libuhab', '', d)}"
-DEPENDS += "${@base_conditional('BASEMACHINE', '8x96autogvmgh', 'libuhab', '', d)}"
+DEPENDS_class-target += " virtual/egl gbm-headers adreno-native virtual/kernel glib-2.0 wayland gbm adreno-headers wayland-native libcutils"
+DEPENDS_class-target += "${@base_conditional('BASEMACHINE', '8x96autogvmquin', 'libuhab', '', d)}"
+DEPENDS_class-target += "${@base_conditional('BASEMACHINE', '8x96autogvmgh', 'libuhab', '', d)}"
