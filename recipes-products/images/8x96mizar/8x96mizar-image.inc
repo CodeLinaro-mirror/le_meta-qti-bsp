@@ -23,5 +23,14 @@ IMAGE_INSTALL += "cifs-utils"
 IMAGE_INSTALL_remove += "pulseaudio-module-acdb"
 IMAGE_INSTALL_remove += "pulseaudio-module-codec-control"
 
+IMAGE_INSTALL_remove += "qtwebkit"
+IMAGE_INSTALL_remove += "qtwebkit-examples-examples"
+IMAGE_INSTALL_remove += "qtwebengine"
+IMAGE_INSTALL_remove += "qtwebengine-qmlplugins"
+IMAGE_INSTALL_remove += "qtwebengine-examples"
+IMAGE_INSTALL_remove += "web-runtime"
+
+IMAGE_INSTALL_remove += "synergy-opensource"
+
 IMAGE_ROOTFS_SIZE = "2097152"
 IMAGE_ROOTFS_EXTRA_SPACE_append = "${@bb.utils.contains("DISTRO_FEATURES", "systemd", " + 4096", "" ,d)}"
