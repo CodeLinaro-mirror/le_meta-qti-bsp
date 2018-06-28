@@ -21,7 +21,7 @@ SYSTEMD_SERVICE_${PN} = "ofono.service"
 
 PACKAGES =+ "${PN}-tests"
 
-RDEPENDS_${PN} += "dbus"
+RDEPENDS_${PN} += "dbus mobile-broadband-provider-info"
 
 FILES_${PN} += "${base_libdir}/udev ${systemd_unitdir}"
 FILES_${PN}-tests = "${libdir}/${BPN}/test"
