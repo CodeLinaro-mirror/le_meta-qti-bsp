@@ -69,6 +69,8 @@ IMAGE_INSTALL += "persistence-administrator"
 IMAGE_INSTALL += "node-state-manager"
 IMAGE_INSTALL += "node-health-monitor"
 IMAGE_INSTALL += "node-startup-controller"
+IMAGE_INSTALL += "common-api-c++-dbus"
+IMAGE_INSTALL += "common-api-c++"
 
 IMAGE_INSTALL += "usbutils"
 IMAGE_INSTALL += "sysstat"
