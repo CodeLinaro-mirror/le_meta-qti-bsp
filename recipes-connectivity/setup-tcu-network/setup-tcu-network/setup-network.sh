@@ -28,7 +28,7 @@
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 CMDLINE_PATH=/proc/cmdline
-AGL1_IFACE_ARRAY=(eth0 eth1 eth2 eth3 eth4)
+AGL1_IFACE_ARRAY=(eth0 eth1 eth2 eth3)
 AGL2_IFACE_ARRAY=(eth0 eth1)
 
 function get_gvm_version()
@@ -81,19 +81,17 @@ function setup_network_agl_vm_1()
     brctl addif tether0 eth1
     brctl addif tether0 eth2
     brctl addif tether0 eth3
-    brctl addif tether0 eth4
     sleep 1
 
     echo "Assign IP address to eth0"
-    ifconfig eth0 192.168.0.2 up
+    ifconfig eth0 192.168.1.2 up
     ifconfig eth1 up
     ifconfig eth2 up
     ifconfig eth3 up
-    ifconfig eth4 up
     sleep 1
 
     echo "Assign IP address to Bridge"
-    ifconfig tether0 192.168.1.2 up
+    ifconfig tether0 192.168.0.2 up
 
     local RETRY_CNT=0
     for i in {1..5}
@@ -102,7 +100,7 @@ function setup_network_agl_vm_1()
         if [[ $(ip address show tether0 up | grep 'state UP' | wc -l) -ne 1 ]];
         then
             echo "tether0 is not up, try to bring up again !!"
-            ifconfig tether0 192.168.1.2 up
+            ifconfig tether0 192.168.0.2 up
             RETRY_CNT=$((RETRY_CNT+1))
             echo "retry ${RETRY_CNT} times ..."
         else
@@ -114,6 +112,8 @@ function setup_network_agl_vm_1()
     echo "Setup NAT rules"
     iptables -t nat -A POSTROUTING -s 192.168.1.0/24 -o rmnet_data0 -j MASQUERADE
     iptables -t nat -A POSTROUTING -s 192.168.1.0/24 -o wlan0 -j MASQUERADE
+    iptables -t nat -A POSTROUTING -s 192.168.0.0/24 -o rmnet_data0 -j MASQUERADE
+    iptables -t nat -A POSTROUTING -s 192.168.0.0/24 -o wlan0 -j MASQUERADE
 
     echo 1 > /proc/sys/net/ipv4/ip_forward
 }
@@ -121,11 +121,11 @@ function setup_network_agl_vm_1()
 function setup_network_agl_vm_2()
 {
     echo "Assign IP address"
-    ifconfig eth0 192.168.0.6 up
-    ifconfig eth1 192.168.1.6 up
+    ifconfig eth0 192.168.1.6 up
+    ifconfig eth1 192.168.0.6 up
 
     echo "Setup route"
-    ip route add default dev eth1 via 192.168.1.2
+    ip route add default dev eth1 via 192.168.0.2
 }
 
 get_gvm_version
