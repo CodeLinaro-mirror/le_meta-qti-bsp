@@ -20,4 +20,5 @@ SECURITY_CFLAGS_pn-loc-net-iface = ""
 SECURITY_CFLAGS_pn-audiohal = ""
 SECURITY_CFLAGS_pn-protobuf = ""
 SECURITY_LDFLAGS_pn-protobuf = ""
+SECURITY_CFLAGS_pn-gstreamer1.0-qvblend = ""
 
