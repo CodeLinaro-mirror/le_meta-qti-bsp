@@ -1,0 +1,44 @@
+From 80d3ddd4f6e55dac5cef3ad88c51624e9ce2a49a Mon Sep 17 00:00:00 2001
+From: Gustavo Solaira <gustavos@codeaurora.org>
+Date: Mon, 9 Jul 2018 20:11:08 -0700
+Subject: [PATCH 5/5] usb: Add diag_mdm to the 901D composition
+
+Enable diag_mdm for USB diag forwarding for APQ8096
+targets.
+
+Change-Id: I6272ffed6ab0015b023b2f64269d7c4143417903
+---
+ usb/compositions/901D | 1 +
+ usb/start_usb         | 1 +
+ 2 files changed, 2 insertions(+)
+ mode change 100755 => 100644 usb/compositions/901D
+
+diff --git a/usb/compositions/901D b/usb/compositions/901D
+old mode 100755
+new mode 100644
+index da93f47..21567f5
+--- a/usb/compositions/901D
++++ b/usb/compositions/901D
+@@ -80,6 +80,7 @@ run_configfs() {
+ 	echo "DIAG_ADB" > configs/c.1/strings/0x409/configuration
+ 	ln -s functions/diag.diag configs/c.1/f1
+ 	ln -s functions/ffs.adb configs/c.1/f2
++	ln -s functions/diag.diag_mdm configs/c.1/f3
+ 	rm -f /data/usb_bind_in_progress
+ 	echo "binding UDC with Gadget..." $1
+ 	echo $1 > UDC
+diff --git a/usb/start_usb b/usb/start_usb
+index 0ee4748..48123e8 100644
+--- a/usb/start_usb
++++ b/usb/start_usb
+@@ -72,6 +72,7 @@ case "$1" in
+ 		mkdir functions/mass_storage.1
+ 		mkdir functions/ffs.adb
+ 		mkdir functions/diag.diag
++		mkdir functions/diag.diag_mdm
+ 		mkdir functions/cser.dun.0
+ 		mkdir functions/cser.nmea.1
+ 		mkdir functions/rmnet_bam.rmnet
+-- 
+1.9.1
+

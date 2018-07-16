@@ -1,12 +1,12 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 
-SRC_URI += "file://0001-Fix-adb-shell-env-issue.patch"
-
 EXTRA_OECONF_remove = "--with-logd-logging"
 
-SRC_URI += "file://0001-post_boot-Run-install-recovery.sh-to-update-recovery.patch"
-SRC_URI += "file://0001-Delete-empty-files-after-recovery-updates.patch"
-SRC_URI += "file://0001-system-core-usb-Avoid-setting-serial-number-with-spa.patch"
+SRC_URI += "file://0001-Fix-adb-shell-env-issue.patch"
+SRC_URI += "file://0002-post_boot-Run-install-recovery.sh-to-update-recovery.patch"
+SRC_URI += "file://0003-Delete-empty-files-after-recovery-updates.patch"
+SRC_URI += "file://0004-system-core-usb-Avoid-setting-serial-number-with-spa.patch"
+SRC_URI += "file://0005-usb-Add-diag_mdm-to-the-901D-composition.patch"
 
 do_install_append() {
    if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
