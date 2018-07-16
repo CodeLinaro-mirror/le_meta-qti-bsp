@@ -652,6 +652,8 @@ int main(int argc, char* argv[])
 	/* Trigger firmware loading parallelly */
 	trigger_firmware_loading(DRM_CARD_PATH);
 #ifdef EARLY_ETHERNET
+	if (-1 == mount("/dev/mmcblk0p42", "/persist","ext4", 0, NULL))
+		perror("mount persist(mmcblk0p42) failed");
 	trigger_firmware_loading(VIDEO_CARD_PATH);
 #endif
 

@@ -39,8 +39,15 @@ do_install() {
     fi
     sed -e 's,@XDG_RUNTIME_DIR@,${DISPLAY_XDG_RUNTIME_DIR},g' \
         -i ${D}${sysconfdir}/early_init.conf
+
+    # Put video firmware to ext4 partition
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'early-ethernet', 'true', 'false', d)}; then
+        install -d ${D}/firmware
+        ln -sf /persist/image ${D}/firmware/image
+    fi
 }
 
 FILES_${PN} += " ${sbindir}/early_init"
 FILES_${PN} += " /run"
 FILES_${PN} += " /debug"
+FILES_${PN} += " /firmware"
