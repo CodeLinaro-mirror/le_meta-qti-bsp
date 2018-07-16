@@ -17,6 +17,7 @@ require conf/machine/include/arm/arch-armv8.inc
 
 SERIAL_CONSOLE ?= "115200 ttyAMA0"
 
+WITH_INTERNAL_LAYER ?= "no"
 DISTRO_FEATURES_BACKFILL_remove = "gobject-introspection-data"
 DISTRO_FEATURES_BACKFILL_CONSIDERED_remove = "gobject-introspection-data"
 DISTRO_FEATURES_append = " emmc-boot "
