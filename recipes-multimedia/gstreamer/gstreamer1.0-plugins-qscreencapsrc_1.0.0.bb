@@ -17,6 +17,7 @@ PREBUILT = "1"
 DEPENDS = "glib-2.0"
 DEPENDS += "gstreamer1.0 \
             gstreamer1.0-plugins-base \
+            gstreamer1.0-plugins-bad \
             weston \
            "
 DEPENDS += "virtual/libc"
