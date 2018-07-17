@@ -10,6 +10,8 @@ CFLAGS_append += "-DRIL_USE_ROOT_UID"
 INITSCRIPT_NAME = "ofono"
 INITSCRIPT_PARAMS = "start 99 5 3 2 . stop 01 0 1 6 ."
 
+EXTRA_OECONF += "--disable-qtimodem"
+
 do_install[noexec] = "1"
 do_default_install() {
 	autotools_do_install
