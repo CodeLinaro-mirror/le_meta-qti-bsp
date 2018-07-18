@@ -17,7 +17,7 @@ IMAGE_INSTALL += "system-core-leprop"
 IMAGE_INSTALL += "system-core-usb"
 IMAGE_INSTALL += "system-core-post-boot"
 #IMAGE_INSTALL += "system-conf"
-#IMAGE_INSTALL += "system-prop"
+IMAGE_INSTALL += "system-prop"
 IMAGE_INSTALL += "wireless-tools"
 IMAGE_INSTALL +="${@bb.utils.contains('DISTRO_FEATURES', 'nand-boot', 'mtd-utils-ubifs', '', d)}"
 
@@ -38,6 +38,9 @@ IMAGE_INSTALL += "start-scripts-firmware-links"
 IMAGE_INSTALL += "systemd-coredump"
 IMAGE_INSTALL += "coreutils"
 IMAGE_EXT4_SELINUX_OPTIONS = "${@bb.utils.contains('DISTRO_FEATURES','selinux',' -S ${SELINUX_FILE_CONTEXTS} ','',d)}"
+
+IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'start-script-ab-slot-util', '', d)}"
+IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'abctl', '', d)}"
 
 do_makesystem() {
     if ${@bb.utils.contains('DISTRO_FEATURES','nand-boot','false','true',d)}; then
