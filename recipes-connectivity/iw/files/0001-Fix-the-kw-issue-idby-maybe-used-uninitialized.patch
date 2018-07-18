@@ -1,0 +1,33 @@
+From e3c02eb9899ffd5e99a20df86f8c21ccf37589df Mon Sep 17 00:00:00 2001
+From: Guisen Yang <guiseny@codeaurora.org>
+Date: Wed, 18 Jul 2018 13:40:38 +0800
+Subject: [PATCH] Fix the kw issue: 'idby' maybe used uninitialized
+
+The initialization of 'idby' should be below the label
+'detect', or else it will not be initialized if the code
+flow is jumped to 'detect' from other places.
+
+Change-Id: Icf97a42758e2c5c99a3e0c8b6bff24821ba16286
+Signed-off-by: Guisen Yang <guiseny@codeaurora.org>
+---
+ iw.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/iw.c b/iw.c
+index af55a9b..18a8e12 100644
+--- a/iw.c
++++ b/iw.c
+@@ -505,8 +505,9 @@ int main(int argc, char **argv)
+		err = __handle_cmd(&nlstate, II_WDEV, argc, argv, &cmd);
+	} else {
+		int idx;
+-		enum id_input idby = II_NONE;
++		enum id_input idby;
+  detect:
++		idby = II_NONE;
+		if ((idx = if_nametoindex(argv[0])) != 0)
+			idby = II_NETDEV;
+		else if ((idx = phy_lookup(argv[0])) >= 0)
+--
+1.9.1
+
