@@ -16,7 +16,7 @@ FILESPATH =+ "${WORKSPACE}:"
 SRC_URI = "file://wlan/qcacld-3.0/"
 SRC_URI += "file://wlan/qca-wifi-host-cmn/"
 SRC_URI += "file://wlan/fw-api/"
-SRC_URI += "file://WCNSS_qcom_cfg.ini"
+SRC_URI += "file://device/qcom/wlan/romelv/WCNSS_qcom_cfg.ini"
 
 S = "${WORKDIR}/wlan/qcacld-3.0/"
 
@@ -50,10 +50,10 @@ do_install () {
     install -m 0644 ${S}/wlan.ko ${WLAN_KO}/wlan/
 
     # Change Default Power Save Offload configuration
-    sed -i -e 's/^gEnablePowerSaveOffload=2/gEnablePowerSaveOffload=1/g' ${WORKDIR}/WCNSS_qcom_cfg.ini
+    #sed -i -e 's/^gEnablePowerSaveOffload=2/gEnablePowerSaveOffload=1/g' ${WORKDIR}/WCNSS_qcom_cfg.ini
 
     install -d ${D}/lib/firmware/wlan/qca_cld
-    install -D -m 0644 ${WORKDIR}/WCNSS_qcom_cfg.ini ${D}/lib/firmware/wlan/qca_cld/
+    install -D -m 0644 ${WORKDIR}/device/qcom/wlan/romelv/WCNSS_qcom_cfg.ini ${D}/lib/firmware/wlan/qca_cld/
 
     # Install systemd service file
     if ${@base_contains('DISTRO_FEATURES','systemd','true','false',d)}; then
