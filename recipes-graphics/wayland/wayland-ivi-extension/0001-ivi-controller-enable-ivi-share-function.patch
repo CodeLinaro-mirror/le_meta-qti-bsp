@@ -19,7 +19,7 @@ Signed-off-by: LiangHui Chen <lianghui@codeaurora.org>
  7 files changed, 231 insertions(+), 78 deletions(-)
 
 diff --git a/ivi-layermanagement-examples/simple-ivi-share/CMakeLists.txt b/ivi-layermanagement-examples/simple-ivi-share/CMakeLists.txt
-index 7401d08..e54a08b 100644
+index 7401d08..5522426 100644
 --- a/ivi-layermanagement-examples/simple-ivi-share/CMakeLists.txt
 +++ b/ivi-layermanagement-examples/simple-ivi-share/CMakeLists.txt
 @@ -34,6 +34,7 @@ pkg_check_modules(GLESv2 glesv2 REQUIRED)
@@ -27,23 +27,23 @@ index 7401d08..e54a08b 100644
  pkg_check_modules(WAYLAND_EGL wayland-egl REQUIRED)
  pkg_check_modules(WAYLAND_CLIENT wayland-client REQUIRED)
 +pkg_check_modules(GBM gbm REQUIRED)
- 
+
  GET_TARGET_PROPERTY(IVI_EXTENSION_PROTOCOL_DIRS ivi-extension-protocol INCLUDE_DIRECTORIES)
- 
+
 @@ -43,12 +44,14 @@ include_directories(
      ${GLESv2_INCLUDE_DIRS}
      ${EGL_INCLUDE_DIRS}
      ${WAYLAND_CLIENT_INCLUDE_DIR}
 +    ${GBM_INCLUDE_DIRS}
  )
- 
+
  link_directories(
      ${GLESv2_LIBRARY_DIRS}
      ${EGL_LIBRARY_DIRS}
      ${WAYLAND_CLIENT_LIBRARY_DIRS}
 +    ${GBM_LIBRARY_DIRS}
  )
- 
+
  SET(LIBS
 @@ -58,6 +61,7 @@ SET(LIBS
      ${WAYLAND_CLIENT_LIBRARIES}
@@ -52,6 +52,14 @@ index 7401d08..e54a08b 100644
 +    ${GBM_LIBRARIES}
      m
  )
+
+@@ -72,6 +76,7 @@ add_executable(${PROJECT_NAME}
+ add_dependencies(${PROJECT_NAME} ${LIBS})
+
+ add_definitions(${EGL_CFLAGS})
++add_definitions(-DEGL_EGLEXT_PROTOTYPES)
+
+ target_link_libraries(${PROJECT_NAME} ${LIBS})
  
 diff --git a/ivi-layermanagement-examples/simple-ivi-share/src/simple-ivi-share.c b/ivi-layermanagement-examples/simple-ivi-share/src/simple-ivi-share.c
 index 56d98d9..a2ace5c 100644
