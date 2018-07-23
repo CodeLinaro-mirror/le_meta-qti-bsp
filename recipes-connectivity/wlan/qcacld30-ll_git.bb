@@ -49,8 +49,9 @@ do_install () {
     install -d ${WLAN_KO}/wlan
     install -m 0644 ${S}/wlan.ko ${WLAN_KO}/wlan/
 
-    # Change Default Power Save Offload configuration
-    #sed -i -e 's/^gEnablePowerSaveOffload=2/gEnablePowerSaveOffload=1/g' ${WORKDIR}/WCNSS_qcom_cfg.ini
+    if [ "${MACHINE}" = "8x96autocv2x" ]; then
+        sed -i -e 's/BandCapability=0/BandCapability=1/g' ${WORKDIR}/device/qcom/wlan/romelv/WCNSS_qcom_cfg.ini
+    fi
 
     install -d ${D}/lib/firmware/wlan/qca_cld
     install -D -m 0644 ${WORKDIR}/device/qcom/wlan/romelv/WCNSS_qcom_cfg.ini ${D}/lib/firmware/wlan/qca_cld/
