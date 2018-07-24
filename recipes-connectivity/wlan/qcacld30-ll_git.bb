@@ -19,6 +19,7 @@ SRC_URI += "file://wlan/fw-api/"
 SRC_URI += "file://device/qcom/wlan/romelv/WCNSS_qcom_cfg.ini"
 
 S = "${WORKDIR}/wlan/qcacld-3.0/"
+S_STRIPPED = "${WORKDIR}/packages-split/kernel-module-wlan/lib/modules/${KERNEL_VERSION}/extra"
 
 FIRMWARE_PATH = "${D}/lib/firmware/wlan/qca_cld"
 
@@ -63,12 +64,23 @@ do_install () {
 }
 
 do_module_signing() {
-    if [ -f ${STAGING_KERNEL_BUILDDIR}/signing_key.priv ]; then
-        bbnote "Signing ${PN} module"
-        ${STAGING_KERNEL_DIR}/scripts/sign-file sha512 ${STAGING_KERNEL_BUILDDIR}/signing_key.priv ${STAGING_KERNEL_BUILDDIR}/signing_key.x509 ${PKGDEST}/${PROVIDES_NAME}/lib/modules/${KERNEL_VERSION}/extra/wlan.ko
-    else
-        bbnote "${PN} module is not being signed"
-    fi
+    KMOD_SIG_ALL=`cat ${STAGING_KERNEL_BUILDDIR}/.config | grep CONFIG_MODULE_SIG_ALL | cut -d'=' -f2`
+    KMOD_SIG_HASH=`cat ${STAGING_KERNEL_BUILDDIR}/.config | grep CONFIG_MODULE_SIG_HASH | cut -d'=' -f2 | sed 's/\"//g'`
+    if [ "$KMOD_SIG_ALL" = "y" ] && [ -n "$KMOD_SIG_HASH" ]; then
+        if [ "${KERNEL_VERSION:0:3}" = "4.4" ]; then
+            MODSECKEY=${STAGING_KERNEL_BUILDDIR}/certs/signing_key.pem
+            MODPUBKEY=${STAGING_KERNEL_BUILDDIR}/certs/signing_key.x509
+        else
+            MODSECKEY=${STAGING_KERNEL_BUILDDIR}/signing_key.priv
+            MODPUBKEY=${STAGING_KERNEL_BUILDDIR}/signing_key.x509
+        fi
+
+        if [ "${KERNEL_VERSION:0:3}" = "4.4" ]; then
+            ${STAGING_KERNEL_BUILDDIR}/scripts/sign-file $KMOD_SIG_HASH $MODSECKEY $MODPUBKEY ${S_STRIPPED}/wlan.ko
+        else
+            perl ${STAGING_KERNEL_DIR}/scripts/sign-file $KMOD_SIG_HASH $MODSECKEY $MODPUBKEY ${S_STRIPPED}/wlan.ko
+        fi
+    fi;
 }
 
 addtask module_signing after do_package before do_package_write_ipk
