@@ -55,6 +55,7 @@ IMAGE_INSTALL_remove += "apm-test-framework"
 IMAGE_INSTALL_remove += "settings mixer hvac"
 IMAGE_INSTALL_remove += "pa-test-utils"
 IMAGE_INSTALL_remove += "navigation"
+IMAGE_INSTALL_remove += "packagegroup-agl-demo-platform"
 
 IMAGE_INSTALL += "gstreamer1.0-meta-base"
-
+IMAGE_INSTALL += "packagegroup-agl-appfw"
