@@ -149,6 +149,8 @@ IMAGE_INSTALL += "python-subprocess"
 IMAGE_INSTALL += "python-dbus"
 IMAGE_INSTALL += "python-pygobject"
 
+IMAGE_INSTALL += "libatomic"
+
 # If non "meta-qti-bsp-prop" layer, skip build below modules.
 IMAGE_INSTALL_remove += "${@base_conditional('WITH_PROP_LAYER', 'no', 'weston', '',d)}"
 IMAGE_INSTALL_remove += "${@base_conditional('WITH_PROP_LAYER', 'no', 'weston-examples', '',d)}"
