@@ -10,6 +10,7 @@ SRC_URI_append_8x96autogvmquin += "file://${BASEMACHINE}/fstab"
 SRC_URI_append_8x96autogvmquintcu += "file://${BASEMACHINE}/fstab"
 SRC_URI_append_8x96autogvmred += "file://${BASEMACHINE}/fstab"
 SRC_URI_append_8x96autogvmgh += "file://${BASEMACHINE}/fstab"
+SRC_URI_append_8x96autogvmga += "file://${BASEMACHINE}/fstab"
 SRC_URI_append_8x96autonapier +="file://${BASEMACHINE}/fstab"
 SRC_URI_append_8x96autocv2x += "file://${BASEMACHINE}/fstab"
 

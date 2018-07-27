@@ -35,6 +35,7 @@ EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm8974', ' --enable-
 EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96autogvmquin', ' --enable-target-hypervisor=yes', '', d)} "
 EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96autogvmred', ' --enable-target-hypervisor=yes', '', d)} "
 EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96autogvmgh', ' --enable-target-hypervisor=yes', '', d)} "
+EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96autogvmga', ' --enable-target-hypervisor=yes', '', d)} "
 EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96auto', ' --enable-target-uses-gbm=yes', '', d)} "
 EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96mizar', ' --enable-target-uses-gbm=yes', '', d)} "
 EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96autodvrs', ' --enable-targets-that-support-pq=yes', '', d)} "
@@ -43,6 +44,7 @@ EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96autodvrs', ' --enable
 
 EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96autogvmquin', ' --enable-target-uses-gbm=yes', '', d)} "
 EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96autogvmgh', ' --enable-target-uses-gbm=yes', '', d)} "
+EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96autogvmga', ' --enable-target-uses-gbm=yes', '', d)} "
 
 EXTRA_OECONF_append =" --enable-use-glib="yes""
 EXTRA_OECONF_append =" --enable-target-uses-ion="yes""
