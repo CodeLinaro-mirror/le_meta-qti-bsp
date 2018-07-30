@@ -1,0 +1,299 @@
+From 58956cc1ef7d1b73a4ed4ef06b87844bca1a829a Mon Sep 17 00:00:00 2001
+From: Jiacheng Zheng <jiaczhen@codeaurora.org>
+Date: Fri, 10 Aug 2018 11:56:10 +0800
+Subject: [PATCH] kernel rootfs prefetch no dm verity
+
+Put forward in time the mounting of rootfs and
+prefetch all early applications(elf files) and
+so libraries they depend on. So later when these
+files are executed, the big overhead of waiting
+data from emmc can now be saved.
+
+Signed-off-by: Jiacheng Zheng <jiaczhen@codeaurora.org>
+---
+ drivers/md/dm-bufio.c         |  2 +-
+ drivers/md/dm-verity-target.c |  2 +-
+ drivers/md/dm.c               |  2 +-
+ drivers/mmc/card/block.c      |  4 +++
+ drivers/scsi/scsi.c           |  3 ++
+ init/Makefile                 |  2 ++
+ init/do_mounts.c              | 36 ++++++++++++--------
+ init/initramfs.c              |  4 +--
+ init/prefetch_rootfs.c        | 79 +++++++++++++++++++++++++++++++++++++++++++
+ init/prefetch_rootfs.h        | 16 +++++++++
+ 10 files changed, 131 insertions(+), 19 deletions(-)
+ create mode 100644 init/prefetch_rootfs.c
+ create mode 100644 init/prefetch_rootfs.h
+
+diff --git a/drivers/md/dm-bufio.c b/drivers/md/dm-bufio.c
+index 969c815..ceae30b 100644
+--- a/drivers/md/dm-bufio.c
++++ b/drivers/md/dm-bufio.c
+@@ -1906,7 +1906,7 @@ static void __exit dm_bufio_exit(void)
+ 		BUG();
+ }
+ 
+-module_init(dm_bufio_init)
++subsys_initcall(dm_bufio_init)
+ module_exit(dm_bufio_exit)
+ 
+ module_param_named(max_cache_size_bytes, dm_bufio_cache_size, ulong, S_IRUGO | S_IWUSR);
+diff --git a/drivers/md/dm-verity-target.c b/drivers/md/dm-verity-target.c
+index e34cf53..d164b41 100644
+--- a/drivers/md/dm-verity-target.c
++++ b/drivers/md/dm-verity-target.c
+@@ -1101,7 +1101,7 @@ static void __exit dm_verity_exit(void)
+ 	dm_unregister_target(&verity_target);
+ }
+ 
+-module_init(dm_verity_init);
++subsys_initcall(dm_verity_init);
+ module_exit(dm_verity_exit);
+ 
+ MODULE_AUTHOR("Mikulas Patocka <mpatocka@redhat.com>");
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index f7f560f..c825d01 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -3761,7 +3761,7 @@ static const struct block_device_operations dm_blk_dops = {
+ /*
+  * module hooks
+  */
+-module_init(dm_init);
++subsys_initcall(dm_init);
+ module_exit(dm_exit);
+ 
+ module_param(major, uint, 0);
+diff --git a/drivers/mmc/card/block.c b/drivers/mmc/card/block.c
+index 2f18ad0..f9c7beb 100644
+--- a/drivers/mmc/card/block.c
++++ b/drivers/mmc/card/block.c
+@@ -89,6 +89,8 @@ MODULE_ALIAS("mmc:block");
+ #define PCKD_TRGR_LOWER_BOUND		5
+ #define PCKD_TRGR_PRECISION_MULTIPLIER	100
+ 
++void rootfs_prefetch(void);
++
+ static struct mmc_cmdq_req *mmc_cmdq_prep_dcmd(
+ 		struct mmc_queue_req *mqrq, struct mmc_queue *mq);
+ static DEFINE_MUTEX(block_mutex);
+@@ -4718,6 +4720,8 @@ static int mmc_blk_probe(struct mmc_card *card)
+ 		pm_runtime_enable(&card->dev);
+ 	}
+ 
++	rootfs_prefetch();
++
+ 	return 0;
+ 
+  out:
+diff --git a/drivers/scsi/scsi.c b/drivers/scsi/scsi.c
+index 53680ea..6688eea 100644
+--- a/drivers/scsi/scsi.c
++++ b/drivers/scsi/scsi.c
+@@ -1204,5 +1204,8 @@ static void __exit exit_scsi(void)
+ 	async_unregister_domain(&scsi_sd_probe_domain);
+ }
+ 
++int rootfs_prefetch_wq(void);
++
+ subsys_initcall(init_scsi);
++subsys_initcall(rootfs_prefetch_wq);
+ module_exit(exit_scsi);
+diff --git a/init/Makefile b/init/Makefile
+index e96f022..b6b6d57 100644
+--- a/init/Makefile
++++ b/init/Makefile
+@@ -11,6 +11,8 @@ ifneq ($(CONFIG_ARCH_INIT_TASK),y)
+ obj-y                          += init_task.o
+ endif
+ 
++obj-y                          += prefetch_rootfs.o
++
+ mounts-y			:= do_mounts.o
+ mounts-$(CONFIG_BLK_DEV_RAM)	+= do_mounts_rd.o
+ mounts-$(CONFIG_BLK_DEV_INITRD)	+= do_mounts_initrd.o
+diff --git a/init/do_mounts.c b/init/do_mounts.c
+index 333cc2e..25ae472 100644
+--- a/init/do_mounts.c
++++ b/init/do_mounts.c
+@@ -572,19 +572,7 @@ void __init prepare_namespace(void)
+ 
+ 	md_run_setup();
+ 	dm_run_setup();
+-	dm_verity_setup();
+-
+-	if (saved_root_name[0]) {
+-		root_device_name = saved_root_name;
+-		if (!strncmp(root_device_name, "mtd", 3) ||
+-		    !strncmp(root_device_name, "ubi", 3)) {
+-			mount_block_root(root_device_name, root_mountflags);
+-			goto out;
+-		}
+-		ROOT_DEV = name_to_dev_t(root_device_name);
+-		if (strncmp(root_device_name, "/dev/", 5) == 0)
+-			root_device_name += 5;
+-	}
++	//dm_verity_setup();
+ 
+ 	if (initrd_load())
+ 		goto out;
+@@ -604,9 +592,29 @@ void __init prepare_namespace(void)
+ 	if (is_floppy && rd_doload && rd_load_disk(0))
+ 		ROOT_DEV = Root_RAM0;
+ 
+-	mount_root();
++	//mount_root();
+ out:
+ 	devtmpfs_mount("dev");
++	//sys_mount(".", "/", NULL, MS_MOVE, NULL);
++	//sys_chroot(".");
++}
++
++void __init pre_prepare_namespace(void)
++{
++	dm_verity_setup();
++	if (saved_root_name[0]) {
++		root_device_name = saved_root_name;
++		if (!strncmp(root_device_name, "mtd", 3) ||
++		    !strncmp(root_device_name, "ubi", 3)) {
++			mount_block_root(root_device_name, root_mountflags);
++			goto out;
++		}
++		ROOT_DEV = name_to_dev_t(root_device_name);
++		if (strncmp(root_device_name, "/dev/", 5) == 0)
++			root_device_name += 5;
++	}
++	mount_root();
++out:
+ 	sys_mount(".", "/", NULL, MS_MOVE, NULL);
+ 	sys_chroot(".");
+ }
+diff --git a/init/initramfs.c b/init/initramfs.c
+index 5205916..6b1d7e2 100644
+--- a/init/initramfs.c
++++ b/init/initramfs.c
+@@ -617,7 +617,7 @@ static int __init skip_initramfs_param(char *str)
+ }
+ __setup("skip_initramfs", skip_initramfs_param);
+ 
+-static int __init populate_rootfs(void)
++int __init populate_rootfs(void)
+ {
+ 	char *err;
+ 
+@@ -675,4 +675,4 @@ static int __init populate_rootfs(void)
+ 	}
+ 	return 0;
+ }
+-rootfs_initcall(populate_rootfs);
++//rootfs_initcall(populate_rootfs);
+diff --git a/init/prefetch_rootfs.c b/init/prefetch_rootfs.c
+new file mode 100644
+index 0000000..a178110
+--- /dev/null
++++ b/init/prefetch_rootfs.c
+@@ -0,0 +1,79 @@
++/* Copyright (c) 2018, The Linux Foundation. All rights reserved.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 and
++ * only version 2 as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ */
++
++#include <linux/kernel.h>
++#include <linux/fs.h>
++#include <linux/init.h>
++#include <linux/module.h>
++#include <linux/workqueue.h>
++
++#include "do_mounts.h"
++#include "prefetch_rootfs.h"
++#include <soc/qcom/boot_stats.h>
++
++int populate_rootfs(void);
++void pre_prepare_namespace(void);
++
++static struct workqueue_struct *prefetch_wq;
++
++int __init rootfs_prefetch_wq(void)
++{
++	prefetch_wq = alloc_workqueue("kprefetchd", WQ_HIGHPRI | WQ_UNBOUND, 
++			num_online_cpus());
++	if (!prefetch_wq) {
++		printk("Cannot allocate prefetch workqueue\n");
++	}
++	return 0;
++}
++
++static void rootfs_prefetch_work(struct work_struct *w)
++{
++	int fd, reads, i=0;
++	char *dummy_buf;
++
++	populate_rootfs();
++	pre_prepare_namespace();
++	dummy_buf = kmalloc(4096, GFP_ATOMIC);
++
++	if(dummy_buf) {
++		place_marker("M - DRIVER PREFETCH Start");
++		while(files[i])
++		{
++			fd = sys_open(files[i], O_RDONLY, 0);
++			if (fd >= 0) {
++				do{
++					reads = sys_read(fd, dummy_buf, 4096);
++				}while(reads>0);
++				sys_close(fd);
++			}
++			i++;
++		}
++		place_marker("M - DRIVER PREFETCH End");
++		kfree(dummy_buf);
++	}
++	
++	kfree(w);
++}
++
++void rootfs_prefetch(void)
++{
++	struct work_struct *prefetch_work;
++
++	if (prefetch_wq) {
++		prefetch_work = kzalloc(sizeof(struct work_struct), GFP_ATOMIC);
++		if(prefetch_work) {
++			INIT_WORK(prefetch_work, rootfs_prefetch_work);
++			queue_work(prefetch_wq, prefetch_work);
++		}
++	}
++}
++
+diff --git a/init/prefetch_rootfs.h b/init/prefetch_rootfs.h
+new file mode 100644
+index 0000000..6471250
+--- /dev/null
++++ b/init/prefetch_rootfs.h
+@@ -0,0 +1,16 @@
++/* Copyright (c) 2018, The Linux Foundation. All rights reserved.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 and
++ * only version 2 as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ */
++
++static char* files[] = {
++	"/usr/sbin/early_init",   //early_init
++	0};
++
+-- 
+1.9.1
+

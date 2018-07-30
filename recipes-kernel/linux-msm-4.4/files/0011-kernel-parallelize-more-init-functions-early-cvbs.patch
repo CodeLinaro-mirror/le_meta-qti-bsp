@@ -1,0 +1,1690 @@
+From 9418769254aca0e71f9d5d3573ef7d9fa1304fb5 Mon Sep 17 00:00:00 2001
+From: Jiacheng Zheng <jiaczhen@codeaurora.org>
+Date: Fri, 10 Aug 2018 14:38:15 +0800
+Subject: [PATCH] kernel parallelize more init functions early cvbs
+
+1)Rearrange and put in correct order all the
+initialization of related regulators and clocks
+that cpu-clock-msm8996 depends on. So that the
+device probe of cpu-clock-msm8996 and later
+msm-bus-fabric can succeed at the first time
+they are called and be ready at the earliest
+stage. This is important since a lot of driver
+modules initialized later depend on these two
+components and repeated failure and deference
+observed in current implementation can block
+and sabotage the effort to put initialization
+of more driver modules forward in time. And I
+run this reordered initialization of regulators
+and clocks in a separate thread so it will not
+influence the main thread of linux initcalls.
+2)Try to parallel more init functions and device
+probes after 1 is done. I run in separate thread
+and in parallel with the main initcall thread
+the chain of camera and display modules on
+early-cvbs just after msm-bus-fabric and smmu
+initialization is finished. So now at least four
+separate threads(the main initcall thread, the
+prefetch of early-applications from rootfs, the
+initial chain of camera related modules, the
+initial chain of display related modules) are
+executed in parallel and fully utilize the four
+cpu cores in our system.
+3)I set some device probes that takes long time
+(>10ms) to finish as asynchronous if it's
+possible and allowed. This could further
+parallelize the work load in system.
+
+Signed-off-by: Jiacheng Zheng <jiaczhen@codeaurora.org>
+---
+ arch/arm/boot/dts/qcom/msm8996-pm.dtsi             |   4 +-
+ arch/arm/boot/dts/qcom/msm8996-regulator.dtsi      |  19 +-
+ arch/arm/boot/dts/qcom/msm8996.dtsi                |  53 +++++-
+ arch/arm64/kernel/setup.c                          |   1 +
+ block/cfq-iosched.c                                |   2 +-
+ drivers/clk/msm/clock-cpu-8996.c                   |   4 +-
+ drivers/clk/msm/clock-gcc-8996.c                   |   2 +-
+ drivers/clk/msm/clock-mmss-8996.c                  |   2 +-
+ drivers/clk/msm/mdss/mdss-pll.c                    |   1 +
+ drivers/gpu/drm/drm_drv.c                          |   4 +-
+ drivers/gpu/drm/msm/dsi-staging/dsi_display.c      |   4 +-
+ drivers/gpu/drm/msm/hdmi-staging/sde_hdmi.c        |   4 +-
+ drivers/gpu/drm/msm/msm_drv.c                      |   4 +-
+ drivers/gpu/drm/msm/sde/sde_wb.c                   |   4 +-
+ drivers/i2c/busses/i2c-msm-v2.c                    |   5 +-
+ drivers/iommu/arm-smmu.c                           |   6 +
+ drivers/leds/led-class.c                           |   7 +-
+ drivers/md/dm-bufio.c                              |   4 +-
+ drivers/md/dm-verity-target.c                      |   4 +-
+ drivers/md/dm.c                                    |   4 +-
+ drivers/media/i2c/adv7481.c                        |   4 +-
+ .../media/platform/msm/ais/common/cam_smmu_api.c   |   4 +-
+ drivers/media/platform/msm/ais/isp/msm_isp.c       |   5 +-
+ drivers/media/platform/msm/ais/isp/msm_isp47.c     |   4 +-
+ drivers/media/platform/msm/ais/ispif/msm_ispif.c   |   4 +-
+ drivers/media/platform/msm/ais/msm.c               |   4 +-
+ .../platform/msm/ais/msm_ais_mgr/msm_ais_mgr.c     |   4 +-
+ .../msm/ais/msm_buf_mgr/msm_generic_buf_mgr.c      |   4 +-
+ .../media/platform/msm/ais/sensor/cci/msm_cci.c    |   4 +-
+ .../platform/msm/ais/sensor/cci/msm_early_cam.c    |   4 +-
+ .../media/platform/msm/ais/sensor/csid/msm_csid.c  |   4 +-
+ .../platform/msm/ais/sensor/csiphy/msm_csiphy.c    |   4 +-
+ .../platform/msm/ais/sensor/msm_sensor_driver.c    |   4 +-
+ .../platform/msm/ais/sensor/msm_sensor_init.c      |   4 +-
+ drivers/media/platform/msm/vidc/vmem/vmem.c        |   1 +
+ drivers/mmc/card/block.c                           |   4 +-
+ drivers/mmc/host/sdhci-msm.c                       |   4 +-
+ drivers/of/platform.c                              | 196 +++++++++++++++++++++
+ drivers/pci/host/pci-msm.c                         |   5 +-
+ drivers/platform/msm/ipa/ipa_api.c                 |   1 +
+ drivers/platform/msm/msm_ext_display.c             |   1 +
+ drivers/platform/msm/qpnp-revid.c                  |   1 +
+ drivers/power/qcom/apm.c                           |   4 +-
+ drivers/regulator/cpr3-hmss-regulator.c            |   4 +-
+ drivers/regulator/cpr3-mmss-regulator.c            |   4 +-
+ drivers/regulator/fan53555.c                       |   2 +-
+ drivers/regulator/fixed.c                          |   4 +-
+ drivers/regulator/kryo-regulator.c                 |   4 +-
+ drivers/regulator/mem-acc-regulator.c              |   2 +-
+ drivers/scsi/scsi.c                                |  10 ++
+ drivers/soc/qcom/glink_smem_native_xprt.c          |   4 +-
+ drivers/soc/qcom/msm_bus/msm_bus_fabric_adhoc.c    |  11 ++
+ drivers/soc/qcom/rpm-smd.c                         |   4 +-
+ drivers/soc/qcom/spm_devices.c                     |   2 +-
+ drivers/soc/qcom/watchdog_v2.c                     |   1 +
+ drivers/spmi/spmi-pmic-arb.c                       |   2 +-
+ drivers/staging/android/ion/msm/msm_ion.c          |   1 +
+ drivers/video/fbdev/msm/msm_dba/adv7533.c          |   5 +-
+ drivers/video/msm/ba/msm_v4l2_ba.c                 |   4 +-
+ fs/ext4/super.c                                    |   2 +-
+ fs/jbd2/journal.c                                  |   2 +-
+ include/linux/of_platform.h                        |  10 ++
+ 62 files changed, 394 insertions(+), 96 deletions(-)
+
+diff --git a/arch/arm/boot/dts/qcom/msm8996-pm.dtsi b/arch/arm/boot/dts/qcom/msm8996-pm.dtsi
+index 74c964b..bbb2c2c 100644
+--- a/arch/arm/boot/dts/qcom/msm8996-pm.dtsi
++++ b/arch/arm/boot/dts/qcom/msm8996-pm.dtsi
+@@ -13,8 +13,7 @@
+ #include <dt-bindings/interrupt-controller/arm-gic.h>
+ #include <dt-bindings/msm/pm.h>
+ 
+-&soc {
+-	qcom,spm@9A10000 {
++	&spm_v2 {
+ 		compatible = "qcom,spm-v2";
+ 		#address-cells = <1>;
+ 		#size-cells = <1>;
+@@ -29,6 +28,7 @@
+ 		qcom,pfm-port = <0x2>;
+ 	};
+ 
++&soc {
+ 	qcom,lpm-levels {
+ 		compatible = "qcom,lpm-levels";
+ 		qcom,use-psci;
+diff --git a/arch/arm/boot/dts/qcom/msm8996-regulator.dtsi b/arch/arm/boot/dts/qcom/msm8996-regulator.dtsi
+index 1800a31..0a6b23f 100644
+--- a/arch/arm/boot/dts/qcom/msm8996-regulator.dtsi
++++ b/arch/arm/boot/dts/qcom/msm8996-regulator.dtsi
+@@ -565,9 +565,8 @@
+ 	};
+ };
+ 
+-&soc {
+ /* CPR controlled regulators */
+-	apcc_cpr: cpr3-ctrl@99e8000 {
++	&apcc_cpr {
+ 		compatible = "qcom,cpr3-msm8996-hmss-regulator";
+ 		reg = <0x099e8000 0x4000>, <0x00074000 0x1000>;
+ 		reg-names = "cpr_ctrl", "fuse_base";
+@@ -1640,7 +1639,7 @@
+ 		};
+ 	};
+ 
+-	gfx_cpr: cpr3-ctrl@838000 {
++	&gfx_cpr {
+ 		compatible = "qcom,cpr3-msm8996-mmss-regulator";
+ 		reg = <0x00838000 0x4000>, <0x00074000 0x1000>;
+ 		reg-names = "cpr_ctrl", "fuse_base";
+@@ -1787,8 +1786,9 @@
+ 			};
+ 		};
+ 	};
++
+ /* Memory accelerator regulators */
+-	apc0_pwrcl_mem_acc_vreg: apc0-pwrcl-mem-acc-regulator {
++	&apc0_pwrcl_mem_acc_vreg {
+ 		compatible = "qcom,mem-acc-regulator";
+ 		reg = <0x099e00c0 0x4>;
+ 		reg-names = "acc-sel-l1";
+@@ -1801,7 +1801,7 @@
+ 		qcom,acc-sel-l1-bit-size = <2>;
+ 	};
+ 
+-	apc1_perfcl_mem_acc_vreg: apc1-perfcl-mem-acc-regulator {
++	&apc1_perfcl_mem_acc_vreg {
+ 		compatible = "qcom,mem-acc-regulator";
+ 		reg = <0x099e00c0 0x4>;
+ 		reg-names = "acc-sel-l1";
+@@ -1814,7 +1814,7 @@
+ 		qcom,acc-sel-l1-bit-size = <2>;
+ 	};
+ 
+-	apcc_l3_mem_acc_vreg: apcc-l3-mem-acc-regulator {
++	&apcc_l3_mem_acc_vreg {
+ 		compatible = "qcom,mem-acc-regulator";
+ 		reg = <0x099e00c0 0x4>;
+ 		reg-names = "acc-sel-l1";
+@@ -1827,6 +1827,7 @@
+ 		qcom,acc-sel-l1-bit-size = <1>;
+ 	};
+ 
++&soc {
+ 	gfx_mem_acc_vreg: regulator@007af004 {
+ 		compatible = "qcom,mem-acc-regulator";
+ 		reg = <0x007af004 0x4>;
+@@ -1839,9 +1840,10 @@
+ 		qcom,acc-sel-l1-bit-pos = <0>;
+ 		qcom,acc-sel-l1-bit-size = <1>;
+ 	};
++};
+ 
+ /* Kryo regulators */
+-	kryo0_vreg: regulator@99a2000 {
++	&kryo0_vreg {
+ 		compatible = "qcom,kryo-regulator";
+ 		regulator-name = "kryo0";
+ 		reg = <0x99a2000 0x1000>, <0x99e0000 0x1000>,
+@@ -1866,7 +1868,7 @@
+ 		};
+ 	};
+ 
+-	kryo1_vreg: regulator@99d2000 {
++	&kryo1_vreg {
+ 		compatible = "qcom,kryo-regulator";
+ 		regulator-name = "kryo1";
+ 		reg = <0x99d2000 0x1000>, <0x99e0000 0x1000>,
+@@ -1891,6 +1893,7 @@
+ 		};
+ 	};
+ 
++&soc {
+ /* Miscellaneous regulators */
+ 	spi_eth_vreg: spi_eth_phy_vreg {
+ 		compatible = "regulator-fixed";
+diff --git a/arch/arm/boot/dts/qcom/msm8996.dtsi b/arch/arm/boot/dts/qcom/msm8996.dtsi
+index 73ae1b8..25b7560 100644
+--- a/arch/arm/boot/dts/qcom/msm8996.dtsi
++++ b/arch/arm/boot/dts/qcom/msm8996.dtsi
+@@ -282,6 +282,18 @@
+ 	ranges = <0 0 0 0xffffffff>;
+ 	compatible = "simple-bus";
+ 
++	smem_xprt_rpm: qcom,glink-smem-native-xprt-rpm@68000 {
++	};
++
++	rpm_bus: qcom,rpm-smd {
++	};
++
++	clock_gcc: qcom,gcc@300000 {
++	};
++
++	spm_v2: qcom,spm@9A10000 {
++	};
++
+         spmi_bus: qcom,spmi@400f000 {
+                 compatible = "qcom,spmi-pmic-arb";
+                 reg = <0x400f000 0xc00>,
+@@ -326,6 +338,33 @@
+ 		qcom,clock-source-override;
+ 	};
+ 
++	apcc_l3_mem_acc_vreg: apcc-l3-mem-acc-regulator {
++	};
++	
++	kryo0_vreg: regulator@99a2000 {
++	};
++	
++	kryo1_vreg: regulator@99d2000 {
++	};
++
++	apc0_pwrcl_mem_acc_vreg: apc0-pwrcl-mem-acc-regulator {
++	};
++
++	apc1_perfcl_mem_acc_vreg: apc1-perfcl-mem-acc-regulator {
++	};
++
++	apcc_cpr: cpr3-ctrl@99e8000 {
++	};
++
++	gfx_cpr: cpr3-ctrl@838000 {
++	};
++
++	clock_cpu: qcom,cpu-clock-8996@ {
++	};
++
++	qcom,cpu-clock-sync-dummy@ {
++	};
++
+ 	intc: interrupt-controller@09bc0000 {
+ 		compatible = "arm,gic-v3";
+ 		reg = <0x9bc0000 0x10000>,       /* GICD */
+@@ -741,8 +780,9 @@
+ 			< 1497600 >,
+ 			< 1593600 >;
+ 	};
++};
+ 
+-	clock_cpu: qcom,cpu-clock-8996@ {
++	&clock_cpu {
+ 		compatible = "qcom,cpu-clock-8996";
+ 		reg = <0x06400000 0x1000>,
+ 		      <0x06480000 0x1000>,
+@@ -815,7 +855,7 @@
+ 		#clock-cells = <1>;
+ 	};
+ 
+-	clock_gcc: qcom,gcc@300000 {
++	&clock_gcc {
+ 		compatible = "qcom,gcc-8996";
+ 		reg = <0x300000 0x8f014>;
+ 		reg-names = "cc_base";
+@@ -824,6 +864,7 @@
+ 		#reset-cells = <1>;
+ 	};
+ 
++&soc {
+ 	clock_mmss: qcom,mmsscc@8c0000 {
+ 		compatible = "qcom,mmsscc-8996";
+ 		reg = <0x8c0000 0xb00c>,
+@@ -1884,13 +1925,15 @@
+ 		reg = <0x7602c 0xc>;
+ 		reg-names = "fuse-base";
+ 	};
++};
+ 
+-	rpm_bus: qcom,rpm-smd {
++	&rpm_bus {
+ 		 compatible = "qcom,rpm-glink";
+ 		 qcom,glink-edge = "rpm";
+ 		 rpm-channel-name = "rpm_requests";
+ 	 };
+ 
++&soc {
+ 	qcom,smdpkt {
+ 		compatible = "qcom,smdpkt";
+ 
+@@ -3824,8 +3867,9 @@
+ 		interrupts = <0 179 1>;
+ 		label = "dsps";
+ 	};
++};
+ 
+-	qcom,glink-smem-native-xprt-rpm@68000 {
++	&smem_xprt_rpm {
+ 		compatible = "qcom,glink-rpm-native-xprt";
+ 		reg = <0x68000 0x6000>,
+ 			<0x9820010 0x4>;
+@@ -3835,6 +3879,7 @@
+ 		label = "rpm";
+ 	};
+ 
++&soc {
+ 	glink_mpss: qcom,glink-ssr-modem {
+ 		compatible = "qcom,glink_ssr";
+ 		label = "modem";
+diff --git a/arch/arm64/kernel/setup.c b/arch/arm64/kernel/setup.c
+index 01f259e..378586e 100644
+--- a/arch/arm64/kernel/setup.c
++++ b/arch/arm64/kernel/setup.c
+@@ -394,6 +394,7 @@ static int __init arm64_device_init(void)
+ {
+ 	if (of_have_populated_dt()) {
+ 		of_iommu_init();
++		of_platform_populate_async_wq_init();
+ 		of_platform_populate(NULL, of_default_bus_match_table,
+ 				     NULL, NULL);
+ 	} else if (acpi_disabled) {
+diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
+index 658dcf9..ee4ad69 100644
+--- a/block/cfq-iosched.c
++++ b/block/cfq-iosched.c
+@@ -4808,7 +4808,7 @@ static void __exit cfq_exit(void)
+ 	kmem_cache_destroy(cfq_pool);
+ }
+ 
+-fs_initcall(cfq_init);
++subsys_initcall(cfq_init);
+ module_exit(cfq_exit);
+ 
+ MODULE_AUTHOR("Jens Axboe");
+diff --git a/drivers/clk/msm/clock-cpu-8996.c b/drivers/clk/msm/clock-cpu-8996.c
+index bca8ada..e9dfce3 100644
+--- a/drivers/clk/msm/clock-cpu-8996.c
++++ b/drivers/clk/msm/clock-cpu-8996.c
+@@ -1476,11 +1476,11 @@ static struct platform_driver cpu_clock_8996_driver = {
+ 	},
+ };
+ 
+-static int __init cpu_clock_8996_init(void)
++int __init cpu_clock_8996_init(void)
+ {
+ 	return platform_driver_register(&cpu_clock_8996_driver);
+ }
+-arch_initcall(cpu_clock_8996_init);
++//arch_initcall(cpu_clock_8996_init);
+ 
+ static void __exit cpu_clock_8996_exit(void)
+ {
+diff --git a/drivers/clk/msm/clock-gcc-8996.c b/drivers/clk/msm/clock-gcc-8996.c
+index 6dd2cf8..4f839e2 100644
+--- a/drivers/clk/msm/clock-gcc-8996.c
++++ b/drivers/clk/msm/clock-gcc-8996.c
+@@ -3758,7 +3758,7 @@ int __init msm_gcc_8996_init(void)
+ {
+ 	return platform_driver_register(&msm_clock_gcc_driver);
+ }
+-arch_initcall(msm_gcc_8996_init);
++//arch_initcall(msm_gcc_8996_init);
+ 
+ /* ======== Clock Debug Controller ======== */
+ static struct clk_lookup msm_clocks_measure_8996[] = {
+diff --git a/drivers/clk/msm/clock-mmss-8996.c b/drivers/clk/msm/clock-mmss-8996.c
+index 91c871c..2ea6f15 100644
+--- a/drivers/clk/msm/clock-mmss-8996.c
++++ b/drivers/clk/msm/clock-mmss-8996.c
+@@ -4008,4 +4008,4 @@ int __init msm_mmsscc_8996_init(void)
+ {
+ 	return platform_driver_register(&msm_clock_mmss_driver);
+ }
+-arch_initcall(msm_mmsscc_8996_init);
++//arch_initcall(msm_mmsscc_8996_init);
+diff --git a/drivers/clk/msm/mdss/mdss-pll.c b/drivers/clk/msm/mdss/mdss-pll.c
+index b5c9877..d5bbe1c 100644
+--- a/drivers/clk/msm/mdss/mdss-pll.c
++++ b/drivers/clk/msm/mdss/mdss-pll.c
+@@ -418,6 +418,7 @@ static struct platform_driver mdss_pll_driver = {
+ 	.driver = {
+ 		.name = "mdss_pll",
+ 		.of_match_table = mdss_pll_dt_match,
++		.probe_type = PROBE_PREFER_ASYNCHRONOUS,
+ 	},
+ };
+ 
+diff --git a/drivers/gpu/drm/drm_drv.c b/drivers/gpu/drm/drm_drv.c
+index 760410e..c90c133 100644
+--- a/drivers/gpu/drm/drm_drv.c
++++ b/drivers/gpu/drm/drm_drv.c
+@@ -879,7 +879,7 @@ static const struct file_operations drm_stub_fops = {
+ 	.llseek = noop_llseek,
+ };
+ 
+-static int __init drm_core_init(void)
++int __init drm_core_init(void)
+ {
+ 	int ret = -ENOMEM;
+ 
+@@ -927,5 +927,5 @@ static void __exit drm_core_exit(void)
+ 	idr_destroy(&drm_minors_idr);
+ }
+ 
+-fs_initcall(drm_core_init);
++//fs_initcall(drm_core_init);
+ module_exit(drm_core_exit);
+diff --git a/drivers/gpu/drm/msm/dsi-staging/dsi_display.c b/drivers/gpu/drm/msm/dsi-staging/dsi_display.c
+index be2ed09..fa0be5e 100644
+--- a/drivers/gpu/drm/msm/dsi-staging/dsi_display.c
++++ b/drivers/gpu/drm/msm/dsi-staging/dsi_display.c
+@@ -2855,7 +2855,7 @@ int dsi_dsiplay_setup_splash_resource(struct dsi_display *display)
+ 	return ret;
+ }
+ 
+-static int __init dsi_display_register(void)
++int __init dsi_display_register(void)
+ {
+ 	dsi_phy_drv_register();
+ 	dsi_ctrl_drv_register();
+@@ -2869,5 +2869,5 @@ static void __exit dsi_display_unregister(void)
+ 	dsi_phy_drv_unregister();
+ }
+ 
+-fs_initcall(dsi_display_register);
++//fs_initcall(dsi_display_register);
+ module_exit(dsi_display_unregister);
+diff --git a/drivers/gpu/drm/msm/hdmi-staging/sde_hdmi.c b/drivers/gpu/drm/msm/hdmi-staging/sde_hdmi.c
+index c1d6bc3..42464f9 100644
+--- a/drivers/gpu/drm/msm/hdmi-staging/sde_hdmi.c
++++ b/drivers/gpu/drm/msm/hdmi-staging/sde_hdmi.c
+@@ -3261,7 +3261,7 @@ int sde_hdmi_drm_deinit(struct sde_hdmi *display)
+ 	return rc;
+ }
+ 
+-static int __init sde_hdmi_register(void)
++int __init sde_hdmi_register(void)
+ {
+ 	int rc = 0;
+ 
+@@ -3275,5 +3275,5 @@ static void __exit sde_hdmi_unregister(void)
+ 	platform_driver_unregister(&sde_hdmi_driver);
+ }
+ 
+-fs_initcall(sde_hdmi_register);
++//fs_initcall(sde_hdmi_register);
+ module_exit(sde_hdmi_unregister);
+diff --git a/drivers/gpu/drm/msm/msm_drv.c b/drivers/gpu/drm/msm/msm_drv.c
+index fe9e4cb..ff381d7 100644
+--- a/drivers/gpu/drm/msm/msm_drv.c
++++ b/drivers/gpu/drm/msm/msm_drv.c
+@@ -2236,7 +2236,7 @@ void __exit adreno_unregister(void)
+ }
+ #endif
+ 
+-static int __init msm_drm_register(void)
++int __init msm_drm_register(void)
+ {
+ 	DBG("init");
+ 	msm_smmu_driver_init();
+@@ -2258,7 +2258,7 @@ static void __exit msm_drm_unregister(void)
+ 	msm_smmu_driver_cleanup();
+ }
+ 
+-fs_initcall(msm_drm_register);
++//fs_initcall(msm_drm_register);
+ module_exit(msm_drm_unregister);
+ 
+ MODULE_AUTHOR("Rob Clark <robdclark@gmail.com");
+diff --git a/drivers/gpu/drm/msm/sde/sde_wb.c b/drivers/gpu/drm/msm/sde/sde_wb.c
+index af91691..d97288d 100644
+--- a/drivers/gpu/drm/msm/sde/sde_wb.c
++++ b/drivers/gpu/drm/msm/sde/sde_wb.c
+@@ -731,7 +731,7 @@ static struct platform_driver sde_wb_driver = {
+ 	},
+ };
+ 
+-static int __init sde_wb_register(void)
++int __init sde_wb_register(void)
+ {
+ 	return platform_driver_register(&sde_wb_driver);
+ }
+@@ -741,5 +741,5 @@ static void __exit sde_wb_unregister(void)
+ 	platform_driver_unregister(&sde_wb_driver);
+ }
+ 
+-fs_initcall(sde_wb_register);
++//fs_initcall(sde_wb_register);
+ module_exit(sde_wb_unregister);
+diff --git a/drivers/i2c/busses/i2c-msm-v2.c b/drivers/i2c/busses/i2c-msm-v2.c
+index 4a9536d..f7f850b 100644
+--- a/drivers/i2c/busses/i2c-msm-v2.c
++++ b/drivers/i2c/busses/i2c-msm-v2.c
+@@ -3009,16 +3009,17 @@ static struct platform_driver i2c_msm_driver = {
+ 	.driver = {
+ 		.name           = "i2c-msm-v2",
+ 		.owner          = THIS_MODULE,
++		.probe_type     = PROBE_PREFER_ASYNCHRONOUS,
+ 		.pm             = &i2c_msm_pm_ops,
+ 		.of_match_table = i2c_msm_dt_match,
+ 	},
+ };
+ 
+-static int i2c_msm_init(void)
++int i2c_msm_init(void)
+ {
+ 	return platform_driver_register(&i2c_msm_driver);
+ }
+-subsys_initcall(i2c_msm_init);
++//subsys_initcall(i2c_msm_init);
+ 
+ static void i2c_msm_exit(void)
+ {
+diff --git a/drivers/iommu/arm-smmu.c b/drivers/iommu/arm-smmu.c
+index 6317478..8965222 100644
+--- a/drivers/iommu/arm-smmu.c
++++ b/drivers/iommu/arm-smmu.c
+@@ -4342,6 +4342,12 @@ static void __exit arm_smmu_exit(void)
+ 	return platform_driver_unregister(&arm_smmu_driver);
+ }
+ 
++int of_platform_populate_async_display_add_work(void);
++int of_platform_populate_async_camera_add_work(void);
++
++subsys_initcall(of_platform_populate_async_display_add_work);
++subsys_initcall(of_platform_populate_async_camera_add_work);
++
+ subsys_initcall(arm_smmu_init);
+ module_exit(arm_smmu_exit);
+ 
+diff --git a/drivers/leds/led-class.c b/drivers/leds/led-class.c
+index ba20b8e..497bfd2 100644
+--- a/drivers/leds/led-class.c
++++ b/drivers/leds/led-class.c
+@@ -338,7 +338,7 @@ void devm_led_classdev_unregister(struct device *dev,
+ }
+ EXPORT_SYMBOL_GPL(devm_led_classdev_unregister);
+ 
+-static int __init leds_init(void)
++int __init leds_init(void)
+ {
+ 	leds_class = class_create(THIS_MODULE, "leds");
+ 	if (IS_ERR(leds_class))
+@@ -353,9 +353,12 @@ static void __exit leds_exit(void)
+ 	class_destroy(leds_class);
+ }
+ 
+-subsys_initcall(leds_init);
++//subsys_initcall(leds_init);
+ module_exit(leds_exit);
+ 
++int i2c_msm_init(void);
++subsys_initcall(i2c_msm_init);
++
+ MODULE_AUTHOR("John Lenz, Richard Purdie");
+ MODULE_LICENSE("GPL");
+ MODULE_DESCRIPTION("LED Class Interface");
+diff --git a/drivers/md/dm-bufio.c b/drivers/md/dm-bufio.c
+index ceae30b..056f8ad 100644
+--- a/drivers/md/dm-bufio.c
++++ b/drivers/md/dm-bufio.c
+@@ -1821,7 +1821,7 @@ static void work_fn(struct work_struct *w)
+  * This is called only once for the whole dm_bufio module.
+  * It initializes memory limit.
+  */
+-static int __init dm_bufio_init(void)
++int __init dm_bufio_init(void)
+ {
+ 	__u64 mem;
+ 
+@@ -1906,7 +1906,7 @@ static void __exit dm_bufio_exit(void)
+ 		BUG();
+ }
+ 
+-subsys_initcall(dm_bufio_init)
++//subsys_initcall(dm_bufio_init)
+ module_exit(dm_bufio_exit)
+ 
+ module_param_named(max_cache_size_bytes, dm_bufio_cache_size, ulong, S_IRUGO | S_IWUSR);
+diff --git a/drivers/md/dm-verity-target.c b/drivers/md/dm-verity-target.c
+index d164b41..277bb2d 100644
+--- a/drivers/md/dm-verity-target.c
++++ b/drivers/md/dm-verity-target.c
+@@ -1085,7 +1085,7 @@ static struct target_type verity_target = {
+ 	.io_hints	= verity_io_hints,
+ };
+ 
+-static int __init dm_verity_init(void)
++int __init dm_verity_init(void)
+ {
+ 	int r;
+ 
+@@ -1101,7 +1101,7 @@ static void __exit dm_verity_exit(void)
+ 	dm_unregister_target(&verity_target);
+ }
+ 
+-subsys_initcall(dm_verity_init);
++//subsys_initcall(dm_verity_init);
+ module_exit(dm_verity_exit);
+ 
+ MODULE_AUTHOR("Mikulas Patocka <mpatocka@redhat.com>");
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index c825d01..c4b385e 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -400,7 +400,7 @@ static void (*_exits[])(void) = {
+ 	dm_statistics_exit,
+ };
+ 
+-static int __init dm_init(void)
++int __init dm_init(void)
+ {
+ 	const int count = ARRAY_SIZE(_inits);
+ 
+@@ -3761,7 +3761,7 @@ static const struct block_device_operations dm_blk_dops = {
+ /*
+  * module hooks
+  */
+-subsys_initcall(dm_init);
++//subsys_initcall(dm_init);
+ module_exit(dm_exit);
+ 
+ module_param(major, uint, 0);
+diff --git a/drivers/media/i2c/adv7481.c b/drivers/media/i2c/adv7481.c
+index f7df61f..1fb320b 100644
+--- a/drivers/media/i2c/adv7481.c
++++ b/drivers/media/i2c/adv7481.c
+@@ -2801,7 +2801,7 @@ static struct platform_driver adv7481_driver = {
+ 	.remove = adv7481_remove,
+ };
+ 
+-static int __init adv7481_init_module(void)
++int __init adv7481_init_module(void)
+ {
+ 	place_marker("# adv7481 in");
+ 	return platform_driver_register(&adv7481_driver);
+@@ -2812,7 +2812,7 @@ static void __exit adv7481_exit_module(void)
+ 	platform_driver_unregister(&adv7481_driver);
+ }
+ 
+-fs_initcall_sync(adv7481_init_module);
++//fs_initcall_sync(adv7481_init_module);
+ module_exit(adv7481_exit_module);
+ 
+ 
+diff --git a/drivers/media/platform/msm/ais/common/cam_smmu_api.c b/drivers/media/platform/msm/ais/common/cam_smmu_api.c
+index d445863..7478a84 100644
+--- a/drivers/media/platform/msm/ais/common/cam_smmu_api.c
++++ b/drivers/media/platform/msm/ais/common/cam_smmu_api.c
+@@ -1665,7 +1665,7 @@ static struct platform_driver cam_smmu_driver = {
+ 	},
+ };
+ 
+-static int __init cam_smmu_init_module(void)
++int __init cam_smmu_init_module(void)
+ {
+ 	place_marker("M - DRIVER Camera Init");
+ 	return platform_driver_register(&cam_smmu_driver);
+@@ -1676,7 +1676,7 @@ static void __exit cam_smmu_exit_module(void)
+ 	platform_driver_unregister(&cam_smmu_driver);
+ }
+ 
+-fs_initcall(cam_smmu_init_module);
++//subsys_initcall(cam_smmu_init_module);
+ module_exit(cam_smmu_exit_module);
+ MODULE_DESCRIPTION("MSM Camera SMMU driver");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/media/platform/msm/ais/isp/msm_isp.c b/drivers/media/platform/msm/ais/isp/msm_isp.c
+index 7ef4afb..e59029d 100644
+--- a/drivers/media/platform/msm/ais/isp/msm_isp.c
++++ b/drivers/media/platform/msm/ais/isp/msm_isp.c
+@@ -639,12 +639,11 @@ static struct platform_driver vfe_driver = {
+ 	.driver = {
+ 		.name = "msm_vfe",
+ 		.owner = THIS_MODULE,
+-		.probe_type = PROBE_PREFER_ASYNCHRONOUS,
+ 		.of_match_table = msm_vfe_dt_match,
+ 	},
+ };
+ 
+-static int __init msm_vfe_init_module(void)
++int __init msm_vfe_init_module(void)
+ {
+ 	place_marker("# isp in");
+ 	return platform_driver_register(&vfe_driver);
+@@ -655,7 +654,7 @@ static void __exit msm_vfe_exit_module(void)
+ 	platform_driver_unregister(&vfe_driver);
+ }
+ 
+-fs_initcall_sync(msm_vfe_init_module);
++//fs_initcall_sync(msm_vfe_init_module);
+ module_exit(msm_vfe_exit_module);
+ MODULE_DESCRIPTION("MSM VFE driver");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/media/platform/msm/ais/isp/msm_isp47.c b/drivers/media/platform/msm/ais/isp/msm_isp47.c
+index 6984c48..62b7f67 100644
+--- a/drivers/media/platform/msm/ais/isp/msm_isp47.c
++++ b/drivers/media/platform/msm/ais/isp/msm_isp47.c
+@@ -2873,7 +2873,7 @@ static struct platform_driver vfe47_driver = {
+ 	},
+ };
+ 
+-static int __init msm_vfe47_init_module(void)
++int __init msm_vfe47_init_module(void)
+ {
+ 	return platform_driver_register(&vfe47_driver);
+ }
+@@ -2883,7 +2883,7 @@ static void __exit msm_vfe47_exit_module(void)
+ 	platform_driver_unregister(&vfe47_driver);
+ }
+ 
+-fs_initcall(msm_vfe47_init_module);
++//fs_initcall(msm_vfe47_init_module);
+ module_exit(msm_vfe47_exit_module);
+ MODULE_DESCRIPTION("MSM VFE47 driver");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/media/platform/msm/ais/ispif/msm_ispif.c b/drivers/media/platform/msm/ais/ispif/msm_ispif.c
+index 0d3fc66..49a30e5 100644
+--- a/drivers/media/platform/msm/ais/ispif/msm_ispif.c
++++ b/drivers/media/platform/msm/ais/ispif/msm_ispif.c
+@@ -1797,7 +1797,7 @@ static struct platform_driver ispif_driver = {
+ 	},
+ };
+ 
+-static int __init msm_ispif_init_module(void)
++int __init msm_ispif_init_module(void)
+ {
+ 	place_marker("# ispif in");
+ 	return platform_driver_register(&ispif_driver);
+@@ -1808,7 +1808,7 @@ static void __exit msm_ispif_exit_module(void)
+ 	platform_driver_unregister(&ispif_driver);
+ }
+ 
+-fs_initcall(msm_ispif_init_module);
++//fs_initcall(msm_ispif_init_module);
+ module_exit(msm_ispif_exit_module);
+ MODULE_DESCRIPTION("MSM ISP Interface driver");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/media/platform/msm/ais/msm.c b/drivers/media/platform/msm/ais/msm.c
+index df93e32..eeac2a8 100644
+--- a/drivers/media/platform/msm/ais/msm.c
++++ b/drivers/media/platform/msm/ais/msm.c
+@@ -1422,7 +1422,7 @@ static struct platform_driver msm_driver = {
+ 	},
+ };
+ 
+-static int __init msm_init(void)
++int __init msm_init(void)
+ {
+ 	place_marker("# msm in");
+ 	return platform_driver_register(&msm_driver);
+@@ -1434,7 +1434,7 @@ static void __exit msm_exit(void)
+ }
+ 
+ 
+-fs_initcall(msm_init);
++//fs_initcall(msm_init);
+ module_exit(msm_exit);
+ MODULE_DESCRIPTION("MSM V4L2 Camera");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/media/platform/msm/ais/msm_ais_mgr/msm_ais_mgr.c b/drivers/media/platform/msm/ais/msm_ais_mgr/msm_ais_mgr.c
+index e58c041..43aa677 100644
+--- a/drivers/media/platform/msm/ais/msm_ais_mgr/msm_ais_mgr.c
++++ b/drivers/media/platform/msm/ais/msm_ais_mgr/msm_ais_mgr.c
+@@ -96,7 +96,7 @@ static long msm_ais_subdev_fops_ioctl(struct file *file, unsigned int cmd,
+ 	return video_usercopy(file, cmd, arg, msm_clkmgr_subdev_do_ioctl);
+ }
+ 
+-static int32_t __init msm_ais_mngr_init(void)
++int32_t __init msm_ais_mngr_init(void)
+ {
+ 	int32_t rc = 0;
+ 
+@@ -141,7 +141,7 @@ static void __exit msm_ais_mngr_exit(void)
+ 	kfree(msm_ais_mngr_dev);
+ }
+ 
+-fs_initcall(msm_ais_mngr_init);
++//fs_initcall(msm_ais_mngr_init);
+ module_exit(msm_ais_mngr_exit);
+ MODULE_DESCRIPTION("MSM AIS Manager");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/media/platform/msm/ais/msm_buf_mgr/msm_generic_buf_mgr.c b/drivers/media/platform/msm/ais/msm_buf_mgr/msm_generic_buf_mgr.c
+index 72b5bc9..9f53110 100644
+--- a/drivers/media/platform/msm/ais/msm_buf_mgr/msm_generic_buf_mgr.c
++++ b/drivers/media/platform/msm/ais/msm_buf_mgr/msm_generic_buf_mgr.c
+@@ -827,7 +827,7 @@ static long msm_buf_subdev_fops_ioctl(struct file *file, unsigned int cmd,
+ 	return video_usercopy(file, cmd, arg, msm_bmgr_subdev_do_ioctl);
+ }
+ 
+-static int32_t __init msm_buf_mngr_init(void)
++int32_t __init msm_buf_mngr_init(void)
+ {
+ 	int32_t rc = 0;
+ 
+@@ -892,7 +892,7 @@ static void __exit msm_buf_mngr_exit(void)
+ 	kfree(msm_buf_mngr_dev);
+ }
+ 
+-fs_initcall(msm_buf_mngr_init);
++//fs_initcall(msm_buf_mngr_init);
+ module_exit(msm_buf_mngr_exit);
+ MODULE_DESCRIPTION("MSM Buffer Manager");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/media/platform/msm/ais/sensor/cci/msm_cci.c b/drivers/media/platform/msm/ais/sensor/cci/msm_cci.c
+index cbe925a..0f3abe2 100644
+--- a/drivers/media/platform/msm/ais/sensor/cci/msm_cci.c
++++ b/drivers/media/platform/msm/ais/sensor/cci/msm_cci.c
+@@ -2152,7 +2152,7 @@ static struct platform_driver cci_driver = {
+ 	},
+ };
+ 
+-static int __init msm_cci_init_module(void)
++int __init msm_cci_init_module(void)
+ {
+ 	return platform_driver_register(&cci_driver);
+ }
+@@ -2162,7 +2162,7 @@ static void __exit msm_cci_exit_module(void)
+ 	platform_driver_unregister(&cci_driver);
+ }
+ 
+-fs_initcall(msm_cci_init_module);
++//fs_initcall(msm_cci_init_module);
+ module_exit(msm_cci_exit_module);
+ MODULE_DESCRIPTION("MSM CCI driver");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/media/platform/msm/ais/sensor/cci/msm_early_cam.c b/drivers/media/platform/msm/ais/sensor/cci/msm_early_cam.c
+index 6c7fe6e..0c7417a 100644
+--- a/drivers/media/platform/msm/ais/sensor/cci/msm_early_cam.c
++++ b/drivers/media/platform/msm/ais/sensor/cci/msm_early_cam.c
+@@ -383,7 +383,7 @@ static int msm_early_cam_exit(struct platform_device *pdev)
+ 	return 0;
+ }
+ 
+-static int __init msm_early_cam_init_module(void)
++int __init msm_early_cam_init_module(void)
+ {
+ 	return platform_driver_register(&msm_early_camera_driver);
+ }
+@@ -411,7 +411,7 @@ static struct platform_driver msm_early_camera_driver = {
+ 
+ MODULE_DEVICE_TABLE(of, msm_early_camera_match_table);
+ 
+-fs_initcall(msm_early_cam_init_module);
++//fs_initcall(msm_early_cam_init_module);
+ module_exit(msm_early_cam_exit_module);
+ MODULE_DESCRIPTION("MSM early camera driver");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/media/platform/msm/ais/sensor/csid/msm_csid.c b/drivers/media/platform/msm/ais/sensor/csid/msm_csid.c
+index db215d2..5d4f9f4 100644
+--- a/drivers/media/platform/msm/ais/sensor/csid/msm_csid.c
++++ b/drivers/media/platform/msm/ais/sensor/csid/msm_csid.c
+@@ -1477,7 +1477,7 @@ static struct platform_driver csid_driver = {
+ 	},
+ };
+ 
+-static int __init msm_csid_init_module(void)
++int __init msm_csid_init_module(void)
+ {
+ 	return platform_driver_register(&csid_driver);
+ }
+@@ -1487,7 +1487,7 @@ static void __exit msm_csid_exit_module(void)
+ 	platform_driver_unregister(&csid_driver);
+ }
+ 
+-fs_initcall(msm_csid_init_module);
++//fs_initcall(msm_csid_init_module);
+ module_exit(msm_csid_exit_module);
+ MODULE_DESCRIPTION("MSM CSID driver");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/media/platform/msm/ais/sensor/csiphy/msm_csiphy.c b/drivers/media/platform/msm/ais/sensor/csiphy/msm_csiphy.c
+index 7d0d317..965034e 100644
+--- a/drivers/media/platform/msm/ais/sensor/csiphy/msm_csiphy.c
++++ b/drivers/media/platform/msm/ais/sensor/csiphy/msm_csiphy.c
+@@ -1646,7 +1646,7 @@ static struct platform_driver csiphy_driver = {
+ 	},
+ };
+ 
+-static int __init msm_csiphy_init_module(void)
++int __init msm_csiphy_init_module(void)
+ {
+ 	return platform_driver_register(&csiphy_driver);
+ }
+@@ -1656,7 +1656,7 @@ static void __exit msm_csiphy_exit_module(void)
+ 	platform_driver_unregister(&csiphy_driver);
+ }
+ 
+-fs_initcall(msm_csiphy_init_module);
++//fs_initcall(msm_csiphy_init_module);
+ module_exit(msm_csiphy_exit_module);
+ MODULE_DESCRIPTION("MSM CSIPHY driver");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/media/platform/msm/ais/sensor/msm_sensor_driver.c b/drivers/media/platform/msm/ais/sensor/msm_sensor_driver.c
+index b25786b..0bfd73e 100644
+--- a/drivers/media/platform/msm/ais/sensor/msm_sensor_driver.c
++++ b/drivers/media/platform/msm/ais/sensor/msm_sensor_driver.c
+@@ -1386,7 +1386,7 @@ static struct i2c_driver msm_sensor_driver_i2c = {
+ 	},
+ };
+ 
+-static int __init msm_sensor_driver_init(void)
++int __init msm_sensor_driver_init(void)
+ {
+ 	int32_t rc = 0;
+ 
+@@ -1409,7 +1409,7 @@ static void __exit msm_sensor_driver_exit(void)
+ 	i2c_del_driver(&msm_sensor_driver_i2c);
+ }
+ 
+-fs_initcall(msm_sensor_driver_init);
++//fs_initcall(msm_sensor_driver_init);
+ module_exit(msm_sensor_driver_exit);
+ MODULE_DESCRIPTION("msm_sensor_driver");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/media/platform/msm/ais/sensor/msm_sensor_init.c b/drivers/media/platform/msm/ais/sensor/msm_sensor_init.c
+index cdf4830..44f42fe 100644
+--- a/drivers/media/platform/msm/ais/sensor/msm_sensor_init.c
++++ b/drivers/media/platform/msm/ais/sensor/msm_sensor_init.c
+@@ -116,7 +116,7 @@ int32_t msm_sensor_driver_cmd(struct msm_sensor_init_t *s_init, void *arg)
+ 	return rc;
+ }
+ 
+-static int __init msm_sensor_init_module(void)
++int __init msm_sensor_init_module(void)
+ {
+ 	int ret = 0;
+ 
+@@ -141,7 +141,7 @@ static void __exit msm_sensor_exit_module(void)
+ 	kfree(s_init);
+ }
+ 
+-fs_initcall(msm_sensor_init_module);
++//fs_initcall(msm_sensor_init_module);
+ module_exit(msm_sensor_exit_module);
+ MODULE_DESCRIPTION("msm_sensor_init");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/media/platform/msm/vidc/vmem/vmem.c b/drivers/media/platform/msm/vidc/vmem/vmem.c
+index 4285246..b580a81 100644
+--- a/drivers/media/platform/msm/vidc/vmem/vmem.c
++++ b/drivers/media/platform/msm/vidc/vmem/vmem.c
+@@ -719,6 +719,7 @@ static struct platform_driver vmem_driver = {
+ 	.driver = {
+ 		.name = "msm_vidc_vmem",
+ 		.owner = THIS_MODULE,
++		.probe_type = PROBE_PREFER_ASYNCHRONOUS,
+ 		.of_match_table = vmem_of_match,
+ 	},
+ };
+diff --git a/drivers/mmc/card/block.c b/drivers/mmc/card/block.c
+index f9c7beb..082d4f2 100644
+--- a/drivers/mmc/card/block.c
++++ b/drivers/mmc/card/block.c
+@@ -4821,7 +4821,7 @@ static struct mmc_driver mmc_driver = {
+ 	.shutdown	= mmc_blk_shutdown,
+ };
+ 
+-static int __init mmc_blk_init(void)
++int __init mmc_blk_init(void)
+ {
+ 	int res;
+ 
+@@ -4852,7 +4852,7 @@ static void __exit mmc_blk_exit(void)
+ 	unregister_blkdev(MMC_BLOCK_MAJOR, "mmc");
+ }
+ 
+-fs_initcall(mmc_blk_init);
++//fs_initcall(mmc_blk_init);
+ module_exit(mmc_blk_exit);
+ 
+ MODULE_LICENSE("GPL");
+diff --git a/drivers/mmc/host/sdhci-msm.c b/drivers/mmc/host/sdhci-msm.c
+index ea42efc..2d109df 100644
+--- a/drivers/mmc/host/sdhci-msm.c
++++ b/drivers/mmc/host/sdhci-msm.c
+@@ -5054,11 +5054,11 @@ static struct platform_driver sdhci_msm_driver = {
+ 	},
+ };
+ 
+-static int __init sdhci_msm_driver_init(void)
++int __init sdhci_msm_driver_init(void)
+ {
+ 	return platform_driver_register(&sdhci_msm_driver);
+ }
+-fs_initcall(sdhci_msm_driver_init);
++//fs_initcall(sdhci_msm_driver_init);
+ 
+ static void __exit sdhci_msm_driver_exit(void)
+ {
+diff --git a/drivers/of/platform.c b/drivers/of/platform.c
+index 2924c81..c66cadb 100644
+--- a/drivers/of/platform.c
++++ b/drivers/of/platform.c
+@@ -316,6 +316,193 @@ static const struct of_dev_auxdata *of_dev_lookup(const struct of_dev_auxdata *l
+ 	return NULL;
+ }
+ 
++static int of_platform_bus_create(struct device_node *bus,
++				  const struct of_device_id *matches,
++				  const struct of_dev_auxdata *lookup,
++				  struct device *parent, bool strict);
++int cpu_clock_8996_init(void);
++int cpr_regulator_init(void);
++int mem_acc_regulator_init(void);
++int kryo_regulator_init(void);
++int msm_apm_init(void);
++int spmi_pmic_arb_init(void);
++int msm_spm_device_init(void);
++int msm_gcc_8996_init(void);
++int msm_rpm_driver_init(void);
++int glink_smem_native_xprt_init(void);
++int msm_mmsscc_8996_init(void);
++int cpr_mmss_regulator_init(void);
++
++static struct workqueue_struct *of_platform_populate_async_wq;
++static __initdata DECLARE_COMPLETION(cpu_clock_done);
++
++void __init of_platform_populate_async_wq_init(void)
++{
++	of_platform_populate_async_wq = alloc_workqueue("kasyncpopd", WQ_HIGHPRI | WQ_UNBOUND, num_online_cpus());
++	if (!of_platform_populate_async_wq) {
++		printk("Cannot allocate async_populate workqueue\n");
++	}
++}
++
++void __init of_platform_populate_async_wq_deinit(void)
++{
++	if(of_platform_populate_async_wq) {
++		flush_workqueue(of_platform_populate_async_wq);
++		destroy_workqueue(of_platform_populate_async_wq);
++		of_platform_populate_async_wq = NULL;
++	}
++}
++
++static void __init of_platform_populate_async_pcie_work_fn(struct work_struct *work)
++{
++	struct pcie_pop_item *item =
++		container_of(work, struct pcie_pop_item, work);
++
++	if(of_platform_bus_create(item->bus, of_default_bus_match_table, NULL, item->parent, true))
++		of_node_put(item->bus);
++	kfree(item);
++}
++
++static void __init of_platform_populate_async_pcie_add_work(struct device_node *bus, struct device *parent)
++{
++	struct pcie_pop_item *item;
++
++	if(of_platform_populate_async_wq) {
++		item = kzalloc(sizeof(struct pcie_pop_item), GFP_ATOMIC);
++		if(item) {
++			INIT_WORK(&item->work, of_platform_populate_async_pcie_work_fn);
++			item->bus = bus;
++			item->parent = parent;
++			queue_work(of_platform_populate_async_wq, &item->work);
++		}
++	}
++}
++
++static void __init of_platform_populate_async_cpu_clock_work_fn(struct work_struct *work)
++{
++	printk("of_platform_populate_async_cpu_clock_work_fn start\n");
++	glink_smem_native_xprt_init();
++	msm_rpm_driver_init();
++	msm_gcc_8996_init();
++	msm_spm_device_init();
++	spmi_pmic_arb_init();
++	msm_apm_init();
++	kryo_regulator_init();
++	mem_acc_regulator_init();
++	cpr_regulator_init();
++	cpr_mmss_regulator_init();
++	msm_mmsscc_8996_init();
++	cpu_clock_8996_init();
++	complete(&cpu_clock_done);
++	printk("of_platform_populate_async_cpu_clock_work_fn end\n");
++	kfree(work);
++}
++
++int __init cpu_clock_sync(void)
++{
++	wait_for_completion(&cpu_clock_done);
++	return 0;
++}
++
++static void __init of_platform_populate_async_cpu_clock_add_work(void)
++{
++	struct work_struct *item;
++
++	if(of_platform_populate_async_wq) {
++		item = kzalloc(sizeof(struct work_struct), GFP_ATOMIC);
++		if(item) {
++			INIT_WORK(item, of_platform_populate_async_cpu_clock_work_fn);
++			queue_work(of_platform_populate_async_wq, item);
++		}
++	}
++}
++
++int cam_smmu_init_module(void);
++int msm_init(void);
++int msm_cci_init_module(void);
++int msm_early_cam_init_module(void);
++int msm_csiphy_init_module(void);
++int msm_csid_init_module(void);
++int msm_sensor_init_module(void);
++int msm_sensor_driver_init(void);
++int msm_vfe47_init_module(void);
++int msm_ispif_init_module(void);
++int msm_buf_mngr_init(void);
++int msm_ais_mngr_init(void);
++int msm_ba_mod_init(void);
++int adv7481_init_module(void);
++int msm_vfe_init_module(void);
++
++static void __init of_platform_populate_async_camera_work_fn(struct work_struct *work)
++{
++	printk("of_platform_populate_async_camera_work_fn start\n");
++	cam_smmu_init_module();
++	msm_init();
++	msm_cci_init_module();
++	msm_early_cam_init_module();
++	msm_csiphy_init_module();
++	msm_csid_init_module();
++	msm_sensor_init_module();
++	msm_sensor_driver_init();
++	msm_vfe47_init_module();
++	msm_ispif_init_module();
++	msm_buf_mngr_init();
++	msm_ais_mngr_init();
++	msm_ba_mod_init();
++	adv7481_init_module();
++	msm_vfe_init_module();
++	printk("of_platform_populate_async_camera_work_fn end\n");
++	kfree(work);
++}
++
++int __init of_platform_populate_async_camera_add_work(void)
++{
++	struct work_struct *item;
++
++	if(of_platform_populate_async_wq) {
++		item = kzalloc(sizeof(struct work_struct), GFP_ATOMIC);
++		if(item) {
++			INIT_WORK(item, of_platform_populate_async_camera_work_fn);
++			queue_work(of_platform_populate_async_wq, item);
++		}
++	}
++	return 0;
++}
++
++int adv7533_init(void);
++int drm_core_init(void);
++int dsi_display_register(void);
++int sde_hdmi_register(void);
++int sde_wb_register(void);
++int msm_drm_register(void);
++
++static void __init of_platform_populate_async_display_work_fn(struct work_struct *work)
++{
++	printk("of_platform_populate_async_display_work_fn start\n");
++	adv7533_init();
++	drm_core_init();
++	dsi_display_register();
++	sde_hdmi_register();
++	sde_wb_register();
++	msm_drm_register();
++	printk("of_platform_populate_async_display_work_fn end\n");
++	kfree(work);
++}
++
++int __init of_platform_populate_async_display_add_work(void)
++{
++	struct work_struct *item;
++
++	if(of_platform_populate_async_wq) {
++		item = kzalloc(sizeof(struct work_struct), GFP_ATOMIC);
++		if(item) {
++			INIT_WORK(item, of_platform_populate_async_display_work_fn);
++			queue_work(of_platform_populate_async_wq, item);
++		}
++	}
++	return 0;
++}
++
+ /**
+  * of_platform_bus_create() - Create a device for a node and its children.
+  * @bus: device node of the bus to instantiate
+@@ -367,6 +554,15 @@ static int of_platform_bus_create(struct device_node *bus,
+ 
+ 	for_each_child_of_node(bus, child) {
+ 		pr_debug("   create child: %s\n", child->full_name);
++		if((child->name) && (strcmp(child->name, "qcom,pcie")==0))
++		{
++			of_platform_populate_async_pcie_add_work(child, &dev->dev);
++			continue;
++		} else if((child->name) && (strcmp(child->name, "qcom,cpu-clock-sync-dummy")==0))
++		{
++			of_platform_populate_async_cpu_clock_add_work();
++			continue;
++		}
+ 		rc = of_platform_bus_create(child, matches, lookup, &dev->dev, strict);
+ 		if (rc) {
+ 			of_node_put(child);
+diff --git a/drivers/pci/host/pci-msm.c b/drivers/pci/host/pci-msm.c
+index 85d790b..8fa8ef0 100644
+--- a/drivers/pci/host/pci-msm.c
++++ b/drivers/pci/host/pci-msm.c
+@@ -31,6 +31,7 @@
+ #include <linux/slab.h>
+ #include <linux/types.h>
+ #include <linux/of_gpio.h>
++#include <linux/of_platform.h>
+ #include <linux/clk/msm-clk.h>
+ #include <linux/reset.h>
+ #include <linux/msm-bus.h>
+@@ -6638,6 +6639,7 @@ static struct platform_driver msm_pcie_driver = {
+ 	.driver	= {
+ 		.name		= "pci-msm",
+ 		.owner		= THIS_MODULE,
++		.probe_type = PROBE_PREFER_ASYNCHRONOUS,
+ 		.of_match_table	= msm_pcie_match,
+ 	},
+ };
+@@ -6648,6 +6650,7 @@ int __init pcie_init(void)
+ 	char rc_name[MAX_RC_NAME_LEN];
+ 
+ 	pr_alert("pcie:%s.\n", __func__);
++	of_platform_populate_async_wq_deinit();
+ 	place_marker("M - DRIVER PCIe Init");
+ 
+ 	pcie_drv.rc_num = 0;
+@@ -6730,7 +6733,7 @@ static void __exit pcie_exit(void)
+ 		msm_pcie_sysfs_exit(&msm_pcie_dev[i]);
+ }
+ 
+-subsys_initcall_sync(pcie_init);
++fs_initcall_sync(pcie_init);
+ module_exit(pcie_exit);
+ 
+ 
+diff --git a/drivers/platform/msm/ipa/ipa_api.c b/drivers/platform/msm/ipa/ipa_api.c
+index 35ea498..ada3a1e 100644
+--- a/drivers/platform/msm/ipa/ipa_api.c
++++ b/drivers/platform/msm/ipa/ipa_api.c
+@@ -2972,6 +2972,7 @@ static struct platform_driver ipa_plat_drv = {
+ 	.driver = {
+ 		.name = DRV_NAME,
+ 		.owner = THIS_MODULE,
++		.probe_type = PROBE_PREFER_ASYNCHRONOUS,
+ 		.pm = &ipa_pm_ops,
+ 		.of_match_table = ipa_plat_drv_match,
+ 	},
+diff --git a/drivers/platform/msm/msm_ext_display.c b/drivers/platform/msm/msm_ext_display.c
+index bc15ef2..ce22e6b 100644
+--- a/drivers/platform/msm/msm_ext_display.c
++++ b/drivers/platform/msm/msm_ext_display.c
+@@ -875,6 +875,7 @@ static struct platform_driver this_driver = {
+ 	.remove = msm_ext_disp_remove,
+ 	.driver = {
+ 		.name = "msm-ext-disp",
++		.probe_type = PROBE_PREFER_ASYNCHRONOUS,
+ 		.of_match_table = msm_ext_dt_match,
+ 	},
+ };
+diff --git a/drivers/platform/msm/qpnp-revid.c b/drivers/platform/msm/qpnp-revid.c
+index 0fec8ac..722e338 100644
+--- a/drivers/platform/msm/qpnp-revid.c
++++ b/drivers/platform/msm/qpnp-revid.c
+@@ -255,6 +255,7 @@ static struct platform_driver qpnp_revid_driver = {
+ 	.driver	= {
+ 		.name		= QPNP_REVID_DEV_NAME,
+ 		.owner		= THIS_MODULE,
++		.probe_type = PROBE_PREFER_ASYNCHRONOUS,
+ 		.of_match_table	= qpnp_revid_match_table,
+ 	},
+ };
+diff --git a/drivers/power/qcom/apm.c b/drivers/power/qcom/apm.c
+index 9455468..87dce7d 100644
+--- a/drivers/power/qcom/apm.c
++++ b/drivers/power/qcom/apm.c
+@@ -1040,7 +1040,7 @@ static struct platform_driver msm_apm_driver = {
+ 	.remove		= msm_apm_remove,
+ };
+ 
+-static int __init msm_apm_init(void)
++int __init msm_apm_init(void)
+ {
+ 	apm_debugfs_base_init();
+ 	return platform_driver_register(&msm_apm_driver);
+@@ -1052,7 +1052,7 @@ static void __exit msm_apm_exit(void)
+ 	apm_debugfs_base_remove();
+ }
+ 
+-arch_initcall(msm_apm_init);
++//arch_initcall(msm_apm_init);
+ module_exit(msm_apm_exit);
+ 
+ MODULE_DESCRIPTION("MSM Array Power Mux driver");
+diff --git a/drivers/regulator/cpr3-hmss-regulator.c b/drivers/regulator/cpr3-hmss-regulator.c
+index 21381d1..b190dfe 100644
+--- a/drivers/regulator/cpr3-hmss-regulator.c
++++ b/drivers/regulator/cpr3-hmss-regulator.c
+@@ -1818,7 +1818,7 @@ static struct platform_driver cpr3_hmss_regulator_driver = {
+ 	.resume		= cpr3_hmss_regulator_resume,
+ };
+ 
+-static int cpr_regulator_init(void)
++int cpr_regulator_init(void)
+ {
+ 	return platform_driver_register(&cpr3_hmss_regulator_driver);
+ }
+@@ -1831,5 +1831,5 @@ static void cpr_regulator_exit(void)
+ MODULE_DESCRIPTION("CPR3 HMSS regulator driver");
+ MODULE_LICENSE("GPL v2");
+ 
+-arch_initcall(cpr_regulator_init);
++//arch_initcall(cpr_regulator_init);
+ module_exit(cpr_regulator_exit);
+diff --git a/drivers/regulator/cpr3-mmss-regulator.c b/drivers/regulator/cpr3-mmss-regulator.c
+index 5a031f5..a567b0c 100644
+--- a/drivers/regulator/cpr3-mmss-regulator.c
++++ b/drivers/regulator/cpr3-mmss-regulator.c
+@@ -1240,7 +1240,7 @@ static struct platform_driver cpr3_mmss_regulator_driver = {
+ 	.resume		= cpr3_mmss_regulator_resume,
+ };
+ 
+-static int cpr_regulator_init(void)
++int cpr_mmss_regulator_init(void)
+ {
+ 	return platform_driver_register(&cpr3_mmss_regulator_driver);
+ }
+@@ -1253,5 +1253,5 @@ static void cpr_regulator_exit(void)
+ MODULE_DESCRIPTION("CPR3 MMSS regulator driver");
+ MODULE_LICENSE("GPL v2");
+ 
+-arch_initcall(cpr_regulator_init);
++//arch_initcall(cpr_regulator_init);
+ module_exit(cpr_regulator_exit);
+diff --git a/drivers/regulator/fan53555.c b/drivers/regulator/fan53555.c
+index 245ccad..afa6644 100644
+--- a/drivers/regulator/fan53555.c
++++ b/drivers/regulator/fan53555.c
+@@ -478,7 +478,7 @@ static int __init fan53555_regulator_driver_init(void)
+     return i2c_add_driver(&fan53555_regulator_driver);
+ }
+ 
+-fs_initcall(fan53555_regulator_driver_init);
++subsys_initcall(fan53555_regulator_driver_init);
+ 
+ static void __exit fan53555_regulator_driver_exit(void)
+ {
+diff --git a/drivers/regulator/fixed.c b/drivers/regulator/fixed.c
+index ff62d69..7a1db2c 100644
+--- a/drivers/regulator/fixed.c
++++ b/drivers/regulator/fixed.c
+@@ -217,11 +217,11 @@ static struct platform_driver regulator_fixed_voltage_driver = {
+ 	},
+ };
+ 
+-static int __init regulator_fixed_voltage_init(void)
++int __init regulator_fixed_voltage_init(void)
+ {
+ 	return platform_driver_register(&regulator_fixed_voltage_driver);
+ }
+-subsys_initcall(regulator_fixed_voltage_init);
++//subsys_initcall(regulator_fixed_voltage_init);
+ 
+ static void __exit regulator_fixed_voltage_exit(void)
+ {
+diff --git a/drivers/regulator/kryo-regulator.c b/drivers/regulator/kryo-regulator.c
+index fd853e7..f3f1b90 100644
+--- a/drivers/regulator/kryo-regulator.c
++++ b/drivers/regulator/kryo-regulator.c
+@@ -1086,7 +1086,7 @@ static struct platform_driver kryo_regulator_driver = {
+ 	},
+ };
+ 
+-static int __init kryo_regulator_init(void)
++int __init kryo_regulator_init(void)
+ {
+ 	kryo_debugfs_base_init();
+ 	return platform_driver_register(&kryo_regulator_driver);
+@@ -1101,5 +1101,5 @@ static void __exit kryo_regulator_exit(void)
+ MODULE_DESCRIPTION("Kryo regulator driver");
+ MODULE_LICENSE("GPL v2");
+ 
+-arch_initcall(kryo_regulator_init);
++//arch_initcall(kryo_regulator_init);
+ module_exit(kryo_regulator_exit);
+diff --git a/drivers/regulator/mem-acc-regulator.c b/drivers/regulator/mem-acc-regulator.c
+index 4c03dec..a98f27b 100644
+--- a/drivers/regulator/mem-acc-regulator.c
++++ b/drivers/regulator/mem-acc-regulator.c
+@@ -1375,7 +1375,7 @@ int __init mem_acc_regulator_init(void)
+ {
+ 	return platform_driver_register(&mem_acc_regulator_driver);
+ }
+-postcore_initcall(mem_acc_regulator_init);
++//postcore_initcall(mem_acc_regulator_init);
+ 
+ static void __exit mem_acc_regulator_exit(void)
+ {
+diff --git a/drivers/scsi/scsi.c b/drivers/scsi/scsi.c
+index 6688eea..1410250 100644
+--- a/drivers/scsi/scsi.c
++++ b/drivers/scsi/scsi.c
+@@ -1204,8 +1204,18 @@ static void __exit exit_scsi(void)
+ 	async_unregister_domain(&scsi_sd_probe_domain);
+ }
+ 
++int leds_init(void);
++int mmc_blk_init(void);
++int dm_verity_init(void);
++int dm_bufio_init(void);
++int dm_init(void);
+ int rootfs_prefetch_wq(void);
+ 
++subsys_initcall(dm_verity_init);
++subsys_initcall(dm_bufio_init);
++subsys_initcall(dm_init);
++subsys_initcall(mmc_blk_init);
++subsys_initcall(leds_init);
+ subsys_initcall(init_scsi);
+ subsys_initcall(rootfs_prefetch_wq);
+ module_exit(exit_scsi);
+diff --git a/drivers/soc/qcom/glink_smem_native_xprt.c b/drivers/soc/qcom/glink_smem_native_xprt.c
+index 4407dfb..eeff2c1 100644
+--- a/drivers/soc/qcom/glink_smem_native_xprt.c
++++ b/drivers/soc/qcom/glink_smem_native_xprt.c
+@@ -3122,7 +3122,7 @@ static struct platform_driver glink_mailbox_driver = {
+ 	},
+ };
+ 
+-static int __init glink_smem_native_xprt_init(void)
++int __init glink_smem_native_xprt_init(void)
+ {
+ 	int rc;
+ 
+@@ -3149,7 +3149,7 @@ static int __init glink_smem_native_xprt_init(void)
+ 
+ 	return 0;
+ }
+-arch_initcall(glink_smem_native_xprt_init);
++//arch_initcall(glink_smem_native_xprt_init);
+ 
+ MODULE_DESCRIPTION("MSM G-Link SMEM Native Transport");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/soc/qcom/msm_bus/msm_bus_fabric_adhoc.c b/drivers/soc/qcom/msm_bus/msm_bus_fabric_adhoc.c
+index 08a4d83..7070ca2 100644
+--- a/drivers/soc/qcom/msm_bus/msm_bus_fabric_adhoc.c
++++ b/drivers/soc/qcom/msm_bus/msm_bus_fabric_adhoc.c
+@@ -1249,6 +1249,8 @@ static struct notifier_block msm_bus_panic_notifier = {
+ 	.priority = 1,
+ };
+ 
++int sdhci_msm_driver_init(void);
++
+ static int msm_bus_device_probe(struct platform_device *pdev)
+ {
+ 	unsigned int i, ret;
+@@ -1326,6 +1328,7 @@ static int msm_bus_device_probe(struct platform_device *pdev)
+ 
+ 	devm_kfree(&pdev->dev, pdata->info);
+ 	devm_kfree(&pdev->dev, pdata);
++	sdhci_msm_driver_init();
+ exit_device_probe:
+ 	return ret;
+ }
+@@ -1387,6 +1390,7 @@ static struct platform_driver msm_bus_device_driver = {
+ 	.driver = {
+ 		.name = "msm_bus_device",
+ 		.owner = THIS_MODULE,
++		.probe_type = PROBE_PREFER_ASYNCHRONOUS,
+ 		.of_match_table = fabric_match,
+ 	},
+ };
+@@ -1405,3 +1409,10 @@ int __init msm_bus_device_init_driver(void)
+ 	return platform_driver_register(&msm_bus_rules_driver);
+ }
+ subsys_initcall(msm_bus_device_init_driver);
++
++int cpu_clock_sync(void);
++subsys_initcall(cpu_clock_sync);
++
++int regulator_fixed_voltage_init(void);
++subsys_initcall(regulator_fixed_voltage_init);
++
+diff --git a/drivers/soc/qcom/rpm-smd.c b/drivers/soc/qcom/rpm-smd.c
+index e792c95..0dbca00 100644
+--- a/drivers/soc/qcom/rpm-smd.c
++++ b/drivers/soc/qcom/rpm-smd.c
+@@ -2078,6 +2078,8 @@ static int msm_rpm_dev_probe(struct platform_device *pdev)
+ 	if (!ret) {
+ 		pr_info("APSS-RPM communication over GLINK\n");
+ 		msm_rpm_send_buffer = msm_rpm_glink_send_buffer;
++		while(probe_status == -EPROBE_DEFER)
++			mdelay(2);
+ 		of_platform_populate(pdev->dev.of_node, NULL, NULL,
+ 							&pdev->dev);
+ 		return ret;
+@@ -2171,4 +2173,4 @@ int __init msm_rpm_driver_init(void)
+ 	return platform_driver_register(&msm_rpm_device_driver);
+ }
+ EXPORT_SYMBOL(msm_rpm_driver_init);
+-arch_initcall(msm_rpm_driver_init);
++//arch_initcall(msm_rpm_driver_init);
+diff --git a/drivers/soc/qcom/spm_devices.c b/drivers/soc/qcom/spm_devices.c
+index 67d4275..7c5aed7 100644
+--- a/drivers/soc/qcom/spm_devices.c
++++ b/drivers/soc/qcom/spm_devices.c
+@@ -982,4 +982,4 @@ int __init msm_spm_device_init(void)
+ 	registered = true;
+ 	return platform_driver_register(&msm_spm_device_driver);
+ }
+-arch_initcall(msm_spm_device_init);
++//arch_initcall(msm_spm_device_init);
+diff --git a/drivers/soc/qcom/watchdog_v2.c b/drivers/soc/qcom/watchdog_v2.c
+index 625030f..33d56c3 100644
+--- a/drivers/soc/qcom/watchdog_v2.c
++++ b/drivers/soc/qcom/watchdog_v2.c
+@@ -883,6 +883,7 @@ static struct platform_driver msm_watchdog_driver = {
+ 	.driver = {
+ 		.name = MODULE_NAME,
+ 		.owner = THIS_MODULE,
++		.probe_type = PROBE_PREFER_ASYNCHRONOUS,
+ 		.pm = &msm_watchdog_dev_pm_ops,
+ 		.of_match_table = msm_wdog_match_table,
+ 	},
+diff --git a/drivers/spmi/spmi-pmic-arb.c b/drivers/spmi/spmi-pmic-arb.c
+index d3130cf..7c264dd 100644
+--- a/drivers/spmi/spmi-pmic-arb.c
++++ b/drivers/spmi/spmi-pmic-arb.c
+@@ -1475,7 +1475,7 @@ int __init spmi_pmic_arb_init(void)
+ {
+ 	return platform_driver_register(&spmi_pmic_arb_driver);
+ }
+-arch_initcall(spmi_pmic_arb_init);
++//arch_initcall(spmi_pmic_arb_init);
+ 
+ MODULE_LICENSE("GPL v2");
+ MODULE_ALIAS("platform:spmi_pmic_arb");
+diff --git a/drivers/staging/android/ion/msm/msm_ion.c b/drivers/staging/android/ion/msm/msm_ion.c
+index 989d336..43b4157 100644
+--- a/drivers/staging/android/ion/msm/msm_ion.c
++++ b/drivers/staging/android/ion/msm/msm_ion.c
+@@ -1120,6 +1120,7 @@ static struct platform_driver msm_ion_driver = {
+ 	.driver = {
+ 		.name = "ion-msm",
+ 		.of_match_table = msm_ion_match_table,
++		.probe_type = PROBE_PREFER_ASYNCHRONOUS,
+ 	},
+ };
+ 
+diff --git a/drivers/video/fbdev/msm/msm_dba/adv7533.c b/drivers/video/fbdev/msm/msm_dba/adv7533.c
+index e8c8c29..4bafefc 100644
+--- a/drivers/video/fbdev/msm/msm_dba/adv7533.c
++++ b/drivers/video/fbdev/msm/msm_dba/adv7533.c
+@@ -2166,13 +2166,14 @@ static struct i2c_driver adv7533_driver = {
+ 	.driver = {
+ 		.name = "adv7533",
+ 		.owner = THIS_MODULE,
++		.probe_type = PROBE_PREFER_ASYNCHRONOUS,
+ 	},
+ 	.probe = adv7533_probe,
+ 	.remove = adv7533_remove,
+ 	.id_table = adv7533_id,
+ };
+ 
+-static int __init adv7533_init(void)
++int __init adv7533_init(void)
+ {
+ 	return i2c_add_driver(&adv7533_driver);
+ }
+@@ -2184,7 +2185,7 @@ static void __exit adv7533_exit(void)
+ 
+ module_param_string(panel, mdss_mdp_panel, MDSS_MAX_PANEL_LEN, 0);
+ 
+-fs_initcall(adv7533_init);
++//fs_initcall(adv7533_init);
+ module_exit(adv7533_exit);
+ MODULE_LICENSE("GPL v2");
+ MODULE_DESCRIPTION("adv7533 driver");
+diff --git a/drivers/video/msm/ba/msm_v4l2_ba.c b/drivers/video/msm/ba/msm_v4l2_ba.c
+index 1d6e723..310efcd 100644
+--- a/drivers/video/msm/ba/msm_v4l2_ba.c
++++ b/drivers/video/msm/ba/msm_v4l2_ba.c
+@@ -593,7 +593,7 @@ static struct platform_driver msm_ba_driver = {
+ 	},
+ };
+ 
+-static int __init msm_ba_mod_init(void)
++int __init msm_ba_mod_init(void)
+ {
+ 	int rc = 0;
+ 
+@@ -624,6 +624,6 @@ static void __exit msm_ba_mod_exit(void)
+ 	dprintk(BA_INFO, "Exit %s", __func__);
+ }
+ 
+-fs_initcall(msm_ba_mod_init);
++//fs_initcall(msm_ba_mod_init);
+ module_exit(msm_ba_mod_exit);
+ 
+diff --git a/fs/ext4/super.c b/fs/ext4/super.c
+index 7114586..2bb01a4 100644
+--- a/fs/ext4/super.c
++++ b/fs/ext4/super.c
+@@ -5444,5 +5444,5 @@ static void __exit ext4_exit_fs(void)
+ MODULE_AUTHOR("Remy Card, Stephen Tweedie, Andrew Morton, Andreas Dilger, Theodore Ts'o and others");
+ MODULE_DESCRIPTION("Fourth Extended Filesystem");
+ MODULE_LICENSE("GPL");
+-fs_initcall(ext4_init_fs)
++subsys_initcall(ext4_init_fs)
+ module_exit(ext4_exit_fs)
+diff --git a/fs/jbd2/journal.c b/fs/jbd2/journal.c
+index a091146..dfe5892 100644
+--- a/fs/jbd2/journal.c
++++ b/fs/jbd2/journal.c
+@@ -2694,6 +2694,6 @@ static void __exit journal_exit(void)
+ }
+ 
+ MODULE_LICENSE("GPL");
+-fs_initcall(journal_init);
++subsys_initcall(journal_init);
+ module_exit(journal_exit);
+ 
+diff --git a/include/linux/of_platform.h b/include/linux/of_platform.h
+index 956a100..114b01e 100644
+--- a/include/linux/of_platform.h
++++ b/include/linux/of_platform.h
+@@ -46,6 +46,12 @@ struct of_dev_auxdata {
+ 	void *platform_data;
+ };
+ 
++struct pcie_pop_item {
++	struct work_struct	work;
++	struct device_node *bus;
++	struct device *parent;
++};
++
+ /* Macro to simplify populating a lookup table */
+ #define OF_DEV_AUXDATA(_compat,_phys,_name,_pdata) \
+ 	{ .compatible = _compat, .phys_addr = _phys, .name = _name, \
+@@ -68,6 +74,8 @@ extern int of_platform_bus_probe(struct device_node *root,
+ 				 const struct of_device_id *matches,
+ 				 struct device *parent);
+ #ifdef CONFIG_OF_ADDRESS
++extern void of_platform_populate_async_wq_init(void);
++extern void of_platform_populate_async_wq_deinit(void);
+ extern int of_platform_populate(struct device_node *root,
+ 				const struct of_device_id *matches,
+ 				const struct of_dev_auxdata *lookup,
+@@ -77,6 +85,8 @@ extern int of_platform_default_populate(struct device_node *root,
+ 					struct device *parent);
+ extern void of_platform_depopulate(struct device *parent);
+ #else
++static inline void of_platform_populate_async_wq_init(void) { }
++static inline void of_platform_populate_async_wq_deinit(void) { }
+ static inline int of_platform_populate(struct device_node *root,
+ 					const struct of_device_id *matches,
+ 					const struct of_dev_auxdata *lookup,
+-- 
+1.9.1
+

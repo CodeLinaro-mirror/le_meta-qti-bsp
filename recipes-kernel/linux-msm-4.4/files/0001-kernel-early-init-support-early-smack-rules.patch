@@ -1,23 +1,22 @@
-From 002f79efbfb5fd569c19f6ecd3cd8c1be837bc0a Mon Sep 17 00:00:00 2001
-From: Lei wang <leiwan@codeaurora.org>
-Date: Mon, 28 May 2018 15:34:00 +0800
-Subject: [PATCH] kernel: early-init: support early smack rules
+From 78dcabc937d9df772a109fd3e41cd459774ce39d Mon Sep 17 00:00:00 2001
+From: Jiacheng Zheng <jiaczhen@codeaurora.org>
+Date: Fri, 10 Aug 2018 14:48:07 +0800
+Subject: [PATCH] kernel early init support early smack rules
 
 For early userpace, add some basic rules.
 when system rules loaded later, will switch to
-system rules
+system rules.
 
-Change-Id: I36918264dc9cdef9fd551794656c39692cc538c9
-Signed-off-by: Lei wang <leiwan@codeaurora.org>
+Signed-off-by: Jiacheng Zheng <jiaczhen@codeaurora.org>
 ---
- security/smack/smack_access.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ security/smack/smack_access.c | 29 +++++++++++++++++++----------
+ 1 file changed, 19 insertions(+), 10 deletions(-)
 
 diff --git a/security/smack/smack_access.c b/security/smack/smack_access.c
-index a283f9e..c5d06d0 100644
+index a283f9e..d94223f 100644
 --- a/security/smack/smack_access.c
 +++ b/security/smack/smack_access.c
-@@ -87,6 +87,8 @@ int log_policy = SMACK_AUDIT_DENIED;
+@@ -87,20 +87,29 @@ int log_policy = SMACK_AUDIT_DENIED;
   *
   * Allowing write access implies allowing locking.
   */
@@ -26,15 +25,22 @@ index a283f9e..c5d06d0 100644
  int smk_access_entry(char *subject_label, char *object_label,
  			struct list_head *rule_list)
  {
-@@ -94,13 +96,18 @@ int smk_access_entry(char *subject_label, char *object_label,
+ 	int may = -ENOENT;
  	struct smack_rule *srp;
  
- 	list_for_each_entry_rcu(srp, rule_list, list) {
-+		is_rule_empty = false;
- 		if (srp->smk_object->smk_known == object_label &&
- 		    srp->smk_subject->smk_known == subject_label) {
- 			may = srp->smk_access;
- 			break;
+-	list_for_each_entry_rcu(srp, rule_list, list) {
+-		if (srp->smk_object->smk_known == object_label &&
+-		    srp->smk_subject->smk_known == subject_label) {
+-			may = srp->smk_access;
+-			break;
++	if(rule_list) {
++		list_for_each_entry_rcu(srp, rule_list, list) {
++			is_rule_empty = false;
++			if (srp->smk_object->smk_known == object_label &&
++		    	srp->smk_subject->smk_known == subject_label) {
++				may = srp->smk_access;
++				break;
++			}
  		}
  	}
 -
@@ -46,6 +52,35 @@ index a283f9e..c5d06d0 100644
  	/*
  	 * MAY_WRITE implies MAY_LOCK.
  	 */
+@@ -154,7 +163,7 @@ int smk_access(struct smack_known *subject, struct smack_known *object,
+ 	 * An object can be accessed in any way by a subject
+ 	 * with the same label.
+ 	 */
+-	if (subject->smk_known == object->smk_known)
++	if (subject && object && (subject->smk_known == object->smk_known))
+ 		goto out_audit;
+ 	/*
+ 	 * A hat subject can read or lock any object.
+@@ -175,8 +184,8 @@ int smk_access(struct smack_known *subject, struct smack_known *object,
+ 	 * indicates there is no entry for this pair.
+ 	 */
+ 	rcu_read_lock();
+-	may = smk_access_entry(subject->smk_known, object->smk_known,
+-			       &subject->smk_rules);
++	may = smk_access_entry(subject?subject->smk_known:NULL, object?object->smk_known:NULL,
++			       subject?(&subject->smk_rules):NULL);
+ 	rcu_read_unlock();
+ 
+ 	if (may <= 0 || (request & may) != request) {
+@@ -206,7 +215,7 @@ out_audit:
+ 
+ #ifdef CONFIG_AUDIT
+ 	if (a)
+-		smack_log(subject->smk_known, object->smk_known,
++		smack_log(subject?subject->smk_known:NULL, object?object->smk_known:NULL,
+ 			  request, rc, a);
+ #endif
+ 
 -- 
 1.9.1
 
