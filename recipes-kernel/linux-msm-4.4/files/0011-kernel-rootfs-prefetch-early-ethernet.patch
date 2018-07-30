@@ -1,0 +1,49 @@
+From 8033ebd3fe493fcf4d18648936c81019ec44feff Mon Sep 17 00:00:00 2001
+From: Jiacheng Zheng <jiaczhen@codeaurora.org>
+Date: Fri, 10 Aug 2018 13:18:15 +0800
+Subject: [PATCH] kernel rootfs prefetch early ethernet
+
+prefetch executable files and so libraries for
+early-ethernet implementation
+
+Signed-off-by: Jiacheng Zheng <jiaczhen@codeaurora.org>
+---
+ init/prefetch_rootfs.h | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
+
+diff --git a/init/prefetch_rootfs.h b/init/prefetch_rootfs.h
+index 6471250..42c4e8a 100644
+--- a/init/prefetch_rootfs.h
++++ b/init/prefetch_rootfs.h
+@@ -12,5 +12,28 @@
+ 
+ static char* files[] = {
+ 	"/usr/sbin/early_init",   //early_init
++	"/usr/bin/weston",  //weston
++	"/usr/lib64/libwayland-server.so.0",   //libwayland-server.so.0.1.0 for weston
++	"/usr/lib64/libpixman-1.so.0",   //libpixman-1.so.0.32.8 for weston
++	"/usr/lib64/libxkbcommon.so.0",   //libxkbcommon.so.0.0.0 for weston
++	"/usr/lib64/libgbm.so",   //libgbm.so for weston & ethcam
++	"/lib64/libpthread.so.0",   //libpthread-2.23.so for weston & ethcam
++	"/lib64/libdl.so.2",   //libdl-2.23.so for weston
++	"/lib64/libc.so.6",  //libc-2.23.so for weston & busybox & ethcam
++	"/bin/busybox.nosuid",  //busybox
++	"/lib64/libm.so.6",  //libm-2.23.so for busybox
++	"/lib64/ld-linux-aarch64.so.1",  //ld-2.23.so for busybox & ethcam
++	"/usr/bin/ethcam",  //ethcam
++	"/usr/lib64/libglib-2.0.so.0",  //libglib-2.0.so.0.4600.2 for ethcam
++	"/usr/lib64/libwayland-client.so.0",  //libwayland-client.so.0.3.0 for ethcam
++	"/usr/lib64/libmmrtpdecoder.so.0",  //libmmrtpdecoder.so.0.0.0 for ethcam
++	"/usr/lib64/libmmosal.so",   //libmmosal.so for ethcam
++	"/usr/lib64/libmmparser_lite.so",  //libmmparser_lite.so for ethcam
++	"/usr/lib64/libilmControl.so.1.9.1",  //libilmControl.so.1.9.1 for ethcam
++	"/usr/lib64/libilmCommon.so.1.9.1",  //libilmCommon.so.1.9.1 for ethcam
++	"/usr/lib64/libdrm.so.2",  //libdrm.so.2.4.0 for ethcam
++	"/usr/lib64/libOmxCore.so",  //libOmxCore.so for ethcam
++	"/usr/lib64/libstdc++.so.6",  //libstdc++.so.6.0.21 for ethcam
++	"/lib64/libgcc_s.so.1",  //libgcc_s.so.1 for ethcam
+ 	0};
+ 
+-- 
+1.9.1
+
