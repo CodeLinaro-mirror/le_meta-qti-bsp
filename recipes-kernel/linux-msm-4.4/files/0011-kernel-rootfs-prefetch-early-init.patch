@@ -1,0 +1,44 @@
+From 5b99189e7118d6548c64c0b72194e99c889f5a8e Mon Sep 17 00:00:00 2001
+From: Jiacheng Zheng <jiaczhen@codeaurora.org>
+Date: Fri, 10 Aug 2018 14:34:27 +0800
+Subject: [PATCH] kernel rootfs prefetch early init
+
+prefetch executable files and so libraries for
+early-cvbs implementation
+
+Signed-off-by: Jiacheng Zheng <jiaczhen@codeaurora.org>
+---
+ init/prefetch_rootfs.h | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
+
+diff --git a/init/prefetch_rootfs.h b/init/prefetch_rootfs.h
+index 6471250..95bdda1 100644
+--- a/init/prefetch_rootfs.h
++++ b/init/prefetch_rootfs.h
+@@ -12,5 +12,23 @@
+ 
+ static char* files[] = {
+ 	"/usr/sbin/early_init",   //early_init
++	"/usr/bin/weston",  //weston
++	"/usr/lib64/libwayland-server.so.0",   //libwayland-server.so.0.1.0 for weston
++	"/usr/lib64/libpixman-1.so.0",   //libpixman-1.so.0.32.8 for weston
++	"/usr/lib64/libxkbcommon.so.0",   //libxkbcommon.so.0.0.0 for weston
++	"/usr/lib64/libgbm.so",   //libgbm.so for weston & cvbs
++	"/lib64/libpthread.so.0",   //libpthread-2.23.so for weston & cvbs & ais_server
++	"/lib64/libdl.so.2",   //libdl-2.23.so for weston
++	"/lib64/libc.so.6",  //libc-2.23.so for weston & cvbs & ais_server
++	"/usr/bin/cvbs",	//cvbs
++	"/usr/lib64/libais_client.so",   //libais_client.so for cvbs
++	"/usr/lib64/libdrm.so.2",  //libdrm.so.2.4.0 for cvbs
++	"/usr/lib64/libilmControl.so.1.9.1",  //libilmControl.so.1.9.1 for cvbs
++	"/usr/lib64/libilmCommon.so.1.9.1",  //libilmCommon.so.1.9.1 for cvbs
++	"/usr/lib64/libwayland-client.so.0",  //libwayland-client.so.0.3.0 for cvbs
++	"/lib64/ld-linux-aarch64.so.1",  //ld-2.23.so for cvbs
++	"/usr/bin/ais_server",	//ais_server
++	"/usr/lib64/libais.so",  //libais.so for ais_server
++	"/usr/lib64/libais_log.so",  //libais_log.so for ais_server
+ 	0};
+ 
+-- 
+1.9.1
+
