@@ -650,7 +650,7 @@ int main(int argc, char* argv[])
 	write_marker("early-init-start-up");
 
 	/* Trigger firmware loading parallelly */
-	trigger_firmware_loading(DRM_CARD_PATH);
+	// trigger_firmware_loading(DRM_CARD_PATH);
 #ifdef EARLY_ETHERNET
 	trigger_firmware_loading(VIDEO_CARD_PATH);
 #endif
