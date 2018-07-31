@@ -32,10 +32,11 @@
 FindAndMountEXT4 () {
    partition=$1
    dir=$2
+   flags=$3
    mmc_block_device=/dev/block/bootdevice/by-name/$partition
    mkdir -p $dir
-   mount -t ext4 $mmc_block_device $dir -o relatime,data=ordered,noauto_da_alloc,discard
+   mount -t ext4 $mmc_block_device $dir -o $flags
 }
 
-FindAndMountEXT4 userdata /data
+FindAndMountEXT4 userdata /data relatime,data=ordered,noauto_da_alloc,discard,nodev,nosuid,noexec
 exit 0
