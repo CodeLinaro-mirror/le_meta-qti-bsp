@@ -47,6 +47,10 @@ IMAGE_INSTALL += "cryptsetup"
 IMAGE_INSTALL += "lvm2"
 IMAGE_INSTALL += "pciutils"
 
+# Early init
+IMAGE_INSTALL += "${@bb.utils.contains("DISTRO_FEATURES", "early_init", "early-init", "" ,d)}"
+
+
 #Camera modules
 #IMAGE_INSTALL += "lib32-androidcompat"
 #IMAGE_INSTALL += "init-can"
