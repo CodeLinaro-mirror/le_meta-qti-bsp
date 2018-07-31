@@ -32,9 +32,10 @@
 FindAndMountEXT4 () {
    partition=$1
    dir=$2
+   flags=$3
    mmc_block_device=/dev/block/bootdevice/by-name/$partition
    mkdir -p $dir
-   mount -t ext4 $mmc_block_device $dir -o relatime,data=ordered,noauto_da_alloc,discard
+   mount -t ext4 $mmc_block_device $dir -o $flags
 }
 
 FindAndMountVFAT () {
@@ -44,10 +45,10 @@ FindAndMountVFAT () {
    mkdir -p $dir
    mount -t vfat $mmc_block_device $dir
 }
-FindAndMountEXT4 userdata /data
-FindAndMountVFAT modem   /firmware
-FindAndMountEXT4 persist /persist
-FindAndMountEXT4 dsp /dsp
-FindAndMountEXT4 bt_firmware /bt_firmware/
+FindAndMountEXT4 userdata /data relatime,data=ordered,noauto_da_alloc,discard,nodev,nosuid,noexec
+FindAndMountVFAT modem /firmware
+FindAndMountEXT4 persist /persist relatime,data=ordered,noauto_da_alloc,discard,nodev,nosuid,noexec
+FindAndMountEXT4 dsp /dsp relatime,data=ordered,noauto_da_alloc,discard,nodev,nosuid,noexec
+FindAndMountEXT4 bt_firmware /bt_firmware/ relatime,data=ordered,noauto_da_alloc,discard,nodev,nosuid,noexec
 
 exit 0
