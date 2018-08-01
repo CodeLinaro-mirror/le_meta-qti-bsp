@@ -1,17 +1,21 @@
-From 2a9c2bcf43640c26f7048272ae14d6ce1ad7c2a1 Mon Sep 17 00:00:00 2001
+From 9aa79c44f284f9695beca6eca9ed451dc739e9a6 Mon Sep 17 00:00:00 2001
 From: Yimin Peng <yiminp@codeaurora.org>
 Date: Mon, 26 Feb 2018 15:54:28 +0800
 Subject: [PATCH] trigger wdog bite for panic on gvm.
 
+- vplatform need to wait 5s for dump to launch on host machine.
+- The deferable pet timer is not suitable for vplatform on which
+  vCPU thread could enter WFI for over 1 second.
+
 Change-Id: If5d695af44838326203ced3b553c74843a0c52ff
 Signed-off-by: Yimin Peng <yiminp@codeaurora.org>
 ---
- drivers/soc/qcom/watchdog_v2.c | 8 ++++++++
- kernel/panic.c                 | 6 ++++++
- 2 files changed, 14 insertions(+)
+ drivers/soc/qcom/watchdog_v2.c | 12 ++++++++++++
+ kernel/panic.c                 |  6 ++++++
+ 2 files changed, 18 insertions(+)
 
 diff --git a/drivers/soc/qcom/watchdog_v2.c b/drivers/soc/qcom/watchdog_v2.c
-index 625030f1..b732f35 100644
+index 3528cb0..e1e783f 100644
 --- a/drivers/soc/qcom/watchdog_v2.c
 +++ b/drivers/soc/qcom/watchdog_v2.c
 @@ -472,6 +472,13 @@ void msm_trigger_wdog_bite(void)
@@ -36,6 +40,18 @@ index 625030f1..b732f35 100644
  }
  
  static irqreturn_t wdog_bark_handler(int irq, void *dev_id)
+@@ -716,7 +724,11 @@ static void init_watchdog_data(struct msm_watchdog_data *wdog_dd)
+ 	wdog_dd->user_pet_complete = true;
+ 	wdog_dd->user_pet_enabled = false;
+ 	wake_up_process(wdog_dd->watchdog_task);
++#ifdef CONFIG_MSM_GVM_QUIN
++	init_timer(&wdog_dd->pet_timer);
++#else
+ 	init_timer_deferrable(&wdog_dd->pet_timer);
++#endif
+ 	wdog_dd->pet_timer.data = (unsigned long)wdog_dd;
+ 	wdog_dd->pet_timer.function = pet_task_wakeup;
+ 	wdog_dd->pet_timer.expires = jiffies + delay_time;
 diff --git a/kernel/panic.c b/kernel/panic.c
 index 75f564a..a5ab282 100644
 --- a/kernel/panic.c
