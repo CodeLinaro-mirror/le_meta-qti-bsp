@@ -36,6 +36,8 @@ dev_rw_null(NetworkManager_t)
 allow NetworkManager_t var_t:dir { write add_name };
 allow NetworkManager_t var_t:file { read write create open };
 search_data_dir(NetworkManager_t)
+allow NetworkManager_t var_run_t:dir { write search read remove_name open getattr add_name };
+allow NetworkManager_t var_run_t:sock_file { write create unlink };
 
 manage_sock_files_pattern(NetworkManager_t, device_t, device_t)
 files_search_default(NetworkManager_t)
