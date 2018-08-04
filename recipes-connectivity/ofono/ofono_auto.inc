@@ -10,6 +10,7 @@ DEPENDS += "multimodule-mgr-oss"
 
 DEPENDS_remove_8x96autogvmquin = "multimodule-mgr-oss"
 DEPENDS_remove_8x96autogvmgh = "multimodule-mgr-oss"
+DEPENDS_remove_8x96autogvmga = "multimodule-mgr-oss"
 RDEPENDS_ofono_append_8x96autogvmquintcu += " mobile-broadband-provider-info"
 
 RDEPENDS_ofono_append_8x96autogvmquintcu += " mobile-broadband-provider-info"
@@ -33,6 +34,9 @@ INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmquintcu', 'ofono_aut
 include ${INCSUFFIX}.inc
 
 INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmgh', 'ofono_auto_nofusion', 'none',d)}"
+include ${INCSUFFIX}.inc
+
+INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96autogvmga', 'ofono_auto_nofusion', 'none',d)}"
 include ${INCSUFFIX}.inc
 
 INCSUFFIX = "${@base_conditional('BASEMACHINE', '8x96mizar', 'ofono_auto_nofusion', 'none',d)}"
