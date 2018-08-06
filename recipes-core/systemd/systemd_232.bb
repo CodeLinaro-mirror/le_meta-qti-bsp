@@ -75,6 +75,7 @@ PACKAGECONFIG_remove_libc-musl = "smack"
 PACKAGECONFIG_remove += "timesyncd"
 #rb1.4 remove ima,machined,quotacheck,rfkill,backlight,binfmt
 PACKAGECONFIG_8x96autogvmgh_remove += "ima machined quotacheck rfkill backlight binfmt"
+PACKAGECONFIG_8x96autogvmga_remove += "ima machined quotacheck rfkill backlight binfmt"
 
 # Use the upstream systemd serial-getty@.service and rely on
 # systemd-getty-generator instead of using the OE-core specific
