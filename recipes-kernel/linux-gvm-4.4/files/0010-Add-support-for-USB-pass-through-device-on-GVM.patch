@@ -1,12 +1,10 @@
-From 50a06455082fc8508d62016baf71eda731718f72 Mon Sep 17 00:00:00 2001
-From: Yong Ding <yongding@codeaurora.org>
-Date: Mon, 14 May 2018 16:31:13 +0800
+From 4f872f84913d08a12567c0e97cb47d35b6e94a04 Mon Sep 17 00:00:00 2001
+From: Yimin Peng <yiminp@codeaurora.org>
+Date: Mon, 6 Aug 2018 17:55:45 +0800
 Subject: [PATCH] add support for USB pass through device on GVM
 
-Change-Id: I5d4ede841701ea36633e3e04f8ae95cb4ef4eff3
-Signed-off-by: Yong Ding <yongding@codeaurora.org>
+Change-Id: I7dbd881b3e948702eceb15017ac7934ec5add7e9
 Signed-off-by: Yimin Peng <yiminp@codeaurora.org>
-Signed-off-by: Zhiqiang Tu <ztu@codeaurora.org>
 ---
  .../boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts    |   4 +
  .../dts/qcom/vplatform-lfv-msm8996-telematics.dts  |   4 +
@@ -14,8 +12,8 @@ Signed-off-by: Zhiqiang Tu <ztu@codeaurora.org>
  arch/arm64/configs/msm-auto-gvm-perf_defconfig     |  55 +++++++++
  arch/arm64/configs/msm-auto-gvm_defconfig          |  55 +++++++++
  drivers/platform/msm/gpio-usbdetect.c              | 133 +++++++++++++--------
- drivers/usb/phy/phy-msm-ssusb-qmp.c                |  32 +++--
- 7 files changed, 230 insertions(+), 59 deletions(-)
+ drivers/usb/phy/phy-msm-ssusb-qmp.c                |  22 +++-
+ 7 files changed, 224 insertions(+), 55 deletions(-)
 
 diff --git a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts
 index 7314af2..a58c0b4 100644
@@ -33,10 +31,10 @@ index 7314af2..a58c0b4 100644
  	status = "okay";
  	qcom,no-wakeup-src-in-hostmode;
 diff --git a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-telematics.dts b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-telematics.dts
-index d063a88..724b463 100644
+index 3902731..4b16b93 100644
 --- a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-telematics.dts
 +++ b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-telematics.dts
-@@ -237,6 +237,10 @@
+@@ -238,6 +238,10 @@
  
  #include "vplatform-lfv-msm8996-usb.dtsi"
  
@@ -48,10 +46,10 @@ index d063a88..724b463 100644
  	status = "okay";
  	qcom,no-wakeup-src-in-hostmode;
 diff --git a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-usb.dtsi b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-usb.dtsi
-index b750574..8a7fe96 100644
+index faaf00b..3da7f38 100644
 --- a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-usb.dtsi
 +++ b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-usb.dtsi
-@@ -217,6 +217,12 @@
+@@ -218,6 +218,12 @@
  
  	};
  
@@ -65,10 +63,10 @@ index b750574..8a7fe96 100644
  		compatible = "qcom,qusb2phy";
  		reg = <0x07411000 0x180>,
 diff --git a/arch/arm64/configs/msm-auto-gvm-perf_defconfig b/arch/arm64/configs/msm-auto-gvm-perf_defconfig
-index 55655ac..2b1d162 100644
+index dda4a86..6422fb9 100644
 --- a/arch/arm64/configs/msm-auto-gvm-perf_defconfig
 +++ b/arch/arm64/configs/msm-auto-gvm-perf_defconfig
-@@ -377,3 +377,58 @@ CONFIG_CRYPTO_MD4=y
+@@ -396,3 +396,58 @@ CONFIG_CRYPTO_MD4=y
  CONFIG_CRYPTO_ARC4=y
  CONFIG_CRYPTO_TWOFISH=y
  CONFIG_QMI_ENCDEC=y
@@ -128,10 +126,10 @@ index 55655ac..2b1d162 100644
 +CONFIG_USB_OHCI_HCD_PCI=y
 +CONFIG_DIAG_CHAR=y
 diff --git a/arch/arm64/configs/msm-auto-gvm_defconfig b/arch/arm64/configs/msm-auto-gvm_defconfig
-index 177ccef..1f93f8d 100644
+index 640083b..cf7bd0276 100644
 --- a/arch/arm64/configs/msm-auto-gvm_defconfig
 +++ b/arch/arm64/configs/msm-auto-gvm_defconfig
-@@ -408,3 +408,58 @@ CONFIG_CRYPTO_MD4=y
+@@ -414,3 +414,58 @@ CONFIG_CRYPTO_MD4=y
  CONFIG_CRYPTO_ARC4=y
  CONFIG_CRYPTO_TWOFISH=y
  CONFIG_QMI_ENCDEC=y
@@ -361,7 +359,7 @@ index 9768243..7cddd4c 100644
  	return 0;
  
 diff --git a/drivers/usb/phy/phy-msm-ssusb-qmp.c b/drivers/usb/phy/phy-msm-ssusb-qmp.c
-index a76a657..a27611f 100644
+index d1b6f1d..6942882 100644
 --- a/drivers/usb/phy/phy-msm-ssusb-qmp.c
 +++ b/drivers/usb/phy/phy-msm-ssusb-qmp.c
 @@ -144,6 +144,11 @@ static void msm_ssusb_qmp_enable_autonomous(struct msm_ssphy_qmp *phy,
@@ -376,15 +374,15 @@ index a76a657..a27611f 100644
  	dev_dbg(phy->phy.dev, "enabling QMP autonomous mode with cable %s\n",
  			get_cable_status_str(phy));
  
-@@ -642,16 +647,25 @@ static int msm_ssphy_qmp_probe(struct platform_device *pdev)
+@@ -648,16 +653,23 @@ static int msm_ssphy_qmp_probe(struct platform_device *pdev)
  		goto err;
  	}
  
 -	res = platform_get_resource_byname(pdev, IORESOURCE_MEM,
 -			"vls_clamp_reg");
 -	if (!res) {
--		dev_err(dev, "failed getting vls_clamp_reg\n");
--		return -ENODEV;
+-		dev_dbg(dev, "vls_clamp_reg not passed\n");
+-	} else {
 +	if (!of_property_read_bool(dev->of_node, "qcom,disable-autonomous-mode")) {
 +		dev_err(dev, "%s: autonomous mode enabled!\n", __func__);
 +		res = platform_get_resource_byname(pdev, IORESOURCE_MEM,
@@ -394,18 +392,12 @@ index a76a657..a27611f 100644
 +			return -ENODEV;
 +		}
 +
-+		phy->vls_clamp_reg = devm_ioremap_resource(dev, res);
-+		if (IS_ERR(phy->vls_clamp_reg)) {
-+			dev_err(dev, "couldn't find vls_clamp_reg address.\n");
-+			return PTR_ERR(phy->vls_clamp_reg);
-+		}
- 	}
--	phy->vls_clamp_reg = devm_ioremap_resource(dev, res);
--	if (IS_ERR(phy->vls_clamp_reg)) {
--		dev_err(dev, "couldn't find vls_clamp_reg address.\n");
--		return PTR_ERR(phy->vls_clamp_reg);
-+	else
-+	{
+ 		phy->vls_clamp_reg = devm_ioremap_resource(dev, res);
+ 		if (IS_ERR(phy->vls_clamp_reg)) {
+ 			dev_err(dev, "couldn't find vls_clamp_reg address.\n");
+ 			return PTR_ERR(phy->vls_clamp_reg);
+ 		}
++	} else {
 +		dev_err(dev, "%s: autonomous mode disabled!\n", __func__);
 +		phy->vls_clamp_reg = NULL;
  	}
