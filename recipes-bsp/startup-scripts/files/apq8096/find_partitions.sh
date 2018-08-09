@@ -53,9 +53,10 @@ RESTORECON()
 FindAndMountEXT4 () {
    partition=$1
    dir=$2
+   flags=$3
    mmc_block_device=/dev/block/bootdevice/by-name/$partition
    mkdir -p $dir
-   mount -t ext4 $mmc_block_device $dir -o relatime,data=ordered,noauto_da_alloc,discard
+   mount -t ext4 $mmc_block_device $dir -o $flags
 }
 
 #For now we only have firmware with VFAT and which need protection ( selinux)
@@ -69,10 +70,10 @@ FindAndMountVFAT () {
 }
 
 
-FindAndMountEXT4 userdata /data
-FindAndMountVFAT modem   /firmware
-FindAndMountEXT4 persist /persist
-FindAndMountEXT4 dsp /dsp
+FindAndMountEXT4 userdata /data     relatime,data=ordered,noauto_da_alloc,discard,nodev,nosuid,noexec
+FindAndMountVFAT modem    /firmware
+FindAndMountEXT4 persist  /persist  relatime,data=ordered,noauto_da_alloc,discard,noexec,nodev,nosuid
+FindAndMountEXT4 dsp      /dsp      relatime,data=ordered,noauto_da_alloc,discard,noexec,nodev,nosuid
 
 /sbin/restorecon -RF /data/misc/wifi
 /sbin/restorecon -RF /persist
