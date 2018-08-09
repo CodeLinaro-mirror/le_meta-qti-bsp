@@ -25,7 +25,7 @@ IMAGE_INSTALL += "system-core-logd"
 IMAGE_INSTALL += "system-core-leprop"
 IMAGE_INSTALL += "system-core-usb"
 IMAGE_INSTALL += "system-core-post-boot"
-#IMAGE_INSTALL += "system-conf"
+IMAGE_INSTALL += "system-conf"
 #IMAGE_INSTALL += "system-prop"
 IMAGE_INSTALL += "wireless-tools"
 IMAGE_INSTALL += "volatile-binds"
@@ -39,6 +39,7 @@ IMAGE_INSTALL += "libstdc++"
 IMAGE_INSTALL += "coreutils"
 IMAGE_INSTALL += "media-headers"
 IMAGE_INSTALL += "protobuf"
+IMAGE_INSTALL += "sigma-dut"
 
 # Below is to generate sparse ext4 system image (OE by default supports raw ext4 images)
 do_makesystem() {
