@@ -65,10 +65,12 @@ EXTRA_USERS_PARAMS = "\
  useradd -u 1004 -g input input; \
  useradd -u 1005 -g audio audio; \
  useradd -u 1006 -U camera;\
+ useradd -u 1021 -U gps; \
  useradd -u 1036 -U logd;\
  useradd -u 2000 -U adb; \
  useradd -u 3011 -U sensors; \
  useradd -u 4000 -U apps; \
+ useradd -u 4021 -U locclient; \
  useradd -u 9999 -U nobody; \
  useradd -u 5000 -U qmmfsvr; \
  useradd -u 5001 -U qmmfwebsvr; \
@@ -93,4 +95,5 @@ EXTRA_USERS_PARAMS = "\
  usermod -a -G diag,inet,system,leprop sensors; \
  usermod -a -G inet,system,leprop camera; \
  usermod -a -G leprop bluetooth; \
+ usermod -a -G system,gps,locclient gps; \
 "
