@@ -40,6 +40,7 @@ IMAGE_INSTALL += "coreutils"
 IMAGE_INSTALL += "media-headers"
 IMAGE_INSTALL += "protobuf"
 IMAGE_INSTALL += "sigma-dut"
+IMAGE_INSTALL += "sec-config"
 
 # Below is to generate sparse ext4 system image (OE by default supports raw ext4 images)
 do_makesystem() {
