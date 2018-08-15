@@ -174,6 +174,8 @@ IMAGE_INSTALL_remove += "common-api-test"
 IMAGE_INSTALL_remove += "dlt-daemon-test"
 IMAGE_INSTALL_remove += "sdm"
 
+#Telnet
+IMAGE_INSTALL += " xinetd netkit-telnet"
 
 IMAGE_INSTALL_remove_smack = " smack-userspace"
 
