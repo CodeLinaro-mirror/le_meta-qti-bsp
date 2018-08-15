@@ -143,6 +143,8 @@ IMAGE_INSTALL += "agl-users"
 
 #PTP Virtual
 IMAGE_INSTALL += "ptp-virtual"
+#Telnet
+IMAGE_INSTALL += " xinetd netkit-telnet"
 
 IMAGE_ROOTFS_SIZE = "2097152"
 IMAGE_ROOTFS_EXTRA_SPACE_append = "${@bb.utils.contains("DISTRO_FEATURES", "systemd", " + 4096", "" ,d)}"
