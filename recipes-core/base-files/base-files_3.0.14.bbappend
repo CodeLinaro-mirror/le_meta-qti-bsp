@@ -5,6 +5,7 @@ SRC_URI_append += "file://fstab"
 SRC_URI_append += "file://systemd/cache.mount"
 SRC_URI_append += "file://systemd/data.mount"
 SRC_URI_append += "file://systemd/firmware.mount"
+SRC_URI_append += "file://systemd/bt_firmware-mount.service"
 SRC_URI_append += "file://systemd/firmware-mount.service"
 SRC_URI_append += "file://systemd/systemrw.mount"
 SRC_URI_append += "file://systemd/dsp.mount"
@@ -30,7 +31,7 @@ dirs755_append_apq8053 +="/firmware /persist /cache /dsp "
 dirs755_append_apq8009 += "/firmware /persist /cache"
 dirs755_append_apq8017 += "/firmware /persist /cache /dsp"
 dirs755_append_qcs605 += "/firmware /persist /cache /dsp"
-dirs755_append_sda845 += "/firmware /persist /cache /dsp"
+dirs755_append_sda845 += "/firmware /persist /cache /dsp /bt_firmware"
 dirs755_append_qcs405-som1 += "/firmware /persist"
 dirs755_append_qcs403-som2 += "/firmware /cache"
 # Remove sepolicy entries from various files when selinux is not present.
@@ -38,6 +39,7 @@ do_fix_sepolicies () {
     if ${@bb.utils.contains('DISTRO_FEATURES','selinux','false','true',d)}; then
         # For mount services
         sed -i "s#,context=system_u:object_r:firmware_t:s0##g" ${WORKDIR}/systemd/firmware.mount
+        sed -i "s#,context=system_u:object_r:firmware_t:s0##g" ${WORKDIR}/systemd/bt_firmware-mount.service
         sed -i "s#,context=system_u:object_r:firmware_t:s0##g" ${WORKDIR}/systemd/firmware-mount.service
         sed -i "s#,rootcontext=system_u:object_r:var_t:s0##g"  ${WORKDIR}/systemd/var-volatile.mount
         sed -i "s#,rootcontext=system_u:object_r:system_data_t:s0##g"  ${WORKDIR}/systemd/systemrw.mount
@@ -107,6 +109,10 @@ do_install_append_msm() {
                 if [ "$d" == "/firmware" ]; then
                     install -m 0644 ${WORKDIR}/systemd/firmware-mount.service ${D}${sysconfdir}/systemd/system/firmware-mount.service
                     ln -sf  ../firmware-mount.service  ${D}${sysconfdir}/systemd/system/local-fs.target.requires/firmware-mount.service
+                fi
+                if [ "$d" == "/bt_firmware" ]; then
+                    install -m 0644 ${WORKDIR}/systemd/bt_firmware-mount.service ${D}${sysconfdir}/systemd/system/bt_firmware-mount.service
+                    ln -sf  ../bt_firmware-mount.service  ${D}${sysconfdir}/systemd/system/local-fs.target.requires/bt_firmware-mount.service
                 fi
                 if [ "$d" == "/dsp" ]; then
                     install -m 0644 ${WORKDIR}/systemd/dsp-mount.service ${D}${sysconfdir}/systemd/system/dsp-mount.service
