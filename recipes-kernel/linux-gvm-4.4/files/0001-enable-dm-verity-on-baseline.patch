@@ -1,0 +1,28 @@
+From 199248a34bd899ff9794063dc768b319ae1b6509 Mon Sep 17 00:00:00 2001
+From: Jiacheng Zheng <jiaczhen@codeaurora.org>
+Date: Thu, 16 Aug 2018 17:54:15 +0800
+Subject: [PATCH] enable dm verity on baseline
+
+add dm-verity entry into vplatform-lfv-msm8996-baseline.dts
+
+Signed-off-by: Jiacheng Zheng <jiaczhen@codeaurora.org>
+---
+ arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-baseline.dts | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-baseline.dts b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-baseline.dts
+index aa74ec5..69b13a9 100644
+--- a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-baseline.dts
++++ b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-baseline.dts
+@@ -20,6 +20,8 @@
+ 	compatible = "qcom,msm8996";
+ 	qcom,msm-id = <246 0x0>;
+ 
++	/include/ "dm-verity-boot.dtsi"
++
+ 	reserved_memory: reserved-memory {
+ 		#address-cells = <2>;
+ 		#size-cells = <2>;
+-- 
+1.9.1
+

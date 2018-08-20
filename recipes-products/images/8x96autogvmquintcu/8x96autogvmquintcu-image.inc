@@ -121,7 +121,7 @@ IMAGE_INSTALL += "init-mss"
 # setup network for tcu
 IMAGE_INSTALL += "setup-tcu-network"
 
-IMAGE_ROOTFS_SIZE = "323584"
+IMAGE_ROOTFS_SIZE = "318464"
 IMAGE_ROOTFS_EXTRA_SPACE_append = "${@bb.utils.contains("DISTRO_FEATURES", "systemd", " + 4096", "" ,d)}"
 
 USERDATA_SIZE_EXT4 = "256M"
