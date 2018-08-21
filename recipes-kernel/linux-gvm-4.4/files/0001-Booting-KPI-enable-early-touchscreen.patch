@@ -1,0 +1,258 @@
+From f1ce52c07379dc214a3d2411293a8400e6794254 Mon Sep 17 00:00:00 2001
+From: xianzhu <xianzhu@codeaurora.org>
+Date: Wed, 22 Aug 2018 18:05:58 +0800
+Subject: [PATCH] Booting KPI:enable early touchscreen
+
+enable early touchscreen in linux gvm.
+
+Change-Id: I64b37113c93df592e49e80796e356a779d60b1e0
+Signed-off-by: xianzhu <xianzhu@codeaurora.org>
+---
+ drivers/hid/hid-core.c                |  2 +-
+ drivers/hid/hid-input.c               |  4 ++--
+ drivers/hid/hid-multitouch.c          | 13 +++++++++++--
+ drivers/hid/usbhid/hid-core.c         |  3 +--
+ drivers/platform/msm/gpio-usbdetect.c | 12 ++++++++++--
+ drivers/usb/dwc3/core.c               | 16 ++++++++++++----
+ drivers/usb/dwc3/dbm.c                | 13 ++++++++++++-
+ drivers/usb/dwc3/dwc3-msm.c           |  3 +--
+ drivers/usb/host/xhci-plat.c          |  2 +-
+ drivers/usb/phy/phy-msm-qusb.c        | 11 ++++++++++-
+ drivers/usb/phy/phy-msm-ssusb-qmp.c   | 11 ++++++++++-
+ 11 files changed, 71 insertions(+), 19 deletions(-)
+
+diff --git a/drivers/hid/hid-core.c b/drivers/hid/hid-core.c
+index d1d399cc..52c1132 100644
+--- a/drivers/hid/hid-core.c
++++ b/drivers/hid/hid-core.c
+@@ -2808,7 +2808,7 @@ static void __exit hid_exit(void)
+ 	bus_unregister(&hid_bus_type);
+ }
+ 
+-module_init(hid_init);
++subsys_initcall(hid_init);
+ module_exit(hid_exit);
+ 
+ MODULE_AUTHOR("Andreas Gal");
+diff --git a/drivers/hid/hid-input.c b/drivers/hid/hid-input.c
+index 8d74e69..5774908 100644
+--- a/drivers/hid/hid-input.c
++++ b/drivers/hid/hid-input.c
+@@ -31,7 +31,7 @@
+ 
+ #include <linux/hid.h>
+ #include <linux/hid-debug.h>
+-
++#include <soc/qcom/boot_stats.h>
+ #include "hid-ids.h"
+ 
+ #define unk	KEY_UNKNOWN
+@@ -1548,7 +1548,7 @@ int hidinput_connect(struct hid_device *hid, unsigned int force)
+ 		if (input_register_device(hidinput->input))
+ 			goto out_cleanup;
+ 	}
+-
++	place_marker("M - DRIVER TouchInput Ready");
+ 	return 0;
+ 
+ out_cleanup:
+diff --git a/drivers/hid/hid-multitouch.c b/drivers/hid/hid-multitouch.c
+index 9de379c..f27e48d 100644
+--- a/drivers/hid/hid-multitouch.c
++++ b/drivers/hid/hid-multitouch.c
+@@ -1076,7 +1076,6 @@ static int mt_probe(struct hid_device *hdev, const struct hid_device_id *id)
+ 	int ret, i;
+ 	struct mt_device *td;
+ 	struct mt_class *mtclass = mt_classes; /* MT_CLS_DEFAULT */
+-
+ 	for (i = 0; mt_classes[i].name ; i++) {
+ 		if (id->driver_data == mt_classes[i].name) {
+ 			mtclass = &(mt_classes[i]);
+@@ -1504,4 +1503,14 @@ static struct hid_driver mt_driver = {
+ 	.resume = mt_resume,
+ #endif
+ };
+-module_hid_driver(mt_driver);
++
++static int mt_driver_init(void)
++{
++	return hid_register_driver(&mt_driver);
++}
++fs_initcall(mt_driver_init);
++static void mt_driver_exit(void)
++{
++	hid_unregister_driver(&mt_driver);
++}
++module_exit(mt_driver_exit);
+diff --git a/drivers/hid/usbhid/hid-core.c b/drivers/hid/usbhid/hid-core.c
+index b0eeb50..2f28ad9 100644
+--- a/drivers/hid/usbhid/hid-core.c
++++ b/drivers/hid/usbhid/hid-core.c
+@@ -1284,7 +1284,6 @@ static int usbhid_probe(struct usb_interface *intf, const struct usb_device_id *
+ 	unsigned int n, has_in = 0;
+ 	size_t len;
+ 	int ret;
+-
+ 	dbg_hid("HID probe called for ifnum %d\n",
+ 			intf->altsetting->desc.bInterfaceNumber);
+ 
+@@ -1663,7 +1662,7 @@ static void __exit hid_exit(void)
+ 	usbhid_quirks_exit();
+ }
+ 
+-module_init(hid_init);
++fs_initcall(hid_init);
+ module_exit(hid_exit);
+ 
+ MODULE_AUTHOR("Andreas Gal");
+diff --git a/drivers/platform/msm/gpio-usbdetect.c b/drivers/platform/msm/gpio-usbdetect.c
+index 9768243..cd4efe2 100644
+--- a/drivers/platform/msm/gpio-usbdetect.c
++++ b/drivers/platform/msm/gpio-usbdetect.c
+@@ -245,8 +245,16 @@ static struct platform_driver gpio_usbdetect_driver = {
+ 	.remove		= gpio_usbdetect_remove,
+ };
+ 
+-module_driver(gpio_usbdetect_driver, platform_driver_register,
+-		platform_driver_unregister);
++static int gpio_usbdetect_driver_init(void)
++{
++       return platform_driver_register(&gpio_usbdetect_driver);
++}
++subsys_initcall(gpio_usbdetect_driver_init);
++static void gpio_usbdetect_driver_exit(void)
++{
++       platform_driver_unregister(&gpio_usbdetect_driver);
++}
++module_exit(gpio_usbdetect_driver_exit);
+ 
+ MODULE_DESCRIPTION("GPIO USB VBUS Detection driver");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/usb/dwc3/core.c b/drivers/usb/dwc3/core.c
+index 3191825..1f0fac9 100644
+--- a/drivers/usb/dwc3/core.c
++++ b/drivers/usb/dwc3/core.c
+@@ -1497,8 +1496,17 @@ static struct platform_driver dwc3_driver = {
+ 	},
+ };
+ 
+-module_platform_driver(dwc3_driver);
++static int dwc3_driver_init(void)
++{
++	return platform_driver_register(&dwc3_driver);
++}
++subsys_initcall(dwc3_driver_init);
+ 
++static void dwc3_driver_exit(void)
++{
++	platform_driver_unregister(&dwc3_driver);
++}
++module_exit(dwc3_driver_exit);
+ MODULE_ALIAS("platform:dwc3");
+ MODULE_AUTHOR("Felipe Balbi <balbi@ti.com>");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/usb/dwc3/dbm.c b/drivers/usb/dwc3/dbm.c
+index cc7fb40..ebd4dc3 100644
+--- a/drivers/usb/dwc3/dbm.c
++++ b/drivers/usb/dwc3/dbm.c
+@@ -606,7 +606,18 @@ static struct platform_driver msm_dbm_driver = {
+ 	},
+ };
+ 
+-module_platform_driver(msm_dbm_driver);
++static int msm_dbm_driver_init(void)
++{
++       return platform_driver_register(&msm_dbm_driver);
++}
++subsys_initcall(msm_dbm_driver_init);
++
++static void msm_dbm_driver_exit(void)
++{
++       platform_driver_unregister(&msm_dbm_driver);
++}
++module_exit(msm_dbm_driver_exit);
++
+ 
+ static struct dbm *of_usb_find_dbm(struct device_node *node)
+ {
+diff --git a/drivers/usb/dwc3/dwc3-msm.c b/drivers/usb/dwc3/dwc3-msm.c
+index 95e27e0..22c0767 100644
+--- a/drivers/usb/dwc3/dwc3-msm.c
++++ b/drivers/usb/dwc3/dwc3-msm.c
+@@ -2920,7 +2920,6 @@ static int dwc3_msm_probe(struct platform_device *pdev)
+ 	int ext_hub_reset_gpio;
+ 	u32 val;
+ 	char boot_marker[40];
+-
+ 	mdwc = devm_kzalloc(&pdev->dev, sizeof(*mdwc), GFP_KERNEL);
+ 	if (!mdwc)
+ 		return -ENOMEM;
+@@ -4196,7 +4195,7 @@ static int dwc3_msm_init(void)
+ {
+ 	return platform_driver_register(&dwc3_msm_driver);
+ }
+-module_init(dwc3_msm_init);
++subsys_initcall(dwc3_msm_init);
+ 
+ static void __exit dwc3_msm_exit(void)
+ {
+diff --git a/drivers/usb/host/xhci-plat.c b/drivers/usb/host/xhci-plat.c
+index efe1924..f7a6fd5 100644
+--- a/drivers/usb/host/xhci-plat.c
++++ b/drivers/usb/host/xhci-plat.c
+@@ -484,7 +484,7 @@ static int __init xhci_plat_init(void)
+ 	xhci_init_driver(&xhci_plat_hc_driver, &xhci_plat_overrides);
+ 	return platform_driver_register(&usb_xhci_driver);
+ }
+-module_init(xhci_plat_init);
++subsys_initcall(xhci_plat_init);
+ 
+ static void __exit xhci_plat_exit(void)
+ {
+diff --git a/drivers/usb/phy/phy-msm-qusb.c b/drivers/usb/phy/phy-msm-qusb.c
+index be63c6c..3a86e23 100644
+--- a/drivers/usb/phy/phy-msm-qusb.c
++++ b/drivers/usb/phy/phy-msm-qusb.c
+@@ -1210,7 +1210,16 @@ static struct platform_driver qusb_phy_driver = {
+ 	},
+ };
+ 
+-module_platform_driver(qusb_phy_driver);
++static int qusb_phy_driver_init(void)
++{
++       return platform_driver_register(&qusb_phy_driver);
++}
++subsys_initcall(qusb_phy_driver_init);
++static void qusb_phy_driver_exit(void)
++{
++       platform_driver_unregister(&qusb_phy_driver);
++}
++module_exit(qusb_phy_driver_exit);
+ 
+ MODULE_DESCRIPTION("MSM QUSB2 PHY driver");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/usb/phy/phy-msm-ssusb-qmp.c b/drivers/usb/phy/phy-msm-ssusb-qmp.c
+index d1b6f1d..1b8297a 100644
+--- a/drivers/usb/phy/phy-msm-ssusb-qmp.c
++++ b/drivers/usb/phy/phy-msm-ssusb-qmp.c
+@@ -834,7 +834,16 @@ static struct platform_driver msm_ssphy_qmp_driver = {
+ 	},
+ };
+ 
+-module_platform_driver(msm_ssphy_qmp_driver);
++static int msm_ssphy_qmp_driver_init(void)
++{
++       return platform_driver_register(&msm_ssphy_qmp_driver);
++}
++subsys_initcall(msm_ssphy_qmp_driver_init);
++static void msm_ssphy_qmp_driver_exit(void)
++{
++       platform_driver_unregister(&msm_ssphy_qmp_driver);
++}
++module_exit(msm_ssphy_qmp_driver_exit);
+ 
+ MODULE_DESCRIPTION("MSM USB SS QMP PHY driver");
+ MODULE_LICENSE("GPL v2");
+-- 
+1.9.1
+
