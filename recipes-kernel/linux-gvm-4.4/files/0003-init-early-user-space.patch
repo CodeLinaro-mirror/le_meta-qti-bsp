@@ -1,0 +1,234 @@
+From dbf7c4cd76e20cd704f29596e31bb33dae2f28d8 Mon Sep 17 00:00:00 2001
+From: Xianbin Zhu <xianzhu@codeaurora.org>
+Date: Sun, 12 Aug 2018 16:01:03 +0800
+Subject: [PATCH] Booting KPI:enable early user space
+
+enable early user space in ICAS3
+
+Change-Id: I41f793608b9e4488641bd990a6d3f2865b4dca22
+Signed-off-by: Xianbin Zhu <xianzhu@codeaurora.org>
+---
+ arch/arm64/kernel/head.S       |  6 ++++++
+ block/cfq-iosched.c            |  2 +-
+ drivers/block/virtio_blk.c     |  2 +-
+ drivers/soc/qcom/boot_marker.c | 11 +++++++++++
+ drivers/virtio/virtio_mmio.c   |  2 +-
+ fs/ext4/super.c                |  2 +-
+ fs/jbd2/journal.c              |  2 +-
+ init/do_mounts.c               |  7 ++++---
+ init/main.c                    | 32 +++++++++++++++++++++++++++++++-
+ 9 files changed, 57 insertions(+), 9 deletions(-)
+
+diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
+index b8121a5..7a73ab9 100644
+--- a/arch/arm64/kernel/head.S
++++ b/arch/arm64/kernel/head.S
+@@ -207,6 +207,12 @@ efi_header_end:
+ 	__INIT
+ 
+ ENTRY(stext)
++#ifdef	CONFIG_MSM_GVM_QUIN
++	ldr     x21, =0x004a3000                // read mpm timer
++	ldr     x22, [x21]
++	ldr     x21, =0x0066bf6b8               // store the mpm timer value to shared memory
++	str     x22, [x21]
++#endif
+ 	bl	preserve_boot_args
+ 	bl	el2_setup			// Drop to EL1, w20=cpu_boot_mode
+ 	adrp	x24, __PHYS_OFFSET
+diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
+index e04a7b8..658dcf9 100644
+--- a/block/cfq-iosched.c
++++ b/block/cfq-iosched.c
+@@ -4808,7 +4808,7 @@ static void __exit cfq_exit(void)
+ 	kmem_cache_destroy(cfq_pool);
+ }
+ 
+-module_init(cfq_init);
++fs_initcall(cfq_init);
+ module_exit(cfq_exit);
+ 
+ MODULE_AUTHOR("Jens Axboe");
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index 1e5cd39..a2f5b3c 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -894,7 +894,7 @@ static void __exit fini(void)
+ 	unregister_blkdev(major, "virtblk");
+ 	destroy_workqueue(virtblk_wq);
+ }
+-module_init(init);
++fs_initcall(init);
+ module_exit(fini);
+ 
+ MODULE_DEVICE_TABLE(virtio, id_table);
+diff --git a/drivers/soc/qcom/boot_marker.c b/drivers/soc/qcom/boot_marker.c
+index 0b72d76..c5ccb3b 100644
+--- a/drivers/soc/qcom/boot_marker.c
++++ b/drivers/soc/qcom/boot_marker.c
+@@ -65,6 +65,16 @@ static void _create_boot_marker(const char *name,
+ 
+ static void set_bootloader_stats(void)
+ {
++#ifdef CONFIG_MSM_GVM_QUIN
++
++	/* Kernel Start in GVM is read from boot_stats->bootloader_display
++	 * This is a hack to save Kernel_Start when host boots the kernel
++	 * instead of a bootloader.
++	 */
++
++	_create_boot_marker("M - Kernel Start  - ",
++		readl_relaxed(&boot_stats->bootloader_display));
++#else
+ 	_create_boot_marker("M - APPSBL Start - ",
+ 		readl_relaxed(&boot_stats->bootloader_start));
+ 	_create_boot_marker("M - APPSBL Display Init - ",
+@@ -77,6 +87,7 @@ static void set_bootloader_stats(void)
+ 		readl_relaxed(&boot_stats->bootloader_checksum));
+ 	_create_boot_marker("M - APPSBL End - ",
+ 		readl_relaxed(&boot_stats->bootloader_end));
++#endif
+ }
+ 
+ void place_marker(const char *name)
+diff --git a/drivers/virtio/virtio_mmio.c b/drivers/virtio/virtio_mmio.c
+index f499d9d..adfa059 100644
+--- a/drivers/virtio/virtio_mmio.c
++++ b/drivers/virtio/virtio_mmio.c
+@@ -762,7 +762,7 @@ static void __exit virtio_mmio_exit(void)
+ 	vm_unregister_cmdline_devices();
+ }
+ 
+-module_init(virtio_mmio_init);
++fs_initcall(virtio_mmio_init);
+ module_exit(virtio_mmio_exit);
+ 
+ MODULE_AUTHOR("Pawel Moll <pawel.moll@arm.com>");
+diff --git a/fs/ext4/super.c b/fs/ext4/super.c
+index c5ba22b..d321341 100644
+--- a/fs/ext4/super.c
++++ b/fs/ext4/super.c
+@@ -5513,5 +5513,5 @@ static void __exit ext4_exit_fs(void)
+ MODULE_AUTHOR("Remy Card, Stephen Tweedie, Andrew Morton, Andreas Dilger, Theodore Ts'o and others");
+ MODULE_DESCRIPTION("Fourth Extended Filesystem");
+ MODULE_LICENSE("GPL");
+-module_init(ext4_init_fs)
++fs_initcall(ext4_init_fs)
+ module_exit(ext4_exit_fs)
+diff --git a/fs/jbd2/journal.c b/fs/jbd2/journal.c
+index 9398d1b..98c52a2 100644
+--- a/fs/jbd2/journal.c
++++ b/fs/jbd2/journal.c
+@@ -2697,6 +2697,6 @@ static void __exit journal_exit(void)
+ }
+ 
+ MODULE_LICENSE("GPL");
+-module_init(journal_init);
++fs_initcall(journal_init);
+ module_exit(journal_exit);
+ 
+diff --git a/init/do_mounts.c b/init/do_mounts.c
+index 1902a1c8..1bbc506 100644
+--- a/init/do_mounts.c
++++ b/init/do_mounts.c
+@@ -37,7 +37,7 @@
+ 
+ int __initdata rd_doload;	/* 1 = load RAM disk, 0 = don't load */
+ 
+-int root_mountflags = MS_RDONLY | MS_SILENT;
++int root_mountflags = MS_SILENT;
+ static char * __initdata root_device_name;
+ static char __initdata saved_root_name[64];
+ static int root_wait;
+@@ -563,7 +563,8 @@ void __init prepare_namespace(void)
+ 	 * For example, it is not atypical to wait 5 seconds here
+ 	 * for the touchpad of a laptop to initialize.
+ 	 */
+-	wait_for_device_probe();
++	/* Move this wait later */
++	/* wait_for_device_probe(); */
+ 
+ 	md_run_setup();
+ 	dm_run_setup();
+@@ -589,7 +590,7 @@ void __init prepare_namespace(void)
+ 			saved_root_name);
+ 		while (driver_probe_done() != 0 ||
+ 			(ROOT_DEV = name_to_dev_t(saved_root_name)) == 0)
+-			msleep(100);
++			msleep(20);
+ 		async_synchronize_full();
+ 	}
+ 
+diff --git a/init/main.c b/init/main.c
+index 84d4bce..c4a2431 100644
+--- a/init/main.c
++++ b/init/main.c
+@@ -842,6 +842,12 @@ static char *initcall_level_names[] __initdata = {
+ 	"late",
+ };
+ 
++static char init_prog[128] = "/usr/sbin/early_init";
++static char *init_prog_argv[2] = { init_prog, NULL };
++
++static char touch_early_done[128] = "/bin/touch";
++static char *touch_early_done_argv[3] = { touch_early_done, "/dev/early_driver_done", NULL };
++
+ static void __init do_initcall_level(int level)
+ {
+ 	initcall_t *fn;
+@@ -855,13 +861,22 @@ static void __init do_initcall_level(int level)
+ 
+ 	for (fn = initcall_levels[level]; fn < initcall_levels[level+1]; fn++)
+ 		do_one_initcall(*fn);
++
+ }
+ 
+ static void __init do_initcalls(void)
+ {
+ 	int level;
+ 
+-	for (level = 0; level < ARRAY_SIZE(initcall_levels) - 1; level++)
++	for (level = 0; level < 6; level++)
++		do_initcall_level(level);
++}
++
++static void __init do_initcalls_late(void)
++{
++	int level;
++
++	for (level = 6; level < ARRAY_SIZE(initcall_levels) - 1; level++)
+ 		do_initcall_level(level);
+ }
+ 
+@@ -997,6 +1012,7 @@ static int __ref kernel_init(void *unused)
+ 
+ static noinline void __init kernel_init_freeable(void)
+ {
++	int rc;
+ 	/*
+ 	 * Wait until kthreadd is all set-up.
+ 	 */
+@@ -1047,6 +1063,20 @@ static noinline void __init kernel_init_freeable(void)
+ 		prepare_namespace();
+ 	}
+ 
++	rc = call_usermodehelper(init_prog, init_prog_argv, NULL, 0);
++	if (!rc)
++		pr_info("early_init launched\n");
++	else
++		pr_err("early_init failed\n");
++
++	wait_for_device_probe();
++	rc = call_usermodehelper(touch_early_done, touch_early_done_argv, NULL, 0);
++	if (!rc)
++		pr_err("early driver done \n");
++	else
++		pr_err("early driver failed to sign success\n");
++	do_initcalls_late();
++
+ 	/*
+ 	 * Ok, we have completed the initial bootup, and
+ 	 * we're essentially up and running. Get rid of the
+-- 
+1.9.1
+

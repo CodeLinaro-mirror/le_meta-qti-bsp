@@ -1,0 +1,41 @@
+From 9fd3c5572d9277db6aa2009292105738e2d1b2a1 Mon Sep 17 00:00:00 2001
+From: Xianbin Zhu <xianzhu@codeaurora.org>
+Date: Sun, 12 Aug 2018 16:08:29 +0800
+Subject: [PATCH] Booting KPI:display support in early user space
+
+display support in early user space in ICAS3
+
+Change-Id: Ib27bce161c2be6d3196864a2f89b590e8224fc71
+Signed-off-by: Xianbin Zhu <xianzhu@codeaurora.org>
+---
+ drivers/gpu/drm/drm_drv.c             | 2 +-
+ drivers/gpu/drm/msm-hyp/msm_drv_hyp.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/gpu/drm/drm_drv.c b/drivers/gpu/drm/drm_drv.c
+index ccc2044..760410e 100644
+--- a/drivers/gpu/drm/drm_drv.c
++++ b/drivers/gpu/drm/drm_drv.c
+@@ -927,5 +927,5 @@ static void __exit drm_core_exit(void)
+ 	idr_destroy(&drm_minors_idr);
+ }
+ 
+-module_init(drm_core_init);
++fs_initcall(drm_core_init);
+ module_exit(drm_core_exit);
+diff --git a/drivers/gpu/drm/msm-hyp/msm_drv_hyp.c b/drivers/gpu/drm/msm-hyp/msm_drv_hyp.c
+index 133b122..1fd6790 100644
+--- a/drivers/gpu/drm/msm-hyp/msm_drv_hyp.c
++++ b/drivers/gpu/drm/msm-hyp/msm_drv_hyp.c
+@@ -468,7 +468,7 @@ static void __exit msm_drm_unregister(void)
+ 	platform_driver_unregister(&msm_platform_driver);
+ }
+ 
+-module_init(msm_drm_register);
++fs_initcall(msm_drm_register);
+ module_exit(msm_drm_unregister);
+ 
+ MODULE_DESCRIPTION("MSM DRM Mini Driver");
+-- 
+1.9.1
+
