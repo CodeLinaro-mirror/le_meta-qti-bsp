@@ -29,8 +29,10 @@ python __anonymous () {
   if d.getVar("KERNEL_IMAGETYPE", True):
       d.setVar("KERNEL_IMAGETYPE_FOR_MAKE", "")
 
-  if( (d.getVar('KERNEL_ROOTDEVICE', True) == "/dev/dm-0") and (d.getVar('MACHINE', True) == "8x96autogvmquin")):
-    d.appendVar("SRC_URI", " file://0001-enable-rootfs-mount-as-dm-verity-target-during-boot.patch")
+  if d.getVar('KERNEL_ROOTDEVICE', True) == "/dev/dm-0":
+      d.appendVar("SRC_URI", " file://0001-enable-rootfs-mount-as-dm-verity-target-during-boot.patch")
+      if d.getVar('MACHINE', True) == "8x96autogvmquintcu":
+          d.appendVar("SRC_URI", " file://0001-enable-dm-verity-on-baseline.patch")
 }
 
 KERNEL_IMAGEDEST_apq8096 = "boot"
