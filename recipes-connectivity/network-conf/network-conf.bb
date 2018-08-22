@@ -4,8 +4,6 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/${LICENSE};md5=550794465ba0ec53
 
 RDEPENDS_${PN} += "wpa-supplicant hostapd cannelloni systemd"
 
-SRC_URI += "file://dsrc.network"
-SRC_URI += "file://mhi_swip.network"
 SRC_URI += "file://wlan.network"
 SRC_URI += "file://wpa_supplicant@wlan0.service"
 SRC_URI += "file://wpa_supplicant-wlan0.conf"

@@ -15,7 +15,7 @@ EXTRA_OECONF = "--with-core-includes=${WORKSPACE}/system/core/include \
 
 
 CPPFLAGS += "-I${WORKSPACE}/base/include"
-CFLAGS += "-I${STAGING_INCDIR}/cutils"
+CFLAGS += "-I${STAGING_INCDIR}/cutils -DFEATURE_EXTERNAL_AP"
 
 PACKAGES = "${PN}"
 INHIBIT_PACKAGE_DEBUG_SPLIT = "1"

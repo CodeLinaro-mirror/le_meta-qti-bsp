@@ -45,39 +45,19 @@ CONFIG_VIDEO_ADV7481=y
 CONFIG_CAN_KVASER_USB=y
 CONFIG_CIFS=y
 CONFIG_USB_ACM=y
+CONFIG_CNSS_GENL=y
 KERNEL_EXTRACONFIGS
 
-    if [ "${MACHINE}" == "8x96autocv2x" ]; then
-        echo "CONFIG_CNSS_GENL=y" >> ${S}/arch/${ARCH}/configs/${KERNEL_CONFIG}
-    else # !8x96autocv2x
-        echo "# CONFIG_CNSS2 is not set" >> ${S}/arch/${ARCH}/configs/${KERNEL_CONFIG}
-        echo "# CONFIG_CNSS2_DEBUG is not set" >> ${S}/arch/${ARCH}/configs/${KERNEL_CONFIG}
-        echo "CONFIG_CNSS=y" >> ${S}/arch/${ARCH}/configs/${KERNEL_CONFIG}
-        echo "CONFIG_CNSS_ASYNC=y" >> ${S}/arch/${ARCH}/configs/${KERNEL_CONFIG}
-    fi
+cat >> ${S}/arch/${ARCH}/configs/${KERNEL_CONFIG} <<KERNEL_EXTRACONFIGS
+# CONFIG_MSM_RMNET_MHI is not set
+# CONFIG_MSM_MHI is not set
+# CONFIG_MSM_MHI_UCI is not set
+# CONFIG_MSM_MHI_DEBUG is not set
+# CONFIG_RMNET_DATA is not set
+# CONFIG_RMNET_DATA_FC is not set
+# CONFIG_RMNET_DATA_DEBUG_PKT is not set
+KERNEL_EXTRACONFIGS
 }
-
-python do_getpatches() {
-    import os
-    cmd = "wget https://source.codeaurora.org/quic/la/kernel/msm-4.4/patch/?id=f083f557186d77de5f14bf90aec1bfe2503cf513 -O ${WORKSPACE}/poky/meta-qti-bsp/recipes-kernel/linux-msm-4.4/files/0001-dmaengine-Add-helper-function-to-prep-for-error-repo.patch"
-    os.system(cmd)
-    cmd = "wget https://source.codeaurora.org/quic/la/kernel/msm-4.4/patch/?id=f067025bc676ba8d18fba5f959598339e39b86db -O ${WORKSPACE}/poky/meta-qti-bsp/recipes-kernel/linux-msm-4.4/files/0001-dmaengine-add-support-to-provide-error-result-from-a.patch"
-    os.system(cmd)
-}
-
-SRC_URI_append_8x96mizar += " \
-    git://source.codeaurora.org/quic/la/kernel/msm-4.4;nobranch=1;tag=8a1eab637309319aee4caa10b196eb7327b549ae;protocol=https;destsuffix=drivers/ntb;subpath=drivers/ntb \
-    git://source.codeaurora.org/quic/la/kernel/msm-4.4;nobranch=1;tag=8a1eab637309319aee4caa10b196eb7327b549ae;protocol=https;destsuffix=include/linux/;subpath=include/linux \
-    file://0001-defconfig-Enable-NTB-framework-and-IDT-hw-driver.patch \
-    file://0001-dmaengine-Add-helper-function-to-prep-for-error-repo.patch \
-    file://0001-dmaengine-add-support-to-provide-error-result-from-a.patch \
-    file://0001-ntb-ntb_perf-Disable-dma-routine.patch \
-    file://0001-ntb-hw-idt-Fix-set-DMA-mask-bit-failure.patch \
-    file://0001-dirvers-ntb-Fix-isr-routine-backport-issue.patch \
-    file://0001-ntb_transport-Enable-ntb-tranport-layer-for-IDT-devi.patch \
-    file://0001-net-ntb_netdev-Change-module-load-order.patch \
-    file://0001-Revert-ARM-dts-msm-modify-HDMI-configuration-for-msm.patch \
-"
 
 do_deploy_rename () {
     mv ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img ${DEPLOY_DIR_IMAGE}/boot.img
@@ -85,22 +65,26 @@ do_deploy_rename () {
 
 addtask deploy_rename after do_deploy before do_packagedata
 
+FILESEXTRAPATHS_append := ":${WORKSPACE}/kernel"
+SRC_URI += "file://eap-qti-kernel"
+SRC_URI += "file://0001-Enable-compilation-of-eap-qti-kernel-on-msm-4.4.patch"
+
 do_unpack_extra () {
-    if [ ${@d.getVar("MACHINE", True)} == "8x96auto" ]; then
-        mkdir -p ${S}/drivers/net/ethernet/neutrino
-        cp -f ${WORKSPACE}/vehiclenetwork/ethernet/* ${S}/drivers/net/ethernet/neutrino/
-        rm ${S}/drivers/net/ethernet/neutrino/Makefile
-        rm ${S}/drivers/net/ethernet/neutrino/Makefile.am
-        rm ${S}/drivers/net/ethernet/neutrino/Kbuild
-        mv ${S}/drivers/net/ethernet/neutrino/Makefile.builtin ${S}/drivers/net/ethernet/neutrino/Makefile
-        echo "source \"drivers/net/ethernet/neutrino/Kconfig"\" >> ${S}/drivers/net/ethernet/Kconfig
-        echo "obj-y += neutrino/" >> ${S}/drivers/net/ethernet/Makefile
-    fi
-    if [ ${@d.getVar("MACHINE", True)} == "8x96mizar" ]; then
-      cp -rf ${WORKDIR}/drivers/ntb/* ${S}/drivers/ntb/
-      cp -rf ${WORKDIR}/include/linux/ntb.h ${S}/include/linux/
-    fi
+    cp -r ${WORKDIR}/eap-qti-kernel/* ${S}/
+    cp ${WORKDIR}/eap-qti-kernel/devicetree/* ${S}/arch/${ARCH}/boot/dts/
+    echo "source \"drivers/qti/Kconfig"\" >> ${S}/drivers/Kconfig
+    echo "obj-y += qti/" >> ${S}/drivers/Makefile
+    echo "header-y += qrtr.h" >> ${S}/include/uapi/linux/Kbuild
+    echo "header-y += msm_rmnet.h" >> ${S}/include/uapi/linux/Kbuild
+    echo "header-y += rmnet_data.h" >> ${S}/include/uapi/linux/Kbuild
+    echo "#include \"external-modem-pcie.dtsi\"" >> ${S}/arch/arm64/boot/dts/qcom/msm8996-cv2x.dtsi
+    echo "&mhi_0 { qcom,pci-domain = <2>; };" >> ${S}/arch/arm64/boot/dts/qcom/msm8996-cv2x.dtsi
 }
 
-addtask getpatches before do_fetch
 addtask unpack_extra after do_unpack before do_patch
+
+do_patch_extra () {
+    cat ${WORKDIR}/eap-qti-kernel/defconfig >> ${S}/arch/${ARCH}/configs/${KERNEL_CONFIG}
+}
+
+addtask patch_extra after do_patch before do_configure
