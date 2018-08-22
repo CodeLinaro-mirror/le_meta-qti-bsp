@@ -33,6 +33,9 @@ CPPFLAGS += " -I${WORKSPACE}/system/core/libsync/include"
 CPPFLAGS += " -I${WORKSPACE}/system/core/libsync/include/sync"
 
 
+CPPFLAGS += " -I${STAGING_INCDIR}/c++/6.4.0"
+CPPFLAGS += " -I${STAGING_INCDIR}/c++/6.4.0/aarch64-oe-linux"
+CPPFLAGS += " -I${STAGING_INCDIR}/c++/6.4.0/arm-oemllib32-linux-gnueabi"
 CPPFLAGS += "-fpermissive"
 LDFLAGS  += "-llog"
 

@@ -1,4 +1,4 @@
-inherit autotools pkgconfig externalsrc
+inherit autotools pkgconfig externalsrc sdllvm
 
 DESCRIPTION = "Build Android libcutils"
 HOMEPAGE = "http://developer.android.com/"
