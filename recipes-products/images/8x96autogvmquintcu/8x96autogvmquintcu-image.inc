@@ -126,6 +126,8 @@ IMAGE_ROOTFS_EXTRA_SPACE_append = "${@bb.utils.contains("DISTRO_FEATURES", "syst
 
 USERDATA_SIZE_EXT4 = "256M"
 PERSIST_SIZE_EXT4  = "16M"
+IMAGE_INSTALL += "e2fsprogs-mke2fs"
+#IMAGE_INSTALL += "enable-fde"
 
 IMAGE_INSTALL_remove += "pulseaudio-module-codec-control"
 IMAGE_INSTALL_remove += "pulseaudio-module-acdb"
