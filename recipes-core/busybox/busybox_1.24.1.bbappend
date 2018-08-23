@@ -21,6 +21,7 @@ SRC_URI += "\
             file://fix-mdev-crash.patch \
 "
 SRC_URI_append_apq8053 += "file://apq8053/mdev.conf"
+SRC_URI_append += "${@bb.utils.contains('DISTRO_FEATURES', 'virtualization', 'file://0001-Remove-readprofile-and-brctl-from-busybox.links-file.patch', '', d)}"
 
 prefix = ""
 
