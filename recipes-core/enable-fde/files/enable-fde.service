@@ -1,0 +1,14 @@
+[Unit]
+Description=Enable fde on data partition
+
+BindsTo=dev-vdb.device
+After=dev-vdb.device persist.mount
+Before=systemd-fsck@dev-vdb.service
+DefaultDependencies=no
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/enable-fde.sh
+
+[Install]
+WantedBy=local-fs-pre.target
