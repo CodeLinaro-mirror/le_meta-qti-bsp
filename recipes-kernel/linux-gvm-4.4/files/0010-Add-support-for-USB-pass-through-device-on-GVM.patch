@@ -1,12 +1,13 @@
-From 4f872f84913d08a12567c0e97cb47d35b6e94a04 Mon Sep 17 00:00:00 2001
+From e4689ef0249cf2175c32c833e19da4f99a43a521 Mon Sep 17 00:00:00 2001
 From: Yimin Peng <yiminp@codeaurora.org>
 Date: Mon, 6 Aug 2018 17:55:45 +0800
-Subject: [PATCH] add support for USB pass through device on GVM
+Subject: [PATCH] Add support for USB pass through device on GVM
 
 Change-Id: I7dbd881b3e948702eceb15017ac7934ec5add7e9
 Signed-off-by: Yimin Peng <yiminp@codeaurora.org>
+Signed-off-by: Zhiqiang Tu <ztu@codeaurora.org>
 ---
- .../boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts    |   4 +
+ .../dts/qcom/vplatform-lfv-msm8996-ivi-common.dtsi |   4 +
  .../dts/qcom/vplatform-lfv-msm8996-telematics.dts  |   4 +
  .../boot/dts/qcom/vplatform-lfv-msm8996-usb.dtsi   |   6 +
  arch/arm64/configs/msm-auto-gvm-perf_defconfig     |  55 +++++++++
@@ -15,11 +16,11 @@ Signed-off-by: Yimin Peng <yiminp@codeaurora.org>
  drivers/usb/phy/phy-msm-ssusb-qmp.c                |  22 +++-
  7 files changed, 224 insertions(+), 55 deletions(-)
 
-diff --git a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts
-index 7314af2..a58c0b4 100644
---- a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts
-+++ b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts
-@@ -142,6 +142,10 @@
+diff --git a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi-common.dtsi b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi-common.dtsi
+index a050f09..3dc266b 100644
+--- a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi-common.dtsi
++++ b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi-common.dtsi
+@@ -131,6 +131,10 @@
  
  #include "vplatform-lfv-msm8996-usb.dtsi"
  
