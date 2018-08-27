@@ -81,6 +81,7 @@ do_install_append_msm() {
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
         install -d 0644 ${D}${sysconfdir}/systemd/system
         install -d 0644 ${D}${sysconfdir}/systemd/system/local-fs.target.requires
+
         # userdata is present by default.
         if ${@bb.utils.contains("DISTRO_FEATURES", "full-disk-encryption",'false', 'true', d)}; then
             if ${@bb.utils.contains('DISTRO_FEATURES','nand-boot','false','true',d)}; then
