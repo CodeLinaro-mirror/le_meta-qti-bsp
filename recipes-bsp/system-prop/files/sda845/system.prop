@@ -57,6 +57,9 @@ vendor.audio.pp.asphere.enabled=false
 #property to enable DS2 dap
 vendor.audio.dolby.ds2.enabled=true
 
+#property to enable QAS
+persist.vendor.audio.qas.enabled=true
+
 #Offset for audio timestamp
 persist.qmmf.timestamp.adjust=-150000
 
