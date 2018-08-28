@@ -2,6 +2,8 @@ DEFAULT_PREFERENCE = "-1"
 
 require ${COREBASE}/meta/recipes-multimedia/gstreamer/gstreamer1.0-plugins-bad.inc
 
+DEPENDS += "gbm wayland-native weston"
+
 LIC_FILES_CHKSUM = "file://COPYING;md5=73a5855a8119deb017f5f13cf327095d \
                     file://gst/tta/filters.h;beginline=12;endline=29;md5=8a08270656f2f8ad7bb3655b83138e5a \
                     file://COPYING.LIB;md5=21682e4e8fea52413fd26c60acb907e5 \
