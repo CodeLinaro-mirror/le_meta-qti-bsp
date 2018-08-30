@@ -1,18 +1,37 @@
-From c8ef09a51a5d0567b70fc93f2a2e0dd2cde57ff3 Mon Sep 17 00:00:00 2001
-From: Zhiqiang Tu <ztu@codeaurora.org>
-Date: Mon, 19 Mar 2018 13:38:20 +0800
+From 5c6613d4021d2592205f58529861e953ca5a535a Mon Sep 17 00:00:00 2001
+From: xianzhu <xianzhu@codeaurora.org>
+Date: Tue, 28 Aug 2018 11:21:48 +0800
 Subject: [PATCH] automotive: add boot time marker for LV GVM
 
 Add boot time marker for boot KPI measurement.
 
-Change-Id: Idb669bf15b215b0acec9434e3c7fb52faa92d415
-Signed-off-by: Zhiqiang Tu <ztu@codeaurora.org>
+Change-Id: I6f2986f697098b46ae388267f992103744327537
+Signed-off-by: xianzhu <xianzhu@codeaurora.org>
 ---
- drivers/pci/host/pci-host-generic.c | 6 ++++++
- init/do_mounts.c                    | 6 +++++-
- net/ipv4/af_inet.c                  | 3 +++
- 3 files changed, 14 insertions(+), 1 deletion(-)
+ arch/arm64/kernel/head.S            |  6 ++++++
+ drivers/pci/host/pci-host-generic.c |  6 ++++++
+ drivers/soc/qcom/boot_marker.c      | 11 +++++++++++
+ init/do_mounts.c                    |  6 +++++-
+ net/ipv4/af_inet.c                  |  3 +++
+ 5 files changed, 31 insertions(+), 1 deletion(-)
 
+diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
+index d5d4afb..c97ff37 100644
+--- a/arch/arm64/kernel/head.S
++++ b/arch/arm64/kernel/head.S
+@@ -207,6 +207,12 @@ efi_header_end:
+ 	__INIT
+ 
+ ENTRY(stext)
++#ifdef	CONFIG_MSM_GVM_QUIN
++	ldr     x21, =0x004a3000                // read mpm timer
++	ldr     x22, [x21]
++	ldr     x21, =0x0066bf6b8               // store the mpm timer value to shared memory
++	str     x22, [x21]
++#endif
+ 	bl	preserve_boot_args
+ 	bl	el2_setup			// Drop to EL1, w20=cpu_boot_mode
+ 	adrp	x24, __PHYS_OFFSET
 diff --git a/drivers/pci/host/pci-host-generic.c b/drivers/pci/host/pci-host-generic.c
 index 5434c90..fe6c83e 100644
 --- a/drivers/pci/host/pci-host-generic.c
@@ -44,8 +63,37 @@ index 5434c90..fe6c83e 100644
  	return 0;
  }
  
+diff --git a/drivers/soc/qcom/boot_marker.c b/drivers/soc/qcom/boot_marker.c
+index 0b72d76..c5ccb3b 100644
+--- a/drivers/soc/qcom/boot_marker.c
++++ b/drivers/soc/qcom/boot_marker.c
+@@ -65,6 +65,16 @@ static void _create_boot_marker(const char *name,
+ 
+ static void set_bootloader_stats(void)
+ {
++#ifdef CONFIG_MSM_GVM_QUIN
++
++	/* Kernel Start in GVM is read from boot_stats->bootloader_display
++	 * This is a hack to save Kernel_Start when host boots the kernel
++	 * instead of a bootloader.
++	 */
++
++	_create_boot_marker("M - Kernel Start  - ",
++		readl_relaxed(&boot_stats->bootloader_display));
++#else
+ 	_create_boot_marker("M - APPSBL Start - ",
+ 		readl_relaxed(&boot_stats->bootloader_start));
+ 	_create_boot_marker("M - APPSBL Display Init - ",
+@@ -77,6 +87,7 @@ static void set_bootloader_stats(void)
+ 		readl_relaxed(&boot_stats->bootloader_checksum));
+ 	_create_boot_marker("M - APPSBL End - ",
+ 		readl_relaxed(&boot_stats->bootloader_end));
++#endif
+ }
+ 
+ void place_marker(const char *name)
 diff --git a/init/do_mounts.c b/init/do_mounts.c
-index 1902a1c8..f6f0fc1 100644
+index 1bbc506..4986c61 100644
 --- a/init/do_mounts.c
 +++ b/init/do_mounts.c
 @@ -34,6 +34,7 @@
