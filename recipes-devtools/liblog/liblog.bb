@@ -1,4 +1,4 @@
-inherit autotools-brokensep pkgconfig
+inherit autotools-brokensep pkgconfig sdllvm
 
 DESCRIPTION = "Build Android liblog"
 HOMEPAGE = "http://developer.android.com/"
