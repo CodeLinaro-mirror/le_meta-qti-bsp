@@ -62,6 +62,18 @@ python __anonymous () {
       if d.getVar('BASEMACHINE', True) == '8x96auto':
           d.appendVar("SRC_URI", " file://0001-ARM-dts-msm-remove-reserved-splash-memory-regions.patch")
 
+  if bb.utils.contains('DISTRO_FEATURES', 'early_init', True, False, d) or bb.utils.contains('DISTRO_FEATURES', 'early-ethernet', True, False, d):
+      if d.getVar('KERNEL_ROOTDEVICE', True) == "/dev/dm-0":
+          d.appendVar("SRC_URI", " file://0011-kernel-rootfs-prefetch-dm-verity.patch")
+      else:
+          d.appendVar("SRC_URI", " file://0011-kernel-rootfs-prefetch-no-dm-verity.patch")
+      if bb.utils.contains('DISTRO_FEATURES', 'early_init', True, False, d):
+          d.appendVar("SRC_URI", " file://0011-kernel-rootfs-prefetch-early-init.patch")
+          d.appendVar("SRC_URI", " file://0011-kernel-parallelize-more-init-functions-early-cvbs.patch")
+      if bb.utils.contains('DISTRO_FEATURES', 'early-ethernet', True, False, d):
+          d.appendVar("SRC_URI", " file://0011-kernel-rootfs-prefetch-early-ethernet.patch")
+          d.appendVar("SRC_URI", " file://0011-kernel-parallelize-more-init-functions-early-ethernet.patch")
+
   # Override KERNEL_IMAGETYPE_FOR_MAKE variable, which is internal
   # to kernel.bbclass. We override the variable as msm kernel can't
   # support alternate image builds
