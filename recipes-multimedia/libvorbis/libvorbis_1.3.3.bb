@@ -11,7 +11,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=ca77c6c3ea4d29cb68dce8ef5ab0d897"
 PR = "r1"
 
 SRC_URI = "\
-    http://downloads.xiph.org/releases/vorbis/${PN}-1.3.3.tar.gz \
+    http://downloads.xiph.org/releases/vorbis/libvorbis-${PV}.tar.gz \
 "
 
 SRC_URI[md5sum] = "6b1a36f0d72332fae5130688e65efe1f"
