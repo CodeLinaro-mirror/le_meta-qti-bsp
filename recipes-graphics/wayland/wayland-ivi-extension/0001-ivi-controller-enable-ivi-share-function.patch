@@ -78,7 +78,7 @@ index 56d98d9..a2ace5c 100644
  #include "ivi-share-client-protocol.h"
 +#include "gbm_priv.h"
 +
-+#define DRM_DEV_NAME "/dev/dri/card0"
++#define DRM_DEV_NAME "/dev/dri/renderD128"
  
  struct window;
  
