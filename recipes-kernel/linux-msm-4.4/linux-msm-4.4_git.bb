@@ -69,7 +69,10 @@ python __anonymous () {
           d.appendVar("SRC_URI", " file://0011-kernel-rootfs-prefetch-no-dm-verity.patch")
       if bb.utils.contains('DISTRO_FEATURES', 'early_init', True, False, d):
           d.appendVar("SRC_URI", " file://0011-kernel-rootfs-prefetch-early-init.patch")
-          d.appendVar("SRC_URI", " file://0011-kernel-parallelize-more-init-functions-early-cvbs.patch")
+          if d.getVar('BASEMACHINE', True) == '8x96autodvrs':
+            d.appendVar("SRC_URI", " file://0011-kernel-parallelize-more-init-functions-early-cvbs-dvrs.patch")
+          else:
+            d.appendVar("SRC_URI", " file://0011-kernel-parallelize-more-init-functions-early-cvbs.patch")
       if bb.utils.contains('DISTRO_FEATURES', 'early-ethernet', True, False, d):
           d.appendVar("SRC_URI", " file://0011-kernel-rootfs-prefetch-early-ethernet.patch")
           d.appendVar("SRC_URI", " file://0011-kernel-parallelize-more-init-functions-early-ethernet.patch")
