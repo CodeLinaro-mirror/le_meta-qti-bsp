@@ -70,7 +70,7 @@ do_makesystem[cleandirs] += "${UNSPARSED_RECOVERYFS_DEST}"
 
 # Below is to generate sparse ext4 recovery image (OE by default supports raw ext4 images)
 do_makesystem() {
-    if [ "${MACHINE}" != "mdm9607" ]; then
+    if [ "${MACHINE}" != "mdm9607" ] && [ "${MACHINE}" != "mdm9650" ] && [ "${MACHINE}" != "mdm9650-2k" ]; then
 
         # SELinux feature is enabled
         if [[ "${DISTRO_FEATURES}" =~ "selinux" ]]; then
