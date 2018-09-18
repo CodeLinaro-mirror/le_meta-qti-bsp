@@ -18,7 +18,7 @@ IMAGE_INSTALL += "procps"
 IMAGE_INSTALL += "protobuf"
 
 #BT
-IMAGE_INSTALL += "${@base_conditional('SYNERGY_DIR_PRESENT', 'True', 'synergy-opensource', '', d)}"
+IMAGE_INSTALL += "${@base_conditional('SYNERGY_ENABLE', 'True', 'synergy-opensource', '', d)}"
 
 # Perf
 IMAGE_INSTALL += "${@bb.utils.contains("DISTRO_FEATURES", "early_init", "memory-hotplug", "" ,d)}"

@@ -19,7 +19,7 @@ dirs755 += "/media/cf /media/net /media/ram \
 dirs755_append_apq8009 +="/persist"
 
 do_install_append(){
-  if [ "${SYNERGY_DIR_PRESENT}" == "False" ]; then
+  if [ "${SYNERGY_ENABLE}" == "False" ]; then
     sed -i -e '/^PARTLABEL=bluetooth/d' ${D}/etc/fstab
   fi
 
@@ -27,7 +27,7 @@ do_install_append(){
   if [ "${MACHINEGROUP}" == "auto" ] || [[ "${BASEMACHINE}" =~ $REGEXP ]]; then
     # Prepare mountpoint in case rootfs is readonly
     install -d ${D}/firmware
-    if [ "${SYNERGY_DIR_PRESENT}" == "True" ]; then
+    if [ "${SYNERGY_ENABLE}" == "True" ]; then
       install -d ${D}/bluetooth
     fi
     install -d ${D}/dsp
