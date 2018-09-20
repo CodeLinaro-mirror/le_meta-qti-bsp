@@ -80,7 +80,3 @@ BB_HASHBASE_WHITELIST = "TMPDIR FILE PATH PWD BB_TASKHASH BBPATH DL_DIR \
 # The WORKSPACE variable is added through build/conf/bblayers.conf
 BB_HASHBASE_WHITELIST += "WORKSPACE"
 
-#Reduce the number of parallel make and bb threads
-CPU_COUNT = "${@bb.utils.cpu_count()}"
-PARALLEL_MAKE = "${@base_less_or_equal('CPU_COUNT', '24', '-j ${CPU_COUNT}', '-j 24',d)}"
-BB_NUMBER_THREADS = "${@base_less_or_equal('CPU_COUNT', '24', ' ${CPU_COUNT}', ' 24',d)}"
