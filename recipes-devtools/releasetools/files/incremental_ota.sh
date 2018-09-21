@@ -40,18 +40,14 @@ if [ "$#" -lt 4 ]; then
     exit 1
 fi
 
-FSCONFIG_PATH=../../../../../sysroots-components/x86_64/fsconfig-native/usr/bin
-IMGDIFF_PATH=../../../../../sysroots-components/x86_64/applypatch-native/usr/bin
-BSDIFF_PATH=../../../../../sysroots-components/x86_64/bsdiff-native/usr/bin
-export PATH=.:${STAGING_BINDIR_NATIVE}:$FSCONFIG_PATH:$IMGDIFF_PATH:$BSDIFF_PATH:$PATH:/usr/bin
+USR_LIB=../recipe-sysroot-native/usr/lib
+LIB=../recipe-sysroot-native/lib
+USR_BIN=../recipe-sysroot-native/usr/bin
+
+export PATH=.:${USR_LIB}:${LIB}:${USR_BIN}:$PATH:$PATH:/usr/bin
 export OUT_HOST_ROOT=.
 
-LIBSELINUX_PATH=../../../../../sysroots-components/x86_64/libselinux-native/usr/lib
-LIBCUTILS_PATH=../../../../../sysroots-components/x86_64/libcutils-native/usr/lib
-LIBPCRE_PATH=../../../../../sysroots-components/x86_64/libpcre-native/usr/lib
-LIBLOG_PATH=../../../../../sysroots-components/x86_64/liblog-native/usr/lib
-LIBDIVSUFSORT_PATH=../../../../../sysroots-components/x86_64/libdivsufsort-native/usr/lib
-export LD_LIBRARY_PATH=${STAGING_LIBDIR_NATIVE}:$LIBSELINUX_PATH:$LIBCUTILS_PATH:$LIBPCRE_PATH:$LIBLOG_PATH:$LIBDIVSUFSORT_PATH
+export LD_LIBRARY_PATH=${USR_LIB}:${LIB}:${USR_BIN}
 
 export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
@@ -79,6 +75,14 @@ unzip -qo $2 -d target_files
 mkdir -p target_files/META
 mkdir -p target_files/SYSTEM
 
+if [ "${block_based}" = "--block" ]; then
+    # python2 is needed for block based OTA.
+    python_version="python2"
+else
+    # File-based OTA needs this to assign the correct context to '/' after OTA upgrade
+    echo "/system -d system_u:object_r:root_t:s0" >> target_files/BOOT/RAMDISK/file_contexts
+fi
+
 # Generate selabel rules only if file_contexts is packed in target-files
 if grep "selinux_fc" target_files/META/misc_info.txt
 then
@@ -89,9 +93,5 @@ fi
 
 
 cd target_files && zip -q ../$2 META/*filesystem_config.txt SYSTEM/build.prop && cd ..
-
-if [ "${block_based}" = "--block" ]; then
-    python_version="python2"
-fi
 
 $python_version ./ota_from_target_files $block_based -n -v -d $device_type -v -p . -m linux_embedded --no_signing -i $1 $2 update_incr_$4.zip

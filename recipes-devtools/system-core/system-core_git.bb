@@ -9,23 +9,21 @@ ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 EXTERNALSRC = "${WORKSPACE}/system/core/"
 PR = "r19"
 
-DEPENDS = "virtual/kernel openssl glib-2.0 libselinux ext4-utils libunwind libcutils libmincrypt libbase libutils"
+DEPENDS += "virtual/kernel openssl glib-2.0 libselinux ext4-utils libunwind libcutils libmincrypt libbase libutils"
+DEPENDS_append_qcs605 = " libsync"
 
 EXTRA_OECONF = " --with-host-os=${HOST_OS} --with-glib"
 EXTRA_OECONF_append = " --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
 EXTRA_OECONF_append = " --with-logd-logging"
-EXTRA_OECONF_append = "${@base_conditional('USER_BUILD','1',' --disable-debuggerd','',d)}"
+EXTRA_OECONF_append = "${@bb.utils.contains('VARIANT','user',' --disable-debuggerd','',d)}"
 EXTRA_OECONF_append_apq8053 = " --enable-logd-privs"
-EXTRA_OECONF_append_qcs40x = " --disable-libsync"
+
+#Disable default libsync in system/core for 4.4 above kernels
+EXTRA_OECONF_append += "${@base_version_less_or_equal('PREFERRED_VERSION_linux-msm', '4.4', '', ' --disable-libsync', d)}"
 
 # Disable adb root privileges in USER builds for msm targets
-EXTRA_OECONF_append_msm = "${@base_conditional('USER_BUILD','1',' --disable-adb-root','',d)}"
+EXTRA_OECONF_append_msm = "${@bb.utils.contains('VARIANT','user',' --disable-adb-root','',d)}"
 
-# Pass on system partition size to adb
-EXTRA_OECONF_append = " --with-system-size=${SYSTEM_SIZE_EXT4}"
-
-#Pass on fec image size to adb
-EXTRA_OECONF_append = " --with-fec-size=${FEC_SIZE}"
 
 CPPFLAGS += "-I${STAGING_INCDIR}/ext4_utils"
 CPPFLAGS += "-I${STAGING_INCDIR}/libselinux"

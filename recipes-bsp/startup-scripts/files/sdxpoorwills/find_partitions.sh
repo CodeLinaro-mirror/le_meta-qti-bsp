@@ -93,10 +93,11 @@ else
         eval FindAndMountVolume${fstype} usrfs /data
         eval FindAndMountVolume${fstype} systemrw /systemrw
         test -x /sbin/restorecon && /sbin/restorecon -RD /data /systemrw
+        eval FindAndMountVolume${fstype} cachefs /cache
 fi
 
 if [ -x /sbin/restorecon ]; then
-    firmware_selinux_opt=",rootcontext=system_u:object_r:firmware_t:s0"
+    firmware_selinux_opt=",context=system_u:object_r:firmware_t:s0"
 else
     firmware_selinux_opt=""
 fi

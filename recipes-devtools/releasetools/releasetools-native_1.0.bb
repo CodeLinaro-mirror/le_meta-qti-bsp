@@ -7,6 +7,8 @@ ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 
 PR = "r0"
 
+DEPENDS += "libselinux libpcre2 liblog fsconfig-native applypatch-native libdivsufsort"
+
 FILESPATH =+ "${WORKSPACE}/OTA/build/tools/:"
 
 SRC_URI   = "file://releasetools/"
@@ -17,12 +19,11 @@ S = "${WORKDIR}/releasetools"
 
 
 do_configure_append() {
-    mv ${WORKDIR}/full_ota.sh ${S}
+    cp ${WORKDIR}/full_ota.sh ${S}
     chmod 755 ${S}/full_ota.sh
-    mv ${WORKDIR}/incremental_ota.sh ${S}
+    cp ${WORKDIR}/incremental_ota.sh ${S}
     chmod 755 ${S}/incremental_ota.sh
 }
 
 do_compile[noexec] = "1"
 do_install[noexec] = "1"
-
