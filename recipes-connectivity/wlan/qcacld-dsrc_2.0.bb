@@ -47,6 +47,9 @@ do_install () {
     install -d ${D}/lib/modules/${KERNEL_VERSION}/extra
     install -D -m 0644 ${S}/${WLAN_MODULE_NAME}.ko ${D}/lib/modules/${KERNEL_VERSION}/extra/
 
+    # Enable OCB/DSRC tx per packet stats
+    sed -i -e 's/^gOcbTxPerPktStatsEnable=0/gOcbTxPerPktStatsEnable=1/g' ${S}/firmware_bin/WCNSS_qcom_cfg.ini
+
     # Enable 802.11p (DSRC) standalone mode
     sed -i -e 's/^END/# OCB mode - 1=standalone\ngDot11PMode=1\n\nEND/g' ${S}/firmware_bin/WCNSS_qcom_cfg.ini
 
