@@ -47,14 +47,8 @@ SYSTEM_VOLUME_SIZE ?= "110MiB"
 CACHE_VOLUME_SIZE ?= "70MiB"
 SYSTEMRW_VOLUME_SIZE ?= "6MiB"
 
-# Sizes for EXT4 (in bytes)
-SYSTEM_SIZE_EXT4 ?= "200000000"
-SYSTEMRW_SIZE_EXT4 ?= "8388608"
-USERDATA_SIZE_EXT4 ?= "2000000000"
-CACHE_SIZE_EXT4 ?= "80000000"
-
 #Enable SDK feature
 SDK_IMAGE ?= "1"
 
 # Formats of root filesystem images. 
-IMAGE_FSTYPES += "ext4 ubi"
+IMAGE_FSTYPES += "ubi"
