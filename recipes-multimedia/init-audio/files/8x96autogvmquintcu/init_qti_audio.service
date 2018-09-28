@@ -1,8 +1,7 @@
-
 [Unit]
 Description=INIT_AUDIO
 Before=multi-user.target
-After=firmware-links.service
+After=init_sys_mss.service
 Conflicts=shutdown.target
 
 [Service]

@@ -1,7 +1,7 @@
 
 [Unit]
 Description=MODPROBE_WLAN_MODULE
-After=firmware-links.service firmware.mount
+After=firmware.mount
 Conflicts=shutdown.target
 
 [Service]

@@ -1,4 +1,4 @@
-inherit autotools-brokensep update-rc.d
+inherit autotools-brokensep systemd
 
 DESCRIPTION = "Modem init"
 LICENSE = "BSD"
@@ -11,6 +11,8 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/init_mss:"
 SRC_URI = "file://mdm-ss-mgr/init_mss/"
 SRC_URI += "file://init_sys_mss.service"
 
+DEPENDS += "systemd"
+
 S = "${WORKDIR}/mdm-ss-mgr/init_mss/"
 EXTRA_OECONF += " ${@base_contains('BASEMACHINE', 'apq8009', '--enable-indefinite-sleep', '', d)}"
 EXTRA_OECONF += " ${@base_contains('BASEMACHINE', 'apq8017', '--enable-indefinite-sleep', '', d)}"
@@ -18,20 +20,17 @@ EXTRA_OECONF += " ${@base_contains('BASEMACHINE', 'apq8053', '--enable-indefinit
 EXTRA_OECONF += " ${@base_contains('BASEMACHINE', 'apq8096', '--enable-indefinite-sleep', '', d)}"
 
 CFLAGS += "-DSLEEP_INDEFINITE"
+CFLAGS += "-lsystemd"
 
-FILES_${PN} += "${systemd_unitdir}/system/"
-
-INITSCRIPT_NAME = "init_sys_mss"
-INITSCRIPT_PARAMS = "start 38 2 3 4 5 ."
+SYSTEMD_SERVICE_${PN} = "init_sys_mss.service"
+SYSTEMD_AUTO_ENABLE_${PN} = "enable"
 
 do_install() {
     install -m 0755 ${S}/init_mss -D ${D}/sbin/init_mss
-    install -m 0755 ${S}/start_mss -D ${D}${sysconfdir}/init.d/init_sys_mss
-    if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
-        install -d ${D}${systemd_unitdir}/system/
-        install -d ${D}${systemd_unitdir}/system/multi-user.target.wants/
-        install -m 0644 ${WORKDIR}/init_sys_mss.service -D ${D}${systemd_unitdir}/system/init_sys_mss.service
-        ln -sf ${systemd_unitdir}/system/init_sys_mss.service \
-            ${D}${systemd_unitdir}/system/multi-user.target.wants/init_sys_mss.service
-    fi
+    install -d ${D}${systemd_unitdir}/system/
+    install -m 0644 ${WORKDIR}/init_sys_mss.service -D ${D}${systemd_unitdir}/system/init_sys_mss.service
+
 }
+
+FILES_${PN} += "${systemd_unitdir}/system/"
+
