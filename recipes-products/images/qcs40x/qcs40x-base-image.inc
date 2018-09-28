@@ -16,15 +16,15 @@ IMAGE_INSTALL += "system-core-logd"
 IMAGE_INSTALL += "system-core-leprop"
 IMAGE_INSTALL += "system-core-usb"
 IMAGE_INSTALL += "system-core-post-boot"
-#IMAGE_INSTALL += "system-conf"
-#IMAGE_INSTALL += "system-prop"
+IMAGE_INSTALL += "system-conf"
+IMAGE_INSTALL += "system-prop"
 IMAGE_INSTALL += "wireless-tools"
 IMAGE_INSTALL +="${@bb.utils.contains('DISTRO_FEATURES', 'nand-boot', 'mtd-utils-ubifs', '', d)}"
 
 # The MSM Linux minimal boot image files.
 #IMAGE_INSTALL += "gdbserver"
 #IMAGE_INSTALL += "gdb"
-#IMAGE_INSTALL += "iw"
+IMAGE_INSTALL += "iw"
 IMAGE_INSTALL += "kernel-modules"
 IMAGE_INSTALL += "libnl"
 IMAGE_INSTALL += "libstdc++"
@@ -34,13 +34,17 @@ IMAGE_INSTALL += "powerapp"
 IMAGE_INSTALL += "powerapp-powerconfig"
 IMAGE_INSTALL += "powerapp-reboot"
 IMAGE_INSTALL += "powerapp-shutdown"
-IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'nand-boot', 'start-scripts-find-partitions', '', d)}"
 IMAGE_INSTALL += "start-scripts-firmware-links"
 IMAGE_INSTALL += "systemd-coredump"
+IMAGE_INSTALL += "coreutils"
+IMAGE_EXT4_SELINUX_OPTIONS = "${@bb.utils.contains('DISTRO_FEATURES','selinux',' -S ${SELINUX_FILE_CONTEXTS} ','',d)}"
+
+IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'start-script-ab-slot-util', '', d)}"
+IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'abctl', '', d)}"
 
 do_makesystem() {
     if ${@bb.utils.contains('DISTRO_FEATURES','nand-boot','false','true',d)}; then
-     make_ext4fs -a /systemrw ${IMAGE_EXT4_SELINUX_OPTIONS}  -l ${SYSTEM_SIZE_EXT4} ${DEPLOY_DIR_IMAGE}/${SYSTEMIMAGE_TARGET} ${IMAGE_ROOTFS}
-     make_ext4fs -l ${SYSTEMRW_SIZE_EXT4} ${DEPLOY_DIR_IMAGE}/${SYSTEMRWIMAGE_TARGET}
+     make_ext4fs -s -a / ${IMAGE_EXT4_SELINUX_OPTIONS} -l ${SYSTEM_SIZE_EXT4} ${DEPLOY_DIR_IMAGE}/${SYSTEMIMAGE_TARGET} ${IMAGE_ROOTFS}
+     make_ext4fs -s -a /systemrw ${IMAGE_EXT4_SELINUX_OPTIONS} -b 4096 -l ${SYSTEMRW_SIZE_EXT4} ${DEPLOY_DIR_IMAGE}/${SYSTEMRWIMAGE_TARGET}
     fi
 }
