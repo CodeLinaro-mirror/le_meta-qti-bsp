@@ -16,6 +16,7 @@ IMAGE_INSTALL += "start-script-ab-slot-util"
 
 IMAGE_INSTALL += "base-files"
 IMAGE_INSTALL += "base-passwd"
+IMAGE_INSTALL += "openssl"
 IMAGE_INSTALL += "glib-2.0"
 IMAGE_INSTALL += "libcutils"
 IMAGE_INSTALL += "liblog"
@@ -45,6 +46,8 @@ IMAGE_INSTALL += "media-headers"
 IMAGE_INSTALL += "protobuf"
 IMAGE_INSTALL += "sigma-dut"
 IMAGE_INSTALL += "sec-config"
+
+IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'full-disk-encryption', 'libscrypt', '', d)}"
 
 # Below is to generate sparse ext4 system image (OE by default supports raw ext4 images)
 do_makesystem() {

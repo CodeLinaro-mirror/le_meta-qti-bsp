@@ -43,8 +43,9 @@ do_fix_sepolicies () {
         sed -i "s#,context=system_u:object_r:firmware_t:s0##g" ${WORKDIR}/systemd/firmware-mount.service
         sed -i "s#,rootcontext=system_u:object_r:var_t:s0##g"  ${WORKDIR}/systemd/var-volatile.mount
         sed -i "s#,rootcontext=system_u:object_r:system_data_t:s0##g"  ${WORKDIR}/systemd/systemrw.mount
+    if ${@bb.utils.contains("DISTRO_FEATURES", "full-disk-encryption",'false', 'true', d)}; then
         sed -i "s#,rootcontext=system_u:object_r:data_t:s0##g"  ${WORKDIR}/systemd/data.mount
-
+    fi
         # Remove selinux entries from fstab
         #For /run
         sed -i "s#,rootcontext=system_u:object_r:var_run_t:s0##g" ${WORKDIR}/fstab
@@ -81,12 +82,14 @@ do_install_append_msm() {
         install -d 0644 ${D}${sysconfdir}/systemd/system
         install -d 0644 ${D}${sysconfdir}/systemd/system/local-fs.target.requires
         # userdata is present by default.
-        if ${@bb.utils.contains('DISTRO_FEATURES','nand-boot','false','true',d)}; then
-        install -m 0644 ${WORKDIR}/systemd/data.mount ${D}${sysconfdir}/systemd/system/data.mount
-        else
-        install -m 0644 ${WORKDIR}/systemd/data-ubi.mount ${D}${sysconfdir}/systemd/system/data.mount
+        if ${@bb.utils.contains("DISTRO_FEATURES", "full-disk-encryption",'false', 'true', d)}; then
+            if ${@bb.utils.contains('DISTRO_FEATURES','nand-boot','false','true',d)}; then
+                install -m 0644 ${WORKDIR}/systemd/data.mount ${D}${sysconfdir}/systemd/system/data.mount
+            else
+                install -m 0644 ${WORKDIR}/systemd/data-ubi.mount ${D}${sysconfdir}/systemd/system/data.mount
+            fi
+            ln -sf  ../data.mount  ${D}${sysconfdir}/systemd/system/local-fs.target.requires/data.mount
         fi
-        ln -sf  ../data.mount  ${D}${sysconfdir}/systemd/system/local-fs.target.requires/data.mount
         for d in ${dirs755}; do
             if [ "$d" == "/cache" ]; then
                 if ${@bb.utils.contains('DISTRO_FEATURES','nand-boot','false','true',d)}; then
