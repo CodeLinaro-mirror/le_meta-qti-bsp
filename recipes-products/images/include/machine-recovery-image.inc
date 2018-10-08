@@ -50,8 +50,7 @@ SELINUX_FILE_CONTEXTS = "${IMAGE_ROOTFS}/etc/selinux/mls/contexts/files/file_con
 
 # Below is to generate sparse ext4 recovery image (OE by default supports raw ext4 images)
 do_makesystem() {
-    if [ "${MACHINE}" != "mdm9607" ] && [ "${MACHINE}" != "mdm9650" ] && [ "${MACHINE}" != "mdm9650-2k" ]; then
-
+    if ${@bb.utils.contains('IMAGE_FSTYPES', 'ext4', 'true', 'false', d)}; then
         # SELinux feature is enabled
         if [[ "${DISTRO_FEATURES}" =~ "selinux" ]]; then
             make_ext4fs -s -a / -S ${SELINUX_FILE_CONTEXTS} -l ${RECOVERYFS_SIZE_EXT4} ${DEPLOY_DIR_IMAGE}/${MACHINE}-recovery.ext4 ${IMAGE_ROOTFS}
