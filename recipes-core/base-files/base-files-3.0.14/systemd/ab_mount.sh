@@ -29,4 +29,20 @@
 suffix=$(getslotsuffix)
 partition=$3${suffix}
 
+count=0
+while [ ! -h "$partition" ]; do
+   sleep 0.1
+   # wait 10s for file
+   count=$(( $count + 1 ))
+   if [ $count -ge 100 ]; then
+     echo "[ERROR] Can not find the"$partition
+     exit 1
+   fi
+done
+
 mount -o $1 -t $2 $partition $4
+result=$?
+if [ 0 -ne $result ];then
+   sleep 2
+   mount -o $1 -t $2 $partition $4
+fi
