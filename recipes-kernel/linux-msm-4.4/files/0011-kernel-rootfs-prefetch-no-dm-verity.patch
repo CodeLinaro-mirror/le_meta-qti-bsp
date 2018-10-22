@@ -1,6 +1,6 @@
-From 58956cc1ef7d1b73a4ed4ef06b87844bca1a829a Mon Sep 17 00:00:00 2001
+From 29b2093462adde58e7b736ddcc2c220647abde3e Mon Sep 17 00:00:00 2001
 From: Jiacheng Zheng <jiaczhen@codeaurora.org>
-Date: Fri, 10 Aug 2018 11:56:10 +0800
+Date: Mon, 22 Oct 2018 13:54:37 +0800
 Subject: [PATCH] kernel rootfs prefetch no dm verity
 
 Put forward in time the mounting of rootfs and
@@ -16,12 +16,13 @@ Signed-off-by: Jiacheng Zheng <jiaczhen@codeaurora.org>
  drivers/md/dm.c               |  2 +-
  drivers/mmc/card/block.c      |  4 +++
  drivers/scsi/scsi.c           |  3 ++
+ fs/ramfs/inode.c              |  2 +-
  init/Makefile                 |  2 ++
- init/do_mounts.c              | 36 ++++++++++++--------
- init/initramfs.c              |  4 +--
+ init/do_mounts.c              | 51 +++++++++++++++++++---------
+ init/initramfs.c              |  6 ++--
  init/prefetch_rootfs.c        | 79 +++++++++++++++++++++++++++++++++++++++++++
  init/prefetch_rootfs.h        | 16 +++++++++
- 10 files changed, 131 insertions(+), 19 deletions(-)
+ 11 files changed, 147 insertions(+), 22 deletions(-)
  create mode 100644 init/prefetch_rootfs.c
  create mode 100644 init/prefetch_rootfs.h
 
@@ -99,6 +100,16 @@ index 53680ea..6688eea 100644
  subsys_initcall(init_scsi);
 +subsys_initcall(rootfs_prefetch_wq);
  module_exit(exit_scsi);
+diff --git a/fs/ramfs/inode.c b/fs/ramfs/inode.c
+index 889d558..892521b 100644
+--- a/fs/ramfs/inode.c
++++ b/fs/ramfs/inode.c
+@@ -263,4 +263,4 @@ int __init init_ramfs_fs(void)
+ 		return 0;
+ 	return register_filesystem(&ramfs_fs_type);
+ }
+-fs_initcall(init_ramfs_fs);
++subsys_initcall(init_ramfs_fs);
 diff --git a/init/Makefile b/init/Makefile
 index e96f022..b6b6d57 100644
 --- a/init/Makefile
@@ -113,31 +124,45 @@ index e96f022..b6b6d57 100644
  mounts-$(CONFIG_BLK_DEV_RAM)	+= do_mounts_rd.o
  mounts-$(CONFIG_BLK_DEV_INITRD)	+= do_mounts_initrd.o
 diff --git a/init/do_mounts.c b/init/do_mounts.c
-index 333cc2e..25ae472 100644
+index 333cc2e..5917863 100644
 --- a/init/do_mounts.c
 +++ b/init/do_mounts.c
-@@ -572,19 +572,7 @@ void __init prepare_namespace(void)
+@@ -547,6 +547,7 @@ void __init mount_root(void)
+ #endif
+ }
+ 
++extern int early_initrd;
+ /*
+  * Prepare the namespace - decide what/where to mount, load ramdisks, etc.
+  */
+@@ -572,23 +573,13 @@ void __init prepare_namespace(void)
  
  	md_run_setup();
  	dm_run_setup();
 -	dm_verity_setup();
--
++	//dm_verity_setup();
+ 
 -	if (saved_root_name[0]) {
 -		root_device_name = saved_root_name;
 -		if (!strncmp(root_device_name, "mtd", 3) ||
 -		    !strncmp(root_device_name, "ubi", 3)) {
 -			mount_block_root(root_device_name, root_mountflags);
--			goto out;
++	if (!early_initrd) {
++		if (initrd_load())
+ 			goto out;
 -		}
 -		ROOT_DEV = name_to_dev_t(root_device_name);
 -		if (strncmp(root_device_name, "/dev/", 5) == 0)
 -			root_device_name += 5;
--	}
-+	//dm_verity_setup();
+ 	}
  
- 	if (initrd_load())
- 		goto out;
-@@ -604,9 +592,29 @@ void __init prepare_namespace(void)
+-	if (initrd_load())
+-		goto out;
+-
+ 	/* wait for any asynchronous scanning to complete */
+ 	if ((ROOT_DEV == 0) && root_wait) {
+ 		printk(KERN_INFO "Waiting for root device %s...\n",
+@@ -604,11 +595,39 @@ void __init prepare_namespace(void)
  	if (is_floppy && rd_doload && rd_load_disk(0))
  		ROOT_DEV = Root_RAM0;
  
@@ -145,8 +170,12 @@ index 333cc2e..25ae472 100644
 +	//mount_root();
  out:
  	devtmpfs_mount("dev");
-+	//sys_mount(".", "/", NULL, MS_MOVE, NULL);
-+	//sys_chroot(".");
+-	sys_mount(".", "/", NULL, MS_MOVE, NULL);
+-	sys_chroot(".");
++	if (early_initrd) {
++		sys_mount(".", "/", NULL, MS_MOVE, NULL);
++		sys_chroot(".");
++	}
 +}
 +
 +void __init pre_prepare_namespace(void)
@@ -163,25 +192,42 @@ index 333cc2e..25ae472 100644
 +		if (strncmp(root_device_name, "/dev/", 5) == 0)
 +			root_device_name += 5;
 +	}
++	if (early_initrd) {
++		if (initrd_load())
++			goto out;
++	}
 +	mount_root();
 +out:
- 	sys_mount(".", "/", NULL, MS_MOVE, NULL);
- 	sys_chroot(".");
++	if (!early_initrd) {
++		sys_mount(".", "/", NULL, MS_MOVE, NULL);
++		sys_chroot(".");
++	}
  }
+ 
+ static bool is_tmpfs;
 diff --git a/init/initramfs.c b/init/initramfs.c
-index 5205916..6b1d7e2 100644
+index 5205916..83db993 100644
 --- a/init/initramfs.c
 +++ b/init/initramfs.c
-@@ -617,7 +617,7 @@ static int __init skip_initramfs_param(char *str)
+@@ -617,7 +617,8 @@ static int __init skip_initramfs_param(char *str)
  }
  __setup("skip_initramfs", skip_initramfs_param);
  
 -static int __init populate_rootfs(void)
++int early_initrd = 0;
 +int __init populate_rootfs(void)
  {
  	char *err;
  
-@@ -675,4 +675,4 @@ static int __init populate_rootfs(void)
+@@ -634,6 +635,7 @@ static int __init populate_rootfs(void)
+ #ifdef CONFIG_BLK_DEV_RAM
+ 		int fd;
+ 		printk(KERN_INFO "Trying to unpack rootfs image as initramfs...\n");
++		early_initrd = 1;
+ 		err = unpack_to_rootfs((char *)initrd_start,
+ 			initrd_end - initrd_start);
+ 		if (!err) {
+@@ -675,4 +677,4 @@ static int __init populate_rootfs(void)
  	}
  	return 0;
  }
