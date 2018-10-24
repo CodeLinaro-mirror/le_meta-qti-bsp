@@ -16,6 +16,10 @@ RDEPENDS_${PN} = " \
         gstreamer1.0-libav \
         gstreamer1.0-omx \
         gstreamer1.0-plugins-ugly \
+        gdk-pixbuf-loader-bmp \
+        gdk-pixbuf-loader-gif \
+        gdk-pixbuf-loader-tiff \
+        alsa-lib \
         alsa-utils \
         alsa-plugins \
 "
@@ -26,3 +30,6 @@ RDEPENDS_${PN} = " \
 RDEPENDS_${PN}_remove_8x96autodvrs += "alsa-lib alsa-utils alsa-plugins"
 # Disable gstreamer1.0-omx until solve media build issue.
 RDEPENDS_${PN}_remove_8x96autodvrs += "gstreamer1.0-omx"
+RDEPENDS_${PN}_remove_8x96auto += "alsa-lib"
+RDEPENDS_${PN}_remove_8x96autogvmgh += "alsa-lib"
+RDEPENDS_${PN}_remove_8x96autogvmga += "alsa-lib"
