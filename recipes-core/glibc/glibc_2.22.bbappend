@@ -11,4 +11,9 @@ def fix_optimization(d):
 SELECTED_OPTIMIZATION := "${@fix_optimization(d)}"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
-SRC_URI += " file://0001-Adding-support-to-dlopen-library-from-memory.patch "
+SRC_URI += " \
+	file://0001-Adding-support-to-dlopen-library-from-memory.patch \
+	file://CVE-2017-15804.patch \
+	file://CVE-2017-15670.patch \
+	file://CVE-2017-1000366.patch \
+"
