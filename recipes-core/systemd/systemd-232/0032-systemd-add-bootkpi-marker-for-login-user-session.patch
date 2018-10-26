@@ -1,64 +1,58 @@
-From 0352117d4d12d5dbf44da7205666ab5602994a7c Mon Sep 17 00:00:00 2001
+From 38b1f9ba5874777ba710315be683c6889949b813 Mon Sep 17 00:00:00 2001
 From: Lei wang <leiwan@codeaurora.org>
-Date: Fri, 23 Jun 2017 16:41:07 +0800
-Subject: [PATCH] systemd: add bootkpi marker for login/user-session
+Date: Mon, 7 May 2018 20:06:06 +0800
+Subject: [PATCH] systemd: add bootkpi marker for user session
 
-Change-Id: I3d20a42d22d4ca1e9e566b85ef2aeff197cf5e84
+Change-Id: I67a26acf7e0014ed0f8d19813ed0bba988b18dc6
 Signed-off-by: Lei wang <leiwan@codeaurora.org>
 ---
- src/core/job.c | 47 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 47 insertions(+)
+ src/core/job.c | 41 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 41 insertions(+)
 
 diff --git a/src/core/job.c b/src/core/job.c
-index ac6910a..7523997 100644
+index ac6910a..dc519ee 100644
 --- a/src/core/job.c
 +++ b/src/core/job.c
-@@ -41,6 +41,37 @@
+@@ -41,6 +41,31 @@
  #include "unit.h"
  #include "virt.h"
  
 +#define KPI_VALUE_PATH "/sys/kernel/debug/bootkpi/kpi_values"
 +
-+#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
-+const static char* bootkpi_unit_list[]= {
-+        "systemd-logind.service",
-+        "systemd-user-sessions.service",
-+        "ofono.service"
++#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0][0]))
++
++static const char* bootkpi_unit_list[][3]= {
++        {"systemd-logind.service", "M - agl system session complete", "M - agl first user logined in"},
++        {"user@",                  "M - agl user session start",      "M - agl user session started"},
++        {"ofono.service",          "M - ofono service start",         "M - ofono service complete"}
 +};
 +
-+static void inline write_marker(const char* name, bool start)
++static inline void write_marker(const char* label)
 +{
 +        int fd = -1;
-+        static char markername[60];
 +
-+        memset(markername, 0,  sizeof(markername));
 +        fd = open(KPI_VALUE_PATH, O_WRONLY);
-+        if (fd > 0)
-+        {
-+                if (start && name)
-+                        snprintf(markername, 50 ,"%s-start", name);
-+                else if (!start && name)
-+                        snprintf(markername, 50 ,"%s-stop", name);
-+                write(fd, markername, strlen(markername));
++        if (fd > 0) {
++                write(fd, label, strlen(label));
++                close(fd);
 +        } else {
 +                log_error("open bootkpi_values failed");
 +        }
 +
-+        close(fd);
 +        return;
 +}
 +
  Job* job_new_raw(Unit *unit) {
          Job *j;
  
-@@ -546,6 +577,14 @@ static int job_perform_on_unit(Job **j) {
+@@ -546,6 +571,14 @@ static int job_perform_on_unit(Job **j) {
                          assert_not_reached("Invalid job type");
          }
  
 +        if (t == JOB_START && u->type == UNIT_SERVICE) {
-+                for (int i = 0; i < ARRAY_SIZE(bootkpi_unit_list); i++) {
-+                        if (strneq(u->id, bootkpi_unit_list[i], strlen(u->id))) {
-+                                write_marker(u->id, true);
++                for (int i = 0; i < (ARRAY_SIZE(bootkpi_unit_list) / 3); i++) {
++                        if (strneq(u->id, bootkpi_unit_list[i][0], strlen(bootkpi_unit_list[i][0]))) {
++                                write_marker(bootkpi_unit_list[i][1]);
 +                        }
 +                }
 +        }
@@ -66,14 +60,14 @@ index ac6910a..7523997 100644
          /* Log if the job still exists and the start/stop/reload function
           * actually did something. */
          *j = manager_get_job(m, id);
-@@ -810,6 +849,14 @@ static void job_emit_status_message(Unit *u, JobType t, JobResult result) {
+@@ -810,6 +843,14 @@ static void job_emit_status_message(Unit *u, JobType t, JobResult result) {
          if (t == JOB_START && result == JOB_DONE && !u->condition_result)
                  return;
  
 +        if (t == JOB_DONE && u->type == UNIT_SERVICE) {
-+                for (int i = 0; i < ARRAY_SIZE(bootkpi_unit_list); i++) {
-+                        if (strneq(u->id, bootkpi_unit_list[i], strlen(u->id))) {
-+                                write_marker(u->id, false);
++                for (int i = 0; i < (ARRAY_SIZE(bootkpi_unit_list) / 3); i++) {
++                        if (strneq(u->id, bootkpi_unit_list[i][0], strlen(bootkpi_unit_list[i][0]))) {
++                                write_marker(bootkpi_unit_list[i][2]);
 +                        }
 +                }
 +        }
