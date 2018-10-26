@@ -13,8 +13,6 @@ DEPENDS += "glib-2.0"
 DEPENDS += "virtual/libc"
 DEPENDS += "libcutils liblog liblog-native system-core"
 DEPENDS += "weston"
-#RDEPENDS_{PN} = "mm-video-prop"
-#INSANE_SKIP = 1
 
 # Need the kernel headers
 PACKAGE_ARCH = "${MACHINE_ARCH}"
@@ -35,6 +33,15 @@ BASEMACHINE = "msm8974"
 EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm8974', ' --enable-target-msm8974=yes', '', d)} "
 EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96autogvmquin', ' --enable-target-hypervisor=yes', '', d)} "
 EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96autogvmred', ' --enable-target-hypervisor=yes', '', d)} "
+EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96autocv2x', ' --enable-target-uses-gbm=yes', '', d)} "
+
+EXTRA_OECONF_append =" --enable-use-glib="yes""
+EXTRA_OECONF_append =" --enable-target-uses-ion="yes""
+EXTRA_OECONF_append =" --enable-target-${SOC_FAMILY}="yes""
+EXTRA_OECONF_append =" --enable-target-uses-media-extensions="no""
+EXTRA_OECONF_append_msm8996 =" --enable-build-mm-video="yes""
+EXTRA_OECONF_append_msm8996 =" --enable-is-ubwc-supported="yes""
+EXTRA_OECONF_append_msm8996 =" --enable-master-side-cp-target-list="yes""
 
 python __anonymous () {
   # add early_init specified patch
@@ -50,7 +57,9 @@ CPPFLAGS += "-I${STAGING_INCDIR} \
              -I${STAGING_LIBDIR}/glib-2.0/include \
              -I${STAGING_LIBDIR}/glib-2.0/glib \
              -I${STAGING_INCDIR}/c++ \
-             -I${STAGING_INCDIR}/c++/${TARGET_SYS}"
+             -I${STAGING_INCDIR}/c++/${TARGET_SYS} \
+             -I${STAGING_INCDIR}/libqdutils \
+	     -I${STAGING_INCDIR}/qcom/display"
 CPPFLAGS += "-include stdint.h"
 
 LDFLAGS += "-lglib-2.0"
