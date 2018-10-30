@@ -18,7 +18,7 @@ SECURITY_CFLAGS_pn-loc-api-v02 = "${SECURITY_PIC_CFLAGS}"
 SECURITY_CFLAGS_pn-loc-ds = "${SECURITY_PIC_CFLAGS}"
 SECURITY_CFLAGS_pn-loc-net-iface = "${SECURITY_PIC_CFLAGS}"
 SECURITY_CFLAGS_pn-location-api = "${SECURITY_PIC_CFLAGS}"
-
+SECURITY_CFLAGS_pn-location-hal-daemon = "${SECURITY_PIC_CFLAGS}"
 
 # packages to use -fPIC in security flags instead of -fpie
 SECURITY_CFLAGS_pn-gtest = "${SECURITY_PIC_CFLAGS}"
