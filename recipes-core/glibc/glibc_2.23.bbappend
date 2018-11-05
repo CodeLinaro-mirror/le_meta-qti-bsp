@@ -4,9 +4,3 @@ do_strip_header_virtclass-multilib-lib32(){
 
 do_strip_header(){
 }
-
-addtask do_strip_header after do_populate_sysroot before do_package
-
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
-
-SRC_URI += "file://0001-Add-IPCR-protocol-family.patch"
