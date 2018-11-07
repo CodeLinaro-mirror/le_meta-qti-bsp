@@ -38,6 +38,12 @@ SRC_URI += "file://init_qti_wlan.service"
 SYSTEMD_SERVICE_${PN} = "init_qti_wlan.service"
 SYSTEMD_AUTO_ENABLE_${PN} = "enable"
 
+do_compile_prepend () {
+    if [ "${MACHINE}" = "8x96autocv2x" ]; then
+        sed -i -e 's/QDF_LOCK_STATS_BUG_ON=1/QDF_LOCK_STATS_BUG_ON=0/g' ${S}/Kbuild
+    fi
+}
+
 do_install () {
     module_do_install
 
