@@ -1,0 +1,62 @@
+From 56a02e140bca1b7bdda652d1718ee9e0280e229d Mon Sep 17 00:00:00 2001
+From: Xianbin Zhu <xianzhu@codeaurora.org>
+Date: Wed, 7 Nov 2018 18:50:48 +0800
+Subject: [PATCH] Booting KPI:Optimize more time-consuming drivers
+
+Backward or asynchronous execution of time-consuming drivers
+
+Change-Id: Iab6201d74c6db53900944eaf23dd8d9caa6744d4
+Signed-off-by: Xianbin Zhu <xianzhu@codeaurora.org>
+---
+ drivers/cpuidle/governors/Makefile        | 2 +-
+ drivers/cpuidle/governors/menu.c          | 2 +-
+ drivers/staging/android/ion/msm/msm_ion.c | 1 +
+ kernel/power/poweroff.c                   | 2 +-
+ 4 files changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/cpuidle/governors/Makefile b/drivers/cpuidle/governors/Makefile
+index 1b51272..316cf21 100644
+--- a/drivers/cpuidle/governors/Makefile
++++ b/drivers/cpuidle/governors/Makefile
+@@ -2,5 +2,5 @@
+ # Makefile for cpuidle governors.
+ #
+ 
+-obj-$(CONFIG_CPU_IDLE_GOV_LADDER) += ladder.o
++#obj-$(CONFIG_CPU_IDLE_GOV_LADDER) += ladder.o
+ obj-$(CONFIG_CPU_IDLE_GOV_MENU) += menu.o
+diff --git a/drivers/cpuidle/governors/menu.c b/drivers/cpuidle/governors/menu.c
+index 0846b39..304fdbb 100644
+--- a/drivers/cpuidle/governors/menu.c
++++ b/drivers/cpuidle/governors/menu.c
+@@ -486,4 +486,4 @@ static int __init init_menu(void)
+ 	return cpuidle_register_governor(&menu_governor);
+ }
+ 
+-postcore_initcall(init_menu);
++late_initcall(init_menu);
+diff --git a/drivers/staging/android/ion/msm/msm_ion.c b/drivers/staging/android/ion/msm/msm_ion.c
+index 116a6fe..c8aae30 100644
+--- a/drivers/staging/android/ion/msm/msm_ion.c
++++ b/drivers/staging/android/ion/msm/msm_ion.c
+@@ -1135,6 +1135,7 @@ static struct platform_driver msm_ion_driver = {
+ 	.driver = {
+ 		.name = "ion-msm",
+ 		.of_match_table = msm_ion_match_table,
++		.probe_type = PROBE_PREFER_ASYNCHRONOUS,
+ 	},
+ };
+ 
+diff --git a/kernel/power/poweroff.c b/kernel/power/poweroff.c
+index 7ef6866..e5422b8 100644
+--- a/kernel/power/poweroff.c
++++ b/kernel/power/poweroff.c
+@@ -43,4 +43,4 @@ static int __init pm_sysrq_init(void)
+ 	return 0;
+ }
+ 
+-subsys_initcall(pm_sysrq_init);
++late_initcall(pm_sysrq_init);
+-- 
+1.9.1
+

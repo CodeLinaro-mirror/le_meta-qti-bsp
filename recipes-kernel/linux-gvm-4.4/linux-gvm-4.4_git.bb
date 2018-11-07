@@ -29,6 +29,7 @@ python __anonymous () {
       d.appendVar("SRC_URI", " file://0004-kernel-display-support-early-init.patch")
       d.appendVar("SRC_URI", " file://0001-Booting-KPI-enable-early-touchscreen.patch")
       d.appendVar("SRC_URI", " file://0001-Booting-KPI-add-memory-hotplug-function.patch");
+      d.appendVar("SRC_URI", " file://0001-Booting-KPI-Optimize-more-time-consuming-drivers.patch");
 
   # Override KERNEL_IMAGETYPE_FOR_MAKE variable, which is internal
   # to kernel.bbclass. We override the variable as msm kernel can't
