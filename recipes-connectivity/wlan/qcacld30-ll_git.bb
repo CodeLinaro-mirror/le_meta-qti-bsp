@@ -52,6 +52,7 @@ do_install () {
 
     if [ "${MACHINE}" = "8x96autocv2x" ]; then
         sed -i -e 's/BandCapability=0/BandCapability=1/g' ${WORKDIR}/device/qcom/wlan/romelv/WCNSS_qcom_cfg.ini
+        sed -i 's/^END/fw_timeout_crash=0\nEND/g' ${WORKDIR}/device/qcom/wlan/romelv/WCNSS_qcom_cfg.ini
     fi
 
     install -d ${D}/lib/firmware/wlan/qca_cld
