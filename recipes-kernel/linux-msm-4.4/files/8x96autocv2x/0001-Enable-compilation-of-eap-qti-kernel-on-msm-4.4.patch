@@ -1,4 +1,4 @@
-From ba26174eac18bf971d63d99175c9c8f62424b815 Mon Sep 17 00:00:00 2001
+From 5d48a6f147bff0f189953aef04551bb9230a98a4 Mon Sep 17 00:00:00 2001
 From: Gustavo Solaira <gustavos@codeaurora.org>
 Date: Tue, 21 Aug 2018 22:07:58 -0700
 Subject: [PATCH] Enable compilation of eap-qti-kernel on msm-4.4
@@ -9,10 +9,27 @@ the EAP add-on package for kernel.
 Change-Id: I68732c61f609d5420aa2c30524f3f20b9b5fea08
 Signed-off-by: Gustavo Solaira <gustavos@codeaurora.org>
 ---
+ drivers/net/usb/usbnet.c        |  5 ++++-
  include/linux/mod_devicetable.h | 13 +++++++++++++
  include/linux/socket.h          |  4 +++-
- 2 files changed, 16 insertions(+), 1 deletion(-)
+ 3 files changed, 20 insertions(+), 2 deletions(-)
 
+diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
+index c0bcfa9..4f08426 100644
+--- a/drivers/net/usb/usbnet.c
++++ b/drivers/net/usb/usbnet.c
+@@ -323,7 +323,10 @@ void usbnet_skb_return (struct usbnet *dev, struct sk_buff *skb)
+ 		return;
+ 	}
+ 
+-	skb->protocol = eth_type_trans (skb, dev->net);
++	/* only update if unset to allow minidriver rx_fixup override */
++	if (skb->protocol == 0)
++		skb->protocol = eth_type_trans (skb, dev->net);
++
+ 	dev->net->stats.rx_packets++;
+ 	dev->net->stats.rx_bytes += skb->len;
+ 
 diff --git a/include/linux/mod_devicetable.h b/include/linux/mod_devicetable.h
 index f534982..f02eb5d 100644
 --- a/include/linux/mod_devicetable.h
