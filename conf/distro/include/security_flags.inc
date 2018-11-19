@@ -22,3 +22,7 @@ SECURITY_CFLAGS_pn-system-core = "${SECURITY_PIC_CFLAGS}"
 # libbinder to use -fPIC in security flags instead of -fpie
 SECURITY_CFLAGS_pn-native-frameworks  = "${SECURITY_PIC_CFLAGS}"
 
+# GPS OSS packages to use -fPIC in security flags instead of -fpie
+# GPS OSS packages
+SECURITY_CFLAGS_pn-loc-pla = "${SECURITY_PIC_CFLAGS}"
+SECURITY_CFLAGS_pn-gps-utils = "${SECURITY_PIC_CFLAGS}"
