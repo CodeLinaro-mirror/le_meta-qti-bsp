@@ -15,7 +15,7 @@ python __anonymous () {
          d.setVar('WLAN_MODULE_NAME', 'wlan_sdio')
          d.setVar('CHIP_NAME', 'qca9377')
      else:
-         d.setVar('WLAN_MODULE_NAME', 'wlan')
+         d.setVar('WLAN_MODULE_NAME', 'wlan_sdio')
          d.setVar('CHIP_NAME', '')
 }
 
@@ -63,7 +63,7 @@ do_install () {
     #copying wlan.ko to STAGING_DIR_TARGET
     WLAN_KO=${@base_conditional('PERF_BUILD', '1', '${STAGING_DIR_TARGET}-perf', '${STAGING_DIR_TARGET}', d)}
     install -d ${WLAN_KO}/wlan
-    install -m 0644 ${S}/wlan.ko ${WLAN_KO}/wlan/
+    install -m 0644 ${S}/${WLAN_MODULE_NAME}.ko ${WLAN_KO}/wlan/
 }
 
 do_module_signing() {
