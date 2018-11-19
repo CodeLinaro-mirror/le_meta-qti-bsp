@@ -34,11 +34,6 @@ IMAGE_INSTALL += "gstreamer1.0-plugins-base"
 IMAGE_INSTALL += "gstreamer1.0-plugins-good"
 IMAGE_INSTALL += "gstreamer1.0-plugins-ugly"
 
-IMAGE_INSTALL += "gps-utils"
-IMAGE_INSTALL += "loc-hal"
-IMAGE_INSTALL += "loc-pla"
-IMAGE_INSTALL += "loc-stub"
-
 IMAGE_ROOTFS_SIZE = "2097152"
 IMAGE_ROOTFS_EXTRA_SPACE_append = "${@bb.utils.contains("DISTRO_FEATURES", "systemd", " + 4096", "" ,d)}"
 
