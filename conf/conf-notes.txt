@@ -29,6 +29,9 @@ Supported combinations are listed below.
       |sdxpoorwills   |                | debug perf       |
       +---------------+----------------+------------------+
       |sa8155         | automotive     | debug perf       |
+      |sa8155qdrive   |                |                  |
+      +---------------+----------------+------------------+
+      |sdmsteppe      | concam         | debug perf user  |
       +---------------+----------------+------------------+
 
 Once ready run 'bitbake <pkg-name>' to build required package or

@@ -36,17 +36,22 @@ IMAGE_INSTALL += "abctl"
 IMAGE_INSTALL += "libhardware"
 IMAGE_INSTALL += "binder"
 IMAGE_INSTALL += "kernel-modules"
-IMAGE_INSTALL += "ffmpeg"
 IMAGE_INSTALL += "av-frameworks"
 IMAGE_INSTALL += "libstdc++"
 IMAGE_INSTALL += "coreutils"
 IMAGE_INSTALL += "media-headers"
 IMAGE_INSTALL += "protobuf"
+IMAGE_INSTALL += "kptr-restrict"
 
 IMAGE_INSTALL += "${@bb.utils.contains('MULTILIB_VARIANTS', 'lib32', 'lib32-live555-qti', 'live555-qti', d)}"
 
+#Install virtualization support packages
+IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'virtualization', 'docker docker-registry python3-docker-compose', '', d)}"
+IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'virtualization', 'cgroup-lite aufs-util xz ca-certificates chrony', '', d)}"
+
 # Below is to generate sparse ext4 system image (OE by default supports raw ext4 images)
 do_makesystem() {
-    make_ext4fs ${IMAGE_EXT4_EXTRA_OPTIONS} -s ${IMAGE_EXT4_SELINUX_OPTIONS} -l ${SYSTEM_SIZE_EXT4} ${DEPLOY_DIR_IMAGE}/${SYSTEMIMAGE_TARGET} ${IMAGE_ROOTFS}
+    cp ${THISDIR}/${BASEMACHINE}/qcs605-fsconfig.conf ${WORKDIR}/rootfs-fsconfig.conf
+    make_ext4fs -C ${WORKDIR}/rootfs-fsconfig.conf ${IMAGE_EXT4_EXTRA_OPTIONS} -s -a / ${IMAGE_EXT4_SELINUX_OPTIONS} -l ${SYSTEM_SIZE_EXT4} ${DEPLOY_DIR_IMAGE}/${SYSTEMIMAGE_TARGET} ${IMAGE_ROOTFS}
     make_ext4fs -a /systemrw ${IMAGE_EXT4_SELINUX_OPTIONS} -l ${SYSTEMRW_SIZE_EXT4} ${DEPLOY_DIR_IMAGE}/${SYSTEMRWIMAGE_TARGET}
 }
