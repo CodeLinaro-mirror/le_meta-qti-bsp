@@ -22,7 +22,7 @@ SRC_URI += "\
             file://fix-mdev-crash.patch \
 "
 SRC_URI_append_apq8053 += "file://apq8053/mdev.conf"
-SRC_URI_append_mdm9650 += "file://ifup-mhi-net.sh"
+SRC_URI_append_mdm9650 += "file://ifup.sh"
 
 prefix = ""
 
@@ -51,7 +51,7 @@ do_install_append() {
      install -m 0644 ${WORKDIR}/apq8053/mdev.conf ${D}${sysconfdir}/
     fi
     if [ ${BASEMACHINE} == "mdm9650" ]; then
-        install -m 0755 ${WORKDIR}/ifup-mhi-net.sh ${D}${sysconfdir}/mdev/
+        install -m 0755 ${WORKDIR}/ifup.sh ${D}${sysconfdir}/mdev/
     fi
     chmod -R go-x ${D}${sysconfdir}/mdev/
     mkdir -p ${D}/usr/bin
