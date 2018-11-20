@@ -1,14 +1,17 @@
 DEPENDS += "${@["","machine-recovery-image releasetools-native"][(d.getVar('RECOVERY_IMAGE', True) == '1')]}"
+DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES','ab-boot-support','releasetools-native','',d)}"
 
 # Add tasks to generate recovery image, OTA zip files
 python __anonymous () {
-    if d.getVar('RECOVERY_IMAGE', True) == '1' and bb.utils.contains('IMAGE_FSTYPES', 'ext4', True, False, d):
-        bb.build.addtask('do_recovery_ext4', 'do_build', 'do_makesystem', d)
-        bb.build.addtask('do_gen_otazip_ext4', 'do_build', 'do_recovery_ext4', d)
+    if bb.utils.contains('IMAGE_FSTYPES', 'ext4', True, False, d):
+        if d.getVar('RECOVERY_IMAGE', True) == '1' or bb.utils.contains('DISTRO_FEATURES','ab-boot-support','true','false',d):
+            bb.build.addtask('do_recovery_ext4', 'do_build', 'do_makesystem', d)
+            bb.build.addtask('do_gen_otazip_ext4', 'do_build', 'do_recovery_ext4', d)
 }
 
 OTA_TARGET_IMAGE_ROOTFS_EXT4 = "${IMAGE_ROOTFS}/../${MACHINE}-ota-target-image-ext4"
 RECOVERY_IMAGE_ROOTFS        = "$(echo ${IMAGE_ROOTFS} | sed 's#${PN}#machine-recovery-image#')"
+HAVE_RECOVERY_IMAGE = "${@d.getVar('RECOVERY_IMAGE', True)}"
 
 #Create directory structure for targetfiles.zip
 do_recovery_ext4[cleandirs] += "${OTA_TARGET_IMAGE_ROOTFS_EXT4}"
@@ -27,7 +30,7 @@ do_recovery_ext4[cleandirs] += "${OTA_TARGET_IMAGE_ROOTFS_EXT4}/BOOT/RAMDISK"
 
 # recovery rootfs is required for generating OTA files.
 # Wait till all tasks of machine-recovery-image complete.
-do_recovery_ext4[depends] += "machine-recovery-image:do_build"
+do_recovery_ext4[depends] += "${@["","machine-recovery-image:do_build"][(d.getVar('RECOVERY_IMAGE', True) == '1')]}"
 
 do_recovery_ext4() {
     echo "base image rootfs: ${IMAGE_ROOTFS}"
@@ -38,11 +41,14 @@ do_recovery_ext4() {
 
     # copy the boot\recovery images
     cp ${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET} ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/BOOTABLE_IMAGES/boot.img
-
-    cp ${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET}   ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/BOOTABLE_IMAGES/recovery.img
-    cp ${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET}   ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/IMAGES/recovery.img
     cp ${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET}   ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/IMAGES/boot.img
     cp ${DEPLOY_DIR_IMAGE}/${SYSTEMIMAGE_TARGET} ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/IMAGES/system.img
+
+    if [ ${HAVE_RECOVERY_IMAGE} == '1' ]; then
+        cp ${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET}   ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/BOOTABLE_IMAGES/recovery.img
+        cp ${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET}   ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/IMAGES/recovery.img
+    fi
+
     if [ -e ${DEPLOY_DIR_IMAGE}/system.map ]; then
        cp ${DEPLOY_DIR_IMAGE}/system.map ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/IMAGES/system.map
     fi
@@ -53,27 +59,33 @@ do_recovery_ext4() {
     rm -rf var/run
     ln -snf ../run var/run
 
-    #copy contents of recovery rootfs
-    cp -r ${RECOVERY_IMAGE_ROOTFS}/. ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/.
+    #Getting content for OTA folder
+    mkdir -p ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/OTA/bin
+    if [ ${HAVE_RECOVERY_IMAGE} == '1' ]; then
+        #copy contents of recovery rootfs
+        cp -r ${RECOVERY_IMAGE_ROOTFS}/. ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/.
+        cp   ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/usr/bin/applypatch ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/OTA/bin/.
+        cp   ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/usr/bin/updater ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/OTA/bin/.
+    else
+        cp   ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/SYSTEM/usr/bin/applypatch ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/OTA/bin/.
+        cp   ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/SYSTEM/usr/bin/updater ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/OTA/bin/.
+    fi
 
     #generate recovery.fstab which is used by the updater-script
     #echo #mount point fstype device [device2] >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/recovery.fstab
     echo /boot     emmc  /dev/block/bootdevice/by-name/boot >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/recovery.fstab
     echo /cache    ext4  cache >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/recovery.fstab
     echo /data     ext4  userdata >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/recovery.fstab
-    echo /recovery emmc  /dev/block/bootdevice/by-name/recovery >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/recovery.fstab
     echo /system   ext4  /dev/block/bootdevice/by-name/system >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/recovery.fstab
+    if [ ${HAVE_RECOVERY_IMAGE} == '1' ]; then
+        echo /recovery emmc  /dev/block/bootdevice/by-name/recovery >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/recovery.fstab
+    fi
 
     #Copy contents of userdata rootfs
     if [ -d ${TMPDIR}/rootfs/${MACHINE}-usrfs/ ]; then
        cp -r ${TMPDIR}/rootfs/${MACHINE}-usrfs/. ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/DATA/.
     fi
 
-    #Getting content for OTA folder
-    mkdir -p ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/OTA/bin
-    cp   ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/usr/bin/applypatch ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/OTA/bin/.
-
-    cp   ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/usr/bin/updater ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/OTA/bin/.
 
     # Pack releasetools.py into META folder itself.
     # This could also have been done by passing "--device_specific" to
@@ -109,6 +121,9 @@ do_recovery_ext4() {
 
        #recovery_size : Size of recovery partition from partition.xml
        echo recovery_size=0x04000000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
+    elif [ "${BASEMACHINE}" == "sda845" ]; then
+       #boot_size: Size of boot partition from partition.xml
+       echo boot_size=0x04000000  >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
     else
        #boot_size: Size of boot partition from partition.xml
        echo boot_size=0x00F00000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
@@ -117,14 +132,25 @@ do_recovery_ext4() {
        echo recovery_size=0x00F00000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
     fi
 
-    #system_size : Size of system partition from partition.xml
-    echo system_size=0x00A00000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
+    if [ "${BASEMACHINE}" == "sda845" ] ; then
+        #system_size : Size of system partition from partition.xml
+        echo system_size=0xC0000000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 
-    #userdate_size : Size of data partition from partition.xml
-    echo userdata_size=0x00A00000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
+        #userdate_size : Size of data partition from partition.xml
+        echo userdata_size=0x300000000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 
-    #cache_size : Size of data partition from partition.xml
-    echo cache_size=0x00A00000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
+        #cache_size : Size of data partition from partition.xml
+        echo cache_size=0x8000000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
+    else
+        #system_size : Size of system partition from partition.xml
+        echo system_size=0x00A00000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
+
+        #userdate_size : Size of data partition from partition.xml
+        echo userdata_size=0x00A00000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
+
+        #cache_size : Size of data partition from partition.xml
+        echo cache_size=0x00A00000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
+    fi
 
     #mkyaffs2_extra_flags : -c $(BOARD_KERNEL_PAGESIZE) -s $(BOARD_KERNEL_SPARESIZE)
     echo mkyaffs2_extra_flags=-c 4096 -s 16 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
@@ -151,10 +177,12 @@ do_gen_otazip_ext4() {
 
     cd ${IMAGE_ROOTFS}/../${MACHINE}-ota-target-image-ext4 && /usr/bin/zip -qry ${TMPDIR}/work/x86_64-linux/releasetools-native/1.0-r0/releasetools/target-files-ext4.zip *
 
-    cd ${TMPDIR}/work/x86_64-linux/releasetools-native/1.0-r0/releasetools && zip -qry target-files-ext4.zip BOOTABLE_IMAGES/recovery-unsparsed.ext4
+    if [ ${HAVE_RECOVERY_IMAGE} == '1' ]; then
+        cd ${TMPDIR}/work/x86_64-linux/releasetools-native/1.0-r0/releasetools && zip -qry target-files-ext4.zip BOOTABLE_IMAGES/recovery-unsparsed.ext4
+    fi
 
     block_based=""
-    if [ "${BASEMACHINE}" == "apq8009" ]; then
+    if [ "${BASEMACHINE}" == "apq8009" ] || [ "${BASEMACHINE}" == "sda845" ]; then
         block_based="--block"
     fi
 
