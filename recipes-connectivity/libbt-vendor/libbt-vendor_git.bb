@@ -29,6 +29,7 @@ EXTRA_OECONF = "--with-common-includes="${WORKDIR}/system/bt/hci/include" \
                 --with-lib-path=${STAGING_LIBDIR} \
                 --enable-target=${BASEMACHINE} \
                 --enable-rome=${BASEPRODUCT} \
+                --with-glib=yes \
                "
 
 FILES_${PN} += "${userfsdatadir}/misc/bluetooth/*"
