@@ -11,3 +11,5 @@
 LICENSE = "GPLv2only & LGPLv2.1only"
 LIC_FILES_CHKSUM = "file://Documentation/licenses/COPYING.GPLv2;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
                     file://Documentation/licenses/COPYING.LGPLv2.1;md5=4fbd65380cdd255951079008b364516c"
+
+ALTERNATIVE_${PN}-readprofile_remove_sda845 = "readprofile"
