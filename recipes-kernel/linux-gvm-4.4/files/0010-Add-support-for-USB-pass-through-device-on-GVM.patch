@@ -1,4 +1,4 @@
-From 4f872f84913d08a12567c0e97cb47d35b6e94a04 Mon Sep 17 00:00:00 2001
+From c53d03a9f3b5307937638227045bd6c90c7e1e01 Mon Sep 17 00:00:00 2001
 From: Yimin Peng <yiminp@codeaurora.org>
 Date: Mon, 6 Aug 2018 17:55:45 +0800
 Subject: [PATCH] add support for USB pass through device on GVM
@@ -12,14 +12,15 @@ Signed-off-by: Yimin Peng <yiminp@codeaurora.org>
  arch/arm64/configs/msm-auto-gvm-perf_defconfig     |  55 +++++++++
  arch/arm64/configs/msm-auto-gvm_defconfig          |  55 +++++++++
  drivers/platform/msm/gpio-usbdetect.c              | 133 +++++++++++++--------
+ drivers/usb/dwc3/dwc3-msm.c                        |   5 +
  drivers/usb/phy/phy-msm-ssusb-qmp.c                |  22 +++-
- 7 files changed, 224 insertions(+), 55 deletions(-)
+ 8 files changed, 229 insertions(+), 55 deletions(-)
 
 diff --git a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts
-index 7314af2..a58c0b4 100644
+index 6274d75..772584c 100644
 --- a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts
 +++ b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts
-@@ -142,6 +142,10 @@
+@@ -155,6 +155,10 @@
  
  #include "vplatform-lfv-msm8996-usb.dtsi"
  
@@ -31,10 +32,10 @@ index 7314af2..a58c0b4 100644
  	status = "okay";
  	qcom,no-wakeup-src-in-hostmode;
 diff --git a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-telematics.dts b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-telematics.dts
-index 3902731..4b16b93 100644
+index 9fad271..15463f6 100644
 --- a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-telematics.dts
 +++ b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-telematics.dts
-@@ -238,6 +238,10 @@
+@@ -241,6 +241,10 @@
  
  #include "vplatform-lfv-msm8996-usb.dtsi"
  
@@ -63,7 +64,7 @@ index faaf00b..3da7f38 100644
  		compatible = "qcom,qusb2phy";
  		reg = <0x07411000 0x180>,
 diff --git a/arch/arm64/configs/msm-auto-gvm-perf_defconfig b/arch/arm64/configs/msm-auto-gvm-perf_defconfig
-index dda4a86..6422fb9 100644
+index fb50825..5a57bf0 100644
 --- a/arch/arm64/configs/msm-auto-gvm-perf_defconfig
 +++ b/arch/arm64/configs/msm-auto-gvm-perf_defconfig
 @@ -396,3 +396,58 @@ CONFIG_CRYPTO_MD4=y
@@ -126,7 +127,7 @@ index dda4a86..6422fb9 100644
 +CONFIG_USB_OHCI_HCD_PCI=y
 +CONFIG_DIAG_CHAR=y
 diff --git a/arch/arm64/configs/msm-auto-gvm_defconfig b/arch/arm64/configs/msm-auto-gvm_defconfig
-index 640083b..cf7bd0276 100644
+index bff5700..418dd4c 100644
 --- a/arch/arm64/configs/msm-auto-gvm_defconfig
 +++ b/arch/arm64/configs/msm-auto-gvm_defconfig
 @@ -414,3 +414,58 @@ CONFIG_CRYPTO_MD4=y
@@ -358,6 +359,22 @@ index 9768243..7cddd4c 100644
  
  	return 0;
  
+diff --git a/drivers/usb/dwc3/dwc3-msm.c b/drivers/usb/dwc3/dwc3-msm.c
+index d69c5a3..3c172a6 100644
+--- a/drivers/usb/dwc3/dwc3-msm.c
++++ b/drivers/usb/dwc3/dwc3-msm.c
+@@ -4030,6 +4030,11 @@ static int dwc3_msm_pm_suspend(struct device *dev)
+ 		return -EBUSY;
+ 	}
+ 
++	if (!mdwc->in_host_mode && !atomic_read(&dwc->in_lpm)) {
++		dev_err(mdwc->dev, "Abort PM suspend!! (peripheral mode but outside LPM)\n");
++		return -EBUSY;
++	}
++
+ 	ret = dwc3_msm_suspend(mdwc, false);
+ 	if (ret)
+ 		return ret;
 diff --git a/drivers/usb/phy/phy-msm-ssusb-qmp.c b/drivers/usb/phy/phy-msm-ssusb-qmp.c
 index d1b6f1d..6942882 100644
 --- a/drivers/usb/phy/phy-msm-ssusb-qmp.c
