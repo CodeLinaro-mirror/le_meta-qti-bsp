@@ -37,6 +37,10 @@ do_install_append() {
         install -m 0755 ${WORKDIR}/automountsdcard.sh \
             ${D}${sysconfdir}/udev/scripts/automountsdcard.sh
         install -d ${D}${systemd_unitdir}/system/
+        install -d ${D}${sysconfdir}/initscripts
+        install -m 0755 ${WORKDIR}/syslog ${D}${sysconfdir}/initscripts/syslog
+        install -m 0644 ${WORKDIR}/syslog-startup.conf -D ${D}${sysconfdir}/syslog-startup.conf
+        sed -i "s#init.d#initscripts#g" ${WORKDIR}/busybox-syslog.service
         install -m 0644 ${WORKDIR}/busybox-syslog.service -D ${D}${systemd_unitdir}/system/busybox-syslog.service
         install -d ${D}${systemd_unitdir}/system/multi-user.target.wants/
         # enable the service for multi-user.target
