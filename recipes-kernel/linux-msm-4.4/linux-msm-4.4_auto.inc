@@ -67,7 +67,6 @@ addtask deploy_rename after do_deploy before do_packagedata
 
 FILESEXTRAPATHS_append := ":${WORKSPACE}/kernel"
 SRC_URI += "file://eap-qti-kernel"
-SRC_URI += "file://0001-Enable-compilation-of-eap-qti-kernel-on-msm-4.4.patch"
 
 do_unpack_extra () {
     cp -r ${WORKDIR}/eap-qti-kernel/* ${S}/
