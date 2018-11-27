@@ -40,7 +40,7 @@ do_install_append() {
     # systemd is udev compatible.
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
         install -d ${D}${sysconfdir}/udev/scripts/
-        install -m 0755 ${WORKDIR}/automountsdcard.sh \
+        install -m 0744 ${WORKDIR}/automountsdcard.sh \
             ${D}${sysconfdir}/udev/scripts/automountsdcard.sh
         install -d ${D}${systemd_unitdir}/system/
         install -m 0644 ${WORKDIR}/busybox-syslog.service -D ${D}${systemd_unitdir}/system/busybox-syslog.service
@@ -48,6 +48,10 @@ do_install_append() {
         # enable the service for multi-user.target
         ln -sf ${systemd_unitdir}/system/busybox-syslog.service \
            ${D}${systemd_unitdir}/system/multi-user.target.wants/busybox-syslog.service
+        install -d ${D}${sysconfdir}/initscripts
+        install -m 0755 ${WORKDIR}/syslog ${D}${sysconfdir}/initscripts/syslog
+        sed -i 's/syslogd -- -n/syslogd -n/' ${D}${sysconfdir}/initscripts/syslog
+        sed -i 's/init.d/initscripts/g'  ${D}${systemd_unitdir}/system/busybox-syslog.service
     else
         install -d ${D}${sysconfdir}/mdev
         install -m 0755 ${WORKDIR}/automountsdcard.sh ${D}${sysconfdir}/mdev/
