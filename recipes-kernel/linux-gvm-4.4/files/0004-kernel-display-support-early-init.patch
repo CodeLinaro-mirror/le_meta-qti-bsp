@@ -21,7 +21,7 @@ index ccc2044..760410e 100644
  }
  
 -module_init(drm_core_init);
-+fs_initcall(drm_core_init);
++postcore_initcall(drm_core_init);
  module_exit(drm_core_exit);
 diff --git a/drivers/gpu/drm/msm-hyp/msm_drv_hyp.c b/drivers/gpu/drm/msm-hyp/msm_drv_hyp.c
 index 133b122..1fd6790 100644
@@ -32,7 +32,7 @@ index 133b122..1fd6790 100644
  }
  
 -module_init(msm_drm_register);
-+fs_initcall(msm_drm_register);
++postcore_initcall(msm_drm_register);
  module_exit(msm_drm_unregister);
  
  MODULE_DESCRIPTION("MSM DRM Mini Driver");
