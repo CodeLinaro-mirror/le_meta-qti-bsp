@@ -1,37 +1,115 @@
-From 35d3856b39b685825ffe7e96443645d47a2f483d Mon Sep 17 00:00:00 2001
-From: xianzhu <xianzhu@codeaurora.org>
-Date: Tue, 28 Aug 2018 11:17:57 +0800
+From b7103e38221b8af381f942edb894cdf6a6cb492f Mon Sep 17 00:00:00 2001
+From: Xianbin Zhu <xianzhu@codeaurora.org>
+Date: Thu, 22 Nov 2018 10:11:51 +0800
 Subject: [PATCH] Booting KPI:enable early user space
 
 enable early user space in linux gvm.
 
-Change-Id: I45a5660f9fae4ad9eb6b607ce090360928a0033a
-Signed-off-by: xianzhu <xianzhu@codeaurora.org>
+Change-Id: I46afcc65852702fc634641ecfd7ef7a5f6cc5478
+Signed-off-by: Xianbin Zhu <xianzhu@codeaurora.org>
 ---
- block/cfq-iosched.c          |  2 +-
+ arch/arm64/kernel/setup.c    |  4 +--
+ block/bio.c                  |  2 +-
+ block/blk-mq.c               |  2 +-
+ block/cfq-iosched.c          |  3 +-
+ block/genhd.c                |  4 +--
  drivers/block/virtio_blk.c   |  2 +-
  drivers/virtio/virtio_mmio.c |  2 +-
  fs/ext4/super.c              |  2 +-
  fs/jbd2/journal.c            |  2 +-
- init/do_mounts.c             |  7 ++++---
- init/main.c                  | 32 +++++++++++++++++++++++++++++++-
- 7 files changed, 40 insertions(+), 9 deletions(-)
+ init/do_mounts.c             |  7 ++--
+ init/initramfs.c             |  2 +-
+ init/main.c                  | 80 +++++++++++++++++++++++++++++++++++---------
+ mm/backing-dev.c             |  4 +--
+ 13 files changed, 82 insertions(+), 34 deletions(-)
 
+diff --git a/arch/arm64/kernel/setup.c b/arch/arm64/kernel/setup.c
+index 01f259e..d3df89f 100644
+--- a/arch/arm64/kernel/setup.c
++++ b/arch/arm64/kernel/setup.c
+@@ -401,7 +401,7 @@ static int __init arm64_device_init(void)
+ 	}
+ 	return 0;
+ }
+-arch_initcall_sync(arm64_device_init);
++postcore_initcall_sync(arm64_device_init);
+ 
+ static int __init topology_init(void)
+ {
+@@ -415,7 +415,7 @@ static int __init topology_init(void)
+ 
+ 	return 0;
+ }
+-postcore_initcall(topology_init);
++core_initcall_sync(topology_init);
+ 
+ void arch_setup_pdev_archdata(struct platform_device *pdev)
+ {
+diff --git a/block/bio.c b/block/bio.c
+index 52b5f74..9a803cd 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -2093,4 +2093,4 @@ static int __init init_bio(void)
+ 
+ 	return 0;
+ }
+-subsys_initcall(init_bio);
++core_initcall(init_bio);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index d65ddc1..512c3a0 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2325,4 +2325,4 @@ static int __init blk_mq_init(void)
+ 
+ 	return 0;
+ }
+-subsys_initcall(blk_mq_init);
++core_initcall(blk_mq_init);
 diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
-index e04a7b8..658dcf9 100644
+index 4e1f494..e3e1c2f 100644
 --- a/block/cfq-iosched.c
 +++ b/block/cfq-iosched.c
-@@ -4808,7 +4808,7 @@ static void __exit cfq_exit(void)
+@@ -4809,8 +4809,7 @@ static void __exit cfq_exit(void)
+ 	elv_unregister(&iosched_cfq);
  	kmem_cache_destroy(cfq_pool);
  }
- 
+-
 -module_init(cfq_init);
-+fs_initcall(cfq_init);
++postcore_initcall(cfq_init);
  module_exit(cfq_exit);
  
  MODULE_AUTHOR("Jens Axboe");
+diff --git a/block/genhd.c b/block/genhd.c
+index 53a931b..e1699f4 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -929,7 +929,7 @@ static int __init genhd_device_init(void)
+ 	return 0;
+ }
+ 
+-subsys_initcall(genhd_device_init);
++core_initcall(genhd_device_init);
+ 
+ static ssize_t disk_range_show(struct device *dev,
+ 			       struct device_attribute *attr, char *buf)
+@@ -1250,7 +1250,6 @@ dev_t blk_lookup_devt(const char *name, int partno)
+ 	dev_t devt = MKDEV(0, 0);
+ 	struct class_dev_iter iter;
+ 	struct device *dev;
+-
+ 	class_dev_iter_init(&iter, &block_class, NULL, &disk_type);
+ 	while ((dev = class_dev_iter_next(&iter))) {
+ 		struct gendisk *disk = dev_to_disk(dev);
+@@ -1258,7 +1257,6 @@ dev_t blk_lookup_devt(const char *name, int partno)
+ 
+ 		if (strcmp(dev_name(dev), name))
+ 			continue;
+-
+ 		if (partno < disk->minors) {
+ 			/* We need to return the right devno, even
+ 			 * if the partition doesn't exist yet.
 diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 1e5cd39..a2f5b3c 100644
+index 1e5cd39..ccf42e77 100644
 --- a/drivers/block/virtio_blk.c
 +++ b/drivers/block/virtio_blk.c
 @@ -894,7 +894,7 @@ static void __exit fini(void)
@@ -39,12 +117,12 @@ index 1e5cd39..a2f5b3c 100644
  	destroy_workqueue(virtblk_wq);
  }
 -module_init(init);
-+fs_initcall(init);
++postcore_initcall(init);
  module_exit(fini);
  
  MODULE_DEVICE_TABLE(virtio, id_table);
 diff --git a/drivers/virtio/virtio_mmio.c b/drivers/virtio/virtio_mmio.c
-index f499d9d..adfa059 100644
+index f499d9d..f4baef8 100644
 --- a/drivers/virtio/virtio_mmio.c
 +++ b/drivers/virtio/virtio_mmio.c
 @@ -762,7 +762,7 @@ static void __exit virtio_mmio_exit(void)
@@ -52,23 +130,23 @@ index f499d9d..adfa059 100644
  }
  
 -module_init(virtio_mmio_init);
-+fs_initcall(virtio_mmio_init);
++postcore_initcall_sync(virtio_mmio_init);
  module_exit(virtio_mmio_exit);
  
  MODULE_AUTHOR("Pawel Moll <pawel.moll@arm.com>");
 diff --git a/fs/ext4/super.c b/fs/ext4/super.c
-index 53d28a0..588e4d2 100644
+index 959d734..c927852 100644
 --- a/fs/ext4/super.c
 +++ b/fs/ext4/super.c
-@@ -5507,5 +5507,5 @@ static void __exit ext4_exit_fs(void)
+@@ -5509,5 +5509,5 @@ static void __exit ext4_exit_fs(void)
  MODULE_AUTHOR("Remy Card, Stephen Tweedie, Andrew Morton, Andreas Dilger, Theodore Ts'o and others");
  MODULE_DESCRIPTION("Fourth Extended Filesystem");
  MODULE_LICENSE("GPL");
 -module_init(ext4_init_fs)
-+fs_initcall(ext4_init_fs)
++postcore_initcall(ext4_init_fs)
  module_exit(ext4_exit_fs)
 diff --git a/fs/jbd2/journal.c b/fs/jbd2/journal.c
-index 9398d1b..98c52a2 100644
+index 9398d1b..1c77853 100644
 --- a/fs/jbd2/journal.c
 +++ b/fs/jbd2/journal.c
 @@ -2697,6 +2697,6 @@ static void __exit journal_exit(void)
@@ -76,7 +154,7 @@ index 9398d1b..98c52a2 100644
  
  MODULE_LICENSE("GPL");
 -module_init(journal_init);
-+fs_initcall(journal_init);
++postcore_initcall(journal_init);
  module_exit(journal_exit);
  
 diff --git a/init/do_mounts.c b/init/do_mounts.c
@@ -111,10 +189,32 @@ index 1902a1c8..1bbc506 100644
  		async_synchronize_full();
  	}
  
+diff --git a/init/initramfs.c b/init/initramfs.c
+index 5205916..3d31147 100644
+--- a/init/initramfs.c
++++ b/init/initramfs.c
+@@ -675,4 +675,4 @@ static int __init populate_rootfs(void)
+ 	}
+ 	return 0;
+ }
+-rootfs_initcall(populate_rootfs);
++postcore_initcall(populate_rootfs);
 diff --git a/init/main.c b/init/main.c
-index 84d4bce..c4a2431 100644
+index 84d4bce..f4c93ba 100644
 --- a/init/main.c
 +++ b/init/main.c
+@@ -674,9 +674,9 @@ asmlinkage __visible void __init start_kernel(void)
+ 		efi_late_init();
+ 		efi_free_boot_services();
+ 	}
+-
++	
+ 	ftrace_init();
+-
++	
+ 	/* Do the rest non-__init'ed, we're now alive */
+ 	rest_init();
+ }
 @@ -842,6 +842,12 @@ static char *initcall_level_names[] __initdata = {
  	"late",
  };
@@ -128,7 +228,7 @@ index 84d4bce..c4a2431 100644
  static void __init do_initcall_level(int level)
  {
  	initcall_t *fn;
-@@ -855,13 +861,22 @@ static void __init do_initcall_level(int level)
+@@ -855,16 +861,59 @@ static void __init do_initcall_level(int level)
  
  	for (fn = initcall_levels[level]; fn < initcall_levels[level+1]; fn++)
  		do_one_initcall(*fn);
@@ -140,7 +240,15 @@ index 84d4bce..c4a2431 100644
  	int level;
  
 -	for (level = 0; level < ARRAY_SIZE(initcall_levels) - 1; level++)
-+	for (level = 0; level < 6; level++)
++	for (level = 0; level < 3; level++)
++		do_initcall_level(level);
++}
++
++static void __init do_initcalls_middle(void)
++{
++	int level;
++
++	for (level = 3; level < 6; level++)
 +		do_initcall_level(level);
 +}
 +
@@ -152,24 +260,81 @@ index 84d4bce..c4a2431 100644
  		do_initcall_level(level);
  }
  
-@@ -997,6 +1012,7 @@ static int __ref kernel_init(void *unused)
++static int early_userspace(void)
++{
++	/*
++	 * check if there is an early userspace init.  If yes, let it do all
++	 * the work
++	 */
++	int rc = 0;
++	
++	if (!ramdisk_execute_command)
++		ramdisk_execute_command = "/init";
++
++	if (sys_access((const char __user *) ramdisk_execute_command, 0) != 0) {
++		ramdisk_execute_command = NULL;
++		prepare_namespace();
++	}
++
++
++	rc = call_usermodehelper(init_prog, init_prog_argv, NULL, 0);
++	if (!rc)
++		pr_info("early_init launched\n");
++	else
++		pr_err("early_init failed\n");
++	
++	return 0;
++} 
++
+ /*
+  * Ok, the machine is now initialized. None of the devices
+  * have been touched yet, but the CPU subsystem is up and
+@@ -882,6 +931,9 @@ static void __init do_basic_setup(void)
+ 	usermodehelper_enable();
+ 	do_initcalls();
+ 	random_int_secret_init();
++	/*add a thread and prefetch rootfs*/
++	early_userspace();
++	do_initcalls_middle();
+ }
  
+ static void __init do_pre_smp_initcalls(void)
+@@ -995,8 +1047,10 @@ static int __ref kernel_init(void *unused)
+ 	      "See Linux Documentation/init.txt for guidance.");
+ }
+ 
++
  static noinline void __init kernel_init_freeable(void)
  {
 +	int rc;
  	/*
  	 * Wait until kthreadd is all set-up.
  	 */
-@@ -1047,6 +1063,20 @@ static noinline void __init kernel_init_freeable(void)
- 		prepare_namespace();
- 	}
+@@ -1025,7 +1079,7 @@ static noinline void __init kernel_init_freeable(void)
+ 	sched_init_smp();
  
-+	rc = call_usermodehelper(init_prog, init_prog_argv, NULL, 0);
-+	if (!rc)
-+		pr_info("early_init launched\n");
-+	else
-+		pr_err("early_init failed\n");
-+
+ 	page_alloc_init_late();
+-
++	
+ 	do_basic_setup();
+ 
+ 	/* Open the /dev/console on the rootfs, this should never fail */
+@@ -1034,18 +1088,14 @@ static noinline void __init kernel_init_freeable(void)
+ 
+ 	(void) sys_dup(0);
+ 	(void) sys_dup(0);
+-	/*
+-	 * check if there is an early userspace init.  If yes, let it do all
+-	 * the work
+-	 */
+-
+-	if (!ramdisk_execute_command)
+-		ramdisk_execute_command = "/init";
+ 
+-	if (sys_access((const char __user *) ramdisk_execute_command, 0) != 0) {
+-		ramdisk_execute_command = NULL;
+-		prepare_namespace();
+-	}
 +	wait_for_device_probe();
 +	rc = call_usermodehelper(touch_early_done, touch_early_done_argv, NULL, 0);
 +	if (!rc)
@@ -177,10 +342,31 @@ index 84d4bce..c4a2431 100644
 +	else
 +		pr_err("early driver failed to sign success\n");
 +	do_initcalls_late();
-+
+ 
  	/*
  	 * Ok, we have completed the initial bootup, and
- 	 * we're essentially up and running. Get rid of the
+diff --git a/mm/backing-dev.c b/mm/backing-dev.c
+index 3081f12..f86fc14 100644
+--- a/mm/backing-dev.c
++++ b/mm/backing-dev.c
+@@ -240,7 +240,7 @@ static __init int bdi_class_init(void)
+ 
+ 	return 0;
+ }
+-postcore_initcall(bdi_class_init);
++core_initcall_sync(bdi_class_init);
+ 
+ static int __init default_bdi_init(void)
+ {
+@@ -255,7 +255,7 @@ static int __init default_bdi_init(void)
+ 
+ 	return err;
+ }
+-subsys_initcall(default_bdi_init);
++postcore_initcall(default_bdi_init);
+ 
+ /*
+  * This function is used when the first inode for this wb is marked dirty. It
 -- 
 1.9.1
 
