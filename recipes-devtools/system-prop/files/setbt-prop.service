@@ -1,0 +1,11 @@
+[Unit]
+Description=Set bt property
+SourcePath=/etc/init.d/setbt-prop
+After=data.mount leprop.service
+Requires=leprop.service
+[Service]
+RemainAfterExit=yes
+ExecStart=/etc/init.d/setbt-prop start
+
+[Install]
+WantedBy=multi-user.target
