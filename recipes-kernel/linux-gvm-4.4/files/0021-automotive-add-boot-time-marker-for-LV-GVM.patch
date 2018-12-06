@@ -1,19 +1,18 @@
-From 07a332745d96b2902dc5e9085e2bd2e3c6827147 Mon Sep 17 00:00:00 2001
-From: Xianbin Zhu <xianzhu@codeaurora.org>
-Date: Wed, 28 Nov 2018 20:23:45 +0800
+From 5c6613d4021d2592205f58529861e953ca5a535a Mon Sep 17 00:00:00 2001
+From: xianzhu <xianzhu@codeaurora.org>
+Date: Tue, 28 Aug 2018 11:21:48 +0800
 Subject: [PATCH] automotive: add boot time marker for LV GVM
 
 Add boot time marker for boot KPI measurement.
 
-Change-Id: I02ad546f771d436c6d3c8ba274b54f267285c4b0
-Signed-off-by: Xianbin Zhu <xianzhu@codeaurora.org>
+Change-Id: I6f2986f697098b46ae388267f992103744327537
+Signed-off-by: xianzhu <xianzhu@codeaurora.org>
 ---
  drivers/pci/host/pci-host-generic.c |  6 ++++++
- drivers/soc/qcom/boot_marker.c      | 19 ++++++++++++++++++-
- drivers/soc/qcom/socinfo.c          |  2 +-
+ drivers/soc/qcom/boot_marker.c      | 11 +++++++++++
  init/do_mounts.c                    |  6 +++++-
  net/ipv4/af_inet.c                  |  3 +++
- 5 files changed, 33 insertions(+), 3 deletions(-)
+ 5 files changed, 31 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/pci/host/pci-host-generic.c b/drivers/pci/host/pci-host-generic.c
 index 5434c90..fe6c83e 100644
@@ -47,7 +46,7 @@ index 5434c90..fe6c83e 100644
  }
  
 diff --git a/drivers/soc/qcom/boot_marker.c b/drivers/soc/qcom/boot_marker.c
-index 0b72d76..5e341ff 100644
+index 0b72d76..c5ccb3b 100644
 --- a/drivers/soc/qcom/boot_marker.c
 +++ b/drivers/soc/qcom/boot_marker.c
 @@ -65,6 +65,16 @@ static void _create_boot_marker(const char *name,
@@ -75,38 +74,8 @@ index 0b72d76..5e341ff 100644
  }
  
  void place_marker(const char *name)
-@@ -209,12 +220,18 @@ static int __init init_bootkpi(void)
- 		return -ENODEV;
- 	}
- 
-+	return 0;
-+}
-+subsys_initcall(init_bootkpi);
-+
-+static int __init init_list(void)
-+{
- 	INIT_LIST_HEAD(&boot_marker_list.list);
- 	mutex_init(&boot_marker_list.lock);
- 	set_bootloader_stats();
- 	return 0;
- }
--subsys_initcall(init_bootkpi);
-+postcore_initcall(init_list);
- 
- static void __exit exit_bootkpi(void)
- {
-diff --git a/drivers/soc/qcom/socinfo.c b/drivers/soc/qcom/socinfo.c
-index b20cf2d..0387855 100644
---- a/drivers/soc/qcom/socinfo.c
-+++ b/drivers/soc/qcom/socinfo.c
-@@ -1610,4 +1610,4 @@ int __init socinfo_init(void)
- 
- 	return 0;
- }
--subsys_initcall(socinfo_init);
-+postcore_initcall(socinfo_init);
 diff --git a/init/do_mounts.c b/init/do_mounts.c
-index 1902a1c8..f6f0fc1 100644
+index 1bbc506..4986c61 100644
 --- a/init/do_mounts.c
 +++ b/init/do_mounts.c
 @@ -34,6 +34,7 @@
@@ -137,7 +106,7 @@ index 1902a1c8..f6f0fc1 100644
  }
  
 diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
-index 55eff96..af0c5a6 100644
+index aad274c..eed912a 100644
 --- a/net/ipv4/af_inet.c
 +++ b/net/ipv4/af_inet.c
 @@ -121,6 +121,7 @@
@@ -148,7 +117,7 @@ index 55eff96..af0c5a6 100644
  
  #ifdef CONFIG_ANDROID_PARANOID_NETWORK
  #include <linux/android_aid.h>
-@@ -1738,6 +1739,7 @@ static int __init inet_init(void)
+@@ -1737,6 +1738,7 @@ static int __init inet_init(void)
  	struct list_head *r;
  	int rc = -EINVAL;
  
@@ -156,7 +125,7 @@ index 55eff96..af0c5a6 100644
  	sock_skb_cb_check_size(sizeof(struct inet_skb_parm));
  
  	rc = proto_register(&tcp_prot, 1);
-@@ -1846,6 +1848,7 @@ static int __init inet_init(void)
+@@ -1845,6 +1847,7 @@ static int __init inet_init(void)
  	ip_tunnel_core_init();
  
  	rc = 0;
