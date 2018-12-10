@@ -91,6 +91,9 @@ do_install_append () {
    ln -sf /dev/null ${D}${systemd_unitdir}/system/sysinit.target.wants/systemd-journal-catalog-update.service
    install -d ${D}${sysconfdir}/udev/rules.d/
    install -m 0644 ${WORKDIR}/ion.rules -D ${D}${sysconfdir}/udev/rules.d/ion.rules
+
+   #create coredump folder in data
+   install -dm 0755 ${D}/data/coredump
 }
 
 # Scripts for pre and post hibernate functions for BatCam
@@ -111,5 +114,5 @@ do_install_append_robot-som-ros () {
 PACKAGES +="${PN}-coredump"
 FILES_${PN} += "/etc/initscripts \
                 ${sysconfdir}/udev/rules.d "
-FILES_${PN}-coredump = "/etc/sysctl.d/core.conf /etc/security/limits.d/core.conf"
+FILES_${PN}-coredump = "/etc/sysctl.d/core.conf /etc/security/limits.d/core.conf  /data/coredump"
 
