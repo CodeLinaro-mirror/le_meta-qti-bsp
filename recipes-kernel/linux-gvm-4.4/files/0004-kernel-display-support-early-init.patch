@@ -1,16 +1,16 @@
-From 9fd3c5572d9277db6aa2009292105738e2d1b2a1 Mon Sep 17 00:00:00 2001
+From df0769f2efb278ef6b158fadeb4c4d54a44af3c6 Mon Sep 17 00:00:00 2001
 From: Xianbin Zhu <xianzhu@codeaurora.org>
-Date: Sun, 12 Aug 2018 16:08:29 +0800
+Date: Wed, 31 Oct 2018 19:53:08 +0800
 Subject: [PATCH] Booting KPI:display support in early user space
 
 enable early display in linux gvm.
 
-Change-Id: Ib27bce161c2be6d3196864a2f89b590e8224fc71
+Change-Id: Icae02fe92b0a68f2a8d982b02cc017ee13f660d7
 Signed-off-by: Xianbin Zhu <xianzhu@codeaurora.org>
 ---
  drivers/gpu/drm/drm_drv.c             | 2 +-
- drivers/gpu/drm/msm-hyp/msm_drv_hyp.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ drivers/gpu/drm/msm-hyp/msm_drv_hyp.c | 3 ++-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/gpu/drm/drm_drv.c b/drivers/gpu/drm/drm_drv.c
 index ccc2044..760410e 100644
@@ -24,10 +24,18 @@ index ccc2044..760410e 100644
 +postcore_initcall(drm_core_init);
  module_exit(drm_core_exit);
 diff --git a/drivers/gpu/drm/msm-hyp/msm_drv_hyp.c b/drivers/gpu/drm/msm-hyp/msm_drv_hyp.c
-index 133b122..1fd6790 100644
+index 0579b35..66c1afa 100644
 --- a/drivers/gpu/drm/msm-hyp/msm_drv_hyp.c
 +++ b/drivers/gpu/drm/msm-hyp/msm_drv_hyp.c
-@@ -468,7 +468,7 @@ static void __exit msm_drm_unregister(void)
+@@ -452,6 +452,7 @@ static struct platform_driver msm_platform_driver = {
+ 	.driver     = {
+ 		.name   = "msm_drm_hyp",
+ 		.of_match_table = dt_match,
++		.probe_type = PROBE_PREFER_ASYNCHRONOUS,
+ 	},
+ 	.id_table   = msm_id,
+ };
+@@ -468,7 +469,7 @@ static void __exit msm_drm_unregister(void)
  	platform_driver_unregister(&msm_platform_driver);
  }
  

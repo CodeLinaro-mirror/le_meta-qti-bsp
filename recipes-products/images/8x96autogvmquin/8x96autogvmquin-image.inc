@@ -49,7 +49,7 @@ IMAGE_INSTALL += "pciutils"
 
 # Early init
 IMAGE_INSTALL += "${@bb.utils.contains("DISTRO_FEATURES", "early_init", "early-init", "" ,d)}"
-
+IMAGE_INSTALL += "${@bb.utils.contains("DISTRO_FEATURES", "early_init", "memory-hotplug", "" ,d)}"
 
 #Camera modules
 #IMAGE_INSTALL += "lib32-androidcompat"
