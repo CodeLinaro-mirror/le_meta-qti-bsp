@@ -14,7 +14,17 @@ mount_partition()
         if [ ! -d "${destdir}" ]; then
             mkdir "${destdir}"
         fi
-        if ! mount -t auto "/dev/$1" "${destdir}" -o nodev,noexec,nosuid; then
+	result=`lsmod | grep ufsd | wc -l`
+	if [ $result -ne 1 ]; then 
+            	insmod /usr/lib/ufsd.ko
+		partition_name=/dev/block/storagedevice/by-name
+		mkdir -p $partition_name
+		target_dev=/dev/$1
+		target_memblock=$(echo $target_dev | sed 's/p1//g')
+        	ln -s $target_memblock $partition_name/memblock
+		ln -s $target_dev $partition_name/sdcard
+	fi
+        if ! mount -t ufsd "/dev/$1" "${destdir}" -o force,nodev,noexec,nosuid,localtime,nls=utf8,safe=order; then
                 # failed to mount
                 exit 1
         fi

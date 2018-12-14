@@ -40,9 +40,9 @@ if [ "$#" -lt 3 ]; then
     exit 1
 fi
 
-export PATH=.:${STAGING_BINDIR_NATIVE}:$PATH
+export PATH=.:../../../../poky/build/tmp-glibc/sysroots/x86_64-linux/usr/bin:$PATH
 export OUT_HOST_ROOT=.
-export LD_LIBRARY_PATH=${STAGING_LIBDIR_NATIVE}
+export LD_LIBRARY_PATH=../../../../poky/build/tmp-glibc/sysroots/x86_64-linux/usr/lib:$LD_LIBRARY_PATH
 export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
 export LANGUAGE=en_US.UTF-8
@@ -70,13 +70,6 @@ unzip -qo $1 -d $target_files
 mkdir -p $target_files/META
 mkdir -p $target_files/SYSTEM
 
-# Workarounds for file-based OTA:
-# Set lib64 and its contents's selabel to lib_t
-# Set / (i.e. /system/ in recovery mode)'s selabel to root_t
-echo "/system/lib64/.* system_u:object_r:lib_t:s0" >> $target_files/BOOT/RAMDISK/file_contexts
-echo "/system/lib64 -d system_u:object_r:lib_t:s0" >> $target_files/BOOT/RAMDISK/file_contexts
-echo "/system -d system_u:object_r:root_t:s0" >> $target_files/BOOT/RAMDISK/file_contexts
-
 # Generate selabel rules only if file_contexts is packed in target-files
 if grep "selinux_fc" $target_files/META/misc_info.txt
 then
@@ -85,14 +78,15 @@ else
     zipinfo -1 $1 |  awk 'BEGIN { FS="SYSTEM/" } /^SYSTEM\// {print "system/" $2}' | fs_config ${FSCONFIGFOPTS} -D ${2} > $target_files/META/filesystem_config.txt
 fi
 
-cd $target_files && zip -q ../$1 META/*filesystem_config.txt SYSTEM/build.prop && cd ..
+echo "blockimgdiff_versions=1,2,3" >> $target_files/META/misc_info.txt
+cd $target_files && zip -q ../$1 META/*filesystem_config.txt SYSTEM/build.prop META/misc_info.txt  && cd ..
 
 python_version="python3" # file-based OTA scripts have migrated to python3
 if [ "${block_based}" = "--block" ]; then
     python_version="python2" # fall back to python2 for block-based OTA scripts
 fi
 
-$python_version ./ota_from_target_files $block_based -n -v -d $device_type -p . -s "${WORKSPACE}/android_compat/device/qcom/common" --no_signing --full_radio $1 update_$3.zip > ota_debug.txt 2>&1
+$python_version ./ota_from_target_files $block_based -n -v -d $device_type -p . -s "./android_compat/device/qcom/common" --no_signing  $1 update_$3.zip > ota_debug.txt 2>&1
 
 if [[ $? = 0 ]]; then
     echo "update.zip generation was successful"

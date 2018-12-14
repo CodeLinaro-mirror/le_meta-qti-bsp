@@ -1,6 +1,6 @@
 # The MSM Linux image rootfs creation files.
 
-inherit dm-verity
+#inherit dm-verity
 
 # lk supports only 32-bit compilation.
 DEPENDS_append_arm += " lk"
@@ -36,6 +36,7 @@ IMAGE_INSTALL += "glib-2.0"
 IMAGE_INSTALL += "libcutils"
 IMAGE_INSTALL += "liblog"
 IMAGE_INSTALL += "libxml2"
+IMAGE_INSTALL += "system-core-debuggerd"
 IMAGE_INSTALL += "system-core-adbd"
 IMAGE_INSTALL += "system-core-logd"
 IMAGE_INSTALL += "system-core-leprop"
@@ -45,6 +46,13 @@ IMAGE_INSTALL += "system-conf"
 IMAGE_INSTALL += "system-prop"
 IMAGE_INSTALL += "tcpdump"
 IMAGE_INSTALL += "wireless-tools"
+IMAGE_INSTALL += "${@base_contains('MULTILIB_VARIANTS', 'lib32', 'lib32-avahi', 'avahi', d)}"
+IMAGE_INSTALL += "${@base_contains('MULTILIB_VARIANTS', 'lib32', 'lib32-curl', 'curl', d)}"
+IMAGE_INSTALL += "${@base_contains('MULTILIB_VARIANTS', 'lib32', 'lib32-gnutls', 'gnutls', d)}"
+IMAGE_INSTALL += "${@base_contains('MULTILIB_VARIANTS', 'lib32', 'lib32-nettle', 'nettle', d)}"
+IMAGE_INSTALL += "${@base_contains('MULTILIB_VARIANTS', 'lib32', 'lib32-e2fsprogs', 'e2fsprogs', d)}"
+IMAGE_INSTALL += "${@base_contains('MULTILIB_VARIANTS', 'lib32', 'lib32-iperf', 'iperf', d)}"
+IMAGE_INSTALL += "iw"
 
 #32-bit only packages
 IMAGE_INSTALL += "${@base_contains('MULTILIB_VARIANTS', 'lib32', 'lib32-libnl', 'libnl', d)}"
@@ -57,6 +65,8 @@ IMAGE_INSTALL += "procrank"
 
 IMAGE_INSTALL += "libuv"
 IMAGE_INSTALL += "libwebsockets"
+
+IMAGE_INSTALL_append = " glibc-dbg"
 
 # Below is to generate sparse ext4 system image (OE by default supports raw ext4 images)
 SELINUX_FILE_CONTEXTS = "${IMAGE_ROOTFS}/etc/selinux/mls/contexts/files/file_contexts"

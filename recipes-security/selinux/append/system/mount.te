@@ -29,4 +29,5 @@
 # Appended to modules/system/init.te in meta-selinux
 #============= mount_t ==============
 allow mount_t init_t:unix_stream_socket { read write };
+allow mount_t tmpfs_t:blk_file getattr;
 fs_relabelfrom_firmware(mount_t)

@@ -1,0 +1,27 @@
+From 9e6df3a69caefecc3be53dcd63c1c2aa10d56898 Mon Sep 17 00:00:00 2001
+From: Viswanath Kraleti <vkraleti@codeaurora.org>
+Date: Wed, 25 Jul 2018 08:33:10 +0530
+Subject: [PATCH] Mount /var/volatile in populate-volatile.sh
+
+Change-Id: Ie245e1817af7c50c98a4dfd316861f2422cc7184
+---
+ populate-volatile.sh | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/populate-volatile.sh b/populate-volatile.sh
+index 904037e..55bd5b0 100755
+--- a/populate-volatile.sh
++++ b/populate-volatile.sh
+@@ -8,6 +8,9 @@
+ # Short-Description:  Populate the volatile filesystem
+ ### END INIT INFO
+ 
++# Mount /var/volatile
++mount -t tmpfs tmpfs /var/volatile
++
+ # Get ROOT_DIR
+ DIRNAME=`dirname $0`
+ ROOT_DIR=`echo $DIRNAME | sed -ne 's:/etc/.*::p'`
+-- 
+1.9.1
+

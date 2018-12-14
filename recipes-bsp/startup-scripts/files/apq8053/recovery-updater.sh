@@ -57,6 +57,9 @@ echo -e $INIT_LOG
 # Cookie to indicate whether to perform recovery-upgrade or not
 cookie="${cache_work_dir}/RECOVERY_UPGRADE_DONE"
 
+# Cookie to indicate whether to start recovery-upgrade or not
+start_cookie="${cache_work_dir}/RECOVERY_UPGRADE_START"
+
 # By default, we assume that recovery-upgrade is not needed
 recovery_upgrade_needed=0
 recoveryfs_upgrade_needed=0
@@ -85,11 +88,11 @@ upgrade_zip_sanity_failed=0 # assume sanity by default
 
 # Important: We assume that the only zip file in
 # /cache has to be the upgrade package.
-zipfile=`ls /cache/*.zip | awk '{ print $1 }'`
+zipfile=`ls /data/UPDATE/*.zip | awk '{ print $1 }'`
 
 # As a sanity check, count the number of *.zip
 # in the said location. If > 1, exit!
-count_of_zipfiles=`ls -1 /cache/*.zip | wc -l`
+count_of_zipfiles=`ls -1 /data/UPDATE/*.zip | wc -l`
 if [ $count_of_zipfiles -gt 1 ];
 then
   echo -e "\nMore than one zip file present. Aborting!"
@@ -211,6 +214,7 @@ UnzipAndCompareSHA1Sum() {
   rm $temp_file1 $temp_file2 # Clean up temp files
   return $ret_code
 }
+
 # End of Helper functions
 ################################################################################
 
@@ -223,7 +227,7 @@ ExtractAndCheckUpgradePackage() {
   # Check if the upgrade package actually exists or not.
   if [ "$zip" == "" ];
   then
-    echo -e "\nCouldn't find any upgrade package in /cache !"
+    echo -e "\nCouldn't find any upgrade package in /data/UPDATE !"
     upgrade_zip_sanity_failed=1
   fi
 
@@ -288,12 +292,10 @@ ExtractAndCheckUpgradePackage() {
 # if a cookie already exists in /cache/recoveryupgrade.
 # When an OTA upgrade is triggered, recovery module
 # will clear this cookie signalling us to do an explicit upgrade.
-if [ -e $cookie ];
+if [ ! -e $start_cookie ];
 then
-  echo -e "\nA cookie is present in /cache/recoveryupgrade."
-  echo -e "We must have already done a recovery-upgrade recently. Nothing to do!"
-  # Recreate the cookie, just in case
-  WriteRecoveryUpgradeDoneCookie
+  echo -e "\nRECOVERY_UPGRADE_START cookie is not present in /cache/recoveryupgrade."
+  echo -e "No need to start recovery upgrade !"
 else
   # Check whether recovery partition needs an upgrade?
   if CompareSHA1Sum $recovery_partition $recoveryimg_length $recoveryimg_sha1;

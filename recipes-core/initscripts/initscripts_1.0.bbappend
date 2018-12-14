@@ -2,17 +2,24 @@ PR = "r157"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}-${PV}:"
 
+SRC_URI += "file://0001-Mount-var-volatile-in-populate-volatile.patch"
 SRC_URI += "file://umountfs"
 SRC_URI += "file://bsp_paths.sh"
 SRC_URI += "file://set_core_pattern.sh"
 SRC_URI += "file://bsp_paths.service"
 SRC_URI += "file://set_core_pattern.service"
 SRC_URI += "file://logging-restrictions.sh"
+SRC_URI += "file://populate_volatile_bg.sh"
 
 do_install_append() {
         update-rc.d -f -r ${D} mountnfs.sh remove
         update-rc.d -f -r ${D} urandom remove
         update-rc.d -f -r ${D} checkroot.sh remove
+
+        # Start populate-volatile.sh in rc5 instead of rcS.
+        update-rc.d -f -r ${D} populate-volatile.sh remove
+        #update-rc.d -r ${D} populate-volatile.sh start 22 5 .
+
         if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
          rm  ${D}${sysconfdir}/init.d/halt
          rm  ${D}${sysconfdir}/init.d/reboot
@@ -44,7 +51,9 @@ do_install_append() {
               ${D}/etc/systemd/system/multi-user.target.wants/set_core_pattern.service
         else
          install -m 0755 ${WORKDIR}/bsp_paths.sh  ${D}${sysconfdir}/init.d
+         install -m 0755 ${WORKDIR}/populate_volatile_bg.sh  ${D}${sysconfdir}/init.d
          update-rc.d -r ${D} bsp_paths.sh start 15 2 3 4 5 .
+         update-rc.d -r ${D} populate_volatile_bg.sh start 37 S .
          install -m 0755 ${WORKDIR}/set_core_pattern.sh  ${D}${sysconfdir}/init.d
          update-rc.d -r ${D} set_core_pattern.sh start 01 S 2 3 4 5 S .
          if [ "${VARIANT}" = "user" ]; then
