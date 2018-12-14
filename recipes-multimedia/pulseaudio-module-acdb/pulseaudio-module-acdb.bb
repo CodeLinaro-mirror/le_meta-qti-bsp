@@ -15,6 +15,8 @@ FILESEXTRAPATHS_prepend := "${WORKSPACE}/:"
 SRC_URI = "file://audio/mm-audio-opensource/pulseaudio-module-acdb/"
 S = "${WORKDIR}/audio/mm-audio-opensource/pulseaudio-module-acdb/"
 
+SRC_URI += "file://8x96autogvmga/pulseaudio-acdb.cfg"
+
 EXTRA_OECONF += "--with-glib \
                  --enable-target=${BASEMACHINE}"
 
@@ -25,4 +27,9 @@ FILES_${PN}-dbg += "${libdir}/pulse-8.0/modules/.debug"
 do_install_append() {
          mkdir -p ${D}${sysconfdir}/pulse/
          install -m 0755 ${S}/*.cfg  -D ${D}${sysconfdir}/pulse/
+}
+
+do_install_append_8x96autogvmga() {
+         # override with the machine type specific config
+         install -m 0755 ${WORKDIR}/8x96autogvmga/pulseaudio-acdb.cfg -D ${D}${sysconfdir}/pulse/
 }
