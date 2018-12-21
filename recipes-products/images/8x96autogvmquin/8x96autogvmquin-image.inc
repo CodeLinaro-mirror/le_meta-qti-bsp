@@ -141,6 +141,9 @@ IMAGE_INSTALL += "security-manager"
 IMAGE_INSTALL += "security-manager-policy"
 IMAGE_INSTALL += "agl-users"
 
+#RESIZE
+IMAGE_INSTALL += "resize-service"
+
 # Hypervisor
 #IMAGE_INSTALL += "libuhab"
 #IMAGE_INSTALL += "uhabtest"

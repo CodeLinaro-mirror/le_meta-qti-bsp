@@ -19,6 +19,12 @@ do_install() {
         sed -i    '/^Before=.*$/a\ConditionPathExists=\/var\/lib\/need_resize' ${S}/resize-userdata.service
         sed -i -e 's/^ExecStartPost=.*$/ExecStartPost=\/bin\/rm -rf \/var\/lib\/need_resize/' ${S}/resize-userdata.service
     fi
+    if ${@base_conditional('BASEMACHINE', '8x96autogvmquin', 'true', 'false', d)}; then
+        sed -i -e 's/^Requires=.*$/Requires=dev-vdc.device/' ${S}/resize-userdata.service
+        sed -i -e 's/^After=.*$/After=dev-vdc.device var-lib.mount/' ${S}/resize-userdata.service
+        sed -i -e 's/^Before=.*$/Before=systemd-fsck@dev-vdc.service/' ${S}/resize-userdata.service
+        sed -i -e 's/^ExecStart=.*$/ExecStart=\/lib\/systemd\/systemd-fsck \/dev\/vdc ; \/sbin\/resize2fs -f \/dev\/vdc/' ${S}/resize-userdata.service
+    fi
     install -d ${D}${systemd_unitdir}/system
     install -m 0644 ${S}/resize-userdata.service ${D}${systemd_unitdir}/system/resize-userdata.service
     install -d ${D}/var/lib
