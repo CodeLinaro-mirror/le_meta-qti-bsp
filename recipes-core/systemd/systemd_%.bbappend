@@ -5,19 +5,52 @@ SRC_URI += "file://mountpartitions.rules"
 SRC_URI += "file://systemd-udevd.service"
 SRC_URI += "file://ffbm.target"
 SRC_URI += "file://mtpserver.rules"
-SRC_URI_append_batcam = " file://pre_hibernate.sh"
-SRC_URI_append_batcam = " file://post_hibernate.sh"
 SRC_URI += "file://sysctl-core.conf"
 SRC_URI += "file://limit-core.conf"
 SRC_URI += "file://logind.conf"
 SRC_URI += "file://ion.rules"
 
+# Custom setup for PACKAGECONFIG to get a slimmer systemd.
+# Removed following:
+#   * timesyncd - Chronyd is being used instead for NTP timesync
+#                 Also timesyncd was resulting in higher boot KPI.
+#   * ldconfig  - configures dynamic linker run-time bindings.
+#                 ldconfig  creates  the  necessary links and cache to the most
+#                 recent shared libraries found in the directories specified on
+#                 the command line, in the file /etc/ld.so.conf, and in the
+#                 trusted directories (/lib and /usr/lib).  The cache (created
+#                 at /etc/ld.so.cache) is used by the run-time linker ld-linux.so.
+#                 system-ldconfig.service runs "ldconfig -X", but as / is RO
+#                 cache may not be created. Disabling this may introduce app
+#                 start time latency.
+#   * backlight - Loads/Saves Screen Backlight Brightness, not required.
+#   * localed   - systemd-localed is a system service that may be used as
+#                 mechanism to change the system locale settings
+#   * quotacheck  Not using Quota
+#   * vconsole  - Not used
+#   * hostname  - No need to change the system's hostname
+#   * smack     - Not used
+#   * utmp      - No back fill for SysV runlevel changes needed
+#   * resolvd   - Use own network name resolution manager
+PACKAGECONFIG = " \
+    ${@bb.utils.filter('DISTRO_FEATURES', 'selinux', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'wifi', 'rfkill', '', d)} \
+    binfmt \
+    firstboot \
+    hibernate \
+    hostnamed \
+    ima \
+    logind \
+    machined \
+    networkd \
+    polkit \
+    randomseed \
+    sysusers \
+    timedated \
+    xz \
+"
 EXTRA_OECONF += " --disable-efi"
-
-# Don't use systemd network name resolution manager
-EXTRA_OECONF += " --disable-resolved --disable-hwdb"
-PACKAGECONFIG_remove = "resolved"
-ALTERNATIVE_LINK_NAME[resolv-conf] = "${sysconfdir}/resolv-systemd.conf"
+EXTRA_OECONF += " --disable-hwdb"
 
 # In aarch64 targets systemd is not booting with -finline-functions -finline-limit=64 optimizations
 # So temporarily revert to default optimizations for systemd.
@@ -51,14 +84,6 @@ do_install_append () {
    install -m 0644 ${WORKDIR}/ion.rules -D ${D}${sysconfdir}/udev/rules.d/ion.rules
 }
 
-# Scripts for pre and post hibernate functions for BatCam
-do_install_append_batcam () {
-   install -d ${D}${systemd_unitdir}/system-sleep/
-   install -m 0755 ${WORKDIR}/pre_hibernate.sh -D ${D}${systemd_unitdir}/system-sleep/pre_hibernate.sh
-   install -m 0755 ${WORKDIR}/post_hibernate.sh -D ${D}${systemd_unitdir}/system-sleep/post_hibernate.sh
-
-}
-
 RRECOMMENDS_${PN}_remove += "systemd-extra-utils"
 PACKAGES_remove += "${PN}-extra-utils"
 
@@ -70,4 +95,3 @@ PACKAGES +="${PN}-coredump"
 FILES_${PN} += "/etc/initscripts \
                 ${sysconfdir}/udev/rules.d "
 FILES_${PN}-coredump = "/etc/sysctl.d/core.conf /etc/security/limits.d/core.conf"
-

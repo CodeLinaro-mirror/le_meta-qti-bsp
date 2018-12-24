@@ -18,7 +18,7 @@ IMAGE_INSTALL += "start-scripts-firmware-links"
 #IMAGE_INSTALL += "start-scripts-find-partitions"
 IMAGE_INSTALL += "start-scripts-misc-daemon"
 IMAGE_INSTALL += "start-scripts-update-perms"
-IMAGE_INSTALL += "start-script-ab-slot-util"
+IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'start-script-ab-slot-util', '', d)}"
 IMAGE_INSTALL += "start-scripts-recovery-updater"
 #IMAGE_INSTALL += "sec-config"
 
@@ -45,7 +45,6 @@ IMAGE_INSTALL += "volatile-binds"
 
 #32-bit only packages
 IMAGE_INSTALL += "${@bb.utils.contains('MULTILIB_VARIANTS', 'lib32', 'lib32-libnl', 'libnl', d)}"
-IMAGE_INSTALL += "${@bb.utils.contains('MULTILIB_VARIANTS', 'lib32', 'lib32-live555-qti', 'live555-qti', d)}"
 #IMAGE_INSTALL += "${@bb.utils.contains('MULTILIB_VARIANTS', 'lib32', 'lib32-gtest', 'gtest', d)}"
 IMAGE_INSTALL += "${@bb.utils.contains('MULTILIB_VARIANTS', 'lib32', 'lib32-cairo', 'cairo', d)}"
 
