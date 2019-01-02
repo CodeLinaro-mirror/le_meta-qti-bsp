@@ -6,7 +6,7 @@ LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
 
 PR = "r0"
-
+SRC_URI = "${CAF_LA_GIT}/platform/vendor/qcom-opensource/wlan/utils/sigma-dut.git;protocol=${CAF_PROT};nobranch=1;tag=${CAF_TAG};destsuffix=wlan/utils/sigma-dut"
 SRC_DIR = "${WORKSPACE}/wlan/utils/sigma-dut/"
 
 S = "${WORKDIR}/wlan/utils/sigma-dut"
