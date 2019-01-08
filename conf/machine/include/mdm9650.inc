@@ -52,3 +52,9 @@ SDK_IMAGE ?= "1"
 
 # Formats of root filesystem images. 
 IMAGE_FSTYPES += "ubi"
+
+# Uncomment to enable system integrity through IMA on
+# embedded Linux platforms.
+# DISTRO_FEATURES_append = " vbleima"
+
+PREFERRED_VERSION_mtd-utils = "${@bb.utils.contains('DISTRO_FEATURES', 'vbleima', '2.0.2', '1.0', d)}"
