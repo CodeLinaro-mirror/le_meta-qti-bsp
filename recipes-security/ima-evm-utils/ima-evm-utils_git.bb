@@ -24,4 +24,5 @@ FILES_${PN}-dev += "${includedir}"
 
 RDEPENDS_${PN}_class-target += "libcrypto libattr keyutils"
 
+DEPENDS_append_class-target = " ima-evm-utils-native"
 BBCLASSEXTEND = "native nativesdk"

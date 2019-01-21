@@ -43,3 +43,13 @@ do_install_ptest () {
 }
 
 RDEPENDS_${PN}-ptest += "glibc-utils"
+
+sysroot_preprocess() {
+  install -d ${SYSROOT_DESTDIR}${includedir}
+  install -m 0666 ${S}/keyutils.h ${SYSROOT_DESTDIR}${includedir}
+}
+
+SYSROOT_PREPROCESS_FUNCS += "sysroot_preprocess"
+
+DEPENDS_append_class-target = " keyutils-native"
+BBCLASSEXTEND = "native nativesdk"
