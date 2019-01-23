@@ -106,7 +106,14 @@ do_install_append_batcam () {
    install -d ${D}${systemd_unitdir}/system-sleep/
    install -m 0755 ${WORKDIR}/pre_hibernate.sh -D ${D}${systemd_unitdir}/system-sleep/pre_hibernate.sh
    install -m 0755 ${WORKDIR}/post_hibernate.sh -D ${D}${systemd_unitdir}/system-sleep/post_hibernate.sh
+}
 
+# Run fsck as part of local-fs-pre.target instead of local-fs.target
+do_install_append () {
+   # remove from After
+   sed -i '/After/s/local-fs-pre.target//' ${D}${systemd_unitdir}/system/systemd-fsck@.service
+   # Add to Before
+   sed -i '/Before/s/$/ local-fs-pre.target/' ${D}${systemd_unitdir}/system/systemd-fsck@.service
 }
 
 RRECOMMENDS_${PN}_remove += "systemd-extra-utils"
