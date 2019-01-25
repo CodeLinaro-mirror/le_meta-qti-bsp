@@ -13,7 +13,7 @@ SRC_URI = "file://external/wpa_supplicant_8/ \
 S = "${WORKDIR}/external/wpa_supplicant_8/hostapd"
 B = "${WORKDIR}/external/wpa_supplicant_8/hostapd"
 
-SYSTEMD_AUTO_ENABLE_${PN}_8x96autocv2x = "enable"
+SYSTEMD_AUTO_ENABLE_${PN}_8x96autocv2x = "disable"
 
 do_configure_prepend () {
     #Chnage defconfig file to configure specific features

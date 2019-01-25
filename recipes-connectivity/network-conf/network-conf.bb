@@ -23,8 +23,6 @@ do_install() {
     # systemd service for wpa_supplicant
     install -d ${D}${sysconfdir}/systemd/system/multi-user.target.wants
     install -m 0644 ${WORKDIR}/wpa_supplicant@wlan0.service ${D}${sysconfdir}/systemd/system/
-    ln -sf ${sysconfdir}/systemd/system/wpa_supplicant@wlan0.service \
-        ${D}${sysconfdir}/systemd/system/multi-user.target.wants/wpa_supplicant@wlan0.service
     # wpa_supplicant conf
     install -d ${D}${sysconfdir}/wpa_supplicant
     install -m 0644 ${WORKDIR}/wpa_supplicant-wlan0.conf ${D}${sysconfdir}/wpa_supplicant

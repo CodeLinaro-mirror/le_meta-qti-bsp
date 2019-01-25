@@ -37,6 +37,7 @@ FILES_${PN} += "/lib/firmware/"
 SRC_URI += "file://init_qti_wlan.service"
 SYSTEMD_SERVICE_${PN} = "init_qti_wlan.service"
 SYSTEMD_AUTO_ENABLE_${PN} = "enable"
+SYSTEMD_AUTO_ENABLE_${PN}_8x96autocv2x = "disable"
 
 do_compile_prepend () {
     if [ "${MACHINE}" = "8x96autocv2x" ]; then
