@@ -61,7 +61,10 @@ do_install () {
     if ${@base_conditional('BASEMACHINE', '8x96autogvmquintcu', 'true', 'false', d)}; then
         # enable the removal of wma_send_time_stamp_sync_cmd
         sed -i '/gOcbTxPerPktStatsEnable/a\gRemoveTimeStampSyncCmd=1' ${S}/firmware_bin/WCNSS_qcom_cfg.ini
+        # enable the crash inject of crash
         sed -i '/gRemoveTimeStampSyncCmd=1/a\gSkipCrashInject=1' ${S}/firmware_bin/WCNSS_qcom_cfg.ini
+        # enable skip wow hostwakeup
+        sed -i '/gSkipCrashInject=1/a\gSkipWowHostWakeup=1' ${S}/firmware_bin/WCNSS_qcom_cfg.ini
         # Add dsrc module load/unload in wifi_on.sh/wifi_off.sh for 8x96autogvmquintcu
         sed -i -e '$a sleep 2' ${WORKDIR}/wifi_on.sh
         sed -i -e '$a modprobe dsrc' ${WORKDIR}/wifi_on.sh
