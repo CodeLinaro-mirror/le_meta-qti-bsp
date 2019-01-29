@@ -46,6 +46,7 @@ IMAGE_INSTALL += "media-headers"
 IMAGE_INSTALL += "protobuf"
 IMAGE_INSTALL += "sigma-dut"
 IMAGE_INSTALL += "sec-config"
+IMAGE_INSTALL += "libatomic"
 
 IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'full-disk-encryption', 'libscrypt', '', d)}"
 
