@@ -22,6 +22,8 @@ SRC_URI += "\
             file://fix-mdev-crash.patch \
 "
 
+SRC_URI_append = "${@bb.utils.contains('DISTRO_FEATURES', 'vbleima', ' file://no-history.cfg', '',d)}"
+
 prefix = ""
 
 BUSYBOX_SPLIT_SUID = "0"
