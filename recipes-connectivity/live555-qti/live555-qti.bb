@@ -4,7 +4,7 @@ LICENSE = "LGPLv2.1"
 LIC_FILES_CHKSUM = "file://${WORKDIR}/git/COPYING;md5=68ad62c64cc6c620126241fd429e68fe"
 
 # fetch from server
-SRC_URI = "git://source.codeaurora.org/quic/le/live555;protocol=http;branch=github/master"
+SRC_URI = "${CAF_LE_GIT}/live555;protocol=${CAF_PROT};branch=github/master"
 SRC_URI += "file://config.linux-cross"
 SRC_URI += "file://0001-live555-Update-fps-and-bank-size-value.patch"
 SRC_URI += "file://0002-live555-Decrease-RTP-buffer-size.patch"
