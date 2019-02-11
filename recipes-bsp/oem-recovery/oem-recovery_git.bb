@@ -15,12 +15,13 @@ SRC_URI = " \
 
 S = "${WORKDIR}/android_compat/device/qcom/common/recovery/oem-recovery/"
 
+DEPENDS += "virtual/kernel"
+
 CPPFLAGS += "-I${WORKDIR}/bootable/recovery"
 
 EXTRA_OECONF_append_class-native = " --with-core-headers=${STAGING_INCDIR_NATIVE}/sparse"
-
 EXTRA_OECONF_append_class-target = " --with-core-headers=${STAGING_INCDIR}/sparse"
-EXTRA_OECONF_append_class-target += " --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include" 
+EXTRA_OECONF_append_class-target += " --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
 
 PARALLEL_MAKE = ""
 INITSCRIPT_NAME = "oem-recovery"

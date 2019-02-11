@@ -1,7 +1,11 @@
 # Rootfs creation.
 require ../../../recipes-ss-mgr/packagegroup/ss-mgr.inc
 
-DEPENDS_append += "lk"
+DEPENDS += "lk"
+
+# Formats of root filesystem images.
+IMAGE_FSTYPES += "ext4 ubi"
+
 IMAGE_INSTALL += "packagegroup-core-boot"
 
 IMAGE_INSTALL += "${ROOTFS_PKGMANAGE_BOOTSTRAP}"
