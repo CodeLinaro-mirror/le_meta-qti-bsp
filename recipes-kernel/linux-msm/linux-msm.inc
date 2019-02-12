@@ -51,18 +51,6 @@ do_compile () {
     oe_runmake CC="${KERNEL_CC}" LD="${KERNEL_LD}" ${KERNEL_EXTRA_ARGS} $use_alternate_initrd
 }
 
-# keep this path in-sync with bouncycastle recipe.
-SECURITY_TOOLS_DIR = "${TMPDIR}/work-shared/security_tools"
-
-do_configure[depends] += "bouncycastle:do_unpack"
-
-# Copy verity certificate into ${S} to generate verity signed boot image
-do_configure_append () {
-    if [ "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'dm-verity', '', d)}" = "dm-verity" ] ; then
-        openssl x509 -in ${SECURITY_TOOLS_DIR}/verity.x509.pem -outform der -out ${S}/verity.x509
-    fi
-}
-
 do_deploy[depends] += " ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'machine-image:do_makesystem', '', d)}"
 do_deploy[prefuncs] += "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'update_cmdline', '', d)}"
 
