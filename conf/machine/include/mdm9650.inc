@@ -52,3 +52,6 @@ SDK_IMAGE ?= "1"
 
 # Formats of root filesystem images. 
 IMAGE_FSTYPES += "ubi"
+
+# Disable DRM libs for MDM targets
+DISTRO_FEATURES += "disable_drm"
