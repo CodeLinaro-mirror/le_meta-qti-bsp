@@ -1,0 +1,1 @@
+ACTION=="add" SUBSYSTEM=="hab", KERNEL=="hab", MODE="0666"

@@ -8,6 +8,8 @@ FILESEXTRAPATHS_append := ":${THISDIR}/systemd-232"
 # 0013-sysv-generator-add-support-for-executing-scripts-und.patch
 SRC_URI_append += "file://70-net-setup-link.rules \
                    file://60-persistent-v4l.rules \
+                   file://ion.rules \
+                   file://hab.rules \
                    file://systemd-udev-trigger-full.service \
                    file://0030-plymounth-dependency-cleanup.patch \
                    file://0031-udev-trigger-only-enable-must-part-while-leave-other.patch \
@@ -27,4 +29,8 @@ do_install_append () {
   install -d ${D}${systemd_unitdir}/system/multi-user.target.wants
   install -m 0644 ${WORKDIR}/systemd-udev-trigger-full.service ${D}${systemd_unitdir}/system/
   ln -sf ../systemd-udev-trigger-full.service ${D}${systemd_unitdir}/system/multi-user.target.wants/systemd-udev-trigger-full.service
+  if [ "${BASEMACHINE}" == "8x96autogvmquin" ]; then
+      install -m 0644 ${WORKDIR}/ion.rules ${D}${sysconfdir}/udev/rules.d/
+      install -m 0644 ${WORKDIR}/hab.rules ${D}${sysconfdir}/udev/rules.d/
+  fi
 }
