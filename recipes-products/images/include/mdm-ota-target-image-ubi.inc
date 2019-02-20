@@ -68,6 +68,8 @@ do_recovery_ubi() {
 
     cp   ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RECOVERY/usr/bin/updater ${OTA_TARGET_IMAGE_ROOTFS_UBI}/OTA/bin/.
 
+    cp   ${COREBASE}/meta/files/device_table-minimal.txt ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/device_table.txt
+
     #cp and modify file_contexts to BOOT/RAMDISK folder
     if [[ "${DISTRO_FEATURES}" =~ "selinux" ]]; then
         cp ${IMAGE_ROOTFS}/etc/selinux/mls/contexts/files/file_contexts ${OTA_TARGET_IMAGE_ROOTFS_UBI}/BOOT/RAMDISK/.
