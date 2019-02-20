@@ -1,1 +1,2 @@
 ACTION=="add" SUBSYSTEM=="misc", KERNEL=="ion", MODE="0666"
+ACTION=="add" SUBSYSTEM=="misc", KERNEL=="sw_sync", MODE="0666"
