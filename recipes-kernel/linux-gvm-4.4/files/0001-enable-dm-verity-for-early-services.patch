@@ -1,0 +1,80 @@
+From 54ef11f51f079d02d0da7b599cb1cc77b4bc9c3e Mon Sep 17 00:00:00 2001
+From: Lei wang <leiwan@codeaurora.org>
+Date: Mon, 4 Mar 2019 17:32:08 +0800
+Subject: [PATCH] enable dm-verity for early services
+
+put dm-verity earlier for early_init
+
+Change-Id: I72cfc89bc00dea1a2eae826ab8862d9c95e0e97e
+Signed-off-by: Lei wang <leiwan@codeaurora.org>
+---
+ arch/arm64/crypto/sha2-ce-glue.c | 2 +-
+ drivers/char/misc.c              | 2 +-
+ drivers/md/dm-bufio.c            | 2 +-
+ drivers/md/dm-verity-target.c    | 2 +-
+ drivers/md/dm.c                  | 2 +-
+ 5 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/arch/arm64/crypto/sha2-ce-glue.c b/arch/arm64/crypto/sha2-ce-glue.c
+index 0ed9486f75dd..f9d809d72f63 100644
+--- a/arch/arm64/crypto/sha2-ce-glue.c
++++ b/arch/arm64/crypto/sha2-ce-glue.c
+@@ -123,5 +123,5 @@ static void __exit sha2_ce_mod_fini(void)
+ 	crypto_unregister_shashes(algs, ARRAY_SIZE(algs));
+ }
+ 
+-module_cpu_feature_match(SHA2, sha2_ce_mod_init);
++postcore_initcall(sha2_ce_mod_init);
+ module_exit(sha2_ce_mod_fini);
+diff --git a/drivers/char/misc.c b/drivers/char/misc.c
+index 803b7840759a..59b5b9d35220 100644
+--- a/drivers/char/misc.c
++++ b/drivers/char/misc.c
+@@ -300,4 +300,4 @@ fail_remove:
+ 		remove_proc_entry("misc", NULL);
+ 	return err;
+ }
+-subsys_initcall(misc_init);
++core_initcall_sync(misc_init);
+diff --git a/drivers/md/dm-bufio.c b/drivers/md/dm-bufio.c
+index b1d5fa0bc8f7..5ae7818f7808 100644
+--- a/drivers/md/dm-bufio.c
++++ b/drivers/md/dm-bufio.c
+@@ -1909,7 +1909,7 @@ static void __exit dm_bufio_exit(void)
+ 		BUG();
+ }
+ 
+-module_init(dm_bufio_init)
++postcore_initcall(dm_bufio_init)
+ module_exit(dm_bufio_exit)
+ 
+ module_param_named(max_cache_size_bytes, dm_bufio_cache_size, ulong, S_IRUGO | S_IWUSR);
+diff --git a/drivers/md/dm-verity-target.c b/drivers/md/dm-verity-target.c
+index d2e3abc182b3..cef2abc1f6d9 100644
+--- a/drivers/md/dm-verity-target.c
++++ b/drivers/md/dm-verity-target.c
+@@ -1164,7 +1164,7 @@ static void __exit dm_verity_exit(void)
+ 	dm_unregister_target(&verity_target);
+ }
+ 
+-module_init(dm_verity_init);
++postcore_initcall(dm_verity_init);
+ module_exit(dm_verity_exit);
+ 
+ MODULE_AUTHOR("Mikulas Patocka <mpatocka@redhat.com>");
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index f002d2ce9c9f..c5a7db16cda2 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -3762,7 +3762,7 @@ static const struct block_device_operations dm_blk_dops = {
+ /*
+  * module hooks
+  */
+-module_init(dm_init);
++postcore_initcall(dm_init);
+ module_exit(dm_exit);
+ 
+ module_param(major, uint, 0);
+-- 
+2.14.0.rc1.14.gc3eb4e6
+
