@@ -1,6 +1,6 @@
 #/bin/sh
 #
-# Copyright (c) 2018, The Linux Foundation. All rights reserved.
+# Copyright (c) 2018-2019, The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -28,7 +28,7 @@
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 while [ ! -e /etc/resolv.conf ]; do
-    sleep 1
+    sleep 0.1
 done
 
 ifup $1
