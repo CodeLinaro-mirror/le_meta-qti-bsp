@@ -34,6 +34,16 @@ if [ ! -d /data/persist ]; then
     mkdir -p /data/persist
 fi
 
+RETRY=0
+while [ $RETRY -le 10 ]
+do
 # Start using persist properties
 setprop le.persistprop.enable true
 setprop service.adb.tcp.port 5555
+
+PORT=`getprop service.adb.tcp.port`
+if [ $PORT -eq "5555" ]; then
+	break
+fi
+let RETRY+=1
+done
