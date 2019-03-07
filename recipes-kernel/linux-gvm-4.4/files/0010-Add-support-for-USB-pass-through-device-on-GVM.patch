@@ -1,4 +1,4 @@
-From e4689ef0249cf2175c32c833e19da4f99a43a521 Mon Sep 17 00:00:00 2001
+From 1f08046ee521291bda9d6a0e2f68a69e09381744 Mon Sep 17 00:00:00 2001
 From: Yimin Peng <yiminp@codeaurora.org>
 Date: Mon, 6 Aug 2018 17:55:45 +0800
 Subject: [PATCH] Add support for USB pass through device on GVM
@@ -8,16 +8,17 @@ Signed-off-by: Yimin Peng <yiminp@codeaurora.org>
 Signed-off-by: Zhiqiang Tu <ztu@codeaurora.org>
 ---
  .../dts/qcom/vplatform-lfv-msm8996-ivi-common.dtsi |   4 +
+ .../boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts    |  20 ++++
  .../dts/qcom/vplatform-lfv-msm8996-telematics.dts  |   4 +
  .../boot/dts/qcom/vplatform-lfv-msm8996-usb.dtsi   |   6 +
  arch/arm64/configs/msm-auto-gvm-perf_defconfig     |  55 +++++++++
  arch/arm64/configs/msm-auto-gvm_defconfig          |  55 +++++++++
  drivers/platform/msm/gpio-usbdetect.c              | 133 +++++++++++++--------
  drivers/usb/phy/phy-msm-ssusb-qmp.c                |  22 +++-
- 7 files changed, 224 insertions(+), 55 deletions(-)
+ 8 files changed, 244 insertions(+), 55 deletions(-)
 
 diff --git a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi-common.dtsi b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi-common.dtsi
-index a050f09..3dc266b 100644
+index 456eb754b3..910f335 100644
 --- a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi-common.dtsi
 +++ b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi-common.dtsi
 @@ -131,6 +131,10 @@
@@ -31,11 +32,39 @@ index a050f09..3dc266b 100644
  &usb3 {
  	status = "okay";
  	qcom,no-wakeup-src-in-hostmode;
+diff --git a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts
+index ae2ec05..29e1d7b 100644
+--- a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts
++++ b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts
+@@ -46,3 +46,23 @@
+ 			label = "ion_audio_mem";
+ 		};
+ };
++
++&pm8994_gpios {
++	gpio@d000 { /* GPIO 17 - USB1 VBUS detect */
++		qcom,mode = <0>;/* Digital Input*/
++		qcom,pull = <5>;/* No pull */
++		qcom,vin-sel = <2>; /* 1.8 V */
++		qcom,src-sel = <0>;/* GPIO */
++		qcom,master-en = <1>; /* Enable GPIO */
++		status = "okay";
++	};
++};
++
++&usb_detect {
++	qcom,vbus-det-gpio = <&pm8994_gpios 17 0>;
++	interrupt-parent = <&spmi_bus>;
++	interrupts = <0x0 0x9 0x0 IRQ_TYPE_NONE>;
++	interrupt-names ="pmic_id_irq";
++	/delete-property/qcom,skip-vbus-detect;
++	status = "okay";
++};
 diff --git a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-telematics.dts b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-telematics.dts
-index 3902731..4b16b93 100644
+index 6bdc92f..4f0f82a 100644
 --- a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-telematics.dts
 +++ b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-telematics.dts
-@@ -238,6 +238,10 @@
+@@ -241,6 +241,10 @@
  
  #include "vplatform-lfv-msm8996-usb.dtsi"
  
@@ -64,10 +93,10 @@ index faaf00b..3da7f38 100644
  		compatible = "qcom,qusb2phy";
  		reg = <0x07411000 0x180>,
 diff --git a/arch/arm64/configs/msm-auto-gvm-perf_defconfig b/arch/arm64/configs/msm-auto-gvm-perf_defconfig
-index dda4a86..6422fb9 100644
+index 5c3e636..dc43dae 100644
 --- a/arch/arm64/configs/msm-auto-gvm-perf_defconfig
 +++ b/arch/arm64/configs/msm-auto-gvm-perf_defconfig
-@@ -396,3 +396,58 @@ CONFIG_CRYPTO_MD4=y
+@@ -399,3 +399,58 @@ CONFIG_CRYPTO_MD4=y
  CONFIG_CRYPTO_ARC4=y
  CONFIG_CRYPTO_TWOFISH=y
  CONFIG_QMI_ENCDEC=y
@@ -127,10 +156,10 @@ index dda4a86..6422fb9 100644
 +CONFIG_USB_OHCI_HCD_PCI=y
 +CONFIG_DIAG_CHAR=y
 diff --git a/arch/arm64/configs/msm-auto-gvm_defconfig b/arch/arm64/configs/msm-auto-gvm_defconfig
-index 640083b..cf7bd0276 100644
+index 6d2084d..8613b1e 100644
 --- a/arch/arm64/configs/msm-auto-gvm_defconfig
 +++ b/arch/arm64/configs/msm-auto-gvm_defconfig
-@@ -414,3 +414,58 @@ CONFIG_CRYPTO_MD4=y
+@@ -416,3 +416,58 @@ CONFIG_CRYPTO_MD4=y
  CONFIG_CRYPTO_ARC4=y
  CONFIG_CRYPTO_TWOFISH=y
  CONFIG_QMI_ENCDEC=y
