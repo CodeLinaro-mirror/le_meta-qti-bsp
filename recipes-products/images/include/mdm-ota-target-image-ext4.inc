@@ -2,7 +2,7 @@
 # add the MACHINE name to this list.
 # This is the "only" list that will control whether
 # OTA upgrade will be supported on a target.
-OTA_SUPPORTED_EMMC_TARGET_LIST = "apq8009 qcs405-som1 qcs605-64 qcs605-32"
+OTA_SUPPORTED_EMMC_TARGET_LIST = "apq8009 qcs405-som1 qcs605-64 qcs605-32 sdm845 sdmsteppe"
 
 def emmc_target_supports_OTA_upgrade(d):
     list_of_supported_targets = d.getVar('OTA_SUPPORTED_EMMC_TARGET_LIST');
@@ -24,13 +24,13 @@ def emmc_set_vars_and_get_dependencies(d):
         # only A/B target will be generated
         d.setVar('RECOVERY_IMAGE', "0");
         d.setVar('GENERATE_AB_OTA_PACKAGE', "1");
-        return "releasetools-native"
+        return " releasetools-native"
     else:
         # for Non A/B target, set RECOVERY_IMAGE to "1"
         # this will generate a non A/B update package as well.
         d.setVar('RECOVERY_IMAGE', "1");
         d.setVar('GENERATE_AB_OTA_PACKAGE', "0");
-        return "machine-recovery-image releasetools-native"
+        return " machine-recovery-image releasetools-native"
 
 # Add tasks to generate recovery image, OTA zip files
 python __anonymous () {
@@ -38,8 +38,9 @@ python __anonymous () {
         d.appendVar('DEPENDS', emmc_set_vars_and_get_dependencies(d));
         if (d.getVar('RECOVERY_IMAGE', True) == '1' or
                 d.getVar('GENERATE_AB_OTA_PACKAGE', True) == '1'):
-            bb.build.addtask('do_recovery_ext4', 'do_build', 'do_makesystem', d)
-            bb.build.addtask('do_gen_otazip_ext4', 'do_build', 'do_recovery_ext4', d)
+            if (d.getVar('DEBUG_BUILD', True) == '0'):
+                bb.build.addtask('do_recovery_ext4', 'do_build', 'do_makesystem', d)
+                bb.build.addtask('do_gen_otazip_ext4', 'do_build', 'do_recovery_ext4', d)
 }
 
 OTA_TARGET_IMAGE_ROOTFS_EXT4 = "${IMAGE_ROOTFS}/../${MACHINE}-ota-target-image-ext4"
@@ -66,6 +67,7 @@ do_recovery_ext4[cleandirs] += "${OTA_TARGET_IMAGE_ROOTFS_EXT4}/BOOT/RAMDISK"
 # recovery rootfs is required for generating OTA files.
 # Wait till all tasks of machine-recovery-image complete.
 do_recovery_ext4[depends] += "${@ 'machine-recovery-image:do_build' if d.getVar('RECOVERY_IMAGE') == '1' else ''}"
+do_recovery_ext4[depends] += "machine-image:do_make_bootimg"
 
 # if dm-verity is enabled, boot image will be regenerated
 # again after system-image is generated with updated cmdline.
@@ -145,7 +147,9 @@ do_recovery_ext4() {
 
        #recovery_size : Size of recovery partition from partition.xml
        echo recovery_size=0x01E00000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
-    elif [ "${BASEMACHINE}" == "apq8096" ] || [ "${BASEMACHINE}" == "apq8017" ] || [ "${BASEMACHINE}" == "qcs605" ]; then
+    elif [ "${BASEMACHINE}" == "apq8096" ] || [ "${BASEMACHINE}" == "apq8017" ] || \
+         [ "${BASEMACHINE}" == "qcs605" ] || [ "${BASEMACHINE}" == "sdm845" ] || \
+         [ "${BASEMACHINE}" == "sdmsteppe" ]; then
        #boot_size: Size of boot partition from partition.xml
        echo boot_size=0x04000000  >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 

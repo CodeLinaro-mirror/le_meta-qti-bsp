@@ -18,11 +18,16 @@ do_install_append_msm(){
       cp ${D}/etc/init.d/wlan ${D}/etc/initscripts/wlan
       install -d ${D}/etc/systemd/system/
       install -d ${D}/etc/systemd/system/multi-user.target.wants/
+      if ${@base_conditional('MACHINE', 'qcs403-som2', 'true', 'false', d)}; then
+          sed "s/^gEnable2x2\s*=.*/gEnable2x2=0/" -i ${D}/lib/firmware/wlan/qca_cld/WCNSS_qcom_cfg.ini
+      fi
     if ${@base_conditional('BASEMACHINE', 'apq8009', base_conditional('BASEPRODUCT', 'qsap', 'false', 'true', d), 'true', d)}; then
-        install -m 0644 ${WORKDIR}/wlan_daemon.service -D ${D}/etc/systemd/system/wlan_daemon.service
-        # enable the service for multi-user.target
-        ln -sf /etc/systemd/system/wlan_daemon.service \
-           ${D}/etc/systemd/system/multi-user.target.wants/wlan_daemon.service
+        if ${@base_conditional('BASEMACHINE', 'qcs40x', 'false', 'true', d)}; then
+            install -m 0644 ${WORKDIR}/wlan_daemon.service -D ${D}/etc/systemd/system/wlan_daemon.service
+            # enable the service for multi-user.target
+            ln -sf /etc/systemd/system/wlan_daemon.service \
+               ${D}/etc/systemd/system/multi-user.target.wants/wlan_daemon.service
+        fi
     fi
   else
     if ${@base_conditional('BASEMACHINE', 'apq8009', base_conditional('BASEPRODUCT', 'qsap', 'false', 'true', d), 'true', d)}; then
@@ -47,6 +52,8 @@ EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'sdx20', '--enable-target-sd
 EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'sdxpoorwills', '--enable-target-sdxpoorwills=yes', '', d)}"
 EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'qcs40x', '--enable-target-qcs405-som1=yes', '', d)}"
 EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'qcs605', '--enable-target-qcs605=yes', '', d)}"
+EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'sdm845', '--enable-target-sdm845=yes', '', d)}"
+EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'sdmsteppe', '--enable-target-sdmsteppe=yes', '', d)}"
 
 EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'apq8053', '--enable-pronto-wlan=yes', '', d)}"
 EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'apq8017', '--enable-pronto-wlan=yes', '', d)}"

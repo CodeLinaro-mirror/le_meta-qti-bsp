@@ -1,4 +1,3 @@
-inherit dm-verity
 # Enable Bootloader
 RDEPENDS += "${@bb.utils.contains('TARGET_ARCH', 'arm','lib64-edk2','edk2',d)}"
 
@@ -13,7 +12,7 @@ IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES','selinux', 'refpolicy-m
 IMAGE_INSTALL += "start-scripts-firmware-links"
 #IMAGE_INSTALL += "start-scripts-find-partitions"
 IMAGE_INSTALL += "start-scripts-misc-daemon"
-IMAGE_INSTALL += "start-script-ab-slot-util"
+IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'start-script-ab-slot-util', '', d)}"
 
 IMAGE_INSTALL += "base-files"
 IMAGE_INSTALL += "base-passwd"
@@ -32,7 +31,6 @@ IMAGE_INSTALL += "system-prop"
 IMAGE_INSTALL += "systemd-machine-units"
 IMAGE_INSTALL += "wireless-tools"
 IMAGE_INSTALL += "volatile-binds"
-IMAGE_INSTALL += "abctl"
 IMAGE_INSTALL += "libhardware"
 IMAGE_INSTALL += "binder"
 IMAGE_INSTALL += "kernel-modules"
@@ -50,6 +48,9 @@ IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'virtualization', 'cgr
 # Install recovery and its libs in system image if A/B boot is supported
 IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'recovery-bin', '', d)}"
 IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'recovery', '', d)}"
+
+IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'full-disk-encryption', 'openssl', '', d)}"
+IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'full-disk-encryption', 'libscrypt', '', d)}"
 
 # Below is to generate sparse ext4 system image (OE by default supports raw ext4 images)
 do_makesystem() {

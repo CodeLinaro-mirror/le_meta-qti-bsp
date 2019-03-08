@@ -14,6 +14,7 @@ PR = "r19"
 
 DEPENDS += "virtual/kernel openssl glib-2.0 libselinux ext4-utils libunwind libcutils libmincrypt libbase libutils"
 DEPENDS_append_qcs605 = " libsync"
+DEPENDS_append_sdm845 = " libsync"
 
 EXTRA_OECONF = " --with-host-os=${HOST_OS} --with-glib"
 EXTRA_OECONF_append = " --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
@@ -47,8 +48,11 @@ COMPOSITION_apq8053 = "901D"
 COMPOSITION_apq8096 = "901D"
 COMPOSITION_apq8098 = "901D"
 COMPOSITION_qcs605 = "901D"
+COMPOSITION_sdm845 = "901D"
 COMPOSITION_sdxpoorwills = "90DB"
 COMPOSITION_sdmsteppe = "901D"
+
+QPERM_SERVICE = "${S}/logd/logd.service ${S}/leproperties/leprop.service"
 
 do_install_append() {
    install -m 0755 ${S}/adb/launch_adbd -D ${D}${sysconfdir}/launch_adbd
