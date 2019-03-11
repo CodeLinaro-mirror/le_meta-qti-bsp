@@ -58,6 +58,10 @@ IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', '',
 IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'recovery-bin', '', d)}"
 IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'recovery', '', d)}"
 
+#Install virtualization support packages
+IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'virtualization', 'docker docker-registry python3-docker-compose', '', d)}"
+IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'virtualization', 'cgroup-lite aufs-util xz ca-certificates chrony', '', d)}"
+
 # Below is to generate sparse ext4 system image (OE by default supports raw ext4 images)
 do_makesystem() {
     make_ext4fs -B ${DEPLOY_DIR_IMAGE}/system.map -s ${IMAGE_EXT4_SELINUX_OPTIONS} -b 4096 -l ${SYSTEM_SIZE_EXT4} ${DEPLOY_DIR_IMAGE}/${SYSTEMIMAGE_TARGET} ${IMAGE_ROOTFS}
