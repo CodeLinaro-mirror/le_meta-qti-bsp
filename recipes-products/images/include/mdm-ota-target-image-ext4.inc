@@ -33,6 +33,9 @@ do_recovery_ext4[cleandirs] += "${OTA_TARGET_IMAGE_ROOTFS_EXT4}/BOOT/RAMDISK"
 do_recovery_ext4[depends] += "${@["","machine-recovery-image:do_build"][(d.getVar('RECOVERY_IMAGE', True) == '1')]}"
 
 do_recovery_ext4() {
+    if [ "${BASEMACHINE}" == "genericarmv8-64" ]; then
+        return 0
+    fi
     echo "base image rootfs: ${IMAGE_ROOTFS}"
     echo "recovery image rootfs: ${RECOVERY_IMAGE_ROOTFS}"
 
@@ -178,6 +181,9 @@ do_recovery_ext4() {
 # Generate OTA zip files
 do_gen_otazip_ext4() {
 
+    if [ "${BASEMACHINE}" == "genericarmv8-64" ]; then
+        return 0
+    fi
     # Clean up any existing target-files*.zip as this can lead to incorrect content getting packed in the zip.
     rm -f ${TMPDIR}/work/x86_64-linux/releasetools-native/1.0-r0/releasetools/target-files-ext4.zip
 
