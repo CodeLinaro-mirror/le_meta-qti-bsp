@@ -109,3 +109,8 @@ IMAGE_INSTALL += "python-xml"
 IMAGE_INSTALL += "python-subprocess"
 IMAGE_INSTALL += "python-dbus"
 IMAGE_INSTALL += "python-pygobject"
+
+
+IMAGE_INSTALL += "libcap"
+IMAGE_INSTALL += "libcap-bin"
+IMAGE_INSTALL += "attr"
