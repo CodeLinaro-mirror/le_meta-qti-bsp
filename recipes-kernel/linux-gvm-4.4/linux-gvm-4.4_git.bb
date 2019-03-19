@@ -31,6 +31,9 @@ python __anonymous () {
 
   if( (d.getVar('KERNEL_ROOTDEVICE', True) == "/dev/dm-0") and (d.getVar('MACHINE', True) == "8x96autogvmquin")):
     d.appendVar("SRC_URI", " file://0001-enable-rootfs-mount-as-dm-verity-target-during-boot.patch")
+
+  if( (d.getVar('KERNEL_ROOTDEVICE', True) == "/dev/dm-0") and (d.getVar('MACHINE', True) == "8x96autogvmgh")):
+    d.appendVar("SRC_URI", " file://0001-enable-rootfs-mount-as-dm-verity-target-during-boot-gh.patch")
 }
 
 KERNEL_IMAGEDEST_apq8096 = "boot"
