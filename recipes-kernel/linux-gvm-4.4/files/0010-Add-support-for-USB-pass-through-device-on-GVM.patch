@@ -1,21 +1,16 @@
-From 1f08046ee521291bda9d6a0e2f68a69e09381744 Mon Sep 17 00:00:00 2001
-From: Yimin Peng <yiminp@codeaurora.org>
-Date: Mon, 6 Aug 2018 17:55:45 +0800
-Subject: [PATCH] Add support for USB pass through device on GVM
+From 3ac9e95aea7d93676b3af587d75e81e3ec806d81 Mon Sep 17 00:00:00 2001
+From: laiyu <laiyu@codeaurora.org>
+Date: Tue, 19 Mar 2019 17:11:54 +0800
+Subject: [PATCH] laiyu
 
-Change-Id: I7dbd881b3e948702eceb15017ac7934ec5add7e9
-Signed-off-by: Yimin Peng <yiminp@codeaurora.org>
-Signed-off-by: Zhiqiang Tu <ztu@codeaurora.org>
+Change-Id: I868f7736f5d68415012b69af2802da239ccfd733
+Signed-off-by: laiyu <laiyu@codeaurora.org>
 ---
  .../dts/qcom/vplatform-lfv-msm8996-ivi-common.dtsi |   4 +
- .../boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts    |  20 ++++
- .../dts/qcom/vplatform-lfv-msm8996-telematics.dts  |   4 +
- .../boot/dts/qcom/vplatform-lfv-msm8996-usb.dtsi   |   6 +
- arch/arm64/configs/msm-auto-gvm-perf_defconfig     |  55 +++++++++
- arch/arm64/configs/msm-auto-gvm_defconfig          |  55 +++++++++
- drivers/platform/msm/gpio-usbdetect.c              | 133 +++++++++++++--------
- drivers/usb/phy/phy-msm-ssusb-qmp.c                |  22 +++-
- 8 files changed, 244 insertions(+), 55 deletions(-)
+ .../dts/qcom/vplatform-lfv-msm8996-telematics.dts  |   5 +
+ drivers/platform/msm/gpio-usbdetect.c              | 135 +++++++++++++--------
+ 3 files changed, 94 insertions(+), 50 deletions(-)
+ mode change 100644 => 100755 drivers/platform/msm/gpio-usbdetect.c
 
 diff --git a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi-common.dtsi b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi-common.dtsi
 index 456eb754b3..910f335 100644
@@ -32,194 +27,26 @@ index 456eb754b3..910f335 100644
  &usb3 {
  	status = "okay";
  	qcom,no-wakeup-src-in-hostmode;
-diff --git a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts
-index ae2ec05..29e1d7b 100644
---- a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts
-+++ b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts
-@@ -46,3 +46,23 @@
- 			label = "ion_audio_mem";
- 		};
- };
-+
-+&pm8994_gpios {
-+	gpio@d000 { /* GPIO 17 - USB1 VBUS detect */
-+		qcom,mode = <0>;/* Digital Input*/
-+		qcom,pull = <5>;/* No pull */
-+		qcom,vin-sel = <2>; /* 1.8 V */
-+		qcom,src-sel = <0>;/* GPIO */
-+		qcom,master-en = <1>; /* Enable GPIO */
-+		status = "okay";
-+	};
-+};
-+
-+&usb_detect {
-+	qcom,vbus-det-gpio = <&pm8994_gpios 17 0>;
-+	interrupt-parent = <&spmi_bus>;
-+	interrupts = <0x0 0x9 0x0 IRQ_TYPE_NONE>;
-+	interrupt-names ="pmic_id_irq";
-+	/delete-property/qcom,skip-vbus-detect;
-+	status = "okay";
-+};
 diff --git a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-telematics.dts b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-telematics.dts
-index 6bdc92f..4f0f82a 100644
+index 6bdc92f..5cd87f7 100644
 --- a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-telematics.dts
 +++ b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-telematics.dts
-@@ -241,6 +241,10 @@
+@@ -241,6 +241,11 @@
  
  #include "vplatform-lfv-msm8996-usb.dtsi"
  
 +&usb_detect {
++	/delete-property/qcom,force-vbus-status-off;
 +	qcom,force-vbus-status-on;
 +};
 +
  &usb3 {
  	status = "okay";
  	qcom,no-wakeup-src-in-hostmode;
-diff --git a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-usb.dtsi b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-usb.dtsi
-index faaf00b..3da7f38 100644
---- a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-usb.dtsi
-+++ b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-usb.dtsi
-@@ -218,6 +218,12 @@
- 
- 	};
- 
-+	android_usb@66bf0c8 {
-+		compatible = "qcom,android-usb";
-+		reg = <0x066bf0c8 0xc8>;
-+		qcom,pm-qos-latency = <301 701 801>;
-+	};
-+
- 	qusb_phy0: qusb@7411000 {
- 		compatible = "qcom,qusb2phy";
- 		reg = <0x07411000 0x180>,
-diff --git a/arch/arm64/configs/msm-auto-gvm-perf_defconfig b/arch/arm64/configs/msm-auto-gvm-perf_defconfig
-index 5c3e636..dc43dae 100644
---- a/arch/arm64/configs/msm-auto-gvm-perf_defconfig
-+++ b/arch/arm64/configs/msm-auto-gvm-perf_defconfig
-@@ -399,3 +399,58 @@ CONFIG_CRYPTO_MD4=y
- CONFIG_CRYPTO_ARC4=y
- CONFIG_CRYPTO_TWOFISH=y
- CONFIG_QMI_ENCDEC=y
-+CONFIG_USB=y
-+CONFIG_USB_XHCI_HCD=y
-+CONFIG_USB_EHCI_HCD=y
-+CONFIG_USB_EHCI_HCD_PLATFORM=y
-+CONFIG_USB_OHCI_HCD=y
-+CONFIG_USB_OHCI_HCD_PLATFORM=y
-+CONFIG_USB_STORAGE=y
-+CONFIG_USB_DWC3=y
-+CONFIG_USB_ISP1760=y
-+CONFIG_USB_QTI_KS_BRIDGE=y
-+CONFIG_NOP_USB_XCEIV=y
-+CONFIG_USB_MSM_SSPHY_QMP=y
-+CONFIG_MSM_QUSB_PHY=y
-+CONFIG_USB_ULPI=y
-+CONFIG_USB_GADGET=y
-+CONFIG_USB_GADGET_VBUS_DRAW=500
-+CONFIG_USB_CONFIGFS=y
-+CONFIG_USB_CONFIGFS_SERIAL=y
-+CONFIG_USB_CONFIGFS_NCM=y
-+CONFIG_USB_CONFIGFS_ECM=y
-+CONFIG_USB_CONFIGFS_MASS_STORAGE=y
-+CONFIG_USB_CONFIGFS_F_FS=y
-+CONFIG_USB_CONFIGFS_F_MTP=y
-+CONFIG_USB_CONFIGFS_F_PTP=y
-+CONFIG_USB_CONFIGFS_F_ACC=y
-+CONFIG_USB_CONFIGFS_UEVENT=y
-+CONFIG_USB_CONFIGFS_F_DIAG=y
-+CONFIG_USB_CONFIGFS_F_CDEV=y
-+CONFIG_USB_CONFIGFS_F_QDSS=y
-+CONFIG_GPIO_USB_DETECT=y
-+CONFIG_USB_USBNET=y
-+CONFIG_USB_BAM=y
-+CONFIG_USB_CONFIGFS_QCRNDIS=y
-+CONFIG_USB_CONFIGFS_RMNET_BAM=y
-+CONFIG_USB_F_QCRNDIS=y
-+CONFIG_USB_F_RMNET_BAM=y
-+CONFIG_DIAG_OVER_USB=y
-+CONFIG_EXTCON=y
-+CONFIG_RNDIS_IPA=y
-+CONFIG_SCSI=y
-+CONFIG_BLK_DEV_SD=y
-+CONFIG_CHR_DEV_SG=y
-+CONFIG_CHR_DEV_SCH=y
-+CONFIG_SCSI_CONSTANTS=y
-+CONFIG_SCSI_LOGGING=y
-+CONFIG_SCSI_SCAN_ASYNC=y
-+CONFIG_SCSI_UFSHCD=y
-+CONFIG_SCSI_UFSHCD_PLATFORM=y
-+CONFIG_SCSI_UFS_QCOM=y
-+CONFIG_SCSI_UFS_QCOM_ICE=y
-+CONFIG_USB_DWC3_PCI=y
-+CONFIG_USB_XHCI_PCI=y
-+CONFIG_USB_EHCI_PCI=y
-+CONFIG_USB_OHCI_HCD_PCI=y
-+CONFIG_DIAG_CHAR=y
-diff --git a/arch/arm64/configs/msm-auto-gvm_defconfig b/arch/arm64/configs/msm-auto-gvm_defconfig
-index 6d2084d..8613b1e 100644
---- a/arch/arm64/configs/msm-auto-gvm_defconfig
-+++ b/arch/arm64/configs/msm-auto-gvm_defconfig
-@@ -416,3 +416,58 @@ CONFIG_CRYPTO_MD4=y
- CONFIG_CRYPTO_ARC4=y
- CONFIG_CRYPTO_TWOFISH=y
- CONFIG_QMI_ENCDEC=y
-+CONFIG_USB=y
-+CONFIG_USB_XHCI_HCD=y
-+CONFIG_USB_EHCI_HCD=y
-+CONFIG_USB_EHCI_HCD_PLATFORM=y
-+CONFIG_USB_OHCI_HCD=y
-+CONFIG_USB_OHCI_HCD_PLATFORM=y
-+CONFIG_USB_STORAGE=y
-+CONFIG_USB_DWC3=y
-+CONFIG_USB_ISP1760=y
-+CONFIG_USB_QTI_KS_BRIDGE=y
-+CONFIG_NOP_USB_XCEIV=y
-+CONFIG_USB_MSM_SSPHY_QMP=y
-+CONFIG_MSM_QUSB_PHY=y
-+CONFIG_USB_ULPI=y
-+CONFIG_USB_GADGET=y
-+CONFIG_USB_GADGET_VBUS_DRAW=500
-+CONFIG_USB_CONFIGFS=y
-+CONFIG_USB_CONFIGFS_SERIAL=y
-+CONFIG_USB_CONFIGFS_NCM=y
-+CONFIG_USB_CONFIGFS_ECM=y
-+CONFIG_USB_CONFIGFS_MASS_STORAGE=y
-+CONFIG_USB_CONFIGFS_F_FS=y
-+CONFIG_USB_CONFIGFS_F_MTP=y
-+CONFIG_USB_CONFIGFS_F_PTP=y
-+CONFIG_USB_CONFIGFS_F_ACC=y
-+CONFIG_USB_CONFIGFS_UEVENT=y
-+CONFIG_USB_CONFIGFS_F_DIAG=y
-+CONFIG_USB_CONFIGFS_F_CDEV=y
-+CONFIG_USB_CONFIGFS_F_QDSS=y
-+CONFIG_GPIO_USB_DETECT=y
-+CONFIG_USB_USBNET=y
-+CONFIG_USB_BAM=y
-+CONFIG_USB_CONFIGFS_QCRNDIS=y
-+CONFIG_USB_CONFIGFS_RMNET_BAM=y
-+CONFIG_USB_F_QCRNDIS=y
-+CONFIG_USB_F_RMNET_BAM=y
-+CONFIG_DIAG_OVER_USB=y
-+CONFIG_EXTCON=y
-+CONFIG_RNDIS_IPA=y
-+CONFIG_SCSI=y
-+CONFIG_BLK_DEV_SD=y
-+CONFIG_CHR_DEV_SG=y
-+CONFIG_CHR_DEV_SCH=y
-+CONFIG_SCSI_CONSTANTS=y
-+CONFIG_SCSI_LOGGING=y
-+CONFIG_SCSI_SCAN_ASYNC=y
-+CONFIG_SCSI_UFSHCD=y
-+CONFIG_SCSI_UFSHCD_PLATFORM=y
-+CONFIG_SCSI_UFS_QCOM=y
-+CONFIG_SCSI_UFS_QCOM_ICE=y
-+CONFIG_USB_DWC3_PCI=y
-+CONFIG_USB_XHCI_PCI=y
-+CONFIG_USB_EHCI_PCI=y
-+CONFIG_USB_OHCI_HCD_PCI=y
-+CONFIG_DIAG_CHAR=y
 diff --git a/drivers/platform/msm/gpio-usbdetect.c b/drivers/platform/msm/gpio-usbdetect.c
-index 9768243..7cddd4c 100644
+old mode 100644
+new mode 100755
+index 9768243..8a08909
 --- a/drivers/platform/msm/gpio-usbdetect.c
 +++ b/drivers/platform/msm/gpio-usbdetect.c
 @@ -46,6 +46,9 @@ static irqreturn_t gpio_usbdetect_vbus_irq(int irq, void *data)
@@ -240,7 +67,7 @@ index 9768243..7cddd4c 100644
  
  	usb = devm_kzalloc(&pdev->dev, sizeof(*usb), GFP_KERNEL);
  	if (!usb)
-@@ -146,68 +150,97 @@ static int gpio_usbdetect_probe(struct platform_device *pdev)
+@@ -146,68 +150,99 @@ static int gpio_usbdetect_probe(struct platform_device *pdev)
  		}
  	}
  
@@ -376,63 +203,20 @@ index 9768243..7cddd4c 100644
 +	{
 +		dev_info(&pdev->dev, "%s: force vbus status to ON\n", __func__);
 +		extcon_set_cable_state_(usb->extcon_dev, EXTCON_USB_HOST, 0);
++		extcon_set_cable_state_(usb->extcon_dev, EXTCON_USB_SPEED, 1);
 +		extcon_set_cable_state_(usb->extcon_dev, EXTCON_USB, 1);
 +	}
 +	else if(skip_vbus_detect && of_property_read_bool(pdev->dev.of_node,
 +		"qcom,force-vbus-status-off"))
 +	{
 +		dev_info(&pdev->dev, "%s: force vbus status to OFF\n", __func__);
++		extcon_set_cable_state_(usb->extcon_dev, EXTCON_USB_SPEED, 1);
 +		extcon_set_cable_state_(usb->extcon_dev, EXTCON_USB_HOST, 1);
 +		extcon_set_cable_state_(usb->extcon_dev, EXTCON_USB, 0);
 +	}
  
  	return 0;
  
-diff --git a/drivers/usb/phy/phy-msm-ssusb-qmp.c b/drivers/usb/phy/phy-msm-ssusb-qmp.c
-index d1b6f1d..6942882 100644
---- a/drivers/usb/phy/phy-msm-ssusb-qmp.c
-+++ b/drivers/usb/phy/phy-msm-ssusb-qmp.c
-@@ -144,6 +144,11 @@ static void msm_ssusb_qmp_enable_autonomous(struct msm_ssphy_qmp *phy,
- 	unsigned int autonomous_mode_offset =
- 			phy->phy_reg[USB3_PHY_AUTONOMOUS_MODE_CTRL];
- 
-+	if(!phy->vls_clamp_reg)	{
-+		dev_dbg(phy->phy.dev, "vls_clamp_reg not available\n");
-+		return;
-+	}
-+
- 	dev_dbg(phy->phy.dev, "enabling QMP autonomous mode with cable %s\n",
- 			get_cable_status_str(phy));
- 
-@@ -648,16 +653,23 @@ static int msm_ssphy_qmp_probe(struct platform_device *pdev)
- 		goto err;
- 	}
- 
--	res = platform_get_resource_byname(pdev, IORESOURCE_MEM,
--			"vls_clamp_reg");
--	if (!res) {
--		dev_dbg(dev, "vls_clamp_reg not passed\n");
--	} else {
-+	if (!of_property_read_bool(dev->of_node, "qcom,disable-autonomous-mode")) {
-+		dev_err(dev, "%s: autonomous mode enabled!\n", __func__);
-+		res = platform_get_resource_byname(pdev, IORESOURCE_MEM,
-+				"vls_clamp_reg");
-+		if (!res) {
-+			dev_err(dev, "failed getting vls_clamp_reg\n");
-+			return -ENODEV;
-+		}
-+
- 		phy->vls_clamp_reg = devm_ioremap_resource(dev, res);
- 		if (IS_ERR(phy->vls_clamp_reg)) {
- 			dev_err(dev, "couldn't find vls_clamp_reg address.\n");
- 			return PTR_ERR(phy->vls_clamp_reg);
- 		}
-+	} else {
-+		dev_err(dev, "%s: autonomous mode disabled!\n", __func__);
-+		phy->vls_clamp_reg = NULL;
- 	}
- 
- 	res = platform_get_resource_byname(pdev, IORESOURCE_MEM,
 -- 
 1.9.1
 
