@@ -5,6 +5,8 @@ DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES','ab-boot-support','releasetoo
 python __anonymous () {
     if bb.utils.contains('IMAGE_FSTYPES', 'ext4', True, False, d):
         if d.getVar('RECOVERY_IMAGE', True) == '1' or bb.utils.contains('DISTRO_FEATURES','ab-boot-support','true','false',d):
+            if d.getVar('BASEMACHINE', True) == 'sda845' and d.getVar('DISTRO', True) == 'robot-ros':
+                return
             bb.build.addtask('do_recovery_ext4', 'do_build', 'do_makesystem', d)
             bb.build.addtask('do_gen_otazip_ext4', 'do_build', 'do_recovery_ext4', d)
 }
