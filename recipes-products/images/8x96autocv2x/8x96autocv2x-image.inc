@@ -7,6 +7,7 @@ IMAGE_INSTALL += "packagegroup-agl-image-minimal"
 
 IMAGE_INSTALL += "packagegroup-telematics-utils"
 IMAGE_INSTALL += "packagegroup-telematics-qti"
+IMAGE_INSTALL += "packagegroup-telematics-cv2x-qti"
 
 IMAGE_INSTALL += "iproute2"
 IMAGE_INSTALL += "pciutils"
