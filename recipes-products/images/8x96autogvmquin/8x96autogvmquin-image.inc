@@ -4,7 +4,6 @@ require recipes-platform/images/agl-demo-platform.bb
 
 EXTRA_IMAGE_FEATURES += "package-management"
 EXTRA_IMAGE_FEATURES += "tools-debug"
-EXTRA_IMAGE_FEATURES += "ssh-server-openssh"
 
 IMAGE_INSTALL += "packagegroup-agl-core"
 IMAGE_INSTALL += "packagegroup-agl-ivi"
@@ -15,12 +14,9 @@ IMAGE_INSTALL += "packagegroup-agl-appfw"
 IMAGE_INSTALL += "weston"
 IMAGE_INSTALL += "weston-examples"
 IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'qtbase-examples', '',d)}"
-#IMAGE_INSTALL += "qtwebkit"
-#IMAGE_INSTALL += "qtwebkit-examples-examples"
 IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'qtmultimedia', '',d)}"
 IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'qtmultimedia-plugins', '',d)}"
 IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'qtmultimedia-qmlplugins', '',d)}"
-#IMAGE_INSTALL += "lmbench"
 IMAGE_INSTALL += "libcutils"
 IMAGE_INSTALL += "liblog"
 IMAGE_INSTALL += "system-core-adbd"
@@ -28,19 +24,12 @@ IMAGE_INSTALL += "system-core-usb"
 IMAGE_INSTALL += "system-core-leprop"
 IMAGE_INSTALL += "system-prop"
 IMAGE_INSTALL += "packagegroup-multimedia"
-#IMAGE_INSTALL += "lib32-lk"
-#IMAGE_INSTALL += "init-audio"
 IMAGE_INSTALL += "pulseaudio-module-acdb"
 IMAGE_INSTALL += "pulseaudio-module-codec-control"
-IMAGE_INSTALL += "start-scripts-firmware-links"
-#IMAGE_INSTALL += "start-scripts-find-partitions"
-#IMAGE_INSTALL += "neutrino-eth"
-#IMAGE_INSTALL += "open-avb"
 IMAGE_INSTALL += "iperf3"
 IMAGE_INSTALL += "iperf"
 IMAGE_INSTALL += "ethtool"
 IMAGE_INSTALL += "tcpdump"
-#IMAGE_INSTALL += "ebtables"
 IMAGE_INSTALL += "vlan"
 IMAGE_INSTALL += "bridge-utils"
 IMAGE_INSTALL += "cryptsetup"
@@ -51,27 +40,11 @@ IMAGE_INSTALL += "pciutils"
 IMAGE_INSTALL += "${@bb.utils.contains("DISTRO_FEATURES", "early_init", "early-init", "" ,d)}"
 IMAGE_INSTALL += "${@bb.utils.contains("DISTRO_FEATURES", "early_init", "memory-hotplug", "" ,d)}"
 
-#Camera modules
-#IMAGE_INSTALL += "lib32-androidcompat"
-#IMAGE_INSTALL += "init-can"
-
-#WiFi
-#IMAGE_INSTALL += "qcacld"
-#IMAGE_INSTALL += "wpa-supplicant"
-#IMAGE_INSTALL += "hostapd"
-#IMAGE_INSTALL += "iw"
-#IMAGE_INSTALL += "wireless-tools"
-#IMAGE_INSTALL += "sigma-dut"
-
-#BT
-#IMAGE_INSTALL += "synergy-opensource"
-
 # Add Persistence Storage related components
 IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'dlt-daemon', '',d)}"
 IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'persistence-common-object', '',d)}"
 IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'persistence-client-library', '',d)}"
-#IMAGE_INSTALL += "persistence-administrator"
-IMAGE_INSTALL += "node-startup-controller"
+IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'node-startup-controller', '',d)}"
 IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'node-state-manager', '',d)}"
 IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'node-health-monitor', '',d)}"
 IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'mm-vdec-omx-test', '',d)}"
@@ -134,7 +107,6 @@ IMAGE_INSTALL += "af-binder"
 IMAGE_INSTALL += "af-binder-binding-afb-dbus-binding"
 IMAGE_INSTALL += "af-binder-binding-authlogin"
 IMAGE_INSTALL += "libafbwsc"
-#IMAGE_INSTALL += "web-runtime"
 IMAGE_INSTALL += "xmlsec1"
 IMAGE_INSTALL += "cynara"
 IMAGE_INSTALL += "security-manager"
@@ -144,14 +116,10 @@ IMAGE_INSTALL += "agl-users"
 #RESIZE
 IMAGE_INSTALL += "resize-service"
 
-# Hypervisor
-#IMAGE_INSTALL += "libuhab"
-#IMAGE_INSTALL += "uhabtest"
-
 #PTP Virtual
 IMAGE_INSTALL += "ptp-virtual"
 #Telnet
-IMAGE_INSTALL += " xinetd netkit-telnet"
+IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'xinetd netkit-telnet', '',d)}"
 
 IMAGE_ROOTFS_SIZE = "2097152"
 IMAGE_ROOTFS_EXTRA_SPACE_append = "${@bb.utils.contains("DISTRO_FEATURES", "systemd", " + 4096", "" ,d)}"
