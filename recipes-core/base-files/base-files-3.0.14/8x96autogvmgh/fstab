@@ -4,9 +4,9 @@ devpts               /dev/pts             devpts     mode=0620,gid=5       0  0
 tmpfs                /run                 tmpfs      mode=0755,nodev,nosuid,strictatime 0  0
 tmpfs                /var/volatile        tmpfs      defaults              0  0
 
-/dev/disk/by-path/virtio-pci-300805000.virtio-scsi1-scsi-0:0:0:0-part1            /firmware            auto       defaults              0  2
-/dev/disk/by-path/virtio-pci-300806000.virtio-scsi2-scsi-0:0:0:0-part1            /bluetooth           auto       defaults              0  2
-/dev/disk/by-path/virtio-pci-300807000.virtio-scsi3-scsi-0:0:0:0-part1            /data                auto       defaults              0  2
+PARTLABEL=modem       /firmware           auto        defaults             0  2
+PARTLABEL=bluetooth   /bluetooth          auto        defaults             0  2
+PARTLABEL=userdata    /data               auto        defaults             0  2
 
 # Bind /home to /data
 /data                /home                auto       defaults,bind         0  0
