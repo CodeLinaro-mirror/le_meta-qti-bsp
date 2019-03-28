@@ -25,7 +25,7 @@ This recipe produces two binary packages: 'chrony' which contains chronyd, \
 the configuration file and the init script, and 'chronyc' which contains \
 the client program only."
 
-HOMEPAGE = "http://chrony.tuxfamily.org/"
+HOMEPAGE = "https://chrony.tuxfamily.org/"
 SECTION = "net"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
@@ -33,11 +33,12 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 SRC_URI = "https://download.tuxfamily.org/chrony/chrony-${PV}.tar.gz \
     file://chrony.conf \
     file://chronyd \
+    file://arm_eabi.patch \
 "
-SRC_URI[md5sum] = "d0598aa8a9be8faccef9386f6fc0d5f2"
-SRC_URI[sha256sum] = "8d04e7cda2333289c2104b731d39c3c1db94816e43bae35d7ee4e7ae8af6391f"
+SRC_URI[md5sum] = "7170e750469c198fc6784047d6f71144"
+SRC_URI[sha256sum] = "af77e47c2610a7e55c8af5b89a8aeff52d9a867dd5983d848b52d374bc0e6b9f"
 
-DEPENDS += "pps-tools"
+DEPENDS = "pps-tools"
 
 # Note: Despite being built via './configure; make; make install',
 #       chrony does not use GNU Autotools.
@@ -58,22 +59,25 @@ inherit update-rc.d systemd
 #     chrony.conf and init script.
 #   - 'scfilter' enables support for system call filtering, but requires the
 #     kernel to have CONFIG_SECCOMP enabled.
-PACKAGECONFIG ??= "editline scfilter"
+PACKAGECONFIG ??= "editline \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'ipv6', 'ipv6', '', d)} \
+"
 PACKAGECONFIG[readline] = "--without-editline,--without-readline,readline"
-#PACKAGECONFIG[editline] = ",--without-editline,libedit"
+PACKAGECONFIG[editline] = ",--without-editline,libedit"
 PACKAGECONFIG[sechash] = "--without-tomcrypt,--disable-sechash,nss"
 PACKAGECONFIG[privdrop] = ",--disable-privdrop,libcap"
-PACKAGECONFIG[scfilter] = "--enable-scfilter,--without-seccomp"
+PACKAGECONFIG[scfilter] = "--enable-scfilter,--without-seccomp,libseccomp"
+PACKAGECONFIG[ipv6] = ",--disable-ipv6,"
+PACKAGECONFIG[nss] = "--with-nss,--without-nss,nss"
+PACKAGECONFIG[libcap] = "--with-libcap,--without-libcap,libcap"
 
 # --disable-static isn't supported by chrony's configure script.
 DISABLE_STATIC = ""
 
-LDFLAGS += "-lpthread"
-
 do_configure() {
     ./configure --sysconfdir=${sysconfdir} --bindir=${bindir} --sbindir=${sbindir} \
                 --localstatedir=${localstatedir} --datarootdir=${datadir} \
-                ${EXTRA_OECONF}
+                ${PACKAGECONFIG_CONFARGS}
 }
 
 do_install() {
@@ -114,7 +118,7 @@ do_install() {
 FILES_${PN} = "${sbindir}/chronyd ${sysconfdir} ${localstatedir}"
 CONFFILES_${PN} = "${sysconfdir}/chrony.conf"
 INITSCRIPT_NAME = "chronyd"
-INITSCRIPT_PARAMS = "start 84 5 ."
+INITSCRIPT_PARAMS = "defaults"
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE_${PN} = "chronyd.service"
 
