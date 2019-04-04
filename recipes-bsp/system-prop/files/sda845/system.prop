@@ -63,5 +63,8 @@ persist.vendor.audio.qas.enabled=true
 #Offset for audio timestamp
 persist.qmmf.timestamp.adjust=-150000
 
+#camera hal library suffix
+ro.hardware.camera=qcom
+
 #isp clock optimization enable(1)/disable(0)
 persist.camera.isp.clock.optmz=0
