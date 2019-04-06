@@ -47,6 +47,7 @@ IMAGE_INSTALL += "protobuf"
 IMAGE_INSTALL += "sigma-dut"
 IMAGE_INSTALL += "sec-config"
 IMAGE_INSTALL += "libatomic"
+IMAGE_INSTALL += "openssh"
 
 IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'full-disk-encryption', 'libscrypt', '', d)}"
 
