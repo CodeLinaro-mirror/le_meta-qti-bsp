@@ -45,8 +45,12 @@ VOLATILE_BINDS_append_apq8017 = "\
 "
 VOLATILE_BINDS_append_apq8009 = "\
 /systemrw/alexa /etc/alexa/ \n\
+/systemrw/var/lib/pulse /var/lib/pulse/ \n\
 "
 VOLATILE_BINDS_append_qcs40x = "\
+/systemrw/var/lib/pulse /var/lib/pulse/ \n\
+"
+VOLATILE_BINDS_append_sdmsteppe = "\
 /systemrw/var/lib/pulse /var/lib/pulse/ \n\
 "
 
