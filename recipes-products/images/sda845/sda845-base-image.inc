@@ -48,6 +48,7 @@ IMAGE_INSTALL += "sigma-dut"
 IMAGE_INSTALL += "sec-config"
 IMAGE_INSTALL += "libatomic"
 IMAGE_INSTALL += "openssh"
+IMAGE_INSTALL += "python-distutils python-email python-compile python-json python-threading python-numbers"
 
 IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'full-disk-encryption', 'libscrypt', '', d)}"
 
