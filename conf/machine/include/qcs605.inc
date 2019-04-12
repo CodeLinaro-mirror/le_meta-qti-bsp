@@ -16,7 +16,7 @@ PREFERRED_PROVIDER_virtual/egl ?= "adreno"
 PREFERRED_PROVIDER_virtual/libgles1 ?= "adreno"
 PREFERRED_PROVIDER_virtual/libgles2 ?= "adreno"
 
-SERIAL_CONSOLE ?= "${@['', '115200 ttyMSM0'][d.getVar('VARIANT', True) == ('' or 'debug')]}"
+SERIAL_CONSOLE ?= "${@['', '115200 ttyMSM0'][d.getVar('VARIANT', True) == ('perf' or 'debug')]}"
 
 DISTRO ?= "msm"
 
@@ -28,6 +28,8 @@ PAGE_SIZE ?= '4096'
 
 # Max supported inodes
 EXTRA_IMAGECMD ?= "-N 2048"
+
+MACHINE_MNT_POINTS = "/firmware /persist /cache /dsp /bt_firmware"
 
 # Sizes for EXT4 (in bytes)
 SYSTEM_SIZE_EXT4 ?= "3221225472"
