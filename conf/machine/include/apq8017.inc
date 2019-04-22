@@ -53,3 +53,5 @@ RECOVERY_IMAGE ?= "1"
 # Formats of root filesystem images.
 IMAGE_FSTYPES += "ext4"
 
+# Disable DRM libs for MDM targets
+DISTRO_FEATURES += "disable_drm"
