@@ -36,7 +36,7 @@ IMAGE_INSTALL += "cryptsetup"
 
 # Early init
 IMAGE_INSTALL += "${@bb.utils.contains("DISTRO_FEATURES", "early_init", "early-init", "" ,d)}"
-IMAGE_INSTALL += "${@bb.utils.contains("DISTRO_FEATURES", "early_init", "memory-hotplug", "" ,d)}"
+
 
 # Add Persistence Storage related components
 IMAGE_INSTALL += "${@base_conditional('WITH_INTERNAL_LAYER', 'yes', 'dlt-daemon', '',d)}"
