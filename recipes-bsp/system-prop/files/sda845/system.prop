@@ -68,3 +68,6 @@ ro.hardware.camera=qcom
 
 #isp clock optimization enable(1)/disable(0)
 persist.camera.isp.clock.optmz=0
+
+#zsl force contolled by application
+camera.force_control_zsl=1
