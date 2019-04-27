@@ -84,6 +84,7 @@ addtask unpack_extra after do_unpack before do_patch
 
 do_patch_extra () {
     cat ${WORKDIR}/eap-qti-kernel/defconfig >> ${S}/arch/${ARCH}/configs/${KERNEL_CONFIG}
+    echo "# CONFIG_DRM_MSM_EARLY_CARD is not set" >> ${S}/arch/${ARCH}/configs/${KERNEL_CONFIG}
 }
 
 addtask patch_extra after do_patch before do_configure
