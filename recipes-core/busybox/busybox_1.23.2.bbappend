@@ -17,6 +17,7 @@ SRC_URI += "\
             file://busybox-syslog.service \
             file://busybox_klogd.patch;patchdir=.. \
             file://iio.sh \
+            file://sensors.sh \
             file://0001-Support-MTP-function.patch \
             file://0001-Fix-file-synchronization-in-mdev.patch \
             file://fix-mdev-crash.patch \
@@ -46,6 +47,7 @@ do_install_append() {
         install -m 0755 ${WORKDIR}/find-touchscreen.sh ${D}${sysconfdir}/mdev/
         install -m 0755 ${WORKDIR}/usb.sh ${D}${sysconfdir}/mdev/
         install -m 0755 ${WORKDIR}/iio.sh ${D}${sysconfdir}/mdev/
+        install -m 0755 ${WORKDIR}/sensors.sh ${D}${sysconfdir}/mdev/
     fi
     if [ ${BASEMACHINE} == "apq8053"];then
      install -m 0644 ${WORKDIR}/apq8053/mdev.conf ${D}${sysconfdir}/
