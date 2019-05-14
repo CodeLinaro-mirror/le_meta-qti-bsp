@@ -1,0 +1,13 @@
+[Unit]
+Description=Enable fde on data partition
+Before=data.mount
+After=sys-devices-300807000.virtio\x2dscsi3-virtio3-host3-target3:0:0-3:0:0:0-block-sdd-sdd1.device persist.mount
+SourcePath=/usr/bin/enable-fde.sh
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/enable-fde.sh
+
+[Install]
+WantedBy= data.mount

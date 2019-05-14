@@ -99,6 +99,10 @@ IMAGE_INSTALL += "dhcp-client"
 IMAGE_ROOTFS_SIZE = "2097152"
 IMAGE_ROOTFS_EXTRA_SPACE_append = "${@bb.utils.contains("DISTRO_FEATURES", "systemd", " + 4096", "" ,d)}"
 
+IMAGE_INSTALL += "e2fsprogs-mke2fs"
+#IMAGE_INSTALL += "enable-fde"
+
+
 IMAGE_INSTALL += "busybox"
 IMAGE_INSTALL += "packagegroup-agl-core-connectivity"
 IMAGE_INSTALL += "python-setuptools"
