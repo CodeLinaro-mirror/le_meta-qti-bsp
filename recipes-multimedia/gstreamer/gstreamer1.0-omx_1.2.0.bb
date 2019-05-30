@@ -1,6 +1,8 @@
 DEFAULT_PREFERENCE = "-1"
 
 require ${COREBASE}/meta/recipes-multimedia/gstreamer/gstreamer1.0-omx.inc
+#inherit python3native to export related STAGING ENVs
+inherit python3native
 
 DEPENDS += "media"
 RDEPENDS_${PN} = "media"

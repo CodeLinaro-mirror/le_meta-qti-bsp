@@ -20,7 +20,8 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 LV = "1.0.0"
 
-inherit autotools
+#inherit python3native to export related STAGING ENVs
+inherit autotools python3native
 
 #re-use non-perf settings
 #BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
@@ -36,15 +37,9 @@ EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96autogvmquin', ' --ena
 EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96autogvmred', ' --enable-target-hypervisor=yes', '', d)} "
 EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96autogvmgh', ' --enable-target-hypervisor=yes', '', d)} "
 EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96autogvmga', ' --enable-target-hypervisor=yes', '', d)} "
-EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96auto', ' --enable-target-uses-gbm=yes', '', d)} "
-EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96mizar', ' --enable-target-uses-gbm=yes', '', d)} "
 EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96autodvrs', ' --enable-targets-that-support-pq=yes', '', d)} "
 EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96autodvrs', ' --enable-targets-that-support-adsp-pq=yes', '', d)} "
-EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96autodvrs', ' --enable-target-uses-gbm=yes', '', d)} "
 
-EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96autogvmquin', ' --enable-target-uses-gbm=yes', '', d)} "
-EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96autogvmgh', ' --enable-target-uses-gbm=yes', '', d)} "
-EXTRA_OECONF_append = "${@base_conditional('MACHINE', '8x96autogvmga', ' --enable-target-uses-gbm=yes', '', d)} "
 
 EXTRA_OECONF_append =" --enable-use-glib="yes""
 EXTRA_OECONF_append =" --enable-target-uses-ion="yes""
@@ -75,7 +70,6 @@ CPPFLAGS += "-I${STAGING_INCDIR} \
 CPPFLAGS += "-include stdint.h"
 
 LDFLAGS += "-lglib-2.0"
-LDFLAGS += "-lgbm"
 LDFLAGS += "-ldrm"
 LDFLAGS += "-lwayland-client"
 LDFLAGS += "-lEGL"
