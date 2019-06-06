@@ -9,7 +9,7 @@ inherit ${@bb.utils.contains('TARGET_KERNEL_ARCH', 'aarch64', 'qtikernel-arch', 
 SRC_URI_append_sdmsteppe = " file://disableipa3.cfg"
 SRC_URI_append_sdmsteppe = " file://sdmsteppe_iot_configs.cfg"
 
-COMPATIBLE_MACHINE = "(qcs40x|sdxprairie|sdmsteppe)"
+COMPATIBLE_MACHINE = "(qcs40x|sdxprairie|sdmsteppe|sa515m)"
 
 KERNEL_IMAGEDEST = "boot"
 
