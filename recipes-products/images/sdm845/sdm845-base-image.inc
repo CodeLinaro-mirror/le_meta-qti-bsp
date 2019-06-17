@@ -1,4 +1,3 @@
-inherit dm-verity
 # Enable Bootloader
 RDEPENDS += "${@bb.utils.contains('TARGET_ARCH', 'arm','lib64-edk2','edk2',d)}"
 
@@ -26,7 +25,7 @@ IMAGE_INSTALL += "system-core-logd"
 IMAGE_INSTALL += "system-core-leprop"
 IMAGE_INSTALL += "system-core-usb"
 IMAGE_INSTALL += "system-core-post-boot"
-#IMAGE_INSTALL += "system-conf"
+IMAGE_INSTALL += "system-conf"
 IMAGE_INSTALL += "iw"
 IMAGE_INSTALL += "system-prop"
 IMAGE_INSTALL += "systemd-machine-units"
