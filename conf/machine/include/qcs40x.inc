@@ -15,11 +15,6 @@ USBCOMPOSITION      = "901D"
 PREFERRED_PROVIDER_virtual/kernel = "linux-msm"
 PREFERRED_VERSION_linux-msm = "4.14"
 
-# Set openssl10 as openssl provider.
-PREFERRED_PROVIDER_openssl          = "openssl10"
-PREFERRED_VERSION_openssl10         = "1.0.2q"
-PREFERRED_PROVIDER_openssl-native   = "openssl10-native"
-
 MACHINE_DISPLAY_WIDTH_PIXELS ?= "480"
 MACHINE_DISPLAY_HEIGHT_PIXELS ?= "640"
 
