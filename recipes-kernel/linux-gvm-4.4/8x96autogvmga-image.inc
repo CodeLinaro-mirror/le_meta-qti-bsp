@@ -71,6 +71,7 @@ SRC_URI_append_kernelpatchok += " \
     file://0011-Add-psci-workaround-for-gvm-suspend.patch \
     file://0012-unmask-virtio-net-irq-to-wake-up-system.patch \
     file://0001-kernel-misc-qseecom-Use-hvenv-driver-for-ghs-lv-gvm.patch \
+    file://0001-ASoC-msm-Change-SEC_MI2S-from-Master-to-Slave.patch \
 "
 
 do_deploy_rename () {
