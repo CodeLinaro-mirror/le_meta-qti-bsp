@@ -1,0 +1,30 @@
+From 555afd86e877e2c58484a8b39a6fa5a4b5938bdb Mon Sep 17 00:00:00 2001
+From: Lei wang <leiwan@codeaurora.org>
+Date: Sat, 26 Aug 2017 13:17:42 +0800
+Subject: [PATCH] systemd: make early-init socket visible for systemd
+
+Signed-off-by: Lei wang <leiwan@codeaurora.org>
+---
+ src/login/logind-user.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/src/login/logind-user.c b/src/login/logind-user.c
+index a826321..ccac4b0 100644
+--- a/src/login/logind-user.c
++++ b/src/login/logind-user.c
+@@ -370,6 +370,12 @@ static int user_mkdir_runtime_path(User *u) {
+                         }
+                 }
+ 
++                /* When support early_init, make early_init socket visible for systemd */
++                r = mount("/early/user/0", u->runtime_path, NULL, MS_BIND, NULL);
++                if (r < 0) {
++                    log_error_errno(r, "Failed to bind runtime dir to our early_init path: %m");
++                }
++
+                 r = label_fix(u->runtime_path, false, false);
+                 if (r < 0)
+                         log_warning_errno(r, "Failed to fix label of '%s', ignoring: %m", u->runtime_path);
+-- 
+1.9.1
+

@@ -1,0 +1,107 @@
+From a0707c1779355d2e5324cd779c121178a20444f5 Mon Sep 17 00:00:00 2001
+From: Lei wang <leiwan@codeaurea.org>
+Date: Sat, 12 Aug 2017 17:30:10 +0800
+Subject: [PATCH] cleanup nonused plymouth dependency for perfomance
+
+Signed-off-by: Lei wang <leiwan@codeaurea.org>
+---
+ units/console-getty.service.m4.in             | 2 +-
+ units/container-getty@.service.m4.in          | 2 +-
+ units/getty@.service.m4                       | 2 +-
+ units/rescue.service.in                       | 2 +-
+ units/systemd-ask-password-console.path       | 1 -
+ units/systemd-ask-password-console.service.in | 2 +-
+ units/systemd-ask-password-wall.service.in    | 2 +-
+ 7 files changed, 6 insertions(+), 7 deletions(-)
+
+diff --git a/units/console-getty.service.m4.in b/units/console-getty.service.m4.in
+index 413d940..a880172 100644
+--- a/units/console-getty.service.m4.in
++++ b/units/console-getty.service.m4.in
+@@ -8,7 +8,7 @@
+ [Unit]
+ Description=Console Getty
+ Documentation=man:agetty(8)
+-After=systemd-user-sessions.service plymouth-quit-wait.service
++After=systemd-user-sessions.service
+ ConditionPathExists=/dev/console
+ m4_ifdef(`HAVE_SYSV_COMPAT',
+ After=rc-local.service
+diff --git a/units/container-getty@.service.m4.in b/units/container-getty@.service.m4.in
+index e126f3a..bd8436a 100644
+--- a/units/container-getty@.service.m4.in
++++ b/units/container-getty@.service.m4.in
+@@ -8,7 +8,7 @@
+ [Unit]
+ Description=Container Getty on /dev/pts/%I
+ Documentation=man:agetty(8) man:machinectl(1)
+-After=systemd-user-sessions.service plymouth-quit-wait.service
++After=systemd-user-sessions.service
+ m4_ifdef(`HAVE_SYSV_COMPAT',
+ After=rc-local.service
+ )m4_dnl
+diff --git a/units/getty@.service.m4 b/units/getty@.service.m4
+index 5b82c13..7640a65 100644
+--- a/units/getty@.service.m4
++++ b/units/getty@.service.m4
+@@ -9,7 +9,7 @@
+ Description=Getty on %I
+ Documentation=man:agetty(8) man:systemd-getty-generator(8)
+ Documentation=http://0pointer.de/blog/projects/serial-console.html
+-After=systemd-user-sessions.service plymouth-quit-wait.service
++After=systemd-user-sessions.service
+ m4_ifdef(`HAVE_SYSV_COMPAT',
+ After=rc-local.service
+ )m4_dnl
+diff --git a/units/rescue.service.in b/units/rescue.service.in
+index 5feff69..6c39771 100644
+--- a/units/rescue.service.in
++++ b/units/rescue.service.in
+@@ -10,7 +10,7 @@ Description=Rescue Shell
+ Documentation=man:sulogin(8)
+ DefaultDependencies=no
+ Conflicts=shutdown.target
+-After=sysinit.target plymouth-start.service
++After=sysinit.target
+ Before=shutdown.target
+ 
+ [Service]
+diff --git a/units/systemd-ask-password-console.path b/units/systemd-ask-password-console.path
+index 7899ae7..3c712c3 100644
+--- a/units/systemd-ask-password-console.path
++++ b/units/systemd-ask-password-console.path
+@@ -10,7 +10,6 @@ Description=Dispatch Password Requests to Console Directory Watch
+ Documentation=man:systemd-ask-password-console.service(8)
+ DefaultDependencies=no
+ Conflicts=shutdown.target
+-After=plymouth-start.service
+ Before=paths.target shutdown.target cryptsetup.target
+ ConditionPathExists=!/run/plymouth/pid
+ 
+diff --git a/units/systemd-ask-password-console.service.in b/units/systemd-ask-password-console.service.in
+index a24fa51..205eced 100644
+--- a/units/systemd-ask-password-console.service.in
++++ b/units/systemd-ask-password-console.service.in
+@@ -10,7 +10,7 @@ Description=Dispatch Password Requests to Console
+ Documentation=man:systemd-ask-password-console.service(8)
+ DefaultDependencies=no
+ Conflicts=shutdown.target
+-After=plymouth-start.service systemd-vconsole-setup.service
++After=systemd-vconsole-setup.service
+ Before=shutdown.target
+ ConditionPathExists=!/run/plymouth/pid
+ 
+diff --git a/units/systemd-ask-password-wall.service.in b/units/systemd-ask-password-wall.service.in
+index 0eaa274..4e34082 100644
+--- a/units/systemd-ask-password-wall.service.in
++++ b/units/systemd-ask-password-wall.service.in
+@@ -11,5 +11,5 @@ Documentation=man:systemd-ask-password-console.service(8)
+ After=systemd-user-sessions.service
+ 
+ [Service]
+-ExecStartPre=-@SYSTEMCTL@ stop systemd-ask-password-console.path systemd-ask-password-console.service systemd-ask-password-plymouth.path systemd-ask-password-plymouth.service
++ExecStartPre=-@SYSTEMCTL@ stop systemd-ask-password-console.path systemd-ask-password-console.service
+ ExecStart=@rootbindir@/systemd-tty-ask-password-agent --wall
+-- 
+1.9.1
+

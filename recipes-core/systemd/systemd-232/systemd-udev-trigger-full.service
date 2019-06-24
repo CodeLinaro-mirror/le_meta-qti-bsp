@@ -1,0 +1,16 @@
+[Unit]
+Description=udev Coldplug all Devices
+Documentation=man:udev(7) man:systemd-udevd.service(8)
+DefaultDependencies=no
+Wants=systemd-udevd.service
+After=systemd-udevd-kernel.socket systemd-udevd-control.socket systemd-hwdb-update.service
+Before=multi-user.target
+ConditionPathIsReadWrite=/sys
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/udevadm trigger --type=subsystems --action=add ; /bin/udevadm trigger --type=devices --subsystem-nomatch=block --action=add
+
+[Install]
+WantedBy=multi-user.target

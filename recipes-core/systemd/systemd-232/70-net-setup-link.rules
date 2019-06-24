@@ -1,0 +1,10 @@
+# for 8996-lv
+# disable ethernet rename, fix its name to eth0 (DWC_ETH_QOS)
+SUBSYSTEM=="net", ACTION=="add", DRIVERS=="DWC_ETH_QOS", ATTR{address}=="?*", ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="eth*", NAME="eth0"
+
+# fix gaget to eth1
+SUBSYSTEM=="net", SUBSYSTEMS=="usb", ACTION=="add", , ATTR{address}=="?*", ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="eth*", NAME="eth1"
+
+# fix wlan & p2p names
+SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="?*", ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="wlan*", NAME="wlan0"
+SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="?*", ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="p2p*", NAME="p2p0"
