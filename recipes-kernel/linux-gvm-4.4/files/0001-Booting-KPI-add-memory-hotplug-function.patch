@@ -1,0 +1,126 @@
+From 716c97ee38902b9ea18f9b741120ff9011ddc6c8 Mon Sep 17 00:00:00 2001
+From: Xianbin Zhu <xianzhu@codeaurora.org>
+Date: Mon, 24 Jun 2019 19:37:08 +0800
+Subject: [PATCH] Booting KPI:add memory hotplug function
+
+Change-Id: Icadadb858fb3a752bfe61d01c35271c7e981555e
+Signed-off-by: Xianbin Zhu <xianzhu@codeaurora.org>
+---
+ .../boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts    | 11 +++++++++
+ arch/arm64/mm/init.c                               | 10 +++++++++
+ drivers/of/fdt.c                                   | 26 ++++++++++++++++++++--
+ 3 files changed, 45 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts
+index ae2ec05..750f890 100644
+--- a/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts
++++ b/arch/arm/boot/dts/qcom/vplatform-lfv-msm8996-ivi.dts
+@@ -18,6 +18,17 @@
+ 	model = "Qualcomm Technologies, Inc. MSM 8996";
+ 	compatible = "qcom,msm8996";
+ 	qcom,msm-id = <246 0x0>;
++
++	memory {
++		device_type = "memory";
++		reg = <0 0 0 0>;
++		/* for 8G board*/
++		memory-limit-one = <0 0x98400000> ;
++		end-memory-one = <0x2 0x7fcbf000> ;
++		pmem-start-addr-one = <0x1 0x40000000> ;
++		pmem-nomap-addr-one = <0x1 0x60000000> ;
++		pmem-nomap-size-one = <0x0 0x50000000>;
++	};
+ };
+ 
+ &ion {
+diff --git a/arch/arm64/mm/init.c b/arch/arm64/mm/init.c
+index 26b1221..ab05c4b 100644
+--- a/arch/arm64/mm/init.c
++++ b/arch/arm64/mm/init.c
+@@ -172,6 +172,9 @@ static int __init early_mem(char *p)
+ }
+ early_param("mem", early_mem);
+ 
++extern u64 memory_limit_one;
++extern u64 end_memory_one;
++
+ void __init arm64_memblock_init(void)
+ {
+ 	const s64 linear_region_size = -(s64)PAGE_OFFSET;
+@@ -218,6 +221,13 @@ void __init arm64_memblock_init(void)
+ 		memblock_add(__pa_symbol(_text), (u64)(_end - _text));
+ 	}
+ 
++	if (memblock_end_of_DRAM() == end_memory_one){
++		bootloader_memory_limit = memblock_end_of_DRAM();
++		memblock_enforce_memory_limit(memory_limit_one);
++		memblock_add(__pa_symbol(_text), (u64)(_end - _text));
++		pr_notice("Memory limited to %lldMB\n", memory_limit_one >> 20);
++	}
++
+ 	if (IS_ENABLED(CONFIG_RANDOMIZE_BASE)) {
+ 		extern u16 memstart_offset_seed;
+ 		u64 range = linear_region_size -
+diff --git a/drivers/of/fdt.c b/drivers/of/fdt.c
+index ca17571..c02f4dc 100644
+--- a/drivers/of/fdt.c
++++ b/drivers/of/fdt.c
+@@ -466,6 +466,7 @@ void *initial_boot_params;
+ 
+ static u32 of_fdt_crc32;
+ 
++u64 memory_limit_one, end_memory_one, pmem_start_addr_one, pmem_nomap_addr_one, pmem_nomap_size_one;
+ /**
+  * res_mem_reserve_reg() - reserve all memory described in 'reg' property
+  */
+@@ -504,6 +505,11 @@ static int __init __reserved_mem_reserve_reg(unsigned long node,
+ 
+ 		len -= t_len;
+ 		if (first) {
++			if (base == pmem_start_addr_one) {
++				memblock_remove(pmem_nomap_addr_one, pmem_nomap_size_one);
++				memblock_free(pmem_nomap_addr_one, size - pmem_nomap_addr_one + pmem_start_addr_one);
++				size = pmem_nomap_addr_one - pmem_start_addr_one;
++			}
+ 			fdt_reserved_mem_save_node(node, uname, base, size);
+ 			first = 0;
+ 		}
+@@ -908,7 +914,7 @@ int __init early_init_dt_scan_memory(unsigned long node, const char *uname,
+ 				     int depth, void *data)
+ {
+ 	const char *type = of_get_flat_dt_prop(node, "device_type", NULL);
+-	const __be32 *reg, *endp;
++	const __be32 *reg, *endp, *reg_1;
+ 	int l;
+ 
+ 	/* We are scanning "memory" nodes only */
+@@ -929,9 +935,25 @@ int __init early_init_dt_scan_memory(unsigned long node, const char *uname,
+ 		return 0;
+ 
+ 	endp = reg + (l / sizeof(__be32));
+-
+ 	pr_debug("memory scan node %s, reg size %d,\n", uname, l);
+ 
++	reg_1 = of_get_flat_dt_prop(node, "memory-limit-one", &l);
++	if (reg_1){
++		memory_limit_one = dt_mem_next_cell(dt_root_addr_cells, &reg_1);
++
++		reg_1 = of_get_flat_dt_prop(node, "end-memory-one", &l);
++		end_memory_one = dt_mem_next_cell(dt_root_addr_cells, &reg_1);
++
++		reg_1 = of_get_flat_dt_prop(node, "pmem-start-addr-one", &l);
++		pmem_start_addr_one = dt_mem_next_cell(dt_root_addr_cells, &reg_1);
++
++		reg_1 = of_get_flat_dt_prop(node, "pmem-nomap-addr-one", &l);
++		pmem_nomap_addr_one = dt_mem_next_cell(dt_root_addr_cells, &reg_1);
++
++		reg_1 = of_get_flat_dt_prop(node, "pmem-nomap-size-one", &l);
++		pmem_nomap_size_one = dt_mem_next_cell(dt_root_addr_cells, &reg_1);
++	}
++
+ 	while ((endp - reg) >= (dt_root_addr_cells + dt_root_size_cells)) {
+ 		u64 base, size;
+ 
+-- 
+1.9.1
+
