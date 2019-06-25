@@ -11,7 +11,7 @@ SRC_URI += "file://logind.conf"
 SRC_URI += "file://ion.rules"
 SRC_URI += "file://kgsl.rules"
 SRC_URI += "file://platform.conf"
-
+SRC_URI += "file://ashmem.rules"
 # Custom setup for PACKAGECONFIG to get a slimmer systemd.
 # Removed following:
 #   * timesyncd - Chronyd is being used instead for NTP timesync
@@ -94,6 +94,7 @@ do_install_append () {
    install -d ${D}${sysconfdir}/udev/rules.d/
    install -m 0644 ${WORKDIR}/ion.rules -D ${D}${sysconfdir}/udev/rules.d/ion.rules
    install -m 0644 ${WORKDIR}/kgsl.rules -D ${D}${sysconfdir}/udev/rules.d/kgsl.rules
+   install -m 0644 ${WORKDIR}/ashmem.rules -D ${D}${sysconfdir}/udev/rules.d/ashmem.rules
 }
 
 # Run fsck as part of local-fs-pre.target instead of local-fs.target
