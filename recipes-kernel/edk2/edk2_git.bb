@@ -4,6 +4,8 @@ LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=0835ade698e0bcf8506ecda2f7b4f302"
 
+DEPLOY_DIR_IMAGE_NAND ?= "${DEPLOYDIR}"
+DEPLOY_DIR_IMAGE_EMMC ?= "${DEPLOYDIR}"
 PROVIDES = "virtual/bootloader"
 PV       = "3.0"
 PR       = "r1"
@@ -49,16 +51,22 @@ do_compile () {
 }
 
 do_install() {
-        install -d ${D}/boot
+        install -d  ${D}/boot
 }
-
 do_configure[noexec]="1"
 
 FILES_${PN} = "/boot"
 FILES_${PN}-dbg = "/boot/.debug"
 
 do_deploy() {
-        install ${D}/boot/abl.elf ${DEPLOYDIR}
+   if ${@bb.utils.contains('IMAGE_FSTYPES', 'ext4', 'true', 'false', d)}; then
+        install -d  ${DEPLOY_DIR_IMAGE_EMMC}
+        install ${D}/boot/abl.elf ${DEPLOY_DIR_IMAGE_EMMC}
+   fi
+   if ${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', 'true', 'false', d)}; then
+        install -d  ${DEPLOY_DIR_IMAGE_NAND}
+        install ${D}/boot/abl.elf ${DEPLOY_DIR_IMAGE_NAND}
+   fi
 }
 
 do_deploy[dirs] = "${S} ${DEPLOYDIR}"
