@@ -24,6 +24,8 @@ DEPENDS += "glib-2.0"
 
 EXTRA_OECONF = "--with-glib"
 
+CPPFLAGS += "-I${STAGING_KERNEL_BUILDDIR}/usr/include"
+
 PACKAGES =+ "${PN}-test-bin"
 
 FILES_${PN}-test-bin = "${base_bindir}/*"
