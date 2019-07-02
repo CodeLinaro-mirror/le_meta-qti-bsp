@@ -20,9 +20,9 @@ def get_bblayer_img_inc(layerkey, d):
     if distro != 'base' or '':
         distro_inc = basemachine + "-" + distro +"-" + lkey + "image.inc"
 
-    distro_inc_path  = os.path.join(d.getVar('THISDIR'), basemachine, distro_inc)
-    machine_inc_path = os.path.join(d.getVar('THISDIR'), basemachine, machine_inc)
-    common_inc_path  = os.path.join(d.getVar('THISDIR'), "common", common_inc)
+    distro_inc_path  = os.path.join(d.getVar('THISDIR', True), basemachine, distro_inc)
+    machine_inc_path = os.path.join(d.getVar('THISDIR', True), basemachine, machine_inc)
+    common_inc_path  = os.path.join(d.getVar('THISDIR', True), "common", common_inc)
 
     if os.path.exists(distro_inc_path):
         img_inc_path = distro_inc_path
