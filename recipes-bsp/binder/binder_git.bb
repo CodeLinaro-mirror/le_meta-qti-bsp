@@ -1,4 +1,4 @@
-inherit autotools pkgconfig useradd
+inherit autotools pkgconfig
 
 DESCRIPTION = "Android Binder support"
 HOMEPAGE = "http://developer.android.com/"
@@ -18,6 +18,7 @@ SRC_URI += "file://servicemanager.service"
 S = "${WORKDIR}/binder"
 
 EXTRA_OECONF += " --with-glib"
+CPPFLAGS += "-I${STAGING_KERNEL_BUILDDIR}/usr/include"
 
 # This recipe assumes kernel always compile for default arch even when
 # multilib compilation is enabled. If kernel is 64bit and binder is compiled
