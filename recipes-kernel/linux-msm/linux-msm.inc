@@ -1,4 +1,4 @@
-inherit kernel qperf kernel-yocto
+inherit kernel qperf
 
 DESCRIPTION = "CAF Linux Kernel"
 LICENSE = "GPLv2"
@@ -41,22 +41,19 @@ KMACHINE ?= "${MACHINE}"
 KCONFIG_MODE = "--alldefconfig"
 KBUILD_DEFCONFIG ?= "${KERNEL_CONFIG}"
 LINUX_VERSION_EXTENSION = "${@['-perf', ''][d.getVar('VARIANT', True) == ('' or 'debug')]}"
+KERNEL_OUTPUT_DIR ?= "arch/${ARCH}/boot"
 
 do_kernel_checkout[noexec] = "1"
 
-# extra task for configuration checks
-addtask kernel_configcheck after do_configure before do_compile
+do_configure () {
+    oe_runmake_call -C ${S} ARCH=${ARCH} ${KERNEL_EXTRA_ARGS} ${KERNEL_CONFIG}
+}
 
 do_compile () {
     oe_runmake CC="${KERNEL_CC}" LD="${KERNEL_LD}" ${KERNEL_EXTRA_ARGS} $use_alternate_initrd
 }
 
 do_deploy() {
-    if [[ ${KERNEL_IMAGETYPE} != *-dtb ]]; then
-        bberror "${PN}: Only appended DTB supported; Change KERNEL_IMAGETYPE to ${KERNEL_IMAGETYPE}-dtb in your kernel config."
-        return
-    fi
-
     if [ -f ${D}/${KERNEL_IMAGEDEST}/-${KERNEL_VERSION} ]; then
         mv ${D}/${KERNEL_IMAGEDEST}/-${KERNEL_VERSION} ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}
     fi
