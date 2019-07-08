@@ -5,7 +5,7 @@
 OTA_SUPPORTED_EMMC_TARGET_LIST = "apq8009 qcs405-som1 qcs605-64 qcs605-32 sdm845 sdmsteppe"
 
 def emmc_target_supports_OTA_upgrade(d):
-    list_of_supported_targets = d.getVar('OTA_SUPPORTED_EMMC_TARGET_LIST');
+    list_of_supported_targets = d.getVar('OTA_SUPPORTED_EMMC_TARGET_LIST', True);
 
     if d.getVar('MACHINE', True) in list_of_supported_targets:
       return True
