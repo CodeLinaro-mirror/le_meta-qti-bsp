@@ -48,12 +48,23 @@ fix_sepolicies () {
 }
 do_install[prefuncs] += " ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', '', 'fix_sepolicies', d)}"
 
+# Install var-volatile.mount for tmpfs
+do_install_append () {
+    install -d 0644 ${D}${systemd_unitdir}/system
+    install -d 0644 ${D}${systemd_unitdir}/system/local-fs.target.wants
+    install -m 0644 ${WORKDIR}/var-volatile.mount \
+            ${D}${systemd_unitdir}/system/var-volatile.mount
+
+    ln -sf ${systemd_unitdir}/system/var-volatile.mount \
+           ${D}${systemd_unitdir}/system/local-fs.target.wants/var-volatile.mount
+}
+
+# Install mount and service units for mounting hard parititions.
 MNT_POINTS  = "${@d.getVar('MACHINE_MNT_POINTS') or ""}"
 # /data is default. /systemrw is applicable only when rootfs is read only.
 MNT_POINTS += " /data"
 MNT_POINTS += " ${@bb.utils.contains('DISTRO_FEATURES', 'ro-rootfs', '/systemrw', '', d)}"
 
-# Install various mount and service units for mounting parititions.
 do_install_append () {
     install -d 0644 ${D}${sysconfdir}/initscripts
     install -d 0644 ${D}${systemd_unitdir}/system
@@ -66,19 +77,17 @@ do_install_append () {
     # a <partition-mount>.service invokes mounting the A/B partition as detected at the time of boot.
     for entry in ${MNT_POINTS}; do
         if [ "$entry" == "$userfsdatadir" ]; then
-            if ${@bb.utils.contains('DISTRO_FEATURES', 'full-disk-encryption', 'false', 'true', d)}; then
-                if ${@bb.utils.contains('DISTRO_FEATURES','nand-boot','false','true',d)}; then
-                    install -m 0644 ${WORKDIR}/data.mount ${D}${systemd_unitdir}/system/data.mount
+            if ${@bb.utils.contains('DISTRO_FEATURES','nand-boot','false','true',d)}; then
+                install -m 0644 ${WORKDIR}/data.mount ${D}${systemd_unitdir}/system/data.mount
 
-                    # Run fsck at boot
-                    install -d 0644 ${D}${systemd_unitdir}/system/local-fs-pre.target.requires
-                    ln -sf ${systemd_unitdir}/system/systemd-fsck@.service \
-                       ${D}${systemd_unitdir}/system/local-fs-pre.target.requires/systemd-fsck@dev-disk-by\\x2dpartlabel-userdata.service
-                else
-                    install -m 0644 ${WORKDIR}/data-ubi.mount ${D}${systemd_unitdir}/system/data.mount
-                fi
-                ln -sf ${systemd_unitdir}/system/data.mount ${D}${systemd_unitdir}/system/local-fs.target.wants/data.mount
+                # Run fsck at boot
+                install -d 0644 ${D}${systemd_unitdir}/system/local-fs-pre.target.requires
+                ln -sf ${systemd_unitdir}/system/systemd-fsck@.service \
+                   ${D}${systemd_unitdir}/system/local-fs-pre.target.requires/systemd-fsck@dev-disk-by\\x2dpartlabel-userdata.service
+            else
+                install -m 0644 ${WORKDIR}/data-ubi.mount ${D}${systemd_unitdir}/system/data.mount
             fi
+            ln -sf ${systemd_unitdir}/system/data.mount ${D}${systemd_unitdir}/system/local-fs.target.wants/data.mount
         fi
 
         if [ "$entry" == "/systemrw" ]; then

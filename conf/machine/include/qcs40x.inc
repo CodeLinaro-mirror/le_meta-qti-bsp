@@ -13,6 +13,11 @@ include conf/machine/include/arm/arch-armv8.inc
 PREFERRED_PROVIDER_virtual/kernel = "linux-msm"
 PREFERRED_VERSION_linux-msm = "4.14"
 
+# Set openssl10 as openssl provider.
+PREFERRED_PROVIDER_openssl          = "openssl10"
+PREFERRED_VERSION_openssl10         = "1.0.2q"
+PREFERRED_PROVIDER_openssl-native   = "openssl10-native"
+
 MACHINE_DISPLAY_WIDTH_PIXELS ?= "480"
 MACHINE_DISPLAY_HEIGHT_PIXELS ?= "640"
 
@@ -56,3 +61,4 @@ KERNEL_CMD_PARAMS ?= "noinitrd ro rootwait console=ttyMSM0,115200,n8 no_console_
 # Userspace needs below given macro to support libion after kernel 4.12.
 TARGET_CFLAGS_append = " -DTARGET_ION_ABI_VERSION=2 "
 TARGET_CXXFLAGS_append = " -DTARGET_ION_ABI_VERSION=2 "
+DISTRO_FEATURES_append = " audio-only-libav "

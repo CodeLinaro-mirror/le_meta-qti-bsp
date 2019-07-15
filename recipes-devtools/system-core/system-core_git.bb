@@ -12,14 +12,14 @@ S = "${WORKDIR}/system/core/"
 
 PR = "r19"
 
-DEPENDS += "virtual/kernel openssl glib-2.0 libselinux ext4-utils libunwind libcutils libmincrypt libbase libutils"
+DEPENDS += "virtual/kernel openssl glib-2.0 libselinux ext4-utils libcutils libmincrypt libbase libutils"
 DEPENDS_append_qcs605 = " libsync"
 DEPENDS_append_sdm845 = " libsync"
 
 EXTRA_OECONF = " --with-host-os=${HOST_OS} --with-glib"
 EXTRA_OECONF_append = " --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
 EXTRA_OECONF_append = " --with-logd-logging"
-EXTRA_OECONF_append = "${@bb.utils.contains('VARIANT','user',' --disable-debuggerd','',d)}"
+EXTRA_OECONF_append = " --disable-debuggerd"
 
 #Disable default libsync in system/core for 4.4 above kernels
 EXTRA_OECONF_append += "${@oe.utils.version_less_or_equal('PREFERRED_VERSION_linux-msm', '4.4', '', ' --disable-libsync', d)}"
@@ -108,10 +108,14 @@ do_install_append() {
       install -m 0644 ${S}/logd/logd.path -D ${D}${systemd_unitdir}/system/logd.path
       install -m 0644 ${S}/logd/earlyinit-logd.service -D ${D}${systemd_unitdir}/system/earlyinit-logd.service
       install -m 0644 ${S}/logd/logd.service -D ${D}${systemd_unitdir}/system/logd.service
+
       ln -sf ${systemd_unitdir}/system/logd.path ${D}${systemd_unitdir}/system/multi-user.target.wants/logd.path
-      ln -sf ${systemd_unitdir}/system/logd.service ${D}${systemd_unitdir}/system/multi-user.target.wants/logd.service
+      ln -sf ${systemd_unitdir}/system/earlyinit-logd.service \
+             ${D}${systemd_unitdir}/system/multi-user.target.wants/earlyinit-logd.service
+
       ln -sf ${systemd_unitdir}/system/logd.path ${D}${systemd_unitdir}/system/ffbm.target.wants/logd.path
-      ln -sf ${systemd_unitdir}/system/logd.service ${D}${systemd_unitdir}/system/ffbm.target.wants/logd.service
+      ln -sf ${systemd_unitdir}/system/earlyinit-logd.service \
+             ${D}${systemd_unitdir}/system/ffbm.target.wants/earlyinit-logd.service
    else
       install -m 0750 ${S}/logd/start_logd -D ${D}${sysconfdir}/init.d/logd
    fi
