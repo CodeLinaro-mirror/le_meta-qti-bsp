@@ -13,4 +13,4 @@ do_update_files() {
     fi
 }
 
-do_install[postfuncs] += "${@['','do_update_files'][(d.getVar('QPERMISSIONS_ENABLE', True) == '1')]}"
+do_install[postfuncs] += "do_update_files"
