@@ -38,5 +38,5 @@ ro.qc.sdk.fwk.mic_support=6
 
 ro.board.platform=qcs40x
 
-#Bluetooth Disable Avrcp browsing
-persist.bluetooth.disablebrowsing=true
+#Bluetooth address path
+ro.vendor.bt.bdaddr_path=/persist/factory/bluetooth/bdaddr.txt
