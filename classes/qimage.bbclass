@@ -71,7 +71,7 @@ python rootfs_ignore_packages() {
 # Call function makesystem to generate sparse ext4 image
 python __anonymous () {
     machine = d.getVar("MACHINE", True)
-    if (machine!="sdxpoorwills") and (machine!="mdm9607") and (machine!="sdxprairie"):
+    if bb.utils.contains('DISTRO_FEATURES', 'nand-boot', False, True, d):
         bb.build.addtask('makesystem', 'do_build', 'do_rootfs', d)
 }
 
