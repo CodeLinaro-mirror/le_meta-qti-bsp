@@ -55,7 +55,7 @@ DISTRO_FEATURES_append = " no-rpmb-listener-support"
 DISTRO_FEATURES_append = " no-ssd-listener-support"
 
 # Formats of root filesystem images.
-IMAGE_FSTYPES += "ext4 ubi"
+IMAGE_FSTYPES += "ubi"
 
 # Userspace needs below given macro to support libion after kernel 4.12.
 TARGET_CFLAGS_append = " -DTARGET_ION_ABI_VERSION=2 "
