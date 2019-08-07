@@ -13,4 +13,4 @@ do_update_files() {
     fi
 }
 
-do_install[postfuncs] += "do_update_files"
+do_package[prefuncs] += "do_update_files"
