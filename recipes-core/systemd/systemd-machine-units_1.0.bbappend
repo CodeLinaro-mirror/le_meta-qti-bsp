@@ -31,6 +31,8 @@ SRC_URI_append += " file://non-hlos-squash.sh"
 SRC_URI_append_batcam += " file://pre_hibernate.sh"
 SRC_URI_append_batcam += " file://post_hibernate.sh"
 
+SRC_URI_append_mdm += " file://systemrw.conf"
+
 # Various mount related files assume selinux support by default.
 # Explicitly remove sepolicy entries when selinux is not present.
 fix_sepolicies () {
@@ -189,6 +191,11 @@ do_install_append() {
     if ${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'true', 'false', d)}; then
         install -m 0644 ${WORKDIR}/set-slotsuffix.service ${D}${systemd_unitdir}/system
     fi
+}
+
+do_install_append_mdm () {
+   install -d ${D}/lib/systemd/system/systemrw.mount.d
+   install  -m 0644 ${WORKDIR}/systemrw.conf ${D}/lib/systemd/system/systemrw.mount.d/systemrw.conf
 }
 
 # Scripts for pre and post hibernate functions
