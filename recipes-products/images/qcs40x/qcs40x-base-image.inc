@@ -68,7 +68,9 @@ do_makesystem() {
 fixup_systemd_mounts_services_ext4_rootfs() {
 #Mount ext4 partitions at bootup.
  if ${@bb.utils.contains('DISTRO_FEATURES','ab-boot-support','true','false',d)}; then
-   cp ${IMAGE_ROOTFS}/lib/systemd/system/bt-fw-ab-ext4-mount.service ${IMAGE_ROOTFS}/lib/systemd/system/bt_firmware-mount.service
+   if [ -e ${IMAGE_ROOTFS}/lib/systemd/system/bt-fw-ab-ext4-mount.service ]; then
+     cp ${IMAGE_ROOTFS}/lib/systemd/system/bt-fw-ab-ext4-mount.service ${IMAGE_ROOTFS}/lib/systemd/system/bt_firmware-mount.service
+   fi
    cp ${IMAGE_ROOTFS}/lib/systemd/system/fw-ab-ext4-mount.service ${IMAGE_ROOTFS}/lib/systemd/system/firmware-mount.service
    cp ${IMAGE_ROOTFS}/lib/systemd/system/dsp-ab-ext4-mount.service ${IMAGE_ROOTFS}/lib/systemd/system/dsp-mount.service
  else
