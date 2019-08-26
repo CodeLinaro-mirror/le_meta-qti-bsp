@@ -17,6 +17,8 @@ si::sysinit:/etc/init.d/rcS
 tftp:2345:respawn:/sbin/tftp_server
 scrb:2345:respawn:/sbin/fs-scrub-daemon
 locd:2345:respawn:/usr/bin/location_hal_daemon
+thrm:2345:respawn:/usr/bin/thermal-engine
+tsen:2345:respawn:/usr/bin/tsens_service
 
 # /etc/init.d executes the S and K scripts upon change
 # of runlevel.
