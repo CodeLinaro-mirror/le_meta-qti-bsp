@@ -25,9 +25,6 @@ SRC_URI   =  "file://kernel \
 	     "
 SRC_URI_append_sdm845 += "${@bb.utils.contains('DISTRO_FEATURES', 'virtualization', 'file://virtualization_robomaker.cfg', '', d)}"
 
-PACKAGE_ARCH = "${MACHINE_ARCH}"
-PACKAGES = "kernel kernel-base kernel-vmlinux kernel-dev kernel-modules"
-
 LINUX_VERSION_EXTENSION_qperf = "-perf"
 
 # returns all the elements from the src uri that are config fragments
