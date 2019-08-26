@@ -58,3 +58,6 @@ IMAGE_FSTYPES += "ubi"
 DISTRO_FEATURES_append = " vbleima"
 
 PREFERRED_VERSION_mtd-utils = "${@bb.utils.contains('DISTRO_FEATURES', 'vbleima', '2.0.2', '1.0', d)}"
+
+# Disable DRM libs for MDM targets
+DISTRO_FEATURES += "disable_drm"
