@@ -49,18 +49,25 @@ IMAGE_EXT4_SELINUX_OPTIONS = "${@bb.utils.contains('DISTRO_FEATURES','selinux','
 IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'start-script-ab-slot-util', '', d)}"
 DEPENDS += "squashfs-tools-native"
 
-# Install recovery and its libs in system image if A/B boot is supported
-IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'recovery-bin', '', d)}"
-IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'recovery', '', d)}"
+# Install A/B recovery bins and its libs in system image if A/B boot is supported
+IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'recovery-ab-bin', '', d)}"
+IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'recovery-ab', '', d)}"
 
 #Dont use upstream fuctions for fs generation.
 IMAGE_CMD_ext4 = " "
 IMAGE_CMD_ubi  = " "
+EMMC_ROOTFS    = "emmc-rootfs"
+EMMC_ROOTFS_DIR = "${IMAGE_ROOTFS}/../${EMMC_ROOTFS}"
 
 do_makesystem() {
  if ${@bb.utils.contains('IMAGE_FSTYPES', 'ext4', 'true', 'false', d)}; then
      fixup_systemd_mounts_services_ext4_rootfs
      cp ${THISDIR}/${BASEMACHINE}/qcs40x-fsconfig.conf ${WORKDIR}/rootfs-fsconfig.conf
+#preserve rootfs to be used by recovery for emmc ota package generation.
+     rm -rf ${EMMC_ROOTFS_DIR}
+     mkdir -p ${EMMC_ROOTFS_DIR}
+     cp -pr ${IMAGE_ROOTFS}/*  ${EMMC_ROOTFS_DIR}/
+#generate ext4 fs.
      make_ext4fs -C ${WORKDIR}/rootfs-fsconfig.conf -B ${DEPLOY_DIR_IMAGE}/system.map -s -a / ${IMAGE_EXT4_SELINUX_OPTIONS} -l ${SYSTEM_SIZE_EXT4} ${DEPLOY_DIR_IMAGE_EMMC}/${SYSTEMIMAGE_TARGET} ${IMAGE_ROOTFS}
      make_ext4fs -s -a /systemrw ${IMAGE_EXT4_SELINUX_OPTIONS} -b 4096 -l ${SYSTEMRW_SIZE_EXT4} ${DEPLOY_DIR_IMAGE_EMMC}/${SYSTEMRWIMAGE_TARGET}
  fi
