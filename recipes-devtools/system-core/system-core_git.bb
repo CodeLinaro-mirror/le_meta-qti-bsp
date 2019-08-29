@@ -48,6 +48,7 @@ USBCOMPOSITION_sdm845 = "901D"
 USBCOMPOSITION_sdxpoorwills = "90DB"
 USBCOMPOSITION_sdxprairie = "90DB"
 USBCOMPOSITION_sdmsteppe = "901D"
+USBCOMPOSITION_sa2150p = "90D9"
 
 do_install_append() {
    install -m 0755 ${S}/adb/launch_adbd -D ${D}${sysconfdir}/launch_adbd
