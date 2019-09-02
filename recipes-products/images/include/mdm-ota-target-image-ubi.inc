@@ -2,7 +2,7 @@
 # add the MACHINE name to this list.
 # This is the "only" list that will control whether
 # OTA upgrade will be supported on a target.
-OTA_SUPPORTED_NAND_TARGET_LIST = "sdxprairie sdxpoorwills mdm9607 qcs403-som2"
+OTA_SUPPORTED_NAND_TARGET_LIST = "sdxprairie sdxpoorwills mdm9607 qcs403-som2 sa415m sa515m"
 
 def nand_target_supports_OTA_upgrade(d):
     list_of_supported_targets = d.getVar('OTA_SUPPORTED_NAND_TARGET_LIST');
@@ -126,9 +126,16 @@ do_recovery_ubi() {
         # change system partitions fs_type to squashfs and the block-device instead of mtd device's name
         echo /system   squashfs  /dev/block/bootdevice/by-name/system >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RECOVERY/recovery.fstab
     else
-        echo /system   ubifs  system >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RECOVERY/recovery.fstab
-    fi
+        # File-based OTA upgrade
 
+        echo /system   ubifs  system >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RECOVERY/recovery.fstab
+
+        # File-based OTA upgrade is also responsible for assigning the correct
+        # uid/gid to each file in the system's rootfs. For this, we use canned_fs_config.
+        # The fsconfig file is the complete snapshot of file-attributes
+        # collected from the fakeroot/pseudo build environment.
+        cp ${DEPLOY_DIR_IMAGE}/system.canned.fsconfig ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/.
+    fi
 
     # Pack releasetools.py into META folder itself.
     # This could also have been done by passing "--device_specific" to
@@ -140,12 +147,6 @@ do_recovery_ubi() {
     # This only applies for file-based OTA and since nand/ubifs targets use file-based OTA
     # by default, this mechanism is limited to nand targets and not emmc.
     cp ${COREBASE}/meta/files/device_table-minimal.txt ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/device_table.txt
-
-    # File-based OTA upgrade is also responsible for assigning the correct
-    # uid/gid to each file in the system's rootfs. For this, we use canned_fs_config.
-    # The fsconfig file is the complete snapshot of file-attributes
-    # collected from the fakeroot/pseudo build environment.
-    cp ${DEPLOY_DIR_IMAGE}/system.canned.fsconfig ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/.
 
     #cp and modify file_contexts to BOOT/RAMDISK folder
     if [[ "${DISTRO_FEATURES}" =~ "selinux" ]]; then
@@ -181,6 +182,18 @@ do_recovery_ubi() {
         # recovery_size : Size of recovery partition from partition.xml
         echo recovery_size=0x007C0000 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
     elif [ "${BASEMACHINE}" == "sdxpoorwills" ] && [ "${DISTRO}" == "auto" ]; then
+        # boot_size: Size of boot partition from partition.xml
+        echo boot_size=0x00E40000 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
+
+        # recovery_size : Size of recovery partition from partition.xml
+        echo recovery_size=0x00C00000 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
+    elif [ "${BASEMACHINE}" == "sdxprairie" ] && [ "${DISTRO}" == "auto" ]; then
+        # boot_size: Size of boot partition from partition.xml
+        echo boot_size=0x00EA6000 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
+
+        # recovery_size : Size of recovery partition from partition.xml
+        echo recovery_size=0x00EA6000 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
+    elif [ "${BASEMACHINE}" == "sdxprairie" ]; then
         # boot_size: Size of boot partition from partition.xml
         echo boot_size=0x00C00000 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
 

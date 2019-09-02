@@ -20,8 +20,12 @@ Supported combinations are listed below.
       +---------------+----------------+------------------+
       |mdm9650        | mdm            | debug perf       |
       +---------------+----------------+------------------+
-      |qcs403-som2    | qsap           | debug            |
+      |qcs403-som2    | qsap           | debug perf       |
       |qcs405-som1    |                |                  |
+      |nf-64          |                |                  |
+      |nf-32          |                |                  |
+      +---------------+----------------+------------------+
+      |sa2150p        | msm            | debug perf       |
       +---------------+----------------+------------------+
       |qcs605-32      | concam         | debug perf user  |
       |qcs605-64      |                |                  |
@@ -37,7 +41,7 @@ Supported combinations are listed below.
       +---------------+----------------+------------------+
       |sdmsteppe      | concam         | debug perf user  |
       +---------------+----------------+------------------+
-      |sdm845         | robot          | debug            |
+      |sdm845         | robot          | debug perf       |
       +---------------+----------------+------------------+
 
 Once ready run 'bitbake <pkg-name>' to build required package or

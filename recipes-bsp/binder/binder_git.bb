@@ -37,8 +37,6 @@ FILES_${PN}        = "${libdir}/libbinder.so.* ${libdir}/pkgconfig/* ${bindir}/s
 FILES_${PN}-dev    = "${libdir}/libbinder.so ${libdir}/libbinder.la ${includedir}"
 FILES_${PN}-static = "${libdir}/libbinder.a"
 
-QPERM_SERVICE = "${WORKDIR}/servicemanager.service"
-
 do_install_append() {
    if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
        install -d ${D}${systemd_unitdir}/system/

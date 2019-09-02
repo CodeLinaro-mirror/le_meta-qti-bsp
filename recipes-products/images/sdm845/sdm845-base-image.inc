@@ -39,7 +39,7 @@ IMAGE_INSTALL += "libstdc++"
 IMAGE_INSTALL += "coreutils"
 IMAGE_INSTALL += "media-headers"
 IMAGE_INSTALL += "protobuf"
-IMAGE_INSTALL += "kptr-restrict"
+IMAGE_INSTALL += "openssh"
 
 #Install virtualization support packages
 IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'virtualization', 'docker docker-registry python3-docker-compose', '', d)}"

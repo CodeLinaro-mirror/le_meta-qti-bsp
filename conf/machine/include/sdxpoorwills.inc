@@ -21,6 +21,9 @@ DISTRO ?= "mdm"
 
 DISTRO_FEATURES_append = " persist-volume"
 
+#Disable ssd listene
+DISTRO_FEATURES_append = " no-ssd-listener-support"
+
 MACHINE_FEATURES += "kernel26 keyboard ipa-offload"
 
 PAGE_SIZE ?= '4096'

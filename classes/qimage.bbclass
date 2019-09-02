@@ -4,6 +4,12 @@ inherit core-image
 VERITY_PROVIDER ?= "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'dm-verity', '', d)}"
 inherit ${VERITY_PROVIDER}
 
+# Default deploy path for emmc images.
+DEPLOY_DIR_IMAGE_EMMC ?= "${DEPLOY_DIR_IMAGE}"
+
+# Default deploy path for nand images.
+DEPLOY_DIR_IMAGE_NAND ?= "${DEPLOY_DIR_IMAGE}"
+
 #  Function to get most suitable .inc file with list of packages
 #  to be installed into root filesystem from layer it is called.
 #  Following is the order of priority.
@@ -71,8 +77,8 @@ python rootfs_ignore_packages() {
 # Call function makesystem to generate sparse ext4 image
 python __anonymous () {
     machine = d.getVar("MACHINE", True)
-    if (machine!="sdxpoorwills") and (machine!="mdm9607") and (machine!="sdxprairie"):
-        bb.build.addtask('makesystem', 'do_build', 'do_rootfs', d)
+    if bb.utils.contains('IMAGE_FSTYPES', 'ext4', True, False, d):
+        bb.build.addtask('makesystem', 'do_image_qa', 'do_rootfs', d)
 }
 
 ### Generate system.img #####
@@ -87,28 +93,43 @@ do_makesystem[dirs]       = "${DEPLOY_DIR_IMAGE}"
 python do_make_bootimg () {
     import subprocess
 
-    xtra_parms=""
-    if bb.utils.contains('DISTRO_FEATURES', 'nand-boot', True, False, d):
-        xtra_parms = " --tags-addr" + " " + d.getVar('KERNEL_TAGS_OFFSET')
+#create emmc deploy dir.
+    emmc_deploy = d.getVar('DEPLOY_DIR_IMAGE_EMMC', True)
+    if not os.path.exists(emmc_deploy):
+     os.mkdir(emmc_deploy)
 
+#create nand deploy dir.
+    nand_deploy = d.getVar('DEPLOY_DIR_IMAGE_NAND', True)
+    if not os.path.exists(nand_deploy):
+     os.mkdir(nand_deploy)
+
+    xtra_parms=""
     mkboot_bin_path = d.getVar('STAGING_BINDIR_NATIVE', True) + '/mkbootimg'
     zimg_path       = d.getVar('DEPLOY_DIR_IMAGE', True) + "/" + d.getVar('KERNEL_IMAGETYPE', True)
     cmdline         = "\"" + d.getVar('KERNEL_CMD_PARAMS', True) + "\""
     pagesize        = d.getVar('PAGE_SIZE', True)
     base            = d.getVar('KERNEL_BASE', True)
 
+    output_emmc          = d.getVar('DEPLOY_DIR_IMAGE_EMMC', True) + "/" + d.getVar('BOOTIMAGE_TARGET', True)
+    output_nand          = d.getVar('DEPLOY_DIR_IMAGE_NAND', True) + "/" + d.getVar('BOOTIMAGE_TARGET', True)
+
     # When verity is enabled add '.noverity' suffix to default boot img.
-    output          = d.getVar('DEPLOY_DIR_IMAGE', True) + "/" + d.getVar('BOOTIMAGE_TARGET', True)
     if bb.utils.contains('DISTRO_FEATURES', 'dm-verity', True, False, d):
-            output += ".noverity"
+            output_emmc += ".noverity"
 
-    # cmd to make boot.img
-    cmd =  mkboot_bin_path + " --kernel %s --cmdline %s --pagesize %s --base %s %s --ramdisk /dev/null --ramdisk_offset 0x0 --output %s" \
-           % (zimg_path, cmdline, pagesize, base, xtra_parms, output )
+    # cmd to make boot.img for ext4
+    if bb.utils.contains('IMAGE_FSTYPES', 'ext4', True, False, d):
+         cmd_emmc =  mkboot_bin_path + " --kernel %s --cmdline %s --pagesize %s --base %s %s --ramdisk /dev/null --ramdisk_offset 0x0 --output %s" \
+           % (zimg_path, cmdline, pagesize, base, xtra_parms, output_emmc )
+         bb.debug(1, "do_make_bootimg cmd_emmc: %s" % (cmd_emmc))
+         subprocess.call(cmd_emmc, shell=True)
 
-    bb.debug(1, "do_make_bootimg cmd: %s" % (cmd))
-
-    subprocess.call(cmd, shell=True)
+    if bb.utils.contains('IMAGE_FSTYPES', 'ubi', True, False, d):
+         xtra_parms = " --tags-addr" + " " + d.getVar('KERNEL_TAGS_OFFSET')
+         cmd_nand =  mkboot_bin_path + " --kernel %s --cmdline %s --pagesize %s --base %s %s --ramdisk /dev/null --ramdisk_offset 0x0 --output %s" \
+           % (zimg_path, cmdline, pagesize, base, xtra_parms, output_nand )
+         bb.debug(1, "do_make_bootimg cmd_nand: %s" % (cmd_nand))
+         subprocess.call(cmd_nand, shell=True)
 }
 do_make_bootimg[dirs]      = "${DEPLOY_DIR_IMAGE}"
 # Make sure native tools and vmlinux ready to create boot.img
@@ -126,9 +147,6 @@ python do_make_veritybootimg () {
     import subprocess
 
     xtra_parms=""
-    if bb.utils.contains('DISTRO_FEATURES', 'nand-boot', True, False, d):
-        xtra_parms = " --tags-addr" + " " + d.getVar('KERNEL_TAGS_OFFSET')
-
     verity_cmdline = ""
     if bb.utils.contains('DISTRO_FEATURES', 'dm-verity', True, False, d):
         verity_cmdline = get_verity_cmdline(d).strip()
@@ -138,18 +156,17 @@ python do_make_veritybootimg () {
     cmdline         = "\"" + d.getVar('KERNEL_CMD_PARAMS', True) + " " + verity_cmdline + "\""
     pagesize        = d.getVar('PAGE_SIZE', True)
     base            = d.getVar('KERNEL_BASE', True)
-    output          = d.getVar('DEPLOY_DIR_IMAGE', True) + "/" + d.getVar('BOOTIMAGE_TARGET', True)
+    output_emmc     = d.getVar('DEPLOY_DIR_IMAGE_EMMC', True) + "/" + d.getVar('BOOTIMAGE_TARGET', True)
 
     # cmd to make boot.img
     cmd =  mkboot_bin_path + " --kernel %s --cmdline %s --pagesize %s --base %s %s --ramdisk /dev/null --ramdisk_offset 0x0 --output %s" \
-           % (zimg_path, cmdline, pagesize, base, xtra_parms, output )
+           % (zimg_path, cmdline, pagesize, base, xtra_parms, output_emmc )
 
     bb.debug(1, "do_make_veritybootimg cmd: %s" % (cmd))
 
     subprocess.call(cmd, shell=True)
 }
 do_make_veritybootimg[depends]  += "${PN}:do_makesystem"
-do_make_veritybootimg[dirs]      = "${DEPLOY_DIR_IMAGE}"
 
 python () {
     if bb.utils.contains('DISTRO_FEATURES', 'dm-verity', True, False, d):
