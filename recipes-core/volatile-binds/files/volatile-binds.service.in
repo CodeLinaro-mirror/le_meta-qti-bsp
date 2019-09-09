@@ -1,7 +1,7 @@
 [Unit]
 Description=Bind mount volatile @where@
 DefaultDependencies=no
-After=systemrw.mount sysinit.target
+After=systemrw.mount sockets.target
 Before=basic.target
 RequiresMountsFor=@whereparent@
 ConditionPathIsReadWrite=@whatparent@

@@ -77,107 +77,127 @@ do_install_append () {
     # a <partition-mount>.service invokes mounting the A/B partition as detected at the time of boot.
     for entry in ${MNT_POINTS}; do
         if [ "$entry" == "$userfsdatadir" ]; then
-            if ${@bb.utils.contains('DISTRO_FEATURES','nand-boot','false','true',d)}; then
+            if ${@bb.utils.contains('IMAGE_FSTYPES', 'ext4', 'true', 'false', d)}; then
                 install -m 0644 ${WORKDIR}/data.mount ${D}${systemd_unitdir}/system/data.mount
+                install -m 0644 ${WORKDIR}/data.mount ${D}${systemd_unitdir}/system/data-ext4.mount
 
                 # Run fsck at boot
                 install -d 0644 ${D}${systemd_unitdir}/system/local-fs-pre.target.requires
                 ln -sf ${systemd_unitdir}/system/systemd-fsck@.service \
                    ${D}${systemd_unitdir}/system/local-fs-pre.target.requires/systemd-fsck@dev-disk-by\\x2dpartlabel-userdata.service
-            else
+            fi
+            if ${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', 'true', 'false', d)}; then
                 install -m 0644 ${WORKDIR}/data-ubi.mount ${D}${systemd_unitdir}/system/data.mount
+                install -m 0644 ${WORKDIR}/data-ubi.mount ${D}${systemd_unitdir}/system/data-ubi.mount
             fi
             ln -sf ${systemd_unitdir}/system/data.mount ${D}${systemd_unitdir}/system/local-fs.target.wants/data.mount
         fi
 
         if [ "$entry" == "/systemrw" ]; then
-            if ${@bb.utils.contains('DISTRO_FEATURES','nand-boot','false','true',d)}; then
+            if ${@bb.utils.contains('IMAGE_FSTYPES', 'ext4', 'true', 'false', d)}; then
                 install -m 0644 ${WORKDIR}/systemrw.mount ${D}${systemd_unitdir}/system/systemrw.mount
-
+                install -m 0644 ${WORKDIR}/systemrw.mount ${D}${systemd_unitdir}/system/systemrw-ext4.mount
                 # Run fsck at boot
-                install -d 0644 ${D}${systemd_unitdir}/system/local-fs-pre.target.requires
                 ln -sf ${systemd_unitdir}/system/systemd-fsck@.service \
                      ${D}${systemd_unitdir}/system/local-fs-pre.target.requires/systemd-fsck@dev-disk-by\\x2dpartlabel-systemrw.service
-            else
+            fi
+            if ${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', 'true', 'false', d)}; then
                 install -m 0644 ${WORKDIR}/systemrw-ubi.mount ${D}${systemd_unitdir}/system/systemrw.mount
+                install -m 0644 ${WORKDIR}/systemrw-ubi.mount ${D}${systemd_unitdir}/system/systemrw-ubi.mount
             fi
             ln -sf ${systemd_unitdir}/system/systemrw.mount ${D}${systemd_unitdir}/system/local-fs.target.requires/systemrw.mount
         fi
 
         if [ "$entry" == "/cache" ]; then
-            if ${@bb.utils.contains('DISTRO_FEATURES','nand-boot','false','true',d)}; then
+            if ${@bb.utils.contains('IMAGE_FSTYPES', 'ext4', 'true', 'false', d)}; then
                 install -m 0644 ${WORKDIR}/cache.mount ${D}${systemd_unitdir}/system/cache.mount
-            else
-                install -m 0644 ${WORKDIR}/cache-ubi.mount ${D}${systemd_unitdir}/system/cache.mount
+                install -m 0644 ${WORKDIR}/cache.mount ${D}${systemd_unitdir}/system/cache-ext4.mount
+            fi
+            if ${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', 'true', 'false', d)}; then
+             install -m 0644 ${WORKDIR}/cache-ubi.mount ${D}${systemd_unitdir}/system/cache.mount
+             install -m 0644 ${WORKDIR}/cache-ubi.mount ${D}${systemd_unitdir}/system/cache-ubi.mount
             fi
             ln -sf ${systemd_unitdir}/system/cache.mount ${D}${systemd_unitdir}/system/multi-user.target.wants/cache.mount
         fi
 
         if [ "$entry" == "/persist" ]; then
-            if ${@bb.utils.contains('DISTRO_FEATURES','nand-boot','false','true',d)}; then
+            if ${@bb.utils.contains('IMAGE_FSTYPES', 'ext4', 'true', 'false', d)}; then
                 install -m 0644 ${WORKDIR}/persist.mount ${D}${systemd_unitdir}/system/persist.mount
-            else
+                install -m 0644 ${WORKDIR}/persist.mount ${D}${systemd_unitdir}/system/persist-ext4.mount
+
+            fi
+            if ${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', 'true', 'false', d)}; then
                 if ${@bb.utils.contains('DISTRO_FEATURES','persist-volume','true','false',d)}; then
                     install -m 0644 ${WORKDIR}/persist-ubi.mount ${D}${systemd_unitdir}/system/persist.mount
+                    install -m 0644 ${WORKDIR}/persist-ubi.mount ${D}${systemd_unitdir}/system/persist-ubi.mount
                 fi
             fi
             ln -sf ${systemd_unitdir}/system/persist.mount ${D}${systemd_unitdir}/system/sysinit.target.wants/persist.mount
         fi
 
         if [ "$entry" == "/firmware" ]; then
-            if ${@bb.utils.contains('DISTRO_FEATURES','ab-boot-support','true','false',d)}; then
-                install -m 0644 ${WORKDIR}/firmware-mount.service ${D}${systemd_unitdir}/system/firmware-mount.service
-                ln -sf ${systemd_unitdir}/system/firmware-mount.service \
+            if ${@bb.utils.contains('IMAGE_FSTYPES', 'ext4', 'true', 'false', d)}; then
+               if ${@bb.utils.contains('DISTRO_FEATURES','ab-boot-support','true','false',d)}; then
+                   install -m 0644 ${WORKDIR}/firmware-mount.service ${D}${systemd_unitdir}/system/firmware-mount.service
+                   install -m 0644 ${WORKDIR}/firmware-mount.service ${D}${systemd_unitdir}/system/fw-ab-ext4-mount.service
+                   ln -sf ${systemd_unitdir}/system/firmware-mount.service \
                        ${D}${systemd_unitdir}/system/local-fs.target.requires/firmware-mount.service
-            else
-                if ${@bb.utils.contains('DISTRO_FEATURES','nand-boot','false','true',d)}; then
-                    install -m 0644 ${WORKDIR}/firmware.mount ${D}${systemd_unitdir}/system/firmware.mount
-                    ln -sf ${systemd_unitdir}/system/firmware.mount ${D}${systemd_unitdir}/system/local-fs.target.requires/firmware.mount
-                else
-                    if ${@bb.utils.contains('DISTRO_FEATURES','nand-squashfs','true','false',d)}; then
-                        install -m 0744 ${WORKDIR}/non-hlos-squash.sh ${D}${sysconfdir}/initscripts/firmware-ubi-mount.sh
-                    else
-                        install -m 0744 ${WORKDIR}/firmware-ubi-mount.sh ${D}${sysconfdir}/initscripts/firmware-ubi-mount.sh
-                    fi
-                    install -m 0644 ${WORKDIR}/firmware-ubi-mount.service ${D}${systemd_unitdir}/system/firmware-mount.service
-                    ln -sf ${systemd_unitdir}/system/firmware-mount.service \
+               else
+                   install -m 0644 ${WORKDIR}/firmware.mount ${D}${systemd_unitdir}/system/firmware.mount
+                   ln -sf ${systemd_unitdir}/system/firmware.mount ${D}${systemd_unitdir}/system/local-fs.target.requires/firmware.mount
+               fi
+            fi
+            if ${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', 'true', 'false', d)}; then
+               if ${@bb.utils.contains('DISTRO_FEATURES','nand-squashfs','true','false',d)}; then
+                    install -m 0744 ${WORKDIR}/non-hlos-squash.sh ${D}${sysconfdir}/initscripts/firmware-ubi-mount.sh
+               else
+                    install -m 0744 ${WORKDIR}/firmware-ubi-mount.sh ${D}${sysconfdir}/initscripts/firmware-ubi-mount.sh
+               fi
+               install -m 0644 ${WORKDIR}/firmware-ubi-mount.service ${D}${systemd_unitdir}/system/firmware-mount.service
+               install -m 0644 ${WORKDIR}/firmware-ubi-mount.service ${D}${systemd_unitdir}/system/fw-ubi-mount.service
+               ln -sf ${systemd_unitdir}/system/firmware-mount.service \
                            ${D}${systemd_unitdir}/system/local-fs.target.requires/firmware-mount.service
-                fi
             fi
         fi
 
         if [ "$entry" == "/dsp" ]; then
-            if ${@bb.utils.contains('DISTRO_FEATURES','ab-boot-support','true','false',d)}; then
+            if ${@bb.utils.contains('IMAGE_FSTYPES', 'ext4', 'true', 'false', d)}; then
+               if ${@bb.utils.contains('DISTRO_FEATURES','ab-boot-support','true','false',d)}; then
                 install -m 0644 ${WORKDIR}/dsp-mount.service ${D}${systemd_unitdir}/system/dsp-mount.service
+                install -m 0644 ${WORKDIR}/dsp-mount.service ${D}${systemd_unitdir}/system/dsp-ab-ext4-mount.service
                 ln -sf ${systemd_unitdir}/system/dsp-mount.service ${D}${systemd_unitdir}/system/local-fs.target.requires/dsp-mount.service
-            else
-                if ${@bb.utils.contains('DISTRO_FEATURES','nand-boot','false','true',d)}; then
+               else
                     install -m 0644 ${WORKDIR}/dsp.mount ${D}${systemd_unitdir}/system/dsp.mount
                     ln -sf ${systemd_unitdir}/system/dsp.mount ${D}${systemd_unitdir}/system/local-fs.target.requires/dsp.mount
-                else
-                    install -m 0744 ${WORKDIR}/dsp-ubi-mount.sh ${D}${sysconfdir}/initscripts/dsp-ubi-mount.sh
-                    install -m 0644 ${WORKDIR}/dsp-ubi-mount.service ${D}${systemd_unitdir}/system/dsp-mount.service
-                    ln -sf ${systemd_unitdir}/system/dsp-mount.service ${D}${systemd_unitdir}/system/local-fs.target.requires/dsp-mount.service
-                fi
+               fi
+            fi
+            if ${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', 'true', 'false', d)}; then
+               install -m 0744 ${WORKDIR}/dsp-ubi-mount.sh ${D}${sysconfdir}/initscripts/dsp-ubi-mount.sh
+               install -m 0644 ${WORKDIR}/dsp-ubi-mount.service ${D}${systemd_unitdir}/system/dsp-mount.service
+               install -m 0644 ${WORKDIR}/dsp-ubi-mount.service ${D}${systemd_unitdir}/system/dsp-ubi-mount.service
+               ln -sf ${systemd_unitdir}/system/dsp-mount.service ${D}${systemd_unitdir}/system/local-fs.target.requires/dsp-mount.service
             fi
         fi
 
         if [ "$entry" == "/bt_firmware" ]; then
-            if ${@bb.utils.contains('DISTRO_FEATURES','ab-boot-support','true','false',d)}; then
+            if ${@bb.utils.contains('IMAGE_FSTYPES', 'ext4', 'true', 'false', d)}; then
+               if ${@bb.utils.contains('DISTRO_FEATURES','ab-boot-support','true','false',d)}; then
                 install -m 0644 ${WORKDIR}/bt_firmware-mount.service ${D}${systemd_unitdir}/system/bt_firmware-mount.service
+                install -m 0644 ${WORKDIR}/bt_firmware-mount.service ${D}${systemd_unitdir}/system/bt-fw-ab-ext4-mount.service
                 ln -sf ${systemd_unitdir}/system/bt_firmware-mount.service \
                        ${D}${systemd_unitdir}/system/local-fs.target.requires/bt_firmware-mount.service
-            else
-                if ${@bb.utils.contains('DISTRO_FEATURES','nand-boot','false','true',d)}; then
-                    install -m 0644 ${WORKDIR}/bt_firmware.mount ${D}${systemd_unitdir}/system/bt_firmware.mount
-                    ln -sf ${systemd_unitdir}/system/bt_firmware.mount \
+               else
+                install -m 0644 ${WORKDIR}/bt_firmware.mount ${D}${systemd_unitdir}/system/bt_firmware.mount
+                ln -sf ${systemd_unitdir}/system/bt_firmware.mount \
                            ${D}${systemd_unitdir}/system/local-fs.target.requires/bt_firmware.mount
-                else
-                    install -m 0744 ${WORKDIR}/bluetooth-ubi-mount.sh ${D}${sysconfdir}/initscripts/bluetooth-ubi-mount.sh
-                    install -m 0644 ${WORKDIR}/bt_firmware-ubi-mount.service ${D}${systemd_unitdir}/system/bt_firmware-mount.service
-                    ln -sf ${systemd_unitdir}/system/bt_firmware-mount.service \
+               fi
+            fi
+            if ${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', 'true', 'false', d)}; then
+               install -m 0744 ${WORKDIR}/bluetooth-ubi-mount.sh ${D}${sysconfdir}/initscripts/bluetooth-ubi-mount.sh
+               install -m 0644 ${WORKDIR}/bt_firmware-ubi-mount.service ${D}${systemd_unitdir}/system/bt_firmware-mount.service
+               install -m 0644 ${WORKDIR}/bt_firmware-ubi-mount.service ${D}${systemd_unitdir}/system/bt-fw-ubi-mount.service
+               ln -sf ${systemd_unitdir}/system/bt_firmware-mount.service \
                            ${D}${systemd_unitdir}/system/local-fs.target.requires/bt_firmware-mount.service
-                fi
             fi
         fi
     done

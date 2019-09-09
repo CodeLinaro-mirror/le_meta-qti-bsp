@@ -1,6 +1,6 @@
 require recipes-kernel/linux-msm/linux-msm.inc
 
-COMPATIBLE_MACHINE = "(apq8009|apq8053|qcs605|sdm845|sdxpoorwills|mdm9650|mdm9607|genericarmv8-64)"
+COMPATIBLE_MACHINE = "(apq8009|apq8053|qcs605|sdm845|sdxpoorwills|mdm9650|mdm9607|genericarmv8-64|sa415m)"
 
 KERNEL_IMAGEDEST = "boot"
 
@@ -40,6 +40,7 @@ do_shared_workdir_append () {
                 scripts/basic/fixdep \
                 scripts/conmakehash \
                 scripts/dtc/dtc \
+                scripts/genksyms/genksyms \
                 scripts/kallsyms \
                 scripts/kconfig/conf \
                 scripts/mod/mk_elfconfig \

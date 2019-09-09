@@ -2,7 +2,7 @@
 # add the MACHINE name to this list.
 # This is the "only" list that will control whether
 # OTA upgrade will be supported on a target.
-OTA_SUPPORTED_NAND_TARGET_LIST = "sdxprairie sdxpoorwills mdm9607 qcs403-som2"
+OTA_SUPPORTED_NAND_TARGET_LIST = "sdxprairie sdxpoorwills mdm9607 qcs403-som2 sa415m sa515m nf-32 nf-64"
 
 def nand_target_supports_OTA_upgrade(d):
     list_of_supported_targets = d.getVar('OTA_SUPPORTED_NAND_TARGET_LIST');
@@ -12,10 +12,13 @@ def nand_target_supports_OTA_upgrade(d):
 
     return False
 
+DEPLOY_DIR_IMAGE_NAND ?= "${DEPLOY_DIR_IMAGE}"
+SQUASHFS_SYS_VOLUME ?= "${BASEMACHINE}-sysfs.squash"
+
 def nand_set_vars_and_get_dependencies(d):
     if not nand_target_supports_OTA_upgrade(d):
-        d.setVar('RECOVERY_IMAGE', "0");
-        d.setVar('GENERATE_AB_OTA_PACKAGE', "0");
+        d.setVar('RECOVERY_IMAGE_UBI', "0");
+        d.setVar('GENERATE_AB_OTA_PACKAGE_UBI', "0");
         # Do not create machine-recovery-image or the OTA packages
         return ""
 
@@ -23,36 +26,28 @@ def nand_set_vars_and_get_dependencies(d):
     if bb.utils.contains('DISTRO_FEATURES', 'nand-squashfs', True, False, d):
         d.setVar('SQUASHFS_SUPPORTED', "1");
 
-    if bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', True, False, d):
-        # if A/B support is supported, recovery image need not be generated.
-        # only A/B target will be generated
-        d.setVar('RECOVERY_IMAGE', "0");
-        # For nand targets, A/B OTA support is not present currently
-        d.setVar('GENERATE_AB_OTA_PACKAGE', "0");
-        return " releasetools-native"
-    else:
-        # for Non A/B target, set RECOVERY_IMAGE to "1"
-        # this will generate a non A/B update package as well.
-        d.setVar('RECOVERY_IMAGE', "1");
-        d.setVar('GENERATE_AB_OTA_PACKAGE', "0");
-        return " machine-recovery-image releasetools-native"
+    # for Non A/B target, set RECOVERY_IMAGE_UBI to "1"
+    # this will generate a non A/B update package as well.
+    d.setVar('RECOVERY_IMAGE_UBI', "1");
+    d.setVar('GENERATE_AB_OTA_PACKAGE_UBI', "0");
+    return " machine-recovery-image releasetools-native"
 
 
 # Add tasks to generate recovery image, OTA zip files
 python __anonymous () {
     if bb.utils.contains('IMAGE_FSTYPES', 'ubi', True, False, d):
         d.appendVar('DEPENDS', nand_set_vars_and_get_dependencies(d));
-        if (d.getVar('RECOVERY_IMAGE', True) == '1' or
-                d.getVar('GENERATE_AB_OTA_PACKAGE', True) == '1'):
+        if (d.getVar('RECOVERY_IMAGE_UBI', True) == '1' or
+                d.getVar('GENERATE_AB_OTA_PACKAGE_UBI', True) == '1'):
             bb.build.addtask('do_recovery_ubi', 'do_build', 'do_image_ubi', d)
             bb.build.addtask('do_gen_otazip_ubi', 'do_build', 'do_recovery_ubi', d)
 }
 
 OTA_TARGET_IMAGE_ROOTFS_UBI = "${IMAGE_ROOTFS}/../${MACHINE}-ota-target-image-ubi"
-NON_AB_RECOVERY_IMAGE_ROOTFS = "$(echo ${IMAGE_ROOTFS} | sed 's#${PN}#machine-recovery-image#')"
+NON_AB_RECOVERY_IMAGE_UBI_ROOTFS = "$(echo ${IMAGE_ROOTFS} | sed 's#${PN}#machine-recovery-image#')"
 
 # If A/B package is to be generated, recoveryfs's rootfs is same as system's rootfs
-RECOVERY_IMAGE_ROOTFS = "${@["${NON_AB_RECOVERY_IMAGE_ROOTFS}", "${IMAGE_ROOTFS}"][(d.getVar('GENERATE_AB_OTA_PACKAGE', True) == '1')]}"
+RECOVERY_IMAGE_UBI_ROOTFS = "${@["${NON_AB_RECOVERY_IMAGE_UBI_ROOTFS}", "${IMAGE_ROOTFS}"][(d.getVar('GENERATE_AB_OTA_PACKAGE_UBI', True) == '1')]}"
 
 #Create directory structure for targetfiles.zip
 do_recovery_ubi[cleandirs] += "${OTA_TARGET_IMAGE_ROOTFS_UBI}"
@@ -75,15 +70,15 @@ do_recovery_ubi[depends] += "machine-recovery-image:do_build"
 
 do_recovery_ubi() {
     echo "base image rootfs: ${IMAGE_ROOTFS}"
-    echo "recovery image rootfs: ${RECOVERY_IMAGE_ROOTFS}"
+    echo "recovery image rootfs: ${RECOVERY_IMAGE_UBI_ROOTFS}"
 
     # copy radio directory content into RADIO directory
     cp -r ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/base-files-recovery/${MACHINE}/radio/. ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RADIO/.
 
     # copy the boot\recovery images
-    cp ${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET} ${OTA_TARGET_IMAGE_ROOTFS_UBI}/BOOTABLE_IMAGES/boot.img
+    cp ${DEPLOY_DIR_IMAGE_NAND}/${BOOTIMAGE_TARGET} ${OTA_TARGET_IMAGE_ROOTFS_UBI}/BOOTABLE_IMAGES/boot.img
 
-    cp ${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET} ${OTA_TARGET_IMAGE_ROOTFS_UBI}/BOOTABLE_IMAGES/recovery.img
+    cp ${DEPLOY_DIR_IMAGE_NAND}/${BOOTIMAGE_TARGET} ${OTA_TARGET_IMAGE_ROOTFS_UBI}/BOOTABLE_IMAGES/recovery.img
 
     # copy the contents of system rootfs
     cp -r ${IMAGE_ROOTFS}/. ${OTA_TARGET_IMAGE_ROOTFS_UBI}/SYSTEM/.
@@ -92,7 +87,7 @@ do_recovery_ubi() {
     ln -snf ../run var/run
 
     #copy contents of recovery rootfs
-    cp -r ${RECOVERY_IMAGE_ROOTFS}/. ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RECOVERY/.
+    cp -r ${RECOVERY_IMAGE_UBI_ROOTFS}/. ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RECOVERY/.
 
     #generate recovery.fstab which is used by the updater-script
     #echo #mount point fstype device [device2] >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RECOVERY/recovery.fstab
@@ -118,7 +113,7 @@ do_recovery_ubi() {
         # OTA scripts expect a sparse image for block-based package.
         # run img2simg on the squashfs image - this is purely aesthetic
         # and adds no value to the compression of the image.
-        img2simg ${DEPLOY_DIR_IMAGE}/${BASEMACHINE}-sysfs.squash ${OTA_TARGET_IMAGE_ROOTFS_UBI}/IMAGES/system.img
+        img2simg ${DEPLOY_DIR_IMAGE_NAND}/${SQUASHFS_SYS_VOLUME} ${OTA_TARGET_IMAGE_ROOTFS_UBI}/IMAGES/system.img
 
         # set block img diff version to v3
         echo "blockimgdiff_versions=3" >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
@@ -134,7 +129,7 @@ do_recovery_ubi() {
         # uid/gid to each file in the system's rootfs. For this, we use canned_fs_config.
         # The fsconfig file is the complete snapshot of file-attributes
         # collected from the fakeroot/pseudo build environment.
-        cp ${DEPLOY_DIR_IMAGE}/system.canned.fsconfig ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/.
+        cp ${DEPLOY_DIR_IMAGE_NAND}/system.canned.fsconfig ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/.
     fi
 
     # Pack releasetools.py into META folder itself.
@@ -183,6 +178,24 @@ do_recovery_ubi() {
         echo recovery_size=0x007C0000 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
     elif [ "${BASEMACHINE}" == "sdxpoorwills" ] && [ "${DISTRO}" == "auto" ]; then
         # boot_size: Size of boot partition from partition.xml
+        echo boot_size=0x00E40000 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
+
+        # recovery_size : Size of recovery partition from partition.xml
+        echo recovery_size=0x00C00000 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
+    elif [ "${BASEMACHINE}" == "sdxprairie" ] && [ "${DISTRO}" == "auto" ]; then
+        # boot_size: Size of boot partition from partition.xml
+        echo boot_size=0x00EA6000 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
+
+        # recovery_size : Size of recovery partition from partition.xml
+        echo recovery_size=0x00EA6000 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
+    elif [ "${BASEMACHINE}" == "sdxprairie" ]; then
+        # boot_size: Size of boot partition from partition.xml
+        echo boot_size=0x00C00000 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
+
+        # recovery_size : Size of recovery partition from partition.xml
+        echo recovery_size=0x00C00000 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
+   elif [ "${MACHINE}" == "nf-64" ]; then
+        # boot_size: Size of boot partition from partition.xml
         echo boot_size=0x00C00000 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
 
         # recovery_size : Size of recovery partition from partition.xml
@@ -230,5 +243,5 @@ do_gen_otazip_ubi() {
 
     cd ${TMPDIR}/work/x86_64-linux/releasetools-native/1.0-r0/releasetools && ./full_ota.sh target-files-ubi.zip ${IMAGE_ROOTFS} ubi $block_based
 
-    cd ${TMPDIR}/work/x86_64-linux/releasetools-native/1.0-r0/releasetools && cp update_ubi.zip target-files-ubi.zip ${DEPLOY_DIR_IMAGE}
+    cd ${TMPDIR}/work/x86_64-linux/releasetools-native/1.0-r0/releasetools && cp update_ubi.zip target-files-ubi.zip ${DEPLOY_DIR_IMAGE_NAND}
 }

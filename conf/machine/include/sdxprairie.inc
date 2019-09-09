@@ -33,8 +33,8 @@ UBINIZE_ARGS ?= "-m 4096 -p 256KiB -s 4096"
 #MKUBIFS Args
 MKUBIFS_ARGS ?= "-m 4096 -e 253952 -c 2146 -F"
 #Volume sizes
-SYSTEM_VOLUME_SIZE ?= "120MiB"
-CACHE_VOLUME_SIZE ?= "15MiB"
+SYSTEM_VOLUME_SIZE ?= "110MiB"
+CACHE_VOLUME_SIZE ?= "5MiB"
 SYSTEMRW_VOLUME_SIZE ?= "6MiB"
 PERSIST_VOLUME_SIZE ?= "6MiB"
 
@@ -55,7 +55,7 @@ DISTRO_FEATURES_append = " no-rpmb-listener-support"
 DISTRO_FEATURES_append = " no-ssd-listener-support"
 
 # Formats of root filesystem images.
-IMAGE_FSTYPES += "ext4 ubi"
+IMAGE_FSTYPES += "ubi"
 
 # Userspace needs below given macro to support libion after kernel 4.12.
 TARGET_CFLAGS_append = " -DTARGET_ION_ABI_VERSION=2 "
