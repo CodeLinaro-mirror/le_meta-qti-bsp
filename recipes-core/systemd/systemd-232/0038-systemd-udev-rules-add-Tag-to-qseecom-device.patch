@@ -1,0 +1,25 @@
+From 4e82ceed862c85829df51c593b04ac012c661636 Mon Sep 17 00:00:00 2001
+From: Shumin Qiu <shuminq@codeaurora.org>
+Date: Mon, 16 Sep 2019 14:27:16 +0800
+Subject: [PATCH] [PATCH] systemd: udev rules add Tag to qseecom device
+
+Change-Id: I225285d315b7013089f12a20de95af20e8f11273
+Signed-off-by: Shumin Qiu <shuminq@codeaurora.org>
+---
+ .../systemd/1_232-r0/external/systemd/rules/99-systemd.rules.in          | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/rules/99-systemd.rules.in b/rules/99-systemd.rules.in
+index 88780d1..ea273df 100644
+--- a/rules/99-systemd.rules.in
++++ b/rules/99-systemd.rules.in
+@@ -64,5 +64,6 @@ SUBSYSTEM=="module", KERNEL=="fuse", TAG+="systemd", ENV{SYSTEMD_WANTS}+="sys-fs
+ SUBSYSTEM=="module", KERNEL=="configfs", TAG+="systemd", ENV{SYSTEMD_WANTS}+="sys-kernel-config.mount"
+ 
+ SUBSYSTEM=="diag", KERNEL=="diag", TAG+="systemd"
++SUBSYSTEM=="qseecom", KERNEL=="qseecom", TAG+="systemd"
+ 
+ LABEL="systemd_end"
+-- 
+1.9.1
+

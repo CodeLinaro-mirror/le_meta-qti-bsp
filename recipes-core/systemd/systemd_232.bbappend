@@ -14,7 +14,8 @@ SRC_URI_append += "file://70-net-setup-link.rules \
                    file://0032-systemd-add-bootkpi-marker-for-login-user-session.patch \
                    file://0033-no-pam_loginuid-in-current-build-comment-it-out.patch \
                    file://0033-systemd-reduce-service-stop-timeout-to-10s.patch \
-                   file://0036-systemd-udev-rules-add-Tag-to-diag-device.patch"
+                   file://0036-systemd-udev-rules-add-Tag-to-diag-device.patch \
+                   file://0038-systemd-udev-rules-add-Tag-to-qseecom-device.patch"
 
 python __anonymous () {
     if bb.utils.contains('DISTRO_FEATURES', 'early_init', True, False, d) or bb.utils.contains('DISTRO_FEATURES', 'early-ethernet', True, False, d):
