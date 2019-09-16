@@ -70,6 +70,7 @@ do_install_append() {
       install -m 0750 ${S}/adb/start_adbd -D ${D}${sysconfdir}/initscripts/adbd
       install -m 0755 ${S}/usb/start_usb -D ${D}${sysconfdir}/initscripts/usb
       install -m 0750 ${S}/rootdir/etc/init.qcom.post_boot.sh -D ${D}${sysconfdir}/initscripts/init_post_boot
+      install -m 0750 ${S}/rootdir/etc/init.qti.debug.sh -D ${D}${sysconfdir}/initscripts/init_qti_debug
       install -d ${D}${systemd_unitdir}/system/
       install -d ${D}${systemd_unitdir}/system/multi-user.target.wants/
       install -d ${D}${systemd_unitdir}/system/ffbm.target.wants/
@@ -210,7 +211,7 @@ FILES_${PN}-usb     += "${systemd_unitdir}/system/usb.service ${systemd_unitdir}
 
 PACKAGES =+ "${PN}-post-boot"
 FILES_${PN}-post-boot  = "${sysconfdir}/init.d/init_post_boot"
-FILES_${PN}-post-boot += "${systemd_unitdir}/system/init_post_boot.service ${systemd_unitdir}/system/multi-user.target.wants/init_post_boot.service ${systemd_unitdir}/system/ffbm.target.wants/init_post_boot.service ${sysconfdir}/initscripts/init_post_boot"
+FILES_${PN}-post-boot += "${systemd_unitdir}/system/init_post_boot.service ${systemd_unitdir}/system/multi-user.target.wants/init_post_boot.service ${systemd_unitdir}/system/ffbm.target.wants/init_post_boot.service ${sysconfdir}/initscripts/init_post_boot ${sysconfdir}/initscripts/init_qti_debug"
 INSANE_SKIP_${PN}-post-boot = "file-rdeps"
 
 PACKAGES =+ "${PN}-logd-dbg ${PN}-logd"
