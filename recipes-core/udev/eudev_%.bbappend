@@ -25,3 +25,9 @@ do_install_append_msm8226 () {
      install -d ${D}${sysconfdir}/udev/scripts/
      install -m 0755 ${FILESEXTRAPATHS}/${BASEMACHINE}/set-dev-nodes.sh ${D}${sysconfdir}/udev/scripts/set-dev-nodes.sh
 }
+
+do_install_append () {
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd-minimal', 'true', 'false', d)}; then
+        rm -rf ${D}/lib/udev/rules.d/*
+    fi
+}
