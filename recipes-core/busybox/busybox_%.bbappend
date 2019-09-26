@@ -51,6 +51,9 @@ do_configure_append() {
         done
         cml1_do_configure
     fi
+    sed -i 's/CONFIG_FEATURE_SYSLOG=y/#CONFIG_FEATURE_SYSLOG is not set/' ${S}/.config
+    sed -i 's/CONFIG_KLOGD=y/# CONFIG_KLOGD is not set/' ${S}/.config
+    sed -i 's/CONFIG_SYSLOGD=y/# CONFIG_SYSLOGD is not set/' ${S}/.config
 }
 
 do_install_append() {
