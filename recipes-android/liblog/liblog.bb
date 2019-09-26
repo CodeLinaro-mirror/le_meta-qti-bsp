@@ -18,7 +18,6 @@ BBCLASSEXTEND = "native"
 
 EXTRA_OECONF += " --with-core-includes=${WORKSPACE}/system/core/include"
 EXTRA_OECONF += " --disable-static"
-EXTRA_OECONF_append_class-target = " --with-logd-logging"
 
 do_install_append() {
     if [ "${CLASSOVERRIDE}" = "class-target" ]; then
