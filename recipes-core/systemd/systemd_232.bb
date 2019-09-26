@@ -37,6 +37,7 @@ SRC_URI += " \
            ${SOURCE_SYSTEMD_PATCHES}/0019-socket-util-don-t-fail-if-libc-doesn-t-support-IDN.patch?h=yocto/pyro;downloadfilename=0019-socket-util-don-t-fail-if-libc-doesn-t-support-IDN.patch;md5sum=cb10493c7d0dc12f4804954e4437a4c0 \
            ${SOURCE_SYSTEMD_PATCHES}/0020-back-port-233-don-t-use-the-unified-hierarchy-for-the-systemd.patch?h=yocto/pyro;downloadfilename=0020-back-port-233-don-t-use-the-unified-hierarchy-for-the-systemd.patch;md5sum=2ded3d8934d3f0498eee21e351db9625 \
            ${SOURCE_SYSTEMD_PATCHES}/0001-core-load-fragment-refuse-units-with-errors-in-certa.patch?h=yocto/pyro;downloadfilename=0001-core-load-fragment-refuse-units-with-errors-in-certa.patch;md5sum=0368ab50ecc1f1749f6665cee59427bc \
+           ${SOURCE_SYSTEMD_PATCHES}/0001-dhcp6-make-sure-we-have-enough-space-for-the-DHCP6-o.patch?h=yocto/sumo;downloadfilename=0001-dhcp6-make-sure-we-have-enough-space-for-the-DHCP6-o.patch;md5sum=be7226265afac8bf73b877fd44b00143 \
            "
 SRC_URI_append_qemuall = " ${SOURCE_SYSTEMD_PATCHES}/0001-core-device.c-Change-the-default-device-timeout-to-2.patch?h=yocto/pyro;downloadfilename=0001-core-device.c-Change-the-default-device-timeout-to-2.patch;md5sum=e01761b342499b017ccbe936ba28d0a1 "
 
