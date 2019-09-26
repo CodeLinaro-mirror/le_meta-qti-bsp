@@ -90,4 +90,8 @@ fixup_systemd_mounts_services_ext4_rootfs() {
  cp ${IMAGE_ROOTFS}/lib/systemd/system/persist-ext4.mount ${IMAGE_ROOTFS}/lib/systemd/system/persist.mount
  cp ${IMAGE_ROOTFS}/lib/systemd/system/cache-ext4.mount ${IMAGE_ROOTFS}/lib/systemd/system/cache.mount
  cp ${IMAGE_ROOTFS}/lib/systemd/system/data-ext4.mount  ${IMAGE_ROOTFS}/lib/systemd/system/data.mount
+ if ${@bb.utils.contains('DISTRO_FEATURES', 'full-disk-encryption', 'true', 'false', d)}; then
+   rm -rf ${IMAGE_ROOTFS}/lib/systemd/system/data.mount
+   rm -rf ${IMAGE_ROOTFS}/lib/systemd/system/data-ext4.mount
+ fi
 }
