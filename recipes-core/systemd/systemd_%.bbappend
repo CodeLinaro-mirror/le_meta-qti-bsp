@@ -4,7 +4,7 @@ SRC_URI += "file://Disable-unused-mount-points.patch"
 SRC_URI += "file://mountpartitions.rules"
 SRC_URI += "file://systemd-udevd.service"
 SRC_URI += "file://ffbm.target"
-SRC_URI += "file://mtpserver.rules"
+#SRC_URI += "file://mtpserver.rules"
 SRC_URI += "file://ion.rules"
 SRC_URI += "file://kgsl.rules"
 SRC_URI += "file://set-usb-nodes.rules"
@@ -95,6 +95,11 @@ do_install_append () {
    ln -sf /dev/null ${D}/etc/systemd/system/systemd-journald.service
    ln -sf /dev/null ${D}${systemd_unitdir}/system/sysinit.target.wants/systemd-journal-flush.service
    ln -sf /dev/null ${D}${systemd_unitdir}/system/sysinit.target.wants/systemd-journal-catalog-update.service
+   if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd-minimal', 'true', 'false', d)}; then
+       ln -sf /dev/null ${D}${systemd_unitdir}/system/sockets.target.wants/systemd-journald-audit.socket
+       ln -sf /dev/null ${D}${systemd_unitdir}/system/sockets.target.wants/systemd-journald-dev-log.socket
+       ln -sf /dev/null ${D}${systemd_unitdir}/system/sockets.target.wants/systemd-journald.socket
+   fi
    install -d ${D}${sysconfdir}/udev/rules.d/
    install -m 0644 ${WORKDIR}/ion.rules -D ${D}${sysconfdir}/udev/rules.d/ion.rules
    install -m 0644 ${WORKDIR}/kgsl.rules -D ${D}${sysconfdir}/udev/rules.d/kgsl.rules
@@ -124,8 +129,13 @@ do_install_append () {
            sed -i '/Before=sysinit.target/d' ${D}${systemd_unitdir}/system/systemd-udev-trigger.service
        fi
    fi
-}
 
+   if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd-minimal', 'true', 'false', d)}; then
+       rm -rf ${D}/usr/lib/tmpfiles.d/*
+       rm -rf ${D}${sysconfdir}/udev/rules.d/mtpserver.rules
+       rm -rf ${D}/lib/udev/rules.d/*
+   fi
+}
 # Run fsck as part of local-fs-pre.target instead of local-fs.target
 do_install_append () {
    # remove from After
