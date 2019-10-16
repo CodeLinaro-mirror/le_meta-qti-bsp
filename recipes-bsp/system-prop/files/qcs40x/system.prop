@@ -8,6 +8,7 @@ ro.product.board=qcs40x
 ro.vendor.audio.sdk.ssr=false
 ##fluencetype can be "fluence" or "fluencepro" or "none"
 ro.vendor.audio.sdk.fluencetype=none
+ro.vendor.audio.trumpet.enable=false
 persist.vendor.audio.fluence.voicecall=false
 persist.vendor.audio.fluence.voicerec=false
 persist.vendor.audio.fluence.speaker=false

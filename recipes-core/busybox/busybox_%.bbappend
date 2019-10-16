@@ -22,12 +22,17 @@ SRC_URI += "\
             file://sensors.sh \
 "
 SRC_URI_append_apq8053 += "file://apq8053/mdev.conf"
-SRC_URI_append += "${@bb.utils.contains('DISTRO_FEATURES', 'virtualization', 'file://0001-Remove-readprofile-and-brctl-from-busybox.links-file.patch', '', d)}"
 
 # By default, we now split BusyBox into two binaries.
 # One that is suid root for those components that need it.
 # Another for the rest of the components.
 BUSYBOX_SPLIT_SUID = "1"
+
+# Explicitly remove sepolicy entries when selinux is not present
+remove_sepolicies () {
+    sed -i "s#context=system_u:object_r:sdcard_t:s0,##g" ${WORKDIR}/automountsdcard.sh
+}
+do_install[prefuncs] += " ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', '', 'remove_sepolicies', d)}"
 
 FILES_${PN} += "/usr/bin/env"
 
@@ -48,7 +53,7 @@ do_configure_append() {
     if ${@bb.utils.contains('DISTRO_FEATURES', 'virtualization','true','false',d)}; then
         for var in ${VIRT_RM_BIN_LIST}
         do
-            sed -i "/$var=y/d" ${S}/.config
+            sed -i "s/$var=y/# $var is not set/g" ${S}/.config
         done
         cml1_do_configure
     fi

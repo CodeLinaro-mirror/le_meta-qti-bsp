@@ -48,3 +48,9 @@ do_install_append() {
     fi
 
 }
+
+do_install_append_sdm845 () {
+    install -m 755 -o diag -g diag -d ${D}/mnt/usbstorage0
+    install -m 755 -o diag -g diag -d ${D}/mnt/usbstorage1
+    install -m 755 -o diag -g diag -d ${D}/mnt/usbstorage2
+}

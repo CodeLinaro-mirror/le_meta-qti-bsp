@@ -4,7 +4,7 @@ SRC_URI += "file://Disable-unused-mount-points.patch"
 SRC_URI += "file://mountpartitions.rules"
 SRC_URI += "file://systemd-udevd.service"
 SRC_URI += "file://ffbm.target"
-SRC_URI += "file://mtpserver.rules"
+#SRC_URI += "file://mtpserver.rules"
 SRC_URI += "file://ion.rules"
 SRC_URI += "file://kgsl.rules"
 SRC_URI += "file://set-usb-nodes.rules"
@@ -12,6 +12,7 @@ SRC_URI += "file://sysctl.conf"
 SRC_URI += "file://platform.conf"
 SRC_URI += "file://sd-bus-Allow-extra-users-to-communicate.patch"
 SRC_URI += "file://systemd-namespace-mountflags-fix.patch"
+SRC_URI += "file://set-mhi-nodes.rules"
 
 # Custom setup for PACKAGECONFIG to get a slimmer systemd.
 # Removed following:
@@ -67,7 +68,7 @@ CFLAGS_append = " -fPIC"
 # So temporarily revert to default optimizations for systemd.
 SELECTED_OPTIMIZATION = "-O2 -fexpensive-optimizations -frename-registers -fomit-frame-pointer -ftree-vectorize"
 
-MACHINE_SUPPORT_BLOCK_DEVICES = "${@bb.utils.contains_any('BASEMACHINE', 'qcs403-som2 sdxprairie', 'false', 'true', d)}"
+MACHINE_SUPPORT_BLOCK_DEVICES = "${@bb.utils.contains('DISTRO_FEATURES','nand-boot', 'false', 'true', d)}"
 
 do_install_append () {
    install -d ${D}/etc/systemd/system/
@@ -94,9 +95,15 @@ do_install_append () {
    ln -sf /dev/null ${D}/etc/systemd/system/systemd-journald.service
    ln -sf /dev/null ${D}${systemd_unitdir}/system/sysinit.target.wants/systemd-journal-flush.service
    ln -sf /dev/null ${D}${systemd_unitdir}/system/sysinit.target.wants/systemd-journal-catalog-update.service
+   if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd-minimal', 'true', 'false', d)}; then
+       ln -sf /dev/null ${D}${systemd_unitdir}/system/sockets.target.wants/systemd-journald-audit.socket
+       ln -sf /dev/null ${D}${systemd_unitdir}/system/sockets.target.wants/systemd-journald-dev-log.socket
+       ln -sf /dev/null ${D}${systemd_unitdir}/system/sockets.target.wants/systemd-journald.socket
+   fi
    install -d ${D}${sysconfdir}/udev/rules.d/
    install -m 0644 ${WORKDIR}/ion.rules -D ${D}${sysconfdir}/udev/rules.d/ion.rules
    install -m 0644 ${WORKDIR}/kgsl.rules -D ${D}${sysconfdir}/udev/rules.d/kgsl.rules
+   install -m 0644 ${WORKDIR}/set-mhi-nodes.rules -D ${D}${sysconfdir}/udev/rules.d/set-mhi-nodes.rules
 
    # Mask dev-ttyS0.device
    ln -sf /dev/null ${D}/etc/systemd/system/dev-ttyS0.device
@@ -115,9 +122,20 @@ do_install_append () {
        rm -rf ${D}/lib/systemd/system-generators/systemd-rc-local-generator
        rm -rf ${D}/lib/systemd/system-generators/systemd-system-update-generator
        rm -rf ${D}/lib/systemd/system-generators/systemd-sysv-generator
+
+       # Start systemd-udev-trigger.service after sysinit.target
+       if ${@bb.utils.contains_any('DISTRO_NAME','mdm auto', 'true', 'false', d)}; then
+           sed -i '/Before=sysinit.target/a After=sysinit.target init_sys_mss.service' ${D}${systemd_unitdir}/system/systemd-udev-trigger.service
+           sed -i '/Before=sysinit.target/d' ${D}${systemd_unitdir}/system/systemd-udev-trigger.service
+       fi
+   fi
+
+   if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd-minimal', 'true', 'false', d)}; then
+       rm -rf ${D}/usr/lib/tmpfiles.d/*
+       rm -rf ${D}${sysconfdir}/udev/rules.d/mtpserver.rules
+       rm -rf ${D}/lib/udev/rules.d/*
    fi
 }
-
 # Run fsck as part of local-fs-pre.target instead of local-fs.target
 do_install_append () {
    # remove from After

@@ -1,5 +1,7 @@
 #compile abl
+DEPLOY_DIR_IMAGE_EMMC ?= "${DEPLOY_DIR_IMAGE}"
 RDEPENDS  += "${@bb.utils.contains('TARGET_ARCH', 'arm','lib64-edk2','edk2',d)}"
+RDEPENDS  += "${@bb.utils.contains('TARGET_ARCH', 'arm','lib64-abl-ubifs','abl-ubifs',d)}"
 # Packages to be included in rootfs creation.
 IMAGE_INSTALL += "packagegroup-core-boot"
 IMAGE_INSTALL += "${CORE_IMAGE_EXTRA_INSTALL}"
@@ -38,7 +40,6 @@ IMAGE_INSTALL += "openssl"
 # IMAGE_INSTALL += "powerapp-shutdown"
 IMAGE_INSTALL += "start-scripts-firmware-links"
 IMAGE_INSTALL += "coreutils"
-IMAGE_INSTALL += "kptr-restrict"
 
 IMAGE_INSTALL += "libgomp"
 TOOLCHAIN_TARGET_TASK_append += " libgomp-dev libgomp-staticdev libstdc++-staticdev"
@@ -48,14 +49,45 @@ IMAGE_EXT4_SELINUX_OPTIONS = "${@bb.utils.contains('DISTRO_FEATURES','selinux','
 IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'start-script-ab-slot-util', '', d)}"
 DEPENDS += "squashfs-tools-native"
 
-# Install recovery and its libs in system image if A/B boot is supported
-IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'recovery-bin', '', d)}"
-IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'recovery', '', d)}"
+# Install A/B recovery bins and its libs in system image if A/B boot is supported
+IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'recovery-ab-bin', '', d)}"
+IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'recovery-ab', '', d)}"
+
+#Dont use upstream fuctions for fs generation.
+IMAGE_CMD_ext4 = " "
+IMAGE_CMD_ubi  = " "
+EMMC_ROOTFS    = "emmc-rootfs"
+EMMC_ROOTFS_DIR = "${IMAGE_ROOTFS}/../${EMMC_ROOTFS}"
 
 do_makesystem() {
-    if ${@bb.utils.contains('DISTRO_FEATURES','nand-boot','false','true',d)}; then
+ if ${@bb.utils.contains('IMAGE_FSTYPES', 'ext4', 'true', 'false', d)}; then
+     fixup_systemd_mounts_services_ext4_rootfs
      cp ${THISDIR}/${BASEMACHINE}/qcs40x-fsconfig.conf ${WORKDIR}/rootfs-fsconfig.conf
-     make_ext4fs -C ${WORKDIR}/rootfs-fsconfig.conf -B ${DEPLOY_DIR_IMAGE}/system.map -s -a / ${IMAGE_EXT4_SELINUX_OPTIONS} -l ${SYSTEM_SIZE_EXT4} ${DEPLOY_DIR_IMAGE}/${SYSTEMIMAGE_TARGET} ${IMAGE_ROOTFS}
-     make_ext4fs -s -a /systemrw ${IMAGE_EXT4_SELINUX_OPTIONS} -b 4096 -l ${SYSTEMRW_SIZE_EXT4} ${DEPLOY_DIR_IMAGE}/${SYSTEMRWIMAGE_TARGET}
-    fi
+#preserve rootfs to be used by recovery for emmc ota package generation.
+     rm -rf ${EMMC_ROOTFS_DIR}
+     mkdir -p ${EMMC_ROOTFS_DIR}
+     cp -pr ${IMAGE_ROOTFS}/*  ${EMMC_ROOTFS_DIR}/
+#generate ext4 fs.
+     make_ext4fs -C ${WORKDIR}/rootfs-fsconfig.conf -B ${DEPLOY_DIR_IMAGE}/system.map -s -a / ${IMAGE_EXT4_SELINUX_OPTIONS} -l ${SYSTEM_SIZE_EXT4} ${DEPLOY_DIR_IMAGE_EMMC}/${SYSTEMIMAGE_TARGET} ${IMAGE_ROOTFS}
+     make_ext4fs -s -a /systemrw ${IMAGE_EXT4_SELINUX_OPTIONS} -b 4096 -l ${SYSTEMRW_SIZE_EXT4} ${DEPLOY_DIR_IMAGE_EMMC}/${SYSTEMRWIMAGE_TARGET}
+ fi
+}
+
+fixup_systemd_mounts_services_ext4_rootfs() {
+#Mount ext4 partitions at bootup.
+ if ${@bb.utils.contains('DISTRO_FEATURES','ab-boot-support','true','false',d)}; then
+   if [ -e ${IMAGE_ROOTFS}/lib/systemd/system/bt-fw-ab-ext4-mount.service ]; then
+     cp ${IMAGE_ROOTFS}/lib/systemd/system/bt-fw-ab-ext4-mount.service ${IMAGE_ROOTFS}/lib/systemd/system/bt_firmware-mount.service
+   fi
+   cp ${IMAGE_ROOTFS}/lib/systemd/system/fw-ab-ext4-mount.service ${IMAGE_ROOTFS}/lib/systemd/system/firmware-mount.service
+   cp ${IMAGE_ROOTFS}/lib/systemd/system/dsp-ab-ext4-mount.service ${IMAGE_ROOTFS}/lib/systemd/system/dsp-mount.service
+ else
+   rm -rf ${IMAGE_ROOTFS}/lib/systemd/system/bt_firmware-mount.service
+   rm -rf ${IMAGE_ROOTFS}/lib/systemd/system/firmware-mount.service
+   rm -rf ${IMAGE_ROOTFS}/lib/systemd/system/dsp-mount.service
+ fi
+ cp ${IMAGE_ROOTFS}/lib/systemd/system/systemrw-ext4.mount ${IMAGE_ROOTFS}/lib/systemd/system/systemrw.mount
+ cp ${IMAGE_ROOTFS}/lib/systemd/system/persist-ext4.mount ${IMAGE_ROOTFS}/lib/systemd/system/persist.mount
+ cp ${IMAGE_ROOTFS}/lib/systemd/system/cache-ext4.mount ${IMAGE_ROOTFS}/lib/systemd/system/cache.mount
+ cp ${IMAGE_ROOTFS}/lib/systemd/system/data-ext4.mount  ${IMAGE_ROOTFS}/lib/systemd/system/data.mount
 }

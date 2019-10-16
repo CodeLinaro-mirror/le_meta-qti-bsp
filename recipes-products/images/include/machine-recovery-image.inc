@@ -48,7 +48,8 @@ do_fsconfig() {
   chmod -R o-rwx ${IMAGE_ROOTFS}/etc/init.d/
  fi
 }
-
+DEPLOY_DIR_IMAGE_NAND ?= "${DEPLOY_DIR_IMAGE}"
+DEPLOY_DIR_IMAGE_EMMC ?= "${DEPLOY_DIR_IMAGE}"
 UNSPARSED_RECOVERYFS_DEST = "${TMPDIR}/work/x86_64-linux/releasetools-native/1.0-r0/releasetools/BOOTABLE_IMAGES"
 
 # Create a BOOTABLE_IMAGES dir in this location,
@@ -58,17 +59,19 @@ do_makesystem[cleandirs] += "${UNSPARSED_RECOVERYFS_DEST}"
 # Below is to generate sparse ext4 recovery image (OE by default supports raw ext4 images)
 do_makesystem() {
 	if ${@bb.utils.contains('IMAGE_FSTYPES', 'ext4', 'true', 'false', d)}; then
+        if ${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'false', 'true', d)}; then
         # SELinux feature is enabled
         if [[ "${DISTRO_FEATURES}" =~ "selinux" ]]; then
-            make_ext4fs -s ${IMAGE_EXT4_SELINUX_OPTIONS} -l ${RECOVERYFS_SIZE_EXT4} ${DEPLOY_DIR_IMAGE}/${RECOVERYIMAGE_TARGET} ${IMAGE_ROOTFS}
+            make_ext4fs -s ${IMAGE_EXT4_SELINUX_OPTIONS} -l ${RECOVERYFS_SIZE_EXT4} ${DEPLOY_DIR_IMAGE_EMMC}/${RECOVERYIMAGE_TARGET} ${IMAGE_ROOTFS}
 
             # Create an unsparse image as well to be included as part of ota target-files
-            simg2img ${DEPLOY_DIR_IMAGE}/${RECOVERYIMAGE_TARGET} ${UNSPARSED_RECOVERYFS_DEST}/recovery-unsparsed.ext4
+            simg2img ${DEPLOY_DIR_IMAGE_EMMC}/${RECOVERYIMAGE_TARGET} ${UNSPARSED_RECOVERYFS_DEST}/recovery-unsparsed.ext4
         else
-            make_ext4fs -s -l ${RECOVERYFS_SIZE_EXT4} ${DEPLOY_DIR_IMAGE}/${RECOVERYIMAGE_TARGET} ${IMAGE_ROOTFS}
+            make_ext4fs -s -l ${RECOVERYFS_SIZE_EXT4} ${DEPLOY_DIR_IMAGE_EMMC}/${RECOVERYIMAGE_TARGET} ${IMAGE_ROOTFS}
 
             # Create an unsparse image as well to be included as part of ota target-files
-            simg2img ${DEPLOY_DIR_IMAGE}/${RECOVERYIMAGE_TARGET} ${UNSPARSED_RECOVERYFS_DEST}/recovery-unsparsed.ext4
+            simg2img ${DEPLOY_DIR_IMAGE_EMMC}/${RECOVERYIMAGE_TARGET} ${UNSPARSED_RECOVERYFS_DEST}/recovery-unsparsed.ext4
+        fi
         fi
 	fi
 }
@@ -78,9 +81,9 @@ do_makesystem() {
 # Do this only when both selinux & nand-boot is enabled
 IMAGE_PREPROCESS_COMMAND_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'selinux nand-boot', 'create_recoveryfs_ubi_img_with_selinux;', '', d)} "
 
-RECOVERYFS_SELINUX_CFG = "${DEPLOY_DIR_IMAGE}/ubinize-recoveryfs-selinux.cfg"
-OUTPUT_UBIFS_IMAGE = "${DEPLOY_DIR_IMAGE}/machine-recovery-image-selinux-${MACHINE}.ubifs"
-OUTPUT_UBI_IMAGE = "${DEPLOY_DIR_IMAGE}/machine-recovery-image-selinux-${MACHINE}.ubi"
+RECOVERYFS_SELINUX_CFG = "${DEPLOY_DIR_IMAGE_NAND}/ubinize-recoveryfs-selinux.cfg"
+OUTPUT_UBIFS_IMAGE = "${DEPLOY_DIR_IMAGE_NAND}/machine-recovery-image-selinux-${MACHINE}.ubifs"
+OUTPUT_UBI_IMAGE = "${DEPLOY_DIR_IMAGE_NAND}/machine-recovery-image-selinux-${MACHINE}.ubi"
 
 create_recoveryfs_ubi_img_with_selinux() {
     # create ubinize cfg
@@ -100,14 +103,14 @@ create_recoveryfs_ubi_img_with_selinux() {
 
 do_rename_recovery_ubi_image() {
     #rename machine-recovery-image.ubi if it exists
-    if [ -f "${DEPLOY_DIR_IMAGE}/machine-recovery-image-${MACHINE}.ubi" ]; then
-        mv ${DEPLOY_DIR_IMAGE}/machine-recovery-image-${MACHINE}.ubi ${DEPLOY_DIR_IMAGE}/${MACHINE}-recoveryfs.ubi
+    if [ -f "${DEPLOY_DIR_IMAGE_NAND}/machine-recovery-image-${MACHINE}.ubi" ]; then
+        mv ${DEPLOY_DIR_IMAGE_NAND}/machine-recovery-image-${MACHINE}.ubi ${DEPLOY_DIR_IMAGE_NAND}/${MACHINE}-recoveryfs.ubi
     fi
 
     # if there is "selinux enabled" version of recoveryfs image,
     # we would like to use that instead
-    if [ -f "${DEPLOY_DIR_IMAGE}/machine-recovery-image-selinux-${MACHINE}.ubi" ]; then
-        mv ${DEPLOY_DIR_IMAGE}/machine-recovery-image-selinux-${MACHINE}.ubi ${DEPLOY_DIR_IMAGE}/${MACHINE}-recoveryfs.ubi
+    if [ -f "${DEPLOY_DIR_IMAGE_NAND}/machine-recovery-image-selinux-${MACHINE}.ubi" ]; then
+        mv ${DEPLOY_DIR_IMAGE_NAND}/machine-recovery-image-selinux-${MACHINE}.ubi ${DEPLOY_DIR_IMAGE_NAND}/${MACHINE}-recoveryfs.ubi
     fi
 }
 
@@ -166,9 +169,9 @@ remove_mount_operations() {
 # This squashfs image will be one of the volumes on a ubi device
 IMAGE_PREPROCESS_COMMAND_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'nand-squashfs', 'create_recoveryfs_squashfs_ubi_img', '', d)} "
 
-RECOVERYFS_SQUASHFS_IMAGE = "${DEPLOY_DIR_IMAGE}/${BASEMACHINE}-recoveryfs.squash"
-RECOVERYFS_SQUASHFS_UBI_IMAGE = "${DEPLOY_DIR_IMAGE}/${BASEMACHINE}-squashfs-recoveryfs.ubi"
-UBINIZE_RECOVERYFS_SQUASHFS_CFG = "${DEPLOY_DIR_IMAGE}/recoveryfs_squashfs_ubinize.cfg"
+RECOVERYFS_SQUASHFS_IMAGE ?= "${DEPLOY_DIR_IMAGE_NAND}/${BASEMACHINE}-recoveryfs.squash"
+RECOVERYFS_SQUASHFS_UBI_IMAGE ?= "${DEPLOY_DIR_IMAGE_NAND}/${BASEMACHINE}-squashfs-recoveryfs.ubi"
+UBINIZE_RECOVERYFS_SQUASHFS_CFG = "${DEPLOY_DIR_IMAGE_NAND}/recoveryfs_squashfs_ubinize.cfg"
 
 create_recoveryfs_squashfs_ubi_img() {
     create_recoveryfs_squashfs_ubinize_config
@@ -236,37 +239,16 @@ remove_mount_operations() {
             rm ${IMAGE_ROOTFS}/etc/systemd/system/local-fs.target.requires/systemrw.mount
         fi
     fi
-}
-
-# Create a recoveryfs image with squashfs in it.
-# This squashfs image will be one of the volumes on a ubi device
-IMAGE_PREPROCESS_COMMAND_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'nand-squashfs', 'create_recoveryfs_squashfs_ubi_img', '', d)} "
-
-RECOVERYFS_SQUASHFS_IMAGE = "${DEPLOY_DIR_IMAGE}/${BASEMACHINE}-recoveryfs.squash"
-RECOVERYFS_SQUASHFS_UBI_IMAGE = "${DEPLOY_DIR_IMAGE}/${BASEMACHINE}-squashfs-recoveryfs.ubi"
-UBINIZE_RECOVERYFS_SQUASHFS_CFG = "${DEPLOY_DIR_IMAGE}/recoveryfs_squashfs_ubinize.cfg"
-
-create_recoveryfs_squashfs_ubi_img() {
-    create_recoveryfs_squashfs_ubinize_config
-    mksquashfs ${IMAGE_ROOTFS} ${RECOVERYFS_SQUASHFS_IMAGE} -noappend -comp xz
-    ubinize -o ${RECOVERYFS_SQUASHFS_UBI_IMAGE} ${UBINIZE_ARGS} ${UBINIZE_RECOVERYFS_SQUASHFS_CFG}
-    chmod 644 ${RECOVERYFS_SQUASHFS_UBI_IMAGE}
-}
-
-create_recoveryfs_squashfs_ubinize_config() {
-    echo \[recoveryfs_volume\] > "${UBINIZE_RECOVERYFS_SQUASHFS_CFG}"
-    echo mode=ubi >> "${UBINIZE_RECOVERYFS_SQUASHFS_CFG}"
-    echo image="${RECOVERYFS_SQUASHFS_IMAGE}" >> "${UBINIZE_RECOVERYFS_SQUASHFS_CFG}"
-    echo vol_id=0 >> "${UBINIZE_RECOVERYFS_SQUASHFS_CFG}"
-    echo vol_type=dynamic >> "${UBINIZE_RECOVERYFS_SQUASHFS_CFG}"
-    echo vol_name=recoveryfs >> "${UBINIZE_RECOVERYFS_SQUASHFS_CFG}"
-    echo vol_flags=autoresize >> "${UBINIZE_RECOVERYFS_SQUASHFS_CFG}"
+    # copy recovery bins and libs in correct path
+    cp -rp  ${IMAGE_ROOTFS}/recovery/* ${IMAGE_ROOTFS}/
+    rm -rf ${IMAGE_ROOTFS}/recovery/
 }
 
 ROOTFS_POSTPROCESS_COMMAND += " do_fsconfig; remove_mount_operations; "
 
 # Call function makesystem to generate sparse ext4 image
 addtask makesystem after do_rootfs before do_build
-
-# rename recovery images only after they are copied to DEPLOY_DIR
+do_makesystem[noexec] = "1"
+do_make_veritybootimg[noexec] = "1"
+# rename recovery images only after they are copied to DEPLOY_DIR_NAND
 addtask rename_recovery_ubi_image after do_image_complete before do_build
