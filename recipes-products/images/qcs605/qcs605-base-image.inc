@@ -55,6 +55,20 @@ IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'full-disk-encryption'
 # Below is to generate sparse ext4 system image (OE by default supports raw ext4 images)
 do_makesystem() {
     cp ${THISDIR}/${BASEMACHINE}/qcs605-fsconfig.conf ${WORKDIR}/rootfs-fsconfig.conf
-    make_ext4fs -B ${DEPLOY_DIR_IMAGE}/system.map -C ${WORKDIR}/rootfs-fsconfig.conf ${IMAGE_EXT4_EXTRA_OPTIONS} -s -a / ${IMAGE_EXT4_SELINUX_OPTIONS} -l ${SYSTEM_SIZE_EXT4} ${DEPLOY_DIR_IMAGE}/${SYSTEMIMAGE_TARGET} ${IMAGE_ROOTFS}
+    # Check and re-generate at least 5 times, if sparsed system image is not generated correctly.
+    for fcount in {1..5}
+    do
+	 is_simg_err=0
+	 # Generate sparsed system image
+	 # Removed extra "-a /", This android mount point flag is also present into "IMAGE_EXT4_SELINUX_OPTIONS"
+     make_ext4fs -B ${DEPLOY_DIR_IMAGE}/system.map -C ${WORKDIR}/rootfs-fsconfig.conf ${IMAGE_EXT4_EXTRA_OPTIONS} -s ${IMAGE_EXT4_SELINUX_OPTIONS} -l ${SYSTEM_SIZE_EXT4} ${DEPLOY_DIR_IMAGE}/${SYSTEMIMAGE_TARGET} ${IMAGE_ROOTFS}
+	 # Check Image is correct or not
+	 simg2img ${DEPLOY_DIR_IMAGE}/${SYSTEMIMAGE_TARGET} /dev/null || is_simg_err=1
+     if [ $is_simg_err -eq 1 ]; then
+	  continue
+     else
+      break
+     fi
+    done
     make_ext4fs -a /systemrw ${IMAGE_EXT4_SELINUX_OPTIONS} -l ${SYSTEMRW_SIZE_EXT4} ${DEPLOY_DIR_IMAGE}/${SYSTEMRWIMAGE_TARGET}
 }
