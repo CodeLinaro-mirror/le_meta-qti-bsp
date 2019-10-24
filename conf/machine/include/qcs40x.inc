@@ -48,6 +48,9 @@ PAGE_SIZE ?= '4096'
 
 MACHINE_FEATURES += "kernel26 keyboard"
 
+# fbdev driver
+MACHINE_FEATURES += "fbdev"
+
 #Enable persist image/volume.
 DISTRO_FEATURES += "persist-image"
 # Enable LE Verified Boot
