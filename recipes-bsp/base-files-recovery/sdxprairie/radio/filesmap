@@ -32,8 +32,15 @@ NON-HLOS.bin            modem
 
 sbl1.mbn                sbl
 tz.mbn                  tz
-rpm.mbn                 rpm
-appsboot.mbn            aboot
+aop.mbn                 aop
+devcfg.mbn              tz_devcfg
+hyp.mbn                 qhee
+multi_image.mbn         multi_image
+uefi.elf                uefi
+xbl_cfg.elf             xbl_config
+abl.elf                 abl
+sec.elf                 sec
+apdp.mbn                apdp
 
 # filename + .bak       backup partition
 
