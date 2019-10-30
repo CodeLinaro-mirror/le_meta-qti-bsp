@@ -23,6 +23,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-data \
         packagegroup-qti-dsp \
         packagegroup-qti-display \
+        packagegroup-qti-gst \
         packagegroup-qti-ml \
         packagegroup-qti-qmmf \
         packagegroup-qti-ss-mgr \
