@@ -25,6 +25,7 @@ IMAGE_INSTALL += "dnsmasq"
 IMAGE_INSTALL += "cannelloni"
 IMAGE_INSTALL += "e2fsprogs"
 IMAGE_INSTALL += "e2fsprogs-tune2fs"
+IMAGE_INSTALL += "systemd-serialgetty"
 
 IMAGE_INSTALL += "gstreamer"
 IMAGE_INSTALL += "gstreamer1.0"
