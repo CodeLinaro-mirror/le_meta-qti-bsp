@@ -68,7 +68,7 @@ CFLAGS_append = " -fPIC"
 # So temporarily revert to default optimizations for systemd.
 SELECTED_OPTIMIZATION = "-O2 -fexpensive-optimizations -frename-registers -fomit-frame-pointer -ftree-vectorize"
 
-MACHINE_SUPPORT_BLOCK_DEVICES = "${@bb.utils.contains('DISTRO_FEATURES','nand-boot', 'false', 'true', d)}"
+MACHINE_SUPPORT_BLOCK_DEVICES = "${@bb.utils.contains('IMAGE_FSTYPES','ext4', 'true', 'false', d)}"
 
 do_install_append () {
    install -d ${D}/etc/systemd/system/
@@ -133,6 +133,12 @@ do_install_append () {
    if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd-minimal', 'true', 'false', d)}; then
        rm -rf ${D}/usr/lib/tmpfiles.d/*
        rm -rf ${D}${sysconfdir}/udev/rules.d/mtpserver.rules
+#Required for soundcard
+       cp ${D}/lib/udev/rules.d/50-udev-default.rules  ${D}${sysconfdir}/udev/rules.d/50-udev-default.rules
+       if ${@bb.utils.contains('IMAGE_FSTYPES','ext4', 'true', 'false', d)}; then
+        cp ${D}/lib/udev/rules.d/60-persistent-storage.rules ${D}${sysconfdir}/udev/rules.d/60-persistent-storage.rules
+        cp ${D}/lib/udev/rules.d/99-systemd.rules ${D}${sysconfdir}/udev/rules.d/99-systemd.rules
+       fi
        rm -rf ${D}/lib/udev/rules.d/*
    fi
 }
