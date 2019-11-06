@@ -34,6 +34,10 @@ SRC_URI = "https://download.tuxfamily.org/chrony/chrony-${PV}.tar.gz \
     file://chrony.conf \
     file://chronyd \
 "
+SRC_URI_append_qcs40x = "file://chronyd.path \
+    file://chrony.patch;patchdir=${WORKDIR}/chrony-${PV}/ \
+"
+
 SRC_URI[md5sum] = "d0598aa8a9be8faccef9386f6fc0d5f2"
 SRC_URI[sha256sum] = "8d04e7cda2333289c2104b731d39c3c1db94816e43bae35d7ee4e7ae8af6391f"
 
@@ -96,28 +100,32 @@ do_install() {
     install -m 0644 ${S}/examples/chronyd.service ${D}${systemd_unitdir}/system/
 
     # Variable data (for drift and/or rtc file)
-    install -d ${D}${localstatedir}/lib/chrony
+    install -d ${D}${userfsdatadir}/chrony
 
     # Log files
-    install -d ${D}${localstatedir}/log/chrony
+    install -d ${D}${userfsdatadir}/chrony/logs
 
     # Fix hard-coded paths in config files and init scripts
-    sed -i -e 's!/var/!${localstatedir}/!g' -e 's!/etc/!${sysconfdir}/!g' \
-           -e 's!/usr/sbin/!${sbindir}/!g' -e 's!/usr/bin/!${bindir}/!g' \
-           ${D}${sysconfdir}/chrony.conf \
-           ${D}${sysconfdir}/init.d/chronyd \
-           ${D}${systemd_unitdir}/system/chronyd.service
-    sed -i 's!^PATH=.*!PATH=${base_sbindir}:${base_bindir}:${sbindir}:${bindir}!' ${D}${sysconfdir}/init.d/chronyd
-    sed -i 's!^EnvironmentFile=.*!EnvironmentFile=-${sysconfdir}/default/chronyd!' ${D}${systemd_unitdir}/system/chronyd.service
+    #sed -i -e 's!/var/!${localstatedir}/!g' -e 's!/etc/!${sysconfdir}/!g' \
+    #       -e 's!/usr/sbin/!${sbindir}/!g' -e 's!/usr/bin/!${bindir}/!g' \
+    #       ${D}${sysconfdir}/chrony.conf \
+    #       ${D}${sysconfdir}/init.d/chronyd \
+    #       ${D}${systemd_unitdir}/system/chronyd.service
+    #sed -i 's!^PATH=.*!PATH=${base_sbindir}:${base_bindir}:${sbindir}:${bindir}!' ${D}${sysconfdir}/init.d/chronyd
+    #sed -i 's!^EnvironmentFile=.*!EnvironmentFile=-${sysconfdir}/default/chronyd!' ${D}${systemd_unitdir}/system/chronyd.service
 }
 
-FILES_${PN} = "${sbindir}/chronyd ${sysconfdir} ${localstatedir}"
+do_install_append_qcs40x() {
+    install -m 0644 ${WORKDIR}/chronyd.path ${D}${systemd_unitdir}/system/
+}
+
+FILES_${PN} = "${sbindir}/chronyd ${sysconfdir} ${systemd_system_unitdir} ${userfsdatadir}"
 CONFFILES_${PN} = "${sysconfdir}/chrony.conf"
 INITSCRIPT_NAME = "chronyd"
 INITSCRIPT_PARAMS = "start 84 5 ."
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE_${PN} = "chronyd.service"
-
+SYSTEMD_SERVICE_${PN}_qcs40x = "chronyd.path"
 # It's probably a bad idea to run chrony and another time daemon on
 # the same system.  systemd includes the SNTP client 'timesyncd', which
 # will be disabled by chronyd.service, however it will remain on the rootfs
