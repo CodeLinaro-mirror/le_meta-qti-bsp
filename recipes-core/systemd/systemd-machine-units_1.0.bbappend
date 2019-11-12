@@ -27,6 +27,10 @@ SRC_URI_append += " file://bt_firmware-ubi-mount.service"
 SRC_URI_append += " file://bt_firmware.mount"
 SRC_URI_append += " file://bt_firmware-mount.service"
 SRC_URI_append += " file://non-hlos-squash.sh"
+SRC_URI_append += " file://persistfactory-mount.sh"
+SRC_URI_append += " file://persistfactory-mount.service"
+SRC_URI_append += " file://persistfactory-ubi-mount.sh"
+SRC_URI_append += " file://persistfactory-ubi-mount.service"
 
 SRC_URI_append_batcam += " file://pre_hibernate.sh"
 SRC_URI_append_batcam += " file://post_hibernate.sh"
@@ -64,6 +68,7 @@ MNT_POINTS  = "${@d.getVar('MACHINE_MNT_POINTS') or ""}"
 # /data is default. /systemrw is applicable only when rootfs is read only.
 MNT_POINTS += " /data"
 MNT_POINTS += " ${@bb.utils.contains('DISTRO_FEATURES', 'ro-rootfs', '/systemrw', '', d)}"
+MNT_POINTS += " ${@bb.utils.contains('DISTRO_FEATURES', 'factory-storage', '/persist/factory', '', d)}"
 
 do_install_append () {
     install -d 0644 ${D}${sysconfdir}/initscripts
@@ -198,6 +203,23 @@ do_install_append () {
                install -m 0644 ${WORKDIR}/bt_firmware-ubi-mount.service ${D}${systemd_unitdir}/system/bt-fw-ubi-mount.service
                ln -sf ${systemd_unitdir}/system/bt_firmware-mount.service \
                            ${D}${systemd_unitdir}/system/local-fs.target.requires/bt_firmware-mount.service
+            fi
+        fi
+
+        if [ "$entry" == "/persist/factory" ]; then
+            if ${@bb.utils.contains('IMAGE_FSTYPES', 'ext4', 'true', 'false', d)}; then
+                install -m 0744 ${WORKDIR}/persistfactory-mount.sh ${D}${sysconfdir}/initscripts/persistfactory-mount.sh
+                install -m 0644 ${WORKDIR}/persistfactory-mount.service ${D}${systemd_unitdir}/system/persistfactory-mount.service
+                install -m 0644 ${WORKDIR}/persistfactory-mount.service ${D}${systemd_unitdir}/system/persistfactory-ext4-mount.service
+                ln -sf ${systemd_unitdir}/system/persistfactory-mount.service \
+                    ${D}${systemd_unitdir}/system/local-fs.target.requires/persistfactory-mount.service
+            fi
+            if ${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', 'true', 'false', d)}; then
+                install -m 0744 ${WORKDIR}/persistfactory-ubi-mount.sh ${D}${sysconfdir}/initscripts/persistfactory-ubi-mount.sh
+                install -m 0644 ${WORKDIR}/persistfactory-ubi-mount.service ${D}${systemd_unitdir}/system/persistfactory-mount.service
+                install -m 0644 ${WORKDIR}/persistfactory-ubi-mount.service ${D}${systemd_unitdir}/system/persistfactory-ubi-mount.service
+                ln -sf ${systemd_unitdir}/system/persistfactory-ubi-mount.service \
+                    ${D}${systemd_unitdir}/system/local-fs.target.requires/persistfactory-mount.service
             fi
         fi
     done
