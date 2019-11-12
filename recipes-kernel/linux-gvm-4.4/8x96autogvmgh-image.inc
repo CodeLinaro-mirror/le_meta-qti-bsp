@@ -63,6 +63,17 @@ CONFIG_DEBUG_CREDENTIALS=y
 CONFIG_RANDOMIZE_BASE=y
 
 KERNEL_EXTRACONFIGS
+
+if ${@bb.utils.contains('DISTRO_FEATURES', 'qti-perf', 'true', 'false', d)}; then
+cat >> ${S}/arch/${ARCH}/configs/${KERNEL_CONFIG} <<KERNEL_EXTRACONFIGS_PERF
+# CONFIG_AUDIT is not set
+# CONFIG_KALLSYMS_ALL is not set
+# CONFIG_KALLSYMS is not set
+# CONFIG_FW_LOADER_USER_HELPER_FALLBACK is not set
+# CONFIG_FW_LOADER_USER_HELPER is not set
+# CONFIG_SERIAL_CORE_CONSOLE is not set
+KERNEL_EXTRACONFIGS_PERF
+fi
 }
 
 SRC_URI_append_kernelpatchok += " \
