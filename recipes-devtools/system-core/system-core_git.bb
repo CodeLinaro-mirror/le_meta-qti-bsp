@@ -1,4 +1,4 @@
-inherit autotools pkgconfig systemd update-rc.d qperf
+inherit autotools pkgconfig systemd update-rc.d qperf linux-kernel-base
 
 DESCRIPTION = "Android system/core components"
 HOMEPAGE = "http://developer.android.com/"
@@ -19,6 +19,9 @@ EXTRA_OECONF_append = " --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/
 EXTRA_OECONF_append = " --with-logd-logging"
 EXTRA_OECONF_append = "${@base_conditional('USER_BUILD','1',' --disable-debuggerd','',d)}"
 EXTRA_OECONF_append_apq8053 = " --enable-logd-privs"
+
+#Disable default libsync for 4.14 kernel
+EXTRA_OECONF_append += "--disable-libsync"
 
 # Disable adb root privileges in USER builds for msm targets
 EXTRA_OECONF_append_msm = "${@base_conditional('USER_BUILD','1',' --disable-adb-root','',d)}"

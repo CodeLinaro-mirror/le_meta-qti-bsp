@@ -5,7 +5,7 @@ SRC_URI += "\
 "
 
 SERIAL_CONSOLE = "115200 console"
-TERMINAL = "${@base_contains('BASEMACHINE', 'apq8098', 'ttyMSM0', 'ttyHSL0', d)}"
+TERMINAL = "${@base_contains('BASEMACHINE', 'mdm9607', 'ttyMSM0', 'ttyHSL0', d)}"
 USE_VT = "0"
 SYSVINIT_ENABLED_GETTYS = ""
 
