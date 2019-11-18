@@ -84,6 +84,14 @@ addtask unpack_extra after do_unpack before do_patch
 
 do_patch_extra () {
     cat ${WORKDIR}/eap-qti-kernel/defconfig >> ${S}/arch/${ARCH}/configs/${KERNEL_CONFIG}
+
+# Disable EAP QMI configs
+cat >> ${S}/arch/${ARCH}/configs/${KERNEL_CONFIG} <<KERNEL_EXTRACONFIGS
+# CONFIG_QTI_QMI_HELPERS is not set
+# CONFIG_QTI_DIAG_CHAR is not set
+# CONFIG_QTI_USB_F_DIAG is not set
+# CONFIG_QTI_USB_DIAG_BRIDGE is not set
+KERNEL_EXTRACONFIGS
 }
 
 addtask patch_extra after do_patch before do_configure
