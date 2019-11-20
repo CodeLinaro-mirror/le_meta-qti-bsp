@@ -8,7 +8,7 @@ To avoid conflict with 8x96autogvmga and 8x96autogvmgh platforms.
 Change-Id: I1d093c6cc6ed8b0a617c206b526990cc18db2a88
 ---
  sound/soc/msm/apq8096-auto.c               | 6 +++---
- sound/soc/msm/qdsp6v2/msm-pcm-routing-v2.c | 6 ------
+ sound/soc/msm/qdsp6v2/msm-pcm-routing-v2.c | 8 ------
  2 files changed, 3 insertions(+), 9 deletions(-)
 
 diff --git a/sound/soc/msm/apq8096-auto.c b/sound/soc/msm/apq8096-auto.c
@@ -39,14 +39,16 @@ diff --git a/sound/soc/msm/qdsp6v2/msm-pcm-routing-v2.c b/sound/soc/msm/qdsp6v2/
 index a923faf11c84..1122e7795fb9 100644
 --- a/sound/soc/msm/qdsp6v2/msm-pcm-routing-v2.c
 +++ b/sound/soc/msm/qdsp6v2/msm-pcm-routing-v2.c
-@@ -8625,12 +8625,6 @@ static const struct snd_kcontrol_new mmul5_mixer_controls[] = {
- 	SOC_SINGLE_EXT("QUAT_MI2S_TX_4", MSM_BACKEND_DAI_QUATERNARY_MI2S_TX_4,
+@@ -10072,14 +10072,6 @@ static const struct snd_kcontrol_new mmul5_mixer_controls[] = {
+ 	MSM_BACKEND_DAI_QUATERNARY_MI2S_TX_4,
  	MSM_FRONTEND_DAI_MULTIMEDIA5, 1, 0, msm_routing_get_audio_mixer,
  	msm_routing_put_audio_mixer),
--	SOC_SINGLE_EXT("QUAT_MI2S_TX", MSM_BACKEND_DAI_QUATERNARY_MI2S_TX,
+-	SOC_DOUBLE_EXT("QUAT_MI2S_TX", SND_SOC_NOPM,
+-	MSM_BACKEND_DAI_QUATERNARY_MI2S_TX,
 -	MSM_FRONTEND_DAI_MULTIMEDIA5, 1, 0, msm_routing_get_audio_mixer,
 -	msm_routing_put_audio_mixer),
--	SOC_SINGLE_EXT("SEC_MI2S_TX", MSM_BACKEND_DAI_SECONDARY_MI2S_TX,
+-	SOC_DOUBLE_EXT("SEC_MI2S_TX", SND_SOC_NOPM,
+-	MSM_BACKEND_DAI_SECONDARY_MI2S_TX,
 -	MSM_FRONTEND_DAI_MULTIMEDIA5, 1, 0, msm_routing_get_audio_mixer,
 -	msm_routing_put_audio_mixer),
  };
