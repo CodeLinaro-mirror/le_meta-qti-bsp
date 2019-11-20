@@ -6,7 +6,7 @@ Subject: [PATCH] ASoC: msm: Change SEC_MI2S to fit 8x96autogvmga
 Change-Id: Iedc058efa0117706f693ab8d025dbfa2a5a99634
 ---
  sound/soc/msm/apq8096-auto.c               | 42 +++++++++++++++++++++++++-----
- sound/soc/msm/qdsp6v2/msm-pcm-routing-v2.c |  4 +++
+ sound/soc/msm/qdsp6v2/msm-pcm-routing-v2.c |  5 +++
  2 files changed, 39 insertions(+), 7 deletions(-)
 
 diff --git a/sound/soc/msm/apq8096-auto.c b/sound/soc/msm/apq8096-auto.c
@@ -99,17 +99,18 @@ diff --git a/sound/soc/msm/qdsp6v2/msm-pcm-routing-v2.c b/sound/soc/msm/qdsp6v2/
 index a923faf..7f010ca 100644
 --- a/sound/soc/msm/qdsp6v2/msm-pcm-routing-v2.c
 +++ b/sound/soc/msm/qdsp6v2/msm-pcm-routing-v2.c
-@@ -10800,6 +10800,9 @@ static const struct snd_kcontrol_new aux_pcm_rx_port_mixer_controls[] = {
- 	SOC_SINGLE_EXT("QUAT_TDM_TX_0", MSM_BACKEND_DAI_AUXPCM_RX,
+@@ -12888,6 +12888,10 @@ static const struct snd_kcontrol_new aux_pcm_rx_port_mixer_controls[] = {
+ 	MSM_BACKEND_DAI_AUXPCM_RX,
  	MSM_BACKEND_DAI_QUAT_TDM_TX_0, 1, 0, msm_routing_get_port_mixer,
  	msm_routing_put_port_mixer),
-+	SOC_SINGLE_EXT("SEC_MI2S_TX", MSM_BACKEND_DAI_AUXPCM_RX,
++	SOC_DOUBLE_EXT("SEC_MI2S_TX", SND_SOC_NOPM,
++	MSM_BACKEND_DAI_AUXPCM_RX,
 +	MSM_BACKEND_DAI_SECONDARY_MI2S_TX, 1, 0, msm_routing_get_port_mixer,
 +	msm_routing_put_port_mixer),
  };
  
  static const struct snd_kcontrol_new sec_auxpcm_rx_port_mixer_controls[] = {
-@@ -17333,6 +17336,7 @@ static const struct snd_soc_dapm_route intercon[] = {
+@@ -19839,6 +19843,7 @@ static const struct snd_soc_dapm_route intercon[] = {
  	{"AUX_PCM_RX Port Mixer", "SLIM_1_TX", "SLIMBUS_1_TX"},
  	{"AUX_PCM_RX Port Mixer", "SEC_AUX_PCM_UL_TX", "SEC_AUX_PCM_TX"},
  	{"AUX_PCM_RX Port Mixer", "QUAT_TDM_TX_0", "QUAT_TDM_TX_0"},
