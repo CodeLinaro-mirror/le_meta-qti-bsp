@@ -27,6 +27,10 @@ SRC_URI_append += " file://bt_firmware-ubi-mount.service"
 SRC_URI_append += " file://bt_firmware.mount"
 SRC_URI_append += " file://bt_firmware-mount.service"
 SRC_URI_append += " file://non-hlos-squash.sh"
+SRC_URI_append += " file://data-nbd.mount"
+SRC_URI_append += " file://systemrw-nbd.mount"
+SRC_URI_append += " file://persist-nbd.mount"
+SRC_URI_append += " file://firmware-nbd-mount.service"
 
 SRC_URI_append_batcam += " file://pre_hibernate.sh"
 SRC_URI_append_batcam += " file://post_hibernate.sh"
@@ -79,6 +83,11 @@ do_install_append () {
     # a <partition-mount>.service invokes mounting the A/B partition as detected at the time of boot.
     for entry in ${MNT_POINTS}; do
         if [ "$entry" == "$userfsdatadir" ]; then
+            if ${@bb.utils.contains('IMAGE_FSTYPES', 'squashfs-xz', 'true', 'false', d)}; then
+               if ${@bb.utils.contains('DISTRO_FEATURES','flashless','true','false',d)}; then
+                  install -m 0644 ${WORKDIR}/data-nbd.mount ${D}${systemd_unitdir}/system/data-nbd.mount
+               fi
+            fi
             if ${@bb.utils.contains('IMAGE_FSTYPES', 'ext4', 'true', 'false', d)}; then
                 install -m 0644 ${WORKDIR}/data.mount ${D}${systemd_unitdir}/system/data.mount
                 install -m 0644 ${WORKDIR}/data.mount ${D}${systemd_unitdir}/system/data-ext4.mount
@@ -96,6 +105,11 @@ do_install_append () {
         fi
 
         if [ "$entry" == "/systemrw" ]; then
+            if ${@bb.utils.contains('IMAGE_FSTYPES', 'squashfs-xz', 'true', 'false', d)}; then
+               if ${@bb.utils.contains('DISTRO_FEATURES','flashless','true','false',d)}; then
+                  install -m 0644 ${WORKDIR}/systemrw-nbd.mount ${D}${systemd_unitdir}/system/systemrw-nbd.mount
+               fi
+            fi
             if ${@bb.utils.contains('IMAGE_FSTYPES', 'ext4', 'true', 'false', d)}; then
                 install -m 0644 ${WORKDIR}/systemrw.mount ${D}${systemd_unitdir}/system/systemrw.mount
                 install -m 0644 ${WORKDIR}/systemrw.mount ${D}${systemd_unitdir}/system/systemrw-ext4.mount
@@ -123,6 +137,11 @@ do_install_append () {
         fi
 
         if [ "$entry" == "/persist" ]; then
+            if ${@bb.utils.contains('IMAGE_FSTYPES', 'squashfs-xz', 'true', 'false', d)}; then
+               if ${@bb.utils.contains('DISTRO_FEATURES','flashless','true','false',d)}; then
+                  install -m 0644 ${WORKDIR}/persist-nbd.mount ${D}${systemd_unitdir}/system/persist-nbd.mount
+               fi
+            fi
             if ${@bb.utils.contains('IMAGE_FSTYPES', 'ext4', 'true', 'false', d)}; then
                 install -m 0644 ${WORKDIR}/persist.mount ${D}${systemd_unitdir}/system/persist.mount
                 install -m 0644 ${WORKDIR}/persist.mount ${D}${systemd_unitdir}/system/persist-ext4.mount
@@ -159,6 +178,13 @@ do_install_append () {
                install -m 0644 ${WORKDIR}/firmware-ubi-mount.service ${D}${systemd_unitdir}/system/fw-ubi-mount.service
                ln -sf ${systemd_unitdir}/system/firmware-mount.service \
                            ${D}${systemd_unitdir}/system/local-fs.target.requires/firmware-mount.service
+            fi
+            if ${@bb.utils.contains('IMAGE_FSTYPES', 'squashfs-xz', 'true', 'false', d)}; then
+               if ${@bb.utils.contains('DISTRO_FEATURES','flashless','true','false',d)}; then
+                   install -m 0644 ${WORKDIR}/firmware-nbd-mount.service ${D}${systemd_unitdir}/system/firmware-nbd-mount.service
+                   ln -sf ${systemd_unitdir}/system/firmware-mount.service \
+                           ${D}${systemd_unitdir}/system/local-fs.target.requires/firmware-mount.service
+               fi
             fi
         fi
 

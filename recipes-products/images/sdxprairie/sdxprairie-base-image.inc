@@ -37,7 +37,24 @@ create_squashfs_rootimg() {
   if ${@bb.utils.contains('IMAGE_FSTYPES', 'squashfs-xz', 'true', 'false', d)}; then
        mkdir -p ${IMAGE_ROOTFS_FLASHLESS}
        cp -R ${IMAGE_ROOTFS}/. ${IMAGE_ROOTFS_FLASHLESS}/.
+       fixup_systemd_mounts_services_flashless_squashfs_rootfs
        mksquashfs ${IMAGE_ROOTFS_FLASHLESS} ${RAMDISK} -context-file ${SELINUX_FILE_CONTEXTS} -noappend -comp xz
 
    fi
+
+}
+
+fixup_systemd_mounts_services_flashless_squashfs_rootfs() {
+# Mount remote squashfs partitions for flashless
+ cp ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/data-nbd.mount \
+           ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/data.mount
+ cp ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/systemrw-nbd.mount \
+           ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/systemrw.mount
+ cp ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/persist-nbd.mount \
+           ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/persist.mount
+ cp ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/firmware-nbd-mount.service \
+           ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/firmware-mount.service
+ ln -sf ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/nbdclient.service \
+               ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/local-fs.target.wants/nbdclient.service
+ rm -rf ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/multi-user.target.wants/cache.mount
 }
