@@ -77,7 +77,7 @@ IMAGE_INSTALL += "system-conf"
 IMAGE_INSTALL += "tcpdump"
 IMAGE_INSTALL += "wireless-tools"
 
-#IMAGE_INSTALL += "sfe"
+IMAGE_INSTALL += "sfe"
 IMAGE_INSTALL += "tinyproxy"
 IMAGE_INSTALL += "iputils"
 #IMAGE_INSTALL += "bt-app"
