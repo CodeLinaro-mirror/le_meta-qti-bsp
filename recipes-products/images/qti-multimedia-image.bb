@@ -22,6 +22,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-gst \
         packagegroup-qti-ml \
         packagegroup-qti-qmmf \
+        packagegroup-qti-securemsm \
         packagegroup-qti-ss-mgr \
         packagegroup-qti-video \
         packagegroup-qti-wifi \
