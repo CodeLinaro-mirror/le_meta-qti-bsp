@@ -53,7 +53,6 @@ PACKAGECONFIG = " \
     randomseed \
     sysusers \
     timedated \
-    xz \
 "
 
 # Enable coredump support when needed
