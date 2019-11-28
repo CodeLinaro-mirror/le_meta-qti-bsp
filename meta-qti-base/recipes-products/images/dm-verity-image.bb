@@ -29,14 +29,15 @@ do_make_system_image () {
   dd if=/dev/zero of=${DEPLOY_DIR_IMAGE}/dm-verity/hashtable.img bs=1M count=1
   #export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${TMPDIR}/sysroots/${BUILD_SYS}/lib:${TMPDIR}/sysroots/${BUILD_SYS}/usr/lib
   veritysetup format ${DEPLOY_DIR_IMAGE}/machine-image-${PRODUCT}.ext4 ${DEPLOY_DIR_IMAGE}/dm-verity/hashtable.img > ${DEPLOY_DIR_IMAGE}/dm-verity/hash_info.txt
+  touch ${DEPLOY_DIR_IMAGE}/dm-verity/verity.conf
   cat ${DEPLOY_DIR_IMAGE}/machine-image-${PRODUCT}.ext4 ${DEPLOY_DIR_IMAGE}/dm-verity/hashtable.img > ${DEPLOY_DIR_IMAGE}/dm-verity/machine-image-${PRODUCT}.ext4
 }
 
 python do_make_dm_verity_image(){
     if(d.getVar('KERNEL_ROOTDEVICE', True) == "/dev/dm-0"):
         bb.build.exec_func('do_make_system_image',d)
-        bb.build.exec_func('do_generate_verity_dts',d)
-        bb.build.exec_func('do_rebuild_dtb',d)
+        bb.build.exec_func('do_generate_verity_conf',d)
+        bb.build.exec_func('do_rebuild_verity_cmdline',d)
 }
 
 addtask do_make_dm_verity_image after do_populate_sysroot before do_build 
