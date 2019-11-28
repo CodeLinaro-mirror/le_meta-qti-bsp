@@ -82,8 +82,8 @@ IMAGE_INSTALL += "tinyproxy"
 IMAGE_INSTALL += "iputils"
 #IMAGE_INSTALL += "bt-app"
 IMAGE_INSTALL += "bt-property"
-IMAGE_INSTALL += "fluoride"
-IMAGE_INSTALL += "libbt-vendor"
+#IMAGE_INSTALL += "fluoride"
+#IMAGE_INSTALL += "libbt-vendor"
 
 # Below packages are open source packages that depend on proprietary packages
 
