@@ -35,7 +35,7 @@ FindAndMountUBI () {
    mkdir -p $dir
 
    ubiattach -m $mtd_block_number
-   non_hlos_block=`cat $mtd_file | grep -i nonhlos-fs | sed 's/^mtd//' | awk -F ':' '{print $1}'`
+   non_hlos_block=`cat $mtd_file | grep -i nonhlos-fs${SLOT_SUFFIX} | sed 's/^mtd//' | awk -F ':' '{print $1}'`
    device=/dev/mtdblock$non_hlos_block
    while [ 1 ]
     do
