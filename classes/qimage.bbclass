@@ -12,6 +12,20 @@ RM_WORK_EXCLUDE += "${PN}"
 IMAGE_GEN_DEBUGFS = "1"
 IMAGE_FSTYPES_DEBUGFS = "tar.bz2"
 
+# By default support only custom images generation using functions like do_makesystem.
+# Don't build the monolith rootfs image as it pulls in a lot of unused dependencies.
+IMAGE_FSTYPES = ""
+
+### Don't append timestamp to image name
+IMAGE_VERSION_SUFFIX = ""
+
+# Default Image names
+BOOTIMAGE_TARGET ?= "${IMAGE_NAME}-boot.img"
+SYSTEMIMAGE_TARGET ?= "${IMAGE_NAME}-sysfs.ext4"
+SYSTEMIMAGE_MAP_TARGET ?= "${IMAGE_NAME}-sysfs.map"
+OVERLAYIMAGE_TARGET ?= "${IMAGE_NAME}-overlayfs.ext4"
+OVERLAYIMAGE_MAP_TARGET ?= "${IMAGE_NAME}-overlayfs.map"
+
 #  Function to get most suitable .inc file with list of packages
 #  to be installed into root filesystem from layer it is called.
 #  Following is the order of priority.
@@ -62,13 +76,26 @@ IMAGE_LOGIN_MANAGER = "busybox-static"
 
 DEPENDS += "\
              ext4-utils-native \
-             gen-partitions-native \
+             gen-partitions-tool-native \
              mkbootimg-native \
              mtd-utils-native \
              openssl-native \
              pkgconfig-native \
+             ptool-native \
              virtual/bootloader \
 "
+
+do_gen_partition_bin[dirs]      = "${DEPLOY_DIR_IMAGE}"
+
+do_gen_partition_bin () {
+    python ${STAGING_BINDIR_NATIVE}/gen_partition.py -i ${MACHINE_PARTITION_CONF} \
+-o ${WORKDIR}/partition.xml -m boot="${BOOTIMAGE_TARGET}",system="${SYSTEMIMAGE_TARGET}"
+    python ${STAGING_BINDIR_NATIVE}/ptool.py -x ${WORKDIR}/partition.xml -t ${DEPLOY_DIR_IMAGE}
+    install ${WORKDIR}/partition.xml ${DEPLOY_DIR_IMAGE}
+}
+
+addtask do_gen_partition_bin after do_prepare_recipe_sysroot before do_image
+
 
 # Check and remove empty packages before rootfs creation
 do_rootfs[prefuncs] += "rootfs_ignore_packages"
@@ -95,12 +122,21 @@ python rootfs_ignore_packages() {
 }
 
 ROOTFS_POSTPROCESS_COMMAND += "gen_buildprop;do_fsconfig;"
+ROOTFS_POSTPROCESS_COMMAND += "gen_overlayfs;"
 
 gen_buildprop() {
    mkdir -p ${IMAGE_ROOTFS}/cache
    echo ro.build.version.release=`cat ${IMAGE_ROOTFS}/etc/version ` >> ${IMAGE_ROOTFS}/build.prop
    echo ro.product.name=${BASEMACHINE}-${DISTRO} >> ${IMAGE_ROOTFS}/build.prop
    echo ${MACHINE} >> ${IMAGE_ROOTFS}/target
+}
+
+gen_overlayfs() {
+    mkdir -p ${IMAGE_ROOTFS}/overlay
+    mkdir -p ${IMAGE_ROOTFS}/overlay/etc
+    mkdir -p ${IMAGE_ROOTFS}/overlay/.etc-work
+    mkdir -p ${IMAGE_ROOTFS}/overlay/data
+    mkdir -p ${IMAGE_ROOTFS}/overlay/.data-work
 }
 
 do_fsconfig() {
@@ -112,26 +148,33 @@ do_fsconfig_append_qti-distro-user() {
  rm ${IMAGE_ROOTFS}/lib/systemd/system/sys-kernel-debug.mount
 }
 
-
-# Call function makesystem to generate sparse ext4 image
-python __anonymous () {
-    machine = d.getVar("MACHINE", True)
-    if (machine!="sdxpoorwills") and (machine!="mdm9607") and (machine!="sdxprairie"):
-        bb.build.addtask('makesystem', 'do_build', 'do_rootfs', d)
-}
-
+################################################
 ### Generate system.img #####
+################################################
 # Alter system image size if varity is enabled.
 do_makesystem[prefuncs]  += " ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'adjust_system_size_for_verity', '', d)}"
 do_makesystem[postfuncs] += " ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'make_verity_enabled_system_image', '', d)}"
 do_makesystem[dirs]       = "${DEPLOY_DIR_IMAGE}"
 
-
 do_makesystem() {
-    cp ${THISDIR}/${BASEMACHINE}/${BASEMACHINE}-fsconfig.conf ${WORKDIR}/rootfs-fsconfig.conf
-    make_ext4fs -C ${WORKDIR}/rootfs-fsconfig.conf -B ${DEPLOY_DIR_IMAGE}/system.map ${IMAGE_EXT4_SELINUX_OPTIONS} -b 4096 -l ${SYSTEM_SIZE_EXT4} ${DEPLOY_DIR_IMAGE}/${SYSTEMIMAGE_TARGET} ${IMAGE_ROOTFS}
+    cp ${THISDIR}/fsconfig/${MACHINE_FSCONFIG_CONF} ${WORKDIR}/rootfs-fsconfig.conf
+    make_ext4fs -C ${WORKDIR}/rootfs-fsconfig.conf \
+                -B ${DEPLOY_DIR_IMAGE}/${SYSTEMIMAGE_MAP_TARGET} \
+                -a / -b 4096 \
+                -l ${SYSTEM_SIZE_EXT4} \
+                ${IMAGE_EXT4_SELINUX_OPTIONS} \
+                ${DEPLOY_DIR_IMAGE}/${SYSTEMIMAGE_TARGET} ${IMAGE_ROOTFS}
+}
+addtask do_makesystem after do_rootfs before do_image_complete
+
+### Generate overlay.img ###
+do_makeoverlay[dirs] = "${DEPLOY_DIR_IMAGE}"
+
+do_makeoverlay() {
+    make_ext4fs -B ${DEPLOY_DIR_IMAGE}/${OVERLAYIMAGE_MAP_TARGET} ${IMAGE_EXT4_SELINUX_OPTIONS} -b 4096 -l ${OVERLAY_SIZE_EXT4} ${DEPLOY_DIR_IMAGE}/${OVERLAYIMAGE_TARGET} ${IMAGE_ROOTFS}/overlay
 }
 
+addtask do_makeoverlay after do_rootfs before do_build
 
 ################################################
 ############# Generate boot.img ################
@@ -205,6 +248,7 @@ python do_make_veritybootimg () {
         bb.error("Running: %s failed." % cmd)
 }
 do_make_veritybootimg[depends]  += "${PN}:do_makesystem"
+do_make_veritybootimg[depends]  += "${PN}:do_makeoverlay"
 do_make_veritybootimg[dirs]      = "${DEPLOY_DIR_IMAGE}"
 do_make_veritybootimg[depends] += "virtual/kernel:do_deploy"
 

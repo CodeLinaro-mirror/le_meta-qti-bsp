@@ -1,0 +1,40 @@
+From a9ee2fca676d57217a8fee3fb8453c4496c4b990 Mon Sep 17 00:00:00 2001
+From: Nicolas Dechesne <nicolas.dechesne@linaro.org>
+Date: Wed, 28 Aug 2019 17:54:50 +0200
+Subject: [PATCH] Makefile: Use pkg-config for libxml2 detection.
+
+xml2-config does not work. Use pkgconfig to set CPPFLAGS and LIBS.
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Nicolas Dechesne <nicolas.dechesne@linaro.org>
+---
+ Makefile | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 86a81f8..470befb 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,14 +1,14 @@
+ OUT := qdl
+ 
+-CFLAGS := -O2 -Wall -g `xml2-config --cflags`
+-LDFLAGS := `xml2-config --libs` -ludev
+-prefix := /usr/local
++CFLAGS += -O2 -Wall -g `pkg-config --cflags libxml-2.0`
++LDFLAGS += `pkg-config --libs libxml-2.0` -ludev
++prefix ?= /usr/local
+ 
+ SRCS := firehose.c qdl.c sahara.c util.c patch.c program.c ufs.c sparse_read.c sparse.c output_stream.c backed_block.c sparse_err.c
+ OBJS := $(SRCS:.c=.o)
+ 
+ $(OUT): $(OBJS)
+-	$(CC) -o $@ $^ $(LDFLAGS)
++	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+ 
+ clean:
+ 	rm -f $(OUT) $(OBJS)
+-- 
+2.24.0
+

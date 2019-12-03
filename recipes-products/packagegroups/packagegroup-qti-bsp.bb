@@ -17,6 +17,7 @@ RDEPENDS_packagegroup-android-utils = "\
     leproperties \
     logcat \
     logd \
+    system-prop \
     "
 
 # Startup scripts needed during device bootup
@@ -24,5 +25,4 @@ RDEPENDS_packagegroup-startup-scripts = "\
     firmware-links \
     post-boot \
     usb-composition \
-    ${@bb.utils.contains('COMBINED_FEATURES', 'qti-wifi', 'wlan-setup', '', d)} \
     "
