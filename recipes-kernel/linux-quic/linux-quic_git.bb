@@ -65,8 +65,6 @@ DEPENDS_apq8096 += "mkbootimg-native dtc-native"
 
 # Force dependencies on 64-bit toolchain when building 64-bit.
 DEPENDS_remove_pn-lib64-linux-quic = "virtual/${TARGET_PREFIX}binutils"
-DEPENDS_remove_pn-lib64-linux-quic = "virtual/${TARGET_PREFIX}gcc"
-DEPENDS_append_pn-lib64-linux-quic = " lib64-binutils-cross-aarch64 lib64-gcc-cross-aarch64"
 
 PACKAGES = "kernel kernel-base kernel-vmlinux kernel-dev kernel-modules"
 RDEPENDS_kernel-base = ""
