@@ -14,11 +14,13 @@ SRC_URI  += "file://50-log.rules"
 
 S = "${WORKDIR}/liblog"
 
+DEPENDS += " glib-2.0"
+
 BBCLASSEXTEND = "native"
 
 EXTRA_OECONF += " --with-core-includes=${WORKSPACE}/system/core/include"
 EXTRA_OECONF += " --disable-static"
-EXTRA_OECONF_append_class-target = " --with-logd-logging"
+EXTRA_OECONF += " --with-glib"
 
 do_install_append() {
     if [ "${CLASSOVERRIDE}" = "class-target" ]; then
