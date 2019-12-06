@@ -6,4 +6,5 @@ SRC_URI += "\
 	file://makedepend.SH.patch \
 	file://CVE-2018-18311.patch \
 	file://CVE-2018-18314_1.patch \
+	file://CVE-2018-18314_2.patch \
         "
