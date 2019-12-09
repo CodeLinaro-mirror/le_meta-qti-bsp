@@ -30,6 +30,9 @@ vendor.audio.record.multiple.enabled=true
 #enable offload buffer duration
 vendor.audio.offload.buffer.duration.enabled=true
 
+#enable ttp in capture and playback path
+persist.vendor.audio.ttp.render.mode=true
+
 #Audio voice concurrency related flags
 vendor.voice.playback.conc.disabled=true
 vendor.voice.record.conc.disabled=true
