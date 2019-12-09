@@ -1,0 +1,1 @@
+ACTION=="add" SUBSYSTEM=="mtd", KERNEL=="mtd*",NAME="%k" GROUP="disk", MODE="0660"
