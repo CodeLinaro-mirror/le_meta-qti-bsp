@@ -7,4 +7,5 @@ SRC_URI += "\
 	    file://CVE-2018-16839.patch \
 	    file://CVE-2018-1000300.patch \
 	    file://CVE-2018-1000120.patch \
+	    file://CVE-2018-0500.patch \
 "
