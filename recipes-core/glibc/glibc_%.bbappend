@@ -1,6 +1,10 @@
+FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 # glibc expects -fstack-protector optimization passed as a configuration option
 # instead of a top level build flag. 
 
+SRC_URI += "\
+            file://CVE-2019-9169.patch \
+"
 python __anonymous () {
     sel_opt = d.getVar("SELECTED_OPTIMIZATION", True).split()
 
