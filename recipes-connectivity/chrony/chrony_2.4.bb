@@ -30,11 +30,13 @@ SECTION = "net"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 
-SRC_URI = "https://download.tuxfamily.org/chrony/chrony-${PV}.tar.gz \
+SRC_URI = "\
+    https://download.tuxfamily.org/chrony/chrony-${PV}.tar.gz \
     file://chrony.conf \
     file://chronyd \
 "
-SRC_URI_append_qcs40x = "file://chronyd.path \
+SRC_URI_append_qcs40x = " \
+    file://chronyd.path \
     file://chrony.patch;patchdir=${WORKDIR}/chrony-${PV}/ \
 "
 
