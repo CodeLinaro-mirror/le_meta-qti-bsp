@@ -10,6 +10,7 @@ HOMEPAGE = "http://android.git.kernel.org/?p=platform/system/core.git"
 
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI = "file://android_compat/build/tools/fs_config/"
+DEPENDS += "libselinux libcutils"
 
 S = "${WORKDIR}/android_compat/build/tools/fs_config/"
 
