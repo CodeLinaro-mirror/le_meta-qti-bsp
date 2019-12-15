@@ -15,6 +15,7 @@ RDEPENDS_packagegroup-android-utils = "\
     adbd \
     binder \
     leproperties \
+    logcat \
     system-prop \
     "
 
