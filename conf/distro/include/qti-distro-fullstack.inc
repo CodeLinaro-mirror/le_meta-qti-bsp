@@ -30,7 +30,7 @@ DISTRO_FEATURES_append = " fbdev opencl opengl pulseaudio tensorflow-lite waylan
 # qti-video:         Support QTI video solution
 # qti-video-encoder: Support QTI video encode
 
-DISTRO_FEATURES_append = " qti-audio qti-bluetooth qti-camera qti-mm-parser qti-qmmf qti-video qti-video-encoder"
+DISTRO_FEATURES_append = " qti-audio qti-bluetooth qti-camera qti-mm-parser qti-qmmf qti-video qti-video-encoder qti-fastcv"
 
 # inherit distro_featres_check class across the distro
 INHERIT += "distro_features_check"
