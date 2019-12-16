@@ -29,6 +29,7 @@ IMAGE_INIT_MANAGER ?= "sysvinit sysvinit-pidof"
 IMAGE_INITSCRIPTS ?= ""
 
 ROOTFS_POSTPROCESS_COMMAND_append = " gen_buildprop;"
+ROOTFS_POSTPROCESS_COMMAND_append = "${@bb.utils.contains('DISTRO_FEATURES','flashless','create_squashfs-rootimg;','', d)}"
 EXTRA_IMAGE_FEATURES += "${@bb.utils.contains('DISTRO_FEATURES','ro-rootfs','read-only-rootfs','',d)}"
 gen_buildprop() {
    mkdir -p ${IMAGE_ROOTFS}/cache
