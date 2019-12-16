@@ -27,6 +27,7 @@ EXTRA_OECONF = "--with-common-includes="${WORKSPACE}/vendor/qcom/opensource/blue
                 --enable-target=${BASEMACHINE} \
                 --enable-rome=${BASEPRODUCT} \
                "
+CPPFLAGS += " -DTIOCPMGET_544D "
 
 FILES_${PN} += "${userfsdatadir}/misc/bluetooth/*"
 
