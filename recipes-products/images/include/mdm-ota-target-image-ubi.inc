@@ -2,7 +2,7 @@
 # add the MACHINE name to this list.
 # This is the "only" list that will control whether
 # OTA upgrade will be supported on a target.
-OTA_SUPPORTED_NAND_TARGET_LIST = "sdxprairie sdxpoorwills mdm9607 qcs403-som2 sa415m sa515m"
+OTA_SUPPORTED_NAND_TARGET_LIST = "sdxprairie sdxpoorwills mdm9607 qcs403-som2 sa415m sa515m nf-32"
 
 def nand_target_supports_OTA_upgrade(d):
     list_of_supported_targets = d.getVar('OTA_SUPPORTED_NAND_TARGET_LIST');
@@ -26,11 +26,16 @@ def nand_set_vars_and_get_dependencies(d):
     if bb.utils.contains('DISTRO_FEATURES', 'nand-squashfs', True, False, d):
         d.setVar('SQUASHFS_SUPPORTED', "1");
 
-    # for Non A/B target, set RECOVERY_IMAGE_UBI to "1"
-    # this will generate a non A/B update package as well.
-    d.setVar('RECOVERY_IMAGE_UBI', "1");
-    d.setVar('GENERATE_AB_OTA_PACKAGE_UBI', "0");
-    return " machine-recovery-image releasetools-native"
+    if bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', True, False, d):
+        d.setVar('RECOVERY_IMAGE_UBI', "0");
+        d.setVar('GENERATE_AB_OTA_PACKAGE_UBI', "1");
+        return " releasetools-native"
+    else:
+        # for Non A/B target, set RECOVERY_IMAGE_UBI to "1"
+        # this will generate a non A/B update package as well.
+        d.setVar('RECOVERY_IMAGE_UBI', "1");
+        d.setVar('GENERATE_AB_OTA_PACKAGE_UBI', "0");
+        return " machine-recovery-image releasetools-native"
 
 
 # Add tasks to generate recovery image, OTA zip files
@@ -161,6 +166,11 @@ do_recovery_ubi() {
         #set use_set_metadata to 1 so that updater-script
         #will have rules to apply selabels
         echo use_set_metadata=1 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
+    fi
+
+    # Targets that support A/B boot do not need recovery(fs)-updater
+    if ${@bb.utils.contains('DISTRO_FEATURES','ab-boot-support','true','false',d)}; then
+        echo le_target_supports_ab=1 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
     fi
 
     # copy contents of META folder

@@ -50,5 +50,11 @@ do_install_append() {
         install -d ${D}/data/
         install -d ${D}/system/
         install -m 0755 ${S}/start_recovery -D ${D}${sysconfdir}/init.d/recovery
-        install -m 0755 ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/base-files-recovery/fstab_AB -D ${D}/res/recovery_volume_config
+        if ${@bb.utils.contains('DISTRO_FEATURES','ab-boot-support','true','false',d)}; then
+           if ${@bb.utils.contains('DISTRO_FEATURES','nand-squashfs','true','false',d)}; then
+              install -m 0755 ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/base-files-recovery/fstab_AB_nand -D ${D}/res/recovery_volume_config
+           else
+              install -m 0755 ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/base-files-recovery/fstab_AB -D ${D}/res/recovery_volume_config
+           fi
+        fi
 }
