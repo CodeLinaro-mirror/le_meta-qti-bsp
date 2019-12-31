@@ -1,4 +1,5 @@
-#!/bin/sh
+#! /bin/sh
+
 # Copyright (c) 2019, The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -25,23 +26,48 @@
 # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#
-#
-echo "##########Trying to unload wlanhost driver ##########"
-if (lspci -k|grep cnss_pci);then
-	if (lspci -k|grep 1102);then
-		echo "##########unload qca6595#############"
-		modprobe -r qca6595
-	elif ((lspci -k|grep 003e) || (lspci -k|grep QCA6174));then
-		echo "##########unload qca6574#############"
-		modprobe -r qca6574
-	elif (lspci -k|grep 1101);then
-		echo "##########unload qca6696#############"
-		modprobe -r qca6696
-	else
-		echo "##########unload default wlan########"
-		modprobe -r wlan
-	fi
-fi
-echo "##########Unload wlanhost driver done################"
 
+echo "prepare rootfs for ivi1 using overlay..."
+
+IVI1_ROOTFS=/var/lib/lxc/ivi1/rootfs
+
+mkdir -p /data/ivi1/rootfs_upper
+mkdir -p /data/ivi1/rootfs_workdir
+mkdir -p /var/lib/lxc/ivi1/rootfs
+mount -t overlay -o lowerdir=/,upperdir=/data/ivi1/rootfs_upper,workdir=/data/ivi1/rootfs_workdir overlay /var/lib/lxc/ivi1/rootfs
+
+# remove fstab
+sed -i '/^PARTLABEL/d' ${IVI1_ROOTFS}/etc/fstab
+sed -i '/^\/data/d'    ${IVI1_ROOTFS}/etc/fstab
+sed -i '/^\/var/d'     ${IVI1_ROOTFS}/etc/fstab
+
+# TBD, fix failed service
+
+# set hostname cluster
+echo "cluster" > ${IVI1_ROOTFS}/etc/hostname
+
+#enable weston in ivi1
+rm ${IVI1_ROOTFS}/etc/systemd/system/weston.service
+rm ${IVI1_ROOTFS}/lib/systemd/system/multi-user.target.wants/usb.service
+rm ${IVI1_ROOTFS}/lib/systemd/system/multi-user.target.wants/adbd.service
+
+#disable adsprpcd
+rm ${IVI1_ROOTFS}/lib/systemd/system/adsprpcd*.service
+
+#disable connman
+FILE=${IVI1_ROOTFS}/lib/systemd/system/connman.service
+FILE_BAK=${IVI1_ROOTFS}/lib/systemd/system/connman.service.bak
+if [ -f "$FILE" ]; then
+    mv $FILE $FILE_BAK
+fi
+if [ -L ${IVI1_ROOTFS}/etc/resolv.conf ]; then
+    rm ${IVI1_ROOTFS}/etc/resolv.conf
+fi
+echo "nameserver 8.8.8.8" > ${IVI1_ROOTFS}/etc/resolv.conf
+
+# use systemd-networkd for route config
+cp /var/lib/lxc/ivi1/lxc-wired.network ${IVI1_ROOTFS}/etc/systemd/network/
+
+mkdir -p ${IVI1_ROOTFS}/home/root
+
+echo "prepare rootfs for ivi1 done"

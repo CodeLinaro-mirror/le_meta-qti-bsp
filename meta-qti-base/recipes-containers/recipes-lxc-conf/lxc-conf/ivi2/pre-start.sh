@@ -1,4 +1,5 @@
-#!/bin/sh
+#! /bin/sh
+
 # Copyright (c) 2019, The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -25,23 +26,13 @@
 # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#
-#
-echo "##########Trying to unload wlanhost driver ##########"
-if (lspci -k|grep cnss_pci);then
-	if (lspci -k|grep 1102);then
-		echo "##########unload qca6595#############"
-		modprobe -r qca6595
-	elif ((lspci -k|grep 003e) || (lspci -k|grep QCA6174));then
-		echo "##########unload qca6574#############"
-		modprobe -r qca6574
-	elif (lspci -k|grep 1101);then
-		echo "##########unload qca6696#############"
-		modprobe -r qca6696
-	else
-		echo "##########unload default wlan########"
-		modprobe -r wlan
-	fi
-fi
-echo "##########Unload wlanhost driver done################"
+
+echo "prepare setup bridge in host side"
+brctl addbr lxcbrivi2
+ifconfig lxcbrivi2 192.168.2.1 up
+echo "setup the routing"
+systemctl stop connman
+echo "nameserver 8.8.8.8" > /etc/resolv.conf
+sysctl -w net.ipv4.conf.all.forwarding=1
+iptables -t nat -A POSTROUTING -s 192.168.2.0/24 -o eth0 -j MASQUERADE
 
