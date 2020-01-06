@@ -67,6 +67,9 @@ echo "nameserver 8.8.8.8" > ${IVI1_ROOTFS}/etc/resolv.conf
 
 # use systemd-networkd for route config
 cp /var/lib/lxc/ivi1/lxc-wired.network ${IVI1_ROOTFS}/etc/systemd/network/
+chown systemd-network ${IVI1_ROOTFS}/etc/systemd/network/lxc-wired.network
+sed -i "/^require-input/d" ${IVI1_ROOTFS}/etc/xdg/weston/weston.ini
+sed -i "/^idle-time/a require-input=false" ${IVI1_ROOTFS}/etc/xdg/weston/weston.ini
 
 mkdir -p ${IVI1_ROOTFS}/home/root
 

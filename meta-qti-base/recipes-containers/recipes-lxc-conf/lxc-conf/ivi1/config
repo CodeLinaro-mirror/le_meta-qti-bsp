@@ -49,10 +49,5 @@ lxc.mount.entry = /dev/tty12 dev/tty2 none bind,optional,create=file
 lxc.mount.entry = /dev/kgsl-3d0 dev/kgsl-3d0 none bind,optional,create=file
 lxc.mount.entry = /dev/dri/card2 dev/dri/card0 none bind,optional,create=file
 lxc.mount.entry = /dev/dri/renderD128 dev/dri/renderD128 none bind,optional,create=file
-lxc.mount.entry = /dev/input dev/input none bind,optional,create=dir
 lxc.mount.entry = /dev/video32 dev/video32 none bind,optional,create=file
 lxc.mount.entry = /dev/video33 dev/video33 none bind,optional,create=file
-lxc.mount.entry = /dev/snd/timer dev/snd/timer none bind,optional,create=file
-lxc.mount.entry = /dev/snd/controlC0 dev/snd/controlC0 none bind,optional,create=file
-lxc.mount.entry = /dev/snd/pcmC0D1c dev/snd/pcmC0D1c none bind,optional,create=file
-lxc.mount.entry = /dev/snd/pcmC0D1p dev/snd/pcmC0D1p none bind,optional,create=file
