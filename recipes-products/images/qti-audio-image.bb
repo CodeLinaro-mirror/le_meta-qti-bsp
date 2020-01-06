@@ -22,6 +22,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-android-utils \
         packagegroup-qti-audio \
         packagegroup-qti-bsp \
+        packagegroup-qti-bluetooth \
         packagegroup-qti-core-prop \
         packagegroup-qti-data \
         packagegroup-qti-ml \
