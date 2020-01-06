@@ -18,6 +18,7 @@ def get_depends():
         return   "btvendorhal gen-gatt glib-2.0 btobex audiohal"
 
 DEPENDS  += "${@get_depends()}"
+DEPENDS_remove_mdm9607 = "audiohal"
 
 CPPFLAGS_append = " -DUSE_ANDROID_LOGGING -DUSE_BT_OBEX -DUSE_LIBHW_AOSP"
 CFLAGS_append = " -DUSE_ANDROID_LOGGING "
@@ -29,6 +30,7 @@ EXTRA_OECONF = " \
                 --with-lib-path=${STAGING_LIBDIR} \
                 --with-btobex \
                 --with-gengatt \
+                --with-btvendorhal \
                "
 EXTRA_OECONF += "--enable-target=${BASEMACHINE}"
 
