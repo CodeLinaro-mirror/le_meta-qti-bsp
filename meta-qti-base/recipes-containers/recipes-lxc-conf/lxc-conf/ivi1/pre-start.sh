@@ -27,11 +27,10 @@
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-echo "prepare setup bridge in host side"
-brctl addbr lxcbrivi1
-ifconfig lxcbrivi1 192.168.1.1 up
 echo "setup the routing"
 systemctl stop connman
+brctl addbr lxcbrivi1
+ifconfig lxcbrivi1 192.168.1.1 up
 echo "nameserver 8.8.8.8" > /etc/resolv.conf
 sysctl -w net.ipv4.conf.all.forwarding=1
 iptables -t nat -A POSTROUTING -s 192.168.1.0/24 -o eth0 -j MASQUERADE
