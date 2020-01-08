@@ -9,7 +9,9 @@ PROVIDES = "${PACKAGES}"
 PACKAGES = ' \
     packagegroup-android-utils \
     packagegroup-startup-scripts \
+    packagegroup-qti-bsp \
     '
+RDEPENDS_packagegroup-qti-bsp = ''
 
 # Android Core Image and Debugging utilities
 RDEPENDS_packagegroup-android-utils = "\
