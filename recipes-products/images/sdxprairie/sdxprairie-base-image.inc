@@ -30,3 +30,14 @@ IMAGE_INSTALL += "volatile-binds"
 IMAGE_INSTALL += "edk2"
 IMAGE_INSTALL += "coreutils"
 IMAGE_INSTALL += "systemd-machine-units"
+
+# Squashfs rootfs for flashless needs nbd mount points,
+# so create a copy of rootfs for flashless to fixup.
+create_squashfs_rootimg() {
+  if ${@bb.utils.contains('IMAGE_FSTYPES', 'squashfs-xz', 'true', 'false', d)}; then
+       mkdir -p ${IMAGE_ROOTFS_FLASHLESS}
+       cp -R ${IMAGE_ROOTFS}/. ${IMAGE_ROOTFS_FLASHLESS}/.
+       mksquashfs ${IMAGE_ROOTFS_FLASHLESS} ${RAMDISK} -context-file ${SELINUX_FILE_CONTEXTS} -noappend -comp xz
+
+   fi
+}
