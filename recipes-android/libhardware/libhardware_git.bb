@@ -24,3 +24,7 @@ PACKAGECONFIG[location] = "--enable-location, --disable-location"
 PACKAGECONFIG[sensors]  = "--enable-sensors, --disable-sensors"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
+
+EXTRA_OECONF += " \
+    ${@"" if d.getVar('MULTILIBS') else "--with-hal-path=${libdir}"} \
+"
