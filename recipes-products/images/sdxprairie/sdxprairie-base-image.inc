@@ -31,6 +31,8 @@ IMAGE_INSTALL += "edk2"
 IMAGE_INSTALL += "coreutils"
 IMAGE_INSTALL += "systemd-machine-units"
 
+IMAGE_POSTPROCESS_COMMAND_append = "${@bb.utils.contains('IMAGE_FSTYPES', 'squashfs-xz', 'create_ext4_images;','',d)}"
+
 # Squashfs rootfs for flashless needs nbd mount points,
 # so create a copy of rootfs for flashless to fixup.
 create_squashfs_rootimg() {
@@ -57,4 +59,13 @@ fixup_systemd_mounts_services_flashless_squashfs_rootfs() {
  ln -sf ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/nbdclient.service \
                ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/local-fs.target.wants/nbdclient.service
  rm -rf ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/multi-user.target.wants/cache.mount
+}
+
+create_ext4_images() {
+   if ${@bb.utils.contains('DISTRO_FEATURES', 'flashless', 'true', 'false', d)}; then
+          create_usr_ext4_img
+          make_ext4fs -s -b 4096 -l ${PERSIST_SIZE_EXT4} -L ${PERSIST_LABEL} ${DEPLOY_DIR_IMAGE_EMMC}/${PERSISTIMAGE_TARGET} ${PERSIST_IMAGE_ROOTFS}
+          chmod 644 ${OUTPUT_PERSIST_FILE}
+          make_ext4fs -s -a /systemrw ${IMAGE_EXT4_SELINUX_OPTIONS} -b 4096 -l ${SYSTEMRW_SIZE_EXT4} -L ${SYSTEMRW_LABEL} ${DEPLOY_DIR_IMAGE_EMMC}/${SYSTEMRWIMAGE_TARGET}
+   fi
 }
