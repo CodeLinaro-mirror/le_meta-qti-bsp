@@ -56,9 +56,12 @@ fixup_systemd_mounts_services_flashless_squashfs_rootfs() {
            ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/persist.mount
  cp ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/firmware-nbd-mount.service \
            ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/firmware-mount.service
+ cp ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/usb_flashless.service \
+           ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/usb.service
  ln -sf ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/nbdclient.service \
                ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/local-fs.target.wants/nbdclient.service
  rm -rf ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/multi-user.target.wants/cache.mount
+ rm -rf ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/usb.service.d/usb_data_service.conf
 }
 
 create_ext4_images() {
