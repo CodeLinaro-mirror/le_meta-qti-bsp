@@ -60,6 +60,12 @@ if [ -f "$FILE" ]; then
   mv $FILE $FILE_BAK
 fi
 
+FILE=${ANDROID_ROOTFS}/init.usb.configfs.rc
+BAK=.bak
+if [ -f "$FILE" ]; then
+  mv $FILE $FILE$BAK
+fi
+
 # disable adsprpcd/cdsp
 FILE=${ANDROID_ROOTFS}/vendor/etc/init/vendor.qti.adsprpc-service.rc
 if [ -f "$FILE" ]; then
