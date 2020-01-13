@@ -210,7 +210,7 @@ index 0000000..c1979c0
 +	int f;
 +	int r;
 +
-+    if(0 == strcmp(cmd, "dm-verity device corrupted"))
++    if(cmd && (0 == strcmp(cmd, "dm-verity device corrupted")))
 +    {
 +		f = sys_open(dm_misc_dev, O_WRONLY, 0);
 +		if(f < 0)
