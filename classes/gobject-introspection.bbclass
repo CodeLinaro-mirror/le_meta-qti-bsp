@@ -30,8 +30,8 @@ export XDG_DATA_DIRS = "${STAGING_DATADIR}"
 do_configure_prepend_class-target () {
     # introspection.m4 pre-packaged with upstream tarballs does not yet
     # have our fixes
-    mkdir -p ${S}/m4
-    cp ${STAGING_DIR_TARGET}/${datadir}/aclocal/introspection.m4 ${S}/m4
+#    mkdir -p ${S}/m4
+#    cp ${STAGING_DIR_TARGET}/${datadir}/aclocal/introspection.m4 ${S}/m4
 }
 
 # .typelib files are needed at runtime and so they go to the main package (so
