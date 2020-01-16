@@ -29,6 +29,7 @@ IMAGE_INSTALL += "system-core-usb"
 IMAGE_INSTALL += "volatile-binds"
 IMAGE_INSTALL += "edk2"
 IMAGE_INSTALL += "coreutils"
+IMAGE_INSTALL += "km-loader"
 IMAGE_INSTALL += "systemd-machine-units"
 
 IMAGE_POSTPROCESS_COMMAND_append = "${@bb.utils.contains('IMAGE_FSTYPES', 'squashfs-xz', 'create_ext4_images;','',d)}"
