@@ -30,6 +30,8 @@ IMAGE_INSTALL += "systemd-machine-units"
 IMAGE_INSTALL += "volatile-binds"
 IMAGE_INSTALL += "binder"
 
+IMAGE_INSTALL += "ffmpeg"
+
 IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'start-script-ab-slot-util', '', d)}"
 
 ROOTFS_POSTPROCESS_COMMAND_remove += "do_fsconfig;"
