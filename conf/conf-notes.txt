@@ -43,6 +43,8 @@ Supported combinations are listed below.
       +---------------+----------------+------------------+
       |sdm845         | robot          | debug perf       |
       +---------------+----------------+------------------+
+      |sm8250         | edge           | debug perf       |
+      +---------------+----------------+------------------+
 
 Once ready run 'bitbake <pkg-name>' to build required package or
 run 'bitbake machine-image' to build complete image.

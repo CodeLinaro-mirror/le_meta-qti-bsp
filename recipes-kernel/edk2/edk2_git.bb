@@ -21,6 +21,7 @@ S         =  "${WORKDIR}/edk2"
 INSANE_SKIP_${PN} = "arch"
 
 VBLE = "${@bb.utils.contains('DISTRO_FEATURES', 'vble','1', '0', d)}"
+RW_ROOTFS = "${@bb.utils.contains('DISTRO_FEATURES', 'ro-rootfs','0', '1', d)}"
 
 VERITY_ENABLED = "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity','1', '0', d)}"
 
@@ -36,6 +37,7 @@ EXTRA_OEMAKE = "'CLANG_BIN=${STAGING_BINDIR_NATIVE}/llvm-arm-toolchain/bin/' \
                 'VERITY_LE=${VERITY_ENABLED}'\
                 'INIT_BIN_LE=\"/sbin/init\"'\
                 'EDK_TOOLS_PATH=${S}/BaseTools'\
+                'RW_ROOTFS=${RW_ROOTFS}'\
                 'EARLY_ETH_ENABLED=${EARLY_ETH}'"
 
 EXTRA_OEMAKE_append_qcs40x = " 'DISABLE_PARALLEL_DOWNLOAD_FLASH=1'"

@@ -1,5 +1,8 @@
 EXTRA_IMAGE_FEATURES += " package-management"
 
+#compile abl
+RDEPENDS += "${@bb.utils.contains('TARGET_ARCH', 'arm', 'lib64-edk2', 'edk2', d)}"
+
 # Rootfs creation.
 IMAGE_INSTALL += "packagegroup-core-boot"
 IMAGE_INSTALL += "${CORE_IMAGE_EXTRA_INSTALL}"
