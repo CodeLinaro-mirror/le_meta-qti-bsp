@@ -30,3 +30,45 @@ IMAGE_INSTALL += "volatile-binds"
 IMAGE_INSTALL += "edk2"
 IMAGE_INSTALL += "coreutils"
 IMAGE_INSTALL += "systemd-machine-units"
+
+IMAGE_POSTPROCESS_COMMAND_append = "${@bb.utils.contains('IMAGE_FSTYPES', 'squashfs-xz', 'create_ext4_images;','',d)}"
+
+# Squashfs rootfs for flashless needs nbd mount points,
+# so create a copy of rootfs for flashless to fixup.
+create_squashfs_rootimg() {
+  if ${@bb.utils.contains('IMAGE_FSTYPES', 'squashfs-xz', 'true', 'false', d)}; then
+       mkdir -p ${IMAGE_ROOTFS_FLASHLESS}
+       cp -R ${IMAGE_ROOTFS}/. ${IMAGE_ROOTFS_FLASHLESS}/.
+       fixup_systemd_mounts_services_flashless_squashfs_rootfs
+       mksquashfs ${IMAGE_ROOTFS_FLASHLESS} ${RAMDISK} -context-file ${SELINUX_FILE_CONTEXTS} -noappend -comp xz
+
+   fi
+
+}
+
+fixup_systemd_mounts_services_flashless_squashfs_rootfs() {
+# Mount remote squashfs partitions for flashless
+ cp ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/data-nbd.mount \
+           ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/data.mount
+ cp ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/systemrw-nbd.mount \
+           ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/systemrw.mount
+ cp ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/persist-nbd.mount \
+           ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/persist.mount
+ cp ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/firmware-nbd-mount.service \
+           ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/firmware-mount.service
+ cp ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/usb_flashless.service \
+           ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/usb.service
+ ln -sf ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/nbdclient.service \
+               ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/local-fs.target.wants/nbdclient.service
+ rm -rf ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/multi-user.target.wants/cache.mount
+ rm -rf ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/usb.service.d/usb_data_service.conf
+}
+
+create_ext4_images() {
+   if ${@bb.utils.contains('DISTRO_FEATURES', 'flashless', 'true', 'false', d)}; then
+          create_usr_ext4_img
+          make_ext4fs -s -b 4096 -l ${PERSIST_SIZE_EXT4} -L ${PERSIST_LABEL} ${DEPLOY_DIR_IMAGE_EMMC}/${PERSISTIMAGE_TARGET} ${PERSIST_IMAGE_ROOTFS}
+          chmod 644 ${OUTPUT_PERSIST_FILE}
+          make_ext4fs -s -a /systemrw ${IMAGE_EXT4_SELINUX_OPTIONS} -b 4096 -l ${SYSTEMRW_SIZE_EXT4} -L ${SYSTEMRW_LABEL} ${DEPLOY_DIR_IMAGE_EMMC}/${SYSTEMRWIMAGE_TARGET}
+   fi
+}
