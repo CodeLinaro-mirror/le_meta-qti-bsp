@@ -21,6 +21,7 @@ EXTRA_OECONF = " \
                --with-protocal-xml-path=${STAGING_DATADIR}/weston \
               "
 EXTRA_OECONF_append =" --enable-target-vpu554='yes'"
+EXTRA_OECONF_append =" --enable-encoder-heic='yes'"
 
 CPPFLAGS += "-I${STAGING_KERNEL_BUILDDIR}/usr/include"
 CPPFLAGS += "-I${STAGING_INCDIR}/ion_headers"
