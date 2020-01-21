@@ -83,6 +83,7 @@ DEPENDS += "\
              pkgconfig-native \
              ptool-native \
              virtual/bootloader \
+             qdl-native \
 "
 
 do_gen_partition_bin[dirs]      = "${DEPLOY_DIR_IMAGE}"
