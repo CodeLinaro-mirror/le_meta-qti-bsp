@@ -9,6 +9,8 @@ IMAGE_INSTALL += "${CORE_IMAGE_EXTRA_INSTALL}"
 #IMAGE_INSTALL += "alsa-intf"
 
 #IMAGE_INSTALL += "audiohal"
+IMAGE_INSTALL += "audiodlkm"
+IMAGE_INSTALL += "tinyalsa"
 
 IMAGE_INSTALL += "avahi-daemon"
 IMAGE_INSTALL += "avahi-dnsconfd"
