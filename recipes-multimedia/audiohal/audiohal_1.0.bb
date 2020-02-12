@@ -13,15 +13,20 @@ SRC_URI += "file://${BASEMACHINE}/"
 S = "${WORKDIR}/hardware/qcom/audio/"
 PR = "r0"
 
-DEPENDS = "glib-2.0 tinycompress tinyalsa expat system-media libhardware acdbloader surround-sound-3mic qti-audio-server qahw native-frameworks"
+DEPENDS = "glib-2.0 tinycompress tinyalsa expat system-media libhardware acdbloader surround-sound-3mic qahw"
+DEPENDS_append = "${@bb.utils.contains('DISTRO_FEATURES', 'audio-dlkm', ' audiodlkm', '', d)}"
+
+AUDIO_KERNEL_HEADERS="${STAGING_KERNEL_BUILDDIR}/audio-kernel"
+CFLAGS += "-I${AUDIO_KERNEL_HEADERS}"
 
 EXTRA_OEMAKE = "DEFAULT_INCLUDES= CPPFLAGS="-I. -I${STAGING_KERNEL_BUILDDIR}/usr/include -I${STAGING_INCDIR}/surround_sound_3mic -I${STAGING_INCDIR}/sound_trigger""
 EXTRA_OECONF = "--with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
 EXTRA_OECONF += "--with-glib"
+EXTRA_OECONF += " --with-audio-kernel-headers=${AUDIO_KERNEL_HEADERS}"
 
 EXTRA_OECONF += "TARGET_SUPPORT=${BASEMACHINE}"
 EXTRA_OECONF += "BOARD_SUPPORTS_QAHW=true"
-EXTRA_OECONF += "BOARD_SUPPORTS_QTI_AUDIO_SERVER=true"
+EXTRA_OECONF += "BOARD_SUPPORTS_QTI_AUDIO_SERVER=false"
 EXTRA_OECONF += "AUDIO_FEATURE_ENABLED_HDMI_EDID=true"
 EXTRA_OECONF += "AUDIO_FEATURE_ENABLED_FM_POWER_OPT=false"
 EXTRA_OECONF += "AUDIO_FEATURE_ENABLED_USBAUDIO=false"
