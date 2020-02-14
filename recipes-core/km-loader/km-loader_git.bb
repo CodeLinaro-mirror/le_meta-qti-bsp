@@ -24,7 +24,7 @@ do_install () {
 
       # Enable the service for multi-user.target
       install -d ${D}/etc/systemd/system/multi-user.target.wants/
-      ln -sf ${D}/etc/systemd/system/evdev_load.service \
+      ln -sf ${sysconfdir}/systemd/system/evdev_load.service \
              ${D}/etc/systemd/system/multi-user.target.wants/evdev_load.service
     else
       install -d ${D}/etc/init.d/
