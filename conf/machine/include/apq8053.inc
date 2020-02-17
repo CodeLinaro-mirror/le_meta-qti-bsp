@@ -23,9 +23,6 @@ SERIAL_CONSOLE ?= "${@['', '115200 ttyMSM0'][d.getVar('VARIANT', True) == ('' or
 
 DISTRO ?= "msm"
 
-# Change default jpeg provider to turbo jpeg
-PREFERRED_PROVIDER_jpeg = "libjpeg-turbo"
-
 # iproute2 bump version to 4.1.1
 PREFERRED_VERSION_iproute2 = "4.1.1"
 
