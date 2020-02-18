@@ -52,6 +52,8 @@ case "$1" in
   stop)
         start-stop-daemon -S -b -a start_audio_le
         echo -n "Bypassing Unloading of  audio_kernel modules "
+        echo "audio:stop" > /dev/kmsg
+        echo 0 > /sys/kernel/boot_adsp/boot
         ;;
   restart)
         $0 stop
