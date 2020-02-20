@@ -72,6 +72,9 @@ cat >> ${S}/arch/${ARCH}/configs/${KERNEL_CONFIG} <<KERNEL_EXTRACONFIGS_PERF
 # CONFIG_FW_LOADER_USER_HELPER_FALLBACK is not set
 # CONFIG_FW_LOADER_USER_HELPER is not set
 # CONFIG_SERIAL_CORE_CONSOLE is not set
+CONFIG_DEBUG_LIST=y
+CONFIG_PROFILING=y
+CONFIG_OPROFILE=y
 KERNEL_EXTRACONFIGS_PERF
 fi
 }
@@ -86,6 +89,7 @@ SRC_URI_append_kernelpatchok += " \
     file://0012-unmask-virtio-net-irq-to-wake-up-system.patch \
     file://0001-kernel-misc-qseecom-Use-hvenv-driver-for-ghs-lv-gvm.patch \
     file://0001-ASoC-msm-Change-SEC_MI2S-from-Master-to-Slave.patch \
+    file://0001-Enable-CONFIG_PROFILING-CONFIG_OPROFILE-in-perf-buil.patch \
 "
 
 SRC_URI_append_kernelpatchok += "${@bb.utils.contains('DISTRO_FEATURES', 'qti-perf', 'file://0001-parallelize-audio-and-pcie-driver-to-improve-bootkpi.patch ', '', d)}"
