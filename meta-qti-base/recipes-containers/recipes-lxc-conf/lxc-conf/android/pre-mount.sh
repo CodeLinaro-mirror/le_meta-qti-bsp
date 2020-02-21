@@ -60,6 +60,12 @@ if [ -f "$FILE" ]; then
   mv $FILE $FILE_BAK
 fi
 
+FILE=${ANDROID_ROOTFS}/init.usb.configfs.rc
+BAK=.bak
+if [ -f "$FILE" ]; then
+  mv $FILE $FILE$BAK
+fi
+
 # disable adsprpcd/cdsp
 FILE=${ANDROID_ROOTFS}/vendor/etc/init/vendor.qti.adsprpc-service.rc
 if [ -f "$FILE" ]; then
@@ -73,6 +79,12 @@ sed -i '/vendor.adsprpcd/,+3d'  ${ANDROID_ROOTFS}/vendor/etc/init/hw/init.target
 sed -i '/vendor.cdsprpcd/,+3d'  ${ANDROID_ROOTFS}/vendor/etc/init/hw/init.target.rc
 sed -i '/boot_adsp/d'  ${ANDROID_ROOTFS}/vendor/etc/init/hw/init.qcom.rc
 sed -i '/boot_cdsp/d'  ${ANDROID_ROOTFS}/vendor/etc/init/hw/init.qcom.rc
+
+# make qcom-post-boot workable and add ipconfig command to it
+sed -i 's/service qcom-post-boot \/vendor\/bin\/init/service qcom-post-boot \/vendor\/bin\/sh \/vendor\/bin\/init/g' ${ANDROID_ROOTFS}/vendor/etc/init/hw/init.qcom.rc
+sed -i '/\/bin\/ifconfig/d'  ${ANDROID_ROOTFS}/vendor/bin/init.qcom.post_boot.sh
+sed -i '/\/bin\/ip/d'  ${ANDROID_ROOTFS}/vendor/bin/init.qcom.post_boot.sh
+sed -i '/^#!/a \/bin\/ifconfig eth0 192.168.0.2 netmask 255.255.255.0 up\n\/bin\/ip rule add from all lookup main\n\/bin\/ip route add default dev eth0 via 192.168.0.1' ${ANDROID_ROOTFS}/vendor/bin/init.qcom.post_boot.sh
 
 #FIXME
 sed -i 's/chmod\ 0660\ \/dev\/ttyHS0/chmod\ 0666\ \/dev\/ttyHS0/g' ${ANDROID_ROOTFS}/vendor/etc/init/hw/init.qcom.rc

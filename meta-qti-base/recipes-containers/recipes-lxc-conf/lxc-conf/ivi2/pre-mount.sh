@@ -65,6 +65,7 @@ echo "nameserver 8.8.8.8" > ${IVI2_ROOTFS}/etc/resolv.conf
 
 # use systemd-networkd for route config
 cp /var/lib/lxc/ivi2/lxc-wired.network ${IVI2_ROOTFS}/etc/systemd/network/
+chown systemd-network ${IVI2_ROOTFS}/etc/systemd/network/lxc-wired.network
 
 mkdir -p ${IVI2_ROOTFS}/home/root
 

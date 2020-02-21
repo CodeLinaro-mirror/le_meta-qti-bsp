@@ -1,6 +1,4 @@
-#! /bin/sh
-
-# Copyright (c) 2019, The Linux Foundation. All rights reserved.
+# Copyright (c) 2020, The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -27,11 +25,9 @@
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-echo "setup the routing"
-systemctl stop connman
-brctl addbr lxcbrivi1
-ifconfig lxcbrivi1 192.168.1.1 up
-echo "nameserver 8.8.8.8" > /etc/resolv.conf
-sysctl -w net.ipv4.conf.all.forwarding=1
-iptables -t nat -A POSTROUTING -s 192.168.1.0/24 -o eth0 -j MASQUERADE
+#
+# Default properties to be set for qtiquingvm
+#
+
+service.adb.tcp.port=5555 
 

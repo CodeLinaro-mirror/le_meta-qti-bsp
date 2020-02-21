@@ -27,10 +27,10 @@
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-echo "prepare setup bridge in host side"
+echo "setup the routing"
+systemctl stop connman
 brctl addbr lxcbrandroid
 ifconfig lxcbrandroid 192.168.0.1 up
-echo "setup the routing"
 sysctl -w net.ipv4.conf.all.forwarding=1
 iptables -t nat -A POSTROUTING -s 192.168.0.0/24 -o eth0 -j MASQUERADE
 
