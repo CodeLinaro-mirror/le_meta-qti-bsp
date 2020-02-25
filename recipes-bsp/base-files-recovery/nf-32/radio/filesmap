@@ -29,6 +29,7 @@
 
 NON-HLOS.ubi            modem
 NON-HLOS.bin            modem
+NON-HLOS.squashfs       modem
 dspso.ubi               dsp
 
 sbl1.mbn                sbl
