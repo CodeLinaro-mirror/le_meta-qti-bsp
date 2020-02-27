@@ -11,6 +11,5 @@ SRC_URI = "file://logwrapper"
 
 S = "${WORKDIR}/logwrapper"
 
-DEPENDS += "glib-2.0 libcutils"
-
+DEPENDS += "glib-2.0 liblog libcutils"
 EXTRA_OECONF = " --with-glib"
