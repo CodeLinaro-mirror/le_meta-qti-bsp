@@ -13,7 +13,7 @@ DEPENDS += "glib-2.0"
 DEPENDS += "virtual/libc"
 DEPENDS += "libcutils liblog liblog-native system-core"
 DEPENDS += "weston"
-DEPENDS += "mm-video-noship"
+DEPENDS += "${@base_conditional('WITH_PROP_LAYER', 'no', 'display-hal-linux', 'mm-video-noship',d)}"
 
 # Need the kernel headers
 PACKAGE_ARCH = "${MACHINE_ARCH}"

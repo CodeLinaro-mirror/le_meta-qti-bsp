@@ -1,4 +1,4 @@
-inherit qcommon cmake qprebuilt
+inherit qcommon cmake
 DESCRIPTION = "OMX video decoder sample"
 SECTION  = "mm-vdec-omx-test"
 
