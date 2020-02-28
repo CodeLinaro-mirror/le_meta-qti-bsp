@@ -31,7 +31,7 @@ do_configure() {
 }
 
 INITSCRIPT_NAME = "start_audio_le"
-INITSCRIPT_PARAMS = "start 35 5 . stop 15 0 1 6 ."
+INITSCRIPT_PARAMS = "start 99 5 . stop 15 0 1 6 ."
 
 do_install_append() {
   install -d ${STAGING_KERNEL_BUILDDIR}/audio-kernel/
@@ -44,11 +44,13 @@ do_install_append() {
   cp -fr ${S}/linux/* ${STAGING_KERNEL_BUILDDIR}/audio-kernel/linux
   install -m 0644 ${S}/sound/* ${STAGING_KERNEL_BUILDDIR}/audio-kernel/sound
 
+if [ ${BASEMACHINE} != "mdm9607" ];then
   if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
   install -m 0755 ${WORKDIR}/${BASEMACHINE}/audio_load.conf -D ${D}${sysconfdir}/modules-load.d/audio_load.conf
   else
     install -m 0755 ${WORKDIR}/${BASEMACHINE}/audio_load.conf -D ${D}${sysconfdir}/modules/audio_load.conf
   fi
+fi
 
    for i in $(find ${D}/${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/. -name "*.ko"); do
    mv ${i} ${D}/${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/
@@ -71,7 +73,7 @@ pkg_postinst_${PN} () {
     [ -n "$D" ] && OPT="-r $D" || OPT="-s"
     # remove all rc.d-links potentially created from alternatives
     update-rc.d $OPT -f ${INITSCRIPT_NAME} remove
-    update-rc.d $OPT ${INITSCRIPT_NAME} start 35 5 . stop 15 0 1 6 .
+    update-rc.d $OPT ${INITSCRIPT_NAME} start 99 5 . stop 15 0 1 6 .
 }
 
 do_module_signing() {
