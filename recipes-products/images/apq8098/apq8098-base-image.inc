@@ -16,6 +16,9 @@ IMAGE_INSTALL += "selinux-config"
 
 IMAGE_INSTALL += "alx"
 
+# sec_config
+IMAGE_INSTALL += "sec-config"
+
 IMAGE_INSTALL += "base-files"
 IMAGE_INSTALL += "base-passwd"
 

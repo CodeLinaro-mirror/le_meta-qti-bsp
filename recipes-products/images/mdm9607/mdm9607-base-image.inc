@@ -43,6 +43,7 @@ IMAGE_INSTALL += "system-core-usb"
 IMAGE_INSTALL += "system-conf"
 IMAGE_INSTALL += "tcpdump"
 IMAGE_INSTALL += "wireless-tools"
+IMAGE_INSTALL += "sec-config"
 
 # Below packages are open source packages that depend on proprietary packages
 

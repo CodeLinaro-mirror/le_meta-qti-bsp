@@ -47,6 +47,7 @@ IMAGE_INSTALL += "powerapp-shutdown"
 IMAGE_INSTALL += "perl"
 IMAGE_INSTALL += "pps-tools"
 IMAGE_INSTALL += "resolvconf"
+
 IMAGE_INSTALL += "sigma-dut"
 IMAGE_INSTALL += "spitools"
 IMAGE_INSTALL += "sqlite3"
@@ -57,6 +58,7 @@ IMAGE_INSTALL += "system-core-usb"
 IMAGE_INSTALL += "system-conf"
 IMAGE_INSTALL += "tcpdump"
 IMAGE_INSTALL += "wireless-tools"
+IMAGE_INSTALL += "sec-config"
 
 IMAGE_PREPROCESS_COMMAND += "echo ${MACHINE} >> ${IMAGE_ROOTFS}/target;"
 

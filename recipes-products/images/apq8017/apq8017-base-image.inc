@@ -16,6 +16,9 @@ IMAGE_INSTALL += "refpolicy-mls"
 
 IMAGE_INSTALL += "rmtstorage"
 
+# sec_config
+IMAGE_INSTALL += "sec-config"
+
 IMAGE_INSTALL += "base-files"
 IMAGE_INSTALL += "base-passwd"
 DEPENDS += "gdb-cross-aarch64"
