@@ -14,6 +14,7 @@ DEPENDS = "libgcc libmincrypt libsparse zlib openssl bouncycastle"
 
 FILESPATH =+ "${WORKSPACE}/system/extras/:"
 SRC_URI = "file://verity"
+SRC_URI += "file://0001-change-api-based-on-openssl1.1.1a.patch"
 
 S = "${WORKDIR}/verity"
 

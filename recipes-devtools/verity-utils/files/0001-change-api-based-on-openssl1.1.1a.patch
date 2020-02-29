@@ -1,0 +1,105 @@
+From 9d27891c6e961c7234ce0c21e4de9f134ad5a74b Mon Sep 17 00:00:00 2001
+From: liushudan <shudan@codeaurora.org>
+Date: Tue, 11 Feb 2020 16:13:53 +0800
+Subject: [PATCH] change api based on openssl1.1.1a
+
+Change-Id: I179633d5ed2296876a81ca399f5c20819903deee
+---
+ generate_verity_key.c   |  4 ++--
+ verify_boot_signature.c | 28 ++++++++++++++--------------
+ 2 files changed, 16 insertions(+), 16 deletions(-)
+
+diff --git a/generate_verity_key.c b/generate_verity_key.c
+index 0da978f..5b56695 100644
+--- a/generate_verity_key.c
++++ b/generate_verity_key.c
+@@ -54,7 +54,7 @@ static int convert_to_mincrypt_format(RSA *rsa, RSAPublicKey *pkey)
+     BIGNUM* n0inv = BN_new();
+ 
+     BN_set_bit(r32, 32);
+-    BN_copy(n, rsa->n);
++    BN_copy(n, RSA_get0_n(rsa));
+     BN_set_bit(r, RSANUMWORDS * 32);
+     BN_mod_sqr(rr, r, n, ctx);
+     BN_div(NULL, rem, n, r32, ctx);
+@@ -68,7 +68,7 @@ static int convert_to_mincrypt_format(RSA *rsa, RSAPublicKey *pkey)
+         BN_div(n, rem, n, r32, ctx);
+         pkey->n[i] = BN_get_word(rem);
+     }
+-    pkey->exponent = BN_get_word(rsa->e);
++    pkey->exponent = BN_get_word(RSA_get0_e(rsa));
+ 
+     ret = 0;
+ 
+diff --git a/verify_boot_signature.c b/verify_boot_signature.c
+index 58b7a19..de7eafe 100644
+--- a/verify_boot_signature.c
++++ b/verify_boot_signature.c
+@@ -171,41 +171,41 @@ static int read_signature(int fd, off64_t offset, BootSignature **bs)
+  */
+ static int validate_signature_block(const BootSignature *bs, uint64_t length)
+ {
+-    BIGNUM expected;
+-    BIGNUM value;
++    BIGNUM *expected;
++    BIGNUM *value;
+     int rc = -1;
+ 
+     if (!bs) {
+         return -1;
+     }
+ 
+-    BN_init(&expected);
+-    BN_init(&value);
++	expected = BN_new();
++	value = BN_new();
+ 
+     /* Confirm that formatVersion matches our supported version */
+-    if (!BN_set_word(&expected, FORMAT_VERSION)) {
++    if (!BN_set_word(expected, FORMAT_VERSION)) {
+         ERR_print_errors(g_error);
+         goto vsb_done;
+     }
+ 
+-    ASN1_INTEGER_to_BN(bs->formatVersion, &value);
++    ASN1_INTEGER_to_BN(bs->formatVersion, value);
+ 
+-    if (BN_cmp(&expected, &value) != 0) {
++    if (BN_cmp(expected, value) != 0) {
+         printf("Unsupported signature version\n");
+         goto vsb_done;
+     }
+ 
+-    BN_clear(&expected);
+-    BN_clear(&value);
++    BN_clear(expected);
++    BN_clear(value);
+ 
+     /* Confirm that the length of the image matches with the length in
+         the authenticated attributes */
+     length = htobe64(length);
+-    BN_bin2bn((const unsigned char *) &length, sizeof(length), &expected);
++    BN_bin2bn((const unsigned char *) &length, sizeof(length), expected);
+ 
+-    ASN1_INTEGER_to_BN(bs->authenticatedAttributes->length, &value);
++    ASN1_INTEGER_to_BN(bs->authenticatedAttributes->length, value);
+ 
+-    if (BN_cmp(&expected, &value) != 0) {
++    if (BN_cmp(expected, value) != 0) {
+         printf("Image length doesn't match signature attributes\n");
+         goto vsb_done;
+     }
+@@ -213,8 +213,8 @@ static int validate_signature_block(const BootSignature *bs, uint64_t length)
+     rc = 0;
+ 
+ vsb_done:
+-    BN_free(&expected);
+-    BN_free(&value);
++    BN_free(expected);
++    BN_free(value);
+ 
+     return rc;
+ }
+-- 
+2.7.4
+
