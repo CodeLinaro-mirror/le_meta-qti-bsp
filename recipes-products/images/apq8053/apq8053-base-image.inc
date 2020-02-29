@@ -71,6 +71,10 @@ LOCATION_IMAGE_INSTALL += "${@base_contains('DISTRO_FEATURES','location-services
 META_QTI_LOC_DIR_PRESENT = "${@os.path.exists('${WORKSPACE}/poky/meta-qti-location')}"
 IMAGE_INSTALL += "${@base_conditional('META_QTI_LOC_DIR_PRESENT', 'False', '${LOCATION_IMAGE_INSTALL}', '', d)}"
 
+# sec_config
+## do not install sec_config for legacy targets
+IMAGE_INSTALL += "${@base_conditional('META_QTI_LOC_DIR_PRESENT', 'True', 'sec-config', '', d)}"
+
 #32-bit packages
 IMAGE_INSTALL += "lib32-live555-qti"
 IMAGE_INSTALL += "lib32-qmmf-support"

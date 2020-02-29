@@ -72,6 +72,10 @@ LOCATION_IMAGE_INSTALL += "loc-net-iface"
 META_QTI_LOC_DIR_PRESENT = "${@os.path.exists('${WORKSPACE}/poky/meta-qti-location')}"
 IMAGE_INSTALL += "${@base_conditional('META_QTI_LOC_DIR_PRESENT', 'False', '${LOCATION_IMAGE_INSTALL}', '', d)}"
 
+# sec_config
+## do not install sec_config for legacy targets
+IMAGE_INSTALL += "${@base_conditional('META_QTI_LOC_DIR_PRESENT', 'True', 'sec-config', '', d)}"
+
 IMAGE_INSTALL += "rtsp-alg"
 IMAGE_INSTALL += "sigma-dut"
 IMAGE_INSTALL += "start-scripts-find-partitions"

@@ -32,6 +32,8 @@ IMAGE_INSTALL += "wcnss"
 IMAGE_INSTALL += "wlan-opensource"
 IMAGE_INSTALL += "hostap-daemon-qcacld"
 IMAGE_INSTALL += "wpa-supplicant-qcacld"
+# sec_config
+IMAGE_INSTALL += "sec-config"
 
 # Below is to generate sparse ext4 system image (OE by default supports raw ext4 images)
 

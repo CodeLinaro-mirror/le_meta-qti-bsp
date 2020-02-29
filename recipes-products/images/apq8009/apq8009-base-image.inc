@@ -13,6 +13,9 @@ IMAGE_INSTALL += "selinux-config"
 IMAGE_INSTALL += "refpolicy-mls"
 IMAGE_INSTALL += "start-scripts-misc-daemon"
 
+# sec_config
+IMAGE_INSTALL += "sec-config"
+
 # The MSM Linux minimal boot image files.
 
 IMAGE_INSTALL += "alsa-lib"
