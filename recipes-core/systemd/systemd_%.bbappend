@@ -72,9 +72,9 @@ MACHINE_SUPPORT_BLOCK_DEVICES = "${@bb.utils.contains('IMAGE_FSTYPES','ext4', 't
 
 do_install_append () {
    install -d ${D}/etc/systemd/system/
-   install -d ${D}/lib/systemd/system/ffbm.target.wants
+   install -d ${D}/${nonarch_libdir}/systemd/system/ffbm.target.wants
    install -d ${D}/etc/systemd/system/ffbm.target.wants
-   rm ${D}/lib/udev/rules.d/60-persistent-v4l.rules
+   rm ${D}/${nonarch_libdir}/udev/rules.d/60-persistent-v4l.rules
 
    # Place systemd-udevd.service in /etc/systemd/system
    install -m 0644 ${WORKDIR}/systemd-udevd.service \
@@ -83,9 +83,9 @@ do_install_append () {
        -D ${D}/etc/systemd/system/ffbm.target
 
    # Enable logind/getty/password-wall service in FFBM mode
-   ln -sf /lib/systemd/system/systemd-logind.service ${D}/lib/systemd/system/ffbm.target.wants/systemd-logind.service
-   ln -sf /lib/systemd/system/getty.target ${D}/lib/systemd/system/ffbm.target.wants/getty.target
-   ln -sf /lib/systemd/system/systemd-ask-password-wall.path ${D}/lib/systemd/system/ffbm.target.wants/systemd-ask-password-wall.path
+   ln -sf /${nonarch_libdir}/systemd/system/systemd-logind.service ${D}/${nonarch_libdir}/systemd/system/ffbm.target.wants/systemd-logind.service
+   ln -sf /${nonarch_libdir}/systemd/system/getty.target ${D}/${nonarch_libdir}/systemd/system/ffbm.target.wants/getty.target
+   ln -sf /${nonarch_libdir}/systemd/system/systemd-ask-password-wall.path ${D}/${nonarch_libdir}/systemd/system/ffbm.target.wants/systemd-ask-password-wall.path
    install -d /etc/sysctl.d/
    install -m 0644 ${WORKDIR}/sysctl.conf -D ${D}/etc/sysctl.d/sysctl.conf
    install -m 0644 ${WORKDIR}/platform.conf -D ${D}/etc/tmpfiles.d/platform.conf

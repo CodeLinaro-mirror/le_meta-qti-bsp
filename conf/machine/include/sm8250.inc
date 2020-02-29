@@ -22,7 +22,7 @@ PREFERRED_PROVIDER_openssl-native   = "openssl-native"
 MACHINE_DISPLAY_WIDTH_PIXELS ?= "480"
 MACHINE_DISPLAY_HEIGHT_PIXELS ?= "640"
 
-SERIAL_CONSOLE ?= "${@['', '115200 ttyMSM0'][d.getVar('VARIANT', True) == ('' or 'debug')]}"
+SERIAL_CONSOLES ?= "115200;ttyMSM0"
 LLVM_VERSION = "8.0"
 DISTRO ?= "msm"
 
@@ -44,6 +44,8 @@ PAGE_SIZE ?= '4096'
 DISTRO_FEATURES += "persist-image"
 # Enable LE Verified Boot
 DISTRO_FEATURES_append = " vble"
+
+DISTRO_FEATURES += "usrmerge"
 
 KERNEL_IMAGETYPE = "Image.gz-dtb"
 KERNEL_DTS_NAME = "kona-qrd-overlay"

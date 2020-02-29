@@ -1,0 +1,5 @@
+#
+# Default properties to be set for sm8250
+#
+
+ro.product.board=sm8250

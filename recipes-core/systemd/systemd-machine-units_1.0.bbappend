@@ -11,7 +11,6 @@ SRC_URI_append += " file://dsp-mount.service"
 SRC_URI_append += " file://media-card.mount"
 SRC_URI_append += " file://media-ram.mount"
 SRC_URI_append += " file://persist.mount"
-SRC_URI_append += " file://var-volatile.mount"
 SRC_URI_append += " file://proc-bus-usb.mount"
 SRC_URI_append += " file://dash.mount"
 SRC_URI_append += " file://cache-ubi.mount"
@@ -41,7 +40,6 @@ fix_sepolicies () {
     sed -i "s#,context=system_u:object_r:firmware_t:s0##g" ${WORKDIR}/bt_firmware.mount
     sed -i "s#,context=system_u:object_r:firmware_t:s0##g" ${WORKDIR}/bt_firmware-mount.service
     sed -i "s#,context=system_u:object_r:adsprpcd_t:s0##g" ${WORKDIR}/dsp-mount.service
-    sed -i "s#,rootcontext=system_u:object_r:var_t:s0##g"  ${WORKDIR}/var-volatile.mount
     sed -i "s#,rootcontext=system_u:object_r:data_t:s0##g" ${WORKDIR}/data.mount
     sed -i "s#,rootcontext=system_u:object_r:data_t:s0##g" ${WORKDIR}/data-ubi.mount
     sed -i "s#,rootcontext=system_u:object_r:persist_t:s0##g" ${WORKDIR}/persist-ubi.mount
@@ -49,17 +47,6 @@ fix_sepolicies () {
     sed -i "s#,rootcontext=system_u:object_r:system_data_t:s0##g"  ${WORKDIR}/systemrw-ubi.mount
 }
 do_install[prefuncs] += " ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', '', 'fix_sepolicies', d)}"
-
-# Install var-volatile.mount for tmpfs
-do_install_append () {
-    install -d 0644 ${D}${systemd_unitdir}/system
-    install -d 0644 ${D}${systemd_unitdir}/system/local-fs.target.wants
-    install -m 0644 ${WORKDIR}/var-volatile.mount \
-            ${D}${systemd_unitdir}/system/var-volatile.mount
-
-    ln -sf ${systemd_unitdir}/system/var-volatile.mount \
-           ${D}${systemd_unitdir}/system/local-fs.target.wants/var-volatile.mount
-}
 
 # Install mount and service units for mounting hard parititions.
 MNT_POINTS  = "${@d.getVar('MACHINE_MNT_POINTS') or ""}"
@@ -210,6 +197,8 @@ do_install_append() {
     install -d ${D}${systemd_unitdir}/system
     if ${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'true', 'false', d)}; then
         install -m 0644 ${WORKDIR}/set-slotsuffix.service ${D}${systemd_unitdir}/system
+        install -d 0644 ${D}${systemd_unitdir}/system/local-fs-pre.target.wants
+        ln -sf ${systemd_unitdir}/system/set-slotsuffix.service ${D}${systemd_unitdir}/system/local-fs-pre.target.wants/set-slotsuffix.service
     fi
 }
 
