@@ -108,10 +108,8 @@ ROOTFS_POSTPROCESS_COMMAND =+ "copy_edge_rootfs;"
 copy_edge_bsp_rpm() {
     cp ${DEPLOY_DIR_RPM}/noarch/volatile-binds-1.0-r0.noarch.rpm ${IMAGE_ROOTFS}/packages/noarch/
     cp ${DEPLOY_DIR_RPM}/sm8250/systemd-machine-units-1.0-r19.sm8250.rpm ${IMAGE_ROOTFS}/packages/sm8250/
-    cp ${DEPLOY_DIR_RPM}/aarch64/av-frameworks-git-r1.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/binder-git-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/libbase0-1.0-r1.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
-    cp ${DEPLOY_DIR_RPM}/aarch64/libcamera-metadata0-1.0-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/libcutils0-1.0-r1.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/libext4-utils0-git-r1.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/libhardware0-git-r6.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
@@ -121,7 +119,6 @@ copy_edge_bsp_rpm() {
     cp ${DEPLOY_DIR_RPM}/aarch64/libselinux0-git-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/libsparse0-1.0-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/libsync0-1.0-r1.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
-    cp ${DEPLOY_DIR_RPM}/aarch64/libui0-git-r1.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/libutils0-1.0-r1.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/start-script-ab-slot-util-1.0-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/system-core-git-r19.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
@@ -134,6 +131,9 @@ copy_edge_bsp_rpm() {
     cp ${DEPLOY_DIR_RPM}/aarch64/ffmpeg-dev-4.2.2-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/libx264-152-r2854+git0+e9a5903edf-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/libx264-bin-r2854+git0+e9a5903edf-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
+    cp ${DEPLOY_DIR_RPM}/aarch64/libjpeg8-1.2.1-r2.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
+    cp ${DEPLOY_DIR_RPM}/aarch64/mtdev-1.1.5-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
+    cp ${DEPLOY_DIR_RPM}/aarch64/libevdev-1.5.9-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
 }
 
 ROOTFS_POSTPROCESS_COMMAND += "copy_edge_bsp_rpm;"
