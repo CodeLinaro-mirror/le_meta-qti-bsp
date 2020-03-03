@@ -1,7 +1,6 @@
 #compile abl
 DEPLOY_DIR_IMAGE_EMMC ?= "${DEPLOY_DIR_IMAGE}"
 RDEPENDS  += "${@bb.utils.contains('TARGET_ARCH', 'arm','lib64-edk2','edk2',d)}"
-RDEPENDS  += "${@bb.utils.contains('TARGET_ARCH', 'arm','lib64-abl-ubifs','abl-ubifs',d)}"
 # Packages to be included in rootfs creation.
 IMAGE_INSTALL += "packagegroup-core-boot"
 IMAGE_INSTALL += "${CORE_IMAGE_EXTRA_INSTALL}"
