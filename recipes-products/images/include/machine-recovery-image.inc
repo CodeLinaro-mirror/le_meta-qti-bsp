@@ -31,6 +31,7 @@ IMAGE_INSTALL += "libcomerr"
 IMAGE_INSTALL += "libss"
 IMAGE_INSTALL += "libe2p"
 IMAGE_INSTALL += "libext2fs"
+IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_NAME','mdm', 'systemd-machine-units-recovery', '', d)}"
 
 # Needed for generating recovery.ubi ignored for ext4
 MKUBIFS_ARGS = "${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', '-m 4096 -e 253952 -c 200 -F', '', d)}"
@@ -85,16 +86,30 @@ RECOVERYFS_SELINUX_CFG = "${DEPLOY_DIR_IMAGE_NAND}/ubinize-recoveryfs-selinux.cf
 OUTPUT_UBIFS_IMAGE = "${DEPLOY_DIR_IMAGE_NAND}/machine-recovery-image-selinux-${MACHINE}.ubifs"
 OUTPUT_UBI_IMAGE = "${DEPLOY_DIR_IMAGE_NAND}/machine-recovery-image-selinux-${MACHINE}.ubi"
 
+SYSTEMRW_RECOVERY_VOLUME_SIZE ?= "4MiB"
+
+create_ubinize_config() {
+   echo \[recoveryfs_volume\] > "${RECOVERYFS_SELINUX_CFG}"
+   echo mode=ubi >> "${RECOVERYFS_SELINUX_CFG}"
+   echo image="${OUTPUT_UBIFS_IMAGE}" >> "${RECOVERYFS_SELINUX_CFG}"
+   echo vol_id=0 >> "${RECOVERYFS_SELINUX_CFG}"
+   echo vol_type=dynamic >> "${RECOVERYFS_SELINUX_CFG}"
+   echo vol_name=${UBI_VOLNAME} >> "${RECOVERYFS_SELINUX_CFG}"
+   echo vol_flags = autoresize >> "${RECOVERYFS_SELINUX_CFG}"
+
+   if ${@bb.utils.contains('DISTRO_NAME','mdm', 'true', 'false', d)}; then
+       echo \[systemrw_volume\] >> "${RECOVERYFS_SELINUX_CFG}"
+       echo mode=ubi >> "${RECOVERYFS_SELINUX_CFG}"
+       echo vol_id=1 >> "${RECOVERYFS_SELINUX_CFG}"
+       echo vol_type=dynamic >> "${RECOVERYFS_SELINUX_CFG}"
+       echo vol_name=systemrw >> "${RECOVERYFS_SELINUX_CFG}"
+       echo vol_size="${SYSTEMRW_RECOVERY_VOLUME_SIZE}" >> "${RECOVERYFS_SELINUX_CFG}"
+   fi
+}
+
 create_recoveryfs_ubi_img_with_selinux() {
     # create ubinize cfg
-    echo \[ubifs\] > "${RECOVERYFS_SELINUX_CFG}"
-    echo mode=ubi >> "${RECOVERYFS_SELINUX_CFG}"
-    echo image="${OUTPUT_UBIFS_IMAGE}" >> "${RECOVERYFS_SELINUX_CFG}"
-    echo vol_id=0 >> "${RECOVERYFS_SELINUX_CFG}"
-    echo vol_type=dynamic >> "${RECOVERYFS_SELINUX_CFG}"
-    echo vol_name=${UBI_VOLNAME} >> "${RECOVERYFS_SELINUX_CFG}"
-    echo vol_flags=autoresize >> "${RECOVERYFS_SELINUX_CFG}"
-
+    create_ubinize_config
     # create ubifs image (with selinux option passed) and then ubi image
     mkfs.ubifs -r ${IMAGE_ROOTFS} --selinux=${SELINUX_FILE_CONTEXTS} -o ${OUTPUT_UBIFS_IMAGE} ${MKUBIFS_ARGS}
     ubinize -o ${OUTPUT_UBI_IMAGE} ${UBINIZE_ARGS} ${RECOVERYFS_SELINUX_CFG}
@@ -111,57 +126,6 @@ do_rename_recovery_ubi_image() {
     # we would like to use that instead
     if [ -f "${DEPLOY_DIR_IMAGE_NAND}/machine-recovery-image-selinux-${MACHINE}.ubi" ]; then
         mv ${DEPLOY_DIR_IMAGE_NAND}/machine-recovery-image-selinux-${MACHINE}.ubi ${DEPLOY_DIR_IMAGE_NAND}/${MACHINE}-recoveryfs.ubi
-    fi
-}
-
-# machine-recovery-image and machine-image both use base-files package.
-# base-files mounts a couple of partitions during bootup.
-# This is fine for mission mode but not recovery mode.
-# We strip out these mount operations from machine-recovery-image.
-remove_mount_operations() {
-    # do this only for systemd-boot, since the mount operations
-    # are being done only for systemd as of now.
-    if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
-        # userdata
-        if [ -L ${IMAGE_ROOTFS}/lib/systemd/system/sysinit.target.wants/data.mount ]; then
-            rm ${IMAGE_ROOTFS}/lib/systemd/system/sysinit.target.wants/data.mount
-        fi
-        # cache
-        if [ -L ${IMAGE_ROOTFS}/lib/systemd/system/sysinit.target.wants/cache.mount ]; then
-            rm ${IMAGE_ROOTFS}/lib/systemd/system/sysinit.target.wants/cache.mount
-        fi
-        # persist
-        if [ -L ${IMAGE_ROOTFS}/lib/systemd/system/sysinit.target.wants/persist.mount ]; then
-            rm ${IMAGE_ROOTFS}/lib/systemd/system/sysinit.target.wants/persist.mount
-        fi
-        # modem on A/B
-        if [ -L ${IMAGE_ROOTFS}/etc/systemd/system/local-fs.target.requires/firmware-mount.service ]; then
-            rm ${IMAGE_ROOTFS}/etc/systemd/system/local-fs.target.requires/firmware-mount.service
-        fi
-        # modem on nand + non A/B
-        if [ -L ${IMAGE_ROOTFS}/etc/systemd/system/local-fs.target.requires/firmware.mount ]; then
-            rm ${IMAGE_ROOTFS}/etc/systemd/system/local-fs.target.requires/firmware.mount
-        fi
-        # dsp on nand + non A/B
-        if [ -L ${IMAGE_ROOTFS}/etc/systemd/system/local-fs.target.requires/dsp.mount ]; then
-            rm ${IMAGE_ROOTFS}/etc/systemd/system/local-fs.target.requires/dsp.mount
-        fi
-        # dsp on A/B
-        if [ -L ${IMAGE_ROOTFS}/etc/systemd/system/local-fs.target.requires/dsp-mount.service ]; then
-            rm ${IMAGE_ROOTFS}/etc/systemd/system/local-fs.target.requires/dsp-mount.service
-        fi
-        # bluetooth on nand + non A/B
-        if [ -L ${IMAGE_ROOTFS}/etc/systemd/system/local-fs.target.requires/bluetooth.mount ]; then
-            rm ${IMAGE_ROOTFS}/etc/systemd/system/local-fs.target.requires/bluetooth.mount
-        fi
-        # bluetooth on A/B
-        if [ -L ${IMAGE_ROOTFS}/etc/systemd/system/local-fs.target.requires/bluetooth-mount.service ]; then
-            rm ${IMAGE_ROOTFS}/etc/systemd/system/local-fs.target.requires/bluetooth-mount.service
-        fi
-        # systemrw
-        if [ -L ${IMAGE_ROOTFS}/etc/systemd/system/local-fs.target.requires/systemrw.mount ]; then
-            rm ${IMAGE_ROOTFS}/etc/systemd/system/local-fs.target.requires/systemrw.mount
-        fi
     fi
 }
 
