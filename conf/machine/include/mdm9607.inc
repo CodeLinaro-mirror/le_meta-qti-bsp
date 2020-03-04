@@ -23,6 +23,8 @@ DISTRO ?= "mdm"
 
 MACHINE_FEATURES += "kernel26 keyboard"
 
+PREFERRED_VERSION_linux-msm ?= "3.18"
+
 PAGE_SIZE ?= '4096'
 PAGE_SIZE_2K ?= '2048'
 
