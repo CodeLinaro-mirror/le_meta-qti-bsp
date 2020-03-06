@@ -61,6 +61,7 @@ fixup_systemd_mounts_services_flashless_squashfs_rootfs() {
                ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/local-fs.target.wants/nbdclient.service
  rm -rf ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/multi-user.target.wants/cache.mount
  rm -rf ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/usb.service.d/usb_data_service.conf
+ rm -rf ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/QCMAP_copybind.service.d/QCMAP_copybind.conf
 }
 
 create_ext4_images() {
