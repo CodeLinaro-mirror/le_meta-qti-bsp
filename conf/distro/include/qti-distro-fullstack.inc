@@ -8,6 +8,7 @@ require conf/distro/include/qti-distro-base.inc
 
 DISTRO_NAME = "QTI Linux full refrence stack distro."
 
+DISTRO_FEATURES_append = " qti-audio-cal "
 ##################################################################
 # list of distro features
 ##################################################################
@@ -21,7 +22,6 @@ DISTRO_NAME = "QTI Linux full refrence stack distro."
 # wayland:         Include the Wayland display server protocol.
 
 DISTRO_FEATURES_append = " drm fbdev opencl opengl pulseaudio tensorflow-lite wayland"
-
 ## QTI defined distro features ##
 # qti-audio:     Support QTI audio solution
 # qti-audio-encoder: Support QRI audio encoder
