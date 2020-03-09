@@ -59,8 +59,9 @@ python __anonymous () {
       d.appendVar("SRC_URI", " file://0009-ARM-dts-msm-DRAM-diet-for-dvrs.patch")
 
   if oe.utils.conditional('WITH_INTERNAL_LAYER', 'no', True, False, d):
-      if d.getVar('BASEMACHINE', True) == '8x96auto':
-          d.appendVar("SRC_URI", " file://0001-ARM-dts-msm-remove-reserved-splash-memory-regions.patch")
+      if oe.utils.conditional('WITH_PROP_LAYER', 'yes', True, False, d):
+          if d.getVar('BASEMACHINE', True) == '8x96auto':
+              d.appendVar("SRC_URI", " file://0001-ARM-dts-msm-remove-reserved-splash-memory-regions.patch")
 
   if bb.utils.contains('DISTRO_FEATURES', 'early_init', True, False, d) or bb.utils.contains('DISTRO_FEATURES', 'early-ethernet', True, False, d):
       if d.getVar('KERNEL_ROOTDEVICE', True) == "/dev/dm-0":
