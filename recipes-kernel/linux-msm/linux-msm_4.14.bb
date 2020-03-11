@@ -23,10 +23,6 @@ LDFLAGS_aarch64 = "-O1 --hash-style=gnu --as-needed"
 TARGET_CXXFLAGS += "-Wno-format"
 EXTRA_OEMAKE_append += "INSTALL_MOD_STRIP=1"
 
-do_compile () {
-    oe_runmake CC="${KERNEL_CC}" LD="${KERNEL_LD}" ${KERNEL_EXTRA_ARGS} $use_alternate_initrd
-}
-
 do_shared_workdir_append () {
         cp Makefile $kerneldir/
         cp -fR usr $kerneldir/
