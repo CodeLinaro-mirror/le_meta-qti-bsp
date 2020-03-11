@@ -68,6 +68,7 @@ do_install_append() {
    install -b -m 0644 /dev/null -D ${D}${sysconfdir}/build.prop
    if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
       install -m 0750 ${S}/adb/start_adbd -D ${D}${sysconfdir}/initscripts/adbd
+      install -m 0755 ${S}/adb/start_pcie -D ${D}${sysconfdir}/start_pcie
       install -m 0755 ${S}/usb/start_usb -D ${D}${sysconfdir}/initscripts/usb
       install -m 0750 ${S}/rootdir/etc/init.qcom.post_boot.sh -D ${D}${sysconfdir}/initscripts/init_post_boot
       install -m 0750 ${S}/rootdir/etc/init.qti.debug.sh -D ${D}${sysconfdir}/initscripts/init_qti_debug
@@ -75,6 +76,7 @@ do_install_append() {
       install -d ${D}${systemd_unitdir}/system/multi-user.target.wants/
       install -d ${D}${systemd_unitdir}/system/ffbm.target.wants/
       install -m 0644 ${S}/adb/adbd.service -D ${D}${systemd_unitdir}/system/adbd.service
+      install -m 0644 ${S}/adb/pcie.service -D ${D}${systemd_unitdir}/system/pcie.service
       ln -sf ${systemd_unitdir}/system/adbd.service ${D}${systemd_unitdir}/system/multi-user.target.wants/adbd.service
       ln -sf ${systemd_unitdir}/system/adbd.service ${D}${systemd_unitdir}/system/ffbm.target.wants/adbd.service
       install -m 0644 ${S}/usb/usb.service -D ${D}${systemd_unitdir}/system/usb.service
@@ -127,6 +129,8 @@ do_install_append_mdm() {
       rm -rf ${D}${systemd_unitdir}/system/multi-user.target.wants/adbd.service
       rm -rf ${D}${systemd_unitdir}/system/multi-user.target.wants/usb.service
       ln -sf ${systemd_unitdir}/system/adbd.service ${D}${systemd_unitdir}/system/local-fs.target.wants/adbd.service
+      ln -sf ${systemd_unitdir}/system/pcie.service ${D}${systemd_unitdir}/system/ffbm.target.wants/pcie.service
+      ln -sf ${systemd_unitdir}/system/pcie.service ${D}${systemd_unitdir}/system/local-fs.target.wants/pcie.service
       ln -sf ${systemd_unitdir}/system/usb.service ${D}${systemd_unitdir}/system/local-fs.target.wants/usb.service
    fi
 }
@@ -200,6 +204,7 @@ PACKAGES =+ "${PN}-adbd-dbg ${PN}-adbd ${PN}-adbd-dev"
 FILES_${PN}-adbd-dbg = "${base_sbindir}/.debug/adbd ${libdir}/.debug/libadbd.*"
 FILES_${PN}-adbd     = "${base_sbindir}/adbd ${sysconfdir}/init.d/adbd ${libdir}/libadbd.so.*"
 FILES_${PN}-adbd    += "${systemd_unitdir}/system/adbd.service ${systemd_unitdir}/system/multi-user.target.wants/adbd.service ${systemd_unitdir}/system/local-fs.target.wants/adbd.service ${systemd_unitdir}/system/ffbm.target.wants/adbd.service ${sysconfdir}/launch_adbd ${sysconfdir}/initscripts/adbd ${sysconfdir}/adb_devid"
+FILES_${PN}-adbd    += "${systemd_unitdir}/system/pcie.service ${systemd_unitdir}/system/local-fs.target.wants/pcie.service ${systemd_unitdir}/system/ffbm.target.wants/pcie.service ${sysconfdir}/start_pcie"
 FILES_${PN}-adbd-dev = "${libdir}/libadbd.so ${libdir}/libadbd.la"
 
 PACKAGES =+ "${PN}-usb-dbg ${PN}-usb"
