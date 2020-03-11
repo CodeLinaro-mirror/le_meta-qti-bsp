@@ -117,7 +117,7 @@ python make_verity_enabled_system_image () {
     verity_img = d.getVar('VERITY_IMG', True)
     verity_md_img = d.getVar('VERITY_METADATA_IMG', True)
     signer_path = d.getVar('STAGING_BINDIR_NATIVE',True) + "/verity_signer"
-    signer_key  = d.getVar('TMPDIR',True) + "/work-shared/security_tools/verity.pk8"
+    signer_key  = d.getVar('STAGING_BINDIR_NATIVE',True) + "/verity.pk8"
 
     # Build verity tree
     bvt_bin_path = d.getVar('STAGING_BINDIR_NATIVE', True) + '/build_verity_tree'
