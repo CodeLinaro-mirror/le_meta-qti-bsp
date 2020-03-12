@@ -38,10 +38,6 @@ IMAGE_INSTALL += "lib32-libnl"
 IMAGE_INSTALL += "libcutils"
 IMAGE_INSTALL += "liblog"
 IMAGE_INSTALL += "libxml2"
-IMAGE_INSTALL += "${@base_contains('DISTRO_FEATURES','location-services', 'loc-stub', '', d)}"
-IMAGE_INSTALL += "${@base_contains('DISTRO_FEATURES','location-services', 'loc-pla', '', d)}"
-IMAGE_INSTALL += "${@base_contains('DISTRO_FEATURES','location-services', 'loc-hal', '', d)}"
-IMAGE_INSTALL += "${@base_contains('DISTRO_FEATURES','location-services', 'loc-net-iface', '', d)}"
 IMAGE_INSTALL += "start-scripts-find-partitions"
 IMAGE_INSTALL += "start-scripts-firmware-links"
 IMAGE_INSTALL += "system-core-adbd"
@@ -65,6 +61,19 @@ IMAGE_INSTALL += "lib32-bt-property"
 IMAGE_INSTALL += "lib32-bt-app"
 IMAGE_INSTALL += "display-hal"
 IMAGE_INSTALL += "lib32-display-hal"
+
+# location recipes
+LOCATION_IMAGE_INSTALL = "${@base_contains('DISTRO_FEATURES','location-services', 'loc-stub', '', d)}"
+LOCATION_IMAGE_INSTALL += "${@base_contains('DISTRO_FEATURES','location-services', 'loc-pla', '', d)}"
+LOCATION_IMAGE_INSTALL += "${@base_contains('DISTRO_FEATURES','location-services', 'loc-hal', '', d)}"
+LOCATION_IMAGE_INSTALL += "${@base_contains('DISTRO_FEATURES','location-services', 'loc-net-iface', '', d)}"
+## Install location modules for legacy PLs
+META_QTI_LOC_DIR_PRESENT = "${@os.path.exists('${WORKSPACE}/poky/meta-qti-location')}"
+IMAGE_INSTALL += "${@base_conditional('META_QTI_LOC_DIR_PRESENT', 'False', '${LOCATION_IMAGE_INSTALL}', '', d)}"
+
+# sec_config
+## do not install sec_config for legacy targets
+IMAGE_INSTALL += "${@base_conditional('META_QTI_LOC_DIR_PRESENT', 'True', 'sec-config', '', d)}"
 
 #32-bit packages
 IMAGE_INSTALL += "lib32-live555-qti"

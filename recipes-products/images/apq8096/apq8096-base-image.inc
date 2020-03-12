@@ -20,10 +20,18 @@ IMAGE_INSTALL += "start-scripts-misc-daemon"
 IMAGE_INSTALL += "alsa-lib"
 IMAGE_INSTALL += "alsa-utils"
 
-IMAGE_INSTALL += "loc-stub"
-IMAGE_INSTALL += "loc-pla"
-IMAGE_INSTALL += "loc-hal"
-IMAGE_INSTALL += "loc-net-iface"
+# location recipes
+LOCATION_IMAGE_INSTALL = "loc-stub"
+LOCATION_IMAGE_INSTALL += "loc-pla"
+LOCATION_IMAGE_INSTALL += "loc-hal"
+LOCATION_IMAGE_INSTALL += "loc-net-iface"
+## Install location modules for legacy PLs
+META_QTI_LOC_DIR_PRESENT = "${@os.path.exists('${WORKSPACE}/poky/meta-qti-location')}"
+IMAGE_INSTALL += "${@base_conditional('META_QTI_LOC_DIR_PRESENT', 'False', '${LOCATION_IMAGE_INSTALL}', '', d)}"
+
+# sec_config
+## do not install sec_config for legacy targets
+IMAGE_INSTALL += "${@base_conditional('META_QTI_LOC_DIR_PRESENT', 'True', 'sec-config', '', d)}"
 
 IMAGE_INSTALL += "base-files"
 IMAGE_INSTALL += "base-passwd"

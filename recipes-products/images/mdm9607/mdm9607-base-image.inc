@@ -50,11 +50,7 @@ IMAGE_INSTALL += "liblog"
 IMAGE_INSTALL += "libstdc++"
 IMAGE_INSTALL += "libxml2"
 IMAGE_INSTALL += "lighttpd"
-IMAGE_INSTALL += "loc-stub"
-IMAGE_INSTALL += "loc-pla"
-IMAGE_INSTALL += "loc-hal"
 IMAGE_INSTALL += "libsensors"
-IMAGE_INSTALL += "loc-net-iface"
 IMAGE_INSTALL += "minidlna"
 IMAGE_INSTALL += "miniupnpd"
 IMAGE_INSTALL += "mtd-utils-ubifs"
@@ -66,6 +62,19 @@ IMAGE_INSTALL += "powerapp-shutdown"
 IMAGE_INSTALL += "ppp"
 IMAGE_INSTALL += "perl"
 IMAGE_INSTALL += "qcacld-hl"
+
+# location recipes
+LOCATION_IMAGE_INSTALL = "loc-stub"
+LOCATION_IMAGE_INSTALL += "loc-pla"
+LOCATION_IMAGE_INSTALL += "loc-hal"
+LOCATION_IMAGE_INSTALL += "loc-net-iface"
+## Install location modules for legacy PLs
+META_QTI_LOC_DIR_PRESENT = "${@os.path.exists('${WORKSPACE}/poky/meta-qti-location')}"
+IMAGE_INSTALL += "${@base_conditional('META_QTI_LOC_DIR_PRESENT', 'False', '${LOCATION_IMAGE_INSTALL}', '', d)}"
+
+# sec_config
+## do not install sec_config for legacy targets
+IMAGE_INSTALL += "${@base_conditional('META_QTI_LOC_DIR_PRESENT', 'True', 'sec-config', '', d)}"
 
 IMAGE_INSTALL += "rtsp-alg"
 IMAGE_INSTALL += "sigma-dut"

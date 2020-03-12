@@ -13,6 +13,9 @@ IMAGE_INSTALL += "alsa-lib"
 IMAGE_INSTALL += "alsa-utils"
 IMAGE_INSTALL += "tinycompress"
 
+# sec_config
+IMAGE_INSTALL += "sec-config"
+
 IMAGE_INSTALL += "base-files"
 IMAGE_INSTALL += "base-passwd"
 

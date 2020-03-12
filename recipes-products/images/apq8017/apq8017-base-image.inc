@@ -17,6 +17,9 @@ IMAGE_INSTALL += "alsa-utils"
 IMAGE_INSTALL += "tinycompress"
 IMAGE_INSTALL += "rmtstorage"
 
+# sec_config
+IMAGE_INSTALL += "sec-config"
+
 # AUDIO HAL
 IMAGE_INSTALL += "lib32-tinyalsa"
 IMAGE_INSTALL += "lib32-audiohal"
