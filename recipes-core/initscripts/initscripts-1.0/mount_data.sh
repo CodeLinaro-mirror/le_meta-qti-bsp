@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (c) 2014, The Linux Foundation. All rights reserved.
+# Copyright (c) 2020, The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -29,43 +29,15 @@
 # find_partitions        init.d script to dynamically find partitions
 #
 
-FindAndMountUBI () {
-   partition=$1
-   dir=$2
-
-   mtd_block_number=`cat $mtd_file | grep -i $partition | sed 's/^mtd//' | awk -F ':' '{print $1}'`
-   echo "MTD : Detected block device : $dir for $partition"
-   mkdir -p $dir
-
-   ubiattach -m $mtd_block_number -d 1 /dev/ubi_ctrl
-   device=/dev/ubi1_0
-   while [ 1 ]
-    do
-        if [ -c $device ]
-        then
-            mount -t ubifs -o ro /dev/ubi1_0 $dir -o bulk_read
-            break
-        else
-            sleep 0.010
-        fi
-    done
-}
-
 FindAndMountVolumeUBI () {
    volume_name=$1
    dir=$2
    if [ ! -d $dir ]
    then
-       mkdir -p $dir
+      mkdir -p $dir
    fi
    mount -t ubifs ubi0:$volume_name $dir -o bulk_read
 }
 
-mtd_file=/proc/mtd
-
 fstype="UBI"
-#eval FindAndMountVolume${fstype} usrfs /data
-
-eval FindAndMount${fstype} modem /firmware
-
-exit 0
+eval FindAndMountVolume${fstype} usrfs /data

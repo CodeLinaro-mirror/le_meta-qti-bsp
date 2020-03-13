@@ -33,6 +33,7 @@ set -e
 case "$1" in
   start)
         echo -n "Starting/Loading audio module: "
+	sleep 6
 
         echo "audio:start/load" > /dev/kmsg
         start-stop-daemon -S -b -a start_audio_le
