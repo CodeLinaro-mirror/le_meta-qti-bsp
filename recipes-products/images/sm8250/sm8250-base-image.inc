@@ -129,6 +129,16 @@ copy_edge_bsp_rpm() {
     cp ${DEPLOY_DIR_RPM}/aarch64/system-core-usb-git-r19.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/ffmpeg-4.2.2-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/ffmpeg-dev-4.2.2-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
+    cp ${DEPLOY_DIR_RPM}/aarch64/libavfilter7-4.2.2-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
+    cp ${DEPLOY_DIR_RPM}/aarch64/libavutil56-4.2.2-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
+    cp ${DEPLOY_DIR_RPM}/aarch64/libswscale5-4.2.2-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
+    cp ${DEPLOY_DIR_RPM}/aarch64/libavcodec58-4.2.2-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
+    cp ${DEPLOY_DIR_RPM}/aarch64/libavformat58-4.2.2-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
+    cp ${DEPLOY_DIR_RPM}/aarch64/libpostproc55-4.2.2-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
+    cp ${DEPLOY_DIR_RPM}/aarch64/libavdevice58-4.2.2-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
+    cp ${DEPLOY_DIR_RPM}/aarch64/libavresample4-4.2.2-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
+    cp ${DEPLOY_DIR_RPM}/aarch64/libswresample3-4.2.2-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
+    cp ${DEPLOY_DIR_RPM}/aarch64/libasound2-1.1.6-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/libx264-152-r2854+git0+e9a5903edf-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/libx264-bin-r2854+git0+e9a5903edf-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/libjpeg8-1.2.1-r2.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
