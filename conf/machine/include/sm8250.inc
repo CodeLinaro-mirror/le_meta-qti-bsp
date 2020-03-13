@@ -52,7 +52,7 @@ KERNEL_DTS_NAME = "kona-qrd-overlay"
 KERNEL_BASE = "0x80000000"
 KERNEL_TAGS_OFFSET = "0x1e00000"
 
-KERNEL_CMD_PARAMS ?= "noinitrd rw rootwait console=ttyMSM0,115200,n8 no_console_suspend=1 androidboot.hardware=qcom androidboot.console=ttyMSM0 lpm_levels.sleep_disabled=1 service_locator.enable=1 firmware_class.path=/lib/firmware/updates msm_rtb.filter=0x237"
+KERNEL_CMD_PARAMS ?= "noinitrd rw rootwait console=ttyMSM0,115200,n8 no_console_suspend=1 androidboot.hardware=qcom androidboot.console=ttyMSM0 lpm_levels.sleep_disabled=1 service_locator.enable=1 firmware_class.path=/firmware/image msm_rtb.filter=0x237"
 
 # Userspace needs below given macro to support libion after kernel 4.12.
 TARGET_CFLAGS_append = " -DTARGET_ION_ABI_VERSION=2 "
