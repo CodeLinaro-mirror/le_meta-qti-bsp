@@ -7,8 +7,6 @@ IMAGE_INSTALL += "${CORE_IMAGE_EXTRA_INSTALL}"
 IMAGE_INSTALL += "base-files"
 IMAGE_INSTALL += "base-passwd"
 IMAGE_INSTALL += "glib-2.0"
-IMAGE_INSTALL += "gdbserver"
-IMAGE_INSTALL += "gdb"
 IMAGE_INSTALL += "iw"
 IMAGE_INSTALL += "kernel-modules"
 IMAGE_INSTALL += "libnl"
@@ -29,6 +27,7 @@ IMAGE_INSTALL += "system-core-usb"
 IMAGE_INSTALL += "volatile-binds"
 IMAGE_INSTALL += "edk2"
 IMAGE_INSTALL += "coreutils"
+IMAGE_INSTALL += "km-loader"
 IMAGE_INSTALL += "systemd-machine-units"
 
 IMAGE_POSTPROCESS_COMMAND_append = "${@bb.utils.contains('IMAGE_FSTYPES', 'squashfs-xz', 'create_ext4_images;','',d)}"
@@ -62,6 +61,7 @@ fixup_systemd_mounts_services_flashless_squashfs_rootfs() {
                ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/local-fs.target.wants/nbdclient.service
  rm -rf ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/multi-user.target.wants/cache.mount
  rm -rf ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/usb.service.d/usb_data_service.conf
+ rm -rf ${IMAGE_ROOTFS_FLASHLESS}/lib/systemd/system/QCMAP_copybind.service.d/QCMAP_copybind.conf
 }
 
 create_ext4_images() {

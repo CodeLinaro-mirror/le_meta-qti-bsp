@@ -23,6 +23,9 @@ PREFERRED_VERSION_weston ?= "1.1.9%"
 
 MACHINE_FEATURES += "kernel26 keyboard"
 
+# drm driver
+MACHINE_FEATURES += "drm"
+
 PAGE_SIZE ?= '4096'
 
 # Max supported inodes

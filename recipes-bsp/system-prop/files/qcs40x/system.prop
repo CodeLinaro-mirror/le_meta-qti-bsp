@@ -38,6 +38,8 @@ vendor.voice.playback.conc.disabled=true
 vendor.voice.record.conc.disabled=true
 vendor.voice.voip.conc.disabled=true
 
+vendor.audio.capture.pcm.32bit.enable=true
+
 #property to select 3/6 MICS
 ro.qc.sdk.fwk.mic_support=6
 
