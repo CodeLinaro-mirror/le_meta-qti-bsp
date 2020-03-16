@@ -1,19 +1,20 @@
-From 500174438b65dd69c0e7078c30cec760590777ba Mon Sep 17 00:00:00 2001
-From: liushudan <shudan@codeaurora.org>
+From ad9d6d4ee4608cc88ca48296ec9a6292c0075e72 Mon Sep 17 00:00:00 2001
+From: Zhenlin Lian <lianzhenlin@codeaurora.org>
 Date: Thu, 27 Feb 2020 10:58:57 +0800
-Subject: [PATCH] modified for v4l2 codec to enable decode
+Subject: [PATCH] modified for v4l2 codec to enable decode and encode
 
 ---
  configure                 |   5 +-
  libavcodec/decode.c       |   6 ++
- libavcodec/v4l2_buffers.c | 151 +++++++++++++++++++++++++++++++++++++++-------
- libavcodec/v4l2_buffers.h |  14 ++++-
- libavcodec/v4l2_context.c | 151 ++++++++++++++++++++++++++++++++++------------
- libavcodec/v4l2_context.h |   8 +++
- libavcodec/v4l2_m2m.c     |  43 +++++++++----
- libavcodec/v4l2_m2m_dec.c |  35 +++++++----
- libavformat/utils.c       |   7 ++-
- 9 files changed, 333 insertions(+), 87 deletions(-)
+ libavcodec/v4l2_buffers.c | 206 +++++++++++++++++++++++++++++++++++++---------
+ libavcodec/v4l2_buffers.h |  14 +++-
+ libavcodec/v4l2_context.c | 148 ++++++++++++++++++++++++---------
+ libavcodec/v4l2_context.h |   8 ++
+ libavcodec/v4l2_m2m.c     |  43 +++++++---
+ libavcodec/v4l2_m2m_dec.c |  35 +++++---
+ libavcodec/v4l2_m2m_enc.c | 111 +++++++++++++++++++++----
+ libavformat/utils.c       |   7 +-
+ 10 files changed, 461 insertions(+), 122 deletions(-)
 
 diff --git a/configure b/configure
 index 34c2adb..ad6ebc8 100755
@@ -70,7 +71,7 @@ index 6c31166..4c53aa2 100644
  }
  
 diff --git a/libavcodec/v4l2_buffers.c b/libavcodec/v4l2_buffers.c
-index aef911f..a342f69 100644
+index aef911f..504ff80 100644
 --- a/libavcodec/v4l2_buffers.c
 +++ b/libavcodec/v4l2_buffers.c
 @@ -33,7 +33,16 @@
@@ -90,7 +91,76 @@ index aef911f..a342f69 100644
  
  static inline V4L2m2mContext *buf_to_m2mctx(V4L2Buffer *buf)
  {
-@@ -301,6 +310,29 @@ int ff_v4l2_buffer_avframe_to_buf(const AVFrame *frame, V4L2Buffer* out)
+@@ -263,19 +272,40 @@ static int v4l2_bufref_to_buf(V4L2Buffer *out, int plane, const uint8_t* data, i
+ 
+     if (plane >= out->num_planes)
+         return AVERROR(EINVAL);
+-
+-    bytesused = FFMIN(size, out->plane_info[plane].length);
+-    length = out->plane_info[plane].length;
+-
+-    memcpy(out->plane_info[plane].mm_addr, data, FFMIN(size, out->plane_info[plane].length));
+-
+-    if (V4L2_TYPE_IS_MULTIPLANAR(out->buf.type)) {
+-        out->planes[plane].bytesused = bytesused;
+-        out->planes[plane].length = length;
+-    } else {
+-        out->buf.bytesused = bytesused;
+-        out->buf.length = length;
+-    }
++	if (out->context->av_pix_fmt == AV_PIX_FMT_NV12) {
++        char *buf = out->plane_info[plane].mm_addr;
++        int i = 0;
++	    for(i = 0; i < out->context->format.fmt.pix_mp.height; i ++){
++		    memcpy(buf, data, out->context->format.fmt.pix_mp.width);
++            buf += out->plane_info[plane].bytesperline;
++		    data += out->context->format.fmt.pix_mp.width;
++	    }
++        for (i = 0; i < VENUS_Y_STRIDE(0,out->context->format.fmt.pix_mp.height) - out->context->format.fmt.pix_mp.height;i ++){
++            buf += out->plane_info[plane].bytesperline;
++	    }
++
++	    for(i = 0; i < out->context->format.fmt.pix_mp.height/2; i ++){
++		    memcpy(buf, data, out->context->format.fmt.pix_mp.width);
++            buf += out->plane_info[plane].bytesperline;
++		    data += out->context->format.fmt.pix_mp.width;
++	    }
++
++	    out->planes[plane].bytesused = out->plane_info[plane].length;
++	    out->planes[plane].length = out->plane_info[plane].length;
++	} else {
++        bytesused = FFMIN(size, out->plane_info[plane].length);
++        length = out->plane_info[plane].length;
++
++        memcpy(out->plane_info[plane].mm_addr, data, FFMIN(size, out->plane_info[plane].length));
++
++        if (V4L2_TYPE_IS_MULTIPLANAR(out->buf.type)) {
++            out->planes[plane].bytesused = bytesused;
++            out->planes[plane].length = length;
++        } else {
++            out->buf.bytesused = bytesused;
++            out->buf.length = length;
++        }
++	}
+ 
+     return 0;
+ }
+@@ -291,9 +321,11 @@ int ff_v4l2_buffer_avframe_to_buf(const AVFrame *frame, V4L2Buffer* out)
+     int i, ret;
+ 
+     for(i = 0; i < out->num_planes; i++) {
+-        ret = v4l2_bufref_to_buf(out, i, frame->buf[i]->data, frame->buf[i]->size, frame->buf[i]);
+-        if (ret)
+-            return ret;
++        if (frame->buf[i]) {
++            ret = v4l2_bufref_to_buf(out, i, frame->buf[i]->data, frame->buf[i]->size, frame->buf[i]);
++            if (ret)
++                return ret;
++		}
+     }
+ 
+     v4l2_set_pts(out, frame->pts);
+@@ -301,6 +333,29 @@ int ff_v4l2_buffer_avframe_to_buf(const AVFrame *frame, V4L2Buffer* out)
      return 0;
  }
  
@@ -120,7 +190,7 @@ index aef911f..a342f69 100644
  int ff_v4l2_buffer_buf_to_avframe(AVFrame *frame, V4L2Buffer *avbuf)
  {
      V4L2m2mContext *s = buf_to_m2mctx(avbuf);
-@@ -321,10 +353,10 @@ int ff_v4l2_buffer_buf_to_avframe(AVFrame *frame, V4L2Buffer *avbuf)
+@@ -321,10 +376,10 @@ int ff_v4l2_buffer_buf_to_avframe(AVFrame *frame, V4L2Buffer *avbuf)
      /* 1.1 fixup special cases */
      switch (avbuf->context->av_pix_fmt) {
      case AV_PIX_FMT_NV12:
@@ -134,7 +204,7 @@ index aef911f..a342f69 100644
          break;
      default:
          break;
-@@ -396,23 +428,104 @@ int ff_v4l2_buffer_avpkt_to_buf(const AVPacket *pkt, V4L2Buffer *out)
+@@ -396,23 +451,104 @@ int ff_v4l2_buffer_avpkt_to_buf(const AVPacket *pkt, V4L2Buffer *out)
  int ff_v4l2_buffer_initialize(V4L2Buffer* avbuf, int index)
  {
      V4L2Context *ctx = avbuf->context;
@@ -205,7 +275,7 @@ index aef911f..a342f69 100644
  
 -    if (V4L2_TYPE_IS_MULTIPLANAR(ctx->type)) {
 -        avbuf->num_planes = 0;
-+    if (ctx->type == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE) {
++    if (ctx->format.fmt.pix_mp.num_planes > 1) {
 +        avbuf->extra_ion.ion_device_fd = ion_open();
 +        if (avbuf->extra_ion.ion_device_fd < 0) {
 +            av_log(NULL, AV_LOG_ERROR, "extra ion_open failed ret = %d\n", avbuf->extra_ion.ion_device_fd);
@@ -247,7 +317,7 @@ index aef911f..a342f69 100644
          for (;;) {
              /* in MP, the V4L2 API states that buf.length means num_planes */
              if (avbuf->num_planes >= avbuf->buf.length)
-@@ -420,25 +533,19 @@ int ff_v4l2_buffer_initialize(V4L2Buffer* avbuf, int index)
+@@ -420,25 +556,19 @@ int ff_v4l2_buffer_initialize(V4L2Buffer* avbuf, int index)
              if (avbuf->buf.m.planes[avbuf->num_planes].length)
                  avbuf->num_planes++;
          }
@@ -315,7 +385,7 @@ index 7a57caf..0aa8b56 100644
  
      /* This object is refcounted per-plane, so we need to keep track
 diff --git a/libavcodec/v4l2_context.c b/libavcodec/v4l2_context.c
-index efcb042..ef5aed8 100644
+index efcb042..20f7e93 100644
 --- a/libavcodec/v4l2_context.c
 +++ b/libavcodec/v4l2_context.c
 @@ -32,6 +32,8 @@
@@ -342,7 +412,15 @@ index efcb042..ef5aed8 100644
  
      ret = ioctl(s->fd, VIDIOC_G_FMT, &out_fmt);
      if (ret) {
-@@ -262,10 +266,6 @@ static V4L2Buffer* v4l2_dequeue_v4l2buf(V4L2Context *ctx, int timeout)
+@@ -255,17 +259,13 @@ static V4L2Buffer* v4l2_dequeue_v4l2buf(V4L2Context *ctx, int timeout)
+     struct v4l2_buffer buf = { 0 };
+     V4L2Buffer* avbuf = NULL;
+     struct pollfd pfd = {
+-        .events =  POLLIN | POLLRDNORM | POLLPRI | POLLOUT | POLLWRNORM, /* default blocking capture */
++        .events =  POLLIN | POLLRDNORM | POLLPRI | POLLOUT | POLLWRNORM | POLLRDBAND, /* default blocking capture */
+         .fd = ctx_to_m2mctx(ctx)->fd,
+     };
+     int i, ret;
  
      /* if we are draining and there are no more capture buffers queued in the driver we are done */
      if (!V4L2_TYPE_IS_OUTPUT(ctx->type) && ctx_to_m2mctx(ctx)->draining) {
@@ -353,7 +431,7 @@ index efcb042..ef5aed8 100644
          ctx->done = 1;
          return NULL;
      }
-@@ -337,11 +337,15 @@ start:
+@@ -337,11 +337,11 @@ start:
  
  dequeue:
          memset(&buf, 0, sizeof(buf));
@@ -363,15 +441,11 @@ index efcb042..ef5aed8 100644
          if (V4L2_TYPE_IS_MULTIPLANAR(ctx->type)) {
              memset(planes, 0, sizeof(planes));
 -            buf.length = VIDEO_MAX_PLANES;
-+			if(pfd.revents & POLLIN){
-+                buf.length = 2;
-+			} else if(pfd.revents & POLLOUT) {
-+			    buf.length = 1;
-+			}
++            buf.length = ctx->format.fmt.pix_mp.num_planes;
              buf.m.planes = planes;
          }
  
-@@ -380,23 +384,34 @@ static V4L2Buffer* v4l2_getfree_v4l2buf(V4L2Context *ctx)
+@@ -380,23 +380,34 @@ static V4L2Buffer* v4l2_getfree_v4l2buf(V4L2Context *ctx)
            } while (v4l2_dequeue_v4l2buf(ctx, timeout));
      }
  
@@ -414,7 +488,7 @@ index efcb042..ef5aed8 100644
      for (i = 0; i < ctx->num_buffers; i++) {
          V4L2Buffer *buffer = &ctx->buffers[i];
  
-@@ -405,9 +420,24 @@ static int v4l2_release_buffers(V4L2Context* ctx)
+@@ -405,9 +416,24 @@ static int v4l2_release_buffers(V4L2Context* ctx)
              if (p->mm_addr && p->length)
                  if (munmap(p->mm_addr, p->length) < 0)
                      av_log(logger(ctx), AV_LOG_ERROR, "%s unmap plane (%s))\n", ctx->name, av_err2str(AVERROR(errno)));
@@ -441,7 +515,7 @@ index efcb042..ef5aed8 100644
      return ioctl(ctx_to_m2mctx(ctx)->fd, VIDIOC_REQBUFS, &req);
  }
  
-@@ -427,12 +457,7 @@ static inline int v4l2_try_raw_format(V4L2Context* ctx, enum AVPixelFormat pixfm
+@@ -427,12 +453,7 @@ static inline int v4l2_try_raw_format(V4L2Context* ctx, enum AVPixelFormat pixfm
          fmt->fmt.pix.pixelformat = v4l2_fmt;
  
      fmt->type = ctx->type;
@@ -455,7 +529,7 @@ index efcb042..ef5aed8 100644
  }
  
  static int v4l2_get_raw_format(V4L2Context* ctx, enum AVPixelFormat *p)
-@@ -446,8 +471,8 @@ static int v4l2_get_raw_format(V4L2Context* ctx, enum AVPixelFormat *p)
+@@ -446,8 +467,8 @@ static int v4l2_get_raw_format(V4L2Context* ctx, enum AVPixelFormat *p)
  
      if (pixfmt != AV_PIX_FMT_NONE) {
          ret = v4l2_try_raw_format(ctx, pixfmt);
@@ -466,7 +540,7 @@ index efcb042..ef5aed8 100644
      }
  
      for (;;) {
-@@ -634,13 +659,34 @@ int ff_v4l2_context_get_format(V4L2Context* ctx)
+@@ -634,13 +655,33 @@ int ff_v4l2_context_get_format(V4L2Context* ctx)
  
      fmt.update_v4l2 = 1;
      v4l2_save_to_context(ctx, &fmt);
@@ -481,7 +555,6 @@ index efcb042..ef5aed8 100644
 +    int ret, extra_idx;
 +    int extra_data_size = 0;
 +    const int SZ_4K = 0x1000;
-+    ctx->format.fmt.pix_mp.colorspace = 0;
 +
 +	ret = ioctl(ctx_to_m2mctx(ctx)->fd, VIDIOC_S_FMT, &ctx->format);
 +	ret = ioctl(ctx_to_m2mctx(ctx)->fd, VIDIOC_G_FMT, &ctx->format);
@@ -504,7 +577,7 @@ index efcb042..ef5aed8 100644
  }
  
  void ff_v4l2_context_release(V4L2Context* ctx)
-@@ -658,37 +704,62 @@ void ff_v4l2_context_release(V4L2Context* ctx)
+@@ -658,37 +699,62 @@ void ff_v4l2_context_release(V4L2Context* ctx)
      ctx->buffers = NULL;
  }
  
@@ -763,6 +836,190 @@ index d0601f0..6296d73 100644
      return 0;
  }
  
+diff --git a/libavcodec/v4l2_m2m_enc.c b/libavcodec/v4l2_m2m_enc.c
+index 636e1a9..e979ad0 100644
+--- a/libavcodec/v4l2_m2m_enc.c
++++ b/libavcodec/v4l2_m2m_enc.c
+@@ -34,16 +34,63 @@
+ #define MPEG_CID(x) V4L2_CID_MPEG_VIDEO_##x
+ #define MPEG_VIDEO(x) V4L2_MPEG_VIDEO_##x
+ 
+-static inline void v4l2_set_timeperframe(V4L2m2mContext *s, unsigned int num, unsigned int den)
++static inline void v4l2_set_ctrl(V4L2m2mContext *s, unsigned int id, signed int value, char *name)
+ {
+-    struct v4l2_streamparm parm = { 0 };
++    struct v4l2_control control;
++    int ret = 0;
++    control.id = id;
++    control.value = value;
++    ret = ioctl(s->fd, VIDIOC_S_CTRL, &control);
++	if (ret != 0)
++        av_log(s->avctx, AV_LOG_WARNING, "Failed to set %s\n", name);
++}
+ 
+-    parm.type = V4L2_TYPE_IS_MULTIPLANAR(s->output.type) ? V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE : V4L2_BUF_TYPE_VIDEO_OUTPUT;
+-    parm.parm.output.timeperframe.denominator = den;
+-    parm.parm.output.timeperframe.numerator = num;
++static inline void v4l2_set_gopsize(V4L2m2mContext *s,unsigned int gop)
++{
++    struct v4l2_control control;
++    int ret = 0;
++    control.id = V4L2_CID_MPEG_VIDEO_GOP_SIZE;
++    control.value = gop;
++    ret = ioctl(s->fd, VIDIOC_S_CTRL, &control);
++	if (ret != 0)
++        av_log(s->avctx, AV_LOG_WARNING, "Failed to set gop size\n");
++}
+ 
+-    if (ioctl(s->fd, VIDIOC_S_PARM, &parm) < 0)
+-        av_log(s->avctx, AV_LOG_WARNING, "Failed to set timeperframe");
++static inline void v4l2_set_bitrate(V4L2m2mContext *s,unsigned int bitrate)
++{
++    struct v4l2_control control;
++    int ret = 0;
++    control.id = V4L2_CID_MPEG_VIDEO_BITRATE;
++    control.value = bitrate;
++    ret = ioctl(s->fd, VIDIOC_S_CTRL, &control);
++	if (ret != 0)
++        av_log(s->avctx, AV_LOG_WARNING, "Failed to set bitrate\n");
++}
++
++static inline void v4l2_set_headermode(V4L2m2mContext *s,unsigned int mode)
++{
++    struct v4l2_control control;
++    int ret = 0;
++    control.id = V4L2_CID_MPEG_VIDEO_PREPEND_SPSPPS_TO_IDR;
++    control.value = mode;
++    ret = ioctl(s->fd, VIDIOC_S_CTRL, &control);
++	if (ret != 0)
++        av_log(s->avctx, AV_LOG_WARNING, "Failed to set headermode\n");
++}
++
++static inline void v4l2_set_timeperframe(V4L2m2mContext *s, unsigned int num, unsigned int den)
++{
++    struct v4l2_control control;
++    int ret = 0;
++    int fps = num / den;
++    fps <<= 16;
++    fps |= (0x0000ffff & (num % den));
++
++    control.id = V4L2_CID_MPEG_VIDC_VIDEO_FRAME_RATE;
++    control.value = fps;
++    ret = ioctl(s->fd, VIDIOC_S_CTRL, &control);
++	if (ret != 0)
++        av_log(s->avctx, AV_LOG_WARNING, "Failed to set timeperframe\n");
+ }
+ 
+ static inline void v4l2_set_ext_ctrl(V4L2m2mContext *s, unsigned int id, signed int value, const char *name)
+@@ -112,8 +159,10 @@ static inline unsigned int v4l2_h264_profile_from_ff(int p)
+     int i;
+ 
+     for (i = 0; i < FF_ARRAY_ELEMS(profile); i++) {
+-        if (profile[i].ffmpeg_val == p)
++        if (profile[i].ffmpeg_val == p) {
++			av_log(NULL, AV_LOG_WARNING, "%s i is %d profile val is %d\n", __func__, i, profile[i].v4l2_val);
+             return profile[i].v4l2_val;
++		}
+     }
+     return AVERROR(ENOENT);
+ }
+@@ -141,6 +190,14 @@ static inline int v4l2_mpeg4_profile_from_ff(int p)
+ 
+ static int v4l2_check_b_frame_support(V4L2m2mContext *s)
+ {
++    struct v4l2_control control;
++	control.id = V4L2_CID_MPEG_VIDEO_B_FRAMES;
++	control.value = 0;
++	int rc = ioctl(s->fd, VIDIOC_S_CTRL, &control);
++    if (rc) {
++		av_log(s->avctx, AV_LOG_ERROR, "%s VIDIOC_S_CTRL failed\n", __func__);
++	}
++	return rc;
+     if (s->avctx->max_b_frames)
+         av_log(s->avctx, AV_LOG_WARNING, "Encoder does not support b-frames yet\n");
+ 
+@@ -154,15 +211,32 @@ static int v4l2_check_b_frame_support(V4L2m2mContext *s)
+     return AVERROR_PATCHWELCOME;
+ }
+ 
++static const int event_type[] = {
++    V4L2_EVENT_MSM_VIDC_FLUSH_DONE,
++    V4L2_EVENT_MSM_VIDC_SYS_ERROR
++};
++
+ static int v4l2_prepare_encoder(V4L2m2mContext *s)
+ {
++    struct v4l2_event_subscription sub;
+     AVCodecContext *avctx = s->avctx;
+     int qmin_cid, qmax_cid, qmin, qmax;
+-    int ret, val;
++    int ret, val, nCount;
+ 
+     /**
+      * requirements
+      */
++    for (nCount = 0; nCount < sizeof(event_type)/sizeof(int); ++nCount) {
++        memset(&sub, 0, sizeof(sub));
++        sub.type = event_type[nCount];
++        ret = ioctl(s->fd, VIDIOC_SUBSCRIBE_EVENT, &sub);
++        if ( ret < 0) {
++            av_log(s->avctx, AV_LOG_ERROR,
++                "the v4l2 driver does not support VIDIOC_SUBSCRIBE_EVENT\n");
++            return ret;
++        }
++    }
++
+     ret = v4l2_check_b_frame_support(s);
+     if (ret)
+         return ret;
+@@ -170,13 +244,14 @@ static int v4l2_prepare_encoder(V4L2m2mContext *s)
+     /**
+      * settingss
+      */
+-    if (avctx->framerate.num || avctx->framerate.den)
++    if (avctx->framerate.num || avctx->framerate.den) {
+         v4l2_set_timeperframe(s, avctx->framerate.num, avctx->framerate.den);
+-
+-    /* set ext ctrls */
+-    v4l2_set_ext_ctrl(s, MPEG_CID(HEADER_MODE), MPEG_VIDEO(HEADER_MODE_SEPARATE), "header mode");
+-    v4l2_set_ext_ctrl(s, MPEG_CID(BITRATE) , avctx->bit_rate, "bit rate");
+-    v4l2_set_ext_ctrl(s, MPEG_CID(GOP_SIZE), avctx->gop_size,"gop size");
++        av_log(s->avctx, AV_LOG_DEBUG," framerate.num %d framerate.den %d\n", avctx->framerate.num, avctx->framerate.den);
++	}
++    
++    v4l2_set_headermode(s,MPEG_VIDEO(HEADER_MODE_SEPARATE)); 
++    v4l2_set_bitrate(s, avctx->bit_rate); 
++    v4l2_set_gopsize(s, avctx->gop_size); 
+ 
+     av_log(avctx, AV_LOG_DEBUG,
+         "Encoder Context: id (%d), profile (%d), frame rate(%d/%d), number b-frames (%d), "
+@@ -190,7 +265,7 @@ static int v4l2_prepare_encoder(V4L2m2mContext *s)
+         if (val < 0)
+             av_log(avctx, AV_LOG_WARNING, "h264 profile not found\n");
+         else
+-            v4l2_set_ext_ctrl(s, MPEG_CID(H264_PROFILE), val, "h264 profile");
++            v4l2_set_ctrl(s, V4L2_CID_MPEG_VIDEO_H264_PROFILE, val, "profile");
+         qmin_cid = MPEG_CID(H264_MIN_QP);
+         qmax_cid = MPEG_CID(H264_MAX_QP);
+         qmin = 0;
+@@ -234,8 +309,6 @@ static int v4l2_prepare_encoder(V4L2m2mContext *s)
+     if (qmin != avctx->qmin || qmax != avctx->qmax)
+         av_log(avctx, AV_LOG_WARNING, "Encoder adjusted: qmin (%d), qmax (%d)\n", qmin, qmax);
+ 
+-    v4l2_set_ext_ctrl(s, qmin_cid, qmin, "minimum video quantizer scale");
+-    v4l2_set_ext_ctrl(s, qmax_cid, qmax, "maximum video quantizer scale");
+ 
+     return 0;
+ }
+@@ -283,6 +356,8 @@ static av_cold int v4l2_encode_init(AVCodecContext *avctx)
+     V4L2Context *capture, *output;
+     V4L2m2mContext *s;
+     int ret;
++    if (avctx->profile == FF_PROFILE_UNKNOWN)
++        avctx->profile = FF_PROFILE_H264_BASELINE;
+ 
+     ret = ff_v4l2_m2m_create_context(avctx, &s);
+     if (ret < 0)
 diff --git a/libavformat/utils.c b/libavformat/utils.c
 index 6c6f4e1..c2e289b 100644
 --- a/libavformat/utils.c
