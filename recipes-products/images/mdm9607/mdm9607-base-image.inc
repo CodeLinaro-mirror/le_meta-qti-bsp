@@ -93,6 +93,7 @@ IMAGE_INSTALL += "bt-app"
 IMAGE_INSTALL += "bt-property"
 IMAGE_INSTALL += "fluoride"
 IMAGE_INSTALL += "libbt-vendor"
+IMAGE_INSTALL += "protobuf"
 
 # Below packages are open source packages that depend on proprietary packages
 
