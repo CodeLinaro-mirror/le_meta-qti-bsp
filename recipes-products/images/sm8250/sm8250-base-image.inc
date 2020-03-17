@@ -144,6 +144,17 @@ copy_edge_bsp_rpm() {
     cp ${DEPLOY_DIR_RPM}/aarch64/libjpeg8-1.2.1-r2.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/mtdev-1.1.5-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/libevdev-1.5.9-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
+    cp ${DEPLOY_DIR_RPM}/aarch64/liba52-0-0.7.4-r4.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
+    cp ${DEPLOY_DIR_RPM}/aarch64/libmp3lame0-3.100-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
+    cp ${DEPLOY_DIR_RPM}/aarch64/libmpeg2-0-0.5.1-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
+    cp ${DEPLOY_DIR_RPM}/aarch64/mpg123-1.25.10-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
+    cp ${DEPLOY_DIR_RPM}/aarch64/liborc-0.4-0-0.4.26-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
+    cp ${DEPLOY_DIR_RPM}/aarch64/libpulsecommon-12.2-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
+    cp ${DEPLOY_DIR_RPM}/aarch64/pulseaudio-dev-12.2-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
+    cp ${DEPLOY_DIR_RPM}/aarch64/libsbc1-1.3-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
+    cp ${DEPLOY_DIR_RPM}/aarch64/libsndfile1-1.0.28-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
+    cp ${DEPLOY_DIR_RPM}/aarch64/libspeex1-1.2.0-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
+    cp ${DEPLOY_DIR_RPM}/aarch64/libtag1-1.11.1-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
 }
 
 ROOTFS_POSTPROCESS_COMMAND += "copy_edge_bsp_rpm;"
