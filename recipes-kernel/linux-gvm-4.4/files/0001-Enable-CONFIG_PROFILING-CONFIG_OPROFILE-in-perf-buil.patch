@@ -1,0 +1,27 @@
+From 52941e941415aa7f299a41dffb0c3749c38cd2e7 Mon Sep 17 00:00:00 2001
+From: Bingjie Li <cbingji@codeaurora.org>
+Date: Tue, 25 Feb 2020 10:49:13 +0800
+Subject: [PATCH] Enable CONFIG_PROFILING & CONFIG_OPROFILE in perf build
+
+Change-Id: Ida1df6ef6741811e7cbb8276655faa6a9e66da25
+Signed-off-by: Bingjie Li <cbingji@codeaurora.org>
+---
+ arch/arm64/Kconfig | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index 8b663a5..8c843ea 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -106,6 +106,8 @@ config ARM64
+ 	select HAVE_ARM_SMCCC
+ 	select THREAD_INFO_IN_TASK
+ 	select HAVE_ARM_SMCCC
++	select HAVE_OPROFILE if (HAVE_PERF_EVENTS)
++	select CONFIG_OPROFILE if (HAVE_PERF_EVENTS)
+ 	help
+ 	  ARM 64-bit (AArch64) Linux support.
+ 
+-- 
+2.7.4
+
