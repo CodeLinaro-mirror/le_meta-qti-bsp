@@ -47,14 +47,17 @@ do_compile () {
     oe_runmake -f makefile all
 }
 
-do_install[noexec]="1"
+do_install() {
+        install -d ${D}/boot
+}
+
 do_configure[noexec]="1"
 
 FILES_${PN} = "/boot"
 FILES_${PN}-dbg = "/boot/.debug"
 
 do_deploy() {
-        install ${WORKDIR}/abl.elf ${DEPLOYDIR}
+        install ${D}/boot/abl.elf ${DEPLOYDIR}
 }
 
 do_deploy[dirs] = "${S} ${DEPLOYDIR}"
