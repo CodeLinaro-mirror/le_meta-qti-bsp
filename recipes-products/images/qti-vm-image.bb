@@ -1,10 +1,8 @@
 inherit qimage
 
 DEPENDS += " virtual/kernel"
-IMAGE_LINGUAS = ""
 
-CORE_IMAGE_EXTRA_INSTALL += "\
-"
+CORE_IMAGE_EXTRA_INSTALL += " "
 
 #Exclude packages
 PACKAGE_EXCLUDE += "readline"
@@ -15,5 +13,3 @@ do_makeoverlay[noexec] = "1"
 
 IMAGE_FEATURES[validitems] += "vm"
 IMAGE_FEATURES += " vm"
-
-VM_IMAGE_TARGET ?= "qti-vm-bootsystem-image.ext4"

@@ -12,17 +12,19 @@ DISTRO_NAME = "QTI Linux full refrence stack distro."
 # list of distro features
 ##################################################################
 #
-# fbdev:           Use fbdev display drivers
+# drm:             Use DRM display drivers, provided machine supports it.
+# fbdev:           Use FBDEV display drivers, provided machine supports it.
 # opencl:          Include the Open Computing Language
 # opengl:          Include the Open Graphics Library,
 # pulseaudio:      Use pulseaudio audio server
 # tensorflow-lite: Include the tensorflow lite inference engine.
 # wayland:         Include the Wayland display server protocol.
 
-DISTRO_FEATURES_append = " fbdev opencl opengl pulseaudio tensorflow-lite wayland"
+DISTRO_FEATURES_append = " drm fbdev opencl opengl pulseaudio tensorflow-lite wayland"
 
 ## QTI defined distro features ##
 # qti-audio:     Support QTI audio solution
+# qti-audio-cal: Support QTI audio calibration solution
 # qti-audio-encoder: Support QRI audio encoder
 # qti-bluetooth: Support QTI bluetooth solution
 # qti-camera:    Support QTI camera solution
@@ -31,9 +33,11 @@ DISTRO_FEATURES_append = " fbdev opencl opengl pulseaudio tensorflow-lite waylan
 # qti-video-encoder: Support QTI video encode
 # qti-cdsp:      Support QTI cdsp solution
 # qti-adsp:      Support QTI adsp solution
+# qti-qmmf:      Support QTI QMMF solution
+# qti-security:      Support QTI security solution
 #
 
-DISTRO_FEATURES_append = " qti-audio qti-audio-encoder qti-bluetooth qti-camera qti-mm-parser qti-video qti-video-encoder qti-cdsp qti-adsp qti-fastcv "
+DISTRO_FEATURES_append = " qti-audio qti-audio-cal qti-audio-encoder qti-bluetooth qti-camera qti-mm-parser qti-video qti-video-encoder qti-cdsp qti-adsp qti-fastcv qti-qmmf qti-security "
 
 # inherit distro_featres_check class across the distro
 INHERIT += "distro_features_check"

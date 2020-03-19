@@ -16,12 +16,15 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         libnl \
         libxml2 \
         packagegroup-android-utils \
+        packagegroup-qti-audio \
         packagegroup-qti-bluetooth \
         packagegroup-qti-core-prop \
         packagegroup-qti-camera \
         packagegroup-qti-data \
+        packagegroup-qti-dsp \
         packagegroup-qti-display \
         packagegroup-qti-ml \
+        packagegroup-qti-qmmf \
         packagegroup-qti-ss-mgr \
         packagegroup-qti-video \
         packagegroup-qti-wifi \

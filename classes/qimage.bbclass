@@ -12,9 +12,7 @@ RM_WORK_EXCLUDE += "${PN}"
 IMAGE_GEN_DEBUGFS = "1"
 IMAGE_FSTYPES_DEBUGFS = "tar.bz2"
 
-# By default support only custom images generation using functions like do_makesystem.
-# Don't build the monolith rootfs image as it pulls in a lot of unused dependencies.
-IMAGE_FSTYPES = ""
+do_image_ext4[noexec] = "1"
 
 ### Don't append timestamp to image name
 IMAGE_VERSION_SUFFIX = ""
@@ -142,6 +140,8 @@ gen_overlayfs() {
     mkdir -p ${IMAGE_ROOTFS}/overlay/.etc-work
     mkdir -p ${IMAGE_ROOTFS}/overlay/data
     mkdir -p ${IMAGE_ROOTFS}/overlay/.data-work
+    mkdir -p ${IMAGE_ROOTFS}/overlay/cache
+    mkdir -p ${IMAGE_ROOTFS}/overlay/.cache-work
 }
 
 do_fsconfig() {
@@ -261,23 +261,7 @@ do_make_veritybootimg[depends]  += "${PN}:do_makeoverlay"
 do_make_veritybootimg[dirs]      = "${DEPLOY_DIR_IMAGE}"
 do_make_veritybootimg[depends] += "virtual/kernel:do_deploy"
 
-do_makevmimage[dirs]     = "${DEPLOY_DIR_IMAGE}"
-
-do_makevmimage() {
-   mkdir -p vm-images
-   cp -r ${DEPLOY_DIR_IMAGE}/${SYSTEMIMAGE_TARGET} ${DEPLOY_DIR_IMAGE}/vm-images
-   cd vm-images
-   mkdir -p boot
-   cp -r ${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE} ${DEPLOY_DIR_IMAGE}/vm-images/boot/
-   make_ext4fs -s -a / -b 4096 -l ${VM_SIZE_EXT4} \
-               ${DEPLOY_DIR_IMAGE}/${VM_IMAGE_TARGET} \
-               ${DEPLOY_DIR_IMAGE}/vm-images
-}
-
 python () {
     if bb.utils.contains('DISTRO_FEATURES', 'dm-verity', True, False, d):
         bb.build.addtask('do_make_veritybootimg', 'do_image_complete', 'do_rootfs', d)
-
-    if bb.utils.contains('IMAGE_FEATURES', 'vm', True, False, d):
-        bb.build.addtask('do_makevmimage', 'do_image_complete', 'do_makesystem', d)
 }
