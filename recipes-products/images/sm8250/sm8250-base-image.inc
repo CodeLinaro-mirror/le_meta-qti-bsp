@@ -22,6 +22,9 @@ RDEPENDS += "volatile-binds"
 RDEPENDS += "binder"
 RDEPENDS += "ffmpeg"
 RDEPENDS += "x264"
+IMAGE_INSTALL += "start-scripts-misc-daemon"
+IMAGE_INSTALL += "start-scripts-firmware-links"
+IMAGE_INSTALL += "start-scripts-find-partitions"
 
 RDEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'start-script-ab-slot-util', '', d)}"
 
@@ -108,6 +111,9 @@ ROOTFS_POSTPROCESS_COMMAND =+ "copy_edge_rootfs;"
 copy_edge_bsp_rpm() {
     cp ${DEPLOY_DIR_RPM}/noarch/volatile-binds-1.0-r0.noarch.rpm ${IMAGE_ROOTFS}/packages/noarch/
     cp ${DEPLOY_DIR_RPM}/sm8250/systemd-machine-units-1.0-r19.sm8250.rpm ${IMAGE_ROOTFS}/packages/sm8250/
+    cp ${DEPLOY_DIR_RPM}/sm8250/start-scripts-find-partitions-1.0-r4.sm8250.rpm ${IMAGE_ROOTFS}/packages/aarch64/
+    cp ${DEPLOY_DIR_RPM}/sm8250/start-scripts-firmware-links-1.0-r5.sm8250.rpm ${IMAGE_ROOTFS}/packages/aarch64/
+    cp ${DEPLOY_DIR_RPM}/sm8250/start-scripts-misc-daemon-1.0-r2.sm8250.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/binder-git-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/libbase0-1.0-r1.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/libcutils0-1.0-r1.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
