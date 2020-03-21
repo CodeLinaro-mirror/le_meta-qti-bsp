@@ -2,31 +2,32 @@
 RDEPENDS += "${@bb.utils.contains('TARGET_ARCH', 'arm', 'lib64-edk2', 'edk2', d)}"
 
 # Rootfs creation.
-RDEPENDS += "packagegroup-core-boot"
-RDEPENDS += "${CORE_IMAGE_EXTRA_INSTALL}"
+IMAGE_INSTALL += "packagegroup-core-boot"
+IMAGE_INSTALL += "${CORE_IMAGE_EXTRA_INSTALL}"
 
 # The MSM Linux minimal boot image files.
-RDEPENDS += "base-files"
-RDEPENDS += "kernel-modules"
-RDEPENDS += "libcutils"
-RDEPENDS += "liblog"
+IMAGE_INSTALL += "base-files"
+IMAGE_INSTALL += "kernel-modules"
+IMAGE_INSTALL += "libcutils"
+IMAGE_INSTALL += "liblog"
 
-RDEPENDS += "system-core-adbd"
-RDEPENDS += "system-core-usb"
-RDEPENDS += "system-core-logd"
-RDEPENDS += "coreutils"
-RDEPENDS += "system-core-leprop"
-RDEPENDS += "system-core-post-boot"
-RDEPENDS += "systemd-machine-units"
-RDEPENDS += "volatile-binds"
-RDEPENDS += "binder"
-RDEPENDS += "ffmpeg"
-RDEPENDS += "x264"
+IMAGE_INSTALL += "busybox"
+IMAGE_INSTALL += "system-core-adbd"
+IMAGE_INSTALL += "system-core-usb"
+IMAGE_INSTALL += "system-core-logd"
+IMAGE_INSTALL += "coreutils"
+IMAGE_INSTALL += "system-core-leprop"
+IMAGE_INSTALL += "system-core-post-boot"
+IMAGE_INSTALL += "systemd-machine-units"
+IMAGE_INSTALL += "volatile-binds"
+IMAGE_INSTALL += "binder"
+IMAGE_INSTALL += "ffmpeg"
+IMAGE_INSTALL += "x264"
 IMAGE_INSTALL += "start-scripts-misc-daemon"
 IMAGE_INSTALL += "start-scripts-firmware-links"
 IMAGE_INSTALL += "start-scripts-find-partitions"
 
-RDEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'start-script-ab-slot-util', '', d)}"
+IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'start-script-ab-slot-util', '', d)}"
 
 EXTRA_USERS_PARAMS := ""
 EXTRA_USERS_PARAMS_remove = "%"
@@ -74,6 +75,39 @@ copy_edge_rootfs() {
     mkdir -p ${IMAGE_ROOTFS}/packages/noarch
     mkdir -p ${IMAGE_ROOTFS}/packages/sm8250
 
+    if [ -d ${WORKSPACE}/poky/meta-qti-internal/centos-noship/opencv ]
+    then
+        mkdir -p ${IMAGE_ROOTFS}/packages/opencv
+        cp ${WORKSPACE}/poky/meta-qti-internal/centos-noship/opencv/*.rpm ${IMAGE_ROOTFS}/packages/opencv/
+    fi
+
+    if [ -d ${WORKSPACE}/poky/meta-qti-internal/centos-noship/maynard ]
+    then
+        mkdir -p ${IMAGE_ROOTFS}/packages/maynard
+        cp ${WORKSPACE}/poky/meta-qti-internal/centos-noship/maynard/*.rpm ${IMAGE_ROOTFS}/packages/maynard/
+    fi
+
+    if [ -d ${WORKSPACE}/poky/meta-qti-internal/centos-noship/pcmanfm ]
+    then
+        mkdir -p ${IMAGE_ROOTFS}/packages/pcmanfm
+        cp ${WORKSPACE}/poky/meta-qti-internal/centos-noship/pcmanfm/*.rpm ${IMAGE_ROOTFS}/packages/pcmanfm/
+    fi
+
+    if [ -e ${WORKSPACE}/poky/meta-qti-internal/centos-noship/scripts/install.sh ]
+    then
+        cp ${WORKSPACE}/poky/meta-qti-internal/centos-noship/scripts/install.sh ${IMAGE_ROOTFS}/packages/
+    fi
+
+    if [ -e ${WORKSPACE}/poky/meta-qti-internal/centos-noship/scripts/fstab ]
+    then
+        cp ${WORKSPACE}/poky/meta-qti-internal/centos-noship/scripts/fstab ${IMAGE_ROOTFS}/packages/
+    fi
+
+    if [ -e ${WORKSPACE}/poky/meta-qti-internal/centos-noship/scripts/ifcfg-eth0 ]
+    then
+        cp ${WORKSPACE}/poky/meta-qti-internal/centos-noship/scripts/ifcfg-eth0 ${IMAGE_ROOTFS}/packages/
+    fi
+
     mkdir -p ${IMAGE_ROOTFS}/systemrw
     mkdir -p ${IMAGE_ROOTFS}/persist
     mkdir -p ${IMAGE_ROOTFS}/firmware
@@ -82,20 +116,33 @@ copy_edge_rootfs() {
     mkdir -p ${IMAGE_ROOTFS}/dsp
     mkdir -p ${IMAGE_ROOTFS}/mnt/sdcard
     touch ${IMAGE_ROOTFS}/etc/default/usb
+    if [ `readlink -f ${ROOTFS}/sdcard` != "/mnt/sdcard" ]
+    then
+        rm -rf ${IMAGE_ROOTFS}/sdcard
+        ln -sf ${IMAGES_ROOTFS}/mnt/sdcard ${IMAGE_ROOTFS}/sdcard
+    fi
 
     # find ${IMAGE_ROOTFS} . -name "*.4.18*" |xargs rm -rf
-    rm -rf {IMAGE_ROOTFS}/usr/lib/modules/4.18.0-80.el8.aarch64
-    rm -rf {IMAGE_ROOTFS}/usr/lib/modules/4.18.0-79.el8+2.aarch64
-    rm -rf {IMAGE_ROOTFS}/usr/share/doc/kernel-keys/4.18.0-80.el8.aarch64
-    rm -rf {IMAGE_ROOTFS}/usr/share/licenses/kernel-core/COPYING-4.18.0
-    rm -rf {IMAGE_ROOTFS}/usr/src/kernels/4.18.0-80.el8.aarch64
-    rm -rf {IMAGE_ROOTFS}/usr/src/kernels/4.18.0-80.el8.aarch64+debug
-    rm -rf {IMAGE_ROOTFS}/var/lib/pcp/testsuite/linux/procpid-4.18.13-root-006.tgz
-    rm -rf {IMAGE_ROOTFS}/etc/ld.so.conf.d/kernel-4.18.0-80.el8.aarch64.conf
+    rm -rf ${IMAGE_ROOTFS}/usr/lib/modules/4.18.0-80.el8.aarch64
+    rm -rf ${IMAGE_ROOTFS}/usr/lib/modules/4.18.0-79.el8+2.aarch64
+    rm -rf ${IMAGE_ROOTFS}/usr/share/doc/kernel-keys/4.18.0-80.el8.aarch64
+    rm -rf ${IMAGE_ROOTFS}/usr/share/licenses/kernel-core/COPYING-4.18.0
+    rm -rf ${IMAGE_ROOTFS}/usr/src/kernels/4.18.0-80.el8.aarch64
+    rm -rf ${IMAGE_ROOTFS}/usr/src/kernels/4.18.0-80.el8.aarch64+debug
+    rm -rf ${IMAGE_ROOTFS}/var/lib/pcp/testsuite/linux/procpid-4.18.13-root-006.tgz
+    rm -rf ${IMAGE_ROOTFS}/etc/ld.so.conf.d/kernel-4.18.0-80.el8.aarch64.conf
     rm -rf ${IMAGE_ROOTFS}/usr/lib/firmware/*
     rm -rf ${IMAGE_ROOTFS}/var/lib/pcp/testsuite
+    rm -rf ${IMAGE_ROOTFS}/etc/systemd/system/multi-user.target.wants/pmie.service
+    rm -rf ${IMAGE_ROOTFS}/etc/systemd/system/multi-user.target.wants/pmcd.service
+    rm -rf ${IMAGE_ROOTFS}/etc/systemd/system/multi-user.target.wants/pmlogger.service
     rm -rf ${IMAGE_ROOTFS}/var/lib/nfs/rpc_pipefs
     rm -rf ${IMAGE_ROOTFS}/tmp/*
+
+    if [ -d ${BASE_WORKDIR}/${BASEMACHINE}-oe-linux/linux-msm/4.19-r0/image/usr/lib/modules ]
+    then
+        cp -rf ${BASE_WORKDIR}/${BASEMACHINE}-oe-linux/linux-msm/4.19-r0/image/usr/lib/modules/* ${IMAGE_ROOTFS}/usr/lib/modules/
+    fi
 
     install -m 0755 ${TMPDIR}/work/aarch64-oe-linux/busybox/1.29.3-r0/package/usr/bin/busybox.nosuid -D ${IMAGE_ROOTFS}/usr/bin/start-stop-daemon
     install -m 0644 ${TMPDIR}/work/aarch64-oe-linux/systemd/1_239-r0/package/etc/tmpfiles.d/platform.conf -D ${IMAGE_ROOTFS}/etc/tmpfiles.d/platform.conf
@@ -120,6 +167,7 @@ copy_edge_bsp_rpm() {
     cp ${DEPLOY_DIR_RPM}/aarch64/libext4-utils0-git-r1.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/libhardware0-git-r6.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/libion0-1.0-r1.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
+    cp ${DEPLOY_DIR_RPM}/aarch64/libion-dev-1.0-r1.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/liblog0-1.0-r1.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/libmincrypt0-git-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/libselinux0-git-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
