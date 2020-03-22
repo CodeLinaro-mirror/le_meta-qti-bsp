@@ -210,6 +210,8 @@ copy_edge_bsp_rpm() {
     cp ${DEPLOY_DIR_RPM}/aarch64/libsndfile1-1.0.28-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/libspeex1-1.2.0-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/libtag1-1.11.1-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
+    cp ${DEPLOY_DIR_RPM}/aarch64/libpulse0-12.2-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
+    cp ${DEPLOY_DIR_RPM}/aarch64/libflac8-1.3.2-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
 }
 
 ROOTFS_POSTPROCESS_COMMAND += "copy_edge_bsp_rpm;"
