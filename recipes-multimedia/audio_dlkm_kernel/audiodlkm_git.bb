@@ -31,7 +31,7 @@ do_configure() {
 }
 
 INITSCRIPT_NAME = "start_audio_le"
-INITSCRIPT_PARAMS = "start 99 5 . stop 15 0 1 6 ."
+INITSCRIPT_PARAMS = "start 97 5 . stop 15 0 1 6 ."
 
 do_install_append() {
   install -d ${STAGING_KERNEL_BUILDDIR}/audio-kernel/
@@ -73,7 +73,7 @@ pkg_postinst_${PN} () {
     [ -n "$D" ] && OPT="-r $D" || OPT="-s"
     # remove all rc.d-links potentially created from alternatives
     update-rc.d $OPT -f ${INITSCRIPT_NAME} remove
-    update-rc.d $OPT ${INITSCRIPT_NAME} start 99 5 . stop 15 0 1 6 .
+    update-rc.d $OPT ${INITSCRIPT_NAME} start 97 5 . stop 15 0 1 6 .
 }
 
 do_module_signing() {
