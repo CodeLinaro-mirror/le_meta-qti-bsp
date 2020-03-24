@@ -70,9 +70,9 @@ do_makesystem() {
 #generate ext4 fs.
      make_ext4fs -C ${WORKDIR}/rootfs-fsconfig.conf -B ${DEPLOY_DIR_IMAGE}/system.map -s -a / ${IMAGE_EXT4_SELINUX_OPTIONS} -l ${SYSTEM_SIZE_EXT4} ${DEPLOY_DIR_IMAGE_EMMC}/${SYSTEMIMAGE_TARGET} ${IMAGE_ROOTFS}
      make_ext4fs -s -a /systemrw ${IMAGE_EXT4_SELINUX_OPTIONS} -b 4096 -l ${SYSTEMRW_SIZE_EXT4} ${DEPLOY_DIR_IMAGE_EMMC}/${SYSTEMRWIMAGE_TARGET}
+ fi
      # Create rootfs tar file for debugging on target
      tar -cvzf ${DEPLOY_DIR_IMAGE}/${MACHINE}.rootfs.tar.gz -C ${IMAGE_ROOTFS} .
- fi
 }
 
 fixup_systemd_mounts_services_ext4_rootfs() {
