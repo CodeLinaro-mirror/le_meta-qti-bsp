@@ -2,7 +2,7 @@
 # add the MACHINE name to this list.
 # This is the "only" list that will control whether
 # OTA upgrade will be supported on a target.
-OTA_SUPPORTED_EMMC_TARGET_LIST = "apq8009 qcs405-som1 qcs605-64 qcs605-32 sdm845 sdmsteppe nf-32 nf-64 vt-64"
+OTA_SUPPORTED_EMMC_TARGET_LIST = "apq8009 qcs405-som1 qcs605-64 qcs605-32 sdm845 sm8250 sdmsteppe nf-32 nf-64 vt-64"
 
 #deploy dir for emmc images.
 DEPLOY_DIR_IMAGE_EMMC ?= "${DEPLOY_DIR_IMAGE}"
@@ -43,7 +43,7 @@ python __anonymous () {
         d.appendVar('DEPENDS', emmc_set_vars_and_get_dependencies(d));
         if (d.getVar('RECOVERY_IMAGE', True) == '1' or
                 d.getVar('GENERATE_AB_OTA_PACKAGE', True) == '1'):
-            if (d.getVar('DEBUG_BUILD', True) != '1'):
+                #if (d.getVar('DEBUG_BUILD', True) != '1'):
                 bb.build.addtask('do_recovery_ext4', 'do_build', 'do_image_complete', d)
                 bb.build.addtask('do_gen_otazip_ext4', 'do_build', 'do_recovery_ext4', d)
 }
@@ -150,7 +150,7 @@ do_recovery_ext4() {
        echo recovery_size=0x01E00000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
     elif [ "${BASEMACHINE}" == "apq8096" ] || [ "${BASEMACHINE}" == "apq8017" ] || \
          [ "${BASEMACHINE}" == "qcs605" ] || [ "${BASEMACHINE}" == "sdm845" ] || \
-         [ "${BASEMACHINE}" == "sdmsteppe" ]; then
+         [ "${BASEMACHINE}" == "sdmsteppe" ] || [ "${BASEMACHINE}" == "sm8250" ]; then
        #boot_size: Size of boot partition from partition.xml
        echo boot_size=0x04000000  >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 
@@ -165,7 +165,8 @@ do_recovery_ext4() {
     fi
 
     #system_size : Size of system partition from partition.xml
-    echo system_size=0x00A00000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
+    #echo system_size=0x00A00000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
+    echo system_size=0x400000000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 
     #userdate_size : Size of data partition from partition.xml
     echo userdata_size=0x00A00000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt

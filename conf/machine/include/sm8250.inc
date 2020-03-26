@@ -42,6 +42,9 @@ PAGE_SIZE ?= '4096'
 
 #Enable persist image/volume.
 DISTRO_FEATURES += "persist-image"
+
+#Enable AB Boot support
+DISTRO_FEATURES += "ab-boot-support"
 # Enable LE Verified Boot
 DISTRO_FEATURES_append = " vble"
 

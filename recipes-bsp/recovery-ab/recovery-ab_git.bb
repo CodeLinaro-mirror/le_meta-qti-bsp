@@ -49,6 +49,6 @@ do_install_append() {
         install -d ${D}/res/
         install -d ${D}/data/
         install -d ${D}/system/
-        install -m 0755 ${S}/start_recovery -D ${D}${sysconfdir}/init.d/recovery
+        #install -m 0755 ${S}/start_recovery -D ${D}${sysconfdir}/init.d/recovery
         install -m 0755 ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/base-files-recovery/fstab_AB -D ${D}/res/recovery_volume_config
 }

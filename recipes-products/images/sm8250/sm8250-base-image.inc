@@ -29,6 +29,9 @@ IMAGE_INSTALL += "start-scripts-find-partitions"
 
 IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'start-script-ab-slot-util', '', d)}"
 
+IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'recovery-ab', '', d)}"
+IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'recovery-ab-bin', '', d)}"
+
 EXTRA_USERS_PARAMS := ""
 EXTRA_USERS_PARAMS_remove = "%"
 
@@ -144,6 +147,8 @@ copy_edge_rootfs() {
         cp -rf ${BASE_WORKDIR}/${BASEMACHINE}-oe-linux/linux-msm/4.19-r0/image/usr/lib/modules/* ${IMAGE_ROOTFS}/usr/lib/modules/
     fi
 
+    # if A/B OTA supported, add recovery bin and libs to system rootfs
+    cp -rf ${TMPDIR}/work/aarch64-oe-linux/recovery-ab/git-r7/package/* ${IMAGE_ROOTFS}/
     install -m 0755 ${TMPDIR}/work/aarch64-oe-linux/busybox/1.29.3-r0/package/usr/bin/busybox.nosuid -D ${IMAGE_ROOTFS}/usr/bin/start-stop-daemon
     install -m 0644 ${TMPDIR}/work/aarch64-oe-linux/systemd/1_239-r0/package/etc/tmpfiles.d/platform.conf -D ${IMAGE_ROOTFS}/etc/tmpfiles.d/platform.conf
     install -d ${IMAGE_ROOTFS}/etc/udev/scripts

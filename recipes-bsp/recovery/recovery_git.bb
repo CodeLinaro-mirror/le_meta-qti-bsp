@@ -67,7 +67,7 @@ do_install_append() {
       # Repackaging to recovery rootfs will be taken care in machine-recovery-image.bb
         install -d ${D}/recovery
         install -d ${D}/recovery/lib
-        cp -rp  ${D}/lib/* ${D}/recovery/lib
+#        cp -rp  ${D}/lib/* ${D}/recovery/lib
         install -d ${D}/recovery/res
         cp -rp  ${D}/res/* ${D}/recovery/res
         install -d ${D}/recovery/usr
