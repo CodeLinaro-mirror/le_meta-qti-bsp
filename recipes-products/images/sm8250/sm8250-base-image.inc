@@ -146,6 +146,9 @@ copy_edge_rootfs() {
 
     install -m 0755 ${TMPDIR}/work/aarch64-oe-linux/busybox/1.29.3-r0/package/usr/bin/busybox.nosuid -D ${IMAGE_ROOTFS}/usr/bin/start-stop-daemon
     install -m 0644 ${TMPDIR}/work/aarch64-oe-linux/systemd/1_239-r0/package/etc/tmpfiles.d/platform.conf -D ${IMAGE_ROOTFS}/etc/tmpfiles.d/platform.conf
+    install -d ${IMAGE_ROOTFS}/etc/udev/scripts
+    install -m 0744 ${TMPDIR}/work/aarch64-oe-linux/busybox/1.29.3-r0/package/etc/udev/scripts/automountsdcard.sh -D ${IMAGE_ROOTFS}/etc/udev/scripts/automountsdcard.sh
+    install -m 0644 ${TMPDIR}/work/aarch64-oe-linux/systemd/1_239-r0/package/etc/udev/rules.d/mountpartitions.rules -D ${IMAGE_ROOTFS}/etc/udev/rules.d/mountpartitions.rules
     if [ -e ${IMAGE_ROOTFS}/packages/install.sh ]
     then
         echo "/bin/bash /packages/install.sh" >> ${IMAGE_ROOTFS}/etc/rc.d/rc.local
