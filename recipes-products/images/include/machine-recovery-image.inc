@@ -33,6 +33,8 @@ IMAGE_INSTALL += "libe2p"
 IMAGE_INSTALL += "libext2fs"
 IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_NAME','mdm', 'systemd-machine-units-recovery', '', d)}"
 
+USBCOMPOSITION_RECOVERY = "901D"
+
 # Needed for generating recovery.ubi ignored for ext4
 MKUBIFS_ARGS = "${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', '-m 4096 -e 253952 -c 200 -F', '', d)}"
 UBI_VOLNAME  = "${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', 'rootfs', '', d)}"
@@ -208,7 +210,17 @@ remove_mount_operations() {
     rm -rf ${IMAGE_ROOTFS}/recovery/
 }
 
+# Update usb composition in recovery mode
+update_usb_composition() {
+    if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
+        if [ -e ${IMAGE_ROOTFS}/etc/usb/boot_hsusb_comp ]; then
+            echo ${USBCOMPOSITION_RECOVERY} > ${IMAGE_ROOTFS}/etc/usb/boot_hsusb_comp
+        fi
+    fi
+}
+
 ROOTFS_POSTPROCESS_COMMAND += " do_fsconfig; remove_mount_operations; "
+ROOTFS_POSTPROCESS_COMMAND += "${@bb.utils.contains('DISTRO_NAME','mdm', 'update_usb_composition;', '', d)}"
 
 # Call function makesystem to generate sparse ext4 image
 addtask makesystem after do_rootfs before do_build
