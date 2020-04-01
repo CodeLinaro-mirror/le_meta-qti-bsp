@@ -12,9 +12,22 @@ SRC_URI = "file://OTA/device/qcom/common/recovery/oem-recovery/"
 
 S = "${WORKDIR}/OTA/device/qcom/common/recovery/oem-recovery/"
 
-DEPENDS += "glib-2.0 virtual/kernel libion"
+DEPENDS += "virtual/kernel"
 
-EXTRA_OECONF = "--with-glib --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include \
-                --with-core-headers=${STAGING_INCDIR}"
+# To get kernel headers for compilation
+do_configure[depends] += "virtual/kernel:do_shared_workdir"
+
+EXTRA_OECONF = " \
+    --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include \
+    --with-core-headers=${STAGING_INCDIR} \
+"
+
+PACKAGECONFIG ?= " \
+    glib \
+    ion \
+"
+
+PACKAGECONFIG[glib] = "--with-glib, --without-glib, glib-2.0"
+PACKAGECONFIG[ion] = "--with-ion, --without-ion, libion"
 
 PARALLEL_MAKE = ""

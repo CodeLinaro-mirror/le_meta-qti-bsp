@@ -2,7 +2,7 @@
 # add the MACHINE name to this list.
 # This is the "only" list that will control whether
 # OTA upgrade will be supported on a target.
-IS_OTA_SUPPORTED = "${@bb.utils.contains('DISTRO_FEATURES', 'qti-ab-boot', 'True', 'False', d)}"
+IS_OTA_SUPPORTED = "${@bb.utils.contains('COMBINED_FEATURES', 'qti-ab-boot', 'True', 'False', d)}"
 
 RM_WORK_EXCLUDE_ITEMS += "rootfs rootfs-dbg"
 
@@ -18,7 +18,7 @@ def emmc_set_vars_and_get_dependencies(d):
         # if A/B support is supported, recovery image need not be generated.
         # only A/B target will be generated
         d.setVar('GENERATE_AB_OTA_PACKAGE', "1")
-        return " releasetools-native zip-native fsconfig-native bsdiff-native bc-native"
+        return " releasetools-native zip-native fsconfig-native applypatch-native bc-native bsdiff-native"
 
 # Add tasks to generate recovery image, OTA zip files
 python __anonymous () {
@@ -110,8 +110,8 @@ do_recovery_ext4() {
     #blocksize = BOARD_FLASH_BLOCK_SIZE
     echo blocksize=131072 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 
-    export BOOT_SIZE=$(sed -r 's/.*label="boot".*size_in_kb="([0-9]+\.*[0-9]*).*/\1/;t;d' ${WORKDIR}/partition.xml)
-    export SYSTEM_SIZE=$(sed -r 's/.*label="system".*size_in_kb="([0-9]+\.*[0-9]*).*/\1/;t;d' ${WORKDIR}/partition.xml)
+    export BOOT_SIZE=$(sed -r 's/.*label="boot_a".*size_in_kb="([0-9]+\.*[0-9]*).*/\1/;t;d' ${WORKDIR}/partition.xml)
+    export SYSTEM_SIZE=$(sed -r 's/.*label="system_a".*size_in_kb="([0-9]+\.*[0-9]*).*/\1/;t;d' ${WORKDIR}/partition.xml)
     export USERDATA_SIZE=$(sed -r 's/.*label="userdata".*size_in_kb="([0-9]+\.*[0-9]*).*/\1/;t;d' ${WORKDIR}/partition.xml)
 
     # convert kb to bytes
@@ -129,7 +129,7 @@ do_recovery_ext4() {
     echo "userdate_size=0x$(echo "obase=16; $USERDATA_SIZE" | bc)" >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 
     #cache_size : Size of data partition from partition.xml
-    echo cache_size=0x00A00000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
+    echo "cache_size=0x$(echo "obase=16; $USERDATA_SIZE" | bc)" >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 
     #mkyaffs2_extra_flags : -c $(BOARD_KERNEL_PAGESIZE) -s $(BOARD_KERNEL_SPARESIZE)
     echo mkyaffs2_extra_flags=-c 4096 -s 16 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
