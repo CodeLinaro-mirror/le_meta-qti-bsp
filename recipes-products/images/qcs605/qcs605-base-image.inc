@@ -52,6 +52,10 @@ IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 're
 IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'full-disk-encryption', 'openssl', '', d)}"
 IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'full-disk-encryption', 'libscrypt', '', d)}"
 
+# Enable OpenMP support
+IMAGE_INSTALL += "libgomp"
+TOOLCHAIN_TARGET_TASK_append += " libgomp-dev libgomp-staticdev libstdc++-staticdev"
+
 # Below is to generate sparse ext4 system image (OE by default supports raw ext4 images)
 do_makesystem() {
     cp ${THISDIR}/${BASEMACHINE}/qcs605-fsconfig.conf ${WORKDIR}/rootfs-fsconfig.conf
