@@ -1,22 +1,22 @@
-From f4b2330dc39d6e9ed8950ea94ffb2cdaa6fe87ed Mon Sep 17 00:00:00 2001
+From 3f0471d7dc75b887929616c97a0e43be8a96efba Mon Sep 17 00:00:00 2001
 From: Zhenlin Lian <lianzhenlin@codeaurora.org>
-Date: Tue, 24 Mar 2020 21:37:53 +0800
-Subject: [PATCH] Enable NV12_UBWC for ffmpeg-4.2.2 based on EDGE
+Date: Fri, 3 Apr 2020 14:34:01 +0800
+Subject: [PATCH] Enable NV12_UBWC for ffmpeg 4.2.2 based on EDGE
 
 ---
- fftools/ffmpeg.c          |  2 ++
+ fftools/ffmpeg.c          |  3 +++
  libavcodec/raw.c          |  1 +
  libavcodec/rawenc.c       | 11 ++++++++++-
- libavcodec/v4l2_buffers.c |  3 +++
- libavcodec/v4l2_context.c |  6 ++++++
+ libavcodec/v4l2_buffers.c |  4 ++++
+ libavcodec/v4l2_context.c |  7 +++++++
  libavcodec/v4l2_fmt.c     |  3 +++
  libavformat/riff.c        |  1 +
  libavutil/pixdesc.c       | 12 ++++++++++++
  libavutil/pixfmt.h        |  3 ++-
- 9 files changed, 40 insertions(+), 2 deletions(-)
+ 9 files changed, 43 insertions(+), 2 deletions(-)
 
 diff --git a/fftools/ffmpeg.c b/fftools/ffmpeg.c
-index 01f0410..68fc86b 100644
+index 01f0410..9d4e877 100644
 --- a/fftools/ffmpeg.c
 +++ b/fftools/ffmpeg.c
 @@ -2894,6 +2894,7 @@ static int init_input_stream(int ist_index, char *error, int error_len)
@@ -27,11 +27,12 @@ index 01f0410..68fc86b 100644
  
      if (ist->decoding_needed) {
          AVCodec *codec = ist->dec;
-@@ -2907,6 +2908,7 @@ static int init_input_stream(int ist_index, char *error, int error_len)
+@@ -2907,6 +2908,8 @@ static int init_input_stream(int ist_index, char *error, int error_len)
          ist->dec_ctx->get_format            = get_format;
          ist->dec_ctx->get_buffer2           = get_buffer;
          ist->dec_ctx->thread_safe_callbacks = 1;
-+        ist->dec_ctx->pix_fmt               = ost->enc_ctx->pix_fmt;
++        if (ost->enc->id == AV_CODEC_ID_RAWVIDEO)
++            ist->dec_ctx->pix_fmt           = ost->enc_ctx->pix_fmt;
  
          av_opt_set_int(ist->dec_ctx, "refcounted_frames", 1, 0);
          if (ist->dec_ctx->codec_id == AV_CODEC_ID_DVB_SUBTITLE &&
@@ -76,36 +77,38 @@ index d181b74..b15fffa 100644
      if(avctx->codec_tag == AV_RL32("yuv2") && ret > 0 &&
         frame->format   == AV_PIX_FMT_YUYV422) {
 diff --git a/libavcodec/v4l2_buffers.c b/libavcodec/v4l2_buffers.c
-index 504ff80..9128ba1 100644
+index 504ff80..bfc665f 100644
 --- a/libavcodec/v4l2_buffers.c
 +++ b/libavcodec/v4l2_buffers.c
-@@ -381,6 +381,9 @@ int ff_v4l2_buffer_buf_to_avframe(AVFrame *frame, V4L2Buffer *avbuf)
+@@ -381,6 +381,10 @@ int ff_v4l2_buffer_buf_to_avframe(AVFrame *frame, V4L2Buffer *avbuf)
              VENUS_Y_SCANLINES(MapColorFormat(avbuf->context->format.fmt.pix_mp.pixelformat),
              avbuf->context->format.fmt.pix_mp.height);
          break;
 +    case AV_PIX_FMT_NV12_UBWC:
 +        frame->linesize[1] = avbuf->buf.m.planes[0].bytesused;
++        frame->data[1] = (uint8_t*)avbuf->ion.mapfd;
 +        break;
      default:
          break;
      }
 diff --git a/libavcodec/v4l2_context.c b/libavcodec/v4l2_context.c
-index 20f7e93..ed8a9e0 100644
+index 20f7e93..b7b86c3 100644
 --- a/libavcodec/v4l2_context.c
 +++ b/libavcodec/v4l2_context.c
-@@ -459,6 +459,7 @@ static inline int v4l2_try_raw_format(V4L2Context* ctx, enum AVPixelFormat pixfm
- static int v4l2_get_raw_format(V4L2Context* ctx, enum AVPixelFormat *p)
- {
-     enum AVPixelFormat pixfmt = ctx->av_pix_fmt;
-+    char isCapture[8] = "capture";
-     struct v4l2_fmtdesc fdesc;
-     int ret;
+@@ -469,6 +469,8 @@ static int v4l2_get_raw_format(V4L2Context* ctx, enum AVPixelFormat *p)
+         ret = v4l2_try_raw_format(ctx, pixfmt);
+         //if (!ret)
+         //    return 0; delete by xukui
++    } else {
++          ctx->av_pix_fmt = AV_PIX_FMT_NV12;
+     }
  
-@@ -483,6 +484,11 @@ static int v4l2_get_raw_format(V4L2Context* ctx, enum AVPixelFormat *p)
+     for (;;) {
+@@ -483,6 +485,11 @@ static int v4l2_get_raw_format(V4L2Context* ctx, enum AVPixelFormat *p)
              continue;
          }
  
-+        if(!strcmp(ctx->name, isCapture) && (pixfmt != ctx->av_pix_fmt)) {
++        if (pixfmt != ctx->av_pix_fmt) {
 +            fdesc.index++;
 +            continue;
 +        }
@@ -163,7 +166,7 @@ index b97b066..7bae560 100644
  #if FF_API_PLUS1_MINUS1
  FF_ENABLE_DEPRECATION_WARNINGS
 diff --git a/libavutil/pixfmt.h b/libavutil/pixfmt.h
-index 8b54c94..601f6cf 100644
+index 8b54c94..b7d6cfb 100644
 --- a/libavutil/pixfmt.h
 +++ b/libavutil/pixfmt.h
 @@ -348,7 +348,8 @@ enum AVPixelFormat {
@@ -171,11 +174,11 @@ index 8b54c94..601f6cf 100644
      AV_PIX_FMT_NV42,      ///< as above, but U and V bytes are swapped
  
 -    AV_PIX_FMT_NB         ///< number of pixel formats, DO NOT USE THIS if you want to link with shared libav* because the number of formats might differ between versions
-+    AV_PIX_FMT_NV12_UBWC,  ///< planar UBWC YUV 
++    AV_PIX_FMT_NV12_UBWC,  ///< planar UBWC YUV
 +    AV_PIX_FMT_NB        ///< number of pixel formats, DO NOT USE THIS if you want to link with shared libav* because the number of formats might differ between versions
  };
  
  #if AV_HAVE_BIGENDIAN
 -- 
-1.9.1
+2.7.4
 

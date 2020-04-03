@@ -1,11 +1,11 @@
-From ad9d6d4ee4608cc88ca48296ec9a6292c0075e72 Mon Sep 17 00:00:00 2001
+From 163324b2b30f4187cab55a459fa2d1ddb6bff005 Mon Sep 17 00:00:00 2001
 From: Zhenlin Lian <lianzhenlin@codeaurora.org>
-Date: Thu, 27 Feb 2020 10:58:57 +0800
-Subject: [PATCH] modified for v4l2 codec to enable decode and encode
+Date: Fri, 3 Apr 2020 14:22:02 +0800
+Subject: [PATCH] add for support v4l2 decode
 
 ---
  configure                 |   5 +-
- libavcodec/decode.c       |   6 ++
+ libavcodec/decode.c       |   3 +
  libavcodec/v4l2_buffers.c | 206 +++++++++++++++++++++++++++++++++++++---------
  libavcodec/v4l2_buffers.h |  14 +++-
  libavcodec/v4l2_context.c | 148 ++++++++++++++++++++++++---------
@@ -14,7 +14,7 @@ Subject: [PATCH] modified for v4l2 codec to enable decode and encode
  libavcodec/v4l2_m2m_dec.c |  35 +++++---
  libavcodec/v4l2_m2m_enc.c | 111 +++++++++++++++++++++----
  libavformat/utils.c       |   7 +-
- 10 files changed, 461 insertions(+), 122 deletions(-)
+ 10 files changed, 458 insertions(+), 122 deletions(-)
 
 diff --git a/configure b/configure
 index 34c2adb..ad6ebc8 100755
@@ -54,18 +54,15 @@ index 34c2adb..ad6ebc8 100755
                                 { require libfdk_aac fdk-aac/aacenc_lib.h aacEncOpen -lfdk-aac &&
                                   warn "using libfdk without pkg-config"; } }
 diff --git a/libavcodec/decode.c b/libavcodec/decode.c
-index 6c31166..4c53aa2 100644
+index 6c31166..9bfe8d2 100644
 --- a/libavcodec/decode.c
 +++ b/libavcodec/decode.c
-@@ -707,6 +707,12 @@ int attribute_align_arg avcodec_send_packet(AVCodecContext *avctx, const AVPacke
+@@ -707,6 +707,9 @@ int attribute_align_arg avcodec_send_packet(AVCodecContext *avctx, const AVPacke
              return ret;
      }
  
-+    static int64_t timest = 0;
 +    AVFrame *frame = avci->buffer_frame;
-+    frame->pkt_dts = timest;
-+    frame->pts = timest;
-+    timest += 48000;
++    frame->pts = (avpkt->pts > avpkt->dts)? avpkt->pts : avpkt->dts;
 +
      return 0;
  }
@@ -1042,5 +1039,5 @@ index 6c6f4e1..c2e289b 100644
      if (!codec)
          return NULL;
 -- 
-1.9.1
+2.7.4
 
