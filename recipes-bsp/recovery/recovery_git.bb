@@ -6,7 +6,7 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 HOMEPAGE = "https://www.codeaurora.org/gitweb/quic/la?p=platform/bootable/recovery.git"
-DEPENDS = "glib-2.0 libmincrypt-native system-core oem-recovery libsparse bison-native bzip2"
+DEPENDS = "openssl adbd  oem-recovery bison-native bzip2"
 RDEPENDS_${PN} = "zlib"
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI = "file://OTA/recovery/"
@@ -16,7 +16,7 @@ S = "${WORKDIR}/OTA/recovery/"
 
 EXTRA_OECONF = "--with-glib --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include \
                 --with-core-headers=${STAGING_INCDIR}"
-CFLAGS += "-lsparse -llog"
+CFLAGS += "-lsparse -llog "
 
 SYSTEMD_SUPPORT = "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd', '', d)}"
 
@@ -35,7 +35,7 @@ FILES_${PN} += "/recovery/res"
 FILES_${PN} += "/data"
 FILES_${PN} += "/recovery/lib"
 
-PACKAGES += "${PN}-bin ${PN}-lib"
+PACKAGES += "${PN}-bin  ${PN}-lib"
 FILES_${PN}-bin = "/recovery/usr/bin"
 FILES_${PN}-lib = "${libdir}"
 RDEPENDS_${PN}-bin = "recovery-lib"

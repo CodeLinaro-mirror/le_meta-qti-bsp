@@ -13,4 +13,4 @@ S = "${WORKDIR}/fs_mgr"
 
 DEPENDS += "ext4-utils glib-2.0 libcutils libmincrypt logwrapper"
 
-EXTRA_OECONF = " --with-glib"
+EXTRA_OECONF = "--with-glib"

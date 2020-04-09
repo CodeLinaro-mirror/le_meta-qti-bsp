@@ -11,7 +11,6 @@ PR = "r1"
 FILESPATH =+ "${WORKSPACE}/system/core/:"
 SRC_URI   = "file://liblog"
 SRC_URI  += "file://50-log.rules"
-
 S = "${WORKDIR}/liblog"
 
 BBCLASSEXTEND = "native"

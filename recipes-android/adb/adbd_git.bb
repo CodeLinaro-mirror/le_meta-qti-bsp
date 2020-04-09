@@ -9,6 +9,8 @@ ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 FILESEXTRAPATHS_prepend := "${WORKSPACE}/system/core/:"
 SRC_URI = "file://adb"
 
+CPPFLAGS += "-I${STAGING_INCDIR}/libselinux"
+
 S = "${WORKDIR}/adb"
 
 DEPENDS += "ext4-utils glib-2.0 fsmgr libselinux libbase libcutils liblog"
