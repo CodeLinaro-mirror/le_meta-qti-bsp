@@ -52,9 +52,20 @@ case "$1" in
         ;;
   stop)
         start-stop-daemon -S -b -a start_audio_le
-        echo -n "Bypassing Unloading of  audio_kernel modules "
-        echo "audio:stop" > /dev/kmsg
+        echo "Unloading audio_kernel modules " > /dev/kmsg
+        rmmod machine_dlkm
+        rmmod wcd9330_dlkm
+        rmmod wcd_cpe_dlkm
+        rmmod wcd_core_dlkm
+        rmmod stub_dlkm
+        rmmod platform_dlkm
+        rmmod q6_dlkm
+        echo "audio: unvoting for adsp" > /dev/kmsg
         echo 0 > /sys/kernel/boot_adsp/boot
+        echo "Unloading adsp_loader and apr" > /dev/kmsg
+        rmmod adsp_loader_dlkm
+        rmmod apr_dlkm
+        echo "Unloading audio_kernel modules completed" > /dev/kmsg
         ;;
   restart)
         $0 stop
