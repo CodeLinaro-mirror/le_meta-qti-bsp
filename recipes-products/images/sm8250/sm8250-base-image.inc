@@ -27,6 +27,7 @@ IMAGE_INSTALL += "start-scripts-misc-daemon"
 IMAGE_INSTALL += "start-scripts-firmware-links"
 IMAGE_INSTALL += "start-scripts-find-partitions"
 IMAGE_INSTALL += "opencv"
+IMAGE_INSTALL += "system-media"
 
 IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'start-script-ab-slot-util', '', d)}"
 
@@ -78,6 +79,7 @@ copy_edge_rootfs() {
     mkdir -p ${IMAGE_ROOTFS}/packages/aarch64
     mkdir -p ${IMAGE_ROOTFS}/packages/noarch
     mkdir -p ${IMAGE_ROOTFS}/packages/sm8250
+    mkdir -p ${IMAGE_ROOTFS}/packages/qcaudio
 
     if [ -d ${WORKSPACE}/poky/meta-qti-internal/centos-noship/opencv ]
     then
@@ -231,6 +233,7 @@ copy_edge_bsp_rpm() {
     cp ${DEPLOY_DIR_RPM}/aarch64/protobuf-dev-3.3.0*.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/protobuf-3.3.0*.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/protobuf-compiler-3.3.0*.rpm ${IMAGE_ROOTFS}/packages/aarch64/
+    cp ${DEPLOY_DIR_RPM}/aarch64/system-media-git-r2.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
 }
 
 ROOTFS_POSTPROCESS_COMMAND += "copy_edge_bsp_rpm;"
