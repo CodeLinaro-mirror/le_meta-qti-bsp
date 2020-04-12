@@ -16,6 +16,8 @@ EXTRA_OECONF += " --with-glib"
 
 PR = "r2"
 
+EXTRA_OECONF_append_sm8250 = " BOARD_SUPPORTS_ANDROID_Q_AUDIO=true"
+
 FILES_${PN}-dbg    = "${libdir}/.debug/lib*.*"
 FILES_${PN}        = "${libdir}/lib*.so.* ${libdir}/pkgconfig/*"
 FILES_${PN}-dev    = "${libdir}/lib*.so ${libdir}/lib*.la ${includedir}"
