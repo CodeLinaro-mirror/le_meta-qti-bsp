@@ -15,8 +15,6 @@ si::sysinit:/etc/init.d/rcS
 # NOTE: These entries should be above the rc
 #       run level entries with wait below.
 rmts:2345:respawn:/sbin/rmt_storage
-tftp:2345:respawn:/sbin/tftp_server
-scrb:2345:respawn:/sbin/fs-scrub-daemon
 
 # /etc/init.d executes the S and K scripts upon change
 # of runlevel.
@@ -33,6 +31,9 @@ l3:3:wait:/etc/init.d/rc 3
 l4:4:wait:/etc/init.d/rc 4
 l5:5:wait:/etc/init.d/rc 5
 l6:6:wait:/etc/init.d/rc 6
+
+tftp:2345:respawn:/sbin/tftp_server
+scrb:2345:respawn:/sbin/fs-scrub-daemon
 
 # Normally not reached, but fallthrough in case of emergency.
 z6:6:respawn:/sbin/sulogin
