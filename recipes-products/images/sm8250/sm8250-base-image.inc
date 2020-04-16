@@ -178,7 +178,10 @@ copy_edge_bsp_rpm() {
     cp ${DEPLOY_DIR_RPM}/aarch64/libion-dev-1.0-r1.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/liblog0-1.0-r1.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/libmincrypt0-git-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
-    cp ${DEPLOY_DIR_RPM}/aarch64/libselinux0-git-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
+    if ${@bb.utils.contains('DISTRO_FEATURES','selinux','false','ture',d)}
+    then
+        cp ${DEPLOY_DIR_RPM}/aarch64/libselinux0-git-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
+    fi
     cp ${DEPLOY_DIR_RPM}/aarch64/libsparse0-1.0-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/libsync0-1.0-r1.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/libutils0-1.0-r1.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/

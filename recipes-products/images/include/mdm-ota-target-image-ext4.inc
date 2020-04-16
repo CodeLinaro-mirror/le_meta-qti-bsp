@@ -127,7 +127,7 @@ do_recovery_ext4() {
 
     #cp and modify file_contexts to BOOT/RAMDISK folder
     if [[ "${DISTRO_FEATURES}" =~ "selinux" ]]; then
-        cp ${EMMC_ROOTFS_DIR}/etc/selinux/mls/contexts/files/file_contexts ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/BOOT/RAMDISK/.
+        cp ${EMMC_ROOTFS_DIR}/etc/selinux/targeted/contexts/files/file_contexts ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/BOOT/RAMDISK/.
         sed -i 's#^/#/system/#g' ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/BOOT/RAMDISK/file_contexts
         #set selinux_fc
         echo selinux_fc=BOOT/RAMDISK/file_contexts >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
