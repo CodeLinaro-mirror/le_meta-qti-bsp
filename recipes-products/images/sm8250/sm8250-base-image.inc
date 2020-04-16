@@ -26,6 +26,7 @@ IMAGE_INSTALL += "x264"
 IMAGE_INSTALL += "start-scripts-misc-daemon"
 IMAGE_INSTALL += "start-scripts-firmware-links"
 IMAGE_INSTALL += "start-scripts-find-partitions"
+IMAGE_INSTALL += "opencv"
 
 IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'start-script-ab-slot-util', '', d)}"
 
@@ -223,6 +224,13 @@ copy_edge_bsp_rpm() {
     cp ${DEPLOY_DIR_RPM}/aarch64/libtag1-1.11.1-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/libpulse0-12.2-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/libflac8-1.3.2-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
+    cp ${DEPLOY_DIR_RPM}/aarch64/libopencv*.rpm ${IMAGE_ROOTFS}/packages/opencv/
+    cp ${DEPLOY_DIR_RPM}/aarch64/python3-opencv-3.4.3-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/opencv/
+    cp ${DEPLOY_DIR_RPM}/aarch64/opencv*.rpm ${IMAGE_ROOTFS}/packages/opencv/
+    cp ${DEPLOY_DIR_RPM}/aarch64/opencv*.rpm ${IMAGE_ROOTFS}/packages/opencv/
+    cp ${DEPLOY_DIR_RPM}/aarch64/protobuf-dev-3.3.0*.rpm ${IMAGE_ROOTFS}/packages/aarch64/
+    cp ${DEPLOY_DIR_RPM}/aarch64/protobuf-3.3.0*.rpm ${IMAGE_ROOTFS}/packages/aarch64/
+    cp ${DEPLOY_DIR_RPM}/aarch64/protobuf-compiler-3.3.0*.rpm ${IMAGE_ROOTFS}/packages/aarch64/
 }
 
 ROOTFS_POSTPROCESS_COMMAND += "copy_edge_bsp_rpm;"
