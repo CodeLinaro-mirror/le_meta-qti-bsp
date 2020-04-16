@@ -60,6 +60,8 @@ EXTRA_USERS_PARAMS = "\
  useradd -u 1021 -U gps; \
  useradd -u 1036 -U logd;\
  useradd -u 2000 -U adb; \
+ useradd -u 3004 -U net_raw; \
+ useradd -u 3004 -g net_raw net_raw; \
  useradd -u 3011 -U sensors; \
  useradd -u 4000 -U apps; \
  useradd -u 4021 -U locclient; \
