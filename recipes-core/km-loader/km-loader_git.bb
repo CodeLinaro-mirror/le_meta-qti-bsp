@@ -22,10 +22,17 @@ do_install () {
       install -m 0644 ${WORKDIR}/evdev_load.service  \
           -D ${D}/etc/systemd/system/evdev_load.service
 
-      # Enable the service for multi-user.target
-      install -d ${D}/etc/systemd/system/multi-user.target.wants/
-      ln -sf ${sysconfdir}/systemd/system/evdev_load.service \
+      if ${@bb.utils.contains_any('DISTRO_NAME', 'auto', 'true', 'false', d)}; then
+        # Enable the service for sockets.target
+        install -d ${D}/etc/systemd/system/sockets.target.wants/
+        ln -sf ${sysconfdir}/systemd/system/evdev_load.service \
+             ${D}/etc/systemd/system/sockets.target.wants/evdev_load.service
+      else
+        # Enable the service for multi-user.target
+        install -d ${D}/etc/systemd/system/multi-user.target.wants/
+        ln -sf ${sysconfdir}/systemd/system/evdev_load.service \
              ${D}/etc/systemd/system/multi-user.target.wants/evdev_load.service
+      fi
     else
       install -d ${D}/etc/init.d/
       install -m 0755 ${WORKDIR}/${INITSCRIPT_NAME} \
