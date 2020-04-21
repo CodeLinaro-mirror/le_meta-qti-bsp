@@ -23,8 +23,9 @@ EXTRA_CFLAGS_append += " ${@ bb.utils.contains('TUNE_FEATURES', 'cortexa8', '-mt
 EXTRA_OECONF_append += " \
     --target-os=linux --sysroot=${STAGING_DIR_TARGET} --arch=${TARGET_ARCH} --disable-mmx \
     --enable-shared --disable-doc --disable-htmlpages --disable-manpages --disable-podpages \
-    --enable-small --disable-debug --enable-avresample \
-    --extra-cflags="${EXTRA_CFLAGS}" --disable-network --disable-zlib \
+    --enable-small --disable-debug --enable-avresample --enable-protocol=udp \
+    --enable-protocol=tcp --enable-protocol=rtp --enable-protocol=pipe --enable-protocol=http \
+    --extra-cflags="${EXTRA_CFLAGS}" --enable-network --disable-zlib \
     --disable-altivec --enable-fft --libdir=${base_libdir} --shlibdir=${base_libdir} \
     --prefix=${base_libdir} --incdir=${includedir} --enable-libx264 --enable-libion \
 "
