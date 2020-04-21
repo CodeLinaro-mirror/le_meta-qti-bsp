@@ -1,29 +1,31 @@
-Copyright (c) 2020, The Linux Foundation. All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are
-met:
-    * Redistributions of source code must retain the above copyright
-      notice, this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above
-      copyright notice, this list of conditions and the following
-      disclaimer in the documentation and/or other materials provided
-      with the distribution.
-    * Neither the name of The Linux Foundation nor the names of its
-      contributors may be used to endorse or promote products derived
-      from this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
-WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT
-ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
-BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
-BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
-OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
-IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/*
+ * Copyright (c) 2020, The Linux Foundation. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are
+ * met:
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above
+ *       copyright notice, this list of conditions and the following
+ *       disclaimer in the documentation and/or other materials provided
+ *       with the distribution.
+ *     * Neither the name of The Linux Foundation nor the names of its
+ *       contributors may be used to endorse or promote products derived
+ *       from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
+ * BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+ * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+ * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+ * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
 #include <stdio.h>
 #include <pthread.h>
@@ -42,6 +44,9 @@ extern "C" {
 #include <libswscale/swscale.h>
 #include <libavutil/imgutils.h>
 #include <libavutil/log.h>
+
+#include <libavutil/avutil.h>
+#include <libavdevice/avdevice.h>
 };
 
 extern int ubwc_1080p_show_init(int channels);
@@ -87,6 +92,9 @@ static int ffmpeg_demo_init(struct ffmpeg_decode_info *decode_info)
 {
 	int i, video_index, ret = 0;
 	AVDictionary* options = NULL;
+
+	av_dict_set(&options, "max_delay", "500000", 0);
+	av_dict_set(&options, "rtsp_transport", "tcp", 0);
 
 	decode_info->pFormatCtx = avformat_alloc_context();
 	decode_info->pFormatCtx->video_codec = avcodec_find_decoder_by_name(decode_info->decode_name);
@@ -157,6 +165,7 @@ open_input_err:
 static int ffmpeg_demo_handle(struct ffmpeg_decode_info *decode_info)
 {
 	int ret, got_picture;
+	unsigned long long ion_addr = 0;
 
 	decode_info->pFrame = av_frame_alloc();
 	decode_info->packet = (AVPacket *)av_malloc(sizeof(AVPacket));
@@ -182,7 +191,9 @@ static int ffmpeg_demo_handle(struct ffmpeg_decode_info *decode_info)
 
 		got_picture = avcodec_receive_frame(decode_info->pCodecCtx, decode_info->pFrame);
 		if (!got_picture) {
-			ubwc_1080p_format_convert((int)((int *)(decode_info->pFrame->data[1])), decode_info->channel);
+			ion_addr = (unsigned long long)decode_info->pFrame->data[1];
+			ion_addr &= 0xffffffff;
+			ubwc_1080p_format_convert((int)ion_addr, decode_info->channel);
 		}
 
 		av_packet_unref(decode_info->packet);
@@ -281,6 +292,7 @@ int main(int argc, char* argv[])
 		channels = 24;
 	}
 
+	avformat_network_init();
 	ubwc_1080p_show_init(channels);
 	ffmpeg_create_thread(channels);
 
