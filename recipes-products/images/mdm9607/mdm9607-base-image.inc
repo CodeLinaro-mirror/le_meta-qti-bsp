@@ -50,7 +50,10 @@ IMAGE_INSTALL += "liblog"
 IMAGE_INSTALL += "libstdc++"
 IMAGE_INSTALL += "libxml2"
 IMAGE_INSTALL += "lighttpd"
-IMAGE_INSTALL += "libsensors"
+
+IMAGE_INSTALL += "sensors-see"
+IMAGE_INSTALL += "sensors-see-commonsys-intf"
+
 IMAGE_INSTALL += "minidlna"
 IMAGE_INSTALL += "miniupnpd"
 IMAGE_INSTALL += "mtd-utils-ubifs"
