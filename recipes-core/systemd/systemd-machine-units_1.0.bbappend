@@ -46,7 +46,7 @@ fix_sepolicies () {
     sed -i "s#,rootcontext=system_u:object_r:system_data_t:s0##g"  ${WORKDIR}/systemrw.mount
     sed -i "s#,rootcontext=system_u:object_r:system_data_t:s0##g"  ${WORKDIR}/systemrw-ubi.mount
 }
-do_install[prefuncs] += " ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', '', 'fix_sepolicies', d)}"
+do_install[prefuncs] += "fix_sepolicies"
 
 # Install mount and service units for mounting hard parititions.
 MNT_POINTS  = "${@d.getVar('MACHINE_MNT_POINTS') or ""}"
