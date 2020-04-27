@@ -1,0 +1,26 @@
+From 2ab047c08944e08df56b6b47827f6d14be56a9a1 Mon Sep 17 00:00:00 2001
+From: Zhenlin Lian <lianzhenlin@codeaurora.org>
+Date: Mon, 27 Apr 2020 13:12:46 +0800
+Subject: [PATCH] enable hdf configuration
+
+---
+ modules/hdf/CMakeLists.txt | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/modules/hdf/CMakeLists.txt b/modules/hdf/CMakeLists.txt
+index 2a1ae68..4a9ab29 100644
+--- a/modules/hdf/CMakeLists.txt
++++ b/modules/hdf/CMakeLists.txt
+@@ -16,9 +16,7 @@ if(WIN32)
+      set(HDF5_FOUND "NO")
+   endif()
+ else()
+-  if(NOT CMAKE_CROSSCOMPILING) # iOS build should not reuse OSX package
+     find_package(HDF5)
+-  endif()
+ endif()
+ 
+ if(NOT HDF5_FOUND)
+-- 
+2.7.4
+

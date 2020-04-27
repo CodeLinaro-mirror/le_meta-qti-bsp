@@ -1,0 +1,4 @@
+SYSROOT_DIRS += " \
+    ${bindir} \
+"
+
