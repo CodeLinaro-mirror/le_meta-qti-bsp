@@ -21,8 +21,11 @@ DISTRO ?= "mdm"
 
 DISTRO_FEATURES_append = " persist-volume"
 
-#Disable ssd listene
+#Disable ssd listener
 DISTRO_FEATURES_append = " no-ssd-listener-support"
+
+#Disable rpmb listner
+DISTRO_FEATURES_append = " no-rpmb-listener-support"
 
 MACHINE_FEATURES += "kernel26 keyboard ipa-offload"
 
