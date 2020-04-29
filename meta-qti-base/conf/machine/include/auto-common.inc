@@ -7,7 +7,7 @@ include conf/machine/include/soc-family.inc
 include conf/machine/include/arm/arch-arm64.inc
 
 PREFERRED_PROVIDER_virtual/kernel = "linux-msm"
-PREFERRED_VERSION_linux-msm = "4.14"
+PREFERRED_VERSION_linux-msm = "5.4"
 
 # Prefer tcpdump 4.9.x by default
 PREFERRED_VERSION_tcpdump              ?= "4.9.%"
