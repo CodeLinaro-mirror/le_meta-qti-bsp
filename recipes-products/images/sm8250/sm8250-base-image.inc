@@ -230,9 +230,10 @@ copy_edge_bsp_rpm() {
     cp ${DEPLOY_DIR_RPM}/aarch64/python3-opencv-3.4.3-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/opencv/
     cp ${DEPLOY_DIR_RPM}/aarch64/opencv*.rpm ${IMAGE_ROOTFS}/packages/opencv/
     cp ${DEPLOY_DIR_RPM}/aarch64/opencv*.rpm ${IMAGE_ROOTFS}/packages/opencv/
-    cp ${DEPLOY_DIR_RPM}/aarch64/protobuf-dev-3.3.0*.rpm ${IMAGE_ROOTFS}/packages/aarch64/
-    cp ${DEPLOY_DIR_RPM}/aarch64/protobuf-3.3.0*.rpm ${IMAGE_ROOTFS}/packages/aarch64/
-    cp ${DEPLOY_DIR_RPM}/aarch64/protobuf-compiler-3.3.0*.rpm ${IMAGE_ROOTFS}/packages/aarch64/
+    cp ${DEPLOY_DIR_RPM}/aarch64/libprotobuf22-3.11.4-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
+    cp ${DEPLOY_DIR_RPM}/aarch64/libprotobuf-compiler-3.11.4-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
+    cp ${DEPLOY_DIR_RPM}/aarch64/libprotobuf-dev-3.11.4-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
+    cp ${DEPLOY_DIR_RPM}/aarch64/libprotobuf-lite22-3.11.4-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/system-media-git-r2.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/hdf5-1.8.21-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/hdf5-dev-1.8.21-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
