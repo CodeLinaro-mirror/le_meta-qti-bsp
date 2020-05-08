@@ -81,6 +81,12 @@ copy_edge_rootfs() {
     mkdir -p ${IMAGE_ROOTFS}/packages/sm8250
     mkdir -p ${IMAGE_ROOTFS}/packages/qcaudio
 
+    if [ -d ${WORKSPACE}/poky/meta-qti-internal/centos-noship/llvm ]
+    then
+        mkdir -p ${IMAGE_ROOTFS}/packages/llvm
+        cp ${WORKSPACE}/poky/meta-qti-internal/centos-noship/llvm/*.rpm ${IMAGE_ROOTFS}/packages/llvm/
+    fi
+
     if [ -d ${WORKSPACE}/poky/meta-qti-internal/centos-noship/opencv ]
     then
         mkdir -p ${IMAGE_ROOTFS}/packages/opencv
@@ -128,6 +134,9 @@ copy_edge_rootfs() {
         ln -sf ${IMAGES_ROOTFS}/mnt/sdcard ${IMAGE_ROOTFS}/sdcard
     fi
 
+    mkdir -p ${IMAGE_ROOTFS}/vendor
+    ln -sf /dsp ${IMAGE_ROOTFS}/vendor/dsp
+
     # find ${IMAGE_ROOTFS} . -name "*.4.18*" |xargs rm -rf
     rm -rf ${IMAGE_ROOTFS}/usr/lib/modules/4.18.0-80.el8.aarch64
     rm -rf ${IMAGE_ROOTFS}/usr/lib/modules/4.18.0-79.el8+2.aarch64
@@ -161,6 +170,11 @@ copy_edge_rootfs() {
     then
         echo "/bin/bash /packages/install.sh" >> ${IMAGE_ROOTFS}/etc/rc.d/rc.local
         chmod +x ${IMAGE_ROOTFS}/etc/rc.d/rc.local
+    fi
+
+    if [ -e ${WORKSPACE}/system/core/libion/kernel-headers/linux/ion.h ]
+    then
+        cp ${WORKSPACE}/system/core/libion/kernel-headers/linux/ion.h ${IMAGE_ROOTFS}/usr/include/linux/
     fi
 }
 
