@@ -1,6 +1,6 @@
-# QTI Linux multimedia image file.
+# QTI Linux robotics image file.
 # Provides packages required to build an image with
-# all multimedia support enabled.
+# robotics features support.
 
 inherit qimage
 
@@ -19,20 +19,13 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-audio \
         packagegroup-qti-bluetooth \
         packagegroup-qti-core-prop \
-        packagegroup-qti-camera \
         packagegroup-qti-data \
         packagegroup-qti-dsp \
-        packagegroup-qti-display \
-        packagegroup-qti-gst \
+        packagegroup-qti-fastcv \
         packagegroup-qti-ml \
-        packagegroup-qti-qmmf \
-        ${@bb.utils.contains('MACHINE_FEATURES', 'qti-sensors', 'packagegroup-qti-sensors', '', d)} \
         packagegroup-qti-securemsm \
         packagegroup-qti-ss-mgr \
-        packagegroup-qti-video \
         packagegroup-qti-wifi \
         packagegroup-startup-scripts \
-        packagegroup-qti-fastcv \
         systemd-machine-units \
-        ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
 "

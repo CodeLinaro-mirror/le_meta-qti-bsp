@@ -1,6 +1,6 @@
 inherit core-image
 
-require recipes-products/images/include/mdm-ota-target-image-ext4.inc
+inherit mdm-ota-target-image-ext4
 
 CORE_IMAGE_EXTRA_INSTALL += "${@bb.utils.contains('COMBINED_FEATURES', 'qti-ab-boot', ' recovery-ab', '', d)}"
 
@@ -22,15 +22,17 @@ do_image_ext4[noexec] = "1"
 IMAGE_VERSION_SUFFIX = ""
 
 # Default Image names
-BOOTIMAGE_TARGET ?= "${IMAGE_NAME}-boot.img"
-SYSTEMIMAGE_TARGET ?= "${IMAGE_NAME}-sysfs.ext4"
-SYSTEMIMAGE_MAP_TARGET ?= "${IMAGE_NAME}-sysfs.map"
-OVERLAYIMAGE_TARGET ?= "${IMAGE_NAME}-overlayfs.ext4"
-OVERLAYIMAGE_MAP_TARGET ?= "${IMAGE_NAME}-overlayfs.map"
+BOOTIMAGE_TARGET ?= "boot.img"
+SYSTEMIMAGE_TARGET ?= "system.img"
+SYSTEMIMAGE_MAP_TARGET ?= "system.map"
+OVERLAYIMAGE_TARGET ?= "overlayfs.img"
+OVERLAYIMAGE_MAP_TARGET ?= "overlayfs.map"
+PERSISTIMAGE_TARGET ?= "persist.img"
+PERSISTIMAGE_MAP_TARGET ?= "persist.map"
 
 #Set appropriate partion:Image map
-NONAB_BOOT_PARTITION_IMAGE_MAP = "boot='${BOOTIMAGE_TARGET}',system='${SYSTEMIMAGE_TARGET}',userdata='${OVERLAYIMAGE_TARGET}'"
-AB_BOOT_PARTITION_IMAGE_MAP = "boot_a='${BOOTIMAGE_TARGET}',boot_b='${BOOTIMAGE_TARGET}',system_a='${SYSTEMIMAGE_TARGET}',system_b='${SYSTEMIMAGE_TARGET}',userdata='${OVERLAYIMAGE_TARGET}'"
+NONAB_BOOT_PARTITION_IMAGE_MAP = "boot='${BOOTIMAGE_TARGET}',system='${SYSTEMIMAGE_TARGET}',userdata='${OVERLAYIMAGE_TARGET}',persist='${PERSISTIMAGE_TARGET}'"
+AB_BOOT_PARTITION_IMAGE_MAP = "boot_a='${BOOTIMAGE_TARGET}',boot_b='${BOOTIMAGE_TARGET}',system_a='${SYSTEMIMAGE_TARGET}',system_b='${SYSTEMIMAGE_TARGET}',userdata='${OVERLAYIMAGE_TARGET}',persist='${PERSISTIMAGE_TARGET}'"
 
 def set_partition_image_map(d):
     if "qti-ab-boot" in d.getVar('COMBINED_FEATURES', True):
@@ -42,6 +44,7 @@ PARTITION_IMAGE_MAP = "${@set_partition_image_map(d)}"
 
 
 
+IMAGE_EXT4_SELINUX_OPTIONS = "${@bb.utils.contains('DISTRO_FEATURES', 'selinux', '-S ${SELINUX_FILE_CONTEXTS}', '', d)}"
 #  Function to get most suitable .inc file with list of packages
 #  to be installed into root filesystem from layer it is called.
 #  Following is the order of priority.
@@ -101,7 +104,9 @@ DEPENDS += "\
              qdl-native \
 "
 
-do_gen_partition_bin[dirs]      = "${DEPLOY_DIR_IMAGE}"
+# generate partitions artifact in an image-specific folder since they include
+# image specific data such as file name and parition size
+do_gen_partition_bin[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
 
 do_gen_partition_bin () {
     # Generate partition.xml using gen_partition utility
@@ -110,13 +115,31 @@ do_gen_partition_bin () {
         -o ${WORKDIR}/partition.xml \
         -m ${PARTITION_IMAGE_MAP}
 
-    install ${WORKDIR}/partition.xml ${DEPLOY_DIR_IMAGE}
+    install -m 0644 ${WORKDIR}/partition.xml .
 
     # Call ptool to generate partition bins
-    python ${STAGING_BINDIR_NATIVE}/ptool.py -x ${WORKDIR}/partition.xml -t ${DEPLOY_DIR_IMAGE}
+    python ${STAGING_BINDIR_NATIVE}/ptool.py -x partition.xml
 }
 
-addtask do_gen_partition_bin after do_prepare_recipe_sysroot before do_image
+addtask do_gen_partition_bin after do_rootfs before do_image
+
+
+# all files needed to flash the device must be in DEPLOY_DIR_NAME/IMAGE_BASENAME
+# so we need to copy the bootloader ELF file as well, which we can't do in the
+# actual bootloader recipes.
+
+do_bootloader_deploy_fixup[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
+do_bootloader_deploy_fixup () {
+    for f in ${EXTRA_IMAGEDEPENDS}; do
+        if [ "$f" = "edk2" ] || [ "$f" = "lib64-edk2" ]; then
+            install -m 0644 ${DEPLOY_DIR_IMAGE}/abl.elf .
+        elif [ "$f" = "lk" ]; then
+            install -m 0644 ${DEPLOY_DIR_IMAGE}/*appsboot.mbn .
+        fi
+    done
+}
+
+addtask do_bootloader_deploy_fixup after do_rootfs before do_image
 
 # Check and remove empty packages before rootfs creation
 do_rootfs[prefuncs] += "rootfs_ignore_packages"
@@ -177,31 +200,70 @@ do_fsconfig_append_qti-distro-user() {
 # Alter system image size if varity is enabled.
 do_makesystem[prefuncs]  += " ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'adjust_system_size_for_verity', '', d)}"
 do_makesystem[postfuncs] += " ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'make_verity_enabled_system_image', '', d)}"
-do_makesystem[dirs]       = "${DEPLOY_DIR_IMAGE}"
+do_makesystem[dirs]       = "${IMGDEPLOYDIR}"
+SPARSE_SYSTEMIMAGE_FLAG = "${@bb.utils.contains('IMAGE_FEATURES', 'vm', '', '-s', d)}"
 
 do_makesystem() {
     cp ${THISDIR}/fsconfig/${MACHINE_FSCONFIG_CONF} ${WORKDIR}/rootfs-fsconfig.conf
-    make_ext4fs -C ${WORKDIR}/rootfs-fsconfig.conf \
-                -B ${DEPLOY_DIR_IMAGE}/${SYSTEMIMAGE_MAP_TARGET} \
-                -a / -b 4096 -s \
+    # An ugly hack to mitigate a bug in libsparse were random
+    # asserts are observed during unsparsing if image size is large.
+    # Unsparsing is needed for appending verity metadata to image.
+    # Only known workaround is to recreate image if unsparsing fails.
+    for count in {1..10}
+    do
+        make_ext4fs -C ${WORKDIR}/rootfs-fsconfig.conf \
+                -B ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMIMAGE_MAP_TARGET} \
+                -a / -b 4096 ${SPARSE_SYSTEMIMAGE_FLAG} \
                 -l ${SYSTEM_SIZE_EXT4} \
                 ${IMAGE_EXT4_SELINUX_OPTIONS} \
-                ${DEPLOY_DIR_IMAGE}/${SYSTEMIMAGE_TARGET} ${IMAGE_ROOTFS}
+                ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMIMAGE_TARGET} ${IMAGE_ROOTFS}
+
+        simg2img ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMIMAGE_TARGET} /dev/null || invalid_image=1
+
+        if [ ${invalid_image:-0} -eq 1 ]; then
+            echo "Unsparse image failed.. Recreating image"
+            continue
+        else
+            echo "Sparse image is good to use..."
+            break
+        fi
+    done
+
 }
 addtask do_makesystem after do_rootfs before do_image_complete
 
 ### Generate overlay.img ###
-do_makeoverlay[dirs] = "${DEPLOY_DIR_IMAGE}"
+do_makeoverlay[dirs] = "${IMGDEPLOYDIR}"
 
 do_makeoverlay() {
-    make_ext4fs -B ${DEPLOY_DIR_IMAGE}/${OVERLAYIMAGE_MAP_TARGET} \
-                ${IMAGE_EXT4_SELINUX_OPTIONS} \
+    make_ext4fs -B ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${OVERLAYIMAGE_MAP_TARGET} \
+                -a /data ${IMAGE_EXT4_SELINUX_OPTIONS} \
                 -s -b 4096 -l ${OVERLAY_SIZE_EXT4} \
-                ${DEPLOY_DIR_IMAGE}/${OVERLAYIMAGE_TARGET} \
+                ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${OVERLAYIMAGE_TARGET} \
                 ${IMAGE_ROOTFS}/overlay
 }
 
 addtask do_makeoverlay after do_rootfs before do_build
+
+################################################
+############ Generate persist image ############
+################################################
+PERSIST_IMAGE_ROOTFS_SIZE ?= "6536668"
+do_makepersist[dirs] = "${IMGDEPLOYDIR}"
+
+do_makepersist() {
+    make_ext4fs ${PERSISTFS_CONFIG} ${MAKEEXT4_MOUNT_OPT} \
+                -B ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${PERSISTIMAGE_MAP_TARGET} \
+                -s -l ${PERSIST_IMAGE_ROOTFS_SIZE} \
+                ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${PERSISTIMAGE_TARGET} \
+                ${IMAGE_ROOTFS}/persist
+
+    # Empty the /persist folder so that it doesn't end up
+    # in system image as well
+    rm -rf ${IMAGE_ROOTFS}/persist/*
+}
+# It must be before do_makesystem to remove /persist
+addtask do_makepersist after do_rootfs before do_makesystem
 
 ################################################
 ############# Generate boot.img ################
@@ -220,7 +282,8 @@ python do_make_bootimg () {
     base            = d.getVar('KERNEL_BASE', True)
 
     # When verity is enabled add '.noverity' suffix to default boot img.
-    output          = d.getVar('DEPLOY_DIR_IMAGE', True) + "/" + d.getVar('BOOTIMAGE_TARGET', True)
+    output          = d.getVar('IMGDEPLOYDIR', True) + "/" + d.getVar('BOOTIMAGE_TARGET', True)
+    output          = d.getVar('BOOTIMAGE_TARGET', True)
     if bb.utils.contains('DISTRO_FEATURES', 'dm-verity', True, False, d):
             output += ".noverity"
 
@@ -235,11 +298,11 @@ python do_make_bootimg () {
         bb.error("Running: %s failed." % cmd)
 
 }
-do_make_bootimg[dirs]      = "${DEPLOY_DIR_IMAGE}"
+do_make_bootimg[dirs]      = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
 # Make sure native tools and vmlinux ready to create boot.img
 do_make_bootimg[depends] += "virtual/kernel:do_deploy"
 
-addtask do_make_bootimg before do_image_complete after do_prepare_recipe_sysroot
+addtask do_make_bootimg before do_image_complete after do_rootfs
 
 # With dm-verity, kernel cmdline has to be updated with correct hash value of
 # system image. This means final boot image can be created only after system image.
@@ -262,7 +325,7 @@ python do_make_veritybootimg () {
     cmdline         = "\"" + d.getVar('KERNEL_CMD_PARAMS', True) + " " + verity_cmdline + "\""
     pagesize        = d.getVar('PAGE_SIZE', True)
     base            = d.getVar('KERNEL_BASE', True)
-    output          = d.getVar('DEPLOY_DIR_IMAGE', True) + "/" + d.getVar('BOOTIMAGE_TARGET', True)
+    output          = d.getVar('BOOTIMAGE_TARGET', True)
 
     # cmd to make boot.img
     cmd =  mkboot_bin_path + " --kernel %s --cmdline %s --pagesize %s --base %s %s --ramdisk /dev/null --ramdisk_offset 0x0 --output %s" \
@@ -276,10 +339,11 @@ python do_make_veritybootimg () {
 }
 do_make_veritybootimg[depends]  += "${PN}:do_makesystem"
 do_make_veritybootimg[depends]  += "${PN}:do_makeoverlay"
-do_make_veritybootimg[dirs]      = "${DEPLOY_DIR_IMAGE}"
+do_make_veritybootimg[dirs]      = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
 do_make_veritybootimg[depends] += "virtual/kernel:do_deploy"
 
 python () {
     if bb.utils.contains('DISTRO_FEATURES', 'dm-verity', True, False, d):
         bb.build.addtask('do_make_veritybootimg', 'do_image_complete', 'do_rootfs', d)
 }
+
