@@ -194,7 +194,7 @@ do_recovery_ubi() {
 
         # recovery_size : Size of recovery partition from partition.xml
         echo recovery_size=0x00C00000 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
-   elif [ "${MACHINE}" == "nf-64" ]; then
+   elif [ "${BASEMACHINE}" == "qcs40x" ]; then
         # boot_size: Size of boot partition from partition.xml
         echo boot_size=0x00C00000 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
 
