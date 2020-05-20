@@ -1,0 +1,935 @@
+From 5e183725c6a3c58ba3546e5a46a2eba38b50f159 Mon Sep 17 00:00:00 2001
+From: Jiacheng Zheng <jiaczhen@codeaurora.org>
+Date: Thu, 31 Oct 2019 16:12:58 +0800
+Subject: [PATCH] asynchronize pty init and audio driver to improve kpi
+
+Change-Id: I6932905378c60d447bc4beb0f78e90f7c4ea31be
+Signed-off-by: Jiacheng Zheng <jiaczhen@codeaurora.org>
+---
+ drivers/base/dd.c                                  |  8 +-
+ drivers/soc/qcom/qdsp6v2/apr_vm.c                  |  5 +-
+ drivers/tty/pty.c                                  | 16 +++-
+ init/main.c                                        |  2 +-
+ sound/core/compress_offload.c                      |  5 +-
+ sound/core/pcm.c                                   |  5 +-
+ sound/core/rawmidi.c                               |  5 +-
+ sound/core/timer.c                                 |  5 +-
+ sound/soc/codecs/msm_stub.c                        |  5 +-
+ sound/soc/msm/apq8096-auto.c                       | 93 +++++++++++++++++++++-
+ sound/soc/msm/msm-dai-fe.c                         |  5 +-
+ sound/soc/msm/msm-pcm-hostless.c                   |  5 +-
+ sound/soc/msm/qdsp6v2/audio_slimslave.c            |  5 +-
+ sound/soc/msm/qdsp6v2/msm-compress-q6-v2.c         |  5 +-
+ sound/soc/msm/qdsp6v2/msm-dai-q6-hdmi-v2.c         |  5 +-
+ sound/soc/msm/qdsp6v2/msm-dai-q6-v2.c              |  5 +-
+ sound/soc/msm/qdsp6v2/msm-dai-slim.c               |  5 +-
+ sound/soc/msm/qdsp6v2/msm-dai-stub-v2.c            |  5 +-
+ sound/soc/msm/qdsp6v2/msm-lsm-client.c             |  5 +-
+ sound/soc/msm/qdsp6v2/msm-pcm-afe-v2.c             |  5 +-
+ sound/soc/msm/qdsp6v2/msm-pcm-dtmf-v2.c            |  5 +-
+ sound/soc/msm/qdsp6v2/msm-pcm-host-voice-v2.c      |  5 +-
+ sound/soc/msm/qdsp6v2/msm-pcm-loopback-v2.c        |  5 +-
+ sound/soc/msm/qdsp6v2/msm-pcm-q6-noirq.c           |  5 +-
+ sound/soc/msm/qdsp6v2/msm-pcm-q6-v2.c              |  5 +-
+ sound/soc/msm/qdsp6v2/msm-pcm-routing-v2.c         |  5 +-
+ sound/soc/msm/qdsp6v2/msm-pcm-voice-v2.c           |  5 +-
+ sound/soc/msm/qdsp6v2/msm-pcm-voip-v2.c            |  5 +-
+ .../soc/msm/qdsp6v2/msm-transcode-loopback-q6-v2.c |  5 +-
+ sound/soc/msm/qdsp6v2/q6adm.c                      |  5 +-
+ sound/soc/msm/qdsp6v2/q6afe.c                      |  5 +-
+ sound/soc/msm/qdsp6v2/q6asm.c                      |  5 +-
+ sound/soc/msm/qdsp6v2/q6core.c                     |  5 +-
+ sound/soc/msm/qdsp6v2/q6lsm.c                      |  5 +-
+ sound/soc/msm/qdsp6v2/q6voice.c                    |  6 +-
+ sound/soc/msm/qdsp6v2/rtac.c                       |  5 +-
+ sound/soc/soc-core.c                               |  5 +-
+ 37 files changed, 210 insertions(+), 75 deletions(-)
+
+diff --git a/drivers/base/dd.c b/drivers/base/dd.c
+index 0ab3a8d..2186d95 100644
+--- a/drivers/base/dd.c
++++ b/drivers/base/dd.c
+@@ -666,14 +666,14 @@ static int __driver_attach(struct device *dev, void *data)
+ 
+ 	if (!driver_match_device(drv, dev))
+ 		return 0;
+-	if (lock_parent(dev))
+-		device_lock(dev->parent);
++	//if (lock_parent(dev))
++		//device_lock(dev->parent);
+ 	device_lock(dev);
+ 	if (!dev->driver)
+ 		driver_probe_device(drv, dev);
+ 	device_unlock(dev);
+-	if (lock_parent(dev))
+-		device_unlock(dev->parent);
++	//if (lock_parent(dev))
++		//device_unlock(dev->parent);
+ 
+ 	return 0;
+ }
+diff --git a/drivers/soc/qcom/qdsp6v2/apr_vm.c b/drivers/soc/qcom/qdsp6v2/apr_vm.c
+index 281d127..a7adb56 100644
+--- a/drivers/soc/qcom/qdsp6v2/apr_vm.c
++++ b/drivers/soc/qcom/qdsp6v2/apr_vm.c
+@@ -1155,7 +1155,8 @@ static void apr_vm_set_subsys_state(void)
+ 	apr_set_modem_state(APR_SUBSYS_LOADED);
+ }
+ 
+-static int __init apr_init(void)
++//static int __init apr_init(void)
++int __init apr_init(void)
+ {
+ 	int i, j, k;
+ 	int ret;
+@@ -1229,7 +1230,7 @@ static int __init apr_init(void)
+ 
+ 	return 0;
+ }
+-device_initcall(apr_init);
++//device_initcall(apr_init);
+ 
+ static int __init apr_late_init(void)
+ {
+diff --git a/drivers/tty/pty.c b/drivers/tty/pty.c
+index c8a2e5b..506f7d3 100644
+--- a/drivers/tty/pty.c
++++ b/drivers/tty/pty.c
+@@ -6,6 +6,8 @@
+  *
+  */
+ 
++#include <linux/async.h>
++
+ #include <linux/module.h>
+ #include <linux/errno.h>
+ #include <linux/interrupt.h>
+@@ -886,10 +888,20 @@ static void __init unix98_pty_init(void)
+ static inline void unix98_pty_init(void) { }
+ #endif
+ 
+-static int __init pty_init(void)
++static void pty_init_async(void *data, async_cookie_t cookie)
+ {
+ 	legacy_pty_init();
+ 	unix98_pty_init();
++}
++
++static int __init pty_init(void)
++{
++	//legacy_pty_init();
++	//unix98_pty_init();
++	
++	async_schedule(pty_init_async, NULL);
+ 	return 0;
+ }
+-device_initcall(pty_init);
++//device_initcall(pty_init);
++subsys_initcall_sync(pty_init);
++
+diff --git a/init/main.c b/init/main.c
+index f4c93ba..858b4d5 100644
+--- a/init/main.c
++++ b/init/main.c
+@@ -1089,7 +1089,7 @@ static noinline void __init kernel_init_freeable(void)
+ 	(void) sys_dup(0);
+ 	(void) sys_dup(0);
+ 
+-	wait_for_device_probe();
++	//wait_for_device_probe();
+ 	rc = call_usermodehelper(touch_early_done, touch_early_done_argv, NULL, 0);
+ 	if (!rc)
+ 		pr_err("early driver done \n");
+diff --git a/sound/core/compress_offload.c b/sound/core/compress_offload.c
+index 18eee84..5254188 100644
+--- a/sound/core/compress_offload.c
++++ b/sound/core/compress_offload.c
+@@ -1058,7 +1058,8 @@ int snd_compress_deregister(struct snd_compr *device)
+ }
+ EXPORT_SYMBOL_GPL(snd_compress_deregister);
+ 
+-static int __init snd_compress_init(void)
++//static int __init snd_compress_init(void)
++int __init snd_compress_init(void)
+ {
+ 	return 0;
+ }
+@@ -1067,7 +1068,7 @@ static void __exit snd_compress_exit(void)
+ {
+ }
+ 
+-module_init(snd_compress_init);
++//module_init(snd_compress_init);
+ module_exit(snd_compress_exit);
+ 
+ MODULE_DESCRIPTION("ALSA Compressed offload framework");
+diff --git a/sound/core/pcm.c b/sound/core/pcm.c
+index d79a04e..aa770de 100644
+--- a/sound/core/pcm.c
++++ b/sound/core/pcm.c
+@@ -1260,7 +1260,8 @@ static void snd_pcm_proc_done(void)
+  *  ENTRY functions
+  */
+ 
+-static int __init alsa_pcm_init(void)
++//static int __init alsa_pcm_init(void)
++int __init alsa_pcm_init(void)
+ {
+ 	snd_ctl_register_ioctl(snd_pcm_control_ioctl);
+ 	snd_ctl_register_ioctl_compat(snd_pcm_control_ioctl);
+@@ -1275,5 +1276,5 @@ static void __exit alsa_pcm_exit(void)
+ 	snd_pcm_proc_done();
+ }
+ 
+-module_init(alsa_pcm_init)
++//module_init(alsa_pcm_init)
+ module_exit(alsa_pcm_exit)
+diff --git a/sound/core/rawmidi.c b/sound/core/rawmidi.c
+index 180261d..89c93c1 100644
+--- a/sound/core/rawmidi.c
++++ b/sound/core/rawmidi.c
+@@ -1805,7 +1805,8 @@ EXPORT_SYMBOL(snd_rawmidi_set_ops);
+  *  ENTRY functions
+  */
+ 
+-static int __init alsa_rawmidi_init(void)
++//static int __init alsa_rawmidi_init(void)
++int __init alsa_rawmidi_init(void)
+ {
+ 
+ 	snd_ctl_register_ioctl(snd_rawmidi_control_ioctl);
+@@ -1836,5 +1837,5 @@ static void __exit alsa_rawmidi_exit(void)
+ 	snd_ctl_unregister_ioctl_compat(snd_rawmidi_control_ioctl);
+ }
+ 
+-module_init(alsa_rawmidi_init)
++//module_init(alsa_rawmidi_init)
+ module_exit(alsa_rawmidi_exit)
+diff --git a/sound/core/timer.c b/sound/core/timer.c
+index 9b226aa..0369fb0 100644
+--- a/sound/core/timer.c
++++ b/sound/core/timer.c
+@@ -2059,7 +2059,8 @@ static struct device timer_dev;
+  *  ENTRY functions
+  */
+ 
+-static int __init alsa_timer_init(void)
++//static int __init alsa_timer_init(void)
++int __init alsa_timer_init(void)
+ {
+ 	int err;
+ 
+@@ -2102,7 +2103,7 @@ static void __exit alsa_timer_exit(void)
+ #endif
+ }
+ 
+-module_init(alsa_timer_init)
++//module_init(alsa_timer_init)
+ module_exit(alsa_timer_exit)
+ 
+ EXPORT_SYMBOL(snd_timer_open);
+diff --git a/sound/soc/codecs/msm_stub.c b/sound/soc/codecs/msm_stub.c
+index 9a9c54e..33a28d7 100755
+--- a/sound/soc/codecs/msm_stub.c
++++ b/sound/soc/codecs/msm_stub.c
+@@ -72,11 +72,12 @@ static struct platform_driver msm_stub_driver = {
+ 	.remove = msm_stub_dev_remove,
+ };
+ 
+-static int __init msm_stub_init(void)
++//static int __init msm_stub_init(void)
++int __init msm_stub_init(void)
+ {
+ 	return platform_driver_register(&msm_stub_driver);
+ }
+-module_init(msm_stub_init);
++//module_init(msm_stub_init);
+ 
+ static void __exit msm_stub_exit(void)
+ {
+diff --git a/sound/soc/msm/apq8096-auto.c b/sound/soc/msm/apq8096-auto.c
+index 9874e3a..0b2b4dc 100644
+--- a/sound/soc/msm/apq8096-auto.c
++++ b/sound/soc/msm/apq8096-auto.c
+@@ -10,6 +10,7 @@
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU General Public License for more details.
+  */
++#include <linux/async.h>
+ 
+ #include <linux/clk.h>
+ #include <linux/delay.h>
+@@ -6975,8 +6976,96 @@ static int __init apq8096_soc_platform_init(void)
+ 	return 0;
+ }
+ 
+-module_init(apq8096_soc_platform_init);
+-module_platform_driver(apq8096_asoc_machine_driver);
++extern int __init alsa_timer_init(void);
++extern int __init voice_init(void);
++extern int __init alsa_pcm_init(void);
++extern int __init alsa_rawmidi_init(void);
++extern int __init snd_compress_init(void);
++extern int __init snd_soc_init(void);
++extern int __init msm_stub_init(void);
++extern int __init msm_soc_platform_init_pcm_hostless(void);
++extern int __init msm_dai_slim_init(void);
++extern int __init audio_slimslave_init(void);
++extern int __init msm_dai_q6_init(void);
++extern int __init msm_soc_platform_init_pcm_q6_v2(void);
++extern int __init msm_soc_routing_platform_init(void);
++extern int __init msm_soc_platform_init_compress_q6_v2(void);
++extern int __init msm_soc_platform_init_pcm_afe_v2(void);
++extern int __init msm_soc_platform_init_pcm_voip_v2(void);
++extern int __init msm_soc_platform_init_pcm_voice_v2(void);
++extern int __init msm_dai_q6_hdmi_init(void);
++extern int __init msm_soc_platform_init_lsm_client(void);
++extern int __init msm_soc_platform_init_pcm_host_voice_v2(void);
++extern int __init msm_soc_platform_init_pcm_loopback_v2(void);
++extern int __init msm_soc_platform_init_transcode_loopback_q6_v2(void);
++extern int __init msm_soc_platform_init_pcm_dtmf_v2(void);
++extern int __init msm_dai_stub_init(void);
++extern int __init adm_init(void);
++extern int __init afe_init(void);
++extern int __init q6asm_init(void);
++extern int __init q6_core_init(void);
++extern int __init rtac_init(void);
++extern int __init q6lsm_init(void);
++extern int __init msm_soc_platform_init_pcm_q6_noirq(void);
++extern int __init msm_fe_dai_init(void);
++extern int __init apr_init(void);
++
++static int __init apq8096_asoc_machine_driver_init(void)
++{
++	return platform_driver_register(&apq8096_asoc_machine_driver);
++}
++
++static void __exit apq8096_asoc_machine_driver_exit(void)
++{
++	return platform_driver_unregister(&apq8096_asoc_machine_driver);
++}
++module_exit(apq8096_asoc_machine_driver_exit);
++
++static void early_audio_init_async(void *data, async_cookie_t cookie)
++{
++	voice_init();
++	alsa_timer_init();
++	alsa_pcm_init();
++	alsa_rawmidi_init();
++	snd_compress_init();
++	snd_soc_init();
++	msm_stub_init();
++	msm_soc_platform_init_pcm_hostless();
++	msm_dai_slim_init();
++	audio_slimslave_init();
++	msm_dai_q6_init();
++	msm_soc_platform_init_pcm_q6_v2();
++	msm_soc_routing_platform_init();
++	msm_soc_platform_init_compress_q6_v2();
++	msm_soc_platform_init_pcm_afe_v2();
++	msm_soc_platform_init_pcm_voip_v2();
++	msm_soc_platform_init_pcm_voice_v2();
++	msm_dai_q6_hdmi_init();
++	msm_soc_platform_init_lsm_client();
++	msm_soc_platform_init_pcm_host_voice_v2();
++	msm_soc_platform_init_pcm_loopback_v2();
++	msm_soc_platform_init_transcode_loopback_q6_v2();
++	msm_soc_platform_init_pcm_dtmf_v2();
++	msm_dai_stub_init();
++	adm_init();
++	afe_init();
++	q6asm_init();
++	q6_core_init();
++	rtac_init();
++	q6lsm_init();
++	msm_soc_platform_init_pcm_q6_noirq();
++	msm_fe_dai_init();
++	apr_init();
++	apq8096_soc_platform_init();
++	apq8096_asoc_machine_driver_init();
++}
++
++int __init early_audio_init_async_start(void)
++{
++	async_schedule(early_audio_init_async, NULL);
++	return 0;
++}
++subsys_initcall_sync(early_audio_init_async_start);
+ 
+ MODULE_DESCRIPTION("ALSA SoC msm");
+ MODULE_LICENSE("GPL v2");
+diff --git a/sound/soc/msm/msm-dai-fe.c b/sound/soc/msm/msm-dai-fe.c
+index c9178fb..df0217f 100644
+--- a/sound/soc/msm/msm-dai-fe.c
++++ b/sound/soc/msm/msm-dai-fe.c
+@@ -2872,11 +2872,12 @@ static struct platform_driver msm_fe_dai_driver = {
+ 	},
+ };
+ 
+-static int __init msm_fe_dai_init(void)
++//static int __init msm_fe_dai_init(void)
++int __init msm_fe_dai_init(void)
+ {
+ 	return platform_driver_register(&msm_fe_dai_driver);
+ }
+-module_init(msm_fe_dai_init);
++//module_init(msm_fe_dai_init);
+ 
+ static void __exit msm_fe_dai_exit(void)
+ {
+diff --git a/sound/soc/msm/msm-pcm-hostless.c b/sound/soc/msm/msm-pcm-hostless.c
+index 51b0a72..d72ff4d 100644
+--- a/sound/soc/msm/msm-pcm-hostless.c
++++ b/sound/soc/msm/msm-pcm-hostless.c
+@@ -68,11 +68,12 @@ static struct platform_driver msm_pcm_hostless_driver = {
+ 	.remove = msm_pcm_hostless_remove,
+ };
+ 
+-static int __init msm_soc_platform_init(void)
++//static int __init msm_soc_platform_init(void)
++int __init msm_soc_platform_init_pcm_hostless(void)
+ {
+ 	return platform_driver_register(&msm_pcm_hostless_driver);
+ }
+-module_init(msm_soc_platform_init);
++//module_init(msm_soc_platform_init);
+ 
+ static void __exit msm_soc_platform_exit(void)
+ {
+diff --git a/sound/soc/msm/qdsp6v2/audio_slimslave.c b/sound/soc/msm/qdsp6v2/audio_slimslave.c
+index e9ecfd5..fd1ad18 100644
+--- a/sound/soc/msm/qdsp6v2/audio_slimslave.c
++++ b/sound/soc/msm/qdsp6v2/audio_slimslave.c
+@@ -160,11 +160,12 @@ static struct slim_driver audio_slimslave_driver = {
+ 	.suspend = audio_slimslave_suspend,
+ };
+ 
+-static int __init audio_slimslave_init(void)
++//static int __init audio_slimslave_init(void)
++int __init audio_slimslave_init(void)
+ {
+ 	return slim_driver_register(&audio_slimslave_driver);
+ }
+-module_init(audio_slimslave_init);
++//module_init(audio_slimslave_init);
+ 
+ static void __exit audio_slimslave_exit(void)
+ {
+diff --git a/sound/soc/msm/qdsp6v2/msm-compress-q6-v2.c b/sound/soc/msm/qdsp6v2/msm-compress-q6-v2.c
+index b2aa6bd..97c097d 100644
+--- a/sound/soc/msm/qdsp6v2/msm-compress-q6-v2.c
++++ b/sound/soc/msm/qdsp6v2/msm-compress-q6-v2.c
+@@ -4883,11 +4883,12 @@ static struct platform_driver msm_compr_driver = {
+ 	.remove = msm_compr_remove,
+ };
+ 
+-static int __init msm_soc_platform_init(void)
++//static int __init msm_soc_platform_init(void)
++int __init msm_soc_platform_init_compress_q6_v2(void)
+ {
+ 	return platform_driver_register(&msm_compr_driver);
+ }
+-module_init(msm_soc_platform_init);
++//module_init(msm_soc_platform_init);
+ 
+ static void __exit msm_soc_platform_exit(void)
+ {
+diff --git a/sound/soc/msm/qdsp6v2/msm-dai-q6-hdmi-v2.c b/sound/soc/msm/qdsp6v2/msm-dai-q6-hdmi-v2.c
+index 6b1c150..6d161fb 100644
+--- a/sound/soc/msm/qdsp6v2/msm-dai-q6-hdmi-v2.c
++++ b/sound/soc/msm/qdsp6v2/msm-dai-q6-hdmi-v2.c
+@@ -538,11 +538,12 @@ static struct platform_driver msm_dai_q6_hdmi_driver = {
+ 	},
+ };
+ 
+-static int __init msm_dai_q6_hdmi_init(void)
++//static int __init msm_dai_q6_hdmi_init(void)
++int __init msm_dai_q6_hdmi_init(void)
+ {
+ 	return platform_driver_register(&msm_dai_q6_hdmi_driver);
+ }
+-module_init(msm_dai_q6_hdmi_init);
++//module_init(msm_dai_q6_hdmi_init);
+ 
+ static void __exit msm_dai_q6_hdmi_exit(void)
+ {
+diff --git a/sound/soc/msm/qdsp6v2/msm-dai-q6-v2.c b/sound/soc/msm/qdsp6v2/msm-dai-q6-v2.c
+index b09f6a1..f5870b8 100644
+--- a/sound/soc/msm/qdsp6v2/msm-dai-q6-v2.c
++++ b/sound/soc/msm/qdsp6v2/msm-dai-q6-v2.c
+@@ -8293,7 +8293,8 @@ static struct platform_driver msm_dai_q6_tdm_driver = {
+ 	},
+ };
+ 
+-static int __init msm_dai_q6_init(void)
++//static int __init msm_dai_q6_init(void)
++int __init msm_dai_q6_init(void)
+ {
+ 	int rc;
+ 
+@@ -8363,7 +8364,7 @@ dai_q6_fail:
+ fail:
+ 	return rc;
+ }
+-module_init(msm_dai_q6_init);
++//module_init(msm_dai_q6_init);
+ 
+ static void __exit msm_dai_q6_exit(void)
+ {
+diff --git a/sound/soc/msm/qdsp6v2/msm-dai-slim.c b/sound/soc/msm/qdsp6v2/msm-dai-slim.c
+index 64ecd7e..7d1be0b 100644
+--- a/sound/soc/msm/qdsp6v2/msm-dai-slim.c
++++ b/sound/soc/msm/qdsp6v2/msm-dai-slim.c
+@@ -648,7 +648,8 @@ static struct slim_driver msm_dai_slim_driver = {
+ 	.id_table = msm_dai_slim_dt_match,
+ };
+ 
+-static int __init msm_dai_slim_init(void)
++//static int __init msm_dai_slim_init(void)
++int __init msm_dai_slim_init(void)
+ {
+ 	int rc;
+ 	rc = slim_driver_register(&msm_dai_slim_driver);
+@@ -657,7 +658,7 @@ static int __init msm_dai_slim_init(void)
+ 			__func__, rc);
+ 	return rc;
+ }
+-module_init(msm_dai_slim_init);
++//module_init(msm_dai_slim_init);
+ 
+ static void __exit msm_dai_slim_exit(void)
+ {
+diff --git a/sound/soc/msm/qdsp6v2/msm-dai-stub-v2.c b/sound/soc/msm/qdsp6v2/msm-dai-stub-v2.c
+index 616a1b2..2cd9a98 100644
+--- a/sound/soc/msm/qdsp6v2/msm-dai-stub-v2.c
++++ b/sound/soc/msm/qdsp6v2/msm-dai-stub-v2.c
+@@ -354,7 +354,8 @@ static struct platform_driver msm_dai_stub_driver = {
+ 	},
+ };
+ 
+-static int __init msm_dai_stub_init(void)
++//static int __init msm_dai_stub_init(void)
++int __init msm_dai_stub_init(void)
+ {
+ 	int rc = 0;
+ 
+@@ -378,7 +379,7 @@ dai_stub_dev_fail:
+ fail:
+ 	return rc;
+ }
+-module_init(msm_dai_stub_init);
++//module_init(msm_dai_stub_init);
+ 
+ static void __exit msm_dai_stub_exit(void)
+ {
+diff --git a/sound/soc/msm/qdsp6v2/msm-lsm-client.c b/sound/soc/msm/qdsp6v2/msm-lsm-client.c
+index 9b0918c..2d9f1f1 100644
+--- a/sound/soc/msm/qdsp6v2/msm-lsm-client.c
++++ b/sound/soc/msm/qdsp6v2/msm-lsm-client.c
+@@ -2433,11 +2433,12 @@ static struct platform_driver msm_lsm_driver = {
+ 	.remove = msm_lsm_remove,
+ };
+ 
+-static int __init msm_soc_platform_init(void)
++//static int __init msm_soc_platform_init(void)
++int __init msm_soc_platform_init_lsm_client(void)
+ {
+ 	return platform_driver_register(&msm_lsm_driver);
+ }
+-module_init(msm_soc_platform_init);
++//module_init(msm_soc_platform_init);
+ 
+ static void __exit msm_soc_platform_exit(void)
+ {
+diff --git a/sound/soc/msm/qdsp6v2/msm-pcm-afe-v2.c b/sound/soc/msm/qdsp6v2/msm-pcm-afe-v2.c
+index b1a1ea5..110cfa5 100644
+--- a/sound/soc/msm/qdsp6v2/msm-pcm-afe-v2.c
++++ b/sound/soc/msm/qdsp6v2/msm-pcm-afe-v2.c
+@@ -906,12 +906,13 @@ static struct platform_driver msm_afe_driver = {
+ 	.remove = msm_afe_remove,
+ };
+ 
+-static int __init msm_soc_platform_init(void)
++//static int __init msm_soc_platform_init(void)
++int __init msm_soc_platform_init_pcm_afe_v2(void)
+ {
+ 	pr_debug("%s\n", __func__);
+ 	return platform_driver_register(&msm_afe_driver);
+ }
+-module_init(msm_soc_platform_init);
++//module_init(msm_soc_platform_init);
+ 
+ static void __exit msm_soc_platform_exit(void)
+ {
+diff --git a/sound/soc/msm/qdsp6v2/msm-pcm-dtmf-v2.c b/sound/soc/msm/qdsp6v2/msm-pcm-dtmf-v2.c
+index abbcfed..658882b 100644
+--- a/sound/soc/msm/qdsp6v2/msm-pcm-dtmf-v2.c
++++ b/sound/soc/msm/qdsp6v2/msm-pcm-dtmf-v2.c
+@@ -580,11 +580,12 @@ static struct platform_driver msm_pcm_driver = {
+ 	.remove = msm_pcm_remove,
+ };
+ 
+-static int __init msm_soc_platform_init(void)
++//static int __init msm_soc_platform_init(void)
++int __init msm_soc_platform_init_pcm_dtmf_v2(void)
+ {
+ 	return platform_driver_register(&msm_pcm_driver);
+ }
+-module_init(msm_soc_platform_init);
++//module_init(msm_soc_platform_init);
+ 
+ static void __exit msm_soc_platform_exit(void)
+ {
+diff --git a/sound/soc/msm/qdsp6v2/msm-pcm-host-voice-v2.c b/sound/soc/msm/qdsp6v2/msm-pcm-host-voice-v2.c
+index b02ab78..c94d5ca 100644
+--- a/sound/soc/msm/qdsp6v2/msm-pcm-host-voice-v2.c
++++ b/sound/soc/msm/qdsp6v2/msm-pcm-host-voice-v2.c
+@@ -1503,7 +1503,8 @@ static struct platform_driver msm_pcm_driver = {
+ 	.remove = msm_pcm_remove,
+ };
+ 
+-static int __init msm_soc_platform_init(void)
++//static int __init msm_soc_platform_init(void)
++int __init msm_soc_platform_init_pcm_host_voice_v2(void)
+ {
+ 	int i = 0;
+ 	struct session *s = NULL;
+@@ -1540,7 +1541,7 @@ static int __init msm_soc_platform_init(void)
+ 
+ 	return platform_driver_register(&msm_pcm_driver);
+ }
+-module_init(msm_soc_platform_init);
++//module_init(msm_soc_platform_init);
+ 
+ static void __exit msm_soc_platform_exit(void)
+ {
+diff --git a/sound/soc/msm/qdsp6v2/msm-pcm-loopback-v2.c b/sound/soc/msm/qdsp6v2/msm-pcm-loopback-v2.c
+index 2fbefa7..14c8685 100644
+--- a/sound/soc/msm/qdsp6v2/msm-pcm-loopback-v2.c
++++ b/sound/soc/msm/qdsp6v2/msm-pcm-loopback-v2.c
+@@ -1787,11 +1787,12 @@ static struct platform_driver msm_pcm_driver = {
+ 	.remove = msm_pcm_remove,
+ };
+ 
+-static int __init msm_soc_platform_init(void)
++//static int __init msm_soc_platform_init(void)
++int __init msm_soc_platform_init_pcm_loopback_v2(void)
+ {
+ 	return platform_driver_register(&msm_pcm_driver);
+ }
+-module_init(msm_soc_platform_init);
++//module_init(msm_soc_platform_init);
+ 
+ static void __exit msm_soc_platform_exit(void)
+ {
+diff --git a/sound/soc/msm/qdsp6v2/msm-pcm-q6-noirq.c b/sound/soc/msm/qdsp6v2/msm-pcm-q6-noirq.c
+index ce9091b..e7851a5 100644
+--- a/sound/soc/msm/qdsp6v2/msm-pcm-q6-noirq.c
++++ b/sound/soc/msm/qdsp6v2/msm-pcm-q6-noirq.c
+@@ -1273,11 +1273,12 @@ static struct platform_driver msm_pcm_driver_noirq = {
+ 	.remove = msm_pcm_remove,
+ };
+ 
+-static int __init msm_soc_platform_init(void)
++//static int __init msm_soc_platform_init(void)
++int __init msm_soc_platform_init_pcm_q6_noirq(void)
+ {
+ 	return platform_driver_register(&msm_pcm_driver_noirq);
+ }
+-module_init(msm_soc_platform_init);
++//module_init(msm_soc_platform_init);
+ 
+ static void __exit msm_soc_platform_exit(void)
+ {
+diff --git a/sound/soc/msm/qdsp6v2/msm-pcm-q6-v2.c b/sound/soc/msm/qdsp6v2/msm-pcm-q6-v2.c
+index 6798b50..2512055 100644
+--- a/sound/soc/msm/qdsp6v2/msm-pcm-q6-v2.c
++++ b/sound/soc/msm/qdsp6v2/msm-pcm-q6-v2.c
+@@ -3059,7 +3059,8 @@ static struct platform_driver msm_pcm_driver = {
+ 	.remove = msm_pcm_remove,
+ };
+ 
+-static int __init msm_soc_platform_init(void)
++//static int __init msm_soc_platform_init(void)
++int __init msm_soc_platform_init_pcm_q6_v2(void)
+ {
+ 	init_waitqueue_head(&the_locks.enable_wait);
+ 	init_waitqueue_head(&the_locks.eos_wait);
+@@ -3068,7 +3069,7 @@ static int __init msm_soc_platform_init(void)
+ 
+ 	return platform_driver_register(&msm_pcm_driver);
+ }
+-module_init(msm_soc_platform_init);
++//module_init(msm_soc_platform_init);
+ 
+ static void __exit msm_soc_platform_exit(void)
+ {
+diff --git a/sound/soc/msm/qdsp6v2/msm-pcm-routing-v2.c b/sound/soc/msm/qdsp6v2/msm-pcm-routing-v2.c
+index d0dabcb..85446aa 100644
+--- a/sound/soc/msm/qdsp6v2/msm-pcm-routing-v2.c
++++ b/sound/soc/msm/qdsp6v2/msm-pcm-routing-v2.c
+@@ -17145,7 +17145,8 @@ err:
+ 	return ret;
+ }
+ 
+-static int __init msm_soc_routing_platform_init(void)
++//static int __init msm_soc_routing_platform_init(void)
++int __init msm_soc_routing_platform_init(void)
+ {
+ 	mutex_init(&routing_lock);
+ 	if (msm_routing_init_cal_data())
+@@ -17159,7 +17160,7 @@ static int __init msm_soc_routing_platform_init(void)
+ 
+ 	return platform_driver_register(&msm_routing_pcm_driver);
+ }
+-module_init(msm_soc_routing_platform_init);
++//module_init(msm_soc_routing_platform_init);
+ 
+ static void __exit msm_soc_routing_platform_exit(void)
+ {
+diff --git a/sound/soc/msm/qdsp6v2/msm-pcm-voice-v2.c b/sound/soc/msm/qdsp6v2/msm-pcm-voice-v2.c
+index 2615ee6..6d53486 100644
+--- a/sound/soc/msm/qdsp6v2/msm-pcm-voice-v2.c
++++ b/sound/soc/msm/qdsp6v2/msm-pcm-voice-v2.c
+@@ -1039,7 +1039,8 @@ static struct platform_driver msm_pcm_driver = {
+ 	.remove = msm_pcm_remove,
+ };
+ 
+-static int __init msm_soc_platform_init(void)
++//static int __init msm_soc_platform_init(void)
++int __init msm_soc_platform_init_pcm_voice_v2(void)
+ {
+ 	int i = 0;
+ 
+@@ -1050,7 +1051,7 @@ static int __init msm_soc_platform_init(void)
+ 
+ 	return platform_driver_register(&msm_pcm_driver);
+ }
+-module_init(msm_soc_platform_init);
++//module_init(msm_soc_platform_init);
+ 
+ static void __exit msm_soc_platform_exit(void)
+ {
+diff --git a/sound/soc/msm/qdsp6v2/msm-pcm-voip-v2.c b/sound/soc/msm/qdsp6v2/msm-pcm-voip-v2.c
+index b2387a7..bb644d7 100644
+--- a/sound/soc/msm/qdsp6v2/msm-pcm-voip-v2.c
++++ b/sound/soc/msm/qdsp6v2/msm-pcm-voip-v2.c
+@@ -1682,7 +1682,8 @@ static struct platform_driver msm_pcm_driver = {
+ 	.remove = msm_pcm_remove,
+ };
+ 
+-static int __init msm_soc_platform_init(void)
++//static int __init msm_soc_platform_init(void)
++int __init msm_soc_platform_init_pcm_voip_v2(void)
+ {
+ 	memset(&voip_info, 0, sizeof(voip_info));
+ 	voip_info.mode = MODE_PCM;
+@@ -1701,7 +1702,7 @@ static int __init msm_soc_platform_init(void)
+ 
+ 	return platform_driver_register(&msm_pcm_driver);
+ }
+-module_init(msm_soc_platform_init);
++//module_init(msm_soc_platform_init);
+ 
+ static void __exit msm_soc_platform_exit(void)
+ {
+diff --git a/sound/soc/msm/qdsp6v2/msm-transcode-loopback-q6-v2.c b/sound/soc/msm/qdsp6v2/msm-transcode-loopback-q6-v2.c
+index ef9c652..96453f2 100644
+--- a/sound/soc/msm/qdsp6v2/msm-transcode-loopback-q6-v2.c
++++ b/sound/soc/msm/qdsp6v2/msm-transcode-loopback-q6-v2.c
+@@ -1432,13 +1432,14 @@ static struct platform_driver msm_transcode_loopback_driver = {
+ 	.remove = msm_transcode_remove,
+ };
+ 
+-static int __init msm_soc_platform_init(void)
++//static int __init msm_soc_platform_init(void)
++int __init msm_soc_platform_init_transcode_loopback_q6_v2(void)
+ {
+ 	memset(&transcode_info, 0, sizeof(struct msm_transcode_loopback));
+ 	mutex_init(&transcode_info.lock);
+ 	return platform_driver_register(&msm_transcode_loopback_driver);
+ }
+-module_init(msm_soc_platform_init);
++//module_init(msm_soc_platform_init);
+ 
+ static void __exit msm_soc_platform_exit(void)
+ {
+diff --git a/sound/soc/msm/qdsp6v2/q6adm.c b/sound/soc/msm/qdsp6v2/q6adm.c
+index 986e8b2..84978a6 100644
+--- a/sound/soc/msm/qdsp6v2/q6adm.c
++++ b/sound/soc/msm/qdsp6v2/q6adm.c
+@@ -4697,7 +4697,8 @@ done:
+ 	return ret;
+ }
+ 
+-static int __init adm_init(void)
++//static int __init adm_init(void)
++int __init adm_init(void)
+ {
+ 	int i = 0, j;
+ 
+@@ -4727,5 +4728,5 @@ static void __exit adm_exit(void)
+ 	adm_delete_cal_data();
+ }
+ 
+-device_initcall(adm_init);
++//device_initcall(adm_init);
+ module_exit(adm_exit);
+diff --git a/sound/soc/msm/qdsp6v2/q6afe.c b/sound/soc/msm/qdsp6v2/q6afe.c
+index 6d38cb5..5d5c231 100644
+--- a/sound/soc/msm/qdsp6v2/q6afe.c
++++ b/sound/soc/msm/qdsp6v2/q6afe.c
+@@ -6922,7 +6922,8 @@ done:
+ }
+ EXPORT_SYMBOL(afe_release_all_dma_resources);
+ 
+-static int __init afe_init(void)
++//static int __init afe_init(void)
++int __init afe_init(void)
+ {
+ 	int i = 0, ret;
+ 
+@@ -6966,5 +6967,5 @@ static void __exit afe_exit(void)
+ 	wakeup_source_trash(&wl.ws);
+ }
+ 
+-device_initcall(afe_init);
++//device_initcall(afe_init);
+ __exitcall(afe_exit);
+diff --git a/sound/soc/msm/qdsp6v2/q6asm.c b/sound/soc/msm/qdsp6v2/q6asm.c
+index 092ac38..847be35 100644
+--- a/sound/soc/msm/qdsp6v2/q6asm.c
++++ b/sound/soc/msm/qdsp6v2/q6asm.c
+@@ -10062,7 +10062,8 @@ static int q6asm_is_valid_session(struct apr_client_data *data, void *priv)
+ 	return 0;
+ }
+ 
+-static int __init q6asm_init(void)
++//static int __init q6asm_init(void)
++int __init q6asm_init(void)
+ {
+ 	int lcnt, ret;
+ 	pr_debug("%s:\n", __func__);
+@@ -10106,5 +10107,5 @@ static void __exit q6asm_exit(void)
+ 	q6asm_delete_cal_data();
+ }
+ 
+-device_initcall(q6asm_init);
++//device_initcall(q6asm_init);
+ __exitcall(q6asm_exit);
+diff --git a/sound/soc/msm/qdsp6v2/q6core.c b/sound/soc/msm/qdsp6v2/q6core.c
+index d736af0..220c64b 100644
+--- a/sound/soc/msm/qdsp6v2/q6core.c
++++ b/sound/soc/msm/qdsp6v2/q6core.c
+@@ -1126,7 +1126,8 @@ err:
+ 	return ret;
+ }
+ 
+-static int __init core_init(void)
++//static int __init core_init(void)
++int __init q6_core_init(void)
+ {
+ 	memset(&q6core_lcl, 0, sizeof(struct q6core_str));
+ 	init_waitqueue_head(&q6core_lcl.bus_bw_req_wait);
+@@ -1140,7 +1141,7 @@ static int __init core_init(void)
+ 
+ 	return 0;
+ }
+-module_init(core_init);
++//module_init(core_init);
+ 
+ static void __exit core_exit(void)
+ {
+diff --git a/sound/soc/msm/qdsp6v2/q6lsm.c b/sound/soc/msm/qdsp6v2/q6lsm.c
+index d926623..861bfae 100644
+--- a/sound/soc/msm/qdsp6v2/q6lsm.c
++++ b/sound/soc/msm/qdsp6v2/q6lsm.c
+@@ -2107,7 +2107,8 @@ err:
+ 	return ret;
+ }
+ 
+-static int __init q6lsm_init(void)
++//static int __init q6lsm_init(void)
++int __init q6lsm_init(void)
+ {
+ 	int i = 0;
+ 	pr_debug("%s:\n", __func__);
+@@ -2135,5 +2136,5 @@ static void __exit q6lsm_exit(void)
+ 	lsm_delete_cal_data();
+ }
+ 
+-device_initcall(q6lsm_init);
++//device_initcall(q6lsm_init);
+ __exitcall(q6lsm_exit);
+diff --git a/sound/soc/msm/qdsp6v2/q6voice.c b/sound/soc/msm/qdsp6v2/q6voice.c
+index 3193dd0..4df21e5 100644
+--- a/sound/soc/msm/qdsp6v2/q6voice.c
++++ b/sound/soc/msm/qdsp6v2/q6voice.c
+@@ -8709,7 +8709,8 @@ int is_voc_initialized(void)
+ 	return module_initialized;
+ }
+ 
+-static int __init voice_init(void)
++//static int __init voice_init(void)
++int __init voice_init(void)
+ {
+ 	int rc = 0, i = 0;
+ 
+@@ -8805,7 +8806,8 @@ static int __init voice_init(void)
+ 	return rc;
+ }
+ 
+-device_initcall(voice_init);
++//device_initcall(voice_init);
++//fs_initcall(voice_init);
+ 
+ static void __exit voice_exit(void)
+ {
+diff --git a/sound/soc/msm/qdsp6v2/rtac.c b/sound/soc/msm/qdsp6v2/rtac.c
+index 0a33171..6d0a505 100644
+--- a/sound/soc/msm/qdsp6v2/rtac.c
++++ b/sound/soc/msm/qdsp6v2/rtac.c
+@@ -1984,7 +1984,8 @@ struct miscdevice rtac_misc = {
+ 	.fops	= &rtac_fops,
+ };
+ 
+-static int __init rtac_init(void)
++//static int __init rtac_init(void)
++int __init rtac_init(void)
+ {
+ 	int i = 0;
+ 
+@@ -2068,7 +2069,7 @@ nomem:
+ 	return -ENOMEM;
+ }
+ 
+-module_init(rtac_init);
++//module_init(rtac_init);
+ 
+ MODULE_DESCRIPTION("SoC QDSP6v2 Real-Time Audio Calibration driver");
+ MODULE_LICENSE("GPL v2");
+diff --git a/sound/soc/soc-core.c b/sound/soc/soc-core.c
+index fae57d1..90cfb33 100644
+--- a/sound/soc/soc-core.c
++++ b/sound/soc/soc-core.c
+@@ -3764,14 +3764,15 @@ err:
+ }
+ EXPORT_SYMBOL_GPL(snd_soc_of_get_dai_link_codecs);
+ 
+-static int __init snd_soc_init(void)
++//static int __init snd_soc_init(void)
++int __init snd_soc_init(void)
+ {
+ 	snd_soc_debugfs_init();
+ 	snd_soc_util_init();
+ 
+ 	return platform_driver_register(&soc_driver);
+ }
+-module_init(snd_soc_init);
++//module_init(snd_soc_init);
+ 
+ static void __exit snd_soc_exit(void)
+ {
+-- 
+2.7.4
+
