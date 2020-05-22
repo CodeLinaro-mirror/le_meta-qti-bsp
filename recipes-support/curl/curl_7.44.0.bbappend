@@ -10,4 +10,5 @@ SRC_URI += "\
         file://CVE-2017-1000254.patch \
         file://CVE-2016-7141.patch \
         file://CVE-2018-1000121.patch \
+        file://CVE-2019-3823.patch \
 "
