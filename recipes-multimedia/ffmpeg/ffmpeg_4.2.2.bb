@@ -25,7 +25,8 @@ LIC_FILES_CHKSUM = "file://COPYING.GPLv2;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
 
 SRC_URI = "https://www.ffmpeg.org/releases/${BP}.tar.xz \
            file://add-for-support-v4l2-decode.patch \
-           file://0001-Enable-NV12_UBWC-for-ffmpeg-4.2.2-based-on-EDGE.patch"
+           file://0001-Enable-NV12_UBWC-for-ffmpeg-4.2.2-based-on-EDGE.patch \
+           file://0001-enable-LGPL-license.patch"
 
 SRC_URI[md5sum] = "348956fc2faa57a2f79bbb84ded9fbc3"
 SRC_URI[sha256sum] = "cb754255ab0ee2ea5f66f8850e1bd6ad5cac1cd855d0a2f4990fb8c668b0d29c"
@@ -44,7 +45,7 @@ DEPENDS = "alsa-lib zlib libogg nasm-native"
 inherit autotools pkgconfig
 
 PACKAGECONFIG ??= "avdevice avfilter avcodec avformat swresample swscale postproc \
-                   bzlib gpl lzma theora x264 \
+                   bzlib lzma theora \
                    ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'xv', '', d)}"
 
 # libraries to build in addition to avutil

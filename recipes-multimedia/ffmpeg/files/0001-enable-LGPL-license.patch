@@ -1,0 +1,24 @@
+From 2cde7c5873f7b2e1f15bc4efaead0a670a608a35 Mon Sep 17 00:00:00 2001
+From: Zhenlin Lian <lianzhenlin@codeaurora.org>
+Date: Wed, 27 May 2020 14:47:07 +0800
+Subject: [PATCH] enable-LGPL-license
+
+---
+ libavformat/avio.h | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/libavformat/avio.h b/libavformat/avio.h
+index dcb8dcd..a76827a 100644
+--- a/libavformat/avio.h
++++ b/libavformat/avio.h
+@@ -28,7 +28,6 @@
+ 
+ #include <stdint.h>
+ 
+-#include "libavutil/common.h"
+ #include "libavutil/dict.h"
+ #include "libavutil/log.h"
+ 
+-- 
+2.7.4
+

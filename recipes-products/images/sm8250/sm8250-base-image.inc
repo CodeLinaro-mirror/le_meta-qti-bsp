@@ -22,7 +22,6 @@ IMAGE_INSTALL += "systemd-machine-units"
 IMAGE_INSTALL += "volatile-binds"
 IMAGE_INSTALL += "binder"
 IMAGE_INSTALL += "ffmpeg"
-IMAGE_INSTALL += "x264"
 IMAGE_INSTALL += "start-scripts-misc-daemon"
 IMAGE_INSTALL += "start-scripts-firmware-links"
 IMAGE_INSTALL += "start-scripts-find-partitions"
@@ -217,13 +216,10 @@ copy_edge_bsp_rpm() {
     cp ${DEPLOY_DIR_RPM}/aarch64/libswscale5-4.2.2-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/libavcodec58-4.2.2-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/libavformat58-4.2.2-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
-    cp ${DEPLOY_DIR_RPM}/aarch64/libpostproc55-4.2.2-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/libavdevice58-4.2.2-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/libavresample4-4.2.2-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/libswresample3-4.2.2-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/libasound2-1.1.6-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
-    cp ${DEPLOY_DIR_RPM}/aarch64/libx264-152-r2854+git0+e9a5903edf-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
-    cp ${DEPLOY_DIR_RPM}/aarch64/libx264-bin-r2854+git0+e9a5903edf-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/libjpeg8-1.2.1-r2.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/mtdev-1.1.5-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/libevdev-1.5.9-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
