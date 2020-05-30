@@ -43,6 +43,7 @@ do_shared_workdir_append () {
                 scripts/basic/fixdep \
                 scripts/conmakehash \
                 scripts/dtc/dtc \
+                scripts/genksyms/genksyms \
                 scripts/kallsyms \
                 scripts/kconfig/conf \
                 scripts/mod/mk_elfconfig \
