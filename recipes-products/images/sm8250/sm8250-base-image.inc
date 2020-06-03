@@ -27,6 +27,7 @@ IMAGE_INSTALL += "start-scripts-firmware-links"
 IMAGE_INSTALL += "start-scripts-find-partitions"
 IMAGE_INSTALL += "opencv"
 IMAGE_INSTALL += "system-media"
+IMAGE_INSTALL += "protobuf"
 
 IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'start-script-ab-slot-util', '', d)}"
 

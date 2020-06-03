@@ -12,6 +12,7 @@ DEPENDS += "binder"
 DEPENDS += "camera-metadata"
 DEPENDS += "libhardware"
 DEPENDS += "liblog"
+DEPENDS += "camx-ext"
 
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI   = "file://frameworks/av/"

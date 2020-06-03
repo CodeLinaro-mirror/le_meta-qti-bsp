@@ -13,6 +13,14 @@ S = "${WORKDIR}/camera_metadata"
 
 DEPENDS += "libcutils"
 
+do_install_append() {
+     rm -rf ${D}${includedir}/system/camera_vendor_tags.h
+     rm -rf ${D}${includedir}/system/camera_metadata_tags.h
+     rm -rf ${D}${includedir}/system/camera_metadata.h
+     rm -rf ${D}${includedir}/camera/camera_metadata_hidden.h
+     rm -rf ${D}/usr/lib64/libcamera_metadata.so
+}
+
 FILES_${PN}-dbg    = "${libdir}/.debug/lib*.*"
 FILES_${PN}        = "${libdir}/lib*.so.* ${libdir}/pkgconfig/*"
 FILES_${PN}-dev    = "${libdir}/lib*.so ${libdir}/lib*.la ${includedir}"

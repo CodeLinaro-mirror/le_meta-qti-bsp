@@ -12,6 +12,11 @@ S = "${WORKDIR}/hardware/libhardware"
 
 PR = "r6"
 
+do_install_append() {
+     rm -rf ${D}${includedir}/hardware/gralloc1.h
+     rm -rf ${D}${includedir}/hardware/gralloc.h
+}
+
 DEPENDS += "libcutils liblog system-core"
 
 EXTRA_OECONF_append_apq8053 = " --enable-sensors"
