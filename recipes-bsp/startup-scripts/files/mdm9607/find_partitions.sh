@@ -66,6 +66,8 @@ mtd_file=/proc/mtd
 fstype="UBI"
 eval FindAndMountVolume${fstype} usrfs /data
 
+eval FindAndMountVolume${fstype} persist /persist
+
 eval FindAndMount${fstype} modem /firmware
 
 exit 0
