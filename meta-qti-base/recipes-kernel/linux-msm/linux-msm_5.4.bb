@@ -28,7 +28,6 @@ KERNEL_EXTRA_ARGS_append_sa8155  += "TARGET_BOARD_TYPE=auto"
 KERNEL_EXTRA_ARGS_append_sa6155  += "TARGET_BOARD_TYPE=auto"
 
 SRC_URI   =  "${PATH_TO_REPO}/kernel/msm-5.4/.git;protocol=${PROTO};destsuffix=kernel/msm-5.4;usehead=1 \
-              ${PATH_TO_REPO}/vendor/qcom/proprietary/devicetree/.git;protocol=${PROTO};destsuffix=vendor/qcom/proprietary/devicetree;usehead=1 \
               ${PATH_TO_REPO}/data-kernel/.git;protocol=${PROTO};destsuffix=data-kernel;usehead=1"
 
 SRC_URI_append = "  \
@@ -63,13 +62,6 @@ do_generate_gki_defconfig() {
 
 addtask do_generate_gki_defconfig after do_unpack before do_kernel_metadata
 do_generate_gki_defconfig[depends] += "virtual/${TARGET_PREFIX}binutils:do_populate_sysroot"
-
-do_prepare_source() {
-    mkdir -p ${S}/arch/arm64/boot/dts/vendor
-    cp -rf ${S}/../../vendor/qcom/proprietary/devicetree/* ${S}/arch/arm64/boot/dts/vendor
-}
-
-addtask do_prepare_source after do_unpack before do_symlink_kernsrc
 
 do_kernel_checkout[noexec] = "1"
 
