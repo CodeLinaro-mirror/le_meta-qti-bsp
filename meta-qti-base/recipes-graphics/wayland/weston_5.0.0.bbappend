@@ -36,6 +36,9 @@ TARGET_CPPFLAGS += "-I${STAGING_INCDIR}/qcom/display"
 TARGET_CPPFLAGS += "-I${STAGING_INCDIR}/sdm"
 TARGET_CPPFLAGS += "-I${STAGING_INCDIR}/sdm/core"
 
+# add display techpack headers
+TARGET_CFLAGS += "-I${STAGING_KERNEL_BUILDDIR}/usr/include/display"
+
 EXTRA_OECONF += "--disable-xwayland \
                 --enable-simple-clients \
                 --enable-clients \

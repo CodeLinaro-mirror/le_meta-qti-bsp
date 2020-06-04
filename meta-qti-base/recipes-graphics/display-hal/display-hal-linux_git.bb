@@ -45,6 +45,9 @@ CPPFLAGS += "-I${STAGING_INCDIR}/libdrm"
 # fix for uapi msm_drm.h header file related compilation issue
 CPPFLAGS += "-fno-operator-names"
 
+# add display techpack headers
+CPPFLAGS += "-I${STAGING_KERNEL_BUILDDIR}/usr/include/display"
+
 do_install_append () {
     # libhardware expects to find /usr/lib/hw/gralloc.*.so
     install -d ${D}${libdir}/hw
