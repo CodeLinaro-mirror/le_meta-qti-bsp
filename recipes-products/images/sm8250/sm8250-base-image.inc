@@ -252,6 +252,15 @@ copy_edge_bsp_rpm() {
 
 ROOTFS_POSTPROCESS_COMMAND += "copy_edge_bsp_rpm;"
 
+copy_edge_kernel_certs() {
+    if [ -d ${STAGING_KERNEL_BUILDDIR}/certs ]
+    then
+        cp -rf ${STAGING_KERNEL_BUILDDIR}/certs ${DEPLOY_DIR_IMAGE}/
+    fi
+}
+
+IMAGE_POSTPROCESS_COMMAND += "copy_edge_kernel_certs;"
+
 do_makesystem() {
     cp ${THISDIR}/${BASEMACHINE}/sm8250-fsconfig.conf ${WORKDIR}/rootfs-fsconfig.conf
     make_ext4fs -C ${WORKDIR}/rootfs-fsconfig.conf -B ${DEPLOY_DIR_IMAGE}/system.map -s -a / ${IMAGE_EXT4_SELINUX_OPTIONS} -l ${SYSTEM_SIZE_EXT4} ${DEPLOY_DIR_IMAGE}/${SYSTEMIMAGE_TARGET} ${IMAGE_ROOTFS}
