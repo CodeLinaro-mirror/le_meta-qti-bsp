@@ -6,12 +6,14 @@ SRC_URI += "file://mount_data.sh"
 SRC_URI += "file://umountfs"
 SRC_URI += "file://bsp_paths.sh"
 SRC_URI += "file://set_core_pattern.sh"
+SRC_URI += "file://populate-volatile.sh"
 
 do_install_append() {
         update-rc.d -f -r ${D} mount_data.sh remove
         update-rc.d -f -r ${D} mountnfs.sh remove
         update-rc.d -f -r ${D} urandom remove
         update-rc.d -f -r ${D} checkroot.sh remove
+	update-rc.d -f -r ${D} populate-volatile.sh remove
 
         install -m 0755 ${WORKDIR}/mount_data.sh  ${D}${sysconfdir}/init.d
         update-rc.d -r ${D} mount_data.sh start 03 S .
@@ -22,6 +24,9 @@ do_install_append() {
         install -m 0755 ${WORKDIR}/set_core_pattern.sh  ${D}${sysconfdir}/init.d
         update-rc.d -r ${D} set_core_pattern.sh start 01 S 2 3 4 5 S .
 
-        sed -i '/^test ! -x \/sbin\/restorecon/ d' ${D}${sysconfdir}/init.d/populate-volatile.sh
+        install -m 0755 ${WORKDIR}/populate-volatile.sh ${D}${sysconfdir}/init.d
+        update-rc.d -r ${D} populate-volatile.sh start 28 S .
+
+	sed -i '/^test ! -x \/sbin\/restorecon/ d' ${D}${sysconfdir}/init.d/populate-volatile.sh
         echo "test ! -x /sbin/restorecon || /sbin/restorecon -F /var/log" >> ${D}${sysconfdir}/init.d/populate-volatile.sh
 }
