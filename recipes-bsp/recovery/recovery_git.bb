@@ -21,6 +21,8 @@ CFLAGS += "-lsparse -llog"
 SYSTEMD_SUPPORT = "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd', '', d)}"
 
 SELINUX_SUPPORT = "${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'selinux', '', d)}"
+OTA_VERIFICATION_SUPPORT = "${@bb.utils.contains('DISTRO_FEATURES', 'ota-package-verification', 'TARGET_SUPPORTS_OTA_VERIFICATION=true', '', d)}"
+EXTRA_OECONF += " ${OTA_VERIFICATION_SUPPORT}"
 PARALLEL_MAKE = ""
 INITSCRIPT_NAME = "recovery"
 INITSCRIPT_PARAMS = "start 99 5 . stop 80 0 1 6 ."
