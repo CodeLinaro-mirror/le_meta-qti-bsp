@@ -2,7 +2,7 @@
 # add the MACHINE name to this list.
 # This is the "only" list that will control whether
 # OTA upgrade will be supported on a target.
-OTA_SUPPORTED_NAND_TARGET_LIST = "sdxprairie sdxpoorwills mdm9607 qcs403-som2 sa415m sa515m nf-32 nf-64"
+OTA_SUPPORTED_NAND_TARGET_LIST = "sdxprairie sdxpoorwills mdm9607 qcs403-som2 sa415m sa515m nf-32 nf-64 sa2150p-nand"
 
 def nand_target_supports_OTA_upgrade(d):
     list_of_supported_targets = d.getVar('OTA_SUPPORTED_NAND_TARGET_LIST');

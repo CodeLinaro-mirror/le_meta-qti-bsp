@@ -15,23 +15,34 @@ spec=$1
 mountpoint=$2
 
 if [ -f "$mountpoint" ]; then
+    #Skip if already mount-binded
+    if grep -qs $mountpoint /proc/mounts; then
+        exit 0
+    fi
+
     if [ ! -f "$spec" ]; then
         mkdir -p $(dirname $spec)
         cp -P --preserve=all "$mountpoint" "$spec"
     fi
-  mount -o "bind" "$spec" "$mountpoint"
+
+    mount -o "bind" "$spec" "$mountpoint"
 fi
 
 if [ -d "$mountpoint" ]; then
- mkdir -p $spec
- cd $mountpoint
- for file in *
-  do
-   if [ -f "$mountpoint/$file" ]; then
-    if [ ! -f "$spec/$file" ]; then
-        cp --preserve=all "$file" "$spec/"
-    fi
- mount -o "bind" "$spec/$file" "$mountpoint/$file"
-   fi
- done
+    mkdir -p $spec
+    cd $mountpoint
+    for file in *
+    do
+        #Skip if already mount-binded
+        if grep -qs $file /proc/mounts; then
+            continue
+        fi
+
+        if [ -f "$mountpoint/$file" ]; then
+            if [ ! -f "$spec/$file" ]; then
+                cp --preserve=all "$file" "$spec/"
+            fi
+            mount -o "bind" "$spec/$file" "$mountpoint/$file"
+        fi
+   done
 fi
