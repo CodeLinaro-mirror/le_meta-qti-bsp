@@ -34,7 +34,9 @@ if [ -d "$mountpoint" ]; then
     for file in *
     do
         #Skip if already mount-binded
-        if grep -qs $file /proc/mounts; then
+        # remove trailing '/' if present
+        mountpath=$(echo $mountpoint | sed 's:/*$::')
+        if grep -qs "$mountpath/$file" /proc/mounts; then
             continue
         fi
 
