@@ -1,4 +1,11 @@
-#inherit mdm-ota-target-image-ubi # To be implemented
+# if A/B support is supported, generate OTA pkg by default.
+GENERATE_AB_OTA_PACKAGE ?= "${@bb.utils.contains('COMBINED_FEATURES', 'qti-ab-boot', '1', '', d)}"
+
+QIMGUBICLASSES  = ""
+# To be implemented
+# QIMGUBICLASSES += "${@bb.utils.contains('GENERATE_AB_OTA_PACKAGE', '1', 'ab-ota-ext4', '', d)}"
+
+inherit ${QIMGUBICLASSES}
 
 IMAGE_FEATURES[validitems] += "persist-volume"
 
