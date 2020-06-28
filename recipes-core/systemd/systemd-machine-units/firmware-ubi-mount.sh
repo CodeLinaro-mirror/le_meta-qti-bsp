@@ -56,6 +56,6 @@ if [ -x /sbin/restorecon ]; then
 else
     firmware_selinux_opt=""
 fi
-eval FindAndMountUBI modem /firmware $firmware_selinux_opt
+eval FindAndMountUBI modem /firmware ,noexec,nodev,ro$firmware_selinux_opt
 
 exit 0
