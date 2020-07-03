@@ -151,7 +151,7 @@ do_deploy_append() {
 
     if ${@bb.utils.contains('DISTRO_FEATURES', 'q-hypervisor', 'true', 'false', d)}; then
         cp -f ${B}/arch/${ARCH}/boot/Image ${DEPLOYDIR}/linux-lv.img
-        cp -f ${B}/arch/${ARCH}/boot/dts/qcom/*.dtb ${DEPLOYDIR}/
+        cp -f ${B}/arch/${ARCH}/boot/dts/vendor/qcom/*.dtb ${DEPLOYDIR}/
     fi
 }
 
