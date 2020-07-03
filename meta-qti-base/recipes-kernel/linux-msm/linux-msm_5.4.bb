@@ -146,7 +146,7 @@ do_shared_workdir_append () {
 
 do_deploy_append() {
     if ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'true', 'false', d)}; then
-        ${STAGING_BINDIR_NATIVE}/mkdtimg create ${DEPLOYDIR}/dtbo.img ${B}/arch/${ARCH}/boot/dts/qcom/*.dtbo
+        ${STAGING_BINDIR_NATIVE}/mkdtimg create ${DEPLOYDIR}/dtbo.img ${B}/arch/${ARCH}/boot/dts/vendor/qcom/*.dtbo
     fi
 
     if ${@bb.utils.contains('DISTRO_FEATURES', 'q-hypervisor', 'true', 'false', d)}; then
