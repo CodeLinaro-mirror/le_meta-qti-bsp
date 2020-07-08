@@ -4,6 +4,8 @@
 
 ro.product.board=msm8909
 
+# If ro.debuggable is 1, then enable adb root
+ro.debuggable=1
 #Audio features
 ro.vendor.audio.sdk.ssr=false
 ##fluencetype can be "fluence" or "fluencepro" or "none"
