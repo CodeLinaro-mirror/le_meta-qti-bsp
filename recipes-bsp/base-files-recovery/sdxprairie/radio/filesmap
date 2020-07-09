@@ -41,6 +41,7 @@ xbl_cfg.elf             xbl_config
 abl.elf                 abl
 sec.elf                 sec
 apdp.mbn                apdp
+ipa_fws.elf             IPA_FW
 
 # filename + .bak       backup partition
 
