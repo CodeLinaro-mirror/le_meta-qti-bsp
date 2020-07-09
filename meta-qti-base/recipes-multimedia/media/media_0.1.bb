@@ -41,9 +41,7 @@ EXTRA_OECONF_append =" --enable-use-glib='yes'"
 EXTRA_OECONF_append =" --enable-target-uses-ion='yes'"
 EXTRA_OECONF_append =" --enable-target-uses-gbm='yes'"
 EXTRA_OECONF_append =" --enable-target-uses-media-extensions='no'"
-EXTRA_OECONF_append =" --enable-vdec='yes'"
-# media project Makefile.am changed, "--enable-build-mm-video" is useless
-# EXTRA_OECONF_append =" --enable-build-mm-video='yes'"
+EXTRA_OECONF_append =" --enable-build-mm-video='yes'"
 EXTRA_OECONF_append =" --enable-is-ubwc-supported='yes'"
 EXTRA_OECONF_append =" --enable-build-swcodec='yes'"
 EXTRA_OECONF_append =" --enable-target-output-deinterlaced='yes'"
@@ -86,9 +84,6 @@ do_install_append() {
    install -d ${D}${includedir}/libstagefrighthw
    install -m 0644 ${S}/libstagefrighthw/QComOMXMetadata.h -D ${D}${includedir}/libstagefrighthw/
    install -m 0644 ${S}/libc2dcolorconvert/C2DColorConverter.h ${D}${includedir}/
-   install -d ${D}${includedir}/libarbitrarybytes
-   install -m 0644 ${S}/libarbitrarybytes/inc/*.h -D ${D}${includedir}/libarbitrarybytes/
-
 }
 
 FILES_${PN}-dev = "\
