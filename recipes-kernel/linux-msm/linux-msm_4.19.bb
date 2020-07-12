@@ -8,6 +8,7 @@ inherit ${@bb.utils.contains('TARGET_KERNEL_ARCH', 'aarch64', 'qtikernel-arch', 
 # TEMP: Disable IPA3 config for sdmsteppe
 SRC_URI_append_sdmsteppe = " file://disableipa3.cfg"
 SRC_URI_append_sdmsteppe = " file://sdmsteppe_iot_configs.cfg"
+SRC_URI_append_sm8250 = "${@bb.utils.contains('DISTRO', 'aedk', ' file://aedk_overlay.cfg', '', d)}"
 
 COMPATIBLE_MACHINE = "(sm8250)"
 
