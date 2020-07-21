@@ -27,16 +27,18 @@
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # full_ota.sh      script to generate OTA upgrade pacakges.
-#
+# if sign is part of arguments, the testkey.pk8 located at OTA/build/target/product/security is taken as private key.
+# OEMs can replaces this file with their own private key.
 
 set -o xtrace
 
 if [ "$#" -lt 3 ]; then
-    echo "Usage  : $0 target_files_zipfile rootfs_path ext4_or_ubi [-c fsconfig_file [-p prefix]]"
+    echo "Usage  : $0 target_files_zipfile rootfs_path ext4_or_ubi [-c fsconfig_file [-p prefix]] [--sign]"
     echo "------------------------------------------------------------------"
     echo "example: $0 target_files_ubi.zip  machine_image/1.0-r0/rootfs ubi"
     echo "example: $0 target_files_ext4.zip machine_image/1.0-r0/rootfs ext4"
     echo "example: $0 target_files_ext4.zip machine_image/1.0-r0/rootfs ext4  -p system/ -c fsconfig.conf --block"
+    echo "example: $0 target_files_ubi.zip  machine_image/1.0-r0/rootfs ubi --sign"
     exit 1
 fi
 
@@ -53,6 +55,7 @@ export LANG=en_US.UTF-8
 export LANGUAGE=en_US.UTF-8
 export FSCONFIGFOPTS=" "
 block_based=" "
+sign_ota_package=" "
 python_version="python3"
 
 if [ "$#" -gt 3 ]; then
@@ -61,6 +64,8 @@ if [ "$#" -gt 3 ]; then
     for i in $(seq 3 $#); do
        if [ "${allopts[${i}]}" = "--block" ]; then
            block_based="${allopts[${i}]}"
+       elif [ "${allopts[${i}]}" = "--sign" ]; then
+           sign_ota_package="${allopts[${i}]}"
        else
            FSCONFIGFOPTS=$FSCONFIGFOPTS${allopts[${i}]}" "
        fi
@@ -106,7 +111,21 @@ cd $target_files && zip -q ../$1 META/*filesystem_config.txt SYSTEM/build.prop B
 $python_version ./ota_from_target_files $block_based -n -v -d $device_type -p . -m linux_embedded --no_signing  $1 update_$3.zip > ota_debug.txt 2>&1
 
 if [[ $? = 0 ]]; then
-    echo "update.zip generation was successful"
+    if [ "${sign_ota_package}" = "--sign" ]; then
+        # Pipe the contents of OTA zip to openssl to generate the signature of the OTA zip
+        unzip -p update_$3.zip | openssl dgst -sha256 -sign private.pem -out update.sig
+        if [[ $? = 0 ]]; then
+            zip -q -u update_$3.zip update.sig
+            echo "OTA zip signing is successful"
+        else
+            echo "OTA zip signing is failed"
+            # Add the python script errors back into the target-files zip
+            zip -q $1 ota_debug.txt
+            rm update_$3.zip # delete the half-baked update.zip if any;
+        fi
+    else
+        echo "update.zip generation was successful"
+    fi
 else
     echo "update.zip generation failed"
     # Add the python script errors back into the target-files zip

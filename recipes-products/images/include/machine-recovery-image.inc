@@ -31,6 +31,8 @@ IMAGE_INSTALL += "libcomerr"
 IMAGE_INSTALL += "libss"
 IMAGE_INSTALL += "libe2p"
 IMAGE_INSTALL += "libext2fs"
+IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ota-package-verification', 'openssl', '', d)}"
+IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ota-package-verification', 'openssl-bin', '', d)}"
 IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_NAME','mdm', 'systemd-machine-units-recovery', '', d)}"
 
 USBCOMPOSITION_RECOVERY = "901D"
@@ -219,8 +221,14 @@ update_usb_composition() {
     fi
 }
 
+generate_public_key() {
+    openssl pkcs8 -inform DER -nocrypt -in ${WORKSPACE}/OTA/build/target/product/security/testkey.pk8 -out ${TMPDIR}/work/x86_64-linux/releasetools-native/1.0-r0/releasetools/private.pem
+    openssl rsa -in ${TMPDIR}/work/x86_64-linux/releasetools-native/1.0-r0/releasetools/private.pem -outform PEM -pubout > ${IMAGE_ROOTFS}/res/public.pem
+}
+
 ROOTFS_POSTPROCESS_COMMAND += " do_fsconfig; remove_mount_operations; "
 ROOTFS_POSTPROCESS_COMMAND += "${@bb.utils.contains('DISTRO_NAME','mdm', 'update_usb_composition;', '', d)}"
+ROOTFS_POSTPROCESS_COMMAND += "${@bb.utils.contains('DISTRO_FEATURES','ota-package-verification', ' generate_public_key;', '', d)}"
 
 # Call function makesystem to generate sparse ext4 image
 addtask makesystem after do_rootfs before do_build

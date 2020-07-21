@@ -26,6 +26,10 @@ def nand_set_vars_and_get_dependencies(d):
     if bb.utils.contains('DISTRO_FEATURES', 'nand-squashfs', True, False, d):
         d.setVar('SQUASHFS_SUPPORTED', "1");
 
+    # check if this is a nand target with ota package authentication support
+    if bb.utils.contains('DISTRO_FEATURES', 'ota-package-verification', True, False, d):
+        d.setVar('OTA_PACKAGE_VERIFICATION_SUPPORTED', "1");
+
     # for Non A/B target, set RECOVERY_IMAGE_UBI to "1"
     # this will generate a non A/B update package as well.
     d.setVar('RECOVERY_IMAGE_UBI', "1");
@@ -241,7 +245,12 @@ do_gen_otazip_ubi() {
         block_based="--block"
     fi
 
-    cd ${TMPDIR}/work/x86_64-linux/releasetools-native/1.0-r0/releasetools && ./full_ota.sh target-files-ubi.zip ${IMAGE_ROOTFS} ubi $block_based
+    sign_ota_package=""
+    if [[ "${OTA_PACKAGE_VERIFICATION_SUPPORTED}" == "1" ]]; then
+        sign_ota_package="--sign"
+    fi
+
+    cd ${TMPDIR}/work/x86_64-linux/releasetools-native/1.0-r0/releasetools && ./full_ota.sh target-files-ubi.zip ${IMAGE_ROOTFS} ubi $block_based $sign_ota_package
 
     cd ${TMPDIR}/work/x86_64-linux/releasetools-native/1.0-r0/releasetools && cp update_ubi.zip target-files-ubi.zip ${DEPLOY_DIR_IMAGE_NAND}
 }
