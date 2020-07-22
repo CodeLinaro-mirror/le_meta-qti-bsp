@@ -28,13 +28,15 @@ VERITY_ENABLED = "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity','1', '0', 
 
 EARLY_ETH = "${@bb.utils.contains('DISTRO_FEATURES', 'early-eth', '1', '0', d)}"
 
+HIBERNATION = "${@bb.utils.contains('COMBINED_FEATURES', 'hibernation', '1', '0', d)}"
+
 EXTRA_OEMAKE = "'CLANG_BIN=${CLANG_BIN_PATH}' \
                 'CLANG_PREFIX=${STAGING_BINDIR_NATIVE}/${TARGET_SYS}/${TARGET_PREFIX}' \
                 'TARGET_ARCHITECTURE=${TARGET_ARCH}'\
                 'BUILDDIR=${S}'\
                 'BOOTLOADER_OUT=${S}/out'\
                 'ENABLE_LE_VARIANT=true'\
-                'HIBERNATION_SUPPORT=true'\
+                'HIBERNATION_SUPPORT=${HIBERNATION}'\
                 'VERIFIED_BOOT_LE=${VBLE}'\
                 'VERITY_LE=${VERITY_ENABLED}'\
                 'INIT_BIN_LE=\"/sbin/init\"'\
@@ -48,6 +50,10 @@ do_compile () {
     export CXX=${BUILD_CXX}
     export LD=${BUILD_LD}
     export AR=${BUILD_AR}
+    if ${@bb.utils.contains('MACHINE_FEATURES', 'goldcore-boot', 'true', 'false', d)}; then
+        export LINUX_BOOT_CPU_SELECTION_ENABLED=1
+        export TARGET_LINUX_BOOT_CPU_ID=7
+    fi
     oe_runmake -f makefile all
 }
 
