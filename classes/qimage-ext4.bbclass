@@ -52,15 +52,10 @@ do_fsconfig_append_qti-distro-user() {
 ################################################
 ### Generate system.img #####
 ################################################
-# Alter system image size if varity is enabled.
-do_makesystem[prefuncs]  += " ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'adjust_system_size_for_verity', '', d)}"
-do_makesystem[postfuncs] += " ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'make_verity_enabled_system_image', '', d)}"
-do_makesystem[dirs]       = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
-
 SPARSE_SYSTEMIMAGE_FLAG = "${@bb.utils.contains('IMAGE_FEATURES', 'vm', '', '-s', d)}"
 
 do_makesystem() {
-    cp ${THISDIR}/fsconfig/${MACHINE_FSCONFIG_CONF} ${WORKDIR}/rootfs-fsconfig.conf
+    cp ${MACHINE_FSCONFIG_CONF_FULL_PATH} ${WORKDIR}/rootfs-fsconfig.conf
     # An ugly hack to mitigate a bug in libsparse were random
     # asserts are observed during unsparsing if image size is large.
     # Unsparsing is needed for appending verity metadata to image.

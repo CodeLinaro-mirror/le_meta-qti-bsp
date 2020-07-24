@@ -1,5 +1,5 @@
 QIMGCLASSES = "core-image"
-QIMGCLASSES += "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'dm-verity', '', d)}"
+QIMGCLASSES += "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.filter('MACHINE_FEATURES', 'dm-verity-bootloader dm-verity-initramfs', d), '', d)}"
 QIMGCLASSES += "${@bb.utils.contains('IMAGE_FSTYPES', 'ext4', 'qimage-ext4', '', d)}"
 QIMGCLASSES += "${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', 'qimage-ubi', '', d)}"
 
@@ -7,6 +7,18 @@ QIMGCLASSES += "${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', 'qimage-ubi', '', d
 QIMGEXTENSION ?= ""
 
 inherit ${QIMGCLASSES} ${QIMGEXTENSION}
+
+# Sanity check to ensure dm-verity related configurations are valid
+python () {
+    if 'dm-verity' not in d.getVar('DISTRO_FEATURES'):
+        return
+    machine_features = set(d.getVar('MACHINE_FEATURES').split(' '))
+    verity_features = machine_features & set(['dm-verity-none', 'dm-verity-bootloader', 'dm-verity-initramfs'])
+    if len(verity_features) == 0:
+        bb.fatal("dm-verity in DISTRO_FEATURES but no MACHINE_FEATURES present. Add dm-verity-bootloader or dm-verity-none to MACHINE_FEATURES")
+    if len(verity_features) > 1:
+        bb.fatal("dm-verity in DISTRO_FEATURES and multiple dm-verity related MACHINE_FEATURES present. Only one may be present")
+}
 
 # The work directory for image recipes is retained as the 'rootfs' directory
 # can be used as sysroot during remote gdb debgging
@@ -96,6 +108,21 @@ DEPENDS += "\
              qdl-native \
 "
 
+MACHINE_PARTITION_CONF_SEARCH_PATH ?= "${@':'.join('%s/conf/machine/partition' % p for p in '${BBPATH}'.split(':'))}}"
+MACHINE_PARTITION_CONF_FULL_PATH = "${@machine_search(d.getVar('MACHINE_PARTITION_CONF'), d.getVar('MACHINE_PARTITION_CONF_SEARCH_PATH')) or ''}"
+
+MACHINE_FSCONFIG_CONF_SEARCH_PATH ?= "${@':'.join('%s/conf/machine/fsconfig' % p for p in '${BBPATH}'.split(':'))}}"
+MACHINE_FSCONFIG_CONF_FULL_PATH = "${@machine_search(d.getVar('MACHINE_FSCONFIG_CONF'), d.getVar('MACHINE_FSCONFIG_CONF_SEARCH_PATH')) or ''}"
+
+def machine_search(f, search_path):
+    if os.path.isabs(f):
+        if os.path.exists(f):
+            return f
+    else:
+        searched = bb.utils.which(search_path, f)
+        if searched:
+            return searched
+
 # generate partitions artifact in an image-specific folder since they include
 # image specific data such as file name and parition size
 do_gen_partition_bin[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
@@ -103,7 +130,7 @@ do_gen_partition_bin[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
 do_gen_partition_bin () {
     # Generate partition.xml using gen_partition utility
     python ${STAGING_BINDIR_NATIVE}/gen_partition.py \
-        -i ${THISDIR}/partition/${MACHINE_PARTITION_CONF} \
+        -i ${MACHINE_PARTITION_CONF_FULL_PATH} \
         -o ${WORKDIR}/partition.xml \
         -m ${PARTITION_IMAGE_MAP}
 
@@ -185,7 +212,7 @@ python do_make_bootimg () {
 
     # When verity is enabled add '.noverity' suffix to default boot img.
     output          = d.getVar('BOOTIMAGE_TARGET', True)
-    if bb.utils.contains('DISTRO_FEATURES', 'dm-verity', True, False, d):
+    if bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains('MACHINE_FEATURES', 'dm-verity-bootloader', True, False, d), False, d):
             output += ".noverity"
 
     # cmd to make boot.img
