@@ -20,6 +20,7 @@ SRC_URI += "\
             file://0001-Support-MTP-function.patch \
             file://0001-Fix-file-synchronization-in-mdev.patch \
             file://fix-mdev-crash.patch \
+            file://CVE-2016-6301.patch \
 "
 
 prefix = ""
