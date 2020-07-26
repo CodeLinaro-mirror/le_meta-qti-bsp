@@ -1,7 +1,5 @@
 require recipes-kernel/linux-msm/linux-msm.inc
 
-inherit sdllvm
-
 # if is TARGET_KERNEL_ARCH is set inherit qtikernel-arch to compile for that arch.
 inherit ${@bb.utils.contains('TARGET_KERNEL_ARCH', 'aarch64', 'qtikernel-arch', '', d)}
 
@@ -17,7 +15,7 @@ SRC_DIR   =  "${WORKSPACE}/kernel/msm-4.14"
 S         =  "${WORKDIR}/kernel/msm-4.14"
 PR = "r0"
 
-DEPENDS += "dtc-native llvm-arm-toolchain-native"
+DEPENDS += "dtc-native"
 
 LDFLAGS_aarch64 = "-O1 --hash-style=gnu --as-needed"
 TARGET_CXXFLAGS += "-Wno-format"
