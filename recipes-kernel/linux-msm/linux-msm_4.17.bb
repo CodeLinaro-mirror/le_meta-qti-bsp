@@ -1,5 +1,4 @@
 require recipes-kernel/linux-msm/linux-msm.inc
-inherit sdllvm
 COMPATIBLE_MACHINE = "(sdm710)"
 
 KERNEL_IMAGEDEST = "boot"
@@ -7,8 +6,6 @@ KERNEL_IMAGEDEST = "boot"
 SRC_DIR   =  "${WORKSPACE}/kernel/msm-4.17"
 S         =  "${WORKDIR}/kernel/msm-4.17"
 PR = "r0"
-
-DEPENDS += "llvm-arm-toolchain-native"
 
 LDFLAGS_aarch64 = "-O1 --hash-style=gnu --as-needed"
 TARGET_CXXFLAGS += "-Wno-format"
