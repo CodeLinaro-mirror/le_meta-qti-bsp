@@ -28,6 +28,8 @@ EARLY_ETH = "${@bb.utils.contains('DISTRO_FEATURES', 'early-eth', '1', '0', d)}"
 
 EARLY_USB_INIT = "${@bb.utils.contains('DISTRO_FEATURES', 'early-usb-init', '1', '0', d)}"
 
+ABL_LOAD_ADDRESS_BELOW_256MB = "${@bb.utils.contains('MACHINE_FEATURES', 'ram-256MB', 'true', 'false', d)}"
+
 EXTRA_OEMAKE = "'CLANG_BIN=${STAGING_BINDIR_NATIVE}/llvm-arm-toolchain/bin/' \
                 'CLANG_PREFIX=${STAGING_BINDIR_NATIVE}/${TARGET_SYS}/${TARGET_PREFIX}' \
                 'TARGET_ARCHITECTURE=${TARGET_ARCH}'\
@@ -39,6 +41,7 @@ EXTRA_OEMAKE = "'CLANG_BIN=${STAGING_BINDIR_NATIVE}/llvm-arm-toolchain/bin/' \
                 'INIT_BIN_LE=\"/sbin/init\"'\
                 'EDK_TOOLS_PATH=${S}/BaseTools'\
                 'EARLY_ETH_ENABLED=${EARLY_ETH}'\
+                'ABL_LOAD_ADDRESS_BELOW_256MB=${ABL_LOAD_ADDRESS_BELOW_256MB}'\
                 'TARGET_SUPPORTS_EARLY_USB_INIT=${EARLY_USB_INIT}'"
 
 EXTRA_OEMAKE_append_qcs40x = " 'DISABLE_PARALLEL_DOWNLOAD_FLASH=1'"
