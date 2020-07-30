@@ -61,6 +61,7 @@ recoveryfs_mtd_device=/dev/mtd${recoveryfs_mtd_block_number}
 
 # Change this location to suit your requirement
 update_zip_dir=/data/ota_package
+mkdir -p $update_zip_dir
 
 # ==============================================================================
 # Helper functions
