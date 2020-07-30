@@ -1,6 +1,6 @@
-From 2bd61bcb3e98e50434452fa7808253bba8ea9629 Mon Sep 17 00:00:00 2001
+From e402c56361e6f6e976c7c0ce3a2f2ac366a9ed4e Mon Sep 17 00:00:00 2001
 From: Jiacheng Zheng <jiaczhen@codeaurora.org>
-Date: Mon, 4 Nov 2019 16:24:35 +0800
+Date: Thu, 30 Jul 2020 21:38:04 +0800
 Subject: [PATCH] parallelize audio and pcie driver to improve bootkpi
 
 Audio driver takes the most booting time, so we pick
@@ -12,7 +12,7 @@ the calling of wait_for_device_probe after the
 mounting of rootfs so considerable rootfs mounting
 time can be hidden in parallel with audio driver init.
 
-Change-Id: I975b8a0010c2a44a8b388fa746dc18939e1e87de
+Change-Id: I21ac913b0f92975eddc34e07149d0238ff8eb856
 Signed-off-by: Jiacheng Zheng <jiaczhen@codeaurora.org>
 ---
  drivers/base/dd.c                                  |   8 +-
@@ -28,7 +28,7 @@ Signed-off-by: Jiacheng Zheng <jiaczhen@codeaurora.org>
  sound/core/timer.c                                 |   5 +-
  sound/last.c                                       |   5 +-
  sound/soc/codecs/msm_stub.c                        |   5 +-
- sound/soc/msm/apq8096-auto.c                       | 110 ++++++++++++++++++++-
+ sound/soc/msm/apq8096-auto.c                       | 114 ++++++++++++++++++++-
  sound/soc/msm/msm-dai-fe.c                         |   5 +-
  sound/soc/msm/msm-pcm-hostless.c                   |   5 +-
  sound/soc/msm/qdsp6v2/audio_slimslave.c            |   5 +-
@@ -56,7 +56,7 @@ Signed-off-by: Jiacheng Zheng <jiaczhen@codeaurora.org>
  sound/soc/msm/qdsp6v2/q6voice.c                    |   5 +-
  sound/soc/msm/qdsp6v2/rtac.c                       |   5 +-
  sound/soc/soc-core.c                               |   5 +-
- 41 files changed, 232 insertions(+), 85 deletions(-)
+ 41 files changed, 236 insertions(+), 85 deletions(-)
 
 diff --git a/drivers/base/dd.c b/drivers/base/dd.c
 index 0ab3a8d..2186d95 100644
@@ -82,10 +82,10 @@ index 0ab3a8d..2186d95 100644
  	return 0;
  }
 diff --git a/drivers/pci/host/pci-msm.c b/drivers/pci/host/pci-msm.c
-index b180e67..8d63469 100644
+index 9be5d60..7d44189 100644
 --- a/drivers/pci/host/pci-msm.c
 +++ b/drivers/pci/host/pci-msm.c
-@@ -6633,6 +6633,7 @@ static struct platform_driver msm_pcie_driver = {
+@@ -6638,6 +6638,7 @@ static struct platform_driver msm_pcie_driver = {
  	.driver	= {
  		.name		= "pci-msm",
  		.owner		= THIS_MODULE,
@@ -188,10 +188,10 @@ index 0a49a32..2001fd9 100644
  
  MODULE_DESCRIPTION("Soc QDSP6v2 Voice Service driver");
 diff --git a/drivers/staging/android/ion/ion_hvenv_driver.c b/drivers/staging/android/ion/ion_hvenv_driver.c
-index 5b9870d..87ab214 100644
+index 7e463ae..3130a78 100644
 --- a/drivers/staging/android/ion/ion_hvenv_driver.c
 +++ b/drivers/staging/android/ion/ion_hvenv_driver.c
-@@ -172,7 +172,8 @@ struct ion_client *hvenv_ion_client_create(const char *name)
+@@ -170,7 +170,8 @@ struct ion_client *hvenv_ion_client_create(const char *name)
  }
  EXPORT_SYMBOL(hvenv_ion_client_create);
  
@@ -201,7 +201,7 @@ index 5b9870d..87ab214 100644
  {
  	int i, err;
  
-@@ -225,7 +226,7 @@ err1:
+@@ -223,7 +224,7 @@ err1:
  
  	return err;
  }
@@ -359,7 +359,7 @@ index 9a9c54e..33a28d7 100755
  static void __exit msm_stub_exit(void)
  {
 diff --git a/sound/soc/msm/apq8096-auto.c b/sound/soc/msm/apq8096-auto.c
-index 35fcd50..be3da09 100644
+index 35fcd50..ca0e861 100644
 --- a/sound/soc/msm/apq8096-auto.c
 +++ b/sound/soc/msm/apq8096-auto.c
 @@ -23,6 +23,7 @@
@@ -370,13 +370,15 @@ index 35fcd50..be3da09 100644
  #include <sound/core.h>
  #include <sound/soc.h>
  #include <sound/soc-dapm.h>
-@@ -7752,8 +7753,113 @@ static int __init apq8096_soc_platform_init(void)
+@@ -7752,8 +7753,117 @@ static int __init apq8096_soc_platform_init(void)
  	return 0;
  }
  
 -module_init(apq8096_soc_platform_init);
 -module_platform_driver(apq8096_asoc_machine_driver);
++#ifdef CONFIG_DEBUG_FS
 +extern int __init apr_debug_init(void);
++#endif
 +extern int __init alsa_timer_init(void);
 +extern int __init voice_init(void);
 +extern int __init alsa_pcm_init(void);
@@ -431,7 +433,9 @@ index 35fcd50..be3da09 100644
 +{
 +	voice_init();
 +	ion_dummy_init();
++#ifdef CONFIG_DEBUG_FS
 +	apr_debug_init();
++#endif
 +	apr_init();
 +	voice_svc_init();
 +	msm_audio_ion_init();
@@ -478,7 +482,7 @@ index 35fcd50..be3da09 100644
 +
 +	work = kzalloc(sizeof(struct work_struct), GFP_KERNEL);
 +	INIT_WORK(work, early_audio_init_async);
-+	queue_work_on(3, system_highpri_wq, work);
++	queue_work_on(WORK_CPU_UNBOUND, system_unbound_wq, work);
 +
 +	return 0;
 +}
@@ -544,11 +548,11 @@ index e9ecfd5..fd1ad18 100644
  static void __exit audio_slimslave_exit(void)
  {
 diff --git a/sound/soc/msm/qdsp6v2/msm-compress-q6-v2.c b/sound/soc/msm/qdsp6v2/msm-compress-q6-v2.c
-index 3746a20..9a96481 100644
+index 7a2c50c..d74edec 100644
 --- a/sound/soc/msm/qdsp6v2/msm-compress-q6-v2.c
 +++ b/sound/soc/msm/qdsp6v2/msm-compress-q6-v2.c
-@@ -4932,11 +4932,12 @@ static struct platform_driver msm_compr_driver = {
- 	.remove = msm_compr_remove,
+@@ -4977,11 +4977,12 @@ static struct platform_driver msm_compr_driver = {
+ 	.remove = msm_compr_dev_remove,
  };
  
 -static int __init msm_soc_platform_init(void)
@@ -732,10 +736,10 @@ index b02ab78..c94d5ca 100644
  static void __exit msm_soc_platform_exit(void)
  {
 diff --git a/sound/soc/msm/qdsp6v2/msm-pcm-loopback-v2.c b/sound/soc/msm/qdsp6v2/msm-pcm-loopback-v2.c
-index 2fbefa7..14c8685 100644
+index 0add46f..fdd96c9 100644
 --- a/sound/soc/msm/qdsp6v2/msm-pcm-loopback-v2.c
 +++ b/sound/soc/msm/qdsp6v2/msm-pcm-loopback-v2.c
-@@ -1787,11 +1787,12 @@ static struct platform_driver msm_pcm_driver = {
+@@ -1798,11 +1798,12 @@ static struct platform_driver msm_pcm_driver = {
  	.remove = msm_pcm_remove,
  };
  
@@ -751,10 +755,10 @@ index 2fbefa7..14c8685 100644
  static void __exit msm_soc_platform_exit(void)
  {
 diff --git a/sound/soc/msm/qdsp6v2/msm-pcm-q6-noirq.c b/sound/soc/msm/qdsp6v2/msm-pcm-q6-noirq.c
-index ce9091b..e7851a5 100644
+index 5c78349..82b4ef6 100644
 --- a/sound/soc/msm/qdsp6v2/msm-pcm-q6-noirq.c
 +++ b/sound/soc/msm/qdsp6v2/msm-pcm-q6-noirq.c
-@@ -1273,11 +1273,12 @@ static struct platform_driver msm_pcm_driver_noirq = {
+@@ -1319,11 +1319,12 @@ static struct platform_driver msm_pcm_driver_noirq = {
  	.remove = msm_pcm_remove,
  };
  
@@ -770,10 +774,10 @@ index ce9091b..e7851a5 100644
  static void __exit msm_soc_platform_exit(void)
  {
 diff --git a/sound/soc/msm/qdsp6v2/msm-pcm-q6-v2.c b/sound/soc/msm/qdsp6v2/msm-pcm-q6-v2.c
-index a7aab83..e3341e9 100644
+index b215462..84c8584 100644
 --- a/sound/soc/msm/qdsp6v2/msm-pcm-q6-v2.c
 +++ b/sound/soc/msm/qdsp6v2/msm-pcm-q6-v2.c
-@@ -3122,7 +3122,8 @@ static struct platform_driver msm_pcm_driver = {
+@@ -3211,7 +3211,8 @@ static struct platform_driver msm_pcm_driver = {
  	.remove = msm_pcm_remove,
  };
  
@@ -783,7 +787,7 @@ index a7aab83..e3341e9 100644
  {
  	init_waitqueue_head(&the_locks.enable_wait);
  	init_waitqueue_head(&the_locks.eos_wait);
-@@ -3131,7 +3132,7 @@ static int __init msm_soc_platform_init(void)
+@@ -3220,7 +3221,7 @@ static int __init msm_soc_platform_init(void)
  
  	return platform_driver_register(&msm_pcm_driver);
  }
@@ -793,10 +797,10 @@ index a7aab83..e3341e9 100644
  static void __exit msm_soc_platform_exit(void)
  {
 diff --git a/sound/soc/msm/qdsp6v2/msm-pcm-routing-v2.c b/sound/soc/msm/qdsp6v2/msm-pcm-routing-v2.c
-index 1122e77..43aa387 100644
+index f0f57aa..9864603 100644
 --- a/sound/soc/msm/qdsp6v2/msm-pcm-routing-v2.c
 +++ b/sound/soc/msm/qdsp6v2/msm-pcm-routing-v2.c
-@@ -18715,7 +18715,8 @@ err:
+@@ -21221,7 +21221,8 @@ err:
  	return ret;
  }
  
@@ -806,7 +810,7 @@ index 1122e77..43aa387 100644
  {
  	mutex_init(&routing_lock);
  	if (msm_routing_init_cal_data())
-@@ -18729,7 +18730,7 @@ static int __init msm_soc_routing_platform_init(void)
+@@ -21235,7 +21236,7 @@ static int __init msm_soc_routing_platform_init(void)
  
  	return platform_driver_register(&msm_routing_pcm_driver);
  }
@@ -883,10 +887,10 @@ index ef9c652..96453f2 100644
  static void __exit msm_soc_platform_exit(void)
  {
 diff --git a/sound/soc/msm/qdsp6v2/q6adm.c b/sound/soc/msm/qdsp6v2/q6adm.c
-index 5478920..9d47e0a 100644
+index dc71652..289928c 100644
 --- a/sound/soc/msm/qdsp6v2/q6adm.c
 +++ b/sound/soc/msm/qdsp6v2/q6adm.c
-@@ -4697,7 +4697,8 @@ done:
+@@ -4701,7 +4701,8 @@ done:
  	return ret;
  }
  
@@ -896,7 +900,7 @@ index 5478920..9d47e0a 100644
  {
  	int i = 0, j;
  
-@@ -4727,5 +4728,5 @@ static void __exit adm_exit(void)
+@@ -4731,5 +4732,5 @@ static void __exit adm_exit(void)
  	adm_delete_cal_data();
  }
  
@@ -925,7 +929,7 @@ index 7ee774d..60573ae 100644
 +//device_initcall(afe_init);
  __exitcall(afe_exit);
 diff --git a/sound/soc/msm/qdsp6v2/q6asm.c b/sound/soc/msm/qdsp6v2/q6asm.c
-index eb3b42f..0a42e8e 100644
+index 95374c0..f631fcc 100644
 --- a/sound/soc/msm/qdsp6v2/q6asm.c
 +++ b/sound/soc/msm/qdsp6v2/q6asm.c
 @@ -10065,7 +10065,8 @@ static int q6asm_is_valid_session(struct apr_client_data *data, void *priv)
@@ -1013,10 +1017,10 @@ index eb63524..917d443 100644
  static void __exit voice_exit(void)
  {
 diff --git a/sound/soc/msm/qdsp6v2/rtac.c b/sound/soc/msm/qdsp6v2/rtac.c
-index 5572a3d..35603ca 100644
+index 69e5464..7455d15 100644
 --- a/sound/soc/msm/qdsp6v2/rtac.c
 +++ b/sound/soc/msm/qdsp6v2/rtac.c
-@@ -1985,7 +1985,8 @@ struct miscdevice rtac_misc = {
+@@ -1987,7 +1987,8 @@ struct miscdevice rtac_misc = {
  	.fops	= &rtac_fops,
  };
  
@@ -1026,7 +1030,7 @@ index 5572a3d..35603ca 100644
  {
  	int i = 0;
  
-@@ -2069,7 +2070,7 @@ nomem:
+@@ -2071,7 +2072,7 @@ nomem:
  	return -ENOMEM;
  }
  
