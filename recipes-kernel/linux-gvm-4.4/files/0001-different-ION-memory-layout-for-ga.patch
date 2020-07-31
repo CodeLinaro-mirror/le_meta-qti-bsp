@@ -1,0 +1,43 @@
+From 39e7e035eff9ed1f6861ba6b6602c2e67b68a7f7 Mon Sep 17 00:00:00 2001
+From: Jiacheng Zheng <jiaczhen@codeaurora.org>
+Date: Fri, 31 Jul 2020 15:20:56 +0800
+Subject: [PATCH] different ION memory layout for ga
+
+Change-Id: Ic151849d39d19384904010840026a51abaa137e7
+Signed-off-by: Jiacheng Zheng <jiaczhen@codeaurora.org>
+---
+ drivers/staging/android/ion/ion_hvenv_driver.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/staging/android/ion/ion_hvenv_driver.c b/drivers/staging/android/ion/ion_hvenv_driver.c
+index 5b9870d..5bcfcb1 100644
+--- a/drivers/staging/android/ion/ion_hvenv_driver.c
++++ b/drivers/staging/android/ion/ion_hvenv_driver.c
+@@ -41,21 +41,21 @@ static struct ion_platform_heap dummy_heaps[] = {
+ 		.id	= ION_SYSTEM_HEAP_ID,
+ 		.type	= ION_HEAP_TYPE_CARVEOUT,
+ 		.name	= "ion_system_heap",
+-		.base	= 0xF0000000,
++		.base	= 0x140000000,
+ 		.size	= 0x10000000,
+ 	},
+ 	{
+ 		.id	= ION_AUDIO_HEAP_ID,
+ 		.type	= ION_HEAP_TYPE_CARVEOUT,
+ 		.name	= "ion_audio_heap",
+-		.base	= 0xEF800000,
++		.base	= 0xFF800000,
+ 		.size	= 0x00800000,
+ 	},
+ 	{
+ 		.id	= ION_QSECOM_HEAP_ID,
+ 		.type	= ION_HEAP_TYPE_CARVEOUT,
+ 		.name	= "ion_qsecom_heap",
+-		.base	= 0xEF600000,
++		.base	= 0xFF600000,
+ 		.size	= 0x00200000,
+ 	},
+ };
+-- 
+2.7.4
+
