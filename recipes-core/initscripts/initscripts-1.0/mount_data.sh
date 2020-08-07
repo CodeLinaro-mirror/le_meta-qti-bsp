@@ -34,10 +34,13 @@ FindAndMountVolumeUBI () {
    dir=$2
    if [ ! -d $dir ]
    then
+      mount -o remount,rw /
       mkdir -p $dir
+      mount -o remount,ro /
    fi
    mount -t ubifs ubi0:$volume_name $dir -o bulk_read
 }
 
 fstype="UBI"
 eval FindAndMountVolume${fstype} usrfs /data
+eval FindAndMountVolume${fstype} persist /persist
