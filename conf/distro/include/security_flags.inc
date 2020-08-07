@@ -69,6 +69,7 @@ SECURITY_CFLAGS_pn-lib32-qmmf-sdk = "${SECURITY_PIC_CFLAGS}"
 #
 ### PACKAGES which can't compile with _FORTIFY_SOURCE
 #
+SECURITY_CFLAGS_remove_pn-npu= "-D_FORTIFY_SOURCE=2"
 SECURITY_CFLAGS_remove_pn-ebtables = "-D_FORTIFY_SOURCE=2"
 
 #
