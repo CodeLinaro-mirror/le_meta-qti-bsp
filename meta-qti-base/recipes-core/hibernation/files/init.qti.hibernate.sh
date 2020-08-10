@@ -1,5 +1,6 @@
-# Copyright (c) 2019, The Linux Foundation. All rights reserved.
-#
+#! /bin/sh
+# Copyright (c) 2020, The Linux Foundation. All rights reserved.
+
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
 # met:
@@ -12,7 +13,7 @@
 #     * Neither the name of The Linux Foundation nor the names of its
 #       contributors may be used to endorse or promote products derived
 #       from this software without specific prior written permission.
-#
+
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 # MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT
@@ -24,12 +25,35 @@
 # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
 
-[Match]
-Name=eth0
+target=`cat /sys/devices/soc0/machine | tr [:upper:] [:lower:]`
 
-[Network]
-Address=192.168.2.2
-Gateway=192.168.2.1
-DNS=8.8.8.8
+echo -n "Starting init_hibernate: [$target] "
 
+case "$target" in
+    "sa8155p" | "sa8155" )
+        echo -15 > /proc/1/oom_score_adj
+
+        echo "enable zram"
+        echo 4294967296 > /sys/block/zram0/disksize
+        mkswap /dev/zram0
+        swapon /dev/zram0 -p 32758
+
+        echo "enable swap partition"
+        mkswap /dev/sda8
+        swapon /dev/sda8 -p 0
+        echo 0 > /proc/sys/vm/swappiness
+
+        echo "drop page caches"
+        echo 3 > /proc/sys/vm/drop_caches
+        sync
+
+        echo "prepare Hibernation"
+        echo 1 > /sys/module/lpm_levels/parameters/sleep_disabled
+        echo 0 > /sys/power/image_size
+        echo shutdown > /sys/power/disk
+        ;;
+    *)
+        ;;
+esac

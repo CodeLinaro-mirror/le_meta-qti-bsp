@@ -33,6 +33,7 @@ SourcePath=/usr/bin/servicemanager
 User=system
 Group=system
 Restart=always
+ExecStartPre=/etc/initscripts/create-binder
 ExecStart=/usr/bin/servicemanager
 
 [Install]

@@ -1,5 +1,6 @@
-# Copyright (c) 2019, The Linux Foundation. All rights reserved.
-#
+#!/bin/sh
+# Copyright (c) 2020, The Linux Foundation. All rights reserved.
+
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
 # met:
@@ -25,26 +26,33 @@
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-lxc.rootfs.path = /var/lib/lxc/android/rootfs
-lxc.uts.name = armhf
-lxc.arch = armhf
-lxc.cap.drop = mac_admin mac_override
-lxc.start.auto = 1
-lxc.pty.max = 64
-lxc.selinux.context = unconfined_u:unconfined_r:lxc_t:s0-s0:c0.c1023
+case $1/$2 in
+  pre/*)
+    echo "Entering into $2..."
 
-lxc.net.0.type = veth
-lxc.net.0.hwaddr = 48:29:43:49:19:bf
-lxc.net.0.flags = up
-lxc.net.0.link = lxcbrandroid
-lxc.net.0.ipv4.address = 192.168.0.2/24
+    systemctl stop audiod.service
+    if [ $2 == "hibernate" ]; then
+        echo 0 > /sys/kernel/boot_adsp/boot
+    fi
 
-# permission
-# deny android creating drm card 0/2
-lxc.cgroup.devices.deny                = c 226:0 m
-lxc.cgroup.devices.deny                = c 226:2 m
-lxc.cgroup.devices.deny                = c 226:3 m
+    # disable BT as hsuart could block suspend
+    systemctl stop synergy.service
 
-lxc.init.cmd=/init
-lxc.hook.pre-start = /var/lib/lxc/android/pre-start.sh
-lxc.hook.pre-mount = /var/lib/lxc/android/pre-mount.sh
+    # set all usb mode to none
+    echo none > /sys/devices/platform/soc/a600000.ssusb/mode
+    echo none > /sys/devices/platform/soc/a800000.ssusb/mode
+    ;;
+  post/*)
+    echo "Exiting from $2..."
+
+    echo peripheral > /sys/devices/platform/soc/a600000.ssusb/mode
+    echo host > /sys/devices/platform/soc/a800000.ssusb/mode
+
+    systemctl restart synergy.service
+
+    if [ $2 == "hibernate" ]; then
+        echo 1 > /sys/kernel/boot_adsp/boot
+    fi
+    systemctl restart audiod.service
+    ;;
+esac

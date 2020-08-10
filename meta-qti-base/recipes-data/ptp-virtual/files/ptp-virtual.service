@@ -1,6 +1,4 @@
-#! /bin/sh
-
-# Copyright (c) 2019, The Linux Foundation. All rights reserved.
+# Copyright (c) 2020, The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -27,10 +25,13 @@
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-echo "prepare setup bridge in host side"
-brctl addbr lxcbrandroid
-ifconfig lxcbrandroid 192.168.0.1 up
-echo "setup the routing"
-sysctl -w net.ipv4.conf.all.forwarding=1
-iptables -t nat -A POSTROUTING -s 192.168.0.0/24 -o eth0 -j MASQUERADE
+[Unit]
+Description=Modprobe_ptp_virtual_module
 
+[Service]
+Type=simple
+RemainAfterExit=yes
+ExecStart=/sbin/modprobe ptp_virtual
+
+[Install]
+WantedBy=multi-user.target
