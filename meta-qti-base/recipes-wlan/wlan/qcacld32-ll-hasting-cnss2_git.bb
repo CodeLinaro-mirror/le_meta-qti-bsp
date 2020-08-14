@@ -31,7 +31,11 @@ FIRMWARE_PATH = "${D}/lib/firmware/wlan/qca_cld/${_MODNAME}"
 EXTRA_OEMAKE += "CONFIG_CLD_HL_SDIO_CORE=n CONFIG_CNSS_SDIO=n"
 EXTRA_OEMAKE += "CONFIG_QCA_CLD_WLAN_PROFILE=qca6390"
 EXTRA_OEMAKE += "DYNAMIC_SINGLE_CHIP=${_MODNAME}"
+EXTRA_OEMAKE += "MULTI_IF_NAME=cnss2"
 EXTRA_OEMAKE += "MODNAME=${_MODNAME}"
+EXTRA_OEMAKE += "WLAN_CFG_OVERRIDE="CONFIG_WLAN_DISABLE_EXPORT_SYMBOL=y""
+
+SYSTEMD_AUTO_ENABLE_${PN} = "disable"
 
 do_install () {
     module_do_install
@@ -46,7 +50,7 @@ do_install () {
     install -m 0644 ${S}/${_MODNAME}.ko ${WLAN_KO}/wlan/
 
     install -D -m 0644 ${WORKDIR}/device/qcom/wlan/msm_auto/WCNSS_qcom_cfg_qca6390.ini ${FIRMWARE_PATH}/WCNSS_qcom_cfg.ini
-    install -D -m 0644 ${WORKDIR}/device/qcom/wlan/msm_auto/wlan_mac.bin ${FIRMWARE_PATH}/wlan_mac.bin
+    install -D -m 0644 ${WORKDIR}/device/qcom/wlan/msm_auto/wlan_mac_hst_2.bin ${FIRMWARE_PATH}/wlan_mac.bin
     install -d ${D}${bindir}
     install -D -m 0755 ${WORKDIR}/init.qti.wlan_on.sh ${D}${bindir}/init.qti.wlan_on.sh
     install -D -m 0755 ${WORKDIR}/init.qti.wlan_off.sh ${D}${bindir}/init.qti.wlan_off.sh

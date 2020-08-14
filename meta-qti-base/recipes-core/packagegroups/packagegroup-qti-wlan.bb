@@ -13,9 +13,11 @@ RDEPENDS_${PN} += "\
     hostap-daemon-qcacld \
     wireless-tools \
     iw \
-    qcacld32-ll-hasting \
-    qcacld32-ll-genoa \
-    qcacld32-ll-rome \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'qti-lxc', 'qcacld32-ll-hasting-cnss0', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'qti-lxc', 'qcacld32-ll-hasting-cnss2', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'qti-lxc', '', 'qcacld32-ll-hasting', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'qti-lxc', '', 'qcacld32-ll-genoa', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'qti-lxc', '', 'qcacld32-ll-rome', d)} \
     wlan-sigma-dut \
     wpa-supplicant \
     wlan-conf \
