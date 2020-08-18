@@ -34,7 +34,7 @@ SourcePath=/etc/initscripts/trigger-recovery-updater.sh
 After=cache.mount
 
 [Service]
-Type=forking
+Type=simple
 PIDFile=/var/run/recovery-updater.pid
 RemainAfterExit=yes
 ExecStart=/etc/initscripts/trigger-recovery-updater.sh start

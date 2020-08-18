@@ -30,6 +30,10 @@ def nand_set_vars_and_get_dependencies(d):
     if bb.utils.contains('DISTRO_FEATURES', 'ota-package-verification', True, False, d):
         d.setVar('OTA_PACKAGE_VERIFICATION_SUPPORTED', "1");
 
+    # check if this is a nand target with recovery upgrade support
+    if bb.utils.contains('DISTRO_FEATURES', 'nand-recovery-upgrade', True, False, d):
+        d.setVar('OTA_RECOVERY_UPGRADE_SUPPORTED', "1");
+
     # for Non A/B target, set RECOVERY_IMAGE_UBI to "1"
     # this will generate a non A/B update package as well.
     d.setVar('RECOVERY_IMAGE_UBI', "1");
@@ -173,6 +177,11 @@ do_recovery_ubi() {
 
     #blocksize = BOARD_FLASH_BLOCK_SIZE
     echo blocksize=131072 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
+
+    if [[ "${OTA_RECOVERY_UPGRADE_SUPPORTED}" == "1" ]]; then
+        cp ${DEPLOY_DIR_IMAGE_NAND}/${MACHINE}-recoveryfs.ubi ${OTA_TARGET_IMAGE_ROOTFS_UBI}/BOOTABLE_IMAGES/recoveryfs.ubi
+        echo recovery_upgrade_supported=1 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
+    fi
 
     if [ "${BASEMACHINE}" == "mdm9607" ]; then
         # boot_size: Size of boot partition from partition.xml
