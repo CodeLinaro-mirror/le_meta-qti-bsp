@@ -1,0 +1,50 @@
+From 10183d0f0fdf548da30da8d54956928dd88b5a88 Mon Sep 17 00:00:00 2001
+From: Yao Jiang <yaojia@codeaurora.org>
+Date: Thu, 20 Aug 2020 13:52:22 +0800
+Subject: [PATCH] Remove '-Wno-packed-bitfield-compat' option in Makefile
+
+Due to the upgrade of gcc compiler, this option can't be parsed on kernel 5.4
+so we just remove it safely in Makefile.am as KTF does not use bitfileds.
+
+Signed-off-by: Yao Jiang <yaojia@codeaurora.org>
+---
+ lib/Makefile.am  | 3 +--
+ user/Makefile.am | 3 +--
+ 2 files changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/lib/Makefile.am b/lib/Makefile.am
+index 9c4dea6..e97a502 100644
+--- a/lib/Makefile.am
++++ b/lib/Makefile.am
+@@ -3,10 +3,9 @@
+ ACLOCAL_AMFLAGS = -I m4
+ 
+ AM_CFLAGS = -I$(top_srcdir) $(NETLINK_CFLAGS) $(GTEST_CFLAGS) \
+-		-Wall -Werror -Wno-packed-bitfield-compat -D_GNU_SOURCE
++		-Wall -Werror -D_GNU_SOURCE
+ AM_CXXFLAGS = -I$(top_srcdir) $(NETLINK_CFLAGS) $(KTF_CXXFLAGS) \
+ 		-Wall \
+-		-Wno-packed-bitfield-compat \
+ 		-Wno-pointer-arith -Werror \
+ 		-D__FILENAME__=\"`basename $<`\"
+ 
+diff --git a/user/Makefile.am b/user/Makefile.am
+index baef41f..0610d66 100644
+--- a/user/Makefile.am
++++ b/user/Makefile.am
+@@ -4,11 +4,10 @@ ACLOCAL_AMFLAGS = -I m4
+ 
+ AM_CFLAGS = -I$(top_srcdir)/lib $(NETLINK_CFLAGS) $(KTF_CFLAGS) \
+ 		-Wall -Werror \
+-		-Wno-packed-bitfield-compat -D_GNU_SOURCE
++		-D_GNU_SOURCE
+ 
+ AM_CXXFLAGS = -I$(top_srcdir)/lib $(NETLINK_CFLAGS) $(KTF_CXXFLAGS) \
+ 		-Wall \
+-		-Wno-packed-bitfield-compat \
+ 		-Wno-pointer-arith -Werror \
+ 		-D__FILENAME__=\"`basename $<`\"
+ LDADD =	-L$(top_builddir)/lib -lktf $(NETLINK_LIBS) $(KTF_LIBS)
+-- 
+2.7.4
+
