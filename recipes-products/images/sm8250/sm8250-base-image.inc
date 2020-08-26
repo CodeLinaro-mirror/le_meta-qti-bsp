@@ -256,6 +256,7 @@ ROOTFS_POSTPROCESS_COMMAND += "copy_edge_bsp_rpm;"
 copy_edge_kernel_certs() {
     if [ -d ${STAGING_KERNEL_BUILDDIR}/certs ]
     then
+        chmod a+r ${STAGING_KERNEL_BUILDDIR}/certs/*
         cp -rf ${STAGING_KERNEL_BUILDDIR}/certs ${DEPLOY_DIR_IMAGE}/
     fi
 }
