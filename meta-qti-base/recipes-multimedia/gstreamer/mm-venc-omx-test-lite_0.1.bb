@@ -5,6 +5,7 @@ SECTION  = "mm-venc-omx-test-lite"
 FILESPATH  =+ "${WORKSPACE}:"
 
 SRC_URI   =  "${PATH_TO_REPO}/gstreamer/gst-plugins-qti-oss/.git;protocol=${PROTO};destsuffix=gstreamer/gst-plugins-qti-oss;usehead=1"
+SRCREV = "${AUTOREV}"
 SRC_DIR = "${SRC_DIR_ROOT}/gstreamer/gst-plugins-qti-oss/omx-lite-app/mm-venc-omx-test"
 S      = "${WORKDIR}/gstreamer/gst-plugins-qti-oss/omx-lite-app/mm-venc-omx-test"
 
