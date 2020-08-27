@@ -4,10 +4,10 @@ DESCRIPTION = "Open AVB"
 LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/BSD;md5=3775480a712fc46a69647678acb234cb"
 
-SRC_URI   =  "${PATH_TO_REPO}/external/open-avb/.git;protocol=${PROTO};destsuffix=external/open-avb;usehead=1"
+SRC_URI   =  "${PATH_TO_REPO}/external/open-avb.git;protocol=${PROTO};destsuffix=external/open-avb;nobranch=1"
 SRC_URI += " file://gptp-daemon.service"
 SRC_URI += " file://gptp-daemon-tmpfilesd.conf"
-SRCREV = "${AUTOREV}"
+SRCREV = "71ba6e5b63ab6857adb07071a6ddd376295d763c"
 PR = "r0"
 PV = "0.1"
 

@@ -20,14 +20,16 @@ DEPENDS = "rtsp-alg"
 DEPENDS_remove_automotive = "rtsp-alg"
 DEPENDS_automotive += "llvm-arm-toolchain-native"
 
-SRC_URI = "${PATH_TO_REPO}/wlan/qcacld-3.0/.git;protocol=${PROTO};destsuffix=wlan/qcacld-3.0;usehead=1 \
-           ${PATH_TO_REPO}/wlan/qca-wifi-host-cmn/.git;protocol=${PROTO};destsuffix=wlan/qca-wifi-host-cmn;usehead=1 \
-           ${PATH_TO_REPO}/wlan/fw-api/.git;protocol=${PROTO};destsuffix=wlan/fw-api/;usehead=1 \
+SRC_URI = "${PATH_TO_REPO}/wlan/qcacld-3.0.git;protocol=${PROTO};destsuffix=wlan/qcacld-3.0;nobranch=1;name=qcacld \
+           ${PATH_TO_REPO}/wlan/qca-wifi-host-cmn.git;protocol=${PROTO};destsuffix=wlan/qca-wifi-host-cmn;nobranch=1;name=qcawifi \
+           ${PATH_TO_REPO}/wlan/fw-api.git;protocol=${PROTO};destsuffix=wlan/fw-api/;nobranch=1;name=fwapi \
            "
 
-SRC_URI_append_automotive = " ${PATH_TO_REPO}/device/qcom/wlan/.git;protocol=${PROTO};destsuffix=device/qcom/wlan/msm_auto;subpath=msm_auto;usehead=1"
+SRC_URI_append_automotive = " ${PATH_TO_REPO}/device/qcom/wlan.git;protocol=${PROTO};destsuffix=device/qcom/wlan/msm_auto;subpath=msm_auto;nobranch=1"
 
-SRCREV = "${AUTOREV}"
+SRCREV_qcacld = "fd75b3d300733f139c3d4dfcd7ddf1b8eb7b8d38"
+SRCREV_qcawifi = "72d309edb04f35d50593202cd5fd2341cb4bd13c"
+SRCREV_fwapi = "40f38beb93d09ce65e7d55be3940d3d749d923c6"
 SRCREV_FORMAT= "qcacld_cmn_fw_msm"
 
 S1 = "${WORKDIR}/wlan/qca-wifi-host-cmn/"

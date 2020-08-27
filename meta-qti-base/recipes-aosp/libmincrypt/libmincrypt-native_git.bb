@@ -8,9 +8,9 @@ ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 
 PR = "r1"
 
-SRC_URI   =  "${PATH_TO_REPO}/system/core/.git;protocol=${PROTO};destsuffix=system/core;usehead=1"
+SRC_URI   =  "${PATH_TO_REPO}/system/core.git;protocol=${PROTO};destsuffix=system/core;nobranch=1"
 
-SRCREV = "${AUTOREV}"
+SRCREV = "a108d342592e6d03560729e589ba1ac6f7eaa440"
 
 S = "${WORKDIR}/system/core/libmincrypt"
 

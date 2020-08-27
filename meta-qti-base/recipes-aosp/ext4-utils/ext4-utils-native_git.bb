@@ -10,8 +10,8 @@ PR = "r1"
 
 DEPENDS = "libselinux-native libsparse-native libcutils-native libpcre-native"
 
-SRC_URI   =  "${PATH_TO_REPO}/system/extras/.git;protocol=${PROTO};destsuffix=system/extras/ext4_utils;subpath=ext4_utils;usehead=1"
-SRCREV = "${AUTOREV}"
+SRC_URI   =  "${PATH_TO_REPO}/system/extras.git;protocol=${PROTO};destsuffix=system/extras/ext4_utils;subpath=ext4_utils;nobranch=1"
+SRCREV = "8ef7dae5e1a207c4683e7ea3ee534ea94d13787a"
 
 
 S = "${WORKDIR}/system/extras/ext4_utils"

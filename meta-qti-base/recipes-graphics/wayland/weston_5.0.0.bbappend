@@ -1,7 +1,7 @@
 FILESEXTRAPATHS_append := ":${THISDIR}/weston/"
-SRC_URI = "${PATH_TO_REPO}/graphics/weston/.git;protocol=${PROTO};destsuffix=graphics/weston;usehead=1"
+SRC_URI = "${PATH_TO_REPO}/graphics/weston.git;protocol=${PROTO};destsuffix=graphics/weston;nobranch=1"
 S = "${WORKDIR}/graphics/weston"
-SRCREV = "${AUTOREV}"
+SRCREV = "6c3569e55ea41ce7895bae60ba3a78b2664ba037"
 
 SRC_URI_append = "  \
     file://weston.service_caf \

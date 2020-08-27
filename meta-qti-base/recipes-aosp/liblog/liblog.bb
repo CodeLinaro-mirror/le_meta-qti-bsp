@@ -10,10 +10,10 @@ PR = "r1"
 
 DEPENDS = "glib-2.0"
 
-SRC_URI   =  "${PATH_TO_REPO}/system/core/.git;protocol=${PROTO};destsuffix=system/core;usehead=1"
+SRC_URI   =  "${PATH_TO_REPO}/system/core.git;protocol=${PROTO};destsuffix=system/core;nobranch=1"
 SRC_URI_append = " file://50-log.rules"
 
-SRCREV = "${AUTOREV}"
+SRCREV = "a108d342592e6d03560729e589ba1ac6f7eaa440"
 S = "${WORKDIR}/system/core/liblog"
 
 BBCLASSEXTEND = "native"

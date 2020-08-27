@@ -3,9 +3,9 @@ include wpa-supplicant.inc
 
 PR = "${INC_PR}.2"
 
-SRC_URI   = "${PATH_TO_REPO}/external/wpa_supplicant_8/.git;protocol=${PROTO};destsuffix=external/wpa_supplicant_8;usehead=1"
+SRC_URI   = "${PATH_TO_REPO}/external/wpa_supplicant_8.git;protocol=${PROTO};destsuffix=external/wpa_supplicant_8;nobranch=1"
 SRC_URI_append = " file://defconfig-qcacld"
-SRCREV = "${AUTOREV}"
+SRCREV = "1344cc76644be54b58ab059622aaccb04ef3492b"
 
 DEPENDS += "qmi"
 DEPENDS += "qmi-framework"

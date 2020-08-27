@@ -8,10 +8,10 @@ PR = "r0"
 
 
 # Provide a baseline
-SRC_URI = "${PATH_TO_REPO}/device/qcom/wlan/.git;protocol=${PROTO};destsuffix=device/qcom/wlan;usehead=1"
+SRC_URI = "${PATH_TO_REPO}/device/qcom/wlan.git;protocol=${PROTO};destsuffix=device/qcom/wlan;nobranch=1"
 # Update for each machine
 S = "${WORKDIR}/device"
-SRCREV = "${AUTOREV}"
+SRCREV = "a72009409705ecfa3c2a6e22e8c767679869191e"
 
 do_install_append_auto(){
 	install -d ${D}/etc/misc/wifi

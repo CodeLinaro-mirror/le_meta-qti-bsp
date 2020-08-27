@@ -10,11 +10,11 @@ PR = "r0"
 
 DEPENDS += "zlib"
 
-SRC_URI   =  "${PATH_TO_REPO}/system/core/.git;protocol=${PROTO};destsuffix=system/core/libsparse;subpath=libsparse;usehead=1"
+SRC_URI   =  "${PATH_TO_REPO}/system/core.git;protocol=${PROTO};destsuffix=system/core/libsparse;subpath=libsparse;nobranch=1"
 
 S = "${WORKDIR}/system/core/libsparse"
 
-SRCREV = "${AUTOREV}"
+SRCREV = "a108d342592e6d03560729e589ba1ac6f7eaa440"
 
 BBCLASSEXTEND = "native"
 

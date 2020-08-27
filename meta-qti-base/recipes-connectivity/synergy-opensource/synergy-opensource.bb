@@ -8,9 +8,9 @@ ${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
 
 DEPENDS = "cmake cmake-native dbus synergy pulseaudio"
 
-SRC_URI = "${PATH_TO_REPO}/synergy/synergy-opensource/.git;protocol=${PROTO};destsuffix=synergy/synergy-opensource;usehead=1"
+SRC_URI = "${PATH_TO_REPO}/synergy/synergy-opensource.git;protocol=${PROTO};destsuffix=synergy/synergy-opensource;nobranch=1"
 
-SRCREV = "${AUTOREV}"
+SRCREV = "ef40bf558354e9e79511aff8087c48dc31005bd6"
 
 # Remove -Wl,--hash-style=gnu from it to avoid qa error for the prebuilt lib
 LDFLAGS = "-Wl,-O1"
