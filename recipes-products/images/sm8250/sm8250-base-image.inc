@@ -190,7 +190,7 @@ copy_edge_bsp_rpm() {
     cp ${DEPLOY_DIR_RPM}/aarch64/libbase0-1.0-r1.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/libcutils0-1.0-r1.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/libext4-utils0-git-r1.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
-    cp ${DEPLOY_DIR_RPM}/aarch64/libhardware0-git-r6.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
+    cp ${DEPLOY_DIR_RPM}/sm8250/libhardware0-1.0-r7.sm8250.rpm ${IMAGE_ROOTFS}/packages/sm8250/
     cp ${DEPLOY_DIR_RPM}/aarch64/libion0-1.0-r1.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/libion-dev-1.0-r1.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/liblog0-1.0-r1.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
@@ -248,7 +248,7 @@ copy_edge_bsp_rpm() {
     cp ${DEPLOY_DIR_RPM}/aarch64/system-media-git-r2.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/hdf5-1.8.21-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/hdf5-dev-1.8.21-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
-
+    cp ${DEPLOY_DIR_RPM}/aarch64/libcamera-metadata0-1.1-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
 }
 
 ROOTFS_POSTPROCESS_COMMAND += "copy_edge_bsp_rpm;"
