@@ -71,6 +71,8 @@ EXTRA_USERS_PARAMS = "\
  useradd -u 5002 -U leprop; \
  useradd -u 3013 -U qwes; \
  useradd -u 3013 -g qwes qwes; \
+ useradd -u 2901 -U kmsg; \
+ useradd -u 2901 -g kmsg kmsg; \
  usermod -L -e 1 system; \
  usermod -L -e 1 radio; \
  usermod -L -e 1 bluetooth; \
