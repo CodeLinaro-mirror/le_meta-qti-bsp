@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5
 PR = "r0"
 
 SRC_DIR = "${SRC_DIR_ROOT}/wlan/utils/sigma-dut/"
-SRC_URI   = "${PATH_TO_REPO}/wlan/utils/sigma-dut.git;protocol=${PROTO};destsuffix=wlan/utils/sigma-dut;nobranch=1"
+SRC_URI   = "git://source.codeaurora.org/platform/vendor/qcom-opensource/wlan/utils/sigma-dut.git;protocol=${PROTO};destsuffix=wlan/utils/sigma-dut;nobranch=1"
 S = "${WORKDIR}/wlan/utils/sigma-dut"
 SRCREV = "98c4b198b3010fa27f88d45d5bb744be0e3df852"
 

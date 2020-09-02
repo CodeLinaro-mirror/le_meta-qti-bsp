@@ -10,7 +10,7 @@ RDEPENDS_${PN} = "acdbloader"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/mm-audio.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/mm-audio/pulseaudio-module-acdb;subpath=pulseaudio-module-acdb;nobranch=1"
+SRC_URI = "git://source.codeaurora.org/platform/vendor/qcom-opensource/mm-audio.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/mm-audio/pulseaudio-module-acdb;subpath=pulseaudio-module-acdb;nobranch=1"
 SRCREV  = "a4cd8bb0e14d2ee8e8222def7719dfd732d71574"
 
 S = "${WORKDIR}/vendor/qcom/opensource/mm-audio/pulseaudio-module-acdb"

@@ -8,7 +8,7 @@ PR = "r0"
 
 
 # Provide a baseline
-SRC_URI = "${PATH_TO_REPO}/device/qcom/wlan.git;protocol=${PROTO};destsuffix=device/qcom/wlan;nobranch=1"
+SRC_URI = "git://source.codeaurora.org/platform/vendor/qcom/wlan.git;protocol=${PROTO};destsuffix=device/qcom/wlan;nobranch=1"
 # Update for each machine
 S = "${WORKDIR}/device"
 SRCREV = "a72009409705ecfa3c2a6e22e8c767679869191e"

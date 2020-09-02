@@ -11,7 +11,7 @@ PR = "r1"
 DEPENDS = "binder liblog libcutils libhardware libhardware-headers libselinux glib-2.0 system-core-headers"
 DEPENDS += " ${@oe.utils.version_less_or_equal('PREFERRED_VERSION_linux-msm', '4.4', '', 'libsync', d)}"
 
-SRC_URI = "${PATH_TO_REPO}/frameworks.git;protocol=${PROTO};destsuffix=frameworks;nobranch=1"
+SRC_URI = "git://source.codeaurora.org/quic/le/platform/vendor/qcom-opensource/le-framework.git;protocol=${PROTO};destsuffix=frameworks;nobranch=1"
 S = "${WORKDIR}/frameworks/libui"
 SRCREV = "512dafe851af504ac4642acbd25936aa232711a4"
 

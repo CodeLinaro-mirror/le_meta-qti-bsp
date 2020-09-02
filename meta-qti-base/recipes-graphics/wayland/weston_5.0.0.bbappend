@@ -1,5 +1,5 @@
 FILESEXTRAPATHS_append := ":${THISDIR}/weston/"
-SRC_URI = "${PATH_TO_REPO}/graphics/weston.git;protocol=${PROTO};destsuffix=graphics/weston;nobranch=1"
+SRC_URI = "git://source.codeaurora.org/quic/le/wayland/weston.git;protocol=${PROTO};destsuffix=graphics/weston;nobranch=1"
 S = "${WORKDIR}/graphics/weston"
 SRCREV = "6c3569e55ea41ce7895bae60ba3a78b2664ba037"
 
