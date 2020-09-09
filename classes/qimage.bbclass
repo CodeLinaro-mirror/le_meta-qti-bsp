@@ -106,16 +106,23 @@ do_makesystem[dirs]       = "${DEPLOY_DIR_IMAGE}"
 ################################################
 python do_make_bootimg () {
     import subprocess
+    import errno
 
 #create emmc deploy dir.
     emmc_deploy = d.getVar('DEPLOY_DIR_IMAGE_EMMC', True)
-    if not os.path.exists(emmc_deploy):
-     os.mkdir(emmc_deploy)
+    try:
+       os.mkdir(emmc_deploy)
+    except OSError as e:
+     if e.errno == errno.EEXIST:
+       print("%s directory already exists",'DEPLOY_DIR_IMAGE_EMMC')
 
 #create nand deploy dir.
     nand_deploy = d.getVar('DEPLOY_DIR_IMAGE_NAND', True)
-    if not os.path.exists(nand_deploy):
-     os.mkdir(nand_deploy)
+    try:
+       os.mkdir(nand_deploy)
+    except OSError as e:
+      if e.errno == errno.EEXIST:
+       print("%s directory already exists",'DEPLOY_DIR_IMAGE_NAND')
 
     xtra_parms=""
     mkboot_bin_path = d.getVar('STAGING_BINDIR_NATIVE', True) + '/mkbootimg'
@@ -157,11 +164,15 @@ addtask do_make_bootimg before do_image_complete
 ################################################
 python do_make_ramdisk_bootimg () {
     import subprocess
+    import errno
 
 # create squashfs deploy dir.
     squashfs_deploy = d.getVar('DEPLOY_DIR_IMAGE_SQUASHFS', True)
-    if not os.path.exists(squashfs_deploy):
-     os.mkdir(squashfs_deploy)
+    try:
+      os.mkdir(squashfs_deploy)
+    except OSError as e:
+     if e.errno == errno.EEXIST:
+       print("%s directory already exists",'DEPLOY_DIR_IMAGE_SQUASHFS')
 
     mkboot_bin_path = d.getVar('STAGING_BINDIR_NATIVE', True) + '/mkbootimg'
     zimg_path       = d.getVar('DEPLOY_DIR_IMAGE', True) + "/" + d.getVar('KERNEL_IMAGETYPE', True)
