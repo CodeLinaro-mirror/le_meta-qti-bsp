@@ -19,3 +19,6 @@ PARTLABEL=persist    /var            auto      defaults                         
 
 # uncomment this if your device has a SD/MMC/Transflash slot
 /dev/mmcblk0p1       /media/card          auto       defaults,sync,noauto  0  0
+
+#ramfs for FSM
+tmpfs       /mnt/ramfs tmpfs   nodev,nosuid,noexec,nodiratime,size=1024M   0 0
