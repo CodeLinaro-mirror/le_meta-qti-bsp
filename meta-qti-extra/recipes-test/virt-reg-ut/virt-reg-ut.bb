@@ -9,7 +9,13 @@ SRC_URI = "file://virtio_reg"
 
 S = "${WORKDIR}/virtio_reg"
 
+DEPENDS += "ktf"
+
 MODULES_PATH = "${PKGDEST}/${PN}/${nonarch_base_libdir}/modules/${KERNEL_VERSION}/unit_test"
+
+python __anonymous () {
+    d.setVar('KBUILD_EXTRA_SYMBOLS', "${STAGING_INCDIR}/ktf/Module.symvers")
+}
 
 do_install () {
     install -d ${D}/lib/modules/${KERNEL_VERSION}/unit_test
