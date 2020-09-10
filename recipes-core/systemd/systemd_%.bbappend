@@ -9,7 +9,3 @@ QTI_SYSTEMD_INC = ""
 QTI_SYSTEMD_INC_qti-distro-base = "${THISDIR}/qti-systemd.inc"
 include ${QTI_SYSTEMD_INC}
 
-#remove of bash from systemd
-RDEPENDS_${PN}-kernel-install_remove = "bash"
-
-
