@@ -120,6 +120,11 @@ copy_edge_rootfs() {
         cp ${WORKSPACE}/poky/meta-qti-internal/centos-noship/scripts/ifcfg-eth0 ${IMAGE_ROOTFS}/packages/
     fi
 
+    if [ -e ${WORKSPACE}/poky/meta-qti-internal/centos-noship/scripts/ifcfg-eth1 ]
+    then
+        cp ${WORKSPACE}/poky/meta-qti-internal/centos-noship/scripts/ifcfg-eth1 ${IMAGE_ROOTFS}/packages/
+    fi
+
     mkdir -p ${IMAGE_ROOTFS}/systemrw
     mkdir -p ${IMAGE_ROOTFS}/persist
     mkdir -p ${IMAGE_ROOTFS}/firmware
