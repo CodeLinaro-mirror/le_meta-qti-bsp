@@ -246,7 +246,7 @@ do_install_append () {
                 install -m 0744 ${WORKDIR}/persistfactory-ubi-mount.sh ${D}${sysconfdir}/initscripts/persistfactory-ubi-mount.sh
                 install -m 0644 ${WORKDIR}/persistfactory-ubi-mount.service ${D}${systemd_unitdir}/system/persistfactory-mount.service
                 install -m 0644 ${WORKDIR}/persistfactory-ubi-mount.service ${D}${systemd_unitdir}/system/persistfactory-ubi-mount.service
-                ln -sf ${systemd_unitdir}/system/persistfactory-ubi-mount.service \
+                ln -sf ${systemd_unitdir}/system/persistfactory-mount.service \
                     ${D}${systemd_unitdir}/system/local-fs.target.requires/persistfactory-mount.service
             fi
         fi

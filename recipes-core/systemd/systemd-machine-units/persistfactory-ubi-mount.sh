@@ -43,12 +43,12 @@ FindAndMountUBI () {
 
     mtd_file=/proc/mtd
 
-    mtd_block_number=`cat $mtd_file | grep -i $partition | sed 's/^mtd//' | awk -F ':' '{print $partition}'`
+    mtd_block_number=`cat $mtd_file | grep -i $partition | sed 's/^mtd//' | awk -F ':' '{print $1}'`
     echo "MTD : Detected block device : $dir for $partition"
     mkdir -p $dir
 
     ubiattach -m $mtd_block_number
-    factory_block=`cat $mtd_file | grep -i factory-fs | sed 's/^mtd//' | awk -F ':' '{print $partition}'`
+    factory_block=`cat $mtd_file | grep -i factory-fs | sed 's/^mtd//' | awk -F ':' '{print $1}'`
     device=/dev/mtdblock$factory_block
 
     mount $device $dir
