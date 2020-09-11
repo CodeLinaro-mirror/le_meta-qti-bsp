@@ -1,0 +1,10 @@
+meta-qti-lxc
+=================
+
+This layer provides LXC functionality for QTI based platforms.
+
+
+Dependencies
+============
+
+This layer depends on meta-qti-base and meta-virtualization.
