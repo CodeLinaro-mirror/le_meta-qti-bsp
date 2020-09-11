@@ -1,0 +1,6 @@
+meta-qti-distro 
+=================
+
+This layer depends on: meta-qti-bsp/meta-qti-base
+
+
