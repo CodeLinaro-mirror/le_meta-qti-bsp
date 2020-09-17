@@ -10,7 +10,7 @@ PR = "r0"
 
 DEPENDS = "liblog libcutils libhardware libselinux system-core glib-2.0"
 
-SRC_URI  = "git://source.codeaurora.org/quic/le/platform/vendor/qcom-opensource/le-framework.git;protocol=${PROTO};destsuffix=frameworks/binder;subpath=binder;nobranch=1"
+SRC_URI  = "${PATH_TO_REPO}/frameworks.git;protocol=${PROTO};destsuffix=frameworks/binder;subpath=binder;nobranch=1"
 SRC_URI_append = " file://servicemanager.service"
 SRC_URI_append = " file://create-binder.sh"
 SRCREV = "512dafe851af504ac4642acbd25936aa232711a4"

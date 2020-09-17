@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/MIT;md5=0835ad
 DEPENDS = "libatomic-ops"
 
 PR = "r0"
-SRC_URI   =  "git://source.codeaurora.org/platform/external/libunwind.git;protocol=${PROTO};destsuffix=external/libunwind;nobranch=1"
+SRC_URI   =  "${PATH_TO_REPO}/external/libunwind.git;protocol=${PROTO};destsuffix=external/libunwind;nobranch=1"
 S = "${WORKDIR}/external/libunwind"
 
 SRCREV = "7ae792b4d98fb654b494675ba0f541bf2e664d55"

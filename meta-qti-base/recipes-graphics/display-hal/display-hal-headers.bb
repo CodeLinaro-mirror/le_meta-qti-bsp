@@ -3,7 +3,7 @@ DESCRIPTION = "Provide display-hal Headers"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
 
-SRC_URI = "git://source.codeaurora.org/platform/hardware/qcom/display.git;protocol=${PROTO};destsuffix=display/display-hal;nobranch=1"
+SRC_URI = "${PATH_TO_REPO}/display/display-hal.git;protocol=${PROTO};destsuffix=display/display-hal;nobranch=1"
 SRCREV = "365a1294e0bc9c0bc4027097d0929dcd3d174610"
 
 

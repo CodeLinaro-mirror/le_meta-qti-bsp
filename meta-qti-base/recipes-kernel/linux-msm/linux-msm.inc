@@ -28,8 +28,8 @@ KERNEL_EXTRA_ARGS_append_sa8155  += "TARGET_BOARD_TYPE=auto"
 KERNEL_EXTRA_ARGS_append_sa6155  += "TARGET_BOARD_TYPE=auto"
 KERNEL_EXTRA_ARGS_append_sa8195  += "TARGET_BOARD_TYPE=auto"
 
-SRC_URI   =  "git://source.codeaurora.org/kernel/msm-4.14.git;protocol=${PROTO};destsuffix=kernel/msm-4.14;nobranch=1;name=kernel \
-              git://source.codeaurora.org/platform/vendor/qcom-opensource/data-kernel.git;protocol=${PROTO};destsuffix=data-kernel;nobranch=1;nobranch=datakernel"
+SRC_URI   =  "${PATH_TO_REPO}/kernel/msm-4.14.git;protocol=${PROTO};destsuffix=kernel/msm-4.14;nobranch=1;name=kernel \
+              ${PATH_TO_REPO}/data-kernel.git;protocol=${PROTO};destsuffix=data-kernel;nobranch=1;nobranch=datakernel"
 
 SRC_URI_append = "  \
               ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', ' file://systemd.cfg', '', d)} \

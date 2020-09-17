@@ -12,7 +12,7 @@ PR = "r0"
 DEPENDS = "virtual/kernel"
 AUDIO_BUILD_TARGET = "auto-audio-target"
 
-SRC_URI = "git://source.codeaurora.org/platform/vendor/opensource/audio-kernel.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/audio-kernel;nobranch=1"
+SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/audio-kernel.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/audio-kernel;nobranch=1"
 SRC_URI_append = " file://${AUDIO_BUILD_TARGET}/"
 SRCREV = "ae59f94efec2f86df64a413328eae2c019b9bd4b"
 

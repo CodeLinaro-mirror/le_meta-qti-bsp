@@ -5,7 +5,7 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 LICENSE = "GPL-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=801f80980d171dd6425610833a22dbe6"
 
-SRC_URI = "git://source.codeaurora.org/platform/vendor/qcom-opensource/ptp-virtual.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/ptp-virtual;nobranch=1"
+SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/ptp-virtual.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/ptp-virtual;nobranch=1"
 SRC_URI += " file://ptp-virtual.service"
 SRCREV = "252ec667a35c2c6809f40a80cad73c51f5c0594c"
 

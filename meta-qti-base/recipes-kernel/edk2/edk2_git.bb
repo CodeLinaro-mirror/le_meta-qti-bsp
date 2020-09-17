@@ -12,7 +12,7 @@ BUILD_OS = "linux"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-SRC_URI   =  "git://source.codeaurora.org/quic/le/abl/tianocore/edk2.git;protocol=${PROTO};destsuffix=bootable/bootloader/edk2;nobranch=1"
+SRC_URI   =  "${PATH_TO_REPO}/bootable/bootloader/edk2.git;protocol=${PROTO};destsuffix=bootable/bootloader/edk2;nobranch=1"
 S         =  "${WORKDIR}/bootable/bootloader/edk2"
 SRCREV = "75571706f8756956923db277091bf594e8b47baf"
 
