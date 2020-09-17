@@ -98,6 +98,8 @@ IMAGE_INSTALL += "fluoride"
 IMAGE_INSTALL += "libbt-vendor"
 IMAGE_INSTALL += "protobuf"
 
+IMAGE_INSTALL += "ca-certificates"
+
 # Below packages are open source packages that depend on proprietary packages
 
 QMI_DIR_PRESENT = "${@os.path.exists('${WORKSPACE}/qmi')}"
