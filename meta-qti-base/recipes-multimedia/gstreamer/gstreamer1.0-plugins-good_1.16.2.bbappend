@@ -1,9 +1,13 @@
 DEFAULT_PREFERENCE = "-1"
 
-FILESEXTRAPATHS_append := ":${THISDIR}/gst-plugins-good"
-SRC_URI += "file://0001-ignore-av_bsp-segment-error-in-wav-header.patch \
-            file://0002-qtdemux-add-handle-of-shorter-stream.patch \
-            "
+SRC_URI   =  "${PATH_TO_REPO}/gstreamer/gst-plugins-good/.git;protocol=${PROTO};destsuffix=gstreamer/gst-plugins-good;usehead=1"
+SRC_URI_append = " ${CAF_GIT}/gstreamer/common;destsuffix=gstreamer/gst-plugins-good/common;branch=gstreamer/common/master;name=common"
+
+SRCREV = "${AUTOREV}"
+SRCREV_common = "59cb678164719ff59dcf6c8b93df4617a1075d11"
+SRCREV_FORMAT = "good_common"
+
+S = "${WORKDIR}/gstreamer/gst-plugins-good"
 
 PACKAGECONFIG ??= " \
     ${GSTREAMER_ORC} \

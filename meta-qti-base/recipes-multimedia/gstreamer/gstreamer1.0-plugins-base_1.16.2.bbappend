@@ -1,13 +1,13 @@
 DEFAULT_PREFERENCE = "-1"
 
-FILESEXTRAPATHS_append := ":${THISDIR}/gst-plugins-base"
-SRC_URI += "file://0001-gst-plugins-base-add-NV12_UBWC-and-RGBA_UBWC.patch \
-            file://0002-Support-typefind-of-heic.patch \
-            file://0003-Support-NV12_512-color-format-in-Gstreamer.patch \
-            file://0004-videodecoder-expose-function-push_event.patch \
-            file://0005-change-for-build-error.patch \
-            file://0006-do-not-create-eglsink.patch \
-            "
+SRC_URI = "${PATH_TO_REPO}/gstreamer/gst-plugins-base/.git;protocol=${PROTO};destsuffix=gstreamer/gst-plugins-base;usehead=1"
+SRC_URI_append = " ${CAF_GIT}/gstreamer/common;destsuffix=gstreamer/gst-plugins-base/common;branch=gstreamer/common/master;name=common"
+
+SRCREV = "${AUTOREV}"
+SRCREV_common = "59cb678164719ff59dcf6c8b93df4617a1075d11"
+SRCREV_FORMAT = "base_common"
+
+S = "${WORKDIR}/gstreamer/gst-plugins-base"
 
 PACKAGECONFIG ??= " \
     ${GSTREAMER_ORC} \

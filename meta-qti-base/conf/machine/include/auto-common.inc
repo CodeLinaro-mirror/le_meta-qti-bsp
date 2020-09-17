@@ -16,14 +16,14 @@ PREFERRED_VERSION_wayland-native = "1.18.0"
 PREFERRED_VERSION_wayland-protocols = "1.20"
 PREFERRED_VERSION_wayland-ivi-extension = "2.2.0"
 
-# Prefer GStreamer 1.16.2 by default
-PREFERRED_VERSION_gstreamer1.0              ?= "1.16.2"
-PREFERRED_VERSION_gstreamer1.0-plugins-bad  ?= "1.16.2"
-PREFERRED_VERSION_gstreamer1.0-plugins-base ?= "1.16.2"
-PREFERRED_VERSION_gstreamer1.0-plugins-good ?= "1.16.2"
-PREFERRED_VERSION_gstreamer1.0-plugins-ugly ?= "1.16.2"
-PREFERRED_VERSION_gstreamer1.0-libav        ?= "1.16.2"
-PREFERRED_VERSION_gstreamer1.0-omx          ?= "1.16.2"
+# Prefer GStreamer 1.16.x by default
+PREFERRED_VERSION_gstreamer1.0              ?= "1.16.%"
+PREFERRED_VERSION_gstreamer1.0-plugins-bad  ?= "1.16.%"
+PREFERRED_VERSION_gstreamer1.0-plugins-base ?= "1.16.%"
+PREFERRED_VERSION_gstreamer1.0-plugins-good ?= "1.16.%"
+PREFERRED_VERSION_gstreamer1.0-plugins-ugly ?= "1.16.%"
+PREFERRED_VERSION_gstreamer1.0-libav        ?= "1.16.%"
+PREFERRED_VERSION_gstreamer1.0-omx          ?= "1.16.%"
 
 # Prefer gbm
 PREFERRED_PROVIDER_virtual/libgbm = "gbm"
