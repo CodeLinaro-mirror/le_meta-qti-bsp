@@ -10,8 +10,8 @@ RDEPENDS_${PN} = "pulseaudio-server pulseaudio-misc pulseaudio-module-null-sourc
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/mm-audio.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/mm-audio/pulseaudio-module-codec-control;subpath=pulseaudio-module-codec-control;nobranch=1"
-SRCREV  = "a4cd8bb0e14d2ee8e8222def7719dfd732d71574"
+SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/mm-audio/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/mm-audio/pulseaudio-module-codec-control;subpath=pulseaudio-module-codec-control;usehead=1"
+SRCREV  = "${AUTOREV}"
 
 S = "${WORKDIR}/vendor/qcom/opensource/mm-audio/pulseaudio-module-codec-control/"
 

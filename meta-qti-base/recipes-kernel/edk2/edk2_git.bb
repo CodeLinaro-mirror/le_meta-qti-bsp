@@ -12,9 +12,9 @@ BUILD_OS = "linux"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-SRC_URI   =  "${PATH_TO_REPO}/bootable/bootloader/edk2.git;protocol=${PROTO};destsuffix=bootable/bootloader/edk2;nobranch=1"
+SRC_URI   =  "${PATH_TO_REPO}/bootable/bootloader/edk2/.git;protocol=${PROTO};destsuffix=bootable/bootloader/edk2;usehead=1"
 S         =  "${WORKDIR}/bootable/bootloader/edk2"
-SRCREV = "75571706f8756956923db277091bf594e8b47baf"
+SRCREV = "${AUTOREV}"
 
 # FIXME for keymaster functionality
 SRC_URI_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'qti-lxc', ' file://0001-avb-bring-up-keymaster-for-LV.patch', '', d)}"

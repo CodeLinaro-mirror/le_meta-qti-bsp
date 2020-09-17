@@ -10,8 +10,8 @@ LICENSE = "GPL-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=801f80980d171dd6425610833a22dbe6"
 
 SRC_DIR = "${SRC_DIR_ROOT}/vendor/qcom/opensource/hsi2s-kernel"
-SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/hsi2s-kernel.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/hsi2s-kernel;nobranch=1"
-SRCREV = "3be812645c890e0490117ac1160f8f1887321947"
+SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/hsi2s-kernel/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/hsi2s-kernel;usehead=1"
+SRCREV = "${AUTOREV}"
 
 PR = "r0"
 PV = "0.1"

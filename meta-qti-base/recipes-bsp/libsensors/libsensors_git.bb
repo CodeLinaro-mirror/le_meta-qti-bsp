@@ -5,14 +5,14 @@ PR = "r1"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
 
-SRC_URI = "${PATH_TO_REPO}/hardware/qcom/sensors.git;protocol=${PROTO};destsuffix=hardware/qcom/sensors;nobranch=1"
+SRC_URI = "${PATH_TO_REPO}/hardware/qcom/sensors/.git;protocol=${PROTO};destsuffix=hardware/qcom/sensors;usehead=1"
 SRC_URI += "file://iio.sh"
 SRC_URI += "file://sensors.sh"
 SRC_URI += "file://61-iio.rules"
 SRC_URI += "file://61-sensor.rules"
 S = "${WORKDIR}/hardware/qcom/sensors"
 
-SRCREV = "f9c51c3218203c625e292c1a5b4915518aa6176f"
+SRCREV = "${AUTOREV}"
 DEPENDS = "glib-2.0"
 
 EXTRA_OECONF = "--with-glib"

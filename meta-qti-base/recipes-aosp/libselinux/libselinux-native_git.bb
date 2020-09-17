@@ -8,10 +8,10 @@ PR = "r1"
 
 DEPENDS = "libpcre-native libmincrypt-native libcutils-native"
 
-SRC_URI = "${PATH_TO_REPO}/external/libselinux.git;protocol=${PROTO};destsuffix=external/libselinux;nobranch=1"
+SRC_URI = "${PATH_TO_REPO}/external/libselinux/.git;protocol=${PROTO};destsuffix=external/libselinux;usehead=1"
 S = "${WORKDIR}/external/libselinux"
 
-SRCREV = "ee539d24828440eda6115da4f300937383c6a98d"
+SRCREV = "${AUTOREV}"
 
 
 EXTRA_OECONF = " --with-pcre"
