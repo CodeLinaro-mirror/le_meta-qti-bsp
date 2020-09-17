@@ -25,7 +25,10 @@ EXTRA_OECONF = "KDIR=${STAGING_KERNEL_DIR}"
 SECURITY_CFLAGS = "${SECURITY_NO_PIE_CFLAGS}"
 CPPFLAGS += "-I${STAGING_INCDIR}"
 
-do_install () {
+MODULES_MODULE_SYMVERS_LOCATION = "kernel"
+MODULES_INSTALL_TARGET = ""
+
+do_install_append() {
     install -d ${D}${bindir}
     install -d ${D}${libdir}
     install -d ${D}/lib/modules/${KERNEL_VERSION}/unit_test
