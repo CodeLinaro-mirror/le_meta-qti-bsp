@@ -1,9 +1,5 @@
 DEFAULT_PREFERENCE = "-1"
 
-SRC_URI_remove += " file://0001-introspection.m4-prefix-pkgconfig-paths-with-PKG_CON.patch \
-            file://0001-scaletempo-Advertise-interleaved-layout-in-caps-temp.patch \
-            file://headerfix.patch \
-            "
 SRC_URI   =  "${PATH_TO_REPO}/gstreamer/gst-plugins-good/.git;protocol=${PROTO};destsuffix=gstreamer/gst-plugins-good;usehead=1"
 SRC_URI_append = " ${CAF_GIT}/gstreamer/common;destsuffix=gstreamer/gst-plugins-good/common;branch=gstreamer/common/master;name=common"
 
@@ -13,7 +9,12 @@ SRCREV_FORMAT = "good_common"
 
 S = "${WORKDIR}/gstreamer/gst-plugins-good"
 
-PACKAGECONFIG[v4l2]       = "--enable-gst_v4l2 --disable-v4l2-probe,--disable-gst_v4l2"
+PACKAGECONFIG ??= " \
+    ${GSTREAMER_ORC} \
+    ${@bb.utils.filter('DISTRO_FEATURES', 'pulseaudio x11', d)} \
+    bz2 cairo flac gdk-pixbuf gudev jpeg-turbo lame libpng mpg123 soup speex taglib v4l2 \
+"
+PACKAGECONFIG[v4l2]       = "-Dv4l2=enabled -Dv4l2-probe=false,-Dv4l2=false"
 
 do_configure_prepend() {
 	cd ${S}
