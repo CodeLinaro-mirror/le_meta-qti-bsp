@@ -179,6 +179,12 @@ do_recovery_ubi() {
 
         # recovery_size : Size of recovery partition from partition.xml
         echo recovery_size=0x00C00000 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
+    elif [ "${BASEMACHINE}" == "sdxpoorwills" ]; then
+        # boot_size: Size of boot partition from partition.xml
+        echo boot_size=0x00A80000 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
+
+        # recovery_size : Size of recovery partition from partition.xml
+        echo recovery_size=0x00A80000 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
     else
         # boot_size: Size of boot partition from partition.xml
         echo boot_size=0x00A40000 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
