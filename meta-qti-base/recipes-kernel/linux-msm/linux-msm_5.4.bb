@@ -28,7 +28,11 @@ KERNEL_EXTRA_ARGS_append_sa8155  += "TARGET_BOARD_TYPE=auto"
 KERNEL_EXTRA_ARGS_append_sa6155  += "TARGET_BOARD_TYPE=auto"
 
 SRC_URI   =  "${PATH_TO_REPO}/kernel/msm-5.4/.git;protocol=${PROTO};destsuffix=kernel/msm-5.4;usehead=1 \
-              ${PATH_TO_REPO}/data-kernel/.git;protocol=${PROTO};destsuffix=data-kernel;usehead=1"
+              ${PATH_TO_REPO}/data-kernel/.git;protocol=${PROTO};destsuffix=data-kernel;usehead=1 \
+              ${PATH_TO_REPO}/kernel/msm-5.4/techpack/display/.git;protocol=${PROTO};destsuffix=kernel/msm-5.4/techpack/display;usehead=1 \
+              ${PATH_TO_REPO}/kernel/msm-5.4/techpack/sched/.git;protocol=${PROTO};destsuffix=kernel/msm-5.4/techpack/sched;usehead=1 \
+              ${PATH_TO_REPO}/kernel/msm-5.4/techpack/ais/.git;protocol=${PROTO};destsuffix=kernel/msm-5.4/techpack/ais;usehead=1 \
+              ${PATH_TO_REPO}/kernel/msm-5.4/techpack/video/.git;protocol=${PROTO};destsuffix=kernel/msm-5.4/techpack/video;usehead=1"
 
 SRC_URI_append = "  \
               ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', ' file://systemd.cfg', '', d)} \
@@ -36,7 +40,7 @@ SRC_URI_append = "  \
 SRC_URI_append =  "${@bb.utils.contains('DISTRO_FEATURES', 'wayland', ' file://weston.cfg', '', d)}"
 
 SRCREV = "${AUTOREV}"
-SRCREV_FORMAT = "kernel_data"
+SRCREV_FORMAT = "kernel_data_display_sched_ais_video"
 
 FILESEXTRAPATHS_append := ":${THISDIR}/files"
 
