@@ -4,8 +4,8 @@ SECTION  = "mm-venc-omx-test-lite"
 
 FILESPATH  =+ "${WORKSPACE}:"
 
-SRC_URI   =  "${PATH_TO_REPO}/gstreamer/gst-plugins-qti-oss/.git;protocol=${PROTO};destsuffix=gstreamer/gst-plugins-qti-oss;usehead=1"
-SRCREV = "${AUTOREV}"
+SRC_URI   =  "git://source.codeaurora.org/platform/vendor/qcom-opensource/gst-plugins-qti-oss.git;protocol=https;destsuffix=gstreamer/gst-plugins-qti-oss;nobranch=1"
+SRCREV = "9135db2be8079a1d96691fe3a9e853ce0f94285b"
 SRC_DIR = "${SRC_DIR_ROOT}/gstreamer/gst-plugins-qti-oss/omx-lite-app/mm-venc-omx-test"
 S      = "${WORKDIR}/gstreamer/gst-plugins-qti-oss/omx-lite-app/mm-venc-omx-test"
 

@@ -10,9 +10,9 @@ PROVIDES = "mkdtimg-native"
 DEPENDS += " dtc-native"
 
 PR = "r1"
-SRC_URI = "${PATH_TO_REPO}/system/libufdt/.git;protocol=${PROTO};destsuffix=system/libufdt;usehead=1"
+SRC_URI = "git://source.codeaurora.org/platform/system/libufdt.git;protocol=https;destsuffix=system/libufdt;nobranch=1"
 S = "${WORKDIR}/system/libufdt"
-SRCREV = "${AUTOREV}"
+SRCREV = "f83eb5a3630ffd5842949451c4fe0c235d32defa"
 
 # let libufdt suport autoconf
 FILESEXTRAPATHS_append := "${THISDIR}/files:"

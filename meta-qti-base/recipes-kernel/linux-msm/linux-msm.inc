@@ -28,8 +28,8 @@ KERNEL_EXTRA_ARGS_append_sa8155  += "TARGET_BOARD_TYPE=auto"
 KERNEL_EXTRA_ARGS_append_sa6155  += "TARGET_BOARD_TYPE=auto"
 KERNEL_EXTRA_ARGS_append_sa8195  += "TARGET_BOARD_TYPE=auto"
 
-SRC_URI   =  "${PATH_TO_REPO}/kernel/msm-4.14/.git;protocol=${PROTO};destsuffix=kernel/msm-4.14;usehead=1 \
-              ${PATH_TO_REPO}/data-kernel/.git;protocol=${PROTO};destsuffix=data-kernel;usehead=1"
+SRC_URI   =  "git://source.codeaurora.org/kernel/msm-4.14.git;protocol=https;destsuffix=kernel/msm-4.14;nobranch=1;name=kernel \
+              git://source.codeaurora.org/platform/vendor/qcom-opensource/data-kernel.git;protocol=https;destsuffix=data-kernel;nobranch=1;name=datakernel"
 
 SRC_URI_append = "  \
               ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', ' file://systemd.cfg', '', d)} \
@@ -38,7 +38,8 @@ SRC_URI_append = "  \
               ${@bb.utils.contains('DISTRO_FEATURES', 'early_init', ' file://earlyuserspace.cfg', '', d)} \
 	     "
 
-SRCREV = "${AUTOREV}"
+SRCREV_kernel = "0a31bae6d83daa6726b6f23bdc4bdb88c35fbadf"
+SRCREV_datakernel = "adba5817cfebaacfba8b7a12783729db06550872"
 SRCREV_FORMAT = "kernel_data"
 
 FILESEXTRAPATHS_append := ":${THISDIR}/files"

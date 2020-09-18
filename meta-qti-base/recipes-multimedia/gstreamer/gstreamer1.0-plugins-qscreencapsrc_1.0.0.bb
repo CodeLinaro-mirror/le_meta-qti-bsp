@@ -7,13 +7,13 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/LGPL-2.0;md5=9
                     file://${COREBASE}/meta/files/common-licenses/BSD-3-Clause;md5=550794465ba0ec5312d6919e203a55f9 \
                     file://${COREBASE}/meta/files/common-licenses/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 
-SRC_URI   =  "${PATH_TO_REPO}/gstreamer/gst-plugins-qti-oss/.git;protocol=${PROTO};destsuffix=gstreamer/gst-plugins-qti-oss;usehead=1"
+SRC_URI   =  "git://source.codeaurora.org/platform/vendor/qcom-opensource/gst-plugins-qti-oss.git;protocol=https;destsuffix=gstreamer/gst-plugins-qti-oss;nobranch=1"
 SRC_DIR = "${SRC_DIR_ROOT}/gstreamer/gst-plugins-qti-oss/gst-plugin-qscreencapsrc"
 S      = "${WORKDIR}/gstreamer/gst-plugins-qti-oss/gst-plugin-qscreencapsrc"
 PR = "r1"
 LV = "1.0.0"
 LIBV = "1.0"
-SRCREV="${AUTOREV}"
+SRCREV="9135db2be8079a1d96691fe3a9e853ce0f94285b"
 
 DEPENDS = "glib-2.0 wayland-native"
 DEPENDS += "gstreamer1.0 \

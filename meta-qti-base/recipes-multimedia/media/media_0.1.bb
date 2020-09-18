@@ -3,9 +3,9 @@ SECTION = "multimedia"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
 
-SRC_URI = "${PATH_TO_REPO}/hardware/qcom/media/.git;protocol=${PROTO};destsuffix=hardware/qcom/media;usehead=1"
+SRC_URI = "git://source.codeaurora.org/quic/le/platform/hardware/qcom/media.git;protocol=https;destsuffix=hardware/qcom/media;nobranch=1"
 S = "${WORKDIR}/hardware/qcom/media"
-SRCREV = "${AUTOREV}"
+SRCREV = "8aae7514855b7b506b59717f8983c3010b2da17a"
 
 
 PR = "r1"
