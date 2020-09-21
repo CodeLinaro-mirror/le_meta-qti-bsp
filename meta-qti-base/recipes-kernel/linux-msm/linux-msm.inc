@@ -36,6 +36,7 @@ SRC_URI_append = "  \
               ${@bb.utils.contains('DISTRO_FEATURES', 'virtualization', ' file://virtualization.cfg', '', d)} \
               ${@bb.utils.contains('DISTRO_FEATURES', 'nand-squashfs', ' file://squashfs.cfg', '', d)} \
               ${@bb.utils.contains('DISTRO_FEATURES', 'early_init', ' file://earlyuserspace.cfg', '', d)} \
+              ${@bb.utils.contains('DISTRO_FEATURES', 'qti-dual-wlan', ' file://dual-wlan.cfg', '', d)} \
 	     "
 
 SRCREV = "${AUTOREV}"
