@@ -6,6 +6,8 @@ CORE_IMAGE_EXTRA_INSTALL += "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'packagegroup-selinux-minimal', '', d)} \
     systemd-machine-units \
     packagegroup-startup-scripts \
+    packagegroup-qti-display \
+    packagegroup-qti-securemsm \
 "
 
 #Exclude packages
