@@ -50,8 +50,8 @@ IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'st
 DEPENDS += "squashfs-tools-native"
 
 # Install A/B recovery bins and its libs in system image if A/B boot is supported
-IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'recovery-ab-bin', '', d)}"
 IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'recovery-ab', '', d)}"
+IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'recovery-ab-bin', '', d)}"
 
 #Dont use upstream fuctions for fs generation.
 IMAGE_CMD_ext4 = " "
@@ -103,4 +103,9 @@ fixup_systemd_mounts_services_ext4_rootfs() {
    rm -rf ${IMAGE_ROOTFS}/lib/systemd/system/data.mount
    rm -rf ${IMAGE_ROOTFS}/lib/systemd/system/data-ext4.mount
  fi
+}
+IMAGE_POSTPROCESS_COMMAND_append = " ${@bb.utils.contains('IMAGE_FSTYPES', 'ext4', 'create_unsparsed_sys_image;', '', d)} "
+
+create_unsparsed_sys_image() {
+  simg2img ${DEPLOY_DIR_IMAGE_EMMC}/${SYSTEMIMAGE_TARGET} ${DEPLOY_DIR_IMAGE_EMMC}/system.raw
 }
