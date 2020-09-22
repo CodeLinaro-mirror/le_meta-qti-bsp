@@ -39,22 +39,17 @@ CPPFLAGS += "-I${WORKDIR}/display/display-hal/libqservice"
 CPPFLAGS += "-I${WORKDIR}/display/display-hal/sdm/include"
 CPPFLAGS += "-I${WORKDIR}/display/display-hal/include"
 CPPFLAGS += "-I${WORKDIR}/display/display-hal/libdebug"
-CPPFLAGS += "-I${WORKDIR}/display/display-hal/gralloc"
 CPPFLAGS += "-I${STAGING_INCDIR}/libdrm"
 
 # fix for uapi msm_drm.h header file related compilation issue
 CPPFLAGS += "-fno-operator-names"
 
 do_install_append () {
-    # libhardware expects to find /usr/lib/hw/gralloc.*.so
-    install -d ${D}${libdir}/hw
-    ln -s ${libdir}/libgralloc.so ${D}${libdir}/hw/gralloc.default.so
     cp -fR ${WORKDIR}/display/display-hal/include/* ${STAGING_INCDIR}
     cp -fR ${WORKDIR}/display/display-hal/gpu_tonemapper/*.h ${STAGING_INCDIR}
 }
 
 FILES_${PN} = "${libdir}/*.so"
-FILES_${PN} += "/usr/lib/hw/gralloc.default.so"
 
 FILES_${PN} += " \
    ${libdir}/* \
