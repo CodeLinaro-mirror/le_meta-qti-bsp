@@ -1,4 +1,5 @@
 inherit autotools-brokensep qcommon pkgconfig
+require ../include/common-location-defines.inc
 
 DESCRIPTION = "GPS Utils"
 PR = "r1"

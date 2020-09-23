@@ -1,4 +1,5 @@
 inherit autotools-brokensep pkgconfig
+require ../include/common-location-defines.inc
 
 DESCRIPTION = "location api interface"
 PR = "r1"
