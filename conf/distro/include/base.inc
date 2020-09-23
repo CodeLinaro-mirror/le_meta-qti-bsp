@@ -55,8 +55,6 @@ USE_LDCONFIG = "0"
 LDCONFIGDEPEND = ""
 COMMERCIAL_LICENSE_DEPENDEES = ""
 
-PREFERRED_VERSION_readline = "5.2"
-
 PRODUCT ??= "base"
 
 # Retain existing directory structure for msm or mdm distro images.
