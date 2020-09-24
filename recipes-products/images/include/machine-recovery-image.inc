@@ -175,7 +175,11 @@ UBINIZE_RECOVERYFS_SQUASHFS_CFG = "${DEPLOY_DIR_IMAGE_NAND}/recoveryfs_squashfs_
 
 create_recoveryfs_squashfs_ubi_img() {
     create_recoveryfs_squashfs_ubinize_config
-    mksquashfs ${IMAGE_ROOTFS} ${RECOVERYFS_SQUASHFS_IMAGE} -noappend -comp xz
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'true', 'false', d)}; then
+        mksquashfs ${IMAGE_ROOTFS} ${RECOVERYFS_SQUASHFS_IMAGE} -context-file ${SELINUX_FILE_CONTEXTS} -noappend -comp xz
+    else
+        mksquashfs ${IMAGE_ROOTFS} ${RECOVERYFS_SQUASHFS_IMAGE} -noappend -comp xz
+    fi
     ubinize -o ${RECOVERYFS_SQUASHFS_UBI_IMAGE} ${UBINIZE_ARGS} ${UBINIZE_RECOVERYFS_SQUASHFS_CFG}
     chmod 644 ${RECOVERYFS_SQUASHFS_UBI_IMAGE}
 }
