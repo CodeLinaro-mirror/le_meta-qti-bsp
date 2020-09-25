@@ -3,11 +3,13 @@ require qcacld32-ll.inc
 DESCRIPTION = "Qualcomm Atheros WLAN CLD3.0 low latency driver"
 LICENSE = "ISC"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=f3b90e78ea0cffb20bf5cca7947a896d"
+SRCREV = "${AUTOREV}"
+SRCREV_FORMAT = "qcacld_cmn_fw_msm"
+PR = "r8"
 
 _MODNAME = "qca6574"
 FW_PATH_NAME = "qca6174"
-
-PR = "r8"
+FIRMWARE_PATH = "${D}${nonarch_base_libdir}/firmware/wlan/qca_cld/${_MODNAME}"
 
 SRC_URI = "${PATH_TO_REPO}/wlan/qcacld-3.0/.git;protocol=${PROTO};destsuffix=wlan/qcacld-3.0;usehead=1 \
            ${PATH_TO_REPO}/wlan/qca-wifi-host-cmn/.git;protocol=${PROTO};destsuffix=wlan/qca-wifi-host-cmn;usehead=1 \
@@ -18,13 +20,10 @@ SRC_URI = "${PATH_TO_REPO}/wlan/qcacld-3.0/.git;protocol=${PROTO};destsuffix=wla
            file://init.qti.wlan_off.sh \
            "
 
-SRCREV = "${AUTOREV}"
-SRCREV_FORMAT = "qcacld_cmn_fw_msm"
+
 
 S1 = "${WORKDIR}/wlan/qca-wifi-host-cmn/"
 S = "${WORKDIR}/wlan/qcacld-3.0/"
-
-FIRMWARE_PATH = "${D}/lib/firmware/wlan/qca_cld/${_MODNAME}"
 
 # Explicitly disable HL to enable LL as current WLAN driver is not having
 # simultaneous support of HL and LL.
@@ -33,7 +32,7 @@ EXTRA_OEMAKE += "CONFIG_QCA_CLD_WLAN_PROFILE=qca6174"
 EXTRA_OEMAKE += "DYNAMIC_SINGLE_CHIP=${_MODNAME}"
 EXTRA_OEMAKE += "MODNAME=${_MODNAME}"
 
-do_install () {
+do_install() {
     module_do_install
 
     install -d ${FIRMWARE_PATH}
@@ -51,18 +50,18 @@ do_install () {
     install -D -m 0755 ${WORKDIR}/init.qti.wlan_on.sh ${D}${bindir}/init.qti.wlan_on.sh
     install -D -m 0755 ${WORKDIR}/init.qti.wlan_off.sh ${D}${bindir}/init.qti.wlan_off.sh
 
-    install -d ${D}/lib/firmware/${FW_PATH_NAME}/
-    ln -sf /firmware/image/${FW_PATH_NAME}/bdwlan30.b00 ${D}/lib/firmware/${FW_PATH_NAME}/
-    ln -sf /firmware/image/${FW_PATH_NAME}/bdwlan30.bin ${D}/lib/firmware/${FW_PATH_NAME}/
-    mv ${D}/lib/firmware/${FW_PATH_NAME}/bdwlan30.bin ${D}/lib/firmware/${FW_PATH_NAME}/utfbd30.bin
-    ln -sf /firmware/image/${FW_PATH_NAME}/qwlan30.bin ${D}/lib/firmware/${FW_PATH_NAME}/
-    ln -sf /firmware/image/${FW_PATH_NAME}/utf30.bin ${D}/lib/firmware/${FW_PATH_NAME}/
-    ln -sf /firmware/image/${FW_PATH_NAME}/otp30.bin ${D}/lib/firmware/${FW_PATH_NAME}/
-    ln -sf /firmware/image/${FW_PATH_NAME}/data.msc ${D}/lib/firmware/${FW_PATH_NAME}/
-    ln -sf /firmware/image/${FW_PATH_NAME}/bdwlan30.b31 ${D}/lib/firmware/${FW_PATH_NAME}/
-    mv ${D}/lib/firmware/${FW_PATH_NAME}/bdwlan30.b31 ${D}/lib/firmware/${FW_PATH_NAME}/utfbd30.b31
-    ln -sf /firmware/image/${FW_PATH_NAME}/bdwlan30.bin ${D}/lib/firmware/${FW_PATH_NAME}/
-    ln -sf /firmware/image/${FW_PATH_NAME}/bdwlan30.b31 ${D}/lib/firmware/${FW_PATH_NAME}/
+    install -d ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/
+    ln -sf /firmware/image/${FW_PATH_NAME}/bdwlan30.b00 ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/
+    ln -sf /firmware/image/${FW_PATH_NAME}/bdwlan30.bin ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/
+    mv ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/bdwlan30.bin ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/utfbd30.bin
+    ln -sf /firmware/image/${FW_PATH_NAME}/qwlan30.bin ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/
+    ln -sf /firmware/image/${FW_PATH_NAME}/utf30.bin ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/
+    ln -sf /firmware/image/${FW_PATH_NAME}/otp30.bin ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/
+    ln -sf /firmware/image/${FW_PATH_NAME}/data.msc ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/
+    ln -sf /firmware/image/${FW_PATH_NAME}/bdwlan30.b31 ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/
+    mv ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/bdwlan30.b31 ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/utfbd30.b31
+    ln -sf /firmware/image/${FW_PATH_NAME}/bdwlan30.bin ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/
+    ln -sf /firmware/image/${FW_PATH_NAME}/bdwlan30.b31 ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/
 
     # Install systemd service file
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
