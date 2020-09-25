@@ -1,18 +1,7 @@
-inherit autotools qcommon
-
-DESCRIPTION = "display Library"
+SUMMARY = "display Library"
 LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
-
-PR = "r8"
-
-PACKAGES = "${PN}"
-
-SRC_DIR = "${SRC_DIR_ROOT}/display/display-hal"
-SRC_URI = "${PATH_TO_REPO}/display/display-hal/.git;protocol=${PROTO};destsuffix=display/display-hal;usehead=1"
-S = "${WORKDIR}/display/display-hal"
-SRCREV = "${AUTOREV}"
 
 DEPENDS += "system-core"
 DEPENDS += "libhardware"
@@ -23,9 +12,18 @@ DEPENDS += "libdrm"
 DEPENDS += "gbm-headers"
 DEPENDS += "display-commonsys-intf-linux"
 
-EXTRA_OECONF += " --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
+PR = "r8"
 
+SRC_DIR = "${SRC_DIR_ROOT}/display/display-hal"
+SRC_URI = "${PATH_TO_REPO}/display/display-hal/.git;protocol=${PROTO};destsuffix=display/display-hal;usehead=1"
+SRCREV = "${AUTOREV}"
+S = "${WORKDIR}/display/display-hal"
+
+inherit autotools-brokensep pkgconfig
+
+EXTRA_OECONF += " --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
 EXTRA_OECONF += " --enable-sdmhaldrm"
+
 LDFLAGS += "-llog -lhardware -lutils -lcutils"
 
 CPPFLAGS += "-DCOMPILE_DRM"
@@ -44,22 +42,16 @@ CPPFLAGS += "-I${STAGING_INCDIR}/libdrm"
 # fix for uapi msm_drm.h header file related compilation issue
 CPPFLAGS += "-fno-operator-names"
 
+do_configure[depends] += "virtual/kernel:do_shared_workdir"
 do_install_append () {
-    cp -fR ${WORKDIR}/display/display-hal/include/* ${STAGING_INCDIR}
-    cp -fR ${WORKDIR}/display/display-hal/gpu_tonemapper/*.h ${STAGING_INCDIR}
+    install -m 0644 ${WORKDIR}/display/display-hal/include/* ${STAGING_INCDIR}
+    install -m 0664 ${WORKDIR}/display/display-hal/gpu_tonemapper/*.h ${STAGING_INCDIR}
 }
 
-FILES_${PN} = "${libdir}/*.so"
+PACKAGE_ARCH ?= "${MACHINE_ARCH}"
 
-FILES_${PN} += " \
-   ${libdir}/* \
-   ${includedir} \
-   ${includedir}/utils \
-   ${includedir}/private \
-   ${includedir}/core \
-"
+SOLIBS = ".so"
+FILES_SOLIBSDEV = ""
 
-PACKAGES = "${PN}"
-INSANE_SKIP_${PN} = "dev-so"
-INHIBIT_PACKAGE_STRIP="1"
-INHIBIT_PACKAGE_DEBUG_SPLIT="1"
+INHIBIT_PACKAGE_STRIP = "1"
+INHIBIT_PACKAGE_DEBUG_SPLIT = "1"
