@@ -26,7 +26,7 @@ Supported combinations are listed below.
       |nf-32          |                |                  |
       +---------------+----------------+------------------+
       |sa2150p        | msm            | debug perf       |
-      |sa2150p-nand   | msm            | debug perf       |
+      |sa2150p-nand   | auto-eap-nand  | debug perf       |
       +---------------+----------------+------------------+
       |qcs605-32      | concam         | debug perf user  |
       |qcs605-64      |                |                  |
