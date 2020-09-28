@@ -191,3 +191,4 @@ do_deploy[postfuncs] += "sign_bootimg"
 do_shared_workdir[dirs] = "${DEPLOYDIR}"
 
 INHIBIT_PACKAGE_STRIP = "1"
+KERNEL_VERSION_SANITY_SKIP = "1"
