@@ -33,7 +33,8 @@ BOOTLOADER_NAME = "${@bb.utils.contains('DISTRO_FEATURES', 'emmc-boot', 'emmc_ap
 
 emmc_bootloader = "${@bb.utils.contains('DISTRO_FEATURES', 'emmc-boot', '1', '0', d)}"
 
-LIBGCC = "${STAGING_LIBDIR}/${TARGET_SYS}/6.4.0/libgcc.a"
+LIBGCC = "${STAGING_LIBDIR}/${TARGET_SYS}/8.2.0/libgcc.a"
+#LIBGCC = "${STAGING_LIBDIR}/${TARGET_SYS}/6.4.0/libgcc.a"
 
 # Disable display for nodisplay products
 DISPLAY_SCREEN = "1"
@@ -63,7 +64,8 @@ EXTRA_OEMAKE_append_robot-som = "TARGET_USE_QSEECOM_V4=1"
 EXTRA_OEMAKE_append = " ${@bb.utils.contains('TUNE_FEATURES', 'callconvention-hard', 'ENABLE_HARD_FPU=1', '', d)}"
 
 #add more cflags to lk, if GCC6.3 version
-EXTRA_OEMAKE_append = " 'LKLE_CFLAGS=-Wno-shift-negative-value -Wno-misleading-indentation -Wunused-const-variable=0 -DINIT_BIN_LE=\"/sbin/init\"' "
+EXTRA_OEMAKE_append = " 'LKLE_CFLAGS=-Wno-shift-negative-value -Wno-misleading-indentation -Wno-attributes -Wno-pointer-compare -Wno-implicit-fallthrough -Wno-unused-variable -Wno-switch-unreachable -Wno-cast-function-type -Wno-multistatement-macros -Wunused-const-variable=0 -DINIT_BIN_LE=\"/sbin/init\"' "
+#EXTRA_OEMAKE_append = " 'LKLE_CFLAGS=-Wno-shift-negative-value -Wno-misleading-indentation -Wno-attributes -Wunused-const-variable=0 -DINIT_BIN_LE=\"/sbin/init\"' "
 
 # Disable debug logs for non debug variant builds.
 EXTRA_OEMAKE_append = " ${@bb.utils.contains('VARIANT', 'debug', '', 'DISABLE_LOGGING_BL=1', d)}"

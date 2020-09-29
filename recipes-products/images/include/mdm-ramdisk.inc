@@ -65,7 +65,7 @@ do_ramdisk_create() {
             cp ${IMAGE_ROOTFS}/lib/libselinux.so.1 lib/libselinux.so.1
             cp ${IMAGE_ROOTFS}/lib/libpcre.so.1 lib/libpcre.so.1
         else
-            cp ${IMAGE_ROOTFS}/usr/lib/libselinux.so.0 lib/libselinux.so.0
+            #cp ${IMAGE_ROOTFS}/usr/lib/libselinux.so.0 lib/libselinux.so.0
             # meta-selinux layer does not currently check for distro_features
             if [ -f ${IMAGE_ROOTFS}/usr/lib/libpcre.so.1 ]; then
                 cp ${IMAGE_ROOTFS}/usr/lib/libpcre.so.1 lib/libpcre.so.1
