@@ -6,7 +6,6 @@ ${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
 
 inherit systemd
 
-FILESEXTRAPATHS_append := ":${THISDIR}/setup-network"
 SRC_URI = " file://setup-network.sh \
             file://setup-network.service \
           "
