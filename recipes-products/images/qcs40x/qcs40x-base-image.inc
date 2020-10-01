@@ -52,6 +52,8 @@ DEPENDS += "squashfs-tools-native"
 # Install A/B recovery bins and its libs in system image if A/B boot is supported
 IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'recovery-ab', '', d)}"
 IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'recovery-ab-bin', '', d)}"
+IMAGE_INSTALL_remove_vt-64 += "recovery-ab"
+IMAGE_INSTALL_remove_vt-64 += "recovery-ab-bin"
 
 #Dont use upstream fuctions for fs generation.
 IMAGE_CMD_ext4 = " "
