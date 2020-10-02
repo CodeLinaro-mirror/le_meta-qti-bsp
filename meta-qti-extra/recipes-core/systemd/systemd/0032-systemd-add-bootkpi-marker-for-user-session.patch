@@ -39,7 +39,7 @@ index 25e6ab8112..6688df1959 100644
 +        int fd = -1;
 +
 +        fd = open(KPI_VALUE_PATH, O_WRONLY);
-+        if (fd > 0) {
++        if (fd >= 0) {
 +                write(fd, label, strlen(label));
 +                close(fd);
 +        } else {
