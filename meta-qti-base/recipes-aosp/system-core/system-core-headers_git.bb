@@ -4,9 +4,10 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 
-SRC_URI   =  "${PATH_TO_REPO}/system/core/.git;protocol=${PROTO};destsuffix=system/core;usehead=1"
-S = "${WORKDIR}/system/core/"
 SRCREV = "${AUTOREV}"
+SRC_URI = "${PATH_TO_REPO}/system/core/.git;protocol=${PROTO};destsuffix=system/core;usehead=1"
+
+S = "${WORKDIR}/system/core/"
 
 do_configure[noexec] = "1"
 do_compile[noexec] = "1"
@@ -26,4 +27,3 @@ do_install () {
     install -m 0644 ${S}/include/netutils/dhcp.h  ${D}${includedir}/netutils/
     install -m 0644 ${S}/include/netutils/ifc.h  ${D}${includedir}/netutils/
 }
-
