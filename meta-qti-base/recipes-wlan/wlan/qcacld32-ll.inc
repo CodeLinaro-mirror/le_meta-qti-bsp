@@ -1,21 +1,11 @@
-inherit autotools-brokensep module qperf module-sign distro_features_check systemd
-
-PROVIDES_NAME   = "kernel-module-${_MODNAME}"
-RPROVIDES_${PN} += "${PROVIDES_NAME}-${KERNEL_VERSION}"
-
-do_unpack[deptask] = "do_populate_sysroot"
-
-FILES_${PN}     += "lib/firmware/wlan/*"
-FILES_${PN}     += "lib/firmware/*"
-FILES_${PN}     += "lib/modules/${KERNEL_VERSION}/extra/${_MODNAME}.ko"
-FILES_${PN}     += "usr/bin/init.qti.wlan_on.sh"
-FILES_${PN}     += "usr/bin/init.qti.wlan_off.sh"
-
-LDFLAGS_aarch64 = "-O1 --hash-style=gnu --as-needed"
+PROVIDES_NAME = "kernel-module-${_MODNAME}"
 
 SYSTEMD_SERVICE_${PN} = "init_qti_wlan_auto.service"
 SYSTEMD_AUTO_ENABLE_${PN} = "enable"
 
+inherit autotools-brokensep module qperf module-sign distro_features_check systemd
+
+do_unpack[deptask] = "do_populate_sysroot"
 do_compile() {
     #Add gnu99 for compiler compatible issues
     sed -i '$a\ccflags-y += -std=gnu99' ${S}/Kbuild
@@ -34,6 +24,16 @@ do_compile() {
         bbnote "nothing to compile"
     fi
 }
+
+RPROVIDES_${PN} += "${PROVIDES_NAME}-${KERNEL_VERSION}"
+
+FILES_${PN} += "lib/firmware/wlan/*"
+FILES_${PN} += "lib/firmware/*"
+FILES_${PN} += "lib/modules/${KERNEL_VERSION}/extra/${_MODNAME}.ko"
+FILES_${PN} += "usr/bin/init.qti.wlan_on.sh"
+FILES_${PN} += "usr/bin/init.qti.wlan_off.sh"
+
+LDFLAGS_aarch64 = "-O1 --hash-style=gnu --as-needed"
 
 qoe_runmake() {
     qoe_runmake_call "$@" || die "oe_runmake failed"
