@@ -1,0 +1,83 @@
+From fd508881eab208b185101dc5385cc1c96dbe9556 Mon Sep 17 00:00:00 2001
+From: Lei wang <leiwan@codeaurora.org>
+Date: Fri, 9 Oct 2020 13:49:07 +0800
+Subject: [PATCH] lttng-module: fix lttng-module compile issue
+
+qti kernel envolve with kernel community, this
+may cause lttng-ftrace module compile failed when
+kernel API proto changes. Fix mm_shrike_slab/
+writeback_queue_io api issue.
+
+qti redefine ftrace netif_receive_skb to use verbose template,
+verbose version is not supported by lttng, so comment it out.
+
+Signed-off-by: Lei wang <leiwan@codeaurora.org>
+---
+ instrumentation/events/lttng-module/mm_vmscan.h |  2 +-
+ instrumentation/events/lttng-module/net.h       |  2 ++
+ instrumentation/events/lttng-module/writeback.h | 16 +++++++++++++++-
+ 3 files changed, 18 insertions(+), 2 deletions(-)
+
+diff --git a/instrumentation/events/lttng-module/mm_vmscan.h b/instrumentation/events/lttng-module/mm_vmscan.h
+index 675171c..117b48e 100644
+--- a/instrumentation/events/lttng-module/mm_vmscan.h
++++ b/instrumentation/events/lttng-module/mm_vmscan.h
+@@ -265,7 +265,7 @@ LTTNG_TRACEPOINT_EVENT_INSTANCE(mm_vmscan_direct_reclaim_end_template, mm_vmscan
+ 	TP_ARGS(nr_reclaimed)
+ )
+ 
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,16,0))
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,14,0))
+ LTTNG_TRACEPOINT_EVENT_MAP(mm_shrink_slab_start,
+ 
+ 	mm_vmscan_shrink_slab_start,
+diff --git a/instrumentation/events/lttng-module/net.h b/instrumentation/events/lttng-module/net.h
+index 8789263..fccf575 100644
+--- a/instrumentation/events/lttng-module/net.h
++++ b/instrumentation/events/lttng-module/net.h
+@@ -544,6 +544,7 @@ LTTNG_TRACEPOINT_EVENT_INSTANCE(net_dev_template, net_dev_queue,
+ 	TP_ARGS(skb)
+ )
+ 
++/*
+ LTTNG_TRACEPOINT_EVENT_INSTANCE_MAP(net_dev_template,
+ 
+ 	netif_receive_skb,
+@@ -554,6 +555,7 @@ LTTNG_TRACEPOINT_EVENT_INSTANCE_MAP(net_dev_template,
+ 
+ 	TP_ARGS(skb)
+ )
++*/
+ 
+ LTTNG_TRACEPOINT_EVENT_INSTANCE_MAP(net_dev_template,
+ 
+diff --git a/instrumentation/events/lttng-module/writeback.h b/instrumentation/events/lttng-module/writeback.h
+index 3327a0f..daf3422 100644
+--- a/instrumentation/events/lttng-module/writeback.h
++++ b/instrumentation/events/lttng-module/writeback.h
+@@ -372,7 +372,21 @@ LTTNG_TRACEPOINT_EVENT_WBC_INSTANCE(wbc_balance_dirty_wait, writeback_wbc_balanc
+ #endif
+ LTTNG_TRACEPOINT_EVENT_WBC_INSTANCE(wbc_writepage, writeback_wbc_writepage)
+ 
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,1,0))
++
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,14,0))
++LTTNG_TRACEPOINT_EVENT(writeback_queue_io,
++	TP_PROTO(struct bdi_writeback *wb,
++		struct wb_writeback_work *work,
++		unsigned long dirtied_before,
++		int moved),
++	TP_ARGS(wb, work, dirtied_before, moved),
++	TP_FIELDS(
++		ctf_array_text(char, name, dev_name(wb->bdi->dev), 32)
++		ctf_integer(unsigned long, older, dirtied_before)
++		ctf_integer(int, moved, moved)
++	)
++)
++#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(3,1,0))
+ LTTNG_TRACEPOINT_EVENT(writeback_queue_io,
+ 	TP_PROTO(struct bdi_writeback *wb,
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,2,0))
+-- 
+2.7.4
+
