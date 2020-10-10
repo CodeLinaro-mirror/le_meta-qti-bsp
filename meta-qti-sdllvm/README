@@ -1,0 +1,10 @@
+meta-qti-sdllvm 
+=================
+
+This layer supports building recipes in QTI bsp layer with sdllvm toolchain
+
+
+Dependencies
+============
+
+This layer depends on meta-qti-base and meta-qti-base-prop

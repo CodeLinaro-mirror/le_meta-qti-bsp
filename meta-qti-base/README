@@ -1,0 +1,21 @@
+meta-qti-base 
+=================
+
+OpenEmbedded/Yocto Project layer for QTI based platforms.
+
+
+Dependencies
+============
+
+This layer depends on:
+
+```
+URI: git://github.com/openembedded/oe-core.git
+layers: meta
+```
+
+
+Machines
+========
+
+Supported machines: sa6155, sa8155, sa8195 and qtiquingvm.

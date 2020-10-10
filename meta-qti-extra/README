@@ -1,0 +1,10 @@
+meta-qti-extra 
+=================
+
+This layer provides extra functionality for QTI based platforms.
+
+
+Dependencies
+============
+
+This layer depends on meta-qti-base.

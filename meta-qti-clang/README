@@ -1,0 +1,10 @@
+meta-qti-clang 
+=================
+
+This layer supports building recipes in QTI bsp layer with meta-clang
+
+
+Dependencies
+============
+
+This layer depends on meta-qti-base and meta-clang
