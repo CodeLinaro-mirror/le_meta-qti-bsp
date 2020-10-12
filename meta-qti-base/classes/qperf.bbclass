@@ -22,30 +22,11 @@ python __anonymous() {
             revision += "_perf"
     d.setVar('PR', revision)
 
-    # While building kernel or kernel module recipes add a task to
+    # While building kernel module recipes add a task to
     # copy build artifacts into DEPLOY_DIR for ease of access
-    provides = d.getVar('PROVIDES', True)
-    if (("virtual/kernel" in provides)):
-        bb.build.addtask('do_copy_vmlinux', 'do_strip', 'do_shared_workdir do_deploy', d)
-        bb.build.addtask('do_copy_vmlinux_setscene', '', '', d)
-    elif (bb.data.inherits_class("module", d)):
+    if (bb.data.inherits_class("module", d)):
         bb.build.addtask('do_copy_kernel_module', 'do_module_signing do_deploy', 'do_install', d)
         bb.build.addtask('do_copy_kernel_module_setscene', '', '', d)
-}
-
-# Copy vmlinux into image specific deploy directory.
-SSTATETASKS += "do_copy_vmlinux"
-do_copy_vmlinux[dirs] = "${DEPLOY_DIR_IMAGE}"
-do_copy_vmlinux[stamp-extra-info] = "${MACHINE_ARCH}"
-do_copy_vmlinux[sstate-inputdirs] = "${QPERFDEPLOYDIR}"
-do_copy_vmlinux[sstate-outputdirs] = "${DEPLOY_DIR_IMAGE}"
-
-python do_copy_vmlinux_setscene () {
-    sstate_setscene(d)
-}
-
-do_copy_vmlinux() {
-    install -m 644 ${B}/vmlinux ${QPERFDEPLOYDIR}
 }
 
 # Copy kernel modules into image specific deploy directory.
