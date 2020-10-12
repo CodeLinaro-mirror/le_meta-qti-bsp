@@ -15,7 +15,7 @@ SRC_URI_append = " file://create-binder.sh"
 
 S = "${WORKDIR}/frameworks/binder"
 
-inherit autotools pkgconfig useradd distro_features_check
+inherit autotools pkgconfig useradd 
 
 CFLAGS += "-I${STAGING_INCDIR}/libselinux"
 
@@ -45,5 +45,3 @@ FILES_${PN}-dbg += "${bindir}/test_binder"
 FILES_${PN} += "${systemd_unitdir}/system/"
 
 QPERM_SERVICE = "${WORKDIR}/servicemanager.service"
-
-REQUIRED_DISTRO_FEATURES = "systemd"

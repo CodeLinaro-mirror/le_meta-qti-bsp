@@ -3,7 +3,7 @@ PROVIDES_NAME = "kernel-module-${_MODNAME}"
 SYSTEMD_SERVICE_${PN} = "init_qti_wlan_auto.service"
 SYSTEMD_AUTO_ENABLE_${PN} = "enable"
 
-inherit autotools-brokensep module qperf module-sign distro_features_check systemd
+inherit autotools-brokensep module qperf module-sign systemd
 
 do_unpack[deptask] = "do_populate_sysroot"
 do_compile() {
@@ -42,5 +42,3 @@ qoe_runmake_call() {
     bbnote make ${EXTRA_OEMAKE} CC="${CLANG_BIN_PATH}/clang" "$@"
     make ${EXTRA_OEMAKE} CC="${CLANG_BIN_PATH}/clang" "$@"
 }
-
-REQUIRED_DISTRO_FEATURES = "systemd"
