@@ -184,8 +184,15 @@ do_recovery_ubi() {
     fi
 
     # Targets that support A/B boot do not need recovery(fs)-updater
-    if ${@bb.utils.contains('DISTRO_FEATURES','ab-boot-support','true','false',d)}; then
-      if ${@bb.utils.contains('DISTRO_FEATURES','nand-ab','false','true',d)}; then
+    if ${@bb.utils.contains('DISTRO_FEATURES','nand-ab','false','true',d)}; then
+      # if nand-ab not defined use default flow to generate A/B images based on ab-boot-support
+      if ${@bb.utils.contains('DISTRO_FEATURES','ab-boot-support','true','false',d)}; then
+          echo le_target_supports_ab=1 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
+      fi
+    else
+      # if nand-ab is defined then generate A/B images only when func is passed a parameter
+      # this func is passed a parameter only when A/B images are to be generated
+      if [[ ! -z "${1}" ]]; then
           echo le_target_supports_ab=1 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
       fi
     fi
