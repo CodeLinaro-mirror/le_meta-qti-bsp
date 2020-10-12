@@ -1,0 +1,2 @@
+# Adding group for applications like abctl which need access to mtd partition
+ACTION=="add" SUBSYSTEM=="mtd", KERNEL=="mtd*", GROUP="disk", MODE="0660"
