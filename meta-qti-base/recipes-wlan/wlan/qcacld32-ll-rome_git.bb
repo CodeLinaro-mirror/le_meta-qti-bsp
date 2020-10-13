@@ -50,18 +50,18 @@ do_install() {
     install -D -m 0755 ${WORKDIR}/init.qti.wlan_on.sh ${D}${bindir}/init.qti.wlan_on.sh
     install -D -m 0755 ${WORKDIR}/init.qti.wlan_off.sh ${D}${bindir}/init.qti.wlan_off.sh
 
-    install -d ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/
-    ln -sf /firmware/image/${FW_PATH_NAME}/bdwlan30.b00 ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/
-    ln -sf /firmware/image/${FW_PATH_NAME}/bdwlan30.bin ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/
-    mv ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/bdwlan30.bin ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/utfbd30.bin
-    ln -sf /firmware/image/${FW_PATH_NAME}/qwlan30.bin ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/
-    ln -sf /firmware/image/${FW_PATH_NAME}/utf30.bin ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/
-    ln -sf /firmware/image/${FW_PATH_NAME}/otp30.bin ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/
-    ln -sf /firmware/image/${FW_PATH_NAME}/data.msc ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/
-    ln -sf /firmware/image/${FW_PATH_NAME}/bdwlan30.b31 ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/
-    mv ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/bdwlan30.b31 ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/utfbd30.b31
-    ln -sf /firmware/image/${FW_PATH_NAME}/bdwlan30.bin ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/
-    ln -sf /firmware/image/${FW_PATH_NAME}/bdwlan30.b31 ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/
+    install -d ${D}${nonarch_base_libdir}/firmware/${_MODNAME}/
+    ln -sf /firmware/image/${FW_PATH_NAME}/bdwlan30.b00 ${D}${nonarch_base_libdir}/firmware/${_MODNAME}/
+    ln -sf /firmware/image/${FW_PATH_NAME}/bdwlan30.bin ${D}${nonarch_base_libdir}/firmware/${_MODNAME}/
+    mv ${D}${nonarch_base_libdir}/firmware/${_MODNAME}/bdwlan30.bin ${D}${nonarch_base_libdir}/firmware/${_MODNAME}/utfbd30.bin
+    ln -sf /firmware/image/${FW_PATH_NAME}/qwlan30.bin ${D}${nonarch_base_libdir}/firmware/${_MODNAME}/
+    ln -sf /firmware/image/${FW_PATH_NAME}/utf30.bin ${D}${nonarch_base_libdir}/firmware/${_MODNAME}/
+    ln -sf /firmware/image/${FW_PATH_NAME}/otp30.bin ${D}${nonarch_base_libdir}/firmware/${_MODNAME}/
+    ln -sf /firmware/image/${FW_PATH_NAME}/data.msc ${D}${nonarch_base_libdir}/firmware/${_MODNAME}/
+    ln -sf /firmware/image/${FW_PATH_NAME}/bdwlan30.b31 ${D}${nonarch_base_libdir}/firmware/${_MODNAME}/
+    mv ${D}${nonarch_base_libdir}/firmware/${_MODNAME}/bdwlan30.b31 ${D}${nonarch_base_libdir}/firmware/${_MODNAME}/utfbd30.b31
+    ln -sf /firmware/image/${FW_PATH_NAME}/bdwlan30.bin ${D}${nonarch_base_libdir}/firmware/${_MODNAME}/
+    ln -sf /firmware/image/${FW_PATH_NAME}/bdwlan30.b31 ${D}${nonarch_base_libdir}/firmware/${_MODNAME}/
 
     # Install systemd service file
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
