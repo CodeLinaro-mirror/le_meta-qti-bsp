@@ -26,9 +26,6 @@ TARGET_CC_ARCH += "${LDFLAGS}"
 
 SECURITY_CFLAGS_remove_pn-open-avb = "-D_FORTIFY_SOURCE=2"
 
-do_compile_prepend() {
-}
-
 do_compile() {
 	if ${@bb.utils.contains('DISTRO_FEATURES', 'q-hypervisor', 'true', 'false', d)}; then
 		export AVB_FEATURE_GVM_MODE=1
@@ -48,20 +45,20 @@ do_compile() {
 }
 
 do_install() {
-	mkdir -p ${D}/${bindirr}/
-	mkdir -p ${D}/${bindir}/avb/
-	install ${S}/daemons/maap/linux/maap_daemon ${D}/${bindir}/avb
-	install ${S}/daemons/mrpd/mrpd ${D}/${bindir}/avb
-	install ${S}/daemons/mrpd/mrpctl ${D}/${bindir}/avb
-	install ${S}/daemons/gptp/linux/build/obj/daemon_cl ${D}/${bindir}/avb
-	install ${S}/lib/avtp_pipeline/build/bin/* ${D}/${bindir}/avb
-	mkdir -p ${D}/${libdir}/
-	install ${S}/lib/avtp_pipeline/build/lib/*.so ${D}/${libdir}
-	install ${S}/examples/libgptp_test/libgptp_test ${D}/${bindir}/avb
-	install ${S}/lib/libgptp/*.so ${D}/${libdir}
+	install -d ${D}/${bindir}/
+	install -d ${D}/${bindir}/avb/
+	install -m 0755 ${S}/daemons/maap/linux/maap_daemon ${D}/${bindir}/avb
+	install -m 0755 ${S}/daemons/mrpd/mrpd ${D}/${bindir}/avb
+	install -m 0755 ${S}/daemons/mrpd/mrpctl ${D}/${bindir}/avb
+	install -m 0755 ${S}/daemons/gptp/linux/build/obj/daemon_cl ${D}/${bindir}/avb
+	install -m 0755 ${S}/lib/avtp_pipeline/build/bin/* ${D}/${bindir}/avb
+	install -d ${D}/${libdir}/
+	install -m 0755 ${S}/lib/avtp_pipeline/build/lib/*.so ${D}/${libdir}
+	install -m 0755 ${S}/examples/libgptp_test/libgptp_test ${D}/${bindir}/avb
+	install -m 0755 ${S}/lib/libgptp/*.so ${D}/${libdir}
 
-	mkdir -p ${D}/${includedir}/
-	install ${S}/lib/libgptp/gptp_helper.h ${D}${includedir}
+	install -d ${D}/${includedir}/
+	install -m 0644 ${S}/lib/libgptp/gptp_helper.h ${D}${includedir}
 
 	if (test "x${GPTP_AUTO_START_ENABLE}" == "xYES"); then
 		if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
@@ -73,10 +70,9 @@ do_install() {
 	fi
 }
 
-FILES_${PN} =+ "${bindir}/avb/*"
-FILES_${PN} =+ "${libdir}/*"
-FILES_${PN}-dev = "${includedir}/*"
-FILES_${PN}-dbg += "${bindir}/avb/.debug/*"
+
+SOLIBS = ".so"
+FILES_SOLIBSDEV = ""
 
 INHIBIT_PACKAGE_STRIP="1"
 INHIBIT_PACKAGE_DEBUG_SPLIT="1"

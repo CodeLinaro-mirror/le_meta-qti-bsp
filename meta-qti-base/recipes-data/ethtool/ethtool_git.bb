@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://COPYING;beginline=1;endline=340;md5=b234ee4d69f5fce44
 PR = "r2"
 
 SRCREV = "27798121da5093fcbd0537fbd4c9a1177c620f55"
-#SRC_URI = "git://git.kernel.org/pub/scm/network/ethtool/ethtool.git;protocol=git"
+CAF_GIT  = "git://codeaurora.org/quic/le"
 SRC_URI = "${CAF_GIT}/platform/external/ethtool;protocol=git;branch=korg/master"
 
 SRC_URI[md5sum] = "7e94dd958bcd639aad2e5a752e108b24"
