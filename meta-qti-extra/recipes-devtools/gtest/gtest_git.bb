@@ -5,11 +5,10 @@ LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${WORKDIR}/git/LICENSE;md5=cbbd27594afd089daa160d3a16dd515a"
 
 SRC_URI = "\
-    git://source.codeaurora.org/quic/la/platform/external/chromium_org/testing/gtest;protocol=http;branch=LA.AF.1.1.1 \
-    file://0001-Add-install-command-for-libraries-and-headers.patch \
-    file://0002-CMakeLists-gtest.pc.in-Add-pkg-config-support-to-gte.patch \
+    git://source.codeaurora.org/quic/le/external/oracle/gtest;protocol=git;branch=soppiest/master \
 "
-SRCREV = "93b4e4a7fb335fdccc24d18bfb284e0828d2596d"
+
+SRCREV = "d850e144710e330070b756c009749dc7a7302301"
 
 S = "${WORKDIR}/git"
 
