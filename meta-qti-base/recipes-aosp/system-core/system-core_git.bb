@@ -14,9 +14,7 @@ SRC_URI_append = " file://0001-Fix-adb-shell-env-issue.patch"
 
 S = "${WORKDIR}/system/core/"
 
-inherit autotools pkgconfig systemd useradd distro_features_check
-
-REQUIRED_DISTRO_FEATURES = "systemd"
+inherit autotools pkgconfig systemd useradd
 
 COMPOSITION = "901D"
 
