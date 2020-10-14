@@ -43,6 +43,9 @@ VIRTUAL-RUNTIME_init_manager = "systemd"
 
 DISTRO_FEATURES_append = " ipa3"
 
+# Support kdump
+#DISTRO_FEATURES_append = " kdump-support"
+
 IMAGE_EXT4_EXTRA_OPTIONS = "${@bb.utils.contains('DISTRO_FEATURES','ro-rootfs',' -J -b 1024 ','',d)}"
 
 INCOMPATIBLE_LICENSE = "GPL-3.0 LGPL-3.0 AGPL-3.0"

@@ -1,0 +1,65 @@
+#! /bin/sh
+# This file is derived from
+# https://source.codeaurora.org/quic/ype/external/yoctoproject.org/poky/tree/meta/recipes-kernel/kexec/kexec-tools/kdump?h=yocto/dunfell
+
+KEXEC=/usr/sbin/kexec
+KEXEC_ARGS=""
+
+MAKEDUMPFILE=/usr/bin/makedumpfile
+
+if [ -f /etc/sysconfig/kdump.conf ]; then
+	. /etc/sysconfig/kdump.conf
+else
+	echo "no kdump.conf"
+	exit 1;
+fi
+
+do_save_dump()
+{
+	mkdir -p ${KDUMP_VMCORE_PATH}
+
+	${MAKEDUMPFILE} ${MAKEDUMPFILE_ARGS} /proc/vmcore ${KDUMP_VMCORE_PATH}/vmcore-"`date +"%H:%M:%S"`"
+	return $?
+}
+
+do_start_service()
+{
+	#Load the kdump kernel image
+	if [ -f /sys/devices/soc0/machine  ]; then
+		target=`cat /sys/devices/soc0/machine | tr [:upper:] [:lower:]`
+	fi
+
+	case "$target" in
+		"sa8155" | "sa8155p" )
+		KEXEC_ARGS="--initrd=/boot/kdump-ramdisk.cpio.gz --dtb=/boot/sa8155p-v2-adp-air-capture.dtb -p"
+		;;
+	esac
+
+	case "$target" in
+		"sa8195" | "sa8195p" )
+		KEXEC_ARGS="--initrd=/boot/kdump-ramdisk.cpio.gz --dtb=/boot/sa8195p-v2-adp-air-capture.dtb -p"
+		;;
+	esac
+
+	${KEXEC} ${KEXEC_ARGS} "${KDUMP_KIMAGE}" --command-line="${KDUMP_CMDLINE}"
+	if [ $? == 0 ]; then
+		echo "Kdump started up."
+	fi
+}
+
+case "$1" in
+  start)
+	if [ -s /proc/vmcore ]; then
+		echo 1 > /proc/sys/kernel/kptr_restrict
+		do_save_dump
+		sync && echo c > /proc/sysrq-trigger
+	else
+		do_start_service
+	fi
+	;;
+   *)
+	echo "only support start kdump."
+	exit 1
+esac
+
+exit $?
