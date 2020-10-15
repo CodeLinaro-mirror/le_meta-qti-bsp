@@ -1,7 +1,6 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 SRC_URI += " file://0001-systemd-add-slotselect-support-in-fstab.patch "
 #SRC_URI += " file://0033-systemd-Make-root-s-home-directory-configurable-2.patch "
-SRC_URI += " ${@bb.utils.contains('DISTRO_FEATURES', 'lxc', ' file://0001-systemd-skip-smack-copy-issue-in-systemd.patch ', '', d)}"
 
 
 # Remove backlight ldconfig
