@@ -4,12 +4,11 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 DEPENDS = "openssl libnl dbus qmi qmi-framework"
 SRCREV = "${AUTOREV}"
-PR = "${INC_PR}.2"
-INC_PR = "r5"
+PR = "r5.2"
 
-SRC_URI = "${PATH_TO_REPO}/external/wpa_supplicant_8/.git;protocol=${PROTO};destsuffix=external/wpa_supplicant_8;usehead=1"
-SRC_URI += "file://wpa_supplicant.conf-sane"
-SRC_URI_append = " file://defconfig-qcacld"
+SRC_URI = "${PATH_TO_REPO}/external/wpa_supplicant_8/.git;protocol=${PROTO};destsuffix=external/wpa_supplicant_8;usehead=1 \
+           file://wpa_supplicant.conf-sane \
+           file://defconfig-qcacld"
 
 SOLIBS = "*.so"
 FILES_SOLIBSDEV = ""
