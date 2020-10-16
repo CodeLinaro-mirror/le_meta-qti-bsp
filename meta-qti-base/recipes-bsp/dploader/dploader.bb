@@ -1,7 +1,7 @@
 SUMMARY = "Dynamic partition loader"
-LICENSE = "Apache-2.0"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
-${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
+${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}:"
 
