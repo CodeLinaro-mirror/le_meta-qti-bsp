@@ -1,6 +1,6 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 SRC_URI += " file://0001-systemd-add-slotselect-support-in-fstab.patch "
-#SRC_URI += " file://0033-systemd-Make-root-s-home-directory-configurable-2.patch "
+SRC_URI += " file://0033-systemd-Make-root-s-home-directory-configurable-2.patch "
 SRC_URI += " file://0001-systemd-skip-smack-copy-issue-in-systemd.patch "
 
 
@@ -22,15 +22,6 @@ CFLAGS_append = " -fPIC"
 # In aarch64 targets systemd is not booting with -finline-functions -finline-limit=64 optimizations
 # So temporarily revert to default optimizations for systemd.
 FULL_OPTIMIZATION = "-O2 -fexpensive-optimizations -frename-registers -fomit-frame-pointer -ftree-vectorize"
-
-do_patch_append () {
-    bb.build.exec_func('do_fix_root_home', d)
-}
-
-do_fix_root_home () {
-    sed -i 's/\*home = "\/root"/\*home = "\/home\/root"/' ${S}/src/basic/user-util.c
-    sed -i 's/h = strdup("\/root")/h = strdup("\/home\/root")/' ${S}/src/basic/user-util.c
-}
 
 do_install_append () {
     # Use kernel rules for network iface name

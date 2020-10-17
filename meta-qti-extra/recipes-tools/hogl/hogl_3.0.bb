@@ -9,7 +9,7 @@ SRCREV = "v3.0-rc1"
 SRC_URI = "git://github.com/maxk-org/hogl.git;protocol=git"
 SRC_URI += "file://0001-Fix-compilation-issues-from-hogl-module.patch"
 
-inherit pkgconfig autotools
+inherit pkgconfig autotools-brokensep
 EXTRA_OECONF += " --without-tools --without-tests"
 S = "${WORKDIR}/git"
 

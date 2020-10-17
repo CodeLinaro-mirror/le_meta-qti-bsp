@@ -1,33 +1,24 @@
-inherit deploy
 DESCRIPTION = "UEFI bootloader"
 LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
-
 PROVIDES = "virtual/bootloader"
-PV       = "3.0"
-PR       = "r1"
-
-BUILD_OS = "linux"
-
-PACKAGE_ARCH = "${MACHINE_ARCH}"
-
-SRC_URI   =  "${PATH_TO_REPO}/bootable/bootloader/edk2/.git;protocol=${PROTO};destsuffix=bootable/bootloader/edk2;usehead=1"
-S         =  "${WORKDIR}/bootable/bootloader/edk2"
 SRCREV = "${AUTOREV}"
+PV = "3.0"
+PR = "r1"
 
+SRC_URI = "${PATH_TO_REPO}/bootable/bootloader/edk2/.git;protocol=${PROTO};destsuffix=bootable/bootloader/edk2;usehead=1"
 # FIXME for keymaster functionality
-SRC_URI_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'qti-lxc', ' file://0001-avb-bring-up-keymaster-for-LV.patch', '', d)}"
-SRC_URI_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'qti-lxc', ' file://0002-avb-send-dummy-ROT-and-boot-state-to-keymaster-from-.patch ', '', d)}"
+SRC_URI_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'lxc', ' file://0001-avb-bring-up-keymaster-for-LV.patch', '', d)}"
+SRC_URI_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'lxc', ' file://0002-avb-send-dummy-ROT-and-boot-state-to-keymaster-from-.patch ', '', d)}"
 
-INSANE_SKIP_${PN} = "arch"
+S = "${WORKDIR}/bootable/bootloader/edk2"
+
+inherit deploy
 
 VBLE = "${@bb.utils.contains('DISTRO_FEATURES', 'vble','1', '0', d)}"
-
 VERITY_ENABLED = "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity','1', '0', d)}"
-
 EARLY_ETH = "${@bb.utils.contains('DISTRO_FEATURES', 'early-eth', '1', '0', d)}"
-
 HIBERNATION = "${@bb.utils.contains('COMBINED_FEATURES', 'hibernation', '1', '0', d)}"
 
 EXTRA_OEMAKE = "'CLANG_BIN=${CLANG_BIN_PATH}' \
@@ -44,8 +35,7 @@ EXTRA_OEMAKE = "'CLANG_BIN=${CLANG_BIN_PATH}' \
                 'EARLY_ETH_ENABLED=${EARLY_ETH}'\
                 'UBSAN_UEFI_GCC_FLAG_ALIGNMENT=-Wno-misleading-indentation'"
 
-EXTRA_OEMAKE_append_qcs40x = " 'DISABLE_PARALLEL_DOWNLOAD_FLASH=1'"
-
+do_configure[noexec]="1"
 do_compile () {
     export CC=${BUILD_CC}
     export CXX=${BUILD_CXX}
@@ -57,25 +47,21 @@ do_compile () {
     fi
     oe_runmake -f makefile all
 }
-
 do_install() {
-        install -d ${D}/boot
+    install -d ${D}/boot
 }
 
-do_configure[noexec]="1"
+PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 FILES_${PN} = "/boot"
 FILES_${PN}-dbg = "/boot/.debug"
 
 do_deploy() {
-        install ${D}/boot/abl.elf ${DEPLOYDIR}
+    install -m 0644 ${D}/boot/abl.elf ${DEPLOYDIR}
 }
-
 do_deploy[dirs] = "${S} ${DEPLOYDIR}"
+
 addtask deploy before do_build after do_install
-
-PACKAGE_STRIP = "no"
-
 
 python sstate_task_prefunc () {
     import os
@@ -89,3 +75,9 @@ python sstate_task_prefunc () {
 
 INCSUFFIX = "${@bb.utils.contains('QTI_BASE_PROP', "Y", 'edk2', 'none',d)}"
 include ${INCSUFFIX}.inc
+
+BUILD_OS = "linux"
+
+INSANE_SKIP_${PN} = "arch"
+
+PACKAGE_STRIP = "no"

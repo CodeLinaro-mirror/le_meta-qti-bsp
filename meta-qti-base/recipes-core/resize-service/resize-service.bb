@@ -19,6 +19,11 @@ do_install() {
         sed -i    '/^Before=.*$/a\ConditionPathExists=\/var\/lib\/need_resize' ${S}/resize-userdata.service
         sed -i -e 's/^ExecStartPost=.*$/ExecStartPost=\/bin\/rm -rf \/var\/lib\/need_resize/' ${S}/resize-userdata.service
     fi
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'q-hypervisor', 'true', 'false', d)}; then
+        sed -i    's/dev-disk-by\\x2dpartlabel-userdata/dev-vdb/g' ${S}/resize-userdata.service
+        sed -i    's/dev-disk-by-partlabel-userdata/dev-vdb/g' ${S}/resize-userdata.service
+        sed -i    's/\/dev\/disk\/by-partlabel\/userdata/\/dev\/vdb/g' ${S}/resize-userdata.service
+    fi
     install -d ${D}${systemd_unitdir}/system
     install -m 0644 ${S}/resize-userdata.service ${D}${systemd_unitdir}/system/resize-userdata.service
     install -d ${D}/var/lib

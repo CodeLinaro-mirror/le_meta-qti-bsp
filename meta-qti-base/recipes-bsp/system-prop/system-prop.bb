@@ -1,21 +1,17 @@
-inherit autotools systemd useradd
-
+DESCRIPTION = "Script to populate system properties"
+LICENSE = "BSD"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
+${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 PR = "r0"
-
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 
 SRC_URI = "file://persist-prop.sh"
 SRC_URI_append = " file://persist-prop.service"
 SRC_URI_append_qtiquingvm = " file://system.prop"
 
-DESCRIPTION = "Script to populate system properties"
-
-LICENSE = "BSD"
-LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
-${LICENSE};md5=3775480a712fc46a69647678acb234cb"
-
 SYSTEMD_PACKAGES = "${@bb.utils.contains('DISTRO_FEATURES','systemd','${PN}','',d)}"
 SYSTEMD_SERVICE_${PN} = "${@bb.utils.contains('DISTRO_FEATURES','systemd','persist-prop.service','',d)}"
+
+inherit autotools systemd useradd
 
 do_compile() {
     # Remove empty lines and lines starting with '#'
@@ -25,7 +21,6 @@ do_compile() {
         touch ${S}/build.prop
     fi
 }
-
 do_install() {
     install -d ${D}
     install -m 0644 ${S}/build.prop ${D}/build.prop
@@ -40,6 +35,11 @@ do_install() {
     fi
 }
 
+PACKAGES = "${PN}"
+
+FILES_${PN} += "/build.prop"
+FILES_${PN} += "${systemd_unitdir}/"
+
 pkg_postinst_${PN} () {
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','false','true',d)}; then
         update-alternatives --install ${sysconfdir}/init.d/persist-prop.sh persist-prop.sh  persist-prop 50
@@ -49,8 +49,3 @@ pkg_postinst_${PN} () {
         update-rc.d $OPT persist-prop.sh multiuser
     fi
 }
-
-PACKAGES = "${PN}"
-FILES_${PN} += "${base_sbindir}/"
-FILES_${PN} += "/build.prop"
-FILES_${PN} += "${systemd_unitdir}/"

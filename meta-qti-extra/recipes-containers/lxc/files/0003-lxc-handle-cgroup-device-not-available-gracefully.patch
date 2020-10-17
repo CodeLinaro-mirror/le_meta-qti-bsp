@@ -1,0 +1,32 @@
+From a64c80bda71dbff23fc38eed6450d2d37d7dab21 Mon Sep 17 00:00:00 2001
+From: Lei wang <leiwan@codeaurora.org>
+Date: Wed, 26 Aug 2020 11:16:31 +0800
+Subject: [PATCH] lxc: handle cgroup device not available gracefully
+
+We need configure devices may not exist in some case, like uart
+in perf build and for metal/gvm, we have different devices
+available, but we need to use one common conf for all conditions,
+so handle devices not available more gracefully other than return
+error and refuse launching lxc container.
+
+Signed-off-by: Lei wang <leiwan@codeaurora.org>
+---
+ src/lxc/cgroups/cgfsng.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/lxc/cgroups/cgfsng.c b/src/lxc/cgroups/cgfsng.c
+index fac6862..0def821 100644
+--- a/src/lxc/cgroups/cgfsng.c
++++ b/src/lxc/cgroups/cgfsng.c
+@@ -2724,7 +2724,7 @@ __cgfsng_ops static bool cgfsng_setup_limits_legacy(struct cgroup_ops *ops,
+ 
+ 		if (do_devices == !strncmp("devices", cg->subsystem, 7)) {
+ 			if (cg_legacy_set_data(ops, cg->subsystem, cg->value)) {
+-				if (do_devices && (errno == EACCES || errno == EPERM)) {
++				if (do_devices && (errno == EACCES || errno == EPERM || errno == ENOENT)) {
+ 					SYSWARN("Failed to set \"%s\" to \"%s\"", cg->subsystem, cg->value);
+ 					continue;
+ 				}
+-- 
+2.7.4
+
