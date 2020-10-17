@@ -21,7 +21,7 @@ RDEPENDS_${PN} += "\
     system-core-early-boot \
     system-core-usb \
     system-prop \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'q-hypervisor', '', 'memory-hotplug', d)} \
+    memory-hotplug \
     ${@bb.utils.contains("DISTRO_FEATURES", "early_init", "early-init", "" ,d)} \
     ${@bb.utils.contains("COMBINED_FEATURES", "hibernation", "hibernation", "" ,d)} \
     "
