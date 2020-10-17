@@ -39,6 +39,9 @@ SRC_URI_append = "  \
 	     "
 SRC_URI_append =  "${@bb.utils.contains('DISTRO_FEATURES', 'wayland', ' file://weston.cfg', '', d)}"
 
+SRC_URI_append =  " file://lxc.cfg"
+SRC_URI_append =  " file://ipc.cfg"
+
 SRCREV = "${AUTOREV}"
 SRCREV_FORMAT = "kernel_data_display_sched_ais_video"
 
