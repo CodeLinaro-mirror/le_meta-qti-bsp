@@ -25,6 +25,9 @@ PREFERRED_VERSION_gstreamer1.0-plugins-ugly ?= "1.16.2"
 PREFERRED_VERSION_gstreamer1.0-libav        ?= "1.16.2"
 PREFERRED_VERSION_gstreamer1.0-omx          ?= "1.16.2"
 
+# Prefer gbm
+PREFERRED_PROVIDER_virtual/libgbm = "gbm"
+
 # Prefer adreno
 PREFERRED_PROVIDER_virtual/wayland-egl  = "adreno"
 PREFERRED_PROVIDER_virtual/egl          = "adreno"
