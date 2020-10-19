@@ -28,7 +28,6 @@ KERNEL_EXTRA_ARGS_append_sa8155  += "TARGET_BOARD_TYPE=auto"
 KERNEL_EXTRA_ARGS_append_sa6155  += "TARGET_BOARD_TYPE=auto"
 
 SRC_URI   =  "${PATH_TO_REPO}/kernel/msm-5.4/.git;protocol=${PROTO};destsuffix=kernel/msm-5.4;usehead=1 \
-              ${PATH_TO_REPO}/data-kernel/.git;protocol=${PROTO};destsuffix=data-kernel;usehead=1 \
               ${PATH_TO_REPO}/kernel/msm-5.4/techpack/display/.git;protocol=${PROTO};destsuffix=kernel/msm-5.4/techpack/display;usehead=1 \
               ${PATH_TO_REPO}/kernel/msm-5.4/techpack/sched/.git;protocol=${PROTO};destsuffix=kernel/msm-5.4/techpack/sched;usehead=1 \
               ${PATH_TO_REPO}/kernel/msm-5.4/techpack/ais/.git;protocol=${PROTO};destsuffix=kernel/msm-5.4/techpack/ais;usehead=1 \

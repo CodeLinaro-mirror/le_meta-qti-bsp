@@ -10,14 +10,14 @@ DEPENDS += "edk2"
 
 CORE_IMAGE_EXTRA_INSTALL += "\
     audiodlkm  \
+    weston \ 
+    media \
     openssh-scp \
     openssh-ssh \
     openssh-sshd \
     openssh-sftp \
     openssh-sftp-server \
     "
-#    weston 
-#    media 
 
 IMAGE_FEATURES += " \
     debug-tweaks \
