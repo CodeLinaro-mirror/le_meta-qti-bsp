@@ -35,7 +35,7 @@ do_install_append(){
     fi
 
     # Replace persist/home bind if read-only is not enabled
-    if ${@bb.utils.contains('IMAGE_FEATURES', 'read-only-rootfs', 'true', 'false', d)}; then
+    if ${@bb.utils.contains('IMAGE_FEATURES', 'read-only-rootfs', 'false', 'true', d)}; then
         sed -i "/^\PARTLABEL=persist.*var/d" ${D}${sysconfdir}/fstab
         sed -i "/^\#.*Bind/d" ${D}${sysconfdir}/fstab
         sed -i "/^\/data/d" ${D}${sysconfdir}/fstab
