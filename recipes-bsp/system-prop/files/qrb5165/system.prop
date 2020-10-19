@@ -42,3 +42,6 @@ ro.qc.sdk.fwk.mic_support=6
 
 #property to enable audio HAL server
 persist.vendor.audio.qas.enabled=true
+
+#property to select egl platform
+vendor.egl.default.platform=wayland
