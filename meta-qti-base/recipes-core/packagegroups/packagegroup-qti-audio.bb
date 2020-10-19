@@ -9,4 +9,6 @@ PACKAGES = "${PN}"
 RDEPENDS_${PN} = "\
     init-audio \
     audiodlkm \
+    alsa-lib \
+    alsa-utils \
 "
