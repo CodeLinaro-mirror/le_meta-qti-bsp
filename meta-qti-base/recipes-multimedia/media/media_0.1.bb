@@ -31,11 +31,8 @@ inherit autotools
 #re-use non-perf settings
 EXTRA_OECONF_append =" --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
 EXTRA_OECONF_append =" --with-kernel-headers=${STAGING_KERNEL_BUILDDIR}/include"
-EXTRA_OECONF_append =" --with-adreno-includes=${STAGING_INCDIR}/adreno"
 
 EXTRA_OECONF_append =" --with-cutils-headers=${STAGING_INCDIR}/cutils/"
-EXTRA_OECONF_append =" --with-log-headers=${STAGING_INCDIR}/log/"
-EXTRA_OECONF_append =" --with-usr-include-headers=${STAGING_INCDIR}/"
 
 EXTRA_OECONF_append =" --enable-use-glib='yes'"
 EXTRA_OECONF_append =" --enable-target-uses-ion='yes'"
