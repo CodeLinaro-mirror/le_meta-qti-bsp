@@ -7,12 +7,11 @@ tmpfs                /run            tmpfs     mode=0755,nodev,nosuid,strictatim
 tmpfs                /var/volatile   tmpfs     defaults,rootcontext=system_u:object_r:var_t:s0 0  0
 tmpfs                /media/ram      tmpfs     defaults,noauto       0  0
 
-/dev/vdc             /persist        auto      defaults,nofail       0  2
 /dev/vdb             /data           auto      defaults,nofail       0  2
-/dev/vdc             /dsp            auto      defaults,nofail       0  2
-/dev/vdc             /firmware       auto      defaults,nofail       0  2
 /dev/vdc             /var            auto      defaults,nofail       0  2
-/dev/vdd             /bluetooth      auto      defaults,ro           0  0
+/dev/vdf             /dsp            auto      defaults,ro       0  0
+/dev/vdg             /firmware       auto      defaults,ro       0  0
+/dev/vdd             /bluetooth      auto      defaults,ro       0  0
 
 # Bind /home to /data
 /data                /home                auto       defaults,bind         0  0
