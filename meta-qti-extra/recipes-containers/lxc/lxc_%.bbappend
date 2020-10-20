@@ -1,6 +1,5 @@
 # Fetch code from github
 SRCREV = "98613f618b6f161e11dc9eedf7cb170757624397"
-
 SRC_URI_remove= "http://linuxcontainers.org/downloads/${BPN}-${PV}.tar.gz"
 SRC_URI_append = "git://github.com/lxc/${BPN}.git;protocol=http;branch=stable-4.0 \
     "
