@@ -15,6 +15,25 @@ inherit ${@bb.utils.contains('TARGET_KERNEL_ARCH', 'aarch64', 'qtikernel-arch', 
 
 EXTRA_OEMAKE_append += "INSTALL_MOD_STRIP=1"
 
+do_kernel_metadata_prepend() {
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'kdump-support', 'true', 'false', d)}; then
+        set +e
+        if [ -n "${KBUILD_DEFCONFIG}" ]; then
+            if [ -f "${S}/arch/${ARCH}/configs/${KBUILD_DEFCONFIG}" ]; then
+                if [ -f "${WORKDIR}/defconfig" ]; then
+                    # If the two defconfig's are different, warn that we didn't overwrite the
+                    # one already placed in WORKDIR by the fetcher.
+                    cmp "${WORKDIR}/defconfig" "${S}/arch/${ARCH}/configs/${KBUILD_DEFCONFIG}"
+                    if [ $? -ne 0 ]; then
+                        bbwarn "defconfig detected in WORKDIR. ${KBUILD_DEFCONFIG} overide"
+                        cp -f ${S}/arch/${ARCH}/configs/${KBUILD_DEFCONFIG} ${WORKDIR}/defconfig
+                    fi
+                fi
+            fi
+        fi
+    fi
+}
+
 do_configure_prepend () {
     mkdir -p ${S}/drivers/net/ethernet/qualcomm/emac_dwc_eqos
     cp -f ${WORKDIR}/data-kernel/drivers/emac-dwc-eqos/* ${S}/drivers/net/ethernet/qualcomm/emac_dwc_eqos/
