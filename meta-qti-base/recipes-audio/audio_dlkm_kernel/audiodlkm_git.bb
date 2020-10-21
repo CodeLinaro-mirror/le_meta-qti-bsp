@@ -24,7 +24,7 @@ FILES_${PN} +="/etc/initscripts/start_audio_le"
 FILES_${PN} += "${systemd_unitdir}/system/audio.service"
 FILES_${PN} += "${systemd_unitdir}/system/multi-user.target.wants/audio.service"
 
-EXTRA_OEMAKE += "TARGET_SUPPORT=${BASEMACHINE}"
+EXTRA_OEMAKE += "TARGET_SUPPORT=${@bb.utils.contains('BASEMACHINE', 'sa81x5', 'sa8155', '${BASEMACHINE}', d)}"
 KERNEL_CC += "-Wno-error=maybe-uninitialized"
 # Disable parallel make
 PARALLEL_MAKE = ""
