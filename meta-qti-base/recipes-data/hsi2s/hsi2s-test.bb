@@ -1,4 +1,4 @@
-inherit qcommon
+inherit autotools-brokensep
 
 SUMMARY = "hsi2s-test"
 
