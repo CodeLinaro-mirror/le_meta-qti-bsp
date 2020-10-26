@@ -62,6 +62,7 @@ CPPFLAGS += "-I${STAGING_INCDIR} \
              -I${STAGING_INCDIR}/mm-video/swvenc"
 
 CPPFLAGS += "-include stdint.h"
+CPPFLAGS += "-Wno-format-truncation"
 
 LDFLAGS += "-lglib-2.0"
 LDFLAGS += "-lgbm"
