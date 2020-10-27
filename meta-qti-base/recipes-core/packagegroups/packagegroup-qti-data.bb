@@ -27,4 +27,3 @@ RDEPENDS_${PN} += "\
     netkit-telnet \
     openssh \
     "
-#    emac-dwc-eqos
