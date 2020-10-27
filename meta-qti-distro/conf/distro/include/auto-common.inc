@@ -51,4 +51,8 @@ IMAGE_EXT4_EXTRA_OPTIONS = "${@bb.utils.contains('DISTRO_FEATURES','ro-rootfs','
 
 INCOMPATIBLE_LICENSE = "GPL-3.0 LGPL-3.0 AGPL-3.0"
 
+LICENSE_FLAGS_WHITELIST += "commercial_gstreamer1.0-libav commercial_gstreamer1.0-omx"
+LICENSE_FLAGS_WHITELIST += "commercial_gstreamer1.0-plugins-ugly commercial_opencore-amr"
+LICENSE_FLAGS_WHITELIST += "commercial_ffmpeg"
+
 include ${DISTRO_INC_FILES}
