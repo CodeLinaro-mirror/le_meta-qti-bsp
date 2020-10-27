@@ -12,5 +12,4 @@ RDEPENDS_${PN} += "\
     file \
     pciutils \
     util-linux \
-    gtest \
     "
