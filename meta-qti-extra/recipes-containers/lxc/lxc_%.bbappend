@@ -15,3 +15,13 @@ SYSTEMD_AUTO_ENABLE_${PN} = "enable"
 
 # Skip wget as license conflicts
 RDEPENDS_${PN}_remove = " wget "
+
+# disable weston in host for multi-drm support
+pkg_postinst_${PN}_append () {
+  if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)} && ${@bb.utils.contains('DISTRO_FEATURES', 'q-hypervisor', 'false', 'true', d)}; then
+    if [ -n "$D" ]; then
+      OPTS="--root=$D"
+    fi
+    systemctl $OPTS mask weston.service
+  fi
+}

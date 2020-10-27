@@ -42,13 +42,3 @@ do_install_append () {
     rm ${D}/lib/udev/rules.d/60-persistent-v4l.rules
 }
 
-# disable weston in host for multi-drm support
-pkg_postinst_${PN} () {
-  if ${@bb.utils.contains('DISTRO_FEATURES','lxc','true','false',d)}; then
-    if [ -n "$D" ]; then
-      OPTS="--root=$D"
-    fi
-    systemctl $OPTS mask weston.service
-    systemctl $OPTS mask servicemanager.service
-  fi
-}
