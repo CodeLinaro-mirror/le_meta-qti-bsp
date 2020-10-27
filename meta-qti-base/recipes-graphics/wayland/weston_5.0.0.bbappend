@@ -68,6 +68,8 @@ PACKAGECONFIG[wayland] = "--enable-wayland-compositor,--disable-wayland-composit
 PACKAGECONFIG[launch] = "--enable-weston-launch,--disable-weston-launch,libpam drm"
 # Clients support
 PACKAGECONFIG[clients] = " "
+# pam
+PACKAGECONFIG[pam] = ",,libpam"
 
 do_configure[depends] += "virtual/kernel:do_shared_workdir"
 do_install_append() {
