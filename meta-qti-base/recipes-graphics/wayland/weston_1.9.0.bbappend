@@ -1,0 +1,137 @@
+SRC_URI = "${PATH_TO_REPO}/graphics/weston/.git;protocol=${PROTO};destsuffix=graphics/weston;usehead=1"
+S = "${WORKDIR}/graphics/weston"
+
+WESTONSTART ??=  "/usr/bin/weston ${WESTONARGS}"
+
+FILESEXTRAPATHS_append := ":${THISDIR}/${PN}"
+SRC_URI_append = " \
+    file://weston.service_caf \
+    file://weston_tmpfiles.conf \
+    file://weston.ini_caf \
+    file://drm_firmware_load_trigger.service \
+"
+
+# Remove community patch which is conflict with Weston SDM optimization
+SRC_URI_remove = " \
+    file://weston.png \
+    file://weston.desktop \
+    file://make-lcms-explicitly-configurable.patch \
+    file://make-libwebp-explicitly-configurable.patch \
+    file://0001-make-error-portable.patch \
+    file://0001-compositor-drm.c-Launch-without-input-devices.patch"
+
+EXTRA_OECONF_append = "${@bb.utils.contains("DISTRO_FEATURES", "early_init", " --enable-early-boot", "" ,d)}"
+EXTRA_OECONF_append = "${@bb.utils.contains("DISTRO_FEATURES", "early-ethernet", " --enable-early-boot", "" ,d)}"
+
+EXTRA_OECONF_append = "\
+    --enable-drm-compositor \
+"
+
+EXTRA_OECONF_append = " --enable-sys-uid"
+
+DEPENDS += "display-hal-linux display-noship-linux wayland-native gbm-headers libcap-native display-ship-linux display-hal-headers"
+TARGET_CFLAGS += "-idirafter ${STAGING_KERNEL_BUILDDIR}/include/"
+TARGET_CFLAGS += "-I${STAGING_INCDIR}/libdrm"
+TARGET_CFLAGS += "-I${STAGING_INCDIR}/sdm"
+TARGET_CFLAGS += "-I${STAGING_INCDIR}/sdm/core"
+TARGET_CFLAGS += "-I${STAGING_KERNEL_BUILDDIR}/usr/include"
+
+TARGET_CFLAGS += "-lwayland-client"
+
+
+SOURCE_WESTON_PATCHES = "https://source.codeaurora.org/quic/le/AGL/meta-agl-demo/plain/recipes-graphics/wayland/weston/"
+
+SRC_URI_append = " \
+    https://source.codeaurora.org/quic/le/AGL/meta-agl/plain/meta-agl/recipes-graphics/wayland/weston/fix-touchscreen-crash.patch?h=automotivelinux/chinook;downloadfilename=fix-touchscreen-crash.patch;md5sum=62798230b8bb88f00ee43247fef61713;sha256sum=dd25f196cbe7e8b1ca59ec2b16e7f73dd43995c72ce2175447e3787b98635b28 \
+"
+SRC_URI_append = " \
+    ${SOURCE_WESTON_PATCHES}/0001-weston-patch-for-wl-shell-emulator.patch?h=automotivelinux/chinook;downloadfilename=0001-weston-patch-for-wl-shell-emulator.patch;md5sum=ab4bbc2ec8d5eee375b6b8e5edcb203f;sha256sum=c44d787aa8fabf4f60ab4bf6c0f24cdc3817fbe763f384cf223b7979b44c77f0 \
+    ${SOURCE_WESTON_PATCHES}/0001-ivi-shell-fix-TODO-which-expects-only-one-screen-in-.patch?h=automotivelinux/chinook;downloadfilename=0001-ivi-shell-fix-TODO-which-expects-only-one-screen-in-.patch;md5sum=b243e514098fa6978dd4c7e6080f3351;sha256sum=5791aee2ec7b408755d77c5ac01a882360c60fcafb69495f90acd0600efa74da \
+    ${SOURCE_WESTON_PATCHES}/0002-ivi-shell-avoid-inserting-a-ivi_layer-to-multiple-sc.patch?h=automotivelinux/chinook;downloadfilename=0002-ivi-shell-avoid-inserting-a-ivi_layer-to-multiple-sc.patch;md5sum=390ef0d6ad7e34ff00e63883498e132a;sha256sum=c7e4adf7a5aadedb087cbd3704af9c9b0c8036d3a3b644d0076c53208e89cb22 \
+    ${SOURCE_WESTON_PATCHES}/0003-ivi-shell-fix-layout_layer.view_list-is-not-initiliz.patch?h=automotivelinux/chinook;downloadfilename=0003-ivi-shell-fix-layout_layer.view_list-is-not-initiliz.patch;md5sum=f58ae6cb9100373a61a1f0d4e75c20d5;sha256sum=b0bb7d4c1bc701446ad631dc40f58fe4b4463c0c9f6360f5957578c24384a673 \
+    ${SOURCE_WESTON_PATCHES}/0004-ivi-shell-remove-a-code-which-expects-only-a-screen-.patch?h=automotivelinux/chinook;downloadfilename=0004-ivi-shell-remove-a-code-which-expects-only-a-screen-.patch;md5sum=e13439a08fe622d7e605fd80880683c8;sha256sum=50243cbd9cfcfcf6365472ecb760ebfbd9a497c7f82b4d8a01fd961d750809f5 \
+    ${SOURCE_WESTON_PATCHES}/0005-ivi-shell-multi-screen-support.-ivi_layout_screen-to.patch?h=automotivelinux/chinook;downloadfilename=0005-ivi-shell-multi-screen-support.-ivi_layout_screen-to.patch;md5sum=a82e3e17a569e9da55f2fc450b9aa224;sha256sum=6d3295a29eda5bbe05409b251f3d60650d0ade5137e0e618b17bf236a443618a \
+    ${SOURCE_WESTON_PATCHES}/0006-ivi-shell-transforming-from-a-single-screen-coordina.patch?h=automotivelinux/chinook;downloadfilename=0006-ivi-shell-transforming-from-a-single-screen-coordina.patch;md5sum=7e29fbe0b9715ae56dd82b582f2e044e;sha256sum=a055d40ea563566b4e9e467d6021521a21c1e5ae13e3e595a4624a53d76f4bc9 \
+    ${SOURCE_WESTON_PATCHES}/0007-RFR-ivi-shell-multi-screen-support-to-calcuration-of.patch?h=automotivelinux/chinook;downloadfilename=0007-RFR-ivi-shell-multi-screen-support-to-calcuration-of.patch;md5sum=04db444670948332220fc70e9fd7d9c8;sha256sum=2924b27224529d065d543c0f396ee9c32b061bd65baf5b82ad80ab12ca4aafea \
+"
+SRC_URI_append = " \
+    https://source.codeaurora.org/quic/le/AGL/meta-agl/plain/meta-ivi-common/recipes-graphics/wayland/weston-ivi-shell/0001-IVI-Shell-use-primary-screen-for-resolution.patch?h=automotivelinux/chinook;downloadfilename=0001-IVI-Shell-use-primary-screen-for-resolution.patch;md5sum=3bc2dc2cec11ffcaa26f71ad44f34a88;sha256sum=7d35301488c1bb94871a04c4bf746da8756ea2f4d488a6aa248e3199695341c7 \
+"
+
+#
+# Compositor choices
+#
+# Weston on KMS
+PACKAGECONFIG[kms] = "--enable-drm-compositor,drm udev libgbm mtdev"
+# Weston on Wayland (nested Weston)
+PACKAGECONFIG[wayland] = "--enable-wayland-compositor,--disable-wayland-compositor,libgbm"
+
+inherit systemd
+
+SYSTEMD_PACKAGES = "${PN}"
+SYSTEMD_SERVICE_${PN} = "weston.service"
+
+do_install_append() {
+    # Install systemd unit files
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
+        install -m 644 -p -D ${WORKDIR}/weston.service_caf ${D}${systemd_system_unitdir}/weston.service
+    fi
+
+    sed -e 's,Conflicts=getty@tty.*,Conflicts=getty@tty${WESTONTTY}.service,g' \
+        -e 's,User=root,User=${WESTONUSER},g' \
+        -e 's,Group=root,Group=${WESTONGROUP},g' \
+        -e 's,ExecStart=.*,ExecStart=${WESTONSTART},g' \
+        -e 's,@WESTONTTY@,${WESTONTTY},g' \
+        -e 's,@XDG_RUNTIME_DIR@,${DISPLAY_XDG_RUNTIME_DIR},g' \
+        -i ${D}${systemd_system_unitdir}/weston.service
+
+    install -d ${D}${sysconfdir}/udev/rules.d
+    cat >${D}${sysconfdir}/udev/rules.d/99-zz-dri.rules <<'EOF'
+SUBSYSTEM=="drm", MODE="0660", GROUP="${WESTONGROUP}", SECLABEL{smack}="*", TAG+="systemd", ENV{SYSTEMD_WANTS}="weston.service"
+EOF
+
+    # user 'display' must own /dev/tty${WESTONTTY} for weston to start correctly
+    cat >${D}${sysconfdir}/udev/rules.d/99-zz-tty.rules <<'EOF'
+SUBSYSTEM=="tty", KERNEL=="tty${WESTONTTY}", OWNER="${WESTONUSER}", SECLABEL{smack}="^", TAG+="systemd", ENV{SYSTEMD_WANTS}="weston.service"
+EOF
+
+    # user 'display' must also be able to access /dev/input/*
+    cat >${D}${sysconfdir}/udev/rules.d/99-zz-input.rules <<'EOF'
+SUBSYSTEM=="input", MODE="0660", GROUP="input", SECLABEL{smack}="^", TAG+="systemd", ENV{SYSTEMD_WANTS}="weston.service"
+EOF
+
+    # user 'display' must also be able to access /dev/media*, etc.
+    cat >${D}${sysconfdir}/udev/rules.d/99-zz-remote-display.rules <<'EOF'
+SUBSYSTEM=="media", MODE="0660", GROUP="display", SECLABEL{smack}="*", TAG+="systemd", ENV{SYSTEMD_WANTS}="weston.service"
+SUBSYSTEM=="video4linux", MODE="0660", GROUP="display", SECLABEL{smack}="*", TAG+="systemd", ENV{SYSTEMD_WANTS}="weston.service"
+EOF
+
+    # Prepare the dir for weston socket
+    install -d ${D}${sysconfdir}/tmpfiles.d
+    install -Dm755 ${WORKDIR}/weston_tmpfiles.conf ${D}/${sysconfdir}/tmpfiles.d/weston.conf
+
+    sed -e 's,@WESTONUSER@,${WESTONUSER},g' \
+        -e 's,@WESTONGROUP@,${WESTONGROUP},g' \
+        -i ${D}/${sysconfdir}/tmpfiles.d/weston.conf
+
+    install -m 0644 ${WORKDIR}/weston.ini_caf ${D}${WESTON_INI_CONFIG}/weston.ini
+    # expose weston protocol to /usr/share/weston as video may use it
+    install ${S}/protocol/*.xml ${D}${datadir}/weston
+}
+
+
+pkg_postinst_${PN} () {
+    setcap all=eip $D/usr/bin/weston
+    setcap all=eip $D/usr/libexec/weston-desktop-shell
+    if ${@bb.utils.contains('BASEMACHINE', '8x96autofusion', 'true', 'false', d)}; then
+        if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
+            if [ -n "$D" ]; then
+                OPTS="--root=$D"
+            fi
+            systemctl $OPTS mask weston.service
+        fi
+    fi
+}
+
+FILES_${PN} += "${systemd_unitdir}/system/ ${sysconfdir}/"
+FILES_SOLIBSDEV = ""
