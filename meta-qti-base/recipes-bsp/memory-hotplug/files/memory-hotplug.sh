@@ -38,3 +38,6 @@ let n++
 addr=`cat aligned_blocks_addr | cut -d ',' -f $n`
 num=`cat aligned_blocks_num | cut -d ',' -f $n`
 done
+# tune kernel max-threads
+totalram=`grep MemTotal /proc/meminfo | awk '{print $2}'`
+echo $((totalram/128)) > /proc/sys/kernel/threads-max
