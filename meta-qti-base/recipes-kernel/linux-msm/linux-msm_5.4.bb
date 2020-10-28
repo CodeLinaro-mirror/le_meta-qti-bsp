@@ -56,6 +56,25 @@ KCONFIG_MODE = "--alldefconfig"
 KBUILD_DEFCONFIG ?= "${KERNEL_CONFIG}"
 LINUX_VERSION_EXTENSION = "${@['-perf', ''][d.getVar('VARIANT', True) == ('' or 'debug')]}"
 
+do_kernel_metadata_prepend() {
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'kdump-support', 'true', 'false', d)}; then
+        set +e
+        if [ -n "${KBUILD_DEFCONFIG}"  ]; then
+            if [ -f "${S}/arch/${ARCH}/configs/${KBUILD_DEFCONFIG}"  ]; then
+                if [ -f "${WORKDIR}/defconfig"  ]; then
+                    # If the two defconfig's are different, warn that we didn't overwrite the
+                    # one already placed in WORKDIR by the fetcher.
+                    cmp "${WORKDIR}/defconfig" "${S}/arch/${ARCH}/configs/${KBUILD_DEFCONFIG}"
+                    if [ $? -ne 0  ]; then
+                        bbwarn "defconfig detected in WORKDIR. ${KBUILD_DEFCONFIG} overide"
+                        cp -f ${S}/arch/${ARCH}/configs/${KBUILD_DEFCONFIG} ${WORKDIR}/defconfig
+                    fi
+                fi
+            fi
+        fi
+    fi
+}
+
 do_generate_gki_defconfig() {
     bbnote "Generating GKI defconfig"
 
