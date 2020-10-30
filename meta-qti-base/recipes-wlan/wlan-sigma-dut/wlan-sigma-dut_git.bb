@@ -1,7 +1,7 @@
 DESCRIPTION = "WFA certification testing tool for QCA devices"
 HOMEPAGE = "https://github.com/qca/sigma-dut"
 LICENSE = "BSD-3-Clause"
-LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
+LIC_FILES_CHKSUM = "file://README;md5=a5044fc88d4aecbffe1b1ad56ce8df9f"
 SRCREV = "${AUTOREV}"
 PR = "r0"
 
