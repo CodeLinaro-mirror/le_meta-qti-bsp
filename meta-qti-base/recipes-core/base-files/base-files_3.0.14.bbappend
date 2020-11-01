@@ -5,7 +5,7 @@ SRC_URI_append += "file://${BASEMACHINE}/fstab"
 
 dirs755_append = " /media/cf /media/net /media/ram \
             /media/union /media/realroot /media/hdd /media/mmc1"
-dirs755_append +="/firmware /dsp /bluetooth /var /media/card /persist"
+dirs755_append +="/firmware /var /media/card /persist"
 
 # userdata mount point is present by default in all machines.
 # TODO: Add this path to MACHINE_MNT_POINTS in machine conf.
