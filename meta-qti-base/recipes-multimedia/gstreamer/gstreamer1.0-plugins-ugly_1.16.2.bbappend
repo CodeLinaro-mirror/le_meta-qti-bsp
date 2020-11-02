@@ -19,10 +19,6 @@ EXTRA_OEMESON += " \
     -Damrwbdec=enabled \
     -Dasfdemux=enabled \
     "
-EXTRA_OEMESON_remove = "\
-    -Damrnb=disabled \
-    -Damrwbdec=disabled \
-    "
 
 do_configure_prepend() {
 	cd ${S}

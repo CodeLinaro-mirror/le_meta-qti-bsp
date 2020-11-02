@@ -1,26 +1,28 @@
-inherit qcommon cmake
 DESCRIPTION = "OMX video decoder lite sample"
-SECTION  = "mm-vdec-omx-test-lite"
-
-SRC_URI   =  "${PATH_TO_REPO}/gstreamer/gst-plugins-qti-oss/.git;protocol=${PROTO};destsuffix=gstreamer/gst-plugins-qti-oss;usehead=1"
-SRCREV = "${AUTOREV}"
-SRC_DIR = "${SRC_DIR_ROOT}/gstreamer/gst-plugins-qti-oss/omx-lite-app/mm-vdec-omx-test"
-S      = "${WORKDIR}/gstreamer/gst-plugins-qti-oss/omx-lite-app/mm-vdec-omx-test"
-
+SECTION = "mm-vdec-omx-test-lite"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
-
 DEPENDS += "glib-2.0"
 DEPENDS += "libion libcutils"
 DEPENDS += "weston"
 DEPENDS += "media"
-DEPENDS += "virtual/kernel"
+SRCREV = "${AUTOREV}"
+
+SRC_URI = "${PATH_TO_REPO}/gstreamer/gst-plugins-qti-oss/.git;protocol=${PROTO};destsuffix=gstreamer/gst-plugins-qti-oss;usehead=1"
+
+SRC_DIR = "${SRC_DIR_ROOT}/gstreamer/gst-plugins-qti-oss/omx-lite-app/mm-vdec-omx-test"
+S = "${WORKDIR}/gstreamer/gst-plugins-qti-oss/omx-lite-app/mm-vdec-omx-test"
+
+inherit cmake
+
+do_configure[depends] += "virtual/kernel:do_shared_workdir"
 
 CFLAGS += "-include stdbool.h"
 CFLAGS += "-include stdint.h"
 CFLAGS += "-include signal.h"
 CFLAGS += "-include stdio.h"
+
 CXXFLAGS += "${CFLAGS}"
 CXXFLAGS += "-I${STAGING_INCDIR}"
 CXXFLAGS += "-I${STAGING_INCDIR}/drm"
@@ -36,9 +38,3 @@ CXXFLAGS += "-I${STAGING_INCDIR}/mm-core"
 CXXFLAGS += "-I${STAGING_KERNEL_BUILDDIR}/usr/include"
 CXXFLAGS += "-I${STAGING_INCDIR}/disp-commonsys-intf/display"
 CXXFLAGS += "-I${STAGING_INCDIR}/ion_headers"
-
-FILES_${PN} += " \
-   ${libdir}/* \
-   ${bindir}/* \
-   ${includedir}/* \
-"

@@ -1,4 +1,4 @@
-inherit autotools-brokensep qcommon pkgconfig
+inherit autotools-brokensep pkgconfig
 require ../include/common-location-defines.inc
 
 DESCRIPTION = "GPS Utils"

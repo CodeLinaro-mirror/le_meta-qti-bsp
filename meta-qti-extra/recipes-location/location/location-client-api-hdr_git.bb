@@ -1,4 +1,4 @@
-inherit autotools qcommon
+inherit autotools-brokensep
 
 DESCRIPTION = "Location Client Api Hdr"
 PR = "r1"

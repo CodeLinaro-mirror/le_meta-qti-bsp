@@ -17,9 +17,6 @@ DISTRO_FEATURES_append = " pam"
 # Display
 DISTRO_FEATURES_append = " wayland"
 
-#Disable ssd listener
-DISTRO_FEATURES_append = " no-ssd-listener-support"
-
 # Use synergy, disable bluez
 DISTRO_FEATURES_BACKFILL_CONSIDERED += "bluez5 bluetooth"
 
@@ -42,9 +39,17 @@ VIRTUAL-RUNTIME_dev_manager = "udev"
 VIRTUAL-RUNTIME_init_manager = "systemd"
 
 DISTRO_FEATURES_append = " ipa3"
+DISTRO_FEATURES_append = " vulkan"
+
+# Support kdump
+#DISTRO_FEATURES_append = " kdump-support"
 
 IMAGE_EXT4_EXTRA_OPTIONS = "${@bb.utils.contains('DISTRO_FEATURES','ro-rootfs',' -J -b 1024 ','',d)}"
 
 INCOMPATIBLE_LICENSE = "GPL-3.0 LGPL-3.0 AGPL-3.0"
+
+LICENSE_FLAGS_WHITELIST += "commercial_gstreamer1.0-libav commercial_gstreamer1.0-omx"
+LICENSE_FLAGS_WHITELIST += "commercial_gstreamer1.0-plugins-ugly commercial_opencore-amr"
+LICENSE_FLAGS_WHITELIST += "commercial_ffmpeg"
 
 include ${DISTRO_INC_FILES}

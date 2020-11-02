@@ -1,4 +1,4 @@
-inherit autotools qcommon
+inherit autotools-brokensep
 
 DESCRIPTION = "Ntrip client integration api hdr"
 PR = "r1"

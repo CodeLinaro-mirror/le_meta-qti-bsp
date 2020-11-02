@@ -5,10 +5,8 @@ ${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
 SRCREV = "${AUTOREV}"
 PR = "r0"
 
-# Provide a baseline
 SRC_URI = "${PATH_TO_REPO}/device/qcom/wlan/.git;protocol=${PROTO};destsuffix=device/qcom/wlan;usehead=1"
 
-# Update for each machine
 S = "${WORKDIR}/device"
 
 do_install(){
