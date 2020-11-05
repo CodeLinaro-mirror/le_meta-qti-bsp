@@ -29,6 +29,9 @@ vendor.audio.offload.gapless.enabled=true
 vendor.audio.record.multiple.enabled=true
 #enable offload buffer duration
 vendor.audio.offload.buffer.duration.enabled=true
+vendor.audio.feature.compress_in.enable=true
+vendor.audio.feature.hfp.enable=true
+vendor.audio.feature.compress_meta_data.enable=true
 
 #enable ttp in capture and playback path
 persist.vendor.audio.ttp.render.mode=true
