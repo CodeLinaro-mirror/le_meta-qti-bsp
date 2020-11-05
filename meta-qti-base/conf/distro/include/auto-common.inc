@@ -24,7 +24,7 @@ PERSIST_IMAGE_ROOTFS_SIZE ?= "128M"
 
 DISTRO_FEATURES += "early-eth"
 
-#DISTRO_FEATURES_append = " ab-boot-support"
+DISTRO_FEATURES_append = " ab-boot-support"
 
 # Use systemd init manager.
 DISTRO_FEATURES_append = " systemd"
