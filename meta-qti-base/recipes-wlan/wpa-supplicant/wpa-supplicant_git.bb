@@ -1,7 +1,6 @@
 DESCRIPTION = "Wi-Fi Protected Access(WPA) Supplicant"
 LICENSE = "BSD"
-LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
-${LICENSE};md5=3775480a712fc46a69647678acb234cb"
+LIC_FILES_CHKSUM = "file://${WORKDIR}/external/wpa_supplicant_8/COPYING;md5=279b4f5abb9c153c285221855ddb78cc"
 DEPENDS = "openssl libnl dbus qmi qmi-framework"
 SRCREV = "${AUTOREV}"
 PR = "r5.2"
