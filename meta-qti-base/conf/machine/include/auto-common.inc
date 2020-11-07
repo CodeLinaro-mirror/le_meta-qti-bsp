@@ -41,6 +41,7 @@ PREFERRED_VERSION_libdrm  = "2.4.100"
 
 LICENSE_FLAGS_WHITELIST += "commercial_gstreamer1.0-libav commercial_gstreamer1.0-omx"
 LICENSE_FLAGS_WHITELIST += "commercial_gstreamer1.0-plugins-ugly commercial_opencore-amr"
+LICENSE_FLAGS_WHITELIST += "commercial_ffmpeg"
 
 MACHINE_DISPLAY_WIDTH_PIXELS ?= "480"
 MACHINE_DISPLAY_HEIGHT_PIXELS ?= "640"
