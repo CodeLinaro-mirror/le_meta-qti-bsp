@@ -1,4 +1,6 @@
 SUMMARY = "Provide display-hal Headers"
+DESCRIPTION = "Provide display Hardware Abstraction Layer header \
+files. See display-hal-linux_git.bb for more information."
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
 
@@ -13,5 +15,7 @@ do_install() {
     install -m 644 ${S}/include/*.h ${D}${includedir}
     install -m 644 ${S}/libqservice/*.h ${D}${includedir}
 }
+
+PACKAGE_ARCH ?= "${MACHINE_ARCH}"
 
 ALLOW_EMPTY_${PN} = "1"
