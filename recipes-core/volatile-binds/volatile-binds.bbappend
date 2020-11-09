@@ -1,0 +1,36 @@
+FILESEXTRAPATHS_prepend_sdxlemur := "${THISDIR}/files:"
+REQUIRED_DISTRO_FEATURES = ""
+SRC_URI += "\
+    ${@bb.utils.contains('MACHINE_MNT_POINTS', '/systemrw', 'file://mount-copybind', '', d)} \
+    ${@bb.utils.contains('MACHINE_MNT_POINTS', '/systemrw', 'file://umount-copybind', '', d)} \
+    ${@bb.utils.contains('MACHINE_MNT_POINTS', '/systemrw', 'file://volatile-binds.service.in', '', d)} \
+"
+do_install_append () {
+    if ${@bb.utils.contains('MACHINE_MNT_POINTS', '/systemrw', 'true', 'false', d)}; then
+        install -d ${D}${base_sbindir}
+        install -m 0755 mount-copybind ${D}${base_sbindir}/
+        if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
+            install -d ${D}${systemd_unitdir}/system
+            for service in ${SYSTEMD_SERVICE_${PN}}; do
+                install -m 0644 $service ${D}${systemd_unitdir}/system/
+                install -m 0755 umount-copybind ${D}${base_sbindir}/
+            done
+        fi
+    fi
+}
+
+VOLATILE_BINDS_sdxlemur = "\
+/systemrw/adb_devid  /etc/adb_devid\n\
+/systemrw/build.prop /etc/build.prop\n\
+/systemrw/data /etc/data/\n\
+/systemrw/data/adpl /etc/data/adpl/\n\
+/systemrw/data/usb /etc/data/usb/\n\
+/systemrw/data/miniupnpd /etc/data/miniupnpd/\n\
+/systemrw/data/ipa /etc/data/ipa/\n\
+/systemrw/rt_tables /etc/data/iproute2/rt_tables\n\
+/systemrw/boot_hsusb_comp /etc/usb/boot_hsusb_comp\n\
+/systemrw/boot_hsic_comp /etc/usb/boot_hsic_comp\n\
+/systemrw/misc/wifi /etc/misc/wifi/\n\
+/systemrw/bluetooth /etc/bluetooth/\n\
+/systemrw/allplay /etc/allplay/\n\
+"
