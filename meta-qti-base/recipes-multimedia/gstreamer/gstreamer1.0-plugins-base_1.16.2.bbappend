@@ -17,6 +17,10 @@ PACKAGECONFIG ??= " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'wayland egl', '', d)} \
 "
 
+EXTRA_OEMESON = " \
+                -Dgl=disabled \
+                "
+
 DEPENDS += "libcutils"
 GI_DATA_ENABLED="0"
 do_configure_prepend() {
