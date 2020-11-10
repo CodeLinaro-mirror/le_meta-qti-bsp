@@ -3,3 +3,5 @@
 #
 
 ro.product.board=sm8250
+ro.debuggable=1
+service.adb.root=1

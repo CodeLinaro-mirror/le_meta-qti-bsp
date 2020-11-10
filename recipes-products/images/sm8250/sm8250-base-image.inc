@@ -27,6 +27,7 @@ IMAGE_INSTALL += "start-scripts-find-partitions"
 IMAGE_INSTALL += "opencv"
 IMAGE_INSTALL += "system-media"
 IMAGE_INSTALL += "protobuf"
+IMAGE_INSTALL += "system-prop"
 
 IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'start-script-ab-slot-util', '', d)}"
 
@@ -175,6 +176,7 @@ copy_edge_bsp_rpm() {
     cp ${DEPLOY_DIR_RPM}/aarch64/hdf5-1.8.21-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/hdf5-dev-1.8.21-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/libcamera-metadata0-1.1-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
+    cp ${DEPLOY_DIR_RPM}/sm8250/system-prop-1.0-r0.sm8250.rpm ${IMAGE_ROOTFS}/packages/sm8250/
 }
 
 ROOTFS_POSTPROCESS_COMMAND += "copy_edge_bsp_rpm;"
