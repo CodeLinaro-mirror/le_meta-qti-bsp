@@ -1,3 +1,5 @@
+DEPENDS += "wayland-native"
+
 #package libs from correct libdir after adding mulitilib support.
 
 SRC_URI = "git://github.com/GENIVI/${PN}.git;protocol=git \
@@ -11,8 +13,6 @@ SRC_URI_append = " \
     ${SOURCE_IVIEXT_PATCHES}/0001-wayland-ivi-extension-patch-for-wl-shell-emulator.patch?h=automotivelinux/chinook;downloadfilename=0001-wayland-ivi-extension-patch-for-wl-shell-emulator.patch;md5sum=a5752111a6f0737ab37d7b23dbd674b9 \
     "
 
-PACKAGE_ARCH = "${MACHINE_ARCH}"
-
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 SRC_URI_append = "\
      file://0001-ivi-controller-enable-ivi-share-function.patch \
@@ -21,10 +21,16 @@ SRC_URI_append = "\
 EXTRA_OECMAKE_remove = "-DIVI_SHARE=OFF"
 EXTRA_OECMAKE = "-DIVI_SHARE=ON"
 
-do_install_append() {
-install -d ${D}${libdir}/
-#cp -r  ${D}/usr/lib/* ${D}${libdir}
-#rm -rf ${D}/usr/lib
+do_configure() {
+    cmake_do_configure
+}
+
+do_compile() {
+    cmake_do_compile
+}
+
+do_install() {
+    cmake_do_install
 }
 
 FILES_${PN} += "${includedir}/*"
@@ -34,4 +40,3 @@ FILES_${PN}-dbg += "${libdir}/.debug/*"
 INSANE_SKIP_${PN} += "dev-so"
 
 FILES_${PN}-dev = ""
-
