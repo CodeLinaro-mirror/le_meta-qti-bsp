@@ -12,6 +12,30 @@ python __anonymous () {
       d.setVar("KERNEL_IMAGETYPE_FOR_MAKE", "")
 }
 
+KERNEL_PATH = "${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}"
+
+python do_patch_uncompressed_kernel () {
+    if (d.getVar('KERNEL_IMAGETYPE', True) == "Image"):
+        import struct
+        kernel = d.getVar('KERNEL_PATH')
+        f = open(kernel, 'rb')
+        KERNEL_TYPE = 'UNCOMPRESSED_IMG'.encode()
+        tmp=open(kernel + "-tmp", 'wb')
+        tmp.write(struct.pack('16s', KERNEL_TYPE))
+        tmp.write(struct.pack('1I', os.fstat(f.fileno()).st_size))
+        tmp.write(f.read())
+        f.close()
+        tmp.close()
+        f = open(kernel, 'wb')
+        tmp=open(kernel + "-tmp", 'rb')
+        f.write(tmp.read())
+        f.close()
+        tmp.close()
+        os.remove(kernel + "-tmp")
+}
+
+addtask do_patch_uncompressed_kernel after do_install before do_deploy
+
 DEPENDS += " mkbootimg-native openssl-native kern-tools-native rsync-native"
 RDEPENDS_${KERNEL_PACKAGE_NAME}-base = ""
 
