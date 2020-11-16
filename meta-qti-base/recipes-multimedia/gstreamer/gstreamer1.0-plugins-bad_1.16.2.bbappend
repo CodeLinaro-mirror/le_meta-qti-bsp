@@ -216,6 +216,7 @@ EXTRA_OEMESON = " \
                 -Dy4m=disabled \
                 -Dyadif=disabled \
                 -Dzbar=disabled \
+                -Dintrospection=disabled \
                 "
 EXTRA_OECONF_append =" --with-protocal-xml-path=${STAGING_DATADIR}/weston"
 EXTRA_OEMESON_append = " \
