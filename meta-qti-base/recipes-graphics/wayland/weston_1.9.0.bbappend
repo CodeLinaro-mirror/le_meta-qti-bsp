@@ -114,6 +114,8 @@ EOF
         -e 's,@WESTONGROUP@,${WESTONGROUP},g' \
         -i ${D}/${sysconfdir}/tmpfiles.d/weston.conf
 
+    WESTON_INI_CONFIG=${sysconfdir}/xdg/weston
+    install -d ${D}${WESTON_INI_CONFIG}
     install -m 0644 ${WORKDIR}/weston.ini_caf ${D}${WESTON_INI_CONFIG}/weston.ini
     # expose weston protocol to /usr/share/weston as video may use it
     install ${S}/protocol/*.xml ${D}${datadir}/weston
