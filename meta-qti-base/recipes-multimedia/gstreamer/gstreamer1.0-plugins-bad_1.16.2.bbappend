@@ -46,7 +46,7 @@ PACKAGECONFIG_GL = "${@bb.utils.contains('DISTRO_FEATURES', 'opengl', 'gles2 egl
 PACKAGECONFIG[dc1394]          = "-Ddc1394=enabled,-Ddc1394=disabled,libdc1394"
 PACKAGECONFIG[wayland] = "-Dwayland=enabled -Degl=enabled,-Dwayland=disabled -Degl=disabled,wayland virtual/egl"
 PACKAGECONFIG[hls]             = "-Dhls=enabled -Dhls-crypto=nettle,-Dhls=disabled,nettle"
-ACKAGECONFIG[kms]             = "-Dkms=enabled,-Dkms=disabled,libdrm"
+PACKAGECONFIG[kms]             = "-Dkms=enabled,-Dkms=disabled,libdrm"
 PACKAGECONFIG[openjpeg]        = "-Dopenjpeg=enabled,-Dopenjpeg=disabled,openjpeg"
 PACKAGECONFIG[vulkan]          = "-Dvulkan=enabled,-Dvulkan=disabled,vulkan"
 PACKAGECONFIG[wayland]         = "-Dwayland=enabled,-Dwayland=disabled,wayland-native wayland wayland-protocols libdrm"
@@ -219,6 +219,7 @@ EXTRA_OEMESON = " \
                 "
 EXTRA_OECONF_append =" --with-protocal-xml-path=${STAGING_DATADIR}/weston"
 EXTRA_OEMESON_append = " \
+                           -Dwayland=disabled \
 			   -Dkernel_path=${STAGING_KERNEL_BUILDDIR}/usr/include \
               "
 CPPFLAGS += "-I${STAGING_KERNEL_BUILDDIR}/usr/include"
