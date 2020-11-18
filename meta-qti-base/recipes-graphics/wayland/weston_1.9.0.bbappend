@@ -77,42 +77,6 @@ do_install_append() {
         install -m 644 -p -D ${WORKDIR}/weston.service_caf ${D}${systemd_system_unitdir}/weston.service
     fi
 
-    sed -e 's,Conflicts=getty@tty.*,Conflicts=getty@tty${WESTONTTY}.service,g' \
-        -e 's,User=root,User=${WESTONUSER},g' \
-        -e 's,Group=root,Group=${WESTONGROUP},g' \
-        -e 's,ExecStart=.*,ExecStart=${WESTONSTART},g' \
-        -e 's,@WESTONTTY@,${WESTONTTY},g' \
-        -e 's,@XDG_RUNTIME_DIR@,${DISPLAY_XDG_RUNTIME_DIR},g' \
-        -i ${D}${systemd_system_unitdir}/weston.service
-
-    install -d ${D}${sysconfdir}/udev/rules.d
-    cat >${D}${sysconfdir}/udev/rules.d/99-zz-dri.rules <<'EOF'
-SUBSYSTEM=="drm", MODE="0660", GROUP="${WESTONGROUP}", SECLABEL{smack}="*", TAG+="systemd", ENV{SYSTEMD_WANTS}="weston.service"
-EOF
-
-    # user 'display' must own /dev/tty${WESTONTTY} for weston to start correctly
-    cat >${D}${sysconfdir}/udev/rules.d/99-zz-tty.rules <<'EOF'
-SUBSYSTEM=="tty", KERNEL=="tty${WESTONTTY}", OWNER="${WESTONUSER}", SECLABEL{smack}="^", TAG+="systemd", ENV{SYSTEMD_WANTS}="weston.service"
-EOF
-
-    # user 'display' must also be able to access /dev/input/*
-    cat >${D}${sysconfdir}/udev/rules.d/99-zz-input.rules <<'EOF'
-SUBSYSTEM=="input", MODE="0660", GROUP="input", SECLABEL{smack}="^", TAG+="systemd", ENV{SYSTEMD_WANTS}="weston.service"
-EOF
-
-    # user 'display' must also be able to access /dev/media*, etc.
-    cat >${D}${sysconfdir}/udev/rules.d/99-zz-remote-display.rules <<'EOF'
-SUBSYSTEM=="media", MODE="0660", GROUP="display", SECLABEL{smack}="*", TAG+="systemd", ENV{SYSTEMD_WANTS}="weston.service"
-SUBSYSTEM=="video4linux", MODE="0660", GROUP="display", SECLABEL{smack}="*", TAG+="systemd", ENV{SYSTEMD_WANTS}="weston.service"
-EOF
-
-    # Prepare the dir for weston socket
-    install -d ${D}${sysconfdir}/tmpfiles.d
-    install -Dm755 ${WORKDIR}/weston_tmpfiles.conf ${D}/${sysconfdir}/tmpfiles.d/weston.conf
-
-    sed -e 's,@WESTONUSER@,${WESTONUSER},g' \
-        -e 's,@WESTONGROUP@,${WESTONGROUP},g' \
-        -i ${D}/${sysconfdir}/tmpfiles.d/weston.conf
 
     WESTON_INI_CONFIG=${sysconfdir}/xdg/weston
     install -d ${D}${WESTON_INI_CONFIG}
