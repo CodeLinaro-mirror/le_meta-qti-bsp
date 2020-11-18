@@ -28,6 +28,7 @@
 
 [Unit]
 Description=Audio Data Init Service
+ConditionVirtualization=!container
 After=data.mount
 Requires=data.mount
 StartLimitBurst=10
