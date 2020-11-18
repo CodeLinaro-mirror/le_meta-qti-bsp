@@ -41,6 +41,9 @@ do_start_service()
 		;;
 	esac
 
+	echo 1 > /sys/kernel/debug/clk/disp_cc_mdss_rscc_vsync_clk/clk_enable_count
+	echo 1 > /sys/kernel/debug/clk/disp_cc_mdss_rscc_ahb_clk/clk_enable_count
+
 	${KEXEC} ${KEXEC_ARGS} "${KDUMP_KIMAGE}" --command-line="${KDUMP_CMDLINE}"
 	if [ $? == 0 ]; then
 		echo "Kdump started up."
