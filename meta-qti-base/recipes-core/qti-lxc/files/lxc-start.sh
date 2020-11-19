@@ -1,4 +1,4 @@
-#!/bin/sh
+#! /bin/sh
 # Copyright (c) 2020, The Linux Foundation. All rights reserved.
 
 # Redistribution and use in source and binary forms, with or without
@@ -26,40 +26,18 @@
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-case $1/$2 in
-  pre/*)
-    echo "Entering into $2..."
+LXC_SERVICES="var-lib-shared.mount lxc-net.service lxc.service"
 
-    # set all usb mode to none
-    echo none > /sys/devices/platform/soc/a400000.ssusb/mode
-    echo none > /sys/devices/platform/soc/a600000.ssusb/mode
-    echo none > /sys/devices/platform/soc/a800000.ssusb/mode
+for SRV in $LXC_SERVICES
+do
+	if [ ! -f "/lib/systemd/system/$SRV" ]; then
+		echo "lxc-start: no $SRV!"
+		exit 1
+	fi
+done
 
-    systemctl stop audiod.service
-    if [ $2 == "hibernate" ]; then
-        echo 0 > /sys/kernel/boot_adsp/boot
-    fi
-
-    # disable BT as hsuart could block suspend
-    systemctl stop synergy.service
-
-    # WA: wait for ack from cdsp/adsp on DIAG USB disconnect event.
-    # It's a wakeup source IRQ which would break suspend.
-    sleep 0.2
-    ;;
-  post/*)
-    echo "Exiting from $2..."
-
-    systemctl restart synergy.service
-
-    if [ $2 == "hibernate" ]; then
-        echo 1 > /sys/kernel/boot_adsp/boot
-    fi
-    systemctl restart audiod.service
-
-    # restore all usb mode
-    echo host > /sys/devices/platform/soc/a400000.ssusb/mode
-    echo peripheral > /sys/devices/platform/soc/a600000.ssusb/mode
-    echo host > /sys/devices/platform/soc/a800000.ssusb/mode
-    ;;
-esac
+systemctl daemon-reload
+for SRV in $LXC_SERVICES
+do
+	systemctl start $SRV
+done

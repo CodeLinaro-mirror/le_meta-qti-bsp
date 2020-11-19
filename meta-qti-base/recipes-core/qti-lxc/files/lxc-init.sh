@@ -1,4 +1,4 @@
-#!/bin/sh
+#! /bin/sh
 # Copyright (c) 2020, The Linux Foundation. All rights reserved.
 
 # Redistribution and use in source and binary forms, with or without
@@ -26,40 +26,31 @@
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-case $1/$2 in
-  pre/*)
-    echo "Entering into $2..."
+LXC_MOUNT_POINT="/lxc"
+LXC_DEV="/dev/disk/by-partlabel/lxc"
+OVERLAY_DIRS="usr etc lib var/lib"
 
-    # set all usb mode to none
-    echo none > /sys/devices/platform/soc/a400000.ssusb/mode
-    echo none > /sys/devices/platform/soc/a600000.ssusb/mode
-    echo none > /sys/devices/platform/soc/a800000.ssusb/mode
+if [ ! -d $LXC_MOUNT_POINT ] || [ ! -L $LXC_DEV ]; then
+	echo "lxc-init: no mount point or device"
+	exit 1
+fi
 
-    systemctl stop audiod.service
-    if [ $2 == "hibernate" ]; then
-        echo 0 > /sys/kernel/boot_adsp/boot
-    fi
+e2fsck -fy $LXC_DEV > /dev/null 2>&1
+mount -t ext4 $LXC_DEV $LXC_MOUNT_POINT > /dev/null 2>&1
+if [ $? != 0 ] ; then
+	echo "lxc-init: mount failed"
+	exit 1
+fi
 
-    # disable BT as hsuart could block suspend
-    systemctl stop synergy.service
+# install lxc delta files by overlayfs
+for DIR in $OVERLAY_DIRS
+do
+	WORK_DIR="$LXC_MOUNT_POINT/.work/$DIR"
+	mkdir -p $WORK_DIR
+	mount -t overlay overlay -olowerdir="/$DIR",upperdir="$LXC_MOUNT_POINT/$DIR",workdir="$WORK_DIR" "/$DIR"
+done
 
-    # WA: wait for ack from cdsp/adsp on DIAG USB disconnect event.
-    # It's a wakeup source IRQ which would break suspend.
-    sleep 0.2
-    ;;
-  post/*)
-    echo "Exiting from $2..."
+# cleanup on lxc host environment
+systemctl mask weston.service
 
-    systemctl restart synergy.service
-
-    if [ $2 == "hibernate" ]; then
-        echo 1 > /sys/kernel/boot_adsp/boot
-    fi
-    systemctl restart audiod.service
-
-    # restore all usb mode
-    echo host > /sys/devices/platform/soc/a400000.ssusb/mode
-    echo peripheral > /sys/devices/platform/soc/a600000.ssusb/mode
-    echo host > /sys/devices/platform/soc/a800000.ssusb/mode
-    ;;
-esac
+exit 0
