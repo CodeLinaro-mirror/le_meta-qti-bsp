@@ -12,21 +12,6 @@ DEPENDS += "gbm"
 DEPENDS += "wayland-native"
 DEPENDS += "weston"
 
-PACKAGECONFIG = " \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'wayland', '', d)} \
-    orc \
-    hls \
-    dash \
-    "
-PACKAGECONFIG_GL = "${@bb.utils.contains('DISTRO_FEATURES', 'opengl', 'gles2 egl', '', d)}"
-
-PACKAGECONFIG[dc1394]          = "-Ddc1394=enabled,-Ddc1394=disabled,libdc1394"
-PACKAGECONFIG[wayland] = "-Dwayland=enabled -Degl=enabled,-Dwayland=disabled -Degl=disabled,wayland virtual/egl"
-PACKAGECONFIG[hls]             = "-Dhls=enabled -Dhls-crypto=nettle,-Dhls=disabled,nettle"
-PACKAGECONFIG[kms]             = "-Dkms=enabled,-Dkms=disabled,libdrm"
-PACKAGECONFIG[openjpeg]        = "-Dopenjpeg=enabled,-Dopenjpeg=disabled,openjpeg"
-PACKAGECONFIG[vulkan]          = "-Dvulkan=enabled,-Dvulkan=disabled,vulkan"
-PACKAGECONFIG[wayland]         = "-Dwayland=enabled,-Dwayland=disabled,wayland-native wayland wayland-protocols libdrm"
 
 EXTRA_OEMESON = " \
                 -Daccurip=disabled \
@@ -157,11 +142,7 @@ EXTRA_OEMESON_append = " \
 			   -Dkernel_path=${STAGING_KERNEL_BUILDDIR}/usr/include \
               "
 CPPFLAGS += "-I${STAGING_KERNEL_BUILDDIR}/usr/include"
-do_configure_prepend() {
-	cd ${S}
-	./autogen.sh --noconfigure
-	cd ${B}
-}
+
 do_compile_prepend() {
     export GIR_EXTRA_LIBS_PATH="${B}/gst-libs/gst/allocators/.libs"
 }

@@ -16,10 +16,4 @@ PACKAGECONFIG ??= " \
 "
 PACKAGECONFIG[v4l2]       = "-Dv4l2=enabled -Dv4l2-probe=false,-Dv4l2=false"
 
-do_configure_prepend() {
-	cd ${S}
-	./autogen.sh --noconfigure
-	cd ${B}
-}
-
 RPROVIDES_${PN}-souphttpsrc = "${PN}-soup"

@@ -18,9 +18,3 @@ PACKAGECONFIG ??= " \
 "
 
 DEPENDS += "libcutils"
-GI_DATA_ENABLED="0"
-do_configure_prepend() {
-	cd ${S}
-	./autogen.sh --noconfigure
-	cd ${B}
-}
