@@ -63,6 +63,7 @@ FILES_${PN}-dbg = "/boot/.debug"
 
 do_deploy() {
         install ${D}/boot/abl.elf ${DEPLOYDIR}
+        mv ${DEPLOYDIR}/abl.elf ${DEPLOYDIR}/${PRODUCT}-abl.elf
 }
 
 do_deploy[dirs] = "${S} ${DEPLOYDIR}"
@@ -76,7 +77,7 @@ python sstate_task_prefunc () {
     shared_state = sstate_state_fromvars(d)
     ssmanifest = "%s/manifest-%s-%s.deploy" % (d.getVar("SSTATE_MANIFESTS"), d.getVar("SSTATE_MANMACH") , d.getVar("PN"))
     if (shared_state['task'] == "deploy") and (os.path.exists(ssmanifest)):
-        cmd = "echo '%s/abl.elf' > %s" % (d.getVar("DEPLOY_DIR_IMAGE"), ssmanifest)
+        cmd = "echo '%s/%s-abl.elf' > %s" % (d.getVar("DEPLOY_DIR_IMAGE"), d.getVar("PRODUCT"), ssmanifest)
         os.system(cmd)
     sstate_clean(shared_state, d)
 }
