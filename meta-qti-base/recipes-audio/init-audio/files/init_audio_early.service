@@ -27,7 +27,7 @@
 
 
 [Unit]
-Description=Audio Init Service
+Description=Early Audio Init Service
 After=systemd-modules-load.service
 Requires=systemd-modules-load.service
 DefaultDependencies=no

@@ -44,15 +44,15 @@ start)
     fi
     echo "done"
     ;;
-  stop)
+stop)
     echo -n "Stopping init_qcom_audio: "
     echo "done"
     ;;
-  restart)
+restart)
     $0 stop
     $0 start
     ;;
-  *)
+*)
     echo "Incorrect option specified"
     exit 1
     ;;

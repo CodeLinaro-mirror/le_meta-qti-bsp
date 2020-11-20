@@ -1,4 +1,5 @@
-DESCRIPTION = "pulseaudio module for codec control header files"
+SUMMARY = "PulseAudio Module Codec Control"
+DESCRIPTION = "These are the header files for codec control."
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
 SRCREV = "${AUTOREV}"
@@ -6,7 +7,7 @@ PR = "r0"
 
 SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/mm-audio/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/mm-audio/pulseaudio-module-codec-control;subpath=pulseaudio-module-codec-control;usehead=1"
 
-S = "${WORKDIR}/vendor/qcom/opensource/mm-audio/pulseaudio-module-codec-control/"
+S = "${WORKDIR}/vendor/qcom/opensource/mm-audio/pulseaudio-module-codec-control"
 
 do_configure[noexec] = "1"
 do_compile[noexec] = "1"
