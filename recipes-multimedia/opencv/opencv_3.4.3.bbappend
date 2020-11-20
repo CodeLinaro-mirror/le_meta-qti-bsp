@@ -24,7 +24,7 @@ do_unpack_extra() {
 }
 DEPENDS_append = " hdf5 libgfortran"
 PACKAGECONFIG_append = "${@bb.utils.contains("DISTRO_FEATURES", "wayland", " gtk", "", d)}"
-PACKAGECONFIG_remove = " gphoto2 v4l libv4l gstreamer"
+PACKAGECONFIG_remove = " gphoto2 v4l libv4l gstreamer ffmpeg libav"
 PACKAGECONFIG_append = " dnn"
 EXTRA_OECMAKE_remove = "${@oe.utils.conditional("libdir", "/usr/lib64", "-DLIB_SUFFIX=64", "", d)} \
 			${@oe.utils.conditional("libdir", "/usr/lib32", "-DLIB_SUFFIX=32", "", d)} "
