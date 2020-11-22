@@ -30,6 +30,9 @@ EXTRA_OECONF_append = "\
 EXTRA_OECONF_append = " --enable-sys-uid"
 
 DEPENDS += "display-hal-linux display-noship-linux wayland-native gbm-headers libcap-native display-ship-linux display-hal-headers"
+DEPENDS += "libion"
+DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'q-hypervisor', 'libuhab', '', d)}"
+
 TARGET_CFLAGS += "-idirafter ${STAGING_KERNEL_BUILDDIR}/include/"
 TARGET_CFLAGS += "-I${STAGING_INCDIR}/libdrm"
 TARGET_CFLAGS += "-I${STAGING_INCDIR}/sdm"
