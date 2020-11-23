@@ -9,11 +9,4 @@ SRCREV_FORMAT = "good_common"
 
 S = "${WORKDIR}/gstreamer/gst-plugins-good"
 
-PACKAGECONFIG ??= " \
-    ${GSTREAMER_ORC} \
-    ${@bb.utils.filter('DISTRO_FEATURES', 'pulseaudio x11', d)} \
-    bz2 cairo flac gdk-pixbuf gudev jpeg-turbo lame libpng mpg123 soup speex taglib v4l2 \
-"
-PACKAGECONFIG[v4l2]       = "-Dv4l2=enabled -Dv4l2-probe=false,-Dv4l2=false"
-
 RPROVIDES_${PN}-souphttpsrc = "${PN}-soup"
