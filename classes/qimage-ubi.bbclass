@@ -28,15 +28,42 @@ do_image_multiubi[noexec] = "1"
 ### Generate sysfs.ubi #########################
 ################################################
 
+create_symlink_userfs() {
+   #Symlink modules
+   LIB_MODULES="${IMAGE_ROOTFS}/lib/modules"
+   rm -rf ${LIB_MODULES}
+   mkdir -p ${LIB_MODULES}
+   mv ${LIB_MODULES} ${IMAGE_ROOTFS}/usr/lib/modules
+   ln -sf /usr/lib/modules ${IMAGE_ROOTFS}/lib
+
+   # Move rootfs data to userfs directory
+   # Content of userfs is added to data volume
+   DATA_DIR="${IMAGE_ROOTFS}/data"
+   CONFIG_DIR="${DATA_DIR}/configs"
+   LOGS_DIR="${DATA_DIR}/logs"
+   if [ ! -d ${DATA_DIR} ]; then
+       mkdir ${DATA_DIR}
+   fi
+   if [ ! -d ${CONFIG_DIR} ]; then
+       mkdir ${CONFIG_DIR}
+   fi
+   if [ ! -d ${LOGS_DIR} ]; then
+      mkdir ${LOGS_DIR}
+   fi
+   rm -rf ${USERIMAGE_ROOTFS}
+   mkdir -p ${USERIMAGE_ROOTFS}
+   mv ${DATA_DIR}/* ${USERIMAGE_ROOTFS}
+}
+
 create_symlink_systemd_ubi_mount_rootfs() {
     # Symlink ubi mount files to systemd targets
     for entry in ${MACHINE_MNT_POINTS}; do
         mountname="${entry:1}"
         if [[ "$mountname" == "firmware" || "$mountname" == "bt_firmware" || "$mountname" == "dsp" ]] ; then
-            cp ${IMAGE_ROOTFS}/lib/systemd/system/${mountname}-mount-ubi.service ${IMAGE_ROOTFS}/lib/systemd/system/${mountname}-mount.service
+            mv ${IMAGE_ROOTFS}/lib/systemd/system/${mountname}-mount-ubi.service ${IMAGE_ROOTFS}/lib/systemd/system/${mountname}-mount.service
             ln -sf ${systemd_unitdir}/system/${mountname}-mount.service ${IMAGE_ROOTFS}/lib/systemd/system/local-fs.target.requires/${mountname}-mount.service
         else
-            cp ${IMAGE_ROOTFS}/lib/systemd/system/${mountname}-ubi.mount  ${IMAGE_ROOTFS}/lib/systemd/system/${mountname}.mount
+            mv ${IMAGE_ROOTFS}/lib/systemd/system/${mountname}-ubi.mount  ${IMAGE_ROOTFS}/lib/systemd/system/${mountname}.mount
             if [[ "$mountname" == "$userfsdatadir" ]] ; then
                 ln -sf ${systemd_unitdir}/system/${mountname}.mount ${IMAGE_ROOTFS}/lib/systemd/system/local-fs.target.wants/${mountname}.mount
             elif [[ "$mountname" == "cache" ]] ; then
@@ -105,9 +132,10 @@ EOF
 
 }
 
-do_makesystem_ubi[cleandirs] += "${USERIMAGE_ROOTFS}"
+do_makesystem_ubi[prefuncs] += "create_symlink_userfs"
 do_makesystem_ubi[prefuncs] += "create_symlink_systemd_ubi_mount_rootfs"
 do_makesystem_ubi[prefuncs] += "do_create_ubinize_config"
+do_makesystem_ubi[postfuncs] += "${@bb.utils.contains('INHERIT', 'uninative', 'do_patch_ubitools', '', d)}"
 do_makesystem_ubi[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
 
 fakeroot do_makesystem_ubi() {
@@ -121,4 +149,9 @@ python () {
         bb.build.addtask('do_makesystem_ubi', 'do_image_complete', 'do_makesystem', d)
     else:
         bb.build.addtask('do_makesystem_ubi', 'do_image_complete', 'do_rootfs', d)
+}
+
+do_patch_ubitools() {
+    ${UNINATIVE_STAGING_DIR}-uninative/x86_64-linux/usr/bin/patchelf-uninative --set-interpreter /lib64/ld-linux-x86-64.so.2 ${STAGING_DIR}-components/x86_64/mtd-utils-native/usr/sbin/mkfs.ubifs
+    ${UNINATIVE_STAGING_DIR}-uninative/x86_64-linux/usr/bin/patchelf-uninative --set-interpreter /lib64/ld-linux-x86-64.so.2 ${STAGING_DIR}-components/x86_64/mtd-utils-native/usr/sbin/ubinize
 }
