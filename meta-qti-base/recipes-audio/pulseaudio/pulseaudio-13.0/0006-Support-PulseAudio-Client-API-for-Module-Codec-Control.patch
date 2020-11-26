@@ -3,6 +3,7 @@ From: Cong Tang <congt@codeaurora.org>
 Date: Wed, 25 Oct 2017 15:01:14 +0800
 Subject: [PATCH] Support PulseAudio Client API for Module Codec Control
 
+Signed-off-by: Cong Tang <congt@codeaurora.org>
 ---
  src/Makefile.am               |   2 +
  src/map-file                  |  14 +

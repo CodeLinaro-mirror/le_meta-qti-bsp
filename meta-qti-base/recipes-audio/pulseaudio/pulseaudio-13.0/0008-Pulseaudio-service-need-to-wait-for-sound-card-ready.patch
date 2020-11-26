@@ -3,6 +3,7 @@ From: Lei wang <leiwan@codeaurora.org>
 Date: Wed, 21 Jun 2017 16:40:51 +0800
 Subject: [PATCH] Pulseaudio need to wait for sound card ready
 
+Signed-off-by: Lei wang <leiwan@codeaurora.org>
 ---
  src/daemon/systemd/user/pulseaudio.service.in | 3 +++
  1 file changed, 3 insertions(+)
