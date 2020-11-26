@@ -3,17 +3,18 @@ DESCRIPTION = "Provide display HAL (Hardware Abstraction Layer) \
 libraries. These libraries serves as an abstraction layer between \
 physical hardware and software. They provide display driver interfaces, \
 allowing program to communicate with the hardware."
+HOMEPAGE = "https://www.codeaurora.org/"
 LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 
-DEPENDS += "system-core"
-DEPENDS += "libhardware"
 DEPENDS += "binder"
-DEPENDS += "drm"
-DEPENDS += "libdrm"
-DEPENDS += "gbm-headers"
 DEPENDS += "display-commonsys-intf-linux"
+DEPENDS += "drm"
+DEPENDS += "gbm-headers"
+DEPENDS += "libdrm"
+DEPENDS += "libhardware"
+DEPENDS += "system-core"
 
 PR = "r8"
 
@@ -24,8 +25,8 @@ S = "${WORKDIR}/display/display-hal"
 
 inherit autotools-brokensep pkgconfig
 
-EXTRA_OECONF += " --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
-EXTRA_OECONF += " --enable-sdmhaldrm"
+EXTRA_OECONF += "--with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
+EXTRA_OECONF += "--enable-sdmhaldrm"
 
 LDFLAGS += "-llog -lhardware -lutils -lcutils"
 
