@@ -19,7 +19,7 @@ SRC_URI_append = "\
      file://0001-ivi-controller-fix-return-value-error-for-set-up-buf.patch \
 "
 EXTRA_OECMAKE_remove = "-DIVI_SHARE=OFF"
-EXTRA_OECMAKE = "-DIVI_SHARE=ON"
+EXTRA_OECMAKE += "-DIVI_SHARE=ON"
 
 do_configure() {
     cmake_do_configure
