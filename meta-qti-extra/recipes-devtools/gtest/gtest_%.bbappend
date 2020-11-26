@@ -13,5 +13,6 @@ FILES_${PN} += "${libdir}/*.so"
 
 ALLOW_EMPTY_${PN} = "1"
 ALLOW_EMPTY_${PN}-dbg = "1"
+ALLOW_EMPTY_${PN}-staticdev = "1"
 
 RDEPENDS_${PN}-dev += "${PN}-staticdev"
