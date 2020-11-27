@@ -47,15 +47,6 @@ CPPFLAGS += "-I${STAGING_INCDIR}/libdrm"
 CPPFLAGS += "-fno-operator-names"
 
 do_configure[depends] += "virtual/kernel:do_shared_workdir"
-do_install_append () {
-    install -m 0644 ${WORKDIR}/display/display-hal/include/* ${STAGING_INCDIR}
-    install -m 0664 ${WORKDIR}/display/display-hal/gpu_tonemapper/*.h ${STAGING_INCDIR}
-}
-
-PACKAGE_ARCH ?= "${MACHINE_ARCH}"
 
 SOLIBS = ".so"
 FILES_SOLIBSDEV = ""
-
-INHIBIT_PACKAGE_STRIP = "1"
-INHIBIT_PACKAGE_DEBUG_SPLIT = "1"

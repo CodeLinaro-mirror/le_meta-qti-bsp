@@ -17,6 +17,4 @@ do_install() {
     install -m 644 ${S}/libqservice/*.h ${D}${includedir}
 }
 
-PACKAGE_ARCH ?= "${MACHINE_ARCH}"
-
 ALLOW_EMPTY_${PN} = "1"
