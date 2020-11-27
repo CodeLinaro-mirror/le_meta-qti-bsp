@@ -3,6 +3,9 @@ IMAGE_INSTALL += "packagegroup-core-boot"
 #IMAGE_INSTALL += "${ROOTFS_PKGMANAGE_BOOTSTRAP}"
 IMAGE_INSTALL += "${CORE_IMAGE_EXTRA_INSTALL}"
 
+# Target SDK Packages
+TOOLCHAIN_TARGET_TASK_append_sa515m += "glib-2.0-dev"
+
 # The MSM Linux minimal boot image files.
 IMAGE_INSTALL += "base-files"
 IMAGE_INSTALL += "base-passwd"
