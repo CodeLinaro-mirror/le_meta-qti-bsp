@@ -30,8 +30,8 @@ RPROVIDES_${PN} += "${PROVIDES_NAME}-${KERNEL_VERSION}"
 FILES_${PN} += "lib/firmware/wlan/*"
 FILES_${PN} += "lib/firmware/*"
 FILES_${PN} += "lib/modules/${KERNEL_VERSION}/extra/${_MODNAME}.ko"
-FILES_${PN} += "usr/bin/init.qti.wlan_on.sh"
-FILES_${PN} += "usr/bin/init.qti.wlan_off.sh"
+FILES_${PN} += "${bindir}/init.qti.wlan_on.sh"
+FILES_${PN} += "${bindir}/init.qti.wlan_off.sh"
 
 LDFLAGS_aarch64 = "-O1 --hash-style=gnu --as-needed"
 
