@@ -164,6 +164,7 @@ do_make_bootimg[dirs]      = "${DEPLOY_DIR_IMAGE}"
 # Make sure native tools and vmlinux ready to create boot.img
 do_make_bootimg[depends]  += "${PN}:do_prepare_recipe_sysroot"
 do_make_bootimg[depends]  += "virtual/kernel:do_shared_workdir"
+do_make_bootimg[depends]  += "virtual/kernel:do_deploy"
 
 
 # With dm-verity, kernel cmdline has to be updated with correct hash value of
