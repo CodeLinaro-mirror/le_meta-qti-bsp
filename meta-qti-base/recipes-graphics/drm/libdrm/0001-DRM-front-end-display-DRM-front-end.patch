@@ -4,6 +4,9 @@ Date: Thu, 20 Aug 2020 17:34:59 +0800
 Subject: [PATCH] [DRM front-end] display DRM front-end
 
 Add a display DRM front-end software for the new architecture
+
+Signed-off-by: Wanteng Zhang <wantzhan@codeaurora.org>
+
 ---
  Makefile.am          | 11 +++++++-
  Makefile.sources     |  4 +--
