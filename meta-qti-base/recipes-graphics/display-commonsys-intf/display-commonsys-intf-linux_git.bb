@@ -35,10 +35,5 @@ do_install_append() {
     install -m 644 ${S}/include/*.h ${D}${includedir}
 }
 
-PACKAGE_ARCH ?= "${MACHINE_ARCH}"
-
 SOLIBS = ".so"
 FILES_SOLIBSDEV = ""
-
-INHIBIT_PACKAGE_STRIP = "1"
-INHIBIT_PACKAGE_DEBUG_SPLIT = "1"
