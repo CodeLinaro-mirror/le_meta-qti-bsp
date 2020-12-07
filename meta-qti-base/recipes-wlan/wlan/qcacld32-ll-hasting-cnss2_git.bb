@@ -1,6 +1,8 @@
 require qcacld32-ll.inc
 
+SUMMARY = "Qualcomm Atheros WLAN Driver"
 DESCRIPTION = "Qualcomm Atheros WLAN CLD3.0 low latency driver"
+HOMEPAGE = "https://www.codeaurora.org/"
 LICENSE = "ISC"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=f3b90e78ea0cffb20bf5cca7947a896d"
 SRCREV = "${AUTOREV}"
@@ -20,8 +22,8 @@ SRC_URI = "${PATH_TO_REPO}/wlan/qcacld-3.0/.git;protocol=${PROTO};destsuffix=wla
            file://init.qti.wlan_off.sh \
            "
 
-S1 = "${WORKDIR}/wlan/qca-wifi-host-cmn/"
-S = "${WORKDIR}/wlan/qcacld-3.0/"
+S1 = "${WORKDIR}/wlan/qca-wifi-host-cmn"
+S = "${WORKDIR}/wlan/qcacld-3.0"
 
 # Explicitly disable HL to enable LL as current WLAN driver is not having
 # simultaneous support of HL and LL.
@@ -31,7 +33,6 @@ EXTRA_OEMAKE += "DYNAMIC_SINGLE_CHIP=${_MODNAME}"
 EXTRA_OEMAKE += "MULTI_IF_NAME=cnss2"
 EXTRA_OEMAKE += "MODNAME=${_MODNAME}"
 EXTRA_OEMAKE_append_qtiquingvm += "WLAN_CFG_OVERRIDE="CONFIG_WLAN_DISABLE_EXPORT_SYMBOL=y CONFIG_WLAN_OPEN_P2P_INTERFACE=n CONFIG_SUPPORT_P2P_BY_ONE_INTF_WLAN=y""
-SYSTEMD_AUTO_ENABLE_${PN} = "disable"
 
 do_install() {
     module_do_install
