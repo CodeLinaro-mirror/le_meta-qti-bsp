@@ -10,6 +10,8 @@ ALLOW_EMPTY_${PN} = "1"
 
 RDEPENDS_${PN} += "\
     bridge-utils \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'q-hypervisor', '', 'connman', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'q-hypervisor', '', 'connman-client', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'q-hypervisor', 'setup-network', '', d)} \
     net-tools \
     emac-dwc-eqos \
