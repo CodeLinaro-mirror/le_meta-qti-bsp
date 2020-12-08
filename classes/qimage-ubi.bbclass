@@ -31,9 +31,9 @@ do_image_multiubi[noexec] = "1"
 create_symlink_userfs() {
    #Symlink modules
    LIB_MODULES="${IMAGE_ROOTFS}/lib/modules"
-   rm -rf ${LIB_MODULES}
-   mkdir -p ${LIB_MODULES}
-   mv ${LIB_MODULES} ${IMAGE_ROOTFS}/usr/lib/modules
+   if [ -d ${LIB_MODULES} ]; then
+      mv ${LIB_MODULES} ${IMAGE_ROOTFS}/usr/lib/modules
+   fi
    ln -sf /usr/lib/modules ${IMAGE_ROOTFS}/lib
 
    # Move rootfs data to userfs directory
@@ -105,7 +105,7 @@ image="${USERIMAGE_UBIFS_TARGET}"
 vol_id=1
 vol_type=dynamic
 vol_name=usrfs
-vol_size="${CACHE_VOLUME_SIZE}"
+vol_flags=autoresize
 [cache_volume]
 mode=ubi
 vol_id=2
