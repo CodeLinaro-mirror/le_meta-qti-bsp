@@ -35,6 +35,17 @@ if [ ! -c /dev/binder ] && [ ! -L /dev/binder ]; then
 	chmod 0666 /dev/binderfs/hwbinder
 	chmod 0666 /dev/binderfs/binder
 	chmod 0666 /dev/binderfs/vndbinder
+	if [ -c /dev/binderfs/puddlejumper ]; then
+		ln -s /dev/binderfs/puddlejumper /dev/puddlejumper
+		ln -s /dev/binderfs/vndpuddlejumper /dev/vndpuddlejumper
+		ln -s /dev/binderfs/hwpuddlejumper /dev/hwpuddlejumper
+		chmod 0666 /dev/puddlejumper
+		chmod 0666 /dev/vndpuddlejumper
+		chmod 0666 /dev/hwpuddlejumper
+	fi
+	if [ -f /sys/kernel/debug/sync/sw_sync ]; then
+		chmod 0666 /sys/kernel/debug/sync/sw_sync
+	fi
 fi
 
 exit 0
