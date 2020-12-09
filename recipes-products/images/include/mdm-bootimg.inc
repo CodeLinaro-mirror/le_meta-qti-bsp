@@ -49,3 +49,7 @@ do_rootfs_append_sdxprairie() {
 do_rootfs_append_mdm9650() {
     bb.build.exec_func('do_ramdisk_create',d)
 }
+# Generate ramdisk for sdxnightjar
+do_rootfs_append_sdxnightjar() {
+    bb.build.exec_func('do_ramdisk_create',d)
+}

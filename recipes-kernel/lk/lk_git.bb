@@ -19,6 +19,7 @@ SRC_URI   +=  "file://0001-Add-instructionset-extension.patch"
 S         =  "${WORKDIR}/bootable/bootloader/lk"
 
 MY_TARGET_mdm9650 = "mdm9640"
+MY_TARGET_sdxnightjar = "mdm9640"
 MY_TARGET_sdx20 = "mdm9640"
 MY_TARGET_apq8009  = "msm8909"
 MY_TARGET_msm8909  = "msm8909"
@@ -47,6 +48,7 @@ ENABLE_DISPLAY = "${DISPLAY_SCREEN}"
 EXTRA_OEMAKE = "${MY_TARGET} TOOLCHAIN_PREFIX='${TARGET_PREFIX}'  LIBGCC='${LIBGCC}' DISPLAY_SCREEN=${DISPLAY_SCREEN} ENABLE_DISPLAY=${ENABLE_DISPLAY}"
 
 EXTRA_OEMAKE_append_mdm9650 = " ENABLE_EARLY_ETHERNET=1"
+EXTRA_OEMAKE_append_sdxnightjar = " ENABLE_EARLY_ETHERNET=1"
 
 EXTRA_OEMAKE_append = " VERIFIED_BOOT=0 DEFAULT_UNLOCK=true EMMC_BOOT=${emmc_bootloader}"
 

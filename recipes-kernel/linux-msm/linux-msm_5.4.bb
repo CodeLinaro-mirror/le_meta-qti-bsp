@@ -1,5 +1,5 @@
 require recipes-kernel/linux-msm/linux-msm_5.4.inc
-COMPATIBLE_MACHINE = "genericarmv8|mdm9650"
+COMPATIBLE_MACHINE = "genericarmv8|mdm9650|sdxnightjar"
 
 SRC_DIR   =  "${WORKSPACE}/kernel/msm-5.4"
 S         =  "${WORKDIR}/kernel/msm-5.4"
@@ -12,7 +12,7 @@ TARGET_CXXFLAGS += "-Wno-format"
 KERNEL_CC = "${STAGING_BINDIR_NATIVE}/llvm-arm-toolchain/bin/clang -target ${TARGET_ARCH}${TARGET_VENDOR}-${TARGET_OS}"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
-DYNAMIC_DEFCONFIG_SUPPORT = "mdm9650"
+DYNAMIC_DEFCONFIG_SUPPORT = "mdm9650 sdxnightjar"
 
 do_configure_prepend() {
         if ${@bb.utils.contains('DYNAMIC_DEFCONFIG_SUPPORT', '${MACHINE}', 'true', 'false', d)}; then

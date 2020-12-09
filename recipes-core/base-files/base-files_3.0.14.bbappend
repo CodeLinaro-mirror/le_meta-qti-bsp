@@ -31,7 +31,7 @@ do_install_append(){
 
     ln -s /mnt/sdcard ${D}/sdcard
 
-    if [ ${BASEMACHINE} == "mdm9650" ]; then
+    if [ ${BASEMACHINE} == "mdm9650" ] || [ "${BASEMACHINE}" == "sdxnightjar" ]; then
       ln -s /etc/resolvconf/run/resolv.conf ${D}/etc/resolv.conf
     else
       ln -s /var/run/resolv.conf ${D}/etc/resolv.conf

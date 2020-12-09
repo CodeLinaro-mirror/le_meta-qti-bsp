@@ -20,6 +20,8 @@ Supported combinations are listed below.
       +---------------+----------------+------------------+
       |mdm9650        | mdm            | debug perf       |
       +---------------+----------------+------------------+
+      |sdxnightjar    | mdm            | debug perf       |
+      +---------------+----------------+------------------+
       |qcs403-som2    | qsap           | debug perf       |
       |qcs405-som1    |                |                  |
       |nf-64          |                |                  |
