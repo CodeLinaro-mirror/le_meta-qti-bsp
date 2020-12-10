@@ -25,8 +25,9 @@
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+# Add non-root permission for misc device
 ACTION=="remove", GOTO="misc_end"
-
-SUBSYSTEM=="hab", MODE="0666"
-
+KERNEL=="hab",SUBSYSTEM=="hab", MODE="0666"
+KERNEL=="ion",SUBSYSTEM=="misc", MODE="0664"
+KERNEL=="qseecom",SUBSYSTEM=="qseecom", MODE="0666"
 LABEL="misc_end"
