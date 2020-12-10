@@ -1,5 +1,7 @@
 SUMMARY = "QTI package group for data service"
 
+PACKAGE_ARCH = "${MACHINE_ARCH}"
+
 inherit packagegroup
 
 PACKAGES = "\
@@ -10,9 +12,9 @@ ALLOW_EMPTY_${PN} = "1"
 
 RDEPENDS_${PN} += "\
     bridge-utils \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'q-hypervisor', '', 'connman', d)} \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'q-hypervisor', '', 'connman-client', d)} \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'q-hypervisor', 'setup-network', '', d)} \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', 'connman', d)} \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', 'connman-client', d)} \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'setup-network', '', d)} \
     net-tools \
     emac-dwc-eqos \
     ethtool \
@@ -29,4 +31,4 @@ RDEPENDS_${PN} += "\
     netkit-telnet \
     openssh \
     eavb-fe \
-    "
+"

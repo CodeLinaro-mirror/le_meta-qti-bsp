@@ -27,7 +27,7 @@ TARGET_CC_ARCH += "${LDFLAGS}"
 SECURITY_CFLAGS_remove_pn-open-avb = "-D_FORTIFY_SOURCE=2"
 
 do_compile() {
-	if ${@bb.utils.contains('DISTRO_FEATURES', 'q-hypervisor', 'true', 'false', d)}; then
+	if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'true', 'false', d)}; then
 		export AVB_FEATURE_GVM_MODE=1
 	fi
 	export AVB_FEATURE_NEUTRINO=1
