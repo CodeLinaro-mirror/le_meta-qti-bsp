@@ -48,7 +48,7 @@ COMPATIBLE_MACHINE = "(${BASEMACHINE})"
 KERNEL_IMAGEDEST = "boot"
 KERNEL_IMAGETYPE = "Image"
 KERNEL_PACKAGE_NAME = "capture"
-KERNEL_DEVICETREE = "vendor/qcom/sa8155p-v2-adp-air-capture.dtb"
+KERNEL_DEVICETREE = "vendor/qcom/sa8155p-v2-adp-air-capture.dtb vendor/qcom/sa8195p-v2-adp-air-capture.dtb"
 
 SRC_DIR   =  "${SRC_DIR_ROOT}/kernel/msm-5.4"
 S         =  "${WORKDIR}/kernel/msm-5.4"
