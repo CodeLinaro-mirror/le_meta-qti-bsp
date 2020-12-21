@@ -12,9 +12,6 @@ SRC_URI   =  "${PATH_TO_REPO}/system/core/.git;protocol=${PROTO};destsuffix=syst
 S = "${WORKDIR}/system/core/"
 SRCREV = "${AUTOREV}"
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
-SRC_URI_append = " file://0001-Fix-adb-shell-env-issue.patch"
-
 PR = "r19"
 
 DEPENDS += "virtual/kernel openssl glib-2.0 libselinux ext4-utils libcutils libmincrypt libbase libutils"
