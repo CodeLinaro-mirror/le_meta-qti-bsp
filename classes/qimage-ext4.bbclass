@@ -19,6 +19,7 @@ USERDATAIMAGE_TARGET ?= "userdata.img"
 USERDATAIMAGE_MAP_TARGET ?= "userdata.map"
 PERSISTIMAGE_TARGET ?= "persist.img"
 PERSISTIMAGE_MAP_TARGET ?= "persist.map"
+DTBOIMAGE_TARGET ?= "dtbo.img"
 
 IMAGE_EXT4_SELINUX_OPTIONS = "${@bb.utils.contains('DISTRO_FEATURES', 'selinux', '-S ${SELINUX_FILE_CONTEXTS}', '', d)}"
 
@@ -62,10 +63,10 @@ create_symlink_systemd_ext4_mount_rootfs() {
         mountname="${entry:1}"
         if [[ "$mountname" == "firmware" || "$mountname" == "bt_firmware" || "$mountname" == "dsp" ]] && \
            [[ "${COMBINED_FEATURES}" =~ .*qti-ab-boot.* ]] ; then
-            cp ${IMAGE_ROOTFS}/lib/systemd/system/${mountname}-mount-ext4.service ${IMAGE_ROOTFS}/lib/systemd/system/${mountname}-mount.service
+            mv ${IMAGE_ROOTFS}/lib/systemd/system/${mountname}-mount-ext4.service ${IMAGE_ROOTFS}/lib/systemd/system/${mountname}-mount.service
             ln -sf ${systemd_unitdir}/system/${mountname}-mount.service ${IMAGE_ROOTFS}/lib/systemd/system/local-fs.target.requires/${mountname}-mount.service
         else
-            cp ${IMAGE_ROOTFS}/lib/systemd/system/${mountname}-ext4.mount  ${IMAGE_ROOTFS}/lib/systemd/system/${mountname}.mount
+            mv ${IMAGE_ROOTFS}/lib/systemd/system/${mountname}-ext4.mount  ${IMAGE_ROOTFS}/lib/systemd/system/${mountname}.mount
             if [[ "$mountname" == "$userfsdatadir" ]] ; then
                 ln -sf ${systemd_unitdir}/system/${mountname}.mount ${IMAGE_ROOTFS}/lib/systemd/system/local-fs.target.wants/${mountname}.mount
             elif [[ "$mountname" == "cache" ]] ; then

@@ -5,8 +5,8 @@ require ${COREBASE}/meta-qti-bsp/recipes-products/images/include/qti-ramdisk.inc
 DEFAULTTUNE ?= "aarch64"
 include conf/machine/include/arm/arch-armv8a.inc
 
-PREFERRED_PROVIDER_virtual/kernel = "linux-msm"
-PREFERRED_VERSION_linux-msm ?= "5.4"
+PREFERRED_PROVIDER_virtual/kernel = "linux-dummy"
+PREFERRED_VERSION_linux-msm ?= "5.10"
 
 LLVM_VERSION = "8.0"
 
@@ -14,7 +14,7 @@ PAGE_SIZE ?= '4096'
 
 EXTRA_IMAGECMD ?= "-N 2048"
 
-SYSTEM_SIZE_EXT4 ?= "180000000"
-VM_SIZE_EXT4 ?= "230000000"
+SYSTEM_SIZE_EXT4 ?= "225000000"
+VM_SIZE_EXT4 ?= "270000000"
 
 addtask ramdisk_create after do_makesystem before do_image_complete

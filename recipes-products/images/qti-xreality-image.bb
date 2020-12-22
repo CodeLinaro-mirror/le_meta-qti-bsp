@@ -19,7 +19,9 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-camera \
         packagegroup-qti-data \
         packagegroup-qti-dsp \
+        packagegroup-qti-fastcv \
         packagegroup-qti-gfx \
+        packagegroup-qti-sensors-see \
         packagegroup-qti-ss-mgr \
         ${@bb.utils.contains('COMBINED_FEATURES', 'qti-wifi', "packagegroup-qti-wifi", "", d)} \
         ${@bb.utils.contains('COMBINED_FEATURES', 'qti-bluetooth', "packagegroup-qti-bluetooth", "", d)} \
@@ -34,6 +36,7 @@ CORE_IMAGE_EXTRA_INSTALL += " \
             audiodlkm \
             init-audio \
             tinyalsa \
+            tinycompress \
             soundtrigger \
 "
 #install drm

@@ -28,15 +28,44 @@ do_image_multiubi[noexec] = "1"
 ### Generate sysfs.ubi #########################
 ################################################
 
+create_symlink_userfs() {
+   #Symlink modules
+   LIB_MODULES="${IMAGE_ROOTFS}/lib/modules"
+   if [ -d ${LIB_MODULES} ]; then
+      cp -rf ${LIB_MODULES} ${IMAGE_ROOTFS}/usr/lib/
+      rm -rf ${LIB_MODULES}
+   fi
+   ln -sf /usr/lib/modules ${IMAGE_ROOTFS}/lib
+
+   # Move rootfs data to userfs directory
+   # Content of userfs is added to data volume
+   DATA_DIR="${IMAGE_ROOTFS}/data"
+   CONFIG_DIR="${DATA_DIR}/configs"
+   LOGS_DIR="${DATA_DIR}/logs"
+   if [ ! -d ${DATA_DIR} ]; then
+       mkdir ${DATA_DIR}
+   fi
+   if [ ! -d ${CONFIG_DIR} ]; then
+       mkdir ${CONFIG_DIR}
+   fi
+   if [ ! -d ${LOGS_DIR} ]; then
+      mkdir ${LOGS_DIR}
+   fi
+   rm -rf ${USERIMAGE_ROOTFS}
+   mkdir -p ${USERIMAGE_ROOTFS}
+   mv ${DATA_DIR}/* ${USERIMAGE_ROOTFS}
+}
+
 create_symlink_systemd_ubi_mount_rootfs() {
     # Symlink ubi mount files to systemd targets
     for entry in ${MACHINE_MNT_POINTS}; do
         mountname="${entry:1}"
         if [[ "$mountname" == "firmware" || "$mountname" == "bt_firmware" || "$mountname" == "dsp" ]] ; then
-            cp ${IMAGE_ROOTFS}/lib/systemd/system/${mountname}-mount-ubi.service ${IMAGE_ROOTFS}/lib/systemd/system/${mountname}-mount.service
+            cp -f ${IMAGE_ROOTFS}/lib/systemd/system/${mountname}-mount-ubi.service ${IMAGE_ROOTFS}/lib/systemd/system/${mountname}-mount.service
+            rm ${IMAGE_ROOTFS}/lib/systemd/system/${mountname}-mount-ubi.service
             ln -sf ${systemd_unitdir}/system/${mountname}-mount.service ${IMAGE_ROOTFS}/lib/systemd/system/local-fs.target.requires/${mountname}-mount.service
         else
-            cp ${IMAGE_ROOTFS}/lib/systemd/system/${mountname}-ubi.mount  ${IMAGE_ROOTFS}/lib/systemd/system/${mountname}.mount
+            mv ${IMAGE_ROOTFS}/lib/systemd/system/${mountname}-ubi.mount  ${IMAGE_ROOTFS}/lib/systemd/system/${mountname}.mount
             if [[ "$mountname" == "$userfsdatadir" ]] ; then
                 ln -sf ${systemd_unitdir}/system/${mountname}.mount ${IMAGE_ROOTFS}/lib/systemd/system/local-fs.target.wants/${mountname}.mount
             elif [[ "$mountname" == "cache" ]] ; then
@@ -78,7 +107,7 @@ image="${USERIMAGE_UBIFS_TARGET}"
 vol_id=1
 vol_type=dynamic
 vol_name=usrfs
-vol_size="${CACHE_VOLUME_SIZE}"
+vol_flags=autoresize
 [cache_volume]
 mode=ubi
 vol_id=2
@@ -105,7 +134,7 @@ EOF
 
 }
 
-do_makesystem_ubi[cleandirs] += "${USERIMAGE_ROOTFS}"
+do_makesystem_ubi[prefuncs] += "create_symlink_userfs"
 do_makesystem_ubi[prefuncs] += "create_symlink_systemd_ubi_mount_rootfs"
 do_makesystem_ubi[prefuncs] += "do_create_ubinize_config"
 do_makesystem_ubi[postfuncs] += "${@bb.utils.contains('INHERIT', 'uninative', 'do_patch_ubitools', '', d)}"
