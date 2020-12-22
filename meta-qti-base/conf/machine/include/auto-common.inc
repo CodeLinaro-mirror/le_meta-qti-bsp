@@ -10,7 +10,7 @@ PREFERRED_PROVIDER_virtual/kernel = "linux-msm"
 PREFERRED_VERSION_linux-msm = "4.14"
 
 # Prefer Wayland/Weston version
-PREFERRED_VERSION_weston = "5.0.0"
+PREFERRED_VERSION_weston = "8.0.0"
 PREFERRED_VERSION_wayland = "1.18.0"
 PREFERRED_VERSION_wayland-native = "1.18.0"
 PREFERRED_VERSION_wayland-protocols = "1.20"
