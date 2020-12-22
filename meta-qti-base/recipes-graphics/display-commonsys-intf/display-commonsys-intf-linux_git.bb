@@ -1,9 +1,12 @@
 SUMMARY = "display commonsys intf Library"
+DESCRIPTION = "Provide common display header files and libraries for \
+other modules to use."
+HOMEPAGE = "https://www.codeaurora.org/"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
 
-DEPENDS += "liblog libutils libcutils libhardware-headers"
+DEPENDS += "libcutils libhardware-headers liblog libutils"
 
 PR = "r3"
 
@@ -14,7 +17,7 @@ S = "${WORKDIR}/vendor/qcom/opensource/commonsys-intf/display"
 
 inherit autotools pkgconfig
 
-EXTRA_OECONF += " --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
+EXTRA_OECONF += "--with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
 
 LDFLAGS += "-llog -lutils -lcutils"
 
@@ -32,10 +35,5 @@ do_install_append() {
     install -m 644 ${S}/include/*.h ${D}${includedir}
 }
 
-PACKAGE_ARCH ?= "${MACHINE_ARCH}"
-
 SOLIBS = ".so"
 FILES_SOLIBSDEV = ""
-
-INHIBIT_PACKAGE_STRIP = "1"
-INHIBIT_PACKAGE_DEBUG_SPLIT = "1"

@@ -1,12 +1,14 @@
-DESCRIPTION = "QTI Audio Drivers"
+SUMMARY = "Audio Drivers Kernel Modules"
+DESCRIPTION = "This is the audio driver based on ASoC architecture, used to communicate with DSP."
+HOMEPAGE = "https://www.codeaurora.org"
 LICENSE = "GPL-2.0"
-LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=801f80980d171dd6425610833a22dbe6"
-DEPENDS = "virtual/kernel"
+LIC_FILES_CHKSUM = "file://NOTICE;md5=53c09804050a00b1d27bd609c4e1fc5a"
+DEPENDS += "virtual/kernel"
 SRCREV = "${AUTOREV}"
 PR = "r0"
 
 SRC_URI  = "${PATH_TO_REPO}/vendor/qcom/opensource/audio-kernel/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/audio-kernel;usehead=1"
-SRC_URI += "file://audio_load.conf"
+SRC_URI_append = " file://audio_load.conf"
 
 S = "${WORKDIR}/vendor/qcom/opensource/audio-kernel"
 

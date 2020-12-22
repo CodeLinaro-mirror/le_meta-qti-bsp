@@ -33,7 +33,7 @@ EXTRA_OECONF_append = " --enable-vdec='yes'"
 EXTRA_OECONF_append = " --enable-is-ubwc-supported='yes'"
 EXTRA_OECONF_append = " --enable-build-swcodec='yes'"
 EXTRA_OECONF_append = " --enable-target-output-deinterlaced='yes'"
-EXTRA_OECONF_append = "${@bb.utils.contains('DISTRO_FEATURES', 'q-hypervisor', ' --enable-target-hypervisor=yes', '', d)}"
+EXTRA_OECONF_append = "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', ' --enable-target-hypervisor=yes', '', d)}"
 
 do_configure[depends] += "virtual/kernel:do_shared_workdir"
 do_install_append() {

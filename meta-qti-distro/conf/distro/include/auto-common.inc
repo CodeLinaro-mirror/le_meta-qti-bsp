@@ -41,6 +41,9 @@ VIRTUAL-RUNTIME_init_manager = "systemd"
 DISTRO_FEATURES_append = " ipa3"
 DISTRO_FEATURES_append = " vulkan"
 
+# WLAN
+DISTRO_FEATURES_append = " wifi"
+
 # Support kdump
 #DISTRO_FEATURES_append = " kdump-support"
 
