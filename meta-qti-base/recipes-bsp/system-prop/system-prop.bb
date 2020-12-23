@@ -4,9 +4,11 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 PR = "r0"
 
-SRC_URI = "file://persist-prop.sh"
-SRC_URI_append = " file://persist-prop.service"
-SRC_URI_append_qtiquingvm = " file://system.prop"
+SRC_URI = "\
+    file://persist-prop.sh \
+    file://persist-prop.service \
+    file://system.prop \
+"
 
 SYSTEMD_PACKAGES = "${@bb.utils.contains('DISTRO_FEATURES','systemd','${PN}','',d)}"
 SYSTEMD_SERVICE_${PN} = "${@bb.utils.contains('DISTRO_FEATURES','systemd','persist-prop.service','',d)}"
@@ -15,11 +17,7 @@ inherit autotools systemd useradd
 
 do_compile() {
     # Remove empty lines and lines starting with '#'
-    if [ -e ${WORKDIR}/system.prop ]; then
-        sed -e 's/#.*$//' -e '/^$/d' ${WORKDIR}/system.prop >> ${S}/build.prop
-    else
-        touch ${S}/build.prop
-    fi
+    sed -e 's/#.*$//' -e '/^$/d' ${WORKDIR}/system.prop >> ${S}/build.prop
 }
 do_install() {
     install -d ${D}
