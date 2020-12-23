@@ -29,3 +29,5 @@ CFLAGS += "-I${STAGING_INCDIR} \
 CFLAGS += "-I${STAGING_KERNEL_BUILDDIR}/usr/include"
 CFLAGS += "-I${STAGING_INCDIR}/ion_headers"
 CFLAGS += "-I${STAGING_INCDIR}/mm-core/"
+
+do_configure[depends] += "virtual/kernel:do_shared_workdir"
