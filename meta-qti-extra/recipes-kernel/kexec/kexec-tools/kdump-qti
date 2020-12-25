@@ -43,6 +43,8 @@ do_start_service()
 
 	echo 1 > /sys/kernel/debug/clk/disp_cc_mdss_rscc_vsync_clk/clk_enable_count
 	echo 1 > /sys/kernel/debug/clk/disp_cc_mdss_rscc_ahb_clk/clk_enable_count
+	echo mini > /sys/kernel/dload/dload_mode
+	echo 1 > /sys/kernel/dload/emmc_dload
 
 	${KEXEC} ${KEXEC_ARGS} "${KDUMP_KIMAGE}" --command-line="${KDUMP_CMDLINE}"
 	if [ $? == 0 ]; then

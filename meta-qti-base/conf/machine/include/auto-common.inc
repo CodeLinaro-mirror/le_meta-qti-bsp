@@ -13,7 +13,7 @@ PREFERRED_VERSION_linux-msm = "5.4"
 PREFERRED_VERSION_tcpdump              ?= "4.9.%"
 
 # Prefer Wayland/Weston version
-PREFERRED_VERSION_weston = "5.0.0"
+PREFERRED_VERSION_weston = "8.0.0"
 PREFERRED_VERSION_wayland = "1.18.0"
 PREFERRED_VERSION_wayland-native = "1.18.0"
 PREFERRED_VERSION_wayland-protocols = "1.20"
@@ -27,6 +27,9 @@ PREFERRED_VERSION_gstreamer1.0-plugins-good ?= "1.16.%"
 PREFERRED_VERSION_gstreamer1.0-plugins-ugly ?= "1.16.%"
 PREFERRED_VERSION_gstreamer1.0-libav        ?= "1.16.%"
 PREFERRED_VERSION_gstreamer1.0-omx          ?= "1.16.%"
+
+# Prefer gbm
+PREFERRED_PROVIDER_virtual/libgbm = "gbm"
 
 # Prefer adreno
 PREFERRED_PROVIDER_virtual/wayland-egl  = "adreno"

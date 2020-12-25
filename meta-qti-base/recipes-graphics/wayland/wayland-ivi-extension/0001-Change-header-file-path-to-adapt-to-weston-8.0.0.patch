@@ -1,0 +1,26 @@
+From 25ac4db6a59c3aef7958269c35d265b82b9d5b7c Mon Sep 17 00:00:00 2001
+From: Xiaoyu Huang <xiahua@codeaurora.org>
+Date: Wed, 28 Oct 2020 16:32:24 +0800
+Subject: [PATCH] Change header file path to adapt to weston-8.0.0
+
+Signed-off-by: Xiaoyu Huang <xiahua@codeaurora.org>
+---
+ ivi-input-modules/ivi-input-controller/src/ivi-input-controller.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ivi-input-modules/ivi-input-controller/src/ivi-input-controller.c b/ivi-input-modules/ivi-input-controller/src/ivi-input-controller.c
+index a0bfc48..257a1dc 100644
+--- a/ivi-input-modules/ivi-input-controller/src/ivi-input-controller.c
++++ b/ivi-input-modules/ivi-input-controller/src/ivi-input-controller.c
+@@ -31,7 +31,7 @@
+ #include <fcntl.h>
+ #include <unistd.h>
+ 
+-#include "plugin-registry.h"
++#include <libweston/plugin-registry.h>
+ #include "ilm_types.h"
+ 
+ #include "ivi-input-server-protocol.h"
+-- 
+2.7.4
+

@@ -28,6 +28,7 @@
 [Unit]
 Description=Resize Data Partition
 DefaultDependencies=no
+ConditionVirtualization=!container
 Requires=dev-disk-by\x2dpartlabel-userdata.device
 After=dev-disk-by\x2dpartlabel-userdata.device
 Before=systemd-fsck@dev-disk-by\x2dpartlabel-userdata.service

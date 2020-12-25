@@ -1,0 +1,26 @@
+From c3ff32cfad753b1b6bc298bb09b8f3ed3232f930 Mon Sep 17 00:00:00 2001
+From: kmeng <kmeng@codeaurora.org>
+Date: Sun, 13 Dec 2020 17:06:41 +0800
+Subject: [PATCH] arm64: Fix vaddr to paddr translation
+
+Signed-off-by: kmeng <kmeng@codeaurora.org>
+---
+ arch/arm64.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm64.c b/arch/arm64.c
+index 33fe8d5..cae0772 100644
+--- a/arch/arm64.c
++++ b/arch/arm64.c
+@@ -109,7 +109,7 @@ static unsigned long kimage_voffset;
+ static unsigned long long
+ __pa(unsigned long vaddr)
+ {
+-	if (kimage_voffset == NOT_FOUND_NUMBER ||
++	if (kimage_voffset == NOT_FOUND_NUMBER &&
+ 			(vaddr >= PAGE_OFFSET))
+ 		return (vaddr - PAGE_OFFSET + info->phys_base);
+ 	else
+-- 
+2.7.4
+

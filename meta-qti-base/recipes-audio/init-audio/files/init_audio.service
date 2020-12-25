@@ -28,6 +28,7 @@
 
 [Unit]
 Description=Audio Init Service
+ConditionVirtualization=!container
 After=firmware.mount
 Requires=firmware.mount
 StartLimitBurst=10
