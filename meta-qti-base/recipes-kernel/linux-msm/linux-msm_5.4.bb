@@ -1,3 +1,5 @@
+require recipes-kernel/linux-msm/linux-msm.inc
+
 inherit kernel kernel-yocto
 
 DESCRIPTION = "CAF Linux Kernel"
