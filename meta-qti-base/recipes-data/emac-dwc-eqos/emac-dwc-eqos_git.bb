@@ -31,17 +31,15 @@ do_install() {
     install -d ${D}${sysconfdir}/init.d
     install -m 0755 ${WORKDIR}/emac_dwc_eqos_start_stop_le ${D}${sysconfdir}/init.d
     install -m 0755 ${WORKDIR}/setup_avtp_routing_le ${D}${sysconfdir}/init.d
-}
 
-do_install_append_msm() {
-if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
-   install -d ${D}${systemd_unitdir}/system/
-   install -m 0644 ${WORKDIR}/emac_dwc_eqos.service -D ${D}${systemd_unitdir}/system/emac_dwc_eqos.service
-   install -d ${D}${systemd_unitdir}/system/multi-user.target.wants/
-   # enable the service for multi-user.target
-   ln -sf ${systemd_unitdir}/system/emac_dwc_eqos.service \
-   ${D}${systemd_unitdir}/system/multi-user.target.wants/emac_dwc_eqos.service
-fi
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
+        install -d ${D}${systemd_unitdir}/system/
+        install -m 0644 ${WORKDIR}/emac_dwc_eqos.service -D ${D}${systemd_unitdir}/system/emac_dwc_eqos.service
+        install -d ${D}${systemd_unitdir}/system/multi-user.target.wants/
+        # enable the service for multi-user.target
+        ln -sf ${systemd_unitdir}/system/emac_dwc_eqos.service \
+        ${D}${systemd_unitdir}/system/multi-user.target.wants/emac_dwc_eqos.service
+    fi
 }
 
 pkg_postinst_${PN} () {

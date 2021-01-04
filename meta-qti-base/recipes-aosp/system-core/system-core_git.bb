@@ -28,9 +28,7 @@ EXTRA_OECONF = " --with-host-os=${HOST_OS} --with-glib"
 EXTRA_OECONF_append = " --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
 EXTRA_OECONF_append = " --disable-debuggerd"
 EXTRA_OECONF_append = " --disable-libsync"
-
-# Disable adb root privileges in USER builds for msm targets
-EXTRA_OECONF_append_msm = "${@bb.utils.contains('VARIANT','user',' --disable-adb-root','',d)}"
+EXTRA_OECONF_append = " ${@bb.utils.contains('VARIANT','user',' --disable-adb-root','',d)}"
 
 do_configure[depends] += "virtual/kernel:do_shared_workdir"
 
