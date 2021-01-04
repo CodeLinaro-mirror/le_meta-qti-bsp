@@ -5,12 +5,12 @@ DEPENDS += "media"
 RDEPENDS_${PN} = "media"
 GSTREAMER_1_0_OMX_TARGET = "generic"
 GSTREAMER_1_0_OMX_CORE_NAME = "${libdir}/libOmxCore.so"
-SRC_URI =  "${PATH_TO_REPO}/gstreamer/gst-omx/.git;protocol=${PROTO};destsuffix=gstreamer/gst-omx;usehead=1"
-SRC_URI_append = " ${CAF_GIT}/gstreamer/common;destsuffix=gstreamer/gst-omx/common;branch=gstreamer/common/master;name=common"
+SRC_URI =  "${PATH_TO_REPO}/gstreamer/qti-gst-omx/.git;protocol=${PROTO};destsuffix=gstreamer/qti-gst-omx;usehead=1"
+SRC_URI_append = " ${CAF_GIT}/gstreamer/common;destsuffix=gstreamer/qti-gst-omx/common;branch=gstreamer/common/master;name=common"
 SRCREV = "${AUTOREV}"
 SRCREV_common = "59cb678164719ff59dcf6c8b93df4617a1075d11"
 SRCREV_FORMAT = "omx_common"
-S = "${WORKDIR}/gstreamer/gst-omx"
+S = "${WORKDIR}/gstreamer/qti-gst-omx"
 EXTRA_OEMESON = " \
                -Dtarget=qti \
                -Dheader_path=${STAGING_INCDIR}/mm-core \
