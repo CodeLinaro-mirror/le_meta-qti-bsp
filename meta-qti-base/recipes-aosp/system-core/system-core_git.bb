@@ -10,7 +10,6 @@ SRCREV = "${AUTOREV}"
 PR = "r19"
 
 SRC_URI = "${PATH_TO_REPO}/system/core/.git;protocol=${PROTO};destsuffix=system/core;usehead=1"
-SRC_URI_append = " file://0001-Fix-adb-shell-env-issue.patch"
 
 S = "${WORKDIR}/system/core/"
 
