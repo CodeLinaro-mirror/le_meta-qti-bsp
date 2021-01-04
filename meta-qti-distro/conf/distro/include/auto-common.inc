@@ -28,7 +28,7 @@ DISTRO_FEATURES_append = " early-eth"
 #DISTRO_FEATURES_append = " early_init"
 #DISTRO_FEATURES_append = " early_userspace"
 
-DISTRO_FEATURES_append = " ab-boot-support"
+#DISTRO_FEATURES_append = " ab-boot-support"
 
 DISTRO_FEATURES_append = " hibernation"
 
