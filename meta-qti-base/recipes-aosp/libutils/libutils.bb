@@ -1,4 +1,5 @@
-DESCRIPTION = "Build LE libutils"
+SUMMARY = "Android Utility Function Library"
+DESCRIPTION = "This library provides miscellaneous utility functions."
 HOMEPAGE = "http://developer.android.com/"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\

@@ -1,10 +1,13 @@
-DESCRIPTION = "Build LE libbase"
+SUMMARY = "Android base library"
+DESCRIPTION = "This library provides APIs for basic tasks like \
+handling files, Unicode strings, logging, memory allocation, \
+integer parsing, etc."
 HOMEPAGE = "http://developer.android.com/"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 
-DEPENDS = "libcutils libselinux"
+DEPENDS += "libcutils libselinux"
 
 PR = "r1"
 

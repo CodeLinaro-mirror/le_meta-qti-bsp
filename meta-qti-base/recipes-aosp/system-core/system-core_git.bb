@@ -1,17 +1,19 @@
-DESCRIPTION = "Android system/core components"
+SUMMARY = "Android core components"
+DESCRIPTION = "The system/core directory is intended for pieces of the world that are the core of the embedded linux platform at the heart of Android. These essential bits are required for basic booting, operation, and debugging."
 HOMEPAGE = "http://developer.android.com/"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 
-DEPENDS += "openssl glib-2.0 libselinux ext4-utils libcutils libmincrypt libbase libutils"
+DEPENDS += "ext4-utils glib-2.0 libbase libcutils libmincrypt libselinux libutils openssl"
+
 
 SRCREV = "${AUTOREV}"
 PR = "r19"
 
 SRC_URI = "${PATH_TO_REPO}/system/core/.git;protocol=${PROTO};destsuffix=system/core;usehead=1"
 
-S = "${WORKDIR}/system/core/"
+S = "${WORKDIR}/system/core"
 
 inherit autotools pkgconfig systemd useradd
 
@@ -84,30 +86,26 @@ do_install_append() {
     rm -rf ${D}${includedir}
 }
 
-PACKAGES =+ "${PN}-adbd-dbg ${PN}-adbd ${PN}-adbd-dev"
-PACKAGES =+ "${PN}-usb-dbg ${PN}-usb"
-PACKAGES =+ "${PN}-post-boot"
-PACKAGES =+ "${PN}-early-boot"
-PACKAGES =+ "${PN}-leprop-dbg ${PN}-leprop"
+PACKAGES =+ "${PN}-adbd ${PN}-usb ${PN}-post-boot ${PN}-early-boot ${PN}-leprop"
 
-FILES_${PN}-adbd-dbg = "${base_sbindir}/.debug/adbd ${libdir}/.debug/libadbd.*"
-FILES_${PN}-adbd = "${base_sbindir}/adbd ${sysconfdir}/init.d/adbd ${libdir}/libadbd.so.*"
+FILES_${PN}-adbd += "${base_sbindir}/adbd ${sysconfdir}/init.d/adbd ${libdir}/libadbd.so.*"
 FILES_${PN}-adbd += "${systemd_unitdir}/system/adbd.service ${systemd_unitdir}/system/multi-user.target.wants/adbd.service ${systemd_unitdir}/system/local-fs.target.wants/adbd.service ${systemd_unitdir}/system/ffbm.target.wants/adbd.service ${sysconfdir}/launch_adbd ${sysconfdir}/initscripts/adbd ${sysconfdir}/adb_devid"
-FILES_${PN}-adbd-dev = "${libdir}/libadbd.so ${libdir}/libadbd.la"
+FILES_${PN}-dev += "${libdir}/libadbd.so ${libdir}/libadbd.la"
+FILES_${PN}-dbg += "${base_sbindir}/.debug/adbd ${libdir}/.debug/libadbd.*"
 
-FILES_${PN}-usb-dbg = "${bindir}/.debug/usb_composition_switch"
-FILES_${PN}-usb = "${sysconfdir}/init.d/usb ${base_sbindir}/usb_composition ${bindir}/usb_composition_switch ${base_sbindir}/usb/compositions/*"
+FILES_${PN}-usb += "${sysconfdir}/init.d/usb ${base_sbindir}/usb_composition ${bindir}/usb_composition_switch ${base_sbindir}/usb/compositions/*"
 FILES_${PN}-usb += "${sysconfdir}/usb/*"
 FILES_${PN}-usb += "${base_sbindir}/usb/* ${base_sbindir}/usb_debug ${base_sbindir}/usb/debuger/*"
 FILES_${PN}-usb += "${systemd_unitdir}/system/usb.service ${systemd_unitdir}/system/multi-user.target.wants/usb.service ${systemd_unitdir}/system/local-fs.target.wants/usb.service ${systemd_unitdir}/system/ffbm.target.wants/usb.service ${sysconfdir}/initscripts/usb"
+FILES_${PN}-dbg += "${bindir}/.debug/usb_composition_switch"
 
-FILES_${PN}-post-boot = "${sysconfdir}/init.d/init_post_boot"
+FILES_${PN}-post-boot += "${sysconfdir}/init.d/init_post_boot"
 FILES_${PN}-post-boot += "${systemd_unitdir}/system/init_post_boot.service ${systemd_unitdir}/system/multi-user.target.wants/init_post_boot.service ${systemd_unitdir}/system/ffbm.target.wants/init_post_boot.service ${sysconfdir}/initscripts/init_post_boot"
 
-FILES_${PN}-early-boot = "${sysconfdir}/init.d/init_early_boot"
+FILES_${PN}-early-boot += "${sysconfdir}/init.d/init_early_boot"
 FILES_${PN}-early-boot += "${systemd_unitdir}/system/init_early_boot.service ${systemd_unitdir}/system/sysinit.target.wants/init_early_boot.service ${sysconfdir}/initscripts/init_early_boot"
 
-FILES_${PN}-leprop-dbg = "${base_sbindir}/.debug/leprop-service ${bindir}/.debug/getprop ${bindir}/.debug/setprop"
-FILES_${PN}-leprop = "${base_sbindir}/leprop-service ${bindir}/getprop ${bindir}/setprop ${sysconfdir}/proptrigger.sh ${sysconfdir}/proptrigger.conf"
+FILES_${PN}-leprop += "${base_sbindir}/leprop-service ${bindir}/getprop ${bindir}/setprop ${sysconfdir}/proptrigger.sh ${sysconfdir}/proptrigger.conf"
 FILES_${PN}-leprop += "${systemd_unitdir}/system/leprop.service ${systemd_unitdir}/system/multi-user.target.wants/leprop.service ${systemd_unitdir}/system/ffbm.target.wants/leprop.service ${sysconfdir}/build.prop"
+FILES_${PN}-dbg += "${base_sbindir}/.debug/leprop-service ${bindir}/.debug/getprop ${bindir}/.debug/setprop"
 
