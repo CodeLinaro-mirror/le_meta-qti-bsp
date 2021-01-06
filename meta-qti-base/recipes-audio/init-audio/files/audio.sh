@@ -1,4 +1,4 @@
-# Copyright (c) 2020 The Linux Foundation. All rights reserved.
+# Copyright (c) 2020-2021 The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -26,7 +26,6 @@
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 # demo app for early audio to measure boot kpi
-sleep 0.2s
 /bin/mount -o ro /dev/sde4 /firmware
 /bin/mount -o ro /dev/mmcblk0p28 /firmware
 /bin/echo 0 > /sys/module/subsystem_restart/parameters/enable_debug;
