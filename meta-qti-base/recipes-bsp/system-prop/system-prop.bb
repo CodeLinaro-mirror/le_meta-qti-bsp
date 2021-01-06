@@ -1,8 +1,10 @@
-DESCRIPTION = "Script to populate system properties"
+SUMMARY = "Script and service to populate system properties"
+DESCRIPTION = "Android system properties are a global dictionary of string \
+key/value pairs, used to share system-wide configuration information. The \
+build.prop file contains pesisit system properties."
 LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
-PR = "r0"
 
 SRC_URI = "\
     file://persist-prop.sh \
@@ -10,40 +12,22 @@ SRC_URI = "\
     file://system.prop \
 "
 
-SYSTEMD_PACKAGES = "${@bb.utils.contains('DISTRO_FEATURES','systemd','${PN}','',d)}"
-SYSTEMD_SERVICE_${PN} = "${@bb.utils.contains('DISTRO_FEATURES','systemd','persist-prop.service','',d)}"
+SYSTEMD_SERVICE_${PN} = "persist-prop.service"
 
-inherit autotools systemd useradd
+inherit systemd useradd
 
-do_compile() {
-    # Remove empty lines and lines starting with '#'
-    sed -e 's/#.*$//' -e '/^$/d' ${WORKDIR}/system.prop >> ${S}/build.prop
-}
+do_configure[noexec] = "1"
+do_compile[noexec] = "1"
+
 do_install() {
-    install -d ${D}
-    install -m 0644 ${S}/build.prop ${D}/build.prop
-    if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
-       install -m 0755 ${WORKDIR}/persist-prop.sh -D ${D}${base_sbindir}/persist-prop.sh
-       install -d ${D}${systemd_unitdir}/system
-       install -d ${D}${systemd_unitdir}/system/multi-user.target.wants/
-       install -m 644 ${WORKDIR}/persist-prop.service ${D}/${systemd_unitdir}/system
-       ln -sf ${systemd_unitdir}/system/persist-prop.service ${D}${systemd_unitdir}/system/multi-user.target.wants/persist-prop.service
-    else
-       install -m 0755 ${WORKDIR}/persist-prop.sh -D ${D}${sysconfdir}/init.d/persist-prop
-    fi
-}
+    install -m 0644 ${WORKDIR}/system.prop -D ${D}/build.prop
+    # Remove empty lines and lines starting with '#'
+    sed -i -e 's/#.*$//' -e '/^$/d' ${D}/build.prop
 
-PACKAGES = "${PN}"
+    install -m 0755 ${WORKDIR}/persist-prop.sh -D ${D}${base_sbindir}/persist-prop.sh
+    install -m 0644 ${WORKDIR}/persist-prop.service -D ${D}/${systemd_unitdir}/system/persist-prop.service
+}
 
 FILES_${PN} += "/build.prop"
-FILES_${PN} += "${systemd_unitdir}/"
 
-pkg_postinst_${PN} () {
-    if ${@bb.utils.contains('DISTRO_FEATURES','systemd','false','true',d)}; then
-        update-alternatives --install ${sysconfdir}/init.d/persist-prop.sh persist-prop.sh  persist-prop 50
-        [ -n "$D" ] && OPT="-r $D" || OPT="-s"
-        # remove all rc.d-links potentially created from alternatives
-        update-rc.d $OPT -f persist-prop.sh remove
-        update-rc.d $OPT persist-prop.sh multiuser
-    fi
-}
+PACKAGE_ARCH = "${MACHINE_ARCH}"
