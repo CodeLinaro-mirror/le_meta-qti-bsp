@@ -2,7 +2,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 SRC_URI += " file://kdump-qti "
 
 do_install_append() {
-    echo "KDUMP_CMDLINE=\"minidump=1 maxcpus=1 initcall_debug earlycon=msm_geni_serial,0xa90000 clk_ignore_unused rcupdate.rcu_expedited=1 rcu_nocbs=0-7 root=/dev/ram rw rootwait console=ttyMSM0,115200,n8 lpm_levels.sleep_disabled=1 nokaslr 1 reset_devices minidump=1 androidboot.slot_suffix=_a\"" >> ${D}${sysconfdir}/sysconfig/kdump.conf
+    echo "KDUMP_CMDLINE=\"minidump=1 maxcpus=1 initcall_debug earlycon=msm_geni_serial,0xa90000 clk_ignore_unused rcupdate.rcu_expedited=1 rcu_nocbs=0-7 root=/dev/ram rw rootwait console=ttyMSM0,115200,n8 lpm_levels.sleep_disabled=1 nokaslr 1 reset_devices androidboot.slot_suffix=_a\"" >> ${D}${sysconfdir}/sysconfig/kdump.conf
     echo "KDUMP_VMCORE_PATH=\"/data/crash/\`date +"%Y-%m-%d"\`\"" >> ${D}${sysconfdir}/sysconfig/kdump.conf
     sed -i "s/^MAKEDUMPFILE_ARGS.*$/MAKEDUMPFILE_ARGS=\"-d 31 -c\"/g" ${D}${sysconfdir}/sysconfig/kdump.conf
     sed -i "s/^\#KDUMP_KVER/KDUMP_KVER/g" ${D}${sysconfdir}/sysconfig/kdump.conf
