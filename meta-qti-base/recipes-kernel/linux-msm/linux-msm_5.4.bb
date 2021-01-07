@@ -187,16 +187,16 @@ do_shared_workdir_append () {
 do_deploy_append() {
     if ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'true', 'false', d)}; then
         if ${@bb.utils.contains('COMBINED_FEATURES', 'qti-lxc', 'true', 'false', d)}; then
-            ${STAGING_BINDIR_NATIVE}/mkdtimg create ${DEPLOYDIR}/${PRODUCT}-dtbo.img ${B}/arch/${ARCH}/boot/dts/qcom/*lxc-overlay.dtbo
+            ${STAGING_BINDIR_NATIVE}/mkdtimg create ${DEPLOYDIR}/${PRODUCT}-dtbo.img ${B}/arch/${ARCH}/boot/dts/vendor/qcom/*lxc-overlay.dtbo
         else
-            rm ${B}/arch/${ARCH}/boot/dts/qcom/*lxc-overlay.dtbo
-            ${STAGING_BINDIR_NATIVE}/mkdtimg create ${DEPLOYDIR}/${PRODUCT}-dtbo.img ${B}/arch/${ARCH}/boot/dts/qcom/*.dtbo
+            rm ${B}/arch/${ARCH}/boot/dts/vendor/qcom/*lxc-overlay.dtbo
+            ${STAGING_BINDIR_NATIVE}/mkdtimg create ${DEPLOYDIR}/${PRODUCT}-dtbo.img ${B}/arch/${ARCH}/boot/dts/vendor/qcom/*.dtbo
         fi
     fi
 
     if ${@bb.utils.contains('DISTRO_FEATURES', 'q-hypervisor', 'true', 'false', d)}; then
         cp -f ${B}/arch/${ARCH}/boot/Image ${DEPLOYDIR}/linux-lv.img
-        cp -f ${B}/arch/${ARCH}/boot/dts/qcom/*.dtb ${DEPLOYDIR}/
+        cp -f ${B}/arch/${ARCH}/boot/dts/vendor/qcom/*.dtb ${DEPLOYDIR}/
     fi
 }
 
@@ -208,7 +208,7 @@ do_deploy () {
         extra_mkbootimg_params='--tags-addr ${KERNEL_TAGS_OFFSET}'
     fi
 
-    cat ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} ${B}/arch/${ARCH}/boot/dts/qcom/*.dtb > ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-dtb-${KERNEL_VERSION}
+    cat ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} ${B}/arch/${ARCH}/boot/dts/vendor/qcom/*.dtb > ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-dtb-${KERNEL_VERSION}
 
     # Make bootimage
     ${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-dtb-${KERNEL_VERSION} \
