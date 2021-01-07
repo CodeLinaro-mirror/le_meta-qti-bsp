@@ -31,13 +31,13 @@ do_start_service()
 
 	case "$target" in
 		"sa8155" | "sa8155p" )
-		KEXEC_ARGS="--initrd=/boot/kdump-ramdisk.cpio.gz --dtb=/boot/sa8155p-v2-adp-air-capture.dtb -p"
+		KEXEC_ARGS="--initrd=/boot/kdump-ramdisk.cpio.gz -p -s"
 		;;
 	esac
 
 	case "$target" in
 		"sa8195" | "sa8195p" )
-		KEXEC_ARGS="--initrd=/boot/kdump-ramdisk.cpio.gz --dtb=/boot/sa8195p-v2-adp-air-capture.dtb -p"
+		KEXEC_ARGS="--initrd=/boot/kdump-ramdisk.cpio.gz -p -s"
 		;;
 	esac
 
