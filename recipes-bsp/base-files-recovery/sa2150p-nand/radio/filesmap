@@ -29,7 +29,7 @@
 
 NON-HLOS.ubi            modem
 dspso.ubi               dsp
-sbl1.mbn                sbl
+xbl_nand.elf            sbl
 tz.mbn                  tz
 rpm.mbn                 rpm
 appsboot.mbn            aboot
