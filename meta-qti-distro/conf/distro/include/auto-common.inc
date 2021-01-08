@@ -49,6 +49,8 @@ DISTRO_FEATURES_append = " wifi"
 
 INCOMPATIBLE_LICENSE = "GPL-3.0 LGPL-3.0 AGPL-3.0"
 
+IMAGE_FEATURES_append = " read-only-rootfs"
+
 LICENSE_FLAGS_WHITELIST += "commercial_gstreamer1.0-libav commercial_gstreamer1.0-omx"
 LICENSE_FLAGS_WHITELIST += "commercial_gstreamer1.0-plugins-ugly commercial_opencore-amr"
 LICENSE_FLAGS_WHITELIST += "commercial_ffmpeg"
