@@ -30,7 +30,7 @@ EXTRA_OECONF_append = "\
 EXTRA_OECONF_append = " --enable-sys-uid"
 
 DEPENDS += "display-hal-linux display-noship-linux wayland-native gbm-headers libcap-native display-ship-linux display-hal-headers"
-DEPENDS += "libion"
+DEPENDS += "libion libsync"
 DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'q-hypervisor', 'libuhab', '', d)}"
 
 TARGET_CFLAGS += "-idirafter ${STAGING_KERNEL_BUILDDIR}/include/"
@@ -88,19 +88,6 @@ do_install_append() {
     install ${S}/protocol/*.xml ${D}${datadir}/weston
 }
 
-
-pkg_postinst_${PN} () {
-    setcap all=eip $D/usr/bin/weston
-    setcap all=eip $D/usr/libexec/weston-desktop-shell
-    if ${@bb.utils.contains('BASEMACHINE', '8x96autofusion', 'true', 'false', d)}; then
-        if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
-            if [ -n "$D" ]; then
-                OPTS="--root=$D"
-            fi
-            systemctl $OPTS mask weston.service
-        fi
-    fi
-}
 
 FILES_${PN} += "${systemd_unitdir}/system/ ${sysconfdir}/"
 FILES_SOLIBSDEV = ""
