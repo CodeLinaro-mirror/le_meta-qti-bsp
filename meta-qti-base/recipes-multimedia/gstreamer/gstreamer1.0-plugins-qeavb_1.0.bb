@@ -34,6 +34,8 @@ do_configure[depends] += "virtual/kernel:do_shared_workdir"
 
 install_config_file() {
   mkdir -p ${D}${sysconfdir}/xdg/
+  install ${S}/qeavb/listenerPCM.ini ${D}${sysconfdir}/xdg/listenerPCM.ini
+  install ${S}/qeavb/listenerMPEG2TS.ini ${D}${sysconfdir}/xdg/listenerMPEG2TS.ini
 }
 do_install[postfuncs] += " install_config_file "
 FILES_${PN} += "${libdir}/gstreamer-${LIBV}/*.so"
