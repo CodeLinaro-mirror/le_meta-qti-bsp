@@ -1,0 +1,101 @@
+From 098bea34580aebcba611752c6f0c60b4c18091fe Mon Sep 17 00:00:00 2001
+From: Akshay Adiga <aadiga@codeaurora.org>
+Date: Mon, 21 Dec 2020 11:27:35 +0530
+Subject: [PATCH 2/2] makedumpfile/arm64 : hardcode vabits value, and add
+ secure page support
+
+Current glibc version for the build does not have necessary definitions
+to build automatic detection of vabits value. Hence hardcode it to 39.
+
+Add support to track and skip secure hypassigned pages. now makedumpfile
+can work with XPU enabled.
+---
+ arch/arm64.c   | 4 +++-
+ makedumpfile.c | 8 +++++++-
+ makedumpfile.h | 1 +
+ 3 files changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64.c b/arch/arm64.c
+index 7fd7039..0892d97 100644
+--- a/arch/arm64.c
++++ b/arch/arm64.c
+@@ -418,6 +418,7 @@ get_va_bits_from_stext_arm64(void)
+ 	return TRUE;
+ }
+ 
++#if 0 
+ /* Note that its important to note that the
+  * ID_AA64MMFR2_EL1 architecture register can be read
+  * only when we give an .arch hint to the gcc/binutils,
+@@ -467,6 +468,7 @@ get_vabits_actual_from_id_aa64mmfr2_el1(void)
+ 
+ 	return l_vabits_actual;
+ }
++#endif
+ 
+ static void
+ get_page_offset_arm64(void)
+@@ -476,7 +478,7 @@ get_page_offset_arm64(void)
+ 	 * register.
+ 	 */
+ 	if (!vabits_actual) {
+-		vabits_actual = get_vabits_actual_from_id_aa64mmfr2_el1();
++		vabits_actual = 39;
+ 		if ((vabits_actual == ERROR) || (vabits_actual != 52)) {
+ 			/* If we cannot read ID_AA64MMFR2_EL1 arch
+ 			 * register or if this register does not indicate
+diff --git a/makedumpfile.c b/makedumpfile.c
+index a955912..bba11ff 100644
+--- a/makedumpfile.c
++++ b/makedumpfile.c
+@@ -98,6 +98,7 @@ mdf_pfn_t pfn_free;
+ mdf_pfn_t pfn_hwpoison;
+ mdf_pfn_t pfn_offline;
+ mdf_pfn_t pfn_elf_excluded;
++mdf_pfn_t pfn_secure;
+ 
+ mdf_pfn_t num_dumped;
+ 
+@@ -6064,6 +6065,10 @@ __exclude_unnecessary_pages(unsigned long mem_map,
+ 		nr_pages = 1 << compound_order;
+ 		pfn_counter = NULL;
+ 
++			printf("p : %llx\n",pfn);
++		if  ( private == 0xEEEEEEEEUL ) {
++			pfn_counter = &pfn_secure;
++		}
+ 		/*
+ 		 * Excludable compound tail pages must have already been excluded by
+ 		 * exclude_range(), don't need to check them here.
+@@ -9855,7 +9860,7 @@ print_report(void)
+ 	pfn_original = info->max_mapnr - pfn_memhole;
+ 
+ 	pfn_excluded = pfn_zero + pfn_cache + pfn_cache_private
+-	    + pfn_user + pfn_free + pfn_hwpoison + pfn_offline;
++	    + pfn_user + pfn_free + pfn_hwpoison + pfn_offline + pfn_secure;
+ 
+ 	REPORT_MSG("\n");
+ 	REPORT_MSG("Original pages  : 0x%016llx\n", pfn_original);
+@@ -9871,6 +9876,7 @@ print_report(void)
+ 	REPORT_MSG("    Free pages              : 0x%016llx\n", pfn_free);
+ 	REPORT_MSG("    Hwpoison pages          : 0x%016llx\n", pfn_hwpoison);
+ 	REPORT_MSG("    Offline pages           : 0x%016llx\n", pfn_offline);
++	REPORT_MSG("    Secure pages           : 0x%016llx\n", pfn_secure);
+ 	REPORT_MSG("  Remaining pages  : 0x%016llx\n",
+ 	    pfn_original - pfn_excluded);
+ 
+diff --git a/makedumpfile.h b/makedumpfile.h
+index b95c7b6..a59c5cd 100644
+--- a/makedumpfile.h
++++ b/makedumpfile.h
+@@ -47,6 +47,7 @@
+ #include <semaphore.h>
+ #include <inttypes.h>
+ 
++#define HWCAP_CPUID		(1 << 11)
+ #define VMEMMAPSTART 0xffffea0000000000UL
+ #define BITS_PER_WORD 64
+ 
+-- 
+2.7.4
+

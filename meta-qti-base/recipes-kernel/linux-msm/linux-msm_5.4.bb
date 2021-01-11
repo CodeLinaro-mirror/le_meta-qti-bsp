@@ -196,7 +196,12 @@ do_shared_workdir_append () {
 
 do_deploy_append() {
     if ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'true', 'false', d)}; then
-        ${STAGING_BINDIR_NATIVE}/mkdtimg create ${DEPLOYDIR}/${PRODUCT}-dtbo.img ${B}/arch/${ARCH}/boot/dts/vendor/qcom/*.dtbo
+        if ${@bb.utils.contains('COMBINED_FEATURES', 'qti-lxc', 'true', 'false', d)}; then
+            ${STAGING_BINDIR_NATIVE}/mkdtimg create ${DEPLOYDIR}/${PRODUCT}-dtbo.img ${B}/arch/${ARCH}/boot/dts/vendor/qcom/*lxc-overlay.dtbo
+        else
+            rm ${B}/arch/${ARCH}/boot/dts/vendor/qcom/*lxc-overlay.dtbo
+            ${STAGING_BINDIR_NATIVE}/mkdtimg create ${DEPLOYDIR}/${PRODUCT}-dtbo.img ${B}/arch/${ARCH}/boot/dts/vendor/qcom/*.dtbo
+        fi
     fi
 
     if ${@bb.utils.contains('DISTRO_FEATURES', 'q-hypervisor', 'true', 'false', d)}; then
