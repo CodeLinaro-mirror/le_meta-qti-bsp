@@ -7,6 +7,12 @@ tmpfs                /run            tmpfs     mode=0755,nodev,nosuid,strictatim
 tmpfs                /var/volatile   tmpfs     defaults,rootcontext=system_u:object_r:var_t:s0 0  0
 tmpfs                /media/ram      tmpfs     defaults,noauto       0  0
 
+# Considering the fact that AppArmor checks both the access to
+# the symbol link itself and to the target path, a /tmp which
+# is not a symbol link to somewhere else is needed. And also,
+# mounting /tmp as a tmpfs is some usual implementation.
+tmpfs                /tmp            tmpfs     defaults              0  0
+
 /dev/vdc             /persist        auto      defaults,nofail       0  2
 /dev/vdb             /data           auto      defaults,nofail       0  2
 /dev/vdc             /dsp            auto      defaults,nofail       0  2

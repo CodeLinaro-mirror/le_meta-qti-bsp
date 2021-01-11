@@ -18,8 +18,6 @@ do_install_append(){
     install -m 755 -o diag -g diag -d ${D}/media
     install -m 755 -o diag -g diag -d ${D}/media/card
     ln -s /media/card ${D}/sdcard
-    rmdir ${D}/tmp
-    ln -s /var/tmp ${D}/tmp
     ln -s /var/run/resolv.conf ${D}/etc/resolv.conf
     ln -s /lib ${D}/lib64
     ln -s /usr/lib ${D}/usr/lib64
