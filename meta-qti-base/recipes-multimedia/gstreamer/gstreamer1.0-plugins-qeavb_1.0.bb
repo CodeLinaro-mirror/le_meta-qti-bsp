@@ -30,6 +30,8 @@ CFLAGS += "-I${STAGING_INCDIR} \
            -I${STAGING_INCDIR}/gstreamer-1.0"
 CFLAGS += "-I${STAGING_KERNEL_BUILDDIR}/usr/include"
 
+do_configure[depends] += "virtual/kernel:do_shared_workdir"
+
 install_config_file() {
   mkdir -p ${D}${sysconfdir}/xdg/
   install ${S}/qeavb/listen.ini ${D}${sysconfdir}/xdg/listen.ini
