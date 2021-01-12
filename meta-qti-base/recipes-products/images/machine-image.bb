@@ -11,6 +11,8 @@ EXTRA_IMAGECMD_ext4 = "-i 4096 -b 4096"
 # default value for rootfs size
 IMAGE_ROOTFS_SIZE ?= "1572864"
 
+IMAGE_FEATURES_append = " read-only-rootfs"
+
 SSTATE_MANFILEPREFIX="${@bb.utils.contains('PERF_BUILD', '1', '${SSTATE_MANIFESTS}/manifest-${SSTATE_MANMACH}-${PN}-perf', '${SSTATE_MANIFESTS}/manifest-${SSTATE_MANMACH}-${PN}' , d)}"
 
 SDK_DEPLOY = "${DEPLOY_DIR}/sdk-${PRODUCT}"
