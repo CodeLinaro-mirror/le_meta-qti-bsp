@@ -32,7 +32,6 @@ CFLAGS += "-I${STAGING_KERNEL_BUILDDIR}/usr/include"
 
 install_config_file() {
   mkdir -p ${D}${sysconfdir}/xdg/
-  install ${S}/qeavb/listen.ini ${D}${sysconfdir}/xdg/listen.ini
 }
 do_install[postfuncs] += " install_config_file "
 FILES_${PN} += "${libdir}/gstreamer-${LIBV}/*.so"
