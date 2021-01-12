@@ -46,6 +46,9 @@ CPPFLAGS += "-I${STAGING_INCDIR}/libdrm"
 # fix for uapi msm_drm.h header file related compilation issue
 CPPFLAGS += "-fno-operator-names"
 
+# add display techpack headers
+CPPFLAGS += "-I${STAGING_KERNEL_BUILDDIR}/usr/include/display"
+
 do_configure[depends] += "virtual/kernel:do_shared_workdir"
 
 SOLIBS = ".so"
