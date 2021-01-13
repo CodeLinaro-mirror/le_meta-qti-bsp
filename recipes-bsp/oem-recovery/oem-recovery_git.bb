@@ -17,6 +17,8 @@ DEPENDS += "glib-2.0 virtual/kernel"
 EXTRA_OECONF = "--with-glib --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include \
                 --with-core-headers=${STAGING_INCDIR_NATIVE}"
 
+CPPFLAGS_append = "${@bb.utils.contains_any('PREFERRED_VERSION_linux-msm', '5.4', ' -D_BSG_FRAMEWORK_KERNEL_HEADERS ', '', d)}"
+
 PARALLEL_MAKE = ""
 INITSCRIPT_NAME = "oem-recovery"
 INITSCRIPT_PARAMS = "start 27 5 . stop 80 0 1 6 ."
