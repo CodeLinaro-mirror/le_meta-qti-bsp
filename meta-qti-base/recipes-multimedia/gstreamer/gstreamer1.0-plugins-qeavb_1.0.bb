@@ -34,7 +34,6 @@ do_configure[depends] += "virtual/kernel:do_shared_workdir"
 
 install_config_file() {
   mkdir -p ${D}${sysconfdir}/xdg/
-  install ${S}/qeavb/listen.ini ${D}${sysconfdir}/xdg/listen.ini
 }
 do_install[postfuncs] += " install_config_file "
 FILES_${PN} += "${libdir}/gstreamer-${LIBV}/*.so"
