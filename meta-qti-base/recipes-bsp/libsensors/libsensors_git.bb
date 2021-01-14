@@ -1,19 +1,23 @@
-inherit autotools-brokensep pkgconfig
-
-DESCRIPTION = "Sensor library"
-PR = "r1"
+SUMMARY = "Library for sensor"
+DESCRIPTION = "The library provides sensor related functionality and udev rules"
+HOMEPAGE = "https://www.codeaurora.org/"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
 
-SRC_URI = "${PATH_TO_REPO}/hardware/qcom/sensors/.git;protocol=${PROTO};destsuffix=hardware/qcom/sensors;usehead=1"
-SRC_URI += "file://iio.sh"
-SRC_URI += "file://sensors.sh"
-SRC_URI += "file://61-iio.rules"
-SRC_URI += "file://61-sensor.rules"
+DEPENDS += "glib-2.0"
+
+SRC_URI = "\
+    ${PATH_TO_REPO}/hardware/qcom/sensors/.git;protocol=${PROTO};destsuffix=hardware/qcom/sensors;usehead=1 \
+    file://iio.sh \
+    file://sensors.sh \
+    file://61-iio.rules \
+    file://61-sensor.rules \
+"
+SRCREV = "${AUTOREV}"
+
 S = "${WORKDIR}/hardware/qcom/sensors"
 
-SRCREV = "${AUTOREV}"
-DEPENDS = "glib-2.0"
+inherit autotools-brokensep pkgconfig
 
 EXTRA_OECONF = "--with-glib"
 
@@ -27,7 +31,3 @@ do_install_append() {
         install -m 0555 ${WORKDIR}/iio.sh ${D}${sysconfdir}/udev/scripts/iio.sh
     fi
 }
-
-FILES_${PN} += "${sysconfdir}/udev/rules.d/61-sensor.rules \
-               ${sysconfdir}/udev/rules.d/61-iio.rules \
-               ${sysconfdir}/udev/scripts/*"
