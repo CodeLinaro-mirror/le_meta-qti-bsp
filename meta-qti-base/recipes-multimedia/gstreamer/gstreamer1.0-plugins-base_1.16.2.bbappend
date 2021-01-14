@@ -9,18 +9,4 @@ SRCREV_FORMAT = "base_common"
 
 S = "${WORKDIR}/gstreamer/gst-plugins-base"
 
-PACKAGECONFIG ??= " \
-    ${GSTREAMER_ORC} \
-    ${PACKAGECONFIG_GL} \
-    ${@bb.utils.filter('DISTRO_FEATURES', 'alsa x11', d)} \
-    jpeg-turbo ogg pango png theora vorbis \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'wayland egl', '', d)} \
-"
-
 DEPENDS += "libcutils"
-GI_DATA_ENABLED="0"
-do_configure_prepend() {
-	cd ${S}
-	./autogen.sh --noconfigure
-	cd ${B}
-}
