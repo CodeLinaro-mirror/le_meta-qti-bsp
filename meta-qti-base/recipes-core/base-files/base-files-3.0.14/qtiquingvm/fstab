@@ -9,8 +9,6 @@ tmpfs                /media/ram      tmpfs     defaults,noauto       0  0
 
 /dev/vdb             /data           auto      defaults,nofail       0  2
 /dev/vdc             /var            auto      defaults,nofail       0  2
-/dev/vdf             /dsp            auto      defaults,ro       0  0
-/dev/vdg             /firmware       auto      defaults,ro       0  0
 /dev/vdd             /bluetooth      auto      defaults,ro       0  0
 
 # Bind /home to /data
