@@ -2,6 +2,7 @@ From 832d6951f2e4b982b631ed1f5e1b0c8118d4a40e Mon Sep 17 00:00:00 2001
 From: Viswanath Kraleti <vkraleti@codeaurora.org>
 Date: Thu, 26 May 2016 08:04:13 +0530
 Subject: [PATCH 1/1] Add automake support
+Signed-off-by: Viswanath Kraleti <vkraleti@codeaurora.org>
 
 Change-Id: Iace9ae11173f644a0732f4a09ce70b14aacd5d08
 ---

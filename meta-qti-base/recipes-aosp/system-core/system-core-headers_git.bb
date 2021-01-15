@@ -1,4 +1,7 @@
-DESCRIPTION = "Android system/core components headers"
+SUMMARY = "Android core component headers"
+DESCRIPTION = "The system/core directory is intended for pieces of the world that are \
+the core of the embedded linux platform at the heart of Android. These essential bits \
+are required for basic booting, operation, and debugging."
 HOMEPAGE = "http://developer.android.com/"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
@@ -7,7 +10,7 @@ ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 SRCREV = "${AUTOREV}"
 SRC_URI = "${PATH_TO_REPO}/system/core/.git;protocol=${PROTO};destsuffix=system/core;usehead=1"
 
-S = "${WORKDIR}/system/core/"
+S = "${WORKDIR}/system/core"
 
 do_configure[noexec] = "1"
 do_compile[noexec] = "1"

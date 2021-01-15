@@ -1,4 +1,6 @@
-DESCRIPTION = "Safe integer operation library for C"
+SUMMARY = "Safe integer operation library for C"
+DESCRIPTION = "This library supplies a set of standard functions for performing and checking safe integer operations"
+HOMEPAGE = "http://developer.android.com/"
 LICENSE = "ISC"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=f3b90e78ea0cffb20bf5cca7947a896d"
