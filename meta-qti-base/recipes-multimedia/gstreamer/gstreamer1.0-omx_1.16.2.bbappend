@@ -19,3 +19,5 @@ EXTRA_OEMESON = " \
               "
 EXTRA_OEMESON_append =" -Denable-target-vpu554=yes"
 EXTRA_OEMESON_append =" -Denable-encoder-heic=yes"
+
+CPPFLAGS += "-DVIDC_TARGET_USES_GKI"
