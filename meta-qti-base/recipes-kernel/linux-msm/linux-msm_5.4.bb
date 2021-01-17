@@ -81,7 +81,7 @@ KBUILD_DEFCONFIG ?= "${KERNEL_CONFIG}"
 LINUX_VERSION_EXTENSION = "${@['-perf', ''][d.getVar('VARIANT', True) == ('' or 'debug')]}"
 
 do_kernel_metadata_prepend() {
-    if ${@bb.utils.contains('MACHINE_FEATURES', 'kdump-support', 'true', 'false', d)}; then
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'kdump-support', 'true', 'false', d)}; then
         set +e
         if [ -n "${KBUILD_DEFCONFIG}"  ]; then
             if [ -f "${S}/arch/${ARCH}/configs/${KBUILD_DEFCONFIG}"  ]; then

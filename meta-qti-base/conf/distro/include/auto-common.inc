@@ -34,6 +34,9 @@ DISTRO_FEATURES_BACKFILL_CONSIDERED += "sysvinit"
 VIRTUAL-RUNTIME_dev_manager = "udev"
 VIRTUAL-RUNTIME_init_manager = "systemd"
 
+# Support kdump
+#DISTRO_FEATURES_append = " kdump-support"
+
 DISTRO_FEATURES_append = " ipa3"
 
 IMAGE_EXT4_EXTRA_OPTIONS = "${@bb.utils.contains('DISTRO_FEATURES','ro-rootfs',' -J -b 1024 ','',d)}"
