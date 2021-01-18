@@ -1,5 +1,7 @@
 inherit core-image dm-verity
 
+DEPENDS += "avbtool-native"
+
 IMAGE_INSTALL_ATTEMPTONLY ?= ""
 IMAGE_INSTALL_ATTEMPTONLY[type] = "list"
 
@@ -76,3 +78,31 @@ python () {
     if bb.utils.contains('DISTRO_FEATURES', 'dm-verity', True, False, d):
         bb.build.addtask('do_make_veritybootimg', 'do_image_complete', 'do_rootfs', d)
 }
+
+do_make_dm_verity_avb2_image(){
+    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'true', 'false', d)}; then
+        rootfs_size_kb=${IMAGE_ROOTFS_SIZE}
+        rootfs_size=$(expr $rootfs_size_kb \* 1024)
+        overhead_size_kb=$(expr $rootfs_size_kb / 5)
+        overhead_size=$(expr $overhead_size_kb \* 1024)
+
+        if [ "$(expr $size_bytes % 4096)" != "0" ]; then
+            overhead_size=$(expr $(expr 4096 - $(expr $overhead_size % 4096)) + $overhead_size)
+        fi
+
+        rootfs_partition_size=$(expr $rootfs_size + $overhead_size)
+
+        avbtool add_hash_footer --image ${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET} --partition_size 0x02000000 --partition_name boot \
+        --algorithm SHA256_RSA4096 \
+        --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/vbgvm_private_key_4096.pem --rollback_index 0
+        avbtool add_hashtree_footer --image ${DEPLOY_DIR_IMAGE}/machine-image-${PRODUCT}.ext4 --partition_name system --partition_size ${rootfs_partition_size} --hash_algorithm sha256 --do_not_generate_fec
+        avbtool make_vbmeta_image \
+	--include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET} \
+	--include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
+	--setup_rootfs_from_kernel ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
+        --algorithm SHA256_RSA4096 \
+        --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/vbgvm_private_key_4096.pem --rollback_index 0 --output ${DEPLOY_DIR_IMAGE}/vbmeta.img
+    fi
+}
+
+addtask do_make_dm_verity_avb2_image after do_image_complete before do_build

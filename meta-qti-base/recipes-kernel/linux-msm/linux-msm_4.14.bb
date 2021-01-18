@@ -127,7 +127,7 @@ do_deploy() {
 
 inherit qsigning
 #Sign boot image after generation
-do_deploy[postfuncs] += "sign_bootimg"
+do_deploy[postfuncs] += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor','', 'sign_bootimg', d)}"
 
 do_rebuild_dtb() {
     KERNEL_BUILD=${TMPDIR}/work-shared/${BASEMACHINE}/kernel-build-artifacts
