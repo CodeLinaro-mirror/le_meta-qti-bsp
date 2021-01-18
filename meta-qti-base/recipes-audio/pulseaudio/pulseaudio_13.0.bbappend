@@ -12,6 +12,7 @@ SRC_URI_append = " file://0008-Pulseaudio-service-need-to-wait-for-sound-card-re
 SRC_URI_append = " file://0003-default.pa-Load-agl-audio-plugin-module.patch"
 SRC_URI_append = " file://0006-Support-PulseAudio-Client-API-for-Module-Codec-Control.patch"
 SRC_URI_append = " file://0001-pulseaudio-config-default.pa-to-disable-default-ALSA.patch"
+SRC_URI_append = " file://0001-udev-bypass-udev-device-enumeration-for-auto-targets.patch"
 
 PACKAGES =+ " pulseaudio-module-dev"
 
