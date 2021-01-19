@@ -64,6 +64,7 @@ SRC_URI_append =  "${@bb.utils.contains('DISTRO_FEATURES', 'wayland', ' file://w
 
 SRC_URI_append =  " file://lxc.cfg"
 SRC_URI_append =  " file://ipc.cfg"
+SRC_URI_append =  "${@bb.utils.contains('MACHINE_FEATURES', 'qti-dual-wlan', ' file://dual-wlan.cfg', '', d)}"
 
 SRCREV = "${AUTOREV}"
 SRCREV_FORMAT = "kernel_data_display_sched_ais_video"
