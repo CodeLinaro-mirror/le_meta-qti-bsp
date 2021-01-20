@@ -2,7 +2,7 @@
 # Provides packages required to build an image with
 # robotics features support.
 
-inherit qimage
+inherit qimage populate_sdk
 
 IMAGE_FEATURES += "ssh-server-openssh"
 
