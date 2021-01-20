@@ -2,6 +2,8 @@ IMAGE_INSTALL += " \
     ${@bb.utils.contains('COMBINED_FEATURES', 'qti-core', 'packagegroup-qti-core-minimal', '', d)} \
     ${@bb.utils.contains('COMBINED_FEATURES', 'qti-display', 'packagegroup-qti-display', '', d)} \
     ${@bb.utils.contains('COMBINED_FEATURES', 'qti-security', 'packagegroup-qti-security', '', d)} \
+    ${@bb.utils.contains('COMBINED_FEATURES', 'qti-data', 'packagegroup-qti-data', '', d)} \
+    ${@bb.utils.contains('COMBINED_FEATURES', 'qti-vnw', 'packagegroup-qti-vnw', '', d)} \
     "
 #    ${@bb.utils.contains('COMBINED_FEATURES', 'qti-audio', 'packagegroup-qti-audio', '', d)} \
 #    ${@bb.utils.contains('COMBINED_FEATURES', 'qti-bluetooth', 'packagegroup-qti-bluetooth', '', d)} \

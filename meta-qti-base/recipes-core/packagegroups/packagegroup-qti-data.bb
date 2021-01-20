@@ -15,8 +15,8 @@ RDEPENDS_${PN} += "\
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', 'connman', d)} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', 'connman-client', d)} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'setup-network', '', d)} \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', 'emac-dwc-eqos', d)} \
     net-tools \
-    emac-dwc-eqos \
     ethtool \
     iperf2 \
     iperf3 \
