@@ -25,7 +25,7 @@ DISTRO_FEATURES_append = " persist-image "
 PERSIST_IMAGE_ROOTFS_SIZE ?= "128M"
 
 DISTRO_FEATURES_append = " early-eth"
-DISTRO_FEATURES_append = " early_init"
+#DISTRO_FEATURES_append = " early_init"
 #DISTRO_FEATURES_append = " early_userspace"
 
 DISTRO_FEATURES_append = " ab-boot-support"
