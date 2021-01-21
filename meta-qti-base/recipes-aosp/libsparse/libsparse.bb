@@ -1,4 +1,6 @@
-DESCRIPTION = "Build Android libsprase"
+SUMMARY = "Android Sparse library"
+DESCRIPTION = "Libparse is a library in common use by the various Android core host applications. \
+It provides utilities to convert from raw to sparse images and back."
 HOMEPAGE = "http://developer.android.com/"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\

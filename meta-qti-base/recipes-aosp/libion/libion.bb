@@ -1,4 +1,7 @@
-DESCRIPTION = "Build Android libion"
+SUMMARY = "Library for memory allocator functions for ion"
+DESCRIPTION = "Android libion library contains helper functions for using ion. \
+Ion is a generalized memory manager introduced in the Android release to address \
+the issue of fragmented memory management interfaces across different Android devices."
 HOMEPAGE = "http://developer.android.com/"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
@@ -15,8 +18,7 @@ S = "${WORKDIR}/system/core/libion"
 
 inherit autotools-brokensep pkgconfig
 
-EXTRA_OECONF += " --disable-static"
-EXTRA_OECONF += "${@bb.utils.contains_any('PREFERRED_VERSION_linux-msm', '3.18 4.4 4.9', '--with-legacyion', '', d)}"
+EXTRA_OECONF += "--disable-static"
 EXTRA_OECONF += "--with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
 
 do_configure[depends] += "virtual/kernel:do_shared_workdir"
@@ -25,7 +27,3 @@ do_install_append() {
     install -d ${D}${includedir}/kernel-headers/linux
     install -m 0644 ${S}/kernel-headers/linux/*.h  ${D}${includedir}/kernel-headers/linux
 }
-
-PACKAGES += "${PN}-test-bin"
-
-FILES_${PN}-test-bin = "${base_bindir}/*"

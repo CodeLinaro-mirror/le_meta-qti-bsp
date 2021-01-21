@@ -19,18 +19,5 @@ EXTRA_OEMESON = " \
               "
 EXTRA_OEMESON_append =" -Denable-target-vpu554=yes"
 EXTRA_OEMESON_append =" -Denable-encoder-heic=yes"
-CPPFLAGS += "-I${STAGING_KERNEL_BUILDDIR}/usr/include"
 
-delete_pkg_m4_file() {
-    # Delete m4 files which we provide patched versions of but will be ignored
-    # if these exist
-	rm -f "${S}/common/m4/pkg.m4"
-	rm -f "${S}/common/m4/gtk-doc.m4"
-}
-
-do_configure[prefuncs] += "delete_pkg_m4_file"
-do_configure_prepend() {
-	cd ${S}
-	./autogen.sh --noconfigure
-	cd ${B}
-}
+CPPFLAGS += "-DVIDC_TARGET_USES_GKI"
