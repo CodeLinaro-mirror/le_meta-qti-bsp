@@ -51,7 +51,7 @@ pkg_postinst_${PN} () {
 }
 
 do_module_signing() {
-    if [ "${BASEMACHINE}" = "sa8195" ] || [ "${BASEMACHINE}" = "sa8155" ]; then
+    if [ "${BASEMACHINE}" = "sa81x5" ]; then
     if [ -f  ${STAGING_KERNEL_BUILDDIR}/certs/signing_key.pem ]; then
 	    bbnote "Signing ${PN} module ${i}"
         for i in $(find ${PKGDEST}/${PN}/${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/ -name "*.ko"); do

@@ -14,7 +14,10 @@ S = "${WORKDIR}/vendor/qcom/opensource/audio-kernel"
 
 inherit module module-sign qperf
 
-EXTRA_OEMAKE += "TARGET_SUPPORT=${BASEMACHINE}"
+EXTRA_OEMAKE += "TARGET_SUPPORT=${@bb.utils.contains('BASEMACHINE', 'sa81x5', 'sa8155', '${BASEMACHINE}', d)}"
+KERNEL_CC += "-Wno-error=maybe-uninitialized"
+# Disable parallel make
+PARALLEL_MAKE = ""
 
 do_configure() {
     cp -f ${WORKDIR}/vendor/qcom/opensource/audio-kernel/Makefile.am ${WORKDIR}/vendor/qcom/opensource/audio-kernel/Makefile
