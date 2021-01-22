@@ -1,7 +1,7 @@
 # Provides packages required to build
 # QTI Linux eXtended Reality image.
 
-inherit qimage
+inherit qimage populate_sdk
 
 IMAGE_FEATURES += "ssh-server-openssh"
 
@@ -17,13 +17,18 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-android-utils \
         packagegroup-qti-core-prop \
         packagegroup-qti-camera \
+        packagegroup-qti-display \
         packagegroup-qti-data \
         packagegroup-qti-dsp \
+        packagegroup-qti-fastcv \
         packagegroup-qti-gfx \
+        packagegroup-qti-sensors-see \
         packagegroup-qti-ss-mgr \
+	packagegroup-qti-securemsm \
         ${@bb.utils.contains('COMBINED_FEATURES', 'qti-wifi', "packagegroup-qti-wifi", "", d)} \
         ${@bb.utils.contains('COMBINED_FEATURES', 'qti-bluetooth', "packagegroup-qti-bluetooth", "", d)} \
         packagegroup-qti-video \
+        packagegroup-qti-gst \
         packagegroup-startup-scripts \
         systemd-machine-units \
         ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
@@ -33,6 +38,7 @@ CORE_IMAGE_EXTRA_INSTALL += " \
             audiodlkm \
             init-audio \
             tinyalsa \
+            tinycompress \
             soundtrigger \
 "
 #install drm
