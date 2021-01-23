@@ -1,5 +1,5 @@
 #systemd package is fetch from CAF
-SRC_URI = "git://source.codeaurora.org/quic/le/systemd.git;protocol=https;branch=systemd/master"
+SRC_URI = "git://source.codeaurora.org/quic/le/systemd.git;protocol=https;branch=systemd/main"
 SRC_URI += " \
            file://touchscreen.rules \
            file://00-create-volatile.conf \
