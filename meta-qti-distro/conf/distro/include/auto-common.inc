@@ -56,3 +56,10 @@ LICENSE_FLAGS_WHITELIST += "commercial_gstreamer1.0-plugins-ugly commercial_open
 LICENSE_FLAGS_WHITELIST += "commercial_ffmpeg"
 
 include ${DISTRO_INC_FILES}
+
+# Sizes for EXT4 (in bytes)
+SYSTEM_SIZE_EXT4 ?= "100000000"
+SYSTEMRW_SIZE_EXT4 ?= "8388608"
+USERDATA_SIZE_EXT4 ?= "2000000000"
+CACHE_SIZE_EXT4 ?= "80000000"
+PERSIST_IMAGE_ROOTFS_SIZE ?= "128M"

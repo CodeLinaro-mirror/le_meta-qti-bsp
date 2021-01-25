@@ -1,5 +1,7 @@
-SUMMARY = "Audio Initialization"
-DESCRIPTION = "These are the scripts used to initialize audio."
+SUMMARY = "Audio Initialization Scripts"
+DESCRIPTION = "init_qcom_audio (init_audio.service) sends command to kernel to boot adsp. \
+audio_early.sh loads audio kernel modules, boots adsp and plays audio early chime. \
+audio.sh boots adsp and plays audio early chime."
 HOMEPAGE = "https://www.codeaurora.org"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://NOTICE;md5=31d831381767a5740249540fe63ea013"

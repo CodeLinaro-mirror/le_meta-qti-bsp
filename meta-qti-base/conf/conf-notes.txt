@@ -7,13 +7,13 @@ Supported combinations are listed below.
       +---------------+-----------------+------------------+
       | MACHINE       | DISTRO          |  VARIANT         |
       +---------------+-----------------+------------------+
-      |sa8155         | auto            | debug perf       |
+      |sa81x5         | auto            | debug perf       |
       |sa6155         |                 |                  |
-      |sa8195         |                 |                  |
       +---------------+-----------------+------------------+
-      |sa8155agl      | auto-agl        | debug perf       |
+      |sa81x5lxc      | auto-lxc        | debug perf       |
+      +---------------+-----------------+------------------+
+      |sa81x5agl      | auto-agl        | debug perf       |
       |sa6155agl      |                 |                  |
-      |sa8195agl      |                 |                  |
       +---------------+-----------------+------------------+
       |qtiquingvm     | auto-gvm-agl    | debug perf       |
       +---------------+-----------------+------------------+

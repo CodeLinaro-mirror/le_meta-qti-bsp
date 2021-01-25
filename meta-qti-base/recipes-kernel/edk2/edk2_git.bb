@@ -9,9 +9,8 @@ PR = "r1"
 
 SRC_URI = "${PATH_TO_REPO}/bootable/bootloader/edk2/.git;protocol=${PROTO};destsuffix=bootable/bootloader/edk2;usehead=1"
 # FIXME for keymaster functionality
-SRC_URI_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'lxc', ' file://0001-avb-bring-up-keymaster-for-LV.patch', '', d)}"
-SRC_URI_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'lxc', ' file://0002-avb-send-dummy-ROT-and-boot-state-to-keymaster-from-.patch ', '', d)}"
-
+SRC_URI_append = " file://0001-avb-bring-up-keymaster-for-LV.patch  \
+                   file://0002-avb-send-dummy-ROT-and-boot-state-to-keymaster-from-.patch "
 S = "${WORKDIR}/bootable/bootloader/edk2"
 
 inherit deploy
