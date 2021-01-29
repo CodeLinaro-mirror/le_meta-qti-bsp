@@ -1,18 +1,17 @@
-From e402c56361e6f6e976c7c0ce3a2f2ac366a9ed4e Mon Sep 17 00:00:00 2001
+From f62ff048443c9752f573457808a7919fb5b5cdcd Mon Sep 17 00:00:00 2001
 From: Jiacheng Zheng <jiaczhen@codeaurora.org>
-Date: Thu, 30 Jul 2020 21:38:04 +0800
+Date: Fri, 29 Jan 2021 15:50:05 +0800
 Subject: [PATCH] parallelize audio and pcie driver to improve bootkpi
 
 Audio driver takes the most booting time, so we pick
 out all audio dependency chain and run them in a
-separate thread and bind it to a gold core. Pcie init
-also takes some time and we can define it as
-asynchronous to save more time. Finally, we postpone
-the calling of wait_for_device_probe after the
-mounting of rootfs so considerable rootfs mounting
+separate thread. Pcie init also takes some time and we
+can define it as asynchronous to save more time.
+Finally, we postpone the calling of wait_for_device_probe
+after the mounting of rootfs so considerable rootfs mounting
 time can be hidden in parallel with audio driver init.
 
-Change-Id: I21ac913b0f92975eddc34e07149d0238ff8eb856
+Change-Id: I08f1e8c7089afc55acc4236051e3b0e2594c983d
 Signed-off-by: Jiacheng Zheng <jiaczhen@codeaurora.org>
 ---
  drivers/base/dd.c                                  |   8 +-
@@ -28,7 +27,7 @@ Signed-off-by: Jiacheng Zheng <jiaczhen@codeaurora.org>
  sound/core/timer.c                                 |   5 +-
  sound/last.c                                       |   5 +-
  sound/soc/codecs/msm_stub.c                        |   5 +-
- sound/soc/msm/apq8096-auto.c                       | 114 ++++++++++++++++++++-
+ sound/soc/msm/apq8096-auto.c                       | 109 ++++++++++++++++++++-
  sound/soc/msm/msm-dai-fe.c                         |   5 +-
  sound/soc/msm/msm-pcm-hostless.c                   |   5 +-
  sound/soc/msm/qdsp6v2/audio_slimslave.c            |   5 +-
@@ -56,7 +55,7 @@ Signed-off-by: Jiacheng Zheng <jiaczhen@codeaurora.org>
  sound/soc/msm/qdsp6v2/q6voice.c                    |   5 +-
  sound/soc/msm/qdsp6v2/rtac.c                       |   5 +-
  sound/soc/soc-core.c                               |   5 +-
- 41 files changed, 236 insertions(+), 85 deletions(-)
+ 41 files changed, 231 insertions(+), 85 deletions(-)
 
 diff --git a/drivers/base/dd.c b/drivers/base/dd.c
 index 0ab3a8d..2186d95 100644
@@ -188,10 +187,10 @@ index 0a49a32..2001fd9 100644
  
  MODULE_DESCRIPTION("Soc QDSP6v2 Voice Service driver");
 diff --git a/drivers/staging/android/ion/ion_hvenv_driver.c b/drivers/staging/android/ion/ion_hvenv_driver.c
-index 7e463ae..3130a78 100644
+index 5b9870d..87ab214 100644
 --- a/drivers/staging/android/ion/ion_hvenv_driver.c
 +++ b/drivers/staging/android/ion/ion_hvenv_driver.c
-@@ -170,7 +170,8 @@ struct ion_client *hvenv_ion_client_create(const char *name)
+@@ -172,7 +172,8 @@ struct ion_client *hvenv_ion_client_create(const char *name)
  }
  EXPORT_SYMBOL(hvenv_ion_client_create);
  
@@ -201,7 +200,7 @@ index 7e463ae..3130a78 100644
  {
  	int i, err;
  
-@@ -223,7 +224,7 @@ err1:
+@@ -225,7 +226,7 @@ err1:
  
  	return err;
  }
@@ -359,18 +358,18 @@ index 9a9c54e..33a28d7 100755
  static void __exit msm_stub_exit(void)
  {
 diff --git a/sound/soc/msm/apq8096-auto.c b/sound/soc/msm/apq8096-auto.c
-index 35fcd50..ca0e861 100644
+index 35fcd50..372ec27 100644
 --- a/sound/soc/msm/apq8096-auto.c
 +++ b/sound/soc/msm/apq8096-auto.c
 @@ -23,6 +23,7 @@
  #include <linux/switch.h>
  #include <linux/input.h>
  #include <linux/qdsp6v2/apr.h>
-+#include <linux/workqueue.h>
++#include <linux/async.h>
  #include <sound/core.h>
  #include <sound/soc.h>
  #include <sound/soc-dapm.h>
-@@ -7752,8 +7753,117 @@ static int __init apq8096_soc_platform_init(void)
+@@ -7752,8 +7753,112 @@ static int __init apq8096_soc_platform_init(void)
  	return 0;
  }
  
@@ -478,12 +477,7 @@ index 35fcd50..ca0e861 100644
 +
 +int __init early_audio_init_async_start(void)
 +{
-+	struct work_struct *work;
-+
-+	work = kzalloc(sizeof(struct work_struct), GFP_KERNEL);
-+	INIT_WORK(work, early_audio_init_async);
-+	queue_work_on(WORK_CPU_UNBOUND, system_unbound_wq, work);
-+
++	async_schedule(early_audio_init_async, NULL);
 +	return 0;
 +}
 +fs_initcall_sync(early_audio_init_async_start);
