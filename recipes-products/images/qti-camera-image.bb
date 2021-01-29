@@ -1,14 +1,12 @@
-# QTI Linux robotics image file.
+# QTI Linux multimedia image file.
 # Provides packages required to build an image with
-# robotics features support.
+# Only camera support enabled.
 
 inherit qimage
 
 IMAGE_FEATURES += "ssh-server-openssh"
 
 CORE_IMAGE_EXTRA_INSTALL += "\
-        alsa-utils \
-        canutils \
         chrony \
         e2fsprogs \
         e2fsprogs-e2fsck \
@@ -20,25 +18,18 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-android-utils \
         packagegroup-qti-audio \
         packagegroup-qti-bluetooth \
-        packagegroup-qti-camera \
-        ${@bb.utils.contains('DISTRO_FEATURES','virtualization', 'packagegroup-qti-containers', '', d)} \
-        packagegroup-qti-core \
         packagegroup-qti-core-prop \
+        packagegroup-qti-camera \
         packagegroup-qti-data \
-        packagegroup-qti-display \
         packagegroup-qti-dsp \
-        packagegroup-qti-fastcv \
-        packagegroup-qti-cvp \
-        packagegroup-qti-gfx \
-        packagegroup-qti-gst \
         packagegroup-qti-ml \
-        packagegroup-qti-qmmf \
-        packagegroup-qti-robotics \
-        packagegroup-qti-securemsm \
+        ${@bb.utils.contains('MACHINE_FEATURES', 'qti-sensors', 'packagegroup-qti-sensors', '', d)} \
+        ${@bb.utils.contains('COMBINED_FEATURES', 'qti-security', 'packagegroup-qti-securemsm', '', d)} \
         packagegroup-qti-ss-mgr \
         packagegroup-qti-video \
         packagegroup-qti-wifi \
-        ${@bb.utils.contains('DISTRO_FEATURES', 'ros2', 'packagegroup-ros2-foxy', '', d)} \
         packagegroup-startup-scripts \
+        packagegroup-qti-fastcv \
         systemd-machine-units \
+        ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
 "

@@ -31,9 +31,10 @@ do_image_multiubi[noexec] = "1"
 create_symlink_userfs() {
    #Symlink modules
    LIB_MODULES="${IMAGE_ROOTFS}/lib/modules"
-   rm -rf ${LIB_MODULES}
-   mkdir -p ${LIB_MODULES}
-   mv ${LIB_MODULES} ${IMAGE_ROOTFS}/usr/lib/modules
+   if [ -d ${LIB_MODULES} ]; then
+      cp -rf ${LIB_MODULES} ${IMAGE_ROOTFS}/usr/lib/
+      rm -rf ${LIB_MODULES}
+   fi
    ln -sf /usr/lib/modules ${IMAGE_ROOTFS}/lib
 
    # Move rootfs data to userfs directory
@@ -60,7 +61,8 @@ create_symlink_systemd_ubi_mount_rootfs() {
     for entry in ${MACHINE_MNT_POINTS}; do
         mountname="${entry:1}"
         if [[ "$mountname" == "firmware" || "$mountname" == "bt_firmware" || "$mountname" == "dsp" ]] ; then
-            mv ${IMAGE_ROOTFS}/lib/systemd/system/${mountname}-mount-ubi.service ${IMAGE_ROOTFS}/lib/systemd/system/${mountname}-mount.service
+            cp -f ${IMAGE_ROOTFS}/lib/systemd/system/${mountname}-mount-ubi.service ${IMAGE_ROOTFS}/lib/systemd/system/${mountname}-mount.service
+            rm ${IMAGE_ROOTFS}/lib/systemd/system/${mountname}-mount-ubi.service
             ln -sf ${systemd_unitdir}/system/${mountname}-mount.service ${IMAGE_ROOTFS}/lib/systemd/system/local-fs.target.requires/${mountname}-mount.service
         else
             mv ${IMAGE_ROOTFS}/lib/systemd/system/${mountname}-ubi.mount  ${IMAGE_ROOTFS}/lib/systemd/system/${mountname}.mount
@@ -105,7 +107,7 @@ image="${USERIMAGE_UBIFS_TARGET}"
 vol_id=1
 vol_type=dynamic
 vol_name=usrfs
-vol_size="${CACHE_VOLUME_SIZE}"
+vol_flags=autoresize
 [cache_volume]
 mode=ubi
 vol_id=2
