@@ -26,8 +26,6 @@ FILES_${PN} += "${systemd_unitdir}/system/multi-user.target.wants/audio.service"
 
 EXTRA_OEMAKE += "TARGET_SUPPORT=${@bb.utils.contains('BASEMACHINE', 'sa81x5', 'sa8155', '${BASEMACHINE}', d)}"
 KERNEL_CC += "-Wno-error=maybe-uninitialized"
-# Disable parallel make
-PARALLEL_MAKE = ""
 
 do_configure() {
   cp -f ${WORKDIR}/vendor/qcom/opensource/audio-kernel/Makefile.am ${WORKDIR}/vendor/qcom/opensource/audio-kernel/Makefile
@@ -37,30 +35,29 @@ INITSCRIPT_NAME = "start_audio_le"
 INITSCRIPT_PARAMS = "start 35 5 . stop 15 0 1 6 ."
 
 do_install_append() {
-  install -d ${D}${includedir}/audio-kernel/
-  install -d ${D}${includedir}/audio-kernel/linux
-  install -d ${D}${includedir}/audio-kernel/linux/mfd
-  install -d ${D}${includedir}/audio-kernel/linux/mfd/wcd9xxx
-  install -d ${D}${includedir}/audio-kernel/sound
-  install -d ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra
+    install -d -p ${D}${includedir}/audio-kernel/audio/linux
+    install -d -p ${D}${includedir}/audio-kernel/audio/linux/mfd/wcd9xxx
+    install -d -p ${D}${includedir}/audio-kernel/audio/sound
 
-  cp -fr ${S}/linux/* ${D}${includedir}/audio-kernel/linux
-  install -m 0644 ${S}/sound/* ${D}${includedir}/audio-kernel/sound
+    process_headers "${S}/include/uapi/audio/linux" "${D}${includedir}/audio-kernel/audio/linux"
+    process_headers "${S}/include/uapi/audio/linux/mfd/wcd9xxx" "${D}${includedir}/audio-kernel/audio/linux/mfd/wcd9xxx"
+    process_headers "${S}/include/uapi/audio/sound" "${D}${includedir}/audio-kernel/audio/sound"
 
-  if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
-  install -m 0755 ${WORKDIR}/${AUDIO_BUILD_TARGET}/audio_load.conf -D ${D}${sysconfdir}/modules-load.d/audio_load.conf
-  else
-    install -m 0755 ${WORKDIR}/${AUDIO_BUILD_TARGET}/audio_load.conf -D ${D}${sysconfdir}/modules/audio_load.conf
-  fi
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
+        install -m 0755 ${WORKDIR}/${AUDIO_BUILD_TARGET}/audio_load.conf -D ${D}${sysconfdir}/modules-load.d/audio_load.conf
+    else
+        install -m 0755 ${WORKDIR}/${AUDIO_BUILD_TARGET}/audio_load.conf -D ${D}${sysconfdir}/modules/audio_load.conf
+    fi
 
-   for i in $(find ${D}/${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/. -name "*.ko"); do
-   mv ${i} ${D}/${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/
-   done
+    install -d ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra
+    for i in $(find ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/. -name "*.ko"); do
+        mv ${i} ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/
+    done
 
-   rm -fr ${D}/${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/asoc
-   rm -fr ${D}/${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/dsp
-   rm -fr ${D}/${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/ipc
-   rm -fr ${D}/${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/soc
+    rm -fr ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/asoc
+    rm -fr ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/dsp
+    rm -fr ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/ipc
+    rm -fr ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/soc
 }
 
 do_install_append_mdm() {
@@ -72,6 +69,13 @@ do_install_append_mdm() {
 # enable the service for multi-user.target
    ln -sf ${systemd_unitdir}/system/audio.service \
    ${D}${systemd_unitdir}/system/multi-user.target.wants/audio.service
+}
+
+process_headers() {
+    cd ${STAGING_KERNEL_BUILDDIR}
+    for name in $(ls $1/*.h); do
+        ${STAGING_KERNEL_DIR}/scripts/headers_install.sh $1/$(basename $name) $2/$(basename $name)
+    done
 }
 
 # The inherit of module.bbclass will automatically name module packages with
@@ -120,4 +124,3 @@ RPROVIDES_${PN} += "${@'kernel-module-rx-macro-dlkm-${KERNEL_VERSION}'.replace('
 RPROVIDES_${PN} += "${@'kernel-module-tx-macro-dlkm-${KERNEL_VERSION}'.replace('_', '-')}"
 RPROVIDES_${PN} += "${@'kernel-module-wcd937x-dlkm-${KERNEL_VERSION}'.replace('_', '-')}"
 RPROVIDES_${PN} += "${@'kernel-module-wcd937x-slave-dlkm-${KERNEL_VERSION}'.replace('_', '-')}"
-
