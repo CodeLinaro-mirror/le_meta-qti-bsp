@@ -29,6 +29,7 @@ EXTRA_OECONF_append = " --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/
 EXTRA_OECONF_append = " --disable-debuggerd"
 EXTRA_OECONF_append = " --disable-libsync"
 EXTRA_OECONF_append = " ${@bb.utils.contains('VARIANT','user',' --disable-adb-root','',d)}"
+EXTRA_OECONF_append = " ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', ' --enable-adb-avb20', '', d)}"
 
 do_configure[depends] += "virtual/kernel:do_shared_workdir"
 
