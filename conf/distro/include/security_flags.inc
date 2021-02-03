@@ -37,6 +37,8 @@ SECURITY_CFLAGS_pn-ulp2 = "${SECURITY_PIC_CFLAGS}"
 SECURITY_CFLAGS_pn-location-flp = "${SECURITY_PIC_CFLAGS}"
 SECURITY_CFLAGS_pn-location-service = "${SECURITY_PIC_CFLAGS}"
 SECURITY_CFLAGS_pn-loc-glue = "${SECURITY_PIC_CFLAGS}"
+SECURITY_CFLAGS_pn-nlp-client-api = "${SECURITY_PIC_CFLAGS}"
+SECURITY_CFLAGS_pn-xt-adapter = "${SECURITY_PIC_CFLAGS}"
 
 # packages to use -fPIC in security flags instead of -fpie
 SECURITY_CFLAGS_pn-gtest = "${SECURITY_PIC_CFLAGS}"
