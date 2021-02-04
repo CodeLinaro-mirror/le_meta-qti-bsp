@@ -17,6 +17,8 @@ EXTRA_OECONF = " \
                   --with-glib \
                   --with-core-includes=${WORKSPACE}/system/core/include \
 "
+EXTRA_OECONF_append_qti-distro-fullstack-user = " --disable-adb-root"
+
 do_install_append() {
     install -d ${D}${base_sbindir}
     install -d ${D}${sysconfdir}
