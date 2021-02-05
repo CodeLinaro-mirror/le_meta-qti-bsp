@@ -32,7 +32,8 @@ SRC_URI   =  "file://kernel \
               ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'file://verity.cfg', '', d)} \
               ${@bb.utils.contains('COMBINED_FEATURES', 'qti-audio', 'file://audio_common.cfg', '', d)} \
 	      "
-SRC_URI_append_qcs610 += "${@bb.utils.contains('COMBINED_FEATURES', 'qti-audio', 'file://audio_targets.cfg', '', d)}"
+# Add config to disable DIAG for user distros
+SRC_URI_append_qti-distro-user = " file://disablediag.cfg"
 
 # Don't set any version extention on debug build
 LINUX_VERSION_EXTENSION ?= "-perf"
