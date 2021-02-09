@@ -34,6 +34,8 @@ SRC_URI   =  "file://kernel \
               ${@bb.utils.contains('COMBINED_FEATURES', 'qti-audio', 'file://audio_common.cfg', '', d)} \
 	      "
 SRC_URI_append_qcs610 += "${@bb.utils.contains('COMBINED_FEATURES', 'qti-audio', 'file://audio_targets.cfg', '', d)}"
+SRC_URI_append_mdm9650 += "file://0001-ALSA-uapi-add-check-to-avoid-duplicate-include-of-ti.patch"
+SRC_URI_append_sdxnightjar += "file://0001-ALSA-uapi-add-check-to-avoid-duplicate-include-of-ti.patch"
 
 # Don't set any version extention on debug build
 #LINUX_VERSION_EXTENSION ?= "-perf"

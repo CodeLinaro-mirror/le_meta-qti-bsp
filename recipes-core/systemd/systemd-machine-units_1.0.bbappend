@@ -81,12 +81,12 @@ do_install_append () {
         if [ "$entry" == "$userfsdatadir" ]; then
             if ${@bb.utils.contains('IMAGE_FSTYPES', 'ext4', 'true', 'false', d)}; then
                 install -m 0644 ${WORKDIR}/data.mount ${D}${systemd_unitdir}/system/data.mount
-                install -m 0644 ${WORKDIR}/data.mount ${D}${systemd_unitdir}/system/data-ext4.mount
+                #install -m 0644 ${WORKDIR}/data.mount ${D}${systemd_unitdir}/system/data-ext4.mount
 
                 # Run fsck at boot
-                install -d 0644 ${D}${systemd_unitdir}/system/local-fs-pre.target.requires
-                ln -sf ${systemd_unitdir}/system/systemd-fsck@.service \
-                   ${D}${systemd_unitdir}/system/local-fs-pre.target.requires/systemd-fsck@dev-disk-by\\x2dpartlabel-userdata.service
+                #install -d 0644 ${D}${systemd_unitdir}/system/local-fs-pre.target.requires
+                #ln -sf ${systemd_unitdir}/system/systemd-fsck@.service \
+                #   ${D}${systemd_unitdir}/system/local-fs-pre.target.requires/systemd-fsck@dev-disk-by\\x2dpartlabel-userdata.service
             fi
             if ${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', 'true', 'false', d)}; then
                 install -m 0644 ${WORKDIR}/data-ubi.mount ${D}${systemd_unitdir}/system/data.mount
@@ -98,10 +98,10 @@ do_install_append () {
         if [ "$entry" == "/systemrw" ]; then
             if ${@bb.utils.contains('IMAGE_FSTYPES', 'ext4', 'true', 'false', d)}; then
                 install -m 0644 ${WORKDIR}/systemrw.mount ${D}${systemd_unitdir}/system/systemrw.mount
-                install -m 0644 ${WORKDIR}/systemrw.mount ${D}${systemd_unitdir}/system/systemrw-ext4.mount
+                #install -m 0644 ${WORKDIR}/systemrw.mount ${D}${systemd_unitdir}/system/systemrw-ext4.mount
                 # Run fsck at boot
-                ln -sf ${systemd_unitdir}/system/systemd-fsck@.service \
-                     ${D}${systemd_unitdir}/system/local-fs-pre.target.requires/systemd-fsck@dev-disk-by\\x2dpartlabel-systemrw.service
+                #ln -sf ${systemd_unitdir}/system/systemd-fsck@.service \
+                 #    ${D}${systemd_unitdir}/system/local-fs-pre.target.requires/systemd-fsck@dev-disk-by\\x2dpartlabel-systemrw.service
             fi
             if ${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', 'true', 'false', d)}; then
                 install -m 0644 ${WORKDIR}/systemrw-ubi.mount ${D}${systemd_unitdir}/system/systemrw.mount
@@ -113,7 +113,7 @@ do_install_append () {
         if [ "$entry" == "/cache" ]; then
             if ${@bb.utils.contains('IMAGE_FSTYPES', 'ext4', 'true', 'false', d)}; then
                 install -m 0644 ${WORKDIR}/cache.mount ${D}${systemd_unitdir}/system/cache.mount
-                install -m 0644 ${WORKDIR}/cache.mount ${D}${systemd_unitdir}/system/cache-ext4.mount
+                #install -m 0644 ${WORKDIR}/cache.mount ${D}${systemd_unitdir}/system/cache-ext4.mount
             fi
             if ${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', 'true', 'false', d)}; then
              install -m 0644 ${WORKDIR}/cache-ubi.mount ${D}${systemd_unitdir}/system/cache.mount
@@ -125,7 +125,7 @@ do_install_append () {
         if [ "$entry" == "/persist" ]; then
             if ${@bb.utils.contains('IMAGE_FSTYPES', 'ext4', 'true', 'false', d)}; then
                 install -m 0644 ${WORKDIR}/persist.mount ${D}${systemd_unitdir}/system/persist.mount
-                install -m 0644 ${WORKDIR}/persist.mount ${D}${systemd_unitdir}/system/persist-ext4.mount
+                #install -m 0644 ${WORKDIR}/persist.mount ${D}${systemd_unitdir}/system/persist-ext4.mount
 
             fi
             if ${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', 'true', 'false', d)}; then
