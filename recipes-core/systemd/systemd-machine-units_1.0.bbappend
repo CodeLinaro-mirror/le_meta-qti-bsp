@@ -20,6 +20,8 @@ SRC_URI_append += " file://data-ubi.mount"
 SRC_URI_append += " file://systemrw-ubi.mount"
 SRC_URI_append += " file://firmware-ubi-mount.sh"
 SRC_URI_append += " file://firmware-ubi-mount.service"
+SRC_URI_append += " file://zram-init.sh"
+SRC_URI_append += " file://zram-init.service"
 SRC_URI_append += " file://dsp-ubi-mount.sh"
 SRC_URI_append += " file://dsp-ubi-mount.service"
 SRC_URI_append += " file://bluetooth-ubi-mount.sh"
@@ -159,6 +161,10 @@ do_install_append () {
                install -m 0644 ${WORKDIR}/firmware-ubi-mount.service ${D}${systemd_unitdir}/system/fw-ubi-mount.service
                ln -sf ${systemd_unitdir}/system/firmware-mount.service \
                            ${D}${systemd_unitdir}/system/local-fs.target.requires/firmware-mount.service
+               install -m 0744 ${WORKDIR}/zram-init.sh ${D}${sysconfdir}/initscripts/zram-init.sh
+               install -m 0644 ${WORKDIR}/zram-init.service ${D}${systemd_unitdir}/system/zram-init.service
+               ln -sf ${systemd_unitdir}/system/zram-init.service \
+                           ${D}${systemd_unitdir}/system/local-fs.target.requires/zram-init.service
             fi
         fi
 
