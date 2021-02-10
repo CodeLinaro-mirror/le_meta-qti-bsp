@@ -36,6 +36,8 @@ vendor.audio.feature.compress_in.enable=true
 vendor.audio.feature.hfp.enable=true
 vendor.audio.feature.compress_meta_data.enable=true
 vendor.audio.feature.a2dp_offload.enable=true
+vendor.audio.feature.spkr_prot.enable=true
+vendor.audio.playback.dsp.pathdelay=true
 
 #enable ttp in capture and playback path
 persist.vendor.audio.ttp.render.mode=true

@@ -16,7 +16,7 @@ DEPENDS += "virtual/kernel openssl glib-2.0 libselinux ext4-utils libcutils libm
 DEPENDS_append_qcs605 = " libsync"
 DEPENDS_append_sdm845 = " libsync"
 
-PROVIDES += "libbacktrace libsysutils logwrapper adb logd usb"
+PROVIDES += "libbacktrace libsysutils logwrapper adb logd usb system-core-headers"
 
 EXTRA_OECONF = " --with-host-os=${HOST_OS} --with-glib"
 EXTRA_OECONF_append = " --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"

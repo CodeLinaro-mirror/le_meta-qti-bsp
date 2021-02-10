@@ -2,7 +2,7 @@
 # add the MACHINE name to this list.
 # This is the "only" list that will control whether
 # OTA upgrade will be supported on a target.
-OTA_SUPPORTED_EMMC_TARGET_LIST = "apq8009 qcs405-som1 qcs605-64 qcs605-32 sdm845 sdmsteppe nf-32 nf-64"
+OTA_SUPPORTED_EMMC_TARGET_LIST = "apq8009 qcs405-som1 qcs605-64 qcs605-32 sdm845 sdmsteppe nf-32 nf-64 vt-64"
 
 #deploy dir for emmc images.
 DEPLOY_DIR_IMAGE_EMMC ?= "${DEPLOY_DIR_IMAGE}"
