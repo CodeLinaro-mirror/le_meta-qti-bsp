@@ -23,6 +23,7 @@ INSANE_SKIP_${PN} = "arch"
 VBLE = "${@bb.utils.contains('DISTRO_FEATURES', 'vble','1', '0', d)}"
 
 VBLEIMA = "${@bb.utils.contains('DISTRO_FEATURES', 'vbleima','1', '0', d)}"
+VBLEEVM = "${@bb.utils.contains('DISTRO_FEATURES', 'vbleevm','1', '0', d)}"
 
 VERITY_ENABLED = "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity','1', '0', d)}"
 
@@ -39,6 +40,7 @@ EXTRA_OEMAKE = "'CLANG_BIN=${STAGING_BINDIR_NATIVE}/llvm-arm-toolchain/bin/' \
                 'VERIFIED_BOOT_LE=${VBLE}'\
                 'VERITY_LE=${VERITY_ENABLED}'\
                 'INTEGRITY_LE_IMA=${VBLEIMA}'\
+                'INTEGRITY_LE_EVM=${VBLEEVM}'\
                 'INIT_BIN_LE=\"/sbin/init\"'\
                 'EDK_TOOLS_PATH=${S}/BaseTools'\
                 'EARLY_ETH_ENABLED=${EARLY_ETH}'\
