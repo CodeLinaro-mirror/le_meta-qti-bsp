@@ -63,6 +63,9 @@ FindAndMountVolumeUBI () {
 
 mtd_file=/proc/mtd
 
+mtd_block_number=`cat $mtd_file | grep -i "recoveryfs" | sed 's/mtd//' | awk -F ':' '{print $1}'`
+ln -sf /dev/mtd$mtd_block_number /tmp/recoveryfs-mtd
+
 fstype="UBI"
 eval FindAndMountVolume${fstype} usrfs /data
 
