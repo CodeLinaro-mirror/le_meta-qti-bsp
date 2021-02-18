@@ -75,6 +75,8 @@ cat >> ${S}/arch/${ARCH}/configs/${KERNEL_CONFIG} <<KERNEL_EXTRACONFIGS_PERF
 CONFIG_DEBUG_LIST=y
 CONFIG_PROFILING=y
 CONFIG_OPROFILE=y
+CONFIG_SECURITY_DMESG_RESTRICT=y
+CONFIG_SECURITY_KPTR_RESTRICT=2
 KERNEL_EXTRACONFIGS_PERF
 fi
 }
@@ -90,6 +92,8 @@ SRC_URI_append_kernelpatchok += " \
     file://0001-kernel-misc-qseecom-Use-hvenv-driver-for-ghs-lv-gvm.patch \
     file://0001-ASoC-msm-Change-SEC_MI2S-to-fit-8x96autogvmga.patch \
     file://0001-Enable-CONFIG_PROFILING-CONFIG_OPROFILE-in-perf-buil.patch \
+    file://0001-add-kernel.kptr_restrict-Kconfig-options.patch \
+    file://0001-ion-use-system-heap-type-instead-of-carve-out-type.patch \
 "
 
 SRC_URI_append_kernelpatchok += "${@bb.utils.contains('DISTRO_FEATURES', 'qti-perf', 'file://0001-parallelize-audio-and-pcie-driver-to-improve-bootkpi.patch ', '', d)}"

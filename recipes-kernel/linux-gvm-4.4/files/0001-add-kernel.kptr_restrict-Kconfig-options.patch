@@ -1,0 +1,51 @@
+From 7a59785857dbb61c52f568e2022991d6f95216b2 Mon Sep 17 00:00:00 2001
+From: Bingjie Li <cbingji@codeaurora.org>
+Date: Fri, 20 Mar 2020 15:20:34 +0800
+Subject: [PATCH] add kernel.kptr_restrict Kconfig options
+
+Change-Id: I5882f635a2047a08aa83590a67fbe7049a4ca31a
+Signed-off-by: Bingjie Li <cbingji@codeaurora.org>
+---
+ lib/vsprintf.c   |  2 +-
+ security/Kconfig | 12 ++++++++++++
+ 2 files changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/lib/vsprintf.c b/lib/vsprintf.c
+index 646009d..6e81277 100644
+--- a/lib/vsprintf.c
++++ b/lib/vsprintf.c
+@@ -1358,7 +1358,7 @@ char *clock(char *buf, char *end, struct clk *clk, struct printf_spec spec,
+ 	}
+ }
+ 
+-int kptr_restrict __read_mostly;
++int kptr_restrict __read_mostly = CONFIG_SECURITY_KPTR_RESTRICT;
+ 
+ /*
+  * Show a '%p' thing.  A kernel extension is that the '%p' is followed
+diff --git a/security/Kconfig b/security/Kconfig
+index a98f777..d53dde2 100644
+--- a/security/Kconfig
++++ b/security/Kconfig
+@@ -23,6 +23,18 @@ config SECURITY_DMESG_RESTRICT
+ 
+ 	  If you are unsure how to answer this question, answer N.
+ 
++config SECURITY_KPTR_RESTRICT
++	int "Hide kernel pointers from unprivileged users"
++	default 0
++	help
++	  This enforces restrictions on unprivileged users reading kernel
++	  addresses via various interfaces, e.g. /proc.
++
++	  If this option is not selected, no restrictions will be enforced
++	  unless the kptr_restrict sysctl is explicitly set to (1,2).
++
++	  If you are unsure how to answer this question, answer N.
++
+ config SECURITY_PERF_EVENTS_RESTRICT
+ 	bool "Restrict unprivileged use of performance events"
+ 	depends on PERF_EVENTS
+-- 
+2.7.4
+
