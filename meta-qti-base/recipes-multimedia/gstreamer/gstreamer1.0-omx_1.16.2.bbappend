@@ -20,7 +20,7 @@ EXTRA_OEMESON = " \
 EXTRA_OEMESON_append =" -Denable-target-vpu554=yes"
 EXTRA_OEMESON_append =" -Denable-encoder-heic=yes"
 CPPFLAGS += "-I${STAGING_KERNEL_BUILDDIR}/usr/include"
-CPPFLAGS += "-DVIDC_TARGET_USES_GKI"
+CFLAGS_append = "-DVIDC_TARGET_USES_GKI"
 
 delete_pkg_m4_file() {
     # Delete m4 files which we provide patched versions of but will be ignored
