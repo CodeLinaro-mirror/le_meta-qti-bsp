@@ -93,7 +93,6 @@ SRC_URI_append_kernelpatchok += " \
     file://0001-ASoC-msm-Change-SEC_MI2S-from-Master-to-Slave.patch \
     file://0001-Enable-CONFIG_PROFILING-CONFIG_OPROFILE-in-perf-buil.patch \
     file://0001-add-kernel.kptr_restrict-Kconfig-options.patch \
-    file://0001-ion-use-system-heap-type-instead-of-carve-out-type.patch \
 "
 
 SRC_URI_append_kernelpatchok += "${@bb.utils.contains('DISTRO_FEATURES', 'qti-perf', 'file://0001-parallelize-audio-and-pcie-driver-to-improve-bootkpi.patch ', '', d)}"
