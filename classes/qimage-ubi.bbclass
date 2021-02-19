@@ -19,6 +19,7 @@ USERIMAGE_ROOTFS ?= "${WORKDIR}/usrfs"
 UBINIZE_CFG ?= "ubinize_system.cfg"
 
 IMAGE_UBIFS_SELINUX_OPTIONS = "${@bb.utils.contains('DISTRO_FEATURES', 'selinux', '--selinux=${SELINUX_FILE_CONTEXTS}', '', d)}"
+IMAGE_UBIFS_SELINUX_OPTIONS_DATA = "${@bb.utils.contains('DISTRO_FEATURES', 'selinux', '--selinux=${SELINUX_FILE_CONTEXTS_DATA}', '', d)}"
 
 do_image_ubi[noexec] = "1"
 do_image_ubifs[noexec] = "1"
@@ -62,10 +63,13 @@ create_symlink_systemd_ubi_mount_rootfs() {
         mountname="${entry:1}"
         if [[ "$mountname" == "firmware" || "$mountname" == "bt_firmware" || "$mountname" == "dsp" ]] ; then
             cp -f ${IMAGE_ROOTFS}/lib/systemd/system/${mountname}-mount-ubi.service ${IMAGE_ROOTFS}/lib/systemd/system/${mountname}-mount.service
-            rm ${IMAGE_ROOTFS}/lib/systemd/system/${mountname}-mount-ubi.service
             ln -sf ${systemd_unitdir}/system/${mountname}-mount.service ${IMAGE_ROOTFS}/lib/systemd/system/local-fs.target.requires/${mountname}-mount.service
         else
-            mv ${IMAGE_ROOTFS}/lib/systemd/system/${mountname}-ubi.mount  ${IMAGE_ROOTFS}/lib/systemd/system/${mountname}.mount
+            cp ${IMAGE_ROOTFS}/lib/systemd/system/${mountname}-ubi.mount ${IMAGE_ROOTFS}/lib/systemd/system/${mountname}.mount
+            if [ "$mountname" = "systemrw" ]; then
+                mkdir -p ${IMAGE_ROOTFS}/lib/systemd/system/systemrw.mount.d
+                cp ${IMAGE_ROOTFS}/lib/systemd/system/systemrw-ubi.conf ${IMAGE_ROOTFS}/lib/systemd/system/systemrw.mount.d/systemrw.conf
+            fi
             if [[ "$mountname" == "$userfsdatadir" ]] ; then
                 ln -sf ${systemd_unitdir}/system/${mountname}.mount ${IMAGE_ROOTFS}/lib/systemd/system/local-fs.target.wants/${mountname}.mount
             elif [[ "$mountname" == "cache" ]] ; then
@@ -87,6 +91,24 @@ create_symlink_systemd_ubi_mount_rootfs() {
     rm -rf ${IMAGE_ROOTFS}/etc/systemd/system/local-fs-pre.target.wants/set-slotsuffix.service
     # Recheck when overlay support added for ubi
     rm -rf ${IMAGE_ROOTFS}/lib/systemd/system/local-fs.target.wants/overlay-restore.service
+
+   # Remove rules to automount block devices.
+   sed -i '/SUBSYSTEM=="block", TAG+="systemd"/d' ${IMAGE_ROOTFS}/lib/udev/rules.d/99-systemd.rules
+   sed -i '/SUBSYSTEM=="block", ACTION=="add", ENV{DM_UDEV_DISABLE_OTHER_RULES_FLAG}=="1", ENV{SYSTEMD_READY}="0"/d' ${IMAGE_ROOTFS}/lib/udev/rules.d/99-systemd.rules
+
+   # Remove generator binaries and ensure that we don't rely on generators for mount or service files.
+   rm -rf ${IMAGE_ROOTFS}/lib/systemd/system-generators/systemd-debug-generator
+   rm -rf ${IMAGE_ROOTFS}/lib/systemd/system-generators/systemd-fstab-generator
+   rm -rf ${IMAGE_ROOTFS}/lib/systemd/system-generators/systemd-getty-generator
+   rm -rf ${IMAGE_ROOTFS}/lib/systemd/system-generators/systemd-gpt-auto-generator
+   rm -rf ${IMAGE_ROOTFS}/lib/systemd/system-generators/systemd-hibernate-resume-generator
+   rm -rf ${IMAGE_ROOTFS}/lib/systemd/system-generators/systemd-rc-local-generator
+   rm -rf ${IMAGE_ROOTFS}/lib/systemd/system-generators/systemd-system-update-generator
+   rm -rf ${IMAGE_ROOTFS}/lib/systemd/system-generators/systemd-sysv-generator
+
+   # Start systemd-udev-trigger.service after sysinit.target
+   sed -i '/Before=sysinit.target/a After=sysinit.target init_sys_mss.service' ${IMAGE_ROOTFS}/lib/systemd/system/systemd-udev-trigger.service
+   sed -i '/Before=sysinit.target/d' ${IMAGE_ROOTFS}/lib/systemd/system/systemd-udev-trigger.service
 }
 
 # Need to copy ubinize.cfg file in the deploy directory
@@ -142,7 +164,7 @@ do_makesystem_ubi[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
 
 fakeroot do_makesystem_ubi() {
     mkfs.ubifs -r ${IMAGE_ROOTFS} ${IMAGE_UBIFS_SELINUX_OPTIONS} -o ${SYSTEMIMAGE_UBIFS_TARGET} ${MKUBIFS_ARGS}
-    mkfs.ubifs -r ${USERIMAGE_ROOTFS} -o ${USERIMAGE_UBIFS_TARGET} ${MKUBIFS_ARGS}
+    mkfs.ubifs -r ${USERIMAGE_ROOTFS} ${IMAGE_UBIFS_SELINUX_OPTIONS_DATA} -o ${USERIMAGE_UBIFS_TARGET} ${MKUBIFS_ARGS}
     ubinize -o ${SYSTEMIMAGE_UBI_TARGET} ${UBINIZE_ARGS} ${UBINIZE_CFG}
 }
 
