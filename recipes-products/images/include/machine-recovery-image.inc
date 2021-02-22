@@ -102,15 +102,30 @@ create_recoveryfs_ubi_img_with_selinux() {
 }
 
 do_rename_recovery_ubi_image() {
-    #rename machine-recovery-image.ubi if it exists
-    if [ -f "${DEPLOY_DIR_IMAGE_NAND}/machine-recovery-image-${MACHINE}.ubi" ]; then
-        mv ${DEPLOY_DIR_IMAGE_NAND}/machine-recovery-image-${MACHINE}.ubi ${DEPLOY_DIR_IMAGE_NAND}/${MACHINE}-recoveryfs.ubi
-    fi
+    # if nand-squahfs distro is enabled then rename ubifs file as ${MACHINE}-recoveryfs-ubifs.ubi
+    #  since ${MACHINE}-recoveryfs.ubi is used for squshfs recovery image
+    if ${@bb.utils.contains('DISTRO_FEATURES','nand-squashfs','true','false',d)}; then
+        # rename machine-recovery-image.ubi if it exists
+        if [ -f "${DEPLOY_DIR_IMAGE_NAND}/machine-recovery-image-${MACHINE}.ubi" ]; then
+            mv ${DEPLOY_DIR_IMAGE_NAND}/machine-recovery-image-${MACHINE}.ubi ${RECOVERYFS_UBIFS_UBI_IMAGE}
+        fi
 
-    # if there is "selinux enabled" version of recoveryfs image,
-    # we would like to use that instead
-    if [ -f "${DEPLOY_DIR_IMAGE_NAND}/machine-recovery-image-selinux-${MACHINE}.ubi" ]; then
-        mv ${DEPLOY_DIR_IMAGE_NAND}/machine-recovery-image-selinux-${MACHINE}.ubi ${DEPLOY_DIR_IMAGE_NAND}/${MACHINE}-recoveryfs.ubi
+        # if there is "selinux enabled" version of recoveryfs image,
+        # we would like to use that instead
+        if [ -f "${DEPLOY_DIR_IMAGE_NAND}/machine-recovery-image-selinux-${MACHINE}.ubi" ]; then
+            mv ${DEPLOY_DIR_IMAGE_NAND}/machine-recovery-image-selinux-${MACHINE}.ubi ${RECOVERYFS_UBIFS_UBI_IMAGE}
+        fi
+    else
+        #rename machine-recovery-image.ubi if it exists
+        if [ -f "${DEPLOY_DIR_IMAGE_NAND}/machine-recovery-image-${MACHINE}.ubi" ]; then
+            mv ${DEPLOY_DIR_IMAGE_NAND}/machine-recovery-image-${MACHINE}.ubi ${DEPLOY_DIR_IMAGE_NAND}/${MACHINE}-recoveryfs.ubi
+        fi
+
+        # if there is "selinux enabled" version of recoveryfs image,
+        # we would like to use that instead
+        if [ -f "${DEPLOY_DIR_IMAGE_NAND}/machine-recovery-image-selinux-${MACHINE}.ubi" ]; then
+            mv ${DEPLOY_DIR_IMAGE_NAND}/machine-recovery-image-selinux-${MACHINE}.ubi ${DEPLOY_DIR_IMAGE_NAND}/${MACHINE}-recoveryfs.ubi
+        fi
     fi
 }
 
