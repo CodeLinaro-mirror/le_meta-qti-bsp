@@ -33,6 +33,10 @@ IMAGE_INSTALL += "edk2"
 IMAGE_INSTALL += "coreutils"
 IMAGE_INSTALL += "km-loader"
 IMAGE_INSTALL += "systemd-machine-units"
+# include abl image which support rootfs type as ubifs
+# this image should be flashed while using non-squashfs file
+IMAGE_INSTALL += "abl-ubifs"
+
 
 IMAGE_POSTPROCESS_COMMAND_append = "${@bb.utils.contains('IMAGE_FSTYPES', 'squashfs-xz', 'create_ext4_images;','',d)}"
 
