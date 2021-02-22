@@ -132,6 +132,7 @@ do_install_append_mdm() {
       ln -sf ${systemd_unitdir}/system/pcie.service ${D}${systemd_unitdir}/system/ffbm.target.wants/pcie.service
       ln -sf ${systemd_unitdir}/system/pcie.service ${D}${systemd_unitdir}/system/local-fs.target.wants/pcie.service
       ln -sf ${systemd_unitdir}/system/usb.service ${D}${systemd_unitdir}/system/local-fs.target.wants/usb.service
+      sed -i '/Requires=usb.service/s/$/ diag-router.service/' ${D}${systemd_unitdir}/system/adbd.service
    fi
 }
 
