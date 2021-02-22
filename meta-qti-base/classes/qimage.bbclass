@@ -60,7 +60,7 @@ do_make_dm_verity_avb2_image(){
 
         rootfs_partition_size=$(expr $rootfs_size + $overhead_size)
 
-        avbtool add_hash_footer --image ${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET} --partition_size 0x02000000 --partition_name boot \
+        avbtool add_hash_footer --image ${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET} --partition_size 0x04000000 --partition_name boot \
         --algorithm SHA256_RSA4096 \
         --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/vbgvm_private_key_4096.pem --rollback_index 0
         avbtool add_hashtree_footer --image ${DEPLOY_DIR_IMAGE}/machine-image-${PRODUCT}.ext4 --partition_name system --partition_size ${rootfs_partition_size} --hash_algorithm sha256 --do_not_generate_fec
