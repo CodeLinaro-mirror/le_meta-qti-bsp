@@ -41,6 +41,7 @@ do_compile() {
 do_install() {
     # Add early_init script for early_init feature
     install -d ${D}/run
+	install -d ${D}/early
     install -d ${D}/debug
     install -d ${D}${sbindir}
     install -m 0755 ${S}/early_init  ${D}${sbindir}/early_init
@@ -83,3 +84,4 @@ do_install() {
 FILES_${PN} += " ${sbindir}/early_init"
 FILES_${PN} += " /run"
 FILES_${PN} += " /debug"
+FILES_${PN} += " /early"

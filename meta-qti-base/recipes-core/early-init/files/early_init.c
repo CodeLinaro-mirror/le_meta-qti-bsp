@@ -225,6 +225,13 @@ static inline void prepare_dir(char* p)
 				mkdirs("/run/early", 0775);
 			}
 			break;
+		case 'e':
+			if (0 == strncmp(p + 1, "arly_init_dir", strlen("early_init_dir"))) {
+				ret = mount("tmpfs", "/early", "tmpfs", MS_NOSUID|MS_NODEV|MS_STRICTATIME, "mode=755");
+				if (ret < 0) {
+					perror("mount tmpfs failed");
+				}
+			}
 		case 's':
 			if (0 == strncmp(p + 1, "hm", strlen("hm"))) {
 				mkdirs("/dev/shm", 0777);
@@ -643,11 +650,12 @@ int main(int argc, char* argv[])
 
 	prepare_dir("sysfs");
 	prepare_dir("debugfs");
-	prepare_dir("xdg_runtime_dir");
+	//prepare_dir("xdg_runtime_dir");
 	prepare_dir("shm");
 	prepare_dir("procfs");
+	prepare_dir("early_init_dir");
 
-	fd = open("/run/early_init.log", O_RDWR | O_CREAT, 0644);
+	fd = open("/early/early_init.log", O_RDWR | O_CREAT, 0644);
 	if (fd < 0)
 		perror("open log file failed");
 
