@@ -10,9 +10,11 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         alsa-utils \
         canutils \
         chrony \
+        chronyc \
         e2fsprogs \
         e2fsprogs-e2fsck \
         e2fsprogs-mke2fs \
+        e2fsprogs-tune2fs \
         glib-2.0 \
         kernel-modules \
         libnl \
@@ -40,5 +42,6 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-wifi \
         ${@bb.utils.contains('DISTRO_FEATURES', 'ros2', 'packagegroup-ros2-foxy', '', d)} \
         packagegroup-startup-scripts \
+        ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
         systemd-machine-units \
 "
