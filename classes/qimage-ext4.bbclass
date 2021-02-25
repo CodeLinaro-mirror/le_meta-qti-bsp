@@ -20,14 +20,11 @@ USERDATAIMAGE_MAP_TARGET ?= "userdata.map"
 PERSISTIMAGE_TARGET ?= "persist.img"
 PERSISTIMAGE_MAP_TARGET ?= "persist.map"
 DTBOIMAGE_TARGET ?= "dtbo.img"
-CACHEIMAGE_TARGET ?= "cache.img"
-SYSTEMRWIMAGE_TARGET ?= "systemrw.img"
 
 IMAGE_EXT4_SELINUX_OPTIONS = "${@bb.utils.contains('DISTRO_FEATURES', 'selinux', '-S ${SELINUX_FILE_CONTEXTS}', '', d)}"
 
 ROOTFS_POSTPROCESS_COMMAND += "gen_buildprop;do_fsconfig;"
-ROOTFS_POSTPROCESS_COMMAND += "${@bb.utils.contains('MACHINE_MNT_POINTS', 'overlay', 'gen_overlayfs;', '', d)}"
-USERDATA_DIR = "${@bb.utils.contains('MACHINE_MNT_POINTS', 'overlay', 'overlay', 'data', d)}"
+ROOTFS_POSTPROCESS_COMMAND += "gen_overlayfs;"
 
 gen_buildprop() {
    mkdir -p ${IMAGE_ROOTFS}/cache
@@ -122,7 +119,7 @@ do_makeuserdata() {
                 -a /data ${IMAGE_EXT4_SELINUX_OPTIONS} \
                 -s -b 4096 -l ${USERDATA_SIZE_EXT4} \
                 ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${USERDATAIMAGE_TARGET} \
-                ${IMAGE_ROOTFS}/${USERDATA_DIR}
+                ${IMAGE_ROOTFS}/overlay
 }
 
 addtask do_makeuserdata after do_rootfs before do_build
@@ -146,30 +143,3 @@ do_makepersist() {
 }
 # It must be before do_makesystem to remove /persist
 addtask do_makepersist after do_rootfs before do_makesystem
-
-################################################
-############ Generate cache image ############
-################################################
-CACHE_IMAGE_ROOTFS_SIZE ?= "8388608"
-do_makecache[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
-
-do_makecache() {
-    make_ext4fs  -s -l ${CACHE_IMAGE_ROOTFS_SIZE} \
-                ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${CACHEIMAGE_TARGET}
-}
-
-addtask do_makecache after do_rootfs before do_makesystem
-
-################################################
-############ Generate systemrw image ############
-################################################
-SYSTEMRW_IMAGE_ROOTFS_SIZE ?= "8388608"
-do_makesystemrw[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
-
-do_makesystemrw() {
-    make_ext4fs  -a /systemrw ${IMAGE_EXT4_SELINUX_OPTIONS} \
-                 -s -b 4096 -l ${SYSTEMRW_IMAGE_ROOTFS_SIZE} \
-                 ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMRWIMAGE_TARGET}
-}
-
-addtask do_makesystemrw after do_rootfs before do_makesystem
