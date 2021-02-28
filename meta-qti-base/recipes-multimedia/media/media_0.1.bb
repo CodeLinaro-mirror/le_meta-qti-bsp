@@ -69,7 +69,6 @@ LDFLAGS += "-lgbm"
 LDFLAGS += "-ldrm"
 LDFLAGS += "-lwayland-client"
 LDFLAGS += "-lEGL"
-LDFLAGS += "-lqdMetaData"
 
 do_install_append() {
    install -d ${D}${includedir}/mm-core
