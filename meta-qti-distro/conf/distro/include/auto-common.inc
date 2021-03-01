@@ -1,5 +1,5 @@
 BASEDISTRO ?= "msm"
-include conf/distro/msm.conf
+require conf/distro/include/msm.inc
 
 DISTRO_NAME = "automotive"
 DISTROOVERRIDES =. "automotive:"
