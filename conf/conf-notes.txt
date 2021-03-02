@@ -43,7 +43,7 @@ Supported combinations are listed below.
       +---------------+----------------+------------------+
       |sdm845         | robot          | debug perf       |
       +---------------+----------------+------------------+
-      |sm8250         | edge aedk      | debug perf       |
+      |sm8250         | edge aedk cdp  | debug perf       |
       +---------------+----------------+------------------+
 
 Once ready run 'bitbake <pkg-name>' to build required package or

@@ -9,6 +9,7 @@ inherit ${@bb.utils.contains('TARGET_KERNEL_ARCH', 'aarch64', 'qtikernel-arch', 
 SRC_URI_append_sdmsteppe = " file://disableipa3.cfg"
 SRC_URI_append_sdmsteppe = " file://sdmsteppe_iot_configs.cfg"
 SRC_URI_append_sm8250 = "${@bb.utils.contains('DISTRO', 'aedk', ' file://aedk_overlay.cfg', '', d)}"
+SRC_URI_append_sm8250 = "${@bb.utils.contains('DISTRO', 'cdp', ' file://cdp_overlay.cfg', '', d)}"
 SRC_URI_append_sm8250 += "${@bb.utils.contains('DISTRO_FEATURES', 'disable_kernel_signature', 'file://disable_signature.cfg', '', d)}"
 
 COMPATIBLE_MACHINE = "(sm8250)"
