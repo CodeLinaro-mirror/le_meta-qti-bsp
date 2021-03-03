@@ -1,5 +1,7 @@
 inherit core-image dm-verity
 
+DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'avb', 'avbtool-native', '', d)}"
+
 #  Function to get most suitable .inc file with list of packages
 #  to be installed into root filesystem from layer it is called.
 #  Following is the order of priority.
@@ -109,3 +111,38 @@ python () {
     if bb.utils.contains('DISTRO_FEATURES', 'dm-verity', True, False, d):
         bb.build.addtask('do_make_veritybootimg', 'do_image_complete', 'do_rootfs', d)
 }
+
+do_make_avb_image() {
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'avb', 'true', 'false', d)}; then
+        rootfs_size_kb=${IMAGE_ROOTFS_SIZE}
+        rootfs_size=$(expr $rootfs_size_kb \* 1024)
+        overhead_size_kb=$(expr $rootfs_size_kb / 5)
+        overhead_size=$(expr $overhead_size_kb \* 1024)
+
+        if [ "$(expr $size_bytes % 4096)" != "0" ]; then
+            overhead_size=$(expr $(expr 4096 - $(expr $overhead_size % 4096)) + $overhead_size)
+        fi
+
+    rootfs_partition_size=$(expr $rootfs_size + $overhead_size)
+    # add hashree for system image when enable avb.
+    avbtool add_hashtree_footer \
+        --image ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
+        --partition_size ${rootfs_partition_size} \
+        --partition_name system  \
+        --algorithm SHA256_RSA4096 \
+        --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/testkey_rsa4096.pem \
+        --do_not_generate_fec
+
+   # generate vbmeta.img
+   avbtool make_vbmeta_image \
+        --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET} \
+        --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${PRODUCT}-dtbo.img \
+        --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4  \
+        --setup_rootfs_from_kernel ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4  \
+        --algorithm SHA256_RSA4096 \
+        --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/testkey_rsa4096.pem \
+        --output ${DEPLOY_DIR_IMAGE}/${VBMETAIMAGE_TARGET}
+    fi
+}
+
+addtask do_make_avb_image after do_image_complete before do_build
