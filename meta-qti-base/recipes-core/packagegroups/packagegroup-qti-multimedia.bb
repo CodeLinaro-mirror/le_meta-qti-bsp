@@ -28,4 +28,5 @@ RDEPENDS_${PN} = " \
         alsa-lib \
         alsa-utils \
         alsa-plugins \
+        secureappsrc \
 "
