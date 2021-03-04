@@ -25,7 +25,7 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 LV = "1.0.0"
 
-inherit autotools
+inherit autotools systemd
 
 
 #re-use non-perf settings
@@ -84,6 +84,12 @@ do_install_append() {
    install -d ${D}${includedir}/libstagefrighthw
    install -m 0644 ${S}/libstagefrighthw/QComOMXMetadata.h -D ${D}${includedir}/libstagefrighthw/
    install -m 0644 ${S}/libc2dcolorconvert/C2DColorConverter.h ${D}${includedir}/
+
+   if ${@bb.utils.contains('DISTRO_FEATURES', 'early_init', 'true', 'false', d)}; then
+       install -m 0777 ${THISDIR}/test_1080p.h264 -D ${D}/usr/bin/test_1080p.h264
+       install -m 0755 ${THISDIR}/video_dec_demo.sh -D ${D}${sbindir}/video_dec_demo.sh
+       install -m 0644 ${THISDIR}/video_early_demo.service -D ${D}${systemd_unitdir}/system/video_early_demo.service
+   fi
 }
 
 FILES_${PN}-dev = "\
@@ -102,3 +108,6 @@ FILES_${PN} += "${includedir}/mm-core/* \
                 ${includedir}/venc/inc/* \
                 ${includedir}/vdec/inc/* \
                 ${includedir}/*"
+
+FILES_${PN} += "${sbindir}/* \
+                ${systemd_unitdir}/system/*"
