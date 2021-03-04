@@ -32,4 +32,4 @@ After=basic.target
 Type=ubifs
 What=ubi0:cachefs
 Where=/cache
-Options=bulk_read
+Options=bulk_read,rootcontext=system_u:object_r:cache_t:s0
