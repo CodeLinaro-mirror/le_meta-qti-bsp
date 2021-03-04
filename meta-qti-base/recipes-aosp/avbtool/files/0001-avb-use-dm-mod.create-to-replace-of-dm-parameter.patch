@@ -1,0 +1,30 @@
+From 354b9756489d82c2464df4dcbbe891ffa3fb41c1 Mon Sep 17 00:00:00 2001
+From: Nan Zhang <nanzhan@codeaurora.org>
+Date: Fri, 5 Mar 2021 00:37:40 +0800
+Subject: [PATCH] avb: use dm-mod.create to replace of dm parameter.
+
+For kernel 5.4, dm-init driver will used the dm-mod.create
+parameter to create dm verity.
+
+Change-Id: I235064689c40448b507df3a15ef66e8ac289456a
+Signed-off-by: Nan Zhang <nanzhan@codeaurora.org>
+---
+ avbtool.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/avbtool.py b/avbtool.py
+index 1211df3..c05b516 100755
+--- a/avbtool.py
++++ b/avbtool.py
+@@ -2805,7 +2805,7 @@ class Avb(object):
+       when it is.
+ 
+     """
+-    c = 'dm="1 vroot none ro 1,'
++    c = 'dm-mod.create="vroot,,0,ro,'
+     c += '0'                                                # start
+     c += ' {}'.format((ht.image_size // 512))               # size (# sectors)
+     c += ' verity {}'.format(ht.dm_verity_version)          # type and version
+-- 
+2.7.4
+
