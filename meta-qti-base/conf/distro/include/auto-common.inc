@@ -29,6 +29,9 @@ DISTRO_FEATURES_append = "${@bb.utils.contains_any('VARIANT', 'perf user', ' ear
 #DISTRO_FEATURES_append = " early_init"
 #DISTRO_FEATURES_append = " early_userspace"
 
+# Support selinux
+DISTRO_FEATURES_append = " selinux"
+
 DISTRO_FEATURES_append = " ab-boot-support"
 
 # Use systemd init manager.
