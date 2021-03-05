@@ -20,6 +20,7 @@ SRC_URI_append_qcs610 = " \
     ${@bb.utils.contains_any('COMBINED_FEATURES', 'qti-camera mm-camera', 'file://camera.cfg', '', d)} \
     ${@bb.utils.contains('COMBINED_FEATURES', 'drm', 'file://display_drm.cfg', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'qti-fastcv', 'file://fastcv.cfg', '', d)} \
+    ${@bb.utils.contains('COMBINED_FEATURES', 'qti-audio', 'file://audio_targets.cfg', '', d)} \
     ${DBGCFG} \
 "
 
