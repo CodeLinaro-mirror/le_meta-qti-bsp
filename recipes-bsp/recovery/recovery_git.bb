@@ -21,6 +21,7 @@ CFLAGS += "-lsparse -llog"
 SYSTEMD_SUPPORT = "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd', '', d)}"
 
 SELINUX_SUPPORT = "${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'selinux', '', d)}"
+EXTRA_OECONF += " ${@bb.utils.contains('DISTRO_FEATURES', 'nand-ab', 'TARGET_NAND_AB_BOOT=true', 'TARGET_NAND_NON_AB=true', d)}"
 PARALLEL_MAKE = ""
 INITSCRIPT_NAME = "recovery"
 INITSCRIPT_PARAMS = "start 99 5 . stop 80 0 1 6 ."
