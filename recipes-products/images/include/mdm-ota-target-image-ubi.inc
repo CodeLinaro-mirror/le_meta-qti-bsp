@@ -170,6 +170,12 @@ do_recovery_ubi() {
     #blocksize = BOARD_FLASH_BLOCK_SIZE
     echo blocksize=131072 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
 
+
+    if ! [[ "${DISTRO_FEATURES}" =~ .*nand-ab* ]]; then
+        # add empty file in META, this file if present is used as condition to enable boot incremental
+        echo "" >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/boot-incremetal
+    fi
+
     if [ "${BASEMACHINE}" == "mdm9607" ]; then
         # boot_size: Size of boot partition from partition.xml
         echo boot_size=0x007C0000 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
