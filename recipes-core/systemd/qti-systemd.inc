@@ -1,19 +1,57 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/systemd:"
 
-SRC_URI += "file://Disable-unused-mount-points.patch"
-SRC_URI += "file://mountpartitions.rules"
-SRC_URI += "file://systemd-udevd.service"
-SRC_URI += "file://ffbm.target"
-SRC_URI += "file://mtpserver.rules"
-SRC_URI += "file://ion.rules"
-SRC_URI += "file://kgsl.rules"
-SRC_URI += "file://set-usb-nodes.rules"
-SRC_URI += "file://sysctl.conf"
-SRC_URI += "file://platform.conf"
-SRC_URI += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-vm', 'file://trusted_touch.conf', '',d)}"
-SRC_URI += "file://sd-bus-Allow-extra-users-to-communicate.patch"
-SRC_URI += "file://systemd-namespace-mountflags-fix.patch"
-SRC_URI += "file://set-mhi-nodes.rules"
+# Fetch systemd.git from CAF.
+SRC_URI  = "git://source.codeaurora.org/quic/le/systemd.git;protocol=https;branch=systemd/main"
+
+
+SRC_URI += "file://touchscreen.rules \
+            file://00-create-volatile.conf \
+            file://init \
+            file://0001-binfmt-Don-t-install-dependency-links-at-install-tim.patch \
+            file://0002-use-lnr-wrapper-instead-of-looking-for-relative-opti.patch \
+            file://0003-implment-systemd-sysv-install-for-OE.patch \
+            file://0004-rules-whitelist-hd-devices.patch \
+            file://0005-Make-root-s-home-directory-configurable.patch \
+            file://0006-remove-nobody-user-group-checking.patch \
+            file://0007-rules-watch-metadata-changes-in-ide-devices.patch \
+            file://0008-Do-not-enable-nss-tests-if-nss-systemd-is-not-enable.patch \
+            file://0009-nss-mymachines-Build-conditionally-when-ENABLE_MYHOS.patch \
+            file://0001-login-use-parse_uid-when-unmounting-user-runtime-dir.patch \
+            file://0001-sd-bus-make-BUS_DEFAULT_TIMEOUT-configurable.patch \
+            file://0022-build-sys-Detect-whether-struct-statx-is-defined-in-.patch \
+            file://0023-resolvconf-fixes-for-the-compatibility-interface.patch \
+            file://0001-core-when-deserializing-state-always-use-read_line-L.patch \
+            file://0001-chown-recursive-let-s-rework-the-recursive-logic-to-.patch \
+            file://0001-dhcp6-make-sure-we-have-enough-space-for-the-DHCP6-o.patch \
+            file://0001-Revert-sysctl.d-request-ECN-on-both-in-and-outgoing-.patch \
+            file://0001-timesync-changes-type-of-drift_freq-to-int64_t.patch \
+            file://0001-sysctl-Don-t-pass-null-directive-argument-to-s.patch \
+            file://0002-core-Fix-use-after-free-case-in-load_from_path.patch \
+            file://0001-meson-rename-Ddebug-to-Ddebug-extra.patch \
+            file://0024-journald-do-not-store-the-iovec-entry-for-process-co.patch \
+            file://0025-journald-set-a-limit-on-the-number-of-fields.patch \
+            file://0026-journal-fix-out-of-bounds-read-CVE-2018-16866.patch \
+            file://CVE-2019-6454.patch \
+            file://sd-bus-if-we-receive-an-invalid-dbus-message-ignore-.patch \
+            "
+
+# QTI specific patches.
+SRC_URI += " \
+           file://Disable-unused-mount-points.patch \
+           file://mountpartitions.rules \
+           file://systemd-udevd.service \
+           file://ffbm.target \
+           file://mtpserver.rules \
+           file://ion.rules \
+           file://kgsl.rules \
+           file://set-usb-nodes.rules \
+           file://sysctl.conf \
+           file://platform.conf \
+           ${@bb.utils.contains('MACHINE_FEATURES', 'qti-vm', 'file://trusted_touch.conf', '',d)} \
+           file://sd-bus-Allow-extra-users-to-communicate.patch \
+           file://systemd-namespace-mountflags-fix.patch \
+           file://set-mhi-nodes.rules \
+           "
 
 # Custom setup for PACKAGECONFIG to get a slimmer systemd.
 # Removed following:
