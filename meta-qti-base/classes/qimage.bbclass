@@ -141,6 +141,7 @@ do_make_avb_image() {
         --setup_rootfs_from_kernel ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4  \
         --algorithm SHA256_RSA4096 \
         --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/testkey_rsa4096.pem \
+        --rollback_index 0 \
         --output ${DEPLOY_DIR_IMAGE}/${VBMETAIMAGE_TARGET}
     fi
 }
