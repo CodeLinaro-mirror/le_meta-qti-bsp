@@ -48,6 +48,8 @@ EXTRA_OEMAKE = "'CLANG_BIN=${STAGING_BINDIR_NATIVE}/llvm-arm-toolchain/bin/' \
 EXTRA_OEMAKE_append_qcs40x = " 'DISABLE_PARALLEL_DOWNLOAD_FLASH=1'"
 NAND_SQUASHFS_SUPPORT = "${@bb.utils.contains('DISTRO_FEATURES', 'nand-squashfs', '1', '0', d)}"
 EXTRA_OEMAKE_append = " 'NAND_SQUASHFS_SUPPORT=${NAND_SQUASHFS_SUPPORT}'"
+NAND_AB_ATTR_SUPPORT = "${@bb.utils.contains('DISTRO_FEATURES', 'nand-ab', 'true', 'false', d)}"
+EXTRA_OEMAKE_append = " 'TARGET_NAND_AB_ATTR_SUPPORT=${NAND_AB_ATTR_SUPPORT}'"
 
 do_compile () {
     export CC=${BUILD_CC}

@@ -26,12 +26,21 @@ def nand_set_vars_and_get_dependencies(d):
     if bb.utils.contains('DISTRO_FEATURES', 'nand-squashfs', True, False, d):
         d.setVar('SQUASHFS_SUPPORTED', "1");
 
-    # for Non A/B target, set RECOVERY_IMAGE_UBI to "1"
-    # this will generate a non A/B update package as well.
-    d.setVar('RECOVERY_IMAGE_UBI', "1");
-    d.setVar('GENERATE_AB_OTA_PACKAGE_UBI', "0");
-    return " machine-recovery-image releasetools-native"
+    if bb.utils.contains('DISTRO_FEATURES', 'nand-ab', True, False, d):
+        # Generate A/B and non A/B update package.
+        d.setVar('RECOVERY_IMAGE_UBI', "1");
+        return " machine-recovery-image releasetools-native"
 
+    if bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', True, False, d):
+        d.setVar('RECOVERY_IMAGE_UBI', "0");
+        d.setVar('GENERATE_AB_OTA_PACKAGE_UBI', "1");
+        return " releasetools-native"
+    else:
+        # for Non A/B target, set RECOVERY_IMAGE_UBI to "1"
+        # this will generate a non A/B update package as well.
+        d.setVar('RECOVERY_IMAGE_UBI', "1");
+        d.setVar('GENERATE_AB_OTA_PACKAGE_UBI', "0");
+        return " machine-recovery-image releasetools-native"
 
 # Add tasks to generate recovery image, OTA zip files
 python __anonymous () {
@@ -41,6 +50,12 @@ python __anonymous () {
                 d.getVar('GENERATE_AB_OTA_PACKAGE_UBI', True) == '1'):
             bb.build.addtask('do_recovery_ubi', 'do_build', 'do_image_ubi', d)
             bb.build.addtask('do_gen_otazip_ubi', 'do_build', 'do_recovery_ubi', d)
+            # if nand-ab feature is enabled we generate both A/B and non A/B images
+            # generating non A/B images target-files-ubi.zip and update_ubi.zip is done by default
+            # adding below 2 tasks to generate A/B images target-files-ubi_ab.zip and update_ubi_ab.zip
+            if bb.utils.contains('DISTRO_FEATURES', 'nand-ab', True, False, d):
+                bb.build.addtask('do_recovery_ubi_ab', 'do_gen_otazip_ubi_ab', 'do_gen_otazip_ubi', d)
+                bb.build.addtask('do_gen_otazip_ubi_ab', 'do_build', 'do_recovery_ubi_ab', d)
 }
 
 OTA_TARGET_IMAGE_ROOTFS_UBI = "${IMAGE_ROOTFS}/../${MACHINE}-ota-target-image-ubi"
@@ -87,7 +102,12 @@ do_recovery_ubi() {
     ln -snf ../run var/run
 
     #copy contents of recovery rootfs
-    cp -r ${RECOVERY_IMAGE_UBI_ROOTFS}/. ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RECOVERY/.
+    #if parameter is only passed to generate AB OTA images under "nand-ab" feature
+    if [[ ! -z "${1}" ]]; then
+      cp -r ${IMAGE_ROOTFS}/. ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RECOVERY/.
+    else
+      cp -r ${RECOVERY_IMAGE_UBI_ROOTFS}/. ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RECOVERY/.
+    fi
 
     #generate recovery.fstab which is used by the updater-script
     #echo #mount point fstype device [device2] >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RECOVERY/recovery.fstab
@@ -161,6 +181,20 @@ do_recovery_ubi() {
         #set use_set_metadata to 1 so that updater-script
         #will have rules to apply selabels
         echo use_set_metadata=1 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
+    fi
+
+    # Targets that support A/B boot do not need recovery(fs)-updater
+    if ${@bb.utils.contains('DISTRO_FEATURES','nand-ab','false','true',d)}; then
+      # if nand-ab not defined use default flow to generate A/B images based on ab-boot-support
+      if ${@bb.utils.contains('DISTRO_FEATURES','ab-boot-support','true','false',d)}; then
+          echo le_target_supports_ab=1 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
+      fi
+    else
+      # if nand-ab is defined then generate A/B images only when func is passed a parameter
+      # this func is passed a parameter only when A/B images are to be generated
+      if [[ ! -z "${1}" ]]; then
+          echo le_target_supports_ab=1 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
+      fi
     fi
 
     # copy contents of META folder
@@ -244,4 +278,31 @@ do_gen_otazip_ubi() {
     cd ${TMPDIR}/work/x86_64-linux/releasetools-native/1.0-r0/releasetools && ./full_ota.sh target-files-ubi.zip ${IMAGE_ROOTFS} ubi $block_based
 
     cd ${TMPDIR}/work/x86_64-linux/releasetools-native/1.0-r0/releasetools && cp update_ubi.zip target-files-ubi.zip ${DEPLOY_DIR_IMAGE_NAND}
+}
+
+do_recovery_ubi_ab() {
+  rm -rf ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RECOVERY/*
+  do_recovery_ubi _ab
+}
+
+do_gen_otazip_ubi_util() {
+    # Clean up any existing target-files*.zip as this can lead to incorrect content getting packed in the zip.
+    rm -f ${TMPDIR}/work/x86_64-linux/releasetools-native/1.0-r0/releasetools/target-files-ubi$1.zip
+
+    cd ${IMAGE_ROOTFS}/../${MACHINE}-ota-target-image-ubi && /usr/bin/zip -qry -FS ${TMPDIR}/work/x86_64-linux/releasetools-native/1.0-r0/releasetools/target-files-ubi$1.zip *
+
+    block_based=""
+    if [[ "${SQUASHFS_SUPPORTED}" == "1" ]]; then
+        # if nand-squashfs is supported, we can use block-based OTA upgrade
+        # on gluebi-emulated block devices.
+        block_based="--block"
+    fi
+
+    cd ${TMPDIR}/work/x86_64-linux/releasetools-native/1.0-r0/releasetools && ./full_ota.sh target-files-ubi$1.zip ${IMAGE_ROOTFS} ubi$1 $block_based
+
+    cd ${TMPDIR}/work/x86_64-linux/releasetools-native/1.0-r0/releasetools && cp update_ubi$1.zip target-files-ubi$1.zip ${DEPLOY_DIR_IMAGE_NAND}
+}
+
+do_gen_otazip_ubi_ab() {
+  do_gen_otazip_ubi_util _ab
 }

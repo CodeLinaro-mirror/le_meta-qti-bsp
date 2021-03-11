@@ -6,6 +6,7 @@ SRC_URI += "file://systemd-udevd.service"
 SRC_URI += "file://ffbm.target"
 #SRC_URI += "file://mtpserver.rules"
 SRC_URI += "file://ion.rules"
+SRC_URI += "${@bb.utils.contains('DISTRO_FEATURES', [ 'ab-boot-support', 'nand-ab' ], 'file://mtd.rules', '', d)}"
 SRC_URI += "file://kgsl.rules"
 SRC_URI += "file://set-usb-nodes.rules"
 SRC_URI += "file://sysctl.conf"
@@ -103,6 +104,9 @@ do_install_append () {
    fi
    install -d ${D}${sysconfdir}/udev/rules.d/
    install -m 0644 ${WORKDIR}/ion.rules -D ${D}${sysconfdir}/udev/rules.d/ion.rules
+   if ${@bb.utils.contains('DISTRO_FEATURES', [ 'ab-boot-support', 'nand-ab' ], 'true', 'false', d)}; then
+           install -m 0644 ${WORKDIR}/mtd.rules -D ${D}${sysconfdir}/udev/rules.d/mtd.rules
+   fi
    install -m 0644 ${WORKDIR}/kgsl.rules -D ${D}${sysconfdir}/udev/rules.d/kgsl.rules
    install -m 0644 ${WORKDIR}/set-mhi-nodes.rules -D ${D}${sysconfdir}/udev/rules.d/set-mhi-nodes.rules
 

@@ -25,6 +25,7 @@ SELINUX_SUPPORT = "${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'selinux',
 AB_SUPPORT = "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'TARGET_SUPPORTS_AB=true', '', d)}"
 NEED_ABCTL = "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'abctl', '', d)}"
 EXTRA_OECONF += " ${AB_SUPPORT}"
+EXTRA_OECONF += " ${@bb.utils.contains('DISTRO_FEATURES', 'nand-ab', 'TARGET_NAND_AB_BOOT=true', '', d)}"
 DEPENDS += " ${NEED_ABCTL}"
 
 PARALLEL_MAKE = ""
@@ -50,5 +51,9 @@ do_install_append() {
         install -d ${D}/data/
         install -d ${D}/system/
         install -m 0755 ${S}/start_recovery -D ${D}${sysconfdir}/init.d/recovery
-        install -m 0755 ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/base-files-recovery/fstab_AB -D ${D}/res/recovery_volume_config
+        if ${@bb.utils.contains('DISTRO_FEATURES','nand-squashfs','true','false',d)}; then
+          install -m 0755 ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/base-files-recovery/fstab_AB_nand -D ${D}/res/recovery_volume_config
+        else
+          install -m 0755 ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/base-files-recovery/fstab_AB -D ${D}/res/recovery_volume_config
+         fi
 }

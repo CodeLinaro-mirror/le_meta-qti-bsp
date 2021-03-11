@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (c) 2018, The Linux Foundation. All rights reserved.
+# Copyright (c) 2018, 2021 The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -56,6 +56,6 @@ if [ -x /sbin/restorecon ]; then
 else
     firmware_selinux_opt=""
 fi
-eval FindAndMountUBI modem /firmware $firmware_selinux_opt
+eval FindAndMountUBI modem${SLOT_SUFFIX} /firmware $firmware_selinux_opt
 
 exit 0
