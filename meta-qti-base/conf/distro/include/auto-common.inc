@@ -26,9 +26,6 @@ PERSIST_IMAGE_ROOTFS_SIZE ?= "128M"
 
 DISTRO_FEATURES += "early-eth"
 
-# Support selinux
-DISTRO_FEATURES_append = " selinux"
-
 DISTRO_FEATURES_append = " ab-boot-support"
 
 # Use systemd init manager.
