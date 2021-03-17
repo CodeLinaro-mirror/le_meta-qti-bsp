@@ -93,10 +93,12 @@ CheckFileinZip() {
   zip=$1
   file=$2
 
-  unzip -p $zip $file > /tmp/raw_image
+  #unzip -p $zip $file > /tmp/raw_image
+  unzip -p $zip $file > /data/raw_image
 
   # sanity check on length of raw-image
-  raw_image_size=`stat -c "%s" /tmp/raw_image`
+  #raw_image_size=`stat -c "%s" /tmp/raw_image`
+  raw_image_size=`stat -c "%s" /data/raw_image`
   [ $raw_image_size -gt 0 ]
 }
 
@@ -110,13 +112,15 @@ UpgradeMTDWithRawImage() {
   file=$3
 
   # Extract the file from zip to tmpfs (/tmp)
-  unzip -p $zip $file > /tmp/raw_image
+  #unzip -p $zip $file > /tmp/raw_image
+  unzip -p $zip $file > /data/raw_image
   CheckExitCodeAndTerminate $? 0
 
   flash_erase $mtd_device 0 0
   CheckExitCodeAndTerminate $? 0
 
-  nandwrite -p $mtd_device /tmp/raw_image
+  #nandwrite -p $mtd_device /tmp/raw_image
+  nandwrite -p $mtd_device /data/raw_image
   CheckExitCodeAndTerminate $? 0
 }
 
