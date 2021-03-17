@@ -31,7 +31,7 @@
 
 emmc_dir=/dev/block/bootdevice/by-name
 mtd_file=/proc/mtd
-fstab_file=/res/recovery_volume_detected
+fstab_file=/tmp/recovery_volume_detected
 
 
 ubi_device_number=1
@@ -136,5 +136,9 @@ fi
 
 FindAndMountMTD misc /misc
 eval FindAndMount${fstype} modem /firmware
+
+# set selinux to permissive mode before we start recovery
+# TODO: fix this in future.
+/usr/sbin/setenforce 0
 
 exit
