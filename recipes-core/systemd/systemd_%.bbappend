@@ -69,7 +69,7 @@ CFLAGS_append = " -fPIC"
 # So temporarily revert to default optimizations for systemd.
 SELECTED_OPTIMIZATION = "-O2 -fexpensive-optimizations -frename-registers -fomit-frame-pointer -ftree-vectorize"
 
-MACHINE_SUPPORT_BLOCK_DEVICES = "${@bb.utils.contains('IMAGE_FSTYPES','ext4', 'true', 'false', d)}"
+MACHINE_SUPPORT_BLOCK_DEVICES = "${@bb.utils.contains('DISTRO_FEATURES','nand-boot', 'false', 'true', d)}"
 
 do_install_append () {
    install -d ${D}/etc/systemd/system/
