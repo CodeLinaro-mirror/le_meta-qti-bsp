@@ -28,12 +28,12 @@
 [Unit]
 Description=Setup ZRAM
 SourcePath=/etc/initscripts/zram-init.sh
+After=power_config.service
 DefaultDependencies=no
 
 [Service]
 Type=oneshot
 ExecStart=/etc/initscripts/zram-init.sh
-Nice=-20
 
 [Install]
 WantedBy=local-fs.target
