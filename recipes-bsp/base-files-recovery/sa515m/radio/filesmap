@@ -34,13 +34,18 @@ sbl1.mbn                sbl
 tz.mbn                  tz
 rpm.mbn                 rpm
 appsboot.mbn            aboot
-
-# filename + .bak       backup partition
-
-#sbl1.mbn.bak            sbl1bak
-#tz.mbn.bak              tzbak
-#rpm.mbn.bak             rpmbak
-#appsboot.mbn.bak        abootbak
+aop.mbn                 aop
+xbl_cfg.elf             xbl_config
+devcfg_auto.mbn         tz_devcfg
+uefi.elf                uefi
+abl.elf                 abl
+multi_image.mbn         multi_image
+hyp.mbn                 qhee
+ipa_fws.elf             ipa_fw
+apdp.mbn                apdp
+cmnlib.mbn              cmnlib
+km4.mbn                 keymaster
+sec.elf                 sec
 
 # For multiple file firmware images that differ from *.mbn and *.bin
 # you can specify filename.* to direct all files to the same location.
@@ -51,11 +56,21 @@ appsboot.mbn            aboot
 
 # filename              location
 
-mba.*                   /firmware/image
+aptcryptotestapp.*      /firmware/image
+apttestapp.*            /firmware/image
+apttestapp64.*          /firmware/image
+assurancetest.*         /firmware/image
+assurancetest64.*       /firmware/image
+*.tlv                   /firmware/image
+btnv32.bin              /firmware/image
+cmnlib.*                /firmware/image
+cmnlib64.*              /firmware/image
+gnnv20.bin              /firmware/image
+haventkn.mbn            /firmware/image
+htnv10.bin              /firmware/image
+htnv20.203              /firmware/image
+htnv20.bin              /firmware/image
+km4.*                   /firmware/image
+smplap32.*              /firmware/image
+smplap64.*              /firmware/image
 modem.*                 /firmware/image
-bdwlan30.bin            /firmware/image
-nvm_tlv_3.0.bin         /firmware/image
-otp30.bin               /firmware/image
-qwlan30.bin             /firmware/image
-rampatch_tlv_3.0.tlv    /firmware/image
-utf30.bin               /firmware/image
