@@ -27,20 +27,3 @@ RDEPENDS_${PN} = " \
         alsa-utils \
         alsa-plugins \
 "
-
-RDEPENDS_${PN}_qtiquingvm8295 = " \
-        gstreamer1.0 \
-        gstreamer1.0-plugins-base \
-        gstreamer1.0-plugins-good \
-        gstreamer1.0-plugins-bad \
-        gstreamer1.0-plugins-ugly \
-        gstreamer1.0-libav \
-        gstreamer1.0-plugins-qscreencapsrc \
-        gdk-pixbuf-loader-bmp \
-        gdk-pixbuf-loader-gif \
-        alsa-lib \
-        alsa-utils \
-        alsa-plugins \
-        codec2 \
-        gstreamer1.0-plugins-codec2 \
-"
