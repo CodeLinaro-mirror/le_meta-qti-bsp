@@ -1,7 +1,7 @@
 DEPENDS += "display-hal-headers display-hal-linux display-noship-linux display-ship-linux"
 DEPENDS += "gbm gbm-headers"
 DEPENDS += "libion libsync"
-DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'q-hypervisor', 'libuhab', '', d)}"
+DEPENDS += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'libuhab', '', d)}"
 
 FILESEXTRAPATHS_append := " :${THISDIR}/weston/"
 SRC_URI = "${PATH_TO_REPO}/graphics/weston/.git;protocol=${PROTO};destsuffix=graphics/weston;usehead=1"
@@ -73,7 +73,7 @@ do_install_append() {
     install -d ${D}${WESTON_INI_CONFIG}
     install -m 0644 ${WORKDIR}/weston.ini_caf ${D}${WESTON_INI_CONFIG}/weston.ini
     # Install reuqire-input=false in weston.ini
-    if ${@bb.utils.contains('DISTRO_FEATURES', 'q-hypervisor', 'true', 'false', d)}; then
+    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'true', 'false', d)}; then
         sed -i -e '/\[core\]/a require-input=false' ${D}${WESTON_INI_CONFIG}/weston.ini
     fi
     # expose weston protocol to /usr/share/weston as video may use it
