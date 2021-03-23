@@ -151,6 +151,7 @@ LDFLAGS_aarch64 = "-O1 --hash-style=gnu --as-needed"
 TARGET_CXXFLAGS += "-Wno-format"
 EXTRA_OEMAKE_append += "INSTALL_MOD_STRIP=1"
 KERNEL_EXTRA_ARGS += "${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'DTC_EXT=${STAGING_BINDIR_NATIVE}/dtc CONFIG_BUILD_ARM64_DT_OVERLAY=y', '', d)}"
+KERNEL_EXTRA_ARGS += "${@bb.utils.contains('DISTRO_FEATURES', 'qti-auto-lxc-overlay', 'CONFIG_AUTO_LXC_OVERLAY=y', '', d)}"
 
 do_shared_workdir_append () {
         cp Makefile $kerneldir/
