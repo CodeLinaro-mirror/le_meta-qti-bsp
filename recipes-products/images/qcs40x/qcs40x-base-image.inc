@@ -5,6 +5,7 @@ RDEPENDS  += "${@bb.utils.contains('TARGET_ARCH', 'arm','lib64-abl-ubifs','abl-u
 
 # Target SDK Packages
 TOOLCHAIN_TARGET_TASK_append_sa2150p += "glib-2.0-dev"
+TOOLCHAIN_TARGET_TASK_append_sa2150p += "curl-dev"
 
 # Packages to be included in rootfs creation.
 IMAGE_INSTALL += "packagegroup-core-boot"
