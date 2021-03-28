@@ -40,6 +40,7 @@ SRC_URI_append_batcam += " file://pre_hibernate.sh"
 SRC_URI_append_batcam += " file://post_hibernate.sh"
 
 SRC_URI_append_mdm += " file://systemrw.conf"
+SRC_URI_append_auto += " file://data.conf"
 
 # Various mount related files assume selinux support by default.
 # Explicitly remove sepolicy entries when selinux is not present.
