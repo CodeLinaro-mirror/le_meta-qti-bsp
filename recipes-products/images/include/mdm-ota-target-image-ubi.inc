@@ -127,6 +127,11 @@ do_recovery_ubi() {
 
     cp   ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RECOVERY/usr/bin/updater ${OTA_TARGET_IMAGE_ROOTFS_UBI}/OTA/bin/.
 
+    # copy modemsiubifs image to support full update of nonhlos.ubifs in firmware volume
+    if [ -f ${DEPLOY_DIR_IMAGE_NAND}/${MODEM_UBIFS_IMAGE} ]; then
+        cp ${DEPLOY_DIR_IMAGE_NAND}/${MODEM_UBIFS_IMAGE} ${OTA_TARGET_IMAGE_ROOTFS_UBI}/IMAGES/modem.ubifs
+    fi
+
     # if squashfs is supported, we use block-based OTA upgrade.
     if [[ "${SQUASHFS_SUPPORTED}" == "1" ]]; then
         # what we have is a squashfs image.
@@ -184,15 +189,8 @@ do_recovery_ubi() {
     fi
 
     # Targets that support A/B boot do not need recovery(fs)-updater
-    if ${@bb.utils.contains('DISTRO_FEATURES','nand-ab','false','true',d)}; then
-      # if nand-ab not defined use default flow to generate A/B images based on ab-boot-support
-      if ${@bb.utils.contains('DISTRO_FEATURES','ab-boot-support','true','false',d)}; then
-          echo le_target_supports_ab=1 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
-      fi
-    else
-      # if nand-ab is defined then generate A/B images only when func is passed a parameter
-      # this func is passed a parameter only when A/B images are to be generated
-      if [[ ! -z "${1}" ]]; then
+    if ${@bb.utils.contains('DISTRO_FEATURES','ab-boot-support','true','false',d)}; then
+      if ${@bb.utils.contains('DISTRO_FEATURES','nand-ab','false','true',d)}; then
           echo le_target_supports_ab=1 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
       fi
     fi
