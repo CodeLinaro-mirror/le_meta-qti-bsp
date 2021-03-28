@@ -37,6 +37,8 @@ IMAGE_INSTALL += "systemd-machine-units"
 # this image should be flashed while using non-squashfs file
 IMAGE_INSTALL += "abl-ubifs"
 
+# Install A/B recovery bins and its libs in system image if A/B boot is supported
+IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'start-script-ab-slot-util recovery-ab-bin recovery-ab', '', d)}"
 
 IMAGE_POSTPROCESS_COMMAND_append = "${@bb.utils.contains('IMAGE_FSTYPES', 'squashfs-xz', 'create_ext4_images;','',d)}"
 

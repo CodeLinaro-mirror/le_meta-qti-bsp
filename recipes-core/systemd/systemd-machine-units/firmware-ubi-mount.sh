@@ -32,17 +32,25 @@ FindAndMountUBI () {
    extra_opts=$3
 
    mtd_block_number=`cat $mtd_file | grep -i $partition | sed 's/^mtd//' | awk -F ':' '{print $1}'`
-   echo "MTD : Detected block device : $dir for $partition"
+   echo "MTD : Detected block device : $dir for $partition" > /dev/kmsg
    mkdir -p $dir
 
    ubiattach -m $mtd_block_number -d 1 /dev/ubi_ctrl
-   device=/dev/ubi1_0
+
+   for ubivol in /sys/class/ubi/ubi[0-99]_*/name; do
+      volname=`cat $ubivol`
+      if [ $volname == $partition ]; then
+         device=/dev/$(echo $ubivol | cut -d/ -f5)
+         break
+      fi
+   done
+
    while [ 1 ]
     do
         if [ -c $device ]
         then
             test -x /sbin/restorecon && /sbin/restorecon $device
-            mount -t ubifs /dev/ubi1_0 $dir -o bulk_read$extra_opts
+            mount -t ubifs $device $dir -o bulk_read$extra_opts
             break
         else
             sleep 0.010
@@ -56,6 +64,18 @@ if [ -x /sbin/restorecon ]; then
 else
     firmware_selinux_opt=""
 fi
-eval FindAndMountUBI modem${SLOT_SUFFIX} /firmware $firmware_selinux_opt
+
+
+# system or system_a are used on NAD
+volname=`cat /sys/class/ubi/ubi0_0/name`
+if [ $volname == "system_a" ]; then
+    firmvol="firmware$SLOT_SUFFIX"
+elif [ $volname == "system" ]; then
+    firmvol="firmware"
+else
+    firmvol="modem"
+fi
+
+eval FindAndMountUBI $firmvol /firmware $firmware_selinux_opt
 
 exit 0
