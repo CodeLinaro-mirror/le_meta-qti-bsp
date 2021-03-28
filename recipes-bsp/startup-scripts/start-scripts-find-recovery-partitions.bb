@@ -20,6 +20,9 @@ do_install() {
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
               install -d ${D}${systemd_unitdir}/system/
        install -m 0644 ${WORKDIR}/find-recovery-partitions.service -D ${D}${systemd_unitdir}/system/find-recovery-partitions.service
+       if ${@bb.utils.contains('DISTRO_FEATURES', 'nad-prod', 'true', 'false', d)}; then
+            install -d ${D}${systemd_unitdir}/system/find-recovery-partitions.service.d
+       fi
        install -d ${D}${systemd_unitdir}/system/multi-user.target.wants/
        # enable the service for sysinit.target
        ln -sf ${systemd_unitdir}/system/find-recovery-partitions.service \
