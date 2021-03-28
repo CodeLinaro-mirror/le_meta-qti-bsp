@@ -33,8 +33,7 @@ emmc_dir=/dev/block/bootdevice/by-name
 mtd_file=/proc/mtd
 fstab_file=/tmp/recovery_volume_detected
 
-
-ubi_device_number=1
+ubi_device_number=9 # use a high enough number to avoid conflicts
 
 UpdateRecoveryVolume () {
    partition=$1
@@ -97,7 +96,10 @@ FindAndAttachUBI() {
       ubi_device_number=$(($ubi_device_number + 1))
    fi
 
+   # for debugging purposes, log the list of
+   # ubi devices and gluebi devices to kmsg
    ls -al /dev | grep -i "ubi" > /dev/kmsg
+   cat /proc/mtd > /dev/kmsg
 }
 
 FindAndMountUBI () {
@@ -108,8 +110,12 @@ FindAndMountUBI () {
    echo "MTD : Looking for UBI volume : $dir for $volume" > /dev/kmsg
    mkdir -p $dir
 
-   # Skip ubi0 for recoveryfs
-   for ubidev in /dev/ubi[1-99]_*; do
+   if [ $nad_ubi_present -eq 0 ]; then
+      ubi_no=/dev/ubi[1-99]_*
+   else
+      ubi_no=/dev/ubi[0-99]_*
+   fi
+   for ubidev in $ubi_no; do
       volname=`ubinfo $ubidev | grep Name\: | awk '{print $2}'`
       if [ "$volname" == "$volume" ]; then
          echo "Found Volume: $volname" > /dev/kmsg
@@ -121,6 +127,25 @@ FindAndMountUBI () {
          break
       fi
    done
+}
+
+FindAndMountSquashfsToGluebi () {
+    volume=$2
+    dir=$3
+    fstab_only="$4"
+
+    gluebi_mtd_block_number=`cat $mtd_file | grep -i $volume | sed 's/^mtd//' | awk -F ':' '{print $1}'`
+
+    if [ "$fstab_only" != "1" ]; then
+        mount -t squashfs /dev/mtdblock${gluebi_mtd_block_number} $dir
+    fi
+
+    UpdateRecoveryVolume $volume $dir "squashfs" /dev/block/bootdevice/by-name/$1
+
+    # create symlink from /dev/block/bootdevice/by-name/<partition>
+    # to the gluebi-mtd device
+    mkdir -p /dev/block/bootdevice/by-name
+    ln -sf /dev/mtdblock${gluebi_mtd_block_number} /dev/block/bootdevice/by-name/$1
 }
 
 FindAndMountEXT4 () {
@@ -144,7 +169,7 @@ FindAndMountMTD () {
    dir=$2
 
    mtd_block_device=`cat /proc/mtd | grep -i $partition | sed 's/^mtd/mtdblock/' | awk -F ':' '{print $1}'`
-   echo "Detected block device : $dir for $partition" > /dev/kmsg
+   echo "Detected block device /dev/${mtd_block_device} for $partition" > /dev/kmsg
    mkdir -p $dir
    mount -t mtd /dev/$mtd_block_device $dir
    echo "Mounting of /dev/$mmc_block_device on $dir done" > /dev/kmsg
@@ -153,6 +178,7 @@ FindAndMountMTD () {
 }
 
 echo -n > $fstab_file
+nad_ubi_present=`cat $mtd_file | grep nad_ubi | wc -l`
 
 if [ -d $emmc_dir ]
 then
@@ -160,11 +186,29 @@ then
     eval FindAndMountEXT4 system   /system   1
     eval FindAndMountEXT4 userdata /data     1
     eval FindAndMountEXT4 cache    /cache
+elif grep "rootfstype=squashfs" /proc/cmdline
+then
+    # the recoveryfs image has squashfs on it, so
+    # we assume that system's fs is squashfs as well
+  if [ $nad_ubi_present -eq 0 ]; then
+    eval FindAndAttachUBI system 5
+    eval FindAndMountSquashfsToGluebi system rootfs  /system  1
+    eval FindAndMountUBI usrfs   /data    1
+  else
+    eval FindAndMountSquashfsToGluebi nad_ubi system /system  1
+    eval FindAndMountUBI data   /data    1
+  fi
+    eval FindAndMountUBI cachefs /cache
 else
     fstype="UBI"
+  if [ $nad_ubi_present -eq 0 ]; then
     eval FindAndAttachUBI system 4
     eval FindAndMountUBI rootfs  /system  1
     eval FindAndMountUBI usrfs   /data    1
+  else
+    eval FindAndMountUBI system  /system  1
+    eval FindAndMountUBI data   /data    1
+  fi
     eval FindAndMountUBI cachefs /cache
 fi
 

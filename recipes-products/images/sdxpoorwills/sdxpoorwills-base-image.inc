@@ -35,3 +35,9 @@ IMAGE_INSTALL += "edk2"
 IMAGE_INSTALL += "coreutils"
 IMAGE_INSTALL += "km-loader"
 IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd-machine-units', 'start-scripts-find-partitions', d)}"
+# include abl image which support rootfs type as ubifs
+# this image should be flashed while using non-squashfs file
+IMAGE_INSTALL += "abl-ubifs"
+
+# Install A/B recovery bins and its libs in system image if A/B boot is supported
+IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'start-script-ab-slot-util recovery-ab-bin recovery-ab', '', d)}"

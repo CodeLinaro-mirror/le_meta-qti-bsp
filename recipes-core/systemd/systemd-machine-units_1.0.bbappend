@@ -40,6 +40,7 @@ SRC_URI_append_batcam += " file://pre_hibernate.sh"
 SRC_URI_append_batcam += " file://post_hibernate.sh"
 
 SRC_URI_append_mdm += " file://systemrw.conf"
+SRC_URI_append += " file://data.conf"
 
 # Various mount related files assume selinux support by default.
 # Explicitly remove sepolicy entries when selinux is not present.
@@ -105,6 +106,8 @@ do_install_append () {
             if ${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', 'true', 'false', d)}; then
                 install -m 0644 ${WORKDIR}/data-ubi.mount ${D}${systemd_unitdir}/system/data.mount
                 install -m 0644 ${WORKDIR}/data-ubi.mount ${D}${systemd_unitdir}/system/data-ubi.mount
+                install -d ${D}/lib/systemd/system/data.mount.d
+                install -m 0644 ${WORKDIR}/data.conf ${D}/lib/systemd/system/data.mount.d/data.conf
             fi
             ln -sf ${systemd_unitdir}/system/data.mount ${D}${systemd_unitdir}/system/local-fs.target.wants/data.mount
         fi

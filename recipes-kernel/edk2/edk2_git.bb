@@ -50,6 +50,8 @@ NAND_SQUASHFS_SUPPORT = "${@bb.utils.contains('DISTRO_FEATURES', 'nand-squashfs'
 EXTRA_OEMAKE_append = " 'NAND_SQUASHFS_SUPPORT=${NAND_SQUASHFS_SUPPORT}'"
 NAND_AB_ATTR_SUPPORT = "${@bb.utils.contains('DISTRO_FEATURES', 'nand-ab', 'true', 'false', d)}"
 EXTRA_OEMAKE_append = " 'TARGET_NAND_AB_ATTR_SUPPORT=${NAND_AB_ATTR_SUPPORT}'"
+NAD_PARTITION = "${@bb.utils.contains('DISTRO_FEATURES', 'nad-prod', '1', '0', d)}"
+EXTRA_OEMAKE_append = " 'NAD_PARTITION=${NAD_PARTITION}'"
 
 do_compile () {
     export CC=${BUILD_CC}
