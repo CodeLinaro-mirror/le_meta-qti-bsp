@@ -99,6 +99,7 @@ do_kernel_checkout[noexec] = "1"
 addtask kernel_configcheck after do_configure before do_compile
 
 do_compile () {
+    rm -rf ${S}/techpack/display ${S}/techpack/ais ${S}/techpack/video
     oe_runmake CC="${KERNEL_CC}" LD="${KERNEL_LD}" ${KERNEL_EXTRA_ARGS} $use_alternate_initrd
 }
 
