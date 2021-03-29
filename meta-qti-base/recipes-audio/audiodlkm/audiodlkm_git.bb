@@ -15,22 +15,19 @@ S = "${WORKDIR}/vendor/qcom/opensource/audio-kernel"
 inherit module module-sign qperf
 
 EXTRA_OEMAKE += "TARGET_SUPPORT=${@bb.utils.contains('BASEMACHINE', 'sa81x5', 'sa8155', '${BASEMACHINE}', d)}"
-KERNEL_CC += "-Wno-error=maybe-uninitialized"
-# Disable parallel make
-PARALLEL_MAKE = ""
 
 do_configure() {
     cp -f ${WORKDIR}/vendor/qcom/opensource/audio-kernel/Makefile.am ${WORKDIR}/vendor/qcom/opensource/audio-kernel/Makefile
 }
 
 do_install_append() {
-    install -d -p ${D}${includedir}/audio-kernel/linux
-    install -d -p ${D}${includedir}/audio-kernel/linux/mfd/wcd9xxx
-    install -d -p ${D}${includedir}/audio-kernel/sound
+    install -d -p ${D}${includedir}/audio-kernel/audio/linux
+    install -d -p ${D}${includedir}/audio-kernel/audio/linux/mfd/wcd9xxx
+    install -d -p ${D}${includedir}/audio-kernel/audio/sound
 
-    install -m 0644 ${S}/linux/*h ${D}${includedir}/audio-kernel/linux
-    install -m 0644 ${S}/linux/mfd/wcd9xxx/*h ${D}${includedir}/audio-kernel/linux/mfd/wcd9xxx
-    install -m 0644 ${S}/sound/* ${D}${includedir}/audio-kernel/sound
+    process_headers "${S}/include/uapi/audio/linux" "${D}${includedir}/audio-kernel/audio/linux"
+    process_headers "${S}/include/uapi/audio/linux/mfd/wcd9xxx" "${D}${includedir}/audio-kernel/audio/linux/mfd/wcd9xxx"
+    process_headers "${S}/include/uapi/audio/sound" "${D}${includedir}/audio-kernel/audio/sound"
 
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
         install -m 0755 ${WORKDIR}/audio_load.conf -D ${D}${sysconfdir}/modules-load.d/audio_load.conf
@@ -39,14 +36,21 @@ do_install_append() {
     fi
 
     install -d ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra
-    for i in $(find ${D}/${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/. -name "*.ko"); do
-        mv ${i} ${D}/${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/
+    for i in $(find ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/. -name "*.ko"); do
+        mv ${i} ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/
     done
 
-    rm -fr ${D}/${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/asoc
-    rm -fr ${D}/${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/dsp
-    rm -fr ${D}/${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/ipc
-    rm -fr ${D}/${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/soc
+    rm -fr ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/asoc
+    rm -fr ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/dsp
+    rm -fr ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/ipc
+    rm -fr ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/soc
+}
+
+process_headers() {
+    cd ${STAGING_KERNEL_BUILDDIR}
+    for name in $(ls $1/*.h); do
+        ${STAGING_KERNEL_DIR}/scripts/headers_install.sh $1/$(basename $name) $2/$(basename $name)
+    done
 }
 
 # The inherit of module.bbclass will automatically name module packages with

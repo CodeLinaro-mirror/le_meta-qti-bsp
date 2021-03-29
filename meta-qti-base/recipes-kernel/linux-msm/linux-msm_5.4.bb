@@ -210,6 +210,13 @@ do_deploy () {
         extra_mkbootimg_params='--tags-addr ${KERNEL_TAGS_OFFSET}'
     fi
 
+    # Copy Kernel scripts to deploydir
+    install -d ${DEPLOYDIR}/build-artifacts
+    install -d ${DEPLOYDIR}/build-artifacts/kernel_scripts/scripts
+    cp  ${STAGING_KERNEL_DIR}/usr/gen_initramfs_list.sh ${DEPLOYDIR}/build-artifacts/kernel_scripts/scripts
+    cp -a ${STAGING_KERNEL_BUILDDIR}/usr/ ${DEPLOYDIR}/build-artifacts/kernel_scripts/
+
+    # Copy Image appended with dtbs to deploydir
     cat ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} ${B}/arch/${ARCH}/boot/dts/vendor/qcom/*.dtb > ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-dtb-${KERNEL_VERSION}
 
     # Make bootimage
@@ -220,8 +227,9 @@ do_deploy () {
         --base ${KERNEL_BASE} \
         --ramdisk_offset 0x0 \
         ${extra_mkbootimg_params} --output ${DEPLOYDIR}/${BOOTIMAGE_TARGET}
-    # Copy vmlinux and zImage into deplydir for boot.img creation
+    # Copy vmlinux and zImage into deploydir for boot.img creation
     install -m 0644 ${KERNEL_OUTPUT_DIR}/${KERNEL_IMAGETYPE} ${DEPLOYDIR}/${KERNEL_IMAGETYPE}
+    install -m 0644 ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-dtb-${KERNEL_VERSION} ${DEPLOYDIR}/${KERNEL_IMAGETYPE}-dtb
     install -m 0644 vmlinux ${DEPLOYDIR}
 }
 
