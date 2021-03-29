@@ -16,4 +16,4 @@ SRC_URI_append = " file://0001-libufdt-support-autoconf-compile.patch"
 
 S = "${WORKDIR}/system/libufdt"
 
-inherit native autotools pkgconfig
+inherit autotools pkgconfig native
