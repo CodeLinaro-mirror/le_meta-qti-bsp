@@ -26,10 +26,19 @@
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 # demo app for early audio to measure boot kpi
+modprobe snd_event_dlkm
+modprobe q6_notifier_dlkm
+modprobe apr_dlkm
+modprobe q6_dlkm
+modprobe adsp_loader_dlkm
+modprobe stub_dlkm
 /bin/mount -o ro /dev/sde4 /firmware
 /bin/mount -o ro /dev/mmcblk0p30 /firmware
 /bin/echo 0 > /sys/module/subsystem_restart/parameters/enable_debug;
-/bin/echo 2 > /sys/kernel/boot_adsp/boot
+/bin/echo 2 > /sys/kernel/boot_adsp/boot;
+modprobe platform_dlkm
+modprobe machine_dlkm
+modprobe hdmi_dlkm
 
 while true
 do
