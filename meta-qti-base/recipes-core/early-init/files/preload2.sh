@@ -34,7 +34,7 @@ dd if=/lib/systemd/system/multi-user.target of=/dev/null
 dd if=/lib/systemd/system/local-fs-pre.target of=/dev/null
 ls -l /etc/systemd/system/local-fs-pre.target.wants
 dd if=/lib/systemd/system/init_data.service of=/dev/null
-dd if=/lib/systemd/system/init_audio.service of=/dev/null
+
 echo systemdm1 > /dev/kmsg
 
 dd if=/usr/lib/libweston-8.so.0.0.0 of=/dev/null
