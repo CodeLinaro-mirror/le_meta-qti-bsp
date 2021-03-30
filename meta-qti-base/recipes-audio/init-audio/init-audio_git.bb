@@ -25,12 +25,7 @@ do_install() {
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
         install -m 0644 ${S}/msm-audio-node.rules -D ${D}${sysconfdir}/udev/rules.d/msm-audio-node.rules
         if ${@bb.utils.contains('DISTRO_FEATURES', 'early_init', 'true', 'false', d)}; then
-            if ${@bb.utils.contains('DISTRO_FEATURES', 'early_userspace', 'true', 'false', d)}; then
-                install -m 0755 ${S}/audio_early.sh -D ${D}${sbindir}/audio.sh
-            else
-                install -m 0644 ${S}/init_audio_early.service -D ${D}${systemd_unitdir}/system/init_audio.service
-                install -m 0755 ${S}/audio.sh -D ${D}${sbindir}/audio.sh
-            fi
+            install -m 0755 ${S}/audio.sh -D ${D}${sbindir}/audio.sh
         else
             install -m 0644 ${S}/init_audio.service -D ${D}${systemd_unitdir}/system/init_audio.service
         fi
