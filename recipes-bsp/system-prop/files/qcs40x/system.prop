@@ -11,6 +11,7 @@ ro.debuggable=1
 ro.vendor.audio.sdk.ssr=false
 ##fluencetype can be "fluence" or "fluencepro" or "none"
 ro.vendor.audio.sdk.fluencetype=none
+ro.vendor.audio.dts.vendorid=none
 ro.vendor.audio.trumpet.enable=false
 persist.vendor.audio.fluence.voicecall=false
 persist.vendor.audio.fluence.voicerec=false
