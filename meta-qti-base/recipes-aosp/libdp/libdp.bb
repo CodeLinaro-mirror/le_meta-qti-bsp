@@ -14,6 +14,7 @@ SRC_URI = "\
     git://git.codelinaro.org/clo/la/platform/system/core;protocol=https;nobranch=1; \
     file://0001-libdp-add-support-for-autoconf-build.patch \
     file://0002-libdp-update-fs_mgr-to-work-in-LV.patch \
+    file://0001-liblp-Expand-the-metadata-header-for-future-use.patch \
 "
 
 S = "${WORKDIR}/git"
