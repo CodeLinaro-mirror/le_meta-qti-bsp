@@ -40,8 +40,8 @@ echo systemdm2 > /dev/kmsg
 dd if=/usr/lib/libwayland-server.so.0.1.0 of=/dev/null
 dd if=/usr/lib/libwayland-server.so.0 of=/dev/null
 dd if=/lib/libgcc_s.so.1 of=/dev/null
-dd if=/usr/lib/libweston-desktop-5.so.0.0.0 of=/dev/null
-dd if=/usr/lib/libweston-desktop-5.so.0 of=/dev/null
+dd if=/usr/lib/libweston-desktop-8.so.0.0.0 of=/dev/null
+dd if=/usr/lib/libweston-desktop-8.so.0 of=/dev/null
 dd if=/usr/lib/libqseed3.so of=/dev/null
 dd if=/usr/lib/libfribidi.so.0.4.0 of=/dev/null
 dd if=/usr/lib/libfribidi.so.0 of=/dev/null
