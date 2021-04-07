@@ -12,6 +12,6 @@ SRC_URI = "${PATH_TO_REPO}/external/libselinux/.git;protocol=${PROTO};destsuffix
 
 S = "${WORKDIR}/external/libselinux"
 
-inherit native autotools-brokensep pkgconfig
+inherit autotools-brokensep pkgconfig native
 
 EXTRA_OECONF = " --with-pcre"
