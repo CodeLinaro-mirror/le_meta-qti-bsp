@@ -1,9 +1,7 @@
 SUMMARY = "QTI Screen shot SRC Plugin for GStreamer"
 SECTION = "multimedia"
 LICENSE = "LGPL-2.0 & BSD-3-Clause & MIT"
-LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/LGPL-2.0;md5=9427b8ccf5cf3df47c29110424c9641a \
-                    file://${COREBASE}/meta/files/common-licenses/BSD-3-Clause;md5=550794465ba0ec5312d6919e203a55f9 \
-                    file://${COREBASE}/meta/files/common-licenses/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
+LIC_FILES_CHKSUM = "file://NOTICE.txt;md5=75cfdd159cf288058ddf776b13ec384c"
 DEPENDS = "glib-2.0 wayland-native"
 DEPENDS += "gstreamer1.0 \
             gstreamer1.0-plugins-base \
