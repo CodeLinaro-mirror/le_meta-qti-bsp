@@ -38,7 +38,7 @@ echo systemdm6 > /dev/kmsg
 
 dd if=/usr/lib/libxkbcommon.so.0.0.0 of=/dev/null
 dd if=/usr/lib/libxkbcommon.so.0 of=/dev/null
-dd if=/usr/lib/libweston-5/sdm-service.so of=/dev/null
+dd if=/usr/lib/libweston-8/sdm-service.so of=/dev/null
 dd if=/usr/lib/libhdrdynamicootf.so of=/dev/null
 dd if=/lib/libuuid.so.1.3.0 of=/dev/null
 dd if=/lib/libuuid.so.1 of=/dev/null

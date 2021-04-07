@@ -48,7 +48,7 @@ dd if=/usr/bin/weston of=/dev/null
 dd if=/usr/lib/libion.so.0.0.0 of=/dev/null
 dd if=/usr/lib/libion.so.0 of=/dev/null
 dd if=/usr/libexec/weston-desktop-shell of=/dev/null
-dd if=/usr/lib/libweston-5/gl-renderer.so of=/dev/null
+dd if=/usr/lib/libweston-8/gl-renderer.so of=/dev/null
 dd if=/etc/fonts/conf.d/30-liberation-aliases.conf of=/dev/null
 dd if=/usr/share/fontconfig/conf.avail/10-hinting-full.conf of=/dev/null
 dd if=/usr/share/fontconfig/conf.avail/10-hinting-medium.conf of=/dev/null

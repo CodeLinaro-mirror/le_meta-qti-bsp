@@ -37,8 +37,8 @@ dd if=/lib/systemd/system/init_audio.service of=/dev/null
 
 echo systemdm1 > /dev/kmsg
 
-dd if=/usr/lib/libweston-5.so.0.0.0 of=/dev/null
-dd if=/usr/lib/libweston-5.so.0 of=/dev/null
+dd if=/usr/lib/libweston-8.so.0.0.0 of=/dev/null
+dd if=/usr/lib/libweston-8.so.0 of=/dev/null
 dd if=/usr/lib/libuhab.so of=/dev/null
 dd if=/usr/libexec/weston-keyboard of=/dev/null
 dd if=/usr/lib/libEGL_adreno.so of=/dev/null

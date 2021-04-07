@@ -45,7 +45,7 @@ echo systemdm3 > /dev/kmsg
 
 dd if=/usr/lib/libinput.so.10.13.0 of=/dev/null
 dd if=/usr/lib/libinput.so.10 of=/dev/null
-dd if=/usr/lib/libweston-5/drm-backend.so of=/dev/null
+dd if=/usr/lib/libweston-8/drm-backend.so of=/dev/null
 dd if=/usr/lib/libpng16.so.16.37.0 of=/dev/null
 dd if=/usr/lib/libdisplayqos.so of=/dev/null
 dd if=/etc/fonts/fonts.conf of=/dev/null
