@@ -39,7 +39,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-securemsm \
         packagegroup-qti-ss-mgr \
         packagegroup-qti-video \
-        packagegroup-qti-wifi \
+        ${@bb.utils.contains('MACHINE_FEATURES', 'qca-wifi', 'packagegroup-qti-qcawifi-prop', 'packagegroup-qti-wifi', d)} \
         ${@bb.utils.contains('DISTRO_FEATURES', 'ros2', 'packagegroup-ros2-foxy', '', d)} \
         packagegroup-startup-scripts \
         ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
