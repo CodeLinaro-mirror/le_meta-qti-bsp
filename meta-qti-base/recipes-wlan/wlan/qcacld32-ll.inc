@@ -30,3 +30,4 @@ FILES_${PN} += "${bindir}/init.qti.wlan_off.sh"
 LDFLAGS_aarch64 = "-O1 --hash-style=gnu --as-needed"
 
 KERNEL_CC += "-Wno-error=maybe-uninitialized"
+KERNEL_CC += "-Wno-error=stringop-overflow"
