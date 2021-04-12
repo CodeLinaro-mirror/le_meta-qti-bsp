@@ -25,7 +25,7 @@ do_install_append() {
    fi
 
    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-vm', 'true', 'false', d)}; then
-      sed -i -e 's/.*RuntimeMaxUse.*/RuntimeMaxUse=5M/' ${D}${sysconfdir}/systemd/journald.conf
+      sed -i -e 's/.*RuntimeMaxUse.*/RuntimeMaxUse=5M/' ${D}${systemd_unitdir}/journald.conf.d/00-${PN}.conf
    fi
 }
 
@@ -38,7 +38,7 @@ do_install_append() {
 # logind.conf
 do_install_append() {
     # Ignore PowerKey
-    sed -i -e 's/#HandlePowerKey=poweroff/HandlePowerKey=ignore/' ${D}${sysconfdir}/systemd/logind.conf
+    sed -i -e 's/#HandlePowerKey=poweroff/HandlePowerKey=ignore/' ${D}${systemd_unitdir}/logind.conf.d/00-${PN}.conf
 }
 
 # system.conf
