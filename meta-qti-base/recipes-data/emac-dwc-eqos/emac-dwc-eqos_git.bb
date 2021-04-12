@@ -20,7 +20,7 @@ SRC_URI_append = " file://setup_avtp_routing_le"
 SRC_URI_append = " file://emac_dwc_eqos.service"
 SRCREV = "${AUTOREV}"
 
-S = "${WORKDIR}/data-kernel/drivers/emac-dwc-eqos/"
+S = "${WORKDIR}/data-kernel/drivers/emac-dwc-eqos"
 
 EXTRA_OEMAKE += "LBITS=32"
 EXTRA_OEMAKE += "DWC_ETH_QOS_ENABLE_ETHTOOL=1"
