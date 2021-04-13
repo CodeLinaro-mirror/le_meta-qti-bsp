@@ -7,7 +7,7 @@ PROVIDERS = "hsi2s-test"
 DESCRIPTION = "HS-I2S test utility"
 
 LICENSE = "GPL-2.0"
-LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=801f80980d171dd6425610833a22dbe6"
+LIC_FILES_CHKSUM = "file://NOTICE;md5=434b8411d18d7f18ebe745bd3cc502ed"
 
 SRC_DIR = "${SRC_DIR_ROOT}/vendor/qcom/opensource/hsi2s-kernel"
 SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/hsi2s-kernel/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/hsi2s-kernel;usehead=1"
