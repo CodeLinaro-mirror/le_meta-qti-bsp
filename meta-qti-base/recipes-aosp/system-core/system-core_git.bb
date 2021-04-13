@@ -21,6 +21,10 @@ EXTRA_OECONF_append = " --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/
 EXTRA_OECONF_append = " --disable-debuggerd"
 EXTRA_OECONF_append = " --disable-libsync"
 
+# Add adb disable/enable verity.
+EXTRA_OECONF_append = " --enable-adb-verity"
+EXTRA_OECONF_append = " --enable-adb-avb20"
+
 # Disable adb root privileges in USER builds for msm targets
 EXTRA_OECONF_append_msm = "${@bb.utils.contains('VARIANT','user',' --disable-adb-root','',d)}"
 
