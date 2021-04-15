@@ -1,22 +1,19 @@
-From c3efe253e6a6fde60a812a05456d9b8bd0917900 Mon Sep 17 00:00:00 2001
+From 5702995aed354813be6334d7cd75d43946d32c50 Mon Sep 17 00:00:00 2001
 From: Lei wang <leiwan@codeaurora.org>
-Date: Tue, 5 Nov 2019 19:13:15 +0800
+Date: Thu, 15 Apr 2021 12:45:35 +0800
 Subject: [PATCH] systemd: add userspace marker support
 
-put debugfs mount earlier
 support userspace entry and unit marker
 
 Signed-off-by: Lei wang <leiwan@codeaurora.org>
 ---
- src/basic/util.h       | 19 +++++++++++++++++++
- src/core/job.c         | 26 ++++++++++++++++++++++++++
- src/core/main.c        |  1 +
- src/core/mount-setup.c |  6 ++++--
- units/meson.build      |  2 --
- 5 files changed, 50 insertions(+), 4 deletions(-)
+ src/basic/util.h | 19 +++++++++++++++++++
+ src/core/job.c   | 26 ++++++++++++++++++++++++++
+ src/core/main.c  |  2 ++
+ 3 files changed, 47 insertions(+)
 
 diff --git a/src/basic/util.h b/src/basic/util.h
-index 25e6ab8112..6688df1959 100644
+index 6fc7480..07bb254 100644
 --- a/src/basic/util.h
 +++ b/src/basic/util.h
 @@ -2,6 +2,9 @@
@@ -29,11 +26,11 @@ index 25e6ab8112..6688df1959 100644
  
  #include "macro.h"
  
-@@ -75,6 +78,22 @@ static inline unsigned log2u_round_up(unsigned x) {
+@@ -59,6 +62,22 @@ static inline unsigned log2u_round_up(unsigned x) {
          return log2u(x - 1) + 1;
  }
  
-+#define KPI_VALUE_PATH "/sys/kernel/debug/bootkpi/kpi_values"
++#define KPI_VALUE_PATH "/sys/kernel/boot_kpi/kpi_values"
 +
 +static inline void write_marker(const char *label) {
 +        int fd = -1;
@@ -53,7 +50,7 @@ index 25e6ab8112..6688df1959 100644
  
  int version(void);
 diff --git a/src/core/job.c b/src/core/job.c
-index 9537366eb9..16bee9ed8e 100644
+index 5048a50..b5a7da9 100644
 --- a/src/core/job.c
 +++ b/src/core/job.c
 @@ -28,6 +28,12 @@
@@ -104,55 +101,18 @@ index 9537366eb9..16bee9ed8e 100644
          if (!already)
                  job_emit_done_status_message(u, j->id, t, result);
 diff --git a/src/core/main.c b/src/core/main.c
-index bcce7178a8..20109d300c 100644
+index c24b696..a1b9788 100644
 --- a/src/core/main.c
 +++ b/src/core/main.c
-@@ -2436,6 +2436,7 @@ int main(int argc, char *argv[]) {
+@@ -2471,6 +2471,8 @@ int main(int argc, char *argv[]) {
                                   * available, and it previously wasn't. */
                                  log_open();
  
 +                                write_marker("M - User Space Start");
-                                 r = initialize_security(
-                                                 &loaded_policy,
-                                                 &security_start_timestamp,
-diff --git a/src/core/mount-setup.c b/src/core/mount-setup.c
-index ea7b0a80cb..49bcfcdb47 100644
---- a/src/core/mount-setup.c
-+++ b/src/core/mount-setup.c
-@@ -53,9 +53,9 @@ typedef struct MountPoint {
-  * other ones we can delay until SELinux and IMA are loaded. When
-  * SMACK is enabled we need smackfs, too, so it's a fifth one. */
- #if ENABLE_SMACK
--#define N_EARLY_MOUNT 5
-+#define N_EARLY_MOUNT 6
- #else
--#define N_EARLY_MOUNT 4
-+#define N_EARLY_MOUNT 5
- #endif
++
+                                 disable_printk_ratelimit();
  
- static const MountPoint mount_table[] = {
-@@ -67,6 +67,8 @@ static const MountPoint mount_table[] = {
-           NULL,          MNT_FATAL|MNT_IN_CONTAINER },
-         { "securityfs",  "/sys/kernel/security",      "securityfs", NULL,                      MS_NOSUID|MS_NOEXEC|MS_NODEV,
-           NULL,          MNT_NONE                   },
-+        { "debugfs",     "/sys/kernel/debug",         "debugfs",    NULL,                      0,
-+          NULL,          MNT_NONE                   },
- #if ENABLE_SMACK
-         { "smackfs",     "/sys/fs/smackfs",           "smackfs",    "smackfsdef=*",            MS_NOSUID|MS_NOEXEC|MS_NODEV,
-           mac_smack_use, MNT_FATAL                  },
-diff --git a/units/meson.build b/units/meson.build
-index 6bb7771b36..07e1845437 100644
---- a/units/meson.build
-+++ b/units/meson.build
-@@ -69,8 +69,6 @@ units = [
-          'sysinit.target.wants/'],
-         ['sys-kernel-config.mount',             '',
-          'sysinit.target.wants/'],
--        ['sys-kernel-debug.mount',              '',
--         'sysinit.target.wants/'],
-         ['sysinit.target',                      ''],
-         ['syslog.socket',                       ''],
-         ['system-update.target',                ''],
+                                 r = initialize_security(
 -- 
-2.14.0.rc1.14.gc3eb4e6
+2.7.4
 
