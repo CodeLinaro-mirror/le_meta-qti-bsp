@@ -20,9 +20,8 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 RDEPENDS_${PN} = "pulseaudio-server pulseaudio-misc pulseaudio-module-null-source"
 
-FILES_${PN} += "${libdir}/pulse-${PULSE_PV}/modules/"
-FILES_${PN}-staticdev += "${libdir}/pulse-${PULSE_PV}/modules/*.a"
-FILES_${PN}-dbg += "${libdir}/pulse-${PULSE_PV}/modules/.debug"
+FILES_${PN} += "${libdir}/pulse-*/modules/"
+FILES_${PN}-staticdev += "${libdir}/pulse-*/modules/*.a"
+FILES_${PN}-dbg += "${libdir}/pulse-*/modules/.debug"
 
 AUDIO_BUILD_TARGET ?= "sa8155"
-PULSE_PV = "13.0"
