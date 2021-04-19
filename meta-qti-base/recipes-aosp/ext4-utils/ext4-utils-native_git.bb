@@ -13,6 +13,6 @@ SRC_URI = "${PATH_TO_REPO}/system/extras/.git;protocol=${PROTO};destsuffix=syste
 
 S = "${WORKDIR}/system/extras/ext4_utils"
 
-inherit native autotools pkgconfig
+inherit autotools pkgconfig native
 
 CPPFLAGS += "-I${STAGING_INCDIR}/libselinux"

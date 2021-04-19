@@ -1,4 +1,4 @@
-require conf/distro/qpermissions.conf
+require conf/distro/include/qpermissions.inc
 
 QPERM_SERVICE ?= ""
 

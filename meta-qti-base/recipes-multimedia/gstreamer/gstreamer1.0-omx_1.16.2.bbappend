@@ -18,6 +18,5 @@ EXTRA_OEMESON = " \
 		-Dstaging_inc_path=${STAGING_INCDIR} \
               "
 EXTRA_OEMESON_append =" -Denable-target-vpu554=yes"
-EXTRA_OEMESON_append =" -Denable-encoder-heic=yes"
 
 CFLAGS_append = "-DVIDC_TARGET_USES_GKI"

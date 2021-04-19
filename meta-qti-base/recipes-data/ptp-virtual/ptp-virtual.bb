@@ -3,7 +3,7 @@ DESCRIPTION = "lib ptp"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 LICENSE = "GPL-2.0"
-LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=801f80980d171dd6425610833a22dbe6"
+LIC_FILES_CHKSUM = "file://NOTICE;md5=752b838e10ae75e6f917015849cf56b0"
 
 SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/ptp-virtual/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/ptp-virtual;usehead=1"
 SRC_URI += " file://ptp-virtual.service"

@@ -2,14 +2,20 @@ SUMMARY = "Unit test for Virtio regulator driver"
 LICENSE = "GPL-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/GPL-2.0;md5=801f80980d171dd6425610833a22dbe6"
 
-inherit module module-sign
+DEPENDS += "ktf"
 
 FILESPATH =+ "${SRC_DIR_ROOT}/vendor/qcom/opensource/unit-test/kernel-unit-test:"
 SRC_URI = "file://virtio_reg"
 
 S = "${WORKDIR}/virtio_reg"
 
+inherit module module-sign
+
 MODULES_PATH = "${PKGDEST}/${PN}/${nonarch_base_libdir}/modules/${KERNEL_VERSION}/unit_test"
+
+python __anonymous () {
+    d.setVar('KBUILD_EXTRA_SYMBOLS', "${STAGING_INCDIR}/ktf/Module.symvers")
+}
 
 do_install () {
     install -d ${D}/lib/modules/${KERNEL_VERSION}/unit_test

@@ -1,5 +1,5 @@
 BASEDISTRO ?= "msm"
-include conf/distro/msm.conf
+require conf/distro/include/msm.inc
 
 DISTRO_NAME = "automotive"
 DISTROOVERRIDES =. "automotive:"
@@ -63,3 +63,5 @@ SYSTEMRW_SIZE_EXT4 ?= "8388608"
 USERDATA_SIZE_EXT4 ?= "2000000000"
 CACHE_SIZE_EXT4 ?= "80000000"
 PERSIST_IMAGE_ROOTFS_SIZE ?= "128M"
+
+BB_DANGLINGAPPENDS_WARNONLY = "yes"
