@@ -48,8 +48,15 @@ EXTRA_OECONF_append = "${@bb.utils.contains("DISTRO_FEATURES", "early-ethernet",
 PACKAGECONFIG = "${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'kms fbdev wayland egl', '', d)} \
                  ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11', '', d)} \
                  ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'launch', '', d)} \
+                 image-jpeg \
+                 screenshare \
+                 shell-desktop \
+                 shell-fullscreen \
+                 shell-ivi \
                 "
 PACKAGECONFIG_append = "clients"
+# pam
+PACKAGECONFIG[pam] = ",,libpam"
 
 do_configure[depends] += "virtual/kernel:do_shared_workdir"
 do_install_append() {
