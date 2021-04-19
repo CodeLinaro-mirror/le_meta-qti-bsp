@@ -6,4 +6,5 @@ S = "${WORKDIR}/vendor/qcom/opensource/agl-audio-plugin/"
 
 EXTRA_OECMAKE += "-DTARGET_BOARD_PLATFORM=${BASEMACHINE}"
 
-PULSE_PV = "13.0"
+FILES_${PN} += "${libdir}/pulse-*/modules/* ${sysconfdir}/pulse/*"
+FILES_${PN}-dbg += "${libdir}/pulse-*/modules/.debug/*"
