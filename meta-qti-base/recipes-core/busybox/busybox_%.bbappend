@@ -4,3 +4,5 @@ SRC_URI_remove = "${@bb.utils.contains("DISTRO_FEATURES", "systemd", "file://sys
 SRC_URI += "${@bb.utils.contains("DISTRO_FEATURES", "systemd", "file://disable-klog.cfg", "", d)}"
 SRC_URI += "${@bb.utils.contains("MACHINE_SUPPORTS_INIT_RAMDISK", "True", "file://init.cfg", "", d)}"
 SRC_URI += "${@bb.utils.contains("MACHINE_SUPPORTS_INIT_RAMDISK", "True", "file://installer.cfg", "", d)}"
+
+FILES_${PN}-syslog += "${systemd_unitdir}/system/busybox-syslog.service"
