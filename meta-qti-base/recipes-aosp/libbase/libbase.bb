@@ -4,8 +4,7 @@ handling files, Unicode strings, logging, memory allocation, \
 integer parsing, etc."
 HOMEPAGE = "http://developer.android.com/"
 LICENSE = "Apache-2.0"
-LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
-${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
+LIC_FILES_CHKSUM = "file://../NOTICE;md5=c1a3ff0b97f199c7ebcfdd4d3fed238e"
 
 DEPENDS += "libcutils libselinux"
 

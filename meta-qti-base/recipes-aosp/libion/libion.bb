@@ -4,8 +4,7 @@ Ion is a generalized memory manager introduced in the Android release to address
 the issue of fragmented memory management interfaces across different Android devices."
 HOMEPAGE = "http://developer.android.com/"
 LICENSE = "Apache-2.0"
-LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
-${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
+LIC_FILES_CHKSUM = "file://../NOTICE;md5=c1a3ff0b97f199c7ebcfdd4d3fed238e"
 
 DEPENDS += "liblog"
 
@@ -18,8 +17,10 @@ S = "${WORKDIR}/system/core/libion"
 
 inherit autotools-brokensep pkgconfig
 
-EXTRA_OECONF += "--disable-static"
-EXTRA_OECONF += "--with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
+EXTRA_OECONF += "\
+    --disable-static \
+    --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include \
+"
 
 do_configure[depends] += "virtual/kernel:do_shared_workdir"
 
