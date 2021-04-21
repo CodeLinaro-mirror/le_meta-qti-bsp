@@ -12,6 +12,7 @@ do_install_append() {
         sed -i "s/^After=sysinit.target/After=sysinit.target data.mount/g" ${D}${systemd_unitdir}/system/kdump.service
         sed -i "s/^WantedBy=multi-user.target/WantedBy=sysinit.target/g" ${D}${systemd_unitdir}/system/kdump.service
         sed -i "s/kdump-helper/kdump-qti-helper/g" ${D}${systemd_unitdir}/system/kdump.service
+        sed -i "/^DefaultDependencies/a\ConditionVirtualization=!container" ${D}${systemd_unitdir}/system/kdump.service
         install -D -m 0755 ${WORKDIR}/kdump-qti ${D}${libexecdir}/kdump-qti-helper
     fi
 }
