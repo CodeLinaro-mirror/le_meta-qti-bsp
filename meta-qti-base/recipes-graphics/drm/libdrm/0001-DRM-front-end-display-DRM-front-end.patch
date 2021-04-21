@@ -1,63 +1,22 @@
-From 9551dd00b1037640330c70dbcdce2b9496c0ef81 Mon Sep 17 00:00:00 2001
+From 40d448bd78791af3e518279ae0d074d8a7dda339 Mon Sep 17 00:00:00 2001
 From: Wanteng Zhang <wantzhan@codeaurora.org>
-Date: Thu, 20 Aug 2020 17:34:59 +0800
+Date: Mon, 19 Oct 2020 20:28:04 +0800
 Subject: [PATCH] [DRM front-end] display DRM front-end
 
 Add a display DRM front-end software for the new architecture
 ---
- Makefile.am          | 11 +++++++-
  Makefile.sources     |  4 +--
- configure.ac         | 17 +++++++++++
- include/drm/fe_drm.h | 48 +++++++++++++++++++++++++++++++
- meson.build          | 18 ++++++++++--
+ include/drm/fe_drm.h | 48 +++++++++++++++++++++++++++
+ meson.build          | 18 ++++++++--
  meson_options.txt    |  6 ++++
- xf86drm.c            | 80 ++++++++++++++++++++++++++++++++++++++++++++++++++--
- 7 files changed, 176 insertions(+), 8 deletions(-)
- mode change 100644 => 100755 Makefile.am
+ xf86drm.c            | 93 ++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 5 files changed, 162 insertions(+), 7 deletions(-)
  mode change 100644 => 100755 Makefile.sources
- mode change 100644 => 100755 configure.ac
  create mode 100755 include/drm/fe_drm.h
  mode change 100644 => 100755 meson.build
  mode change 100644 => 100755 meson_options.txt
  mode change 100644 => 100755 xf86drm.c
 
-diff --git a/Makefile.am b/Makefile.am
-old mode 100644
-new mode 100755
-index 730de1f..b3c2bfd
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -41,7 +41,8 @@ AM_DISTCHECK_CONFIGURE_FLAGS = \
- 	--enable-install-test-programs \
- 	--enable-cairo-tests \
- 	--enable-manpages \
--	--enable-valgrind
-+	--enable-valgrind \
-+	--enable-drm_fe
- 
- pkgconfigdir = @pkgconfigdir@
- pkgconfig_DATA = libdrm.pc
-@@ -117,12 +118,20 @@ libdrm_la_LTLIBRARIES = libdrm.la
- libdrm_ladir = $(libdir)
- libdrm_la_LDFLAGS = -version-number 2:4:0 -no-undefined
- libdrm_la_LIBADD = @CLOCK_LIB@ -lm
-+if HAVE_DRM_FE
-+libdrm_la_LIBADD += @DLOPEN_LIBS@
-+endif
- 
- libdrm_la_CPPFLAGS = -I$(top_srcdir)/include/drm
- AM_CFLAGS = \
- 	$(WARN_CFLAGS) \
- 	-fvisibility=hidden \
- 	$(VALGRIND_CFLAGS)
-+if HAVE_DRM_FE
-+AM_CFLAGS += \
-+        -DLIBDIR='"$(libdir)"' \
-+        -DDRM_FE
-+endif
- 
- libdrm_la_SOURCES = $(LIBDRM_FILES)
- 
 diff --git a/Makefile.sources b/Makefile.sources
 old mode 100644
 new mode 100755
@@ -81,55 +40,6 @@ index 55290fe..70d8a88
  
  LIBDRM_INCLUDE_H_FILES := \
  	include/drm/drm.h \
-diff --git a/configure.ac b/configure.ac
-old mode 100644
-new mode 100755
-index 955dbad..ad802cd
---- a/configure.ac
-+++ b/configure.ac
-@@ -163,6 +163,11 @@ AC_ARG_ENABLE(install-test-programs,
- 		  [Install test programs (default: no)]),
- 		  [INSTALL_TESTS=$enableval], [INSTALL_TESTS=no])
- 
-+AC_ARG_ENABLE(drm_fe,
-+	      AS_HELP_STRING([--enable-drm_fe],
-+	      [Enable support for the DRM front-end (default: disabled)]),
-+	      [DRM_FE=$enableval], [DRM_FE=auto])
-+
- dnl ===========================================================================
- dnl check compiler flags
- AC_DEFUN([LIBDRM_CC_TRY_FLAG], [
-@@ -189,6 +194,10 @@ AC_CHECK_FUNCS([clock_gettime], [CLOCK_LIB=],
-                              [AC_MSG_ERROR([Couldn't find clock_gettime])])])
- AC_SUBST([CLOCK_LIB])
- 
-+AC_CHECK_FUNC([dlopen], [],
-+              AC_CHECK_LIB([dl], [dlopen], DLOPEN_LIBS="-ldl"))
-+AC_SUBST(DLOPEN_LIBS)
-+
- AC_CHECK_FUNCS([open_memstream],
-                [AC_DEFINE([HAVE_OPEN_MEMSTREAM], 1, [Have open_memstream()])],
-                [AC_DEFINE([HAVE_OPEN_MEMSTREAM], 0)])
-@@ -459,6 +468,13 @@ AM_CONDITIONAL(HAVE_ETNAVIV, [test "x$ETNAVIV" = xyes])
- 
- AM_CONDITIONAL(HAVE_INSTALL_TESTS, [test "x$INSTALL_TESTS" = xyes])
- 
-+AM_CONDITIONAL(HAVE_DRM_FE, [test "x$DRM_FE" = xyes])
-+if test "x$DRM_FE" = xyes; then
-+        AC_DEFINE(HAVE_DRM_FE, 1, [Have DRM front-end support])
-+else
-+	echo "DRM FE is not enabled"
-+fi
-+
- AC_ARG_ENABLE([cairo-tests],
-               [AS_HELP_STRING([--enable-cairo-tests],
-                               [Enable support for Cairo rendering in tests (default: auto)])],
-@@ -602,4 +618,5 @@ echo "  Freedreno API  $FREEDRENO (kgsl: $FREEDRENO_KGSL)"
- echo "  Tegra API      $TEGRA"
- echo "  VC4 API        $VC4"
- echo "  Etnaviv API    $ETNAVIV"
-+echo "  drm_fe API     $DRM_FE"
- echo ""
 diff --git a/include/drm/fe_drm.h b/include/drm/fe_drm.h
 new file mode 100755
 index 0000000..32bb84a
@@ -187,10 +97,10 @@ index 0000000..32bb84a
 diff --git a/meson.build b/meson.build
 old mode 100644
 new mode 100755
-index fc02f55..55eac2d
+index 831c883..65f1d7a
 --- a/meson.build
 +++ b/meson.build
-@@ -157,6 +157,19 @@ if _vc4 != 'false'
+@@ -161,6 +161,19 @@ if _vc4 != 'false'
    with_vc4 = _vc4 == 'true' or ['arm', 'aarch64'].contains(host_machine.cpu_family())
  endif
  
@@ -210,7 +120,7 @@ index fc02f55..55eac2d
  # XXX: Apparently only freebsd and dragonfly bsd actually need this (and
  # gnu/kfreebsd), not openbsd and netbsd
  with_libkms = false
-@@ -295,7 +308,7 @@ libdrm = shared_library(
+@@ -313,7 +326,7 @@ libdrm = shared_library(
     config_file,
    ],
    c_args : libdrm_c_args,
@@ -219,7 +129,7 @@ index fc02f55..55eac2d
    include_directories : inc_drm,
    version : '2.4.0',
    install : true,
-@@ -306,7 +319,7 @@ ext_libdrm = declare_dependency(
+@@ -334,7 +347,7 @@ ext_libdrm = declare_dependency(
    include_directories : [inc_root, inc_drm],
  )
  
@@ -228,7 +138,7 @@ index fc02f55..55eac2d
  install_headers(
    'include/drm/drm.h', 'include/drm/drm_fourcc.h', 'include/drm/drm_mode.h',
    'include/drm/drm_sarea.h', 'include/drm/i915_drm.h',
-@@ -388,4 +401,5 @@ message('  Freedreno API  @0@ (kgsl: @1@)'.format(with_freedreno, with_freedreno
+@@ -413,4 +426,5 @@ message('  Freedreno API  @0@ (kgsl: @1@)'.format(with_freedreno, with_freedreno
  message('  Tegra API      @0@'.format(with_tegra))
  message('  VC4 API        @0@'.format(with_vc4))
  message('  Etnaviv API    @0@'.format(with_etnaviv))
@@ -253,10 +163,10 @@ index 8af33f1..ba58b15
 diff --git a/xf86drm.c b/xf86drm.c
 old mode 100644
 new mode 100755
-index b7d5865..6c5abf3
+index b49d42f..b34e84c
 --- a/xf86drm.c
 +++ b/xf86drm.c
-@@ -68,6 +68,10 @@
+@@ -76,6 +76,10 @@
  
  #include "xf86drm.h"
  #include "libdrm_macros.h"
@@ -267,11 +177,21 @@ index b7d5865..6c5abf3
  
  #include "util_math.h"
  
-@@ -167,7 +171,49 @@ drm_public void drmFree(void *pt)
- {
+@@ -179,6 +183,59 @@ drm_public void drmFree(void *pt)
      free(pt);
  }
+ 
 +#ifdef DRM_FE
++void drm_place_marker(const char *name)
++{
++	int fd = open("/sys/kernel/debug/bootkpi/kpi_values", O_WRONLY);
++
++	if (fd > 0) {
++		write(fd, name, strlen(name));
++		close(fd);
++	}
++}
++
 +void * load_drm_fe_module(const char *name, const char *entrypoint)
 +{
 +	char path[1024];
@@ -310,14 +230,14 @@ index b7d5865..6c5abf3
 +		if (!drm_interface_fe)
 +			printf("GK - load drm_fe failed!\n");
 +	}
- 
++
 +	return drm_interface_fe;
 +}
 +#endif
  /**
   * Call ioctl, restarting if it is interrupted
   */
-@@ -175,9 +221,19 @@ drm_public int
+@@ -186,9 +243,19 @@ drm_public int
  drmIoctl(int fd, unsigned long request, void *arg)
  {
      int ret;
@@ -338,7 +258,7 @@ index b7d5865..6c5abf3
      } while (ret == -1 && (errno == EINTR || errno == EAGAIN));
      return ret;
  }
-@@ -340,6 +396,14 @@ static int drmOpenDevice(dev_t dev, int minor, int type)
+@@ -351,6 +418,16 @@ static int drmOpenDevice(dev_t dev, int minor, int type)
      gid_t           group   = DRM_DEV_GID;
  #endif
  
@@ -346,14 +266,16 @@ index b7d5865..6c5abf3
 +	struct drm_interface_fe *drm_intf_fe = get_drm_fe();
 +	if (!drm_intf_fe)
 +		return -EINVAL;
-+	if((fd = drm_intf_fe->drmopen_fe(minor, type)) >= 0)
++	if((fd = drm_intf_fe->drmopen_fe(minor, type)) >= 0) {
++		drm_place_marker("M - USER Virtual Display FE ready");
 +		return fd;
++	}
 +#endif
 +
      if (!dev_name)
          return -EINVAL;
  
-@@ -1219,7 +1283,9 @@ drm_public int drmClose(int fd)
+@@ -1250,7 +1327,9 @@ drm_public int drmClose(int fd)
  {
      unsigned long key    = drmGetKeyFromFd(fd);
      drmHashEntry  *entry = drmGetEntry(fd);
@@ -364,7 +286,7 @@ index b7d5865..6c5abf3
      drmHashDestroy(entry->tagTable);
      entry->fd       = 0;
      entry->f        = NULL;
-@@ -1227,7 +1293,11 @@ drm_public int drmClose(int fd)
+@@ -1258,7 +1337,11 @@ drm_public int drmClose(int fd)
  
      drmHashDelete(drmHashTable, key);
      drmFree(entry);
@@ -377,7 +299,7 @@ index b7d5865..6c5abf3
      return close(fd);
  }
  
-@@ -2143,7 +2213,11 @@ drm_public int drmWaitVBlank(int fd, drmVBlankPtr vbl)
+@@ -2174,7 +2257,11 @@ drm_public int drmWaitVBlank(int fd, drmVBlankPtr vbl)
      timeout.tv_sec++;
  
      do {
