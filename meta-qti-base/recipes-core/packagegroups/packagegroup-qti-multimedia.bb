@@ -22,7 +22,9 @@ RDEPENDS_${PN} = " \
         mm-vdec-omx-test-lite \
         mm-venc-omx-test-lite \
         gdk-pixbuf-loader-bmp \
+        venc-omx-sample \
         gdk-pixbuf-loader-gif \
+        vdec-omx-sample \
         alsa-lib \
         alsa-utils \
         alsa-plugins \

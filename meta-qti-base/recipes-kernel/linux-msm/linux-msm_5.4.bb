@@ -53,7 +53,6 @@ KERNEL_EXTRA_ARGS_append_sa6155  += "TARGET_BOARD_TYPE=auto"
 
 SRC_URI   =  "${PATH_TO_REPO}/kernel/msm-5.4/.git;protocol=${PROTO};destsuffix=kernel/msm-5.4;usehead=1 \
               ${PATH_TO_REPO}/kernel/msm-5.4/techpack/display/.git;protocol=${PROTO};destsuffix=kernel/msm-5.4/techpack/display;usehead=1 \
-              ${PATH_TO_REPO}/kernel/msm-5.4/techpack/sched/.git;protocol=${PROTO};destsuffix=kernel/msm-5.4/techpack/sched;usehead=1 \
               ${PATH_TO_REPO}/kernel/msm-5.4/techpack/ais/.git;protocol=${PROTO};destsuffix=kernel/msm-5.4/techpack/ais;usehead=1 \
               ${PATH_TO_REPO}/kernel/msm-5.4/techpack/video/.git;protocol=${PROTO};destsuffix=kernel/msm-5.4/techpack/video;usehead=1"
 
@@ -65,8 +64,10 @@ SRC_URI_append =  "${@bb.utils.contains('DISTRO_FEATURES', 'wayland', ' file://w
 SRC_URI_append =  " file://lxc.cfg"
 SRC_URI_append =  " file://ipc.cfg"
 
+SRC_URI_append =  "${@bb.utils.contains('MACHINE_FEATURES', 'qti-wlan', ' file://wlan.cfg', '', d)}"
+
 SRCREV = "${AUTOREV}"
-SRCREV_FORMAT = "kernel_data_display_sched_ais_video"
+SRCREV_FORMAT = "kernel_data_display_ais_video"
 
 FILESEXTRAPATHS_append := ":${THISDIR}/files"
 
@@ -150,6 +151,7 @@ LDFLAGS_aarch64 = "-O1 --hash-style=gnu --as-needed"
 TARGET_CXXFLAGS += "-Wno-format"
 EXTRA_OEMAKE_append += "INSTALL_MOD_STRIP=1"
 KERNEL_EXTRA_ARGS += "${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'DTC_EXT=${STAGING_BINDIR_NATIVE}/dtc CONFIG_BUILD_ARM64_DT_OVERLAY=y', '', d)}"
+KERNEL_EXTRA_ARGS += "${@bb.utils.contains('DISTRO_FEATURES', 'qti-auto-lxc-overlay', 'CONFIG_AUTO_LXC_OVERLAY=y', '', d)}"
 
 do_shared_workdir_append () {
         cp Makefile $kerneldir/
@@ -196,12 +198,7 @@ do_shared_workdir_append () {
 
 do_deploy_append() {
     if ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'true', 'false', d)}; then
-        if ${@bb.utils.contains('COMBINED_FEATURES', 'qti-lxc', 'true', 'false', d)}; then
-            ${STAGING_BINDIR_NATIVE}/mkdtimg create ${DEPLOYDIR}/${PRODUCT}-dtbo.img ${B}/arch/${ARCH}/boot/dts/vendor/qcom/*lxc-overlay.dtbo
-        else
-            rm ${B}/arch/${ARCH}/boot/dts/vendor/qcom/*lxc-overlay.dtbo
-            ${STAGING_BINDIR_NATIVE}/mkdtimg create ${DEPLOYDIR}/${PRODUCT}-dtbo.img ${B}/arch/${ARCH}/boot/dts/vendor/qcom/*.dtbo
-        fi
+        ${STAGING_BINDIR_NATIVE}/mkdtimg create ${DEPLOYDIR}/${PRODUCT}-dtbo.img ${B}/arch/${ARCH}/boot/dts/vendor/qcom/*.dtbo
     fi
 
     if ${@bb.utils.contains('DISTRO_FEATURES', 'q-hypervisor', 'true', 'false', d)}; then
