@@ -32,16 +32,6 @@ modprobe apr_dlkm
 modprobe q6_dlkm
 modprobe adsp_loader_dlkm
 modprobe stub_dlkm
-a_p='_a'
-ab_partition=$(/sbin/abctl --boot_slot)
-if [[ $ab_partition == $a_p ]]
-then
-  modema=$(/usr/sbin/findfs PARTLABEL="modem_a")
-  /bin/mount -o ro $modema /firmware
-else
-  modemb=$(/usr/sbin/findfs PARTLABEL="modem_b")
-  /bin/mount -o ro $modemb /firmware
-fi
 
 /bin/echo 0 > /sys/module/subsystem_restart/parameters/enable_debug;
 /bin/echo 2 > /sys/kernel/boot_adsp/boot;
@@ -53,8 +43,6 @@ while true
 do
     if cat /proc/asound/cards | grep "adp-star"
     then
-        audio-nxp-auto
-        amixer -c 0 cset iface=MIXER,name='TERT_TDM_RX_0 Channels' Two
         amixer -c 0 cset iface=MIXER,name='TERT_TDM_RX_0 Audio Mixer MultiMedia1' 1
         aplay -Dhw:0,0 /usr/share/sounds/alsa/Front_Left.wav
         amixer -c 0 cset iface=MIXER,name='TERT_TDM_RX_0 Audio Mixer MultiMedia1' 0

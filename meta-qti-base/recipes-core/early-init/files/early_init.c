@@ -42,6 +42,7 @@
 #include <fcntl.h>
 #include <sched.h>
 #include <errno.h>
+#include <dirent.h>
 
 #define DEFAULT_CONF            "/etc/early_init.conf"
 #define END_TAG                 "<end>"
@@ -699,6 +700,168 @@ static inline void audio_drv_loading()
 	return;
 }
 
+#define MAX_PATH_LEN 128
+#define BUFLEN 1024*4
+#define TARGET_STR_LEN 16
+#define CMDLINE_PATH "/proc/cmdline"
+#define BOOT_SLOT_KEY "androidboot.slot_suffix=_"
+#define BOOT_DEV_VAL ".ufshc"
+
+static inline size_t strlcat(char *dst, const char *src, int dst_size)
+{
+	strlcpy(dst + strlen(dst), src, dst_size - strlen(dst));
+}
+
+/* return '\0' if fail
+ * */
+static char get_boot_slot(void)
+{
+	int fd = -1;
+	char buf[BUFLEN] = {0};
+	int ret = false;
+	char * key = NULL;
+	char slot = '\0';
+
+	fd = open(CMDLINE_PATH, O_RDONLY);
+	if (fd < 0) {
+		printf("open %s failed!\n", CMDLINE_PATH);
+		goto out;
+	}
+	if (read(fd, buf, BUFLEN - 1) <= 0) {
+		goto out;
+	}
+	key = strstr(buf, BOOT_SLOT_KEY);
+	slot = *(key + strlen(BOOT_SLOT_KEY));
+
+	if (slot != 'a' && slot != 'b')
+		slot = '\0';
+
+out:
+	safe_close(fd);
+	return slot;
+}
+
+static inline bool is_modem_firmware(char slot, const char * dev_name)
+{
+	int fd = -1;
+	char dev_uevent_path[MAX_PATH_LEN] = {0};
+	char buf[BUFLEN] = {0};
+	int bytes = 0;
+	bool ret = false;
+	const char *partname = (slot == 'a') ? "PARTNAME=modem_a" : "PARTNAME=modem_b";
+
+	snprintf(dev_uevent_path, MAX_PATH_LEN - 1, "/sys/class/block/%s/uevent", dev_name);
+	fd = open(dev_uevent_path, O_RDONLY);
+	if (fd < 0) {
+		printf("open %s failed!\n", dev_uevent_path);
+		goto out;
+	}
+	bytes = read(fd, buf, BUFLEN - 1);
+	if (bytes <= 0) {
+		goto out;
+	}
+	if (strncmp(&buf[bytes - TARGET_STR_LEN - 1], partname, TARGET_STR_LEN)) {
+		goto out;
+	}
+	ret = true;
+out:
+	safe_close(fd);
+	return ret;
+
+}
+
+#define UFS_DEV_PREFIX "sd"
+#define EMMC_DEV_PREFIX "mmcblk"
+#define BLOCK_DEVS "/sys/class/block/"
+static bool find_modem_firmware(char slot, char * firmware_dev, int fmw_dev_len)
+{
+	DIR *dir = NULL;
+	struct dirent *entry;
+	bool ret = false;
+	int d_name_len = 0;
+
+	dir = opendir(BLOCK_DEVS);
+	if (!dir) {
+		perror("open block devies directory failed!");
+		return false;
+	}
+
+	while ((entry = readdir(dir)) != NULL) {
+		if (strncmp(entry->d_name, UFS_DEV_PREFIX, strlen(UFS_DEV_PREFIX)) != 0
+				&& strncmp(entry->d_name, EMMC_DEV_PREFIX, strlen(EMMC_DEV_PREFIX)) != 0)
+			continue;
+		if (is_modem_firmware(slot, entry->d_name)) {
+			d_name_len = strlen(entry->d_name);
+			if (d_name_len < fmw_dev_len) {
+				strlcpy(firmware_dev, entry->d_name, fmw_dev_len);
+				ret = true;
+			} else {
+				perror("Device name is oversize!");
+			}
+			break;
+		}
+	}
+	closedir(dir);
+	return ret;
+}
+
+#define A_DEF_UFS_FIRMWARE "sde4"
+#define B_DEF_UFS_FIRMWARE "sde20"
+#define A_DEF_EMMC_FIRMWARE "mmcblk0p30"
+#define B_DEF_EMMC_FIRMWARE "mmcblk0p31"
+#define DEV_ROOT "/dev/"
+#define FIRMWARE_DEV_TYPES 4
+static inline void mount_cmd()
+{
+	pid_t pid;
+	char slot = '\0';
+	char firmware_dev[MAX_PATH_LEN] = {DEV_ROOT};
+	const char *firmware_names[FIRMWARE_DEV_TYPES] = {
+		A_DEF_UFS_FIRMWARE,
+		B_DEF_UFS_FIRMWARE,
+		A_DEF_EMMC_FIRMWARE,
+		B_DEF_EMMC_FIRMWARE
+	};
+	int i;
+
+	write_marker("mount_cmd-start-up");
+	pid = fork();
+	if (pid < 0) {
+		write_marker("mount_cmd-failed");
+		perror("fork child process failed \n");
+		return;
+	}
+	if (pid == 0) {
+		slot = get_boot_slot();
+		if (slot == '\0') {
+			write_marker("mount_cmd-failed");
+			perror("Failed to read boot slot!\n");
+			goto out;
+		}
+		for (int i = 0; i < FIRMWARE_DEV_TYPES; i++) {
+			if (is_modem_firmware(slot, firmware_names[i])) {
+                                strlcat(firmware_dev, firmware_names[i], sizeof(firmware_dev));
+				break;
+			}
+		}
+		if (i == FIRMWARE_DEV_TYPES) {
+			if (!find_modem_firmware(slot,
+						firmware_dev + strlen(firmware_dev),
+						MAX_PATH_LEN - strlen(firmware_dev))) {
+				write_marker("mount_cmd-failed");
+				perror("Failed to find modem firmware device!\n");
+				goto out;
+			}
+		}
+
+		mount(firmware_dev, "/firmware", "vfat", MS_RDONLY, NULL);
+		system("audio-nxp-auto");
+out:
+		write_marker("mount_cmd-exit");
+		exit(0);
+	}
+}
+
 int main(int argc, char* argv[])
 {
 	char line[LINE_MAX];
@@ -710,6 +873,8 @@ int main(int argc, char* argv[])
 	prepare_dir("shm");
 	prepare_dir("procfs");
 	prepare_dir("early_init_dir");
+
+	mount_cmd();
 
 	fd = open("/early/early_init.log", O_RDWR | O_CREAT, 0644);
 	if (fd < 0)
