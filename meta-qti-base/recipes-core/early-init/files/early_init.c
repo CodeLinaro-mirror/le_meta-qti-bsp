@@ -642,6 +642,38 @@ static inline void trigger_firmware_loading(const char* path)
 	return;
 }
 
+static inline void mount_cmd()
+{
+        pid_t pid;
+	char buf[8] = {'\0'};
+	int fd;
+
+        write_marker("mount_cmd-start-up");
+        pid = fork();
+        if (pid < 0) {
+                perror("fork child process failed \n");
+                return;
+        }
+        if (pid == 0) {
+		fd = open("/sys/devices/soc0/chip_name",O_RDWR);
+		if(fd < 0) {
+			perror("open chip name error\n");
+		} else {
+			read(fd, &buf, 8);
+			if (!strncmp(buf,"SA6155P", 6)) {
+				mount("/dev/mmcblk0p30", "/firmware", "vfat", MS_RDONLY, NULL);
+			} else {
+				mount("/dev/sde4", "/firmware", "vfat", MS_RDONLY, NULL);
+			}
+		}
+                system("audio-nxp-auto");
+                write_marker("mount_cmd-exit");
+		safe_close(fd);
+                exit(0);
+        }
+        return;
+}
+
 int main(int argc, char* argv[])
 {
 	FILE* f;
@@ -654,6 +686,8 @@ int main(int argc, char* argv[])
 	prepare_dir("shm");
 	prepare_dir("procfs");
 	prepare_dir("early_init_dir");
+
+	mount_cmd();
 
 	fd = open("/early/early_init.log", O_RDWR | O_CREAT, 0644);
 	if (fd < 0)
