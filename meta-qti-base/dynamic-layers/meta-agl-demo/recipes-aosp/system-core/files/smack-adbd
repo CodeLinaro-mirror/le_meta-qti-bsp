@@ -1,0 +1,6 @@
+System System::adbd rwxa--
+System::adbd System -wx---
+System::adbd System::Shared r-x---
+System::adbd System::Run rwxat-
+System::adbd System::Log rwxa--
+System::adbd _ rwx--l
