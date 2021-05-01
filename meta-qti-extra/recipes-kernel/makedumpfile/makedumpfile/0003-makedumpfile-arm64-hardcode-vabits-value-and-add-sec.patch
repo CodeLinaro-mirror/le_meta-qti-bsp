@@ -1,0 +1,76 @@
+From c593ff15df1c0126d7f7dbbfb4ce054838621f5e Mon Sep 17 00:00:00 2001
+From: Akshay Adiga <aadiga@codeaurora.org>
+Date: Fri, 16 Apr 2021 00:33:59 +0530
+Subject: [PATCH 3/3] makedumpfile/arm64 : hardcode vabits value, and add
+ secure page support
+
+Current glibc version for the build does not have necessary definitions
+to build automatic detection of vabits value. Hence hardcode it to 39.
+
+Add support to track and skip secure hypassigned pages. now makedumpfile
+can work with XPU enabled.
+---
+ arch/arm64.c     |   2 +-
+ makedumpfile-git | Bin 0 -> 2763905 bytes
+ makedumpfile.c   |  10 +++++++++-
+ 3 files changed, 10 insertions(+), 2 deletions(-)
+ create mode 100755 makedumpfile-git
+
+diff --git a/arch/arm64.c b/arch/arm64.c
+index 1072178..60c3906 100644
+--- a/arch/arm64.c
++++ b/arch/arm64.c
+@@ -113,7 +113,7 @@ typedef unsigned long pgdval_t;
+ /*
+  * Section address mask and size definitions.
+  */
+-#define SECTIONS_SIZE_BITS	30
++#define SECTIONS_SIZE_BITS	29
+ 
+ /*
+  * Hardware page table definitions.
+diff --git a/makedumpfile.c b/makedumpfile.c
+index fd05910..5092850 100644
+--- a/makedumpfile.c
++++ b/makedumpfile.c
+@@ -98,6 +98,7 @@ mdf_pfn_t pfn_free;
+ mdf_pfn_t pfn_hwpoison;
+ mdf_pfn_t pfn_offline;
+ mdf_pfn_t pfn_elf_excluded;
++mdf_pfn_t pfn_secure;
+ 
+ mdf_pfn_t num_dumped;
+ 
+@@ -6122,6 +6123,12 @@ __exclude_unnecessary_pages(unsigned long mem_map,
+ 			pfn_counter = &pfn_offline;
+ 		}
+ 		/*
++		 * Exclude Secure pages.
++		 */
++		else if  (private == 0xEEEEEEEEUL) {
++			pfn_counter = &pfn_secure;
++		}
++		/*
+ 		 * Unexcludable page
+ 		 */
+ 		else
+@@ -9855,7 +9862,7 @@ print_report(void)
+ 	pfn_original = info->max_mapnr - pfn_memhole;
+ 
+ 	pfn_excluded = pfn_zero + pfn_cache + pfn_cache_private
+-	    + pfn_user + pfn_free + pfn_hwpoison + pfn_offline;
++	    + pfn_user + pfn_free + pfn_hwpoison + pfn_offline + pfn_secure;
+ 
+ 	REPORT_MSG("\n");
+ 	REPORT_MSG("Original pages  : 0x%016llx\n", pfn_original);
+@@ -9871,6 +9878,7 @@ print_report(void)
+ 	REPORT_MSG("    Free pages              : 0x%016llx\n", pfn_free);
+ 	REPORT_MSG("    Hwpoison pages          : 0x%016llx\n", pfn_hwpoison);
+ 	REPORT_MSG("    Offline pages           : 0x%016llx\n", pfn_offline);
++	REPORT_MSG("    Secure pages           : 0x%016llx\n", pfn_secure);
+ 	REPORT_MSG("  Remaining pages  : 0x%016llx\n",
+ 	    pfn_original - pfn_excluded);
+ 
+-- 
+2.7.4
+
