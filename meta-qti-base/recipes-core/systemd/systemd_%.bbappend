@@ -24,6 +24,12 @@ FULL_OPTIMIZATION = "-O2 -fexpensive-optimizations -frename-registers -fomit-fra
 
 do_patch_append () {
     bb.build.exec_func('do_fix_root_home', d)
+    if bb.utils.contains('DISTRO_FEATURES','qti-lxc','True','False',d)=="True":
+        bb.build.exec_func('do_fix_suspend', d)
+}
+# workaroud for suspend, suspend is not allowd in systemd-sleep, LA will trigger suspend
+do_fix_suspend () {
+    sed -i 's/#AllowSuspend=yes/AllowSuspend=no/' ${S}/src/sleep/sleep.conf
 }
 
 do_fix_root_home () {

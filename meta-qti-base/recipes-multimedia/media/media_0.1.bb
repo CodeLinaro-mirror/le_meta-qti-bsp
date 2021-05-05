@@ -26,6 +26,7 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 LV = "1.0.0"
 
 inherit autotools systemd
+SYSTEMD_SERVICE_${PN} = "${@bb.utils.contains('DISTRO_FEATURES','early_init','video_early_demo.service','',d)}"
 
 
 #re-use non-perf settings
