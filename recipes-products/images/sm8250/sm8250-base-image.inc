@@ -82,7 +82,9 @@ copy_edge_rootfs() {
     mkdir -p ${IMAGE_ROOTFS}/packages/noarch
     mkdir -p ${IMAGE_ROOTFS}/packages/sm8250
     mkdir -p ${IMAGE_ROOTFS}/packages/qcaudio
+    mkdir -p ${IMAGE_ROOTFS}/packages/opencv
 
+    # internal only begin
     if [ -d ${WORKSPACE}/poky/meta-qti-internal/centos-noship/llvm ]
     then
         mkdir -p ${IMAGE_ROOTFS}/packages/llvm
@@ -126,6 +128,7 @@ copy_edge_rootfs() {
     then
         cp ${WORKSPACE}/poky/meta-qti-internal/centos-noship/scripts/ifcfg-eth1 ${IMAGE_ROOTFS}/packages/
     fi
+    # internal only end
 
     mkdir -p ${IMAGE_ROOTFS}/systemrw
     mkdir -p ${IMAGE_ROOTFS}/persist
@@ -145,21 +148,24 @@ copy_edge_rootfs() {
     ln -sf /dsp ${IMAGE_ROOTFS}/vendor/dsp
 
     # find ${IMAGE_ROOTFS} . -name "*.4.18*" |xargs rm -rf
-    rm -rf ${IMAGE_ROOTFS}/usr/lib/modules/4.18.0-80.el8.aarch64
-    rm -rf ${IMAGE_ROOTFS}/usr/lib/modules/4.18.0-79.el8+2.aarch64
-    rm -rf ${IMAGE_ROOTFS}/usr/share/doc/kernel-keys/4.18.0-80.el8.aarch64
-    rm -rf ${IMAGE_ROOTFS}/usr/share/licenses/kernel-core/COPYING-4.18.0
-    rm -rf ${IMAGE_ROOTFS}/usr/src/kernels/4.18.0-80.el8.aarch64
-    rm -rf ${IMAGE_ROOTFS}/usr/src/kernels/4.18.0-80.el8.aarch64+debug
-    rm -rf ${IMAGE_ROOTFS}/var/lib/pcp/testsuite/linux/procpid-4.18.13-root-006.tgz
-    rm -rf ${IMAGE_ROOTFS}/etc/ld.so.conf.d/kernel-4.18.0-80.el8.aarch64.conf
-    rm -rf ${IMAGE_ROOTFS}/usr/lib/firmware/*
-    rm -rf ${IMAGE_ROOTFS}/var/lib/pcp/testsuite
-    rm -rf ${IMAGE_ROOTFS}/etc/systemd/system/multi-user.target.wants/pmie.service
-    rm -rf ${IMAGE_ROOTFS}/etc/systemd/system/multi-user.target.wants/pmcd.service
-    rm -rf ${IMAGE_ROOTFS}/etc/systemd/system/multi-user.target.wants/pmlogger.service
-    rm -rf ${IMAGE_ROOTFS}/var/lib/nfs/rpc_pipefs
-    rm -rf ${IMAGE_ROOTFS}/tmp/*
+    if [ -e ${WORKSPACE}/poky/meta-qti-internal/centos-noship ]
+    then
+        rm -rf ${IMAGE_ROOTFS}/usr/lib/modules/4.18.0-80.el8.aarch64
+        rm -rf ${IMAGE_ROOTFS}/usr/lib/modules/4.18.0-79.el8+2.aarch64
+        rm -rf ${IMAGE_ROOTFS}/usr/share/doc/kernel-keys/4.18.0-80.el8.aarch64
+        rm -rf ${IMAGE_ROOTFS}/usr/share/licenses/kernel-core/COPYING-4.18.0
+        rm -rf ${IMAGE_ROOTFS}/usr/src/kernels/4.18.0-80.el8.aarch64
+        rm -rf ${IMAGE_ROOTFS}/usr/src/kernels/4.18.0-80.el8.aarch64+debug
+        rm -rf ${IMAGE_ROOTFS}/var/lib/pcp/testsuite/linux/procpid-4.18.13-root-006.tgz
+        rm -rf ${IMAGE_ROOTFS}/etc/ld.so.conf.d/kernel-4.18.0-80.el8.aarch64.conf
+        rm -rf ${IMAGE_ROOTFS}/usr/lib/firmware/*
+        rm -rf ${IMAGE_ROOTFS}/var/lib/pcp/testsuite
+        rm -rf ${IMAGE_ROOTFS}/etc/systemd/system/multi-user.target.wants/pmie.service
+        rm -rf ${IMAGE_ROOTFS}/etc/systemd/system/multi-user.target.wants/pmcd.service
+        rm -rf ${IMAGE_ROOTFS}/etc/systemd/system/multi-user.target.wants/pmlogger.service
+        rm -rf ${IMAGE_ROOTFS}/var/lib/nfs/rpc_pipefs
+        rm -rf ${IMAGE_ROOTFS}/tmp/*
+    fi
 
     if [ -d ${BASE_WORKDIR}/${BASEMACHINE}-oe-linux/linux-msm/4.19-r0/image/usr/lib/modules ]
     then
