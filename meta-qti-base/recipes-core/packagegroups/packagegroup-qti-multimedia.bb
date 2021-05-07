@@ -36,6 +36,7 @@ RDEPENDS_${PN}_qtiquingvm8295 = " \
         gstreamer1.0-plugins-ugly \
         gstreamer1.0-libav \
         gstreamer1.0-plugins-qscreencapsrc \
+        gstreamer1.0-plugins-qeavb \
         gdk-pixbuf-loader-bmp \
         gdk-pixbuf-loader-gif \
         alsa-lib \
