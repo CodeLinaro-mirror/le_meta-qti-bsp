@@ -1,6 +1,4 @@
-#!/bin/sh
-
-# Copyright (c) 2020,2021 The Linux Foundation. All rights reserved.
+# Copyright (c) 2020, The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -25,15 +23,13 @@
 # BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
-# IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
 
-mkdir -p /overlay/data        || exit 1
-mkdir -p /overlay/etc         || exit 1
-mkdir -p /overlay/cache       || exit 1
-mkdir -p /overlay/usr/share   || exit 1
-mkdir -p /overlay/.data-work  || exit 1
-mkdir -p /overlay/.etc-work   || exit 1
-mkdir -p /overlay/.cache-work || exit 1
-mkdir -p /overlay/.usr-share-work || exit 1
+[Unit]
+Before=local-fs.target
 
-exit 0
+[Mount]
+Type=ubifs
+What=ubi0:systemrw
+Where=/systemrw
+Options=bulk_read,rw,rootcontext=system_u:object_r:system_data_t:s0
