@@ -20,6 +20,10 @@ SRCREV = "a6189acd18b00611c1dc7042299ad75486f08a1a"
 
 SRC_URI = "git://source.codeaurora.org/quic/le/protobuf.git;protocol=git;branch=protobuf/master"
 
+SRC_URI[md5sum] = "9f90a0eaa0ea7747fda01ca79d21ebcb"
+SRC_URI[sha256sum] = "30639c035cdb23534cd4aa2dd52c3bf48f06e5f4a941509c8bafd8ce11080259"
+SRC_URI += "https://pypi.python.org/simple/six/six-1.15.0.tar.gz"
+
 S = "${WORKDIR}/git/python"
 
 BBCLASSEXTEND = "native nativesdk"
@@ -30,6 +34,17 @@ inherit distutils
 # Cherry-pick the files after the `setup.py install` and copy them to ${D}.
 do_install() {
     install -d ${D}${PYTHON_SITEPACKAGES_DIR}
+
+    # download and install package six, as python setup.py
+    # could not access the file server due to some issue
+    cd ${WORKDIR}/six-1.15.0
+    STAGING_INCDIR=${STAGING_INCDIR} \
+    STAGING_LIBDIR=${STAGING_LIBDIR} \
+    PYTHONPATH=${D}${PYTHON_SITEPACKAGES_DIR} \
+    BUILD_SYS=${BUILD_SYS} HOST_SYS=${HOST_SYS} \
+    ${STAGING_BINDIR_NATIVE}/${PYTHON_PN}-native/${PYTHON_PN} setup.py install --install-lib=${D}/${PYTHON_SITEPACKAGES_DIR} || \
+    bbfatal "${PYTHON_PN} SIX setup.py install execution failed."
+    cd ${WORKDIR}/git/python
 
     # this run installs the egg file in to python2.7/site-packages folder
     STAGING_INCDIR=${STAGING_INCDIR} \
