@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://GPL;md5=94d55d512a9ba36caa9b7df079bae19f \
 SRC_URI = "${PATH_TO_REPO}/external/dtc/.git;protocol=${PROTO};destsuffix=external/dtc;usehead=1" 
 
 S = "${WORKDIR}/external/dtc"
-EXTRA_OEMAKE_append = " NO_PYTHON=1"
+EXTRA_OEMAKE_append = " NO_PYTHON=1 CFLAGS='-g -Os $(SHAREDLIB_CFLAGS) -Werror $(WARNINGS) -fcommon'"
 
 SRCREV = "${AUTOREV}"
 
