@@ -37,8 +37,10 @@ CFLAGS += "-I${STAGING_INCDIR} \
            -I${STAGING_INCDIR}/glib-2.0/glib \
            -I${STAGING_INCDIR}/c++ \
            -I${STAGING_INCDIR}/c++/${TARGET_SYS} \
+           -I${STAGING_KERNEL_BUILDDIR}/usr/include/vidc \
            -I${STAGING_KERNEL_BUILDDIR}/usr/include"
 
+CXXFLAGS += "-I${STAGING_KERNEL_BUILDDIR}/usr/include/vidc"
 CXXFLAGS += "-I${STAGING_KERNEL_BUILDDIR}/usr/include"
 
 TOOLCHAIN = "clang"
