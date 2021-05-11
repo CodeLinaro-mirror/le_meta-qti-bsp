@@ -11,6 +11,10 @@ SUMMARY = "A very basic Wayland image with a terminal"
 require recipes-platform/images/agl-image-weston.bb
 require recipes-products/images/qti-image-weston-prop.bb
 
+# Pull in to reuse the COMBINED_FEATURES logic for packagegroups
+# from machine-image
+require recipes-products/images/automotive-image.inc
+
 # Remove splash feature added by agl-image-weston, as psplash does
 # not work
 IMAGE_FEATURES_remove = "splash"
@@ -23,9 +27,7 @@ IMAGE_FEATURES += "ssh-server-openssh"
 # Disable root password for demo development
 EXTRA_IMAGE_FEATURES += "debug-tweaks"
 
-IMAGE_INSTALL_append = "\
-    packagegroup-qti-core-minimal \
-    packagegroup-qti-display \
+IMAGE_INSTALL += "\
     packagegroup-qti-agl-demo-tools \
     "
 
