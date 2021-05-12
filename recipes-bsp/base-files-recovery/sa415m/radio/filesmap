@@ -42,7 +42,10 @@ tools.fv                toolsfv
 uefi.elf                uefi
 xbl_cfg.elf             xbl_config
 abl.elf                 abl
-sec.dat                 sec
+sec.elf                 sec
+apdp.mbn                apdp
+cmnlib.mbn              cmnlib
+km4.mbn                 keymaster
 
 # filename + .bak       backup partition
 
