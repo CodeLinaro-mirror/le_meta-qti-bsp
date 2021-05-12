@@ -32,20 +32,22 @@ NON-HLOS.bin            modem
 
 sbl1.mbn                sbl
 tz.mbn                  tz
-rpm.mbn                 rpm
-appsboot.mbn            aboot
 aop.mbn                 aop
-xbl_cfg.elf             xbl_config
-devcfg_auto.mbn         tz_devcfg
-uefi.elf                uefi
-abl.elf                 abl
-multi_image.mbn         multi_image
+devcfg.mbn              tz_devcfg
 hyp.mbn                 qhee
-ipa_fws.elf             ipa_fw
-apdp.mbn                apdp
-cmnlib.mbn              cmnlib
-km4.mbn                 keymaster
+multi_image.mbn         multi_image
+uefi.elf                uefi
+xbl_cfg.elf             xbl_config
+abl.elf                 abl
 sec.elf                 sec
+apdp.mbn                apdp
+
+# filename + .bak       backup partition
+
+#sbl1.mbn.bak            sbl1bak
+#tz.mbn.bak              tzbak
+#rpm.mbn.bak             rpmbak
+#appsboot.mbn.bak        abootbak
 
 # For multiple file firmware images that differ from *.mbn and *.bin
 # you can specify filename.* to direct all files to the same location.
