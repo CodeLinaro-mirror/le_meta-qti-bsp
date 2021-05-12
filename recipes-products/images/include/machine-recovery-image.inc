@@ -37,6 +37,10 @@ MKUBIFS_ARGS = "${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', '-m 4096 -e 253952 
 UBI_VOLNAME  = "${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', 'rootfs', '', d)}"
 EXT4_IMAGET_TYPE  = "${@bb.utils.contains('IMAGE_FSTYPES', 'ext4', True, False, d)}"
 
+# Install abctl and dependency in recovery bins
+IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'nad-prod', 'abctl', '', d)}"
+DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'nad-prod', 'libgpt virtual/kernel glib-2.0', '', d)}"
+
 do_fsconfig() {
  chmod go-r ${IMAGE_ROOTFS}/etc/passwd
  if ${@bb.utils.contains('DISTRO_FEATURES','systemd','false','true',d)}; then
