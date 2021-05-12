@@ -14,6 +14,7 @@ def nand_target_supports_OTA_upgrade(d):
 
 DEPLOY_DIR_IMAGE_NAND ?= "${DEPLOY_DIR_IMAGE}"
 SQUASHFS_SYS_VOLUME ?= "${BASEMACHINE}-sysfs.squash"
+SQUASHFS_RECOVERYFS_VOLUME ?= "recoveryfs.squash"
 
 def nand_set_vars_and_get_dependencies(d):
     if not nand_target_supports_OTA_upgrade(d):
@@ -90,6 +91,11 @@ do_recovery_ubi() {
     # copy radio directory content into RADIO directory
     cp -r ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/base-files-recovery/${MACHINE}/radio/. ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RADIO/.
 
+    # devcfg image name for NAD is changed
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'nad-prod', 'true', 'false', d)}; then
+      sed -i -e 's/devcfg.mbn/devcfg_auto_nad.mbn/' ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RADIO/filesmap
+    fi
+
     # copy the boot\recovery images
     cp ${DEPLOY_DIR_IMAGE_NAND}/${BOOTIMAGE_TARGET} ${OTA_TARGET_IMAGE_ROOTFS_UBI}/BOOTABLE_IMAGES/boot.img
 
@@ -145,6 +151,11 @@ do_recovery_ubi() {
 
         # change system partitions fs_type to squashfs and the block-device instead of mtd device's name
         echo /system   squashfs  /dev/block/bootdevice/by-name/system >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RECOVERY/recovery.fstab
+        # modem fstype
+        if ${@bb.utils.contains('DISTRO_FEATURES', 'nad-prod', 'true', 'false', d)}; then
+            img2simg  ${DEPLOY_DIR_IMAGE_NAND}/${SQUASHFS_RECOVERYFS_VOLUME} ${OTA_TARGET_IMAGE_ROOTFS_UBI}/IMAGES/recoveryfs.img
+            echo /recoveryfs  squashfs  /dev/block/bootdevice/by-name/recoveryfs >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RECOVERY/recovery.fstab
+        fi
     else
         # File-based OTA upgrade
 
@@ -186,6 +197,10 @@ do_recovery_ubi() {
         #set use_set_metadata to 1 so that updater-script
         #will have rules to apply selabels
         echo use_set_metadata=1 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
+    fi
+
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'nad-prod', 'true', 'false', d)}; then
+      echo le_target_supports_nad=1 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
     fi
 
     # Targets that support A/B boot do not need recovery(fs)-updater
