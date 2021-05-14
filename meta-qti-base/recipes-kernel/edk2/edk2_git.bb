@@ -17,8 +17,8 @@ S         =  "${WORKDIR}/bootable/bootloader/edk2"
 SRCREV = "${AUTOREV}"
 
 # FIXME for keymaster functionality
-SRC_URI_append = " file://0001-avb-bring-up-keymaster-for-LV.patch  \
-                   file://0002-avb-send-dummy-ROT-and-boot-state-to-keymaster-from-.patch "
+SRC_URI_append_sa81x5 = " file://0001-avb-bring-up-keymaster-for-LV.patch  \
+                          file://0002-avb-send-dummy-ROT-and-boot-state-to-keymaster-from-.patch "
 
 INSANE_SKIP_${PN} = "arch"
 
