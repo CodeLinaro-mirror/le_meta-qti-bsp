@@ -35,6 +35,8 @@ dd if=/lib/libpthread.so.0 of=/dev/null
 dd if=/lib/systemd/system/initrd-fs.target of=/dev/null
 dd if=/lib/systemd/system/initrd-root-fs.target of=/dev/null
 dd if=/lib/systemd/system/rescue.target of=/dev/null
+dd if=/lib/systemd/system/ctrl-alt-del.target of=/dev/null
+dd if=/lib/systemd/system/reboot.target of=/dev/null
 dd if=/lib/systemd/system/emergency.service of=/dev/null
 dd if=/lib/systemd/system/getty-pre.target of=/dev/null
 dd if=/lib/systemd/system/emac_dwc_eqos.service of=/dev/null
