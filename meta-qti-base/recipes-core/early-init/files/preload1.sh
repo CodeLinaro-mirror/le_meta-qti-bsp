@@ -36,6 +36,7 @@ dd if=/lib/systemd/system/systemd-ask-password-console.path of=/dev/null
 dd if=/lib/systemd/system/sys-kernel-config.mount of=/dev/null
 dd if=/lib/systemd/system/sys-fs-fuse-connections.mount of=/dev/null
 dd if=/lib/systemd/system/ip6tables.service of=/dev/null
+dd if=/lib/systemd/system/autovt@.service of=/dev/null
 dd if=/lib/systemd/system/init_post_boot.service of=/dev/null
 dd if=/lib/systemd/system/adbd.service of=/dev/null
 dd if=/lib/systemd/system/acdb_loader.service of=/dev/null

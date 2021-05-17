@@ -29,6 +29,7 @@
 echo systemds1 > /dev/kmsg
 
 dd if=/etc/init.d/setup_avtp_routing_le of=/dev/null
+dd if=/etc/systemd/system/dbus-org.freedesktop.network1.service of=/dev/null
 dd if=/lib/systemd/system/multi-user.target of=/dev/null
 dd if=/lib/systemd/system/local-fs-pre.target of=/dev/null
 ls -l /etc/systemd/system/local-fs-pre.target.wants

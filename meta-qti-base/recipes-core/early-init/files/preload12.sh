@@ -36,6 +36,8 @@ dd if=/lib/systemd/system/qseecomd.service of=/dev/null
 dd if=/etc/initscripts/qseecomd of=/dev/null
 dd if=/lib/systemd/system/connman.service of=/dev/null
 dd if=/etc/systemd/system/chgrp-diag.service of=/dev/null
+dd if=/etc/systemd/system/dbus-org.freedesktop.resolve1.service of=/dev/null
+dd if=/etc/systemd/system/dbus-org.freedesktop.timesync1.service of=/dev/null
 dd if=/sbin/leprop-service of=/dev/null
 
 echo systemdmb > /dev/kmsg

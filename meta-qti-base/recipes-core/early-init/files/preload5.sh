@@ -30,6 +30,7 @@ echo systemds4 > /dev/kmsg
 
 dd if=/lib/systemd/system/sysinit.target of=/dev/null
 dd if=/lib/systemd/system/weston.service of=/dev/null
+dd if=/lib/systemd/system/memory-hotplug.service of=/dev/null
 dd if=/lib/systemd/system/systemd-ask-password-console.service of=/dev/null
 dd if=/lib/systemd/system/systemd-vconsole-setup.service of=/dev/null
 dd if=/lib/systemd/system/initrd-switch-root.target of=/dev/null
