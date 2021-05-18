@@ -13,11 +13,11 @@ tmpfs                /media/ram      tmpfs     defaults,noauto       0  0
 # mounting /tmp as a tmpfs is some usual implementation.
 tmpfs                /tmp            tmpfs     defaults              0  0
 
-/dev/vdc             /persist        auto      defaults,nofail       0  2
-/dev/vdb             /data           auto      defaults,nofail       0  2
-/dev/vdc             /dsp            auto      defaults,nofail       0  2
-/dev/vdc             /firmware       auto      defaults,nofail       0  2
 /dev/vdc             /var            auto      defaults,nofail       0  2
+/dev/vdb             /data           auto      defaults,nofail       0  2
+/dev/vdh             /dsp            auto      defaults,nofail       0  2
+/dev/vde             /firmware       auto      defaults,nofail       0  2
+/dev/vdd             /bluetooth      auto      defaults,ro           0  0
 
 # Bind /home to /data
 /data                /home                auto       defaults,bind         0  0
