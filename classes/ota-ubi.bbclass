@@ -2,9 +2,9 @@ DEPENDS += "releasetools-native zip-native fsconfig-native applypatch-native bc-
 
 RM_WORK_EXCLUDE_ITEMS += "rootfs rootfs-dbg"
 
-RECOVERY_IMAGE_ROOTFS = "$(echo ${IMAGE_ROOTFS} | sed 's#${PN}#qti-recovery-image#')"
+RECOVERY_IMAGE_ROOTFS = "$(echo ${IMAGE_ROOTFS} | sed 's#/${PN}/#/qti-recovery-image/#')"
 
-IMAGE_SYSTEM_MOUNT_POINT = "/"
+IMAGE_SYSTEM_MOUNT_POINT = "/system"
 OTA_TARGET_IMAGE_ROOTFS_UBI = "${WORKDIR}/ota-target-image-ubi"
 OTA_TARGET_FILES_UBI = "target-files-ubi.zip"
 OTA_TARGET_FILES_UBI_PATH = "${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${OTA_TARGET_FILES_UBI}"
@@ -16,7 +16,7 @@ def get_filesmap(d):
 
     for o in overrides:
         opath = "poky/meta-qti-bsp/recipes-bsp/base-files-recovery/" + o + "/radio/filesmap"
-        path = os.path.join(d.getVar('THISDIR'), '../../../', opath)
+        path = os.path.join(d.getVar('WORKSPACEROOT'), opath)
         if os.path.exists(path):
             filesmap_path = path
             break
@@ -63,7 +63,6 @@ do_recovery_ubi() {
     echo /cache    ubifs  cache >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RECOVERY/recovery.fstab
     echo /data     ubifs  userdata >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RECOVERY/recovery.fstab
     echo /recovery mtd     recovery >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RECOVERY/recovery.fstab
-    echo ${IMAGE_SYSTEM_MOUNT_POINT}   mtd  rootfs >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RECOVERY/recovery.fstab
 
     #Copy contents of userdata rootfs
     cp -r ${IMAGE_ROOTFS}/data/. ${OTA_TARGET_IMAGE_ROOTFS_UBI}/DATA/.
@@ -138,7 +137,7 @@ do_recovery_ubi() {
     echo blocksize=131072 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
 
     # boot_size: Size of boot partition from partition.xml
-    echo boot_size=0x00C00000 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
+    echo boot_size=0x00CFA000 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
 
     # recovery_size : Size of recovery partition from partition.xml
     echo recovery_size=0x00C00000 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
