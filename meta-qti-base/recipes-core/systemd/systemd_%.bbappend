@@ -3,7 +3,7 @@ SRC_URI += " file://0001-systemd-add-slotselect-support-in-fstab.patch \
     file://0002-udev-trigger-only-enable-must-part-while-leave-other.patch \
     file://systemd-udev-trigger-full.service"
 #SRC_URI += " file://0033-systemd-Make-root-s-home-directory-configurable-2.patch "
-
+SRC_URI += " ${@bb.utils.contains('DISTRO_FEATURES', 'early_init', 'file://0034-systemd-add-handover-support-for-early-service.patch', '', d)}"
 
 # Remove backlight ldconfig
 #   * backlight - Loads/Saves Screen Backlight Brightness, not required.

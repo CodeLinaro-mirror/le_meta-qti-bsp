@@ -229,6 +229,8 @@ static inline void prepare_dir(char* p)
 				/* 	chown(DISPLAY_XDG_RUNTIME_DIR, pw->pw_uid, pw->pw_gid); */
 				/* } */
 				mkdirs("/run/early", 0775);
+				mkdirs("/run/user", 0755);
+				mkdirs("/run/user/0", 0700);
 			}
 			break;
 		case 'e':
@@ -710,7 +712,7 @@ int main(int argc, char* argv[])
 
 	prepare_dir("sysfs");
 	//prepare_dir("debugfs");
-	//prepare_dir("xdg_runtime_dir");
+	prepare_dir("xdg_runtime_dir");
 	prepare_dir("shm");
 	prepare_dir("procfs");
 	prepare_dir("early_init_dir");

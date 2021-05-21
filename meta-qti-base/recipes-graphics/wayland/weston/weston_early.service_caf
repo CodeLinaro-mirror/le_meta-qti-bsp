@@ -31,7 +31,7 @@ After=leprop.service
 DefaultDependencies=no
 
 [Service]
-Environment="XDG_RUNTIME_DIR=/run/"
+Environment="XDG_RUNTIME_DIR=/run/user/0"
 ExecStart=/usr/bin/weston --tty=2 --log=/run/weston.log
 Type=simple
 PIDFile=/run/early/weston.pid
