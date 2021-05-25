@@ -13,6 +13,7 @@ USBCOMPOSITION = "901D"
 
 PREFERRED_PROVIDER_virtual/kernel = "linux-msm"
 PREFERRED_VERSION_linux-msm = "4.19"
+PREFERRED_VERSION_pulseaudio = "12.2"
 
 # Set openssl10 as openssl provider.
 PREFERRED_PROVIDER_openssl          = "openssl"
