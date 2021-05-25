@@ -1,5 +1,7 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
-SRC_URI += " file://0001-systemd-add-slotselect-support-in-fstab.patch "
+SRC_URI += " file://0001-systemd-add-slotselect-support-in-fstab.patch \
+    file://0002-udev-trigger-only-enable-must-part-while-leave-other.patch \
+    file://systemd-udev-trigger-full.service"
 #SRC_URI += " file://0033-systemd-Make-root-s-home-directory-configurable-2.patch "
 
 
@@ -46,5 +48,12 @@ do_install_append () {
 
     # Remove orignal 60-persistent-v4l.rules which is not applicable for QTI video
     rm ${D}/lib/udev/rules.d/60-persistent-v4l.rules
+
+    # Divide the original systemd-udev-trigger.service into two services.The dependent
+    # part is executed first(system-udev-trigger.service,and the non-dependent part is
+    # executed later(systemd-udev-trigger-full.service).Improve performance.
+    install -d ${D}${systemd_unitdir}/system/multi-user.target.wants
+    install -m 0644 ${WORKDIR}/systemd-udev-trigger-full.service ${D}${systemd_unitdir}/system/
+    ln -sf ${systemd_unitdir}/system/systemd-udev-trigger-full.service ${D}${systemd_unitdir}/system/multi-user.target.wants/systemd-udev-trigger-full.service
 }
 
