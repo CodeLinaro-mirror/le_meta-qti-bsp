@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2019, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2017-2019,2021, The Linux Foundation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -78,6 +78,7 @@ static struct {
 #define uid_is_valid(uid) ((uid != (uid_t) UINT32_C(0xFFFFFFFF)) && \
 						(uid != (uid_t) UINT32_C(0xFFFF)))
 #define gid_is_valid(gid)  uid_is_valid(gid)
+#define CMDLINE_MAX 2048
 
 static void inline safe_free(char** p)
 {
@@ -644,34 +645,33 @@ static inline void trigger_firmware_loading(const char* path)
 
 static inline void mount_cmd()
 {
-        pid_t pid;
-	char buf[8] = {'\0'};
+	pid_t pid;
+	char buf[CMDLINE_MAX] = {'\0'};
 	int fd;
 
-        write_marker("mount_cmd-start-up");
-        pid = fork();
-        if (pid < 0) {
-                perror("fork child process failed \n");
-                return;
-        }
-        if (pid == 0) {
-		fd = open("/sys/devices/soc0/chip_name",O_RDWR);
-		if(fd < 0) {
-			perror("open chip name error\n");
+	write_marker("mount_cmd-start-up");
+	pid = fork();
+	if (pid < 0) {
+		perror("fork child process failed\n");
+		return;
+	}
+	if (pid == 0) {
+		fd = open("/proc/cmdline", O_RDWR);
+		if (fd < 0) {
+			perror("open cmdline failed\n");
 		} else {
-			read(fd, &buf, 8);
-			if (!strncmp(buf,"SA6155P", 6)) {
+			read(fd, &buf, CMDLINE_MAX);
+			if (strstr(buf, "root=/dev/mmc"))
 				mount("/dev/mmcblk0p30", "/firmware", "vfat", MS_RDONLY, NULL);
-			} else {
+			else
 				mount("/dev/sde4", "/firmware", "vfat", MS_RDONLY, NULL);
-			}
 		}
-                system("audio-nxp-auto");
-                write_marker("mount_cmd-exit");
+		system("audio-nxp-auto");
+		write_marker("mount_cmd-exit");
 		safe_close(fd);
-                exit(0);
-        }
-        return;
+		exit(0);
+	}
+	return;
 }
 
 int main(int argc, char* argv[])
