@@ -77,6 +77,12 @@ static struct {
 #define BIT_SET(p,n) ((p) & (1 << (n)))
 #define uid_is_valid(uid) ((uid != (uid_t) UINT32_C(0xFFFFFFFF)) && \
 						(uid != (uid_t) UINT32_C(0xFFFF)))
+#define AUDIO_CONFIG_LIINE 4
+char audiostr[AUDIO_CONFIG_LIINE][LINE_MAX] = {
+	"[Audio]",
+	"cmd=/usr/sbin/audio.sh",
+	"log=/early/audio.txt",
+	"<end>"};
 #define gid_is_valid(gid)  uid_is_valid(gid)
 
 static void inline safe_free(char** p)
@@ -674,6 +680,28 @@ static inline void mount_cmd()
         return;
 }
 
+static inline void audio_drv_loading()
+{
+	pid_t pid;
+	int i, j;
+
+	pid = fork();
+	if (pid < 0) {
+		perror("fork child process failed \n");
+		return;
+	}
+	if (pid == 0) {
+		for (i = 0, j = 0; i < sizeof(audiostr)/sizeof(audiostr[0]); i++, j + LINE_MAX) {
+			if (is_empty_line(&audiostr[i][j]))
+				continue;
+			strstrip(&audiostr[i][j]);
+			parse_line(&audiostr[i][j]);
+		}
+		exit(0);
+	}
+	return;
+}
+
 int main(int argc, char* argv[])
 {
 	FILE* f;
@@ -710,6 +738,9 @@ int main(int argc, char* argv[])
 	trigger_firmware_loading(DRM_CARD_PATH);
 #ifdef EARLY_ETHERNET
 	trigger_firmware_loading(VIDEO_CARD_PATH);
+#endif
+#ifdef EARLY_USERSPACE_AUDIO
+	audio_drv_loading();
 #endif
 
 	while (1) {

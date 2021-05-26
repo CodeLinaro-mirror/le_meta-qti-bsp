@@ -34,7 +34,11 @@ do_compile() {
         if ${@bb.utils.contains('DISTRO_FEATURES', 'early-ethernet', 'true', 'false', d)}; then
             ${CC} ${CFLAGS} ${LDFLAGS} -static -D EARLY_ETHERNET -D WESTON_USER=${WESTONUSER} -o ${S}/early_init ${S}/early_init.c
         else
-            ${CC} ${CFLAGS} ${LDFLAGS} -static -o ${S}/early_init ${S}/early_init.c
+            if ${@bb.utils.contains('DISTRO_FEATURES', 'early_userspace_audio', 'true', 'false', d)}; then
+                ${CC} ${CFLAGS} ${LDFLAGS} -static -D EARLY_USERSPACE_AUDIO -o ${S}/early_init ${S}/early_init.c
+            else
+                ${CC} ${CFLAGS} ${LDFLAGS} -static -o ${S}/early_init ${S}/early_init.c
+            fi
         fi
 }
 

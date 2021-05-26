@@ -1,4 +1,4 @@
-# Copyright (c) 2020 The Linux Foundation. All rights reserved.
+# Copyright (c) 2021 The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -26,8 +26,16 @@
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 # demo app for early audio to measure boot kpi
-
+modprobe snd_event_dlkm
+modprobe q6_notifier_dlkm
+modprobe apr_dlkm
+modprobe q6_dlkm
+modprobe adsp_loader_dlkm
+modprobe stub_dlkm
 /bin/echo 2 > /sys/kernel/boot_adsp/boot;
+modprobe platform_dlkm
+modprobe machine_dlkm
+modprobe hdmi_dlkm
 
 while true
 do
@@ -41,3 +49,4 @@ do
         sleep 0.02
     fi
 done
+

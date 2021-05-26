@@ -11,6 +11,7 @@ SRC_URI += "file://init_audio_early.service"
 SRC_URI += "file://audio.sh"
 SRC_URI += "file://init_data.service"
 SRC_URI += "file://msm-audio-node.rules"
+SRC_URI += "file://audio_early.sh"
 
 do_compile[noexec] = "1"
 
@@ -23,7 +24,12 @@ do_install() {
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
         install -m 0644 ${S}/msm-audio-node.rules -D ${D}${sysconfdir}/udev/rules.d/msm-audio-node.rules
         if ${@bb.utils.contains('DISTRO_FEATURES', 'early_init', 'true', 'false', d)}; then
-            install -m 0755 ${S}/audio.sh -D ${D}${sbindir}/audio.sh
+            if ${@bb.utils.contains('DISTRO_FEATURES', 'early_userspace_audio', 'true', 'false', d)}; then
+                install -m 0755 ${S}/audio_early.sh -D ${D}${sbindir}/audio.sh
+            else
+                install -m 0755 ${S}/audio.sh -D ${D}${sbindir}/audio.sh
+                install -m 0644 ${S}/init_audio_early.service -D ${D}${systemd_unitdir}/system/init_audio.service
+            fi
         else
             install -m 0644 ${S}/init_audio.service -D ${D}${systemd_unitdir}/system/init_audio.service
         fi
