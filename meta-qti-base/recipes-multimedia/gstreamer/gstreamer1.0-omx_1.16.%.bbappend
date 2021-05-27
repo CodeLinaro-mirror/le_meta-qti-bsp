@@ -1,7 +1,7 @@
 DEFAULT_PREFERENCE = "-1"
 
 DEPENDS = "gstreamer1.0 gstreamer1.0-plugins-base gstreamer1.0-plugins-bad"
-DEPENDS += "media"
+DEPENDS += "linux-msm-headers media"
 RDEPENDS_${PN} = "media"
 GSTREAMER_1_0_OMX_TARGET = "generic"
 GSTREAMER_1_0_OMX_CORE_NAME = "${libdir}/libOmxCore.so"
@@ -15,7 +15,7 @@ S = "${WORKDIR}/gstreamer/qti-gst-omx"
 EXTRA_OEMESON = " \
                -Dtarget=qti \
                -Dheader_path=${STAGING_INCDIR}/mm-core \
-               -Dkernel_path=${STAGING_KERNEL_BUILDDIR}/usr/include \
+               -Dkernel_path=${STAGING_INCDIR}/linux-msm \
                -Dstaging_inc_path=${STAGING_INCDIR} \
               "
 EXTRA_OEMESON_append =" -Denable-target-vpu554=yes"

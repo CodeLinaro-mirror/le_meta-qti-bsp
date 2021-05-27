@@ -2,14 +2,10 @@ SUMMARY = "Multimedia libraries and SDK"
 SECTION = "multimedia"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
-DEPENDS = "glib-2.0"
-DEPENDS += "virtual/libc"
-DEPENDS += "virtual/egl"
-DEPENDS += "libion libcutils libutils system-core-headers"
-DEPENDS += "mm-video-noship"
-DEPENDS += "libdrm gbm wayland gbm-headers"
-DEPENDS += "display-commonsys-intf-linux display-hal-headers"
-DEPENDS += "media-plugin-headers"
+DEPENDS += "display-commonsys-intf-linux display-hal-headers gbm gbm-headers glib-2.0 \
+            libcutils libdrm libion libutils linux-msm-headers \
+            media-plugin-headers mm-video-noship \
+            system-core-headers virtual/egl virtual/libc wayland"
 SRCREV = "${AUTOREV}"
 PR = "r1"
 
@@ -19,20 +15,18 @@ S = "${WORKDIR}/hardware/qcom/media"
 
 inherit autotools
 
-EXTRA_OECONF_append = " --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
-EXTRA_OECONF_append = " --with-kernel-headers=${STAGING_KERNEL_BUILDDIR}/include"
-EXTRA_OECONF_append = " --with-cutils-headers=${STAGING_INCDIR}/cutils/"
-EXTRA_OECONF_append = " --enable-use-glib='yes'"
-EXTRA_OECONF_append = " --enable-target-uses-ion='yes'"
-EXTRA_OECONF_append = " --enable-target-uses-gbm='yes'"
-EXTRA_OECONF_append = " --enable-target-uses-media-extensions='no'"
-EXTRA_OECONF_append = " --enable-build-mm-video='yes'"
-EXTRA_OECONF_append = " --enable-is-ubwc-supported='yes'"
-EXTRA_OECONF_append = " --enable-build-swcodec='yes'"
-EXTRA_OECONF_append = " --enable-target-output-deinterlaced='yes'"
-EXTRA_OECONF_append = "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', ' --enable-target-hypervisor=yes', '', d)}"
+EXTRA_OECONF_append = " --with-sanitized-headers=${STAGING_INCDIR}/linux-msm \
+                        --with-cutils-headers=${STAGING_INCDIR}/cutils/ \
+                        --enable-use-glib='yes' \
+                        --enable-target-uses-ion='yes' \
+                        --enable-target-uses-gbm='yes' \
+                        --enable-target-uses-media-extensions='no' \
+                        --enable-build-mm-video='yes' \
+                        --enable-is-ubwc-supported='yes' \
+                        --enable-build-swcodec='yes' \
+                        --enable-target-output-deinterlaced='yes' \
+                        ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', ' --enable-target-hypervisor=yes', '', d)}"
 
-do_configure[depends] += "virtual/kernel:do_shared_workdir"
 do_install_append() {
    install -d ${D}${includedir}/mm-core
    install -m 0644 ${S}/mm-core/inc/*.h -D ${D}${includedir}/mm-core/
@@ -70,12 +64,12 @@ CPPFLAGS += "-I${STAGING_INCDIR} \
              -I${STAGING_INCDIR}/ion_headers  \
              -I${STAGING_INCDIR}/disp-commonsys-intf/display \
              -I${STAGING_INCDIR}/mm-video/swvdec \
-             -I${STAGING_INCDIR}/mm-video/swvenc"
-CPPFLAGS += "-include stdint.h"
-CPPFLAGS += "-Wno-format-truncation"
+             -I${STAGING_INCDIR}/mm-video/swvenc \
+             -include stdint.h \
+             -Wno-format-truncation"
 
-LDFLAGS += "-lglib-2.0"
-LDFLAGS += "-lgbm"
-LDFLAGS += "-ldrm"
-LDFLAGS += "-lwayland-client"
-LDFLAGS += "-lEGL"
+LDFLAGS += "-lglib-2.0 \
+            -lgbm \
+            -ldrm \
+            -lwayland-client \
+            -lEGL"
