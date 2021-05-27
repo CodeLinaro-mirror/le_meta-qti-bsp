@@ -6,7 +6,7 @@ LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
 
-DEPENDS += "libcutils libhardware-headers liblog libutils"
+DEPENDS += "libcutils libhardware-headers liblog libutils linux-msm-headers"
 
 PR = "r3"
 
@@ -17,7 +17,7 @@ S = "${WORKDIR}/vendor/qcom/opensource/commonsys-intf/display"
 
 inherit autotools pkgconfig
 
-EXTRA_OECONF += "--with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
+EXTRA_OECONF += "--with-sanitized-headers=${STAGING_INCDIR}/linux-msm"
 
 LDFLAGS += "-llog -lutils -lcutils"
 
@@ -28,7 +28,6 @@ CPPFLAGS += "-I${WORKDIR}/vendor/qcom/opensource/commonsys-intf/display/gralloc"
 CPPFLAGS += "-I${WORKDIR}/vendor/qcom/opensource/commonsys-intf/display/libqdmetadata"
 CPPFLAGS += "-I${WORKDIR}/vendor/qcom/opensource/commonsys-intf/display/include"
 
-do_configure[depends] += "virtual/kernel:do_shared_workdir"
 do_install_append() {
     install -d ${D}${includedir}
     install -m 644 ${S}/gralloc/*.h ${D}${includedir}
