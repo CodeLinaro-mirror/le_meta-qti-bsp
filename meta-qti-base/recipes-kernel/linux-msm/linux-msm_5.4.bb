@@ -128,9 +128,6 @@ do_compile () {
 
 do_shared_workdir[dirs] = "${DEPLOYDIR}"
 do_shared_workdir_append () {
-        cp Makefile $kerneldir/
-        cp -fR usr $kerneldir/
-
         cp include/config/auto.conf $kerneldir/include/config/auto.conf
 
         if [ -d arch/${ARCH}/include ]; then
@@ -165,9 +162,6 @@ do_shared_workdir_append () {
         fi
 
         cp ${STAGING_KERNEL_DIR}/usr/gen_initramfs_list.sh $kerneldir/scripts/
-
-        # Generate kernel headers
-        oe_runmake_call -C ${STAGING_KERNEL_DIR} ARCH=${ARCH} CC="${KERNEL_CC}" LD="${KERNEL_LD}" headers_install O=${STAGING_KERNEL_BUILDDIR}
 }
 
 do_deploy () {
@@ -175,7 +169,6 @@ do_deploy () {
     install -d ${DEPLOYDIR}/build-artifacts
     install -d ${DEPLOYDIR}/build-artifacts/kernel_scripts/scripts
     cp  ${STAGING_KERNEL_DIR}/usr/gen_initramfs_list.sh ${DEPLOYDIR}/build-artifacts/kernel_scripts/scripts
-    cp -a ${STAGING_KERNEL_BUILDDIR}/usr/ ${DEPLOYDIR}/build-artifacts/kernel_scripts/
 
     # Copy Image appended with dtbs to deploydir
     cat ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} ${B}/arch/${ARCH}/boot/dts/vendor/qcom/*.dtb > ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-dtb-${KERNEL_VERSION}
