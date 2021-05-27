@@ -33,7 +33,6 @@ DefaultDependencies=no
 [Service]
 Environment="XDG_RUNTIME_DIR=/run/"
 ExecStart=/usr/bin/weston --tty=2 --log=/run/weston.log
-ExecStop=/usr/bin/killall -s KILL weston
 Type=simple
 PIDFile=/run/early/weston.pid
 Restart=always
