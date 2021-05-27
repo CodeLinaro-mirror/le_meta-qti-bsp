@@ -5,7 +5,7 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 
-DEPENDS += "ext4-utils glib-2.0 libbase libcutils libmincrypt libselinux libutils openssl"
+DEPENDS += "ext4-utils glib-2.0 libbase libcutils libmincrypt libselinux libutils openssl linux-msm-headers"
 
 PR = "r19"
 
@@ -24,13 +24,11 @@ CPPFLAGS += "-I${STAGING_INCDIR}/ext4_utils"
 CPPFLAGS += "-I${STAGING_INCDIR}/libselinux"
 
 EXTRA_OECONF = " --with-host-os=${HOST_OS} --with-glib"
-EXTRA_OECONF_append = " --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
+EXTRA_OECONF_append = " --with-sanitized-headers=${STAGING_INCDIR}/linux-msm"
 EXTRA_OECONF_append = " --disable-debuggerd"
 EXTRA_OECONF_append = " --disable-libsync"
 EXTRA_OECONF_append = " ${@bb.utils.contains('VARIANT','user',' --disable-adb-root','',d)}"
 EXTRA_OECONF_append = " ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', ' --enable-adb-avb20', '', d)}"
-
-do_configure[depends] += "virtual/kernel:do_shared_workdir"
 
 do_install_append() {
    install -m 0755 ${S}/adb/launch_adbd -D ${D}${sysconfdir}/launch_adbd
