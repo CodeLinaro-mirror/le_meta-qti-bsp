@@ -3,10 +3,17 @@ From: Xubao Jiang <xubaoj@codeaurora.org>
 Date: Mon, 26 Apr 2021 18:20:45 +0800
 Subject: [PATCH] Disable close_range
 
-close_range first appeared in Linux 5.9.
-Disable it as it causes boot up issue with linux-msm 5.4
+close_range first appeared in Linux 5.9. The system call number __NR_close_range
+defined in systemd and Linux is 436.
 
-This reverts commit b8cfa2da7c103d612b9608ade580c0a41538450c.
+In linux-msm 5.4 close_range is not supported. And the system call nubmer 436 is
+used by __NR_process_madvise. This causes the call of close_range returns invalid
+argument from process_madvise.
+
+So disable close_range here to fix boot up issue with linux-msm 5.4.
+
+This patch would no longer be necessary if a newer kernel which supports close_range
+is introduced.
 
 Upstream-Status: Inappropriate [disable feature]
 
