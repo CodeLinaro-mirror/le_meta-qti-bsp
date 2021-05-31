@@ -3,8 +3,7 @@ DESCRIPTION = "Codec2 is a codec framework introduced by Google. This is to even
 HOMEPAGE = "https://www.codeaurora.org/"
 SECTION = "multimedia"
 LICENSE = "Apache-2.0"
-LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
-${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
+LIC_FILES_CHKSUM = "file://${WORKDIR}/frameworks/NOTICE;md5=a3fcbe20ea5ac731ed3aa15fe59ba20a"
 
 DEPENDS += "clang-native \
             display-commonsys-intf-linux \
@@ -21,15 +20,7 @@ SRC_URI = "${PATH_TO_REPO}/frameworks/.git;protocol=${PROTO};destsuffix=framewor
 
 S = "${WORKDIR}/frameworks/av/media/codec2"
 
-SOLIBS = ".so"
-FILES_SOLIBSDEV = ""
-
 inherit cmake
-
-do_configure[depends] += "virtual/kernel:do_shared_workdir"
-
-PACKAGE_ARCH = "${MACHINE_ARCH}"
-
 
 CXXFLAGS += "-I${STAGING_INCDIR} \
              -I${STAGING_KERNEL_BUILDDIR}/include \
@@ -39,5 +30,12 @@ CXXFLAGS += "-I${STAGING_INCDIR} \
              -I${STAGING_INCDIR}/kernel-headers \
              -I${STAGING_INCDIR}/c++/ \
              -I${STAGING_INCDIR}/c++/${TARGET_SYS}"
+
+do_configure[depends] += "virtual/kernel:do_shared_workdir"
+
+PACKAGE_ARCH = "${MACHINE_ARCH}"
+
+SOLIBS = ".so"
+FILES_SOLIBSDEV = ""
 
 TOOLCHAIN = "clang"
