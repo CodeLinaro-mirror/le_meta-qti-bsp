@@ -177,6 +177,15 @@ do_deploy_fixup () {
     if [ -f ${DEPLOY_DIR_IMAGE}/ipa-fws/ipa_fws.elf ]; then
        install -m 0644 ${DEPLOY_DIR_IMAGE}/ipa-fws/ipa_fws.elf .
     fi
+
+    # Copy recovery images
+    if [ -f ${DEPLOY_DIR_IMAGE}/recoveryfs.img ]; then
+       install -m 0644 ${DEPLOY_DIR_IMAGE}/recoveryfs.img .
+    fi
+    if [ -f ${DEPLOY_DIR_IMAGE}/recoveryfs.ubi ]; then
+       install -m 0644 ${DEPLOY_DIR_IMAGE}/recoveryfs.ubi .
+    fi
+
 }
 addtask do_deploy_fixup after do_rootfs before do_image
 
@@ -223,6 +232,8 @@ python rootfs_ignore_packages() {
 ################################################
 ############# Generate boot.img ################
 ################################################
+BOOTIMGDEPLOYDIR = "${WORKDIR}/deploy-${PN}-bootimage-complete"
+
 python do_make_bootimg () {
     import subprocess
 
@@ -252,8 +263,18 @@ python do_make_bootimg () {
         bb.error("Running: %s failed." % cmd)
 
 }
-do_make_bootimg[dirs]      = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
+do_make_bootimg[dirs]      = "${BOOTIMGDEPLOYDIR}/${IMAGE_BASENAME}"
 # Make sure native tools and vmlinux ready to create boot.img
-do_make_bootimg[depends] += "virtual/kernel:do_deploy"
+do_make_bootimg[depends] += "virtual/kernel:do_deploy mkbootimg-native:do_populate_sysroot"
+SSTATETASKS += "do_make_bootimg"
+SSTATE_SKIP_CREATION_task-make-bootimg = '1'
+do_make_bootimg[sstate-inputdirs] = "${BOOTIMGDEPLOYDIR}"
+do_make_bootimg[sstate-outputdirs] = "${DEPLOY_DIR_IMAGE}"
+do_make_bootimg[stamp-extra-info] = "${MACHINE_ARCH}"
 
-addtask do_make_bootimg before do_image_complete after do_rootfs
+python do_make_bootimg_setscene () {
+    sstate_setscene(d)
+}
+addtask do_make_bootimg_setscene
+
+addtask do_make_bootimg before do_image_complete
