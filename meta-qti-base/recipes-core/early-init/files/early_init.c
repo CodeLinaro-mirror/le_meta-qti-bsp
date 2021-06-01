@@ -48,7 +48,7 @@
 #define WHITESPACE              " \t\n\r"
 #define KPI_VALUE_PATH          "/sys/kernel/boot_kpi/kpi_values"
 #define GPIO_EXPORT             "/sys/class/gpio/export"
-#define DRM_CARD_PATH           "/dev/dri/card0"
+#define DRM_CARD_PATH           "/dev/kgsl-3d0"
 #define VIDEO_CARD_PATH         "/dev/video32"
 #define DISPLAY_XDG_RUNTIME_DIR "/run/platform/weston"
 #define SMACK_LABEL_PATH        "/proc/self/attr/current"
