@@ -1,5 +1,7 @@
 SUMMARY = "Android libsync"
-DESCRIPTION = "Android libsync library is used to talk to kernel synchronization framework"
+DESCRIPTION = "Android libsync is a helper library which implements the ioctl of \
+SYNC_IOC_FENCE_INFO and SW_SYNC_IOC_CREATE_FENCE for fence synchronization mechanism. \
+Fence is used for synchronization of graphic buffer between CPU and GPU."
 HOMEPAGE = "http://developer.android.com/"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://NOTICE;md5=83eae6a29c0e876fdfebc0e44fb6fa2a"

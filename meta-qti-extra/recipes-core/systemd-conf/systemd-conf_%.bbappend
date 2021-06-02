@@ -1,5 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
-
 do_install_append () {
- echo "HandlePowerKey=ignore" >> ${D}${systemd_unitdir}/logind.conf.d/00-${PN}.conf
+   #Override default setting and use powerkey to do suspend on qti platform.
+   echo "HandlePowerKey=suspend" >> ${D}${systemd_unitdir}/logind.conf.d/00-${PN}.conf
 }

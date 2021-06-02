@@ -5,8 +5,6 @@ HOMEPAGE = "http://developer.android.com/"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://NOTICE;md5=c19179f3430fd533888100ab6616e114"
 
-PR = "r0"
-
 SRCREV = "${AUTOREV}"
 SRC_URI = "${PATH_TO_REPO}/system/core/.git;protocol=${PROTO};destsuffix=system/core;usehead=1"
 
@@ -14,6 +12,6 @@ S = "${WORKDIR}/system/core/libmincrypt"
 
 inherit autotools pkgconfig
 
-EXTRA_OECONF = " --with-core-includes=${WORKDIR}/system/core/include"
+EXTRA_OECONF += "--with-core-includes=${WORKDIR}/system/core/include"
 
 BBCLASSEXTEND = "native"

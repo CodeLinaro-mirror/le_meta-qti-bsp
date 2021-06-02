@@ -1,0 +1,124 @@
+From efb472af7ab899877ac4b3a7d96320e72cb50542 Mon Sep 17 00:00:00 2001
+From: Matt Ranostay <mranosta@codeaurora.org>
+Date: Wed, 7 Apr 2021 16:24:41 -0700
+Subject: [PATCH] agl-service-bluetooth: allow service to run without BlueZ
+
+This allows for the agl-service-bluetooth service to run without
+BlueZ, which permits demoing of AGL applications.
+
+Upstream-Status: Inappropriate
+
+Signed-off-by: Matt Ranostay <mranosta@codeaurora.org>
+Signed-off-by: Scott Murray <scotmurr@codeaurora.org>
+
+---
+ binding/bluetooth-api.c   | 33 ++++++++++++++++++++++++++-------
+ conf.d/cmake/config.cmake |  8 ++++++++
+ 2 files changed, 34 insertions(+), 7 deletions(-)
+
+diff --git a/binding/bluetooth-api.c b/binding/bluetooth-api.c
+index 3fcf841..c39608f 100644
+--- a/binding/bluetooth-api.c
++++ b/binding/bluetooth-api.c
+@@ -38,6 +38,16 @@
+ #include "bluetooth-api.h"
+ #include "bluetooth-common.h"
+ 
++#ifdef MOCK_DATA
++static void mock_verb(afb_req_t request)
++{
++	afb_req_success(request, NULL, "Bluetooth - Mock testing verb");
++}
++#define FUNC_NAME(_func) (mock_verb)
++#else
++#define FUNC_NAME(_func) (bluetooth_ ## _func)
++#endif
++
+ /**
+  * The global thread
+  */
+@@ -742,6 +752,8 @@ static int init(afb_api_t api)
+ 		return ret;
+ 	}
+ 
++#ifndef MOCK_DATA
++
+ 	id->default_adapter = get_default_adapter(id->api);
+ 	if (!id->default_adapter) {
+ 		id->default_adapter = g_strdup(BLUEZ_DEFAULT_ADAPTER);
+@@ -781,7 +793,7 @@ static int init(afb_api_t api)
+ 		AFB_ERROR("bluetooth-binding init thread returned %d", ret);
+ 	else
+ 		AFB_INFO("bluetooth-binding operational");
+-
++#endif
+ 	return ret;
+ }
+ 
+@@ -1451,14 +1463,16 @@ static const afb_verb_t bluetooth_verbs[] = {
+ 	}, {
+ 		.verb = "managed_objects",
+ 		.session = AFB_SESSION_NONE,
+-		.callback = bluetooth_list,
++		.callback = FUNC_NAME(list),
+ 		.info = "Retrieve managed bluetooth devices"
+ 	}, {
+ 		.verb = "adapter_state",
+ 		.session = AFB_SESSION_NONE,
+-		.callback = bluetooth_adapter,
++		.callback = FUNC_NAME(adapter),
+ 		.info = "Set adapter mode and retrieve properties"
+-	}, {
++	},
++#ifndef MOCK_DATA
++	{
+ 		.verb = "default_adapter",
+ 		.session = AFB_SESSION_NONE,
+ 		.callback = bluetooth_default_adapter,
+@@ -1493,16 +1507,21 @@ static const afb_verb_t bluetooth_verbs[] = {
+ 		.session = AFB_SESSION_NONE,
+ 		.callback = bluetooth_remove_device,
+ 		.info = "Removed paired device",
+-	}, {
++	},
++#endif
++	{
+ 		.verb = "avrcp_controls",
+ 		.session = AFB_SESSION_NONE,
+-		.callback = bluetooth_avrcp_controls,
++		.callback = FUNC_NAME(avrcp_controls),
+ 		.info = "AVRCP controls"
+-	}, {
++	},
++#ifndef MOCK_DATA
++	{
+ 		.verb = "set_pincode",
+ 		.session = AFB_SESSION_NONE,
+ 		.callback = bluetooth_pincode,
+ 		.info = "Set pincode for outgoing pairing"},
++#endif
+ 	{ } /* marker for end of the array */
+ };
+ 
+diff --git a/conf.d/cmake/config.cmake b/conf.d/cmake/config.cmake
+index 86d6ca9..0dba4f6 100644
+--- a/conf.d/cmake/config.cmake
++++ b/conf.d/cmake/config.cmake
+@@ -83,6 +83,14 @@ set (PKG_REQUIRED_LIST
+ add_compile_options(-DPB_FIELD_16BIT)
+ add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-pthread>)
+ 
++OPTION(MOCK_DATA
++  "Build the project using mock data stubs"
++  OFF)
++
++IF(MOCK_DATA)
++  ADD_DEFINITIONS(-DMOCK_DATA)
++ENDIF(MOCK_DATA)
++
+ # Customize link option
+ # -----------------------------
+ list (APPEND link_libraries -pthread)
+-- 
+2.30.2
+
