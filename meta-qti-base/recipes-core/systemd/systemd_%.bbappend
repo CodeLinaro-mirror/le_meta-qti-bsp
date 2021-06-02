@@ -32,12 +32,12 @@ FULL_OPTIMIZATION = "-O2 -fexpensive-optimizations -frename-registers -fomit-fra
 
 do_install_append () {
     # Use kernel rules for network iface name
-    sed -i  's/^NamePolicy.*/NamePolicy=kernel/g' ${D}/lib/systemd/network/99-default.link
+    sed -i  's/^NamePolicy.*/NamePolicy=kernel/g' ${D}${systemd_unitdir}/network/99-default.link
 
     #Remove privatetmp=true from hostname service
-    sed -i  '/^PrivateTmp.*/d' ${D}/lib/systemd/system/systemd-hostnamed.service
+    sed -i  '/^PrivateTmp.*/d' ${D}${systemd_system_unitdir}/systemd-hostnamed.service
 
     # Remove orignal 60-persistent-v4l.rules which is not applicable for QTI video
-    rm ${D}/lib/udev/rules.d/60-persistent-v4l.rules
+    rm ${D}${nonarch_base_libdir}/udev/rules.d/60-persistent-v4l.rules
 }
 
