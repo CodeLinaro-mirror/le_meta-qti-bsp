@@ -55,5 +55,15 @@ do_install_append () {
     install -d ${D}${systemd_unitdir}/system/multi-user.target.wants
     install -m 0644 ${WORKDIR}/systemd-udev-trigger-full.service ${D}${systemd_unitdir}/system/
     ln -sf ${systemd_unitdir}/system/systemd-udev-trigger-full.service ${D}${systemd_unitdir}/system/multi-user.target.wants/systemd-udev-trigger-full.service
+
+    # When enable early init, weston no longer trigger login operation,so XDG_RUNTIME_DIR won't be
+    # created unless we adb shell/ssh to login to the board. this will cause issue when we try to
+    # pass XDG_RUNTIME_DIR to container during bootup.
+    # Trigger a login operations for this case.
+    # if lxc can support dynamic mount injection fuction later, this part can be removed.
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'early_init', 'true', 'false', d)}; then
+        sed -i  's/^ExecStart.*/ExecStart=-\/sbin\/agetty --autologin root --noclear %I 38400 linux/g' ${D}/lib/systemd/system/getty@.service
+        sed -i  's/^Type=.*/Type=simple/g' ${D}/lib/systemd/system/getty@.service
+    fi
 }
 
