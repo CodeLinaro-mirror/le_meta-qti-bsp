@@ -6,11 +6,12 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 DEPENDS += "glib-2.0 libcutils libhardware liblog libselinux system-core"
 
+SRC_URI = "\
+    ${PATH_TO_REPO}/frameworks/.git;protocol=${PROTO};destsuffix=frameworks/binder;subpath=binder;usehead=1 \
+    file://servicemanager.service \
+    file://create-binder.sh \
+"
 SRCREV = "${AUTOREV}"
-
-SRC_URI = "${PATH_TO_REPO}/frameworks/.git;protocol=${PROTO};destsuffix=frameworks/binder;subpath=binder;usehead=1"
-SRC_URI_append = " file://servicemanager.service"
-SRC_URI_append = " file://create-binder.sh"
 
 S = "${WORKDIR}/frameworks/binder"
 
@@ -28,6 +29,8 @@ EXTRA_OECONF_append_arm = " \
     ${@bb.utils.contains('MULTILIB_VARIANTS', 'lib32','','--enable-32bit-binder-ipc',d)} \
 "
 
+CFLAGS += "-I${STAGING_INCDIR}/libselinux"
+
 do_install_append() {
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
         install -d ${D}/${sysconfdir}/initscripts/
@@ -36,7 +39,5 @@ do_install_append() {
         install -m 0644 ${WORKDIR}/servicemanager.service -D ${D}${systemd_unitdir}/system/servicemanager.service
     fi
 }
-
-CFLAGS += "-I${STAGING_INCDIR}/libselinux"
 
 QPERM_SERVICE = "${WORKDIR}/servicemanager.service"
