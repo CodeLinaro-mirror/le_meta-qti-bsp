@@ -18,7 +18,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-core-prop \
         packagegroup-qti-camera \
         packagegroup-qti-display \
-        ${@bb.utils.contains('MACHINE_FEATURES', 'qti-data-modem', "packagegroup-qti-data", "", d)} \
+        packagegroup-qti-data \
         packagegroup-qti-dsp \
         packagegroup-qti-fastcv \
         packagegroup-qti-cvp \
