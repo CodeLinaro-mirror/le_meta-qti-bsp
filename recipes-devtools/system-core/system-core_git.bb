@@ -83,6 +83,11 @@ do_install_append() {
       install -m 0644 ${S}/usb/usb.service -D ${D}${systemd_unitdir}/system/usb.service
       ln -sf ${systemd_unitdir}/system/usb.service ${D}${systemd_unitdir}/system/multi-user.target.wants/usb.service
       ln -sf ${systemd_unitdir}/system/usb.service ${D}${systemd_unitdir}/system/ffbm.target.wants/usb.service
+      if [ -f "${S}/usb/usbd.service" ]; then
+      install -m 0644 ${S}/usb/usbd.service -D ${D}${systemd_unitdir}/system/usbd.service
+      ln -sf ${systemd_unitdir}/system/usbd.service ${D}${systemd_unitdir}/system/multi-user.target.wants/usbd.service
+      ln -sf ${systemd_unitdir}/system/usbd.service ${D}${systemd_unitdir}/system/ffbm.target.wants/usbd.service
+      fi
       install -m 0644 ${S}/rootdir/etc/init_post_boot.service -D ${D}${systemd_unitdir}/system/init_post_boot.service
       ln -sf ${systemd_unitdir}/system/init_post_boot.service \
           ${D}${systemd_unitdir}/system/multi-user.target.wants/init_post_boot.service
@@ -210,11 +215,11 @@ FILES_${PN}-adbd    += "${systemd_unitdir}/system/pcie.service ${systemd_unitdir
 FILES_${PN}-adbd-dev = "${libdir}/libadbd.so ${libdir}/libadbd.la"
 
 PACKAGES =+ "${PN}-usb-dbg ${PN}-usb"
-FILES_${PN}-usb-dbg  = "${bindir}/.debug/usb_composition_switch"
-FILES_${PN}-usb      = "${sysconfdir}/init.d/usb ${base_sbindir}/usb_composition ${bindir}/usb_composition_switch ${base_sbindir}/usb/compositions/*"
+FILES_${PN}-usb-dbg  = "${bindir}/.debug/usb_composition_switch ${bindir}/.debug/usbd"
+FILES_${PN}-usb      = "${sysconfdir}/init.d/usb ${bindir}/usbd ${base_sbindir}/usb_composition ${bindir}/usb_composition_switch ${base_sbindir}/usb/compositions/*"
 FILES_${PN}-usb     += "${sysconfdir}/usb/*"
 FILES_${PN}-usb     += "${base_sbindir}/usb/* ${base_sbindir}/usb_debug ${base_sbindir}/usb/debuger/*"
-FILES_${PN}-usb     += "${systemd_unitdir}/system/usb.service ${systemd_unitdir}/system/multi-user.target.wants/usb.service ${systemd_unitdir}/system/local-fs.target.wants/usb.service ${systemd_unitdir}/system/ffbm.target.wants/usb.service ${sysconfdir}/initscripts/usb"
+FILES_${PN}-usb     += "${systemd_unitdir}/system/usb.service ${systemd_unitdir}/system/multi-user.target.wants/usb.service ${systemd_unitdir}/system/local-fs.target.wants/usb.service ${systemd_unitdir}/system/ffbm.target.wants/usb.service ${sysconfdir}/initscripts/usb ${systemd_unitdir}/system/usbd.service ${systemd_unitdir}/system/multi-user.target.wants/usbd.service ${systemd_unitdir}/system/local-fs.target.wants/usbd.service ${systemd_unitdir}/system/ffbm.target.wants/usbd.service"
 
 PACKAGES =+ "${PN}-post-boot"
 FILES_${PN}-post-boot  = "${sysconfdir}/init.d/init_post_boot"
