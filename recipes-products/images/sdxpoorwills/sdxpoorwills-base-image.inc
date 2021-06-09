@@ -5,6 +5,7 @@ IMAGE_INSTALL += "${CORE_IMAGE_EXTRA_INSTALL}"
 
 # Target SDK Packages
 TOOLCHAIN_TARGET_TASK_append_sa415m += "glib-2.0-dev"
+TOOLCHAIN_TARGET_TASK_append_sa415m += "common-headers"
 
 # The MSM Linux minimal boot image files.
 IMAGE_INSTALL += "base-files"
