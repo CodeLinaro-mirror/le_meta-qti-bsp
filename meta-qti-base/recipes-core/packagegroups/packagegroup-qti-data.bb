@@ -15,6 +15,7 @@ RDEPENDS_${PN} += "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'q-hypervisor', 'setup-network', '', d)} \
     net-tools \
     emac-rps \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'qti-lxc', 'usb-adapter-eth', '', d)} \
     ethtool \
     iperf3 \
     iproute2 \
