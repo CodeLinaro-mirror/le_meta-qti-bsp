@@ -7,6 +7,7 @@ FILESEXTRAPATHS_append := " :${THISDIR}/weston/"
 SRC_URI = "${PATH_TO_REPO}/graphics/weston/.git;protocol=${PROTO};destsuffix=graphics/weston;usehead=1"
 SRC_URI_append = " \
     file://weston.service_caf \
+    file://weston_early.service_caf \
     file://weston.ini_caf \
     file://drm_firmware_load_trigger.service \
 "
@@ -48,8 +49,15 @@ EXTRA_OECONF_append = "${@bb.utils.contains("DISTRO_FEATURES", "early-ethernet",
 PACKAGECONFIG = "${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'kms fbdev wayland egl', '', d)} \
                  ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11', '', d)} \
                  ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'launch', '', d)} \
+                 image-jpeg \
+                 screenshare \
+                 shell-desktop \
+                 shell-fullscreen \
+                 shell-ivi \
                 "
 PACKAGECONFIG_append = "clients"
+# pam
+PACKAGECONFIG[pam] = ",,libpam"
 
 do_configure[depends] += "virtual/kernel:do_shared_workdir"
 do_install_append() {
@@ -66,7 +74,8 @@ do_install_append() {
     install -d ${D}${WESTON_INI_CONFIG}
     install -m 0644 ${WORKDIR}/weston.ini_caf ${D}${WESTON_INI_CONFIG}/weston.ini
     # Install reuqire-input=false in weston.ini
-    if ${@bb.utils.contains('DISTRO_FEATURES', 'q-hypervisor', 'true', 'false', d)}; then
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'q-hypervisor', 'true', 'false', d)} ||
+	${@bb.utils.contains('DISTRO_FEATURES', 'early_init', 'true', 'false', d)}; then
         sed -i -e '/\[core\]/a require-input=false' ${D}${WESTON_INI_CONFIG}/weston.ini
     fi
     # expose weston protocol to /usr/share/weston as video may use it

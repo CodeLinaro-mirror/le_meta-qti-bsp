@@ -48,7 +48,6 @@ COMPATIBLE_MACHINE = "(${BASEMACHINE})"
 KERNEL_IMAGEDEST = "boot"
 KERNEL_IMAGETYPE = "Image"
 KERNEL_PACKAGE_NAME = "capture"
-KERNEL_DEVICETREE = "vendor/qcom/sa8155p-v2-adp-air-capture.dtb vendor/qcom/sa8195p-v2-adp-air-capture.dtb"
 
 SRC_DIR   =  "${SRC_DIR_ROOT}/kernel/msm-5.4"
 S         =  "${WORKDIR}/kernel/msm-5.4"
@@ -99,6 +98,7 @@ do_kernel_checkout[noexec] = "1"
 addtask kernel_configcheck after do_configure before do_compile
 
 do_compile () {
+    rm -rf ${S}/techpack/display ${S}/techpack/ais ${S}/techpack/video
     oe_runmake CC="${KERNEL_CC}" LD="${KERNEL_LD}" ${KERNEL_EXTRA_ARGS} $use_alternate_initrd
 }
 

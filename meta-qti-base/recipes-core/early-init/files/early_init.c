@@ -46,7 +46,7 @@
 #define END_TAG                 "<end>"
 #define LINE_MAX                2048
 #define WHITESPACE              " \t\n\r"
-#define KPI_VALUE_PATH          "/sys/kernel/debug/bootkpi/kpi_values"
+#define KPI_VALUE_PATH          "/sys/kernel/boot_kpi/kpi_values"
 #define GPIO_EXPORT             "/sys/class/gpio/export"
 #define DRM_CARD_PATH           "/dev/dri/card0"
 #define VIDEO_CARD_PATH         "/dev/video32"
@@ -225,6 +225,13 @@ static inline void prepare_dir(char* p)
 				mkdirs("/run/early", 0775);
 			}
 			break;
+		case 'e':
+			if (0 == strncmp(p + 1, "arly_init_dir", strlen("early_init_dir"))) {
+				ret = mount("tmpfs", "/early", "tmpfs", MS_NOSUID|MS_NODEV|MS_STRICTATIME, "mode=755");
+				if (ret < 0) {
+					perror("mount tmpfs failed");
+				}
+			}
 		case 's':
 			if (0 == strncmp(p + 1, "hm", strlen("hm"))) {
 				mkdirs("/dev/shm", 0777);
@@ -635,6 +642,38 @@ static inline void trigger_firmware_loading(const char* path)
 	return;
 }
 
+static inline void mount_cmd()
+{
+        pid_t pid;
+	char buf[8] = {'\0'};
+	int fd;
+
+        write_marker("mount_cmd-start-up");
+        pid = fork();
+        if (pid < 0) {
+                perror("fork child process failed \n");
+                return;
+        }
+        if (pid == 0) {
+		fd = open("/sys/devices/soc0/chip_name",O_RDWR);
+		if(fd < 0) {
+			perror("open chip name error\n");
+		} else {
+			read(fd, &buf, 8);
+			if (!strncmp(buf,"SA6155P", 6)) {
+				mount("/dev/mmcblk0p30", "/firmware", "vfat", MS_RDONLY, NULL);
+			} else {
+				mount("/dev/sde4", "/firmware", "vfat", MS_RDONLY, NULL);
+			}
+		}
+                system("audio-nxp-auto");
+                write_marker("mount_cmd-exit");
+		safe_close(fd);
+                exit(0);
+        }
+        return;
+}
+
 int main(int argc, char* argv[])
 {
 	FILE* f;
@@ -642,12 +681,15 @@ int main(int argc, char* argv[])
 	int fd;
 
 	prepare_dir("sysfs");
-	prepare_dir("debugfs");
-	prepare_dir("xdg_runtime_dir");
+	//prepare_dir("debugfs");
+	//prepare_dir("xdg_runtime_dir");
 	prepare_dir("shm");
 	prepare_dir("procfs");
+	prepare_dir("early_init_dir");
 
-	fd = open("/run/early_init.log", O_RDWR | O_CREAT, 0644);
+	mount_cmd();
+
+	fd = open("/early/early_init.log", O_RDWR | O_CREAT, 0644);
 	if (fd < 0)
 		perror("open log file failed");
 

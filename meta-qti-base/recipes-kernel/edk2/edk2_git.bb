@@ -40,15 +40,23 @@ EXTRA_OEMAKE = "'CLANG_BIN=${CLANG_BIN_PATH}' \
                 'INIT_BIN_LE=\"/sbin/init\"'\
                 'EDK_TOOLS_PATH=${S}/BaseTools'\
                 'EARLY_ETH_ENABLED=${EARLY_ETH}'\
+                'TARGET_BOARD_TYPE_AUTO=1' \
                 'UBSAN_UEFI_GCC_FLAG_ALIGNMENT=-Wno-misleading-indentation'"
 
 EXTRA_OEMAKE_append_qcs40x = " 'DISABLE_PARALLEL_DOWNLOAD_FLASH=1'"
+
+# Enable AVB2.0
+EXTRA_OEMAKE_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'avb', 'VERIFIED_BOOT_2=1', '', d)}"
 
 do_compile () {
     export CC=${BUILD_CC}
     export CXX=${BUILD_CXX}
     export LD=${BUILD_LD}
     export AR=${BUILD_AR}
+	if ${@bb.utils.contains('MACHINE_FEATURES', 'goldcore-boot', 'true', 'false', d)}; then
+		export LINUX_BOOT_CPU_SELECTION_ENABLED=1
+		export TARGET_LINUX_BOOT_CPU_ID=7
+	fi
     oe_runmake -f makefile all
 }
 

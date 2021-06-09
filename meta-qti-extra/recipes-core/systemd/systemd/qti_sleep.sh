@@ -38,6 +38,10 @@ case $1/$2 in
     # disable BT as hsuart could block suspend
     systemctl stop synergy.service
 
+    # clocks enabled by kdump
+    echo 0 > /sys/kernel/debug/clk/disp_cc_mdss_rscc_vsync_clk/clk_enable_count
+    echo 0 > /sys/kernel/debug/clk/disp_cc_mdss_rscc_ahb_clk/clk_enable_count
+
     # set all usb mode to none
     echo none > /sys/devices/platform/soc/a600000.ssusb/mode
     echo none > /sys/devices/platform/soc/a800000.ssusb/mode
@@ -49,6 +53,9 @@ case $1/$2 in
     echo host > /sys/devices/platform/soc/a800000.ssusb/mode
 
     systemctl restart synergy.service
+
+    echo 1 > /sys/kernel/debug/clk/disp_cc_mdss_rscc_vsync_clk/clk_enable_count
+    echo 1 > /sys/kernel/debug/clk/disp_cc_mdss_rscc_ahb_clk/clk_enable_count
 
     if [ $2 == "hibernate" ]; then
         echo 1 > /sys/kernel/boot_adsp/boot

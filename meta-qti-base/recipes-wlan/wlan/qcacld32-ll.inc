@@ -2,6 +2,7 @@ PROVIDES_NAME = "kernel-module-${_MODNAME}"
 
 SYSTEMD_SERVICE_${PN} = "init_qti_wlan_auto.service"
 SYSTEMD_AUTO_ENABLE_${PN} = "enable"
+SYSTEMD_AUTO_ENABLE_${PN}_sa6155 = "disable"
 
 inherit autotools-brokensep module qperf module-sign systemd
 

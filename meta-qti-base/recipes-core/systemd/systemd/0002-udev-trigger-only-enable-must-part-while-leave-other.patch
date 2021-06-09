@@ -1,0 +1,22 @@
+From d86bad5320846d59c4bb68dfd41c5ebd83ff3354 Mon Sep 17 00:00:00 2001
+From: Wang jing <jingwa@codeaurora.org>
+Date: Tue, 18 May 2021 15:15:58 +0530
+Subject: [PATCH] systemd-udev: split udev-trigger for performance.
+
+Change-Id: I4df13af77b56c97e6246dbfab52cf664fb0aabdc
+Signed-off-by: Jing Wang <jingwa@codeaurora.org>
+---
+ units/systemd-udev-trigger.service.in | 3 +-
+ 1 file changed, 1 insertion(+), 2 deletion(-)
+
+diff --git a/units/systemd-udev-trigger.service.in b/units/systemd-udev-trigger.service.in
+index b60204e..c96c4ee 100644
+--- a/units/systemd-udev-trigger.service.in
++++ b/units/systemd-udev-trigger.service.in
+@@ -19,5 +19,4 @@ ConditionPathIsReadWrite=/sys
+ [Service]
+ Type=oneshot
+ RemainAfterExit=yes
+-ExecStart=@rootbindir@/udevadm trigger --type=subsystems --action=add
+-ExecStart=@rootbindir@/udevadm trigger --type=devices --action=add
++ExecStart=@rootbindir@/udevadm trigger --subsystem-match=block --type=devices --action=add
