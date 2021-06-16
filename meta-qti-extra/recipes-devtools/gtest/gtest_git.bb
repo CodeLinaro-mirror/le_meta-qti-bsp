@@ -1,4 +1,4 @@
-SUMMRARY = "Google's framework for writing C++ tests"
+SUMMARY = "Google's framework for writing C++ tests"
 DESCRIPTION = "Gtest is a cross-platform C++ testing framework published by Google"
 HOMEPAGE = "http://code.google.com/p/googletest/"
 SECTION = "libs"
