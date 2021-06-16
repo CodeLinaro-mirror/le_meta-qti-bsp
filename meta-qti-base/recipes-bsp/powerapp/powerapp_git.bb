@@ -1,4 +1,5 @@
 SUMMARY = "Powerapp tools"
+DESCRIPTION = "powerapp tools"
 HOMEPAGE = "http://codeaurora.org/"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
@@ -81,8 +82,10 @@ pkg_postinst_${PN} () {
 
 PACKAGES =+ "${PN}-reboot ${PN}-shutdown ${PN}-powerconfig"
 
-FILES_${PN}-reboot = " ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', "${sysconfdir}/initscripts/reboot", "${sysconfdir}/init.d/reboot", d)} "
-FILES_${PN}-shutdown = " ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', "${sysconfdir}/initscripts/shutdown", "${sysconfdir}/init.d/shutdown", d)} "
-FILES_${PN}-powerconfig = " ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', "${sysconfdir}/initscripts/power_config", "${sysconfdir}/init.d/power_config", d)} "
-FILES_${PN} += "/data/*"
-FILES_${PN} += "/lib/systemd/*"
+FILES_${PN}-reboot += "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', "${sysconfdir}/initscripts/reboot", "${sysconfdir}/init.d/reboot", d)} "
+FILES_${PN}-shutdown += "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', "${sysconfdir}/initscripts/shutdown", "${sysconfdir}/init.d/shutdown", d)} "
+FILES_${PN}-powerconfig += "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', "${sysconfdir}/initscripts/power_config", "${sysconfdir}/init.d/power_config", d)} "
+FILES_${PN} += "\
+    /data/* \
+    /lib/systemd/* \
+"
