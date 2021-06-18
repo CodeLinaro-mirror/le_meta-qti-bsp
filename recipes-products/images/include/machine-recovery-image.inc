@@ -31,6 +31,7 @@ IMAGE_INSTALL += "libcomerr"
 IMAGE_INSTALL += "libss"
 IMAGE_INSTALL += "libe2p"
 IMAGE_INSTALL += "libext2fs"
+IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'vbleima', 'ima-cert-setup', '',d)}"
 
 # Needed for generating recovery.ubi ignored for ext4
 MKUBIFS_ARGS = "${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', '-m 4096 -e 253952 -c 200 -F', '', d)}"
