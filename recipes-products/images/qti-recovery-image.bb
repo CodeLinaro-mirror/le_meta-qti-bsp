@@ -1,4 +1,4 @@
-inherit core-image
+inherit core-image image-prelink
 
 # This class creates recoveryfs
 DEPENDS += "virtual/kernel"

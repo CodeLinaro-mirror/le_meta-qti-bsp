@@ -65,7 +65,7 @@ do_recovery_ubi() {
     echo /recovery mtd     recovery >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RECOVERY/recovery.fstab
 
     #Copy contents of userdata rootfs
-    cp -r ${IMAGE_ROOTFS}/data/. ${OTA_TARGET_IMAGE_ROOTFS_UBI}/DATA/.
+    cp -r ${USERIMAGE_ROOTFS}/. ${OTA_TARGET_IMAGE_ROOTFS_UBI}/DATA/.
 
     #Getting content for OTA folder
     mkdir -p ${OTA_TARGET_IMAGE_ROOTFS_UBI}/OTA/bin
@@ -169,6 +169,10 @@ do_gen_otazip_ubi[dirs] += "${DEPLOY_DIR_IMAGE}/ota-scripts"
 do_gen_otazip_ubi() {
     ./full_ota.sh ${OTA_TARGET_FILES_UBI_PATH} ${IMAGE_ROOTFS} ubi --system_path ${IMAGE_SYSTEM_MOUNT_POINT}
 
-    cp update_ubi.zip ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}
+    if [[ -e update_ubi.zip ]]; then
+        cp update_ubi.zip ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}
+    else
+        bbwarn "update_ubi.zip failed to create"
+    fi
 }
 addtask do_gen_otazip_ubi after do_recovery_ubi before do_build

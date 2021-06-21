@@ -31,35 +31,24 @@ do_image_multiubi[noexec] = "1"
 
 ROOTFS_VOLUME_SIZE = "${@bb.utils.contains('IMAGE_FEATURES', 'nand2x', '${SYSTEM_VOLUME_SIZE_G}', '${SYSTEM_VOLUME_SIZE}', d)}"
 
-create_symlink_userfs() {
+create_symlink_userfs[cleandirs] = "${USERIMAGE_ROOTFS}"
+fakeroot create_symlink_userfs() {
     #Symlink modules
     LIB_MODULES="${IMAGE_ROOTFS}/lib/modules"
     if [ -d ${LIB_MODULES} ]; then
-        cp -rf ${LIB_MODULES} ${IMAGE_ROOTFS}/usr/lib/
+        cp -rp ${LIB_MODULES} ${IMAGE_ROOTFS}/usr/lib/
         rm -rf ${LIB_MODULES}
     fi
     ln -sf /usr/lib/modules ${IMAGE_ROOTFS}/lib
 
     # Move rootfs data to userfs directory
     # Content of userfs is added to data volume
-    DATA_DIR="${IMAGE_ROOTFS}/data"
-    CONFIG_DIR="${DATA_DIR}/configs"
-    LOGS_DIR="${DATA_DIR}/logs"
-    if [ ! -d ${DATA_DIR} ]; then
-        mkdir ${DATA_DIR}
-    fi
-    if [ ! -d ${CONFIG_DIR} ]; then
-        mkdir ${CONFIG_DIR}
-    fi
-    if [ ! -d ${LOGS_DIR} ]; then
-        mkdir ${LOGS_DIR}
-    fi
-    rm -rf ${USERIMAGE_ROOTFS}
-    mkdir -p ${USERIMAGE_ROOTFS}
-    mv ${DATA_DIR}/* ${USERIMAGE_ROOTFS}
+    mkdir -p ${IMAGE_ROOTFS}/data/configs
+    mkdir -p ${IMAGE_ROOTFS}/data/logs
+    mv ${IMAGE_ROOTFS}/data/* ${USERIMAGE_ROOTFS}
 }
 
-create_symlink_systemd_ubi_mount_rootfs() {
+fakeroot create_symlink_systemd_ubi_mount_rootfs() {
     # Symlink ubi mount files to systemd targets
     for entry in ${MACHINE_MNT_POINTS}; do
         mountname="${entry:1}"
