@@ -1,16 +1,18 @@
 SUMMARY = "Scripts for setup LV GVM Network"
+DESCRIPTION = "This is a scripts about automatic setup network, \
+it can help us to setup LV GVM Network quickly"
+HOMEPAGE = "https://www.codeaurora.org/"
 SECTION = "network"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
 
+SRC_URI = "\
+    file://setup-network.sh \
+    file://setup-network.service \
+"
+
 inherit systemd
-
-SRC_URI = " file://setup-network.sh \
-            file://setup-network.service \
-          "
-
-RDEPENDS_${PN} += "bash"
 
 do_install() {
   install -d ${D}${systemd_system_unitdir}
@@ -20,3 +22,5 @@ do_install() {
 }
 
 SYSTEMD_SERVICE_${PN} = "setup-network.service"
+
+RDEPENDS_${PN} += "bash"
