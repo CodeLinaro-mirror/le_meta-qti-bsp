@@ -262,6 +262,7 @@ copy_edge_bsp_rpm() {
     cp ${DEPLOY_DIR_RPM}/aarch64/hdf5-1.8.21-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/hdf5-dev-1.8.21-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/aarch64/libcamera-metadata0-1.1-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
+    cp ${DEPLOY_DIR_RPM}/aarch64/libcamera-metadata-dev-1.1-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
     cp ${DEPLOY_DIR_RPM}/sm8250/system-prop-1.0-r0.sm8250.rpm ${IMAGE_ROOTFS}/packages/sm8250/
     cp ${DEPLOY_DIR_RPM}/aarch64/fp16-headers-git-r0.aarch64.rpm ${IMAGE_ROOTFS}/packages/aarch64/
 }
