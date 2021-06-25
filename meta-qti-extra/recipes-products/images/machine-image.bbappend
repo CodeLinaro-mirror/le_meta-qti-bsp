@@ -8,9 +8,6 @@ IMAGE_INSTALL += "\
 # Add libgomp support
 IMAGE_INSTALL += "libgomp libgomp-dev libgomp-staticdev"
 
-# Add kernel header to SDK.
-TOOLCHAIN_TARGET_TASK_append = " kernel-devsrc"
-
 # Add kdump support
 do_rootfs[depends] += "${@bb.utils.contains('DISTRO_FEATURES', 'kdump-support', 'machine-kdump-image:do_image_complete', '', d)}"
 ROOTFS_POSTPROCESS_COMMAND_prepend = "${@bb.utils.contains('DISTRO_FEATURES', 'kdump-support', ' add_kdump_ramdisk; ', '', d)}"
