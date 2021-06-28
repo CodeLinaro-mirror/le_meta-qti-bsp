@@ -151,4 +151,13 @@ do_make_avb_image() {
     fi
 }
 
+
+python do_make_vendorbootimg () {
+    import subprocess
+
+    cmd = "dd if=/dev/zero of=%s bs=1M count=96" % output
+    subprocess.call(cmd, shell=True)
+}
+
 addtask do_make_avb_image after do_image_complete before do_build
+addtask do_make_vendorbootimg after do_image_complete before do_build
