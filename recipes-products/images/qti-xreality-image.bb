@@ -1,7 +1,7 @@
 # Provides packages required to build
 # QTI Linux eXtended Reality image.
 
-inherit qimage populate_sdk
+inherit qimage
 
 IMAGE_FEATURES += "ssh-server-openssh"
 
