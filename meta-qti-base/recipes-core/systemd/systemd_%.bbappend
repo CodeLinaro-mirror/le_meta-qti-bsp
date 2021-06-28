@@ -3,7 +3,7 @@ SRC_URI += " file://0001-systemd-add-slotselect-support-in-fstab.patch \
     file://0002-udev-trigger-only-enable-must-part-while-leave-other.patch \
     file://systemd-udev-trigger-full.service"
 #SRC_URI += " file://0033-systemd-Make-root-s-home-directory-configurable-2.patch "
-
+SRC_URI += " ${@bb.utils.contains('DISTRO_FEATURES', 'early_init', 'file://0034-systemd-add-handover-support-for-early-service.patch', '', d)}"
 
 # Remove backlight ldconfig
 #   * backlight - Loads/Saves Screen Backlight Brightness, not required.
@@ -55,5 +55,14 @@ do_install_append () {
     install -d ${D}${systemd_unitdir}/system/multi-user.target.wants
     install -m 0644 ${WORKDIR}/systemd-udev-trigger-full.service ${D}${systemd_unitdir}/system/
     ln -sf ${systemd_unitdir}/system/systemd-udev-trigger-full.service ${D}${systemd_unitdir}/system/multi-user.target.wants/systemd-udev-trigger-full.service
+    # When enable early init, weston no longer trigger login operation,so XDG_RUNTIME_DIR won't be
+    # created unless we adb shell/ssh to login to the board. this will cause issue when we try to
+    # pass XDG_RUNTIME_DIR to container during bootup.
+    # Trigger a login operations for this case.
+    # if lxc can support dynamic mount injection fuction later, this part can be removed.
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'early_init', 'true', 'false', d)}; then
+        sed -i  's/^ExecStart.*/ExecStart=-\/sbin\/agetty --autologin root --noclear %I 38400 linux/g' ${D}/lib/systemd/system/getty@.service
+        sed -i  's/^Type=.*/Type=simple/g' ${D}/lib/systemd/system/getty@.service
+    fi
 }
 

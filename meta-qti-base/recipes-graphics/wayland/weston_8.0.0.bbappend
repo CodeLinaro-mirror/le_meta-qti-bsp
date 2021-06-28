@@ -42,13 +42,13 @@ EXTRA_OECONF_append_qemux86-64 = " \
         WESTON_NATIVE_BACKEND=fbdev-backend.so \
         "
 
-EXTRA_OECONF_append = "${@bb.utils.contains("DISTRO_FEATURES", "early_init", " --enable-early-boot", "" ,d)}"
 EXTRA_OECONF_append = "${@bb.utils.contains("DISTRO_FEATURES", "early-ethernet", " --enable-early-boot", "" ,d)}"
 
 #Overwrite Packageconfig
 PACKAGECONFIG = "${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'kms fbdev wayland egl', '', d)} \
                  ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11', '', d)} \
                  ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'launch', '', d)} \
+                 ${@bb.utils.contains('DISTRO_FEATURES', 'early_init', 'early', '', d)} \
                  image-jpeg \
                  screenshare \
                  shell-desktop \
@@ -58,6 +58,8 @@ PACKAGECONFIG = "${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'kms fbdev w
 PACKAGECONFIG_append = "clients"
 # pam
 PACKAGECONFIG[pam] = ",,libpam"
+# early-init
+PACKAGECONFIG[early] = "-Denable-early-boot=true,-Denable-early-boot=false"
 
 do_configure[depends] += "virtual/kernel:do_shared_workdir"
 do_install_append() {
@@ -75,7 +77,7 @@ do_install_append() {
     install -m 0644 ${WORKDIR}/weston.ini_caf ${D}${WESTON_INI_CONFIG}/weston.ini
     # Install reuqire-input=false in weston.ini
     if ${@bb.utils.contains('DISTRO_FEATURES', 'q-hypervisor', 'true', 'false', d)} ||
-	${@bb.utils.contains('DISTRO_FEATURES', 'early_init', 'true', 'false', d)}; then
+        ${@bb.utils.contains('DISTRO_FEATURES', 'early_init', 'true', 'false', d)}; then
         sed -i -e '/\[core\]/a require-input=false' ${D}${WESTON_INI_CONFIG}/weston.ini
     fi
     # expose weston protocol to /usr/share/weston as video may use it

@@ -1,9 +1,10 @@
 #!/bin/sh
-# Copyright (c) 2019, The Linux Foundation. All rights reserved.
-
+# Copyright (c) 2019,2021, The Linux Foundation. All rights reserved.
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
 # met:
+#
 #    * Redistributions of source code must retain the above copyright
 #      notice, this list of conditions and the following disclaimer.
 #    * Redistributions in binary form must reproduce the above
@@ -13,11 +14,11 @@
 #    * Neither the name of The Linux Foundation nor the names of its
 #      contributors may be used to endorse or promote products derived
 #      from this software without specific prior written permission.
-
+#
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 # MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT
-# ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
 # BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
 # CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
 # SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
@@ -26,18 +27,7 @@
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-cd /sys/devices/system/memory/
-n=1
-addr=`cat aligned_blocks_addr | cut -d ',' -f $n`
-num=`cat aligned_blocks_num | cut -d ',' -f $n`
-while [ -n "$addr" ]
-do
-echo $addr > probe
-echo online > memory$num/state
-let n++
-addr=`cat aligned_blocks_addr | cut -d ',' -f $n`
-num=`cat aligned_blocks_num | cut -d ',' -f $n`
-done
-# tune kernel max-threads
-totalram=`grep MemTotal /proc/meminfo | awk '{print $2}'`
-echo $((totalram/128)) > /proc/sys/kernel/threads-max
+#irq_num=`cat /proc/interrupts | grep -i DWC_ETH_QOS| grep -i gic | awk {'print $1'} | awk -F :  {'print $1'}`;
+#echo irqnum=$irq_num;
+#echo 08 > /proc/irq/$irq_num/smp_affinity;
+echo 6 > /sys/class/net/eth0/queues/rx-0/rps_cpus;
