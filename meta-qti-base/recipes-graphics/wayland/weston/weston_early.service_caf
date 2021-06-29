@@ -1,4 +1,4 @@
-# Copyright (c) 2020, The Linux Foundation. All rights reserved.
+# Copyright (c) 2021, The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -31,9 +31,9 @@ After=leprop.service
 DefaultDependencies=no
 
 [Service]
-Environment="XDG_RUNTIME_DIR=/run/"
+Environment="XDG_RUNTIME_DIR=/run/user/0"
 ExecStart=/usr/bin/weston --tty=2 --log=/run/weston.log
-ExecStop=/usr/bin/killall -s KILL weston
+ExecStop=/usr/bin/killall -s SIGTERM weston
 Type=simple
 PIDFile=/run/early/weston.pid
 Restart=always
