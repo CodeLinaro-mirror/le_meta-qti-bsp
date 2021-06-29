@@ -63,7 +63,10 @@ SRC_URI_append =  "${@bb.utils.contains('DISTRO_FEATURES', 'wayland', ' file://w
 
 SRC_URI_append =  " file://lxc.cfg"
 SRC_URI_append =  " file://ipc.cfg"
-SRC_URI_append =  "${@bb.utils.contains('MACHINE_FEATURES', 'qti-dual-wlan', ' file://dual-wlan.cfg', '', d)}"
+SRC_URI_append =  " \
+              ${@bb.utils.contains('MACHINE_FEATURES', 'qti-dual-wlan', ' file://dual-wlan.cfg', \
+                 bb.utils.contains('MACHINE_FEATURES', 'qti-wlan',      ' file://wlan.cfg', \
+                 '', d), d)}"
 SRC_URI_append_qtiquingvm8295 = " file://qtiquingvm8295.cfg"
 
 SRCREV = "${AUTOREV}"
