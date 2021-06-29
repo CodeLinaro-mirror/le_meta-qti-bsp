@@ -1,9 +1,15 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
-SRC_URI += " file://0001-systemd-add-slotselect-support-in-fstab.patch "
-SRC_URI += " file://0033-systemd-Make-root-s-home-directory-configurable-2.patch "
-SRC_URI += " file://0001-systemd-skip-smack-copy-issue-in-systemd.patch "
-SRC_URI += " file://60-misc.rules "
+FILESBBAPPENDPATH := "${THISDIR}"
+FILESEXTRAPATHS =. "${FILESBBAPPENDPATH}/${BP}:${FILESBBAPPENDPATH}/${BPN}:"
 
+SRC_URI_append = " \
+    file://0001-systemd-add-slotselect-support-in-fstab.patch \
+    file://0033-systemd-Make-root-s-home-directory-configurable-2.patch \
+    file://0001-systemd-skip-smack-copy-issue-in-systemd.patch \
+    file://60-misc.rules \
+"
+
+# Disable close_range in systemd v247.4 as it doesn't work with linux-msm 5.4
+SRC_URI_append = " ${@oe.utils.conditional("PV", "247.4", "file://0001-Disable-close_range.patch", "", d)}"
 
 # Remove backlight ldconfig
 #   * backlight - Loads/Saves Screen Backlight Brightness, not required.

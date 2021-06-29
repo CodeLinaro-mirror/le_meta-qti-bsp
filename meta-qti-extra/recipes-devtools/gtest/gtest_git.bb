@@ -1,4 +1,5 @@
-DESCRIPTION = "Google's framework for writing C++ tests"
+SUMMARY = "Google's framework for writing C++ tests"
+DESCRIPTION = "Gtest is a cross-platform C++ testing framework published by Google"
 HOMEPAGE = "http://code.google.com/p/googletest/"
 SECTION = "libs"
 LICENSE = "BSD-3-Clause"
@@ -16,7 +17,7 @@ inherit lib_package cmake
 
 EXTRA_OECMAKE = "-DBUILD_SHARED_LIBS=ON"
 
-BBCLASSEXTEND = "native nativesdk"
-
 FILES_SOLIBSDEV = ""
 FILES_${PN} += "${libdir}/*.so"
+
+BBCLASSEXTEND = "native nativesdk"

@@ -2,6 +2,7 @@ SUMMARY = "Script and service to populate system properties"
 DESCRIPTION = "Android system properties are a global dictionary of string \
 key/value pairs, used to share system-wide configuration information. The \
 build.prop file contains pesisit system properties."
+HOMEPAGE = "https://www.codeaurora.org/"
 LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
@@ -28,6 +29,6 @@ do_install() {
     install -m 0644 ${WORKDIR}/persist-prop.service -D ${D}/${systemd_unitdir}/system/persist-prop.service
 }
 
-FILES_${PN} += "/build.prop"
-
 PACKAGE_ARCH = "${MACHINE_ARCH}"
+
+FILES_${PN} += "/build.prop"

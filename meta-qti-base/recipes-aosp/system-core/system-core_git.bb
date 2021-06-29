@@ -7,11 +7,10 @@ ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 
 DEPENDS += "ext4-utils glib-2.0 libbase libcutils libmincrypt libselinux libutils openssl"
 
-
-SRCREV = "${AUTOREV}"
 PR = "r19"
 
 SRC_URI = "${PATH_TO_REPO}/system/core/.git;protocol=${PROTO};destsuffix=system/core;usehead=1"
+SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/system/core"
 
