@@ -3,6 +3,7 @@ From: Daniel Tak <ytak@codeaurora.org>
 Date: Fri, 7 Dec 2018 12:57:36 -0700
 Subject: [PATCH] add sdcard diag groups
 
+Signed-off-by: Daniel Tak <ytak@codeaurora.org>
 %% original patch: add-sdcard-diag-groups.patch
 ---
  group.master | 2 ++

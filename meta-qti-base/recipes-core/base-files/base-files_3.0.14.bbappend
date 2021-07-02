@@ -1,26 +1,23 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}-${PV}:"
 
-DEPENDS = "base-passwd"
+DEPENDS += "base-passwd"
 
-SRC_URI += "file://${BASEMACHINE}/fstab"
+SRC_URI_append = " file://${BASEMACHINE}/fstab"
 
-dirs755_append = " /media/cf /media/net /media/ram \
-            /media/union /media/realroot /media/hdd /media/mmc1"
-dirs755_append = " /firmware /dsp /bluetooth /var /media/card /persist"
-
-# userdata mount point is present by default in all machines.
-# TODO: Add this path to MACHINE_MNT_POINTS in machine conf.
-dirs755_append = " ${userfsdatadir}"
-
-dirs755_append = " ${MACHINE_MNT_POINTS}"
+dirs755_append = " \
+    /media/cf /media/net /media/ram \
+    /media/union /media/realroot /media/hdd /media/mmc1 \
+    /firmware /dsp /bluetooth ${localstatedir} /media/card /persist \
+    ${userfsdatadir} ${MACHINE_MNT_POINTS} \
+"
 
 do_install_append(){
     install -m 755 -o diag -g diag -d ${D}/media
     install -m 755 -o diag -g diag -d ${D}/media/card
     ln -s /media/card ${D}/sdcard
-    ln -s /var/run/resolv.conf ${D}/etc/resolv.conf
-    ln -s /lib ${D}/lib64
-    ln -s /usr/lib ${D}/usr/lib64
+    ln -s ${localstatedir}/run/resolv.conf ${D}${sysconfdir}/resolv.conf
+    ln -s ${nonarch_base_libdir} ${D}/lib64
+    ln -s ${libdir} ${D}/usr/lib64
 
     install -m 0644 ${WORKDIR}/fstab ${D}${sysconfdir}/fstab
 
@@ -37,6 +34,6 @@ do_install_append(){
         sed -i "/^\PARTLABEL=persist.*var/d" ${D}${sysconfdir}/fstab
         sed -i "/^\#.*Bind/d" ${D}${sysconfdir}/fstab
         sed -i "/^\/data/d" ${D}${sysconfdir}/fstab
-        sed -i "/^\/var/d" ${D}${sysconfdir}/fstab
+        sed -i "/^\${localstatedir}/d" ${D}${sysconfdir}/fstab
     fi
 }
