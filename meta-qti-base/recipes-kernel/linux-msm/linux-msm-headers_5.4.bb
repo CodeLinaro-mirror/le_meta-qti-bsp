@@ -1,13 +1,12 @@
 SUMMARY = "MSM Linux Kernel Headers"
 DESCRIPTION = "Installs MSM kernel headers required to build userspace. \
 These headers are installed in ${includedir}/linux-msm path."
-
+HOMEPAGE = "https://www.codeaurora.org"
 SECTION = "kernel"
-
 LICENSE = "GPLv2.0-with-linux-syscall-note"
 LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
 
-DEPENDS += "unifdef-native bison-native rsync-native"
+DEPENDS += "bison-native rsync-native unifdef-native"
 
 S = "${STAGING_KERNEL_DIR}"
 B = "${WORKDIR}/build"
@@ -28,8 +27,8 @@ do_install() {
     # Generate kernel headers
     rm -rf ${B}
     oe_runmake_call -C ${STAGING_KERNEL_DIR} ARCH=${ARCH} CC="${KERNEL_CC}" LD="${KERNEL_LD}" headers_install O=${B}
-    install -d ${D}/usr/include
-    mv ${B}/usr/include ${D}/usr/include/linux-msm
+    install -d ${D}${includedir}
+    mv ${B}${includedir} ${D}${includedir}/linux-msm
 
     # Need to create a hierarchy that works for Adreno's expectation that
     # its KERN_INCDIR variable is pointed at a directory with usr/include
@@ -39,8 +38,8 @@ do_install() {
     # can be changed to just use KERN_INCDIR directly.
     # A separate hierarchy as opposed to one under ${D}/usr/include/linux-msm is
     # used to avoid issues from a symlink loop.
-    install -d ${D}/usr/include/kernel/usr
-    ln -sf ../../linux-msm ${D}/usr/include/kernel/usr/include
+    install -d ${D}${includedir}/kernel/usr
+    ln -sf ../../linux-msm ${D}${includedir}/kernel/usr/include
 }
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
