@@ -10,10 +10,10 @@ def get_tag(path,d):
                 if f.close() is None:
                     rev = data.split(" ")[0]
                     if len(rev) != 0:
-                        return rev.rstrip("\n")
+                        return rev.rstrip("\n") + get_buildmode(path)
     except:
         pass
-    return time.strftime('%Y%m%d%H%M')
+    return time.strftime('%Y%m%d%H%M') + get_buildmode(path)
 
 
 def get_link_filename(link_fn):
@@ -23,3 +23,8 @@ def get_link_filename(link_fn):
     except:
         return ""
 
+def get_buildmode(path):
+    if os.path.exists(path + "/meta-qti-internal"):
+        return " (non-HY11)"
+    else:
+        return " (HY11)"
