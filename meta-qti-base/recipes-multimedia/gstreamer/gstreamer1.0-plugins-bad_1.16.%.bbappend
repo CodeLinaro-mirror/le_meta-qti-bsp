@@ -17,7 +17,7 @@ EXTRA_OEMESON += " \
                  "
 EXTRA_OECONF_append =" --with-protocal-xml-path=${STAGING_DATADIR}/weston"
 EXTRA_OEMESON_append = " \
-			   -Dkernel_path=${STAGING_KERNEL_BUILDDIR}/usr/include \
+               -Dkernel_path=${STAGING_KERNEL_BUILDDIR}/usr/include \
               "
 CPPFLAGS += "-I${STAGING_KERNEL_BUILDDIR}/usr/include"
 
