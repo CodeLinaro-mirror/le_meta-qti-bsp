@@ -1,47 +1,51 @@
-From b7cd50675eca1fc25d25b3de2c7e21d1f8b041fd Mon Sep 17 00:00:00 2001
+From 2014de8cd3d20a7626e6cca157f522069a3628d0 Mon Sep 17 00:00:00 2001
 From: Lei wang <leiwan@codeaurora.org>
-Date: Sat, 21 Mar 2020 20:51:44 +0800
+Date: Mon, 19 Jul 2021 13:30:11 +0800
 Subject: [PATCH] lttng-module: fix lttng-module compile issue
+
+Android kernel is a little different from linux standard kernel,
+this may cause lttng compile issue.
+Make lttng-modules use new kallsyms_lookup_name.
+Import android GKI symbol namespace.
 
 Signed-off-by: Lei wang <leiwan@codeaurora.org>
 ---
- instrumentation/events/lttng-module/mm_vmscan.h | 2 +-
- instrumentation/events/lttng-module/net.h       | 2 ++
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ wrapper/kallsyms.c | 4 ++--
+ wrapper/kallsyms.h | 3 ++-
+ 2 files changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/instrumentation/events/lttng-module/mm_vmscan.h b/instrumentation/events/lttng-module/mm_vmscan.h
-index ef768b1..58bb1df 100644
---- a/instrumentation/events/lttng-module/mm_vmscan.h
-+++ b/instrumentation/events/lttng-module/mm_vmscan.h
-@@ -264,7 +264,7 @@ LTTNG_TRACEPOINT_EVENT_INSTANCE(mm_vmscan_direct_reclaim_end_template, mm_vmscan
- 	TP_ARGS(nr_reclaimed)
- )
+diff --git a/wrapper/kallsyms.c b/wrapper/kallsyms.c
+index 6af77f5..6c100a4 100644
+--- a/wrapper/kallsyms.c
++++ b/wrapper/kallsyms.c
+@@ -14,10 +14,10 @@
+ #include <linux/module.h>
+ #include <wrapper/kallsyms.h>
  
--#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,16,0))
-+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,14,0))
- LTTNG_TRACEPOINT_EVENT_MAP(mm_shrink_slab_start,
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,7,0))
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,4,0))
  
- 	mm_vmscan_shrink_slab_start,
-diff --git a/instrumentation/events/lttng-module/net.h b/instrumentation/events/lttng-module/net.h
-index 2085def..7d39b86 100644
---- a/instrumentation/events/lttng-module/net.h
-+++ b/instrumentation/events/lttng-module/net.h
-@@ -543,6 +543,7 @@ LTTNG_TRACEPOINT_EVENT_INSTANCE(net_dev_template, net_dev_queue,
- 	TP_ARGS(skb)
- )
+ #ifndef CONFIG_KPROBES
+-# error "LTTng-modules requires CONFIG_KPROBES on kernels >= 5.7.0"
++# error "LTTng-modules requires CONFIG_KPROBES on kernels >= 5.4.0"
+ #endif
  
-+/*
- LTTNG_TRACEPOINT_EVENT_INSTANCE_MAP(net_dev_template,
+ static
+diff --git a/wrapper/kallsyms.h b/wrapper/kallsyms.h
+index 5f48847..d54a084 100644
+--- a/wrapper/kallsyms.h
++++ b/wrapper/kallsyms.h
+@@ -26,8 +26,9 @@
+ # endif
+ #endif
  
- 	netif_receive_skb,
-@@ -553,6 +554,7 @@ LTTNG_TRACEPOINT_EVENT_INSTANCE_MAP(net_dev_template,
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,7,0))
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,4,0))
  
- 	TP_ARGS(skb)
- )
-+*/
++MODULE_IMPORT_NS(VFS_internal_I_am_really_a_filesystem_and_am_NOT_a_driver);
+ unsigned long wrapper_kallsyms_lookup_name(const char *name);
  
- LTTNG_TRACEPOINT_EVENT_INSTANCE_MAP(net_dev_template,
- 
+ #else /* #if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,7,0)) */
 -- 
 2.7.4
 
