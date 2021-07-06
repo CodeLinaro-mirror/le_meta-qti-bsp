@@ -9,7 +9,6 @@ DEPENDS += "liblog"
 
 PR = "r1"
 
-SRCREV = "${AUTOREV}"
 SRC_URI = "\
     ${PATH_TO_REPO}/system/core/.git;protocol=${PROTO};destsuffix=system/core;usehead=1 \
     file://0001-libcutils-Remove-autotools-support.patch;patchdir=../ \
@@ -30,6 +29,7 @@ SRC_URI[patch4.md5sum] = "8a70aab2809b83730b48369c37f291ba"
 SRC_URI[patch4.sha256sum] = "a382117538b0a2fb1cfecb0f2dfd4ee6a22a6baff5a710853dedfe72203b5d1c"
 SRC_URI[patch5.md5sum] = "6eaf69fbe8a793c46442ea36682a9a7c"
 SRC_URI[patch5.sha256sum] = "bd1b2192105aec07f7d8388beefb5e7200da69c9d50ab1cd7789eadb090c090b"
+SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/system/core/libcutils"
 

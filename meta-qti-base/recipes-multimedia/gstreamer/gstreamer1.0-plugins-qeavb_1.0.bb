@@ -1,24 +1,31 @@
-inherit qcommon
-
-SUMMARY = "avb plugins for GStreamer"
+SUMMARY = "avb (audio video bridge) plugins for GStreamer"
+DESCRIPTION = "avb (audio video bridge) plugins for GStreamer, receive pcm data or ts data from qavb FE, push the data to downstream to support audio or video playback"
+HOMEPAGE = "https://www.codeaurora.org/"
 SECTION = "multimedia"
 LICENSE = "BSD-3-Clause"
-LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/BSD-3-Clause;md5=550794465ba0ec5312d6919e203a55f9"
+LIC_FILES_CHKSUM = "file://README;md5=d41d8cd98f00b204e9800998ecf8427e"
 
-SRC_URI   =  "${PATH_TO_REPO}/gstreamer/gst-plugins-qti-oss/.git;protocol=${PROTO};destsuffix=gstreamer/gst-plugins-qti-oss;usehead=1"
-SRC_DIR = "${SRC_DIR_ROOT}/gstreamer/gst-plugins-qti-oss/gst-plugins-qeavb"
-S      = "${WORKDIR}/gstreamer/gst-plugins-qti-oss/gst-plugins-qeavb"
-PR = "r1"
-LV = "1.0.0"
-LIBV = "1.0"
-SRCREV="${AUTOREV}"
-
-DEPENDS = "glib-2.0"
-
-DEPENDS += "gstreamer1.0 \
+DEPENDS += "avb-utils \
+            glib-2.0 \
+            gstreamer1.0 \
             gstreamer1.0-plugins-base \
+            virtual/libc \
            "
-DEPENDS += "virtual/libc"
+
+PR = "r1"
+
+SRC_URI = "${PATH_TO_REPO}/gstreamer/gst-plugins-qti-oss/.git;protocol=${PROTO};destsuffix=gstreamer/gst-plugins-qti-oss;usehead=1"
+SRCREV = "${AUTOREV}"
+
+S = "${WORKDIR}/gstreamer/gst-plugins-qti-oss/gst-plugins-qeavb"
+
+inherit autotools-brokensep pkgconfig
+
+do_configure[depends] += "virtual/kernel:do_shared_workdir"
+
+FILES_${PN} += "${libdir}/gstreamer-1.0/*.so"
+FILES_${PN}-dbg += "${libdir}/gstreamer-1.0/.debug"
+FILES_${PN}-dev += "${libdir}/gstreamer-1.0/*.la"
 
 CFLAGS += "-I${STAGING_INCDIR} \
            -I${STAGING_INCDIR}/glib-2.0 \
@@ -27,22 +34,7 @@ CFLAGS += "-I${STAGING_INCDIR} \
            -I${STAGING_INCDIR}/glib-2.0/glib \
            -I${STAGING_INCDIR}/c++ \
            -I${STAGING_INCDIR}/c++/${TARGET_SYS} \
-           -I${STAGING_INCDIR}/gstreamer-1.0"
-CFLAGS += "-I${STAGING_KERNEL_BUILDDIR}/usr/include"
+           -I${STAGING_INCDIR}/gstreamer-1.0 \
+           -I${STAGING_KERNEL_BUILDDIR}/usr/include"
 
-do_configure[depends] += "virtual/kernel:do_shared_workdir"
-
-install_config_file() {
-  mkdir -p ${D}${sysconfdir}/xdg/
-  install ${S}/qeavb/listenerPCM.ini ${D}${sysconfdir}/xdg/listenerPCM.ini
-  install ${S}/qeavb/listenerMPEG2TS.ini ${D}${sysconfdir}/xdg/listenerMPEG2TS.ini
-}
-do_install[postfuncs] += " install_config_file "
-FILES_${PN} += "${libdir}/gstreamer-${LIBV}/*.so"
-FILES_${PN}-dbg += "${libdir}/gstreamer-${LIBV}/.debug"
-FILES_${PN}-dev += "${libdir}/gstreamer-${LIBV}/*.la"
-
-#Skips check for .so symlinks
-INSANE_SKIP_${PN} = "dev-so"
-
-
+RDEPENDS_${PN} += "avb-utils"

@@ -5,8 +5,8 @@ HOMEPAGE = "http://developer.android.com/"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://NOTICE;md5=c19179f3430fd533888100ab6616e114"
 
-SRCREV = "${AUTOREV}"
 SRC_URI = "${PATH_TO_REPO}/system/core/.git;protocol=${PROTO};destsuffix=system/core;usehead=1"
+SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/system/core/libmincrypt"
 

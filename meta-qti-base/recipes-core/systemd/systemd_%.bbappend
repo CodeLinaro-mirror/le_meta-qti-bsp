@@ -1,9 +1,15 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
-SRC_URI += " file://0001-systemd-add-slotselect-support-in-fstab.patch "
-SRC_URI += " file://0033-systemd-Make-root-s-home-directory-configurable-2.patch "
-SRC_URI += " file://0001-systemd-skip-smack-copy-issue-in-systemd.patch "
-SRC_URI += " file://60-misc.rules "
+FILESBBAPPENDPATH := "${THISDIR}"
+FILESEXTRAPATHS =. "${FILESBBAPPENDPATH}/${BP}:${FILESBBAPPENDPATH}/${BPN}:"
 
+SRC_URI_append = " \
+    file://0001-systemd-add-slotselect-support-in-fstab.patch \
+    file://0033-systemd-Make-root-s-home-directory-configurable-2.patch \
+    file://0001-systemd-skip-smack-copy-issue-in-systemd.patch \
+    file://60-misc.rules \
+"
+
+# Disable close_range in systemd v247.4 as it doesn't work with linux-msm 5.4
+SRC_URI_append = " ${@oe.utils.conditional("PV", "247.4", "file://0001-Disable-close_range.patch", "", d)}"
 
 # Remove backlight ldconfig
 #   * backlight - Loads/Saves Screen Backlight Brightness, not required.
@@ -26,12 +32,12 @@ FULL_OPTIMIZATION = "-O2 -fexpensive-optimizations -frename-registers -fomit-fra
 
 do_install_append () {
     # Use kernel rules for network iface name
-    sed -i  's/^NamePolicy.*/NamePolicy=kernel/g' ${D}/lib/systemd/network/99-default.link
+    sed -i  's/^NamePolicy.*/NamePolicy=kernel/g' ${D}${systemd_unitdir}/network/99-default.link
 
     #Remove privatetmp=true from hostname service
-    sed -i  '/^PrivateTmp.*/d' ${D}/lib/systemd/system/systemd-hostnamed.service
+    sed -i  '/^PrivateTmp.*/d' ${D}${systemd_system_unitdir}/systemd-hostnamed.service
 
     # Remove orignal 60-persistent-v4l.rules which is not applicable for QTI video
-    rm ${D}/lib/udev/rules.d/60-persistent-v4l.rules
+    rm ${D}${nonarch_base_libdir}/udev/rules.d/60-persistent-v4l.rules
 }
 

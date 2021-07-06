@@ -10,8 +10,8 @@ DEPENDS += "libcutils libselinux"
 
 PR = "r1"
 
-SRCREV = "${AUTOREV}"
 SRC_URI = "${PATH_TO_REPO}/system/core/.git;protocol=${PROTO};destsuffix=system/core;usehead=1"
+SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/system/core/base"
 

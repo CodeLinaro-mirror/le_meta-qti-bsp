@@ -10,8 +10,8 @@ DEPENDS += "libcutils libpcre libselinux libsparse"
 
 PR = "r1"
 
-SRCREV = "${AUTOREV}"
 SRC_URI = "${PATH_TO_REPO}/system/extras/.git;protocol=${PROTO};destsuffix=system/extras/ext4_utils;subpath=ext4_utils;usehead=1"
+SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/system/extras/ext4_utils"
 
