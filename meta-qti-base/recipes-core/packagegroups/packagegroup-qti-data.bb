@@ -12,8 +12,8 @@ ALLOW_EMPTY_${PN} = "1"
 
 RDEPENDS_${PN} += "\
     bridge-utils \
-    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', 'connman', d)} \
-    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', 'connman-client', d)} \
+    connman \
+    connman-client \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'setup-network', '', d)} \
     net-tools \
     ethtool \
