@@ -23,9 +23,6 @@ RDEPENDS_${PN} = " \
         mm-venc-omx-test-lite \
         gdk-pixbuf-loader-bmp \
         gdk-pixbuf-loader-gif \
-        alsa-lib \
-        alsa-utils \
-        alsa-plugins \
 "
 
 RDEPENDS_${PN}_qtiquingvm8295 = " \
@@ -39,9 +36,6 @@ RDEPENDS_${PN}_qtiquingvm8295 = " \
         gstreamer1.0-plugins-qeavb \
         gdk-pixbuf-loader-bmp \
         gdk-pixbuf-loader-gif \
-        alsa-lib \
-        alsa-utils \
-        alsa-plugins \
         codec2 \
         gstreamer1.0-plugins-codec2 \
 "
