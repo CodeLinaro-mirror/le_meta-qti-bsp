@@ -34,7 +34,7 @@ case $1/$2 in
     if [ $2 == "hibernate" ]; then
         echo 0 > /sys/kernel/boot_adsp/boot
     fi
-
+    audio-nxp-auto 8 1
     # disable BT as hsuart could block suspend
     systemctl stop synergy.service
 
@@ -61,5 +61,6 @@ case $1/$2 in
         echo 1 > /sys/kernel/boot_adsp/boot
     fi
     systemctl restart audiod.service
+    audio-nxp-auto 8 0
     ;;
 esac
