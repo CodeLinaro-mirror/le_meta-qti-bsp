@@ -1,8 +1,3 @@
-DEFAULT_PREFERENCE = "-1"
-
-PACKAGECONFIG ??= "orc opencore-amr"
-DEPENDS += "opencore-amr"
-
 SRC_URI_remove = "https://gstreamer.freedesktop.org/src/gst-plugins-ugly/gst-plugins-ugly-${PV}.tar.xz"
 SRC_URI += "${PATH_TO_REPO}/gstreamer/gst-plugins-ugly/.git;protocol=${PROTO};destsuffix=gstreamer/gst-plugins-ugly;usehead=1"
 SRC_URI += "${CAF_GIT}/gstreamer/common;destsuffix=gstreamer/gst-plugins-ugly/common;branch=gstreamer/common/1.16;name=common"
@@ -13,26 +8,5 @@ SRCREV_FORMAT = "ugly_common"
 
 S = "${WORKDIR}/gstreamer/gst-plugins-ugly"
 
-
-EXTRA_OEMESON += " \
-    -Da52dec=disabled \
-    -Dcdio=disabled \
-    -Ddvdlpcmdec=disabled \
-    -Ddvdread=disabled \
-    -Ddvdsub=disabled \
-    -Dmpeg2dec=disabled \
-    -Drealmedia=disabled \
-    -Dsidplay=disabled \
-    -Dx264=disabled \
-    -Dxingmux=disabled \
-    -Damrnb=enabled \
-    -Damrwbdec=enabled \
-    -Dasfdemux=enabled \
-    "
-
-do_configure_prepend() {
-	cd ${S}
-	./autogen.sh --noconfigure
-	cd ${B}
-}
-
+# remove a52dec and mpeg2dec, for don't support.
+PACKAGECONFIG_remove = "a52dec mpeg2dec"
