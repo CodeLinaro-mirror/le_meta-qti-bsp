@@ -9,18 +9,8 @@ OTA_TARGET_IMAGE_ROOTFS_UBI = "${WORKDIR}/ota-target-image-ubi"
 OTA_TARGET_FILES_UBI = "target-files-ubi.zip"
 OTA_TARGET_FILES_UBI_PATH = "${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${OTA_TARGET_FILES_UBI}"
 
-def get_filesmap(d):
-    filesmap_path = ""
-    overrides = (":" + (d.getVar("MACHINEOVERRIDES") or "")).split(":")
-    overrides.reverse()
-
-    for o in overrides:
-        opath = "poky/meta-qti-bsp/recipes-bsp/base-files-recovery/" + o + "/radio/filesmap"
-        path = os.path.join(d.getVar('WORKSPACEROOT'), opath)
-        if os.path.exists(path):
-            filesmap_path = path
-            break
-    return filesmap_path
+MACHINE_FILESMAP_SEARCH_PATH ?= "${@':'.join('%s/conf/machine/filesmap' % p for p in '${BBPATH}'.split(':'))}}"
+MACHINE_FILESMAP_FULL_PATH = "${@machine_search(d.getVar('MACHINE_FILESMAP_CONF'), d.getVar('MACHINE_FILESMAP_SEARCH_PATH')) or ''}"
 
 #Create directory structure for targetfiles.zip
 do_recovery_ubi[cleandirs] += "${OTA_TARGET_IMAGE_ROOTFS_UBI}"
@@ -41,7 +31,7 @@ do_recovery_ubi() {
     echo "recovery image rootfs: ${RECOVERY_IMAGE_ROOTFS}"
 
     # if exists copy filesmap into RADIO directory
-    radiofilesmap=${@get_filesmap(d)}
+    radiofilesmap=${MACHINE_FILESMAP_FULL_PATH}
     [[ ! -z "$radiofilesmap" ]] && install -m 755 $radiofilesmap ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RADIO/
 
     # copy the boot\recovery images
@@ -137,7 +127,7 @@ do_recovery_ubi() {
     echo blocksize=131072 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
 
     # boot_size: Size of boot partition from partition.xml
-    echo boot_size=0x00CFA000 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
+    echo boot_size=0x00FE8000 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
 
     # recovery_size : Size of recovery partition from partition.xml
     echo recovery_size=0x00C00000 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
@@ -169,6 +159,10 @@ do_gen_otazip_ubi[dirs] += "${DEPLOY_DIR_IMAGE}/ota-scripts"
 do_gen_otazip_ubi() {
     ./full_ota.sh ${OTA_TARGET_FILES_UBI_PATH} ${IMAGE_ROOTFS} ubi --system_path ${IMAGE_SYSTEM_MOUNT_POINT}
 
-    cp update_ubi.zip ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}
+    if [[ -e update_ubi.zip ]]; then
+        cp update_ubi.zip ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}
+    else
+        bbwarn "update_ubi.zip failed to create"
+    fi
 }
 addtask do_gen_otazip_ubi after do_recovery_ubi before do_build

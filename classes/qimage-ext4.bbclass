@@ -59,32 +59,47 @@ do_fsconfig_append_qti-distro-user() {
 ### Generate system.img #####
 ################################################
 SPARSE_SYSTEMIMAGE_FLAG = "${@bb.utils.contains('IMAGE_FEATURES', 'vm', '', '-s', d)}"
+IMAGE_ROOTFS_EXT4 = "${WORKDIR}/rootfs-ext4"
+
+MACHINE_FSCONFIG_CONF_SEARCH_PATH ?= "${@':'.join('%s/conf/machine/fsconfig' % p for p in '${BBPATH}'.split(':'))}}"
+MACHINE_FSCONFIG_CONF_FULL_PATH = "${@machine_search(d.getVar('MACHINE_FSCONFIG_CONF'), d.getVar('MACHINE_FSCONFIG_CONF_SEARCH_PATH')) or ''}"
 
 create_symlink_systemd_ext4_mount_rootfs() {
+
     # Symlink ext4 mount files to systemd targets
     for entry in ${MACHINE_MNT_POINTS}; do
         mountname="${entry:1}"
         if [[ "$mountname" == "firmware" || "$mountname" == "bt_firmware" || "$mountname" == "dsp" ]] && \
            [[ "${COMBINED_FEATURES}" =~ .*qti-ab-boot.* ]] ; then
-            cp ${IMAGE_ROOTFS}/lib/systemd/system/${mountname}-mount-ext4.service ${IMAGE_ROOTFS}/lib/systemd/system/${mountname}-mount.service
-            ln -sf ${systemd_unitdir}/system/${mountname}-mount.service ${IMAGE_ROOTFS}/lib/systemd/system/local-fs.target.requires/${mountname}-mount.service
+            cp ${IMAGE_ROOTFS_EXT4}/lib/systemd/system/${mountname}-mount-ext4.service ${IMAGE_ROOTFS_EXT4}/lib/systemd/system/${mountname}-mount.service
+            ln -sf ${systemd_unitdir}/system/${mountname}-mount.service ${IMAGE_ROOTFS_EXT4}/lib/systemd/system/local-fs.target.requires/${mountname}-mount.service
         else
-            cp ${IMAGE_ROOTFS}/lib/systemd/system/${mountname}-ext4.mount  ${IMAGE_ROOTFS}/lib/systemd/system/${mountname}.mount
+            cp ${IMAGE_ROOTFS_EXT4}/lib/systemd/system/${mountname}-ext4.mount  ${IMAGE_ROOTFS_EXT4}/lib/systemd/system/${mountname}.mount
             if [[ "$mountname" == "$userfsdatadir" ]] ; then
-                ln -sf ${systemd_unitdir}/system/${mountname}.mount ${IMAGE_ROOTFS}/lib/systemd/system/local-fs.target.wants/${mountname}.mount
+                ln -sf ${systemd_unitdir}/system/${mountname}.mount ${IMAGE_ROOTFS_EXT4}/lib/systemd/system/local-fs.target.wants/${mountname}.mount
             elif [[ "$mountname" == "cache" ]] ; then
-                ln -sf ${systemd_unitdir}/system/${mountname}.mount ${IMAGE_ROOTFS}/lib/systemd/system/multi-user.target.wants/${mountname}.mount
+                ln -sf ${systemd_unitdir}/system/${mountname}.mount ${IMAGE_ROOTFS_EXT4}/lib/systemd/system/multi-user.target.wants/${mountname}.mount
             elif [[ "$mountname" == "persist" ]] ; then
-                ln -sf ${systemd_unitdir}/system/${mountname}.mount ${IMAGE_ROOTFS}/lib/systemd/system/local-fs.target.requires/${mountname}.mount
+                ln -sf ${systemd_unitdir}/system/${mountname}.mount ${IMAGE_ROOTFS_EXT4}/lib/systemd/system/local-fs.target.requires/${mountname}.mount
             else
-                ln -sf ${systemd_unitdir}/system/${mountname}.mount ${IMAGE_ROOTFS}/lib/systemd/system/local-fs.target.requires/${mountname}.mount
+                ln -sf ${systemd_unitdir}/system/${mountname}.mount ${IMAGE_ROOTFS_EXT4}/lib/systemd/system/local-fs.target.requires/${mountname}.mount
             fi
         fi
     done
 }
 
-do_makesystem[prefuncs] += "create_symlink_systemd_ext4_mount_rootfs"
+create_rootfs_ext4[cleandirs] = "${IMAGE_ROOTFS_EXT4}"
+python create_rootfs_ext4 () {
+    src_dir = d.getVar("IMAGE_ROOTFS")
+    dest_dir = d.getVar("IMAGE_ROOTFS_EXT4")
+    if os.path.isdir(src_dir):
+        oe.path.copyhardlinktree(src_dir, dest_dir)
+    else:
+        bb.error("rootfs is not generated")
+}
 
+do_makesystem[prefuncs] += "create_rootfs_ext4"
+do_makesystem[prefuncs] += "create_symlink_systemd_ext4_mount_rootfs"
 do_makesystem() {
     cp ${MACHINE_FSCONFIG_CONF_FULL_PATH} ${WORKDIR}/rootfs-fsconfig.conf
     # An ugly hack to mitigate a bug in libsparse were random
@@ -98,7 +113,7 @@ do_makesystem() {
                 -a / -b 4096 ${SPARSE_SYSTEMIMAGE_FLAG} \
                 -l ${SYSTEM_SIZE_EXT4} \
                 ${IMAGE_EXT4_SELINUX_OPTIONS} \
-                ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMIMAGE_TARGET} ${IMAGE_ROOTFS}
+                ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMIMAGE_TARGET} ${IMAGE_ROOTFS_EXT4}
 
         simg2img ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMIMAGE_TARGET} /dev/null || invalid_image=1
 
@@ -112,7 +127,7 @@ do_makesystem() {
     done
 
 }
-addtask do_makesystem after do_rootfs before do_image_complete
+addtask do_makesystem after do_image before do_image_complete
 
 ### Generate userdata.img ###
 do_makeuserdata[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
@@ -125,7 +140,7 @@ do_makeuserdata() {
                 ${IMAGE_ROOTFS}/${USERDATA_DIR}
 }
 
-addtask do_makeuserdata after do_rootfs before do_build
+addtask do_makeuserdata after do_image before do_build
 
 ################################################
 ############ Generate persist image ############
@@ -145,7 +160,7 @@ do_makepersist() {
     rm -rf ${IMAGE_ROOTFS}/persist/*
 }
 # It must be before do_makesystem to remove /persist
-addtask do_makepersist after do_rootfs before do_makesystem
+addtask do_makepersist after do_image before do_makesystem
 
 ################################################
 ############ Generate cache image ############
@@ -158,7 +173,7 @@ do_makecache() {
                 ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${CACHEIMAGE_TARGET}
 }
 
-addtask do_makecache after do_rootfs before do_makesystem
+addtask do_makecache after do_image before do_makesystem
 
 ################################################
 ############ Generate systemrw image ############
@@ -172,4 +187,4 @@ do_makesystemrw() {
                  ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMRWIMAGE_TARGET}
 }
 
-addtask do_makesystemrw after do_rootfs before do_makesystem
+addtask do_makesystemrw after do_image before do_makesystem
