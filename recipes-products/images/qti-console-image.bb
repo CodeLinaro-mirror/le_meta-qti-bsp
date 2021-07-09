@@ -27,7 +27,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
               packagegroup-qti-data \
               packagegroup-qti-dsp \
               packagegroup-qti-ss-mgr \
-              packagegroup-qti-wifi \
+              ${@bb.utils.contains('MACHINE_FEATURES', 'qti-wifi', 'packagegroup-qti-wifi', '', d)} \
               ${@bb.utils.contains('MACHINE_FEATURES', 'qca-wifi', 'packagegroup-qti-qcawifi', '', d)} \
               ${@bb.utils.contains('COMBINED_FEATURES', 'qti-bluetooth', "packagegroup-qti-bluetooth", "", d)} \
               packagegroup-startup-scripts \
