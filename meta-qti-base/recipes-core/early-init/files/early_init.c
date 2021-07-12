@@ -684,7 +684,7 @@ int main(int argc, char* argv[])
 
 	prepare_dir("sysfs");
 	//prepare_dir("debugfs");
-	//prepare_dir("xdg_runtime_dir");
+	prepare_dir("xdg_runtime_dir");
 	prepare_dir("shm");
 	prepare_dir("procfs");
 	prepare_dir("early_init_dir");
