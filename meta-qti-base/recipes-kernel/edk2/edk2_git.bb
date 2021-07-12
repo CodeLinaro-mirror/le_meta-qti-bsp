@@ -20,6 +20,8 @@ SRCREV = "${AUTOREV}"
 SRC_URI_append = " file://0001-avb-bring-up-keymaster-for-LV.patch  \
                    file://0002-avb-send-dummy-ROT-and-boot-state-to-keymaster-from-.patch "
 
+SRC_URI_append = " ${@bb.utils.contains('COMBINED_FEATURES', 'qti-lxc', ' file://0003-QcomModulePkg-Allow-lv-load-recovery-partition.patch ', '', d)}"
+
 INSANE_SKIP_${PN} = "arch"
 
 VBLE = "${@bb.utils.contains('DISTRO_FEATURES', 'vble','1', '0', d)}"
@@ -27,6 +29,8 @@ VBLE = "${@bb.utils.contains('DISTRO_FEATURES', 'vble','1', '0', d)}"
 VERITY_ENABLED = "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity','1', '0', d)}"
 
 EARLY_ETH = "${@bb.utils.contains('DISTRO_FEATURES', 'early-eth', '1', '0', d)}"
+
+FASTBOOTD_ENABLED = "${@bb.utils.contains('DISTRO_FEATURES', 'qti-lxc', '1', '0', d)}"
 
 EXTRA_OEMAKE = "'CLANG_BIN=${CLANG_BIN_PATH}' \
                 'CLANG_PREFIX=${STAGING_BINDIR_NATIVE}/${TARGET_SYS}/${TARGET_PREFIX}' \
@@ -41,6 +45,7 @@ EXTRA_OEMAKE = "'CLANG_BIN=${CLANG_BIN_PATH}' \
                 'EDK_TOOLS_PATH=${S}/BaseTools'\
                 'EARLY_ETH_ENABLED=${EARLY_ETH}'\
                 'TARGET_BOARD_TYPE_AUTO=1' \
+                'DYNAMIC_PARTITION_SUPPORT=${FASTBOOTD_ENABLED}' \
                 'UBSAN_UEFI_GCC_FLAG_ALIGNMENT=-Wno-misleading-indentation'"
 
 EXTRA_OEMAKE_append_qcs40x = " 'DISABLE_PARALLEL_DOWNLOAD_FLASH=1'"
