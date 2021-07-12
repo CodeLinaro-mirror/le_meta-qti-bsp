@@ -53,7 +53,7 @@ pkg_postinst_${PN} () {
 do_module_signing() {
     if [ "${BASEMACHINE}" = "sa81x5" ]; then
     if [ -f  ${STAGING_KERNEL_BUILDDIR}/certs/signing_key.pem ]; then
-	    bbnote "Signing ${PN} module ${i}"
+        bbnote "Signing ${PN} module ${i}"
         for i in $(find ${PKGDEST}/${PN}/${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/ -name "*.ko"); do
           ${STAGING_KERNEL_BUILDDIR}/scripts/sign-file sha512 ${STAGING_KERNEL_BUILDDIR}/certs/signing_key.pem ${STAGING_KERNEL_BUILDDIR}/certs/signing_key.x509 ${i}
         done
@@ -63,8 +63,8 @@ do_module_signing() {
     elif [ -f ${STAGING_KERNEL_BUILDDIR}/signing_key.priv ]; then
         bbnote "Signing ${PN} module"
         ${STAGING_KERNEL_DIR}/scripts/sign-file sha512 ${STAGING_KERNEL_BUILDDIR}/signing_key.priv \
-		${STAGING_KERNEL_BUILDDIR}/signing_key.x509 \
-		${PKGDEST}/${PROVIDES_NAME}/lib/modules/$${KERNEL_VERSION}/extra/emac_dwc_eqos.ko
+            ${STAGING_KERNEL_BUILDDIR}/signing_key.x509 \
+            ${PKGDEST}/${PROVIDES_NAME}/lib/modules/$${KERNEL_VERSION}/extra/emac_dwc_eqos.ko
     else
         bbnote "${PN} module is not being signed"
     fi

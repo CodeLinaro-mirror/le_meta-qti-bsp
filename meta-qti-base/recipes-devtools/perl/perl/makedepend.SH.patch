@@ -1,3 +1,5 @@
+Signed-off-by: Andrew Walker <andreww@codeaurora.org>
+
 diff -u a/makedepend.SH b/makedepend.SH
 --- a/makedepend.SH	2014-07-16 13:29:26.224361999 -0700
 +++ b/makedepend.SH	2014-07-16 13:30:05.456191012 -0700

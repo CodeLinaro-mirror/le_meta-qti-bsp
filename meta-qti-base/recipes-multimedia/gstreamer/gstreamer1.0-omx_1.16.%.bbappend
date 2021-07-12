@@ -15,8 +15,8 @@ S = "${WORKDIR}/gstreamer/qti-gst-omx"
 EXTRA_OEMESON = " \
                -Dtarget=qti \
                -Dheader_path=${STAGING_INCDIR}/mm-core \
-		-Dkernel_path=${STAGING_KERNEL_BUILDDIR}/usr/include \
-		-Dstaging_inc_path=${STAGING_INCDIR} \
+               -Dkernel_path=${STAGING_KERNEL_BUILDDIR}/usr/include \
+               -Dstaging_inc_path=${STAGING_INCDIR} \
               "
 EXTRA_OEMESON_append =" -Denable-target-vpu554=yes"
 
