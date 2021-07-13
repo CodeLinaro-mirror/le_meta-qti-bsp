@@ -114,36 +114,59 @@ python () {
 
 do_make_avb_image() {
     if ${@bb.utils.contains('DISTRO_FEATURES', 'avb', 'true', 'false', d)}; then
-        rootfs_size_kb=${IMAGE_ROOTFS_SIZE}
-        rootfs_size=$(expr $rootfs_size_kb \* 1024)
-        overhead_size_kb=$(expr $rootfs_size_kb / 5)
-        overhead_size=$(expr $overhead_size_kb \* 1024)
+        if [[ "${IMAGE_ROOTFS_SIZE}" -lt "1048576" ]]; then
+            # when rootfs size is less than 1G, cannot calculate an appropriate image size
+            # for hashtree footer on top of rootfs image, so disable avb.
+            echo "No need avb for core minimal image!"
+        else
+            rootfs_size_kb=${IMAGE_ROOTFS_SIZE}
+            rootfs_size=$(expr $rootfs_size_kb \* 1024)
+            overhead_size_kb=$(expr $rootfs_size_kb / 5)
+            overhead_size=$(expr $overhead_size_kb \* 1024)
+            if [ "$(expr $size_bytes % 4096)" != "0" ]; then
+                overhead_size=$(expr $(expr 4096 - $(expr $overhead_size % 4096)) + $overhead_size)
+            fi
+            rootfs_partition_size=$(expr $rootfs_size + $overhead_size)
 
-        if [ "$(expr $size_bytes % 4096)" != "0" ]; then
-            overhead_size=$(expr $(expr 4096 - $(expr $overhead_size % 4096)) + $overhead_size)
+            if ${@bb.utils.contains('DISTRO_FEATURES', 'q-hypervisor', 'true', 'false', d)}; then
+                #For lvgvm avb2.0, add hashtree for system image and generate vbmeta.img.
+                avbtool add_hashtree_footer \
+                    --image ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
+                    --partition_size ${rootfs_partition_size} \
+                    --partition_name system  \
+                    --algorithm SHA256_RSA4096 \
+                    --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/vbgvm_private_key_4096.pem \
+                    --do_not_generate_fec
+                avbtool make_vbmeta_image \
+                    --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET} \
+                    --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
+                    --setup_rootfs_from_kernel ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
+                    --algorithm SHA256_RSA4096 \
+                    --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/vbgvm_private_key_4096.pem \
+                    --rollback_index 0 \
+                    --output ${DEPLOY_DIR_IMAGE}/${VBMETAIMAGE_TARGET}
+            else
+                #For lv avb2.0, add hashtree for system image and generate vbmeta.img.
+                avbtool add_hashtree_footer \
+                    --image ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
+                    --partition_size ${rootfs_partition_size} \
+                    --partition_name system  \
+                    --algorithm SHA256_RSA4096 \
+                    --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/testkey_rsa4096.pem \
+                    --rollback_index 0 \
+                    --do_not_generate_fec
+
+                avbtool make_vbmeta_image \
+                    --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET} \
+                    --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${PRODUCT}-dtbo.img \
+                    --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
+                    --setup_rootfs_from_kernel ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
+                    --algorithm SHA256_RSA4096 \
+                    --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/testkey_rsa4096.pem \
+                    --rollback_index 0 \
+                    --output ${DEPLOY_DIR_IMAGE}/${VBMETAIMAGE_TARGET}
+            fi
         fi
-
-    rootfs_partition_size=$(expr $rootfs_size + $overhead_size)
-    # add hashree for system image when enable avb.
-    avbtool add_hashtree_footer \
-        --image ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
-        --partition_size ${rootfs_partition_size} \
-        --partition_name system  \
-        --algorithm SHA256_RSA4096 \
-        --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/testkey_rsa4096.pem \
-        --rollback_index 0 \
-        --do_not_generate_fec
-
-    # generate vbmeta.img
-    avbtool make_vbmeta_image \
-        --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET} \
-        --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${PRODUCT}-dtbo.img \
-        --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
-        --setup_rootfs_from_kernel ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
-        --algorithm SHA256_RSA4096 \
-        --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/testkey_rsa4096.pem \
-        --rollback_index 0 \
-        --output ${DEPLOY_DIR_IMAGE}/${VBMETAIMAGE_TARGET}
     fi
 }
 
