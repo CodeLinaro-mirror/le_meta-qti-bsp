@@ -14,7 +14,14 @@ inherit qimage
 IMAGE_FEATURES += "ssh-server-openssh"
 
 CORE_IMAGE_EXTRA_INSTALL += "\
+              codec2 \
+              media \
+              media-codec2 \
+              media-external \
+              gtest \
+              libhardware \
               chrony \
+              alsa-utils \
               e2fsprogs \
               e2fsprogs-e2fsck \
               e2fsprogs-mke2fs \
@@ -26,6 +33,9 @@ CORE_IMAGE_EXTRA_INSTALL += "\
               packagegroup-qti-core \
               packagegroup-qti-data \
               packagegroup-qti-dsp \
+              packagegroup-qti-audio \
+              packagegroup-qti-display \
+              packagegroup-qti-gfx \
               packagegroup-qti-ss-mgr \
               ${@bb.utils.contains('COMBINED_FEATURES', 'qti-wifi', "packagegroup-qti-wifi", "", d)} \
               ${@bb.utils.contains('COMBINED_FEATURES', 'qti-bluetooth', "packagegroup-qti-bluetooth", "", d)} \
