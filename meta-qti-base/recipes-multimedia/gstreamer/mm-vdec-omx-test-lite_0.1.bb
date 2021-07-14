@@ -3,10 +3,7 @@ SECTION = "mm-vdec-omx-test-lite"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
-DEPENDS += "glib-2.0"
-DEPENDS += "libion libcutils"
-DEPENDS += "weston"
-DEPENDS += "media"
+DEPENDS += "glib-2.0 libion libcutils linux-msm-headers media weston"
 SRCREV = "${AUTOREV}"
 
 SRC_URI = "${PATH_TO_REPO}/gstreamer/gst-plugins-qti-oss/.git;protocol=${PROTO};destsuffix=gstreamer/gst-plugins-qti-oss;usehead=1"
@@ -16,25 +13,23 @@ S = "${WORKDIR}/gstreamer/gst-plugins-qti-oss/omx-lite-app/mm-vdec-omx-test"
 
 inherit cmake
 
-do_configure[depends] += "virtual/kernel:do_shared_workdir"
+CFLAGS += "-include stdbool.h \
+           -include stdint.h \
+           -include signal.h \
+           -include stdio.h"
 
-CFLAGS += "-include stdbool.h"
-CFLAGS += "-include stdint.h"
-CFLAGS += "-include signal.h"
-CFLAGS += "-include stdio.h"
-
-CXXFLAGS += "${CFLAGS}"
-CXXFLAGS += "-I${STAGING_INCDIR}"
-CXXFLAGS += "-I${STAGING_INCDIR}/drm"
-CXXFLAGS += "-I${STAGING_INCDIR}/EGL"
-CXXFLAGS += "-I${STAGING_INCDIR}/GLES2"
-CXXFLAGS += "-I${STAGING_INCDIR}/glib-2.0"
-CXXFLAGS += "-I${STAGING_LIBDIR}/glib-2.0/include"
-CXXFLAGS += "-I${STAGING_LIBDIR}/glib-2.0/glib"
-CXXFLAGS += "-I${STAGING_INCDIR}/c++"
-CXXFLAGS += "-I${STAGING_INCDIR}/c++/${TARGET_SYS}"
-CXXFLAGS += "-I${STAGING_INCDIR}/common/inc"
-CXXFLAGS += "-I${STAGING_INCDIR}/mm-core"
-CXXFLAGS += "-I${STAGING_KERNEL_BUILDDIR}/usr/include"
-CXXFLAGS += "-I${STAGING_INCDIR}/disp-commonsys-intf/display"
-CXXFLAGS += "-I${STAGING_INCDIR}/ion_headers"
+CXXFLAGS += "${CFLAGS} \
+             -I${STAGING_INCDIR} \
+             -I${STAGING_INCDIR}/drm \
+             -I${STAGING_INCDIR}/EGL \
+             -I${STAGING_INCDIR}/GLES2 \
+             -I${STAGING_INCDIR}/glib-2.0 \
+             -I${STAGING_LIBDIR}/glib-2.0/include \
+             -I${STAGING_LIBDIR}/glib-2.0/glib \
+             -I${STAGING_INCDIR}/c++ \
+             -I${STAGING_INCDIR}/c++/${TARGET_SYS} \
+             -I${STAGING_INCDIR}/common/inc \
+             -I${STAGING_INCDIR}/mm-core \
+             -I${STAGING_INCDIR}/linux-msm \
+             -I${STAGING_INCDIR}/disp-commonsys-intf/display \
+             -I${STAGING_INCDIR}/ion_headers"

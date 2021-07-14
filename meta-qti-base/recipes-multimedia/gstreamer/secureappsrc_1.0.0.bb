@@ -3,11 +3,12 @@ SECTION = "multimedia"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/BSD-3-Clause;md5=550794465ba0ec5312d6919e203a55f9"
 DEPENDS = "glib-2.0"
-DEPENDS += "media"
 DEPENDS += "gstreamer1.0 \
             gstreamer1.0-plugins-base \
+            linux-msm-headers \
+            media \
+            virtual/libc \
            "
-DEPENDS += "virtual/libc"
 SRCREV = "${AUTOREV}"
 PR = "r1"
 
@@ -25,9 +26,7 @@ CFLAGS += "-I${STAGING_INCDIR} \
            -I${STAGING_INCDIR}/glib-2.0/glib \
            -I${STAGING_INCDIR}/c++ \
            -I${STAGING_INCDIR}/c++/${TARGET_SYS} \
-           -I${STAGING_INCDIR}/gstreamer-1.0"
-CFLAGS += "-I${STAGING_KERNEL_BUILDDIR}/usr/include"
-CFLAGS += "-I${STAGING_INCDIR}/ion_headers"
-CFLAGS += "-I${STAGING_INCDIR}/mm-core/"
-
-do_configure[depends] += "virtual/kernel:do_shared_workdir"
+           -I${STAGING_INCDIR}/gstreamer-1.0 \
+           -I${STAGING_INCDIR}/linux-msm \
+           -I${STAGING_INCDIR}/ion_headers \
+           -I${STAGING_INCDIR}/mm-core/"
