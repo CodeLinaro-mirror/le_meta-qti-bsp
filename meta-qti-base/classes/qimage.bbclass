@@ -155,6 +155,10 @@ do_make_avb_image() {
 python do_make_vendorbootimg () {
     import subprocess
 
+    Product = d.getVar('PRODUCT', True)
+    if (Product == "qtiquingvm") or (Product == "qtiquingvm-headless") or (Product == "sa81x5bg"):
+        return
+
     output = d.getVar('DEPLOY_DIR_IMAGE', True) + "/" + d.getVar('VENDORBOOTIMAGE_TARGET', True)
 
     cmd = "dd if=/dev/zero of=%s bs=1M count=96" % output
