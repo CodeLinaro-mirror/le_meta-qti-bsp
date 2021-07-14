@@ -34,17 +34,8 @@ TARGET_CPPFLAGS += "-I${STAGING_INCDIR}/qcom/display"
 TARGET_CPPFLAGS += "-I${STAGING_INCDIR}/sdm"
 TARGET_CPPFLAGS += "-I${STAGING_INCDIR}/sdm/core"
 
-EXTRA_OECONF_append_qemux86 = " \
-        WESTON_NATIVE_BACKEND=fbdev-backend.so \
-        "
-EXTRA_OECONF_append_qemux86-64 = " \
-        WESTON_NATIVE_BACKEND=fbdev-backend.so \
-        "
-
-EXTRA_OECONF_append = "${@bb.utils.contains("DISTRO_FEATURES", "early-ethernet", " --enable-early-boot", "" ,d)}"
-
 #Overwrite Packageconfig
-PACKAGECONFIG = "${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'kms fbdev wayland egl', '', d)} \
+PACKAGECONFIG = "${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'kms fbdev wayland egl clients', '', d)} \
                  ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11', '', d)} \
                  ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'launch', '', d)} \
                  ${@bb.utils.contains('DISTRO_FEATURES', 'early_init', 'early', '', d)} \
@@ -54,11 +45,19 @@ PACKAGECONFIG = "${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'kms fbdev w
                  shell-fullscreen \
                  shell-ivi \
                 "
-PACKAGECONFIG_append = "clients"
 # pam
 PACKAGECONFIG[pam] = ",,libpam"
 # early-init
 PACKAGECONFIG[early] = "-Denable-early-boot=true,-Denable-early-boot=false"
+
+EXTRA_OECONF_append_qemux86 = " \
+        WESTON_NATIVE_BACKEND=fbdev-backend.so \
+        "
+EXTRA_OECONF_append_qemux86-64 = " \
+        WESTON_NATIVE_BACKEND=fbdev-backend.so \
+        "
+
+EXTRA_OECONF_append = "${@bb.utils.contains("DISTRO_FEATURES", "early-ethernet", " --enable-early-boot", "" ,d)}"
 
 do_configure[depends] += "virtual/kernel:do_shared_workdir"
 do_install_append() {
