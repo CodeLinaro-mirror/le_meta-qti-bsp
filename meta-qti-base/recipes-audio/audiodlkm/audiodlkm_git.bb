@@ -4,12 +4,10 @@ HOMEPAGE = "https://www.codeaurora.org"
 LICENSE = "GPL-2.0"
 LIC_FILES_CHKSUM = "file://NOTICE;md5=689b0a45875711dc09b94e4b6524c3cd"
 DEPENDS += "virtual/kernel"
-SRCREV = "${AUTOREV}"
-PR = "r0"
 
-SRC_URI  = "${PATH_TO_REPO}/vendor/qcom/opensource/audio-kernel/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/audio-kernel;usehead=1"
+SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/audio-kernel/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/audio-kernel;usehead=1"
 SRC_URI_append = " file://audio_load.conf"
-
+SRCREV = "${AUTOREV}"
 S = "${WORKDIR}/vendor/qcom/opensource/audio-kernel"
 
 inherit module module-sign qperf
@@ -52,6 +50,10 @@ process_headers() {
         ${STAGING_KERNEL_DIR}/scripts/headers_install.sh $1/$(basename $name) $2/$(basename $name)
     done
 }
+
+# install subdirectories under ${sysconfdir}
+FILES_${PN} += "${sysconfdir}/*"
+FILES_${PN} += "${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/*"
 
 # The inherit of module.bbclass will automatically name module packages with
 # kernel-module-" prefix as required by the oe-core build environment. Also it
@@ -98,9 +100,5 @@ RPROVIDES_${PN} += "${@'kernel-module-rx-macro-dlkm-${KERNEL_VERSION}'.replace('
 RPROVIDES_${PN} += "${@'kernel-module-tx-macro-dlkm-${KERNEL_VERSION}'.replace('_', '-')}"
 RPROVIDES_${PN} += "${@'kernel-module-wcd937x-dlkm-${KERNEL_VERSION}'.replace('_', '-')}"
 RPROVIDES_${PN} += "${@'kernel-module-wcd937x-slave-dlkm-${KERNEL_VERSION}'.replace('_', '-')}"
-
-# install subdirectories under ${sysconfdir}
-FILES_${PN} += "${sysconfdir}/*"
-FILES_${PN} += "${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/*"
 
 KERNEL_CC += "-Wno-error=maybe-uninitialized"
