@@ -18,6 +18,7 @@ SRC_URI_append += " file://cache-ubi.mount"
 SRC_URI_append += " file://persist-ubi.mount"
 SRC_URI_append += " file://data-ubi.mount"
 SRC_URI_append += " file://systemrw-ubi.mount"
+SRC_URI_append += " file://firmware-ubi.mount"
 SRC_URI_append += " file://firmware-ubi-mount.sh"
 SRC_URI_append += " file://firmware-ubi-mount.service"
 SRC_URI_append += " file://dsp-ubi-mount.sh"
@@ -155,8 +156,11 @@ do_install_append () {
                else
                     install -m 0744 ${WORKDIR}/firmware-ubi-mount.sh ${D}${sysconfdir}/initscripts/firmware-ubi-mount.sh
                fi
+               install -m 0644 ${WORKDIR}/firmware-ubi.mount ${D}${systemd_unitdir}/system/firmware.mount
                install -m 0644 ${WORKDIR}/firmware-ubi-mount.service ${D}${systemd_unitdir}/system/firmware-mount.service
                install -m 0644 ${WORKDIR}/firmware-ubi-mount.service ${D}${systemd_unitdir}/system/fw-ubi-mount.service
+               ln -sf ${systemd_unitdir}/system/firmware.mount \
+                           ${D}${systemd_unitdir}/system/local-fs.target.requires/firmware.mount
                ln -sf ${systemd_unitdir}/system/firmware-mount.service \
                            ${D}${systemd_unitdir}/system/local-fs.target.requires/firmware-mount.service
             fi

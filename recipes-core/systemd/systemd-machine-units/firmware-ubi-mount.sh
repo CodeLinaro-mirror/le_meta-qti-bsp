@@ -29,7 +29,7 @@
 FindAndMountUBI () {
    partition=$1
    dir=$2
-   extra_opts=$3
+   mtd_file=/proc/mtd
 
    mtd_block_number=`cat $mtd_file | grep -i $partition | sed 's/^mtd//' | awk -F ':' '{print $1}'`
    echo "MTD : Detected block device : $dir for $partition"
@@ -42,7 +42,6 @@ FindAndMountUBI () {
         if [ -c $device ]
         then
             test -x /sbin/restorecon && /sbin/restorecon $device
-            mount -t ubifs /dev/ubi1_0 $dir -o bulk_read$extra_opts
             break
         else
             sleep 0.010
@@ -50,12 +49,6 @@ FindAndMountUBI () {
     done
 }
 
-mtd_file=/proc/mtd
-if [ -x /sbin/restorecon ]; then
-    firmware_selinux_opt=",context=system_u:object_r:firmware_t:s0"
-else
-    firmware_selinux_opt=""
-fi
-eval FindAndMountUBI modem /firmware ,noexec,nodev,ro$firmware_selinux_opt
+eval FindAndMountUBI modem /firmware
 
 exit 0
