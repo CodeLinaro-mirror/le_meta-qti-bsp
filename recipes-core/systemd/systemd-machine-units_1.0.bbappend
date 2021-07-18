@@ -35,6 +35,8 @@ SRC_URI_append += " file://persistfactory-mount.sh"
 SRC_URI_append += " file://persistfactory-mount.service"
 SRC_URI_append += " file://persistfactory-ubi-mount.sh"
 SRC_URI_append += " file://persistfactory-ubi-mount.service"
+SRC_URI_append += " file://overlay_selinuxrw-workdir.service"
+SRC_URI_append += " file://overlay_selinuxrw-workdir.sh"
 
 SRC_URI_append_batcam += " file://pre_hibernate.sh"
 SRC_URI_append_batcam += " file://post_hibernate.sh"
@@ -256,11 +258,18 @@ do_install_append () {
     done
 }
 
+SYSTEMD_SERVICE_${PN} += "${@bb.utils.contains('DISTRO_FEATURES','nad-prod',' overlay_selinuxrw-workdir.service','',d)}"
+
 # Service for ab-boot support.
 do_install_append() {
     install -d ${D}${systemd_unitdir}/system
     if ${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'true', 'false', d)}; then
         install -m 0644 ${WORKDIR}/set-slotsuffix.service ${D}${systemd_unitdir}/system
+    fi
+
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'nad-prod', 'true', 'false', d)}; then
+        install -m 0644 ${WORKDIR}/overlay_selinuxrw-workdir.service ${D}${systemd_unitdir}/system/overlay_selinuxrw-workdir.service
+        install -m 0744 ${WORKDIR}/overlay_selinuxrw-workdir.sh ${D}${sysconfdir}/initscripts/overlay_selinuxrw-workdir.sh
     fi
 }
 
