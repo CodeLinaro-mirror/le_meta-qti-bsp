@@ -19,6 +19,7 @@ RDEPENDS_${PN} = " \
         gstreamer1.0-omx \
         gstreamer1.0-plugins-qscreencapsrc \
         gstreamer1.0-plugins-qeavb \
+        gstreamer1.0-plugins-qvblend \
         mm-vdec-omx-test-lite \
         mm-venc-omx-test-lite \
         gdk-pixbuf-loader-bmp \
