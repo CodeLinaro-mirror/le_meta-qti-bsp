@@ -163,6 +163,7 @@ static inline void mkdirs(char* p, mode_t mode)
 	if (str[0] != '/')
 		return;
 
+	len = strlen(str);
 	if (str[len - 1] == '/') {
 		len--;
 		str[len] = '\0';
@@ -301,7 +302,7 @@ static inline char *strstrip(char *s) {
 // if fail, fallback to root user
 static void inline enforce_user(char* username)
 {
-	return 0;
+	return;
 	/* struct passwd *pw; */
 
 	/* pw = getpwnam(username); */
@@ -421,7 +422,10 @@ static inline int parse_line(char* p)
 				*t = '\0';
 				p++;
 				app_launcher.appname= strdup(p);
-				printf("appname is %s \r\n", app_launcher.appname);
+				if(app_launcher.appname != NULL)
+					printf("appname is %s \r\n", app_launcher.appname);
+				else
+					printf("parse appname failed with %s\n", strerror(errno));
 			}
 			break;
 		case 'c':/* cmd */
@@ -449,25 +453,37 @@ static inline int parse_line(char* p)
 		case 'l':/* applog */
 			if (0 == strncmp(p + 1, "og", strlen("og")) && 0 == find_rvalue(&p)) {
 				app_launcher.applog = strdup(p);
-				printf("applog is %s", app_launcher.applog);
+				if(app_launcher.applog != NULL)
+					printf("applog is %s", app_launcher.applog);
+				else
+					printf("parse applog failed with %s\n", strerror(errno));
 			}
 			break;
 		case 'g':/* gpio */
 			if (0 == strncmp(p + 1, "pio", strlen("pio")) && 0 == find_rvalue(&p)) {
 				app_launcher.gpio = strdup(p);
-				printf("gpio is %s", app_launcher.gpio);
+				if(app_launcher.gpio != NULL)
+					printf("gpio is %s", app_launcher.gpio);
+				else
+					printf("parse gpio failed with %s\n", strerror(errno));
 			}
 			break;
 		case 'w':/* wait */
 			if (0 == strncmp(p + 1, "ait", strlen("ait")) && 0 == find_rvalue(&p)) {
 				app_launcher.wait = strdup(p);
-				printf("wait is %s", app_launcher.wait);
+				if(app_launcher.wait != NULL)
+					printf("wait is %s", app_launcher.wait);
+				else
+					printf("parse wait failed with %s\n", strerror(errno));
 			}
 			break;
 		case 'p':/* pidfile */
 			if (0 == strncmp(p + 1, "idfile", strlen("idfile")) && 0 == find_rvalue(&p)) {
 				app_launcher.pidfile = strdup(p);
-				printf("pidfile is %s", app_launcher.pidfile);
+				if(app_launcher.pidfile != NULL)
+					printf("pidfile is %s", app_launcher.pidfile);
+				else
+					printf("parse pidfile failed with %s\n", strerror(errno));
 			}
 			if (0 == strncmp(p + 1, "riority", strlen("riority")) && 0 == find_rvalue(&p)) {
 				app_launcher.priority = atoi(p);
@@ -491,7 +507,10 @@ static inline int parse_line(char* p)
 		case 'u':
 			if (0 == strncmp(p + 1, "ser", strlen("ser")) && 0 == find_rvalue(&p)) {
 				app_launcher.username = strdup(p);
-				printf("username is %s", app_launcher.username);
+				if(app_launcher.username != NULL)
+					printf("username is %s", app_launcher.username);
+				else
+					printf("parse username failed with %s\n", strerror(errno));
 			}
 			break;
 		case '<':/* end */
@@ -536,7 +555,7 @@ static inline int parse_line(char* p)
 					struct sched_param sp;
 					memset( &sp, 0, sizeof(sp) );
 					sp.sched_priority = app_launcher.priority;
-					if (0 != sched_setscheduler( 0, SCHED_FIFO, &sp))
+					if (0 != sched_setscheduler( getpid(), SCHED_FIFO, &sp))
 						printf("sched_setparam failed %d %s\r\n", app_launcher.priority, strerror(errno));
 				}
 
@@ -701,7 +720,7 @@ int main(int argc, char* argv[])
 	safe_close(fd);
 
 	f = fopen(DEFAULT_CONF, "re");
-	if (f < 0) {
+	if (f == NULL) {
 		perror("open early_init.conf failed.\r\n");
 		return -1;
 	}
