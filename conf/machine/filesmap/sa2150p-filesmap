@@ -27,21 +27,16 @@
 
 # filename              partition
 
-NON-HLOS.ubi            modem
 NON-HLOS.bin            /dev/block/bootdevice/by-name/modem
 
-sbl1.mbn                /dev/block/bootdevice/by-name/sbl1
 tz.mbn                  /dev/block/bootdevice/by-name/tz
 rpm.mbn                 /dev/block/bootdevice/by-name/rpm
-emmc_appsboot.mbn       /dev/block/bootdevice/by-name/aboot
 dspso.bin              /dev/block/bootdevice/by-name/dsp
 cmnlib.mbn              /dev/block/bootdevice/by-name/cmnlib
 cmnlib64.mbn            /dev/block/bootdevice/by-name/cmnlib64
 devcfg.mbn              /dev/block/bootdevice/by-name/devcfg
 keymaster.mbn           /dev/block/bootdevice/by-name/keymaster
 keymaster64.mbn         /dev/block/bootdevice/by-name/keymaster64
-lksecapp.mbn            /dev/block/bootdevice/by-name/lksecapp
-sec.dat                 /dev/block/bootdevice/by-name/sec
 uefi_sec.mbn            /dev/block/bootdevice/by-name/uefisecapp
 BTFM.bin                /dev/block/bootdevice/by-name/bluetooth
 abl.elf                 /dev/block/bootdevice/by-name/abl
@@ -50,15 +45,12 @@ pmic.elf                /dev/block/bootdevice/by-name/pmic
 
 # filename + .bak       backup partition
 
-sbl1.mbn.bak            /dev/block/bootdevice/by-name/sbl1bak
 tz.mbn.bak              /dev/block/bootdevice/by-name/tzbak
 rpm.mbn.bak             /dev/block/bootdevice/by-name/rpmbak
-emmc_appsboot.mbn.bak   /dev/block/bootdevice/by-name/abootbak
 cmnlib.mbn.bak          /dev/block/bootdevice/by-name/cmnlibbak
 cmnlib64.mbn.bak        /dev/block/bootdevice/by-name/cmnlib64bak
 devcfg.mbn.bak          /dev/block/bootdevice/by-name/devcfgbak
 keymaster.mbn.bak       /dev/block/bootdevice/by-name/keymasterbak
-lksecapp.mbn.bak        /dev/block/bootdevice/by-name/lksecappbak
 
 # For multiple file firmware images that differ from *.mbn and *.bin
 # you can specify filename.* to direct all files to the same location.
@@ -69,11 +61,16 @@ lksecapp.mbn.bak        /dev/block/bootdevice/by-name/lksecappbak
 
 # filename              location
 
-mba.*                   /firmware/image
-modem.*                 /firmware/image
-bdwlan30.bin            /firmware/image
-nvm_tlv_3.0.bin         /firmware/image
-otp30.bin               /firmware/image
-qwlan30.bin             /firmware/image
-rampatch_tlv_3.0.tlv    /firmware/image
-utf30.bin               /firmware/image
+adsp.*               /firmware/image/
+cdsp.*               /firmware/image/
+cmnlib.*             /firmware/image/
+cmnlib64.*           /firmware/image/
+gptest.*             /firmware/image/
+haventkn.mbn         /firmware/image/
+licmngr.*            /firmware/image/
+rtic.*               /firmware/image/
+rtic_tst.*           /firmware/image/
+securemm.*           /firmware/image/
+smplap32.*           /firmware/image/
+smplap64.*           /firmware/image/
+*.jsn                /firmware/image/

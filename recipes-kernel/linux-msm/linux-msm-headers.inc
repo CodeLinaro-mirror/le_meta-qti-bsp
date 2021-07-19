@@ -1,6 +1,6 @@
 inherit kernel-arch pkgconfig multilib_header
 
-SUMMARY = "CAF Linux Kernel Headers"
+SUMMARY = "MSM Linux Kernel Headers"
 DESCRIPTION = "Installs MSM kernel headers required to build userspace. \
 These headers are installed in ${includedir}/linux-msm path."
 LICENSE = "GPLv2.0-with-linux-syscall-note"
@@ -9,12 +9,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI   =  "file://kernel"
 
-LINUXMSM_VERSION = "${@d.getVar('PREFERRED_VERSION_linux-msm', True)}"
-PV = "${LINUXMSM_VERSION}"
-
 DEPENDS += "rsync-native"
 
-S  =  "${WORKDIR}/kernel/msm-${LINUXMSM_VERSION}"
+S  =  "${WORKDIR}/kernel/msm-${PV}"
 
 do_configure[noexec] = "1"
 do_compile[noexec] = "1"
