@@ -34,6 +34,8 @@ EXTRA_OEMAKE_append_sa8195 = " WLAN_CFG_OVERRIDE="CONFIG_WLAN_MAX_VDEVS=4 CONFIG
 EXTRA_OEMAKE_append_sa8155 = " WLAN_CFG_OVERRIDE="CONFIG_WLAN_MAX_VDEVS=4 CONFIG_QCACLD_FEATURE_BTC_CHAIN_MODE=y CONFIG_FEATURE_COEX=y CONFIG_QCACLD_FEATURE_COEX_CONFIG=y""
 EXTRA_OEMAKE_append_sa81x5 = " WLAN_CFG_OVERRIDE="CONFIG_WLAN_MAX_VDEVS=4 CONFIG_QCACLD_FEATURE_BTC_CHAIN_MODE=y CONFIG_FEATURE_COEX=y CONFIG_QCACLD_FEATURE_COEX_CONFIG=y CONFIG_WLAN_FEATURE_LINK_LAYER_STATS=y""
 
+SYSTEMD_SERVICE_${PN} = "init_qti_wlan_auto.service"
+
 do_install() {
     module_do_install
 
@@ -71,3 +73,8 @@ do_install() {
         install -m 0644 ${WORKDIR}/init_qti_wlan_auto.service -D ${D}${systemd_unitdir}/system/init_qti_wlan_auto.service
     fi
 }
+
+FILES_${PN} += "\
+    ${bindir}/init.qti.wlan_on.sh \
+    ${bindir}/init.qti.wlan_off.sh \
+"

@@ -30,6 +30,8 @@ EXTRA_OEMAKE += "CONFIG_QCA_CLD_WLAN_PROFILE=qca6390"
 EXTRA_OEMAKE += "DYNAMIC_SINGLE_CHIP=${_MODNAME}"
 EXTRA_OEMAKE += "MODNAME=${_MODNAME}"
 
+SYSTEMD_SERVICE_${PN} = "init_qti_wlan_auto.service"
+
 do_install() {
     module_do_install
 
@@ -61,3 +63,8 @@ do_install() {
         install -m 0644 ${WORKDIR}/init_qti_wlan_auto.service -D ${D}${systemd_unitdir}/system/init_qti_wlan_auto.service
     fi
 }
+
+FILES_${PN} += "\
+    ${bindir}/init.qti.wlan_on.sh \
+    ${bindir}/init.qti.wlan_off.sh \
+"
