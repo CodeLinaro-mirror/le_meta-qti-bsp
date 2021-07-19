@@ -31,6 +31,8 @@ CXXFLAGS += "-I${STAGING_INCDIR} \
              -I${STAGING_INCDIR}/c++/ \
              -I${STAGING_INCDIR}/c++/${TARGET_SYS}"
 
+EXTRA_OECMAKE += "-DAGL_LINUX:BOOL=ON"
+
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 SOLIBS = ".so"
