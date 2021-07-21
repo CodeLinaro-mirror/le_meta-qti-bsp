@@ -42,6 +42,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
               ${@bb.utils.contains('COMBINED_FEATURES', 'qti-bluetooth', "packagegroup-qti-bluetooth", "", d)} \
               packagegroup-startup-scripts \
               systemd-machine-units \
+              ${@bb.utils.contains("DISTRO_FEATURES", "librealsense2", "librealsense2 librealsense2-tests", "", d)} \
               ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
               packagegroup-qti-sensors-see \
 "
