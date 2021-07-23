@@ -165,10 +165,10 @@ static inline void mkdirs(char* p, mode_t mode)
 
 	strlcpy(str, p, sizeof(str));
 
-	if (str[0] != '/')
+	len = strlen(str);
+	if ((str[0] != '/') || (len < 1))
 		return;
 
-	len = strlen(str);
 	if (str[len - 1] == '/') {
 		len--;
 		str[len] = '\0';
