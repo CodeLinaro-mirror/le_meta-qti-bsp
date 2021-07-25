@@ -49,7 +49,7 @@ DISTRO_FEATURES_append = " ipa3"
 DISTRO_FEATURES_append = " vulkan"
 
 # WLAN
-DISTRO_FEATURES_append = " wifi"
+DISTRO_FEATURES_append = " qti-wlan wifi"
 
 # Support kdump
 #DISTRO_FEATURES_append = " kdump-support"
