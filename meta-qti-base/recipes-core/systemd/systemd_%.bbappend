@@ -1,7 +1,7 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 SRC_URI += " file://0001-systemd-add-slotselect-support-in-fstab.patch "
 #SRC_URI += " file://0033-systemd-Make-root-s-home-directory-configurable-2.patch "
-
+SRC_URI += " ${@bb.utils.contains('DISTRO_FEATURES', 'early_init', 'file://0034-systemd-add-handover-support-for-early-service.patch', '', d)}"
 
 # Remove backlight ldconfig
 #   * backlight - Loads/Saves Screen Backlight Brightness, not required.
@@ -24,6 +24,12 @@ FULL_OPTIMIZATION = "-O2 -fexpensive-optimizations -frename-registers -fomit-fra
 
 do_patch_append () {
     bb.build.exec_func('do_fix_root_home', d)
+    if bb.utils.contains('DISTRO_FEATURES','qti-lxc','True','False',d)=="True":
+        bb.build.exec_func('do_fix_suspend', d)
+}
+# workaroud for suspend, suspend is not allowd in systemd-sleep, LA will trigger suspend
+do_fix_suspend () {
+    sed -i 's/#AllowSuspend=yes/AllowSuspend=no/' ${S}/src/sleep/sleep.conf
 }
 
 do_fix_root_home () {
@@ -40,5 +46,15 @@ do_install_append () {
 
     # Remove orignal 60-persistent-v4l.rules which is not applicable for QTI video
     rm ${D}/lib/udev/rules.d/60-persistent-v4l.rules
+
+    # When enable early init, weston no longer trigger login operation,so XDG_RUNTIME_DIR won't be
+    # created unless we adb shell/ssh to login to the board. this will cause issue when we try to
+    # pass XDG_RUNTIME_DIR to container during bootup.
+    # Trigger a login operations for this case.
+    # if lxc can support dynamic mount injection fuction later, this part can be removed.
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'early_init', 'true', 'false', d)}; then
+        sed -i  's/^ExecStart.*/ExecStart=-\/sbin\/agetty --autologin root --noclear %I 38400 linux/g' ${D}/lib/systemd/system/getty@.service
+        sed -i  's/^Type=.*/Type=simple/g' ${D}/lib/systemd/system/getty@.service
+    fi
 }
 

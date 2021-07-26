@@ -10,8 +10,8 @@ IMAGE_INSTALL += "libgomp libgomp-dev libgomp-staticdev"
 TOOLCHAIN_TARGET_TASK_append = " kernel-devsrc"
 
 # Add kdump support
-do_rootfs[depends] += "${@bb.utils.contains('MACHINE_FEATURES', 'kdump-support', 'machine-kdump-image:do_image_complete', '', d)}"
+do_rootfs[depends] += "${@bb.utils.contains('MACHINE_FEATURES', 'kdump-support', 'initramfs-debug-image:do_image_complete', '', d)}"
 ROOTFS_POSTPROCESS_COMMAND_prepend = "${@bb.utils.contains('MACHINE_FEATURES', 'kdump-support', ' add_kdump_ramdisk; ', '', d)}"
 add_kdump_ramdisk() {
-    cp ${DEPLOY_DIR_IMAGE}/machine-kdump-image-${PRODUCT}.cpio.gz ${IMAGE_ROOTFS}/boot/kdump-ramdisk.cpio.gz
+    cp ${DEPLOY_DIR_IMAGE}/initramfs-debug-image-${PRODUCT}.cpio.gz ${IMAGE_ROOTFS}/boot/capture-kernel-initramfs.cpio.gz
 }
