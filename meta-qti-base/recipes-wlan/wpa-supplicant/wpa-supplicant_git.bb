@@ -1,18 +1,18 @@
-SUMMARY = "WPA Supplicant"
-DESCRIPTION = "Wi-Fi Protected Access(WPA) Supplicant"
+SUMMARY = "Client for Wi-Fi Protected Access (WPA)"
+DESCRIPTION = "WPA supplicant client used for WLAN STA/AP/P2P/WPS such feature test"
 HOMEPAGE = "https://www.codeaurora.org/"
 LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://${WORKDIR}/external/wpa_supplicant_8/COPYING;md5=279b4f5abb9c153c285221855ddb78cc"
-DEPENDS += "dbus libnl openssl"
-SRCREV = "${AUTOREV}"
-PR = "r5.2"
 
+DEPENDS += "dbus libnl openssl"
 SRC_URI = "${PATH_TO_REPO}/external/wpa_supplicant_8/.git;protocol=${PROTO};destsuffix=external/wpa_supplicant_8;usehead=1 \
            file://wpa_supplicant.conf-sane \
            file://defconfig-qcacld \
            file://wpa-supplicant.sh \
            file://99_wpa_supplicant \
           "
+SRCREV = "${AUTOREV}"
+PR = "r5.2"
 
 SOLIBS = "*.so"
 FILES_SOLIBSDEV = ""
