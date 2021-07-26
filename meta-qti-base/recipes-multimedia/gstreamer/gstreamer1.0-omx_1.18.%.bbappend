@@ -1,5 +1,5 @@
 DEPENDS_remove = "virtual/libomxil"
-DEPENDS += "media"
+DEPENDS += "linux-msm-headers media"
 
 SRC_URI_remove = "https://gstreamer.freedesktop.org/src/gst-omx/gst-omx-${PV}.tar.xz"
 SRC_URI += "${PATH_TO_REPO}/gstreamer/qti-gst-omx/.git;protocol=${PROTO};destsuffix=gstreamer/qti-gst-omx;usehead=1"
@@ -17,13 +17,11 @@ GSTREAMER_1_0_OMX_CORE_NAME = "${libdir}/libOmxCore.so"
 EXTRA_OEMESON = "\
                  -Dtarget=qti \
                  -Dheader_path=${STAGING_INCDIR}/mm-core \
-                 -Dkernel_path=${STAGING_KERNEL_BUILDDIR}/usr/include \
+                 -Dkernel_path=${STAGING_INCDIR}/linux-msm \
                  -Dstaging_inc_path=${STAGING_INCDIR} \
                  -Denable-target-vpu554=yes \
                 "
 
 CFLAGS_append = " -DVIDC_TARGET_USES_GKI"
-
-do_configure[depends] += "virtual/kernel:do_shared_workdir"
 
 RDEPENDS_${PN} = "media"

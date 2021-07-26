@@ -31,6 +31,8 @@ EXTRA_OEMAKE += "DYNAMIC_SINGLE_CHIP=${_MODNAME}"
 EXTRA_OEMAKE += "MODNAME=${_MODNAME}"
 EXTRA_OEMAKE += "WLAN_CFG_OVERRIDE="CONFIG_FEATURE_GPIO_CFG=y CONFIG_CNSS_GENL=n""
 
+SYSTEMD_SERVICE_${PN} = "init_qti_wlan_auto.service"
+
 do_install() {
     module_do_install
 
@@ -62,3 +64,8 @@ do_install() {
         install -m 0644 ${WORKDIR}/init_qti_wlan_auto.service -D ${D}${systemd_unitdir}/system/init_qti_wlan_auto.service
     fi
 }
+
+FILES_${PN} += "\
+    ${bindir}/init.qti.wlan_on.sh \
+    ${bindir}/init.qti.wlan_off.sh \
+"

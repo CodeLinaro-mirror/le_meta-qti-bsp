@@ -17,9 +17,8 @@ SRC_URI = "${PATH_TO_REPO}/wlan/qcacld-3.0/.git;protocol=${PROTO};destsuffix=wla
            ${PATH_TO_REPO}/wlan/qca-wifi-host-cmn/.git;protocol=${PROTO};destsuffix=wlan/qca-wifi-host-cmn;usehead=1 \
            ${PATH_TO_REPO}/wlan/fw-api/.git;protocol=${PROTO};destsuffix=wlan/fw-api/;usehead=1 \
            ${PATH_TO_REPO}/device/qcom/wlan/.git;protocol=${PROTO};destsuffix=device/qcom/wlan/msm_auto;subpath=msm_auto;usehead=1 \
-           file://init_qti_wlan_auto.service \
-           file://init.qti.wlan_on.sh \
-           file://init.qti.wlan_off.sh \
+           file://qca6696-module-load.service \
+           file://qca6696_load.sh \
            "
 
 S1 = "${WORKDIR}/wlan/qca-wifi-host-cmn"
@@ -34,6 +33,8 @@ EXTRA_OEMAKE += "MULTI_IF_NAME=cnss0"
 EXTRA_OEMAKE += "MODNAME=${_MODNAME}"
 EXTRA_OEMAKE_append_qtiquingvm += "WLAN_CFG_OVERRIDE="CONFIG_WLAN_DISABLE_EXPORT_SYMBOL=y CONFIG_WLAN_OPEN_P2P_INTERFACE=n CONFIG_SUPPORT_P2P_BY_ONE_INTF_WLAN=y CONFIG_WLAN_PLACEMARKER_PREFIX=108 CONFIG_FEATURE_GPIO_CFG=y CONFIG_CNSS_GENL=n CONFIG_MULTI_IF_LOG=y CONFIG_FEATURE_WLAN_CH_AVOID_EXT=y""
 EXTRA_OEMAKE_append_qtiquingvm8295 += "WLAN_CFG_OVERRIDE="CONFIG_WLAN_DISABLE_EXPORT_SYMBOL=y CONFIG_WLAN_OPEN_P2P_INTERFACE=n CONFIG_SUPPORT_P2P_BY_ONE_INTF_WLAN=y CONFIG_WLAN_PLACEMARKER_PREFIX=108""
+
+SYSTEMD_SERVICE_${PN} = "qca6696-module-load.service"
 
 do_install() {
     module_do_install
@@ -50,8 +51,7 @@ do_install() {
     install -D -m 0644 ${WORKDIR}/device/qcom/wlan/msm_auto/WCNSS_qcom_cfg_qca6390.ini ${FIRMWARE_PATH}/WCNSS_qcom_cfg.ini
     install -D -m 0644 ${WORKDIR}/device/qcom/wlan/msm_auto/wlan_mac_hst_1.bin ${FIRMWARE_PATH}/wlan_mac.bin
     install -d ${D}${bindir}
-    install -D -m 0755 ${WORKDIR}/init.qti.wlan_on.sh ${D}${bindir}/init.qti.wlan_on.sh
-    install -D -m 0755 ${WORKDIR}/init.qti.wlan_off.sh ${D}${bindir}/init.qti.wlan_off.sh
+    install -D -m 0755 ${WORKDIR}/qca6696_load.sh ${D}${bindir}/qca6696_load.sh
 
     install -d ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/
     ln -sf /firmware/image/${FW_PATH_NAME}/amss.bin ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/
@@ -63,6 +63,13 @@ do_install() {
 
     # Install systemd service file
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
-        install -m 0644 ${WORKDIR}/init_qti_wlan_auto.service -D ${D}${systemd_unitdir}/system/init_qti_wlan_auto.service
+        install -d ${D}${systemd_unitdir}/system/
+        install -m 0644 ${WORKDIR}/qca6696-module-load.service -D ${D}${systemd_unitdir}/system/qca6696-module-load.service
     fi
 }
+
+FILES_${PN} += "\
+    ${bindir}/qca6696_load.sh \
+    ${systemd_unitdir}/system/* \
+    ${sysconfdir}/* \
+"

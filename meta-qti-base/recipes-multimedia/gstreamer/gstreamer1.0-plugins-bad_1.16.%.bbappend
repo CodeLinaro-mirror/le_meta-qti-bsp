@@ -9,15 +9,15 @@ SRCREV_common = "59cb678164719ff59dcf6c8b93df4617a1075d11"
 SRCREV_FORMAT = "bad_common"
 S = "${WORKDIR}/gstreamer/gst-plugins-bad"
 
-DEPENDS += "wayland-native"
+DEPENDS += "linux-msm-headers wayland-native"
 
 EXTRA_OEMESON += " \
                   -Dyadif=disabled \
                  "
 EXTRA_OEMESON_append = " \
-               -Dkernel_path=${STAGING_KERNEL_BUILDDIR}/usr/include \
+               -Dkernel_path=${STAGING_INCDIR}/linux-msm \
               "
-CPPFLAGS += "-I${STAGING_KERNEL_BUILDDIR}/usr/include"
+CPPFLAGS += "-I${STAGING_INCDIR}/linux-msm"
 
 do_compile_prepend() {
     export GIR_EXTRA_LIBS_PATH="${B}/gst-libs/gst/allocators/.libs"

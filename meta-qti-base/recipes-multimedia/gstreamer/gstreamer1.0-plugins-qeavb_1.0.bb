@@ -9,6 +9,7 @@ DEPENDS += "avb-utils \
             glib-2.0 \
             gstreamer1.0 \
             gstreamer1.0-plugins-base \
+            linux-msm-headers \
             virtual/libc \
            "
 
@@ -20,8 +21,6 @@ SRCREV = "${AUTOREV}"
 S = "${WORKDIR}/gstreamer/gst-plugins-qti-oss/gst-plugins-qeavb"
 
 inherit autotools-brokensep pkgconfig
-
-do_configure[depends] += "virtual/kernel:do_shared_workdir"
 
 FILES_${PN} += "${libdir}/gstreamer-1.0/*.so"
 FILES_${PN}-dbg += "${libdir}/gstreamer-1.0/.debug"
@@ -35,6 +34,6 @@ CFLAGS += "-I${STAGING_INCDIR} \
            -I${STAGING_INCDIR}/c++ \
            -I${STAGING_INCDIR}/c++/${TARGET_SYS} \
            -I${STAGING_INCDIR}/gstreamer-1.0 \
-           -I${STAGING_KERNEL_BUILDDIR}/usr/include"
+           -I${STAGING_INCDIR}/linux-msm"
 
 RDEPENDS_${PN} += "avb-utils"

@@ -1,7 +1,8 @@
-DEPENDS += "display-hal-headers display-hal-linux display-noship-linux display-ship-linux"
-DEPENDS += "gbm gbm-headers"
-DEPENDS += "libion libsync"
-DEPENDS += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'libuhab', '', d)}"
+DEPENDS += "display-hal-headers display-hal-linux display-noship-linux display-ship-linux \
+            gbm gbm-headers \
+            libion libsync \
+            linux-msm-headers \
+            ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'libuhab', '', d)}"
 
 FILESEXTRAPATHS_append := " :${THISDIR}/weston/"
 SRC_URI = "${PATH_TO_REPO}/graphics/weston/.git;protocol=${PROTO};destsuffix=graphics/weston;usehead=1"
@@ -24,15 +25,30 @@ REQUIRED_DISTRO_FEATURES_remove = "opengl"
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE_${PN} = "weston.service"
 
-TARGET_CFLAGS += "-idirafter ${STAGING_KERNEL_BUILDDIR}/include/"
 TARGET_CFLAGS += "-I${STAGING_INCDIR}/libdrm"
 TARGET_CFLAGS += "-I${STAGING_INCDIR}/sdm"
 TARGET_CFLAGS += "-I${STAGING_INCDIR}/sdm/core"
-TARGET_CFLAGS += "-I${STAGING_KERNEL_BUILDDIR}/usr/include"
-TARGET_CFLAGS += "-I${STAGING_KERNEL_BUILDDIR}/usr/include/display"
+TARGET_CFLAGS += "-I${STAGING_INCDIR}/linux-msm"
+TARGET_CFLAGS += "-I${STAGING_INCDIR}/linux-msm/display"
 TARGET_CPPFLAGS += "-I${STAGING_INCDIR}/qcom/display"
 TARGET_CPPFLAGS += "-I${STAGING_INCDIR}/sdm"
 TARGET_CPPFLAGS += "-I${STAGING_INCDIR}/sdm/core"
+
+#Overwrite Packageconfig
+PACKAGECONFIG = "${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'kms fbdev wayland egl clients', '', d)} \
+                 ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11', '', d)} \
+                 ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'launch', '', d)} \
+                 ${@bb.utils.contains('DISTRO_FEATURES', 'early_init', 'early', '', d)} \
+                 image-jpeg \
+                 screenshare \
+                 shell-desktop \
+                 shell-fullscreen \
+                 shell-ivi \
+                "
+# pam
+PACKAGECONFIG[pam] = ",,libpam"
+# early-init
+PACKAGECONFIG[early] = "-Denable-early-boot=true,-Denable-early-boot=false"
 
 EXTRA_OECONF_append_qemux86 = " \
         WESTON_NATIVE_BACKEND=fbdev-backend.so \
@@ -43,24 +59,6 @@ EXTRA_OECONF_append_qemux86-64 = " \
 
 EXTRA_OECONF_append = "${@bb.utils.contains("DISTRO_FEATURES", "early-ethernet", " --enable-early-boot", "" ,d)}"
 
-#Overwrite Packageconfig
-PACKAGECONFIG = "${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'kms fbdev wayland egl', '', d)} \
-                 ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11', '', d)} \
-                 ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'launch', '', d)} \
-                 ${@bb.utils.contains('DISTRO_FEATURES', 'early_init', 'early', '', d)} \
-                 image-jpeg \
-                 screenshare \
-                 shell-desktop \
-                 shell-fullscreen \
-                 shell-ivi \
-                "
-PACKAGECONFIG_append = "clients"
-# pam
-PACKAGECONFIG[pam] = ",,libpam"
-# early-init
-PACKAGECONFIG[early] = "-Denable-early-boot=true,-Denable-early-boot=false"
-
-do_configure[depends] += "virtual/kernel:do_shared_workdir"
 do_install_append() {
     # Install systemd unit files
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then

@@ -6,9 +6,10 @@ DEPENDS = "glib-2.0 wayland-native"
 DEPENDS += "gstreamer1.0 \
             gstreamer1.0-plugins-base \
             gstreamer1.0-plugins-bad \
+            linux-msm-headers \
+            virtual/libc \
             weston \
            "
-DEPENDS += "virtual/libc"
 SRCREV = "${AUTOREV}"
 PR = "r1"
 
@@ -30,8 +31,9 @@ CFLAGS += "-I${STAGING_INCDIR} \
            -I${STAGING_INCDIR}/glib-2.0/include \
            -I${STAGING_INCDIR}/glib-2.0/glib \
            -I${STAGING_INCDIR}/c++ \
-           -I${STAGING_INCDIR}/c++/${TARGET_SYS}"
-CFLAGS += "-I${STAGING_KERNEL_BUILDDIR}/usr/include"
-CFLAGS += "-DUSE_V6"
+           -I${STAGING_INCDIR}/c++/${TARGET_SYS} \
+           -I${STAGING_INCDIR}/linux-msm \
+           -DUSE_V6 \
+          "
 
 LIBV = "1.0"

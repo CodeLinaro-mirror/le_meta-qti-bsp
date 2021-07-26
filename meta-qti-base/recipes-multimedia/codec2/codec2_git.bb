@@ -12,6 +12,7 @@ DEPENDS += "clang-native \
             libcutils \
             libion \
             libutils \
+            linux-msm-headers \
             media-plugin-headers \
             system-core-headers"
 
@@ -23,15 +24,14 @@ S = "${WORKDIR}/frameworks/av/media/codec2"
 inherit cmake
 
 CXXFLAGS += "-I${STAGING_INCDIR} \
-             -I${STAGING_KERNEL_BUILDDIR}/include \
-             -I${STAGING_KERNEL_BUILDDIR}/usr/include \
+             -I${STAGING_INCDIR}/linux-msm \
              -I${STAGING_INCDIR}/drm \
              -I${STAGING_INCDIR}/ion_headers \
              -I${STAGING_INCDIR}/kernel-headers \
              -I${STAGING_INCDIR}/c++/ \
              -I${STAGING_INCDIR}/c++/${TARGET_SYS}"
 
-do_configure[depends] += "virtual/kernel:do_shared_workdir"
+EXTRA_OECMAKE += "-DAGL_LINUX:BOOL=ON"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
