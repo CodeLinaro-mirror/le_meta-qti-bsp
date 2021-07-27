@@ -177,12 +177,7 @@ fakeroot do_makesystem_ubi() {
     ubinize -o ${SYSTEMIMAGE_UBI_TARGET} ${UBINIZE_ARGS} ${UBINIZE_CFG}
 }
 
-python () {
-    if bb.utils.contains('IMAGE_FSTYPES', 'ext4', True, False, d):
-        bb.build.addtask('do_makesystem_ubi', 'do_image_complete', 'do_makesystem', d)
-    else:
-        bb.build.addtask('do_makesystem_ubi', 'do_image_complete', 'do_image', d)
-}
+addtask do_makesystem_ubi after do_image before do_image_complete
 
 do_patch_ubitools() {
     ${UNINATIVE_STAGING_DIR}-uninative/x86_64-linux/usr/bin/patchelf-uninative --set-interpreter /lib64/ld-linux-x86-64.so.2 ${STAGING_DIR}-components/x86_64/mtd-utils-native/usr/sbin/mkfs.ubifs

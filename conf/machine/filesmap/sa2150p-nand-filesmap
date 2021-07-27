@@ -1,4 +1,4 @@
-# Copyright (c) 2020 The Linux Foundation. All rights reserved.
+# Copyright (c) 2020, The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -25,12 +25,38 @@
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# Type  Path  Mode  UID  GID  Age  Argument
-z /sys/devices/platform/soc/990000.i2c/i2c-0/0-0049/trusted_touch_enable 0660 system - - -
-z /sys/devices/platform/soc/990000.i2c/i2c-0/0-0038/trusted_touch_enable 0660 system - - -
-z /sys/devices/platform/soc/988000.i2c/i2c-0/0-0038/trusted_touch_enable 0660 system - - -
-z /sys/devices/platform/soc/990000.spi/spi_master/spi0/spi0.0/trusted_touch_enable 0660 system - - -
-z /sys/devices/platform/soc/990000.i2c/i2c-0/0-0049/trusted_touch_event 0660 system - - -
-z /sys/devices/platform/soc/990000.i2c/i2c-0/0-0038/trusted_touch_event 0660 system - - -
-z /sys/devices/platform/soc/988000.i2c/i2c-0/0-0038/trusted_touch_event 0660 system - - -
-z /sys/devices/platform/soc/990000.spi/spi_master/spi0/spi0.0/trusted_touch_event 0660 system - - -
+# filename              partition
+
+NON-HLOS.ubi            modem
+dspso.ubi               dsp
+xbl_nand.elf            sbl
+tz.mbn                  tz
+rpm.mbn                 rpm
+appsboot.mbn            aboot
+devcfg.mbn              tz_devcfg
+abl.elf                 abl
+pmic.elf                pmic
+
+
+# For multiple file firmware images that differ from *.mbn and *.bin
+# you can specify filename.* to direct all files to the same location.
+# For example for modem.mdt, modem.b00, modem.b01,... modem.bxx files
+# writting 'modem.*   location' will direct all files to 'location'.
+# If still some files need to go to different location give the full
+# file name also, for example 'modem.b01   other_location'
+
+# filename                location
+
+adsp.*               /firmware/image/
+cdsp.*               /firmware/image/
+cmnlib.*             /firmware/image/
+cmnlib64.*           /firmware/image/
+gptest.*             /firmware/image/
+haventkn.mbn         /firmware/image/
+licmngr.*            /firmware/image/
+rtic.*               /firmware/image/
+rtic_tst.*           /firmware/image/
+securemm.*           /firmware/image/
+smplap32.*           /firmware/image/
+smplap64.*           /firmware/image/
+*.jsn                /firmware/image/
