@@ -9,10 +9,6 @@ require recipes-products/images/automotive-image.inc
 # not work
 IMAGE_FEATURES_remove = "splash"
 
-IMAGE_INSTALL_append = " \
-    packagegroup-agl-demo-platform \
-    "
-
 # screen is GPLv3, remove
 IMAGE_INSTALL_remove = "screen"
 
