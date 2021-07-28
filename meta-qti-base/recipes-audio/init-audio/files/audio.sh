@@ -33,9 +33,9 @@ while true
 do
     if cat /proc/asound/cards | grep "adp-star"
     then
-        amixer -c 0 cset iface=MIXER,name='TERT_TDM_RX_0 Audio Mixer MultiMedia1' 1
-        aplay -Dhw:0,0 /usr/share/sounds/alsa/Front_Left.wav
-        amixer -c 0 cset iface=MIXER,name='TERT_TDM_RX_0 Audio Mixer MultiMedia1' 0
+        amixer -c 0 cset iface=MIXER,name='TERT_TDM_RX_0 Audio Mixer MultiMedia22' 1
+        aplay -Dhw:0,54 /usr/share/sounds/alsa/Front_Left.wav
+        amixer -c 0 cset iface=MIXER,name='TERT_TDM_RX_0 Audio Mixer MultiMedia22' 0
         break
     else
         sleep 0.02
