@@ -31,6 +31,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
               libxml2 \
               packagegroup-android-utils \
               packagegroup-qti-camera \
+              ${@bb.utils.contains("DISTRO_FEATURES", "virtualization", "packagegroup-qti-containers", "", d)} \
               packagegroup-qti-core \
               packagegroup-qti-data \
               packagegroup-qti-dsp \

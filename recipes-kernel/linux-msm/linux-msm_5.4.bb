@@ -2,6 +2,7 @@ require recipes-kernel/linux-msm/linux-msm.inc
 COMPATIBLE_MACHINE = "genericarmv8|sdxlemur|scuba|qrbx210-rbx|sa2150p|sa2150p-nand"
 
 SRC_URI_append_sdxlemur += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-audio', 'file://0001-ALSA-uapi-add-check-to-avoid-duplicate-include-of-ti.patch', '', d)}"
+SRC_URI_append_qrbx210 += "file://virtualization_robomaker.cfg"
 
 S         =  "${WORKDIR}/kernel/msm-5.4"
 PR        =  "r0"
