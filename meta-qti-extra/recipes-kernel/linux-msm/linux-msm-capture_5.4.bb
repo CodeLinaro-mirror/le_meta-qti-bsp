@@ -24,7 +24,6 @@ KERNEL_LD_append_aarch64 = " ${TOOLCHAIN_OPTIONS}"
 KERNEL_PRIORITY           = "9001"
 # Add V=1 to KERNEL_EXTRA_ARGS for verbose
 KERNEL_EXTRA_ARGS        += "O=${B}"
-KERNEL_EXTRA_ARGS_append_sa8155  += "TARGET_BOARD_TYPE=auto"
 
 SRC_URI   =  "${PATH_TO_REPO}/kernel/msm-5.4/.git;protocol=${PROTO};destsuffix=kernel/msm-5.4;usehead=1 \
               ${PATH_TO_REPO}/data-kernel/.git;protocol=${PROTO};destsuffix=data-kernel;usehead=1"
