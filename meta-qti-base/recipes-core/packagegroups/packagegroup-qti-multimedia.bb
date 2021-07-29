@@ -29,4 +29,5 @@ RDEPENDS_${PN} = " \
         alsa-utils \
         alsa-plugins \
         secureappsrc \
+        vhost-user-q \
 "
