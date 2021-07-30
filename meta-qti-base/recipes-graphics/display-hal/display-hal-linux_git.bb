@@ -20,7 +20,6 @@ DEPENDS += "binder \
 
 PR = "r8"
 
-SRC_DIR = "${SRC_DIR_ROOT}/display/display-hal"
 SRC_URI = "${PATH_TO_REPO}/display/display-hal/.git;protocol=${PROTO};destsuffix=display/display-hal;usehead=1"
 SRCREV = "${AUTOREV}"
 S = "${WORKDIR}/display/display-hal"

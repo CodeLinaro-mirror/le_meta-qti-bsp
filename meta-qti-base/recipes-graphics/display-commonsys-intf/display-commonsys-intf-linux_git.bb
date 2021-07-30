@@ -10,7 +10,6 @@ DEPENDS += "libcutils libhardware-headers liblog libutils linux-msm-headers"
 
 PR = "r3"
 
-SRC_DIR = "${SRC_DIR_ROOT}/vendor/qcom/opensource/commonsys-intf/display"
 SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/commonsys-intf/display/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/commonsys-intf/display;usehead=1"
 SRCREV = "${AUTOREV}"
 S = "${WORKDIR}/vendor/qcom/opensource/commonsys-intf/display"
