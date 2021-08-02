@@ -74,8 +74,6 @@ addtask do_uncompressed_kernel_patch after do_install before do_deploy
 KERNEL_PRIORITY = "9001"
 # Add V=1 to KERNEL_EXTRA_ARGS for verbose
 KERNEL_EXTRA_ARGS_append = " O=${B}"
-KERNEL_EXTRA_ARGS_append_sa8155 = " TARGET_BOARD_TYPE=auto"
-KERNEL_EXTRA_ARGS_append_sa6155 = " TARGET_BOARD_TYPE=auto"
 KERNEL_EXTRA_ARGS_append = " ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'DTC_EXT=${STAGING_BINDIR_NATIVE}/dtc CONFIG_BUILD_ARM64_DT_OVERLAY=y', '', d)}"
 
 KBRANCH ?= ""
