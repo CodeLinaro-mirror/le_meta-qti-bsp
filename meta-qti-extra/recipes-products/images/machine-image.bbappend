@@ -1,6 +1,7 @@
 IMAGE_INSTALL += " \
     ${@bb.utils.contains('COMBINED_FEATURES', 'qti-lxc', 'packagegroup-qti-lxc', '', d)} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'kdump-support', 'kexec-tools makedumpfile capture-image', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'packagegroup-selinux-minimal packagegroup-selinux-policycoreutils checkpolicy secilc auditd selinux-autorelabel', '', d)} \
     "
 
 # Add libgomp support
