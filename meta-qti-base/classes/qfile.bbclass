@@ -48,6 +48,10 @@ python __anonymous(){
             bb.warn("[qfile debug] Change SRC_URI failed")
         new_src_uri_list.append(new_srcuri)
 
+    is_externalsrc = bb.data.inherits_class('externalsrc', d)
+    if is_externalsrc:
+        need_change = False
+
     if need_change:
         new_src_uri = " ".join(new_src_uri_list)
         d.setVar("SRC_URI", new_src_uri)

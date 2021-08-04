@@ -82,6 +82,7 @@ KMETA = "kernel-meta"
 KMACHINE ?= "${BASEMACHINE}"
 KCONFIG_MODE = "--alldefconfig"
 KBUILD_DEFCONFIG ?= "${KERNEL_CONFIG}"
+LINUX_VERSION = "5.4.86"
 LINUX_VERSION_EXTENSION = "${@['-perf', ''][d.getVar('VARIANT', True) == ('' or 'debug')]}"
 
 do_kernel_metadata_prepend() {
@@ -114,10 +115,11 @@ do_generate_gki_defconfig() {
     ${S}/scripts/gki/generate_defconfig.sh ${gki_defconfig}
 }
 
-addtask do_generate_gki_defconfig after do_unpack before do_kernel_metadata
+addtask do_generate_gki_defconfig after do_kernel_checkout before do_kernel_metadata
 do_generate_gki_defconfig[depends] += "virtual/${TARGET_PREFIX}binutils:do_populate_sysroot"
 
-do_kernel_checkout[noexec] = "1"
+do_kernel_checkout() {
+}
 
 # extra task for configuration checks
 addtask kernel_configcheck after do_configure before do_compile
