@@ -29,5 +29,4 @@ RDEPENDS_${PN} += "\
     tcp-wrappers \
     netkit-telnet \
     openssh \
-    eavb-fe \
 "
