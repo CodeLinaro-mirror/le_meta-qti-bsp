@@ -27,9 +27,10 @@
 
 #
 # Default properties to be set for qtiquingvm
-#
-
 service.adb.tcp.port=5555 
 
 # If ro.debuggable is 1, then enable adb root
 ro.debuggable=1
+
+# Block device for the vbmeta partition, used by ADB for changing verity state.
+vbmeta.device=/dev/vdf
