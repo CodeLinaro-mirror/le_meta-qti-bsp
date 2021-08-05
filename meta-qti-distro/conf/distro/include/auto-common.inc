@@ -15,9 +15,9 @@ IMAGE_LINK_NAME = "${IMAGE_BASENAME}-${PRODUCT}"
 DISTRO_FEATURES_append = " pam"
 
 # Video
-DISTRO_FEATURES_append_sa6155 = " qti-omx"
-DISTRO_FEATURES_append_sa81x5-rt = " qti-omx"
-DISTRO_FEATURES_append_sa81x5 = " qti-omx"
+DISTRO_FEATURES_append_sa6155 = " qti-carcamsrc qti-fastcv qti-omx"
+DISTRO_FEATURES_append_sa81x5-rt = " qti-carcamsrc qti-fastcv qti-omx"
+DISTRO_FEATURES_append_sa81x5 = " qti-carcamsrc qti-fastcv qti-omx"
 DISTRO_FEATURES_append_sa8295 = " qti-codec2"
 DISTRO_FEATURES_append_qtiquingvm = " qti-omx"
 DISTRO_FEATURES_append_qtiquingvm8295 = " qti-codec2"
