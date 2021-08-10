@@ -30,4 +30,5 @@ RDEPENDS_${PN} = " \
         alsa-plugins \
         secureappsrc \
         vhost-user-q \
+        uhabtest \
 "
