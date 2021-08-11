@@ -1,21 +1,20 @@
-inherit autotools-brokensep
-
 SUMMARY = "hsi2s-test"
-
-PROVIDERS = "hsi2s-test"
-
-DESCRIPTION = "HS-I2S test utility"
+DESCRIPTION = "Recipe to generate the HS-I2S test application. The application interacts with the HS-I2S driver using IOCTLs on the exposed device nodes for each interface. It is used to dump the data received on the HS-I2S interfaces into an output file. It also supports various test modes."
+HOMEPAGE = "https://www.codeaurora.org/"
 
 LICENSE = "GPL-2.0"
 LIC_FILES_CHKSUM = "file://NOTICE;md5=434b8411d18d7f18ebe745bd3cc502ed"
 
+PROVIDES = "hsi2s-test"
+
+PV = "0.1"
+
 SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/hsi2s-kernel/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/hsi2s-kernel;usehead=1"
 SRCREV = "${AUTOREV}"
 
-PR = "r0"
-PV = "0.1"
+S = "${WORKDIR}/vendor/qcom/opensource/hsi2s-kernel"
 
-S =  "${WORKDIR}/vendor/qcom/opensource/hsi2s-kernel"
+inherit autotools-brokensep
 
 TARGET_CC_ARCH += "${LDFLAGS}"
 
