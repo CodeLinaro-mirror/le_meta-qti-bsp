@@ -7,8 +7,6 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/BSD;md5=377548
 
 DEPENDS += "alsa-lib cmake-native glib-2.0 gstreamer1.0 gstreamer1.0-plugins-base libpcap pciutils"
 
-PV = "0.1"
-
 SRC_URI = "\
     ${PATH_TO_REPO}/external/open-avb/.git;protocol=${PROTO};destsuffix=external/open-avb;usehead=1 \
     file://gptp-daemon.service \
