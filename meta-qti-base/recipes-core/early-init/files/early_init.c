@@ -663,7 +663,7 @@ static inline void mount_cmd()
 			perror("open cmdline failed\n");
 		} else {
 			read(fd, &buf, CMDLINE_MAX);
-			if (strstr(buf, "root=/dev/mmc"))
+			if (strstr(buf, ".sdhci"))
 				mount("/dev/mmcblk0p30", "/firmware", "vfat", MS_RDONLY, NULL);
 			else
 				mount("/dev/sde4", "/firmware", "vfat", MS_RDONLY, NULL);
