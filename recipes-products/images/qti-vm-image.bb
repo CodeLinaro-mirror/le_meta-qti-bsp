@@ -5,7 +5,6 @@ DEPENDS += " virtual/kernel"
 CORE_IMAGE_EXTRA_INSTALL += " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'packagegroup-selinux-minimal', '', d)} \
     packagegroup-startup-scripts \
-    procrank \
 "
 CORE_IMAGE_EXTRA_INSTALL += "packagegroup-qti-display"
 CORE_IMAGE_EXTRA_INSTALL += "packagegroup-qti-securemsm"
