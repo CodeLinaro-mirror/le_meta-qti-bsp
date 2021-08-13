@@ -1,4 +1,4 @@
-# Copyright (c) 2020 The Linux Foundation. All rights reserved.
+# Copyright (c) 2021 The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -25,16 +25,12 @@
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# Type  Path  Mode  UID  GID  Age  Argument
-z /sys/devices/platform/soc/990000.i2c/i2c-0/0-0049/trusted_touch_enable 0660 system - - -
-z /sys/devices/platform/soc/990000.i2c/i2c-0/0-0038/trusted_touch_enable 0660 system - - -
-z /sys/devices/platform/soc/988000.i2c/i2c-0/0-0038/trusted_touch_enable 0660 system - - -
-z /sys/devices/platform/soc/990000.spi/spi_master/spi0/spi0.0/trusted_touch_enable 0660 system - - -
-z /sys/devices/platform/soc/990000.i2c/i2c-0/0-0049/trusted_touch_event 0660 system - - -
-z /sys/devices/platform/soc/990000.i2c/i2c-0/0-0038/trusted_touch_event 0660 system - - -
-z /sys/devices/platform/soc/988000.i2c/i2c-0/0-0038/trusted_touch_event 0660 system - - -
-z /sys/devices/platform/soc/990000.spi/spi_master/spi0/spi0.0/trusted_touch_event 0660 system - - -
-z /sys/devices/platform/soc/990000.i2c/i2c-0/0-0049/trusted_touch_type 0440 system - - -
-z /sys/devices/platform/soc/990000.i2c/i2c-0/0-0038/trusted_touch_type 0440 system - - -
-z /sys/devices/platform/soc/988000.i2c/i2c-0/0-0038/trusted_touch_type 0440 system - - -
-z /sys/devices/platform/soc/990000.spi/spi_master/spi0/spi0.0/trusted_touch_type 0440 system - - -
+# This function creates an environment-setup-script to support
+# cross compilation of kernel modules in a deployable SDK.
+sdk_kernel_devsrc_script() {
+        kernel_script=${1:-${SDK_OUTPUT}/${SDKPATH}/kernel-devsrc-setup}
+        rm -f $kernel_script
+        touch $kernel_script
+        echo 'export KERNEL_SRC=${SDKTARGETSYSROOT}/usr/src/kernel' >> $kernel_script
+        echo 'make -C ${KERNEL_SRC} modules_prepare' >> $kernel_script
+}

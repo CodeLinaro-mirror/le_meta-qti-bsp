@@ -1,10 +1,11 @@
-inherit qimage
+inherit qimage qramdisk
 
 DEPENDS += " virtual/kernel"
 
 CORE_IMAGE_EXTRA_INSTALL += " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'packagegroup-selinux-minimal', '', d)} \
     packagegroup-startup-scripts \
+    e2fsprogs-mke2fs \
 "
 CORE_IMAGE_EXTRA_INSTALL += "packagegroup-qti-display"
 CORE_IMAGE_EXTRA_INSTALL += "packagegroup-qti-securemsm"
@@ -17,4 +18,4 @@ USE_DEPMOD = "0"
 do_gen_partition_bin[noexec] = "1"
 
 IMAGE_FEATURES[validitems] += "vm"
-IMAGE_FEATURES += " vm"
+IMAGE_FEATURES += "vm"
