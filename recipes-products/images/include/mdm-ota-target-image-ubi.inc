@@ -144,7 +144,12 @@ do_recovery_ubi() {
         # OTA scripts expect a sparse image for block-based package.
         # run img2simg on the squashfs image - this is purely aesthetic
         # and adds no value to the compression of the image.
-        img2simg ${DEPLOY_DIR_IMAGE_NAND}/${SQUASHFS_SYS_VOLUME} ${OTA_TARGET_IMAGE_ROOTFS_UBI}/IMAGES/system.img
+        # replacing img2simg with own util squashfs2sparse, since on 18.04 machine img2simg is failing
+        if ${@bb.utils.contains('DISTRO_FEATURES', 'nad-prod', 'true', 'false', d)}; then
+            squashfs2sparse ${DEPLOY_DIR_IMAGE_NAND}/${SQUASHFS_SYS_VOLUME} ${OTA_TARGET_IMAGE_ROOTFS_UBI}/IMAGES/system.img
+        else
+            img2simg ${DEPLOY_DIR_IMAGE_NAND}/${SQUASHFS_SYS_VOLUME} ${OTA_TARGET_IMAGE_ROOTFS_UBI}/IMAGES/system.img
+        fi
 
         # set block img diff version to v3
         echo "blockimgdiff_versions=3" >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
@@ -153,7 +158,7 @@ do_recovery_ubi() {
         echo /system   squashfs  /dev/block/bootdevice/by-name/system >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RECOVERY/recovery.fstab
         # modem fstype
         if ${@bb.utils.contains('DISTRO_FEATURES', 'nad-prod', 'true', 'false', d)}; then
-            img2simg  ${DEPLOY_DIR_IMAGE_NAND}/${SQUASHFS_RECOVERYFS_VOLUME} ${OTA_TARGET_IMAGE_ROOTFS_UBI}/IMAGES/recoveryfs.img
+            squashfs2sparse  ${DEPLOY_DIR_IMAGE_NAND}/${SQUASHFS_RECOVERYFS_VOLUME} ${OTA_TARGET_IMAGE_ROOTFS_UBI}/IMAGES/recoveryfs.img
             echo /recoveryfs  squashfs  /dev/block/bootdevice/by-name/recoveryfs >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RECOVERY/recovery.fstab
         fi
     else
