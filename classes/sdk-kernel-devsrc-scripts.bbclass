@@ -1,5 +1,4 @@
-#!/bin/sh
-# Copyright (c) 2020, The Linux Foundation. All rights reserved.
+# Copyright (c) 2021 The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -26,35 +25,12 @@
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-busybox.suid mount -n -o mode=0755 -t devtmpfs none "/dev"
-busybox echo "mounted devtmpfsr"
-busybox.suid mount proc /proc -t proc
-busybox echo "mounted proc"
-busybox.suid mount -o remount,rw  /
-busybox mkdir -p /mnt/vfs
-
-# verity protection
-if [ -f /etc/verity.env ]; then
-    source /etc/verity.env
-    veritysetup open /dev/vda system /dev/vda $VERITY_ROOT_HASH --salt $VERITY_SALT --hash-offset $VERITY_HASH_OFFSET --data-blocks $VERITY_DATA_BLOCKS --fec-device /dev/vda --fec-offset $VERITY_FEC_OFFSET --fec-roots $VERITY_FEC_ROOTS --root-hash-signature=/etc/verity_sig.txt
-    
-    # Wait till the block device is available
-    busybox echo "waiting for /dev/mapper/system"
-    while [ ! -e /dev/mapper/system ]; do
-        counter=$((counter + 1))
-        busybox sleep 0.1
-    done
-    counter=$((counter * 100))
-    busybox echo "/dev/mapper/system ready, time = $counter ms"
-
-    busybox.suid mount -t ext4 -o ro /dev/mapper/system /mnt/vfs
-else
-    busybox.suid mount -t ext4 -o ro /dev/vda /mnt/vfs
-fi
-
-if [ $? -ne 0]; then
-    busybox echo "mounting rootfs failed"
-fi
-
-busybox echo "Switching root"
-exec busybox switch_root -c /dev/console /mnt/vfs /sbin/init
+# This function creates an environment-setup-script to support
+# cross compilation of kernel modules in a deployable SDK.
+sdk_kernel_devsrc_script() {
+        kernel_script=${1:-${SDK_OUTPUT}/${SDKPATH}/kernel-devsrc-setup}
+        rm -f $kernel_script
+        touch $kernel_script
+        echo 'export KERNEL_SRC=${SDKTARGETSYSROOT}/usr/src/kernel' >> $kernel_script
+        echo 'make -C ${KERNEL_SRC} modules_prepare' >> $kernel_script
+}

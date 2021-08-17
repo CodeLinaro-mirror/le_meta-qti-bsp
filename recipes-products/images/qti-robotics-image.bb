@@ -25,7 +25,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-camera \
         ${@bb.utils.contains('DISTRO_FEATURES','virtualization', 'packagegroup-qti-containers', '', d)} \
         packagegroup-qti-core \
-        packagegroup-qti-core \
+        packagegroup-qti-core-prop \
         packagegroup-qti-data \
         packagegroup-qti-display \
         packagegroup-qti-dsp \
@@ -37,6 +37,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-qmmf \
         packagegroup-qti-robotics \
         packagegroup-qti-securemsm \
+        packagegroup-qti-test-sensors-see \
         packagegroup-qti-ss-mgr \
         packagegroup-qti-video \
         packagegroup-qti-wifi \
