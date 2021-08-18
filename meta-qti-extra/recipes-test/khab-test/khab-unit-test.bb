@@ -19,22 +19,22 @@ python __anonymous () {
 }
 
 do_install () {
-	install -d ${D}/lib/modules/${KERNEL_VERSION}/unit_test
-	install -D -m 0644 ${S}/fault_injection_khab_test_export.ko ${D}/lib/modules/${KERNEL_VERSION}/unit_test/
-	install -D -m 0644 ${S}/fault_injection_khab_test_import.ko ${D}/lib/modules/${KERNEL_VERSION}/unit_test/
-	install -D -m 0644 ${S}/fault_injection_khab_test_open.ko ${D}/lib/modules/${KERNEL_VERSION}/unit_test/
-	install -D -m 0644 ${S}/fault_injection_khab_test_unexport.ko ${D}/lib/modules/${KERNEL_VERSION}/unit_test/
-	install -D -m 0644 ${S}/fault_injection_khab_test_unimport.ko ${D}/lib/modules/${KERNEL_VERSION}/unit_test/
-	install -D -m 0644 ${S}/khab_test_close.ko ${D}/lib/modules/${KERNEL_VERSION}/unit_test/
-	install -D -m 0644 ${S}/khab_test_export.ko ${D}/lib/modules/${KERNEL_VERSION}/unit_test/
-	install -D -m 0644 ${S}/khab_test_import.ko ${D}/lib/modules/${KERNEL_VERSION}/unit_test/
-	install -D -m 0644 ${S}/khab_test_open.ko ${D}/lib/modules/${KERNEL_VERSION}/unit_test/
-	install -D -m 0644 ${S}/khab_test_query.ko ${D}/lib/modules/${KERNEL_VERSION}/unit_test/
-	install -D -m 0644 ${S}/khab_test_recv.ko ${D}/lib/modules/${KERNEL_VERSION}/unit_test/
-	install -D -m 0644 ${S}/khab_test_send.ko ${D}/lib/modules/${KERNEL_VERSION}/unit_test/
-	install -D -m 0644 ${S}/khab_test_unexport.ko ${D}/lib/modules/${KERNEL_VERSION}/unit_test/
-	install -D -m 0644 ${S}/khab_test_unimport.ko ${D}/lib/modules/${KERNEL_VERSION}/unit_test/
-	install -D -m 0644 ${S}/khab_unittest_kprobe.ko ${D}/lib/modules/${KERNEL_VERSION}/unit_test/
+    install -d ${D}/lib/modules/${KERNEL_VERSION}/unit_test
+    install -D -m 0644 ${S}/fault_injection_khab_test_export.ko ${D}/lib/modules/${KERNEL_VERSION}/unit_test/
+    install -D -m 0644 ${S}/fault_injection_khab_test_import.ko ${D}/lib/modules/${KERNEL_VERSION}/unit_test/
+    install -D -m 0644 ${S}/fault_injection_khab_test_open.ko ${D}/lib/modules/${KERNEL_VERSION}/unit_test/
+    install -D -m 0644 ${S}/fault_injection_khab_test_unexport.ko ${D}/lib/modules/${KERNEL_VERSION}/unit_test/
+    install -D -m 0644 ${S}/fault_injection_khab_test_unimport.ko ${D}/lib/modules/${KERNEL_VERSION}/unit_test/
+    install -D -m 0644 ${S}/khab_test_close.ko ${D}/lib/modules/${KERNEL_VERSION}/unit_test/
+    install -D -m 0644 ${S}/khab_test_export.ko ${D}/lib/modules/${KERNEL_VERSION}/unit_test/
+    install -D -m 0644 ${S}/khab_test_import.ko ${D}/lib/modules/${KERNEL_VERSION}/unit_test/
+    install -D -m 0644 ${S}/khab_test_open.ko ${D}/lib/modules/${KERNEL_VERSION}/unit_test/
+    install -D -m 0644 ${S}/khab_test_query.ko ${D}/lib/modules/${KERNEL_VERSION}/unit_test/
+    install -D -m 0644 ${S}/khab_test_recv.ko ${D}/lib/modules/${KERNEL_VERSION}/unit_test/
+    install -D -m 0644 ${S}/khab_test_send.ko ${D}/lib/modules/${KERNEL_VERSION}/unit_test/
+    install -D -m 0644 ${S}/khab_test_unexport.ko ${D}/lib/modules/${KERNEL_VERSION}/unit_test/
+    install -D -m 0644 ${S}/khab_test_unimport.ko ${D}/lib/modules/${KERNEL_VERSION}/unit_test/
+    install -D -m 0644 ${S}/khab_unittest_kprobe.ko ${D}/lib/modules/${KERNEL_VERSION}/unit_test/
 }
 
 FILES_${PN} += "${base_libdir}/modules/${KERNEL_VERSION}/unit_test/fault_injection_khab_test_export.ko"
