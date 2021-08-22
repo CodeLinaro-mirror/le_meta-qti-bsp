@@ -12,6 +12,6 @@ RDEPENDS_${PN} += "\
     system-core-adbd \
     system-core-leprop \
     system-core-post-boot \
-    system-core-early-boot \
     system-core-usb \
+    ${@bb.utils.contains("MACHINE_FEATURES", "qti-hypervisor", "", "system-core-early-boot", d)} \
     "

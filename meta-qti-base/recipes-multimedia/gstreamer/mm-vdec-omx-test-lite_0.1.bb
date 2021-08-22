@@ -8,7 +8,6 @@ SRCREV = "${AUTOREV}"
 
 SRC_URI = "${PATH_TO_REPO}/gstreamer/gst-plugins-qti-oss/.git;protocol=${PROTO};destsuffix=gstreamer/gst-plugins-qti-oss;usehead=1"
 
-SRC_DIR = "${SRC_DIR_ROOT}/gstreamer/gst-plugins-qti-oss/omx-lite-app/mm-vdec-omx-test"
 S = "${WORKDIR}/gstreamer/gst-plugins-qti-oss/omx-lite-app/mm-vdec-omx-test"
 
 inherit cmake

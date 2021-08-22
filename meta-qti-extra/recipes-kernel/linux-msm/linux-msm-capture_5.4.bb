@@ -24,7 +24,6 @@ KERNEL_LD_append_aarch64 = " ${TOOLCHAIN_OPTIONS}"
 KERNEL_PRIORITY           = "9001"
 # Add V=1 to KERNEL_EXTRA_ARGS for verbose
 KERNEL_EXTRA_ARGS        += "O=${B}"
-KERNEL_EXTRA_ARGS_append_sa8155  += "TARGET_BOARD_TYPE=auto"
 
 SRC_URI   =  "${PATH_TO_REPO}/kernel/msm-5.4/.git;protocol=${PROTO};destsuffix=kernel/msm-5.4;usehead=1 \
               ${PATH_TO_REPO}/data-kernel/.git;protocol=${PROTO};destsuffix=data-kernel;usehead=1"
@@ -50,7 +49,6 @@ KERNEL_IMAGETYPE = "Image"
 KERNEL_PACKAGE_NAME = "capture"
 KERNEL_DEVICETREE = "vendor/qcom/sa8155p-v2-adp-air-capture.dtb vendor/qcom/sa8195p-v2-adp-air-capture.dtb"
 
-SRC_DIR   =  "${SRC_DIR_ROOT}/kernel/msm-5.4"
 S         =  "${WORKDIR}/kernel/msm-5.4"
 PR = "r0"
 

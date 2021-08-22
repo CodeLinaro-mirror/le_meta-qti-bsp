@@ -1,5 +1,5 @@
-DEPENDS_remove = "virtual/libomxil"
 DEPENDS += "linux-msm-headers media"
+DEPENDS_remove = "virtual/libomxil"
 
 SRC_URI_remove = "https://gstreamer.freedesktop.org/src/gst-omx/gst-omx-${PV}.tar.xz"
 SRC_URI += "${PATH_TO_REPO}/gstreamer/qti-gst-omx/.git;protocol=${PROTO};destsuffix=gstreamer/qti-gst-omx;usehead=1"
