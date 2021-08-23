@@ -30,6 +30,9 @@ case $1/$2 in
   pre/*)
     echo "Entering into $2..."
 
+    # disable weston before kernel libdrm FE is ready
+    systemctl stop weston.service
+
     systemctl stop audiod.service
     if [ $2 == "hibernate" ]; then
         echo 0 > /sys/kernel/boot_adsp/boot
@@ -54,5 +57,7 @@ case $1/$2 in
         echo 1 > /sys/kernel/boot_adsp/boot
     fi
     systemctl restart audiod.service
+
+    systemctl restart weston.service
     ;;
 esac
