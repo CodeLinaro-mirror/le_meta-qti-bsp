@@ -35,6 +35,8 @@ IMAGE_INSTALL += "km-loader"
 IMAGE_INSTALL += "systemd-machine-units"
 
 IMAGE_POSTPROCESS_COMMAND_append = "${@bb.utils.contains('IMAGE_FSTYPES', 'squashfs-xz', 'create_ext4_images;','',d)}"
+IMAGE_CMD_ubi  = " "
+IMAGE_CMD_ubifs  = " "
 
 # Squashfs rootfs for flashless needs nbd mount points,
 # so create a copy of rootfs for flashless to fixup.
