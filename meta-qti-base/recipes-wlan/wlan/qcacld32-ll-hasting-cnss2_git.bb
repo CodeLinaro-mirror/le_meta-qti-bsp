@@ -39,8 +39,18 @@ EXTRA_OEMAKE_append = " \
                        MULTI_IF_NAME=cnss2 \
                        MODNAME=${_MODNAME} \
                        "
-EXTRA_OEMAKE_append_qtiquingvm = " WLAN_CFG_OVERRIDE="CONFIG_WLAN_DISABLE_EXPORT_SYMBOL=y CONFIG_WLAN_OPEN_P2P_INTERFACE=n CONFIG_SUPPORT_P2P_BY_ONE_INTF_WLAN=y CONFIG_WLAN_PLACEMARKER_PREFIX=108 CONFIG_FEATURE_GPIO_CFG=y CONFIG_CNSS_GENL=n CONFIG_MULTI_IF_LOG=y CONFIG_FEATURE_WLAN_CH_AVOID_EXT=y""
-EXTRA_OEMAKE_append_qtiquingvm8295 = " WLAN_CFG_OVERRIDE="CONFIG_WLAN_DISABLE_EXPORT_SYMBOL=y CONFIG_WLAN_OPEN_P2P_INTERFACE=n CONFIG_SUPPORT_P2P_BY_ONE_INTF_WLAN=y CONFIG_WLAN_PLACEMARKER_PREFIX=108""
+_WLAN_CFG_OVERRIDE_GVM = "\
+                        CONFIG_WLAN_DISABLE_EXPORT_SYMBOL=y \
+                        CONFIG_WLAN_OPEN_P2P_INTERFACE=n \
+                        CONFIG_SUPPORT_P2P_BY_ONE_INTF_WLAN=y \
+                        CONFIG_WLAN_PLACEMARKER_PREFIX=108 \
+                        CONFIG_FEATURE_GPIO_CFG=y \
+                        CONFIG_CNSS_GENL=n \
+                        CONFIG_MULTI_IF_LOG=y \
+                        CONFIG_FEATURE_WLAN_CH_AVOID_EXT=y \
+                        "
+EXTRA_OEMAKE_append_qtiquingvm = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
+EXTRA_OEMAKE_append_qtiquingvm8295 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
 
 do_configure_append() {
     sed -i -e 's/^gEnableConcurrentSTA=wlan1/gEnableConcurrentSTA=wlan3/g' ${WORKDIR}/device/qcom/wlan/msm_auto/WCNSS_qcom_cfg_qca6390.ini
