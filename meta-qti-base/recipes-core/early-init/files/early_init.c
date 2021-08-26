@@ -668,7 +668,7 @@ static inline void trigger_firmware_loading(const char* path)
 static inline void mount_cmd()
 {
 	pid_t pid;
-	char buf[CMDLINE_MAX] = {'\0'};
+	char buf[CMDLINE_MAX+1] = {'\0'};
 	int fd;
 
 	write_marker("mount_cmd-start-up");
