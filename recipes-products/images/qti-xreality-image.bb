@@ -34,14 +34,10 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-startup-scripts \
         systemd-machine-units \
         ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
+        packagegroup-qti-pulseaudio \
+        packagegroup-qti-audio \
 "
-#Install packages for audio
-CORE_IMAGE_EXTRA_INSTALL += " \
-            audiodlkm \
-            init-audio \
-            tinyalsa \
-            tinycompress \
-"
+
 #install drm
 CORE_IMAGE_EXTRA_INSTALL += " \
             libdrm \
