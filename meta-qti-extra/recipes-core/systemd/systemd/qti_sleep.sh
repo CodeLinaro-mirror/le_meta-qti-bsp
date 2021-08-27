@@ -44,12 +44,14 @@ case $1/$2 in
     # set all usb mode to none
     echo none > /sys/devices/platform/soc/a600000.ssusb/mode
     echo none > /sys/devices/platform/soc/a800000.ssusb/mode
+    echo none > /sys/devices/platform/soc/a400000.ssusb/mode
     ;;
   post/*)
     echo "Exiting from $2..."
 
     echo peripheral > /sys/devices/platform/soc/a600000.ssusb/mode
     echo host > /sys/devices/platform/soc/a800000.ssusb/mode
+    echo host > /sys/devices/platform/soc/a400000.ssusb/mode
 
     systemctl restart synergy.service
 
