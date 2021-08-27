@@ -16,6 +16,8 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         libxml2 \
         net-tools \
         packagegroup-android-utils \
+        packagegroup-qti-core \
+        packagegroup-qti-data \
         packagegroup-qti-teleap \
         packagegroup-qti-telematics \
         packagegroup-startup-scripts \
