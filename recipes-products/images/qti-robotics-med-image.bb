@@ -38,6 +38,8 @@ CORE_IMAGE_EXTRA_INSTALL += "\
               packagegroup-qti-audio \
               packagegroup-qti-display \
               packagegroup-qti-gfx \
+              packagegroup-qti-pulseaudio \
+              packagegroup-qti-gst \
               packagegroup-qti-ss-mgr \
               ${@bb.utils.contains('COMBINED_FEATURES', 'qti-wifi', "packagegroup-qti-wifi", "", d)} \
               ${@bb.utils.contains('COMBINED_FEATURES', 'qti-bluetooth', "packagegroup-qti-bluetooth", "", d)} \
