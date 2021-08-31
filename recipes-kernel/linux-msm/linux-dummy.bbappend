@@ -1,7 +1,1 @@
-DEPENDS += " linux-platform"
-
-do_compile_kernelmodules () {
-       :
-}
-
-addtask compile_kernelmodules after do_compile before do_install
+do_configure[depends] += "linux-platform:do_deploy"
