@@ -12,6 +12,7 @@ SRC_URI += "file://audio.sh"
 SRC_URI += "file://init_data.service"
 SRC_URI += "file://msm-audio-node.rules"
 SRC_URI += "file://audio_early.sh"
+SRC_URI += "file://audio_load.conf"
 
 do_compile[noexec] = "1"
 
@@ -34,11 +35,13 @@ do_install() {
             install -m 0644 ${S}/init_audio.service -D ${D}${systemd_unitdir}/system/init_audio.service
         fi
         install -m 0644 ${S}/init_data.service -D ${D}${systemd_unitdir}/system/init_data.service
+        install -m 0644 ${S}/audio_load.conf -D ${D}${sysconfdir}/modules-load.d/audio_load.conf
         install -d ${D}/${systemd_unitdir}/system/sysinit.target.wants
         ln -sf ${systemd_unitdir}/system/init_audio.service ${D}${systemd_unitdir}/system/sysinit.target.wants/init_audio.service
         ln -sf ${systemd_unitdir}/system/init_data.service ${D}${systemd_unitdir}/system/sysinit.target.wants/init_data.service
     else
         install -m 0755 ${S}/init_qcom_audio -D ${D}${sysconfdir}/init.d/init_qcom_audio
+        install -m 0644 ${S}/audio_load.conf -D ${D}${sysconfdir}/modules/audio_load.conf
     fi
 
 }
