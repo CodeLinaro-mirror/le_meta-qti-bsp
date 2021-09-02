@@ -10,4 +10,12 @@ ALLOW_EMPTY_${PN} = "1"
 
 RDEPENDS_${PN} += "\
     gps-utils \
+    location-hal-daemon \
+    loc-core \
+    loc-hal \
+    location-api \
+    location-api-msg-proto \
+    loc-sll-if \
+    synergy-loc-api \
+    location-api-iface \
     "
