@@ -46,9 +46,9 @@
 #define END_TAG                 "<end>"
 #define LINE_MAX                2048
 #define WHITESPACE              " \t\n\r"
-#define KPI_VALUE_PATH          "/sys/kernel/debug/bootkpi/kpi_values"
+#define KPI_VALUE_PATH          "/sys/kernel/boot_kpi/kpi_values"
 #define GPIO_EXPORT             "/sys/class/gpio/export"
-#define DRM_CARD_PATH           "/dev/dri/card0"
+#define DRM_CARD_PATH           "/dev/kgsl-3d0"
 #define VIDEO_CARD_PATH         "/dev/video32"
 #define DISPLAY_XDG_RUNTIME_DIR "/run/platform/weston"
 #define SMACK_LABEL_PATH        "/proc/self/attr/current"
@@ -77,6 +77,12 @@ static struct {
 #define BIT_SET(p,n) ((p) & (1 << (n)))
 #define uid_is_valid(uid) ((uid != (uid_t) UINT32_C(0xFFFFFFFF)) && \
 						(uid != (uid_t) UINT32_C(0xFFFF)))
+#define AUDIO_CONFIG_LIINE 4
+char audiostr[AUDIO_CONFIG_LIINE][LINE_MAX] = {
+	"[Audio]",
+	"cmd=/usr/sbin/audio.sh",
+	"log=/early/audio.txt",
+	"<end>"};
 #define gid_is_valid(gid)  uid_is_valid(gid)
 
 static void inline safe_free(char** p)
@@ -159,7 +165,8 @@ static inline void mkdirs(char* p, mode_t mode)
 
 	strlcpy(str, p, sizeof(str));
 
-	if (str[0] != '/')
+	len = strlen(str);
+	if ((str[0] != '/') || (len < 1))
 		return;
 
 	if (str[len - 1] == '/') {
@@ -223,8 +230,17 @@ static inline void prepare_dir(char* p)
 				/* 	chown(DISPLAY_XDG_RUNTIME_DIR, pw->pw_uid, pw->pw_gid); */
 				/* } */
 				mkdirs("/run/early", 0775);
+				mkdirs("/run/user", 0755);
+				mkdirs("/run/user/0", 0700);
 			}
 			break;
+		case 'e':
+			if (0 == strncmp(p + 1, "arly_init_dir", strlen("early_init_dir"))) {
+				ret = mount("tmpfs", "/early", "tmpfs", MS_NOSUID|MS_NODEV|MS_STRICTATIME, "mode=755");
+				if (ret < 0) {
+					perror("mount tmpfs failed");
+				}
+			}
 		case 's':
 			if (0 == strncmp(p + 1, "hm", strlen("hm"))) {
 				mkdirs("/dev/shm", 0777);
@@ -291,7 +307,7 @@ static inline char *strstrip(char *s) {
 // if fail, fallback to root user
 static void inline enforce_user(char* username)
 {
-	return 0;
+	return;
 	/* struct passwd *pw; */
 
 	/* pw = getpwnam(username); */
@@ -411,7 +427,10 @@ static inline int parse_line(char* p)
 				*t = '\0';
 				p++;
 				app_launcher.appname= strdup(p);
-				printf("appname is %s \r\n", app_launcher.appname);
+				if(app_launcher.appname != NULL)
+					printf("appname is %s \r\n", app_launcher.appname);
+				else
+					printf("parse appname failed with %s\n", strerror(errno));
 			}
 			break;
 		case 'c':/* cmd */
@@ -439,25 +458,37 @@ static inline int parse_line(char* p)
 		case 'l':/* applog */
 			if (0 == strncmp(p + 1, "og", strlen("og")) && 0 == find_rvalue(&p)) {
 				app_launcher.applog = strdup(p);
-				printf("applog is %s", app_launcher.applog);
+				if(app_launcher.applog != NULL)
+					printf("applog is %s", app_launcher.applog);
+				else
+					printf("parse applog failed with %s\n", strerror(errno));
 			}
 			break;
 		case 'g':/* gpio */
 			if (0 == strncmp(p + 1, "pio", strlen("pio")) && 0 == find_rvalue(&p)) {
 				app_launcher.gpio = strdup(p);
-				printf("gpio is %s", app_launcher.gpio);
+				if(app_launcher.gpio != NULL)
+					printf("gpio is %s", app_launcher.gpio);
+				else
+					printf("parse gpio failed with %s\n", strerror(errno));
 			}
 			break;
 		case 'w':/* wait */
 			if (0 == strncmp(p + 1, "ait", strlen("ait")) && 0 == find_rvalue(&p)) {
 				app_launcher.wait = strdup(p);
-				printf("wait is %s", app_launcher.wait);
+				if(app_launcher.wait != NULL)
+					printf("wait is %s", app_launcher.wait);
+				else
+					printf("parse wait failed with %s\n", strerror(errno));
 			}
 			break;
 		case 'p':/* pidfile */
 			if (0 == strncmp(p + 1, "idfile", strlen("idfile")) && 0 == find_rvalue(&p)) {
 				app_launcher.pidfile = strdup(p);
-				printf("pidfile is %s", app_launcher.pidfile);
+				if(app_launcher.pidfile != NULL)
+					printf("pidfile is %s", app_launcher.pidfile);
+				else
+					printf("parse pidfile failed with %s\n", strerror(errno));
 			}
 			if (0 == strncmp(p + 1, "riority", strlen("riority")) && 0 == find_rvalue(&p)) {
 				app_launcher.priority = atoi(p);
@@ -481,7 +512,10 @@ static inline int parse_line(char* p)
 		case 'u':
 			if (0 == strncmp(p + 1, "ser", strlen("ser")) && 0 == find_rvalue(&p)) {
 				app_launcher.username = strdup(p);
-				printf("username is %s", app_launcher.username);
+				if(app_launcher.username != NULL)
+					printf("username is %s", app_launcher.username);
+				else
+					printf("parse username failed with %s\n", strerror(errno));
 			}
 			break;
 		case '<':/* end */
@@ -526,7 +560,7 @@ static inline int parse_line(char* p)
 					struct sched_param sp;
 					memset( &sp, 0, sizeof(sp) );
 					sp.sched_priority = app_launcher.priority;
-					if (0 != sched_setscheduler( 0, SCHED_FIFO, &sp))
+					if (0 != sched_setscheduler( getpid(), SCHED_FIFO, &sp))
 						printf("sched_setparam failed %d %s\r\n", app_launcher.priority, strerror(errno));
 				}
 
@@ -635,6 +669,60 @@ static inline void trigger_firmware_loading(const char* path)
 	return;
 }
 
+static inline void mount_cmd()
+{
+        pid_t pid;
+	char buf[8] = {'\0'};
+	int fd;
+
+        write_marker("mount_cmd-start-up");
+        pid = fork();
+        if (pid < 0) {
+                perror("fork child process failed \n");
+                return;
+        }
+        if (pid == 0) {
+		fd = open("/sys/devices/soc0/chip_name",O_RDWR);
+		if(fd < 0) {
+			perror("open chip name error\n");
+		} else {
+			read(fd, &buf, 8);
+			if (!strncmp(buf,"SA6155P", 6)) {
+				mount("/dev/mmcblk0p30", "/firmware", "vfat", MS_RDONLY, NULL);
+			} else {
+				mount("/dev/sde4", "/firmware", "vfat", MS_RDONLY, NULL);
+			}
+		}
+                system("audio-nxp-auto");
+                write_marker("mount_cmd-exit");
+		safe_close(fd);
+                exit(0);
+        }
+        return;
+}
+
+static inline void audio_drv_loading()
+{
+	pid_t pid;
+	int i, j;
+
+	pid = fork();
+	if (pid < 0) {
+		perror("fork child process failed \n");
+		return;
+	}
+	if (pid == 0) {
+		for (i = 0, j = 0; i < sizeof(audiostr)/sizeof(audiostr[0]); i++, j + LINE_MAX) {
+			if (is_empty_line(&audiostr[i][j]))
+				continue;
+			strstrip(&audiostr[i][j]);
+			parse_line(&audiostr[i][j]);
+		}
+		exit(0);
+	}
+	return;
+}
+
 int main(int argc, char* argv[])
 {
 	FILE* f;
@@ -642,12 +730,15 @@ int main(int argc, char* argv[])
 	int fd;
 
 	prepare_dir("sysfs");
-	prepare_dir("debugfs");
+	//prepare_dir("debugfs");
 	prepare_dir("xdg_runtime_dir");
 	prepare_dir("shm");
 	prepare_dir("procfs");
+	prepare_dir("early_init_dir");
 
-	fd = open("/run/early_init.log", O_RDWR | O_CREAT, 0644);
+	mount_cmd();
+
+	fd = open("/early/early_init.log", O_RDWR | O_CREAT, 0644);
 	if (fd < 0)
 		perror("open log file failed");
 
@@ -657,7 +748,7 @@ int main(int argc, char* argv[])
 	safe_close(fd);
 
 	f = fopen(DEFAULT_CONF, "re");
-	if (f < 0) {
+	if (f == NULL) {
 		perror("open early_init.conf failed.\r\n");
 		return -1;
 	}
@@ -665,8 +756,12 @@ int main(int argc, char* argv[])
 	write_marker("early-init-start-up");
 
 	/* Trigger firmware loading parallelly */
+	trigger_firmware_loading(DRM_CARD_PATH);
 #ifdef EARLY_ETHERNET
 	trigger_firmware_loading(VIDEO_CARD_PATH);
+#endif
+#ifdef EARLY_USERSPACE_AUDIO
+	audio_drv_loading();
 #endif
 
 	while (1) {
