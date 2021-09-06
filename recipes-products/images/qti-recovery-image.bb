@@ -23,9 +23,9 @@ do_image_ubi[noexec] = "1"
 do_image_ubifs[noexec] = "1"
 do_image_multiubi[noexec] = "1"
 
-
 CORE_IMAGE_EXTRA_INSTALL += "\
             packagegroup-qti-recoveryfs \
+            packagegroup-qti-core-recovery \
 "
 
 RM_WORK_EXCLUDE += "${PN}"
@@ -118,7 +118,7 @@ do_create_recoveryfs_ext4[dirs] = "${IMGDEPLOYDIR}"
 
 python () {
     if bb.utils.contains('IMAGE_FSTYPES', 'ubi', True, False, d):
-        bb.build.addtask('do_create_recoveryfs_ubi', 'do_image_complete', 'do_rootfs', d)
+        bb.build.addtask('do_create_recoveryfs_ubi', 'do_image_complete', 'do_image', d)
     if bb.utils.contains('IMAGE_FSTYPES', 'ext4', True, False, d):
-        bb.build.addtask('do_create_recoveryfs_ext4', 'do_image_complete', 'do_rootfs', d)
+        bb.build.addtask('do_create_recoveryfs_ext4', 'do_image_complete', 'do_image', d)
 }

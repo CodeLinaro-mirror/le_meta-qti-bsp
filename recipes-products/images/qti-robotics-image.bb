@@ -37,6 +37,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-qmmf \
         packagegroup-qti-robotics \
         packagegroup-qti-securemsm \
+        packagegroup-qti-test-sensors-see \
         packagegroup-qti-ss-mgr \
         packagegroup-qti-video \
         packagegroup-qti-wifi \
@@ -44,4 +45,5 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-startup-scripts \
         ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
         systemd-machine-units \
+        packagegroup-qti-mmframeworks \
 "
