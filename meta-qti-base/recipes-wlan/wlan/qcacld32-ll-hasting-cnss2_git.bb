@@ -49,6 +49,8 @@ _WLAN_CFG_OVERRIDE_GVM = "\
                         CONFIG_MULTI_IF_LOG=y \
                         CONFIG_FEATURE_WLAN_CH_AVOID_EXT=y \
                         CONFIG_QCOM_TDLS=n \
+                        CONFIG_CFG_MAX_STA_VDEVS=4 \
+                        CONFIG_CFG_BMISS_OFFLOAD_MAX_VDEV=4 \
                         "
 EXTRA_OEMAKE_append_qtiquingvm = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
 EXTRA_OEMAKE_append_qtiquingvm8295 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
