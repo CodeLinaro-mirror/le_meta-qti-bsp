@@ -13,5 +13,4 @@ RDEPENDS_${PN} += "\
     libcap \
     libcap-bin \
     attr \
-    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'enable-fde', '', d)} \
 "
