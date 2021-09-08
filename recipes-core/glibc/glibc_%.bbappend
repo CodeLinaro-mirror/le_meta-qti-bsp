@@ -1,6 +1,9 @@
+FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 # Adjust branch & URI to fetch from CAF.
 SRCBRANCH = "drains/release/${PV}/master"
 GLIBC_GIT_URI = "git://source.codeaurora.org/quic/le/glibc.git;protocol=https"
+
+SRC_URI += "file://CVE-2019-25013.patch"
 
 # glibc expects -fstack-protector optimization passed as a configuration option
 # instead of a top level build flag.
