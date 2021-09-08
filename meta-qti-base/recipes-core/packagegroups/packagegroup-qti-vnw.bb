@@ -11,7 +11,7 @@ PACKAGES = "\
 ALLOW_EMPTY_${PN} = "1"
 
 RDEPENDS_${PN} += "\
-    open-avb \
+    ${@bb.utils.contains('LAYERSERIES_COMPAT_yocto', 'dunfell', 'open-avb', '', d)} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'ptp-virtual', '', d)} \
     hsi2s \
     hsi2s-test \
