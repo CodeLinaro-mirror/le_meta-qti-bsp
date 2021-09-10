@@ -1,7 +1,7 @@
 # Provides packages required to build
 # QTI Linux eXtended Reality image.
 
-inherit qimage populate_sdk
+inherit qimage populate_sdk_qti
 
 IMAGE_FEATURES += "ssh-server-openssh"
 
@@ -24,6 +24,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-cvp \
         packagegroup-qti-gfx \
         packagegroup-qti-sensors-see \
+        packagegroup-qti-test-sensors-see \
         packagegroup-qti-ss-mgr \
         packagegroup-qti-securemsm \
         ${@bb.utils.contains('COMBINED_FEATURES', 'qti-wifi', "packagegroup-qti-wifi", "", d)} \
@@ -40,7 +41,6 @@ CORE_IMAGE_EXTRA_INSTALL += " \
             init-audio \
             tinyalsa \
             tinycompress \
-            soundtrigger \
 "
 #install drm
 CORE_IMAGE_EXTRA_INSTALL += " \
@@ -53,14 +53,3 @@ CORE_IMAGE_EXTRA_INSTALL += " \
             wayland \
             gbm \
             "
-# To include protoc compiler in SDK
-TOOLCHAIN_HOST_TASK_append = " nativesdk-protobuf-compiler "
-
-# Add nativesdk-llvm-arm-toolchain in SDK to run on SDKMACHINE
-TOOLCHAIN_HOST_TASK_append = " nativesdk-llvm-arm-toolchain"
-
-# To include kernel headers in SDK
-TOOLCHAIN_TARGET_TASK_append = " linux-msm-headers-dev"
-
-# To include kernel sources in SDK to build kernel modules
-TOOLCHAIN_TARGET_TASK_append = " kernel-devsrc"

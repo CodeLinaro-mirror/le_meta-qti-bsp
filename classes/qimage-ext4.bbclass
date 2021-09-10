@@ -23,7 +23,10 @@ DTBOIMAGE_TARGET ?= "dtbo.img"
 CACHEIMAGE_TARGET ?= "cache.img"
 SYSTEMRWIMAGE_TARGET ?= "systemrw.img"
 
-IMAGE_EXT4_SELINUX_OPTIONS = "${@bb.utils.contains('DISTRO_FEATURES', 'selinux', '-S ${SELINUX_FILE_CONTEXTS}', '', d)}"
+# Ensure SELinux file context variable is defined
+SELINUX_FILE_CONTEXTS ?= ""
+SELINUX_IMG_S = "${@['-S ${SELINUX_FILE_CONTEXTS}', ''][d.getVar('SELINUX_FILE_CONTEXTS') == '']}"
+IMAGE_EXT4_SELINUX_OPTIONS = "${@bb.utils.contains('DISTRO_FEATURES', 'selinux', '${SELINUX_IMG_S}', '', d)}"
 
 ROOTFS_POSTPROCESS_COMMAND += "gen_buildprop;do_fsconfig;"
 ROOTFS_POSTPROCESS_COMMAND += "${@bb.utils.contains('MACHINE_MNT_POINTS', 'overlay', 'gen_overlayfs;', '', d)}"
@@ -100,6 +103,11 @@ python create_rootfs_ext4 () {
 
 do_makesystem[prefuncs] += "create_rootfs_ext4"
 do_makesystem[prefuncs] += "create_symlink_systemd_ext4_mount_rootfs"
+# The system image size update that happens in do_make_verity_enabled_system_image
+#  step is not persistent outside that task scope. Update it again within this
+#  task's scope.
+do_makesystem[prefuncs] += "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains('MACHINE_FEATURES', 'dm-verity-bootloader', 'adjust_system_size_for_verity', '', d), '', d)}"
+
 do_makesystem() {
     # Empty the /persist folder so that it doesn't end up
     # in system image as well

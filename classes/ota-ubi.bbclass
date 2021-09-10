@@ -32,13 +32,22 @@ do_recovery_ubi() {
 
     # if exists copy filesmap into RADIO directory
     radiofilesmap=${MACHINE_FILESMAP_FULL_PATH}
-    [[ ! -z "$radiofilesmap" ]] && install -m 755 $radiofilesmap ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RADIO/
+    [[ ! -z "$radiofilesmap" ]] && install -m 755 $radiofilesmap ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RADIO/filesmap
 
     # copy the boot\recovery images
-    cp ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${BOOTIMAGE_TARGET} ${OTA_TARGET_IMAGE_ROOTFS_UBI}/BOOTABLE_IMAGES/boot.img
-    cp ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${BOOTIMAGE_TARGET} ${OTA_TARGET_IMAGE_ROOTFS_UBI}/BOOTABLE_IMAGES/recovery.img
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains('IMAGE_FEATURES', 'gluebi', 'true', 'false', d), 'false', d)}; then
+        cp ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/verity/system-gluebi.ext4/${BOOTIMAGE_TARGET} ${OTA_TARGET_IMAGE_ROOTFS_UBI}/BOOTABLE_IMAGES/boot.img
+        cp ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/verity/system-gluebi.ext4/${BOOTIMAGE_TARGET} ${OTA_TARGET_IMAGE_ROOTFS_UBI}/BOOTABLE_IMAGES/recovery.img
+    else
+        cp ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${BOOTIMAGE_TARGET} ${OTA_TARGET_IMAGE_ROOTFS_UBI}/BOOTABLE_IMAGES/boot.img
+        cp ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${BOOTIMAGE_TARGET} ${OTA_TARGET_IMAGE_ROOTFS_UBI}/BOOTABLE_IMAGES/recovery.img
+    fi
 
     # copy the contents of system rootfs
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains('IMAGE_FEATURES', 'gluebi', 'true', 'false', d), 'false', d)}; then
+        cp ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/verity/system-gluebi.ext4/system-gluebi.ext4 ${OTA_TARGET_IMAGE_ROOTFS_UBI}/BOOTABLE_IMAGES/system.img
+        echo dm_verity_nand=1 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
+    fi
     cp -r ${IMAGE_ROOTFS_UBI}/. ${OTA_TARGET_IMAGE_ROOTFS_UBI}/SYSTEM/.
     cd  ${OTA_TARGET_IMAGE_ROOTFS_UBI}/SYSTEM
     rm -rf var/run
