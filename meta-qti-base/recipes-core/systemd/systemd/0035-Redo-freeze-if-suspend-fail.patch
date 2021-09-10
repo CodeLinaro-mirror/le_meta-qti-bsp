@@ -1,0 +1,55 @@
+From 62cd5de03142ca121606b6f2c9784170dbcace39 Mon Sep 17 00:00:00 2001
+From: Futao He <fhe@codeaurora.org>
+Date: Thu, 16 Sep 2021 16:28:28 +0530
+Subject: [PATCH] Redo freeze if suspend fail
+
+Redo freeze(s2idle) if previous suspend failed.
+
+Signed-off-by: Futao He <fhe@codeaurora.org>
+---
+ src/sleep/sleep.c | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
+
+diff --git a/src/sleep/sleep.c b/src/sleep/sleep.c
+index 89b8036..1feac38 100644
+--- a/src/sleep/sleep.c
++++ b/src/sleep/sleep.c
+@@ -104,6 +104,8 @@ static int write_mode(char **modes) {
+ static int write_state(FILE **f, char **states) {
+         char **state;
+         int r = 0;
++        bool is_mem = false;
++        char *last_state = NULL;
+
+         STRV_FOREACH(state, states) {
+                 int k;
+@@ -119,6 +121,26 @@ static int write_state(FILE **f, char **states) {
+                 *f = fopen("/sys/power/state", "we");
+                 if (!*f)
+                         return -errno;
++                last_state = *state;
++                if (!strcmp(last_state, "mem"))
++                        is_mem = true;
++        }
++        /* if failed redo last suspend */
++        if (r < 0 && is_mem) {
++                int k;
++
++                sleep(1);
++                k = write_string_stream(*f, last_state, WRITE_STRING_FILE_DISABLE_BUFFER);
++                if (k >= 0)
++                        return 0;
++                log_debug_errno(k, "Failed to write '%s' to /sys/power/state: %m", *state);
++                if (r >= 0)
++                        r = k;
++
++                fclose(*f);
++                *f = fopen("/sys/power/state", "we");
++                if (!*f)
++                        return -errno;
+         }
+
+         return r;
+-- 
+2.7.4
+
