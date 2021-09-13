@@ -70,6 +70,8 @@ do_make_dm_verity_avb2_image(){
 	--setup_rootfs_from_kernel ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
         --algorithm SHA256_RSA4096 \
         --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/vbgvm_private_key_4096.pem --rollback_index 0 --output ${DEPLOY_DIR_IMAGE}/vbmeta.img
+        # Workaround, to keep two vbmeta images here with different vbmeta name.
+        install -m 644 ${DEPLOY_DIR_IMAGE}/vbmeta.img ${DEPLOY_DIR_IMAGE}/${PRODUCT}-vbmeta.img
     fi
 }
 

@@ -1,16 +1,16 @@
 require qcacld32-ll.inc
 
-DESCRIPTION = "Qualcomm Atheros WLAN CLD3.0 low latency driver"
+SUMMARY = "Qualcomm Atheros WLAN Driver"
+DESCRIPTION = "Qualcomm Atheros WLAN CLD3.0 low latency driver for Hastings WLAN chip.\
+               It is a kernel extra module, which loaded by init_qti_wlan_auto.service \
+               once the system bootup. And this WLAN host driver module name is qca6696.ko,\
+               it create two interface by defaults, one is wlan0 and the other is p2p0. \
+               Application can use the wireless interfaces as STA/AP/P2P mode in need. \"
+HOMEPAGE = "https://www.codeaurora.org/"
 LICENSE = "ISC"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=f3b90e78ea0cffb20bf5cca7947a896d"
-SRCREV = "${AUTOREV}"
-SRCREV_FORMAT = "qcacld_cmn_fw_msm"
+
 PR = "r8"
-
-_MODNAME = "qca6696"
-FW_PATH_NAME = "qca6390"
-FIRMWARE_PATH = "${D}${nonarch_base_libdir}/firmware/wlan/qca_cld/${_MODNAME}"
-
 SRC_URI = "${PATH_TO_REPO}/wlan/qcacld-3.0/.git;protocol=${PROTO};destsuffix=wlan/qcacld-3.0;usehead=1 \
            ${PATH_TO_REPO}/wlan/qca-wifi-host-cmn/.git;protocol=${PROTO};destsuffix=wlan/qca-wifi-host-cmn;usehead=1 \
            ${PATH_TO_REPO}/wlan/fw-api/.git;protocol=${PROTO};destsuffix=wlan/fw-api/;usehead=1 \
@@ -19,6 +19,12 @@ SRC_URI = "${PATH_TO_REPO}/wlan/qcacld-3.0/.git;protocol=${PROTO};destsuffix=wla
            file://init.qti.wlan_on.sh \
            file://init.qti.wlan_off.sh \
            "
+SRCREV = "${AUTOREV}"
+SRCREV_FORMAT = "qcacld_cmn_fw_msm"
+
+_MODNAME = "qca6696"
+FW_PATH_NAME = "qca6390"
+FIRMWARE_PATH = "${D}${nonarch_base_libdir}/firmware/wlan/qca_cld/${_MODNAME}"
 
 S1 = "${WORKDIR}/wlan/qca-wifi-host-cmn"
 S = "${WORKDIR}/wlan/qcacld-3.0"
@@ -69,3 +75,4 @@ FILES_${PN} += "\
     ${bindir}/init.qti.wlan_on.sh \
     ${bindir}/init.qti.wlan_off.sh \
 "
+

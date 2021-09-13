@@ -11,6 +11,7 @@ HOMEPAGE = "https://www.codeaurora.org/"
 LICENSE = "ISC"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=f3b90e78ea0cffb20bf5cca7947a896d"
 
+PR = "r8"
 SRC_URI = "${PATH_TO_REPO}/wlan/qcacld-3.0/.git;protocol=${PROTO};destsuffix=wlan/qcacld-3.0;usehead=1 \
            ${PATH_TO_REPO}/wlan/qca-wifi-host-cmn/.git;protocol=${PROTO};destsuffix=wlan/qca-wifi-host-cmn;usehead=1 \
            ${PATH_TO_REPO}/wlan/fw-api/.git;protocol=${PROTO};destsuffix=wlan/fw-api/;usehead=1 \
@@ -20,7 +21,6 @@ SRC_URI = "${PATH_TO_REPO}/wlan/qcacld-3.0/.git;protocol=${PROTO};destsuffix=wla
            "
 SRCREV = "${AUTOREV}"
 SRCREV_FORMAT = "qcacld_cmn_fw_msm"
-PR = "r8"
 
 _MODNAME = "qca6696"
 FW_PATH_NAME = "qca6390"
@@ -39,8 +39,22 @@ EXTRA_OEMAKE_append = " \
                        MULTI_IF_NAME=cnss0 \
                        MODNAME=${_MODNAME} \
                        "
-EXTRA_OEMAKE_append_qtiquingvm = " WLAN_CFG_OVERRIDE="CONFIG_WLAN_DISABLE_EXPORT_SYMBOL=y CONFIG_WLAN_OPEN_P2P_INTERFACE=n CONFIG_SUPPORT_P2P_BY_ONE_INTF_WLAN=y CONFIG_WLAN_PLACEMARKER_PREFIX=108 CONFIG_FEATURE_GPIO_CFG=y CONFIG_CNSS_GENL=n CONFIG_MULTI_IF_LOG=y CONFIG_FEATURE_WLAN_CH_AVOID_EXT=y""
-EXTRA_OEMAKE_append_qtiquingvm8295 = " WLAN_CFG_OVERRIDE="CONFIG_WLAN_DISABLE_EXPORT_SYMBOL=y CONFIG_WLAN_OPEN_P2P_INTERFACE=n CONFIG_SUPPORT_P2P_BY_ONE_INTF_WLAN=y CONFIG_WLAN_PLACEMARKER_PREFIX=108""
+
+_WLAN_CFG_OVERRIDE_GVM = "\
+                        CONFIG_WLAN_DISABLE_EXPORT_SYMBOL=y \
+                        CONFIG_WLAN_OPEN_P2P_INTERFACE=n \
+                        CONFIG_SUPPORT_P2P_BY_ONE_INTF_WLAN=y \
+                        CONFIG_WLAN_PLACEMARKER_PREFIX=108 \
+                        CONFIG_FEATURE_GPIO_CFG=y \
+                        CONFIG_CNSS_GENL=n \
+                        CONFIG_MULTI_IF_LOG=y \
+                        CONFIG_FEATURE_WLAN_CH_AVOID_EXT=y \
+                        CONFIG_QCOM_TDLS=n \
+                        CONFIG_CFG_MAX_STA_VDEVS=4 \
+                        CONFIG_CFG_BMISS_OFFLOAD_MAX_VDEV=4 \
+                        "
+EXTRA_OEMAKE_append_qtiquingvm = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
+EXTRA_OEMAKE_append_qtiquingvm8295 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
 
 SYSTEMD_SERVICE_${PN} = "qca6696-module-load.service"
 
