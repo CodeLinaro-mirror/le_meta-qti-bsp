@@ -28,6 +28,10 @@
 
 echo systemds0 > /dev/kmsg
 
+echo "early-init:preload clkscale, autohibern8  disable"
+echo 0 > /sys/bus/platform/devices/1d84000.ufshc/clkscale_enable
+echo 0 > /sys/bus/platform/devices/1d84000.ufshc/auto_hibern8
+
 dd if=/lib/systemd/system/systemd-update-utmp.service of=/dev/null
 dd if=/lib/systemd/system/umount.target of=/dev/null
 dd if=/lib/systemd/system/systemd-journal-catalog-update.service of=/dev/null
