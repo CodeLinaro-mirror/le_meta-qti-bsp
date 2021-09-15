@@ -15,3 +15,5 @@ SYSTEMD_AUTO_ENABLE_${PN} = "enable"
 
 # Skip wget as license conflicts
 RDEPENDS_${PN}_remove = " wget "
+# Disable dnsmasq.service in lxc
+RDEPENDS_${PN}_remove = "dnsmasq"
