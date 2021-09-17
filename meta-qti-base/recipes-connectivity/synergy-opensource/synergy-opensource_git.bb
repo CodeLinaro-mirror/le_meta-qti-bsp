@@ -1,12 +1,12 @@
-DESCRIPTION = "QTI Synergy opensource SA8155 AGL Platform"
-
-PACKAGE_ARCH = "${MACHINE_ARCH}"
-
+SUMMARY = "QTI Synergy opensource for AGL Platform"
+DESCRIPTION = "Synergy opensource is part of Synergy BT Stack\
+which contains BT audio service for HF audio routing."
+HOMEPAGE = "https://www.codeaurora.org"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
 
-DEPENDS = "cmake-native dbus pulseaudio"
+DEPENDS += "cmake-native dbus pulseaudio"
 
 SRC_URI = "${PATH_TO_REPO}/synergy/synergy-opensource/.git;protocol=${PROTO};destsuffix=synergy/synergy-opensource;usehead=1"
 
@@ -32,4 +32,4 @@ do_install() {
     fi
 }
 
-FILES_${PN} += "${bindir}"
+PACKAGE_ARCH = "${MACHINE_ARCH}"

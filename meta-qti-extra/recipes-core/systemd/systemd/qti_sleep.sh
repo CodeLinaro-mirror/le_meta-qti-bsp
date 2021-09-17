@@ -37,16 +37,23 @@ case $1/$2 in
 
     # disable BT as hsuart could block suspend
     systemctl stop synergy.service
+    # disable WLAN related app
+    killall wpa_supplicant
+    killall hostapd
+    # wait for it complete
+    sleep 10
 
     # set all usb mode to none
     echo none > /sys/devices/platform/soc/a600000.ssusb/mode
     echo none > /sys/devices/platform/soc/a800000.ssusb/mode
+    echo none > /sys/devices/platform/soc/a400000.ssusb/mode
     ;;
   post/*)
     echo "Exiting from $2..."
 
     echo peripheral > /sys/devices/platform/soc/a600000.ssusb/mode
     echo host > /sys/devices/platform/soc/a800000.ssusb/mode
+    echo host > /sys/devices/platform/soc/a400000.ssusb/mode
 
     systemctl restart synergy.service
 

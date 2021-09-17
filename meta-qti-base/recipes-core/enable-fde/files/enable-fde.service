@@ -28,8 +28,9 @@
 [Unit]
 Description=Enable fde on data partition
 Before=data.mount
-After=sys-devices-300807000.virtio\x2dscsi3-virtio3-host3-target3:0:0-3:0:0:0-block-sdd-sdd1.device persist.mount
+After=sys-devices-300807000.virtio\x2dscsi3-virtio3-host3-target3:0:0-3:0:0:0-block-sdd-sdd1.device persist.mount resize-userdata.service
 SourcePath=/usr/bin/enable-fde.sh
+DefaultDependencies=no
 
 [Service]
 Type=oneshot
