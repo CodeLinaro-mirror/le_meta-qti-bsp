@@ -53,8 +53,12 @@ _WLAN_CFG_OVERRIDE_GVM = "\
                         CONFIG_CFG_MAX_STA_VDEVS=4 \
                         CONFIG_CFG_BMISS_OFFLOAD_MAX_VDEV=4 \
                         "
+_WLAN_CFG_OVERRIDE_METAL = "\
+                        CONFIG_WLAN_DISABLE_EXPORT_SYMBOL=y \
+                        "
 EXTRA_OEMAKE_append_qtiquingvm = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
 EXTRA_OEMAKE_append_qtiquingvm8295 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
+EXTRA_OEMAKE_append_sa8295 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_METAL}"
 
 SYSTEMD_SERVICE_${PN} = "qca6696-module-load.service"
 
