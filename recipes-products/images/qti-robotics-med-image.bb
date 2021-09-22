@@ -50,4 +50,5 @@ CORE_IMAGE_EXTRA_INSTALL += "\
               ${@bb.utils.contains("DISTRO_FEATURES", "librealsense2", "librealsense2 librealsense2-tests", "", d)} \
               ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
               packagegroup-qti-sensors-see \
+              packagegroup-qti-test-sensors-see \
 "
