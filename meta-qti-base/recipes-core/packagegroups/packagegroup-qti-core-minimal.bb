@@ -11,6 +11,7 @@ ALLOW_EMPTY_${PN} = "1"
 RDEPENDS_${PN} += "\
     packagegroup-qti-core-boot \
     packagegroup-qti-core-commonlibs \
+    packagegroup-machine-base \
     "
 
 RDEPENDS_${PN} += "\
