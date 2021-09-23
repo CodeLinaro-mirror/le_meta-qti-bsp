@@ -32,8 +32,6 @@ IMAGE_INSTALL += "volatile-binds"
 IMAGE_INSTALL += "lk"
 IMAGE_INSTALL += "coreutils"
 IMAGE_INSTALL += "systemd-machine-units"
-IMAGE_INSTALL += "system-core-adbd"
-IMAGE_INSTALL += "system-core-usb"
 
 IMAGE_PREPROCESS_COMMAND += "echo ${MACHINE} >> ${IMAGE_ROOTFS}/target;"
 
