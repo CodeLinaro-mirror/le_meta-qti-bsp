@@ -43,6 +43,7 @@ EXTRA_OEMAKE = "'CLANG_BIN=${CLANG_BIN_PATH}' \
                 'VERITY_LE=${VERITY_ENABLED}'\
                 'INIT_BIN_LE=\"/sbin/init\"'\
                 'EDK_TOOLS_PATH=${S}/BaseTools'\
+                'BOOTIMAGE_LOAD_VERIFY_IN_PARALLEL=1' \
                 'EARLY_ETH_ENABLED=${EARLY_ETH}'\
                 'EARLY_ETH_AS_DLKM=1' \
                 'TARGET_BOARD_TYPE_AUTO=1' \

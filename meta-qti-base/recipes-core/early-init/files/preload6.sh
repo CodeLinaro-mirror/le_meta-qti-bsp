@@ -33,6 +33,7 @@ dd if=/lib/systemd/system/shutdown.target of=/dev/null
 dd if=/lib/systemd/system/xinetd.service of=/dev/null
 dd if=/lib/librt-2.31.so of=/dev/null
 dd if=/lib/librt.so.1 of=/dev/null
+modprobe dwmac_qcom_eth &
 dd if=/lib/systemd/system/initrd-udevadm-cleanup-db.service of=/dev/null
 dd if=/lib/systemd/system/systemd-udev-settle.service of=/dev/null
 dd if=/lib/systemd/system/basic.target of=/dev/null
