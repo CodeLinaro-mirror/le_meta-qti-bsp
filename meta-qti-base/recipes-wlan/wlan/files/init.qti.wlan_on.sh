@@ -88,6 +88,13 @@ while [ $n -le 5 ]
 			else
 				echo "##########Error! QCA6696 FW is not available!#####"
 			fi
+		elif (lspci -k|grep 1103);then
+			echo "##########load qca6490#############"
+			if [ -f /firmware/image/qca6490/amss20.bin ];then
+				modprobe qca6490
+			else
+				echo "##########Error! QCA6490 FW is not available!#####"
+			fi
 		else
 			echo "##########load default wlan########"
 			modprobe wlan
