@@ -36,6 +36,8 @@ IMAGE_INSTALL += "systemd-machine-units"
 # include abl image which support rootfs type as ubifs
 # this image should be flashed while using non-squashfs file
 IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES','nad-prod','abl-ubifs','',d)}"
+IMAGE_INSTALL += "bouncycastle"
+IMAGE_INSTALL += "fec"
 
 # Install A/B recovery bins and its libs in system image if A/B boot is supported
 IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'start-script-ab-slot-util recovery-ab-bin recovery-ab', '', d)}"
@@ -83,4 +85,14 @@ create_ext4_images() {
           chmod 644 ${OUTPUT_PERSIST_FILE}
           make_ext4fs -s -a /systemrw ${IMAGE_EXT4_SELINUX_OPTIONS} -b 4096 -l ${SYSTEMRW_SIZE_EXT4} -L ${SYSTEMRW_LABEL} ${DEPLOY_DIR_IMAGE_EMMC}/${SYSTEMRWIMAGE_TARGET}
    fi
+}
+
+fakeroot do_makesystem () {
+        rm -rf ${IMAGE_ROOTFS}/dev
+        mkdir ${IMAGE_ROOTFS}/dev
+        if ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'true', 'false', d)}; then
+           mksquashfs ${IMAGE_ROOTFS} ${DEPLOY_DIR_IMAGE_NAND}/${SQUASHFS_SYS_VOLUME} -context-file ${SELINUX_FILE_CONTEXTS} -noappend -comp xz -Xdict-size 32K -noI -Xbcj arm -b 65536 -processors 1
+        else
+           mksquashfs ${IMAGE_ROOTFS} ${DEPLOY_DIR_IMAGE_NAND}/${SQUASHFS_SYS_VOLUME} -noappend -comp xz -Xdict-size 32K -noI -Xbcj arm -b 65536 -processors 1
+        fi
 }
