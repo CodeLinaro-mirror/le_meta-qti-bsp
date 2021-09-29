@@ -37,7 +37,7 @@ SRC_URI = "${PATH_TO_REPO}/hardware/qcom/media/.git;protocol=${PROTO};destsuffix
 SRCREV = "${AUTOREV}"
 S = "${WORKDIR}/hardware/qcom/media"
 
-inherit autotools
+inherit autotools systemd
 
 EXTRA_OECONF_append = " \
     --with-sanitized-headers=${STAGING_INCDIR}/linux-msm \
