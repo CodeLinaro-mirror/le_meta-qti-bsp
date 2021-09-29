@@ -35,6 +35,7 @@ DefaultDependencies=no
 [Service]
 Type=oneshot
 Restart=no
+RemainAfterExit=yes
 ExecStart=/bin/sh /usr/sbin/video_dec_demo.sh
 
 [Install]
