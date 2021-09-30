@@ -45,3 +45,16 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         systemd-machine-units \
         ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
 "
+
+# To include kernel headers in SDK
+TOOLCHAIN_TARGET_TASK_append = " linux-msm-headers-dev"
+
+# To include kernel sources in SDK for kernel modules
+TOOLCHAIN_TARGET_TASK_append = " kernel-devsrc"
+
+# To include header files in SDK for sample code
+TOOLCHAIN_TARGET_TASK_append = " camera-metadata-dev glm-dev opencv-staticdev"
+TOOLCHAIN_HOST_TASK_append = " nativesdk-llvm-arm-toolchain"
+
+# Remove docker-distribution-dev from SDK
+PACKAGE_EXCLUDE = "docker-distribution-dev"
