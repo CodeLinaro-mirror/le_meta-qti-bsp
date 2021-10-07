@@ -94,16 +94,18 @@ do_install_append() {
    install -m 0644 ${S}/libstagefrighthw/QComOMXMetadata.h -D ${D}${includedir}/libstagefrighthw/
    install -m 0644 ${S}/libc2dcolorconvert/C2DColorConverter.h ${D}${includedir}/
 
-   if ${@bb.utils.contains('DISTRO_FEATURES', 'early_userspace', 'true', 'false', d)}; then
-       install -d ${D}/${bindir}
-       install -m 0777 ${THISDIR}/test_1080p.h264 ${D}/${bindir}/test_1080p.h264
+   if ${@bb.utils.contains('DISTRO_FEATURES', 'early_init', 'true', 'false', d)}; then
+       install -m 0777 ${THISDIR}/test_1080p.h264 -D ${D}${bindir}/test_1080p.h264
+       install -m 0755 ${THISDIR}/video_dec_demo.sh -D ${D}${sbindir}/video_dec_demo.sh
+       install -m 0644 ${THISDIR}/video_early_demo.service -D ${D}${systemd_system_unitdir}/video_early_demo.service
    fi
 }
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 FILES_${PN} += "\
-    ${datadir}/*"
+    ${datadir}/* \
+    ${systemd_system_unitdir}/*"
 
 SOLIBS = ".so"
 FILES_SOLIBSDEV = ""
