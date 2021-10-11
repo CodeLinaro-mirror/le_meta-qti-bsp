@@ -25,24 +25,25 @@
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# The majority of populate_sdk is located in populate_sdk_base
-# which is inherited by populate_sdk_ext. So inheriting
-# populate_sdk_ext also helps to run populate_sdk task.
+# filename              partition
 
-inherit populate_sdk_ext
-
-addtask populate_sdk after do_install before do_build
-
-# To include protoc compiler in SDK
-TOOLCHAIN_HOST_TASK_append = " nativesdk-protobuf-compiler "
-
-# Add nativesdk-llvm-arm-toolchain in SDK to run on SDKMACHINE
-TOOLCHAIN_HOST_TASK_append = " nativesdk-llvm-arm-toolchain"
-
-# To include kernel headers in SDK
-TOOLCHAIN_TARGET_TASK_append = " linux-msm-headers-dev"
-
-# To include kernel sources in SDK to build kernel modules
-TOOLCHAIN_TARGET_TASK_append = " kernel-devsrc"
-
-TOOLCHAIN_TARGET_TASK_append = "  ath6kl-utils-staticdev"
+NON-HLOS.bin            /dev/block/bootdevice/by-name/modem
+abl.elf                 /dev/block/bootdevice/by-name/abl
+aop.mbn                 /dev/block/bootdevice/by-name/aop
+apdp.mbn                /dev/block/bootdevice/by-name/apdp
+ipa_fws.elf             /dev/block/bootdevice/by-name/ipa_fw
+logfs_ufs_8mb.bin       /dev/block/bootdevice/by-name/logfs
+multi_image.mbn         /dev/block/bootdevice/by-name/multi_image
+multi_image_qti.mbn     /dev/block/bootdevice/by-name/multi_image_qti
+persist.img             /dev/block/bootdevice/by-name/persist
+hyp.mbn                 /dev/block/bootdevice/by-name/hyp
+Quantum.fv              /dev/block/bootdevice/by-name/quantumfv
+quantumsdk.fv           /dev/block/bootdevice/by-name/quantumsdk
+xbl_no_preamble.elf     /dev/block/bootdevice/by-name/sbl
+sec.elf                 /dev/block/bootdevice/by-name/sec
+tools32.fv              /dev/block/bootdevice/by-name/toolsfv
+tz.mbn                  /dev/block/bootdevice/by-name/tz
+devcfg.mbn              /dev/block/bootdevice/by-name/tz_devcfg
+uefi.elf                /dev/block/bootdevice/by-name/uefi
+xbl_config.elf          /dev/block/bootdevice/by-name/xbl_config
+xbl_ramdump.elf         /dev/block/bootdevice/by-name/xbl_ramdump
