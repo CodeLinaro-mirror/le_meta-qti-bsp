@@ -1,5 +1,4 @@
-#!/bin/sh
-# Copyright (c) 2020, The Linux Foundation. All rights reserved.
+# Copyright (c) 2021, The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -26,53 +25,25 @@
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# Perform a bind mount, copying existing files as we do so to ensure the
-#!/bin/sh
-#
-# Perform a bind mount, copying existing files as we do so to ensure the
-# overlaid path has the necessary content.
+# filename              partition
 
-if [ ! -e "$2" ]; then
-   echo >&2 "No System file/directory exist"
-   exit 1
-fi
-
-spec=$1
-mountpoint=$2
-
-if [ -f "$mountpoint" ]; then
-    #Skip if already mount-binded
-    if grep -qs $mountpoint /proc/mounts; then
-        exit 0
-    fi
-
-    if [ ! -f "$spec" ]; then
-        mkdir -p $(dirname $spec)
-        cp -P --preserve=all "$mountpoint" "$spec"
-    fi
-
-    mount -o "bind" "$spec" "$mountpoint"
-    test ! -x /sbin/restorecon || /sbin/restorecon "$mountpoint"
-fi
-
-if [ -d "$mountpoint" ]; then
-    mkdir -p $spec
-    cd $mountpoint
-    for file in *
-    do
-        #Skip if already mount-binded
-        # remove trailing '/' if present
-        mountpath=$(echo $mountpoint | sed 's:/*$::')
-        if grep -qs "$mountpath/$file" /proc/mounts; then
-            continue
-        fi
-
-        if [ -f "$mountpoint/$file" ]; then
-            if [ ! -f "$spec/$file" ]; then
-                cp --preserve=all "$file" "$spec/"
-            fi
-            mount -o "bind" "$spec/$file" "$mountpoint/$file"
-            test ! -x /sbin/restorecon || /sbin/restorecon "$mountpoint/$file"
-        fi
-   done
-fi
+NON-HLOS.bin            /dev/block/bootdevice/by-name/modem
+abl.elf                 /dev/block/bootdevice/by-name/abl
+aop.mbn                 /dev/block/bootdevice/by-name/aop
+apdp.mbn                /dev/block/bootdevice/by-name/apdp
+ipa_fws.elf             /dev/block/bootdevice/by-name/ipa_fw
+logfs_ufs_8mb.bin       /dev/block/bootdevice/by-name/logfs
+multi_image.mbn         /dev/block/bootdevice/by-name/multi_image
+multi_image_qti.mbn     /dev/block/bootdevice/by-name/multi_image_qti
+persist.img             /dev/block/bootdevice/by-name/persist
+hyp.mbn                 /dev/block/bootdevice/by-name/hyp
+Quantum.fv              /dev/block/bootdevice/by-name/quantumfv
+quantumsdk.fv           /dev/block/bootdevice/by-name/quantumsdk
+xbl_no_preamble.elf     /dev/block/bootdevice/by-name/sbl
+sec.elf                 /dev/block/bootdevice/by-name/sec
+tools32.fv              /dev/block/bootdevice/by-name/toolsfv
+tz.mbn                  /dev/block/bootdevice/by-name/tz
+devcfg.mbn              /dev/block/bootdevice/by-name/tz_devcfg
+uefi.elf                /dev/block/bootdevice/by-name/uefi
+xbl_config.elf          /dev/block/bootdevice/by-name/xbl_config
+xbl_ramdump.elf         /dev/block/bootdevice/by-name/xbl_ramdump
