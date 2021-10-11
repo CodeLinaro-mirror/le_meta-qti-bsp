@@ -51,9 +51,15 @@ _WLAN_CFG_OVERRIDE_GVM = "\
                         CONFIG_QCOM_TDLS=n \
                         CONFIG_CFG_MAX_STA_VDEVS=4 \
                         CONFIG_CFG_BMISS_OFFLOAD_MAX_VDEV=4 \
+                        CONFIG_FEATURE_MEMDUMP_ENABLE=n \
+                        "
+_WLAN_CFG_OVERRIDE_METAL = "\
+                        CONFIG_WLAN_DISABLE_EXPORT_SYMBOL=y \
+                        CONFIG_FEATURE_MEMDUMP_ENABLE=n \
                         "
 EXTRA_OEMAKE_append_qtiquingvm = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
 EXTRA_OEMAKE_append_qtiquingvm8295 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
+EXTRA_OEMAKE_append_sa8295 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_METAL}"
 
 do_configure_append() {
     sed -i -e 's/^gEnableConcurrentSTA=wlan1/gEnableConcurrentSTA=wlan3/g' ${WORKDIR}/device/qcom/wlan/msm_auto/WCNSS_qcom_cfg_qca6390.ini

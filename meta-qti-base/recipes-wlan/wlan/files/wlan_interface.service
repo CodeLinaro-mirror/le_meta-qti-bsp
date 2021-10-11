@@ -1,4 +1,3 @@
-#!/bin/sh
 # Copyright (c) 2021 The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -26,22 +25,14 @@
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-if (lsmod|grep cnss2);then
-	echo "cnss2 already exist"
-else
-	echo "try to load cnss2"
-	modprobe cnss2
-fi
+[Unit]
+Description=wireless interface operation
+Requires=qca6696-module-load.service qca6390-module-load.service
+After=qca6696-module-load.service qca6390-module-load.service
 
-if (lspci -k|grep cnss_pci);then
-	if (lspci -k|grep 1101);then
-		if (ls -l /sys/bus/pci/devices/ | grep 0002:01:00.0 ||
-		ls -l /sys/bus/pci/devices/ | grep 0004:01:00.0 ); then
-			modprobe qca6390
-		else
-			echo "cnss: No Second Hastings wlan chipset attached"
-		fi
-	else
-		echo "cnss: No Hastings wlan chipset attached"
-	fi
-fi
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/wlan_interface.sh
+
+[Install]
+WantedBy=default.target

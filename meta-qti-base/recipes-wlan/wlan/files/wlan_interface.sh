@@ -26,22 +26,30 @@
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-if (lsmod|grep cnss2);then
-	echo "cnss2 already exist"
-else
-	echo "try to load cnss2"
-	modprobe cnss2
+if (lsmod | grep qca6696);then
+	while ! [ "$(ls /sys/class/net/ | grep wifi-aware0)" = "wifi-aware0" ]
+	do
+		echo  "waiting for wifi-aware0 to be ready"
+		sleep 1
+	done
 fi
 
-if (lspci -k|grep cnss_pci);then
-	if (lspci -k|grep 1101);then
-		if (ls -l /sys/bus/pci/devices/ | grep 0002:01:00.0 ||
-		ls -l /sys/bus/pci/devices/ | grep 0004:01:00.0 ); then
-			modprobe qca6390
-		else
-			echo "cnss: No Second Hastings wlan chipset attached"
-		fi
-	else
-		echo "cnss: No Hastings wlan chipset attached"
-	fi
+if (lsmod | grep qca6390);then
+	while ! [ "$(ls /sys/class/net/ | grep wifi-aware1)" = "wifi-aware1" ]
+	do
+		echo  "waiting for wifi-aware1 to be ready"
+		sleep 1
+	done
+fi
+
+echo "try to delete NAN wifi-aware0 interface..."
+if [ -f /sys/class/net/wifi-aware0/operstate ];then
+	echo "find wifi-aware0..."
+	iw dev wifi-aware0 del
+fi
+
+echo "try to delete NAN wifi-aware1 interface..."
+if [ -f /sys/class/net/wifi-aware1/operstate ];then
+	echo "find wifi-aware1..."
+	iw dev wifi-aware1 del
 fi
