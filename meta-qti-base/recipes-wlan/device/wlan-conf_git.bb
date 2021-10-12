@@ -24,6 +24,7 @@ S = "${WORKDIR}/device"
 do_install(){
     install -d ${D}${sysconfdir}/misc/wifi
     install -m 0644 ${S}/qcom/wlan/msm_auto/*.conf ${D}${sysconfdir}/misc/wifi
+    install -m 0644 ${S}/qcom/wlan/msm_auto/vendor_cmd.xml ${D}${sysconfdir}/misc/wifi
     install -d ${D}${bindir}
     install -m 0755 ${S}/qcom/wlan/msm_auto/*.sh ${D}${bindir}
 }
