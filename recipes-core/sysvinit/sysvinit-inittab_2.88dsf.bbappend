@@ -24,6 +24,10 @@ do_install() {
             echo "m4:5:respawn:/usr/bin/location_hal_daemon" >> ${D}${sysconfdir}/inittab
             echo "m5:5:respawn:/usr/bin/loc_launcher" >> ${D}${sysconfdir}/inittab
             echo >> ${D}${sysconfdir}/inittab
+        else
+            ## older PLs has only loc_launcher
+            echo "m4:5:respawn:/usr/bin/loc_launcher" >> ${D}${sysconfdir}/inittab
+            echo >> ${D}${sysconfdir}/inittab
         fi
     fi
 
