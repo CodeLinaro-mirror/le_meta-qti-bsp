@@ -24,6 +24,6 @@ do_configure_append() {
     cp ${WORKDIR}/incremental_ota.sh ${S}
     chmod 755 ${S}/incremental_ota.sh
 }
-
+do_fetch[nostamp] = "1"
 do_compile[noexec] = "1"
 do_install[noexec] = "1"
