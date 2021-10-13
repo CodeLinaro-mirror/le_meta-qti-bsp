@@ -26,6 +26,7 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 LV = "1.0.0"
 
 inherit autotools systemd
+SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE_${PN} = "${@bb.utils.contains('DISTRO_FEATURES','early_init','video_early_demo.service','',d)}"
 
 
@@ -89,7 +90,7 @@ do_install_append() {
    if ${@bb.utils.contains('DISTRO_FEATURES', 'early_init', 'true', 'false', d)}; then
        install -m 0777 ${THISDIR}/test_1080p.h264 -D ${D}/usr/bin/test_1080p.h264
        install -m 0755 ${THISDIR}/video_dec_demo.sh -D ${D}${sbindir}/video_dec_demo.sh
-       install -m 0644 ${THISDIR}/video_early_demo.service -D ${D}${systemd_unitdir}/system/video_early_demo.service
+       install -m 0644 ${THISDIR}/video_early_demo.service -D ${D}${systemd_system_unitdir}/video_early_demo.service
    fi
 }
 
