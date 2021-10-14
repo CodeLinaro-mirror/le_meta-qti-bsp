@@ -13,6 +13,7 @@ RDEPENDS_${PN} += "\
     wayland \
     wayland-ivi-extension \
     weston \
+    weston-init \
     weston-examples \
     display-hal-linux \
     display-commonsys-intf-linux \
