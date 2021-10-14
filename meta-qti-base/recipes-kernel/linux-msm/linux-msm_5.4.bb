@@ -66,6 +66,7 @@ SRC_URI_append =  " file://lxc.cfg"
 SRC_URI_append =  " file://ipc.cfg"
 SRC_URI_append = "${@bb.utils.contains('DISTRO_FEATURES', 'early_init', ' file://earlyuserspace.cfg', '', d)}"
 SRC_URI_append = " file://memhotplug.cfg"
+SRC_URI_append = " file://eth.conf"
 
 SRC_URI_append =  "${@bb.utils.contains('MACHINE_FEATURES', 'qti-wlan', ' file://wlan.cfg', '', d)}"
 
@@ -124,6 +125,14 @@ addtask kernel_configcheck after do_configure before do_compile
 
 do_compile () {
     oe_runmake CC="${KERNEL_CC}" LD="${KERNEL_LD}" ${KERNEL_EXTRA_ARGS} $use_alternate_initrd
+}
+
+do_install_append() {
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
+        install -m 0755 ${WORKDIR}/eth.conf -D ${D}${sysconfdir}/modules-load.d/eth.conf
+    else
+        install -m 0755 ${WORKDIR}/eth.conf -D ${D}${sysconfdir}/modules/eth.conf
+    fi
 }
 
 do_deploy() {
