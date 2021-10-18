@@ -41,6 +41,7 @@ DEPENDS += " mkbootimg-native openssl-native kern-tools-native rsync-native"
 RDEPENDS_${KERNEL_PACKAGE_NAME}-base = ""
 
 LDFLAGS_aarch64 = "-O1 --hash-style=gnu --as-needed"
+FILES_${KERNEL_PACKAGE_NAME}-base += "${sysconfdir}/modules-load.d/eth.conf"
 
 DEPENDS_append_aarch64 = " libgcc"
 KERNEL_CC_append_aarch64 = " ${TOOLCHAIN_OPTIONS}"
