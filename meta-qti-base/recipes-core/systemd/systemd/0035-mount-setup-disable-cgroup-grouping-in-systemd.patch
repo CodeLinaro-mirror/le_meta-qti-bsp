@@ -1,0 +1,40 @@
+From e9d1b8bcdd1095c3292f90411efd0e0498bd7e2f Mon Sep 17 00:00:00 2001
+From: Lei wang <quic_leiwan@quicinc.com>
+Date: Fri, 15 Oct 2021 19:20:00 +0800
+Subject: [PATCH] mount-setup: disable cgroup grouping in systemd
+
+Systemd would like to group several cgroup feature
+together. Some system like android, for better control
+purpose, they would like split the feture to different
+mount point. so disable cgroup grouping for Android
+container support
+
+Signed-off-by: Lei wang <quic_leiwan@quicinc.com>
+---
+ src/core/mount-setup.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/core/mount-setup.c b/src/core/mount-setup.c
+index 7ef5b12..38cb163 100644
+--- a/src/core/mount-setup.c
++++ b/src/core/mount-setup.c
+@@ -309,7 +309,7 @@ int mount_cgroup_controllers(void) {
+                 controller = set_steal_first(controllers);
+                 if (!controller)
+                         break;
+-
++#if 0
+                 /* Check if we shall mount this together with another controller */
+                 other_controller = join_with(controller);
+                 if (other_controller) {
+@@ -328,6 +328,7 @@ int mount_cgroup_controllers(void) {
+                                         return log_oom();
+                         }
+                 }
++#endif
+ 
+                 /* The simple case, where there's only one controller to mount together */
+                 if (!options)
+-- 
+2.7.4
+
