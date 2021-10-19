@@ -37,11 +37,15 @@ case $1/$2 in
 
     # disable BT as hsuart could block suspend
     systemctl stop synergy.service
+
     # disable WLAN related app
-    killall wpa_supplicant
-    killall hostapd
-    # wait for it complete
-    sleep 10
+    killall wpa_supplicant &
+    PID_KW=$!
+    killall hostapd &
+    PID_KH=$!
+    echo "wait killing... $PID_KW and $PID_KH"
+    wait $PID_KW
+    wait $PID_KH
 
     # set all usb mode to none
     echo none > /sys/devices/platform/soc/a600000.ssusb/mode
