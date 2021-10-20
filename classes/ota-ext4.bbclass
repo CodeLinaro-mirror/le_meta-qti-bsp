@@ -17,8 +17,8 @@ OTA_FULL_UPDATE_EXT4_PATH = "${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${OTA_FULL_UP
 OTA_INCREMENTAL_UPDATE_EXT4 = "incremental_update_ext4.zip"
 OTA_INCREMENTAL_UPDATE_EXT4_PATH = "${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${OTA_INCREMENTAL_UPDATE_EXT4}"
 
-MACHINE_FILESMAP_SEARCH_PATH ?= "${@':'.join('%s/conf/machine/filesmap' % p for p in '${BBPATH}'.split(':'))}}"
-MACHINE_FILESMAP_FULL_PATH = "${@machine_search(d.getVar('MACHINE_FILESMAP_CONF'), d.getVar('MACHINE_FILESMAP_SEARCH_PATH')) or ''}"
+MACHINE_FILESMAP_SEARCH_PATH_EXT4 ?= "${@':'.join('%s/conf/machine/filesmap' % p for p in '${BBPATH}'.split(':'))}}"
+MACHINE_FILESMAP_FULL_PATH_EXT4 = "${@machine_search(d.getVar('MACHINE_FILESMAP_CONF_EMMC'), d.getVar('MACHINE_FILESMAP_SEARCH_PATH_EXT4')) or ''}"
 
 #Create directory structure for targetfiles.zip
 do_recovery_ext4[cleandirs] += "${OTA_TARGET_IMAGE_ROOTFS_EXT4}"
@@ -40,10 +40,11 @@ do_recovery_ext4[cleandirs] += "${OTA_TARGET_IMAGE_ROOTFS_EXT4}/BOOT/RAMDISK"
 # Wait till all tasks of machine-recovery-image complete.
 
 do_recovery_ext4() {
-    echo "base image rootfs: ${IMAGE_ROOTFS}"
+    echo "base image rootfs: ${IMAGE_ROOTFS_EXT4}"
+    echo "recovery image rootfs: ${RECOVERY_IMAGE_ROOTFS}"
 
     # if exists copy filesmap into RADIO directory
-    radiofilesmap=${MACHINE_FILESMAP_FULL_PATH}
+    radiofilesmap=${MACHINE_FILESMAP_FULL_PATH_EXT4}
     [[ ! -z "$radiofilesmap" ]] && install -m 755 $radiofilesmap ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RADIO/filesmap
 
     # copy the boot\recovery images
@@ -64,15 +65,15 @@ do_recovery_ext4() {
     fi
 
     # copy the contents of system rootfs
-    cp -r ${IMAGE_ROOTFS}/. ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/SYSTEM/.
+    cp -r ${IMAGE_ROOTFS_EXT4}/. ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/SYSTEM/.
     cd  ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/SYSTEM
     rm -rf var/run
     ln -snf ../run var/run
 
     # copy the contents of system overlayfs
-    cp -r ${IMAGE_ROOTFS}/overlay/. ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/DATA/.
+    cp -r ${IMAGE_ROOTFS_EXT4}/overlay/. ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/DATA/.
 
-    cp -r ${IMAGE_ROOTFS}/. ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/.
+    cp -r ${RECOVERY_IMAGE_ROOTFS}/. ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/.
 
     #generate recovery.fstab which is used by the updater-script
     echo #mount point fstype device [device2] >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/recovery.fstab
@@ -98,26 +99,20 @@ do_recovery_ext4() {
     #blocksize = BOARD_FLASH_BLOCK_SIZE
     echo blocksize=131072 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 
-    export BOOT_SIZE=$(sed -r 's/.*label="boot_a".*size_in_kb="([0-9]+\.*[0-9]*).*/\1/;t;d' ${WORKDIR}/partition.xml)
-    export SYSTEM_SIZE=$(sed -r 's/.*label="system_a".*size_in_kb="([0-9]+\.*[0-9]*).*/\1/;t;d' ${WORKDIR}/partition.xml)
-    export USERDATA_SIZE=$(sed -r 's/.*label="userdata".*size_in_kb="([0-9]+\.*[0-9]*).*/\1/;t;d' ${WORKDIR}/partition.xml)
+    # boot_size: Size of boot partition from partition.xml
+    echo boot_size=0x011DC000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 
-    # convert kb to bytes
-    export BOOT_SIZE="$(expr $BOOT_SIZE \* 1024)"
-    export SYSTEM_SIZE="$(expr $SYSTEM_SIZE \* 1024)"
-    export USERDATA_SIZE="$(expr $USERDATA_SIZE \* 1024)"
-
-    #boot_size: Size of boot partition from partition.xml
-    echo "boot_size=0x$(echo "obase=16; $BOOT_SIZE" | bc)" >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
+    # recovery_size : Size of recovery partition from partition.xml
+    echo recovery_size=0x011DC000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 
     #system_size : Size of system partition from partition.xml
-    echo "system_size=0x$(echo "obase=16; $SYSTEM_SIZE" | bc)" >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
+    echo system_size=0x10000000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 
     #userdate_size : Size of data partition from partition.xml
-    echo "userdate_size=0x$(echo "obase=16; $USERDATA_SIZE" | bc)" >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
+    echo userdata_size=0x0F000000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 
     #cache_size : Size of data partition from partition.xml
-    echo "cache_size=0x$(echo "obase=16; $USERDATA_SIZE" | bc)" >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
+    echo cache_size=0x00800000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 
     #mkyaffs2_extra_flags : -c $(BOARD_KERNEL_PAGESIZE) -s $(BOARD_KERNEL_SPARESIZE)
     echo mkyaffs2_extra_flags=-c 4096 -s 16 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
@@ -131,9 +126,6 @@ do_recovery_ext4() {
     # set block img diff version to v3
     echo "blockimgdiff_versions=3" >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 
-    # Targets that support A/B boot do not need recovery(fs)-updater
-    echo le_target_supports_ab=1 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
-
     cd ${OTA_TARGET_IMAGE_ROOTFS_EXT4} && zip -qry ${OTA_TARGET_FILES_EXT4_PATH} *
 }
 addtask do_recovery_ext4 after do_image_complete before do_build
@@ -143,7 +135,7 @@ do_gen_ota_incremental_zip_ext4[dirs] += "${DEPLOY_DIR_IMAGE}/ota-scripts"
 do_gen_ota_incremental_zip_ext4() {
     if [ -f "${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${OTA_TARGET_FILES_EXT4}" ]; then
 
-        ./incremental_ota.sh ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${OTA_TARGET_FILES_EXT4} ${OTA_TARGET_FILES_EXT4_PATH} ${IMAGE_ROOTFS} ext4 --block --system_path ${IMAGE_SYSTEM_MOUNT_POINT}
+        ./incremental_ota.sh ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${OTA_TARGET_FILES_EXT4} ${OTA_TARGET_FILES_EXT4_PATH} ${IMAGE_ROOTFS_EXT4} ext4 --block --system_path ${IMAGE_SYSTEM_MOUNT_POINT}
 
         cp update_incr_ext4.zip ${DEPLOY_DIR_IMAGE}/${OTA_INCREMENTAL_UPDATE_EXT4}
     else
@@ -153,7 +145,7 @@ do_gen_ota_incremental_zip_ext4() {
 
 do_gen_ota_full_zip_ext4[dirs] += "${DEPLOY_DIR_IMAGE}/ota-scripts"
 do_gen_ota_full_zip_ext4() {
-    ./full_ota.sh ${OTA_TARGET_FILES_EXT4_PATH} ${IMAGE_ROOTFS} ext4 --block --system_path ${IMAGE_SYSTEM_MOUNT_POINT}
+    ./full_ota.sh ${OTA_TARGET_FILES_EXT4_PATH} ${IMAGE_ROOTFS_EXT4} ext4 --block --system_path ${IMAGE_SYSTEM_MOUNT_POINT}
 
     cp update_ext4.zip ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${OTA_FULL_UPDATE_EXT4}
 }
