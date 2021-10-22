@@ -59,7 +59,7 @@ index 69ba4bfc64..0d922314e8 100644
 +                if (fstab_test_option(me->mnt_opts, "slotselect\0")) {
 +                        if (slot_suffix || proc_cmdline_get_key("androidboot.slot_suffix", 0, &slot_suffix)) {
 +                                realloc(what, strlen(what) + strlen(slot_suffix) + 1);
-+                                strlcat(what, slot_suffix, strlen(slot_suffix));
++                                strlcat(what, slot_suffix, strlen(what) + strlen(slot_suffix) + 1);
 +                                log_info("slotselect mount target changed to '%s' suffix is '%s'.", what, slot_suffix);
 +                        }
 +                        else
