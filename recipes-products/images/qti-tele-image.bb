@@ -17,8 +17,10 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         pps-tools \
         spitools \
         packagegroup-android-utils \
+        packagegroup-qti-core \
         ${@bb.utils.contains('MACHINE_FEATURES', 'qti-location', 'packagegroup-qti-location', '', d)} \
         ${@bb.utils.contains('COMBINED_FEATURES', 'qti-security', 'packagegroup-qti-securemsm', '', d)} \
+	packagegroup-qti-ss-mgr \
         packagegroup-qti-telematics \
         ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
         packagegroup-startup-scripts \
