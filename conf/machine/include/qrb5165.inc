@@ -9,6 +9,9 @@ require conf/machine/include/arm/arch-armv8.inc
 PREFERRED_PROVIDER_virtual/kernel = "linux-msm"
 PREFERRED_VERSION_linux-msm ?= "4.19"
 PREFERRED_VERSION_pulseaudio = "12.2"
+PREFERRED_VERSION_protobuf = "3.11.4"
+PREFERRED_VERSION_protobuf-native = "3.11.4"
+PREFERRED_VERSION_nativesdk-protobuf = "3.11.4"
 PAGE_SIZE ?= '4096'
 
 # Max supported inodes
