@@ -3,7 +3,9 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 SRCBRANCH = "drains/release/${PV}/master"
 GLIBC_GIT_URI = "git://source.codeaurora.org/quic/le/glibc.git;protocol=https"
 
-SRC_URI += "file://CVE-2019-25013.patch"
+SRC_URI += "file://CVE-2019-25013.patch \
+	    file://CVE-2017-8804.patch \
+"
 
 # glibc expects -fstack-protector optimization passed as a configuration option
 # instead of a top level build flag.
