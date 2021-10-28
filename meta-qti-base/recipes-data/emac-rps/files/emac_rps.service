@@ -28,10 +28,12 @@
 
 [Unit]
 Description= emac_rps_setting
-After=firmware-links.service firmware.mount sysinit.target
+After=firmware-links.service firmware.mount sysinit.target systemd-udev-trigger-full.service
 
 [Service]
 Type=simple
+Restart=on-failure
+RestartSec=100ms
 ExecStart=/bin/sh /usr/bin/emac_rps_settings.sh
 
 [Install]
