@@ -43,6 +43,7 @@ _WLAN_CFG_OVERRIDE_GVM = "\
                         CONFIG_WLAN_DISABLE_EXPORT_SYMBOL=y \
                         CONFIG_WLAN_OPEN_P2P_INTERFACE=n \
                         CONFIG_SUPPORT_P2P_BY_ONE_INTF_WLAN=y \
+                        CONFIG_WLAN_BOOTUP_MARKER=y \
                         CONFIG_WLAN_PLACEMARKER_PREFIX=108 \
                         CONFIG_FEATURE_GPIO_CFG=y \
                         CONFIG_CNSS_GENL=n \
