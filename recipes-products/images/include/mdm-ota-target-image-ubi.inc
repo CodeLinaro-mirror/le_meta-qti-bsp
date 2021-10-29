@@ -15,6 +15,7 @@ def nand_target_supports_OTA_upgrade(d):
 DEPLOY_DIR_IMAGE_NAND ?= "${DEPLOY_DIR_IMAGE}"
 SQUASHFS_SYS_VOLUME ?= "${BASEMACHINE}-sysfs.squash"
 SQUASHFS_RECOVERYFS_VOLUME ?= "recoveryfs.squash"
+MODEM_SQUASHFS_IMAGE ?= "NON-HLOS.squash"
 
 def nand_set_vars_and_get_dependencies(d):
     if not nand_target_supports_OTA_upgrade(d):
@@ -160,6 +161,12 @@ do_recovery_ubi() {
         if ${@bb.utils.contains('DISTRO_FEATURES', 'nad-prod', 'true', 'false', d)}; then
             squashfs2sparse  ${DEPLOY_DIR_IMAGE_NAND}/${SQUASHFS_RECOVERYFS_VOLUME} ${OTA_TARGET_IMAGE_ROOTFS_UBI}/IMAGES/recoveryfs.img
             echo /recoveryfs  squashfs  /dev/block/bootdevice/by-name/recoveryfs >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RECOVERY/recovery.fstab
+        fi
+        if ${@bb.utils.contains('DISTRO_FEATURES', 'modem-volume', 'true', 'false', d)}; then
+            echo /modem  squashfs  /dev/block/bootdevice/by-name/modem >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RECOVERY/recovery.fstab
+            if [ -f ${DEPLOY_DIR_IMAGE_NAND}/${MODEM_SQUASHFS_IMAGE} ]; then
+                squashfs2sparse  ${DEPLOY_DIR_IMAGE_NAND}/${MODEM_SQUASHFS_IMAGE} ${OTA_TARGET_IMAGE_ROOTFS_UBI}/IMAGES/modem.img
+            fi
         fi
     else
         # File-based OTA upgrade
