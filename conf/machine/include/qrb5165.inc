@@ -12,6 +12,7 @@ PREFERRED_VERSION_pulseaudio = "12.2"
 PREFERRED_VERSION_protobuf = "3.11.4"
 PREFERRED_VERSION_protobuf-native = "3.11.4"
 PREFERRED_VERSION_nativesdk-protobuf = "3.11.4"
+PREFERRED_VERSION_ffmpeg = "3.4.8"
 PAGE_SIZE ?= '4096'
 
 # Max supported inodes
