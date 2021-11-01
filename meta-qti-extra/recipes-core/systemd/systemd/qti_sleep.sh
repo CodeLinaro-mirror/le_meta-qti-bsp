@@ -30,9 +30,6 @@ case $1/$2 in
   pre/*)
     echo "Entering into $2..."
 
-    #disable camera v4l2
-    systemctl stop ais_v4l2_proxy
-
     # disable weston before kernel libdrm FE is ready
     systemctl stop weston.service
 
@@ -73,7 +70,5 @@ case $1/$2 in
     systemctl restart audiod.service
 
     systemctl restart weston.service
-
-    systemctl restart ais_v4l2_proxy
     ;;
 esac
