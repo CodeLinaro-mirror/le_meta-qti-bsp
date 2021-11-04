@@ -83,10 +83,11 @@ python rootfs_ignore_packages() {
     d.setVar("PACKAGE_INSTALL_ATTEMPTONLY", ' '.join(atmt_only_pkgs))
 }
 
-# Call function makesystem to generate sparse squashfs or ext4 image
+# Call function makesystem to generate sparse ext4 image
 python __anonymous () {
     machine = d.getVar("MACHINE", True)
-    bb.build.addtask('makesystem', 'do_image_qa', 'do_rootfs', d)
+    if bb.utils.contains('IMAGE_FSTYPES', 'ext4', True, False, d):
+        bb.build.addtask('makesystem', 'do_image_qa', 'do_rootfs', d)
 
 # Call function image_squashfs_xz before executing do_make_ramdisk_bootimg
     if bb.utils.contains('DISTRO_FEATURES', 'flashless', True, False, d):
@@ -96,7 +97,7 @@ python __anonymous () {
 
 ### Generate system.img #####
 # Alter system image size if varity is enabled.
-do_makesystem[postfuncs]  += " ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'adjust_system_size_for_verity_squashfs', '', d)}"
+do_makesystem[prefuncs]  += " ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'adjust_system_size_for_verity', '', d)}"
 do_makesystem[postfuncs] += " ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'make_verity_enabled_system_image', '', d)}"
 do_makesystem[dirs]       = "${DEPLOY_DIR_IMAGE}"
 
