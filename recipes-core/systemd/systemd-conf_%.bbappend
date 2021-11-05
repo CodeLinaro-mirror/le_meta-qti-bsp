@@ -38,11 +38,13 @@ do_install_append() {
 # logind.conf
 do_install_append() {
     # Ignore PowerKey
-    sed -i -e 's/#HandlePowerKey=poweroff/HandlePowerKey=ignore/' ${D}${systemd_unitdir}/logind.conf.d/00-${PN}.conf
+    sed -i '$aHandlePowerKey=ignore' ${D}${systemd_unitdir}/logind.conf.d/00-${PN}.conf
 }
 
 # system.conf
 do_install_append() {
+    # Set LogTarget as syslog
+    sed -i '$aLogTarget=syslog' ${D}${systemd_unitdir}/system.conf.d/00-${PN}.conf
 }
 
 # user.conf

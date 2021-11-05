@@ -5,17 +5,18 @@ inherit qimage
 
 IMAGE_FEATURES += "ssh-server-openssh"
 
+# This image doesn't support abl generation
+EXTRA_IMAGEDEPENDS_remove = "edk2"
+
 CORE_IMAGE_EXTRA_INSTALL += "\
-        chrony \
         e2fsprogs \
-	packagegroup-android-utils-base \
-	packagegroup-startup-scripts-base \
         e2fsprogs-e2fsck \
         e2fsprogs-mke2fs \
         glib-2.0 \
         kernel-modules \
-        libnl \
-        libxml2 \
+        packagegroup-android-utils-base \
+        packagegroup-startup-scripts-base \
+        packagegroup-support-utils \
         systemd-machine-units \
         ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
 "
