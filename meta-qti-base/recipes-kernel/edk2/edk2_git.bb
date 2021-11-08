@@ -59,6 +59,7 @@ do_deploy() {
     install -m 0644 ${D}/boot/abl.elf ${DEPLOYDIR}
 }
 do_deploy[dirs] = "${S} ${DEPLOYDIR}"
+do_deploy[nostamp] = "1"
 
 addtask deploy before do_build after do_install
 
