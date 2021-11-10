@@ -36,6 +36,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-support-utils \
         systemd-machine-units \
         ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
+        ${@bb.utils.contains('MACHINE_FEATURES', 'qti-npu', "packagegroup-qti-npu", "", d)} \
 "
 
 #install drm
@@ -49,3 +50,6 @@ CORE_IMAGE_EXTRA_INSTALL += " \
             wayland \
             gbm \
             "
+#To include BT static libs in SDK
+TOOLCHAIN_TARGET_TASK_append = " fluoride-staticdev"
+TOOLCHAIN_TARGET_TASK_append = " btobex-staticdev"
