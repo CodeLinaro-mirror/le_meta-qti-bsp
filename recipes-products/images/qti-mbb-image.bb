@@ -6,8 +6,13 @@ require qti-mbb-minimal-image.bb
 
 IMAGE_FEATURES += "nand2x"
 
+# gluebi is read only and prevents debugging/experimentation. Only enable in user variant
+IMAGE_FEATURES_append_qti-distro-base-user = " gluebi"
+
 CORE_IMAGE_EXTRA_INSTALL += "\
               packagegroup-qti-data-1g \
+              ${@bb.utils.contains('MACHINE_FEATURES', 'qti-ssdk', "packagegroup-qti-ssdk", "", d)} \
+              ${@bb.utils.contains('MACHINE_FEATURES', 'qti-audio', 'packagegroup-qti-audio', '', d)} \
               ${@bb.utils.contains('MACHINE_FEATURES', 'qti-bluetooth', "packagegroup-qti-bluetooth", "", d)} \
               ${@bb.utils.contains('MACHINE_FEATURES', 'qti-wifi', "packagegroup-qti-wifi", "", d)} \
 "

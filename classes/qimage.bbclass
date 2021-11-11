@@ -1,4 +1,4 @@
-QIMGCLASSES = "core-image"
+QIMGCLASSES = "core-image qimage-utils python3native"
 QIMGCLASSES += "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.filter('MACHINE_FEATURES', 'dm-verity-bootloader dm-verity-initramfs', d), '', d)}"
 QIMGCLASSES += "${@bb.utils.contains('IMAGE_FSTYPES', 'ext4', 'qimage-ext4', '', d)}"
 QIMGCLASSES += "${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', 'qimage-ubi', '', d)}"
@@ -6,7 +6,7 @@ QIMGCLASSES += "${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', 'qimage-ubi', '', d
 # Use the following to extend qimage with custom functions like signing
 QIMGEXTENSION ?= ""
 
-inherit python3native ${QIMGCLASSES} ${QIMGEXTENSION}
+inherit ${QIMGCLASSES} ${QIMGEXTENSION}
 
 # Sanity check to ensure dm-verity related configurations are valid
 python () {
@@ -49,39 +49,6 @@ def set_partition_image_map(d):
 
 PARTITION_IMAGE_MAP = "${@set_partition_image_map(d)}"
 
-#  Function to get most suitable .inc file with list of packages
-#  to be installed into root filesystem from layer it is called.
-#  Following is the order of priority.
-#  P1: <basemachine>/<basemachine>-<distro>-<layerkey>-image.inc
-#  P2: <basemachine>/<basemachine>-<layerkey>-image.inc
-#  P3: common/common-<layerkey>-image.inc
-def get_bblayer_img_inc(layerkey, d):
-    distro      = d.getVar('DISTRO', True)
-    basemachine = d.getVar('BASEMACHINE', True)
-
-    lkey = ''
-    if layerkey != '':
-        lkey = layerkey + "-"
-
-    common_inc  = "common-"+ lkey + "image.inc"
-    machine_inc = basemachine + "-" + lkey + "image.inc"
-    distro_inc  = machine_inc
-    if distro != 'base' or '':
-        distro_inc = basemachine + "-" + distro +"-" + lkey + "image.inc"
-
-    distro_inc_path  = os.path.join(d.getVar('THISDIR'), basemachine, distro_inc)
-    machine_inc_path = os.path.join(d.getVar('THISDIR'), basemachine, machine_inc)
-    common_inc_path  = os.path.join(d.getVar('THISDIR'), "common", common_inc)
-
-    if os.path.exists(distro_inc_path):
-        img_inc_path = distro_inc_path
-    elif os.path.exists(machine_inc_path):
-        img_inc_path = machine_inc_path
-    else:
-        img_inc_path = common_inc_path
-    bb.note(" Incuding packages from %s" % (img_inc_path))
-    return img_inc_path
-
 IMAGE_INSTALL_ATTEMPTONLY ?= ""
 IMAGE_INSTALL_ATTEMPTONLY[type] = "list"
 
@@ -110,18 +77,6 @@ DEPENDS += "\
 
 MACHINE_PARTITION_CONF_SEARCH_PATH ?= "${@':'.join('%s/conf/machine/partition' % p for p in '${BBPATH}'.split(':'))}}"
 MACHINE_PARTITION_CONF_FULL_PATH = "${@machine_search(d.getVar('MACHINE_PARTITION_CONF'), d.getVar('MACHINE_PARTITION_CONF_SEARCH_PATH')) or ''}"
-
-MACHINE_FSCONFIG_CONF_SEARCH_PATH ?= "${@':'.join('%s/conf/machine/fsconfig' % p for p in '${BBPATH}'.split(':'))}}"
-MACHINE_FSCONFIG_CONF_FULL_PATH = "${@machine_search(d.getVar('MACHINE_FSCONFIG_CONF'), d.getVar('MACHINE_FSCONFIG_CONF_SEARCH_PATH')) or ''}"
-
-def machine_search(f, search_path):
-    if os.path.isabs(f):
-        if os.path.exists(f):
-            return f
-    else:
-        searched = bb.utils.which(search_path, f)
-        if searched:
-            return searched
 
 # generate partitions artifact in an image-specific folder since they include
 # image specific data such as file name and parition size
@@ -177,6 +132,15 @@ do_deploy_fixup () {
     if [ -f ${DEPLOY_DIR_IMAGE}/ipa-fws/ipa_fws.elf ]; then
        install -m 0644 ${DEPLOY_DIR_IMAGE}/ipa-fws/ipa_fws.elf .
     fi
+
+    # Copy recovery images
+    if [ -f ${DEPLOY_DIR_IMAGE}/recoveryfs.img ]; then
+       install -m 0644 ${DEPLOY_DIR_IMAGE}/recoveryfs.img .
+    fi
+    if [ -f ${DEPLOY_DIR_IMAGE}/recoveryfs.ubi ]; then
+       install -m 0644 ${DEPLOY_DIR_IMAGE}/recoveryfs.ubi .
+    fi
+
 }
 addtask do_deploy_fixup after do_rootfs before do_image
 
@@ -223,6 +187,8 @@ python rootfs_ignore_packages() {
 ################################################
 ############# Generate boot.img ################
 ################################################
+BOOTIMGDEPLOYDIR = "${WORKDIR}/deploy-${PN}-bootimage-complete"
+
 python do_make_bootimg () {
     import subprocess
 
@@ -252,12 +218,12 @@ python do_make_bootimg () {
         bb.error("Running: %s failed." % cmd)
 
 }
-do_make_bootimg[dirs]      = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
+do_make_bootimg[dirs]      = "${BOOTIMGDEPLOYDIR}/${IMAGE_BASENAME}"
 # Make sure native tools and vmlinux ready to create boot.img
 do_make_bootimg[depends] += "virtual/kernel:do_deploy mkbootimg-native:do_populate_sysroot"
 SSTATETASKS += "do_make_bootimg"
 SSTATE_SKIP_CREATION_task-make-bootimg = '1'
-do_make_bootimg[sstate-inputdirs] = "${IMGDEPLOYDIR}"
+do_make_bootimg[sstate-inputdirs] = "${BOOTIMGDEPLOYDIR}"
 do_make_bootimg[sstate-outputdirs] = "${DEPLOY_DIR_IMAGE}"
 do_make_bootimg[stamp-extra-info] = "${MACHINE_ARCH}"
 
