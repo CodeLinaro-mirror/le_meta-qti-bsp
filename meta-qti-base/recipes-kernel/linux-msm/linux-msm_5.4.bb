@@ -86,6 +86,8 @@ KCONFIG_MODE = "--alldefconfig"
 KBUILD_DEFCONFIG ?= "${KERNEL_CONFIG}"
 LINUX_VERSION_EXTENSION = "${@['-perf', ''][d.getVar('VARIANT', True) == ('' or 'debug')]}"
 
+KERNEL_MODULE_AUTOLOAD += "qti-can"
+
 do_kernel_metadata_prepend() {
     if ${@bb.utils.contains('MACHINE_FEATURES', 'kdump-support', 'true', 'false', d)}; then
         set +e
