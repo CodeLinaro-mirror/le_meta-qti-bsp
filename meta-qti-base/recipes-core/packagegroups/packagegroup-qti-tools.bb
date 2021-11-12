@@ -13,4 +13,5 @@ RDEPENDS_${PN} += "\
     pciutils \
     usbutils \
     util-linux \
+    libgpiod-tools \
     "
