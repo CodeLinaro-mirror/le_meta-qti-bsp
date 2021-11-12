@@ -24,7 +24,6 @@ KERNEL_LD_append_aarch64 = " ${TOOLCHAIN_OPTIONS}"
 KERNEL_PRIORITY           = "9001"
 # Add V=1 to KERNEL_EXTRA_ARGS for verbose
 KERNEL_EXTRA_ARGS        += "O=${B}"
-KERNEL_EXTRA_ARGS_append_sa8155  += "TARGET_BOARD_TYPE=auto"
 
 SRC_URI   =  "${PATH_TO_REPO}/kernel/msm-5.4/.git;protocol=${PROTO};destsuffix=kernel/msm-5.4;usehead=1 \
               ${PATH_TO_REPO}/data-kernel/.git;protocol=${PROTO};destsuffix=data-kernel;usehead=1"
@@ -50,7 +49,6 @@ KERNEL_IMAGETYPE = "Image"
 KERNEL_PACKAGE_NAME = "capture"
 KERNEL_DEVICETREE = "vendor/qcom/sa8155p-v2-adp-air-capture.dtb vendor/qcom/sa8195p-v2-adp-air-capture.dtb"
 
-SRC_DIR   =  "${SRC_DIR_ROOT}/kernel/msm-5.4"
 S         =  "${WORKDIR}/kernel/msm-5.4"
 PR = "r0"
 
@@ -106,9 +104,6 @@ do_compile () {
 inherit ${@bb.utils.contains('TARGET_KERNEL_ARCH', 'aarch64', 'qtikernel-arch', '', d)}
 
 do_shared_workdir_append () {
-        cp Makefile $kerneldir/
-        cp -fR usr $kerneldir/
-
         cp include/config/auto.conf $kerneldir/include/config/auto.conf
 
         if [ -d arch/${ARCH}/include ]; then
@@ -143,9 +138,6 @@ do_shared_workdir_append () {
         fi
 
         cp ${STAGING_KERNEL_DIR}/usr/gen_initramfs_list.sh $kerneldir/scripts/
-
-        # Generate kernel headers
-        oe_runmake_call -C ${STAGING_KERNEL_DIR} ARCH=${ARCH} CC="${KERNEL_CC}" LD="${KERNEL_LD}" headers_install O=${STAGING_KERNEL_BUILDDIR}
 }
 
 nand_boot_flag = "${@bb.utils.contains('DISTRO_FEATURES', 'nand-boot', '1', '0', d)}"

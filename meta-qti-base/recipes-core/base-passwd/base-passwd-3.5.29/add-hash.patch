@@ -3,6 +3,7 @@ From: John Lima <jlima@codeaurora.org>
 Date: Wed, 23 May 2012 13:30:52 -0700
 Subject: [PATCH 1/1] added hash
 
+Signed-off-by: John Lima <jlima@codeaurora.org>
 ---
  passwd.master |    2 +-
  1 files changed, 1 insertions(+), 1 deletions(-)

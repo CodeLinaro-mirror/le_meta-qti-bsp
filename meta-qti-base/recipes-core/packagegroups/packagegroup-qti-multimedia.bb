@@ -16,32 +16,10 @@ RDEPENDS_${PN} = " \
         gstreamer1.0-plugins-bad \
         gstreamer1.0-plugins-ugly \
         gstreamer1.0-libav \
-        gstreamer1.0-omx \
         gstreamer1.0-plugins-qscreencapsrc \
-        gstreamer1.0-plugins-qeavb \
-        mm-vdec-omx-test-lite \
-        mm-venc-omx-test-lite \
         gdk-pixbuf-loader-bmp \
         gdk-pixbuf-loader-gif \
-        alsa-lib \
-        alsa-utils \
-        alsa-plugins \
-"
-
-RDEPENDS_${PN}_qtiquingvm8295 = " \
-        gstreamer1.0 \
-        gstreamer1.0-plugins-base \
-        gstreamer1.0-plugins-good \
-        gstreamer1.0-plugins-bad \
-        gstreamer1.0-plugins-ugly \
-        gstreamer1.0-libav \
-        gstreamer1.0-plugins-qscreencapsrc \
-        gstreamer1.0-plugins-qeavb \
-        gdk-pixbuf-loader-bmp \
-        gdk-pixbuf-loader-gif \
-        alsa-lib \
-        alsa-utils \
-        alsa-plugins \
-        codec2 \
-        gstreamer1.0-plugins-codec2 \
+        ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'gstreamer1.0-plugins-qeavb', '', d)} \
+        ${@bb.utils.contains('DISTRO_FEATURES', 'qti-omx', 'gstreamer1.0-omx mm-vdec-omx-test-lite mm-venc-omx-test-lite', '', d)} \
+        ${@bb.utils.contains('DISTRO_FEATURES', 'qti-codec2', 'codec2 gstreamer1.0-plugins-codec2', '', d)} \
 "

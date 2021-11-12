@@ -1,5 +1,5 @@
 SUMMARY = "A very basic Wayland image with a terminal"
-
+LICENSE = "BSD-3-Clause"
 # NOTE:
 #   qti-image-{minimal,weston} use is avoided here to avoid mixing
 #   core-image-minimal / packagegroup-core-boot with the AGL
@@ -36,7 +36,7 @@ IMAGE_INSTALL += "\
 # the password patched into base-passwd will be present.
 #
 
-ROOTFS_POSTPROCESS_COMMAND += '${@bb.utils.contains_any("IMAGE_FEATURES", [ 'debug-tweaks', 'empty-root-password' ], "clear_root_password ; ", "",d)}'
+ROOTFS_POSTPROCESS_COMMAND += "${@bb.utils.contains_any("IMAGE_FEATURES", [ 'debug-tweaks', 'empty-root-password' ], "clear_root_password ; ", "",d)}"
 
 clear_root_password () {
         if [ -e ${IMAGE_ROOTFS}/etc/shadow ]; then
@@ -50,7 +50,7 @@ clear_root_password () {
 #       other potential openssh package users.
 #
 
-ROOTFS_POSTPROCESS_COMMAND += '${@bb.utils.contains("IMAGE_FEATURES", "ssh-server-openssh", "openssh_enable_internal_sftp; ", "",d)}'
+ROOTFS_POSTPROCESS_COMMAND += "${@bb.utils.contains("IMAGE_FEATURES", "ssh-server-openssh", "openssh_enable_internal_sftp; ", "",d)}"
 
 openssh_enable_internal_sftp () {
         for f in sshd_config sshd_config_readonly; do

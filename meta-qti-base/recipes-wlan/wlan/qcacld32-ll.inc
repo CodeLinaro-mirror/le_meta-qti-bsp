@@ -1,8 +1,5 @@
 PROVIDES_NAME = "kernel-module-${_MODNAME}"
 
-SYSTEMD_SERVICE_${PN} = "init_qti_wlan_auto.service"
-SYSTEMD_AUTO_ENABLE_${PN} = "enable"
-
 inherit autotools-brokensep module qperf module-sign systemd
 
 do_unpack[deptask] = "do_populate_sysroot"
@@ -24,8 +21,6 @@ RPROVIDES_${PN} += "${PROVIDES_NAME}-${KERNEL_VERSION}"
 FILES_${PN} += "lib/firmware/wlan/*"
 FILES_${PN} += "lib/firmware/*"
 FILES_${PN} += "lib/modules/${KERNEL_VERSION}/extra/${_MODNAME}.ko"
-FILES_${PN} += "${bindir}/init.qti.wlan_on.sh"
-FILES_${PN} += "${bindir}/init.qti.wlan_off.sh"
 
 LDFLAGS_aarch64 = "-O1 --hash-style=gnu --as-needed"
 

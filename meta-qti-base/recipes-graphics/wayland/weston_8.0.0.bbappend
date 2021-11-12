@@ -1,16 +1,12 @@
-DEPENDS += "display-hal-headers display-hal-linux display-noship-linux display-ship-linux"
-DEPENDS += "gbm gbm-headers"
-DEPENDS += "libion libsync"
-DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'q-hypervisor', 'libuhab', '', d)}"
+DEPENDS += "display-hal-headers display-hal-linux display-noship-linux display-ship-linux \
+            gbm gbm-headers \
+            libion libsync \
+            ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'libuhab', '', d)} \
+            linux-msm-headers \
+"
 
 FILESEXTRAPATHS_append := " :${THISDIR}/weston/"
 SRC_URI = "${PATH_TO_REPO}/graphics/weston/.git;protocol=${PROTO};destsuffix=graphics/weston;usehead=1"
-SRC_URI_append = " \
-    file://weston.service_caf \
-    file://weston_early.service_caf \
-    file://weston.ini_caf \
-    file://drm_firmware_load_trigger.service \
-"
 #Remove community patch which is conflict with Weston SDM optimization
 SRC_URI_remove = "file://0001-compositor-drm.c-Launch-without-input-devices.patch"
 SRCREV = "${AUTOREV}"
@@ -22,31 +18,17 @@ UPSTREAM_CHECK_URI_remove = "https://wayland.freedesktop.org/releases.html"
 
 REQUIRED_DISTRO_FEATURES_remove = "opengl"
 
-SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} = "weston.service"
-
-TARGET_CFLAGS += "-idirafter ${STAGING_KERNEL_BUILDDIR}/include/"
 TARGET_CFLAGS += "-I${STAGING_INCDIR}/libdrm"
 TARGET_CFLAGS += "-I${STAGING_INCDIR}/sdm"
 TARGET_CFLAGS += "-I${STAGING_INCDIR}/sdm/core"
-TARGET_CFLAGS += "-I${STAGING_KERNEL_BUILDDIR}/usr/include"
-TARGET_CFLAGS += "-I${STAGING_KERNEL_BUILDDIR}/usr/include/display"
+TARGET_CFLAGS += "-I${STAGING_INCDIR}/linux-msm"
+TARGET_CFLAGS += "-I${STAGING_INCDIR}/linux-msm/display"
 TARGET_CPPFLAGS += "-I${STAGING_INCDIR}/qcom/display"
 TARGET_CPPFLAGS += "-I${STAGING_INCDIR}/sdm"
 TARGET_CPPFLAGS += "-I${STAGING_INCDIR}/sdm/core"
 
-EXTRA_OECONF_append_qemux86 = " \
-        WESTON_NATIVE_BACKEND=fbdev-backend.so \
-        "
-EXTRA_OECONF_append_qemux86-64 = " \
-        WESTON_NATIVE_BACKEND=fbdev-backend.so \
-        "
-
-EXTRA_OECONF_append = "${@bb.utils.contains("DISTRO_FEATURES", "early_init", " --enable-early-boot", "" ,d)}"
-EXTRA_OECONF_append = "${@bb.utils.contains("DISTRO_FEATURES", "early-ethernet", " --enable-early-boot", "" ,d)}"
-
 #Overwrite Packageconfig
-PACKAGECONFIG = "${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'kms fbdev wayland egl', '', d)} \
+PACKAGECONFIG = "${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'kms fbdev wayland egl clients', '', d)} \
                  ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11', '', d)} \
                  ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'launch', '', d)} \
                  image-jpeg \
@@ -55,29 +37,19 @@ PACKAGECONFIG = "${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'kms fbdev w
                  shell-fullscreen \
                  shell-ivi \
                 "
-PACKAGECONFIG_append = "clients"
 # pam
 PACKAGECONFIG[pam] = ",,libpam"
 
-do_configure[depends] += "virtual/kernel:do_shared_workdir"
-do_install_append() {
-    # Install systemd unit files
-    if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
-        if ${@bb.utils.contains('DISTRO_FEATURES', 'early_init', 'true', 'false', d)}; then
-            install -m 644 -p -D ${WORKDIR}/weston_early.service_caf ${D}${systemd_system_unitdir}/weston.service
-        else
-            install -m 644 -p -D ${WORKDIR}/weston.service_caf ${D}${systemd_system_unitdir}/weston.service
-        fi
-    fi
+EXTRA_OECONF_append_qemux86 = " \
+        WESTON_NATIVE_BACKEND=fbdev-backend.so \
+        "
+EXTRA_OECONF_append_qemux86-64 = " \
+        WESTON_NATIVE_BACKEND=fbdev-backend.so \
+        "
 
-    WESTON_INI_CONFIG=${sysconfdir}/xdg/weston
-    install -d ${D}${WESTON_INI_CONFIG}
-    install -m 0644 ${WORKDIR}/weston.ini_caf ${D}${WESTON_INI_CONFIG}/weston.ini
-    # Install reuqire-input=false in weston.ini
-    if ${@bb.utils.contains('DISTRO_FEATURES', 'q-hypervisor', 'true', 'false', d)} ||
-	${@bb.utils.contains('DISTRO_FEATURES', 'early_init', 'true', 'false', d)}; then
-        sed -i -e '/\[core\]/a require-input=false' ${D}${WESTON_INI_CONFIG}/weston.ini
-    fi
+EXTRA_OECONF_append = "${@bb.utils.contains("DISTRO_FEATURES", "early-ethernet", " --enable-early-boot", "" ,d)}"
+
+do_install_append() {
     # expose weston protocol to /usr/share/weston as video may use it
     install ${WORKDIR}/graphics/weston/protocol/*.xml ${D}${datadir}/weston
 }
@@ -85,5 +57,3 @@ do_install_append() {
 FILES_${PN} += "${libdir}/lib*${SOLIBS} ${libdir}/libweston-${WESTON_MAJOR_VERSION}/*.so"
 FILES_${PN} += "${systemd_unitdir}/system/ ${sysconfdir}/"
 FILES_${PN}-staticdev += "${libdir}/libweston-${WESTON_MAJOR_VERSION}/*.a"
-
-RRECOMMENDS_${PN}_remove = "weston-init"

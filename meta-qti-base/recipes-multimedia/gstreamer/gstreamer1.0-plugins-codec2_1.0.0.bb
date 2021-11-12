@@ -10,12 +10,12 @@ DEPENDS += "codec2 \
             gstreamer1.0 \
             gstreamer1.0-plugins-bad \
             gstreamer1.0-plugins-base \
+            linux-msm-headers \
             media-codec2 \
             media-external"
 
-SRCREV = "${AUTOREV}"
 SRC_URI = "${PATH_TO_REPO}/gstreamer/gst-plugins-qti-oss/.git;protocol=${PROTO};destsuffix=gstreamer/gst-plugins-qti-oss;usehead=1"
-
+SRCREV = "${AUTOREV}"
 S = "${WORKDIR}/gstreamer/gst-plugins-qti-oss/gst-plugin-codec2"
 
 inherit autotools-brokensep
@@ -27,13 +27,11 @@ CFLAGS += "-I${STAGING_INCDIR} \
            -I${STAGING_INCDIR}/glib-2.0/glib \
            -I${STAGING_INCDIR}/c++ \
            -I${STAGING_INCDIR}/c++/${TARGET_SYS} \
-           -I${STAGING_KERNEL_BUILDDIR}/usr/include/vidc \
-           -I${STAGING_KERNEL_BUILDDIR}/usr/include"
+           -I${STAGING_INCDIR}/linux-msm/vidc \
+           -I${STAGING_INCDIR}/linux-msm"
 
-CXXFLAGS += "-I${STAGING_KERNEL_BUILDDIR}/usr/include/vidc"
-CXXFLAGS += "-I${STAGING_KERNEL_BUILDDIR}/usr/include"
-
-do_configure[depends] += "virtual/kernel:do_shared_workdir"
+CXXFLAGS += "-I${STAGING_INCDIR}/linux-msm/vidc \
+             -I${STAGING_INCDIR}/linux-msm"
 
 PACKAGE_ARCH ?= "${MACHINE_ARCH}"
 

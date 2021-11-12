@@ -1,39 +1,69 @@
 require qcacld32-ll.inc
 
 SUMMARY = "Qualcomm Atheros WLAN Driver"
-DESCRIPTION = "Qualcomm Atheros WLAN CLD3.0 low latency driver"
+DESCRIPTION = "Qualcomm Atheros WLAN CLD3.0 low latency driver for the first WLAN chip.\
+               It is a kernel extra module, which loaded by qca6696-module-load.service \
+               once the system bootup. And this WLAN host driver module name is qca6696.ko,\
+               it create two interface by defaults, one is wlan0 and the other is wlan1. \
+               Application can use the wireless interfaces as STA or AP mode in need. \
+               Usually, it bind to pcie0 slot by default if it loaded first. \"
 HOMEPAGE = "https://www.codeaurora.org/"
 LICENSE = "ISC"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=f3b90e78ea0cffb20bf5cca7947a896d"
-SRCREV = "${AUTOREV}"
-SRCREV_FORMAT = "qcacld_cmn_fw_msm"
+
 PR = "r8"
-
-_MODNAME = "qca6696"
-FW_PATH_NAME = "qca6390"
-FIRMWARE_PATH = "${D}${nonarch_base_libdir}/firmware/wlan/qca_cld/${_MODNAME}"
-
 SRC_URI = "${PATH_TO_REPO}/wlan/qcacld-3.0/.git;protocol=${PROTO};destsuffix=wlan/qcacld-3.0;usehead=1 \
            ${PATH_TO_REPO}/wlan/qca-wifi-host-cmn/.git;protocol=${PROTO};destsuffix=wlan/qca-wifi-host-cmn;usehead=1 \
            ${PATH_TO_REPO}/wlan/fw-api/.git;protocol=${PROTO};destsuffix=wlan/fw-api/;usehead=1 \
            ${PATH_TO_REPO}/device/qcom/wlan/.git;protocol=${PROTO};destsuffix=device/qcom/wlan/msm_auto;subpath=msm_auto;usehead=1 \
-           file://init_qti_wlan_auto.service \
-           file://init.qti.wlan_on.sh \
-           file://init.qti.wlan_off.sh \
+           file://qca6696-module-load.service \
+           file://qca6696_load.sh \
+           file://wlan_interface.service \
+           file://wlan_interface.sh \
            "
+SRCREV = "${AUTOREV}"
+SRCREV_FORMAT = "qcacld_cmn_fw_msm"
+
+_MODNAME = "qca6696"
+FW_PATH_NAME = "qca6390"
+FIRMWARE_PATH = "${D}${nonarch_base_libdir}/firmware/wlan/qca_cld/${_MODNAME}"
 
 S1 = "${WORKDIR}/wlan/qca-wifi-host-cmn"
 S = "${WORKDIR}/wlan/qcacld-3.0"
 
 # Explicitly disable HL to enable LL as current WLAN driver is not having
 # simultaneous support of HL and LL.
-EXTRA_OEMAKE += "CONFIG_CLD_HL_SDIO_CORE=n CONFIG_CNSS_SDIO=n"
-EXTRA_OEMAKE += "CONFIG_QCA_CLD_WLAN_PROFILE=qca6390"
-EXTRA_OEMAKE += "DYNAMIC_SINGLE_CHIP=${_MODNAME}"
-EXTRA_OEMAKE += "MULTI_IF_NAME=cnss0"
-EXTRA_OEMAKE += "MODNAME=${_MODNAME}"
-EXTRA_OEMAKE_append_qtiquingvm += "WLAN_CFG_OVERRIDE="CONFIG_WLAN_DISABLE_EXPORT_SYMBOL=y CONFIG_WLAN_OPEN_P2P_INTERFACE=n CONFIG_SUPPORT_P2P_BY_ONE_INTF_WLAN=y CONFIG_WLAN_PLACEMARKER_PREFIX=108 CONFIG_FEATURE_GPIO_CFG=y""
-EXTRA_OEMAKE_append_qtiquingvm8295 += "WLAN_CFG_OVERRIDE="CONFIG_WLAN_DISABLE_EXPORT_SYMBOL=y CONFIG_WLAN_OPEN_P2P_INTERFACE=n CONFIG_SUPPORT_P2P_BY_ONE_INTF_WLAN=y CONFIG_WLAN_PLACEMARKER_PREFIX=108""
+EXTRA_OEMAKE_append = " \
+                       CONFIG_CLD_HL_SDIO_CORE=n \
+                       CONFIG_CNSS_SDIO=n \
+                       CONFIG_QCA_CLD_WLAN_PROFILE=qca6390 \
+                       DYNAMIC_SINGLE_CHIP=${_MODNAME} \
+                       MULTI_IF_NAME=cnss0 \
+                       MODNAME=${_MODNAME} \
+                       "
+
+_WLAN_CFG_OVERRIDE_GVM = "\
+                        CONFIG_WLAN_DISABLE_EXPORT_SYMBOL=y \
+                        CONFIG_WLAN_OPEN_P2P_INTERFACE=n \
+                        CONFIG_SUPPORT_P2P_BY_ONE_INTF_WLAN=y \
+                        CONFIG_WLAN_BOOTUP_MARKER=y \
+                        CONFIG_WLAN_PLACEMARKER_PREFIX=108 \
+                        CONFIG_FEATURE_GPIO_CFG=y \
+                        CONFIG_CNSS_GENL=n \
+                        CONFIG_MULTI_IF_LOG=y \
+                        CONFIG_FEATURE_WLAN_CH_AVOID_EXT=y \
+                        CONFIG_QCOM_TDLS=n \
+                        CONFIG_CFG_MAX_STA_VDEVS=4 \
+                        CONFIG_CFG_BMISS_OFFLOAD_MAX_VDEV=4 \
+                        "
+_WLAN_CFG_OVERRIDE_METAL = "\
+                        CONFIG_WLAN_DISABLE_EXPORT_SYMBOL=y \
+                        "
+EXTRA_OEMAKE_append_qtiquingvm = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
+EXTRA_OEMAKE_append_qtiquingvm8295 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
+EXTRA_OEMAKE_append_sa8295 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_METAL}"
+
+SYSTEMD_SERVICE_${PN} = "qca6696-module-load.service wlan_interface.service"
 
 do_install() {
     module_do_install
@@ -50,8 +80,8 @@ do_install() {
     install -D -m 0644 ${WORKDIR}/device/qcom/wlan/msm_auto/WCNSS_qcom_cfg_qca6390.ini ${FIRMWARE_PATH}/WCNSS_qcom_cfg.ini
     install -D -m 0644 ${WORKDIR}/device/qcom/wlan/msm_auto/wlan_mac_hst_1.bin ${FIRMWARE_PATH}/wlan_mac.bin
     install -d ${D}${bindir}
-    install -D -m 0755 ${WORKDIR}/init.qti.wlan_on.sh ${D}${bindir}/init.qti.wlan_on.sh
-    install -D -m 0755 ${WORKDIR}/init.qti.wlan_off.sh ${D}${bindir}/init.qti.wlan_off.sh
+    install -D -m 0755 ${WORKDIR}/qca6696_load.sh ${D}${bindir}/qca6696_load.sh
+    install -D -m 0755 ${WORKDIR}/wlan_interface.sh ${D}${bindir}/wlan_interface.sh
 
     install -d ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/
     ln -sf /firmware/image/${FW_PATH_NAME}/amss.bin ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/
@@ -63,6 +93,15 @@ do_install() {
 
     # Install systemd service file
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
-        install -m 0644 ${WORKDIR}/init_qti_wlan_auto.service -D ${D}${systemd_unitdir}/system/init_qti_wlan_auto.service
+        install -d ${D}${systemd_unitdir}/system/
+        install -m 0644 ${WORKDIR}/qca6696-module-load.service -D ${D}${systemd_unitdir}/system/qca6696-module-load.service
+        install -m 0644 ${WORKDIR}/wlan_interface.service -D ${D}${systemd_unitdir}/system/wlan_interface.service
     fi
 }
+
+FILES_${PN} += "\
+    ${bindir}/qca6696_load.sh \
+    ${bindir}/wlan_interface.sh \
+    ${systemd_unitdir}/system/* \
+    ${sysconfdir}/* \
+"

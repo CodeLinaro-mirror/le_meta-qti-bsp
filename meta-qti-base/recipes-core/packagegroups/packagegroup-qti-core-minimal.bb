@@ -11,6 +11,7 @@ ALLOW_EMPTY_${PN} = "1"
 RDEPENDS_${PN} += "\
     packagegroup-qti-core-boot \
     packagegroup-qti-core-commonlibs \
+    packagegroup-machine-base \
     "
 
 RDEPENDS_${PN} += "\
@@ -18,10 +19,10 @@ RDEPENDS_${PN} += "\
     system-core-adbd \
     system-core-leprop \
     system-core-post-boot \
-    system-core-early-boot \
     system-core-usb \
     system-prop \
     memory-hotplug \
+    ${@bb.utils.contains("MACHINE_FEATURES", "qti-hypervisor", "", "system-core-early-boot", d)} \
     ${@bb.utils.contains("DISTRO_FEATURES", "early_init", "early-init", "" ,d)} \
     ${@bb.utils.contains("COMBINED_FEATURES", "hibernation", "hibernation", "" ,d)} \
     "

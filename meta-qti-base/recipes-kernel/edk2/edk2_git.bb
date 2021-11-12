@@ -1,16 +1,21 @@
+SUMMARY = "edk2"
 DESCRIPTION = "UEFI bootloader"
+HOMEPAGE = "https://www.codeaurora.org"
 LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
+
 PROVIDES = "virtual/bootloader"
-SRCREV = "${AUTOREV}"
-PV = "3.0"
+
 PR = "r1"
+PV = "3.0"
 
 SRC_URI = "${PATH_TO_REPO}/bootable/bootloader/edk2/.git;protocol=${PROTO};destsuffix=bootable/bootloader/edk2;usehead=1"
 # FIXME for keymaster functionality
 SRC_URI_append = " file://0001-avb-bring-up-keymaster-for-LV.patch  \
                    file://0002-avb-send-dummy-ROT-and-boot-state-to-keymaster-from-.patch "
+SRCREV = "${AUTOREV}"
+
 S = "${WORKDIR}/bootable/bootloader/edk2"
 
 inherit deploy
@@ -34,7 +39,7 @@ EXTRA_OEMAKE = "'CLANG_BIN=${CLANG_BIN_PATH}' \
                 'EARLY_ETH_ENABLED=${EARLY_ETH}'\
                 'UBSAN_UEFI_GCC_FLAG_ALIGNMENT=-Wno-misleading-indentation'"
 
-do_configure[noexec]="1"
+do_configure[noexec] = "1"
 do_compile () {
     export CC=${BUILD_CC}
     export CXX=${BUILD_CXX}
@@ -49,11 +54,6 @@ do_compile () {
 do_install() {
     install -d ${D}/boot
 }
-
-PACKAGE_ARCH = "${MACHINE_ARCH}"
-
-FILES_${PN} = "/boot"
-FILES_${PN}-dbg = "/boot/.debug"
 
 do_deploy() {
     install -m 0644 ${D}/boot/abl.elf ${DEPLOYDIR}
@@ -70,3 +70,7 @@ BUILD_OS = "linux"
 INSANE_SKIP_${PN} = "arch"
 
 PACKAGE_STRIP = "no"
+PACKAGE_ARCH = "${MACHINE_ARCH}"
+
+FILES_${PN} += "/boot"
+FILES_${PN}-dbg += "/boot/.debug"

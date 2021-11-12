@@ -8,24 +8,25 @@ LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 
-DEPENDS += "binder"
-DEPENDS += "display-commonsys-intf-linux"
-DEPENDS += "drm"
-DEPENDS += "gbm-headers"
-DEPENDS += "libdrm"
-DEPENDS += "libhardware"
-DEPENDS += "system-core"
+DEPENDS += "binder \
+            display-commonsys-intf-linux \
+            drm \
+            gbm-headers \
+            libdrm \
+            libhardware \
+            linux-msm-headers \
+            system-core \
+"
 
 PR = "r8"
 
-SRC_DIR = "${SRC_DIR_ROOT}/display/display-hal"
 SRC_URI = "${PATH_TO_REPO}/display/display-hal/.git;protocol=${PROTO};destsuffix=display/display-hal;usehead=1"
 SRCREV = "${AUTOREV}"
 S = "${WORKDIR}/display/display-hal"
 
 inherit autotools-brokensep pkgconfig
 
-EXTRA_OECONF += "--with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
+EXTRA_OECONF += "--with-sanitized-headers=${STAGING_INCDIR}/linux-msm"
 EXTRA_OECONF += "--enable-sdmhaldrm"
 
 LDFLAGS += "-llog -lhardware -lutils -lcutils"
@@ -47,9 +48,7 @@ CPPFLAGS += "-I${STAGING_INCDIR}/libdrm"
 CPPFLAGS += "-fno-operator-names"
 
 # add display techpack headers
-CPPFLAGS += "-I${STAGING_KERNEL_BUILDDIR}/usr/include/display"
-
-do_configure[depends] += "virtual/kernel:do_shared_workdir"
+CPPFLAGS += "-I${STAGING_INCDIR}/linux-msm/display"
 
 SOLIBS = ".so"
 FILES_SOLIBSDEV = ""

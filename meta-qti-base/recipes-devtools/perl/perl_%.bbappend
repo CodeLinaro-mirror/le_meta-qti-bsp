@@ -1,7 +1,6 @@
-require perl-rdepends_${PV}.inc
+FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}-${PV}:"
+SRC_URI_append = " \
+    file://makedepend.SH.patch \
+"
 
-SRC_URI += "\
-        file://makedepend.SH.patch \
-        "
