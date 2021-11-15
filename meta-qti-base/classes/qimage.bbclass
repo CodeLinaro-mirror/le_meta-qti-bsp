@@ -137,31 +137,16 @@ do_make_avb_image() {
                 --rollback_index 0 \
                 --do_not_generate_fec
 
-            #FIXME, selinux need to remount when first boot up, avb feature will stop this action, so
-            #add this branch as workaround.
-            if ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'true', 'false', d)}; then
-                avbtool make_vbmeta_image \
-                    --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET} \
-                    --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${PRODUCT}-dtbo.img \
-                    --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
-                    --setup_rootfs_from_kernel ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
-                    --algorithm SHA256_RSA4096 \
-                    --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/testkey_rsa4096.pem \
-                    --rollback_index 0 \
-                    --set_hashtree_disabled_flag \
-                    --output ${DEPLOY_DIR_IMAGE}/${VBMETAIMAGE_TARGET}
-            else
-                # generate vbmeta.img
-                avbtool make_vbmeta_image \
-                    --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET} \
-                    --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${PRODUCT}-dtbo.img \
-                    --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
-                    --setup_rootfs_from_kernel ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
-                    --algorithm SHA256_RSA4096 \
-                    --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/testkey_rsa4096.pem \
-                    --rollback_index 0 \
-                    --output ${DEPLOY_DIR_IMAGE}/${VBMETAIMAGE_TARGET}
-            fi
+            # generate vbmeta.img
+            avbtool make_vbmeta_image \
+                --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET} \
+                --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${PRODUCT}-dtbo.img \
+                --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
+                --setup_rootfs_from_kernel ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
+                --algorithm SHA256_RSA4096 \
+                --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/testkey_rsa4096.pem \
+                --rollback_index 0 \
+                --output ${DEPLOY_DIR_IMAGE}/${VBMETAIMAGE_TARGET}
         fi
     fi
 }
