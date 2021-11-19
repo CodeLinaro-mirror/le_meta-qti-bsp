@@ -1,11 +1,11 @@
-From 93af780e33da6450c2a8f0613c149ec51bcd2a37 Mon Sep 17 00:00:00 2001
+From b1eee6e2a812151da5bf2ae37bd11094b04bb07b Mon Sep 17 00:00:00 2001
 From: Lei wang <leiwan@codeaurora.org>
 Date: Tue, 5 Nov 2019 14:05:47 +0800
 Subject: [PATCH] systemd: add slotselect support in fstab
 
 support a/b partition option in fstab
 
-Change-Id: I8ab0bb7eae2092d40f69f9b8e46b1a87f817c7e1
+Change-Id: I4fbfc49ac0b5d0a9292dc07e81f0eb09c9b246bb
 Signed-off-by: Lei wang <leiwan@codeaurora.org>
 ---
  src/core/mount.c                      |  2 +-
@@ -13,20 +13,20 @@ Signed-off-by: Lei wang <leiwan@codeaurora.org>
  2 files changed, 19 insertions(+), 1 deletion(-)
 
 diff --git a/src/core/mount.c b/src/core/mount.c
-index a0dfa6a..769c963 100644
+index ca5d0939a1..a903c17a69 100644
 --- a/src/core/mount.c
 +++ b/src/core/mount.c
-@@ -993,7 +993,7 @@ static void mount_enter_mounting(Mount *m) {
+@@ -1019,7 +1019,7 @@ static void mount_enter_mounting(Mount *m) {
          if (p) {
                  _cleanup_free_ char *opts = NULL;
  
--                r = fstab_filter_options(p->options, "nofail\0" "noauto\0" "auto\0", NULL, NULL, &opts);
-+                r = fstab_filter_options(p->options, "nofail\0" "noauto\0" "auto\0" "slotselect\0", NULL, NULL, &opts);
+-                r = fstab_filter_options(p->options, "nofail\0" "noauto\0" "auto\0", NULL, NULL, NULL, &opts);
++                r = fstab_filter_options(p->options, "nofail\0" "noauto\0" "auto\0" "slotselect\0", NULL, NULL, NULL, &opts);
                  if (r < 0)
                          goto fail;
  
 diff --git a/src/fstab-generator/fstab-generator.c b/src/fstab-generator/fstab-generator.c
-index 75f804c..cacc6a6 100644
+index 69ba4bfc64..0d922314e8 100644
 --- a/src/fstab-generator/fstab-generator.c
 +++ b/src/fstab-generator/fstab-generator.c
 @@ -4,6 +4,11 @@
@@ -41,7 +41,7 @@ index 75f804c..cacc6a6 100644
  #include "alloc-util.h"
  #include "fd-util.h"
  #include "fileio.h"
-@@ -49,6 +54,7 @@ static char *arg_usr_what = NULL;
+@@ -51,6 +56,7 @@ static char *arg_usr_what = NULL;
  static char *arg_usr_fstype = NULL;
  static char *arg_usr_options = NULL;
  static VolatileMode arg_volatile_mode = _VOLATILE_MODE_INVALID;
@@ -49,8 +49,8 @@ index 75f804c..cacc6a6 100644
  
  STATIC_DESTRUCTOR_REGISTER(arg_root_what, freep);
  STATIC_DESTRUCTOR_REGISTER(arg_root_fstype, freep);
-@@ -576,6 +582,18 @@ static int parse_fstab(bool initrd) {
-                 growfs = fstab_test_option(me->mnt_opts, "x-systemd.growfs\0");
+@@ -627,6 +633,18 @@ static int parse_fstab(bool initrd) {
+                 rwonly = fstab_test_option(me->mnt_opts, "x-systemd.rw-only\0");
                  noauto = fstab_test_yes_no_option(me->mnt_opts, "noauto\0" "auto\0");
                  nofail = fstab_test_yes_no_option(me->mnt_opts, "nofail\0" "fail\0");
 +                /*
@@ -69,5 +69,5 @@ index 75f804c..cacc6a6 100644
                  log_debug("Found entry what=%s where=%s type=%s makefs=%s growfs=%s noauto=%s nofail=%s",
                            what, where, me->mnt_type,
 -- 
-2.7.4
+2.17.1
 

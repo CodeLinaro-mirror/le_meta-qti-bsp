@@ -1,0 +1,24 @@
+require ../include/common-location-defines.inc
+SUMMARY = "location-api-msg-proto"
+DESCRIPTION = "location api msg protobuf library"
+HOMEPAGE = "https://www.codeaurora.org"
+LICENSE = "BSD-3-Clause"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
+${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
+
+DEPENDS += "glib-2.0 gps-utils loc-pla-hdr protobuf protobuf-native"
+
+SRC_URI = "${PATH_TO_REPO}/qcom-opensource/location/.git;protocol=${PROTO};destsuffix=qcom-opensource/location/location_api_msg_proto;subpath=location_api_msg_proto;usehead=1"
+SRCREV = "${AUTOREV}"
+
+S = "${WORKDIR}/qcom-opensource/location/location_api_msg_proto"
+
+inherit autotools-brokensep pkgconfig
+
+do_compile_prepend () {
+    echo "Running location_api_msg_protobuf_gen.sh"
+    cd ${S}
+    ./location_api_msg_protobuf_gen.sh
+    cd -
+}
+
