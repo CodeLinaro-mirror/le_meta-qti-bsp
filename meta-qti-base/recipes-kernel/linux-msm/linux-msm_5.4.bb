@@ -26,7 +26,6 @@ SRC_URI = "\
     file://lxc.cfg \
     file://ipc.cfg \
 "
-SRC_URI_append_qtiquingvm8295 = " file://qtiquingvm8295.cfg"
 SRCREV = "${AUTOREV}"
 SRCREV_FORMAT = "kernel_data_display_ais_video"
 
