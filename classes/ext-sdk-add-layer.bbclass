@@ -1,4 +1,4 @@
-# Copyright (c) 2021, The Linux Foundation. All rights reserved.
+# Copyright (c) 2021 The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -25,14 +25,22 @@
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# Default properties to be set for qrbx210
-ro.product.board=qrbx210
-
-# If ro.debuggable is 1, then enable adb root
-ro.debuggable=1
-
-# Camera hal module
-ro.hardware.camera=qcom
-
-#enable weston during boot
-persist.display.launch.weston.at.bootup=true
+# This function creates a script to add custom bitbake layers
+# to an extensible SDK.
+ext_sdk_add_layer_script() {
+        add_layer_script=${1:-${SDK_OUTPUT}/${SDKPATH}/add_bitbake_layer}
+        rm -f $add_layer_script
+        touch $add_layer_script
+        echo 'read -p  "Please enter the path to your custom layer: " layer_path' >> $add_layer_script
+        echo 'if [[ -r ${layer_path}/conf/layer.conf ]] ;' >> $add_layer_script
+        echo 'then' >> $add_layer_script
+        echo '    working_dir=`pwd`' >> $add_layer_script
+        echo '    cd ${SDK_ROOT}' >> $add_layer_script
+        echo '    ${SDK_ROOT}/layers/poky/bitbake/bin/bitbake-layers add-layer ${layer_path}' >> $add_layer_script
+        echo '    echo "Your layer is successfully added to the eSDK workspace."' >> $add_layer_script
+        echo '    echo "You may now start the development using devtools"' >> $add_layer_script
+        echo '    cd ${working_dir}' >> $add_layer_script
+        echo 'else' >> $add_layer_script
+        echo '    echo "`tput setaf 3`Specified layer directory ${layer_path} does not contain a conf/layer.conf file`tput sgr0`"' >> $add_layer_script
+        echo 'fi' >> $add_layer_script
+}

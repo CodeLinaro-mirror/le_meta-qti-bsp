@@ -17,6 +17,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-camera \
         packagegroup-qti-core \
         packagegroup-qti-cvp \
+        ${@bb.utils.contains('MACHINE_FEATURES', 'qti-eva', "packagegroup-qti-eva", "", d)} \
         ${@bb.utils.contains('MACHINE_FEATURES', 'qti-data-modem', "packagegroup-qti-data", "", d)} \
         packagegroup-qti-display \
         packagegroup-qti-dsp \
@@ -26,6 +27,8 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-qvr \
         packagegroup-qti-securemsm \
         packagegroup-qti-sensors-see \
+        packagegroup-qti-splitxr \
+        packagegroup-qti-splitxr-common \
         packagegroup-qti-ss-mgr \
         packagegroup-qti-test-sensors-see \
         packagegroup-qti-video \
@@ -34,8 +37,6 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-support-utils \
         systemd-machine-units \
         ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
-        packagegroup-qti-pulseaudio \
-        packagegroup-qti-audio \
         ${@bb.utils.contains('MACHINE_FEATURES', 'qti-npu', "packagegroup-qti-npu", "", d)} \
 "
 

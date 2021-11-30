@@ -67,7 +67,6 @@ IMAGE_LOGIN_MANAGER = "busybox-static"
 DEPENDS += "\
              ext4-utils-native \
              gen-partitions-tool-native \
-             mkbootimg-native \
              mtd-utils-native \
              openssl-native \
              pkgconfig-native \
@@ -155,6 +154,8 @@ python(){
                 deps += " %s:%s" % (dep, task)
             elif 'lk' in dep:
                 deps += " %s:%s" % (dep, task)
+            elif 'linux-host' in dep:
+                deps += " %s:%s" % (dep, task)
         return deps
 
     d.appendVarFlag('do_rootfs', 'depends', extraimage_getdepends('do_populate_sysroot'))
@@ -220,7 +221,7 @@ python do_make_bootimg () {
 }
 do_make_bootimg[dirs]      = "${BOOTIMGDEPLOYDIR}/${IMAGE_BASENAME}"
 # Make sure native tools and vmlinux ready to create boot.img
-do_make_bootimg[depends] += "virtual/kernel:do_deploy mkbootimg-native:do_populate_sysroot"
+do_make_bootimg[depends] += "virtual/kernel:do_deploy virtual/mkbootimg-native:do_populate_sysroot"
 SSTATETASKS += "do_make_bootimg"
 SSTATE_SKIP_CREATION_task-make-bootimg = '1'
 do_make_bootimg[sstate-inputdirs] = "${BOOTIMGDEPLOYDIR}"
@@ -233,3 +234,32 @@ python do_make_bootimg_setscene () {
 addtask do_make_bootimg_setscene
 
 addtask do_make_bootimg before do_image_complete
+
+python do_make_gki_bootimg () {
+    import subprocess
+
+    mkboot_bin_path = d.getVar('STAGING_BINDIR_NATIVE', True) + '/scripts/mkbootimg.py'
+    ramdisk_path    = d.getVar('DEPLOY_DIR_IMAGE', True) + "/" + 'qti-ramdisk-image-initrd.gz'
+    header_version = "3"
+
+    zimg_path       = d.getVar('DEPLOY_DIR_IMAGE', True) + "/" + d.getVar('KERNEL_IMAGETYPE', True)
+    cmdline         = "\"" + d.getVar('KERNEL_CMD_PARAMS', True) + "\""
+    pagesize        = d.getVar('PAGE_SIZE', True)
+    base            = d.getVar('KERNEL_BASE', True)
+
+    # When verity is enabled add '.noverity' suffix to default boot img.
+    output          = d.getVar('BOOTIMAGE_TARGET', True)
+    if bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains('MACHINE_FEATURES', 'dm-verity-bootloader', True, False, d), False, d):
+            output += ".noverity"
+
+    # cmd to make boot.img
+    cmd =  mkboot_bin_path + " --header_version %s --kernel %s --cmdline %s --pagesize %s --base %s %s --ramdisk %s --ramdisk_offset 0x0 --output %s" \
+               % (header_version, zimg_path, cmdline, pagesize, base, xtra_parms, ramdisk_path, output )
+
+    bb.debug(1, "do_make_bootimg cmd: %s" % (cmd))
+
+    ret = subprocess.call(cmd, shell=True)
+    if ret != 0:
+        bb.error("Running: %s failed." % cmd)
+
+}

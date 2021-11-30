@@ -31,7 +31,13 @@
 
 inherit populate_sdk_ext
 
-addtask populate_sdk after do_install before do_build
+python copy_buildsystem_append() {
+    # Create src directory in extensible SDK to copy the project sources
+    bb.utils.mkdirhier(baseoutpath + '/src')
+    # Enable the use of WORKSPACE variable on an extensible SDK
+    with open(baseoutpath + '/conf/bblayers.conf', 'a') as f:
+        f.write('WORKSPACE = "$' + '{TOPDIR}/src"\n')
+}
 
 # To include protoc compiler in SDK
 TOOLCHAIN_HOST_TASK_append = " nativesdk-protobuf-compiler "
