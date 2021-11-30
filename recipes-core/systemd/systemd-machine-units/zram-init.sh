@@ -27,7 +27,7 @@
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 if [ -f /sys/block/zram0/disksize ]; then
-    echo 32M > /sys/block/zram0/disksize
+    echo 48M > /sys/block/zram0/disksize
     mkswap /dev/zram0
     swapon /dev/zram0 -p 32758
 fi
