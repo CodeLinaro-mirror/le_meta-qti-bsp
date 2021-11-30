@@ -22,6 +22,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
               packagegroup-android-utils \
               ${@bb.utils.contains('COMBINED_FEATURES', 'qti-bluetooth', "packagegroup-qti-bluetooth", "", d)} \
               packagegroup-qti-core \
+	      packagegroup-qti-core-prop \
               ${@bb.utils.contains('MACHINE_FEATURES', 'qti-data-modem', "packagegroup-qti-data", "", d)} \
               packagegroup-qti-dsp \
               packagegroup-qti-ss-mgr \
