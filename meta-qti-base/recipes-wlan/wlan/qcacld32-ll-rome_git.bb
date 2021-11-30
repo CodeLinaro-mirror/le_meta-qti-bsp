@@ -31,11 +31,15 @@ S = "${WORKDIR}/wlan/qcacld-3.0"
 
 # Explicitly disable HL to enable LL as current WLAN driver is not having
 # simultaneous support of HL and LL.
-EXTRA_OEMAKE += "CONFIG_CLD_HL_SDIO_CORE=n CONFIG_CNSS_SDIO=n"
-EXTRA_OEMAKE += "CONFIG_QCA_CLD_WLAN_PROFILE=qca6174"
-EXTRA_OEMAKE += "DYNAMIC_SINGLE_CHIP=${_MODNAME}"
-EXTRA_OEMAKE += "MODNAME=${_MODNAME}"
-EXTRA_OEMAKE += "CONFIG_AR6320_SUPPORT=y"
+EXTRA_OEMAKE_append = " \
+                       CONFIG_CLD_HL_SDIO_CORE=n \
+                       CONFIG_CNSS_SDIO=n \
+                       CONFIG_QCA_CLD_WLAN_PROFILE=qca6174 \
+                       DYNAMIC_SINGLE_CHIP=${_MODNAME} \
+                       MODNAME=${_MODNAME} \
+                       CONFIG_AR6320_SUPPORT=y \
+                       CONFIG_CNSS_GENL=n \
+                       "
 
 SYSTEMD_SERVICE_${PN} = "init_qti_wlan_auto.service"
 
