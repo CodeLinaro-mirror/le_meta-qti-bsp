@@ -105,6 +105,9 @@ do_generate_gki_defconfig() {
 
     gki_defconfig=`echo ${KERNEL_CONFIG} | sed 's/vendor\///g'`
 
+    # Point to the correct CC when executing generate_defconfig.sh
+    export REAL_CC=`echo ${CC} | sed 's/-target.*//g'`
+
     # FIXME: Workaround for executing generate_defconfig.sh
     LD=`echo ${LD} | sed 's/--sysroot.*//g'`
 
