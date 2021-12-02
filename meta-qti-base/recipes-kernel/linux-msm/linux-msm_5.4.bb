@@ -4,6 +4,8 @@ HOMEPAGE = "https://www.codeaurora.org"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
 
+require recipes-kernel/linux-msm/kernel-module.inc
+
 DEPENDS += "\
     dtc-native kern-tools-native  mkbootimg-native \
     ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'mkdtimg-native', '', d)} \
