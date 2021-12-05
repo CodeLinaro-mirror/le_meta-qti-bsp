@@ -19,6 +19,7 @@ RECOVERYIMAGE_TARGET ?= "${PRODUCT}-recoveryfs.ext4"
 SYSTEMIMAGE_TARGET ?= "${PRODUCT}-sysfs.ext4"
 SYSTEMRWIMAGE_TARGET ?= "${PRODUCT}-systemrw.ext4"
 USERDATAIMAGE_TARGET ?= "${PRODUCT}-usrfs.ext4"
+VBMETAIMAGE_TARGET ?= "${PRODUCT}-vbmeta.img"
 
 # Flag to Enable QPermissions
 QPERMISSIONS_ENABLE ?= "0"
