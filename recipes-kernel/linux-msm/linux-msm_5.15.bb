@@ -3,20 +3,18 @@ inherit kernel
 DESCRIPTION = "CAF Linux Kernel"
 LICENSE = "GPLv2.0-with-linux-syscall-note"
 
-COMPATIBLE_MACHINE = "sxrneo|cinder"
+COMPATIBLE_MACHINE = "cinder"
 
 FILESPATH =+ "${WORKSPACE}:"
 
-SRC_URI   =  "file://kernel-5.10/kernel_platform/msm-kernel \
-              ${@oe.utils.conditional('KERNEL_USE_PREBUILTS', 'True', '', 'file://kernel-5.10/kernel_platform/msm-kernel/arch/${ARCH}/configs/vendor/neo.config',d)} \
-              ${@oe.utils.conditional('KERNEL_USE_PREBUILTS', 'True', '', 'file://kernel-5.10/kernel_platform/msm-kernel/arch/${ARCH}/configs/vendor/waipio_tuivm_debug.config',d)} \
+SRC_URI   =  "file://kernel-${PV}/kernel_platform/msm-kernel \
              "
-SRC_URI_append_cinder  +=  "${@oe.utils.conditional('KERNEL_USE_PREBUILTS', 'True', '', 'file://kernel-5.10/kernel_platform/msm-kernel/arch/${ARCH}/configs/vendor/cinder_debug.config',d)}"
+SRC_URI_append_cinder  +=  "${@oe.utils.conditional('KERNEL_USE_PREBUILTS', 'True', '', 'file://kernel-${PV}/kernel_platform/msm-kernel/arch/${ARCH}/configs/vendor/cinder_debug.config',d)}"
 
-S = "${WORKDIR}/kernel-5.10/kernel_platform/msm-kernel"
+S = "${WORKDIR}/kernel-${PV}/kernel_platform/msm-kernel"
 PR = "r0"
 
-DEPENDS += "virtual/kernel-toolchain-native virtual/dtc-native rsync-native"
+DEPENDS += "kernel-toolchain-native dtc-android-build-native rsync-native"
 
 LDFLAGS_aarch64 = "-O1 --hash-style=gnu --as-needed"
 TARGET_CXXFLAGS += "-Wno-format"
@@ -33,7 +31,7 @@ get_cc_option () {
 :
 }
 
-DEPENDS += "openssl-native mod-signing-keys"
+DEPENDS += " mkbootimg-native openssl-native mod-signing-keys"
 RDEPENDS_${KERNEL_PACKAGE_NAME}-base = ""
 
 LDFLAGS_aarch64 = "-O1 --hash-style=gnu --as-needed"
@@ -72,12 +70,12 @@ do_patch_veritycert() {
 do_patch[postfuncs] += " ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains('MACHINE_FEATURES', 'dm-verity-bootloader', 'do_patch_veritycert', '', d), '', d)}"
 
 do_configure_prepend() {
-    if [ ! -f "${WORKDIR}/kernel-5.10/kernel_platform/msm-kernel/arch/${ARCH}/configs/${KERNEL_CONFIG}" ]; then
+    if [ ! -f "${WORKDIR}/kernel-${PV}/kernel_platform/msm-kernel/arch/${ARCH}/configs/${KERNEL_CONFIG}" ]; then
         bbfatal "KERNEL_CONFIG '${KERNEL_CONFIG}' was specified, but not present in the source tree"
     fi
 
     sccs_from_src_uri="${@" ".join(find_sccs(d))}"
-    ${S}/scripts/kconfig/merge_config.sh -m -r -y -O ${B} ${WORKDIR}/kernel-5.10/kernel_platform/msm-kernel/arch/${ARCH}/configs/${KERNEL_CONFIG} ${sccs_from_src_uri} 1>&2
+    ${S}/scripts/kconfig/merge_config.sh -m -r -y -O ${B} ${WORKDIR}/kernel-${PV}/kernel_platform/msm-kernel/arch/${ARCH}/configs/${KERNEL_CONFIG} ${sccs_from_src_uri} 1>&2
 
     echo "# Global settings from linux recipe" >> ${B}/.config
     echo "CONFIG_LOCALVERSION="\"${LINUX_VERSION_EXTENSION}\" >> ${B}/.config
@@ -108,10 +106,6 @@ do_prebuilt_configure() {
     done
     install -m 0644 vmlinux ${B}
     install -m 0644 System.map ${B}
-
-    for dtbf in ${KERNEL_DTB_NAMES}; do
-        install -m 0644 $dtbf ${B}
-    done
 }
 
 do_prebuilt_shared_workdir[cleandirs] += " ${STAGING_KERNEL_BUILDDIR}"
@@ -193,7 +187,7 @@ KERNEL_EXTRA_ARGS += "DTC_EXT=${STAGING_DIR_NATIVE}/usr/bin/dtc/bin/dtc"
 
 do_compile_append() {
     for dtbf in ${KERNEL_DTB_NAMES}; do
-        dtbs="$dtbs arch/${ARCH}/boot/dts/vendor/qcom/$dtbf"
+        dtbs="$dtbs arch/${ARCH}/boot/dts/$dtbf"
     done
     cp arch/${ARCH}/boot/${KERNEL_IMAGETYPE} arch/${ARCH}/boot/${KERNEL_IMAGETYPE}.backup
     cat arch/${ARCH}/boot/${KERNEL_IMAGETYPE}.backup $dtbs > arch/${ARCH}/boot/${KERNEL_IMAGETYPE}
@@ -240,9 +234,14 @@ do_deploy() {
     install -m 0644 vmlinux ${DEPLOYDIR}
     install -m 0644 System.map ${DEPLOYDIR}
 
-    for dtbf in ${KERNEL_DTB_NAMES}; do
-        install -m 0644 $dtbf ${DEPLOYDIR}
-    done
+    # copy dtbo files into deplydir and create dtbo.img if DTBO support enable
+    if [  "${DTBO_MACHINE}" == "True" ]; then
+        install -m 0644 ${DTBO_SRC_PATH}/*.dtbo ${DEPLOYDIR}
+        mkdtimg create ${DEPLOYDIR}/dtbo.img \
+             --page_size=${PAGE_SIZE} \
+             ${DEPLOYDIR}/*.dtbo
+
+    fi
 }
 
 # Put the zImage in the kernel-dev pkg

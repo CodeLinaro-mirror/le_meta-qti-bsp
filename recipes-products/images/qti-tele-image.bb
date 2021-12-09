@@ -18,11 +18,14 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         spitools \
         packagegroup-android-utils \
         packagegroup-qti-core \
+        packagegroup-qti-data \
         packagegroup-qti-dsp \
         ${@bb.utils.contains('MACHINE_FEATURES', 'qti-location', 'packagegroup-qti-location', '', d)} \
         ${@bb.utils.contains('COMBINED_FEATURES', 'qti-security', 'packagegroup-qti-securemsm', '', d)} \
+        ${@bb.utils.contains('COMBINED_FEATURES', 'qti-audio', 'packagegroup-qti-audio', '', d)} \
         packagegroup-qti-ss-mgr \
         packagegroup-qti-telematics \
+        packagegroup-qti-telsdk \
         ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
         packagegroup-startup-scripts \
         packagegroup-support-utils \
