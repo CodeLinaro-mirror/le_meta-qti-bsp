@@ -18,7 +18,7 @@ SRC_URI = "${PATH_TO_REPO}/gstreamer/gst-plugins-qti-oss/.git;protocol=${PROTO};
 SRCREV = "${AUTOREV}"
 S = "${WORKDIR}/gstreamer/gst-plugins-qti-oss/gst-plugin-codec2"
 
-inherit autotools-brokensep
+inherit meson
 
 CFLAGS += "-I${STAGING_INCDIR} \
            -I${STAGING_INCDIR}/../lib64/glib-2.0/include \
