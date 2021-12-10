@@ -1,7 +1,7 @@
 #add packages on top of root file system
 
 EXTRA_IMAGE_FEATURES += "package-management"
-EXTRA_IMAGE_FEATURES += "tools-debug"
+#EXTRA_IMAGE_FEATURES += "tools-debug"
 
 
 IMAGE_INSTALL += "weston"
