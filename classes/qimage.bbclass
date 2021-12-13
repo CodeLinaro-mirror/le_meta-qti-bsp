@@ -67,7 +67,6 @@ IMAGE_LOGIN_MANAGER = "busybox-static"
 DEPENDS += "\
              ext4-utils-native \
              gen-partitions-tool-native \
-             mkbootimg-native \
              mtd-utils-native \
              openssl-native \
              pkgconfig-native \
@@ -191,14 +190,30 @@ python rootfs_ignore_packages() {
 ################################################
 BOOTIMGDEPLOYDIR = "${WORKDIR}/deploy-${PN}-bootimage-complete"
 
+INITRAMFS_IMAGE ?= ''
+RAMDISK = "${DEPLOY_DIR_IMAGE}/${INITRAMFS_IMAGE}-${MACHINE}.${INITRAMFS_FSTYPES}"
+def get_ramdisk_path(d):
+    if os.path.exists(d.getVar('RAMDISK')):
+        return '%s' %(d.getVar('RAMDISK'))
+    return '/dev/null'
+
+RAMDISK_PATH = "${@get_ramdisk_path(d)}"
+
+MKBOOTUTIL = '${@oe.utils.conditional("PREFERRED_PROVIDER_virtual/mkbootimg-native", "mkbootimg-gki-native", "scripts/mkbootimg.py", "mkbootimg", d)}'
+
 python do_make_bootimg () {
     import subprocess
 
     xtra_parms=""
-    if bb.utils.contains('DISTRO_FEATURES', 'nand-boot', True, False, d):
+    if bb.utils.contains('MACHINE_FEATURES', 'nand-boot', True, False, d):
         xtra_parms = " --tags-addr" + " " + d.getVar('KERNEL_TAGS_OFFSET')
+    if (d.getVar("BOOT_HEADER_VERSION") or "0") != "0":
+        xtra_parms += " --header_version " + d.getVar('BOOT_HEADER_VERSION')
+        # header version setting expects dtb to be passed seprately but not appended to kernel
+        xtra_parms += " --dtb " + d.getVar('DEPLOY_DIR_IMAGE', True) + "/" + d.getVar('KERNEL_DTB_NAMES').strip()
 
-    mkboot_bin_path = d.getVar('STAGING_BINDIR_NATIVE', True) + '/mkbootimg'
+    mkboot_bin_path = d.getVar('STAGING_BINDIR_NATIVE', True) + "/" + d.getVar('MKBOOTUTIL')
+    ramdisk_path    = d.getVar('RAMDISK_PATH')
     zimg_path       = d.getVar('DEPLOY_DIR_IMAGE', True) + "/" + d.getVar('KERNEL_IMAGETYPE', True)
     cmdline         = "\"" + d.getVar('KERNEL_CMD_PARAMS', True) + "\""
     pagesize        = d.getVar('PAGE_SIZE', True)
@@ -210,8 +225,8 @@ python do_make_bootimg () {
             output += ".noverity"
 
     # cmd to make boot.img
-    cmd =  mkboot_bin_path + " --kernel %s --cmdline %s --pagesize %s --base %s %s --ramdisk /dev/null --ramdisk_offset 0x0 --output %s" \
-           % (zimg_path, cmdline, pagesize, base, xtra_parms, output )
+    cmd =  mkboot_bin_path + " --kernel %s --cmdline %s --pagesize %s --base %s --ramdisk %s --ramdisk_offset 0x0 %s --output %s" \
+           % (zimg_path, cmdline, pagesize, base, ramdisk_path, xtra_parms, output )
 
     bb.debug(1, "do_make_bootimg cmd: %s" % (cmd))
 
@@ -222,7 +237,7 @@ python do_make_bootimg () {
 }
 do_make_bootimg[dirs]      = "${BOOTIMGDEPLOYDIR}/${IMAGE_BASENAME}"
 # Make sure native tools and vmlinux ready to create boot.img
-do_make_bootimg[depends] += "virtual/kernel:do_deploy mkbootimg-native:do_populate_sysroot"
+do_make_bootimg[depends] += "virtual/kernel:do_deploy virtual/mkbootimg-native:do_populate_sysroot"
 SSTATETASKS += "do_make_bootimg"
 SSTATE_SKIP_CREATION_task-make-bootimg = '1'
 do_make_bootimg[sstate-inputdirs] = "${BOOTIMGDEPLOYDIR}"
