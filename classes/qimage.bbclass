@@ -96,7 +96,7 @@ python __anonymous () {
 
 ### Generate system.img #####
 # Alter system image size if varity is enabled.
-do_makesystem[postfuncs]  += " ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'adjust_system_size_for_verity_squashfs', '', d)}"
+do_makesystem[postfuncs]  += " ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'adjust_system_size_for_verity', '', d)}"
 do_makesystem[postfuncs] += " ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'make_verity_enabled_system_image', '', d)}"
 do_makesystem[dirs]       = "${DEPLOY_DIR_IMAGE}"
 
