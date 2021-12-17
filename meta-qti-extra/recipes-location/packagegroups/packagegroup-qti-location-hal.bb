@@ -15,7 +15,5 @@ RDEPENDS_${PN} += "\
     loc-hal \
     location-api \
     location-api-msg-proto \
-    loc-sll-if \
     synergy-loc-api \
-    location-api-iface \
     "
