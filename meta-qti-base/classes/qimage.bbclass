@@ -141,6 +141,7 @@ do_make_avb_image() {
             avbtool make_vbmeta_image \
                 --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET} \
                 --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${PRODUCT}-dtbo.img \
+                --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${PRODUCT}-vendor_boot.img \
                 --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
                 --setup_rootfs_from_kernel ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
                 --algorithm SHA256_RSA4096 \
@@ -157,9 +158,27 @@ python do_make_vendorbootimg () {
 
     output = d.getVar('DEPLOY_DIR_IMAGE', True) + "/" + d.getVar('VENDORBOOTIMAGE_TARGET', True)
 
-    cmd = "dd if=/dev/zero of=%s bs=1M count=96" % output
+    cmd = "dd if=/dev/zero of=%s bs=1M count=64" % output
     subprocess.call(cmd, shell=True)
 }
 
-addtask do_make_avb_image after do_image_complete before do_build
+do_sign_vendor_boot_image () {
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'avb', 'true', 'false', d)}; then
+        if [[ -f "${DEPLOY_DIR_IMAGE}/${PRODUCT}-vendor_boot.img" ]]; then
+            # add hash footer for LXC vendor_boot image.
+            avbtool add_hash_footer  \
+                --image ${DEPLOY_DIR_IMAGE}/${PRODUCT}-vendor_boot.img  \
+                --partition_size 0x06000000  \
+                --partition_name vendor_boot \
+                --algorithm SHA256_RSA4096 \
+                --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/testkey_rsa4096.pem \
+                --rollback_index 0
+        else
+            echo "No need to sign vendor_boot image"
+        fi
+    fi
+}
+
 addtask do_make_vendorbootimg after do_image_complete before do_build
+addtask do_sign_vendor_boot_image after do_make_vendorbootimg before do_build
+addtask do_make_avb_image after do_sign_vendor_boot_image before do_build
