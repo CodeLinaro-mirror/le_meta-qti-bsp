@@ -23,6 +23,7 @@ SRC_URI = "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', ' file://weston.cfg', '', d)} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-dual-wlan', ' file://dual-wlan.cfg', \
         bb.utils.contains('MACHINE_FEATURES', 'qti-wlan', ' file://wlan.cfg', '', d), d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'early_init', ' file://earlyuserspace.cfg', '', d)} \
     file://lxc.cfg \
     file://ipc.cfg \
 "
