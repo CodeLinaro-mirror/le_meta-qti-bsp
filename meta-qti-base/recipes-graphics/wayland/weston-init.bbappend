@@ -1,5 +1,6 @@
 FILESEXTRAPATHS_append := " :${THISDIR}/weston/"
 SRC_URI = "file://weston.service_caf \
+           file://weston_early.service_caf \
            file://weston.ini_caf \
 "
 SYSTEMD_SERVICE_${PN} = "weston.service"
