@@ -34,6 +34,7 @@ DISTRO_FEATURES_append = " persist-image "
 PERSIST_IMAGE_ROOTFS_SIZE ?= "128M"
 
 DISTRO_FEATURES_append = " early-eth"
+DISTRO_FEATURES_append = "${@bb.utils.contains_any('VARIANT', 'perf user', ' early_init', '', d)}"
 #DISTRO_FEATURES_append = " early_init"
 #DISTRO_FEATURES_append = " early_userspace"
 
