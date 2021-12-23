@@ -34,8 +34,7 @@ BUSYBOX_SPLIT_SUID = "1"
 
 FILES_${PN} += "/usr/bin/env"
 
-VIRT_RM_BIN_LIST = "CONFIG_BRCTL \
-             CONFIG_FDFORMAT \
+VIRT_RM_BIN_LIST = "CONFIG_FDFORMAT \
              CONFIG_IPCRM \
              CONFIG_IPCS \
              CONFIG_READPROFILE \
