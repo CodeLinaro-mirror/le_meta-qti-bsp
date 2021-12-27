@@ -36,3 +36,14 @@ ro.hardware.camera=qcom
 
 #enable weston during boot
 persist.display.launch.weston.at.bootup=true
+
+#property to select sensor OEM registry file
+persist.vendor.sensors.enable.tdkMezzCard=false
+persist.vendor.sensors.enable.NavMezzCard=false
+
+##fluencetype can be "fluence" or "fluencepro" or "none"
+ro.vendor.audio.sdk.fluencetype=none
+persist.vendor.audio.fluence.voicecall=false
+persist.vendor.audio.fluence.voicerec=false
+persist.vendor.audio.fluence.speaker=false
+persist.vendor.audio.fluence.audiorec=false
