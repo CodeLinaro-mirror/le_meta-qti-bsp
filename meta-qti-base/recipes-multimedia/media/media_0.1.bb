@@ -38,6 +38,7 @@ SRCREV = "${AUTOREV}"
 S = "${WORKDIR}/hardware/qcom/media"
 
 inherit autotools systemd
+SYSTEMD_SERVICE_${PN} = "${@bb.utils.contains('DISTRO_FEATURES','early_init','video_early_demo.service','',d)}"
 
 EXTRA_OECONF_append = " \
     --with-sanitized-headers=${STAGING_INCDIR}/linux-msm \
