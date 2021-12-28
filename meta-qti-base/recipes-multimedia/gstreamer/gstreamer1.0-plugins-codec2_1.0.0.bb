@@ -10,6 +10,7 @@ DEPENDS += "codec2 \
             gstreamer1.0 \
             gstreamer1.0-plugins-bad \
             gstreamer1.0-plugins-base \
+            libdrm \
             linux-msm-headers \
             media-codec2 \
             media-external"
