@@ -201,7 +201,7 @@ do_deploy () {
 }
 
 #Sign boot image after generation
-do_deploy[postfuncs] += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor','', 'sign_bootimg', d)}"
+do_deploy[postfuncs] += "sign_bootimg"
 
 PACKAGES = "kernel kernel-base kernel-vmlinux kernel-dev kernel-modules"
 

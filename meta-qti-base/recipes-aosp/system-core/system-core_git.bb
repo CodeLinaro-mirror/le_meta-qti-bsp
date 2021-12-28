@@ -32,7 +32,8 @@ EXTRA_OECONF = "\
     --with-sanitized-headers=${STAGING_INCDIR}/linux-msm \
     --disable-debuggerd \
     --disable-libsync \
-    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', ' --enable-adb-avb20', '', d)} \
+    --enable-adb-avb20 \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', '--enable-adb-verity', d)} \
 "
 
 do_install_append() {

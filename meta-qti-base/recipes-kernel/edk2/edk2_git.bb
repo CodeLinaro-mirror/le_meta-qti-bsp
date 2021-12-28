@@ -42,7 +42,9 @@ EXTRA_OEMAKE = "'CLANG_BIN=${CLANG_BIN_PATH}' \
                 'EDK_TOOLS_PATH=${S}/BaseTools'\
                 'EARLY_ETH_ENABLED=${EARLY_ETH}'\
                 'UBSAN_UEFI_GCC_FLAG_ALIGNMENT=-Wno-misleading-indentation'\
-                'SUPPORT_DISABLE_NON_BOOTDEVICE=${DISABLE_NONBOOTDEVICE_ENABLED}'"
+                'SUPPORT_DISABLE_NON_BOOTDEVICE=${DISABLE_NONBOOTDEVICE_ENABLED}' \
+                'TARGET_BOARD_TYPE_AUTO=1' \
+                ${@bb.utils.contains('DISTRO_FEATURES', 'qti-avb', 'VERIFIED_BOOT_2=1', '', d)} "
 
 do_configure[noexec] = "1"
 do_compile () {
