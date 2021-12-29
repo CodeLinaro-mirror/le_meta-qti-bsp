@@ -8,9 +8,18 @@ HOMEPAGE = "http://www.codeaurora.org/"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://NOTICE;md5=b45eb38359bd16993272b40c311aa89f"
 
+DEPENDS += "glib-2.0"
+
 SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/avb-utils/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/avb-utils;usehead=1"
 
 SRCREV = "${AUTOREV}"
+
+CFLAGS += "\
+    -DUSE_GLIB \
+    -I${STAGING_INCDIR}/glib-2.0 \
+    -I${STAGING_LIBDIR}/glib-2.0/include \
+    -I${STAGING_LIBDIR}/glib-2.0/glib \
+"
 
 S = "${WORKDIR}/vendor/qcom/opensource/avb-utils"
 
