@@ -7,8 +7,9 @@ inherit packagegroup
 PACKAGES = "${PN}"
 
 RDEPENDS_${PN} = "\
-    init-audio \
-    audiodlkm \
     alsa-lib \
     alsa-utils \
+    audiodlkm \
+    init-audio \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-audio-ar', 'agm agm-client agm-plugin agm-server agm-sndparser', '', d)} \
 "
