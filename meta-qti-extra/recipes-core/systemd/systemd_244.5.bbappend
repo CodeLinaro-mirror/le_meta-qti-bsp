@@ -3,7 +3,6 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 SRC_URI_append = " \
     file://0032-systemd-add-bootkpi-marker-for-user-session.patch \
     ${@bb.utils.contains('DISTRO_FEATURES', 'early_init', 'file://0034-systemd-add-handover-support-for-early-service.patch', '', d)} \
-    file://0001-systemd-sleep-change-suspend-states.patch \
     file://power-switch.rules \
     file://qti_sleep.sh \
 "
