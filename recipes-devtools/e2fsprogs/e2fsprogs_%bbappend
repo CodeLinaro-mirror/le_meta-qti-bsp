@@ -1,5 +1,0 @@
-#Below CAF path is mirror from "git.kernel.org/pub/scm/fs/ext2/e2fsprogs.git"
-SRC_URI += "https://source.codeaurora.org/quic/le/e2fsprogs;branch=ext2/master"
-SRC_URI[md5sum] = "e2a227ee27c58a76e4a52b51c142e636"
-SRC_URI[sha256sum] = "5ca6731b37e9ab71c731891d92fbeb34ad8688c1b48bd0766be51b163f551f79"
-
