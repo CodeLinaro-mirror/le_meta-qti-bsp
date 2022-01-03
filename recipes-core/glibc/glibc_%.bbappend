@@ -1,7 +1,7 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
-# Adjust branch & URI to fetch from CAF.
-SRCBRANCH = "drains/release/${PV}/master"
-GLIBC_GIT_URI = "git://source.codeaurora.org/quic/le/glibc.git;protocol=https"
+# Adjust branch & URI to fetch from Codelinaro.
+SRCBRANCH = "caf_migration/drains/release/${PV}/master"
+GLIBC_GIT_URI = "${CLO_LE_GIT}/glibc.git;protocol=https"
 
 SRC_URI += "file://CVE-2019-25013.patch \
 	    file://CVE-2017-8804.patch \
