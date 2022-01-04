@@ -30,6 +30,8 @@ case $1/$2 in
   pre/*)
     echo "Entering into $2..."
 
+    systemctl stop loc_launcher.service
+    systemctl stop location_hal_daemon.service
     systemctl stop audiod.service
     if [ $2 == "hibernate" ]; then
         echo 0 > /sys/kernel/boot_adsp/boot
@@ -64,6 +66,8 @@ case $1/$2 in
     if [ $2 == "hibernate" ]; then
         echo 1 > /sys/kernel/boot_adsp/boot
     fi
+    systemctl restart loc_launcher.service
+    systemctl restart location_hal_daemon.service
     systemctl restart audiod.service
     ;;
 esac
