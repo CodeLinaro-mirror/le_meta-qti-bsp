@@ -21,14 +21,6 @@ do_install_append(){
 
     install -m 0644 ${WORKDIR}/fstab ${D}${sysconfdir}/fstab
 
-    # Explicitly remove sepolicy entries from fstab when selinux is not present.
-    if ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'false', 'true', d)}; then
-        #For /run
-        sed -i "s#,rootcontext=system_u:object_r:var_run_t:s0##g" ${D}${sysconfdir}/fstab
-        # For /var/volatile
-        sed -i "s#,rootcontext=system_u:object_r:var_t:s0##g" ${D}${sysconfdir}/fstab
-    fi
-
     # Replace persist/home bind if read-only is not enabled
     if ${@bb.utils.contains('IMAGE_FEATURES', 'read-only-rootfs', 'false', 'true', d)}; then
         sed -i "/^\PARTLABEL=persist.*var/d" ${D}${sysconfdir}/fstab
