@@ -13,12 +13,17 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         glib-2.0 \
         kernel-modules \
         packagegroup-android-utils \
+        packagegroup-qti-camera \
         packagegroup-qti-core \
         packagegroup-qti-data \
+        packagegroup-qti-display \
         packagegroup-qti-dsp \
+        packagegroup-qti-fastcv \
+        packagegroup-qti-gfx \
+        packagegroup-qti-gst \
         packagegroup-qti-ss-mgr \
+        packagegroup-qti-video \
         packagegroup-startup-scripts \
         packagegroup-support-utils \
         systemd-machine-units \
-        ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
 "
