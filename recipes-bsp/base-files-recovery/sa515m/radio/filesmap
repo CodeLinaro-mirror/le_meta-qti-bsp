@@ -33,7 +33,7 @@ NON-HLOS.bin            modem
 sbl1.mbn                sbl
 tz.mbn                  tz
 aop.mbn                 aop
-devcfg_auto_nad.mbn              tz_devcfg
+devcfg_auto_nad.mbn     tz_devcfg
 hyp.mbn                 qhee
 multi_image.mbn         multi_image
 uefi.elf                uefi
@@ -43,7 +43,7 @@ sec.elf                 sec
 apdp.mbn                apdp
 cmnlib.mbn              cmnlib
 km4.mbn                 keymaster
-ipa_fws.elf             IPA_FW
+ipa_fws.elf             ipa_fw
 
 # filename + .bak       backup partition
 
