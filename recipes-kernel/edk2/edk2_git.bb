@@ -50,6 +50,8 @@ NAND_SQUASHFS_SUPPORT = "${@bb.utils.contains('DISTRO_FEATURES', 'nand-squashfs'
 EXTRA_OEMAKE_append = " 'NAND_SQUASHFS_SUPPORT=${NAND_SQUASHFS_SUPPORT}'"
 NAND_AB_ATTR_SUPPORT = "${@bb.utils.contains('DISTRO_FEATURES', 'nand-ab', 'true', 'false', d)}"
 EXTRA_OEMAKE_append = " 'TARGET_NAND_AB_ATTR_SUPPORT=${NAND_AB_ATTR_SUPPORT}'"
+NANDRECOVERY = "${@d.getVar('MACHINE_SUPPORTS_NAND_RECOVERY') or "False"}"
+EXTRA_OEMAKE_append = " 'RAMDISK_RECOVERYFS=${NANDRECOVERY}'"
 
 do_compile () {
     export CC=${BUILD_CC}
@@ -75,6 +77,10 @@ do_deploy() {
    if ${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', 'true', 'false', d)}; then
         install -d  ${DEPLOY_DIR_IMAGE_NAND}
         install ${D}/boot/abl.elf ${DEPLOY_DIR_IMAGE_NAND}
+   fi
+   if ${@bb.utils.contains('IMAGE_FSTYPES', 'cpio.gz', 'true', 'false', d)}; then
+        install -d  ${DEPLOY_DIR_IMAGE}
+        install ${D}/boot/abl.elf ${DEPLOY_DIR_IMAGE}
    fi
 }
 

@@ -1,9 +1,19 @@
+IMAGE_ROOTFS_SIZE = "28672"
+IMAGE_ROOTFS_EXTRA_SPACE = "0"
+
+RAMDISK = "${IMGDEPLOYDIR}/machine-recovery-image-${MACHINE}.cpio.gz"
+RAMDISK_OFFSET = "0x02200000"
+
+PACKAGE_INSTALL = "${IMAGE_INSTALL}"
+
 DEPENDS += "virtual/kernel"
 
 DEPENDS += "pkgconfig-native gtk-doc-native gettext-native mkbootimg-native"
 DEPENDS += "bzip2 fsconfig-native applypatch-native bsdiff-native ext4-utils-native mtd-utils-native"
 
 DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'nand-squashfs', 'squashfs-tools-native', '', d)}"
+
+NANDRECOVERY = "${@d.getVar('MACHINE_SUPPORTS_NAND_RECOVERY') or "False"}"
 
 # The OE-Core minimal boot image files.
 IMAGE_INSTALL += "packagegroup-core-boot"
@@ -15,15 +25,13 @@ IMAGE_INSTALL += "base-passwd"
 IMAGE_INSTALL += "system-core-adbd"
 IMAGE_INSTALL += "system-core-logd"
 IMAGE_INSTALL += "system-core-usb"
-IMAGE_INSTALL += "recovery-bin"
-IMAGE_INSTALL += "recovery"
+IMAGE_INSTALL += "${@oe.utils.conditional('NANDRECOVERY', 'False', 'recovery-bin recovery', '', d)}"
 IMAGE_INSTALL += "${@bb.utils.contains('MULTILIB_VARIANTS', 'lib32', 'lib32-recovery', '', d)}"
 # IMAGE_INSTALL += "powerapp"
 # IMAGE_INSTALL += "powerapp-powerconfig"
 # IMAGE_INSTALL += "powerapp-reboot"
 # IMAGE_INSTALL += "powerapp-shutdown"
-IMAGE_INSTALL += "start-scripts-find-recovery-partitions"
-IMAGE_INSTALL += "start-scripts-firmware-links"
+IMAGE_INSTALL += "${@oe.utils.conditional('NANDRECOVERY', 'False', 'start-scripts-find-recovery-partitions start-scripts-firmware-links', '', d)}"
 IMAGE_INSTALL += "mtd-utils-ubifs"
 IMAGE_INSTALL += "e2fsprogs-e2fsck"
 IMAGE_INSTALL += "e2fsprogs-mke2fs"
@@ -31,6 +39,8 @@ IMAGE_INSTALL += "libcomerr"
 IMAGE_INSTALL += "libss"
 IMAGE_INSTALL += "libe2p"
 IMAGE_INSTALL += "libext2fs"
+
+IMAGE_INSTALL += "${@oe.utils.conditional('NANDRECOVERY', 'True', 'libxml2 nand-recovery kernel-modules data iproute2 can-utils start-scripts-init-can canflasher curl mtd-utils-parttool', '', d)}"
 
 # Needed for generating recovery.ubi ignored for ext4
 MKUBIFS_ARGS = "${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', '-m 4096 -e 253952 -c 200 -F', '', d)}"
@@ -79,7 +89,7 @@ do_makesystem() {
 # The default ubi image generated doesn't have provision for selinux
 # Hence, create a recoveryfs.ubi image which is selinux enabled
 # Do this only when both selinux & nand-boot is enabled
-IMAGE_PREPROCESS_COMMAND_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'selinux nand-boot', 'create_recoveryfs_ubi_img_with_selinux;', '', d)} "
+IMAGE_PREPROCESS_COMMAND_append = "${@oe.utils.conditional('NANDRECOVERY', 'True', '', bb.utils.contains('DISTRO_FEATURES', 'selinux nand-boot', 'create_recoveryfs_ubi_img_with_selinux;', '', d), d)}"
 
 RECOVERYFS_SELINUX_CFG = "${DEPLOY_DIR_IMAGE_NAND}/ubinize-recoveryfs-selinux.cfg"
 OUTPUT_UBIFS_IMAGE = "${DEPLOY_DIR_IMAGE_NAND}/machine-recovery-image-selinux-${MACHINE}.ubifs"
@@ -243,9 +253,12 @@ remove_mount_operations() {
             rm ${IMAGE_ROOTFS}/etc/systemd/system/local-fs.target.requires/systemrw.mount
         fi
     fi
-    # copy recovery bins and libs in correct path
-    cp -rp  ${IMAGE_ROOTFS}/recovery/* ${IMAGE_ROOTFS}/
-    rm -rf ${IMAGE_ROOTFS}/recovery/
+
+    if ${@oe.utils.conditional('NANDRECOVERY', 'True', 'false', 'true', d)}; then
+        # copy recovery bins and libs in correct path
+        cp -rp  ${IMAGE_ROOTFS}/recovery/* ${IMAGE_ROOTFS}/
+        rm -rf ${IMAGE_ROOTFS}/recovery/
+    fi
 }
 
 ROOTFS_POSTPROCESS_COMMAND += " do_fsconfig; remove_mount_operations; "

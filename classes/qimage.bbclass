@@ -9,12 +9,13 @@ DEPLOY_DIR_IMAGE_EMMC ?= "${DEPLOY_DIR_IMAGE}"
 
 # Default deploy path for nand images.
 DEPLOY_DIR_IMAGE_NAND ?= "${DEPLOY_DIR_IMAGE}"
+
+# Default deploy path for ramdisk images.
+DEPLOY_DIR_IMAGE_RAMDISK ?= "${DEPLOY_DIR_IMAGE}"
+
 # generate a companion debug archive containing symbols from the -dbg packages  11
 IMAGE_GEN_DEBUGFS = "1"
 IMAGE_FSTYPES_DEBUGFS = "tar.bz2"
-
-# Default deploy path for squashfs images.
-DEPLOY_DIR_IMAGE_SQUASHFS ?= "${DEPLOY_DIR_IMAGE}"
 
 #  Function to get most suitable .inc file with list of packages
 #  to be installed into root filesystem from layer it is called.
@@ -54,6 +55,7 @@ IMAGE_INSTALL_ATTEMPTONLY[type] = "list"
 
 RAMDISK ?= "/dev/null"
 RAMDISK_OFFSET ?= "0x0"
+BUNDLED_BOOTIMAGE_TARGET ?= ""
 
 # Original definition is in image.bbclass. Overloading it with internal list of packages
 # to ensure dependencies are not messed up in case package is absent.
@@ -93,6 +95,10 @@ python __anonymous () {
     if bb.utils.contains('DISTRO_FEATURES', 'flashless', True, False, d):
         if bb.utils.contains('IMAGE_FSTYPES', 'squashfs-xz', True, False, d):
             bb.build.addtask('do_make_ramdisk_bootimg', 'do_image_complete', 'do_image_squashfs_xz', d)
+
+    image = d.getVar('INITRAMFS_IMAGE')
+    if image:
+        bb.build.addtask('do_make_ramdisk_bootimg', 'do_image_complete', 'do_image_cpio', d)
 }
 
 ### Generate system.img #####
@@ -158,35 +164,35 @@ addtask do_make_bootimg before do_image_complete
 python do_make_ramdisk_bootimg () {
     import subprocess
 
-# create squashfs deploy dir.
-    squashfs_deploy = d.getVar('DEPLOY_DIR_IMAGE_SQUASHFS', True)
-    if not os.path.exists(squashfs_deploy):
-     os.mkdir(squashfs_deploy)
+# create ramdisk deploy dir.
+    ramdisk_deploy = d.getVar('DEPLOY_DIR_IMAGE_RAMDISK', True)
+    if not os.path.exists(ramdisk_deploy):
+     os.mkdir(ramdisk_deploy)
 
     mkboot_bin_path = d.getVar('STAGING_BINDIR_NATIVE', True) + '/mkbootimg'
-    zimg_path       = d.getVar('DEPLOY_DIR_IMAGE', True) + "/" + d.getVar('KERNEL_IMAGETYPE', True)
+    zimg_path       = d.getVar('DEPLOY_DIR_IMAGE', True) + "/" + d.getVar('KERNEL_IMAGETYPE', True) + d.getVar('KERNEL_IMAGENAME', True)
     cmdline         = "\"" + d.getVar('KERNEL_CMD_PARAMS', True) + "\""
     pagesize        = d.getVar('PAGE_SIZE', True)
     base            = d.getVar('KERNEL_BASE', True)
 
-    output_squashfs      = d.getVar('DEPLOY_DIR_IMAGE_SQUASHFS', True) + "/" + d.getVar('MACHINE', True) + "-flashless-boot.img"
+    output_ramdisk  = d.getVar('DEPLOY_DIR_IMAGE_RAMDISK', True) + "/" + d.getVar('BUNDLED_BOOTIMAGE_TARGET', True)
 
-    # Get the squashfs ramdisk
+    # Get the ramdisk
     ramdisk         = d.getVar('RAMDISK', True)
     ramdisk_offset  = d.getVar('RAMDISK_OFFSET', True)
 
-    # cmd to make boot.img for ext4
+    # cmd to make boot.img for ramdisk/ramfs
     xtra_parms = " --tags-addr" + " " + d.getVar('KERNEL_TAGS_OFFSET')
 
-    cmd_squashfs =  mkboot_bin_path + " --kernel %s --cmdline %s --pagesize %s --base %s %s --ramdisk %s --ramdisk_offset %s --output %s" \
-      % (zimg_path, cmdline, pagesize, base, xtra_parms, ramdisk, ramdisk_offset, output_squashfs )
-    bb.debug(1, "do_make_ramdisk_bootimg cmd_squashfs: %s" % (cmd_squashfs))
-    subprocess.call(cmd_squashfs, shell=True)
+    cmd_ramdisk =  mkboot_bin_path + " --kernel %s --cmdline %s --pagesize %s --base %s %s --ramdisk %s --ramdisk_offset %s --output %s" \
+           % (zimg_path, cmdline, pagesize, base, xtra_parms, ramdisk, ramdisk_offset, output_ramdisk )
+    bb.debug(1, "do_make_ramdisk_bootimg cmd_ramdisk: %s" % (cmd_ramdisk))
+    subprocess.call(cmd_ramdisk, shell=True)
 }
 do_make_ramdisk_bootimg[dirs]      = "${DEPLOY_DIR_IMAGE}"
 # Make sure native tools and vmlinux ready to create ramdisk boot.img
 do_make_ramdisk_bootimg[depends]  += "${PN}:do_prepare_recipe_sysroot"
-do_make_ramdisk_bootimg[depends]  += "virtual/kernel:do_shared_workdir"
+do_make_ramdisk_bootimg[depends]  += "virtual/kernel:do_install"
 
 # With dm-verity, kernel cmdline has to be updated with correct hash value of
 # system image. This means final boot image can be created only after system image.

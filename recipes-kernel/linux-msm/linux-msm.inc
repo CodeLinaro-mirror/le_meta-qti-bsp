@@ -25,11 +25,14 @@ KERNEL_PRIORITY           = "9001"
 # Add V=1 to KERNEL_EXTRA_ARGS for verbose
 KERNEL_EXTRA_ARGS        += "O=${B}"
 
+NANDRECOVERY = "${@d.getVar('MACHINE_SUPPORTS_NAND_RECOVERY') or "False"}"
+
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI   =  "file://kernel \
 	      ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'file://systemd.cfg', '', d)} \
               ${@bb.utils.contains('DISTRO_FEATURES', 'virtualization', 'file://virtualization.cfg', '', d)} \
               ${@bb.utils.contains('DISTRO_FEATURES', 'nand-squashfs', 'file://squashfs.cfg', '', d)} \
+              ${@oe.utils.conditional('NANDRECOVERY', 'True', 'file://nandrecovery.cfg', '', d)} \
 	     "
 SRC_URI_append_sdm845 += "${@bb.utils.contains('DISTRO_FEATURES', 'virtualization', 'file://virtualization_robomaker.cfg', '', d)}"
 
