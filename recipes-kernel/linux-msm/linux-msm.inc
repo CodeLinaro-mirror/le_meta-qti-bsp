@@ -96,7 +96,9 @@ do_compile_append() {
 # the x509 (public key) file
 do_shared_workdir_append () {
         mkdir -p $kerneldir/certs
-        cp certs/signing_key.x509 $kerneldir/certs/
+        if [ -f certs/signing_key.x509 ]; then
+            cp certs/signing_key.x509 $kerneldir/certs/
+        fi
 }
 
 do_deploy() {
