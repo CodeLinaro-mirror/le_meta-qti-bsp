@@ -60,6 +60,9 @@ fde_setup () {
                     echo "failed to seed data partition"
                     return 1
                 fi
+            else
+                DATA_DIR="/data"
+                mount $DEV_PATH/$DEV_NAME ${DATA_DIR}
             fi
             return 0
             ;;
