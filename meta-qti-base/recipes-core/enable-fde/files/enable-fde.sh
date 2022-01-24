@@ -60,8 +60,6 @@ fde_setup () {
                     echo "failed to seed data partition"
                     return 1
                 fi
-            else
-                mount $DEV_PATH/$DEV_NAME ${DATA_DIR}
             fi
             return 0
             ;;
@@ -107,12 +105,7 @@ seed_data() {
     return 0
 }
 
-add_sleep() {
-    typeset -i scount=0
-    while [[ ${scount} -le 10000 ]]; do
-        scount=${scount}+1
-    done
-}
+
 
 DEV_PATH="/dev";
 DEV_NAME="vdb";
@@ -120,5 +113,5 @@ fde_setup
 if [ $? -ne 0 ] ; then
    exit 1
 fi
-add_sleep
+
 exit 0
