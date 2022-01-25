@@ -12,7 +12,7 @@ DESCRIPTION = "Sigma_dut is a application that used for WFA certification testin
               "
 HOMEPAGE = "https://github.com/qca/sigma-dut"
 LICENSE = "BSD-3-Clause"
-LIC_FILES_CHKSUM = "file://README;md5=a5044fc88d4aecbffe1b1ad56ce8df9f"
+LIC_FILES_CHKSUM = "file://README;md5=edb3527809487b74b4d4a7e02b05acf0"
 
 DEPENDS += "libnl"
 
