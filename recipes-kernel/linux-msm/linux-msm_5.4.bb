@@ -1,5 +1,5 @@
 require recipes-kernel/linux-msm/linux-msm.inc
-COMPATIBLE_MACHINE = "genericarmv8|sdxlemur|scuba|qrbx210-rbx|sa2150p|sa2150p-nand|sa410m"
+COMPATIBLE_MACHINE = "genericarmv8|sdxlemur|scuba|qrbx210-rbx|sa2150p|sa2150p-nand|sa410m|qcs610"
 
 SRC_URI_append_sdxlemur += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-audio', 'file://0001-ALSA-uapi-add-check-to-avoid-duplicate-include-of-ti.patch', '', d)}"
 SRC_URI_append_sdxlemur += "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'file://gluebi.cfg', '', d)}"
@@ -7,7 +7,7 @@ SRC_URI_append_sdxlemur += "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity',
 S         =  "${WORKDIR}/kernel/msm-5.4"
 PR        =  "r0"
 
-DEPENDS += "llvm-arm-toolchain-native dtc-native rsync-native clang-native"
+DEPENDS += "llvm-arm-toolchain-native virtual/dtc-native rsync-native clang-native"
 TOOLCHAIN = "clang"
 RUNTIME = "llvm"
 

@@ -1,4 +1,4 @@
-# Copyright (c) 2020, The Linux Foundation. All rights reserved.
+# Copyright (c) 2020-2021, The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -84,15 +84,14 @@
 # To search under multiple paths mention in a space separated list, E.g:
 #     PREBUILT_SRC_DIR = "/home/vendor/prebuilt1 /home/vendor/prebuilt2"
 #
-# It's possible to search under prebuilt_<PREBUILT_VARIANTS> directories
-# present under same parent directory as that of WORKSPACE root by setting
+# It's possible to search under a few default directories by setting
 # USE_DEFAULT_PREBUILT_SRC_DIR variable to "1", default is "0". These
-# additional paths are considered along with the ones defined in
+# additional paths are specified using DEFAULT_PREBUILT_SRC_DIR variable
+# in one of the .conf files and are considered along with the ones defined in
 # PREBUILT_SRC_DIR. No sanity checks are in place for dupliate tarballs.
 # Users need to carefully provide paths to avoid surprizes.
 #
-# In which the prebuilt package is populated. If prebuilt class
-# finds a package compatible with the recipe, it will be used to
+# If prebuilt class finds a package compatible with the recipe, it will be used to
 # populate ${D}, fetch, compile... functions will be discarded.
 
 # Anonymous function needs to be executed each time so that runqueue
@@ -117,10 +116,8 @@ def get_prebuilt_paths(d):
 
     defaultsrc = d.getVar('USE_DEFAULT_PREBUILT_SRC_DIR')
     if defaultsrc == "1":
-        dpbpath = os.path.dirname(os.path.abspath(d.getVar('WORKSPACE')))
-        pbvariants = (d.getVar("PREBUILT_VARIANTS") or "").split()
-        for variant in pbvariants:
-            pbpaths.append(dpbpath + '/' + 'prebuilt_' + variant)
+        dpbpath = (d.getVar("DEFAULT_PREBUILT_SRC_DIR") or "").split()
+        pbpaths += dpbpath
 
     bb.debug(1,"Searching for prebuilts in: %s" % pbpaths)
 

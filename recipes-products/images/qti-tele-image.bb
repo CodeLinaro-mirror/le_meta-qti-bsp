@@ -16,11 +16,12 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         net-tools \
         pps-tools \
         spitools \
+        coreutils \
         packagegroup-android-utils \
         packagegroup-qti-core \
         packagegroup-qti-data \
         packagegroup-qti-dsp \
-        ${@bb.utils.contains('MACHINE_FEATURES', 'qti-location', 'packagegroup-qti-location', '', d)} \
+        ${@bb.utils.contains('MACHINE_FEATURES', 'qti-location', 'packagegroup-qti-location packagegroup-qti-location-auto', '', d)} \
         ${@bb.utils.contains('COMBINED_FEATURES', 'qti-security', 'packagegroup-qti-securemsm', '', d)} \
         ${@bb.utils.contains('COMBINED_FEATURES', 'qti-audio', 'packagegroup-qti-audio', '', d)} \
         packagegroup-qti-ss-mgr \
@@ -29,5 +30,6 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
         packagegroup-startup-scripts \
         packagegroup-support-utils \
+        subsystem-ramdump \
         systemd-machine-units \
 "
