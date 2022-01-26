@@ -27,5 +27,6 @@ RDEPENDS_${PN} += "\
     xinetd \
     tcp-wrappers \
     netkit-telnet \
+    proftpd \
     openssh \
     "
