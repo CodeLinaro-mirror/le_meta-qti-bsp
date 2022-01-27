@@ -11,10 +11,11 @@ PACKAGE_INSTALL = "\
     usb-composition \
     busybox \
     ext4-utils \
-    first-stage-modules \
+    gki-kernel-modules-first-stage \
     fsmgr \
     glib-2.0 \
     glibc \
+    initrd-release \
     libbase \
     libcutils \
     libgcc \
@@ -29,5 +30,8 @@ IMAGE_FSTYPES = "${INITRAMFS_FSTYPES}"
 IMAGE_NAME_SUFFIX = ""
 IMAGE_FEATURES = ""
 IMAGE_LINGUAS = ""
+
+# Set default target to initrd.target
+SYSTEMD_DEFAULT_TARGET = "initrd.target"
 
 inherit core-image

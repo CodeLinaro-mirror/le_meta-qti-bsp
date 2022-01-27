@@ -2,7 +2,10 @@ INIT_RAMDISK = "${@d.getVar('MACHINE_SUPPORTS_INIT_RAMDISK') or "False"}"
 RAMDISKDIR = "${WORKDIR}/ramdisk"
 
 TOYBOX_RAMDISK ?= "False"
-PACKAGE_INSTALL += "${@bb.utils.contains('TOYBOX_RAMDISK', 'True', 'toybox mksh', '', d)}"
+ENABLE_ADB ?= "True"
+ENABLE_ADB_qti-distro-base-user ?= "False"
+PACKAGE_INSTALL += "${@oe.utils.conditional('ENABLE_ADB', 'True', 'adbd usb-composition', '', d)}"
+PACKAGE_INSTALL += "${@oe.utils.conditional('TOYBOX_RAMDISK', 'True', 'toybox mksh gawk coreutils e2fsprogs dosfstools', '', d)}"
 
 do_ramdisk_create[depends] += "virtual/kernel:do_deploy"
 do_ramdisk_create[cleandirs] += "${RAMDISKDIR}"
@@ -31,13 +34,31 @@ fakeroot do_ramdisk_create() {
         ln -s bin sbin
         if [[ "${TOYBOX_RAMDISK}" == "True" ]]; then
             cp ${IMAGE_ROOTFS}/usr/lib/libcrypt.so.2 lib/libcrypt.so.2
+            cp ${IMAGE_ROOTFS}/usr/lib/libreadline.so.8 lib/libreadline.so.8 #awk support
+            cp ${IMAGE_ROOTFS}/lib/libtinfo.so.5 lib/libtinfo.so.5
+            cp ${IMAGE_ROOTFS}/lib/libext2fs.so.2 lib/libext2fs.so.2
+            cp ${IMAGE_ROOTFS}/lib/libcom_err.so.2 lib/libcom_err.so.2
+            cp ${IMAGE_ROOTFS}/lib/libblkid.so.1 lib/libblkid.so.1
+            cp ${IMAGE_ROOTFS}/lib/libuuid.so.1 lib/libuuid.so.1
+            cp ${IMAGE_ROOTFS}/lib/libe2p.so.2 lib/libe2p.so.2
+            cp ${IMAGE_ROOTFS}/usr/lib/libgmp.so.10 lib/libgmp.so.10
             cp ${IMAGE_ROOTFS}/bin/toybox bin/
             cp ${IMAGE_ROOTFS}/bin/mksh bin/
+            cp ${IMAGE_ROOTFS}/usr/bin/gawk bin/
+            cp ${IMAGE_ROOTFS}/usr/bin/expr.coreutils bin/
+            cp ${IMAGE_ROOTFS}/usr/sbin/mkfs.vfat.dosfstools bin/
+            cp ${IMAGE_ROOTFS}/sbin/mkfs.ext2.e2fsprogs bin/
+            cp ${IMAGE_ROOTFS}/sbin/mkfs.ext3 bin/
+            cp ${IMAGE_ROOTFS}/sbin/mkfs.ext4 bin/
             ln -s mksh bin/sh
+            ln -s gawk bin/awk
+            ln -s expr.coreutils bin/expr
+            ln -s mkfs.vfat.dosfstools bin/mkfs.vfat
+            ln -s mkfs.ext2.e2fsprogs bin/mkfs.ext2
             # install all the toybox commands
             if [ -r ${IMAGE_ROOTFS}/etc/toybox.links ]; then
                 while read -r LREAD; do
-                    ln -s toybox ${LREAD:1}
+                    ln -s /bin/toybox ${LREAD:1}
                 done < ${IMAGE_ROOTFS}/etc/toybox.links
             fi
         else
@@ -66,23 +87,24 @@ fakeroot do_ramdisk_create() {
             chmod 744 vmrd-init
             ln -s vmrd-init init
         else
-            cp ${IMAGE_ROOTFS}/sbin/adbd sbin/
-            cp ${IMAGE_ROOTFS}/sbin/usb_composition sbin/
-            cp -r ${IMAGE_ROOTFS}/sbin/usb/ sbin/
-            cp ${IMAGE_ROOTFS}/usr/lib/libadbd.so.0 lib/libadbd.so.0
-            cp ${IMAGE_ROOTFS}/usr/lib/libext4_utils.so.0 lib/libext4_utils.so.0
-            cp ${IMAGE_ROOTFS}/usr/lib/libbase.so.0 lib/libbase.so.0
-            cp ${IMAGE_ROOTFS}/usr/lib/libfs_mgr.so.0 lib/libfs_mgr.so.0
-            cp ${IMAGE_ROOTFS}/usr/lib/liblog.so.0 lib/liblog.so.0
-            cp ${IMAGE_ROOTFS}/usr/lib/libcutils.so.0 lib/libcutils.so.0
-            cp ${IMAGE_ROOTFS}/usr/lib/libsparse.so.0 lib/libsparse.so.0
-            cp ${IMAGE_ROOTFS}/usr/lib/libmincrypt.so.0 lib/libmincrypt.so.0
-            cp ${IMAGE_ROOTFS}/usr/lib/libgthread-2.0.so.0 lib/libgthread-2.0.so.0
-            cp ${IMAGE_ROOTFS}/usr/lib/libglib-2.0.so.0 lib/libglib-2.0.so.0
-            cp ${IMAGE_ROOTFS}/usr/lib/liblogwrap.so.0 lib/liblogwrap.so.0
-            cp ${IMAGE_ROOTFS}/lib/libgcc_s.so.1 lib/libgcc_s.so.1
-            #cp ${IMAGE_ROOTFS}/lib/libcrypto.so.1.0.0 lib/libcrypto.so.1.0.0
-            cp ${IMAGE_ROOTFS}/usr/lib/libstdc++.so.6 lib/libstdc++.so.6
+            if [[ "${ENABLE_ADB}" == "True" ]]; then
+                cp ${IMAGE_ROOTFS}/sbin/adbd sbin/
+                cp ${IMAGE_ROOTFS}/usr/lib/libadbd.so.0 lib/libadbd.so.0
+                cp ${IMAGE_ROOTFS}/usr/lib/libext4_utils.so.0 lib/libext4_utils.so.0
+                cp ${IMAGE_ROOTFS}/usr/lib/libbase.so.0 lib/libbase.so.0
+                cp ${IMAGE_ROOTFS}/usr/lib/libfs_mgr.so.0 lib/libfs_mgr.so.0
+                cp ${IMAGE_ROOTFS}/usr/lib/liblog.so.0 lib/liblog.so.0
+                cp ${IMAGE_ROOTFS}/usr/lib/libcutils.so.0 lib/libcutils.so.0
+                cp ${IMAGE_ROOTFS}/usr/lib/libsparse.so.0 lib/libsparse.so.0
+                cp ${IMAGE_ROOTFS}/usr/lib/libmincrypt.so.0 lib/libmincrypt.so.0
+                cp ${IMAGE_ROOTFS}/usr/lib/libgthread-2.0.so.0 lib/libgthread-2.0.so.0
+                cp ${IMAGE_ROOTFS}/usr/lib/libglib-2.0.so.0 lib/libglib-2.0.so.0
+                cp ${IMAGE_ROOTFS}/usr/lib/liblogwrap.so.0 lib/liblogwrap.so.0
+                cp ${IMAGE_ROOTFS}/lib/libgcc_s.so.1 lib/libgcc_s.so.1
+                cp ${IMAGE_ROOTFS}/sbin/usb_composition sbin/
+                cp -r ${IMAGE_ROOTFS}/sbin/usb/ sbin/
+                cp ${IMAGE_ROOTFS}/usr/lib/libstdc++.so.6 lib/libstdc++.so.6
+            fi
             if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-csm', 'true', 'false', d)}; then
                 cp ${IMAGE_ROOTFS}/lib/ld-linux-aarch64.so.1 lib/ld-linux-aarch64.so.1
                 cp ${COREBASE}/meta-qti-bsp/recipes-products/images/include/csmrd-init .
@@ -141,7 +163,7 @@ fakeroot do_ramdisk_create() {
         cd ${DEPLOY_DIR_IMAGE}/build-artifacts/kernel_scripts
         # remove the initrd.gz file if exist
         rm -rf ${IMGDEPLOYDIR}/${PN}-initrd.gz
-        if ${@bb.utils.contains_any('PREFERRED_VERSION_linux-msm', '5.10', 'true', 'false', d)}; then
+        if ${@bb.utils.contains_any('PREFERRED_VERSION_linux-msm', '5.10 5.15', 'true', 'false', d)}; then
             bash ./scripts/gen_initramfs.sh -o ${IMGDEPLOYDIR}/${PN}-initrd.gz -u 0 -g 0 ${RAMDISKDIR}
         else
             bash ./scripts/gen_initramfs_list.sh -o ${IMGDEPLOYDIR}/${PN}-initrd.gz -u 0 -g 0 ${RAMDISKDIR}
