@@ -43,11 +43,20 @@ CreateSelinuxOverlayDirectories () {
      chmod 0755 /data/var_selinux_wk
      chcon system_u:object_r:semanage_store_t:s0 /data/var_selinux_wk
 
+     mkdir -p /data/etc_c2c
+     chmod 0755 /data/etc_c2c
+     chcon system_u:object_r:ota_data_conf_t:s0 /data/etc_c2c
+     mkdir -p /data/etc_c2c_wk
+     chmod 0755 /data/etc_c2c_wk
+     chcon system_u:object_r:ota_data_conf_t:s0 /data/etc_c2c_wk
+
+     mount -t overlay overlay -o context=system_u:object_r:ota_data_conf_t:s0,upperdir=/data/etc_c2c,lowerdir=/etc/c2c,workdir=/data/etc_c2c_wk /etc/c2c
      mount -t overlay overlay -o context=system_u:object_r:selinux_config_t:s0,upperdir=/data/etc_selinux,lowerdir=/etc/selinux,workdir=/data/etc_selinux_wk,redirect_dir=on /etc/selinux
      mount -t overlay overlay -o context=system_u:object_r:semanage_store_t:s0,upperdir=/data/var_selinux,lowerdir=/var/lib/selinux,workdir=/data/var_selinux_wk,redirect_dir=on /var/lib/selinux
    elif [ $mount_operation == "stop" ]; then
      umount /etc/selinux
      umount /var/lib/selinux
+     umount /etc/c2c
    fi
 }
 
