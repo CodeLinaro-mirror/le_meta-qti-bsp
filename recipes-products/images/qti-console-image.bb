@@ -27,8 +27,8 @@ CORE_IMAGE_EXTRA_INSTALL += "\
               packagegroup-qti-data \
               packagegroup-qti-dsp \
               packagegroup-qti-ss-mgr \
-	      ${@bb.utils.contains('MACHINE_FEATURES', 'qca-wifi', 'packagegroup-qti-qcawifi', '', d)} \
-              ${@bb.utils.contains('COMBINED_FEATURES', 'qti-wifi', "packagegroup-qti-wifi", "", d)} \
+	      packagegroup-qti-wifi \
+	      packagegroup-qti-qcawifi \
               packagegroup-startup-scripts \
               systemd-machine-units \
               ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
