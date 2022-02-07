@@ -33,10 +33,11 @@ IMAGE_VERSION_SUFFIX = ""
 
 # Default Image names
 BOOTIMAGE_TARGET ?= "boot.img"
+DTBOIMAGE_TARGET ?= "dtbo.img"
 
 #Set appropriate partion:Image map
-NONAB_BOOT_PARTITION_IMAGE_MAP = "boot='${BOOTIMAGE_TARGET}',system='${SYSTEMIMAGE_TARGET}',userdata='${USERDATAIMAGE_TARGET}',persist='${PERSISTIMAGE_TARGET}'"
-AB_BOOT_PARTITION_IMAGE_MAP = "boot_a='${BOOTIMAGE_TARGET}',boot_b='${BOOTIMAGE_TARGET}',system_a='${SYSTEMIMAGE_TARGET}',system_b='${SYSTEMIMAGE_TARGET}',userdata='${USERDATAIMAGE_TARGET}',persist='${PERSISTIMAGE_TARGET}'"
+NONAB_BOOT_PARTITION_IMAGE_MAP = "boot='${BOOTIMAGE_TARGET}',system='${SYSTEMIMAGE_TARGET}',userdata='${USERDATAIMAGE_TARGET}',persist='${PERSISTIMAGE_TARGET}',dtbo='${DTBOIMAGE_TARGET}'"
+AB_BOOT_PARTITION_IMAGE_MAP = "boot_a='${BOOTIMAGE_TARGET}',boot_b='${BOOTIMAGE_TARGET}',system_a='${SYSTEMIMAGE_TARGET}',system_b='${SYSTEMIMAGE_TARGET}',dtbo_a='${DTBOIMAGE_TARGET}',dtbo_b='${DTBOIMAGE_TARGET}',userdata='${USERDATAIMAGE_TARGET}',persist='${PERSISTIMAGE_TARGET}'"
 
 # Conf with partition entries should be provided to generate partitions artifacts
 MACHINE_PARTITION_CONF ??= ""
@@ -116,11 +117,6 @@ do_deploy_fixup () {
     # copy vmlinux, zImage
     install -m 0644 ${DEPLOY_DIR_IMAGE}/vmlinux .
     install -m 0644 ${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE} .
-
-    # copy dtbo.img
-    if [ -f ${DEPLOY_DIR_IMAGE}/dtbo.img ]; then
-       install -m 0644 ${DEPLOY_DIR_IMAGE}/dtbo.img .
-    fi
 
     # Copy nHLOS bins
     if [ -f ${DEPLOY_DIR_IMAGE}/NHLOS_IMAGES.tar ]; then
@@ -250,3 +246,41 @@ python do_make_bootimg_setscene () {
 addtask do_make_bootimg_setscene
 
 addtask do_make_bootimg before do_image_complete
+################################################
+############# Generate dtbo.img ################
+################################################
+
+MKDTUTIL = '${@oe.utils.conditional("PREFERRED_PROVIDER_virtual/mkdtimg-native", "mkdtimg-gki-native", "mkdtboimg.py", "mkdtimg", d)}'
+DTBODEPLOYDIR = "${WORKDIR}/deploy-${PN}-dtboimage-complete"
+
+# Create dtbo.img if DTBO support is enabled
+python do_make_dtboimg () {
+    import subprocess
+
+    mkdtimg_bin_path = d.getVar('STAGING_BINDIR_NATIVE', True) + "/" + d.getVar('MKDTUTIL')
+    dtbodeploydir = d.getVar('DEPLOY_DIR_IMAGE', True) + "/" + "DTOverlays"
+    pagesize = d.getVar("PAGE_SIZE")
+    output          = d.getVar('DTBOIMAGE_TARGET', True)
+    # cmd to make dtbo.img
+    cmd = mkdtimg_bin_path + " create "+ output +" --page_size="+ pagesize +" "+ dtbodeploydir + "/*.dtbo"
+    bb.debug(1, "do_make_dtboimg cmd: %s" % (cmd))
+    ret = subprocess.call(cmd, shell=True)
+}
+
+do_make_dtboimg[dirs]      = "${DTBODEPLOYDIR}/${IMAGE_BASENAME}"
+# Make sure dtb files ready to create dtbo.img
+do_make_dtboimg[depends] += "virtual/kernel:do_deploy virtual/mkdtimg-native:do_populate_sysroot"
+SSTATETASKS += "do_make_dtboimg"
+SSTATE_SKIP_CREATION_task-make-dtboimg = '1'
+do_make_dtboimg[sstate-inputdirs] = "${DTBODEPLOYDIR}"
+do_make_dtboimg[sstate-outputdirs] = "${DEPLOY_DIR_IMAGE}"
+do_make_dtboimg[stamp-extra-info] = "${MACHINE_ARCH}"
+
+python do_make_dtboimg_setscene () {
+    sstate_setscene(d)
+}
+
+python () {
+    if d.getVar('MACHINE_SUPPORTS_DTBO'):
+       bb.build.addtask('do_make_dtboimg', 'do_image', 'do_rootfs', d)
+}
