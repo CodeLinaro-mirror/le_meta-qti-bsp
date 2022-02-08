@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (c) 2019, The Linux Foundation. All rights reserved.
+# Copyright (c) 2019,2022 The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -29,20 +29,28 @@
 #
 
 echo "##########Trying to load wlanhost driver ##########"
-if (lspci -k|grep cnss_pci);then
-	if (lspci -k|grep 1102);then
-		echo "##########load qca6595#############"
-		modprobe qca6595
-	elif ((lspci -k|grep 003e) || (lspci -k|grep QCA6174));then
-		echo "##########load qca6574#############"
-		modprobe qca6574
-	elif (lspci -k|grep 1101);then
-		echo "##########load qca6696#############"
-		modprobe qca6696
-	else
-		echo "##########load default wlan########"
-		modprobe wlan
+n=0
+while [ $n -le 5 ]
+	do
+	if (lspci -k|grep cnss_pci);then
+		if (lspci -k|grep 1102);then
+			echo "##########load qca6595#############"
+			modprobe qca6595
+		elif ((lspci -k|grep 003e) || (lspci -k|grep QCA6174));then
+			echo "##########load qca6574#############"
+			modprobe qca6574
+		elif (lspci -k|grep 1101);then
+			echo "##########load qca6696#############"
+			modprobe qca6696
+		else
+			echo "##########load default wlan########"
+			modprobe wlan
+		fi
+		break
 	fi
-fi
+	let n++
+	echo "Retry loading wlan @$n"
+	sleep 1
+done
 echo "##########Load wlanhost driver done################"
 
