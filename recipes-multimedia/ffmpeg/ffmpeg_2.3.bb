@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/LGPL-2.1;md5=1
 # Package Revision (update whenever recipe is changed)
 PR = "r0"
 
-SRC_URI = "git://source.codeaurora.org/quic/le/ffmpeg/;protocol=http;branch=ffmpeg/release/2.3;destsuffix=ffmpeg-2.3;name=ffmpeg-2.3"
+SRC_URI = "${CLO_LE_GIT}/ffmpeg/;protocol=https;branch=caf_migration/ffmpeg/release/2.3;destsuffix=ffmpeg-2.3;name=ffmpeg-2.3"
 SRCREV = "${AUTOREV}"
 
 EXTRA_OEMAKE = ""

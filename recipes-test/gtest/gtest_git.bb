@@ -9,6 +9,10 @@ SRC_URI = "\
     file://0001-Add-install-command-for-libraries-and-headers.patch \
     file://0002-CMakeLists-gtest.pc.in-Add-pkg-config-support-to-gte.patch \
 "
+
+SRC_URI[md5sum] = "532f61258208072ccd7517d0fdb9fc69"
+SRC_URI[sha256sum] = "1a6d00f9c6170d2c60d13b1b9558c06e7e66e92fb28df864c0b40f7c2f5f60bc"
+
 SRCREV = "93b4e4a7fb335fdccc24d18bfb284e0828d2596d"
 
 S = "${WORKDIR}/git"
