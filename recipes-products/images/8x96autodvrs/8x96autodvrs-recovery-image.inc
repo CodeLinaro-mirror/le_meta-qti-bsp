@@ -26,10 +26,6 @@ IMAGE_INSTALL += "open-avb"
 IMAGE_INSTALL += "connman"
 
 
-
-
-
-IMAGE_INSTALL += "neutrino-firmware"
 do_makerecovery() {
         echo "Deploy image : ${DEPLOY_DIR_IMAGE}"
 	sleep 5
