@@ -205,9 +205,6 @@ do_deploy () {
 #Sign boot image after generation
 do_deploy[postfuncs] += "sign_bootimg"
 
-PACKAGES = "kernel kernel-base kernel-vmlinux kernel-dev kernel-modules"
-
 INHIBIT_PACKAGE_STRIP = "1"
 KERNEL_VERSION_SANITY_SKIP = "1"
 
-RDEPENDS:${KERNEL_PACKAGE_NAME}-base = ""
