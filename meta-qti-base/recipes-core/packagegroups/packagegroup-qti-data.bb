@@ -12,8 +12,8 @@ ALLOW_EMPTY_${PN} = "1"
 
 RDEPENDS_${PN} += "\
     bridge-utils \
-    connman \
-    connman-client \
+    ${@bb.utils.contains("DISTRO_FEATURES", "qti-headless", "", "connman", d)} \
+    ${@bb.utils.contains("DISTRO_FEATURES", "qti-headless", "", "connman-client", d)} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'setup-network', '', d)} \
     net-tools \
     ethtool \
@@ -24,10 +24,10 @@ RDEPENDS_${PN} += "\
     iproute2-tc \
     tcpdump \
     vlan \
-    strongswan \
-    xinetd \
+    ${@bb.utils.contains("DISTRO_FEATURES", "qti-headless", "", "strongswan", d)} \
+    ${@bb.utils.contains("DISTRO_FEATURES", "qti-headless", "", "xinetd", d)} \
     tcp-wrappers \
     netkit-telnet \
     proftpd \
-    openssh \
+    ${@bb.utils.contains("DISTRO_FEATURES", "qti-headless", "", "openssh", d)} \
 "
