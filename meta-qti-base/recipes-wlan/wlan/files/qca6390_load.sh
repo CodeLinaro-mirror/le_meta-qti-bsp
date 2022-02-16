@@ -35,7 +35,8 @@ fi
 
 if (lspci -k|grep cnss_pci);then
 	if (lspci -k|grep 1101);then
-		if (ls -l /sys/bus/pci/devices/ | grep 0002:01:00.0);then
+		if (ls -l /sys/bus/pci/devices/ | grep 0002:01:00.0 ||
+		ls -l /sys/bus/pci/devices/ | grep 0004:01:00.0 ); then
 			modprobe qca6390
 		else
 			echo "cnss: No Second Hastings wlan chipset attached"

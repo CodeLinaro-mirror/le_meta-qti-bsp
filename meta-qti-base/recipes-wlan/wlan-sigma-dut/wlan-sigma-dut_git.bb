@@ -14,13 +14,17 @@ HOMEPAGE = "https://github.com/qca/sigma-dut"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://README;md5=a5044fc88d4aecbffe1b1ad56ce8df9f"
 
+DEPENDS += "libnl"
+
 SRC_URI = "${PATH_TO_REPO}/wlan/utils/sigma-dut/.git;protocol=${PROTO};destsuffix=wlan/utils/sigma-dut;usehead=1"
 SRCREV = "${AUTOREV}"
-PR = "r0"
 
 S = "${WORKDIR}/wlan/utils/sigma-dut"
 
 inherit autotools-brokensep pkgconfig
+
+CFLAGS += "-I${STAGING_INCDIR}/libnl3/"
+EXTRA_OEMAKE += "NL80211_SUPPORT=y"
 
 do_install() {
     make install DESTDIR=${D} BINDIR=${sbindir}/

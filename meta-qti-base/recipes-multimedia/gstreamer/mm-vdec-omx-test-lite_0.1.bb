@@ -12,7 +12,6 @@ DEPENDS += "\
     libion \
     linux-msm-headers \
     media \
-    weston \
 "
 
 SRC_URI = "${PATH_TO_REPO}/gstreamer/gst-plugins-qti-oss/.git;protocol=${PROTO};destsuffix=gstreamer/gst-plugins-qti-oss;usehead=1"
@@ -32,8 +31,6 @@ CXXFLAGS += "\
     ${CFLAGS} \
     -I${STAGING_INCDIR} \
     -I${STAGING_INCDIR}/drm \
-    -I${STAGING_INCDIR}/EGL \
-    -I${STAGING_INCDIR}/GLES2 \
     -I${STAGING_INCDIR}/glib-2.0 \
     -I${STAGING_LIBDIR}/glib-2.0/include \
     -I${STAGING_LIBDIR}/glib-2.0/glib \
@@ -42,6 +39,5 @@ CXXFLAGS += "\
     -I${STAGING_INCDIR}/common/inc \
     -I${STAGING_INCDIR}/mm-core \
     -I${STAGING_INCDIR}/linux-msm \
-    -I${STAGING_INCDIR}/disp-commonsys-intf/display \
     -I${STAGING_INCDIR}/ion_headers \
 "

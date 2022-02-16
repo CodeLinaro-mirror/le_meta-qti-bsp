@@ -32,7 +32,8 @@ EXTRA_OECONF = "\
     --with-sanitized-headers=${STAGING_INCDIR}/linux-msm \
     --disable-debuggerd \
     --disable-libsync \
-    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', ' --enable-adb-avb20', '', d)} \
+    --enable-adb-avb20 \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', '--enable-adb-verity', d)} \
 "
 
 do_install_append() {
@@ -88,7 +89,7 @@ do_install_append() {
         sed -i -e '/^After/d' ${D}${systemd_unitdir}/system/usb.service
         sed -i -e '/^Requires/d' ${D}${systemd_unitdir}/system/usb.service
         sed -i -e '/^Descr/a\RequiresMountsFor=\/var' ${D}${systemd_unitdir}/system/usb.service
-        sed -i -e '/^Descr/a\Requires=var-adb_devid.service var-usb.service' ${D}${systemd_unitdir}/system/usb.service
+        sed -i -e '/^Descr/a\Requires=var-usb.service' ${D}${systemd_unitdir}/system/usb.service
         sed -i -e '/^Descr/a\After=var-volatile.mount leprop.service' ${D}${systemd_unitdir}/system/usb.service
         sed -i -e '/^ExecStartPre/d' ${D}${systemd_unitdir}/system/usb.service
         sed -i -e '/^Descr/a\ConditionVirtualization=!container' ${D}${systemd_unitdir}/system/usb.service

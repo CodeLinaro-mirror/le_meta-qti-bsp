@@ -21,6 +21,7 @@ DISTRO_FEATURES_append_sa81x5 = " qti-carcamsrc qti-fastcv qti-omx"
 DISTRO_FEATURES_append_sa8295 = " qti-codec2"
 DISTRO_FEATURES_append_qtiquingvm = " qti-omx"
 DISTRO_FEATURES_append_qtiquingvm8295 = " qti-codec2"
+DISTRO_FEATURES_append_qtigvmi3 = " qti-codec2"
 
 # Display
 DISTRO_FEATURES_append = " wayland"
@@ -49,7 +50,7 @@ DISTRO_FEATURES_append = " ipa3"
 DISTRO_FEATURES_append = " vulkan"
 
 # WLAN
-DISTRO_FEATURES_append = " wifi"
+DISTRO_FEATURES_append = " qti-wlan wifi"
 
 # Support kdump
 #DISTRO_FEATURES_append = " kdump-support"

@@ -20,4 +20,21 @@ SRC_URI_append = " file://0001-Support-PulseAudio-Client-API-for-Module-Codec-Co
 SRC_URI_append = " file://0001-pulseaudio-config-default.pa-to-disable-default-ALSA.patch"
 SRC_URI_append = " file://0001-udev-bypass-udev-device-enumeration-for-auto-targets.patch"
 
+RDEPENDS_pulseaudio-server += "\
+    ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'pulseaudio-module-systemd-login', '', d)} \
+"
+
+do_install_append() {
+    # Install pulseaudio systemd service
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
+        # Execute these manually on behalf of systemctl script (from systemd-systemctl-native.bb)
+        # because it does not support systemd's user mode.
+        install -d ${D}${systemd_user_unitdir}/sockets.target.wants/
+        ln -sf ${systemd_user_unitdir}/pulseaudio.socket ${D}${systemd_user_unitdir}/sockets.target.wants/
+
+        install -d ${D}${systemd_user_unitdir}/default.target.wants/
+        ln -sf ${systemd_user_unitdir}/pulseaudio.service ${D}${systemd_user_unitdir}/default.target.wants/
+    fi
+}
+
 FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:${THISDIR}/${BPN}-${PV}:"

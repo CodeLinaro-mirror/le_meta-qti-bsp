@@ -23,10 +23,10 @@ SRC_URI = "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', ' file://weston.cfg', '', d)} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-dual-wlan', ' file://dual-wlan.cfg', \
         bb.utils.contains('MACHINE_FEATURES', 'qti-wlan', ' file://wlan.cfg', '', d), d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'early_init', ' file://earlyuserspace.cfg', '', d)} \
     file://lxc.cfg \
     file://ipc.cfg \
 "
-SRC_URI_append_qtiquingvm8295 = " file://qtiquingvm8295.cfg"
 SRCREV = "${AUTOREV}"
 SRCREV_FORMAT = "kernel_data_display_ais_video"
 
@@ -105,6 +105,9 @@ do_generate_gki_defconfig() {
     bbnote "Generating GKI defconfig"
 
     gki_defconfig=`echo ${KERNEL_CONFIG} | sed 's/vendor\///g'`
+
+    # Point to the correct CC when executing generate_defconfig.sh
+    export REAL_CC=`echo ${CC} | sed 's/-target.*//g'`
 
     # FIXME: Workaround for executing generate_defconfig.sh
     LD=`echo ${LD} | sed 's/--sysroot.*//g'`
@@ -199,7 +202,7 @@ do_deploy () {
 }
 
 #Sign boot image after generation
-do_deploy[postfuncs] += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor','', 'sign_bootimg', d)}"
+do_deploy[postfuncs] += "sign_bootimg"
 
 PACKAGES = "kernel kernel-base kernel-vmlinux kernel-dev kernel-modules"
 

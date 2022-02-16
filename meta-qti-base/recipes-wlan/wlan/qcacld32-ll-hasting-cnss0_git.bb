@@ -18,6 +18,8 @@ SRC_URI = "${PATH_TO_REPO}/wlan/qcacld-3.0/.git;protocol=${PROTO};destsuffix=wla
            ${PATH_TO_REPO}/device/qcom/wlan/.git;protocol=${PROTO};destsuffix=device/qcom/wlan/msm_auto;subpath=msm_auto;usehead=1 \
            file://qca6696-module-load.service \
            file://qca6696_load.sh \
+           file://wlan_interface.service \
+           file://wlan_interface.sh \
            "
 SRCREV = "${AUTOREV}"
 SRCREV_FORMAT = "qcacld_cmn_fw_msm"
@@ -44,6 +46,7 @@ _WLAN_CFG_OVERRIDE_GVM = "\
                         CONFIG_WLAN_DISABLE_EXPORT_SYMBOL=y \
                         CONFIG_WLAN_OPEN_P2P_INTERFACE=n \
                         CONFIG_SUPPORT_P2P_BY_ONE_INTF_WLAN=y \
+                        CONFIG_WLAN_BOOTUP_MARKER=y \
                         CONFIG_WLAN_PLACEMARKER_PREFIX=108 \
                         CONFIG_FEATURE_GPIO_CFG=y \
                         CONFIG_CNSS_GENL=n \
@@ -52,11 +55,19 @@ _WLAN_CFG_OVERRIDE_GVM = "\
                         CONFIG_QCOM_TDLS=n \
                         CONFIG_CFG_MAX_STA_VDEVS=4 \
                         CONFIG_CFG_BMISS_OFFLOAD_MAX_VDEV=4 \
+                        CONFIG_REO_QDESC_HISTORY=y \
+                        CONFIG_REO_DESC_DEFER_FREE=y \
+                        "
+_WLAN_CFG_OVERRIDE_METAL = "\
+                        CONFIG_WLAN_DISABLE_EXPORT_SYMBOL=y \
+                        CONFIG_REO_QDESC_HISTORY=y \
+                        CONFIG_REO_DESC_DEFER_FREE=y \
                         "
 EXTRA_OEMAKE_append_qtiquingvm = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
 EXTRA_OEMAKE_append_qtiquingvm8295 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
+EXTRA_OEMAKE_append_sa8295 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_METAL}"
 
-SYSTEMD_SERVICE_${PN} = "qca6696-module-load.service"
+SYSTEMD_SERVICE_${PN} = "qca6696-module-load.service wlan_interface.service"
 
 do_install() {
     module_do_install
@@ -74,6 +85,7 @@ do_install() {
     install -D -m 0644 ${WORKDIR}/device/qcom/wlan/msm_auto/wlan_mac_hst_1.bin ${FIRMWARE_PATH}/wlan_mac.bin
     install -d ${D}${bindir}
     install -D -m 0755 ${WORKDIR}/qca6696_load.sh ${D}${bindir}/qca6696_load.sh
+    install -D -m 0755 ${WORKDIR}/wlan_interface.sh ${D}${bindir}/wlan_interface.sh
 
     install -d ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/
     ln -sf /firmware/image/${FW_PATH_NAME}/amss.bin ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/
@@ -87,11 +99,13 @@ do_install() {
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
         install -d ${D}${systemd_unitdir}/system/
         install -m 0644 ${WORKDIR}/qca6696-module-load.service -D ${D}${systemd_unitdir}/system/qca6696-module-load.service
+        install -m 0644 ${WORKDIR}/wlan_interface.service -D ${D}${systemd_unitdir}/system/wlan_interface.service
     fi
 }
 
 FILES_${PN} += "\
     ${bindir}/qca6696_load.sh \
+    ${bindir}/wlan_interface.sh \
     ${systemd_unitdir}/system/* \
     ${sysconfdir}/* \
 "
