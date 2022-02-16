@@ -294,8 +294,8 @@ index 84d4bce..f4c93ba 100644
  	do_initcalls();
  	random_int_secret_init();
 +	/*add a thread and prefetch rootfs*/
-+	early_userspace();
 +	do_initcalls_middle();
++       early_userspace();
  }
  
  static void __init do_pre_smp_initcalls(void)
