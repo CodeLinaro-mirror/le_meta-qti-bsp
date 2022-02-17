@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2017-2019, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022, Qualcomm Innovation Center, Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -223,6 +224,8 @@ static inline void prepare_dir(char* p)
 				/* 	chown(DISPLAY_XDG_RUNTIME_DIR, pw->pw_uid, pw->pw_gid); */
 				/* } */
 				mkdirs("/run/early", 0775);
+				mkdirs("/run/user", 0755);
+				mkdirs("/run/user/0", 0700);
 			}
 			break;
 		case 's':
