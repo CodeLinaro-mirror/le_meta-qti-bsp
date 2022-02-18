@@ -17,7 +17,7 @@ S = "${WORKDIR}/git"
 
 DEPENDS = "weston wayland-native"
 
-inherit cmake
+inherit cmake pkgconfig
 
 EXTRA_OECMAKE := "-DWITH_ILM_INPUT=1"
 
