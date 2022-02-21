@@ -3,6 +3,8 @@ SUMMARY = "multimedia framework"
 DESCRIPTION = "packages for multimedia"
 LICENSE = "GPLv2+ & LGPLv2+"
 
+PACKAGE_ARCH = "${TUNE_PKGARCH}"
+
 inherit packagegroup
 
 ALLOW_EMPTY:${PN} = "1"

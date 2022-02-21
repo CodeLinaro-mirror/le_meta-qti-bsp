@@ -1,5 +1,7 @@
 SUMMARY = "QTI package group for extra functions. TBD"
 
+PACKAGE_ARCH = "${TUNE_PKGARCH}"
+
 inherit packagegroup
 
 PACKAGES = "\

@@ -2,6 +2,8 @@ SUMMARY = "QTI package group for audio"
 DESCRIPTION = "This is the minimal set of packages required for audio kernel modules and audio initialization scripts."
 LICENSE = "GPL-2.0 & BSD"
 
+PACKAGE_ARCH = "${TUNE_PKGARCH}"
+
 inherit packagegroup
 
 PACKAGES = "${PN}"

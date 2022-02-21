@@ -1,5 +1,7 @@
 SUMMARY = "QTI package group for os common libs"
 
+PACKAGE_ARCH = "${TUNE_PKGARCH}"
+
 inherit packagegroup
 
 PACKAGES = "\

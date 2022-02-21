@@ -1,5 +1,7 @@
 SUMMARY = "QTI package group for weston"
 
+PACKAGE_ARCH = "${TUNE_PKGARCH}"
+
 inherit packagegroup
 
 PACKAGES = "\
