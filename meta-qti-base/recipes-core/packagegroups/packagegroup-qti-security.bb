@@ -15,8 +15,3 @@ RDEPENDS_${PN} += "\
     attr \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'enable-fde', '', d)} \
 "
-
-RDEPENDS_${PN}_remove += "\
-    ${@bb.utils.contains('BASEMACHINE','qtiquingvm8295', 'enable-fde', '', d)} \
-"
-
