@@ -20,7 +20,8 @@ SRCREV = "${AUTOREV}"
 SRC_URI_append = " file://0001-avb-bring-up-keymaster-for-LV.patch  \
                    file://0002-avb-send-dummy-ROT-and-boot-state-to-keymaster-from-.patch "
 
-SRC_URI_append = " ${@bb.utils.contains('COMBINED_FEATURES', 'qti-lxc', ' file://0003-QcomModulePkg-Allow-lv-load-recovery-partition.patch ', '', d)}"
+SRC_URI_append = " ${@bb.utils.contains('COMBINED_FEATURES', 'qti-lxc', ' file://0003-QcomModulePkg-Allow-lv-load-recovery-partition.patch ', '', d)} \
+                   ${@bb.utils.contains('COMBINED_FEATURES', 'qti-lxc', ' file://0004-edk2-Add-build.boot.security_patch-in-vbmeta-for-lxc.patch ', '', d)}"
 
 INSANE_SKIP_${PN} = "arch"
 

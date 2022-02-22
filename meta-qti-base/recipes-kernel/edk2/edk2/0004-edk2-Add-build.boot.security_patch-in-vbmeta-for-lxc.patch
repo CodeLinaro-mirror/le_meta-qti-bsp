@@ -1,0 +1,30 @@
+From 5cb86bd1fec5627b6a83712e87d4112843784a70 Mon Sep 17 00:00:00 2001
+From: Nan Zhang <quic_nanzhan@quicinc.com>
+Date: Wed, 12 Jan 2022 12:12:27 +0800
+Subject: [PATCH] edk2: Add build.boot.security_patch in vbmeta for lxc
+
+Replace the com.android.build.boot.security_patch to
+build.boot.security_patch for LA and LXC.
+
+Change-Id: I8dfda5daccc55940289166865935540205c90ced
+Signed-off-by: Nan Zhang <quic_nanzhan@quicinc.com>
+---
+ QcomModulePkg/Library/avb/VerifiedBoot.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/QcomModulePkg/Library/avb/VerifiedBoot.c b/QcomModulePkg/Library/avb/VerifiedBoot.c
+index c3a358c..78dc708 100644
+--- a/QcomModulePkg/Library/avb/VerifiedBoot.c
++++ b/QcomModulePkg/Library/avb/VerifiedBoot.c
+@@ -1399,7 +1399,7 @@ LoadImageAndAuthVB2 (BootInfo *Info, BOOLEAN HibernationResume,  BOOLEAN SetRotA
+     BootSecurityLevel = avb_property_lookup (
+                            SlotData->vbmeta_images[0].vbmeta_data,
+                            SlotData->vbmeta_images[0].vbmeta_size,
+-                           "com.android.build.boot.security_patch",
++                           "build.boot.security_patch",
+                            0, &BootSecurityLevelSize);
+ 
+     if (BootSecurityLevel != NULL &&
+-- 
+2.7.4
+

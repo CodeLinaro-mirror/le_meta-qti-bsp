@@ -132,7 +132,7 @@ do_make_avb_image() {
                 --image ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
                 --partition_size ${rootfs_partition_size} \
                 --partition_name system  \
-                --algorithm SHA256_RSA4096 \
+                --hash_algorithm sha1 \
                 --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/testkey_rsa4096.pem \
                 --rollback_index 0 \
                 --do_not_generate_fec
@@ -147,6 +147,7 @@ do_make_avb_image() {
                 --algorithm SHA256_RSA4096 \
                 --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/testkey_rsa4096.pem \
                 --rollback_index 0 \
+                --prop "build.boot.security_patch:${@time.strftime('%Y-%m-%d',time.gmtime())}" \
                 --output ${DEPLOY_DIR_IMAGE}/${VBMETAIMAGE_TARGET}
         fi
     fi
