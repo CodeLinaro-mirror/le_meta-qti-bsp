@@ -3,7 +3,7 @@
 
 DEPENDS += " ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'verity-utils-native', '', d)}"
 
-VERITYSETUP_CMD ?= "1"
+VERITYSETUP_CMD ?= "${@bb.utils.contains('DISTRO_FEATURES', 'nad-prod', '1', '0', d)}"
 DEPENDS += " ${@bb.utils.contains('VERITYSETUP_CMD', '1', 'cryptsetup-native openssl-native', '', d)}"
 
 FIXED_SALT = "aee087a5be3b982978c923f566a94613496b417f2af592639bc80d141e34dfe7"

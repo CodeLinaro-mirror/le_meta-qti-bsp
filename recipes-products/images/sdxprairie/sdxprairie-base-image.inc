@@ -35,7 +35,7 @@ IMAGE_INSTALL += "km-loader"
 IMAGE_INSTALL += "systemd-machine-units"
 # include abl image which support rootfs type as ubifs
 # this image should be flashed while using non-squashfs file
-IMAGE_INSTALL += "abl-ubifs"
+IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES','nad-prod','abl-ubifs','',d)}"
 IMAGE_INSTALL += "bouncycastle"
 IMAGE_INSTALL += "fec"
 
@@ -85,7 +85,9 @@ create_ext4_images() {
    fi
 }
 
+
 fakeroot do_makesystem () {
+   if ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'true', 'false', d)}; then
         rm -rf ${IMAGE_ROOTFS}/dev
         mkdir ${IMAGE_ROOTFS}/dev
         if ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'true', 'false', d)}; then
@@ -93,4 +95,5 @@ fakeroot do_makesystem () {
         else
            mksquashfs ${IMAGE_ROOTFS} ${DEPLOY_DIR_IMAGE_NAND}/${SQUASHFS_SYS_VOLUME} -noappend -comp xz -Xdict-size 32K -noI -Xbcj arm -b 65536 -processors 1
         fi
+   fi
 }
