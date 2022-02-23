@@ -21,6 +21,7 @@ USERADD_PARAM_${PN} ?= 	" \
 			-u 4021 -U locclient; \
 			-u 4022 -U vnw; \
 			-G system,locclient -u 1021 -U gps; \
+			-u 3070 -U qrtr-ns; \
 			"
 
 GROUPADD_PARAM_${PN} ?=	" \
