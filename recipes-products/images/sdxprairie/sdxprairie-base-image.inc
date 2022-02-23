@@ -35,7 +35,7 @@ IMAGE_INSTALL += "km-loader"
 IMAGE_INSTALL += "systemd-machine-units"
 # include abl image which support rootfs type as ubifs
 # this image should be flashed while using non-squashfs file
-IMAGE_INSTALL += "abl-ubifs"
+IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES','nad-prod','abl-ubifs','',d)}"
 
 # Install A/B recovery bins and its libs in system image if A/B boot is supported
 IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'start-script-ab-slot-util recovery-ab-bin recovery-ab', '', d)}"
