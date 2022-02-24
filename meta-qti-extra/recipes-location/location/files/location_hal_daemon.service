@@ -39,7 +39,6 @@ RemainAfterExit=yes
 ExecStartPre=+/bin/chown -R gps:gps /dev/gnss_sirf
 ExecStartPre=+/bin/chown -R gps:gps /dev/ttyHS1
 ExecStart=/usr/bin/location_hal_daemon
-ExecStop=
 # Start as user gps, which already has locclient group
 SupplementaryGroups=diag inet radio
 CapabilityBoundingSet=CAP_SETGID CAP_NET_ADMIN CAP_NET_BIND_SERVICE

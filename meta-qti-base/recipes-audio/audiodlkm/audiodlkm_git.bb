@@ -34,9 +34,16 @@ do_install_append() {
     fi
 
     install -d ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra
-    for i in $(find ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/. -name "*.ko"); do
-        mv ${i} ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/
-    done
+
+    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-audio-ar', 'true', 'false', d)}; then
+        mv ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/asoc/spf_machine_dlkm.ko ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/
+        mv ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/asoc/codecs/stub_dlkm.ko ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/
+    else
+        for i in $(find ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/. -name "*.ko"); do
+            mv ${i} ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/
+        done
+    fi
+
 
     rm -fr ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/asoc
     rm -fr ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/dsp

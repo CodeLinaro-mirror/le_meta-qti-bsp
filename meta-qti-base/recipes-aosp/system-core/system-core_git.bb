@@ -89,7 +89,7 @@ do_install_append() {
         sed -i -e '/^After/d' ${D}${systemd_unitdir}/system/usb.service
         sed -i -e '/^Requires/d' ${D}${systemd_unitdir}/system/usb.service
         sed -i -e '/^Descr/a\RequiresMountsFor=\/var' ${D}${systemd_unitdir}/system/usb.service
-        sed -i -e '/^Descr/a\Requires=var-adb_devid.service var-usb.service' ${D}${systemd_unitdir}/system/usb.service
+        sed -i -e '/^Descr/a\Requires=var-usb.service' ${D}${systemd_unitdir}/system/usb.service
         sed -i -e '/^Descr/a\After=var-volatile.mount leprop.service' ${D}${systemd_unitdir}/system/usb.service
         sed -i -e '/^ExecStartPre/d' ${D}${systemd_unitdir}/system/usb.service
         sed -i -e '/^Descr/a\ConditionVirtualization=!container' ${D}${systemd_unitdir}/system/usb.service
