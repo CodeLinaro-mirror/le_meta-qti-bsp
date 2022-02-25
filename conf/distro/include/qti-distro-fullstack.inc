@@ -22,7 +22,7 @@ DISTRO_NAME = "QTI Linux full refrence stack distro."
 # tensorflow-lite: Include the tensorflow lite inference engine.
 # wayland:         Include the Wayland display server protocol.
 
-DISTRO_FEATURES_append = " drm dm-verity fbdev opencl opengl pulseaudio selinux tensorflow-lite wayland"
+DISTRO_FEATURES_append = " drm fbdev opencl opengl pulseaudio selinux tensorflow-lite wayland"
 
 ## QTI defined distro features ##
 # qti-audio:     Support QTI audio solution
