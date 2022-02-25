@@ -28,7 +28,7 @@ SYSTEM_SIZE_EXT4  ?= "1050214400"
 USERDATA_SIZE_EXT4 ?= "8589934592"
 
 # Formats of root filesystem images.
-IMAGE_FSTYPES += "ext4"
+IMAGE_FSTYPES += "ext4 squashfs"
 
 # Disable some default features supported from upstream
 MACHINE_FEATURES_BACKFILL_CONSIDERED += "qemu-usermode rtc"

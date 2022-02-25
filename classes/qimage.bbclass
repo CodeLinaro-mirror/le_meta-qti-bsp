@@ -1,7 +1,8 @@
 QIMGCLASSES = "core-image"
 QIMGCLASSES += "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.filter('MACHINE_FEATURES', 'dm-verity-bootloader dm-verity-initramfs', d), '', d)}"
-QIMGCLASSES += "${@bb.utils.contains('IMAGE_FSTYPES', 'ext4', 'qimage-ext4', '', d)}"
+# QIMGCLASSES += "${@bb.utils.contains('IMAGE_FSTYPES', 'ext4', 'qimage-ext4', '', d)}"
 QIMGCLASSES += "${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', 'qimage-ubi', '', d)}"
+QIMGCLASSES += "${@bb.utils.contains('IMAGE_FSTYPES', 'squashfs', 'qimage-squashfs', '', d)}"
 
 # Use the following to extend qimage with custom functions like signing
 QIMGEXTENSION ?= ""
