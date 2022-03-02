@@ -6,10 +6,10 @@ SOC_HW_VERSION = "0x60020000"
 SOC_VERS = "0x6002"
 SIGNING_VERSION = "_eccv3"
 
-EXTRA_OEMAKE_append += "SIGNED_KERNEL=1"
-EXTRA_OEMAKE_append += "USER_BUILD_VARIANT=0"
-EXTRA_OEMAKE_append += "DEVICE_STATUS=DEFAULT_UNLOCK=true"
-EXTRA_OEMAKE_append += "TARGET_ARCHITECTURE=${T_ARCH}"
+EXTRA_OEMAKE_append = " SIGNED_KERNEL=1"
+EXTRA_OEMAKE_append = " USER_BUILD_VARIANT=0"
+EXTRA_OEMAKE_append = " DEVICE_STATUS=DEFAULT_UNLOCK=true"
+EXTRA_OEMAKE_append = " TARGET_ARCHITECTURE=${T_ARCH}"
 
 do_install[depends] += "sectool5-native:do_unpack"
 # This install overrides the one in base recipe. In this we perform image signing

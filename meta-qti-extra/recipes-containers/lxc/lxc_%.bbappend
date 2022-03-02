@@ -4,7 +4,7 @@ SRC_URI_remove= "http://linuxcontainers.org/downloads/${BPN}-${PV}.tar.gz"
 SRC_URI_append = "git://github.com/lxc/${BPN}.git;protocol=http;branch=stable-4.0 \
     "
 FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
-SRC_URI_append += "\
+SRC_URI_append = " \
         file://0001-try-to-fix-lxc-4.0.2.patch \
         file://0002-lxc-support-deny-device-by-devpth.patch \
         file://0003-lxc-handle-cgroup-device-not-available-gracefully.patch \
