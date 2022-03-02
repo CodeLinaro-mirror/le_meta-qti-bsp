@@ -88,14 +88,14 @@ do_configure_prepend() {
 }
 
 do_prebuilt_configure() {
-    cd ${KERNEL_PREBUILT_PATH}
+    cd ${KERNEL_PREBUILT_DISTDIR}
 
     install -d ${B}/include/config
     install -d ${B}/include/generated
     install -d ${B}/scripts
     # Some of the artifacts needed for module compilation are present under
     # msm-kernel path, for now copy them for this path to avoid build failures.
-    # Ask prebuilt providers to make these available in KERNEL_PREBUILT_PATH.
+    # Ask prebuilt providers to make these available in KERNEL_PREBUILT_DISTDIR.
     install -m 0644 ../msm-kernel/.config ${B}
     install -m 0644 ../msm-kernel/Module.symvers ${B}
     install -m 0644 ../msm-kernel/include/config/kernel.release ${B}/include/config/kernel.release
@@ -111,6 +111,9 @@ do_prebuilt_configure() {
 
     for dtbf in ${KERNEL_DTB_NAMES}; do
         install -m 0644 $dtbf ${B}
+    done
+    for dtbof in $(find . -name "*.dtbo") ; do
+        install -m 0644 $dtbof ${B}
     done
 }
 
@@ -242,6 +245,10 @@ do_deploy() {
 
     for dtbf in ${KERNEL_DTB_NAMES}; do
         install -m 0644 $dtbf ${DEPLOYDIR}
+    done
+    install -d ${DEPLOYDIR}/DTOverlays
+    for dtbof in $(find . -name "*.dtbo") ; do
+        install -m 0644 $dtbof ${DEPLOYDIR}/DTOverlays
     done
 }
 
