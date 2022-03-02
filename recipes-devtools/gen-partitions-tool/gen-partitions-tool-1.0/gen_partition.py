@@ -55,7 +55,7 @@ partition_entry_defaults = {
    "size_in_kb": "",
    "type": "00000000-0000-0000-0000-000000000000",
    "bootable": "false",
-   "readonly": "true",
+   "readonly": "false",
    "filename": "",
    "sparse" : "false"
 }
@@ -106,10 +106,10 @@ def partition_options(argv):
       elif opt in ['--type-guid']:
          partition_entry["type"] = arg
       elif opt in ['--attributes']:
-         attribute_bits = int(arg,10)
-         if attribute_bits & (1<<2):
+         attribute_bits = int(arg,2)
+         if attribute_bits & (1<<0):
             partition_entry["bootable"] = "true"
-         if attribute_bits & (1<<60):
+         if attribute_bits & (1<<1):
             partition_entry["readonly"] = "true"
       elif opt in ['--filename']:
          partition_entry["filename"] = arg

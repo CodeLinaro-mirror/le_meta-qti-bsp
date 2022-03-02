@@ -125,7 +125,7 @@ def machine_search(f, search_path):
 
 # generate partitions artifact in an image-specific folder since they include
 # image specific data such as file name and parition size
-do_gen_partition_bin[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
+do_gen_partition_bin[dirs] = "${@d.getVar('PARTITION_DIR') or "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"}"
 
 do_gen_partition_bin () {
     # Generate partition.xml using gen_partition utility
