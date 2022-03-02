@@ -1,10 +1,10 @@
 DEFAULT_PREFERENCE = "-1"
 
 SRC_URI   =  "${PATH_TO_REPO}/gstreamer/gst-plugins-good/.git;protocol=${PROTO};destsuffix=gstreamer/gst-plugins-good;usehead=1"
-SRC_URI_append = " ${CAF_GIT}/gstreamer/common;destsuffix=gstreamer/gst-plugins-good/common;branch=gstreamer/common/master;name=common"
+SRC_URI_append = " ${CAF_GIT}/gstreamer/common;destsuffix=gstreamer/gst-plugins-good/common;branch=gstreamer/common/1.16;name=common"
 
 SRCREV = "${AUTOREV}"
-SRCREV_common = "59cb678164719ff59dcf6c8b93df4617a1075d11"
+SRCREV_common = "a825d2773adaeec23369d0770098b2c44ca7377a"
 SRCREV_FORMAT = "good_common"
 
 S = "${WORKDIR}/gstreamer/gst-plugins-good"
