@@ -33,6 +33,8 @@ def get_bblayer_img_inc(layerkey, d):
     common_inc  = "common-"+ lkey + "image.inc"
     machine_inc = basemachine + "-" + lkey + "image.inc"
     distro_inc  = machine_inc
+    if distro == 'nad':
+        distro = 'auto'
     if distro != 'base' or '':
         distro_inc = basemachine + "-" + distro +"-" + lkey + "image.inc"
 
