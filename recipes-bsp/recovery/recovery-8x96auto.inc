@@ -12,5 +12,7 @@ do_install_append() {
 	install -m 0755 ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/recovery/files/progress_fill.png -D ${D}/res/images
 	install -m 0755 ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/recovery/files/stage_empty.png -D ${D}/res/images
 	install -m 0755 ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/recovery/files/stage_fill.png -D ${D}/res/images
-        install -m 0755 ${WORKSPACE}/vehiclenetwork/ethernet/config.ini ${D}/etc/ntn_config.ini
+        if ${@bb.utils.contains('DISTRO_FEATURES', 'early-ethernet', 'true', 'false', d)}; then
+            install -m 0755 ${WORKSPACE}/vehiclenetwork/ethernet/config.ini ${D}/etc/ntn_config.ini
+        fi
 }

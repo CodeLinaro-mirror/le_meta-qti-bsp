@@ -21,6 +21,10 @@ IMAGE_INSTALL += "libcomerr"
 IMAGE_INSTALL += "libss"
 IMAGE_INSTALL += "libe2p"
 IMAGE_INSTALL += "libext2fs"
+IMAGE_INSTALL += "${@bb.utils.contains("DISTRO_FEATURES", "early-ethernet", "open-avb", "" ,d)}"
+IMAGE_INSTALL += "${@bb.utils.contains("DISTRO_FEATURES", "early-ethernet", "connman", "" ,d)}"
+IMAGE_INSTALL += "${@bb.utils.contains("DISTRO_FEATURES", "early-ethernet", "neutrino-firmware", "" ,d)}"
+
 
 do_makerecovery() {
         echo "Deploy image : ${DEPLOY_DIR_IMAGE}"
