@@ -167,7 +167,7 @@ CONFIG_EAP_OTP=y
 CONFIG_EAP_SIM=y
 
 # EAP-PSK (experimental; this is _not_ needed for WPA-PSK)
-#CONFIG_EAP_PSK=y
+CONFIG_EAP_PSK=y
 
 # EAP-pwd (secure authentication using only a password)
 CONFIG_EAP_PWD=y
@@ -526,3 +526,21 @@ CONFIG_IEEE80211AX=y
 # Experimental implementation of draft-harkins-owe-07.txt
 CONFIG_OWE=y
 CONFIG_SAE=y
+
+# WEP support
+CONFIG_WEP=y
+
+# BOOTUP KPI MARKER
+CONFIG_MARKER=y
+
+#FILS
+CONFIG_FILS=y
+CONFIG_FILS_SK_PFS=y
+CONFIG_ERP=y
+
+#WPA3 suiteB
+CONFIG_SUITEB=y
+CONFIG_SUITEB192=y
+
+#MBO
+CONFIG_MBO=y
