@@ -20,3 +20,5 @@ do_install_append () {
   install -m 0755 ${WORKDIR}/enable-fde.sh ${D}${bindir}/enable-fde.sh
   install -m 0644 ${WORKDIR}/enable-fde.service ${D}${systemd_unitdir}/system/
 }
+
+RDEPENDS_${PN} += "e2fsprogs-mke2fs"
