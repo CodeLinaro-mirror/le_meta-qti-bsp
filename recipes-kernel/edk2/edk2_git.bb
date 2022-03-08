@@ -58,6 +58,9 @@ EXTRA_OEMAKE_append = " 'TARGET_NAND_AB_ATTR_SUPPORT=${NAND_AB_ATTR_SUPPORT}'"
 NAD_PARTITION = "${@bb.utils.contains('DISTRO_FEATURES', 'nad-prod', '1', '0', d)}"
 EXTRA_OEMAKE_append = " 'NAD_PARTITION=${NAD_PARTITION}'"
 
+INITRAMFS = "${@bb.utils.contains('INITRAMFS_IMAGE_BUNDLE', '1', '1', '0', d)}"
+EXTRA_OEMAKE_append = " 'INITRAMFS_BUNDLE=${INITRAMFS}'"
+
 do_compile () {
     export CC=${BUILD_CC}
     export CXX=${BUILD_CXX}
