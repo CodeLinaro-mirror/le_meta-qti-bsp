@@ -60,6 +60,9 @@ DM_VERITY = "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', '1', '0', d)}"
 EXTRA_OEMAKE_append = " 'NAD_PARTITION=${NAD_PARTITION}'"
 EXTRA_OEMAKE_append = " 'DM_VERITY=${DM_VERITY}'"
 
+INITRAMFS = "${@bb.utils.contains('INITRAMFS_IMAGE_BUNDLE', '1', '1', '0', d)}"
+EXTRA_OEMAKE_append = " 'INITRAMFS_BUNDLE=${INITRAMFS}'"
+
 do_compile () {
     export CC=${BUILD_CC}
     export CXX=${BUILD_CXX}
