@@ -75,3 +75,7 @@ VIRTUAL-RUNTIME_init_manager = "systemd"
 IMAGE_DEV_MANAGER = "udev"
 IMAGE_INIT_MANAGER = "systemd"
 IMAGE_INITSCRIPTS = ""
+
+INITRAMFS_IMAGE_BUNDLE = "${@bb.utils.contains('DISTRO_FEATURES', 'initramfs', '1', '', d)}"
+INITRAMFS_IMAGE = "${@bb.utils.contains('DISTRO_FEATURES', 'initramfs', 'machine-initramfs', '', d)}"
+INITRAMFS_FSTYPES += "${@bb.utils.contains('DISTRO_FEATURES', 'initramfs', 'cpio.gz tar.bz2', '', d)}"

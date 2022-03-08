@@ -9,7 +9,10 @@ python __anonymous () {
   # to kernel.bbclass. We override the variable as msm kernel can't
   # support alternate image builds
   if d.getVar("KERNEL_IMAGETYPE", True):
-      d.setVar("KERNEL_IMAGETYPE_FOR_MAKE", "")
+      if d.getVar("INITRAMFS_IMAGE_BUNDLE", True):
+          d.setVar("KERNEL_IMAGETYPE_FOR_MAKE", "${KERNEL_IMAGETYPE}")
+      else:
+          d.setVar("KERNEL_IMAGETYPE_FOR_MAKE", "")
 }
 
 DEPENDS += " mkbootimg-native openssl-native kern-tools-native"
@@ -61,6 +64,13 @@ do_deploy() {
 
     if [ -f ${D}/${KERNEL_IMAGEDEST}/-${KERNEL_VERSION} ]; then
         mv ${D}/${KERNEL_IMAGEDEST}/-${KERNEL_VERSION} ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}
+    fi
+}
+
+do_bundle_initramfs_append () {
+    realpath=`readlink -fn ${KERNEL_OUTPUT_DIR}/$imageType.initramfs`
+    if [ -n "$realpath" ]; then
+        ln -sf ${realpath} ${DEPLOY_DIR_IMAGE}
     fi
 }
 

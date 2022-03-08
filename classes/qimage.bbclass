@@ -120,7 +120,11 @@ python do_make_bootimg () {
 
     xtra_parms=""
     mkboot_bin_path = d.getVar('STAGING_BINDIR_NATIVE', True) + '/mkbootimg'
-    zimg_path       = d.getVar('DEPLOY_DIR_IMAGE', True) + "/" + d.getVar('KERNEL_IMAGETYPE', True)
+    bundle_initramfs = d.getVar('INITRAMFS_IMAGE_BUNDLE', True)
+    if bundle_initramfs == '1':
+        zimg_path       = d.getVar('DEPLOY_DIR_IMAGE', True) + "/" + d.getVar('KERNEL_IMAGETYPE', True) + ".initramfs"
+    else:
+        zimg_path       = d.getVar('DEPLOY_DIR_IMAGE', True) + "/" + d.getVar('KERNEL_IMAGETYPE', True)
     cmdline         = "\"" + d.getVar('KERNEL_CMD_PARAMS', True) + "\""
     pagesize        = d.getVar('PAGE_SIZE', True)
     base            = d.getVar('KERNEL_BASE', True)
@@ -150,6 +154,7 @@ do_make_bootimg[dirs]      = "${DEPLOY_DIR_IMAGE}"
 # Make sure native tools and vmlinux ready to create boot.img
 do_make_bootimg[depends]  += "${PN}:do_prepare_recipe_sysroot"
 do_make_bootimg[depends]  += "virtual/kernel:do_shared_workdir"
+do_make_bootimg[depends]  += " ${@bb.utils.contains('INITRAMFS_IMAGE_BUNDLE', '1', 'linux-msm:do_bundle_initramfs', '', d)}"
 
 addtask do_make_bootimg before do_image_complete
 
@@ -221,6 +226,8 @@ do_make_veritybootimg[depends]  += "${PN}:do_makesystem"
 do_make_veritybootimg[depends]  += "${PN}:do_make_bootimg"
 
 python () {
-    if bb.utils.contains('DISTRO_FEATURES', 'dm-verity', True, False, d):
-        bb.build.addtask('do_make_veritybootimg', 'do_image_complete', 'do_rootfs', d)
+    bundle_initramfs = d.getVar('INITRAMFS_IMAGE_BUNDLE', True)
+    if bundle_initramfs != '1':
+        if bb.utils.contains('DISTRO_FEATURES', 'dm-verity', True, False, d):
+            bb.build.addtask('do_make_veritybootimg', 'do_image_complete', 'do_rootfs', d)
 }
