@@ -1,6 +1,6 @@
 PROVIDES_NAME = "kernel-module-${_MODNAME}"
 
-inherit autotools-brokensep module qperf module-sign systemd
+inherit autotools-brokensep module qperf module-sign systemd qti-kernel-arch-clang
 
 do_unpack[deptask] = "do_populate_sysroot"
 do_compile:prepend() {

@@ -10,7 +10,7 @@ SRC_URI:append = " file://audio_load.conf"
 SRCREV = "${AUTOREV}"
 S = "${WORKDIR}/vendor/qcom/opensource/audio-kernel"
 
-inherit module module-sign qperf
+inherit module module-sign qperf qti-kernel-arch-clang
 
 EXTRA_OEMAKE += "TARGET_SUPPORT=${@bb.utils.contains('BASEMACHINE', 'sa81x5', 'sa8155', '${BASEMACHINE}', d)}"
 EXTRA_OEMAKE += "AR_SUPPORT=${@bb.utils.contains('MACHINE_FEATURES', 'qti-audio-ar', 'yes', 'no', d)}"

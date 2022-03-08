@@ -19,6 +19,8 @@ S = "${WORKDIR}/bootable/bootloader/edk2"
 
 inherit deploy
 
+TOOLCHAIN = "clang"
+
 VBLE = "${@bb.utils.contains('DISTRO_FEATURES', 'vble','1', '0', d)}"
 VERITY_ENABLED = "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity','1', '0', d)}"
 EARLY_ETH = "${@bb.utils.contains('DISTRO_FEATURES', 'early-eth', '1', '0', d)}"
@@ -26,7 +28,7 @@ HIBERNATION = "${@bb.utils.contains('COMBINED_FEATURES', 'hibernation', '1', '0'
 DISABLE_NONBOOTDEVICE_ENABLED ?= "0"
 DISABLE_NONBOOTDEVICE_ENABLED:sa6155 = "1"
 
-EXTRA_OEMAKE = "'CLANG_BIN=${CLANG_BIN_PATH}' \
+EXTRA_OEMAKE = "'CLANG_BIN=${STAGING_BINDIR_NATIVE}/' \
                 'CLANG_PREFIX=${STAGING_BINDIR_NATIVE}/${TARGET_SYS}/${TARGET_PREFIX}' \
                 'TARGET_ARCHITECTURE=${TARGET_ARCH}'\
                 'BUILDDIR=${S}'\
