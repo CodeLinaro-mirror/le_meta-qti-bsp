@@ -11,6 +11,7 @@ DEPENDS += "clang-native \
             gbm-headers \
             libcutils \
             libion \
+            libstagefright-headers \
             libutils \
             linux-msm-headers \
             media-plugin-headers \
