@@ -31,6 +31,7 @@ TARGET_CPPFLAGS += "-I${STAGING_INCDIR}/sdm/core"
 PACKAGECONFIG = "${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'kms fbdev wayland egl clients', '', d)} \
                  ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11', '', d)} \
                  ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'launch', '', d)} \
+                 ${@bb.utils.contains('DISTRO_FEATURES', 'early_init', 'early', '', d)} \
                  image-jpeg \
                  screenshare \
                  shell-desktop \
@@ -39,6 +40,8 @@ PACKAGECONFIG = "${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'kms fbdev w
                 "
 # pam
 PACKAGECONFIG[pam] = ",,libpam"
+# early-init
+PACKAGECONFIG[early] = "-Denable-early-boot=true,-Denable-early-boot=false"
 
 EXTRA_OECONF_append_qemux86 = " \
         WESTON_NATIVE_BACKEND=fbdev-backend.so \
