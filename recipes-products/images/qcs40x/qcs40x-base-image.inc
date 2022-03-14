@@ -92,9 +92,14 @@ fixup_systemd_mounts_services_ext4_rootfs() {
  if ${@bb.utils.contains('DISTRO_FEATURES','ab-boot-support','true','false',d)}; then
    if [ -e ${IMAGE_ROOTFS}/lib/systemd/system/bt-fw-ab-ext4-mount.service ]; then
      cp ${IMAGE_ROOTFS}/lib/systemd/system/bt-fw-ab-ext4-mount.service ${IMAGE_ROOTFS}/lib/systemd/system/bt_firmware-mount.service
+     rm -rf ${IMAGE_ROOTFS}/lib/systemd/system/bt-fw-ab-ext4-mount.service
    fi
    cp ${IMAGE_ROOTFS}/lib/systemd/system/fw-ab-ext4-mount.service ${IMAGE_ROOTFS}/lib/systemd/system/firmware-mount.service
    cp ${IMAGE_ROOTFS}/lib/systemd/system/dsp-ab-ext4-mount.service ${IMAGE_ROOTFS}/lib/systemd/system/dsp-mount.service
+
+   # Remove duplicate systemd service units
+   rm -rf ${IMAGE_ROOTFS}/lib/systemd/system/fw-ab-ext4-mount.service
+   rm -rf ${IMAGE_ROOTFS}/lib/systemd/system/dsp-ab-ext4-mount.service
  else
    rm -rf ${IMAGE_ROOTFS}/lib/systemd/system/bt_firmware-mount.service
    rm -rf ${IMAGE_ROOTFS}/lib/systemd/system/firmware-mount.service
@@ -104,6 +109,13 @@ fixup_systemd_mounts_services_ext4_rootfs() {
  cp ${IMAGE_ROOTFS}/lib/systemd/system/persist-ext4.mount ${IMAGE_ROOTFS}/lib/systemd/system/persist.mount
  cp ${IMAGE_ROOTFS}/lib/systemd/system/cache-ext4.mount ${IMAGE_ROOTFS}/lib/systemd/system/cache.mount
  cp ${IMAGE_ROOTFS}/lib/systemd/system/data-ext4.mount  ${IMAGE_ROOTFS}/lib/systemd/system/data.mount
+
+ # Remove duplicate systemd mount units
+ rm -rf ${IMAGE_ROOTFS}/lib/systemd/system/systemrw-ext4.mount
+ rm -rf ${IMAGE_ROOTFS}/lib/systemd/system/persist-ext4.mount
+ rm -rf ${IMAGE_ROOTFS}/lib/systemd/system/cache-ext4.mount
+ rm -rf ${IMAGE_ROOTFS}/lib/systemd/system/data-ext4.mount
+
  if ${@bb.utils.contains('DISTRO_FEATURES', 'full-disk-encryption', 'true', 'false', d)}; then
    rm -rf ${IMAGE_ROOTFS}/lib/systemd/system/data.mount
    rm -rf ${IMAGE_ROOTFS}/lib/systemd/system/data-ext4.mount
