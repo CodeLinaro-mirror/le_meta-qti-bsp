@@ -1,5 +1,5 @@
-#below package is fetch from CAF
-SRC_URI ="git://source.codeaurora.org/quic/le/openssh-portable;nobranch=1;protocol=https;rev=cce8cbe0ed7d1ba3a575310e0b63c193326ae616"
+#below package is fetch from Codelinaro
+SRC_URI ="${CLO_LE_GIT}/openssh-portable;nobranch=1;protocol=https;rev=cce8cbe0ed7d1ba3a575310e0b63c193326ae616"
 
 SRC_URI += " \
             file://sshd_config \
