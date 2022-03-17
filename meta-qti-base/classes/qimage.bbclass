@@ -69,7 +69,7 @@ do_make_avb_image(){
         if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'true', 'false', d)}; then
             #For lvgvm avb2.0, add hashtree for system image and generate vbmeta.img.
             avbtool add_hashtree_footer \
-                --image ${DEPLOY_DIR_IMAGE}/machine-image-${PRODUCT}.ext4 \
+                --image ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
                 --partition_name system \
                 --partition_size ${rootfs_partition_size} \
                 --hash_algorithm sha256 \
