@@ -18,6 +18,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
               e2fsprogs \
               e2fsprogs-e2fsck \
               e2fsprogs-mke2fs \
+              e2fsprogs-tune2fs \
               glib-2.0 \
               kernel-modules \
               packagegroup-android-utils \
@@ -30,6 +31,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
               packagegroup-qti-display \
               packagegroup-qti-dsp \
               packagegroup-qti-fastcv \
+              packagegroup-qti-fastmmi \
               packagegroup-qti-gfx \
               packagegroup-qti-gst \
               packagegroup-qti-ml \
