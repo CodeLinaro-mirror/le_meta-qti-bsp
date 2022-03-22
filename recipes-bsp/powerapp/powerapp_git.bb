@@ -39,13 +39,13 @@ do_install() {
            ln ${D}${base_sbindir}/powerapp ${D}${base_sbindir}/sys_shutdown
            install -m 0644 ${S}/reset_reboot_cookie.service -D ${D}${systemd_unitdir}/system/reset_reboot_cookie.service
            install -m 0644 ${S}/power_config.service -D ${D}${systemd_unitdir}/system/power_config.service
-           install -d ${D}${systemd_unitdir}/system/multi-user.target.wants/
-           ln -sf ${systemd_unitdir}/system/reset_reboot_cookie.service ${D}${systemd_unitdir}/system/multi-user.target.wants/reset_reboot_cookie.service
-           ln -sf ${systemd_unitdir}/system/power_config.service ${D}${systemd_unitdir}/system/multi-user.target.wants/power_config.service
+           install -d ${D}${systemd_unitdir}/system/sysinit.target.wants/
+           ln -sf ${systemd_unitdir}/system/reset_reboot_cookie.service ${D}${systemd_unitdir}/system/sysinit.target.wants/reset_reboot_cookie.service
+           ln -sf ${systemd_unitdir}/system/power_config.service ${D}${systemd_unitdir}/system/sysinit.target.wants/power_config.service
 
            if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-vm', 'true', 'false', d)}; then
                install -m 0644 ${S}/powerapp.service -D ${D}${systemd_unitdir}/system/powerapp.service
-               ln -sf ${systemd_unitdir}/system/powerapp.service ${D}${systemd_unitdir}/system/multi-user.target.wants/powerapp.service
+               ln -sf ${systemd_unitdir}/system/powerapp.service ${D}${systemd_unitdir}/system/sysinit.target.wants/powerapp.service
            fi
         else
            install -m 0755 ${B}/powerapp -D ${D}/sbin/powerapp
