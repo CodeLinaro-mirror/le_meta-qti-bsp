@@ -18,6 +18,7 @@ SRC_URI = "${PATH_TO_REPO}/wlan/qcacld-3.0/.git;protocol=${PROTO};destsuffix=wla
            file://init_qti_wlan_auto.service \
            file://init.qti.wlan_on.sh \
            file://init.qti.wlan_off.sh \
+           file://wlan.conf \
            "
 SRCREV = "${AUTOREV}"
 SRCREV_FORMAT = "qcacld_cmn_fw_msm"
@@ -77,11 +78,13 @@ do_install() {
     # Install systemd service file
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
         install -m 0644 ${WORKDIR}/init_qti_wlan_auto.service -D ${D}${systemd_unitdir}/system/init_qti_wlan_auto.service
+        install -m 0644 ${WORKDIR}/wlan.conf -D ${D}${sysconfdir}/modules-load.d/wlan.conf
     fi
 }
 
 FILES_${PN} += "\
     ${bindir}/init.qti.wlan_on.sh \
     ${bindir}/init.qti.wlan_off.sh \
+    ${sysconfdir}/* \
 "
 
