@@ -1,0 +1,15 @@
+[Unit]
+Description=Weston reference Wayland compositor
+Conflicts=getty@tty7.service
+After=dbus.service rc.pvr.service
+
+[Service]
+Environment="XDG_RUNTIME_DIR=/run/user/0"
+ExecStart=weston --tty=2 --idle-time=0 --socket=wayland-0 --log=/tmp/weston.log
+ExecStop=/usr/bin/killall -s KILL weston
+Type=simple
+PIDFile=/run/early/weston.pid
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
