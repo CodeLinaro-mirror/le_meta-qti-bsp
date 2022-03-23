@@ -1,4 +1,7 @@
+inherit sdllvm
 
 DEPENDS += "llvm-arm-toolchain-native"
 
-CLANG_BIN_PATH = "${STAGING_BINDIR_NATIVE}/llvm-arm-toolchain/bin/"
+# compile with sdllvm.
+KERNEL_CC = "${CC} -fuse-ld=bfd"
+TOOLCHAIN = "sdllvm"

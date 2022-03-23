@@ -1,26 +1,12 @@
-DEFAULT_PREFERENCE = "-1"
+LIC_FILES_CHKSUM_remove = "file://common/coverage/coverage-report.pl;beginline=2;endline=17;md5=a4e1830fce078028c8f0974161272607"
 
-SRC_URI = "${PATH_TO_REPO}/gstreamer/gst-plugins-base/.git;protocol=${PROTO};destsuffix=gstreamer/gst-plugins-base;usehead=1"
-SRC_URI_append = " ${CAF_GIT}/gstreamer/common;destsuffix=gstreamer/gst-plugins-base/common;branch=gstreamer/common/master;name=common"
+# add depends of libion, libsync, libuhab for HY11 build error
+DEPENDS += "libcutils libion libsync"
+DEPENDS += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'libuhab', '', d)}"
+
+SRC_URI_remove = "https://gstreamer.freedesktop.org/src/gst-plugins-base/gst-plugins-base-${PV}.tar.xz"
+SRC_URI_append = " ${PATH_TO_REPO}/gstreamer/gst-plugins-base/.git;protocol=${PROTO};destsuffix=gstreamer/gst-plugins-base;usehead=1"
 
 SRCREV = "${AUTOREV}"
-SRCREV_common = "59cb678164719ff59dcf6c8b93df4617a1075d11"
-SRCREV_FORMAT = "base_common"
 
 S = "${WORKDIR}/gstreamer/gst-plugins-base"
-
-PACKAGECONFIG ??= " \
-    ${GSTREAMER_ORC} \
-    ${PACKAGECONFIG_GL} \
-    ${@bb.utils.filter('DISTRO_FEATURES', 'alsa x11', d)} \
-    jpeg-turbo ogg pango png theora vorbis \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'wayland egl', '', d)} \
-"
-
-DEPENDS += "libcutils"
-GI_DATA_ENABLED="0"
-do_configure_prepend() {
-	cd ${S}
-	./autogen.sh --noconfigure
-	cd ${B}
-}
