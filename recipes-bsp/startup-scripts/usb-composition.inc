@@ -35,8 +35,7 @@ do_install_append() {
    install -m 0755 ${S}/start_usb -D ${D}${base_sbindir}/start_usb
    install -d ${D}${systemd_unitdir}/system/
    install -m 0644 ${S}/usb.service -D ${D}${systemd_unitdir}/system/usb.service
-   install -m 0644 ${S}/usbd.service -D ${D}${systemd_unitdir}/system/usbd.service
 }
 
-SYSTEMD_SERVICE_${PN} = "usb.service usbd.service"
+SYSTEMD_SERVICE_${PN} = "usb.service"
 FILES_${PN} += "${systemd_unitdir}/system/"
