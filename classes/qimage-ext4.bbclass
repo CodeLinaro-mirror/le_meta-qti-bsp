@@ -90,6 +90,14 @@ create_symlink_systemd_ext4_mount_rootfs() {
             fi
         fi
     done
+   # Remove generator binaries and ensure that we don't rely on generators for mount or service files.
+   rm -rf ${IMAGE_ROOTFS_EXT4}/lib/systemd/system-generators/systemd-debug-generator
+   rm -rf ${IMAGE_ROOTFS_EXT4}/lib/systemd/system-generators/systemd-fstab-generator
+   rm -rf ${IMAGE_ROOTFS_EXT4}/lib/systemd/system-generators/systemd-gpt-auto-generator
+   rm -rf ${IMAGE_ROOTFS_EXT4}/lib/systemd/system-generators/systemd-hibernate-resume-generator
+   rm -rf ${IMAGE_ROOTFS_EXT4}/lib/systemd/system-generators/systemd-rc-local-generator
+   rm -rf ${IMAGE_ROOTFS_EXT4}/lib/systemd/system-generators/systemd-system-update-generator
+   rm -rf ${IMAGE_ROOTFS_EXT4}/lib/systemd/system-generators/systemd-sysv-generator
 }
 
 create_rootfs_ext4[cleandirs] = "${IMAGE_ROOTFS_EXT4}"
@@ -159,7 +167,7 @@ addtask do_makeuserdata after do_image before do_build
 ################################################
 ############ Generate persist image ############
 ################################################
-PERSIST_IMAGE_ROOTFS_SIZE ?= "6536668"
+PERSIST_IMAGE_ROOTFS_SIZE ?= "6383KB"
 do_makepersist[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
 
 do_makepersist() {
@@ -173,10 +181,13 @@ do_makepersist() {
 # It must be before do_makesystem to remove /persist
 addtask do_makepersist after do_image before do_makesystem
 
+CACHE_IMG_ENABLE = "${@bb.utils.contains('MACHINE_MNT_POINTS', '/cache', 'true', 'false', d)}"
+SYSTEMRW_IMG_ENABLE = "${@bb.utils.contains('MACHINE_MNT_POINTS', '/systemrw', 'true', 'false', d)}"
+
 ################################################
 ############ Generate cache image ############
 ################################################
-CACHE_IMAGE_ROOTFS_SIZE ?= "8388608"
+CACHE_IMAGE_ROOTFS_SIZE ?= "8192KB"
 do_makecache[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
 
 do_makecache() {
@@ -184,12 +195,10 @@ do_makecache() {
                 ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${CACHEIMAGE_TARGET}
 }
 
-addtask do_makecache after do_image before do_makesystem
-
 ################################################
 ############ Generate systemrw image ############
 ################################################
-SYSTEMRW_IMAGE_ROOTFS_SIZE ?= "8388608"
+SYSTEMRW_IMAGE_ROOTFS_SIZE ?= "8192KB"
 do_makesystemrw[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
 
 do_makesystemrw() {
@@ -198,4 +207,11 @@ do_makesystemrw() {
                  ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMRWIMAGE_TARGET}
 }
 
-addtask do_makesystemrw after do_image before do_makesystem
+python() {
+    systemrw_img = d.getVar("SYSTEMRW_IMG_ENABLE")
+    cache_img = d.getVar("CACHE_IMG_ENABLE")
+    if systemrw_img == "true":
+       bb.build.addtask('do_makesystemrw', 'do_makesystem', 'do_image', d)
+    if cache_img == "true":
+       bb.build.addtask('do_makecache', 'do_makesystem', 'do_image', d)
+}

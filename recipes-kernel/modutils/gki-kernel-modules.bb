@@ -5,23 +5,20 @@ LICENSE = "GPLv2.0-with-linux-syscall-note"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta-qti-bsp/files/common-licenses/\
 ${LICENSE};md5=8afb6abdac9a14cb18a0d6c9c151e9b4"
 
-MODULES_LIST = ""
-MODULES_LIST_sxrneo = "modules.list.neo"
-
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI   =  "file://kernel-5.10/kernel_platform/msm-kernel"
 
 S  =  "${WORKDIR}/kernel-5.10/kernel_platform/msm-kernel"
 
 do_configure () {
-    cd ${KERNEL_PREBUILT_PATH}
+    cd ${KERNEL_PREBUILT_DISTDIR}
     install -d ${B}/include/generated
     install -m 0644 ../msm-kernel/include/generated/utsrelease.h ${B}/include/generated
 }
 
 do_compile () {
     # Segregate modules into first and second stages.
-    mod_list=${B}/${MODULES_LIST}
+    mod_list=${B}/${KERNEL_MODULES_LIST}
 
     while IFS= read -r module;
     do
@@ -32,7 +29,7 @@ do_compile () {
         first_mods="${first_mods}${module} "
     done < "$mod_list"
 
-    for f in $(find ${KERNEL_PREBUILT_PATH} -type f -name '*.ko' -exec basename {} \;) ; do
+    for f in $(find ${KERNEL_PREBUILT_DISTDIR} -type f -name '*.ko' -exec basename {} \;) ; do
         found=0
         for m in ${first_mods} ; do
               [ "$f" = "$m" ] && found=1
@@ -42,8 +39,8 @@ do_compile () {
 
     # Copy first stage modules into ${B} and update modules-load.d conf
     for m in $first_mods; do
-        if [ -f ${KERNEL_PREBUILT_PATH}/$m ]; then
-            install -m 0644 ${KERNEL_PREBUILT_PATH}/$m ${B}
+        if [ -f ${KERNEL_PREBUILT_DISTDIR}/$m ]; then
+            install -m 0644 ${KERNEL_PREBUILT_DISTDIR}/$m ${B}
             mname=`basename ${m} .ko`
             echo "$mname"
         else
@@ -53,7 +50,7 @@ do_compile () {
 
     # Copy remaining modules into ${B} and update modules-load.d conf
     for m in ${second_mods}; do
-        install -m 0644 ${KERNEL_PREBUILT_PATH}/$m ${B}
+        install -m 0644 ${KERNEL_PREBUILT_DISTDIR}/$m ${B}
         mname=`basename ${m} .ko`
         echo "$mname"
     done > ${B}/secondmods.conf
