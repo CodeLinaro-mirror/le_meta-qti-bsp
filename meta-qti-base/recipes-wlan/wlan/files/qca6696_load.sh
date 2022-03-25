@@ -33,21 +33,20 @@ else
 	modprobe cnss2
 fi
 n=0
-if (lspci -k|grep cnss_pci);then
 while [ $n -le 5 ]
 	do
-		if (lspci -k|grep 1101);then
-			if (ls -l /sys/bus/pci/devices/ | grep 0000:01:00.0);then
-				modprobe qca6696
-				break
-			else
-				echo "cnss: No First Hastings wlan chipset attached"
-			fi
+	if ((lspci -k|grep cnss_pci) && (lspci -k|grep 1101));then
+		if (ls -l /sys/bus/pci/devices/ | grep 0000:01:00.0);then
+			echo "try to load qca6696"
+			modprobe qca6696
+			break
 		else
-			echo "cnss: No Hastings wlan chipset attached"
+			echo "cnss: No First Hastings wlan chipset attached"
 		fi
-		echo "retry loading qca6696"
-		let n++
-		sleep 1
-	done
-fi
+	else
+			echo "cnss: No Hastings wlan chipset attached"
+	fi
+	echo "retry loading qca6696"
+	let n++
+	sleep 1
+done

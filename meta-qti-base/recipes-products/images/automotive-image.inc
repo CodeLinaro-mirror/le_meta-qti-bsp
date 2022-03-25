@@ -28,6 +28,6 @@ SSTATE_MANFILEPREFIX = "${@bb.utils.contains('PERF_BUILD', '1', '${SSTATE_MANIFE
 SDK_DEPLOY = "${DEPLOY_DIR}/sdk-${PRODUCT}"
 
 # Add kernel header to SDK.
-TOOLCHAIN_TARGET_TASK_append = " kernel-devsrc"
+TOOLCHAIN_TARGET_TASK_append = " kernel-devsrc linux-msm-headers-dev"
 
 BAD_RECOMMENDATIONS += "rng-tools"
