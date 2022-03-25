@@ -15,5 +15,4 @@ RDEPENDS_${PN} += "\
     lxc \
     lxcfs \
     dploader \
-    e2fsprogs-mke2fs \
     "
