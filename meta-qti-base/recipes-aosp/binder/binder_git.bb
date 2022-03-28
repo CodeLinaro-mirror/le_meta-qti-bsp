@@ -15,7 +15,7 @@ SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/frameworks/binder"
 
-inherit autotools pkgconfig systemd useradd
+inherit autotools pkgconfig systemd
 
 SYSTEMD_SERVICE_${PN} = "servicemanager.service"
 SYSTEMD_AUTO_ENABLE_${PN} = "enable"

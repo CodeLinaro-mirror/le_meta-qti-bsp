@@ -15,7 +15,7 @@ SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/system/core"
 
-inherit autotools pkgconfig systemd useradd
+inherit autotools pkgconfig systemd
 
 COMPOSITION = "901D"
 
