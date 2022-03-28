@@ -62,6 +62,9 @@ IMAGE_FEATURES:append = " read-only-rootfs"
 LICENSE_FLAGS_WHITELIST += "commercial_gstreamer1.0-libav commercial_gstreamer1.0-omx"
 LICENSE_FLAGS_WHITELIST += "commercial_gstreamer1.0-plugins-ugly commercial_opencore-amr"
 LICENSE_FLAGS_WHITELIST += "commercial_ffmpeg"
+LICENSE_FLAGS_ACCEPTED += "commercial_gstreamer1.0-libav commercial_gstreamer1.0-omx"
+LICENSE_FLAGS_ACCEPTED += "commercial_gstreamer1.0-plugins-ugly commercial_opencore-amr"
+LICENSE_FLAGS_ACCEPTED += "commercial_ffmpeg"
 
 include ${DISTRO_INC_FILES}
 
