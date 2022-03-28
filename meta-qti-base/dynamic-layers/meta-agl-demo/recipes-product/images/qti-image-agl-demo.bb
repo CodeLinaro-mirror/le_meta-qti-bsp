@@ -12,6 +12,9 @@ IMAGE_FEATURES_remove = "splash"
 # screen is GPLv3, remove
 IMAGE_INSTALL_remove = "screen"
 
+# enable sparse image to reduce the image size and faster the flash speed.
+IMAGE_FEATURES += "sparse-image"
+
 #
 # Add hook to honor debug-tweaks/empty-root-password, since otherwise
 # the password patched into base-passwd will be present.
