@@ -1,6 +1,20 @@
 inherit core-image dm-verity
 
-DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'qti-avb', 'avbtool-native', '', d)}"
+IMAGE_FEATURES[validitems] += "sparse-image"
+
+DEPENDS += "\
+    ${@bb.utils.contains('DISTRO_FEATURES', 'qti-avb', 'avbtool-native', '', d)} \
+    ${@bb.utils.contains('IMAGE_FEATURES', 'sparse-image', 'libsparse-native', '', d)} \
+"
+
+# Make sparse rootfs by default
+create_sparsesystem() {
+    mv ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.ext4 ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.tmp
+    img2simg ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.tmp ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.ext4
+    rm -f ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.tmp
+}
+
+do_image_ext4[postfuncs] += "${@bb.utils.contains('IMAGE_FEATURES', 'sparse-image', 'create_sparsesystem', '', d)}"
 
 ### Generate system.img #####
 # Alter system image size if varity is enabled.

@@ -24,6 +24,9 @@ IMAGE_FEATURES_remove = "splash"
 IMAGE_FEATURES_remove = "ssh-server-dropbear"
 IMAGE_FEATURES += "ssh-server-openssh"
 
+# enable sparse image to reduce the image size and faster the flash speed.
+IMAGE_FEATURES += "sparse-image"
+
 # Disable root password for demo development
 EXTRA_IMAGE_FEATURES += "debug-tweaks"
 
