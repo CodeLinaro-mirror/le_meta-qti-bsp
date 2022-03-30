@@ -1,13 +1,13 @@
-SRC_URI_append = " https://source.codeaurora.org/quic/le/AGL/meta-agl/plain/meta-ivi-common/recipes-multimedia/pulseaudio/pulseaudio-10.0/0002-volume-ramp-additions-to-the-low-level-infra.patch?h=automotivelinux/eel;downloadfilename=0002-volume-ramp-additions-to-the-low-level-infra.patch;name=infra-p"
+SRC_URI_append = " https://git.codelinaro.org/clo/le/AGL/meta-agl/-/raw/automotivelinux/eel/meta-ivi-common/recipes-multimedia/pulseaudio/pulseaudio-10.0/0002-volume-ramp-additions-to-the-low-level-infra.patch;downloadfilename=0002-volume-ramp-additions-to-the-low-level-infra.patch;name=infra-p"
 SRC_URI[infra-p.sha256sum] = "085d2dd1c778f5a2fd76fd0b7a8a65f15493e0096bde0ddc96d276dda4753c91"
 
-SRC_URI_append = " https://source.codeaurora.org/quic/le/AGL/meta-agl/plain/meta-ivi-common/recipes-multimedia/pulseaudio/pulseaudio-10.0/0003-volume-ramp-adding-volume-ramping-to-sink-input.patch?h=automotivelinux/eel;downloadfilename=0003-volume-ramp-adding-volume-ramping-to-sink-input.patch;name=input-p"
+SRC_URI_append = " https://git.codelinaro.org/clo/le/AGL/meta-agl/-/raw/automotivelinux/eel/meta-ivi-common/recipes-multimedia/pulseaudio/pulseaudio-10.0/0003-volume-ramp-adding-volume-ramping-to-sink-input.patch;downloadfilename=0003-volume-ramp-adding-volume-ramping-to-sink-input.patch;name=input-p"
 SRC_URI[input-p.sha256sum] = "4f8f0f3693d24cba2c9408550766f660e75aa228ba2c1fa8df0d7ae71ecb1831"
 
-SRC_URI_append = " https://source.codeaurora.org/quic/le/AGL/meta-agl/plain/meta-ivi-common/recipes-multimedia/pulseaudio/pulseaudio-10.0/0004-sink-input-Code-cleanup-regarding-volume-ramping.patch?h=automotivelinux/eel;downloadfilename=0004-sink-input-Code-cleanup-regarding-volume-ramping.patch;name=ramping-p"
+SRC_URI_append = " https://git.codelinaro.org/clo/le/AGL/meta-agl/-/raw/automotivelinux/eel/meta-ivi-common/recipes-multimedia/pulseaudio/pulseaudio-10.0/0004-sink-input-Code-cleanup-regarding-volume-ramping.patch;downloadfilename=0004-sink-input-Code-cleanup-regarding-volume-ramping.patch;name=ramping-p"
 SRC_URI[ramping-p.sha256sum] = "727e3b9bf87ffb3fb8eeaafda15cb627731cf366a6d97a141fdfea01f05aac81"
 
-SRC_URI_append = " https://source.codeaurora.org/quic/le/AGL/meta-agl/plain/meta-ivi-common/recipes-multimedia/pulseaudio/pulseaudio-10.0/0005-sink-input-volume-Add-support-for-volume-ramp-factor.patch?h=automotivelinux/eel;downloadfilename=0005-sink-input-volume-Add-support-for-volume-ramp-factor.patch;name=factor-p"
+SRC_URI_append = " https://git.codelinaro.org/clo/le/AGL/meta-agl/-/raw/automotivelinux/eel/meta-ivi-common/recipes-multimedia/pulseaudio/pulseaudio-10.0/0005-sink-input-volume-Add-support-for-volume-ramp-factor.patch;downloadfilename=0005-sink-input-volume-Add-support-for-volume-ramp-factor.patch;name=factor-p"
 SRC_URI[factor-p.sha256sum] = "493c5179598fe852014e00443795a6e8b0cfdddffe60133027dac449c2730d5a"
 
 SRC_URI_append = " file://0001-pulseaudio-module-devel-an-interface-for-module-deve.patch"

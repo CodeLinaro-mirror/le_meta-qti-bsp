@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/GPL-2.0;md5=80
 KTF_MODULE_NAME = "ktf"
 
 SRC_URI = "\
-    git://source.codeaurora.org/quic/le/external/oracle/ktf;protocol=http;branch=circumflex/master \
+    git://git.codelinaro.org/clo/le/external/oracle/ktf;protocol=http;branch=circumflex/master \
     file://0001-Remove-Wno-packed-bitfield-compat-option-in-Makefile.patch \
 "
 
