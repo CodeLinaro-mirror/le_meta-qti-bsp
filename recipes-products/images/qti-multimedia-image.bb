@@ -14,6 +14,8 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         glib-2.0 \
         kernel-modules \
         libnl \
+        init-ifupdown \
+        ifupdown \
         libxml2 \
         packagegroup-android-utils \
         packagegroup-qti-audio \
