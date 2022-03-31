@@ -30,4 +30,15 @@
 #irq_num=`cat /proc/interrupts | grep -i DWC_ETH_QOS| grep -i gic | awk {'print $1'} | awk -F :  {'print $1'}`;
 #echo irqnum=$irq_num;
 #echo 08 > /proc/irq/$irq_num/smp_affinity;
-echo 6 > /sys/class/net/eth0/queues/rx-0/rps_cpus;
+hos_target="opsy-sa81x5";
+hostname=`cat /etc/hostname`;
+#echo "hostname="$hostname;
+echo "ethqos init called for RPS setting" > /dev/kmsg
+ifconfig eth0 up;
+
+if [ "$hostname" = "$hos_target" ]; then
+     echo 90 > /sys/class/net/eth0/queues/rx-0/rps_cpus;
+else
+    echo 6 > /sys/class/net/eth0/queues/rx-0/rps_cpus;
+fi
+
