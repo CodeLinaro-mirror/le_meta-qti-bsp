@@ -27,7 +27,7 @@ do_install() {
 
     # Modify vbmeta device to vdd for headless build variant
     if ${@bb.utils.contains('DISTRO_FEATURES', 'qti-headless', 'true', 'false', d)}; then
-        sed "s/vdf/vdd/g" ${D}/build.prop
+        sed -i "s/vdf/vdd/g" ${D}/build.prop
     fi
 
     install -m 0755 ${WORKDIR}/persist-prop.sh -D ${D}${base_sbindir}/persist-prop.sh
