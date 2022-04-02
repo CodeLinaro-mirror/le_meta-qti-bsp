@@ -25,11 +25,6 @@ do_install() {
     # Remove empty lines and lines starting with '#'
     sed -i -e 's/#.*$//' -e '/^$/d' ${D}/build.prop
 
-    # Modify vbmeta device to vdd for headless build variant
-    if ${@bb.utils.contains('DISTRO_FEATURES', 'qti-headless', 'true', 'false', d)}; then
-        sed -i "s/vdf/vdd/g" ${D}/build.prop
-    fi
-
     install -m 0755 ${WORKDIR}/persist-prop.sh -D ${D}${base_sbindir}/persist-prop.sh
     install -m 0644 ${WORKDIR}/persist-prop.service -D ${D}/${systemd_unitdir}/system/persist-prop.service
 }

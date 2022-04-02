@@ -21,16 +21,6 @@ do_install_append(){
 
     install -m 0644 ${WORKDIR}/fstab ${D}${sysconfdir}/fstab
 
-    # Explicitly remove unused entries from fstab when headless is present.
-    if ${@bb.utils.contains('DISTRO_FEATURES', 'qti-headless', 'true', 'false', d)}; then
-        #For /dev/vdd
-               sed -i '/vdd/d' ${D}${sysconfdir}/fstab
-        #For /dev/vde
-               sed -i '/vde/d' ${D}${sysconfdir}/fstab
-        #For /dev/vdh
-               sed -i '/vdh/d' ${D}${sysconfdir}/fstab
-    fi
-
     # Explicitly remove sepolicy entries from fstab when selinux is not present.
     if ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'false', 'true', d)}; then
         #For /run
