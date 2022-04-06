@@ -7,7 +7,7 @@ ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}:"
 
-SRC_URI = "https://source.codeaurora.org/quic/la/platform/system/extras/plain/bootctl/bootctl.cpp?h=LA.AU.0.0.1_rb1.22;downloadfilename=bootctl.cpp;md5sum=093f5752c62bc002fe4d6291dffaf289"
+SRC_URI = "https://git.codelinaro.org/clo/la/platform/system/extras/-/raw/373d3c7257fa815d0b9ee8f16874470a6002042e/bootctl/bootctl.cpp;downloadfilename=bootctl.cpp;protocol={CLO_PROTOCOL};name=bootctl"
 SRC_URI += " file://0001-Enabel-bootctl-for-LV.patch "
 
 S = "${WORKDIR}/${PN}"
