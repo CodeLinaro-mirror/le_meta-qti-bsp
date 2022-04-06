@@ -73,7 +73,6 @@ RDEPENDS_${PN}_append_class-nativesdk = " libdevmapper"
 RDEPENDS_${PN}-scripts = "${PN} (= ${EXTENDPKGV}) \
                           bash \
                           util-linux-lsblk \
-                          util-linux-findmnt \
                           coreutils \
 "
 RRECOMMENDS_${PN}_class-target = "${PN}-scripts (= ${EXTENDPKGV})"

@@ -9,7 +9,7 @@ do_rootfs_append_sdxprairie() {
 # Replace the macro setting in initramfs init scripts for different project
 do_macro_replace () {
     if ${@bb.utils.contains('DISTRO_FEATURES','nad-prod','true','false',d)}; then
-        sed -i "s/UBI_PART_NAME=\"SET_BY_SED\"/UBI_PART_NAME=\"nad_ubi\"/" ${IMAGE_ROOTFS}/init
+        sed -i "s/UBI_PART_NAME=.*/UBI_PART_NAME=\"nad_ubi\"/g" ${IMAGE_ROOTFS}/init
     fi
 
 }

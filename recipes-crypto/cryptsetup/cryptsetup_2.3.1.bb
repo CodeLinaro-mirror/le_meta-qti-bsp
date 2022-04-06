@@ -24,6 +24,8 @@ SRC_URI = "${KERNELORG_MIRROR}/linux/utils/${BPN}/v${@d.getVar('PV').split('.')[
 SRC_URI[md5sum] = "cef482c0579f34d9524311ac70c0875f"
 SRC_URI[sha256sum] = "92aba4d559a2cf7043faed92e0f22c5addea36bd63f8c039ba5a8f3a159fe7d2"
 
+SRC_URI += "${@bb.utils.contains('DISTRO_FEATURES', 'nad-avb', 'file://0001-Disable-direct-IO-use-case.patch', '', d)}"
+
 inherit autotools gettext pkgconfig
 
 # Use openssl because libgcrypt drops root privileges
@@ -40,9 +42,6 @@ PACKAGECONFIG ??= " \
     blkid \
     luks-adjust-xts-keysize \
     openssl \
-"
-PACKAGECONFIG_append_class-target = " \
-    udev \
 "
 
 PACKAGECONFIG[keyring] = "--enable-keyring,--disable-keyring"

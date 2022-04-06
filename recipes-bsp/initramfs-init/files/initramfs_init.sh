@@ -40,16 +40,19 @@ PATH=/sbin:/bin:/usr/sbin:/usr/bin
 # a default volume will be set in function SetArgs()
 
 # System image partition name not including slot suffix
-SYS_PART_NAME="SET_BY_SED"
+SYS_PART_NAME="system"
 
 # UBI partition name (This is used when CONFIG_MTD_UBI_GLUEBI=y)
-UBI_PART_NAME="SET_BY_SED"
+UBI_PART_NAME="nad_ubi"
 
 # Set UBI bad block percentage for current partition
-MTD_UBI_BEB_LIMIT_PER1024="SET_BY_SED"
+MTD_UBI_BEB_LIMIT_PER1024="30"
 
 # UBI device number for system image
-SYS_UBI_DEV_NUM="SET_BY_SED"
+SYS_UBI_DEV_NUM="0"
+
+# root certificate key path
+CERT_CA_PATH="/etc/keys/x509_root.der"
 
 #------------------------------------------------------------
 
@@ -89,19 +92,6 @@ EarlySetup() {
 }
 
 SetArgs() {
-    if [ "x${SYS_PART_NAME}" == x"SET_BY_SED" ]; then
-        SYS_PART_NAME="system"
-    fi
-    if [ "x${UBI_PART_NAME}" == x"SET_BY_SED" ]; then
-        UBI_PART_NAME="nad_ubi"
-    fi
-    if [ "x${MTD_UBI_BEB_LIMIT_PER1024}" == x"SET_BY_SED" ]; then
-        MTD_UBI_BEB_LIMIT_PER1024="30"
-    fi
-
-    if [ "x${SYS_UBI_DEV_NUM}" == x"SET_BY_SED" ]; then
-        SYS_UBI_DEV_NUM="0"
-    fi
 
     # Root image name
     DM_SYST_NAME="${SYS_PART_NAME}"
@@ -202,6 +192,22 @@ MountSystem () {
                 if [ $? -ne ${STATUS_OK} ]; then
                     echo Error: MountSystem no device: ${block_device} found
                     return ${STATUS_ERR}
+                fi
+            fi
+
+            if grep 'nad_avb=1' /proc/cmdline > /dev/null; then
+                dm_verity_device=/dev/mapper/${DM_SYST_NAME}
+                verified-boot -n ${DM_SYST_NAME} -d $block_device -k ${CERT_CA_PATH}
+                if [ $? -ne 0 ] ; then
+                    echo "Created dm-verity device ${dm_verity_device} failed."
+                    return ${STATUS_ERR}
+                fi
+                WaitDevReady "-b" "${dm_verity_device}"
+                if [ $? -ne 0 ]; then
+                   echo "Failed to wait on ${dm_verity_device}, exiting."
+                   return ${STATUS_ERR}
+                else
+                    block_device=${dm_verity_device}
                 fi
             fi
 
