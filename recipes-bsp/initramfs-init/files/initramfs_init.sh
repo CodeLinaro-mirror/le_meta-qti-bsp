@@ -51,6 +51,9 @@ MTD_UBI_BEB_LIMIT_PER1024="SET_BY_SED"
 # UBI device number for system image
 SYS_UBI_DEV_NUM="SET_BY_SED"
 
+# root certificate key path
+CERT_CA_PATH="SET_BY_SED"
+
 #------------------------------------------------------------
 
 # Temporary rootfs mount node
@@ -101,6 +104,10 @@ SetArgs() {
 
     if [ "x${SYS_UBI_DEV_NUM}" == x"SET_BY_SED" ]; then
         SYS_UBI_DEV_NUM="0"
+    fi
+
+    if [ "x${CERT_CA_PATH}" == x"SET_BY_SED" ]; then
+        CERT_CA_PATH="/etc/keys/x509_root.der"
     fi
 
     # Root image name
@@ -202,6 +209,22 @@ MountSystem () {
                 if [ $? -ne ${STATUS_OK} ]; then
                     echo Error: MountSystem no device: ${block_device} found
                     return ${STATUS_ERR}
+                fi
+            fi
+
+            if grep 'nad_avb=1' /proc/cmdline > /dev/null; then
+                dm_verity_device=/dev/mapper/${DM_SYST_NAME}
+                verified-boot -n ${DM_SYST_NAME} -d $block_device -k ${CERT_CA_PATH}
+                if [ $? -ne 0 ] ; then
+                    echo "Created dm-verity device ${dm_verity_device} failed."
+                    return ${STATUS_ERR}
+                fi
+                WaitDevReady "-b" "${dm_verity_device}"
+                if [ $? -ne 0 ]; then
+                   echo "Failed to wait on ${dm_verity_device}, exiting."
+                   return ${STATUS_ERR}
+                else
+                    block_device=${dm_verity_device}
                 fi
             fi
 
