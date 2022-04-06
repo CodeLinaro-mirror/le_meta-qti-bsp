@@ -8,6 +8,7 @@ ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 
 PR = "r0"
 DEPENDS += "zlib libcutils-native liblog-native libbase-native libsparse-native"
+DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'nad-prod', 'libutils-native', '', d)}"
 
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI   = "file://system/core/"
@@ -15,6 +16,8 @@ SRC_URI   = "file://system/core/"
 S = "${WORKDIR}/system/core"
 
 EXTRA_OECONF = " --with-host-os=${HOST_OS}"
+EXTRA_OECONF += " ${@bb.utils.contains('DISTRO_FEATURES', 'nad-stream-update', '--disable-fastboot', '', d)}"
+EXTRA_OECONF += " ${@bb.utils.contains('DISTRO_FEATURES', 'nad-stream-update', '--enable-libfsmgr', '', d)}"
 
 #TODO: Install host bins
 do_install_append () {

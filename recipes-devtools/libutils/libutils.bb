@@ -8,6 +8,8 @@ ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 
 PR = "r1"
 
+BBCLASSEXTEND = " ${@bb.utils.contains('DISTRO_FEATURES', 'nad-stream-update', 'native', '', d)}"
+
 FILESPATH =+ "${WORKSPACE}/system/core/:"
 SRC_URI   = "file://libutils"
 
