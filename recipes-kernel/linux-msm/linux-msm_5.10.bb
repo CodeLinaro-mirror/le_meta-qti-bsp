@@ -250,6 +250,11 @@ do_deploy() {
     for dtbof in $(find . -name "*.dtbo") ; do
         install -m 0644 $dtbof ${DEPLOYDIR}/DTOverlays
     done
+    install -d ${DEPLOYDIR}/kernel_modules
+    cd ${KERNEL_PREBUILT_DISTDIR}
+    for kmod in $(find . -name "*.ko") ; do
+        install -m 0644 $kmod ${DEPLOYDIR}/kernel_modules
+    done
 }
 
 # Put the zImage in the kernel-dev pkg
