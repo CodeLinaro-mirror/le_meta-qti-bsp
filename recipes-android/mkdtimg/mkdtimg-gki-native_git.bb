@@ -17,17 +17,23 @@ do_configure[noexec] = "1"
 
 SYSROOT_PREPROCESS_FUNCS_remove = "relocatable_binaries_preprocess"
 SYSROOT_PREPROCESS_FUNCS_remove = "relocatable_native_pcfiles"
-SSTATEPOSTUNPACKFUNCS_remove = "uninative_changeinterp"
 INHIBIT_SYSROOT_STRIP = "1"
+
+# uninative.bbclass by default gets inherited into all native recipes.
+# This class provides uninative_changeinterp function which eliminates
+# any host-dependencies from native bins. This alteration is breaking
+# mkdtimg.py and to disable it, defined custom function to do nothing.
+python uninative_changeinterp () {
+    return
+}
 
 do_install() {
     # NOTE: mkdtboimg.py is not a python script but a precompiled binary.
     # It requires native libs like libc++.so to run. Copy these libs from
-    # kernel prebuilt paths and set LD_LIBRARY_PATH to link. This tool isn't
-    # functional with yocto's elf utils. Copy requied elf headers along side.
+    # kernel prebuilt paths into a relative directory to link. This tool isn't
+    # functional with yocto's elf utils eaither. So copy requried elf headers
+    # from kernel prebuilt paths.
     install -d ${D}${bindir}/mkdtboimg/bin
-    # install -m 0755 ${S}/bin/mkdtboimg.py ${D}${bindir}/mkdtboimg/bin/mkdtboimg.py
-    # install -m 0755 ${S}/bin/ufdt_apply_overlay ${D}${bindir}/mkdtboimg/bin/ufdt_apply_overlay
 
     for b in ${S}/bin/*; do
         install -m 0755 $b -D ${D}/${bindir}/mkdtboimg/bin/
