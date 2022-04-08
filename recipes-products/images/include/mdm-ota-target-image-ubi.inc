@@ -45,10 +45,18 @@ def nand_set_vars_and_get_dependencies(d):
         d.setVar('GENERATE_AB_OTA_PACKAGE_UBI', "0");
         return " machine-recovery-image releasetools-native"
 
+def check_stream_dependencies(d):
+    if bb.utils.contains('DISTRO_FEATURES', 'nad-stream-update', True, False, d):
+        # Generate payload.bin streaming update.
+        return " payload-gen-native"
+    else:
+        return ""
+
 # Add tasks to generate recovery image, OTA zip files
 python __anonymous () {
     if bb.utils.contains('IMAGE_FSTYPES', 'ubi', True, False, d):
         d.appendVar('DEPENDS', nand_set_vars_and_get_dependencies(d));
+        d.appendVar('DEPENDS', check_stream_dependencies(d));
         if (d.getVar('RECOVERY_IMAGE_UBI', True) == '1' or
                 d.getVar('GENERATE_AB_OTA_PACKAGE_UBI', True) == '1'):
             bb.build.addtask('do_recovery_ubi', 'do_build', 'do_image_ubi', d)
@@ -328,6 +336,7 @@ do_gen_otazip_ubi() {
     cd ${TMPDIR}/work/x86_64-linux/releasetools-native/1.0-r0/releasetools && ./full_ota.sh target-files-ubi.zip ${IMAGE_ROOTFS} ubi $block_based
 
     cd ${TMPDIR}/work/x86_64-linux/releasetools-native/1.0-r0/releasetools && cp update_ubi.zip target-files-ubi.zip ${DEPLOY_DIR_IMAGE_NAND}
+
 }
 
 do_recovery_ubi_ab() {
@@ -351,6 +360,11 @@ do_gen_otazip_ubi_util() {
     cd ${TMPDIR}/work/x86_64-linux/releasetools-native/1.0-r0/releasetools && ./full_ota.sh target-files-ubi$1.zip ${IMAGE_ROOTFS} ubi$1 $block_based
 
     cd ${TMPDIR}/work/x86_64-linux/releasetools-native/1.0-r0/releasetools && cp update_ubi$1.zip target-files-ubi$1.zip ${DEPLOY_DIR_IMAGE_NAND}
+
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'nad-stream-update', 'true', 'false', d)}; then
+       cd ${TMPDIR}/work/x86_64-linux/payload-gen-native/1.0-r0/payload/ && ./gen_full_stream.sh ${TMPDIR}/work/x86_64-linux/releasetools-native/1.0-r0/releasetools/target-files-ubi_ab.zip
+       cd ${TMPDIR}/work/x86_64-linux/payload-gen-native/1.0-r0/payload/ && cp payload.bin properties.txt ${DEPLOY_DIR_IMAGE_NAND}
+    fi
 }
 
 do_gen_otazip_ubi_ab() {
