@@ -1,3 +1,3 @@
-SRC_URI = "git://source.codeaurora.org/quic/le/AGL/apps/hvac.git;protocol=https;branch=apps/hvac/dab"
+SRC_URI = "${CLO_LE_GIT}/AGL/apps/hvac.git;protocol=https;branch=caf_migration/apps/hvac/dab"
 
 REMOVE_LIBTOOL_LA = "0"

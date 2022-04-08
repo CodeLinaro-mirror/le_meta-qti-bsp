@@ -1,3 +1,3 @@
-SRC_URI = "git://source.codeaurora.org/quic/le/AGL/apps/mixer.git;protocol=https;branch=apps/mixer/dab"
+SRC_URI = "${CLO_LE_GIT}/AGL/apps/mixer.git;protocol=https;branch=caf_migration/apps/mixer/dab"
 
 REMOVE_LIBTOOL_LA = "0"

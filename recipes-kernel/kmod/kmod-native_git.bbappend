@@ -1,7 +1,7 @@
 
 python do_getpatches() {
     import os
-    cmd = "wget https://source.codeaurora.org/quic/la/platform/external/kmod/patch/?id=4c30a11d5fa84ebfdd3a8f05fa4ba1c16c074f43 -O 0001_depmod.patch"
+    cmd = "wget https://git.codelinaro.org/clo/la/platform/external/kmod/-/commit/4c30a11d5fa84ebfdd3a8f05fa4ba1c16c074f43.patch -O 0001_depmod.patch"
     os.system(cmd)
     os.rename("0001_depmod.patch", "../0001_depmod.patch")
 }

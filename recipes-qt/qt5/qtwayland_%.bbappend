@@ -5,7 +5,7 @@ FILESEXTRAPATHS_append := ":${THISDIR}/${PN}"
 python do_getpatches() {
     import os
 
-    cmd = "mkdir -p ${WORKSPACE}/poky/meta-qti-bsp/recipes-qt/qt5/qtwayland && (wget https://source.codeaurora.org/quic/le/AGL/meta-agl-demo/plain/recipes-qt/qt5/qtwayland/0001-Avoid-attaching-NULL-buffer-while-hiding-EGL-windows.patch?h=automotivelinux/chinook -O ${WORKSPACE}/poky/meta-qti-bsp/recipes-qt/qt5/qtwayland/0001-Avoid-attaching-NULL-buffer-while-hiding-EGL-windows.patch || pwd)"
+    cmd = "mkdir -p ${WORKSPACE}/poky/meta-qti-bsp/recipes-qt/qt5/qtwayland && (wget https://git.codelinaro.org/clo/le/AGL/meta-agl-demo/-/raw/caf_migration/automotivelinux/chinook/recipes-qt/qt5/qtwayland/0001-Avoid-attaching-NULL-buffer-while-hiding-EGL-windows.patch -O ${WORKSPACE}/poky/meta-qti-bsp/recipes-qt/qt5/qtwayland/0001-Avoid-attaching-NULL-buffer-while-hiding-EGL-windows.patch || pwd)"
 
     os.system(cmd)
 }

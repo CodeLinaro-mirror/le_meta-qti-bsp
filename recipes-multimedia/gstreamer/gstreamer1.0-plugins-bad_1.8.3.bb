@@ -11,7 +11,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=73a5855a8119deb017f5f13cf327095d \
 
 FILESPATH =+ "${WORKSPACE}/gstreamer:"
 SRC_URI = "file://gst-plugins-bad"
-SRC_URI += "${CAF_GIT}/gstreamer/common;protocol=https;destsuffix=gst-plugins-bad/common;branch=gstreamer/common/master;name=common"
+SRC_URI += "${CLO_LE_GIT}/gstreamer/common;protocol=https;destsuffix=gst-plugins-bad/common;branch=caf_migration/gstreamer/common/master;name=common"
 SRC_URI_remove = " \
     file://0001-introspection.m4-prefix-pkgconfig-paths-with-PKG_CON.patch \
     file://0001-Makefile.am-don-t-hardcode-libtool-name-when-running.patch \

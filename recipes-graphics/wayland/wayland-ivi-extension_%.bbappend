@@ -9,7 +9,7 @@ SRCREV = "44598504503eea5ac7f94c88477a5a78bda01f30"
 python do_getpatches() {
     import os
 
-    cmd = "mkdir -p ${WORKSPACE}/poky/meta-qti-bsp/recipes-graphics/wayland/wayland-ivi-extension && (wget https://source.codeaurora.org/quic/le/AGL/meta-agl-demo/plain/recipes-graphics/wayland/wayland-ivi-extension/0001-wayland-ivi-extension-patch-for-wl-shell-emulator.patch?h=automotivelinux/chinook -O ${WORKSPACE}/poky/meta-qti-bsp/recipes-graphics/wayland/wayland-ivi-extension/0001-wayland-ivi-extension-patch-for-wl-shell-emulator.patch || pwd)"
+    cmd = "mkdir -p ${WORKSPACE}/poky/meta-qti-bsp/recipes-graphics/wayland/wayland-ivi-extension && (wget https://git.codelinaro.org/clo/le/AGL/meta-agl-demo/-/raw/caf_migration/automotivelinux/chinook/recipes-graphics/wayland/wayland-ivi-extension/0001-wayland-ivi-extension-patch-for-wl-shell-emulator.patch -O ${WORKSPACE}/poky/meta-qti-bsp/recipes-graphics/wayland/wayland-ivi-extension/0001-wayland-ivi-extension-patch-for-wl-shell-emulator.patch || pwd)"
     os.system(cmd)
 }
 

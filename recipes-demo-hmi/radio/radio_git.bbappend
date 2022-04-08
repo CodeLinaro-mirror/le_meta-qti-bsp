@@ -1,4 +1,4 @@
-SRC_URI = "git://source.codeaurora.org/quic/le/AGL/apps/radio.git;protocol=https;branch=apps-radio/dab \
+SRC_URI = "${CLO_LE_GIT}/AGL/apps/radio.git;protocol=https;branch=caf_migration/apps-radio/dab \
            file://presets-ALS.conf \
            file://presets-CES.conf \
            file://presets-FOSDEM.conf \

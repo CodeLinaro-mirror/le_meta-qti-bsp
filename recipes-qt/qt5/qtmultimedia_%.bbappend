@@ -5,7 +5,7 @@ FILESEXTRAPATHS_append := ":${THISDIR}/${PN}"
 python do_getpatches() {
     import os
 
-    cmd = "mkdir -p ${WORKSPACE}/poky/meta-qti-bsp/recipes-qt/qt5/qtmultimedia && (wget https://source.codeaurora.org/quic/le/AGL/meta-agl-demo/plain/recipes-qt/qt5/qtmultimedia/0001-GStreamer-support-cover-art.patch?h=automotivelinux/chinook -O ${WORKSPACE}/poky/meta-qti-bsp/recipes-qt/qt5/qtmultimedia/0001-GStreamer-support-cover-art.patch || pwd) && (wget https://source.codeaurora.org/quic/le/AGL/meta-agl-demo/plain/recipes-qt/qt5/qtmultimedia/0001-GStreamer-support-date-time-type-in-metadata.patch?h=automotivelinux/chinook -O ${WORKSPACE}/poky/meta-qti-bsp/recipes-qt/qt5/qtmultimedia/0001-GStreamer-support-date-time-type-in-metadata.patch || pwd)"
+    cmd = "mkdir -p ${WORKSPACE}/poky/meta-qti-bsp/recipes-qt/qt5/qtmultimedia && (wget https://git.codelinaro.org/clo/le/AGL/meta-agl-demo/-/raw/caf_migration/automotivelinux/chinook/recipes-qt/qt5/qtmultimedia/0001-GStreamer-support-cover-art.patch -O ${WORKSPACE}/poky/meta-qti-bsp/recipes-qt/qt5/qtmultimedia/0001-GStreamer-support-cover-art.patch || pwd) && (wget https://git.codelinaro.org/clo/le/AGL/meta-agl-demo/-/raw/caf_migration/automotivelinux/chinook/recipes-qt/qt5/qtmultimedia/0001-GStreamer-support-date-time-type-in-metadata.patch -O ${WORKSPACE}/poky/meta-qti-bsp/recipes-qt/qt5/qtmultimedia/0001-GStreamer-support-date-time-type-in-metadata.patch || pwd)"
 
     os.system(cmd)
 }
