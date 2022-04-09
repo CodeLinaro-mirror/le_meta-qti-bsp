@@ -15,6 +15,7 @@ SRC_URI = "\
     file://0001-libdp-add-support-for-autoconf-build.patch \
     file://0002-libdp-update-fs_mgr-to-work-in-LV.patch \
     file://0001-liblp-Expand-the-metadata-header-for-future-use.patch \
+    file://0001-libdp-Create-symlink-for-dynamic-partitions.patch \
 "
 
 S = "${WORKDIR}/git"
