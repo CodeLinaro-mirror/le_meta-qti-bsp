@@ -10,6 +10,7 @@ SRC_URI = "git://source.codeaurora.org/quic/la/platform/system/core;protocol=htt
            file://0001-libdp-add-support-for-autoconf-build.patch \
            file://0002-libdp-update-fs_mgr-to-work-in-LV.patch \
            file://0001-liblp-Expand-the-metadata-header-for-future-use.patch \
+           file://0001-libdp-Create-symlink-for-dynamic-partitions.patch \
            "
 SRCREV = "b94377adcbb3377a89edc7939d98ce76ccda1398"
 
