@@ -7,11 +7,11 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/GPL-2.0;md5=80
 KTF_MODULE_NAME = "ktf"
 
 SRC_URI = "\
-    git://source.codeaurora.org/quic/le/external/oracle/ktf;protocol=http;branch=circumflex/master \
+    ${CLO_LE_GIT}/external/oracle/ktf;protocol=${CLO_PROTOCOL};nobranch=1;name=ktf \
     file://0001-Remove-Wno-packed-bitfield-compat-option-in-Makefile.patch \
 "
 
-SRCREV = "25c855b0c5c2f3903ce915ece1586f3a87c710f4"
+SRCREV_ktf = "25c855b0c5c2f3903ce915ece1586f3a87c710f4"
 S = "${WORKDIR}/git"
 MODULES_PATH = "${PKGDEST}/${PN}/${nonarch_base_libdir}/modules/${KERNEL_VERSION}/unit_test/"
 
