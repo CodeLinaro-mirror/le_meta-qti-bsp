@@ -74,7 +74,7 @@ fde_setup () {
 
 seed_data() {
     echo "All data within /data would be lost"
-    mkfs -t ext4 $DEV_PATH/$DEV_NAME
+    /sbin/mkfs.ext4  $DEV_PATH/$DEV_NAME
     if [ $? -ne 0 ] ; then
         echo " failed to format data"
         return 1
@@ -102,7 +102,6 @@ seed_data() {
     if [ ! -d ${LOGS_DIR} ]; then
        mkdir ${LOGS_DIR}
     fi
-
     #All done, sync it up
     sync
     return 0
