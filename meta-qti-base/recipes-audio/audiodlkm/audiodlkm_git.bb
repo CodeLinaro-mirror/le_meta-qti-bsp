@@ -13,6 +13,7 @@ S = "${WORKDIR}/vendor/qcom/opensource/audio-kernel"
 inherit module module-sign qperf
 
 EXTRA_OEMAKE += "TARGET_SUPPORT=${@bb.utils.contains('BASEMACHINE', 'sa81x5', 'sa8155', '${BASEMACHINE}', d)}"
+EXTRA_OEMAKE += "AR_SUPPORT=${@bb.utils.contains('MACHINE_FEATURES', 'qti-audio-ar', 'yes', 'no', d)}"
 
 do_configure() {
     cp -f ${WORKDIR}/vendor/qcom/opensource/audio-kernel/Makefile.am ${WORKDIR}/vendor/qcom/opensource/audio-kernel/Makefile
