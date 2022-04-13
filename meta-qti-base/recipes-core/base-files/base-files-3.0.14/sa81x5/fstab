@@ -36,7 +36,7 @@ tmpfs                /var/volatile   tmpfs     defaults,rootcontext=system_u:obj
 tmpfs                /media/ram      tmpfs     defaults,noauto       0  0
 
 PARTLABEL=userdata   /data           auto      defaults,noauto_da_alloc,discard,nodev,nofail   0  2
-PARTLABEL=bluetooth  /bluetooth      auto      defaults,ro,slotselect           0  0
+PARTLABEL=bluetooth  /bluetooth      auto      defaults,ro,slotselect,nofail   0  0
 PARTLABEL=dsp        /dsp            auto      defaults,ro,slotselect           0  0
 PARTLABEL=modem      /firmware       auto      defaults,ro,slotselect           0  0
 PARTLABEL=persist    /var            auto      defaults                         0  0
