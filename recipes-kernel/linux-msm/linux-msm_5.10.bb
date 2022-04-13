@@ -253,13 +253,14 @@ do_deploy() {
     install -m 0644 vmlinux ${DEPLOYDIR}
     install -m 0644 System.map ${DEPLOYDIR}
 
+    install -d ${DEPLOYDIR}/kernel_dtbs
     for dtbf in ${KERNEL_DTB_NAMES}; do
-        install -m 0644 $dtbf ${DEPLOYDIR}
+        install -m 0644 $dtbf ${DEPLOYDIR}/kernel_dtbs
     done
-    install -d ${DEPLOYDIR}/DTOverlays
     for dtbof in $(find . -name "*.dtbo") ; do
-        install -m 0644 $dtbof ${DEPLOYDIR}/DTOverlays
+        install -m 0644 $dtbof ${DEPLOYDIR}/kernel_dtbs
     done
+
     install -d ${DEPLOYDIR}/kernel_modules
     cd ${KERNEL_PREBUILT_DISTDIR}
     for kmod in $(find . -name "*.ko") ; do

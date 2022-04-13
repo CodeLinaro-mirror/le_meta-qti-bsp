@@ -183,6 +183,50 @@ python rootfs_ignore_packages() {
     d.setVar("PACKAGE_INSTALL_ATTEMPTONLY", ' '.join(atmt_only_pkgs))
 }
 
+# Order task dependencies between boot and dtbo creation
+python () {
+    if (d.getVar("BUILD_WITH_TECHPACKS") or "0") == "1":
+        bb.build.addtask('do_merge_techpack_dtbos', 'do_image', 'do_rootfs', d)
+        bb.build.addtask('do_makeboot', 'do_image_complete', 'do_merge_techpack_dtbos', d)
+        if d.getVar('MACHINE_SUPPORTS_DTBO'):
+           bb.build.addtask('do_makedtbo', 'do_image_complete', 'do_merge_techpack_dtbos', d)
+    else:
+        bb.build.addtask('do_makeboot', 'do_image_complete', 'do_image', d)
+        if d.getVar('MACHINE_SUPPORTS_DTBO'):
+           bb.build.addtask('do_makedtbo', 'do_image_complete', 'do_image', d)
+}
+
+############################################################
+# Merge tech dtbos before generating boot.img and dtbo.img #
+############################################################
+MRGDTBODEPLOYDIR = "${WORKDIR}/deploy-${PN}-mergedtbo-complete"
+python do_merge_techpack_dtbos () {
+    import subprocess
+
+    mrgdtbos_bin_path = d.getVar('STAGING_BINDIR_NATIVE', True) + "/merge_dtbs/merge_dtbs.py"
+    dtbotpdir = d.getVar('DEPLOY_DIR_IMAGE', True) + "/" + "tech_dtbs"
+    dtbokpdir = d.getVar('DEPLOY_DIR_IMAGE', True) + "/" + "kernel_dtbs"
+    dtbodir = d.getVar('DEPLOY_DIR_IMAGE', True) + "/" + "DTOverlays"
+    tp_dtbos_found = False
+    if os.path.exists(dtbotpdir):
+        for f in os.listdir(dtbotpdir):
+            if f.endswith('.dtbo'):
+                  tp_dtbos_found = True
+                  break
+    if tp_dtbos_found:
+        cmd = mrgdtbos_bin_path + " "+ dtbokpdir +" "+ dtbotpdir +" "+ dtbodir
+        bb.debug(1, "merge_techpack_dtbos cmd: %s" % (cmd))
+        try:
+            subprocess.check_output(cmd, shell=True)
+        except RuntimeError as e:
+            bb.error("cmd: %s failed with error %s" % (cmd, str(e)))
+    else:
+        bb.debug(1, "No techpack dtbos to merge")
+        oe.path.copytree(dtbokpdir, dtbodir)
+}
+do_merge_techpack_dtbos[cleandirs] = "${DEPLOY_DIR_IMAGE}/DTOverlays"
+do_merge_techpack_dtbos[depends] += " merge-dtbs-gki-native:do_populate_sysroot"
+
 ################################################
 ############# Generate boot.img ################
 ################################################
@@ -208,7 +252,7 @@ python do_makeboot () {
     if (d.getVar("BOOT_HEADER_VERSION") or "0") != "0":
         xtra_parms += " --header_version " + d.getVar('BOOT_HEADER_VERSION')
         # header version setting expects dtb to be passed seprately but not appended to kernel
-        xtra_parms += " --dtb " + d.getVar('DEPLOY_DIR_IMAGE', True) + "/" + d.getVar('KERNEL_DTB_NAMES').strip()
+        xtra_parms += " --dtb " + d.getVar('DEPLOY_DIR_IMAGE', True) + "/" + "DTOverlays" + "/" + d.getVar('KERNEL_DTB_NAMES').strip()
 
     mkboot_bin_path = d.getVar('STAGING_BINDIR_NATIVE', True) + "/" + d.getVar('MKBOOTUTIL')
     ramdisk_path    = d.getVar('RAMDISK_PATH')
@@ -236,7 +280,7 @@ do_makeboot[dirs]      = "${BOOTIMGDEPLOYDIR}/${IMAGE_BASENAME}"
 # Make sure native tools and vmlinux ready to create boot.img
 do_makeboot[depends] += "virtual/kernel:do_deploy virtual/mkbootimg-native:do_populate_sysroot"
 SSTATETASKS += "do_makeboot"
-SSTATE_SKIP_CREATION_task-make-bootimg = '1'
+SSTATE_SKIP_CREATION_task-makeboot = '1'
 do_makeboot[sstate-inputdirs] = "${BOOTIMGDEPLOYDIR}"
 do_makeboot[sstate-outputdirs] = "${DEPLOY_DIR_IMAGE}"
 do_makeboot[stamp-extra-info] = "${MACHINE_ARCH}"
@@ -246,7 +290,6 @@ python do_makeboot_setscene () {
 }
 addtask do_makeboot_setscene
 
-addtask do_makeboot before do_image_complete
 ################################################
 ############# Generate dtbo.img ################
 ################################################
@@ -274,17 +317,13 @@ python do_makedtbo () {
 do_makedtbo[dirs]      = "${DTBODEPLOYDIR}/${IMAGE_BASENAME}"
 # Make sure dtb files ready to create dtbo.img
 do_makedtbo[depends] += "virtual/kernel:do_deploy virtual/mkdtimg-native:do_populate_sysroot"
+
 SSTATETASKS += "do_makedtbo"
-SSTATE_SKIP_CREATION_task-make-dtboimg = '1'
+SSTATE_SKIP_CREATION_task-makedtbo = '1'
 do_makedtbo[sstate-inputdirs] = "${DTBODEPLOYDIR}"
 do_makedtbo[sstate-outputdirs] = "${DEPLOY_DIR_IMAGE}"
 do_makedtbo[stamp-extra-info] = "${MACHINE_ARCH}"
 
 python do_makedtbo_setscene () {
     sstate_setscene(d)
-}
-
-python () {
-    if d.getVar('MACHINE_SUPPORTS_DTBO'):
-       bb.build.addtask('do_makedtbo', 'do_image', 'do_rootfs', d)
 }
