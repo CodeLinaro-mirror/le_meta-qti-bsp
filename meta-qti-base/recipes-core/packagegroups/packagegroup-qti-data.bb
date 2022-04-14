@@ -17,7 +17,6 @@ RDEPENDS_${PN} += "\
     emac-rps \
     ${@bb.utils.contains('DISTRO_FEATURES', 'qti-lxc', 'usb-adapter-eth', '', d)} \
     ethtool \
-    eth-sysctl-setup \
     iperf3 \
     iproute2 \
     iproute2-ss \
