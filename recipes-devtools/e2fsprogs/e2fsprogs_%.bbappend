@@ -1,5 +1,6 @@
-#Below Package is fetch from codelinaro
-SRC_URI = "${CLO_LE_GIT}/e2fsprogs.git;protocol=https;branch=caf_migration/ext2/master"
+#Below Package is fetch from CLO 
+SRC_URI = "git://git.codelinaro.org/clo/le/e2fsprogs.git;branch=caf_migration/ext2/master;protocol=https"
+
 SRC_URI += "file://remove.ldconfig.call.patch \
             file://run-ptest \
             file://ptest.patch \

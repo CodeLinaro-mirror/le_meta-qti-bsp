@@ -9,7 +9,7 @@ ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 PR = "r1"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
-SRC_URI = "${CLO_LA_GIT}/platform/system/core/;protocol=git;nobranch=1;rev=8fbe56b11ee7c1f8c87e9b71d89caa306c6cdebb;destsuffix=libsync;subpath=libsync;name=libsync"
+SRC_URI = "git://git.codelinaro.org/clo/la/platform/system/core/;protocol=git;nobranch=1;rev=8fbe56b11ee7c1f8c87e9b71d89caa306c6cdebb;destsuffix=libsync;subpath=libsync;name=libsync"
 SRC_URI += "file://configure.ac;subdir=${BPN}"
 SRC_URI += "file://Makefile.am;subdir=${BPN}"
 SRC_URI += "file://libsync.pc.in;subdir=${BPN}"

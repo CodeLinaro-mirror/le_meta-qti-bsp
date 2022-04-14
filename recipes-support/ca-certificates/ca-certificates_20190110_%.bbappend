@@ -1,6 +1,6 @@
-#ca-certificates package is fetch from CAF
+#ca-certificates package is fetch from CLO
 
-SRC_URI = "git://source.codeaurora.org/quic/le/ca-certificates.git;protocol=https;branch=syphilitics/master"
+SRC_URI = "git://git.codelinaro.org/clo/le/ca-certificates.git;protocol=https;branch=caf_migration/syphilitics/master"
 
 SRC_URI += " \
             file://0002-update-ca-certificates-use-SYSROOT.patch \
