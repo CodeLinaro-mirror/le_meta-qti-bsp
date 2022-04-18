@@ -4,15 +4,15 @@ DESCRIPTION = "OEM recovery"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
-HOMEPAGE = "https://source.codeaurora.org/quic/la/platform/vendor/qcom-opensource/recovery-ext/"
+HOMEPAGE = "https://git.codelinaro.org/clo/la/platform/vendor/qcom-opensource/recovery-ext/"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}/:"
 
-SRC_URI = "git://source.codeaurora.org/quic/la/platform/vendor/qcom-opensource/recovery-ext;branch=qcom-devices.lnx.4.0;protocol=https"
+SRC_URI = "${CLO_LA_GIT}/platform/vendor/qcom-opensource/recovery-ext;branch=qcom-devices.lnx.4.0;protocol=${CLO_PROTOCOL};name=recoveryext"
 SRC_URI_append = " file://0001-Enable-gpt-utils-for-LV.patch \
                    file://0002-Add-autotools-support.patch "
 
-SRCREV = "1622ca7dee2a6ab1d45fe4e6e7f0a0f52f3c017a"
+SRCREV_recoveryext = "1622ca7dee2a6ab1d45fe4e6e7f0a0f52f3c017a"
 
 S = "${WORKDIR}/git"
 
