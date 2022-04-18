@@ -6,7 +6,7 @@ LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${WORKDIR}/git/LICENSE;md5=cbbd27594afd089daa160d3a16dd515a"
 
 SRC_URI = "\
-    git://source.codeaurora.org/quic/le/external/oracle/gtest;protocol=git;branch=soppiest/main \
+    git://git.codelinaro.org/clo/le/external/oracle/gtest;protocol=git;branch=soppiest/main \
 "
 
 SRCREV = "d850e144710e330070b756c009749dc7a7302301"

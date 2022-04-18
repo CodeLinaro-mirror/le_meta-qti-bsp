@@ -16,7 +16,7 @@ SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/external/open-avb"
 
-inherit systemd
+inherit systemd pkgconfig
 
 GPTP_AUTO_START_ENABLE = "YES"
 EXTRA_OEMAKE += "${@bb.utils.contains("DISTRO_FEATURES", "systemd", "SYSTEMD_SUPPORT_INCLUDED=1", "SYSTEMD_SUPPORT_INCLUDED=0", d)}"

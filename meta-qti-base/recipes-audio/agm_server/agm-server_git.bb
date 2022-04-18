@@ -22,5 +22,7 @@ do_install_append() {
     fi
 }
 
+RDEPENDS_${PN} = "binder"
+
 SOLIBS = ".so"
 FILES_SOLIBSDEV = ""
