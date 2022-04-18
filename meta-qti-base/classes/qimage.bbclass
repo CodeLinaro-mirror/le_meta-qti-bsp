@@ -75,7 +75,7 @@ do_make_avb_image(){
         overhead_size_kb=$(expr $rootfs_size_kb / 5)
         overhead_size=$(expr $overhead_size_kb \* 1024)
 
-        if [ "$(expr $size_bytes % 4096)" != "0" ]; then
+        if [ "$(expr $overhead_size % 4096)" != "0" ]; then
             overhead_size=$(expr $(expr 4096 - $(expr $overhead_size % 4096)) + $overhead_size)
         fi
         rootfs_partition_size=$(expr $rootfs_size + $overhead_size)
