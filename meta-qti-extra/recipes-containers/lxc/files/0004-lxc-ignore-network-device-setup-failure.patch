@@ -1,0 +1,42 @@
+From fd9c8dc540e6adda6ea9af138824cbd42bbc5ba5 Mon Sep 17 00:00:00 2001
+From: naiwyu <quic_naiwyu@quicinc.com>
+Date: Fri, 15 Apr 2022 15:16:59 +0800
+Subject: [PATCH] lxc: ignore network device setup failure when startup container
+
+---
+ src/lxc/network.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/src/lxc/network.c b/src/lxc/network.c
+index 6bdcd71a5..fa6b37e36
+--- a/src/lxc/network.c
++++ b/src/lxc/network.c
+@@ -3092,8 +3092,10 @@ static int lxc_create_network_priv(struct lxc_handler *handler)
+ 				return log_error_errno(-1, errno, "Failed to setup l2proxy");
+ 		}
+ 
+-		if (netdev_conf[netdev->type](handler, netdev))
+-			return log_error_errno(-1, errno, "Failed to create network device");
++		if (netdev_conf[netdev->type](handler, netdev)) {
++			ERROR("Failed to create network device");
++			continue;
++		}
+ 	}
+ 
+ 	return 0;
+@@ -3552,8 +3554,10 @@ int lxc_setup_network_in_child_namespaces(const struct lxc_conf *conf,
+ 		ret = netdev_ns_conf[netdev->type](netdev);
+ 		if (!ret)
+ 			ret = lxc_network_setup_in_child_namespaces_common(netdev);
+-		if (ret)
+-			return log_error_errno(-1, errno, "Failed to setup netdev");
++		if (ret) {
++			ERROR("Failed to setup netdev");
++			continue;
++		}
+ 	}
+ 
+ 	if (!lxc_list_empty(network))
+-- 
+2.17.1
+
