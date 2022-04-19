@@ -4,7 +4,7 @@ RAMDISKDIR = "${WORKDIR}/ramdisk"
 TOYBOX_RAMDISK ?= "False"
 ENABLE_ADB ?= "True"
 ENABLE_ADB_qti-distro-base-user ?= "False"
-PACKAGE_INSTALL += "${@oe.utils.conditional('ENABLE_ADB', 'True', 'adbd usb-composition', '', d)}"
+PACKAGE_INSTALL += "${@oe.utils.conditional('ENABLE_ADB', 'True', 'adbd usb-composition usb-composition-usbd', '', d)}"
 PACKAGE_INSTALL += "${@oe.utils.conditional('TOYBOX_RAMDISK', 'True', 'toybox mksh gawk coreutils e2fsprogs dosfstools', '', d)}"
 
 do_ramdisk_create[depends] += "virtual/kernel:do_deploy"
@@ -46,6 +46,7 @@ fakeroot do_ramdisk_create() {
             cp ${IMAGE_ROOTFS}/bin/mksh bin/
             cp ${IMAGE_ROOTFS}/usr/bin/gawk bin/
             cp ${IMAGE_ROOTFS}/usr/bin/expr.coreutils bin/
+            cp ${IMAGE_ROOTFS}/usr/bin/tr.coreutils bin/
             cp ${IMAGE_ROOTFS}/usr/sbin/mkfs.vfat.dosfstools bin/
             cp ${IMAGE_ROOTFS}/sbin/mkfs.ext2.e2fsprogs bin/
             cp ${IMAGE_ROOTFS}/sbin/mkfs.ext3 bin/
@@ -53,6 +54,7 @@ fakeroot do_ramdisk_create() {
             ln -s mksh bin/sh
             ln -s gawk bin/awk
             ln -s expr.coreutils bin/expr
+            ln -s tr.coreutils bin/tr
             ln -s mkfs.vfat.dosfstools bin/mkfs.vfat
             ln -s mkfs.ext2.e2fsprogs bin/mkfs.ext2
             # install all the toybox commands
