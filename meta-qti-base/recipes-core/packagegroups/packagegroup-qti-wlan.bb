@@ -17,6 +17,7 @@ RDEPENDS_${PN} += "\
     iw \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-dual-wlan', 'qcacld32-ll-hasting-cnss0', '', d)} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-dual-wlan', 'qcacld32-ll-hasting-cnss2', '', d)} \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-dual-wlan', '', 'qcacld32-ll-hsp', d)} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-dual-wlan', '', 'qcacld32-ll-hasting', d)} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-dual-wlan', '', 'qcacld32-ll-genoa', d)} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-dual-wlan', '', 'qcacld32-ll-rome', d)} \
