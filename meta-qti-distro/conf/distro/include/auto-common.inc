@@ -15,13 +15,13 @@ IMAGE_LINK_NAME = "${IMAGE_BASENAME}-${PRODUCT}"
 DISTRO_FEATURES:append = " pam"
 
 # Video
-DISTRO_FEATURES:append_sa6155 = " qti-carcamsrc qti-fastcv qti-omx"
-DISTRO_FEATURES:append_sa81x5-rt = " qti-carcamsrc qti-fastcv qti-omx"
-DISTRO_FEATURES:append_sa81x5 = " qti-carcamsrc qti-fastcv qti-omx"
-DISTRO_FEATURES:append_sa8295 = " qti-codec2"
-DISTRO_FEATURES:append_qtiquingvm = " qti-omx"
-DISTRO_FEATURES:append_qtiquingvm8295 = " qti-codec2"
-DISTRO_FEATURES:append_qtigvmi3 = " qti-codec2"
+DISTRO_FEATURES:append:sa6155 = " qti-carcamsrc qti-fastcv qti-omx"
+DISTRO_FEATURES:append:sa81x5-rt = " qti-carcamsrc qti-fastcv qti-omx"
+DISTRO_FEATURES:append:sa81x5 = " qti-carcamsrc qti-fastcv qti-omx"
+DISTRO_FEATURES:append:sa8295 = " qti-codec2"
+DISTRO_FEATURES:append:qtiquingvm = " qti-omx"
+DISTRO_FEATURES:append:qtiquingvm8295 = " qti-codec2"
+DISTRO_FEATURES:append:qtigvmi3 = " qti-codec2"
 
 # Display
 DISTRO_FEATURES:append = " wayland"

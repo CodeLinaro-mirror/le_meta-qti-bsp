@@ -75,7 +75,7 @@ KERNEL_PRIORITY = "9001"
 # Add V=1 to KERNEL_EXTRA_ARGS for verbose
 KERNEL_EXTRA_ARGS:append = " O=${B}"
 KERNEL_EXTRA_ARGS:append = " ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'DTC_EXT=${STAGING_BINDIR_NATIVE}/dtc CONFIG_BUILD_ARM64_DT_OVERLAY=y', '', d)}"
-KERNEL_EXTRA_ARGS:append_sa81x5 = " ${@bb.utils.contains('DISTRO_FEATURES', 'qti-lxc', 'CONFIG_AUTO_LXC_OVERLAY=y', '', d)}"
+KERNEL_EXTRA_ARGS:append:sa81x5 = " ${@bb.utils.contains('DISTRO_FEATURES', 'qti-lxc', 'CONFIG_AUTO_LXC_OVERLAY=y', '', d)}"
 
 KBRANCH ?= ""
 KMETA = "kernel-meta"
