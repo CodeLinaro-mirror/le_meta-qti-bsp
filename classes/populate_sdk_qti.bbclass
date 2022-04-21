@@ -40,11 +40,17 @@ python copy_buildsystem_append() {
     # Enable the use of WORKSPACE variable on an extensible SDK
     with open(baseoutpath + '/conf/bblayers.conf', 'a') as f:
         f.write('WORKSPACE = "$' + '{TOPDIR}/src"\n')
-    # Copy linux-msm-artifacts to extensible SDK for building out of the tree kernel modules and dtbo's
-    kernel_src = os.path.abspath(d.getVar('STAGING_KERNEL_DIR') + '/kernel-' + d.getVar('PREFERRED_VERSION_linux-msm'))
-    kernel_dest = baseoutpath + '/tmp/work-shared/' + d.getVar('MACHINE_ARCH') + '/kernel-source/kernel-' + d.getVar('PREFERRED_VERSION_linux-msm')
-    bb.utils.mkdirhier(kernel_dest)
-    cmd = "%s %s %s" % (d.getVar('COPY_DIRECTORY_TREE'), kernel_src, kernel_dest)
+    # Copy kernel artifacts to extensible SDK
+    src_kernel_platform = os.path.abspath(d.getVar('WORKSPACE') + '/kernel-' + d.getVar('PREFERRED_VERSION_linux-msm')) + '/kernel_platform'
+    dest_kernel_platform = baseoutpath + '/src/kernel-' + d.getVar('PREFERRED_VERSION_linux-msm') + '/kernel_platform'
+    bb.utils.mkdirhier(dest_kernel_platform)
+    cmd = "%s %s %s" % (d.getVar('COPY_DIRECTORY_TREE'), src_kernel_platform, dest_kernel_platform)
+    subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
+
+    src_kernel_defconfig =  os.path.abspath(d.getVar('WORKSPACE') + '/kernel-' + d.getVar('PREFERRED_VERSION_linux-msm')) + '/out/' + d.getVar('KERNEL_DEFCONFIG')
+    dest_kernel_defconfig =  baseoutpath + '/src/kernel-' + d.getVar('PREFERRED_VERSION_linux-msm') + '/out/' + d.getVar('KERNEL_DEFCONFIG')
+    bb.utils.mkdirhier(dest_kernel_defconfig)
+    cmd = "%s %s %s" % (d.getVar('COPY_DIRECTORY_TREE'), src_kernel_defconfig, dest_kernel_defconfig)
     subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
 }
 
