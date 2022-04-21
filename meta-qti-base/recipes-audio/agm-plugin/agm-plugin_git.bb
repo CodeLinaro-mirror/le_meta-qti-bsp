@@ -16,7 +16,7 @@ inherit autotools pkgconfig
 
 EXTRA_OECONF += "--with-glib"
 
-do_install_append() {
+do_install:append() {
     install -d ${D}${datadir}/alsa/alsa.conf.d
     install -d ${D}${sysconfdir}/alsa/conf.d
     install -m 0644 ${WORKDIR}/agm.conf ${D}${datadir}/alsa/alsa.conf.d/agm.conf
@@ -30,4 +30,4 @@ do_install_append() {
 
 SOLIBS = ".so"
 FILES_SOLIBSDEV = ""
-FILES_${PN} += "${libdir}/alsa-lib/*.so ${datadir}/alsa/alsa.conf.d/*"
+FILES:${PN} += "${libdir}/alsa-lib/*.so ${datadir}/alsa/alsa.conf.d/*"

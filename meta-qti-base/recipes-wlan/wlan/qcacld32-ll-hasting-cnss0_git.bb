@@ -31,7 +31,7 @@ S = "${WORKDIR}/wlan/qcacld-3.0"
 
 # Explicitly disable HL to enable LL as current WLAN driver is not having
 # simultaneous support of HL and LL.
-EXTRA_OEMAKE_append = " \
+EXTRA_OEMAKE:append = " \
                        CONFIG_CLD_HL_SDIO_CORE=n \
                        CONFIG_CNSS_SDIO=n \
                        CONFIG_QCA_CLD_WLAN_PROFILE=qca6390 \
@@ -65,11 +65,11 @@ _WLAN_CFG_OVERRIDE_METAL = "\
                         CONFIG_HIF_DEBUG=y \
                         CONFIG_HIF_CE_DEBUG_DATA_BUF=y \
                         "
-EXTRA_OEMAKE_append_qtiquingvm = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
-EXTRA_OEMAKE_append_qtiquingvm8295 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
-EXTRA_OEMAKE_append_sa8295 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_METAL}"
+EXTRA_OEMAKE:append_qtiquingvm = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
+EXTRA_OEMAKE:append_qtiquingvm8295 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
+EXTRA_OEMAKE:append_sa8295 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_METAL}"
 
-SYSTEMD_SERVICE_${PN} = "qca6696-module-load.service"
+SYSTEMD_SERVICE:${PN} = "qca6696-module-load.service"
 
 do_install() {
     module_do_install
@@ -103,7 +103,7 @@ do_install() {
     fi
 }
 
-FILES_${PN} += "\
+FILES:${PN} += "\
     ${bindir}/qca6696_load.sh \
     ${systemd_unitdir}/system/* \
     ${sysconfdir}/* \

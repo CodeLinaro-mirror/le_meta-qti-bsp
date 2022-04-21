@@ -21,6 +21,6 @@ do_install() {
   install -m 0644 ${WORKDIR}/setup-network.service ${D}${systemd_unitdir}/system/
 }
 
-SYSTEMD_SERVICE_${PN} = "setup-network.service"
+SYSTEMD_SERVICE:${PN} = "setup-network.service"
 
-RDEPENDS_${PN} += "bash"
+RDEPENDS:${PN} += "bash"

@@ -27,7 +27,7 @@ EXTRA_OECONF += "\
     --disable-static \
 "
 
-do_install_append_class-target() {
+do_install:append:class-target() {
     install -m 0644 -D ${WORKDIR}/50-log.rules ${D}${sysconfdir}/udev/rules.d/50-log.rules
 }
 

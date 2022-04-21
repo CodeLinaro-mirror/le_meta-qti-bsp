@@ -42,6 +42,6 @@ do_install() {
     ln -sf ../../linux-msm ${D}${includedir}/kernel/usr/include
 }
 
-RDEPENDS_${PN}-dev = ""
+RDEPENDS:${PN}-dev = ""
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"

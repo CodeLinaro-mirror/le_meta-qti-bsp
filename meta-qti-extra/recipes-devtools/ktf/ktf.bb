@@ -28,7 +28,7 @@ CPPFLAGS += "-I${STAGING_INCDIR}"
 MODULES_MODULE_SYMVERS_LOCATION = "kernel"
 MODULES_INSTALL_TARGET = ""
 
-do_install_append () {
+do_install:append () {
     install -d ${D}${bindir}
     install -d ${D}${libdir}
     install -d ${D}${base_libdir}/modules/${KERNEL_VERSION}/unit_test
@@ -38,6 +38,6 @@ do_install_append () {
     install -m 0644 ${S}/kernel/*.h ${STAGING_KERNEL_DIR}/include/linux
 }
 
-FILES_${PN} += "${bindir} ${libdir} ${base_libdir}/modules/${KERNEL_VERSION}/unit_test/${KTF_MODULE_NAME}.ko"
-FILES_${PN}-dbg += "${bindir}/.debug/ktfrun ${libdir}/.debug"
+FILES:${PN} += "${bindir} ${libdir} ${base_libdir}/modules/${KERNEL_VERSION}/unit_test/${KTF_MODULE_NAME}.ko"
+FILES:${PN}-dbg += "${bindir}/.debug/ktfrun ${libdir}/.debug"
 FILES_SOLIBSDEV = ""

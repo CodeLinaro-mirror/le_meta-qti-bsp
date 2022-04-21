@@ -21,11 +21,11 @@ inherit cmake
 
 EXTRA_OECMAKE := "-DWITH_ILM_INPUT=1"
 
-FILES_${PN} += " \
+FILES:${PN} += " \
         ${libdir}/weston/* \
         ${datadir}/wayland-protocols \
     "
-FILES_${PN}-dbg += "${libdir}/weston/.debug/*"
-INSANE_SKIP_${PN} = "dev-deps"
+FILES:${PN}-dbg += "${libdir}/weston/.debug/*"
+INSANE_SKIP:${PN} = "dev-deps"
 
 EXTRA_OECMAKE += "-DLIB_SUFFIX=${@d.getVar('baselib', True).replace('lib', '')}"

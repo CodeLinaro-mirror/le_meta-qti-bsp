@@ -8,9 +8,9 @@ PACKAGES = "\
     packagegroup-qti-vnw \
     "
 
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     open-avb \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'ptp-virtual', '', d)} \
     hsi2s \

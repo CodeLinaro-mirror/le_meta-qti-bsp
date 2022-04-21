@@ -1,7 +1,7 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
-SRC_URI_append = " file://blacklist.conf"
+SRC_URI:append = " file://blacklist.conf"
 
-do_install_append () {
+do_install:append () {
     install -Dm644 "${WORKDIR}/blacklist.conf" "${D}${sysconfdir}/modprobe.d/blacklist.conf"
 }

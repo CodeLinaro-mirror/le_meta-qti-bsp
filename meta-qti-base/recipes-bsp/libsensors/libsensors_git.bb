@@ -21,7 +21,7 @@ inherit autotools-brokensep pkgconfig
 
 EXTRA_OECONF = "--with-glib"
 
-do_install_append() {
+do_install:append() {
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
         install -d ${D}${sysconfdir}/udev/rules.d/
         install -m 0444 ${WORKDIR}/61-sensor.rules ${D}${sysconfdir}/udev/rules.d/61-sensor.rules

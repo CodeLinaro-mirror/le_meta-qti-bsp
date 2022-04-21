@@ -18,6 +18,6 @@ inherit lib_package cmake
 EXTRA_OECMAKE = "-DBUILD_SHARED_LIBS=ON"
 
 FILES_SOLIBSDEV = ""
-FILES_${PN} += "${libdir}/*.so"
+FILES:${PN} += "${libdir}/*.so"
 
 BBCLASSEXTEND = "native nativesdk"

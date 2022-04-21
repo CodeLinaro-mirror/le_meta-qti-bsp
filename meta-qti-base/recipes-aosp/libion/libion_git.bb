@@ -22,7 +22,7 @@ EXTRA_OECONF += "\
     --with-sanitized-headers=${STAGING_INCDIR}/linux-msm \
 "
 
-do_install_append() {
+do_install:append() {
     install -d ${D}${includedir}/kernel-headers/linux
     install -m 0644 ${S}/kernel-headers/linux/*.h  ${D}${includedir}/kernel-headers/linux
 }

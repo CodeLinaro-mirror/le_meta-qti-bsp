@@ -13,7 +13,7 @@ SRC_URI = "\
     file://system.prop \
 "
 
-SYSTEMD_SERVICE_${PN} = "persist-prop.service"
+SYSTEMD_SERVICE:${PN} = "persist-prop.service"
 
 inherit systemd useradd
 
@@ -31,4 +31,4 @@ do_install() {
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-FILES_${PN} += "/build.prop"
+FILES:${PN} += "/build.prop"

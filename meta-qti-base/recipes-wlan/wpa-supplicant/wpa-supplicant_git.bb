@@ -21,7 +21,7 @@ S = "${WORKDIR}/external/wpa_supplicant_8/wpa_supplicant"
 
 inherit autotools-brokensep linux-kernel-base pkgconfig systemd
 
-SYSTEMD_SERVICE_${PN} = "wpa_supplicant.service"
+SYSTEMD_SERVICE:${PN} = "wpa_supplicant.service"
 SYSTEMD_AUTO_ENABLE = "disable"
 
 export BINDIR = "${sbindir}"
@@ -81,8 +81,8 @@ do_install() {
     install -m 0644 ${WORKDIR}/99_wpa_supplicant ${D}${sysconfdir}/default/volatiles
 }
 
-CONFFILES_${PN} += "${sysconfdir}/wpa_supplicant.conf"
-FILES_${PN} += "${systemd_unitdir}/system/*"
-FILES_${PN} += "${datadir}"
-FILES_${PN} += "${datadir}/dbus-1/system-services/*"
+CONFFILES:${PN} += "${sysconfdir}/wpa_supplicant.conf"
+FILES:${PN} += "${systemd_unitdir}/system/*"
+FILES:${PN} += "${datadir}"
+FILES:${PN} += "${datadir}/dbus-1/system-services/*"
 

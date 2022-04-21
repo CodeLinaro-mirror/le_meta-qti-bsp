@@ -1,6 +1,6 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
-WIFILES_append = " \
+WIFILES:append = " \
     file://zz-kgsl.rules.in \
     file://zz-ion.rules.in \
 "
@@ -8,7 +8,7 @@ WIFILES_append = " \
 # Disable QTI weston.service, use AGL's weston@.service instead
 SYSTEMD_PACKAGES = ""
 
-do_install_append() {
+do_install:append() {
     # Remove CAF weston.ini to avoid conflict with AGL weston-ini-conf package
     rm -f ${D}${sysconfdir}/xdg/weston/weston.ini
 

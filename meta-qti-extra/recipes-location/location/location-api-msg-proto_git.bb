@@ -15,7 +15,7 @@ S = "${WORKDIR}/qcom-opensource/location/location_api_msg_proto"
 
 inherit autotools-brokensep pkgconfig
 
-do_compile_prepend () {
+do_compile:prepend () {
     echo "Running location_api_msg_protobuf_gen.sh"
     cd ${S}
     ./location_api_msg_protobuf_gen.sh

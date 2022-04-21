@@ -6,7 +6,7 @@ inherit packagegroup
 
 PACKAGES = "${PN}"
 
-RDEPENDS_${PN} = "\
+RDEPENDS:${PN} = "\
     alsa-lib \
     alsa-utils \
     audiodlkm \

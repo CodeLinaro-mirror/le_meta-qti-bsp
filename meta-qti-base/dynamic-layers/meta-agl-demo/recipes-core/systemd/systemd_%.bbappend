@@ -1,5 +1,5 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-SRC_URI_append_with-lsm-smack = " \
+SRC_URI:append_with-lsm-smack = " \
     file://zz-qseecom.rules \
 "

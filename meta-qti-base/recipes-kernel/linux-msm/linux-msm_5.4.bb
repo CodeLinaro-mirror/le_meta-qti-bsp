@@ -9,10 +9,10 @@ DEPENDS += "\
     ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'mkdtimg-native', '', d)} \
     openssl-native rsync-native \
 "
-DEPENDS_append_aarch64 = " libgcc"
+DEPENDS:append:aarch64 = " libgcc"
 
-KERNEL_CC_append_aarch64 = " ${TOOLCHAIN_OPTIONS}"
-KERNEL_LD_append_aarch64 = " ${TOOLCHAIN_OPTIONS}"
+KERNEL_CC:append:aarch64 = " ${TOOLCHAIN_OPTIONS}"
+KERNEL_LD:append:aarch64 = " ${TOOLCHAIN_OPTIONS}"
 
 SRC_URI = "\
     ${PATH_TO_REPO}/kernel/msm-5.4/.git;protocol=${PROTO};destsuffix=kernel/msm-5.4;usehead=1 \
@@ -36,7 +36,7 @@ S = "${WORKDIR}/kernel/msm-5.4"
 
 EXTRA_OEMAKE += "INSTALL_MOD_STRIP=1"
 
-LDFLAGS_aarch64 = "-O1 --hash-style=gnu --as-needed"
+LDFLAGS:aarch64 = "-O1 --hash-style=gnu --as-needed"
 TARGET_CXXFLAGS += "-Wno-format"
 
 python __anonymous () {
@@ -73,9 +73,9 @@ addtask do_uncompressed_kernel_patch after do_install before do_deploy
 
 KERNEL_PRIORITY = "9001"
 # Add V=1 to KERNEL_EXTRA_ARGS for verbose
-KERNEL_EXTRA_ARGS_append = " O=${B}"
-KERNEL_EXTRA_ARGS_append = " ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'DTC_EXT=${STAGING_BINDIR_NATIVE}/dtc CONFIG_BUILD_ARM64_DT_OVERLAY=y', '', d)}"
-KERNEL_EXTRA_ARGS_append_sa81x5 = " ${@bb.utils.contains('DISTRO_FEATURES', 'qti-lxc', 'CONFIG_AUTO_LXC_OVERLAY=y', '', d)}"
+KERNEL_EXTRA_ARGS:append = " O=${B}"
+KERNEL_EXTRA_ARGS:append = " ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'DTC_EXT=${STAGING_BINDIR_NATIVE}/dtc CONFIG_BUILD_ARM64_DT_OVERLAY=y', '', d)}"
+KERNEL_EXTRA_ARGS:append_sa81x5 = " ${@bb.utils.contains('DISTRO_FEATURES', 'qti-lxc', 'CONFIG_AUTO_LXC_OVERLAY=y', '', d)}"
 
 KBRANCH ?= ""
 KMETA = "kernel-meta"
@@ -85,7 +85,7 @@ KCONFIG_MODE = "--alldefconfig"
 KBUILD_DEFCONFIG ?= "${KERNEL_CONFIG}"
 LINUX_VERSION_EXTENSION = "${@['-perf', ''][d.getVar('VARIANT', True) == ('' or 'debug')]}"
 
-do_kernel_metadata_prepend() {
+do_kernel_metadata:prepend() {
     set +e
     if [ -n "${KBUILD_DEFCONFIG}"  ]; then
         if [ -f "${S}/arch/${ARCH}/configs/${KBUILD_DEFCONFIG}"  ]; then
@@ -127,7 +127,7 @@ do_compile () {
 }
 
 do_shared_workdir[dirs] = "${DEPLOYDIR}"
-do_shared_workdir_append () {
+do_shared_workdir:append () {
         cp include/config/auto.conf $kerneldir/include/config/auto.conf
 
         if [ -d arch/${ARCH}/include ]; then
@@ -210,4 +210,4 @@ PACKAGES = "kernel kernel-base kernel-vmlinux kernel-dev kernel-modules"
 INHIBIT_PACKAGE_STRIP = "1"
 KERNEL_VERSION_SANITY_SKIP = "1"
 
-RDEPENDS_${KERNEL_PACKAGE_NAME}-base = ""
+RDEPENDS:${KERNEL_PACKAGE_NAME}-base = ""

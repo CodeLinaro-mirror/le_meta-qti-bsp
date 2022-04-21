@@ -17,7 +17,7 @@ S = "${WORKDIR}/hardware/libhardware"
 
 inherit autotools pkgconfig
 
-do_install_append () {
+do_install:append () {
     # remove headers, use libhardware-headers
     rm -rf ${D}${includedir}/hardware/
 }

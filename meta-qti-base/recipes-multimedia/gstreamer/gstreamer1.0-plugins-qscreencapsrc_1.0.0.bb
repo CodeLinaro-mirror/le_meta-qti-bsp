@@ -39,4 +39,4 @@ CFLAGS += "\
     -DUSE_V6 \
 "
 
-FILES_${PN} += "${libdir}/gstreamer-1.0/*.so"
+FILES:${PN} += "${libdir}/gstreamer-1.0/*.so"

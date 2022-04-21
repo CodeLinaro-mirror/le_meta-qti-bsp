@@ -14,15 +14,15 @@ S = "${WORKDIR}/vendor/qcom/opensource/agm/ipc/SwBinders/agm_server"
 
 inherit autotools pkgconfig systemd
 
-SYSTEMD_SERVICE_${PN} = "agm.service"
+SYSTEMD_SERVICE:${PN} = "agm.service"
 
-do_install_append() {
+do_install:append() {
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
         install -m 0644 ${WORKDIR}/agm.service -D ${D}${systemd_unitdir}/system/agm.service
     fi
 }
 
-RDEPENDS_${PN} = "binder"
+RDEPENDS:${PN} = "binder"
 
 SOLIBS = ".so"
 FILES_SOLIBSDEV = ""

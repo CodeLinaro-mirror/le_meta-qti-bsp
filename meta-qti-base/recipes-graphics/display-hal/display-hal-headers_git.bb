@@ -17,4 +17,4 @@ do_install() {
     install -m 644 ${S}/libqservice/*.h ${D}${includedir}
 }
 
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"

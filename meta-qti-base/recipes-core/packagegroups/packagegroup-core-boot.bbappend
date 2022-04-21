@@ -1,4 +1,4 @@
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     packagegroup-qti-core-boot-prop \
     "

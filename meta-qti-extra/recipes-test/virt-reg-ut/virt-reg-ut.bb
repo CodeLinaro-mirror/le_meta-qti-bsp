@@ -24,6 +24,6 @@ do_install () {
     install -D -m 0644 ${S}/fault_injection_virtio_reg_test.ko ${D}/lib/modules/${KERNEL_VERSION}/unit_test/
 }
 
-FILES_${PN} += "${base_libdir}/modules/${KERNEL_VERSION}/unit_test/virtio_regulator_unit_test.ko"
-FILES_${PN} += "${base_libdir}/modules/${KERNEL_VERSION}/unit_test/kprobe_virtio_regulator_ut.ko"
-FILES_${PN} += "${base_libdir}/modules/${KERNEL_VERSION}/unit_test/fault_injection_virtio_reg_test.ko"
+FILES:${PN} += "${base_libdir}/modules/${KERNEL_VERSION}/unit_test/virtio_regulator_unit_test.ko"
+FILES:${PN} += "${base_libdir}/modules/${KERNEL_VERSION}/unit_test/kprobe_virtio_regulator_ut.ko"
+FILES:${PN} += "${base_libdir}/modules/${KERNEL_VERSION}/unit_test/fault_injection_virtio_reg_test.ko"

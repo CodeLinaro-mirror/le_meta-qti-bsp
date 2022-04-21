@@ -7,10 +7,10 @@ require recipes-products/images/automotive-image.inc
 
 # Remove splash feature added by agl-image-ivi.inc, as psplash does
 # not work
-IMAGE_FEATURES_remove = "splash"
+IMAGE_FEATURES:remove = "splash"
 
 # screen is GPLv3, remove
-IMAGE_INSTALL_remove = "screen"
+IMAGE_INSTALL:remove = "screen"
 
 # enable sparse image to reduce the image size and faster the flash speed.
 IMAGE_FEATURES += "sparse-image"

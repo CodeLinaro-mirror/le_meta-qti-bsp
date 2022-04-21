@@ -31,7 +31,7 @@ S = "${WORKDIR}/wlan/qcacld-3.0"
 
 # Explicitly disable HL to enable LL as current WLAN driver is not having
 # simultaneous support of HL and LL.
-EXTRA_OEMAKE_append = " \
+EXTRA_OEMAKE:append = " \
                        CONFIG_CLD_HL_SDIO_CORE=n \
                        CONFIG_CNSS_SDIO=n \
                        CONFIG_QCA_CLD_WLAN_PROFILE=genoa.pci.debug \
@@ -48,10 +48,10 @@ _WLAN_CFG_OVERRIDE = "\
                       CONFIG_CNSS_GENL=n \
                       "
 
-EXTRA_OEMAKE_append_sa6155 = " WLAN_CFG_OVERRIDE="CONFIG_IPA_DISABLE_OVERRIDE=y ${_WLAN_CFG_OVERRIDE}""
-EXTRA_OEMAKE_append_sa81x5 = " WLAN_CFG_OVERRIDE="${_WLAN_CFG_OVERRIDE}""
+EXTRA_OEMAKE:append_sa6155 = " WLAN_CFG_OVERRIDE="CONFIG_IPA_DISABLE_OVERRIDE=y ${_WLAN_CFG_OVERRIDE}""
+EXTRA_OEMAKE:append_sa81x5 = " WLAN_CFG_OVERRIDE="${_WLAN_CFG_OVERRIDE}""
 
-SYSTEMD_SERVICE_${PN} = "init_qti_wlan_auto.service"
+SYSTEMD_SERVICE:${PN} = "init_qti_wlan_auto.service"
 
 do_install() {
     module_do_install
@@ -91,7 +91,7 @@ do_install() {
     fi
 }
 
-FILES_${PN} += "\
+FILES:${PN} += "\
     ${bindir}/init.qti.wlan_on.sh \
     ${bindir}/init.qti.wlan_off.sh \
 "

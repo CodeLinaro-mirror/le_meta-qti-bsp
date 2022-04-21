@@ -15,17 +15,17 @@ EXTRA_OECONF += "--enable-target=${AUDIO_BUILD_TARGET}"
 EXTRA_OECONF += "--enable-acdbservice=yes"
 EXTRA_OECONF += "--with-glib"
 
-do_install_append() {
+do_install:append() {
     install -d ${D}${sysconfdir}/pulse
     install -m 0755 ${S}/*.cfg -D ${D}${sysconfdir}/pulse
 }
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-FILES_${PN} += "${libdir}/pulse-*/modules/"
-FILES_${PN}-staticdev += "${libdir}/pulse-*/modules/*.a"
-FILES_${PN}-dbg += "${libdir}/pulse-*/modules/.debug"
+FILES:${PN} += "${libdir}/pulse-*/modules/"
+FILES:${PN}-staticdev += "${libdir}/pulse-*/modules/*.a"
+FILES:${PN}-dbg += "${libdir}/pulse-*/modules/.debug"
 
-RDEPENDS_${PN} = "acdbloader"
+RDEPENDS:${PN} = "acdbloader"
 
 AUDIO_BUILD_TARGET ?= "sa8155"

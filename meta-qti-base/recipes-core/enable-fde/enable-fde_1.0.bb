@@ -11,14 +11,14 @@ SRC_URI = "\
 
 inherit systemd
 
-SYSTEMD_SERVICE_${PN} = "enable-fde.service"
-SYSTEMD_AUTO_ENABLE_${PN} = "enable"
+SYSTEMD_SERVICE:${PN} = "enable-fde.service"
+SYSTEMD_AUTO_ENABLE:${PN} = "enable"
 
-do_install_append () {
+do_install:append () {
   install -d ${D}${systemd_system_unitdir}
   install -d ${D}${bindir}
   install -m 0755 ${WORKDIR}/enable-fde.sh ${D}${bindir}/enable-fde.sh
   install -m 0644 ${WORKDIR}/enable-fde.service ${D}${systemd_unitdir}/system/
 }
 
-RDEPENDS_${PN} += "e2fsprogs-mke2fs"
+RDEPENDS:${PN} += "e2fsprogs-mke2fs"

@@ -1,4 +1,4 @@
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     agl-audio-plugin \
     pulseaudio-misc \
     pulseaudio-module-null-source \
