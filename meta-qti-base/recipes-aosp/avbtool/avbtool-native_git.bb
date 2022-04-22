@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=f0f3a517d46b5f0ca048b58f503b6dc1"
 
 PR = "r0"
 
-SRC_URI = "git://source.codeaurora.org/quic/la/platform/external/avb/;protocol=https;nobranch=1"
+SRC_URI = "${CLO_LA_GIT}/platform/external/avb;protocol=${CLO_PROTOCOL};nobranch=1"
 
 SRC_URI_append = " file://0001-avb-use-dm-mod.create-to-replace-of-dm-parameter.patch"
 
