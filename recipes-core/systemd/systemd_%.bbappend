@@ -129,7 +129,7 @@ do_install_append () {
        rm -rf ${D}/lib/systemd/system-generators/systemd-sysv-generator
 
        # Start systemd-udev-trigger.service after sysinit.target
-       if ${@bb.utils.contains_any('DISTRO_NAME','mdm auto', 'true', 'false', d)}; then
+       if ${@bb.utils.contains_any('DISTRO_NAME','mdm auto nad-core', 'true', 'false', d)}; then
            sed -i '/Before=sysinit.target/a After=sysinit.target init_sys_mss.service' ${D}${systemd_unitdir}/system/systemd-udev-trigger.service
            sed -i '/Before=sysinit.target/d' ${D}${systemd_unitdir}/system/systemd-udev-trigger.service
        fi
