@@ -21,7 +21,7 @@ DISTRO_FEATURES:append:sa81x5 = " qti-carcamsrc qti-fastcv qti-omx"
 DISTRO_FEATURES:append:sa8295 = " qti-codec2"
 DISTRO_FEATURES:append:qtiquingvm = " qti-omx"
 DISTRO_FEATURES:append:qtiquingvm8295 = " qti-codec2"
-DISTRO_FEATURES:append:qtigvmi3 = " qti-codec2"
+DISTRO_FEATURES:append:quin-gvm-gen4 = " qti-codec2"
 
 # Display
 DISTRO_FEATURES:append = " wayland"
