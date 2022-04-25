@@ -93,6 +93,7 @@ do_prebuilt_configure() {
     install -d ${B}/include/config
     install -d ${B}/include/generated
     install -d ${B}/scripts
+    install -d ${B}/certs
     # Some of the artifacts needed for module compilation are present under
     # msm-kernel path, for now copy them for this path to avoid build failures.
     # Ask prebuilt providers to make these available in KERNEL_PREBUILT_DISTDIR.
@@ -101,6 +102,15 @@ do_prebuilt_configure() {
     install -m 0644 ../msm-kernel/include/config/kernel.release ${B}/include/config/kernel.release
     install -m 0644 ../msm-kernel/scripts/module.lds ${B}/scripts/module.lds
     install -m 0644 ../msm-kernel/include/generated/utsrelease.h ${B}/include/generated
+    install -m 0644 ../msm-kernel/certs/signing_key.pem ${B}/certs/signing_key.pem
+    install -m 0644 ../msm-kernel/certs/verity_cert.pem ${B}/certs/verity_cert.pem
+    install -m 0644 ../msm-kernel/certs/verity_key.pem ${B}/certs/verity_key.pem
+
+    # update paths of signature checking certificates to reflect current host
+    sed -i -e '/CONFIG_MODULE_SIG_KEY[ =]/d' ${B}/.config
+    echo "CONFIG_MODULE_SIG_KEY="\"${B}/certs/signing_key.pem\" >> ${B}/.config
+    sed -i -e '/CONFIG_SYSTEM_TRUSTED_KEYS[ =]/d' ${B}/.config
+    echo "CONFIG_SYSTEM_TRUSTED_KEYS="\"${B}/certs/verity_cert.pem\" >> ${B}/.config
 
     install -d ${B}/${KERNEL_OUTPUT_DIR}
     for typeformake in ${KERNEL_IMAGETYPE_FOR_MAKE} ; do
