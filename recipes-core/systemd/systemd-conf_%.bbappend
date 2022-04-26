@@ -33,6 +33,11 @@ FILES_${PN} += "${sysconfdir}/sysctl.d/* ${sysconfdir}/security/limits.d/* ${SYS
 
 # journald.conf
 do_install_append() {
+    # Redirect journal logs to console.
+    sed -i '$aForwardToConsole=yes' ${D}${systemd_unitdir}/journald.conf.d/00-${PN}.conf
+    sed -i '$aTTYPath=/dev/ttyMSM0' ${D}${systemd_unitdir}/journald.conf.d/00-${PN}.conf
+    sed -i '$aMaxLevelConsole=warning' ${D}${systemd_unitdir}/journald.conf.d/00-${PN}.conf
+    sed -i '$aReadKMsg=yes' ${D}${systemd_unitdir}/journald.conf.d/00-${PN}.conf
 }
 
 # logind.conf
@@ -43,8 +48,10 @@ do_install_append() {
 
 # system.conf
 do_install_append() {
-    # Set LogTarget as syslog
-    sed -i '$aLogTarget=syslog' ${D}${systemd_unitdir}/system.conf.d/00-${PN}.conf
+    # Redirect system logs to both console and syslog.
+    sed -i '$aStandardOutput=syslog+console' ${D}${systemd_unitdir}/system.conf.d/00-${PN}.conf
+    sed -i '$aTTYPath=/dev/ttyMSM0' ${D}${systemd_unitdir}/system.conf.d/00-${PN}.conf
+    sed -i '$aLogTarget=console' ${D}${systemd_unitdir}/system.conf.d/00-${PN}.conf
 }
 
 # user.conf
