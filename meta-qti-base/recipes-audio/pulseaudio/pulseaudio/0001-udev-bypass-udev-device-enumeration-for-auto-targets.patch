@@ -8,20 +8,21 @@ manager, thus bypass udev enumeration to avoid conflict.
 
 Signed-off-by: Deru Wang <deruwang@codeaurora.org>
 ---
- src/modules/alsa/90-pulseaudio.rules | 3 +++
- 1 file changed, 3 insertions(+)
+ src/modules/alsa/90-pulseaudio.rules | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/src/modules/alsa/90-pulseaudio.rules b/src/modules/alsa/90-pulseaudio.rules
-index d857639..00a36f9 100644
+index d857639..9426cd7 100644
 --- a/src/modules/alsa/90-pulseaudio.rules
 +++ b/src/modules/alsa/90-pulseaudio.rules
-@@ -22,6 +22,9 @@ SUBSYSTEMS=="usb", GOTO="pulseaudio_check_usb"
+@@ -22,6 +22,10 @@ SUBSYSTEMS=="usb", GOTO="pulseaudio_check_usb"
  SUBSYSTEMS=="firewire", GOTO="pulseaudio_firewire_quirk"
  
  SUBSYSTEMS=="platform", DRIVERS=="thinkpad_acpi", ENV{PULSE_IGNORE}="1"
 +DRIVERS=="sa6155-asoc-snd", ENV{PULSE_IGNORE}="1"
 +DRIVERS=="sa8155-asoc-snd", ENV{PULSE_IGNORE}="1"
 +DRIVERS=="sa8295-asoc-snd", ENV{PULSE_IGNORE}="1"
++DRIVERS=="spf-asoc-snd", ENV{PULSE_IGNORE}="1"
  
  # Force enable speaker and internal mic for some laptops
  # This should only be necessary for kernels 3.3, 3.4 and 3.5 (as they are lacking the phantom jack kctls).
