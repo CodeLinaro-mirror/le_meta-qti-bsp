@@ -9,6 +9,7 @@ SRC_URI_append_sdmsteppe = " file://sdmsteppe_iot_configs.cfg"
 
 SRC_URI += "${@bb.utils.contains('DISTRO_FEATURES', 'vbleima', 'file://vbleima.cfg', '', d)}"
 SRC_URI += "${@bb.utils.contains('DISTRO_FEATURES', 'vbleevm', 'file://vbleevm.cfg', '', d)}"
+SRC_URI += "${@bb.utils.contains('DISTRO_FEATURES', 'nad-prod', 'file://nad.cfg', '', d)}"
 
 COMPATIBLE_MACHINE = "(qcs40x|sdxprairie|sdmsteppe|sa515m)"
 
