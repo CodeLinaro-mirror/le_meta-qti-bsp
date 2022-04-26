@@ -1,6 +1,6 @@
 SUMMARY = "Codec2 multimedia framework"
 DESCRIPTION = "Codec2 is a codec framework introduced by Google. This is to eventually replace OpenMax-IL."
-HOMEPAGE = "https://www.codeaurora.org/"
+HOMEPAGE = "https://git.codelinaro.org/"
 SECTION = "multimedia"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${WORKDIR}/frameworks/NOTICE;md5=a3fcbe20ea5ac731ed3aa15fe59ba20a"

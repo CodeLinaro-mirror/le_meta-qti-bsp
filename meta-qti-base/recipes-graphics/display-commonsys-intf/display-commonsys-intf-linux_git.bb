@@ -1,7 +1,7 @@
 SUMMARY = "display commonsys intf Library"
 DESCRIPTION = "Provide common display header files and libraries for \
 other modules to use."
-HOMEPAGE = "https://www.codeaurora.org/"
+HOMEPAGE = "https://git.codelinaro.org/"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"

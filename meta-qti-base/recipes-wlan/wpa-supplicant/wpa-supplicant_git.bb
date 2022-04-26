@@ -1,6 +1,6 @@
 SUMMARY = "Client for Wi-Fi Protected Access (WPA)"
 DESCRIPTION = "WPA supplicant client used for WLAN STA/AP/P2P/WPS such feature test"
-HOMEPAGE = "https://www.codeaurora.org/"
+HOMEPAGE = "https://git.codelinaro.org/"
 LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://${WORKDIR}/external/wpa_supplicant_8/COPYING;md5=279b4f5abb9c153c285221855ddb78cc"
 

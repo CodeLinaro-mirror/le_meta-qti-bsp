@@ -7,7 +7,7 @@ DESCRIPTION = "OpenMAX is a royalty-free, cross-platform API that provides compr
                Besides OMX IL implement, this component also provides a series of hardware accelerated 2d video conversion API, including color space convert, \
                scale and crop for video frame data. \
               "
-HOMEPAGE = "https://www.codeaurora.org"
+HOMEPAGE = "https://git.codelinaro.org"
 SECTION = "multimedia"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${WORKDIR}/hardware/qcom/media/NOTICE;md5=67f520c8e55cf33925e4d738d7f4a5f4"

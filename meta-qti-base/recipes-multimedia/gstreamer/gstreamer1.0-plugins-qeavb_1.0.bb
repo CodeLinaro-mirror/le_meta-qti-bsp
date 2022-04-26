@@ -1,6 +1,6 @@
 SUMMARY = "avb (audio video bridge) plugins for GStreamer"
 DESCRIPTION = "avb (audio video bridge) plugins for GStreamer, receive pcm data or ts data from qavb FE, push the data to downstream to support audio or video playback"
-HOMEPAGE = "https://www.codeaurora.org/"
+HOMEPAGE = "https://git.codelinaro.org/"
 SECTION = "multimedia"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://README;md5=d41d8cd98f00b204e9800998ecf8427e"

@@ -1,6 +1,6 @@
 SUMMARY = "Audio Drivers Kernel Modules"
 DESCRIPTION = "This is the audio driver based on ASoC architecture, used to communicate with DSP."
-HOMEPAGE = "https://www.codeaurora.org"
+HOMEPAGE = "https://git.codelinaro.org"
 LICENSE = "GPL-2.0"
 LIC_FILES_CHKSUM = "file://NOTICE;md5=689b0a45875711dc09b94e4b6524c3cd"
 DEPENDS += "virtual/kernel"

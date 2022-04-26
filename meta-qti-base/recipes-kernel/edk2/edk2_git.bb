@@ -1,12 +1,11 @@
 SUMMARY = "edk2"
 DESCRIPTION = "UEFI bootloader"
-HOMEPAGE = "https://www.codeaurora.org"
+HOMEPAGE = "https://git.codelinaro.org"
 LICENSE = "BSD-2-Clause & BSD-3-Clause"
 LIC_FILES_CHKSUM = "\
     file://${COMMON_LICENSE_DIR}/BSD-2-Clause;md5=cb641bc04cda31daea161b1bc15da69f \
     file://${COMMON_LICENSE_DIR}/BSD-3-Clause;md5=550794465ba0ec5312d6919e203a55f9 \
 "
-
 PROVIDES = "virtual/bootloader"
 
 PR = "r1"

@@ -2,7 +2,8 @@ SUMMARY = "Script and service to populate system properties"
 DESCRIPTION = "Android system properties are a global dictionary of string \
 key/value pairs, used to share system-wide configuration information. The \
 build.prop file contains pesisit system properties."
-HOMEPAGE = "https://www.codeaurora.org/"
+
+HOMEPAGE = "https://git.codelinaro.org/"
 LICENSE = "BSD-3-Clause-Clear"
 LIC_FILES_CHKSUM = "file://${QTI_LICENSE_DIR}/${LICENSE};md5=b796c0007db682166a1721da80267bb2"
 
