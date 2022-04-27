@@ -22,7 +22,7 @@ do_install () {
       install -m 0644 ${WORKDIR}/evdev_load.service  \
           -D ${D}/etc/systemd/system/evdev_load.service
 
-      if ${@bb.utils.contains_any('DISTRO_NAME', 'auto', 'true', 'false', d)}; then
+      if ${@bb.utils.contains_any('DISTRO_NAME', 'auto nad-core', 'true', 'false', d)}; then
         # Enable the service for sockets.target
         install -d ${D}/etc/systemd/system/sockets.target.wants/
         ln -sf ${sysconfdir}/systemd/system/evdev_load.service \
