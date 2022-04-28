@@ -55,7 +55,7 @@ DISTRO_FEATURES:append = " qti-wlan wifi"
 # Support kdump
 #DISTRO_FEATURES:append = " kdump-support"
 
-INCOMPATIBLE_LICENSE = "GPL-3.0 LGPL-3.0 AGPL-3.0"
+INCOMPATIBLE_LICENSE = "${@bb.utils.contains('LAYERSERIES_COMPAT_yocto', 'dunfell', 'GPL-3.0 LGPL-3.0 AGPL-3.0', 'GPL-3.0-only LGPL-3.0-only AGPL-3.0-only', d)}"
 
 IMAGE_FEATURES:append = " read-only-rootfs"
 
