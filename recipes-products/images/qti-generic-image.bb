@@ -16,7 +16,6 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         kernel-modules \
         packagegroup-android-utils-base \
         packagegroup-startup-scripts-base \
-        packagegroup-support-utils \
         systemd-machine-units \
         ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
 "
