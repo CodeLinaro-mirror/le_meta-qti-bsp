@@ -177,10 +177,10 @@ do_deploy () {
     cp  ${STAGING_KERNEL_BUILDDIR}/usr/gen_init_cpio ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr
 
     # Copy Image appended with dtbs to deploydir
-    cat ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} ${B}/arch/${ARCH}/boot/dts/vendor/qcom/*.dtb > ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-dtb-${KERNEL_VERSION}
+    cat ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} ${B}/arch/${ARCH}/boot/dts/vendor/qcom/*.dtb > ${DEPLOYDIR}/${KERNEL_IMAGETYPE}-dtb-${KERNEL_VERSION}
 
     # Make bootimage
-    ${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-dtb-${KERNEL_VERSION} \
+    ${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${DEPLOYDIR}/${KERNEL_IMAGETYPE}-dtb-${KERNEL_VERSION} \
         --ramdisk /dev/null \
         --cmdline "${KERNEL_CMD_PARAMS}" \
         --pagesize ${PAGE_SIZE} \
@@ -189,7 +189,7 @@ do_deploy () {
         --output ${DEPLOYDIR}/${BOOTIMAGE_TARGET}
     # Copy vmlinux and zImage into deploydir for boot.img creation
     install -m 0644 ${KERNEL_OUTPUT_DIR}/${KERNEL_IMAGETYPE} ${DEPLOYDIR}/${KERNEL_IMAGETYPE}
-    install -m 0644 ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-dtb-${KERNEL_VERSION} ${DEPLOYDIR}/${KERNEL_IMAGETYPE}-dtb
+    mv ${DEPLOYDIR}/${KERNEL_IMAGETYPE}-dtb-${KERNEL_VERSION} ${DEPLOYDIR}/${KERNEL_IMAGETYPE}-dtb
     install -m 0644 vmlinux ${DEPLOYDIR}
 
     if ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'true', 'false', d)}; then
