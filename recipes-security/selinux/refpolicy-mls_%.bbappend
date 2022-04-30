@@ -1,5 +1,14 @@
 FILESEXTRAPATHS_append := "${THISDIR}:${THISDIR}/files:"
 
+SRC_URI = "git://github.com/TresysTechnology/refpolicy.git;protocol=https;branch=master;name=refpolicy;destsuffix=refpolicy"
+SRC_URI += "git://github.com/TresysTechnology/refpolicy-contrib.git;protocol=https;branch=master;name=refpolicy-contrib;destsuffix=refpolicy/policy/modules/contrib"
+
+SRC_URI += "file://customizable_types \
+            file://setrans-mls.conf \
+            file://setrans-mcs.conf \
+           "
+
+
 SRCREV_refpolicy := "RELEASE_2_20161023"
 SRCREV_refpolicy-contrib = "RELEASE_2_20161023"
 
@@ -34,3 +43,28 @@ do_patch_append() {
                 sys.stderr.write("Could not append to \"" + policy_file + "\"")
     shutil.rmtree(append_dir)
 }
+
+install_misc_files () {
+        echo  user_tty_device_t >>  ${D}${sysconfdir}/selinux/${POLICY_NAME}/contexts/customizable_types
+
+        # install setrans.conf for mls/mcs policy
+        if [ -f ${WORKDIR}/setrans-${POLICY_TYPE}.conf ]; then
+                install -m 0644 ${WORKDIR}/setrans-${POLICY_TYPE}.conf \
+                        ${D}${sysconfdir}/selinux/${POLICY_NAME}/setrans.conf
+        fi
+
+        # install policy headers
+        oe_runmake 'DESTDIR=${D}' 'prefix=${D}${prefix}' install-headers
+}
+
+do_install () {
+        prepare_policy_store
+        rebuild_policy
+        install_misc_files
+}
+
+do_install_append(){
+        # While building policies on target, Makefile will be searched from SELINUX_DEVEL_PATH
+        echo "SELINUX_DEVEL_PATH=${datadir}/selinux/${POLICY_NAME}/include" > ${D}${sysconfdir}/selinux/sepolgen.conf
+}
+
