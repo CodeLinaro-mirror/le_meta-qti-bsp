@@ -11,7 +11,8 @@ PACKAGES = "\
 ALLOW_EMPTY:${PN} = "1"
 
 RDEPENDS:${PN} += "\
-    open-avb \
+    libgptp-test \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', 'open-avb', d)} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'ptp-virtual', '', d)} \
     hsi2s \
     hsi2s-test \
