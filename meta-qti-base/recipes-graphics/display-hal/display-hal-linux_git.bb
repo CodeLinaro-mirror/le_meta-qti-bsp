@@ -4,9 +4,9 @@ libraries. These libraries serves as an abstraction layer between \
 physical hardware and software. They provide display driver interfaces, \
 allowing program to communicate with the hardware."
 HOMEPAGE = "https://www.codeaurora.org/"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
-${LICENSE};md5=3775480a712fc46a69647678acb234cb"
+${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
 
 DEPENDS += "binder \
             display-commonsys-intf-linux \
