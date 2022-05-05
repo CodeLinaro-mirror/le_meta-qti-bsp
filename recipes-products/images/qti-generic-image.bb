@@ -8,12 +8,15 @@ IMAGE_FEATURES += "ssh-server-openssh"
 # This image doesn't support abl generation
 EXTRA_IMAGEDEPENDS_remove = "edk2"
 
+KERN_MODS ?= "kernel-modules"
+KERN_MODS_waipio = "gki-kernel-modules-second-stage"
+
 CORE_IMAGE_EXTRA_INSTALL += "\
         e2fsprogs \
         e2fsprogs-e2fsck \
         e2fsprogs-mke2fs \
         glib-2.0 \
-        kernel-modules \
+        ${KERN_MODS} \
         packagegroup-android-utils-base \
         packagegroup-startup-scripts-base \
         systemd-machine-units \
