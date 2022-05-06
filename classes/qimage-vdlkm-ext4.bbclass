@@ -30,46 +30,20 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-## Generate dtbo.img
-MKDTUTIL = '${@oe.utils.conditional("PREFERRED_PROVIDER_virtual/mkdtimg-native", "mkdtimg-gki-native", "mkdtboimg/bin/mkdtboimg.py", "mkdtimg", d)}'
-DTBODEPLOYDIR = "${WORKDIR}/deploy-${PN}-dtboimage-complete"
-DTBOIMAGE_TARGET ?= "dtbo.img"
+## Generate vendor_dlkm image
 
-# Create dtbo.img if DTBO support is enabled
-python do_makedtbo () {
-    import subprocess
+# Convert human readable partition sizes into bytes
+VDLKM_IMAGE_ROOTFS_SIZE = "${@get_size_in_bytes(d.getVar('VDLKM_SIZE_EXT4') or '32MB')}"
 
-    mkdtimg_bin_path = d.getVar('STAGING_BINDIR_NATIVE', True) + "/" + d.getVar('MKDTUTIL')
-    dtbodeploydir = d.getVar('DEPLOY_DIR_IMAGE', True) + "/" + "DTOverlays"
-    pagesize = d.getVar("PAGE_SIZE")
-    output = d.getVar('DTBOIMAGE_TARGET', True)
-    # cmd to make dtbo.img
-    cmd = mkdtimg_bin_path + " create "+ output +" --page_size="+ pagesize +" "+ dtbodeploydir + "/*.dtbo"
-    bb.debug(1, "do_makedtbo cmd: %s" % (cmd))
-    try:
-        ret = subprocess.check_output(cmd, shell=True)
-    except RuntimeError as e:
-        bb.error("cmd: %s failed with error %s" % (cmd, str(e)))
+VDLKMIMAGE_TARGET ?= "vendor_dlkm.img"
+VDLKMIMAGE_MAP_TARGET ?= "vendor_dlkm.map"
+
+do_makevdlkm[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
+do_makevdlkm() {
+    make_ext4fs -B ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${VDLKMIMAGE_MAP_TARGET} \
+                -s -l ${VDLKM_IMAGE_ROOTFS_SIZE} \
+                ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${VDLKMIMAGE_TARGET} \
+                ${IMAGE_ROOTFS}/lib/modules
 }
-
-do_makedtbo[dirs]      = "${DTBODEPLOYDIR}/${IMAGE_BASENAME}"
-# Make sure dtb files ready to create dtbo.img
-do_makedtbo[depends] += "virtual/kernel:do_deploy virtual/mkdtimg-native:do_populate_sysroot"
-
-SSTATETASKS += "do_makedtbo"
-SSTATE_SKIP_CREATION_task-makedtbo = '1'
-do_makedtbo[sstate-inputdirs] = "${DTBODEPLOYDIR}"
-do_makedtbo[sstate-outputdirs] = "${DEPLOY_DIR_IMAGE}"
-do_makedtbo[stamp-extra-info] = "${MACHINE_ARCH}"
-
-python do_makedtbo_setscene () {
-    sstate_setscene(d)
-}
-
-# Order task dependencies between dtbo.img and techpack dtbo creation
-python () {
-    if (d.getVar("BUILD_WITH_TECHPACKS") or "0") == "1":
-        bb.build.addtask('do_makedtbo', 'do_image_complete', 'do_merge_techpack_dtbos', d)
-    else:
-        bb.build.addtask('do_makedtbo', 'do_image_complete', 'do_image', d)
-}
+# It must be before do_makesystem to remove /lib/modules
+addtask do_makevdlkm after do_image before do_makesystem

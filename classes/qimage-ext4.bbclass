@@ -1,8 +1,5 @@
 # Convert human readable partition sizes into bytes
-CACHE_IMAGE_ROOTFS_SIZE    = "${@get_size_in_bytes(d.getVar('CACHE_SIZE_EXT4') or '8000KiB')}"
 SYSTEM_IMAGE_ROOTFS_SIZE   = "${@get_size_in_bytes(d.getVar('SYSTEM_SIZE_EXT4') or '256MB')}"
-SYSTEMRW_IMAGE_ROOTFS_SIZE = "${@get_size_in_bytes(d.getVar('SYSTEMRW_SIZE_EXT4') or '8000KiB')}"
-PERSIST_IMAGE_ROOTFS_SIZE  = "${@get_size_in_bytes(d.getVar('PERSIST_SIZE_EXT4') or '6MiB')}"
 USERDATA_IMAGE_ROOTFS_SIZE = "${@get_size_in_bytes(d.getVar('USERDATA_SIZE_EXT4') or '1GB')}"
 
 # if A/B support is supported, generate OTA pkg by default.
@@ -11,6 +8,10 @@ GENERATE_AB_OTA_PACKAGE ?= "${@bb.utils.contains('COMBINED_FEATURES', 'qti-ab-bo
 QIMGEXT4CLASSES  = ""
 QIMGEXT4CLASSES += "${@bb.utils.contains('GENERATE_AB_OTA_PACKAGE', '1', 'ab-ota-ext4', '', d)}"
 QIMGEXT4CLASSES += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-recovery', 'ota-ext4', '', d)}"
+QIMGEXT4CLASSES += "${@bb.utils.contains('MACHINE_MNT_POINTS', '/cache', 'qimage-cache-ext4', '', d)}"
+QIMGEXT4CLASSES += "${@bb.utils.contains('MACHINE_MNT_POINTS', '/persist', 'qimage-persist-ext4', '', d)}"
+QIMGEXT4CLASSES += "${@bb.utils.contains('MACHINE_MNT_POINTS', '/systemrw', 'qimage-systemrw-ext4', '', d)}"
+QIMGEXT4CLASSES += "${@bb.utils.contains('MACHINE_MNT_POINTS', '/lib/modules', 'qimage-vdlkm-ext4', '', d)}"
 
 inherit ${QIMGEXT4CLASSES}
 
@@ -25,11 +26,6 @@ SYSTEMIMAGE_TARGET ?= "system.img"
 SYSTEMIMAGE_MAP_TARGET ?= "system.map"
 USERDATAIMAGE_TARGET ?= "userdata.img"
 USERDATAIMAGE_MAP_TARGET ?= "userdata.map"
-PERSISTIMAGE_TARGET ?= "persist.img"
-PERSISTIMAGE_MAP_TARGET ?= "persist.map"
-DTBOIMAGE_TARGET ?= "dtbo.img"
-CACHEIMAGE_TARGET ?= "cache.img"
-SYSTEMRWIMAGE_TARGET ?= "systemrw.img"
 
 # Ensure SELinux file context variable is defined
 SELINUX_FILE_CONTEXTS ?= ""
@@ -81,7 +77,7 @@ create_symlink_systemd_ext4_mount_rootfs() {
         mountname="${entry:1}"
         # Replace "/" with "-" for systemd to understand mount unit.
         mountname=${mountname//'/'/"-"}
-        if [[ "$mountname" == "firmware" || "$mountname" == "bt_firmware" || "$mountname" == "dsp" ]] && \
+        if [[ "$mountname" == "firmware" || "$mountname" == "bt_firmware" || "$mountname" == "dsp" || "$mountname" == "lib-modules" ]] && \
            [[ "${COMBINED_FEATURES}" =~ .*qti-ab-boot.* ]] ; then
             cp ${IMAGE_ROOTFS_EXT4}/lib/systemd/system/${mountname}-mount-ext4.service ${IMAGE_ROOTFS_EXT4}/lib/systemd/system/${mountname}-mount.service
             ln -sf ${systemd_unitdir}/system/${mountname}-mount.service ${IMAGE_ROOTFS_EXT4}/lib/systemd/system/local-fs.target.requires/${mountname}-mount.service
@@ -179,51 +175,3 @@ do_makeuserdata() {
 }
 
 addtask do_makeuserdata after do_image before do_build
-
-################################################
-############ Generate persist image ############
-################################################
-do_makepersist[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
-
-do_makepersist() {
-    make_ext4fs ${PERSISTFS_CONFIG} ${MAKEEXT4_MOUNT_OPT} \
-                -B ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${PERSISTIMAGE_MAP_TARGET} \
-                -s -l ${PERSIST_IMAGE_ROOTFS_SIZE} \
-                ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${PERSISTIMAGE_TARGET} \
-                ${IMAGE_ROOTFS}/persist
-}
-# It must be before do_makesystem to remove /persist
-addtask do_makepersist after do_image before do_makesystem
-
-CACHE_IMG_ENABLE = "${@bb.utils.contains('MACHINE_MNT_POINTS', '/cache', 'true', 'false', d)}"
-SYSTEMRW_IMG_ENABLE = "${@bb.utils.contains('MACHINE_MNT_POINTS', '/systemrw', 'true', 'false', d)}"
-
-################################################
-############ Generate cache image ############
-################################################
-do_makecache[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
-
-do_makecache() {
-    make_ext4fs  -s -l ${CACHE_IMAGE_ROOTFS_SIZE} \
-                ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${CACHEIMAGE_TARGET}
-}
-
-################################################
-############ Generate systemrw image ############
-################################################
-do_makesystemrw[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
-
-do_makesystemrw() {
-    make_ext4fs  -a /systemrw ${IMAGE_EXT4_SELINUX_OPTIONS} \
-                 -s -b 4096 -l ${SYSTEMRW_IMAGE_ROOTFS_SIZE} \
-                 ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMRWIMAGE_TARGET}
-}
-
-python() {
-    systemrw_img = d.getVar("SYSTEMRW_IMG_ENABLE")
-    cache_img = d.getVar("CACHE_IMG_ENABLE")
-    if systemrw_img == "true":
-       bb.build.addtask('do_makesystemrw', 'do_makesystem', 'do_image', d)
-    if cache_img == "true":
-       bb.build.addtask('do_makecache', 'do_makesystem', 'do_image', d)
-}
