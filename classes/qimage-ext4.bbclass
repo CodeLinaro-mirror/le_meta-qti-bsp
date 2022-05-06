@@ -79,6 +79,8 @@ create_symlink_systemd_ext4_mount_rootfs() {
     # Symlink ext4 mount files to systemd targets
     for entry in ${MACHINE_MNT_POINTS}; do
         mountname="${entry:1}"
+        # Replace "/" with "-" for systemd to understand mount unit.
+        mountname=${mountname//'/'/"-"}
         if [[ "$mountname" == "firmware" || "$mountname" == "bt_firmware" || "$mountname" == "dsp" ]] && \
            [[ "${COMBINED_FEATURES}" =~ .*qti-ab-boot.* ]] ; then
             cp ${IMAGE_ROOTFS_EXT4}/lib/systemd/system/${mountname}-mount-ext4.service ${IMAGE_ROOTFS_EXT4}/lib/systemd/system/${mountname}-mount.service
@@ -124,9 +126,14 @@ do_makesystem[prefuncs] += "create_symlink_systemd_ext4_mount_rootfs"
 do_makesystem[prefuncs] += "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains('MACHINE_FEATURES', 'dm-verity-bootloader', 'adjust_system_size_for_verity', '', d), '', d)}"
 
 do_makesystem() {
-    # Empty the /persist folder so that it doesn't end up
-    # in system image as well
-    rm -rf ${IMAGE_ROOTFS_EXT4}/persist/*
+    # Empty the folders that have seperate mount points
+    # so that they doesn't end up in system image as well
+    for entry in ${MACHINE_MNT_POINTS}; do
+        mountname="${entry:1}"
+        rm -rf ${IMAGE_ROOTFS_EXT4}/$mountname/*
+        echo "Cleared... ${IMAGE_ROOTFS_EXT4}/$mountname/"
+    done
+
     cp ${MACHINE_FSCONFIG_CONF_FULL_PATH} ${WORKDIR}/rootfs-fsconfig.conf
     # An ugly hack to mitigate a bug in libsparse were random
     # asserts are observed during unsparsing if image size is large.
