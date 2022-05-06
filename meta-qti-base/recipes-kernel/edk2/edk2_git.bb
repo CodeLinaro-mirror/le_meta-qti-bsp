@@ -1,9 +1,11 @@
 SUMMARY = "edk2"
 DESCRIPTION = "UEFI bootloader"
 HOMEPAGE = "https://www.codeaurora.org"
-LICENSE = "BSD"
-LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
-${LICENSE};md5=3775480a712fc46a69647678acb234cb"
+LICENSE = "BSD-2-Clause & BSD-3-Clause"
+LIC_FILES_CHKSUM = "\
+    file://${COMMON_LICENSE_DIR}/BSD-2-Clause;md5=cb641bc04cda31daea161b1bc15da69f \
+    file://${COMMON_LICENSE_DIR}/BSD-3-Clause;md5=550794465ba0ec5312d6919e203a55f9 \
+"
 
 PROVIDES = "virtual/bootloader"
 
@@ -12,7 +14,7 @@ PV = "3.0"
 
 SRC_URI = "${PATH_TO_REPO}/bootable/bootloader/edk2/.git;protocol=${PROTO};destsuffix=bootable/bootloader/edk2;usehead=1"
 # FIXME for keymaster functionality, disable it for sa8295 target temporarily.
-SRC_URI_append = " ${@oe.utils.conditional('BASEMACHINE','sa8295', '', 'file://0001-avb-bring-up-keymaster-for-LV.patch \
+SRC_URI:append = " ${@oe.utils.conditional('BASEMACHINE','sa8295', '', 'file://0001-avb-bring-up-keymaster-for-LV.patch \
                                                                            file://0002-avb-send-dummy-ROT-and-boot-state-to-keymaster-from-.patch \
                    ', d)}"
 
@@ -27,7 +29,7 @@ VERITY_ENABLED = "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity','1', '0', 
 EARLY_ETH = "${@bb.utils.contains('DISTRO_FEATURES', 'early-eth', '1', '0', d)}"
 HIBERNATION = "${@bb.utils.contains('COMBINED_FEATURES', 'hibernation', '1', '0', d)}"
 DISABLE_NONBOOTDEVICE_ENABLED ?= "0"
-DISABLE_NONBOOTDEVICE_ENABLED_sa6155 = "1"
+DISABLE_NONBOOTDEVICE_ENABLED:sa6155 = "1"
 
 EXTRA_OEMAKE = "'CLANG_BIN=${CLANG_BIN_PATH}' \
                 'CLANG_PREFIX=${STAGING_BINDIR_NATIVE}/${TARGET_SYS}/${TARGET_PREFIX}' \
@@ -75,10 +77,10 @@ include ${INCSUFFIX}.inc
 
 BUILD_OS = "linux"
 
-INSANE_SKIP_${PN} = "arch"
+INSANE_SKIP:${PN} = "arch"
 
 PACKAGE_STRIP = "no"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-FILES_${PN} += "/boot"
-FILES_${PN}-dbg += "/boot/.debug"
+FILES:${PN} += "/boot"
+FILES:${PN}-dbg += "/boot/.debug"

@@ -1,6 +1,20 @@
 inherit core-image dm-verity
 
-DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'qti-avb', 'avbtool-native', '', d)}"
+IMAGE_FEATURES[validitems] += "sparse-image"
+
+DEPENDS += "\
+    ${@bb.utils.contains('DISTRO_FEATURES', 'qti-avb', 'avbtool-native', '', d)} \
+    ${@bb.utils.contains('IMAGE_FEATURES', 'sparse-image', 'libsparse-native', '', d)} \
+"
+
+# Make sparse rootfs by default
+create_sparsesystem() {
+    mv ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.ext4 ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.tmp
+    img2simg ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.tmp ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.ext4
+    rm -f ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.tmp
+}
+
+do_image_ext4[postfuncs] += "${@bb.utils.contains('IMAGE_FEATURES', 'sparse-image', 'create_sparsesystem', '', d)}"
 
 ### Generate system.img #####
 # Alter system image size if varity is enabled.
@@ -69,7 +83,7 @@ do_make_avb_image(){
         if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'true', 'false', d)}; then
             #For lvgvm avb2.0, add hashtree for system image and generate vbmeta.img.
             avbtool add_hashtree_footer \
-                --image ${DEPLOY_DIR_IMAGE}/machine-image-${PRODUCT}.ext4 \
+                --image ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
                 --partition_name system \
                 --partition_size ${rootfs_partition_size} \
                 --hash_algorithm sha256 \

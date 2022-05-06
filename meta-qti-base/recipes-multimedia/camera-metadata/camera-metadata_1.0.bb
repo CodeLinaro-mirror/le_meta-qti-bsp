@@ -17,6 +17,6 @@ S = "${WORKDIR}/frameworks/camera_metadata"
 
 inherit autotools pkgconfig
 
-FILES_${PN}-dbg += "${libdir}/.debug/lib*.*"
-FILES_${PN} += "${libdir}/lib*.so.* ${libdir}/pkgconfig/*"
-FILES_${PN}-dev += "${libdir}/lib*.so ${libdir}/lib*.la"
+FILES:${PN}-dbg += "${libdir}/.debug/lib*.*"
+FILES:${PN} += "${libdir}/lib*.so.* ${libdir}/pkgconfig/*"
+FILES:${PN}-dev += "${libdir}/lib*.so ${libdir}/lib*.la"

@@ -15,7 +15,7 @@ S = "${WORKDIR}/qcom-opensource/location/integration_api"
 inherit autotools-brokensep pkgconfig
 
 #Enable syslogging
-CFLAGS_append = " -DUSE_SYSLOG_LOGGING"
-CPPFLAGS_append = " -DUSE_SYSLOG_LOGGING"
+CFLAGS:append = " -DUSE_SYSLOG_LOGGING"
+CPPFLAGS:append = " -DUSE_SYSLOG_LOGGING"
 
 EXTRA_OECONF = "--with-glib"

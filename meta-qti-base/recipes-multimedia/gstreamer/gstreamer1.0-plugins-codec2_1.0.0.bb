@@ -39,6 +39,6 @@ PACKAGE_ARCH ?= "${MACHINE_ARCH}"
 SOLIBS = ".so"
 FILES_SOLIBSDEV = ""
 
-FILES_${PN} += "${libdir}/gstreamer-1.0/*.so"
+FILES:${PN} += "${libdir}/gstreamer-1.0/*.so"
 
 TOOLCHAIN = "clang"

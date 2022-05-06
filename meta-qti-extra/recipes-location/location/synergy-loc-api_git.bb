@@ -17,10 +17,10 @@ inherit autotools-brokensep pkgconfig
 
 PACKAGES = "${PN}"
 
-FILES_${PN} += "\
+FILES:${PN} += "\
     ${libdir}/* \
     ${includedir}/ \
 "
 
 INHIBIT_PACKAGE_DEBUG_SPLIT = "1"
-INSANE_SKIP_${PN} = "dev-so"
+INSANE_SKIP:${PN} = "dev-so"

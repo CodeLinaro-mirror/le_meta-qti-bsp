@@ -1,11 +1,11 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
-SRC_URI_append = " \
+SRC_URI:append = " \
     file://afm-user-pre-setup.sh \
     file://user-pre-setup.conf \
 "
 
-do_install_append_class-target() {
+do_install:append:class-target() {
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
         install -d -m 0755 ${D}${libexecdir}/afm
         install -m 0755 ${WORKDIR}/afm-user-pre-setup.sh ${D}${libexecdir}/afm/
@@ -15,7 +15,7 @@ do_install_append_class-target() {
     fi
 }
 
-pkg_postinst_${PN} () {
+pkg_postinst:${PN} () {
     # Fail on error.
     set -e
 
@@ -42,5 +42,5 @@ pkg_postinst_${PN} () {
     exit 0
 }
 
-pkg_postinst_ontarget_${PN} () {
+pkg_postinst_ontarget:${PN} () {
 }

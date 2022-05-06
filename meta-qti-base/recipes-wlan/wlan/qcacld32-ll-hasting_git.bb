@@ -31,7 +31,7 @@ S = "${WORKDIR}/wlan/qcacld-3.0"
 
 # Explicitly disable HL to enable LL as current WLAN driver is not having
 # simultaneous support of HL and LL.
-EXTRA_OEMAKE_append = " \
+EXTRA_OEMAKE:append = " \
                        CONFIG_CLD_HL_SDIO_CORE=n \
                        CONFIG_CNSS_SDIO=n \
                        CONFIG_QCA_CLD_WLAN_PROFILE=qca6390 \
@@ -40,7 +40,7 @@ EXTRA_OEMAKE_append = " \
                        CONFIG_CNSS_GENL=n \
                        "
 
-SYSTEMD_SERVICE_${PN} = "init_qti_wlan_auto.service"
+SYSTEMD_SERVICE:${PN} = "init_qti_wlan_auto.service"
 
 do_install() {
     module_do_install
@@ -74,7 +74,7 @@ do_install() {
     fi
 }
 
-FILES_${PN} += "\
+FILES:${PN} += "\
     ${bindir}/init.qti.wlan_on.sh \
     ${bindir}/init.qti.wlan_off.sh \
 "

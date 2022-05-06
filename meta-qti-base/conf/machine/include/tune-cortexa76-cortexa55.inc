@@ -10,15 +10,15 @@ TUNE_CCARGS .= "${@bb.utils.contains("TUNE_FEATURES", "cortexa76-cortexa55", " -
 require conf/machine/include/arch-armv8-2a.inc
 
 AVAILTUNES                                         += "cortexa76-cortexa55 cortexa76-cortexa55-crypto"
-ARMPKGARCH_tune-cortexa76-cortexa55                 = "cortexa76-cortexa55"
-ARMPKGARCH_tune-cortexa76-cortexa55-crypto          = "cortexa76-cortexa55-crypto"
-TUNE_FEATURES_tune-cortexa76-cortexa55              = "${TUNE_FEATURES_tune-armv8-2a} cortexa76-cortexa55"
-TUNE_FEATURES_tune-cortexa76-cortexa55-crypto       = "${TUNE_FEATURES_tune-cortexa76-cortexa55} crypto"
-PACKAGE_EXTRA_ARCHS_tune-cortexa76-cortexa55        = "${PACKAGE_EXTRA_ARCHS_tune-armv8-2a} cortexa76-cortexa55"
-PACKAGE_EXTRA_ARCHS_tune-cortexa76-cortexa55-crypto = "${PACKAGE_EXTRA_ARCHS_tune-armv8-2a-crypto} cortexa76-cortexa55 cortexa76-cortexa55-crypto"
-BASE_LIB_tune-cortexa76-cortexa55                   = "lib64"
-BASE_LIB_tune-cortexa76-cortexa55-crypto            = "lib64"
+ARMPKGARCH:tune-cortexa76-cortexa55                 = "cortexa76-cortexa55"
+ARMPKGARCH:tune-cortexa76-cortexa55-crypto          = "cortexa76-cortexa55-crypto"
+TUNE_FEATURES:tune-cortexa76-cortexa55              = "${TUNE_FEATURES_tune-armv8-2a} cortexa76-cortexa55"
+TUNE_FEATURES:tune-cortexa76-cortexa55-crypto       = "${TUNE_FEATURES_tune-cortexa76-cortexa55} crypto"
+PACKAGE_EXTRA_ARCHS:tune-cortexa76-cortexa55        = "${PACKAGE_EXTRA_ARCHS_tune-armv8-2a} cortexa76-cortexa55"
+PACKAGE_EXTRA_ARCHS:tune-cortexa76-cortexa55-crypto = "${PACKAGE_EXTRA_ARCHS_tune-armv8-2a-crypto} cortexa76-cortexa55 cortexa76-cortexa55-crypto"
+BASE_LIB:tune-cortexa76-cortexa55                   = "lib64"
+BASE_LIB:tune-cortexa76-cortexa55-crypto            = "lib64"
 
 # Clang does not yet support big.LITTLE performance tunes, so use the LITTLE for tunes
-TUNE_CCARGS_remove_toolchain-clang = "-mcpu=cortex-a76.cortex-a55"
-TUNE_CCARGS_append_toolchain-clang = "${@bb.utils.contains_any("TUNE_FEATURES", "cortexa76-cortexa55", " -mcpu=cortex-a55", "", d)}"
+TUNE_CCARGS:remove:toolchain-clang = "-mcpu=cortex-a76.cortex-a55"
+TUNE_CCARGS:append:toolchain-clang = "${@bb.utils.contains_any("TUNE_FEATURES", "cortexa76-cortexa55", " -mcpu=cortex-a55", "", d)}"

@@ -4,7 +4,7 @@ FILESEXTRAPATHS =. "${FILESBBAPPENDPATH}/${BP}:${FILESBBAPPENDPATH}/${BPN}:"
 # Add glib-2.0 dependency to support g_strlcat
 DEPENDS += "glib-2.0"
 
-SRC_URI_append = " \
+SRC_URI:append = " \
     file://0001-systemd-add-slotselect-support-in-fstab.patch \
     file://0033-systemd-Make-root-s-home-directory-configurable-2.patch \
     file://0001-systemd-skip-smack-copy-issue-in-systemd.patch \
@@ -12,7 +12,7 @@ SRC_URI_append = " \
 "
 
 # Disable close_range in systemd v248.3 as it doesn't work with linux-msm 5.4
-SRC_URI_append = " ${@oe.utils.conditional("PV", "248.3", "file://0001-Disable-close_range.patch", "", d)}"
+SRC_URI:append = " ${@oe.utils.conditional("PV", "248.3", "file://0001-Disable-close_range.patch", "", d)}"
 
 # Remove backlight ldconfig
 #   * backlight - Loads/Saves Screen Backlight Brightness, not required.
@@ -25,10 +25,10 @@ SRC_URI_append = " ${@oe.utils.conditional("PV", "248.3", "file://0001-Disable-c
 #                 system-ldconfig.service runs "ldconfig -X", but as / is read-only
 #                 cache may not be created. Disabling this may introduce app
 #                 start time latency.
-PACKAGECONFIG_remove = " backlight ldconfig "
+PACKAGECONFIG:remove = " backlight ldconfig "
 
 # Use glib-2.0 for g_strlcat
-CFLAGS_append = " \
+CFLAGS:append = " \
     -fPIC \
     -DUSE_GLIB \
     -I${STAGING_INCDIR}/glib-2.0 \
@@ -36,13 +36,13 @@ CFLAGS_append = " \
     -I${STAGING_LIBDIR}/glib-2.0/glib \
 "
 
-LDFLAGS_append = " -lglib-2.0"
+LDFLAGS:append = " -lglib-2.0"
 
 # In aarch64 targets systemd is not booting with -finline-functions -finline-limit=64 optimizations
 # So temporarily revert to default optimizations for systemd.
 FULL_OPTIMIZATION = "-O2 -fexpensive-optimizations -frename-registers -fomit-frame-pointer -ftree-vectorize"
 
-do_install_append () {
+do_install:append () {
     # Use kernel rules for network iface name
     sed -i  's/^NamePolicy.*/NamePolicy=kernel/g' ${D}${systemd_unitdir}/network/99-default.link
 

@@ -25,7 +25,7 @@ EXTRA_OECONF += "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', '--with-syst
 INITSCRIPT_NAME = "location_hal_initializer"
 INITSCRIPT_PARAMS = "start 98 2 3 4 5 . stop 2 0 1 6 ."
 
-do_install_append () {
+do_install:append () {
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
         ## Install systemd-tmpfiles config file
         install -d ${D}${sysconfdir}/tmpfiles.d/

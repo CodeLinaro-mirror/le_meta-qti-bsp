@@ -16,7 +16,7 @@ inherit autotools pkgconfig
 
 EXTRA_OECONF += "--with-glib"
 
-do_install_append() {
+do_install:append() {
     install -d ${D}${sysconfdir}
     install -m 0644 ${WORKDIR}/card-defs.xml ${D}${sysconfdir}/card-defs.xml
 }

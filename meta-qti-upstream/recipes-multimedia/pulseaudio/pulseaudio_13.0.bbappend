@@ -1,8 +1,8 @@
-FILESEXTRAPATHS_append := ":${THISDIR}/${PN}"
+FILESEXTRAPATHS:append := ":${THISDIR}/${PN}"
 
 inherit systemd
 
-do_install_append() {
+do_install:append() {
        # Install pulseaudio systemd service
        if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
               install -m 644 -p -D ${WORKDIR}/build/src/pulseaudio.service ${D}${systemd_user_unitdir}/pulseaudio.service
@@ -20,7 +20,7 @@ do_install_append() {
        install -m 755 -p -D ${WORKDIR}/build/src/.libs/pacat ${D}/${bindir}/
 }
 
-FILES_${PN}-server += " \
+FILES:${PN}-server += " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', '${systemd_user_unitdir}/pulseaudio.socket', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', '${systemd_user_unitdir}/sockets.target.wants/pulseaudio.socket', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', '${systemd_user_unitdir}/pulseaudio.service', '', d)} \

@@ -14,7 +14,7 @@ SRC_URI = "\
 
 inherit systemd
 
-SYSTEMD_SERVICE_${PN} = "memory-hotplug.service"
+SYSTEMD_SERVICE:${PN} = "memory-hotplug.service"
 
 do_configure[noexec] = "1"
 do_compile[noexec] = "1"

@@ -18,8 +18,6 @@ SRC_URI = "${PATH_TO_REPO}/wlan/qcacld-3.0/.git;protocol=${PROTO};destsuffix=wla
            ${PATH_TO_REPO}/device/qcom/wlan/.git;protocol=${PROTO};destsuffix=device/qcom/wlan/msm_auto;subpath=msm_auto;usehead=1 \
            file://qca6696-module-load.service \
            file://qca6696_load.sh \
-           file://wlan_interface.service \
-           file://wlan_interface.sh \
            "
 SRCREV = "${AUTOREV}"
 SRCREV_FORMAT = "qcacld_cmn_fw_msm"
@@ -33,7 +31,7 @@ S = "${WORKDIR}/wlan/qcacld-3.0"
 
 # Explicitly disable HL to enable LL as current WLAN driver is not having
 # simultaneous support of HL and LL.
-EXTRA_OEMAKE_append = " \
+EXTRA_OEMAKE:append = " \
                        CONFIG_CLD_HL_SDIO_CORE=n \
                        CONFIG_CNSS_SDIO=n \
                        CONFIG_QCA_CLD_WLAN_PROFILE=qca6390 \
@@ -67,11 +65,11 @@ _WLAN_CFG_OVERRIDE_METAL = "\
                         CONFIG_HIF_DEBUG=y \
                         CONFIG_HIF_CE_DEBUG_DATA_BUF=y \
                         "
-EXTRA_OEMAKE_append_qtiquingvm = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
-EXTRA_OEMAKE_append_qtiquingvm8295 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
-EXTRA_OEMAKE_append_sa8295 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_METAL}"
+EXTRA_OEMAKE:append:qtiquingvm = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
+EXTRA_OEMAKE:append:qtiquingvm8295 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
+EXTRA_OEMAKE:append:sa8295 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_METAL}"
 
-SYSTEMD_SERVICE_${PN} = "qca6696-module-load.service wlan_interface.service"
+SYSTEMD_SERVICE:${PN} = "qca6696-module-load.service"
 
 do_install() {
     module_do_install
@@ -89,7 +87,6 @@ do_install() {
     install -D -m 0644 ${WORKDIR}/device/qcom/wlan/msm_auto/wlan_mac_hst_1.bin ${FIRMWARE_PATH}/wlan_mac.bin
     install -d ${D}${bindir}
     install -D -m 0755 ${WORKDIR}/qca6696_load.sh ${D}${bindir}/qca6696_load.sh
-    install -D -m 0755 ${WORKDIR}/wlan_interface.sh ${D}${bindir}/wlan_interface.sh
 
     install -d ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/
     ln -sf /firmware/image/${FW_PATH_NAME}/amss.bin ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/
@@ -103,13 +100,11 @@ do_install() {
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
         install -d ${D}${systemd_unitdir}/system/
         install -m 0644 ${WORKDIR}/qca6696-module-load.service -D ${D}${systemd_unitdir}/system/qca6696-module-load.service
-        install -m 0644 ${WORKDIR}/wlan_interface.service -D ${D}${systemd_unitdir}/system/wlan_interface.service
     fi
 }
 
-FILES_${PN} += "\
+FILES:${PN} += "\
     ${bindir}/qca6696_load.sh \
-    ${bindir}/wlan_interface.sh \
     ${systemd_unitdir}/system/* \
     ${sysconfdir}/* \
 "

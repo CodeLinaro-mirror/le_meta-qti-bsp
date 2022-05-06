@@ -22,9 +22,9 @@ S = "${WORKDIR}/gstreamer/gst-plugins-qti-oss/gst-plugins-qeavb"
 
 inherit autotools-brokensep pkgconfig
 
-FILES_${PN} += "${libdir}/gstreamer-1.0/*.so"
-FILES_${PN}-dbg += "${libdir}/gstreamer-1.0/.debug"
-FILES_${PN}-dev += "${libdir}/gstreamer-1.0/*.la"
+FILES:${PN} += "${libdir}/gstreamer-1.0/*.so"
+FILES:${PN}-dbg += "${libdir}/gstreamer-1.0/.debug"
+FILES:${PN}-dev += "${libdir}/gstreamer-1.0/*.la"
 
 CFLAGS += "-I${STAGING_INCDIR} \
            -I${STAGING_INCDIR}/glib-2.0 \
@@ -36,4 +36,4 @@ CFLAGS += "-I${STAGING_INCDIR} \
            -I${STAGING_INCDIR}/gstreamer-1.0 \
            -I${STAGING_INCDIR}/linux-msm"
 
-RDEPENDS_${PN} += "avb-utils"
+RDEPENDS:${PN} += "avb-utils"

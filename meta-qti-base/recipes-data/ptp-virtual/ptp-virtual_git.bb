@@ -19,7 +19,7 @@ inherit module module-sign kernel-arch qperf
 INHIBIT_PACKAGE_STRIP = "1"
 EXTRA_OEMAKE += "CONFIG_ARCH_MSM=y"
 
-do_install_append() {
+do_install:append() {
     install -d ${D}${systemd_unitdir}/system
     install -d ${D}/${sysconfdir}
     install -m 0644 ${WORKDIR}/ptp-virtual.service ${D}${systemd_unitdir}/system/ptp-virtual.service
@@ -27,6 +27,6 @@ do_install_append() {
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-FILES_${PN} += "${systemd_unitdir}/system/ptp-virtual.service \
+FILES:${PN} += "${systemd_unitdir}/system/ptp-virtual.service \
                 /etc/* \
 "

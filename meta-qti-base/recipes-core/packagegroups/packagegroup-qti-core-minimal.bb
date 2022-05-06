@@ -6,15 +6,15 @@ PACKAGES = "\
     packagegroup-qti-core-minimal \
     "
 
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     packagegroup-qti-core-boot \
     packagegroup-qti-core-commonlibs \
     packagegroup-machine-base \
     "
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     kernel-modules \
     system-core-adbd \
     system-core-leprop \

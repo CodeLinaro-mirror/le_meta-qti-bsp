@@ -16,10 +16,10 @@ EXTRA_OECONF += "--with-glib"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-FILES_${PN} += "${libdir}/pulse-*/modules/"
-FILES_${PN}-staticdev += "${libdir}/pulse-*/modules/*.a"
-FILES_${PN}-dbg += "${libdir}/pulse-*/modules/.debug"
+FILES:${PN} += "${libdir}/pulse-*/modules/"
+FILES:${PN}-staticdev += "${libdir}/pulse-*/modules/*.a"
+FILES:${PN}-dbg += "${libdir}/pulse-*/modules/.debug"
 
-RDEPENDS_${PN} = "pulseaudio-misc pulseaudio-module-null-source pulseaudio-server"
+RDEPENDS:${PN} = "pulseaudio-misc pulseaudio-module-null-source pulseaudio-server"
 
 AUDIO_BUILD_TARGET ?= "sa8155"

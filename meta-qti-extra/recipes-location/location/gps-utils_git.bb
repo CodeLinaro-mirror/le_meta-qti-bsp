@@ -19,5 +19,5 @@ EXTRA_OECONF = "\
     --with-glib \
 "
 
-CFLAGS_append = " -DUSE_SYSLOG_LOGGING"
-CPPFLAGS_append = " -DUSE_SYSLOG_LOGGING"
+CFLAGS:append = " -DUSE_SYSLOG_LOGGING"
+CPPFLAGS:append = " -DUSE_SYSLOG_LOGGING"

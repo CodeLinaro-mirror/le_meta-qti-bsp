@@ -12,7 +12,7 @@ PR = "r6"
 
 SRCREV = "${AUTOREV}"
 SRC_URI = "${PATH_TO_REPO}/system/core/.git;protocol=${PROTO};destsuffix=system/core/mkbootimg;subpath=mkbootimg;usehead=1"
-SRC_URI_append = " file://makefile;subdir=system/core/mkbootimg"
+SRC_URI:append = " file://makefile;subdir=system/core/mkbootimg"
 
 S = "${WORKDIR}/system/core/mkbootimg"
 

@@ -6,9 +6,9 @@ PACKAGES = "\
     packagegroup-qti-agl-demo-tools \
     "
 
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     curl \
     gdbserver \
     iputils \

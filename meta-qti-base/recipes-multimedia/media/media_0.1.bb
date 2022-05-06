@@ -38,9 +38,9 @@ SRCREV = "${AUTOREV}"
 S = "${WORKDIR}/hardware/qcom/media"
 
 inherit autotools systemd
-SYSTEMD_SERVICE_${PN} = "${@bb.utils.contains('DISTRO_FEATURES','early_init','video_early_demo.service','',d)}"
+SYSTEMD_SERVICE:${PN} = "${@bb.utils.contains('DISTRO_FEATURES','early_init','video_early_demo.service','',d)}"
 
-EXTRA_OECONF_append = " \
+EXTRA_OECONF:append = " \
     --with-sanitized-headers=${STAGING_INCDIR}/linux-msm \
     --with-cutils-headers=${STAGING_INCDIR}/cutils/ \
     --enable-use-glib='yes' \
@@ -80,7 +80,7 @@ LDFLAGS += "\
     -lEGL \
 "
 
-do_install_append() {
+do_install:append() {
    install -d ${D}${includedir}/mm-core
    install -m 0644 ${S}/mm-core/inc/*.h -D ${D}${includedir}/mm-core/
    install -d ${D}${includedir}/venc/inc
@@ -104,7 +104,7 @@ do_install_append() {
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-FILES_${PN} += "\
+FILES:${PN} += "\
     ${datadir}/* \
     ${systemd_system_unitdir}/*"
 

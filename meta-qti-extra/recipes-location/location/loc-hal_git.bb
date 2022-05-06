@@ -17,7 +17,7 @@ S = "${WORKDIR}/hardware/qcom/gps"
 
 inherit autotools-brokensep pkgconfig
 
-do_install_append() {
+do_install:append() {
     #Install default gps.conf file
     install -m 0644 -D ${S}/etc/gps.conf ${D}${sysconfdir}/gps.conf
 }

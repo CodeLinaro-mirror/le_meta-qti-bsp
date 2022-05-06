@@ -23,4 +23,4 @@ do_install() {
         install -m 0755 ${S}/fastrpc_ut ${D}${bindir}
 }
 
-RDEPENDS_${PN} += "glib-2.0 gtest"
+RDEPENDS:${PN} += "glib-2.0 gtest"

@@ -27,7 +27,7 @@ CPPFLAGS += "-I${WORKDIR}/vendor/qcom/opensource/commonsys-intf/display/gralloc"
 CPPFLAGS += "-I${WORKDIR}/vendor/qcom/opensource/commonsys-intf/display/libqdmetadata"
 CPPFLAGS += "-I${WORKDIR}/vendor/qcom/opensource/commonsys-intf/display/include"
 
-do_install_append() {
+do_install:append() {
     install -d ${D}${includedir}
     install -m 644 ${S}/gralloc/*.h ${D}${includedir}
     install -m 644 ${S}/include/*.h ${D}${includedir}

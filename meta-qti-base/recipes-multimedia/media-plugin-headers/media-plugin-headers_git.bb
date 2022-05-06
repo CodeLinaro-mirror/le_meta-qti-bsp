@@ -20,4 +20,4 @@ do_install() {
     install -m 0644 ${S}/native/include/media/hardware/*.h -D ${D}${includedir}/media/hardware/
 }
 
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"
