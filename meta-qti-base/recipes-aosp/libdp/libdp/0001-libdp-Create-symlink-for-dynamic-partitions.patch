@@ -1,0 +1,60 @@
+From bac208c49df7e1011fe520841257738d51aae340 Mon Sep 17 00:00:00 2001
+From: Futao He <quic_fhe@quicinc.com>
+Date: Wed, 20 Apr 2022 08:14:19 +0530
+Subject: [PATCH] libdp: Create symlink for dynamic partitions
+
+Ceate symlink <partion_a> to dm devices. which will be mounted to
+given mount points, like system vendor.
+
+Upstream-Status:Inappropriate [Android has similar design already]
+
+Change-Id: I0176a699310ca5288cdd05b0b2348917697ba935
+Signed-off-by: Futao He <quic_fhe@quicinc.com>
+---
+ fs_mgr/fs_mgr_dm_linear.cpp | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/fs_mgr/fs_mgr_dm_linear.cpp b/fs_mgr/fs_mgr_dm_linear.cpp
+index 4137dab..42108b0 100644
+--- a/fs_mgr/fs_mgr_dm_linear.cpp
++++ b/fs_mgr/fs_mgr_dm_linear.cpp
+@@ -55,6 +55,9 @@
+ #define PERROR   PLOG(ERROR) << FS_MGR_TAG
+ #define PFATAL PLOG(FATAL) << FS_MGR_TAG
+ 
++// for device mapper links
++#define DM_MAPPER_DIR "/dev/device-mapper/"
++
+ enum class FileWaitMode { Exists, DoesNotExist };
+ 
+ namespace android {
+@@ -171,6 +174,7 @@ static bool CreateLogicalPartition(const LpMetadata& metadata, const LpMetadataP
+                                    bool force_writable, const std::chrono::milliseconds& timeout_ms,
+                                    const std::string& super_device, std::string* path) {
+     DeviceMapper& dm = DeviceMapper::Instance();
++    std::string src,dest;
+ 
+     DmTable table;
+     if (!CreateDmTable(metadata, partition, super_device, &table)) {
+@@ -194,6 +198,18 @@ static bool CreateLogicalPartition(const LpMetadata& metadata, const LpMetadataP
+         }
+     }
+     LINFO << "Created logical partition " << name << " on device " << *path;
++    if (mkdir(DM_MAPPER_DIR, 0755) && errno != EEXIST) {
++        LERROR << "Failed to create device mapper dir: " << DM_MAPPER_DIR;
++        return false;
++    }
++    dest = DM_MAPPER_DIR + name;
++    src = *path;
++    //force to create symlink for relate logic partition
++    remove(dest.c_str());
++    if(symlink(src.c_str(), dest.c_str())) {
++        LERROR << "Created symlink:" << src.c_str() << " on device: " << dest.c_str() << "failed";
++        return false;
++    }
+     return true;
+ }
+ 
+-- 
+2.7.4
+
