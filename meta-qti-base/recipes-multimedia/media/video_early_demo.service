@@ -28,8 +28,6 @@
 
 [Unit]
 Description=Video Early Demo Service
-After=systemd-modules-load.service
-Requires=systemd-modules-load.service
 DefaultDependencies=no
 
 [Service]
