@@ -28,8 +28,8 @@
 
 [Unit]
 Description=Video Early Demo Service
-After=systemd-modules-load.service
-Requires=systemd-modules-load.service
+After=firmware.mount
+Requires=firmware.mount
 DefaultDependencies=no
 
 [Service]
