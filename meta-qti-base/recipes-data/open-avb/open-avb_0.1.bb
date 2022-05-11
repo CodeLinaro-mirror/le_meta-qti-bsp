@@ -2,8 +2,9 @@ SUMMARY = "Open AVB"
 DESCRIPTION = "Open Source Project for Audio Video Bridging/Time Sensitive Networking stack"
 HOMEPAGE = "https://www.codeaurora.org/"
 
-LICENSE = "BSD"
-LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/BSD;md5=3775480a712fc46a69647678acb234cb"
+LICENSE = "BSD-3-Clause"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
+${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
 
 DEPENDS += "alsa-lib cmake-native glib-2.0 gstreamer1.0 gstreamer1.0-plugins-base libpcap pciutils"
 DEPENDS += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'libuhab', '', d)}"
