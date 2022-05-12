@@ -1,4 +1,4 @@
-From ff33f536350b62c872e1893021273f0ec93094e3 Mon Sep 17 00:00:00 2001
+From 6f9d73d927fa6b99fa0c9c0a48788574973bf970 Mon Sep 17 00:00:00 2001
 From: Xubao Jiang <xubaoj@codeaurora.org>
 Date: Mon, 26 Apr 2021 18:20:45 +0800
 Subject: [PATCH] Disable close_range
@@ -23,18 +23,18 @@ Signed-off-by: Xubao Jiang <xubaoj@codeaurora.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/basic/fd-util.c b/src/basic/fd-util.c
-index 07a7b3a..0addf6d 100644
+index 3866e87675..c7a742dd5e 100644
 --- a/src/basic/fd-util.c
 +++ b/src/basic/fd-util.c
-@@ -216,7 +216,7 @@ static int cmp_int(const int *a, const int *b) {
+@@ -237,7 +237,7 @@ static int close_all_fds_frugal(const int except[], size_t n_except) {
+         return r;
  }
  
- int close_all_fds(const int except[], size_t n_except) {
--        static bool have_close_range = true; /* Assume we live in the future */
-+        static bool have_close_range = false;
-         _cleanup_closedir_ DIR *d = NULL;
-         struct dirent *de;
-         int r = 0;
+-static bool have_close_range = true; /* Assume we live in the future */
++static bool have_close_range = false;
+ 
+ static int close_all_fds_special_case(const int except[], size_t n_except) {
+         assert(n_except == 0 || except);
 -- 
-2.7.4
+2.17.1
 

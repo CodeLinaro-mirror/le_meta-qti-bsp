@@ -1,4 +1,4 @@
-From b1eee6e2a812151da5bf2ae37bd11094b04bb07b Mon Sep 17 00:00:00 2001
+From fef75019e2a10cdf875c3244d6214dd6872bfec4 Mon Sep 17 00:00:00 2001
 From: Lei wang <leiwan@codeaurora.org>
 Date: Tue, 5 Nov 2019 14:05:47 +0800
 Subject: [PATCH] systemd: add slotselect support in fstab
@@ -13,10 +13,10 @@ Signed-off-by: Lei wang <leiwan@codeaurora.org>
  2 files changed, 19 insertions(+), 1 deletion(-)
 
 diff --git a/src/core/mount.c b/src/core/mount.c
-index ca5d0939a1..a903c17a69 100644
+index c650b5abe2..4c28db21f9 100644
 --- a/src/core/mount.c
 +++ b/src/core/mount.c
-@@ -1019,7 +1019,7 @@ static void mount_enter_mounting(Mount *m) {
+@@ -1036,7 +1036,7 @@ static void mount_enter_mounting(Mount *m) {
          if (p) {
                  _cleanup_free_ char *opts = NULL;
  
@@ -26,7 +26,7 @@ index ca5d0939a1..a903c17a69 100644
                          goto fail;
  
 diff --git a/src/fstab-generator/fstab-generator.c b/src/fstab-generator/fstab-generator.c
-index 69ba4bfc64..0d922314e8 100644
+index 9b32383a76..2d6105686b 100644
 --- a/src/fstab-generator/fstab-generator.c
 +++ b/src/fstab-generator/fstab-generator.c
 @@ -4,6 +4,11 @@
@@ -39,18 +39,18 @@ index 69ba4bfc64..0d922314e8 100644
 +#endif /* USE_GLIB */
 +
  #include "alloc-util.h"
+ #include "chase-symlinks.h"
  #include "fd-util.h"
- #include "fileio.h"
-@@ -51,6 +56,7 @@ static char *arg_usr_what = NULL;
- static char *arg_usr_fstype = NULL;
+@@ -53,6 +58,7 @@ static char *arg_usr_fstype = NULL;
  static char *arg_usr_options = NULL;
+ static char *arg_usr_hash = NULL;
  static VolatileMode arg_volatile_mode = _VOLATILE_MODE_INVALID;
 +static char* slot_suffix = NULL;
  
  STATIC_DESTRUCTOR_REGISTER(arg_root_what, freep);
  STATIC_DESTRUCTOR_REGISTER(arg_root_fstype, freep);
-@@ -627,6 +633,18 @@ static int parse_fstab(bool initrd) {
-                 rwonly = fstab_test_option(me->mnt_opts, "x-systemd.rw-only\0");
+@@ -641,6 +647,18 @@ static int parse_fstab(bool initrd) {
+                 growfs = fstab_test_option(me->mnt_opts, "x-systemd.growfs\0");
                  noauto = fstab_test_yes_no_option(me->mnt_opts, "noauto\0" "auto\0");
                  nofail = fstab_test_yes_no_option(me->mnt_opts, "nofail\0" "fail\0");
 +                /*
