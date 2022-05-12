@@ -1,3 +1,6 @@
+# Pull in the default security flags
+require ${COREBASE}/meta/conf/distro/include/security_flags.inc
+
 # Modify the primary security flag definitions of yocto
 # _FORTIFY_SOURCE requires -O1 or higher, otherwise results in a compiler warning.
 SECURITY_PIE_CFLAGS = "-fstack-protector-strong -pie -fPIE -D_FORTIFY_SOURCE=2 -Wa,--noexecstack ${SECURITY_STRINGFORMAT}"
