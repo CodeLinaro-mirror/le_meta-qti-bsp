@@ -70,8 +70,8 @@ do_install() {
 
     # Install systemd configuration file for auto load
     install -d ${D}${sysconfdir}/modules-load.d/
-    install -m 0644 firstmods.conf ${D}${sysconfdir}/modules-load.d
-    install -m 0644 secondmods.conf ${D}${sysconfdir}/modules-load.d
+    install -m 0644 firstmods.conf ${D}${sysconfdir}/modules-load.d/00-firstmods.conf
+    install -m 0644 secondmods.conf ${D}${sysconfdir}/modules-load.d/00-secondmods.conf
 }
 
 ALLOW_EMPTY_${PN} = "1"
@@ -82,10 +82,10 @@ PACKAGES = "${PN}-first-stage ${PN}-second-stage"
 python get_files_pn_from_conf() {
     pn = d.getVar('PN')
 
-    f_conf = os.path.join(d.getVar('D'), 'etc/modules-load.d', 'firstmods.conf')
-    s_conf = os.path.join(d.getVar('D'), 'etc/modules-load.d', 'secondmods.conf')
+    f_conf = os.path.join(d.getVar('D'), 'etc/modules-load.d', '00-firstmods.conf')
+    s_conf = os.path.join(d.getVar('D'), 'etc/modules-load.d', '00-secondmods.conf')
 
-    f_mods = [ '/etc/modules-load.d/firstmods.conf' ]
+    f_mods = [ '/etc/modules-load.d/00-firstmods.conf' ]
     with open(f_conf) as f:
         lines = f.readlines()
         for line in lines:
@@ -94,7 +94,7 @@ python get_files_pn_from_conf() {
             f_mods += [ '/lib/modules/*/' + line.rstrip() + '.ko' ]
     d.setVar('FILES_' + pn + '-first-stage', " ".join(f_mods))
 
-    s_mods = [ '/etc/modules-load.d/secondmods.conf' ]
+    s_mods = [ '/etc/modules-load.d/00-secondmods.conf' ]
     with open(s_conf) as f:
         lines = f.readlines()
         for line in lines:

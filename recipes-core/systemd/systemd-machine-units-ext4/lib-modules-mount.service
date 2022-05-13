@@ -49,7 +49,7 @@ Type=oneshot
 RemainAfterExit=yes
 PassEnvironment="SLOT_SUFFIX"
 ExecStart=/bin/mount -o noexec,nodev,ro -t ext4 /dev/disk/by-partlabel/vendor_dlkm${SLOT_SUFFIX} /lib/modules
-ExecStartPost=/usr/bin/ln -sf /lib/modules/modules-load.d /run/modules-load.d
+ExecStartPost=/bin/ln -sf /lib/modules/modules-load.d /run/modules-load.d
 Nice=-20
 
 [Install]
