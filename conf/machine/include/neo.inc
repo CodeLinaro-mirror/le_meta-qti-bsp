@@ -10,11 +10,13 @@ MACHINE_MNT_POINTS = "/firmware \
                       /bt_firmware \
                       /overlay \
                       /persist \
+                      /lib/modules \
                      "
 
 # Sizes for EXT4 partitions
 SYSTEM_SIZE_EXT4 ?= "800MiB"
 USERDATA_SIZE_EXT4 ?= "16GiB"
+VDLKM_SIZE_EXT4 ?= "128MiB"
 
 # Formats of root filesystem images.
 IMAGE_FSTYPES += "ext4"
