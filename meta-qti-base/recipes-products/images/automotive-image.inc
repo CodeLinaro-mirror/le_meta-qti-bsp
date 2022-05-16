@@ -18,7 +18,7 @@ IMAGE_INSTALL += " \
 
 IMAGE_LINGUAS = ""
 
-EXTRA_IMAGECMD_ext4 = "-i 4096 -b 4096"
+EXTRA_IMAGECMD:ext4 = "-i 4096 -b 4096"
 
 # default value for rootfs size
 IMAGE_ROOTFS_SIZE ?= "1572864"
@@ -28,6 +28,6 @@ SSTATE_MANFILEPREFIX = "${@bb.utils.contains('PERF_BUILD', '1', '${SSTATE_MANIFE
 SDK_DEPLOY = "${DEPLOY_DIR}/sdk-${PRODUCT}"
 
 # Add kernel header to SDK.
-TOOLCHAIN_TARGET_TASK_append = " kernel-devsrc"
+TOOLCHAIN_TARGET_TASK:append = " kernel-devsrc linux-msm-headers-dev"
 
 BAD_RECOMMENDATIONS += "rng-tools"

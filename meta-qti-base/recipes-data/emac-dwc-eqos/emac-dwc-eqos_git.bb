@@ -5,19 +5,19 @@ LICENSE = "MIT-style"
 LIC_FILES_CHKSUM = "file://DWC_ETH_QOS_dev.c;\
 startline=1;endline=71;md5=62b57cd65ebb8a65e225a5fbfbc26932"
 
-FILES_${PN}     += "${sysconfdir}/init.d/emac_dwc_eqos_start_stop_le"
-FILES_${PN}     += "${sysconfdir}/init.d/setup_avtp_routing_le"
-FILES_${PN}     += "${systemd_unitdir}/system/emac_dwc_eqos.service"
-FILES_${PN}     += "${systemd_unitdir}/system/multi-user.target.wants/emac_dwc_eqos.service"
-FILES_${PN}     += "${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/*"
+FILES:${PN}     += "${sysconfdir}/init.d/emac_dwc_eqos_start_stop_le"
+FILES:${PN}     += "${sysconfdir}/init.d/setup_avtp_routing_le"
+FILES:${PN}     += "${systemd_unitdir}/system/emac_dwc_eqos.service"
+FILES:${PN}     += "${systemd_unitdir}/system/multi-user.target.wants/emac_dwc_eqos.service"
+FILES:${PN}     += "${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/*"
 
 do_unpack[deptask] = "do_populate_sysroot"
 PR = "r0"
 
 SRC_URI   =  "${PATH_TO_REPO}/data-kernel/.git;protocol=${PROTO};destsuffix=data-kernel/drivers/emac-dwc-eqos;subpath=drivers/emac-dwc-eqos;usehead=1"
-SRC_URI_append = " file://emac_dwc_eqos_start_stop_le"
-SRC_URI_append = " file://setup_avtp_routing_le"
-SRC_URI_append = " file://emac_dwc_eqos.service"
+SRC_URI:append = " file://emac_dwc_eqos_start_stop_le"
+SRC_URI:append = " file://setup_avtp_routing_le"
+SRC_URI:append = " file://emac_dwc_eqos.service"
 SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/data-kernel/drivers/emac-dwc-eqos"
@@ -42,7 +42,7 @@ do_install() {
     fi
 }
 
-pkg_postinst_${PN} () {
+pkg_postinst:${PN} () {
     [ -n "$D" ] && OPT="-r $D" || OPT="-s"
     update-rc.d $OPT -f emac_dwc_eqos_start_stop_le remove
     update-rc.d $OPT emac_dwc_eqos_start_stop_le start 37 S . stop 63 0 1 6 .
@@ -72,6 +72,6 @@ do_module_signing() {
 
 addtask module_signing after do_package before do_package_write_ipk
 
-RPROVIDES_${PN} += "${@'kernel-module-emac-dwc-eqos-${KERNEL_VERSION}'.replace('_', '-')}"
+RPROVIDES:${PN} += "${@'kernel-module-emac-dwc-eqos-${KERNEL_VERSION}'.replace('_', '-')}"
 # uncomment below line if you are compiling test module for vipertooth
-#RPROVIDES_${PN} += "${@'kernel-module-dwc-eth-qos-testmod-${KERNEL_VERSION}'.replace('_', '-')}"
+#RPROVIDES:${PN} += "${@'kernel-module-dwc-eth-qos-testmod-${KERNEL_VERSION}'.replace('_', '-')}"

@@ -32,10 +32,11 @@ EXTRA_OECONF = "\
     --with-sanitized-headers=${STAGING_INCDIR}/linux-msm \
     --disable-debuggerd \
     --disable-libsync \
-    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', ' --enable-adb-avb20', '', d)} \
+    --enable-adb-avb20 \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', '--enable-adb-verity', d)} \
 "
 
-do_install_append() {
+do_install:append() {
     install -m 0755 ${S}/adb/launch_adbd -D ${D}${sysconfdir}/launch_adbd
     install -b -m 0644 /dev/null ${D}${sysconfdir}/adb_devid
 
@@ -100,7 +101,7 @@ do_install_append() {
 
 PACKAGES =+ "${PN}-adbd ${PN}-usb ${PN}-post-boot ${PN}-early-boot ${PN}-leprop"
 
-FILES_${PN}-adbd += "\
+FILES:${PN}-adbd += "\
     ${base_sbindir}/adbd \
     ${libdir}/libadbd.so.* \
     ${systemd_unitdir}/system/adbd.service \
@@ -110,7 +111,7 @@ FILES_${PN}-adbd += "\
     ${sysconfdir}/adb_devid \
 "
 
-FILES_${PN}-usb += "\
+FILES:${PN}-usb += "\
     ${base_sbindir}/usb_composition \
     ${bindir}/usb_composition_switch \
     ${base_sbindir}/usb/compositions/* \
@@ -123,19 +124,19 @@ FILES_${PN}-usb += "\
     ${sysconfdir}/initscripts/usb \
 "
 
-FILES_${PN}-post-boot += "\
+FILES:${PN}-post-boot += "\
     ${systemd_unitdir}/system/init_post_boot.service \
     ${systemd_unitdir}/system/multi-user.target.wants/init_post_boot.service \
     ${sysconfdir}/initscripts/init_post_boot \
 "
 
-FILES_${PN}-early-boot += "\
+FILES:${PN}-early-boot += "\
     ${systemd_unitdir}/system/init_early_boot.service \
     ${systemd_unitdir}/system/sysinit.target.wants/init_early_boot.service \
     ${sysconfdir}/initscripts/init_early_boot \
 "
 
-FILES_${PN}-leprop += "\
+FILES:${PN}-leprop += "\
     ${base_sbindir}/leprop-service \
     ${bindir}/getprop \
     ${bindir}/setprop \

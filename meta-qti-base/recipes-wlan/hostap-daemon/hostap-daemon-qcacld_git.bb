@@ -7,7 +7,7 @@ DESCRIPTION = "Hostapd (host access point daemon) is a user space daemon \
                or with security mode(with password, like wpa2/wpa3). And the station \
                device can connect to this Access Point to get some service. \
                "
-HOMEPAGE = "https://www.codeaurora.org/"
+HOMEPAGE = "https://git.codelinaro.org/"
 LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://${WORKDIR}/external/wpa_supplicant_8/COPYING;md5=279b4f5abb9c153c285221855ddb78cc"
 

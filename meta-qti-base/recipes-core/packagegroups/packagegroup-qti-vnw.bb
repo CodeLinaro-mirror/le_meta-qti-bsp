@@ -8,10 +8,11 @@ PACKAGES = "\
     packagegroup-qti-vnw \
     "
 
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"
 
-RDEPENDS_${PN} += "\
-    open-avb \
+RDEPENDS:${PN} += "\
+    libgptp-test \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', 'open-avb', d)} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'ptp-virtual', '', d)} \
     hsi2s \
     hsi2s-test \

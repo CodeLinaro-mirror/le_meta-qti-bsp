@@ -1,6 +1,6 @@
 SUMMARY = "PulseAudio Module Codec Control"
 DESCRIPTION = "This is PulseAudio module used for Codec control."
-HOMEPAGE = "https://www.codeaurora.org"
+HOMEPAGE = "https://git.codelinaro.org"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
 DEPENDS += "audio-hal-plugin-noship glib-2.0 pulseaudio"
@@ -16,10 +16,10 @@ EXTRA_OECONF += "--with-glib"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-FILES_${PN} += "${libdir}/pulse-*/modules/"
-FILES_${PN}-staticdev += "${libdir}/pulse-*/modules/*.a"
-FILES_${PN}-dbg += "${libdir}/pulse-*/modules/.debug"
+FILES:${PN} += "${libdir}/pulse-*/modules/"
+FILES:${PN}-staticdev += "${libdir}/pulse-*/modules/*.a"
+FILES:${PN}-dbg += "${libdir}/pulse-*/modules/.debug"
 
-RDEPENDS_${PN} = "pulseaudio-misc pulseaudio-module-null-source pulseaudio-server"
+RDEPENDS:${PN} = "pulseaudio-misc pulseaudio-module-null-source pulseaudio-server"
 
 AUDIO_BUILD_TARGET ?= "sa8155"

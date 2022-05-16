@@ -6,5 +6,5 @@ EXTRA_OECMAKE += "\
     -DTARGET_BOARD_PLATFORM=${BASEMACHINE} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-audio-ar', '-DAUDIO_ARCH=audio_reach', '', d)} \
     "
-FILES_${PN} += "${libdir}/pulse-*/modules/*"
-FILES_${PN}-dbg += "${libdir}/pulse-*/modules/.debug/*"
+FILES:${PN} += "${libdir}/pulse-*/modules/*"
+FILES:${PN}-dbg += "${libdir}/pulse-*/modules/.debug/*"

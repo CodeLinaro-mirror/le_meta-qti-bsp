@@ -1,6 +1,6 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}-${PV}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}-${PV}:"
 
-SRC_URI_append = " \
+SRC_URI:append = " \
     file://root-home.patch \
     file://add-hash.patch \
     file://add-diag-user.patch \

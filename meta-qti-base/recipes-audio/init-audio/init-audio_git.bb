@@ -2,18 +2,18 @@ SUMMARY = "Audio Initialization Scripts"
 DESCRIPTION = "init_qcom_audio (init_audio.service) sends command to kernel to boot adsp. \
 audio_early.sh loads audio kernel modules, boots adsp and plays audio early chime. \
 audio.sh boots adsp and plays audio early chime."
-HOMEPAGE = "https://www.codeaurora.org"
+HOMEPAGE = "https://git.codelinaro.org"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://NOTICE;md5=31d831381767a5740249540fe63ea013"
 PR = "r5"
 
 SRC_URI = "file://NOTICE"
-SRC_URI_append = " file://init_qcom_audio"
-SRC_URI_append = " file://init_audio.service"
-SRC_URI_append = " file://init_audio_early.service"
-SRC_URI_append = " file://audio.sh"
-SRC_URI_append = " file://audio_early.sh"
-SRC_URI_append = " file://msm-audio-node.rules"
+SRC_URI:append = " file://init_qcom_audio"
+SRC_URI:append = " file://init_audio.service"
+SRC_URI:append = " file://init_audio_early.service"
+SRC_URI:append = " file://audio.sh"
+SRC_URI:append = " file://audio_early.sh"
+SRC_URI:append = " file://msm-audio-node.rules"
 
 S = "${WORKDIR}"
 
@@ -36,7 +36,7 @@ do_install() {
     fi
 }
 
-FILES_${PN} += "${systemd_unitdir}/system/*"
+FILES:${PN} += "${systemd_unitdir}/system/*"
 
 INITSCRIPT_NAME = "init_qcom_audio"
 INITSCRIPT_PARAMS = "start 99 2 3 4 5 . stop 1 0 1 6 ."

@@ -1,7 +1,7 @@
-inherit sdllvm
+# Build with Clang
+DEPENDS += "clang-native"
 
-DEPENDS += "llvm-arm-toolchain-native"
+inherit qticlang
 
-# compile with sdllvm.
+TOOLCHAIN = "clang"
 KERNEL_CC = "${CC} -fuse-ld=bfd"
-TOOLCHAIN = "sdllvm"

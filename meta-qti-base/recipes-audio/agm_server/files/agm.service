@@ -27,6 +27,8 @@
 
 [Unit]
 Description=Audio Graph Manager Service Daemon
+After=servicemanager.service
+Requires=servicemanager.service
 
 [Service]
 ExecStart=/usr/bin/agm_server

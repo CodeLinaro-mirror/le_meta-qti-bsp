@@ -18,4 +18,4 @@ do_install() {
     install -m 0644 ${S}/av/media/libstagefright/foundation/include/media/stagefright/foundation/*.h -D ${D}${includedir}/media/stagefright/foundation
 }
 
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"

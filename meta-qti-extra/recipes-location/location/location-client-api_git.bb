@@ -1,6 +1,6 @@
 SUMMARY = "location-client-api"
 DESCRIPTION = "location client api library"
-HOMEPAGE = "https://www.codeaurora.org"
+HOMEPAGE = "https://git.codelinaro.org"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
@@ -15,7 +15,7 @@ S = "${WORKDIR}/qcom-opensource/location/client_api"
 inherit autotools-brokensep pkgconfig
 
 #Enable syslogging
-CFLAGS_append = " -DUSE_SYSLOG_LOGGING"
-CPPFLAGS_append = " -DUSE_SYSLOG_LOGGING"
+CFLAGS:append = " -DUSE_SYSLOG_LOGGING"
+CPPFLAGS:append = " -DUSE_SYSLOG_LOGGING"
 
 EXTRA_OECONF = "--with-glib"

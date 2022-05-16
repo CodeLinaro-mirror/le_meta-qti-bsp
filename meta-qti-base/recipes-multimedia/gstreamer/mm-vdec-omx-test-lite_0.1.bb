@@ -1,6 +1,6 @@
 SUMMARY = "OMX video decoder lite sample"
 DESCRIPTION = "OMX video decoder lite sample, a OMX client demo for video decoder"
-HOMEPAGE = "https://www.codeaurora.org"
+HOMEPAGE = "https://git.codelinaro.org"
 SECTION = "mm-vdec-omx-test-lite"
 
 LICENSE = "BSD-3-Clause"
