@@ -215,3 +215,9 @@ CONFIG_IEEE80211AX=y
 # Experimental implementation of draft-harkins-owe-07.txt
 CONFIG_OWE=y
 CONFIG_SAE=y
+
+# WEP support
+CONFIG_WEP=y
+
+# BOOTUP KPI MARKER
+CONFIG_MARKER=y

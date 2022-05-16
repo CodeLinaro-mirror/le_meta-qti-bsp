@@ -1,5 +1,7 @@
-inherit qticlang
-
+# Build with Clang
 DEPENDS += "clang-native"
 
-CLANG_BIN_PATH = "${STAGING_BINDIR_NATIVE}/"
+inherit qticlang
+
+TOOLCHAIN = "clang"
+KERNEL_CC = "${CC} -fuse-ld=bfd"
