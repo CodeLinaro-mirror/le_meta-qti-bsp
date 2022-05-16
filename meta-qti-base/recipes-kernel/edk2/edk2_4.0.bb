@@ -53,6 +53,9 @@ EXTRA_OEMAKE = "'CLANG_BIN=${KERNEL_TOOLCHAIN_CLANG}/bin/' \
                 ${@bb.utils.contains('DISTRO_FEATURES', 'qti-avb', 'VERIFIED_BOOT_ENABLED=1', '', d)} \
                 ${@bb.utils.contains('DISTRO_FEATURES', 'qti-avb', 'VERIFIED_BOOT_2=1', '', d)} "
 
+EXTRA_OEMAKE:append:sa81x5 = " 'AB_RETRYCOUNT_DISABLE=1' \
+                               'ENABLE_LV_ATOMIC_AB=1' "
+
 do_prebuilt_configure() {
     cd ${WORKDIR}/kernel-${PREFERRED_VERSION_linux-msm}/out/msm-kernel-${KERNEL_ARCH}-${EDK2_VARIANT}defconfig/dist/
 
