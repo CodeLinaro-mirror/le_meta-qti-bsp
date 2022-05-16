@@ -23,6 +23,7 @@ IMAGE_VERSION_SUFFIX = ""
 # Default Image names
 BOOTIMAGE_TARGET ?= "boot.img"
 DTBOIMAGE_TARGET ?= "dtbo.img"
+VBOOTIMAGE_TARGET ?= "vendor_boot.img"
 
 #Set appropriate partion:Image map
 NONAB_BOOT_PARTITION_IMAGE_MAP = "boot='${BOOTIMAGE_TARGET}',system='${SYSTEMIMAGE_TARGET}',userdata='${USERDATAIMAGE_TARGET}',persist='${PERSISTIMAGE_TARGET}',dtbo='${DTBOIMAGE_TARGET}'"

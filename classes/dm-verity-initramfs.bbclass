@@ -68,6 +68,8 @@ BOOTIMGDEPLOYDIR = "${WORKDIR}/deploy-${PN}-bootimage-complete"
 
 INITRAMFS_IMAGE ?= ''
 RAMDISK = "${DEPLOY_DIR_IMAGE}/${INITRAMFS_IMAGE}-${MACHINE}.${INITRAMFS_FSTYPES}"
+VRAMDISK = "${DEPLOY_DIR_IMAGE}/${VENDOR_INITRAMFS_IMAGE}-${MACHINE}.${INITRAMFS_FSTYPES}"
+
 def get_ramdisk_path(d):
     if os.path.exists(d.getVar('RAMDISK')):
         return '%s' %(d.getVar('RAMDISK'))
@@ -77,27 +79,39 @@ RAMDISK_PATH = "${@get_ramdisk_path(d)}"
 
 MKBOOTUTIL = '${@oe.utils.conditional("PREFERRED_PROVIDER_virtual/mkbootimg-native", "mkbootimg-gki-native", "scripts/mkbootimg.py", "mkbootimg", d)}'
 
+# If BOOT_HEADER_VERSION >= 3, a vendor_boot image will be built
+#  unless SKIP_VENDOR_BOOT is defined as True.
 python do_makeboot () {
     import subprocess
+
+    # Set cmdline
+    cmdline=""
+    if ((int(d.getVar("BOOT_HEADER_VERSION") or "0") < 3) or (d.getVar("SKIP_VENDOR_BOOT") or "True") == "True"):
+        cmdline = " --cmdline" + "\"" + d.getVar('KERNEL_CMD_PARAMS', True) + "\""
+    else:
+        cmdline     = " --vendor_cmdline " + "\"" + d.getVar('KERNEL_CMD_PARAMS', True) + "\""
 
     xtra_parms=""
     if bb.utils.contains('MACHINE_FEATURES', 'nand-boot', True, False, d):
         xtra_parms = " --tags-addr" + " " + d.getVar('KERNEL_TAGS_OFFSET')
-    if (d.getVar("BOOT_HEADER_VERSION") or "0") != "0":
+    if (int(d.getVar("BOOT_HEADER_VERSION") or "0") >= 2):
         xtra_parms += " --header_version " + d.getVar('BOOT_HEADER_VERSION')
         # header version setting expects dtb to be passed seprately but not appended to kernel
-        xtra_parms += " --dtb " + d.getVar('DEPLOY_DIR_IMAGE', True) + "/" + d.getVar('KERNEL_DTB_NAMES').strip()
+        xtra_parms += " --dtb " + d.getVar('DEPLOY_DIR_IMAGE', True) + "/" + "DTOverlays" + "/" + d.getVar('KERNEL_DTB_NAMES').strip()
+
+    if ((int(d.getVar("BOOT_HEADER_VERSION") or "0") >= 3) and (d.getVar("SKIP_VENDOR_BOOT") or "True") == "False"):
+        xtra_parms += " --vendor_ramdisk %s" %(d.getVar('VRAMDISK'))
+        xtra_parms += " --vendor_boot " + d.getVar('VBOOTIMAGE_TARGET')
 
     mkboot_bin_path = d.getVar('STAGING_BINDIR_NATIVE', True) + "/" + d.getVar('MKBOOTUTIL')
     ramdisk_path    = d.getVar('RAMDISK_PATH')
     zimg_path       = d.getVar('DEPLOY_DIR_IMAGE', True) + "/" + d.getVar('KERNEL_IMAGETYPE', True)
-    cmdline         = "\"" + d.getVar('KERNEL_CMD_PARAMS', True) + "\""
     pagesize        = d.getVar('PAGE_SIZE', True)
     base            = d.getVar('KERNEL_BASE', True)
     output          = d.getVar('BOOTIMAGE_TARGET', True)
 
     # cmd to make boot.img
-    cmd =  mkboot_bin_path + " --kernel %s --cmdline %s --pagesize %s --base %s --ramdisk %s --ramdisk_offset 0x0 %s --output %s" \
+    cmd =  mkboot_bin_path + " --kernel %s %s --pagesize %s --base %s --ramdisk %s --ramdisk_offset 0x0 %s --output %s" \
            % (zimg_path, cmdline, pagesize, base, ramdisk_path, xtra_parms, output )
     bb.debug(1, "dm-verity-initramfs do_makeboot cmd: %s" % (cmd))
     try:
