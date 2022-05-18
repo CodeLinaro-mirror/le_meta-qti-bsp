@@ -16,7 +16,11 @@ PREFERRED_VERSION_kernel-toolchain-native = "5.10"
 PREFERRED_VERSION_dtc-android-build-native = "1.6.0"
 
 # Waipio abl expects boot image with header version set.
-BOOT_HEADER_VERSION = "2"
+BOOT_HEADER_VERSION = "3"
+
+# If BOOT_HEADER_VERSION >= 3, a vendor_boot image will
+# be built unless SKIP_VENDOR_BOOT is defined as True
+SKIP_VENDOR_BOOT = "False"
 
 # Waipio supports techpacks that can build in isolation.
 BUILD_WITH_TECHPACKS = "1"
