@@ -25,6 +25,6 @@ do_install () {
     install -D -m 0644 ${S}/fault_injection_virtio_i2c_unit_test.ko ${D}/${base_libdir}/modules/${KERNEL_VERSION}/unit_test/
 }
 
-FILES_${PN} += "${base_libdir}/modules/${KERNEL_VERSION}/unit_test/virtio_i2c_unit_test.ko"
-FILES_${PN} += "${base_libdir}/modules/${KERNEL_VERSION}/unit_test/virtio_i2c_unittest_kprobe.ko"
-FILES_${PN} += "${base_libdir}/modules/${KERNEL_VERSION}/unit_test/fault_injection_virtio_i2c_unit_test.ko"
+FILES:${PN} += "${base_libdir}/modules/${KERNEL_VERSION}/unit_test/virtio_i2c_unit_test.ko"
+FILES:${PN} += "${base_libdir}/modules/${KERNEL_VERSION}/unit_test/virtio_i2c_unittest_kprobe.ko"
+FILES:${PN} += "${base_libdir}/modules/${KERNEL_VERSION}/unit_test/fault_injection_virtio_i2c_unit_test.ko"

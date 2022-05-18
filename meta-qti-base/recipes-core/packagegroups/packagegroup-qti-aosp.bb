@@ -6,9 +6,9 @@ PACKAGES = "\
     packagegroup-qti-aosp \
     "
 
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     system-core-adbd \
     system-core-leprop \
     system-core-post-boot \

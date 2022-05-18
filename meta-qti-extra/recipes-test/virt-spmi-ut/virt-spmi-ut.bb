@@ -24,5 +24,5 @@ do_install () {
     install -D -m 0644 ${S}/virtio_spmi_irq_unittest.ko ${D}/${base_libdir}/modules/${KERNEL_VERSION}/unit_test/
 }
 
-FILES_${PN} += "${base_libdir}/modules/${KERNEL_VERSION}/unit_test/virtio_spmi_rw_unittest.ko"
-FILES_${PN} += "${base_libdir}/modules/${KERNEL_VERSION}/unit_test/virtio_spmi_irq_unittest.ko"
+FILES:${PN} += "${base_libdir}/modules/${KERNEL_VERSION}/unit_test/virtio_spmi_rw_unittest.ko"
+FILES:${PN} += "${base_libdir}/modules/${KERNEL_VERSION}/unit_test/virtio_spmi_irq_unittest.ko"

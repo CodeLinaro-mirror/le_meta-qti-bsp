@@ -4,7 +4,7 @@ avb utils include share library libeavbfe.so, eAVB (Ethernet Audio Video Bridgin
 Front-End device is virtual device node, multi applications may operate with ioctl cmds.\
 libeavbfe.so to encapsulate ioctl operations"
 
-HOMEPAGE = "http://www.codeaurora.org/"
+HOMEPAGE = "http://git.codelinaro.org/"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://NOTICE;md5=b45eb38359bd16993272b40c311aa89f"
 

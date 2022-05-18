@@ -1,7 +1,7 @@
 require ../include/common-location-defines.inc
 SUMMARY = "synergy-loc-api"
 DESCRIPTION = "Synergy Loc API"
-HOMEPAGE = "https://www.codeaurora.org"
+HOMEPAGE = "https://git.codelinaro.org"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
@@ -17,10 +17,10 @@ inherit autotools-brokensep pkgconfig
 
 PACKAGES = "${PN}"
 
-FILES_${PN} += "\
+FILES:${PN} += "\
     ${libdir}/* \
     ${includedir}/ \
 "
 
 INHIBIT_PACKAGE_DEBUG_SPLIT = "1"
-INSANE_SKIP_${PN} = "dev-so"
+INSANE_SKIP:${PN} = "dev-so"

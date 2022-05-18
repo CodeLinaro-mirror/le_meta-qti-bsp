@@ -1,12 +1,12 @@
-FILESEXTRAPATHS_append := " :${THISDIR}/weston/"
+FILESEXTRAPATHS:append := " :${THISDIR}/weston/"
 SRC_URI = "file://weston.service_caf \
            file://weston_early.service_caf \
            file://weston.ini_caf \
 "
-SYSTEMD_SERVICE_${PN} = "weston.service"
+SYSTEMD_SERVICE:${PN} = "weston.service"
 SYSTEMD_AUTO_ENABLE = "enable"
 
-REQUIRED_DISTRO_FEATURES_remove = "opengl"
+REQUIRED_DISTRO_FEATURES:remove = "opengl"
 
 do_install() {
     # Install systemd unit files

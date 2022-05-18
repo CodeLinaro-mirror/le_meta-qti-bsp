@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 SRC_URI = "git://github.com/GENIVI/${BPN}.git;protocol=http;branch=master \
     file://0001-Change-header-file-path-to-adapt-to-weston-8.0.0.patch \

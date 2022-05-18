@@ -1,6 +1,6 @@
 SUMMARY = "Secure video playback demo for GStreamer"
 DESCRIPTION = "Secure video playback demo for GStreamer, supporting secure input buffer sharing."
-HOMEPAGE = "https://www.codeaurora.org"
+HOMEPAGE = "https://git.codelinaro.org"
 SECTION = "multimedia"
 LICENSE = "BSD-3-Clause-Clear"
 LIC_FILES_CHKSUM = "file://secure-gst-codec2.c;beginline=1;endline=33;md5=8d64263c4896d8aca24635fd53968e67"

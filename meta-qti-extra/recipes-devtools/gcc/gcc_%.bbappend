@@ -1,5 +1,5 @@
 #Enable the gcc compile option with libgomp.
 
-EXTRA_OECONF_INITIAL_remove = " --disable-libgomp "
-EXTRA_OECONF_INITIAL_append = " --enable-libgomp "
+EXTRA_OECONF_INITIAL:remove = " --disable-libgomp "
+EXTRA_OECONF_INITIAL:append = " --enable-libgomp "
 

@@ -1,7 +1,7 @@
 SUMMARY = "display commonsys intf Library"
 DESCRIPTION = "Provide common display header files and libraries for \
 other modules to use."
-HOMEPAGE = "https://www.codeaurora.org/"
+HOMEPAGE = "https://git.codelinaro.org/"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
@@ -27,7 +27,7 @@ CPPFLAGS += "-I${WORKDIR}/vendor/qcom/opensource/commonsys-intf/display/gralloc"
 CPPFLAGS += "-I${WORKDIR}/vendor/qcom/opensource/commonsys-intf/display/libqdmetadata"
 CPPFLAGS += "-I${WORKDIR}/vendor/qcom/opensource/commonsys-intf/display/include"
 
-do_install_append() {
+do_install:append() {
     install -d ${D}${includedir}
     install -m 644 ${S}/gralloc/*.h ${D}${includedir}
     install -m 644 ${S}/include/*.h ${D}${includedir}

@@ -6,7 +6,7 @@ DESCRIPTION = "Qualcomm Atheros WLAN CLD3.0 low latency driver for Hastings WLAN
                once the system bootup. And this WLAN host driver module name is qca6696.ko,\
                it create two interface by defaults, one is wlan0 and the other is p2p0. \
                Application can use the wireless interfaces as STA/AP/P2P mode in need. \"
-HOMEPAGE = "https://www.codeaurora.org/"
+HOMEPAGE = "https://git.codelinaro.org/"
 LICENSE = "ISC"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=f3b90e78ea0cffb20bf5cca7947a896d"
 
@@ -31,7 +31,7 @@ S = "${WORKDIR}/wlan/qcacld-3.0"
 
 # Explicitly disable HL to enable LL as current WLAN driver is not having
 # simultaneous support of HL and LL.
-EXTRA_OEMAKE_append = " \
+EXTRA_OEMAKE:append = " \
                        CONFIG_CLD_HL_SDIO_CORE=n \
                        CONFIG_CNSS_SDIO=n \
                        CONFIG_QCA_CLD_WLAN_PROFILE=qca6390 \
@@ -40,7 +40,7 @@ EXTRA_OEMAKE_append = " \
                        CONFIG_CNSS_GENL=n \
                        "
 
-SYSTEMD_SERVICE_${PN} = "init_qti_wlan_auto.service"
+SYSTEMD_SERVICE:${PN} = "init_qti_wlan_auto.service"
 
 do_install() {
     module_do_install
@@ -74,7 +74,7 @@ do_install() {
     fi
 }
 
-FILES_${PN} += "\
+FILES:${PN} += "\
     ${bindir}/init.qti.wlan_on.sh \
     ${bindir}/init.qti.wlan_off.sh \
 "

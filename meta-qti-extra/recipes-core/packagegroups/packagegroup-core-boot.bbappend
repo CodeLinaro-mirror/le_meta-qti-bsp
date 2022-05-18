@@ -1,4 +1,4 @@
 # Add the libgomp support.
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     libgomp libgomp-dev libgomp-staticdev \
     "

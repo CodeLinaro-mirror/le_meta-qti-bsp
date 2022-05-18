@@ -1,7 +1,7 @@
 require ../include/common-location-defines.inc
 SUMMARY = "loc-hal"
 DESCRIPTION = "GPS Loc HAL"
-HOMEPAGE = "https://www.codeaurora.org"
+HOMEPAGE = "https://git.codelinaro.org"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
@@ -17,7 +17,7 @@ S = "${WORKDIR}/hardware/qcom/gps"
 
 inherit autotools-brokensep pkgconfig
 
-do_install_append() {
+do_install:append() {
     #Install default gps.conf file
     install -m 0644 -D ${S}/etc/gps.conf ${D}${sysconfdir}/gps.conf
 }

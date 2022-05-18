@@ -3,7 +3,7 @@ DESCRIPTION = "During linux booting, we only leave enough memory for booting \
 and remove other memory to reduce memory init time, thus linux kernel boot time. \
 After linux fully boots up, this memory hotplug service needs to return all the \
 removed memory back to linux."
-HOMEPAGE = "https://www.codeaurora.org/"
+HOMEPAGE = "https://git.codelinaro.org/"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
 
@@ -14,7 +14,7 @@ SRC_URI = "\
 
 inherit systemd
 
-SYSTEMD_SERVICE_${PN} = "memory-hotplug.service"
+SYSTEMD_SERVICE:${PN} = "memory-hotplug.service"
 
 do_configure[noexec] = "1"
 do_compile[noexec] = "1"
