@@ -40,7 +40,9 @@ VOLATILE_BINDS = "\
 /systemrw/bluetooth /etc/bluetooth/\n\
 /systemrw/allplay /etc/allplay/\n\
 /systemrw/adk-database /usr/share/adk-database/\n\
+/systemrw/c2c /etc/c2c/\n\
 "
+
 VOLATILE_BINDS_append_apq8017 = "\
 /systemrw/AlexaClientSDKConfig.json  /etc/AlexaClientSDKConfig.json \n\
 "
