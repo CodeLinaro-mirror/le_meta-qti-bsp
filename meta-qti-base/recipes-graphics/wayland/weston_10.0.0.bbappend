@@ -19,7 +19,7 @@ UPSTREAM_CHECK_URI:remove = "https://wayland.freedesktop.org/releases.html"
 
 do_install:append() {
     # expose weston protocol to /usr/share/weston as video may use it
-    install ${WORKDIR}/graphics/weston-10.0.0/protocol/*.xml ${D}${datadir}/weston
+    install ${WORKDIR}/graphics/weston/protocol/*.xml ${D}${datadir}/weston
     # expose some static libraries on which sdm-backend depends
     install -m 0644 ${WORKDIR}/build/libweston/liblibinput-backend.a ${D}${libdir}/
     install -m 0644 ${WORKDIR}/build/libweston/libsession-helper.a ${D}${libdir}/
