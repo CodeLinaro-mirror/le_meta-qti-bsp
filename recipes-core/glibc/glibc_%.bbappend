@@ -3,7 +3,9 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 SRCBRANCH = "caf_migration/drains/release/${PV}/master"
 GLIBC_GIT_URI = "${CLO_LE_GIT}/glibc.git;protocol=https"
 
-SRC_URI += "file://CVE-2019-25013.patch"
+SRC_URI += "file://CVE-2019-25013.patch \
+            file://CVE-2020-1752.patch \
+"
 
 # glibc expects -fstack-protector optimization passed as a configuration option
 # instead of a top level build flag.
