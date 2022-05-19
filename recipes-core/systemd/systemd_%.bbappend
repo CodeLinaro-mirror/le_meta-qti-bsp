@@ -2,6 +2,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
 SRC_URI += " \
         file://0001-kernel-install-shell-changes-to-sh.patch \
+        file://0001-Backport-of-networkd-fix.patch \
 "
 
 #Add qti specific changes only when qt-disro is enabled.
