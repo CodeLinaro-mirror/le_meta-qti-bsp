@@ -19,4 +19,6 @@ SRC_URI += " \
 	file://CVE-2015-5180.patch \
 	file://CVE-2017-12133.patch \
         file://CVE-2021-35942.patch \
+        file://CVE-2022-23218.patch \
+        file://CVE-2022-23218-01.patch \
 "
