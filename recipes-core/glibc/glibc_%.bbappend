@@ -6,6 +6,7 @@ GLIBC_GIT_URI = "${CLO_LE_GIT}/glibc.git;protocol=https"
 SRC_URI += "file://CVE-2019-25013.patch \
             file://CVE-2022-23218.patch \
             file://CVE-2022-23218-01.patch \
+            file://CVE-2022-23219.patch \
 "
 
 # glibc expects -fstack-protector optimization passed as a configuration option
