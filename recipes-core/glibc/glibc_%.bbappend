@@ -5,6 +5,12 @@ GLIBC_GIT_URI = "${CLO_LE_GIT}/glibc.git;protocol=https"
 
 SRC_URI += "file://CVE-2019-25013.patch \
             file://CVE-2020-1752.patch \
+            file://CVE-2020-6096.patch \
+            file://CVE-2020-6096-01.patch \
+            file://CVE-2020-6096-02.patch \
+            file://CVE-2020-6096-03.patch \
+            file://CVE-2020-6096-04.patch \
+            file://CVE-2020-6096-05.patch \
 "
 
 # glibc expects -fstack-protector optimization passed as a configuration option
