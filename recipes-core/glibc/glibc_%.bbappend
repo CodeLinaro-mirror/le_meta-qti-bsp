@@ -11,6 +11,7 @@ SRC_URI += "file://CVE-2019-25013.patch \
             file://CVE-2020-6096-03.patch \
             file://CVE-2020-6096-04.patch \
             file://CVE-2020-6096-05.patch \
+            file://CVE-2021-3326.patch \
 "
 
 # glibc expects -fstack-protector optimization passed as a configuration option
