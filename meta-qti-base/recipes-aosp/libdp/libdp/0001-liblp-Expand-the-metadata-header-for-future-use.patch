@@ -1,16 +1,16 @@
-From f78747309d49f13874356164c02bf2581d20373d Mon Sep 17 00:00:00 2001
-From: Xubao Jiang <xubaoj@codeaurora.org>
-Date: Fri, 2 Apr 2021 14:31:00 +0800
+From 9f75098c60ca2ee593b7f0b630d6e31750456b8a Mon Sep 17 00:00:00 2001
+From: David Anderson <dvander@google.com>
+Date: Sat, 14 Dec 2019 06:05:58 -0700
 Subject: [PATCH] liblp: Expand the metadata header for future use.
 
 A few times we have wanted to stash small bits of information in the
 super header, but we haven't had any bits to do so. This patch addresses
 future needs in two ways:
 
-    1. A "flags" field has been added for miscellanious bits that do not
-       need a version bump.
-    2. The header struct has been padded to 256 bytes to allow for future
-       expansion without complicating the struct-parsing code.
+1. A "flags" field has been added for miscellanious bits that do not
+   need a version bump.
+2. The header struct has been padded to 256 bytes to allow for future
+   expansion without complicating the struct-parsing code.
 
 This is the first time we've materially changed the format, so this
 patch needs some extra explanation.
@@ -28,67 +28,136 @@ only be emitted as-needed.
 
 Bug: 134949511
 Test: liblp_test gtest
-retrofit DAP device boots
-launch DAP device boots
+      retrofit DAP device boots
+      launch DAP device boots
 
 Git-commit: 9f75098c60ca2ee593b7f0b630d6e31750456b8a
 Git-repo: https://android.googlesource.com/platform/system/core
 
-Change-Id: Ib70cd212316a943db5adca410ce50295f4b46d69
-Signed-off-by: Xubao Jiang <xubaoj@codeaurora.org>
+Change-Id: I933d09b1004aeef3bf07ef50fb6dc2920195820e
+Signed-off-by: Futao He <quic_fhe@quicinc.com>
 ---
- fs_mgr/liblp/include/liblp/metadata_format.h | 67 +++++++++++++++++++++--
- fs_mgr/liblp/reader.cpp                      | 79 ++++++++++++++++++++--------
- 2 files changed, 121 insertions(+), 25 deletions(-)
+ fs_mgr/liblp/builder.cpp                     | 16 +++++-
+ fs_mgr/liblp/builder_test.cpp                | 20 ++++++++
+ fs_mgr/liblp/include/liblp/builder.h         |  4 ++
+ fs_mgr/liblp/include/liblp/metadata_format.h | 40 ++++++++++++++-
+ fs_mgr/liblp/io_test.cpp                     | 28 +++++++++-
+ fs_mgr/liblp/reader.cpp                      | 77 ++++++++++++++++++++--------
+ fs_mgr/liblp/writer.cpp                      |  4 +-
+ 7 files changed, 163 insertions(+), 26 deletions(-)
 
+diff --git a/fs_mgr/liblp/builder.cpp b/fs_mgr/liblp/builder.cpp
+index ea921ac..6f0cae5 100644
+--- a/fs_mgr/liblp/builder.cpp
++++ b/fs_mgr/liblp/builder.cpp
+@@ -223,7 +223,7 @@ MetadataBuilder::MetadataBuilder() : auto_slot_suffixing_(false), ignore_slot_su
+     header_.magic = LP_METADATA_HEADER_MAGIC;
+     header_.major_version = LP_METADATA_MAJOR_VERSION;
+     header_.minor_version = LP_METADATA_MINOR_VERSION_MIN;
+-    header_.header_size = sizeof(header_);
++    header_.header_size = sizeof(LpMetadataHeaderV1_0);
+     header_.partitions.entry_size = sizeof(LpMetadataPartition);
+     header_.extents.entry_size = sizeof(LpMetadataExtent);
+     header_.groups.entry_size = sizeof(LpMetadataPartitionGroup);
+@@ -234,6 +234,12 @@ bool MetadataBuilder::Init(const LpMetadata& metadata) {
+     geometry_ = metadata.geometry;
+     block_devices_ = metadata.block_devices;
+ 
++    // Bump the version as necessary to copy any newer fields.
++    if (metadata.header.minor_version >= LP_METADATA_VERSION_FOR_EXPANDED_HEADER) {
++        RequireExpandedMetadataHeader();
++        header_.flags = metadata.header.flags;
++    }
++
+     for (const auto& group : metadata.groups) {
+         std::string group_name = GetPartitionGroupName(group);
+         if (!AddGroup(group_name, group.maximum_size)) {
+@@ -823,6 +829,14 @@ std::unique_ptr<LpMetadata> MetadataBuilder::Export() {
+     return metadata;
+ }
+ 
++void MetadataBuilder::RequireExpandedMetadataHeader() {
++    if (header_.minor_version >= LP_METADATA_VERSION_FOR_EXPANDED_HEADER) {
++        return;
++    }
++    header_.minor_version = LP_METADATA_VERSION_FOR_EXPANDED_HEADER;
++    header_.header_size = sizeof(LpMetadataHeaderV1_2);
++}
++
+ uint64_t MetadataBuilder::AllocatableSpace() const {
+     uint64_t total_size = 0;
+     for (const auto& block_device : block_devices_) {
+diff --git a/fs_mgr/liblp/builder_test.cpp b/fs_mgr/liblp/builder_test.cpp
+index 5eb4bae..cba46be 100644
+--- a/fs_mgr/liblp/builder_test.cpp
++++ b/fs_mgr/liblp/builder_test.cpp
+@@ -344,6 +344,7 @@ TEST_F(BuilderTest, BuilderExport) {
+     EXPECT_EQ(header.magic, LP_METADATA_HEADER_MAGIC);
+     EXPECT_EQ(header.major_version, LP_METADATA_MAJOR_VERSION);
+     EXPECT_EQ(header.minor_version, LP_METADATA_MINOR_VERSION_MIN);
++    EXPECT_EQ(header.header_size, sizeof(LpMetadataHeaderV1_0));
+ 
+     ASSERT_EQ(exported->partitions.size(), 2);
+     ASSERT_EQ(exported->extents.size(), 3);
+@@ -905,3 +906,22 @@ TEST_F(BuilderTest, UpdateSuper) {
+     std::set<std::string> partitions_to_keep{"system_a", "vendor_a", "product_a"};
+     ASSERT_TRUE(builder->ImportPartitions(*on_disk.get(), partitions_to_keep));
+ }
++
++TEST_F(BuilderTest, ExpandedHeader) {
++    unique_ptr<MetadataBuilder> builder = MetadataBuilder::New(1024 * 1024, 1024, 2);
++    ASSERT_NE(builder, nullptr);
++
++    builder->RequireExpandedMetadataHeader();
++
++    unique_ptr<LpMetadata> exported = builder->Export();
++    ASSERT_NE(exported, nullptr);
++    EXPECT_EQ(exported->header.header_size, sizeof(LpMetadataHeaderV1_2));
++
++    exported->header.flags = 0x5e5e5e5e;
++
++    builder = MetadataBuilder::New(*exported.get());
++    exported = builder->Export();
++    ASSERT_NE(exported, nullptr);
++    EXPECT_EQ(exported->header.header_size, sizeof(LpMetadataHeaderV1_2));
++    EXPECT_EQ(exported->header.flags, 0x5e5e5e5e);
++}
+diff --git a/fs_mgr/liblp/include/liblp/builder.h b/fs_mgr/liblp/include/liblp/builder.h
+index c706f2a..8068e33 100644
+--- a/fs_mgr/liblp/include/liblp/builder.h
++++ b/fs_mgr/liblp/include/liblp/builder.h
+@@ -278,6 +278,10 @@ class MetadataBuilder {
+     bool GetBlockDeviceInfo(const std::string& partition_name, BlockDeviceInfo* info) const;
+     bool UpdateBlockDeviceInfo(const std::string& partition_name, const BlockDeviceInfo& info);
+ 
++    // Require the expanded metadata header. This is exposed for testing, and
++    // is normally only called as needed by other methods.
++    void RequireExpandedMetadataHeader();
++
+     // Attempt to preserve the named partitions from an older metadata. If this
+     // is not possible (for example, the block device list has changed) then
+     // false is returned.
 diff --git a/fs_mgr/liblp/include/liblp/metadata_format.h b/fs_mgr/liblp/include/liblp/metadata_format.h
-index 8934aaf..41d8b0c 100644
+index 6e928b4..26cbf07 100644
 --- a/fs_mgr/liblp/include/liblp/metadata_format.h
 +++ b/fs_mgr/liblp/include/liblp/metadata_format.h
-@@ -39,7 +39,14 @@ extern "C" {
- 
+@@ -40,11 +40,14 @@ extern "C" {
  /* Current metadata version. */
  #define LP_METADATA_MAJOR_VERSION 10
--#define LP_METADATA_MINOR_VERSION 0
-+#define LP_METADATA_MINOR_VERSION_MIN 0
+ #define LP_METADATA_MINOR_VERSION_MIN 0
+-#define LP_METADATA_MINOR_VERSION_MAX 1
 +#define LP_METADATA_MINOR_VERSION_MAX 2
-+
-+/* Metadata version needed to use the UPDATED partition attribute. */
-+#define LP_METADATA_VERSION_FOR_UPDATED_ATTR 1
-+
+ 
+ /* Metadata version needed to use the UPDATED partition attribute. */
+ #define LP_METADATA_VERSION_FOR_UPDATED_ATTR 1
+ 
 +/* Metadata version needed for the new expanded header struct. */
 +#define LP_METADATA_VERSION_FOR_EXPANDED_HEADER 2
- 
++
  /* Attributes for the LpMetadataPartition::attributes field.
   *
-@@ -58,8 +65,24 @@ extern "C" {
-  */
- #define LP_PARTITION_ATTR_SLOT_SUFFIXED (1 << 1)
- 
--/* Mask that defines all valid attributes. */
--#define LP_PARTITION_ATTRIBUTE_MASK (LP_PARTITION_ATTR_READONLY | LP_PARTITION_ATTR_SLOT_SUFFIXED)
-+/* This flag is applied automatically when using MetadataBuilder::NewForUpdate.
-+ * It signals that the partition was created (or modified) for a snapshot-based
-+ * update. If this flag is not present, the partition was likely flashed via
-+ * fastboot.
-+ */
-+#define LP_PARTITION_ATTR_UPDATED (1 << 2)
-+
-+/* This flag marks a partition as disabled. It should not be used or mapped. */
-+#define LP_PARTITION_ATTR_DISABLED (1 << 3)
-+
-+/* Mask that defines all valid attributes. When changing this, make sure to
-+ * update ParseMetadata().
-+ */
-+#define LP_PARTITION_ATTRIBUTE_MASK_V0 \
-+    (LP_PARTITION_ATTR_READONLY | LP_PARTITION_ATTR_SLOT_SUFFIXED)
-+#define LP_PARTITION_ATTRIBUTE_MASK_V1 (LP_PARTITION_ATTR_UPDATED | LP_PARTITION_ATTR_DISABLED)
-+#define LP_PARTITION_ATTRIBUTE_MASK \
-+    (LP_PARTITION_ATTRIBUTE_MASK_V0 | LP_PARTITION_ATTRIBUTE_MASK_V1)
- 
- /* Default name of the physical partition that holds logical partition entries.
-  * The layout of this partition will look like:
-@@ -196,8 +219,27 @@ typedef struct LpMetadataHeader {
+  * READONLY - The partition should not be considered writable. When used with
+@@ -212,6 +215,22 @@ typedef struct LpMetadataHeader {
      LpMetadataTableDescriptor groups;
      /* 116: Block device table. */
      LpMetadataTableDescriptor block_devices;
@@ -101,6 +170,8 @@ index 8934aaf..41d8b0c 100644
 +    /* 128: See LP_HEADER_FLAG_ constants for possible values. Header flags are
 +     * independent of the version number and intended to be informational only.
 +     * New flags can be added without bumping the version.
++     *
++     * (Note there are no flags currently defined.)
 +     */
 +    uint32_t flags;
 +
@@ -108,15 +179,8 @@ index 8934aaf..41d8b0c 100644
 +    uint8_t reserved[124];
  } __attribute__((packed)) LpMetadataHeader;
  
-+/* This device uses Virtual A/B. Note that on retrofit devices, the expanded
-+ * header may not be present.
-+ */
-+#define LP_HEADER_FLAG_VIRTUAL_AB_DEVICE 0x1
-+
  /* This struct defines a logical partition entry, similar to what would be
-  * present in a GUID Partition Table.
-  */
-@@ -335,6 +377,25 @@ typedef struct LpMetadataBlockDevice {
+@@ -351,6 +370,25 @@ typedef struct LpMetadataBlockDevice {
   */
  #define LP_BLOCK_DEVICE_SLOT_SUFFIXED (1 << 0)
  
@@ -142,22 +206,67 @@ index 8934aaf..41d8b0c 100644
  #ifdef __cplusplus
  } /* extern "C" */
  #endif
+diff --git a/fs_mgr/liblp/io_test.cpp b/fs_mgr/liblp/io_test.cpp
+index b36f1c7..d4c7cff 100644
+--- a/fs_mgr/liblp/io_test.cpp
++++ b/fs_mgr/liblp/io_test.cpp
+@@ -369,7 +369,7 @@ TEST(liblp, TooManyPartitions) {
+     // Compute the maximum number of partitions we can fit in 512 bytes of
+     // metadata. By default there is the header, one partition group, and a
+     // block device entry.
+-    static const size_t kMaxPartitionTableSize = kMetadataSize - sizeof(LpMetadataHeader) -
++    static const size_t kMaxPartitionTableSize = kMetadataSize - sizeof(LpMetadataHeaderV1_0) -
+                                                  sizeof(LpMetadataPartitionGroup) -
+                                                  sizeof(LpMetadataBlockDevice);
+     size_t max_partitions = kMaxPartitionTableSize / sizeof(LpMetadataPartition);
+@@ -704,6 +704,32 @@ TEST(liblp, UpdateNonRetrofit) {
+     ASSERT_EQ(updated->block_devices.size(), static_cast<size_t>(1));
+     EXPECT_EQ(GetBlockDevicePartitionName(updated->block_devices[0]), "super");
+ }
++
++TEST(liblp, ReadExpandedHeader) {
++    unique_ptr<MetadataBuilder> builder = CreateDefaultBuilder();
++    ASSERT_NE(builder, nullptr);
++    ASSERT_TRUE(AddDefaultPartitions(builder.get()));
++
++    builder->RequireExpandedMetadataHeader();
++
++    unique_fd fd = CreateFakeDisk();
++    ASSERT_GE(fd, 0);
++
++    DefaultPartitionOpener opener(fd);
++
++    // Export and flash.
++    unique_ptr<LpMetadata> exported = builder->Export();
++    ASSERT_NE(exported, nullptr);
++    exported->header.flags = 0x5e5e5e5e;
++    ASSERT_TRUE(FlashPartitionTable(opener, "super", *exported.get()));
++
++    unique_ptr<LpMetadata> imported = ReadMetadata(opener, "super", 0);
++    ASSERT_NE(imported, nullptr);
++    EXPECT_EQ(imported->header.header_size, sizeof(LpMetadataHeaderV1_2));
++    EXPECT_EQ(imported->header.header_size, exported->header.header_size);
++    EXPECT_EQ(imported->header.flags, exported->header.flags);
++}
++
+ /*
+ TEST(liblp, ReadSuperPartition) {
+     auto slot_suffix = fs_mgr_get_slot_suffix();
 diff --git a/fs_mgr/liblp/reader.cpp b/fs_mgr/liblp/reader.cpp
-index dcee6d2d..19690fe 100644
+index 961aabd..ae6b018 100644
 --- a/fs_mgr/liblp/reader.cpp
 +++ b/fs_mgr/liblp/reader.cpp
-@@ -30,6 +30,10 @@
+@@ -30,6 +30,9 @@
  namespace android {
  namespace fs_mgr {
  
 +static_assert(sizeof(LpMetadataHeaderV1_0) == offsetof(LpMetadataHeader, flags),
 +              "Incorrect LpMetadataHeader v0 size");
 +
-+
  // Helper class for reading descriptors and memory buffers in the same manner.
  class Reader {
    public:
-@@ -160,30 +164,59 @@ static bool ValidateTableBounds(const LpMetadataHeader& header,
+@@ -160,30 +163,59 @@ static bool ValidateTableBounds(const LpMetadataHeader& header,
      return true;
  }
  
@@ -190,8 +299,7 @@ index dcee6d2d..19690fe 100644
      }
 -    // Check that the version is compatible.
      if (header.major_version != LP_METADATA_MAJOR_VERSION ||
--        header.minor_version > LP_METADATA_MINOR_VERSION) {
-+        header.minor_version > LP_METADATA_MINOR_VERSION_MAX) {
+         header.minor_version > LP_METADATA_MINOR_VERSION_MAX) {
          LERROR << "Logical partition metadata has incompatible version.";
          return false;
      }
@@ -231,7 +339,7 @@ index dcee6d2d..19690fe 100644
      if (!ValidateTableBounds(header, header.partitions) ||
          !ValidateTableBounds(header, header.extents) ||
          !ValidateTableBounds(header, header.groups) ||
-@@ -214,19 +247,21 @@ static std::unique_ptr<LpMetadata> ParseMetadata(const LpMetadataGeometry& geome
+@@ -214,19 +246,22 @@ static std::unique_ptr<LpMetadata> ParseMetadata(const LpMetadataGeometry& geome
                                                   Reader* reader) {
      // First read and validate the header.
      std::unique_ptr<LpMetadata> metadata = std::make_unique<LpMetadata>();
@@ -240,6 +348,7 @@ index dcee6d2d..19690fe 100644
 -        return nullptr;
 -    }
 -    if (!ValidateMetadataHeader(metadata->header)) {
++
 +    metadata->geometry = geometry;
 +    if (!ReadMetadataHeader(reader, metadata.get())) {
          return nullptr;
@@ -261,6 +370,23 @@ index dcee6d2d..19690fe 100644
      std::unique_ptr<uint8_t[]> buffer(new (std::nothrow) uint8_t[header.tables_size]);
      if (!buffer) {
          LERROR << "Out of memory reading logical partition tables.";
+diff --git a/fs_mgr/liblp/writer.cpp b/fs_mgr/liblp/writer.cpp
+index bffcb7e..14c46ee 100644
+--- a/fs_mgr/liblp/writer.cpp
++++ b/fs_mgr/liblp/writer.cpp
+@@ -73,10 +73,10 @@ std::string SerializeMetadata(const LpMetadata& input) {
+ 
+     // Compute header checksum.
+     memset(header.header_checksum, 0, sizeof(header.header_checksum));
+-    SHA256(&header, sizeof(header), header.header_checksum);
++    SHA256(&header, header.header_size, header.header_checksum);
+ 
+     std::string header_blob =
+-            std::string(reinterpret_cast<const char*>(&metadata.header), sizeof(metadata.header));
++            std::string(reinterpret_cast<const char*>(&header), header.header_size);
+     return header_blob + tables;
+ }
+ 
 -- 
 2.7.4
 

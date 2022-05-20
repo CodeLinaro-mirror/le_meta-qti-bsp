@@ -1,0 +1,150 @@
+From cd7a635dc7efeb3368886e7521e641ec7cdc0129 Mon Sep 17 00:00:00 2001
+From: David Anderson <dvander@google.com>
+Date: Thu, 22 Aug 2019 14:55:03 -0700
+Subject: [PATCH 1/1] liblp: Add an attribute to indicate that a partition has
+ been updated
+
+When the bootloader (or fastbootd) flashes the super partition, we need
+to make sure that init doesn't re-map any snapshot or snapshot-merge targets.
+A simple way to do this is to introduce an attribute that is only added
+by update_engine. When this flag is present, we know the partition has
+not been flashed.
+
+This bumps the minor version of LpMetadata. To make this as uninvasive
+as possible, the new minor version is only used when MetadataBuilder
+detects the new attribute. The new liblp can read older metadata, but will
+reject it if it contains an illegal attribute set.
+
+Bug: 139154795
+Test: liblp_test gtest
+Git-commit: cd7a635dc7efeb3368886e7521e641ec7cdc0129
+Git-repo: https://android.googlesource.com/platform/system/core
+
+Change-Id: I2bc0bb4aac445677ae3efc6cb3d315415681159b
+Signed-off-by: Futao He <quic_fhe@quicinc.com>
+---
+ fs_mgr/liblp/Makefile.am                     |  2 +-
+ fs_mgr/liblp/builder.cpp                     |  2 +-
+ fs_mgr/liblp/builder_test.cpp                |  2 +-
+ fs_mgr/liblp/include/liblp/metadata_format.h | 22 +++++++++++++++++++---
+ fs_mgr/liblp/reader.cpp                      | 11 +++++++++--
+ 5 files changed, 31 insertions(+), 8 deletions(-)
+
+diff --git a/fs_mgr/liblp/Makefile.am b/fs_mgr/liblp/Makefile.am
+index 626046d..9dd9fb1 100644
+--- a/fs_mgr/liblp/Makefile.am
++++ b/fs_mgr/liblp/Makefile.am
+@@ -22,7 +22,7 @@ bin_PROGRAMS := lp_test
+ lp_test_SOURCES := builder_test.cpp \
+                    io_test.cpp \
+                    test_partition_opener.cpp \
+-                   utility.cpp
++                   utility_test.cpp
+ 
+ lp_test_CPPFLAGS := -I$(srcdir)/include \
+                     -I$(top_srcdir)/base/include \
+diff --git a/fs_mgr/liblp/builder.cpp b/fs_mgr/liblp/builder.cpp
+index 27222af..ea921ac 100644
+--- a/fs_mgr/liblp/builder.cpp
++++ b/fs_mgr/liblp/builder.cpp
+@@ -222,7 +222,7 @@ MetadataBuilder::MetadataBuilder() : auto_slot_suffixing_(false), ignore_slot_su
+     memset(&header_, 0, sizeof(header_));
+     header_.magic = LP_METADATA_HEADER_MAGIC;
+     header_.major_version = LP_METADATA_MAJOR_VERSION;
+-    header_.minor_version = LP_METADATA_MINOR_VERSION;
++    header_.minor_version = LP_METADATA_MINOR_VERSION_MIN;
+     header_.header_size = sizeof(header_);
+     header_.partitions.entry_size = sizeof(LpMetadataPartition);
+     header_.extents.entry_size = sizeof(LpMetadataExtent);
+diff --git a/fs_mgr/liblp/builder_test.cpp b/fs_mgr/liblp/builder_test.cpp
+index 00673a1..5eb4bae 100644
+--- a/fs_mgr/liblp/builder_test.cpp
++++ b/fs_mgr/liblp/builder_test.cpp
+@@ -343,7 +343,7 @@ TEST_F(BuilderTest, BuilderExport) {
+     const LpMetadataHeader& header = exported->header;
+     EXPECT_EQ(header.magic, LP_METADATA_HEADER_MAGIC);
+     EXPECT_EQ(header.major_version, LP_METADATA_MAJOR_VERSION);
+-    EXPECT_EQ(header.minor_version, LP_METADATA_MINOR_VERSION);
++    EXPECT_EQ(header.minor_version, LP_METADATA_MINOR_VERSION_MIN);
+ 
+     ASSERT_EQ(exported->partitions.size(), 2);
+     ASSERT_EQ(exported->extents.size(), 3);
+diff --git a/fs_mgr/liblp/include/liblp/metadata_format.h b/fs_mgr/liblp/include/liblp/metadata_format.h
+index 8934aaf..6e928b4 100644
+--- a/fs_mgr/liblp/include/liblp/metadata_format.h
++++ b/fs_mgr/liblp/include/liblp/metadata_format.h
+@@ -39,7 +39,11 @@ extern "C" {
+ 
+ /* Current metadata version. */
+ #define LP_METADATA_MAJOR_VERSION 10
+-#define LP_METADATA_MINOR_VERSION 0
++#define LP_METADATA_MINOR_VERSION_MIN 0
++#define LP_METADATA_MINOR_VERSION_MAX 1
++
++/* Metadata version needed to use the UPDATED partition attribute. */
++#define LP_METADATA_VERSION_FOR_UPDATED_ATTR 1
+ 
+ /* Attributes for the LpMetadataPartition::attributes field.
+  *
+@@ -58,8 +62,20 @@ extern "C" {
+  */
+ #define LP_PARTITION_ATTR_SLOT_SUFFIXED (1 << 1)
+ 
+-/* Mask that defines all valid attributes. */
+-#define LP_PARTITION_ATTRIBUTE_MASK (LP_PARTITION_ATTR_READONLY | LP_PARTITION_ATTR_SLOT_SUFFIXED)
++/* This flag is applied automatically when using MetadataBuilder::NewForUpdate.
++ * It signals that the partition was created (or modified) for a snapshot-based
++ * update. If this flag is not present, the partition was likely flashed via
++ * fastboot.
++ */
++#define LP_PARTITION_ATTR_UPDATED (1 << 2)
++
++/* Mask that defines all valid attributes. When changing this, make sure to
++ * update ParseMetadata().
++ */
++#define LP_PARTITION_ATTRIBUTE_MASK_V0 \
++    (LP_PARTITION_ATTR_READONLY | LP_PARTITION_ATTR_SLOT_SUFFIXED)
++#define LP_PARTITION_ATTRIBUTE_MASK_V1 (LP_PARTITION_ATTRIBUTE_MASK_V0 | LP_PARTITION_ATTR_UPDATED)
++#define LP_PARTITION_ATTRIBUTE_MASK LP_PARTITION_ATTRIBUTE_MASK_V1
+ 
+ /* Default name of the physical partition that holds logical partition entries.
+  * The layout of this partition will look like:
+diff --git a/fs_mgr/liblp/reader.cpp b/fs_mgr/liblp/reader.cpp
+index dcee6d2d..961aabd 100644
+--- a/fs_mgr/liblp/reader.cpp
++++ b/fs_mgr/liblp/reader.cpp
+@@ -180,7 +180,7 @@ static bool ValidateMetadataHeader(const LpMetadataHeader& header) {
+     }
+     // Check that the version is compatible.
+     if (header.major_version != LP_METADATA_MAJOR_VERSION ||
+-        header.minor_version > LP_METADATA_MINOR_VERSION) {
++        header.minor_version > LP_METADATA_MINOR_VERSION_MAX) {
+         LERROR << "Logical partition metadata has incompatible version.";
+         return false;
+     }
+@@ -244,6 +244,13 @@ static std::unique_ptr<LpMetadata> ParseMetadata(const LpMetadataGeometry& geome
+         return nullptr;
+     }
+ 
++    uint32_t valid_attributes = 0;
++    if (metadata->header.minor_version >= LP_METADATA_VERSION_FOR_UPDATED_ATTR) {
++        valid_attributes = LP_PARTITION_ATTRIBUTE_MASK_V1;
++    } else {
++        valid_attributes = LP_PARTITION_ATTRIBUTE_MASK_V0;
++    }
++
+     // ValidateTableSize ensured that |cursor| is valid for the number of
+     // entries in the table.
+     uint8_t* cursor = buffer.get() + header.partitions.offset;
+@@ -252,7 +259,7 @@ static std::unique_ptr<LpMetadata> ParseMetadata(const LpMetadataGeometry& geome
+         memcpy(&partition, cursor, sizeof(partition));
+         cursor += header.partitions.entry_size;
+ 
+-        if (partition.attributes & ~LP_PARTITION_ATTRIBUTE_MASK) {
++        if (partition.attributes & ~valid_attributes) {
+             LERROR << "Logical partition has invalid attribute set.";
+             return nullptr;
+         }
+-- 
+2.7.4
+
