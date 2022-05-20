@@ -56,3 +56,5 @@ ro.debuggable=1
 #persist.vendor.sensors.enable.tdkMezzCard=false
 #persist.vendor.sensors.enable.NavMezzCard=false
 
+#perf client libname to communicate with perf
+ro.vendor.extension_library=libqti-perfd-client.so
