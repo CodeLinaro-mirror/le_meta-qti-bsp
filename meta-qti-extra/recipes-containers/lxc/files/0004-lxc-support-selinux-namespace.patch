@@ -1,0 +1,63 @@
+From eb66fab0823404913a0b04e8f17c8475277c96a0 Mon Sep 17 00:00:00 2001
+From: Lei wang <quic_leiwan@quicinc.com>
+Date: Tue, 21 Jun 2022 13:49:52 +0800
+Subject: [PATCH] lxc:support selinux namespace
+
+Signed-off-by: Lei wang <quic_leiwan@quicinc.com>
+---
+ src/lxc/start.c | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
+
+diff --git a/src/lxc/start.c b/src/lxc/start.c
+index 247890d..ba8d21b 100644
+--- a/src/lxc/start.c
++++ b/src/lxc/start.c
+@@ -1022,6 +1022,36 @@ void lxc_abort(struct lxc_handler *handler)
+ 	} while (ret > 0);
+ }
+ 
++static void unshare_selinux(char* name)
++{
++	const char *buf = "1";
++	if(strncmp (name, "android", 7)) {
++		TRACE("Skip to create selinux namespace in container %s", name);
++		return;
++	}
++
++	TRACE("Try to create selinux namespace in container %s", name);
++
++	if (mount("selinuxfs", "/sys/fs/selinux", "selinuxfs", 0, 0) == 0 || errno == EBUSY) {
++		TRACE("selinuxfs mounted");
++	}
++	// unshare
++	int fd = open("/sys/fs/selinux/unshare", O_WRONLY);
++	if (fd < 0)
++		TRACE("open unshare node failed %d", errno);
++	int ret = write(fd, buf, 1);
++	if (ret < 0)
++		ERROR("Failed to write unshare %d", errno);
++	else
++		TRACE("Write unshare successfully");
++
++	ret = close(fd);
++	if (ret)
++		ERROR("Failed to close unshare %d", errno);
++
++	return;
++}
++
+ static int do_start(void *data)
+ {
+ 	struct lxc_handler *handler = data;
+@@ -1073,6 +1103,8 @@ static int do_start(void *data)
+ 	if (ret < 0)
+ 		goto out_warn_father;
+ 
++	unshare_selinux(handler->name);
++
+ 	/* Unshare CLONE_NEWNET after CLONE_NEWUSER. See
+ 	 * https://github.com/lxc/lxd/issues/1978.
+ 	 */
+-- 
+2.7.4
+
