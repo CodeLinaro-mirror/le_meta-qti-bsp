@@ -1,5 +1,6 @@
 DEPENDS += "gbm gbm-headers \
             ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'libuhab', '', d)} \
+            libcutils \
             linux-msm-headers \
 "
 
