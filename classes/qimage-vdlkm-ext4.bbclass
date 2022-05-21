@@ -38,22 +38,23 @@ VDLKM_IMAGE_ROOTFS_SIZE = "${@get_size_in_bytes(d.getVar('VDLKM_SIZE_EXT4') or '
 VDLKMIMAGE_TARGET ?= "vendor_dlkm.img"
 VDLKMIMAGE_MAP_TARGET ?= "vendor_dlkm.map"
 
-# Copy systemd modules-load.d configs from main rootfs to vdlkm
+# Copy systemd modules-load.d configs from /etc to /lib/modules
+# so that both modules and configs will be part of vdlkm image.
 create_vdlkm_modules_load_d() {
-    install -d ${IMAGE_ROOTFS_EXT4}/lib/modules/modules-load.d/
-    for conf in ${IMAGE_ROOTFS_EXT4}${sysconfdir}/modules-load.d/*.conf; do
-        install -D -m 0644 $conf ${IMAGE_ROOTFS_EXT4}/lib/modules/modules-load.d/
+    install -d ${IMAGE_ROOTFS}/lib/modules/modules-load.d/
+    for conf in ${IMAGE_ROOTFS}${sysconfdir}/modules-load.d/*.conf; do
+        install -D -m 0644 $conf ${IMAGE_ROOTFS}/lib/modules/modules-load.d/
         rm -f $conf
     done
 }
+ROOTFS_POSTPROCESS_COMMAND += "create_vdlkm_modules_load_d"
 
 do_makevdlkm[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
-do_makevdlkm[prefuncs] += "create_vdlkm_modules_load_d"
 do_makevdlkm() {
     make_ext4fs -B ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${VDLKMIMAGE_MAP_TARGET} \
                 -s -l ${VDLKM_IMAGE_ROOTFS_SIZE} \
                 ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${VDLKMIMAGE_TARGET} \
-                ${IMAGE_ROOTFS_EXT4}/lib/modules
+                ${IMAGE_ROOTFS}/lib/modules
 }
 # It must be before do_makesystem to remove /lib/modules
 addtask do_makevdlkm after do_image before do_makesystem

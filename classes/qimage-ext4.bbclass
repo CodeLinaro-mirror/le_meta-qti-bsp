@@ -71,7 +71,6 @@ MACHINE_FSCONFIG_CONF_SEARCH_PATH ?= "${@':'.join('%s/conf/machine/fsconfig' % p
 MACHINE_FSCONFIG_CONF_FULL_PATH = "${@machine_search(d.getVar('MACHINE_FSCONFIG_CONF'), d.getVar('MACHINE_FSCONFIG_CONF_SEARCH_PATH')) or ''}"
 
 create_symlink_systemd_ext4_mount_rootfs() {
-
     # Symlink ext4 mount files to systemd targets
     for entry in ${MACHINE_MNT_POINTS}; do
         mountname="${entry:1}"
@@ -113,8 +112,8 @@ python create_rootfs_ext4 () {
     else:
         bb.error("rootfs is not generated")
 }
-do_image[postfuncs] += "create_rootfs_ext4"
 
+do_makesystem[prefuncs] += "create_rootfs_ext4"
 do_makesystem[prefuncs] += "create_symlink_systemd_ext4_mount_rootfs"
 # The system image size update that happens in do_make_verity_enabled_system_image
 #  step is not persistent outside that task scope. Update it again within this
