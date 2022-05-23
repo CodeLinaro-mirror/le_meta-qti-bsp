@@ -1,4 +1,6 @@
 DEPENDS += "gbm gbm-headers \
+            display-commonsys-intf-linux \
+            libion libsync \
             ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'libuhab', '', d)} \
             libcutils \
             linux-msm-headers \
