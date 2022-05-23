@@ -47,7 +47,7 @@ create_vdlkm_modules_load_d() {
         rm -f $conf
     done
 }
-ROOTFS_POSTPROCESS_COMMAND += "create_vdlkm_modules_load_d"
+ROOTFS_POSTPROCESS_COMMAND += "create_vdlkm_modules_load_d;"
 
 do_makevdlkm[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
 do_makevdlkm() {
