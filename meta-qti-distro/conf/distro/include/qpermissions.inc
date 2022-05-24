@@ -21,6 +21,9 @@ USERADD_PARAM:${PN} ?= 	" \
 			-u 4021 -U locclient; \
 			-u 4022 -U vnw; \
 			-G system,locclient -u 1021 -U gps; \
+			-G audio -u 4050 -U acdb-loader; \
+			-G audio -u 4051 -U amfs; \
+			-u 4052 -U codec2; \
 			"
 
 GROUPADD_PARAM:${PN} ?=	" \
