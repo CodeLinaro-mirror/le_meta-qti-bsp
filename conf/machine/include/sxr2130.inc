@@ -15,9 +15,9 @@ MACHINE_MNT_POINTS = "/firmware \
                       /persist \
                      "
 
-# Sizes for EXT4 (in bytes)
-SYSTEM_SIZE_EXT4 ?= "524288000"
-USERDATA_SIZE_EXT4 ?= "2147483648"
+# Sizes for EXT4
+SYSTEM_SIZE_EXT4 ?= "500MiB"
+USERDATA_SIZE_EXT4 ?= "2GiB"
 
 # Formats of root filesystem images.
 IMAGE_FSTYPES += "ext4"

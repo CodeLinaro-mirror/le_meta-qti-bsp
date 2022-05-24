@@ -31,12 +31,27 @@
 
 inherit populate_sdk_ext
 
+COPY_DIRECTORY_TREE = "${COREBASE}/meta-qti-bsp/files/copy_directory_tree.sh"
+
 python copy_buildsystem_append() {
+    import subprocess
     # Create src directory in extensible SDK to copy the project sources
     bb.utils.mkdirhier(baseoutpath + '/src')
     # Enable the use of WORKSPACE variable on an extensible SDK
     with open(baseoutpath + '/conf/bblayers.conf', 'a') as f:
         f.write('WORKSPACE = "$' + '{TOPDIR}/src"\n')
+    # Copy kernel artifacts to extensible SDK
+    src_kernel_platform = os.path.abspath(d.getVar('WORKSPACE') + '/kernel-' + d.getVar('PREFERRED_VERSION_linux-msm')) + '/kernel_platform'
+    dest_kernel_platform = baseoutpath + '/src/kernel-' + d.getVar('PREFERRED_VERSION_linux-msm') + '/kernel_platform'
+    bb.utils.mkdirhier(dest_kernel_platform)
+    cmd = "%s %s %s" % (d.getVar('COPY_DIRECTORY_TREE'), src_kernel_platform, dest_kernel_platform)
+    subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
+
+    src_kernel_defconfig =  os.path.abspath(d.getVar('WORKSPACE') + '/kernel-' + d.getVar('PREFERRED_VERSION_linux-msm')) + '/out/' + d.getVar('KERNEL_DEFCONFIG')
+    dest_kernel_defconfig =  baseoutpath + '/src/kernel-' + d.getVar('PREFERRED_VERSION_linux-msm') + '/out/' + d.getVar('KERNEL_DEFCONFIG')
+    bb.utils.mkdirhier(dest_kernel_defconfig)
+    cmd = "%s %s %s" % (d.getVar('COPY_DIRECTORY_TREE'), src_kernel_defconfig, dest_kernel_defconfig)
+    subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
 }
 
 # To include protoc compiler in SDK

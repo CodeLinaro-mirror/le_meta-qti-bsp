@@ -1,69 +1,39 @@
-DEPENDS += "cryptsetup-native openssl-native"
+# Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted (subject to the limitations in the
+# disclaimer below) provided that the following conditions are met:
+#
+#    * Redistributions of source code must retain the above copyright
+#      notice, this list of conditions and the following disclaimer.
+#
+#    * Redistributions in binary form must reproduce the above
+#      copyright notice, this list of conditions and the following
+#      disclaimer in the documentation and/or other materials provided
+#       with the distribution.
+#
+#    * Neither the name of Qualcomm Innovation Center, Inc. nor the names of its
+#      contributors may be used to endorse or promote products derived
+#           from this software without specific prior written permission.
+#
+# NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
+# GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
+# HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+# WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+# IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+# ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+# GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+# IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+# IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-CONFLICT_MACHINE_FEATURES += " dm-verity-bootloader dm-verity-none"
+# Generates boot.img without verity
 
-CORE_IMAGE_EXTRA_INSTALL += "cryptsetup"
+CONFLICT_MACHINE_FEATURES += " dm-verity-bootloader dm-verity-initramfs"
 
-VERITY_SALT = "aee087a5be3b982978c923f566a94613496b417f2af592639bc80d141e34dfe7"
-BLOCK_SIZE = "4096"
-FEC_ROOTS = "2"
-
-VERITY_HASH_DEVICE = "${WORKDIR}/${IMAGE_NAME}.verityhash"
-VERITY_FEC_DEVICE = "${WORKDIR}/${IMAGE_NAME}.verityfec"
-UNSPARSED_SYSTEMIMAGE = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMIMAGE_TARGET}"
-
-python adjust_system_size_for_verity () {
-    system_size = int(d.getVar('SYSTEM_IMAGE_ROOTFS_SIZE'))
-    block_size = int(d.getVar('BLOCK_SIZE'))
-    data_blocks = int(system_size / block_size)
-    d.setVar('DATA_BLOCKS', str(data_blocks))
-    if system_size % block_size != 0:
-        bb.warn("aligning system size to {} bytes".format(block_size))
-        d.setVar('SYSTEM_SIZE_EXT4', str(data_blocks * block_size))
-}
-do_makesystem[prefuncs] += "adjust_system_size_for_verity"
-
-append_verity_metadata_to_system_image () {
-    # Reformat the system image with verity support
-    veritysetup format ${UNSPARSED_SYSTEMIMAGE} \
-                ${VERITY_HASH_DEVICE} \
-                --data-blocks ${DATA_BLOCKS} \
-                --fec-device ${VERITY_FEC_DEVICE} \
-                --fec-roots ${FEC_ROOTS} \
-                --salt ${VERITY_SALT} > ${WORKDIR}/verity_metadata.txt
-
-    # Append hash and fec data to the end of the system image after calculating offsets
-    hash_offset=${SYSTEM_SIZE_EXT4}
-    hash_size=`wc -c ${VERITY_HASH_DEVICE} | awk '{print $1}'`
-    fec_offset=`expr ${hash_offset} + ${hash_size}`
-    cat ${VERITY_HASH_DEVICE} >> ${UNSPARSED_SYSTEMIMAGE}
-    cat ${VERITY_FEC_DEVICE} >> ${UNSPARSED_SYSTEMIMAGE}
-
-    # Generate environment variables for veritysetup on target system
-    root_hash=`awk -F ':' '{ if ($1 == "Root hash") print $2 }' ${WORKDIR}/verity_metadata.txt | sed "s/^[ \t]*//"`
-    cat <<-EOF > ${WORKDIR}/verity.env
-	VERITY_DATA_BLOCKS=${DATA_BLOCKS}
-	VERITY_HASH_OFFSET=${hash_offset}
-	VERITY_FEC_OFFSET=${fec_offset}
-	VERITY_FEC_ROOTS=${FEC_ROOTS}
-	VERITY_SALT=${VERITY_SALT}
-	VERITY_ROOT_HASH=${root_hash}
-	EOF
-
-    # Sign the root hash
-    echo -n "${root_hash}" > ${WORKDIR}/roothash.txt
-    openssl smime -sign -nocerts -noattr -binary -in ${WORKDIR}/roothash.txt -inkey ${STAGING_KERNEL_BUILDDIR}/certs/verity_key.pem -signer ${STAGING_KERNEL_BUILDDIR}/certs/verity_cert.pem -outform der -out ${WORKDIR}/verity_sig.txt
-
-    # Clean up large files that are no longer needed
-    rm ${VERITY_HASH_DEVICE}
-    rm ${VERITY_FEC_DEVICE}
-}
-do_makesystem[postfuncs] += "append_verity_metadata_to_system_image"
-
-# ramdisk creation now requires the verity artifacts
-do_ramdisk_create[depends] += "${PN}:do_makesystem"
-
-##### Generate boot.img ######
 BOOTIMGDEPLOYDIR = "${WORKDIR}/deploy-${PN}-bootimage-complete"
 
 INITRAMFS_IMAGE ?= ''
@@ -87,7 +57,7 @@ python do_makeboot () {
     # Set cmdline
     cmdline=""
     if ((int(d.getVar("BOOT_HEADER_VERSION") or "0") < 3) or (d.getVar("SKIP_VENDOR_BOOT") or "True") == "True"):
-        cmdline = " --cmdline" + "\"" + d.getVar('KERNEL_CMD_PARAMS', True) + "\""
+        cmdline = " --cmdline " + "\"" + d.getVar('KERNEL_CMD_PARAMS', True) + "\""
     else:
         cmdline     = " --vendor_cmdline " + "\"" + d.getVar('KERNEL_CMD_PARAMS', True) + "\""
 
@@ -113,11 +83,11 @@ python do_makeboot () {
     # cmd to make boot.img
     cmd =  mkboot_bin_path + " --kernel %s %s --pagesize %s --base %s --ramdisk %s --ramdisk_offset 0x0 %s --output %s" \
            % (zimg_path, cmdline, pagesize, base, ramdisk_path, xtra_parms, output )
-    bb.debug(1, "dm-verity-initramfs do_makeboot cmd: %s" % (cmd))
+    bb.debug(1, "dm-verity-none do_makeboot cmd: %s" % (cmd))
     try:
         ret = subprocess.check_output(cmd, shell=True)
     except RuntimeError as e:
-        bb.error("dm-verity-initramfs cmd: %s failed with error %s" % (cmd, str(e)))
+        bb.error("dm-verity-none cmd: %s failed with error %s" % (cmd, str(e)))
 
 }
 do_makeboot[dirs]      = "${BOOTIMGDEPLOYDIR}/${IMAGE_BASENAME}"
@@ -134,4 +104,10 @@ python do_makeboot_setscene () {
 }
 addtask do_makeboot_setscene
 
-addtask do_makeboot before do_image_complete
+# Order task dependencies between boot and techpack dtbo creation
+python () {
+    if (d.getVar("BUILD_WITH_TECHPACKS") or "0") == "1":
+        bb.build.addtask('do_makeboot', 'do_image_complete', 'do_merge_techpack_dtbos', d)
+    else:
+        bb.build.addtask('do_makeboot', 'do_image_complete', 'do_image', d)
+}

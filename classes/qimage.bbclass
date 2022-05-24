@@ -1,5 +1,6 @@
 QIMGCLASSES = "core-image qimage-utils python3native"
-QIMGCLASSES += "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.filter('MACHINE_FEATURES', 'dm-verity-bootloader dm-verity-initramfs', d), '', d)}"
+QIMGCLASSES += "${@bb.utils.filter('MACHINE_FEATURES', 'dm-verity-none dm-verity-bootloader dm-verity-initramfs', d)}"
+QIMGCLASSES += "${@bb.utils.contains('MACHINE_SUPPORTS_DTBO', 'True', 'qimage-dtbo', '', d)}"
 QIMGCLASSES += "${@bb.utils.contains('IMAGE_FSTYPES', 'ext4', 'qimage-ext4', '', d)}"
 QIMGCLASSES += "${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', 'qimage-ubi', '', d)}"
 
@@ -7,18 +8,6 @@ QIMGCLASSES += "${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', 'qimage-ubi', '', d
 QIMGEXTENSION ?= ""
 
 inherit ${QIMGCLASSES} ${QIMGEXTENSION}
-
-# Sanity check to ensure dm-verity related configurations are valid
-python () {
-    if 'dm-verity' not in d.getVar('DISTRO_FEATURES'):
-        return
-    machine_features = set(d.getVar('MACHINE_FEATURES').split(' '))
-    verity_features = machine_features & set(['dm-verity-none', 'dm-verity-bootloader', 'dm-verity-initramfs'])
-    if len(verity_features) == 0:
-        bb.fatal("dm-verity in DISTRO_FEATURES but no MACHINE_FEATURES present. Add dm-verity-bootloader or dm-verity-none to MACHINE_FEATURES")
-    if len(verity_features) > 1:
-        bb.fatal("dm-verity in DISTRO_FEATURES and multiple dm-verity related MACHINE_FEATURES present. Only one may be present")
-}
 
 # The work directory for image recipes is retained as the 'rootfs' directory
 # can be used as sysroot during remote gdb debgging
@@ -34,6 +23,7 @@ IMAGE_VERSION_SUFFIX = ""
 # Default Image names
 BOOTIMAGE_TARGET ?= "boot.img"
 DTBOIMAGE_TARGET ?= "dtbo.img"
+VBOOTIMAGE_TARGET ?= "vendor_boot.img"
 
 #Set appropriate partion:Image map
 NONAB_BOOT_PARTITION_IMAGE_MAP = "boot='${BOOTIMAGE_TARGET}',system='${SYSTEMIMAGE_TARGET}',userdata='${USERDATAIMAGE_TARGET}',persist='${PERSISTIMAGE_TARGET}',dtbo='${DTBOIMAGE_TARGET}'"
@@ -181,106 +171,46 @@ python rootfs_ignore_packages() {
     d.setVar("PACKAGE_INSTALL_ATTEMPTONLY", ' '.join(atmt_only_pkgs))
 }
 
-################################################
-############# Generate boot.img ################
-################################################
-BOOTIMGDEPLOYDIR = "${WORKDIR}/deploy-${PN}-bootimage-complete"
-
-INITRAMFS_IMAGE ?= ''
-RAMDISK = "${DEPLOY_DIR_IMAGE}/${INITRAMFS_IMAGE}-${MACHINE}.${INITRAMFS_FSTYPES}"
-def get_ramdisk_path(d):
-    if os.path.exists(d.getVar('RAMDISK')):
-        return '%s' %(d.getVar('RAMDISK'))
-    return '/dev/null'
-
-RAMDISK_PATH = "${@get_ramdisk_path(d)}"
-
-MKBOOTUTIL = '${@oe.utils.conditional("PREFERRED_PROVIDER_virtual/mkbootimg-native", "mkbootimg-gki-native", "scripts/mkbootimg.py", "mkbootimg", d)}'
-
-python do_make_bootimg () {
-    import subprocess
-
-    xtra_parms=""
-    if bb.utils.contains('MACHINE_FEATURES', 'nand-boot', True, False, d):
-        xtra_parms = " --tags-addr" + " " + d.getVar('KERNEL_TAGS_OFFSET')
-    if (d.getVar("BOOT_HEADER_VERSION") or "0") != "0":
-        xtra_parms += " --header_version " + d.getVar('BOOT_HEADER_VERSION')
-        # header version setting expects dtb to be passed seprately but not appended to kernel
-        xtra_parms += " --dtb " + d.getVar('DEPLOY_DIR_IMAGE', True) + "/" + d.getVar('KERNEL_DTB_NAMES').strip()
-
-    mkboot_bin_path = d.getVar('STAGING_BINDIR_NATIVE', True) + "/" + d.getVar('MKBOOTUTIL')
-    ramdisk_path    = d.getVar('RAMDISK_PATH')
-    zimg_path       = d.getVar('DEPLOY_DIR_IMAGE', True) + "/" + d.getVar('KERNEL_IMAGETYPE', True)
-    cmdline         = "\"" + d.getVar('KERNEL_CMD_PARAMS', True) + "\""
-    pagesize        = d.getVar('PAGE_SIZE', True)
-    base            = d.getVar('KERNEL_BASE', True)
-
-    # When verity is enabled add '.noverity' suffix to default boot img.
-    output          = d.getVar('BOOTIMAGE_TARGET', True)
-    if bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains('MACHINE_FEATURES', 'dm-verity-bootloader', True, False, d), False, d):
-            output += ".noverity"
-
-    # cmd to make boot.img
-    cmd =  mkboot_bin_path + " --kernel %s --cmdline %s --pagesize %s --base %s --ramdisk %s --ramdisk_offset 0x0 %s --output %s" \
-           % (zimg_path, cmdline, pagesize, base, ramdisk_path, xtra_parms, output )
-
-    bb.debug(1, "do_make_bootimg cmd: %s" % (cmd))
-
-    ret = subprocess.call(cmd, shell=True)
-    if ret != 0:
-        bb.error("Running: %s failed." % cmd)
-
-}
-do_make_bootimg[dirs]      = "${BOOTIMGDEPLOYDIR}/${IMAGE_BASENAME}"
-# Make sure native tools and vmlinux ready to create boot.img
-do_make_bootimg[depends] += "virtual/kernel:do_deploy virtual/mkbootimg-native:do_populate_sysroot"
-SSTATETASKS += "do_make_bootimg"
-SSTATE_SKIP_CREATION_task-make-bootimg = '1'
-do_make_bootimg[sstate-inputdirs] = "${BOOTIMGDEPLOYDIR}"
-do_make_bootimg[sstate-outputdirs] = "${DEPLOY_DIR_IMAGE}"
-do_make_bootimg[stamp-extra-info] = "${MACHINE_ARCH}"
-
-python do_make_bootimg_setscene () {
-    sstate_setscene(d)
-}
-addtask do_make_bootimg_setscene
-
-addtask do_make_bootimg before do_image_complete
-################################################
-############# Generate dtbo.img ################
-################################################
-
-MKDTUTIL = '${@oe.utils.conditional("PREFERRED_PROVIDER_virtual/mkdtimg-native", "mkdtimg-gki-native", "mkdtboimg.py", "mkdtimg", d)}'
-DTBODEPLOYDIR = "${WORKDIR}/deploy-${PN}-dtboimage-complete"
-
-# Create dtbo.img if DTBO support is enabled
-python do_make_dtboimg () {
-    import subprocess
-
-    mkdtimg_bin_path = d.getVar('STAGING_BINDIR_NATIVE', True) + "/" + d.getVar('MKDTUTIL')
-    dtbodeploydir = d.getVar('DEPLOY_DIR_IMAGE', True) + "/" + "DTOverlays"
-    pagesize = d.getVar("PAGE_SIZE")
-    output          = d.getVar('DTBOIMAGE_TARGET', True)
-    # cmd to make dtbo.img
-    cmd = mkdtimg_bin_path + " create "+ output +" --page_size="+ pagesize +" "+ dtbodeploydir + "/*.dtbo"
-    bb.debug(1, "do_make_dtboimg cmd: %s" % (cmd))
-    ret = subprocess.call(cmd, shell=True)
-}
-
-do_make_dtboimg[dirs]      = "${DTBODEPLOYDIR}/${IMAGE_BASENAME}"
-# Make sure dtb files ready to create dtbo.img
-do_make_dtboimg[depends] += "virtual/kernel:do_deploy virtual/mkdtimg-native:do_populate_sysroot"
-SSTATETASKS += "do_make_dtboimg"
-SSTATE_SKIP_CREATION_task-make-dtboimg = '1'
-do_make_dtboimg[sstate-inputdirs] = "${DTBODEPLOYDIR}"
-do_make_dtboimg[sstate-outputdirs] = "${DEPLOY_DIR_IMAGE}"
-do_make_dtboimg[stamp-extra-info] = "${MACHINE_ARCH}"
-
-python do_make_dtboimg_setscene () {
-    sstate_setscene(d)
-}
-
+# Order task dependencies between boot and dtbo creation
 python () {
-    if d.getVar('MACHINE_SUPPORTS_DTBO'):
-       bb.build.addtask('do_make_dtboimg', 'do_image', 'do_rootfs', d)
+    if (d.getVar("BUILD_WITH_TECHPACKS") or "0") == "1":
+        bb.build.addtask('do_merge_techpack_dtbos', 'do_image', 'do_rootfs', d)
+        bb.build.addtask('do_makeboot', 'do_image_complete', 'do_merge_techpack_dtbos', d)
+        if d.getVar('MACHINE_SUPPORTS_DTBO'):
+           bb.build.addtask('do_makedtbo', 'do_image_complete', 'do_merge_techpack_dtbos', d)
+    else:
+        bb.build.addtask('do_makeboot', 'do_image_complete', 'do_image', d)
+        if d.getVar('MACHINE_SUPPORTS_DTBO'):
+           bb.build.addtask('do_makedtbo', 'do_image_complete', 'do_image', d)
 }
+
+############################################################
+# Merge tech dtbos before generating boot.img and dtbo.img #
+############################################################
+MRGDTBODEPLOYDIR = "${WORKDIR}/deploy-${PN}-mergedtbo-complete"
+python do_merge_techpack_dtbos () {
+    import subprocess
+
+    mrgdtbos_bin_path = d.getVar('STAGING_BINDIR_NATIVE', True) + "/merge_dtbs/merge_dtbs.py"
+    dtbotpdir = d.getVar('DEPLOY_DIR_IMAGE', True) + "/" + "tech_dtbs"
+    dtbokpdir = d.getVar('DEPLOY_DIR_IMAGE', True) + "/" + "kernel_dtbs"
+    dtbodir = d.getVar('DEPLOY_DIR_IMAGE', True) + "/" + "DTOverlays"
+    tp_dtbos_found = False
+    if os.path.exists(dtbotpdir):
+        for f in os.listdir(dtbotpdir):
+            if f.endswith('.dtbo'):
+                  tp_dtbos_found = True
+                  break
+    if tp_dtbos_found:
+        cmd = mrgdtbos_bin_path + " "+ dtbokpdir +" "+ dtbotpdir +" "+ dtbodir
+        bb.debug(1, "merge_techpack_dtbos cmd: %s" % (cmd))
+        try:
+            subprocess.check_output(cmd, shell=True)
+        except RuntimeError as e:
+            bb.error("cmd: %s failed with error %s" % (cmd, str(e)))
+    else:
+        bb.debug(1, "No techpack dtbos to merge")
+        oe.path.copytree(dtbokpdir, dtbodir)
+}
+do_merge_techpack_dtbos[cleandirs] = "${DEPLOY_DIR_IMAGE}/DTOverlays"
+do_merge_techpack_dtbos[depends] += " merge-dtbs-gki-native:do_populate_sysroot"

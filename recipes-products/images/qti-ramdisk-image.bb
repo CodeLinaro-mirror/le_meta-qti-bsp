@@ -11,7 +11,7 @@ PACKAGE_INSTALL = "\
     usb-composition \
     busybox \
     ext4-utils \
-    gki-kernel-modules-first-stage \
+    ${@d.getVar('kern_mods')} \
     fsmgr \
     glib-2.0 \
     glibc \
@@ -35,3 +35,12 @@ IMAGE_LINGUAS = ""
 SYSTEMD_DEFAULT_TARGET = "initrd.target"
 
 inherit core-image
+
+# Add dependency on vendor ramdisk
+python () {
+    if ((int(d.getVar("BOOT_HEADER_VERSION") or "0") >= 3) and (d.getVar("SKIP_VENDOR_BOOT") or "True") == "False"):
+        d.setVar("kern_mods", "")
+        d.appendVarFlag('do_image', 'depends', ' ${VENDOR_INITRAMFS_IMAGE}:do_image_complete')
+    else:
+        d.setVar("kern_mods", "gki-kernel-modules-first-stage")
+}

@@ -1,0 +1,17 @@
+# Provides packages required to build QTI vendor Ramdisk archive
+
+LICENSE = "BSD-3-Clause"
+
+inherit core-image
+
+# Ramdisk image generation doesn't need abl
+EXTRA_IMAGEDEPENDS_remove = "edk2"
+
+PACKAGE_INSTALL = "\
+    gki-kernel-modules-first-stage \
+"
+
+IMAGE_FSTYPES = "${INITRAMFS_FSTYPES}"
+IMAGE_NAME_SUFFIX = ""
+IMAGE_FEATURES = ""
+IMAGE_LINGUAS = ""

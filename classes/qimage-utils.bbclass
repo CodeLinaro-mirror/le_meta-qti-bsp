@@ -42,3 +42,38 @@ def machine_search(f, search_path):
         if searched:
             return searched
 
+def get_size_in_bytes (size):
+    import re
+    split_size = re.split("[aA-zZ]", size)
+    partition_size = split_size[0].strip()
+
+    split_unit = re.split("[0-9]", size)
+    split_len = len(split_unit)
+    partition_unit = split_unit[split_len-1].strip()
+
+    bb.debug(1, "get_size_in_bytes: unit: %s" %partition_unit)
+    bb.debug(1, "get_size_in_bytes: size: %s" %partition_size)
+
+    if (partition_unit.lower() == "KB".lower()):
+        size = int(partition_size)*1000
+    elif (partition_unit.lower() == "KiB".lower()):
+        size = int(partition_size)*1024
+    elif (partition_unit.lower() == "MB".lower()):
+        size = int(partition_size)*1000*1000
+    elif (partition_unit.lower() == "MiB".lower()):
+        size = int(partition_size)*1024*1024
+    elif (partition_unit.lower() == "GB".lower()):
+        size = int(partition_size)*1000*1000*1000
+    elif (partition_unit.lower() == "GiB".lower()):
+        size = int(partition_size)*1024*1024*1024
+    elif (partition_unit.lower() == "TB".lower()):
+        size = int(partition_size)*1000*1000*1000*1000
+    elif (partition_unit.lower() == "TiB".lower()):
+        size = int(partition_size)*1024*1024*1024*1024
+    elif (not (partition_unit and partition_unit.strip())):
+        size = int(partition_size)
+    else:
+        bb.note("get_size_in_bytes: unhandled unit")
+        size = int(partition_size)
+    bb.debug(1, "get_size_in_bytes: final size in bytes: %s" %size)
+    return size
