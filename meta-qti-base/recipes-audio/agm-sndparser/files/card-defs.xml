@@ -39,6 +39,7 @@
         <props>
             <playback>1</playback>
             <capture>0</capture>
+            <agm_data_mode>2</agm_data_mode>
         </props>
     </pcm-device>
 
@@ -51,6 +52,7 @@
         <props>
             <playback>1</playback>
             <capture>0</capture>
+            <agm_data_mode>2</agm_data_mode>
         </props>
     </pcm-device>
 
@@ -63,6 +65,7 @@
         <props>
             <playback>1</playback>
             <capture>0</capture>
+            <agm_data_mode>2</agm_data_mode>
         </props>
     </pcm-device>
 
@@ -75,6 +78,7 @@
         <props>
             <playback>1</playback>
             <capture>0</capture>
+            <agm_data_mode>2</agm_data_mode>
         </props>
     </pcm-device>
 <!-- capture devices -->
@@ -87,6 +91,7 @@
         <props>
             <playback>0</playback>
             <capture>1</capture>
+            <agm_data_mode>2</agm_data_mode>
         </props>
     </pcm-device>
 
@@ -99,6 +104,7 @@
         <props>
             <playback>0</playback>
             <capture>1</capture>
+            <agm_data_mode>2</agm_data_mode>
         </props>
     </pcm-device>
 
@@ -113,6 +119,7 @@
             <playback>1</playback>
             <capture>0</capture>
             <session_mode>1</session_mode>
+            <agm_data_mode>2</agm_data_mode>
         </props>
     </pcm-device>
 
@@ -126,6 +133,7 @@
             <playback>1</playback>
             <capture>0</capture>
             <session_mode>1</session_mode>
+            <agm_data_mode>2</agm_data_mode>
         </props>
     </pcm-device>
 
@@ -139,6 +147,7 @@
             <playback>1</playback>
             <capture>0</capture>
             <session_mode>1</session_mode>
+            <agm_data_mode>2</agm_data_mode>
         </props>
     </pcm-device>
 <!-- hostless capture devices -->
@@ -152,6 +161,7 @@
             <playback>0</playback>
             <capture>1</capture>
             <session_mode>1</session_mode>
+            <agm_data_mode>2</agm_data_mode>
         </props>
     </pcm-device>
 
@@ -165,6 +175,7 @@
             <playback>0</playback>
             <capture>1</capture>
             <session_mode>1</session_mode>
+            <agm_data_mode>2</agm_data_mode>
         </props>
     </pcm-device>
 

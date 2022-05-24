@@ -3,7 +3,7 @@ DESCRIPTION = "This is the AGM alsa plugin to support alsa lib APIs."
 HOMEPAGE = "http://git.codelinaro.org"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
-DEPENDS += "agm-client agm-sndparser alsa-lib  ar-osal ar-util glib-2.0 gsl-fe-noship libuhab linux-msm-headers spf"
+DEPENDS += "agm-client agm-sndparser glib-2.0 linux-msm-headers spf"
 
 SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/agm/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/agm/plugins/alsalib;subpath=alsalib;usehead=1 \
            file://agm.conf \
@@ -27,6 +27,15 @@ do_install:append() {
         mv ${i} ${D}${libdir}/alsa-lib/
     done
 }
+
+PACKAGE_ARCH = "${MACHINE_ARCH}"
+
+RDEPENDS:${PN} += "\
+    alsa-lib \
+    ar-osal \
+    ar-util \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'gsl-fe-noship libuhab', 'gsl', d)} \
+"
 
 SOLIBS = ".so"
 FILES_SOLIBSDEV = ""
