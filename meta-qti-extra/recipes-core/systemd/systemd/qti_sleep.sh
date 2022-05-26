@@ -49,6 +49,8 @@ case $1/$2 in
     wait $PID_KW
     wait $PID_KH
 
+    systemctl stop init_qti_wlan_auto.service
+
     # set all usb mode to none
     echo none > /sys/devices/platform/soc/a600000.ssusb/mode
     echo none > /sys/devices/platform/soc/a800000.ssusb/mode
@@ -69,5 +71,9 @@ case $1/$2 in
     systemctl restart loc_launcher.service
     systemctl restart location_hal_daemon.service
     systemctl restart audiod.service
+
+    #load WLAN
+    sleep 3
+    systemctl restart init_qti_wlan_auto.service
     ;;
 esac
