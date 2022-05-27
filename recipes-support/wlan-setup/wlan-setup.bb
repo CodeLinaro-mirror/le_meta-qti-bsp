@@ -1,5 +1,5 @@
 DESCRIPTION = "Utility facilitating wifi auto connection to preconfigured AP"
-HOMEPAGE    = "http://codeaurora.org"
+HOMEPAGE    = "http://git.codelinaro.org"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};\
 md5=550794465ba0ec5312d6919e203a55f9"
