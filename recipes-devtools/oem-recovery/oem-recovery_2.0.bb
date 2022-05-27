@@ -1,5 +1,4 @@
 inherit autotools-brokensep pkgconfig
-PR = "r1"
 
 DESCRIPTION = "OEM Recovery"
 LICENSE = "BSD-3-Clause"
