@@ -48,6 +48,8 @@ EXTRA_OEMAKE = "'CLANG_BIN=${CLANG_BIN_PATH}' \
                 'EARLY_ETH_ENABLED=${EARLY_ETH}'\
                 'EARLY_ETH_AS_DLKM=1' \
                 'TARGET_BOARD_TYPE_AUTO=1' \
+                'AB_RETRYCOUNT_DISABLE=1' \
+                'ENABLE_LV_ATOMIC_AB=1' \
                 'DYNAMIC_PARTITION_SUPPORT=${FASTBOOTD_ENABLED}' \
                 'UBSAN_UEFI_GCC_FLAG_ALIGNMENT=-Wno-misleading-indentation'"
 
