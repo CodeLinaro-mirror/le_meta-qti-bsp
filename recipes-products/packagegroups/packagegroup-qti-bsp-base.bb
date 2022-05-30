@@ -26,10 +26,14 @@ RDEPENDS_packagegroup-android-utils-base = "\
     ${@oe.utils.conditional('PROPERTIES_SUPPORT', 'True', 'system-prop', '', d)} \
     "
 
+ADDON_SCRIPTS ?= ""
+ADDON_SCRIPTS_neo = "helios-start"
+
 # Startup scripts needed during device bootup
 RDEPENDS_packagegroup-startup-scripts-base = "\
     ${@bb.utils.contains('COMBINED_FEATURES', 'qti-ab-boot', 'ab-slot-util', '', d)} \
     ${@oe.utils.conditional('USB_SUPPORT', 'True', 'usb-composition', '', d)} \
     post-boot \
     sdcard-scripts-automount \
+    ${ADDON_SCRIPTS} \
     "
