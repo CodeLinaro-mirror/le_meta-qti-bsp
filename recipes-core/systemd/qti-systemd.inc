@@ -15,8 +15,6 @@ SRC_URI += "file://set-mhi-nodes.rules"
 SRC_URI += "file://99-gpiochardev.rules"
 SRC_URI += "file://kmem.rules"
 
-RDEPENDS_${PN}_remove = "${@bb.utils.contains('MACHINE_MNT_POINTS', '/systemrw', '', 'volatile-binds', d)}"
-
 # Custom setup for PACKAGECONFIG to get a slimmer systemd.
 # Removed following:
 #   * backlight - Loads/Saves Screen Backlight Brightness, not required.
