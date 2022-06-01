@@ -12,10 +12,6 @@ PR = "r1"
 PV = "3.0"
 
 SRC_URI = "${PATH_TO_REPO}/bootable/bootloader/edk2/.git;protocol=${PROTO};destsuffix=bootable/bootloader/edk2;usehead=1"
-# FIXME for keymaster functionality, disable it for sa8295 target temporarily.
-SRC_URI:append = " ${@oe.utils.conditional('BASEMACHINE','sa8295', '', 'file://0001-avb-bring-up-keymaster-for-LV.patch \
-                                                                           file://0002-avb-send-dummy-ROT-and-boot-state-to-keymaster-from-.patch \
-                   ', d)}"
 
 SRCREV = "${AUTOREV}"
 
