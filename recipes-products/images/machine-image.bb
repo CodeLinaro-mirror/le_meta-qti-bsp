@@ -10,6 +10,9 @@ require include/mdm-bootimg.inc
 DEPENDS += " mkbootimg-native"
 DEPENDS += "squashfs-tools-native"
 
+NEED_OTA_GEN_UTIL = "${@bb.utils.contains('DISTRO_FEATURES', 'nad-avb', 'ota-gen-util-native', '', d)}"
+DEPENDS += "${NEED_OTA_GEN_UTIL}"
+
 require include/mdm-ota-target-image-ubi.inc
 require include/mdm-ota-target-image-ext4.inc
 
