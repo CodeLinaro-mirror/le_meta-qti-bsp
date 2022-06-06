@@ -38,4 +38,5 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-fastcv \
         systemd-machine-units \
         ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
+        yavta \
 "
