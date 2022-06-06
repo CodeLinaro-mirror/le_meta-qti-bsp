@@ -19,4 +19,5 @@ RDEPENDS:${PN} += "\
     weston-examples \
     display-hal-linux \
     display-commonsys-intf-linux \
+    ${@bb.utils.contains('LAYERSERIES_COMPAT_yocto', 'dunfell', '', 'weston-sdm-extension', d)} \
     "

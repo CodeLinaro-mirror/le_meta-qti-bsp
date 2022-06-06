@@ -4,6 +4,7 @@ DEPENDS += "gbm gbm-headers \
             ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'libuhab', '', d)} \
             libcutils \
             linux-msm-headers \
+            weston-sdm-extension-headers \
 "
 
 REQUIRED_DISTRO_FEATURES:remove = "opengl"
@@ -19,6 +20,9 @@ SRCREV = "${AUTOREV}"
 S = "${WORKDIR}/graphics/weston"
 
 UPSTREAM_CHECK_URI:remove = "https://wayland.freedesktop.org/releases.html"
+
+# Disable systemd-logind D-Bus protocol
+PACKAGECONFIG:remove = "systemd"
 
 RRECOMMENDS_${PN}:remove = "weston-init"
 
