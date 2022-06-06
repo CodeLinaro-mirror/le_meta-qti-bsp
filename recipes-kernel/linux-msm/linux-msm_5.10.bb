@@ -128,6 +128,7 @@ do_prebuilt_configure() {
 }
 
 do_prebuilt_shared_workdir[cleandirs] += " ${STAGING_KERNEL_BUILDDIR}"
+do_prebuilt_shared_workdir[nostamp] = "1"
 do_prebuilt_shared_workdir() {
     cd ${B}
 
