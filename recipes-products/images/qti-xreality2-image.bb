@@ -18,6 +18,7 @@ CORE_IMAGE_EXTRA_INSTALL_remove = "packagegroup-qti-gst"
 CORE_IMAGE_EXTRA_INSTALL_remove = "packagegroup-qti-qvr"
 CORE_IMAGE_EXTRA_INSTALL_remove = "packagegroup-qti-splitxr"
 CORE_IMAGE_EXTRA_INSTALL_remove = "packagegroup-qti-splitxr-common"
+CORE_IMAGE_EXTRA_INSTALL_remove = "packagegroup-qti-pulseaudio"
 
 # Remove unsupported packages
 CORE_IMAGE_EXTRA_INSTALL_remove = "gbm"
