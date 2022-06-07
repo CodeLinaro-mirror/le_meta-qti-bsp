@@ -2,7 +2,7 @@
 # Provides packages required to build an image with
 # all multimedia support enabled.
 
-inherit qimage
+inherit qimage populate_sdk_qti
 
 IMAGE_FEATURES += "ssh-server-openssh"
 
