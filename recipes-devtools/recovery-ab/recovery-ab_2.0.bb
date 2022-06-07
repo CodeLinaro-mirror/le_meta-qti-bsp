@@ -1,5 +1,4 @@
 inherit autotools-brokensep pkgconfig systemd
-PR = "r0"
 
 DESCRIPTION = "Recovery bootloader"
 LICENSE = "Apache-2.0"

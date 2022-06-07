@@ -1,5 +1,4 @@
 inherit autotools-brokensep pkgconfig
-PR = "r7"
 
 DESCRIPTION = "Recovery bootloader"
 LICENSE = "Apache-2.0"
