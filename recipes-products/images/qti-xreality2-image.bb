@@ -27,3 +27,6 @@ CORE_IMAGE_EXTRA_INSTALL_remove = "libdrm-kms"
 
 # Remove unsupported SDK packages
 TOOLCHAIN_TARGET_TASK_remove = "ath6kl-utils-staticdev"
+
+# Don't include kernel sources in SDK as prebuilt Kernel in use
+TOOLCHAIN_TARGET_TASK_remove = "kernel-devsrc"
