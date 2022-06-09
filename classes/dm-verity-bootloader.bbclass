@@ -22,6 +22,7 @@ METADATA_TREE_SIZE = "0"
 
 FEC_SUPPORT = "1"
 DEPENDS += " ${@bb.utils.contains('FEC_SUPPORT', '1', 'fec-native', '', d)}"
+SQSH_FS = "${@bb.utils.contains('IMAGE_FSTYPES', 'squashfs', '1', '0', d)}"
 
 VERITY_IMAGE_DIR     = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}/verity"
 SPARSE_SYSTEM_IMG    = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMIMAGE_TARGET}"
@@ -30,14 +31,26 @@ VERITY_METADATA_IMG  = "${VERITY_IMAGE_DIR}/verity-metadata.img"
 VERITY_FEC_IMG       = "${VERITY_IMAGE_DIR}/verity-fec.img"
 VERITY_CMDLINE       = "${VERITY_IMAGE_DIR}/cmdline"
 
+def adjust_system_size_for_squashfs_verity(d):
+    import subprocess
+    sparse_img = d.getVar('SPARSE_SYSTEM_IMG', True)
+    system_image_size = int(subprocess.check_output("du -bs %s | awk '{print $1}'" % (sparse_img),shell=True))
+    bb.debug(1,"system_size:%s" %system_image_size)
+    return system_image_size
+
 python adjust_system_size_for_verity () {
     partition_size = int(d.getVar("SYSTEM_SIZE_EXT4",True))
     block_size = int(d.getVar("BLOCK_SIZE",True))
     fec_support = d.getVar("FEC_SUPPORT",True)
+    squash_support= d.getVar("SQSH_FS",True)
+    if squash_support is "1":
+        partition_size = adjust_system_size_for_squashfs_verity (d)
     hi = partition_size
     if hi % block_size != 0:
         hi = (hi // block_size) * block_size
     verity_size = get_verity_size(d, hi, fec_support)
+    if squash_support is "1" :
+        partition_size = partition_size + verity_size
     lo = partition_size - verity_size
     result = lo
     while lo < hi:
@@ -72,7 +85,7 @@ python adjust_system_size_for_verity () {
     bb.debug(1, "system image size with verity: %s" % d.getVar("SYSTEM_SIZE_EXT4",True))
     bb.note("System image size is adjusted with verity")
 }
-do_makesystem[prefuncs]  += " adjust_system_size_for_verity"
+do_makesystem[postfuncs]  += " adjust_system_size_for_verity"
 
 def get_verity_size(d, partition_size, fec_support):
     import subprocess
@@ -116,13 +129,19 @@ make_verity_enabled_system_image[cleandirs] += " ${VERITY_IMAGE_DIR}"
 
 python make_verity_enabled_system_image () {
     import subprocess
+    import shutil
+    squash_support = d.getVar("SQSH_FS",True)
 
-    sparse_img = d.getVar('SPARSE_SYSTEM_IMG', True)
-    verity_img = d.getVar('VERITY_IMG', True)
-    verity_md_img = d.getVar('VERITY_METADATA_IMG', True)
+    original_sparse = os.path.join(d.getVar('SPARSE_SYSTEM_IMG', True))
+    sparse_img = os.path.join(d.getVar('VERITY_IMAGE_DIR', True), d.getVar('SYSTEMIMAGE_TARGET', True))
+    verity_img = os.path.join(d.getVar('VERITY_IMG', True))
+    verity_md_img = os.path.join(d.getVar('VERITY_METADATA_IMG', True))
     signer_path = d.getVar('STAGING_BINDIR_NATIVE',True) + "/verity_signer"
     signer_key  = d.getVar('STAGING_BINDIR_NATIVE',True) + "/verity.pk8"
     is_legacy_dm_verity_driver = d.getVar('LEGACY_DM_ANDROID_VERITY_DRIVER',True)
+
+    # Copy the built system image into the verity subdirectory for this image
+    shutil.copy(original_sparse, sparse_img)
 
     # Build verity tree
     bvt_bin_path = d.getVar('STAGING_BINDIR_NATIVE', True) + '/build_verity_tree'
@@ -171,7 +190,7 @@ python make_verity_enabled_system_image () {
     fec_supported=d.getVar("FEC_SUPPORT",True)
     if fec_supported is "1":
         fec_bin_path = d.getVar('STAGING_BINDIR_NATIVE', True) + '/fec'
-        fec_img_path = d.getVar('VERITY_FEC_IMG', True)
+        fec_img_path = os.path.join(d.getVar('VERITY_FEC_IMG', True))
 
         if is_legacy_dm_verity_driver is "1":
             cmd = fec_bin_path + " -e -p %s %s %s %s" % (padding_size, sparse_img, verity_img, fec_img_path)
@@ -197,14 +216,22 @@ python make_verity_enabled_system_image () {
                         out_file.write(line)
 
     # Almost done. Append verity img to sparse system img.
-    append2simg_path = d.getVar('STAGING_BINDIR_NATIVE', True) + '/append2simg'
-    if is_legacy_dm_verity_driver is "1":
-        cmd = append2simg_path + " %s %s " % (sparse_img, verity_img)
+    if squash_support is "1" :
+        # Append to non-sparse system image
+        bb.debug(1,"NonSparse image")
+        with open(verity_md_img, "rb") as input_file:
+            with open(sparse_img, "ab") as out_file:
+                for line in input_file:
+                    out_file.write(line)
     else:
-        cmd = append2simg_path + " %s %s " % (sparse_img, verity_md_img)
-    ret = subprocess.call(cmd, shell=True)
-    if ret != 0:
-        bb.error("Running: %s failed." % cmd)
+        append2simg_path = d.getVar('STAGING_BINDIR_NATIVE', True) + '/append2simg'
+        if is_legacy_dm_verity_driver is "1":
+            cmd = append2simg_path + " %s %s " % (sparse_img, verity_img)
+        else:
+            cmd = append2simg_path + " %s %s " % (sparse_img, verity_md_img)
+        ret = subprocess.call(cmd, shell=True)
+        if ret != 0:
+            bb.error("Running: %s failed." % cmd)
 
     #system image is ready. Update verity cmdline.
     if is_legacy_dm_verity_driver is "1":
@@ -234,8 +261,13 @@ python make_verity_enabled_system_image () {
     bb.debug(1, "Verity Command line is set to %s " % (cmdline))
 
     # Write cmdline to a tmp file
-    verity_cmd = d.getVar('VERITY_CMDLINE', True)
+    verity_cmd = os.path.join(d.getVar('VERITY_CMDLINE', True))
     subprocess.check_output("echo '%s' > %s" % (cmdline, verity_cmd), stderr=subprocess.STDOUT, shell=True)
+
+    #Copy default system image to original location
+    verity_path = os.path.join(d.getVar('VERITY_IMAGE_DIR', True), d.getVar('SYSTEMIMAGE_TARGET'))
+    img_path    = os.path.join(d.getVar('SPARSE_SYSTEM_IMG', True))
+    shutil.copy(verity_path, img_path)
 
 }
 do_makesystem[postfuncs] += " make_verity_enabled_system_image"
@@ -244,7 +276,7 @@ def get_verity_cmdline(d):
     import subprocess
 
     # Get verity cmdline from tmp file
-    verity_cmd = d.getVar('VERITY_CMDLINE', True)
+    verity_cmd = os.path.join(d.getVar('VERITY_IMAGE_DIR', True), d.getVar('VERITY_CMDLINE', True))
     output = subprocess.check_output("grep -m 1 verity %s" % (verity_cmd), shell=True)
     return output.decode('UTF-8')
 
@@ -255,6 +287,7 @@ def get_verity_cmdline(d):
 # img with verity. Normal do_make_bootimg continue to build boot.img without verity.
 python do_make_veritybootimg () {
     import subprocess
+    import shutil
 
     xtra_parms=""
     if bb.utils.contains('DISTRO_FEATURES', 'nand-boot', True, False, d):
@@ -268,8 +301,7 @@ python do_make_veritybootimg () {
     cmdline         = "\"" + d.getVar('KERNEL_CMD_PARAMS', True) + " " + verity_cmdline + "\""
     pagesize        = d.getVar('PAGE_SIZE', True)
     base            = d.getVar('KERNEL_BASE', True)
-    output          = d.getVar('BOOTIMAGE_TARGET', True)
-
+    output          = os.path.join(d.getVar('VERITY_IMAGE_DIR', True), d.getVar('BOOTIMAGE_TARGET'))
     # cmd to make boot.img
     cmd =  mkboot_bin_path + " --kernel %s --cmdline %s --pagesize %s --base %s %s --ramdisk /dev/null --ramdisk_offset 0x0 --output %s" \
            % (zimg_path, cmdline, pagesize, base, xtra_parms, output )
@@ -279,6 +311,11 @@ python do_make_veritybootimg () {
     ret = subprocess.call(cmd, shell=True)
     if ret != 0:
         bb.error("Running: %s failed." % cmd)
+
+    #Copy boot image for default system image to original location
+    verity_path = os.path.join(d.getVar('VERITY_IMAGE_DIR', True), d.getVar('BOOTIMAGE_TARGET'))
+    img_path    = os.path.join(d.getVar('IMGDEPLOYDIR'), d.getVar('IMAGE_BASENAME'), d.getVar('BOOTIMAGE_TARGET'))
+    shutil.copy (verity_path, img_path)
 }
 do_make_veritybootimg[depends]  += "${PN}:do_makesystem"
 do_make_veritybootimg[depends]  += "${PN}:do_makeuserdata"
