@@ -27,8 +27,13 @@
 #OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 #IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+# Changes from Qualcomm Innovation Center are provided under the following license:
+
+# Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+# SPDX-License-Identifier: BSD-3-Clause-Clear
+
 fde_setup () {
-    /usr/bin/fde_ctl -p userdata
+    /usr/bin/fde_ctl -p $DEV_NAME
     rc=$?
 
     case $rc in
@@ -60,9 +65,6 @@ fde_setup () {
                     echo "failed to seed data partition"
                     return 1
                 fi
-            else
-                DATA_DIR="/data"
-                mount $DEV_PATH/$DEV_NAME ${DATA_DIR}
             fi
             return 0
             ;;
@@ -103,7 +105,7 @@ seed_data() {
        mkdir ${LOGS_DIR}
     fi
     #All done, sync it up
-    sync
+    sync && umount $DEV_PATH/$DEV_NAME
     return 0
 }
 
