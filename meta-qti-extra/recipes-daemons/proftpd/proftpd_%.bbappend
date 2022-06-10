@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_append := ":${THISDIR}/files"
+FILESEXTRAPATHS:append := ":${THISDIR}/files"
 
-SRC_URI_append = " file://disable-reverse-DNS-check.patch \
+SRC_URI:append = " file://disable-reverse-DNS-check.patch \
                    file://enable-RootLogin.patch"

@@ -1,20 +1,24 @@
-FILESEXTRAPATHS_append := " :${THISDIR}/weston/"
+FILESEXTRAPATHS:append := " :${THISDIR}/weston/"
 SRC_URI = "file://weston.service_caf \
+           file://weston.service_caf_10 \
            file://weston_early.service_caf \
            file://weston.ini_caf \
 "
-SYSTEMD_SERVICE_${PN} = "weston.service"
+SYSTEMD_SERVICE:${PN} = "weston.service"
 SYSTEMD_AUTO_ENABLE = "enable"
 
-REQUIRED_DISTRO_FEATURES_remove = "opengl"
+REQUIRED_DISTRO_FEATURES:remove = "opengl"
 
 do_install() {
     # Install systemd unit files
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
         if ${@bb.utils.contains('DISTRO_FEATURES', 'early_init', 'true', 'false', d)}; then
             install -m 644 -p -D ${WORKDIR}/weston_early.service_caf ${D}${systemd_system_unitdir}/weston.service
-        else
+        fi
+        if ${@bb.utils.contains('LAYERSERIES_COMPAT_yocto', 'dunfell', 'true', 'false', d)}; then
             install -m 644 -p -D ${WORKDIR}/weston.service_caf ${D}${systemd_system_unitdir}/weston.service
+        else
+            install -m 644 -p -D ${WORKDIR}/weston.service_caf_10 ${D}${systemd_system_unitdir}/weston.service
         fi
     fi
 

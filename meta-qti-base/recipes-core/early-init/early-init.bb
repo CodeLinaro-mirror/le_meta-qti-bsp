@@ -7,7 +7,7 @@ SRC_URI += "file://early_init.conf"
 SRC_URI += "file://early_init_eth.conf"
 SRC_URI += "file://early_init_noapp.conf"
 
-SECURITY_CFLAGS_pn-${PN} = "${SECURITY_NOPIE_CFLAGS}"
+SECURITY_CFLAGS:pn-${PN} = "${SECURITY_NOPIE_CFLAGS}"
 S = "${WORKDIR}"
 
 do_compile() {

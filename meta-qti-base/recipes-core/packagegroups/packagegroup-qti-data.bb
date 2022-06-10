@@ -8,9 +8,9 @@ PACKAGES = "\
     packagegroup-qti-data \
     "
 
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     bridge-utils \
     ${@bb.utils.contains("DISTRO_FEATURES", "qti-headless", "", "connman", d)} \
     ${@bb.utils.contains("DISTRO_FEATURES", "qti-headless", "", "connman-client", d)} \

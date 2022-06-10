@@ -8,7 +8,7 @@ addtask mkbootimage after do_rootfs before do_build
 require ${QTI_METAPATH_BASE}/recipes-products/images/machine-image.bb
 require include/qti-ramdisk.inc
 
-do_rootfs_append() {
+do_rootfs:append() {
     bb.build.exec_func('do_ramdisk_create',d)
 }
 

@@ -1,6 +1,6 @@
 SUMMARY = "AGM snd_card parser"
 DESCRIPTION = "This is the snd_card parser to get the card defination for AGM."
-HOMEPAGE = "http://www.codeaurora.org"
+HOMEPAGE = "http://git.codelinaro.org"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
 DEPENDS += "agm ar-osal ar-util expat glib-2.0 gsl-fe-noship libcutils libuhab linux-msm-headers spf"
@@ -16,7 +16,7 @@ inherit autotools pkgconfig
 
 EXTRA_OECONF += "--with-glib"
 
-do_install_append() {
+do_install:append() {
     install -d ${D}${sysconfdir}
     install -m 0644 ${WORKDIR}/card-defs.xml ${D}${sysconfdir}/card-defs.xml
 }
