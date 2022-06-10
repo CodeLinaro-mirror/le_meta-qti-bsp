@@ -16,4 +16,5 @@ RDEPENDS_packagegroup-qti-debug-tools = " \
             valgrind \
             systemd-analyze \
             procrank \
+	    perf \
         "
