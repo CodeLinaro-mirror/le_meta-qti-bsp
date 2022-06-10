@@ -15,6 +15,9 @@ PACKAGE_INSTALL += " ${@bb.utils.contains('DISTRO_FEATURES', 'nad-avb', 'cryptse
 PACKAGE_INSTALL += " ${@bb.utils.contains('DISTRO_FEATURES', 'nad-avb', 'libdevmapper', '',d)}"
 PACKAGE_INSTALL += " ${@bb.utils.contains('DISTRO_FEATURES', 'nad-avb', 'verified-boot', '',d)}"
 PACKAGE_INSTALL += " ${@bb.utils.contains('DISTRO_FEATURES', 'nad-avb', 'avbtool', '',d)}"
+PACKAGE_INSTALL += " ${@bb.utils.contains('DISTRO_FEATURES', 'nad-avb', 'nad-fde-app', '',d)}"
+PACKAGE_INSTALL += " ${@bb.utils.contains('DISTRO_FEATURES', 'nad-avb', 'securemsm-noship', '',d)}"
+PACKAGE_INSTALL += " ${@bb.utils.contains('DISTRO_FEATURES', 'nad-avb', 'securemsm', '',d)}"
 PACKAGE_INSTALL_append = " initramfs-init"
 
 PACKAGE_EXCLUDE = " bash systemd-machine-units systemd busybox-udhcpc"
