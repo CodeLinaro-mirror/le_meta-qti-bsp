@@ -62,6 +62,9 @@ FDE_ENCRYPTION_PATH="SET_BY_SED"
 # Temporary rootfs mount node
 ROOT_MOUNT="/rootfs"
 
+# Firmware dir
+FW_DIR="/firmware"
+
 # Function return status
 STATUS_OK=0
 STATUS_ERR=1
@@ -117,13 +120,39 @@ SetArgs() {
     fi
 
     if [ "x${FDE_ENCRYPTION_PATH}" == x"SET_BY_SED" ]; then
-        FDE_ENCRYPTION_PATH="/tmp"
+        FDE_ENCRYPTION_PATH="/tmp/test.img"
     fi
 
     # Root image name
     DM_SYST_NAME="${SYS_PART_NAME}"
 
     return ${STATUS_OK}
+}
+
+MountModemVol() {
+    mkdir -p ${FW_DIR}
+    GetUbiVolumeID ${SYS_UBI_DEV_NUM} "firmware"
+    if [ "${GetUbiVolumeID_RESULT}" == "" ]; then
+        echo "Cannot get 'firmware' volume."
+        return ${STATUS_ERR}
+    fi
+    firmvol=${GetUbiVolumeID_RESULT}
+
+    m_char_device=/dev/ubi${SYS_UBI_DEV_NUM}_${firmvol}
+    m_block_device=/dev/ubiblock${SYS_UBI_DEV_NUM}_${firmvol}
+
+   ubiblock --create "${m_char_device}"
+   WaitDevReady "-b" "${m_block_device}"
+   if [ $? -ne ${STATUS_OK} ]; then
+       echo Error: wait UBI volume: ${m_block_device} timeout
+       return ${STATUS_ERR}
+   fi
+   mount -t squashfs ${m_block_device} ${FW_DIR} -oro
+   if [ $? -ne ${STATUS_OK} ]; then
+       echo Error: mount ${m_block_device} on ${FW_DIR} failed
+       return ${STATUS_ERR}
+   fi
+   return ${STATUS_OK}
 }
 
 #
@@ -171,9 +200,13 @@ CheckTmpDirectorySizeForFde () {
 
     local tmp_directory_size=`df -m | grep "/tmp" | awk '{print $4}'`
     local ubi_vol_size=`cat /sys/class/ubi/ubi${ubi_dev_num}_${ubi_vol_num}/data_bytes`
-    let ubi_vol_size=ubi_vol_size/1024/1024+10
 
+    # Reserved 10MiB space for FDE encryption should be safe enough.
+    let ubi_vol_size=ubi_vol_size/1024/1024+10
     if [ ${ubi_vol_size} -gt ${tmp_directory_size} ]; then
+
+        # If the reserved space is bigger than 5MiB and smaller than 10MiB,
+        # the encryption will be in a high risk, need to export warning info.
         let ubi_vol_size=ubi_vol_size-5
         if [ ${ubi_vol_size} -gt ${tmp_directory_size} ]; then
             echo "Err: Not enough RAM size for FDE."
@@ -187,100 +220,6 @@ CheckTmpDirectorySizeForFde () {
     return ${STATUS_OK}
 }
 
-# nad-fde-app -t ${device_name} -n ${char_device} -d ${block_device} -x ${encryption_path} -k ${key_index} -B ${BS}
-# nad-fde-app return:
-# 0 -- Run encryption and/or decryption successful
-# 1 -- Fuse not blown, continue as normal boot
-# 2 -- Failed
-NadFdeApp () {
-    local device_name=$1
-    local char_device=$2
-    local block_device=$3
-    local encryption_path=$4
-    local key_index=$5
-    local bs_size=$6
-
-    FDE_DEV_PATH="/dev/mapper/${device_name}"
-
-    if [ ! -e "${key_index}" ]; then
-        echo NadFde App: fuse is NOT blown.
-        echo Can not find key file: ${key_index}
-        nad_fde_result=1
-        return 1
-    fi
-
-    # Check if the image type is squashfs in UBI volume
-    if dd if=${char_device}\
-                  count=1 bs=4 2>/dev/null | grep 'hsqs' > /dev/null; then
-       echo "NOT encrypted ${device_name}"
-
-       if [ "${encryption_path}" == "" ]; then
-           encryption_path="/tmp"
-           echo "Using /tmp for ${device_name} encryption"
-       fi
-       mkdir -p ${encryption_path}
-
-       echo "Preparing ${device_name} image"
-       dd if=/dev/zero of=${encryption_path}/test.img bs=${bs_size} count=4096
-       if [ $? -ne ${STATUS_OK} ]; then
-           echo Error: NadFde App create test.img failed.
-           nad_fde_result=2
-           return 2
-       fi
-       sync
-
-       losetup -f ${encryption_path}/test.img
-
-       echo "Creating encrypted partition"
-       cryptsetup --cipher=aes-cbc-essiv:sha256 --offset=0 --key-file=${key_index} --key-size=256 open --type plain ${encryption_path}/test.img ${device_name}
-       if [ $? -ne ${STATUS_OK} ]; then
-           echo Error: NadFde App create FDE interface failed.
-           nad_fde_result=2
-           return 2
-       fi
-
-       echo "Encrypting ${device_name}"
-       dd if=${char_device} of=${FDE_DEV_PATH} bs=${bs_size} count=4096
-       if [ $? -ne ${STATUS_OK} ]; then
-           echo Error: NadFde App encryption failed.
-           nad_fde_result=2
-           return 2
-       fi
-
-       cryptsetup close ${device_name}
-       if [ $? -ne ${STATUS_OK} ]; then
-           echo Error: NadFde App close FDE interface ${device_name} failed.
-           nad_fde_result=2
-           return 2
-       fi
-       sync
-
-       echo "Release loop device"
-       LOOP_DEVICE=`losetup -a | grep test.img | awk -F ":" '{print $1}'`
-       losetup -d ${LOOP_DEVICE}
-
-       echo "Update ${char_device}"
-       ubiupdatevol ${char_device} ${encryption_path}/test.img
-       if [ $? -ne ${STATUS_OK} ]; then
-           echo Error: NadFde App update encrypted image to ${char_device} failed.
-           nad_fde_result=2
-           return 2
-       fi
-
-       rm -rf ${encryption_path}/test.img
-    fi
-
-    echo "Encrypted ${device_name}"
-    cryptsetup --cipher=aes-cbc-essiv:sha256 --offset=0 --key-file=${key_index} --key-size=256 open --type plain ${block_device} ${device_name}
-    if [ $? -ne ${STATUS_OK} ]; then
-        echo Error: NadFde App enable FDE failed.
-        nad_fde_result=2
-        return 2
-    fi
-    nad_fde_result=0
-    return 0
-}
-
 # device_name - The name of the partition
 # ubi_dev_num - UBI device number
 # ubi_vol_num - UBI volume number
@@ -290,7 +229,6 @@ EncryptUbiPartition () {
     local ubi_dev_num=${2}
     local ubi_vol_num=${3}
     local key_index=${4}
-    local bs_size=${5}
 
     local char_device=""
     local block_device=""
@@ -327,24 +265,25 @@ EncryptUbiPartition () {
     # 0 -- Run encryption and/or decryption successful
     # 1 -- Fuse not blown, continue as normal boot
     # 2 -- Failed
-    #nad-fde-app -n ${char_device} -d ${block_device} -m ${FDE_DEV_PATH} -t ${device_name} -b ${BS} -c ${KCOUNT}
-    NadFdeApp ${device_name} ${char_device} ${block_device} ${encryption_path} ${key_index} ${bs_size}
-    #nad_fde_result=$?
-    echo nad_fde_result=${nad_fde_result}
+    nad-fde-app -n ${char_device} -d ${block_device} -t ${device_name} -p ${encryption_path} -k ${key_index}
+    nad_fde_result=$?
     case "${nad_fde_result}" in
         0)
             echo FDE enabled for ${device_name}.
             FDE_MOUNT_NODE="/dev/mapper/${device_name}"
+            rm -rf ${encryption_path}
             return ${STATUS_OK}
         ;;
         1)
             echo FDE fuse bit not blown.
             FDE_MOUNT_NODE=${block_device}
+            rm -rf ${encryption_path}
             return ${STATUS_OK}
         ;;
         *)
-            echo FDE encryption failed.
+            echo FDE encryption failed ${nad_fde_result}.
             FDE_MOUNT_NODE=""
+            rm -rf ${encryption_path}
             return ${STATUS_ERR}
         ;;
     esac
@@ -356,17 +295,16 @@ EncryptNotSysPartition () {
     for parti in ${fde_parti_list}; do
         parti_name=`echo ${parti} | awk -F "." '{print $2}'`
         key_index=`echo ${parti} | awk -F "." '{print $3}'`
-        echo parti_name=${parti_name} key_index=${key_index}
 
         if [ "${DM_SYST_NAME}" == "${parti_name}" ]; then
             continue
         fi
-        key_index="/etc/keys/keyfile"
+
         EncryptUbiPartition ${parti_name} \
                             ${SYS_UBI_DEV_NUM} \
                             "null" \
-                            ${key_index} \
-                            "498"
+                            ${key_index}
+
         if [ $? -ne ${STATUS_OK} ] ; then
             echo "Encrypt partition ${parti_name} failed."
             return ${STATUS_ERR}
@@ -402,7 +340,7 @@ MountSystem () {
 
     GetStorageDev "${parti_name}"
     if [ $? -ne ${STATUS_OK} ]; then
-        echo Error: GetStorageDev failed "DEV_NUM=${DEV_NUM}"
+        echo Error: GetStorageDev failed DEV_NUM=${DEV_NUM}
         return ${STATUS_ERR}
     fi
 
@@ -433,8 +371,8 @@ MountSystem () {
 
         char_device=/dev/ubi${SYS_UBI_DEV_NUM}_${SYS_IMAGE_VOL}
         block_device=/dev/ubiblock${SYS_UBI_DEV_NUM}_${SYS_IMAGE_VOL}
-        echo char_device: ${char_device} block_device: ${block_device}
 
+        # Check if the image type is squashfs in UBI volume
         if dd if=${char_device}\
             count=1 bs=4 2>/dev/null | grep 'hsqs' > /dev/null; then
             image_type="squashfs"
@@ -444,11 +382,9 @@ MountSystem () {
 
             # 4+4 device has not enough ram size for FDE encryption
             # So, skip encryption if the memory is smaller than 512
-            supported_mem_size=`free -m | grep Mem | awk '{print $4}'`
-            echo supported_mem_size=${supported_mem_size}
-            if [ ${supported_mem_size} -gt 512 ]; then
+            supported_mem_size=`free -m | grep Mem | awk '{print $2}'`
 
-                #InitialEnvForFde
+            if [ ${supported_mem_size} -gt 512 ]; then
 
                 # Encrypt other images first, and later will encrypt the root file system.
                 EncryptNotSysPartition
@@ -461,14 +397,14 @@ MountSystem () {
 
                 # Currently, only squashfs image is supported for FDE. If the image magic
                 # isn't squashfs type "hsqs", then suppose this partition was encrypted.
+                # And, after decrypted, it still squashfs type.
                 image_type="squashfs"
             else
-                echo "Warning: Memory size is too small, skip FDE."
+                echo "Warning: Memory size ${supported_mem_size} is too small, skip FDE."
             fi
         fi
 
-        # Check if the image type is squashfs in UBI volume
-        if [ "${image_type}" == "squashfs" ] || [ "${nad_fde_status}" == "enabled" ; then
+        if [ "${image_type}" == "squashfs" ] || [ "${nad_fde_status}" == "enabled" ]; then
 
             if [ ! -e "${block_device}" ]; then
                 ubiblock --create "${char_device}"
@@ -482,16 +418,24 @@ MountSystem () {
             # For root file system FDE enabling
             if [ "${nad_fde_status}" == "enabled" ]; then
 
-                #sys_key_index=`cat /proc/cmdline | sed 's/ /\n/g' |\
-                #                    grep -E 'fde\.system' | awk -F '.' '{print $3}'`
-                sys_key_index="/etc/keys/keyfile"
-                #sys_key_index="/cache/keyfile"
+                MountModemVol
+                if [ $? -ne ${STATUS_OK} ]; then
+                    echo Error: Mount modem UBI volume failed.
+                    return ${STATUS_ERR}
+                fi
+
+                chmod o+rw /dev/qseecom /dev/ion
+                chmod 664 /dev/ion
+                /usr/bin/qseecomd > /dev/kmsg &
+
+                sys_key_index=`cat /proc/cmdline | sed 's/ /\n/g' |\
+                                    grep -E 'fde\.system' | awk -F '.' '{print $3}'`
 
                 EncryptUbiPartition ${DM_SYST_NAME} \
                                     ${SYS_UBI_DEV_NUM} \
                                     ${SYS_IMAGE_VOL} \
-                                    ${sys_key_index} \
-                                    "16080"
+                                    ${sys_key_index}
+
                 if [ $? -ne ${STATUS_OK} ] ; then
                     echo "Encrypt partition ${DM_SYST_NAME} failed."
                     return ${STATUS_ERR}
@@ -529,7 +473,6 @@ MountSystem () {
                 return ${STATUS_ERR}
             fi
         fi
-
     else
         echo This is not a ubi partition, not support yet
         return ${STATUS_ERR}

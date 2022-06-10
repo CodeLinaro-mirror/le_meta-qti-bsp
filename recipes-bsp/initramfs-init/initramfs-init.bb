@@ -6,14 +6,10 @@ ${LICENSE};md5=48b43ba58d0f8e9ef3704313a46b7a43"
 
 RDEPENDS_${PN} += " busybox"
 SRC_URI = "file://initramfs_init.sh"
-SRC_URI += "file://keyfile"
 PR = "r0"
 
 do_install() {
     install -m 0755 ${WORKDIR}/initramfs_init.sh ${D}/init
-
-    install -d "${D}${sysconfdir}/keys"
-    install -m 0755 ${WORKDIR}/keyfile "${D}${sysconfdir}/keys/keyfile"
 
     if ${@bb.utils.contains('DISTRO_FEATURES','nad-fde','true','false',d)}; then
         install -d ${D}/lib/firmware
@@ -22,6 +18,5 @@ do_install() {
 }
 
 FILES_${PN} += " /init"
-FILES_${PN} += " /etc/keys/keyfile"
 FILES_${PN} += " ${@bb.utils.contains('DISTRO_FEATURES', 'nad-fde', '/lib/firmware/*', '', d)}"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
