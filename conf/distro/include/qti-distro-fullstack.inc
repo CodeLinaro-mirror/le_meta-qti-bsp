@@ -39,7 +39,7 @@ DISTRO_FEATURES_append = " drm fbdev opencl opengl pulseaudio selinux tensorflow
 # qti-afr-algo:  Support QTI Auto framing algo
 # qti-uvc:       Support QTI UVC solution
 
-DISTRO_FEATURES_append = " qti-audio qti-bluetooth qti-camera qti-mm-parser qti-video qti-video-encoder qti-cdsp qti-adsp qti-fastcv qti-qmmf qti-security qti-vble qti-afr-algo qti-uvc "
+DISTRO_FEATURES_append = " qti-audio dm-verity qti-bluetooth qti-camera qti-mm-parser qti-video qti-video-encoder qti-cdsp qti-adsp qti-fastcv qti-qmmf qti-security qti-vble qti-afr-algo qti-uvc "
 
 # inherit distro_featres_check class across the distro
 INHERIT += "distro_features_check"
