@@ -14,8 +14,14 @@ do_install() {
 
     install -d "${D}${sysconfdir}/keys"
     install -m 0664 ${WORKDIR}/keyfile "${D}${sysconfdir}/keys/keyfile"
+
+    if ${@bb.utils.contains('DISTRO_FEATURES','nad-fde','true','false',d)}; then
+        install -d ${D}${base_libdir}/firmware
+        ln -sf /firmware/image ${D}${base_libdir}/firmware/updates
+    fi
 }
 
 FILES_${PN} += " /init"
 FILES_${PN} += " ${sysconfdir}/keys/keyfile"
+FILES_${PN} += " ${@bb.utils.contains('DISTRO_FEATURES', 'nad-fde', '${base_libdir}/firmware/*', '', d)}"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
