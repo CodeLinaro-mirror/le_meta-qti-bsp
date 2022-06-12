@@ -5,6 +5,7 @@ SRC_URI += "file://systemd-udevd.service"
 SRC_URI += "file://ffbm.target"
 SRC_URI += "file://mtpserver.rules"
 SRC_URI += "file://ion.rules"
+SRC_URI += "file://tui.rules"
 SRC_URI += "file://kgsl.rules"
 SRC_URI += "file://set-usb-nodes.rules"
 SRC_URI += "file://sysctl.conf"
@@ -13,8 +14,6 @@ SRC_URI += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-vm', 'file://trusted_t
 SRC_URI += "file://sd-bus-Allow-extra-users-to-communicate.patch"
 SRC_URI += "file://set-mhi-nodes.rules"
 SRC_URI += "file://99-gpiochardev.rules"
-
-RDEPENDS_${PN}_remove = "${@bb.utils.contains('MACHINE_MNT_POINTS', '/systemrw', '', 'volatile-binds', d)}"
 
 # Custom setup for PACKAGECONFIG to get a slimmer systemd.
 # Removed following:
@@ -104,6 +103,7 @@ do_install_append () {
    fi
    install -d ${D}${sysconfdir}/udev/rules.d/
    install -m 0644 ${WORKDIR}/ion.rules -D ${D}${sysconfdir}/udev/rules.d/ion.rules
+   install -m 0644 ${WORKDIR}/tui.rules -D ${D}${sysconfdir}/udev/rules.d/tui.rules
    install -m 0644 ${WORKDIR}/kgsl.rules -D ${D}${sysconfdir}/udev/rules.d/kgsl.rules
    install -m 0644 ${WORKDIR}/set-mhi-nodes.rules -D ${D}${sysconfdir}/udev/rules.d/set-mhi-nodes.rules
    install -m 0644 ${WORKDIR}/99-gpiochardev.rules -D ${D}${sysconfdir}/udev/rules.d/99-gpiochardev.rules
