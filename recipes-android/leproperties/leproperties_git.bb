@@ -18,10 +18,10 @@ do_install_append() {
     if ${@bb.utils.contains('EXTRA_OECONF', '--with-systemd', 'true', 'false', d)}; then
         install -b -m 0644 /dev/null -D ${D}${sysconfdir}/build.prop
         install -d ${D}${systemd_unitdir}/system/
-        install -d ${D}${systemd_unitdir}/system/multi-user.target.wants/
+        install -d ${D}${systemd_unitdir}/system/local-fs-pre.target.requires/
         install -d ${D}${systemd_unitdir}/system/ffbm.target.wants/
         ln -sf ${systemd_unitdir}/system/leprop.service \
-               ${D}${systemd_unitdir}/system/multi-user.target.wants/leprop.service
+               ${D}${systemd_unitdir}/system/local-fs-pre.target.requires/leprop.service
         ln -sf ${systemd_unitdir}/system/leprop.service \
                ${D}${systemd_unitdir}/system/ffbm.target.wants/leprop.service
     fi
