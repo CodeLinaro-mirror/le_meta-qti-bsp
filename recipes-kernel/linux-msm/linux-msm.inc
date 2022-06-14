@@ -50,6 +50,10 @@ do_kernel_checkout[noexec] = "1"
 # extra task for configuration checks
 addtask kernel_configcheck after do_configure before do_compile
 
+python do_patch() {
+    bb.build.exec_func('patch_do_patch', d)
+}
+
 do_compile () {
     oe_runmake CC="${KERNEL_CC}" LD="${KERNEL_LD}" ${KERNEL_EXTRA_ARGS} $use_alternate_initrd
 }
