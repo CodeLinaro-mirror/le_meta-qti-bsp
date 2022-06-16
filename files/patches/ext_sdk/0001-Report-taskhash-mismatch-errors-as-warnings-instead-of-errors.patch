@@ -1,0 +1,26 @@
+From cad2538bb3d278275497f9a216032b86edb38bc0 Mon Sep 17 00:00:00 2001
+From: Raghuvar S <quic_raghuvar@quicinc.com>
+Date: Mon, 7 Mar 2022 22:30:48 +0530
+Subject: [PATCH] Report taskhash mismatch errors as warnings instead of errors
+
+Change-Id: I524571ae35fb4aa50660c5492c2cfcfbe84b89db
+---
+ bitbake/lib/bb/siggen.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/bitbake/lib/bb/siggen.py b/bitbake/lib/bb/siggen.py
+index 26fa7f0..862f730 100644
+--- a/bitbake/lib/bb/siggen.py
++++ b/bitbake/lib/bb/siggen.py
+@@ -358,7 +358,7 @@ class SignatureGeneratorBasic(SignatureGenerator):
+         if runtime and tid in self.taskhash:
+             computed_taskhash = calc_taskhash(data)
+             if computed_taskhash != self.taskhash[tid]:
+-                bb.error("Taskhash mismatch %s versus %s for %s" % (computed_taskhash, self.taskhash[tid], tid))
++                bb.warn("Taskhash mismatch %s versus %s for %s" % (computed_taskhash, self.taskhash[tid], tid))
+                 sigfile = sigfile.replace(self.taskhash[tid], computed_taskhash)
+ 
+         fd, tmpfile = tempfile.mkstemp(dir=os.path.dirname(sigfile), prefix="sigtask.")
+-- 
+2.7.4
+
