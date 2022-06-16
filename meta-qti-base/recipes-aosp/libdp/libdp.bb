@@ -18,12 +18,15 @@ SRCREV_core = "b94377adcbb3377a89edc7939d98ce76ccda1398"
 
 S = "${WORKDIR}/git"
 
+do_patch_append () {
+    bb.build.exec_func('do_patch_ex', d)
+}
+
 src = "if (partition->attributes() & ~(LP_PARTITION_ATTRIBUTE_MASK))"
 dst = "        if (partition->attributes() \& LP_PARTITION_ATTR_UPDATED) {\n            static const uint16_t kMinVersion = LP_METADATA_VERSION_FOR_UPDATED_ATTR;\n            metadata->header.minor_version = std::max(metadata->header.minor_version, kMinVersion);\n        }"
 
-do_compile() {
+do_patch_ex () {
     sed -i "/${src}/{n;n;n;s/$/\n\n${dst}/;}" ${S}/fs_mgr/liblp/builder.cpp
 }
-
 
 DEPENDS += "openssl gtest libsparse ext4-utils"
