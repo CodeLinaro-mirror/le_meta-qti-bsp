@@ -60,6 +60,11 @@ DISTRO_FEATURES:append = " qti-wlan wifi"
 
 INCOMPATIBLE_LICENSE = "${@bb.utils.contains('LAYERSERIES_COMPAT_yocto', 'dunfell', 'GPL-3.0 LGPL-3.0 AGPL-3.0', 'GPL-3.0-only LGPL-3.0-only AGPL-3.0-only', d)}"
 
+# Enable FDE
+DISTRO_FEATURES:append:qtiquingvm = " qti-fde"
+DISTRO_FEATURES:append:qtiquingvm8295 = " qti-fde"
+DISTRO_FEATURES:append:quin-gvm-gen4 = " qti-fde"
+
 IMAGE_FEATURES:append = " read-only-rootfs"
 
 LICENSE_FLAGS_WHITELIST += "commercial_gstreamer1.0-libav commercial_gstreamer1.0-omx"

@@ -14,6 +14,11 @@ inherit autotools-brokensep pkgconfig
 EXTRA_OECONF += "--enable-target=${AUDIO_BUILD_TARGET}"
 EXTRA_OECONF += "--enable-acdbservice=yes"
 EXTRA_OECONF += "--with-glib"
+VERSION = "${@bb.utils.contains('LAYERSERIES_COMPAT_yocto', 'kirkstone', '15.0', '14.2', d)}"
+
+do_configure:prepend () {
+    sed -i -e "s|%PULSEAUDIO_VERSION%|${VERSION}|" ${S}/configure.ac
+}
 
 do_install:append() {
     install -d ${D}${sysconfdir}/pulse
