@@ -18,7 +18,7 @@ SRCREV = "a6189acd18b00611c1dc7042299ad75486f08a1a"
 
 PV = "3.3.0+git${SRCPV}"
 
-SRC_URI = "git://git.codelinaro.org/clo/le/protobuf.git;protocol=git;branch=caf_migration/protobuf/master"
+SRC_URI = "git://git.codelinaro.org/clo/le/protobuf.git;protocol=https;branch=caf_migration/protobuf/master"
 
 EXTRA_OECONF += " --with-protoc=echo"
 
