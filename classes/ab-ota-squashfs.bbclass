@@ -99,7 +99,7 @@ do_recovery_squashfs() {
     # Pack releasetools.py into META folder itself.
     # This could also have been done by passing "--device_specific" to
     # ota_from_target_files.py but it would be hacky to find the absolute path there.
-    cp ${WORKSPACE}/OTA/device/qcom/common/releasetools.py ${OTA_TARGET_IMAGE_ROOTFS_SQUASHFS}/META/.
+    cp ${STAGING_DIR_NATIVE}/usr/bin/releasetools/releasetools.py ${OTA_TARGET_IMAGE_ROOTFS_SQUASHFS}/META/.
 
     # copy contents of META folder
     #recovery_api_version is from recovery module
