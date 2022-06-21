@@ -1,5 +1,38 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
+# Fetch systemd.git from CAF.
+SRC_URI  = "${CLO_LE_GIT}/systemd.git;protocol=https;branch=caf_migration/systemd/main"
+SRC_URI += "file://touchscreen.rules \
+            file://00-create-volatile.conf \
+            file://init \
+            file://0001-binfmt-Don-t-install-dependency-links-at-install-tim.patch \
+            file://0002-use-lnr-wrapper-instead-of-looking-for-relative-opti.patch \
+            file://0003-implment-systemd-sysv-install-for-OE.patch \
+            file://0004-rules-whitelist-hd-devices.patch \
+            file://0005-Make-root-s-home-directory-configurable.patch \
+            file://0006-remove-nobody-user-group-checking.patch \
+            file://0007-rules-watch-metadata-changes-in-ide-devices.patch \
+            file://0008-Do-not-enable-nss-tests-if-nss-systemd-is-not-enable.patch \
+            file://0009-nss-mymachines-Build-conditionally-when-ENABLE_MYHOS.patch \
+            file://0001-login-use-parse_uid-when-unmounting-user-runtime-dir.patch \
+            file://0001-sd-bus-make-BUS_DEFAULT_TIMEOUT-configurable.patch \
+            file://0022-build-sys-Detect-whether-struct-statx-is-defined-in-.patch \
+            file://0023-resolvconf-fixes-for-the-compatibility-interface.patch \
+            file://0001-core-when-deserializing-state-always-use-read_line-L.patch \
+            file://0001-chown-recursive-let-s-rework-the-recursive-logic-to-.patch \
+            file://0001-dhcp6-make-sure-we-have-enough-space-for-the-DHCP6-o.patch \
+            file://0001-Revert-sysctl.d-request-ECN-on-both-in-and-outgoing-.patch \
+            file://0001-timesync-changes-type-of-drift_freq-to-int64_t.patch \
+            file://0001-sysctl-Don-t-pass-null-directive-argument-to-s.patch \
+            file://0002-core-Fix-use-after-free-case-in-load_from_path.patch \
+            file://0001-meson-rename-Ddebug-to-Ddebug-extra.patch \
+            file://0024-journald-do-not-store-the-iovec-entry-for-process-co.patch \
+            file://0025-journald-set-a-limit-on-the-number-of-fields.patch \
+            file://0026-journal-fix-out-of-bounds-read-CVE-2018-16866.patch \
+            file://CVE-2019-6454.patch \
+            file://sd-bus-if-we-receive-an-invalid-dbus-message-ignore-.patch \
+            "
+
 SRC_URI += "file://Disable-unused-mount-points.patch"
 SRC_URI += "file://mountpartitions.rules"
 SRC_URI += "file://systemd-udevd.service"
