@@ -1,6 +1,10 @@
 DEPENDS += "gbm gbm-headers \
+            display-commonsys-intf-linux \
+            libion libsync \
             ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'libuhab', '', d)} \
+            libcutils \
             linux-msm-headers \
+            weston-sdm-extension-headers \
 "
 
 REQUIRED_DISTRO_FEATURES:remove = "opengl"
@@ -17,13 +21,22 @@ S = "${WORKDIR}/graphics/weston"
 
 UPSTREAM_CHECK_URI:remove = "https://wayland.freedesktop.org/releases.html"
 
-do_install:append() {
-    # expose weston protocol to /usr/share/weston as video may use it
-    install ${WORKDIR}/graphics/weston/protocol/*.xml ${D}${datadir}/weston
-    # expose some static libraries on which sdm-backend depends
-    install -m 0644 ${WORKDIR}/build/libweston/liblibinput-backend.a ${D}${libdir}/
-    install -m 0644 ${WORKDIR}/build/libweston/libsession-helper.a ${D}${libdir}/
-    install -m 0644 ${WORKDIR}/build/libweston/backend-drm/libbacklight.a ${D}${libdir}/
-}
+# Disable systemd-logind D-Bus protocol
+PACKAGECONFIG:remove = "systemd"
+
+# Enable support for the deprecated wl_shell interface
+# This is a workaround for outdated GFX Benchmark tool
+PACKAGECONFIG:append = " wl-shell"
+PACKAGECONFIG[wl-shell] = "-Ddeprecated-wl-shell=true,-Ddeprecated-wl-shell=false"
 
 RRECOMMENDS_${PN}:remove = "weston-init"
+
+FILES:${PN}-dev = "${includedir} \
+                ${libdir}/pkgconfig ${datadir}/pkgconfig \
+                ${libdir}/${BPN}/libexec_weston.so \
+                ${libdir}/libweston-10.so \
+                ${libdir}/libweston-desktop-10.so"
+# Some libraries on which sdm-backend depends
+FILES:libweston-${WESTON_MAJOR_VERSION} += "${libdir}/libsession-helper.so \
+                                            ${libdir}/liblibinput-backend.so \
+                                            ${libdir}/libbacklight.so"
