@@ -69,5 +69,6 @@ case $1/$2 in
     systemctl restart loc_launcher.service
     systemctl restart location_hal_daemon.service
     systemctl restart audiod.service
+    systemctl restart adbd.service
     ;;
 esac
