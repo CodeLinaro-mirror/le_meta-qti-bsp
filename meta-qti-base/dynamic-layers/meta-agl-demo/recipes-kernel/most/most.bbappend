@@ -1,7 +1,3 @@
 # Build with Clang
-DEPENDS += "clang-native"
+inherit qti-kernel-arch-clang
 
-inherit qticlang
-
-TOOLCHAIN = "clang"
-KERNEL_CC = "${CC} -fuse-ld=bfd"
