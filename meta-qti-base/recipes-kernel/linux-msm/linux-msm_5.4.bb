@@ -30,9 +30,12 @@ SRC_URI = "\
 SRCREV = "${AUTOREV}"
 SRCREV_FORMAT = "kernel_data_display_ais_video"
 
-inherit kernel kernel-yocto qsigning ${@bb.utils.contains('TARGET_KERNEL_ARCH', 'aarch64', 'qtikernel-arch', '', d)}
+inherit kernel kernel-yocto qsigning ${@bb.utils.contains('TARGET_KERNEL_ARCH', 'aarch64', 'qtikernel-arch', '', d)} qti-kernel-arch-clang
 
 S = "${WORKDIR}/kernel/msm-5.4"
+
+# Due to inherit kernel. If choose clang as a compilation chain, need unset thist variable to set clang as BASEDEPENDS.
+unset INHIBIT_DEFAULT_DEPS
 
 EXTRA_OEMAKE += "INSTALL_MOD_STRIP=1"
 
@@ -108,7 +111,7 @@ do_generate_gki_defconfig() {
     gki_defconfig=`echo ${KERNEL_CONFIG} | sed 's/vendor\///g'`
 
     # Point to the correct CC when executing generate_defconfig.sh
-    export REAL_CC=`echo ${CC} | sed 's/-target.*//g'`
+    export REAL_CC=$(realpath $(which $(echo ${CC} | sed 's/-target.*//g')))
 
     # FIXME: Workaround for executing generate_defconfig.sh
     LD=`echo ${LD} | sed 's/--sysroot.*//g'`
@@ -119,6 +122,7 @@ do_generate_gki_defconfig() {
 addtask do_generate_gki_defconfig after do_unpack before do_kernel_metadata
 do_generate_gki_defconfig[depends] += "virtual/${TARGET_PREFIX}binutils:do_populate_sysroot"
 do_generate_gki_defconfig[depends] += "virtual/${TARGET_PREFIX}binutils:do_prepare_recipe_sysroot"
+do_generate_gki_defconfig[depends] += "clang-native:do_populate_sysroot"
 
 do_kernel_checkout[noexec] = "1"
 
