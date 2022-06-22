@@ -9,6 +9,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 SRC_URI_append += "\
         file://0002-lxc-support-deny-device-by-devpth.patch \
         file://0003-lxc-handle-cgroup-device-not-available-gracefully.patch \
+        file://0004-lxc-support-selinux-namespace.patch \
         "
 S = "${WORKDIR}/git"
 
