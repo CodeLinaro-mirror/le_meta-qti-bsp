@@ -58,3 +58,6 @@ ro.debuggable=1
 
 #perf client libname to communicate with perf
 ro.vendor.extension_library=libqti-perfd-client.so
+
+#atrace debug setup
+debug.atrace.tags.enableflags=0
