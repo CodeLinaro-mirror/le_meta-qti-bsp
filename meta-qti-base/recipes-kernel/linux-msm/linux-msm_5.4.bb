@@ -1,6 +1,6 @@
-SUMMARY = "CAF Linux Kernel"
-DESCRIPTION = "CAF Linux Kernel for QTI MSM SoC"
-HOMEPAGE = "https://www.codeaurora.org"
+SUMMARY = "CLO Linux Kernel"
+DESCRIPTION = "CLO Linux Kernel for QTI MSM SoC"
+HOMEPAGE = "https://git.codelinaro.org"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
 
@@ -205,9 +205,6 @@ do_deploy () {
 #Sign boot image after generation
 do_deploy[postfuncs] += "sign_bootimg"
 
-PACKAGES = "kernel kernel-base kernel-vmlinux kernel-dev kernel-modules"
-
 INHIBIT_PACKAGE_STRIP = "1"
 KERNEL_VERSION_SANITY_SKIP = "1"
 
-RDEPENDS:${KERNEL_PACKAGE_NAME}-base = ""

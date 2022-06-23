@@ -1,7 +1,7 @@
 SUMMARY = "Scripts for setup LV GVM Network"
 DESCRIPTION = "This is a scripts about automatic setup network, \
 it can help us to setup LV GVM Network quickly"
-HOMEPAGE = "https://www.codeaurora.org/"
+HOMEPAGE = "https://git.codelinaro.org/"
 SECTION = "network"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\

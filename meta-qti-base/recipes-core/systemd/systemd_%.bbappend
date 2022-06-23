@@ -11,8 +11,8 @@ SRC_URI:append = " \
     file://60-misc.rules \
 "
 
-# Disable close_range in systemd v248.3 as it doesn't work with linux-msm 5.4
-SRC_URI:append = " ${@oe.utils.conditional("PV", "248.3", "file://0001-Disable-close_range.patch", "", d)}"
+# Disable close_range in systemd v250.4 as it doesn't work with linux-msm 5.4
+SRC_URI:append = " ${@oe.utils.conditional("PV", "250.4", "file://0001-Disable-close_range.patch", "", d)}"
 
 # Remove backlight ldconfig
 #   * backlight - Loads/Saves Screen Backlight Brightness, not required.

@@ -6,7 +6,7 @@ DESCRIPTION = "Qualcomm Atheros WLAN CLD3.0 low latency driver for Genoa WLAN ch
                once the system bootup. And this WLAN host driver module name is qca6696.ko,\
                it create two interface by defaults, one is wlan0 and the other is p2p0. \
                Application can use the wireless interfaces as STA/AP/P2P mode in need. \"
-HOMEPAGE = "https://www.codeaurora.org/"
+HOMEPAGE = "https://git.codelinaro.org/"
 LICENSE = "ISC"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=f3b90e78ea0cffb20bf5cca7947a896d"
 

@@ -1,5 +1,7 @@
 SUMMARY = "QTI package group for weston"
 
+PACKAGE_ARCH = "${TUNE_PKGARCH}"
+
 inherit packagegroup
 
 PACKAGES = "\
@@ -17,4 +19,5 @@ RDEPENDS:${PN} += "\
     weston-examples \
     display-hal-linux \
     display-commonsys-intf-linux \
+    ${@bb.utils.contains('LAYERSERIES_COMPAT_yocto', 'dunfell', '', 'weston-sdm-extension', d)} \
     "

@@ -19,6 +19,7 @@ DISTRO_FEATURES:append:sa6155 = " qti-carcamsrc qti-fastcv qti-omx"
 DISTRO_FEATURES:append:sa81x5-rt = " qti-carcamsrc qti-fastcv qti-omx"
 DISTRO_FEATURES:append:sa81x5 = " qti-carcamsrc qti-fastcv qti-omx"
 DISTRO_FEATURES:append:sa8295 = " qti-codec2"
+DISTRO_FEATURES:append:lemans = " qti-codec2"
 DISTRO_FEATURES:append:qtiquingvm = " qti-omx"
 DISTRO_FEATURES:append:qtiquingvm8295 = " qti-codec2"
 DISTRO_FEATURES:append:quin-gvm-gen4 = " qti-codec2"
@@ -57,11 +58,19 @@ DISTRO_FEATURES:append = " qti-wlan wifi"
 
 INCOMPATIBLE_LICENSE = "${@bb.utils.contains('LAYERSERIES_COMPAT_yocto', 'dunfell', 'GPL-3.0 LGPL-3.0 AGPL-3.0', 'GPL-3.0-only LGPL-3.0-only AGPL-3.0-only', d)}"
 
+# Enable FDE
+DISTRO_FEATURES:append:qtiquingvm = " qti-fde"
+DISTRO_FEATURES:append:qtiquingvm8295 = " qti-fde"
+DISTRO_FEATURES:append:quin-gvm-gen4 = " qti-fde"
+
 IMAGE_FEATURES:append = " read-only-rootfs"
 
 LICENSE_FLAGS_WHITELIST += "commercial_gstreamer1.0-libav commercial_gstreamer1.0-omx"
 LICENSE_FLAGS_WHITELIST += "commercial_gstreamer1.0-plugins-ugly commercial_opencore-amr"
 LICENSE_FLAGS_WHITELIST += "commercial_ffmpeg"
+LICENSE_FLAGS_ACCEPTED += "commercial_gstreamer1.0-libav commercial_gstreamer1.0-omx"
+LICENSE_FLAGS_ACCEPTED += "commercial_gstreamer1.0-plugins-ugly commercial_opencore-amr"
+LICENSE_FLAGS_ACCEPTED += "commercial_ffmpeg"
 
 include ${DISTRO_INC_FILES}
 

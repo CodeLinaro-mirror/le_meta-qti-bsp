@@ -1,6 +1,6 @@
 SUMMARY = "implement the Precision Time Protocol(ptp) virtual driver"
 DESCRIPTION = "Precision Time Protocol(ptp) virtual driver leverage the share memory machanism to sync the gptp timestamp between Host and GVM"
-HOMEPAGE = "https://www.codeaurora.org/"
+HOMEPAGE = "https://git.codelinaro.org/"
 
 LICENSE = "GPL-2.0"
 LIC_FILES_CHKSUM = "file://NOTICE;md5=752b838e10ae75e6f917015849cf56b0"

@@ -1,6 +1,6 @@
 SUMMARY = "QTI Screen shot SRC Plugin for GStreamer"
 DESCRIPTION = "QTI screen shot plugin for Gstreamer. It captures your Display and creates raw RGBA8888 video"
-HOMEPAGE = "https://www.codeaurora.org"
+HOMEPAGE = "https://git.codelinaro.org"
 SECTION = "multimedia"
 LICENSE = "LGPL-2.0 & BSD-3-Clause & MIT"
 LIC_FILES_CHKSUM = "file://NOTICE.txt;md5=75cfdd159cf288058ddf776b13ec384c"

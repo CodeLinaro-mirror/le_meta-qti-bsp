@@ -7,7 +7,7 @@ DESCRIPTION = "Qualcomm Atheros WLAN CLD3.0 low latency driver for the second WL
                it create two interface by defaults, one is wlan2 and the other is wlan3. \
                Application can use the wireless interfaces as STA or AP mode in need. \
                Usually, it bind to pcie2 slot by default if it loaded after qca6696.ko. \"
-HOMEPAGE = "https://www.codeaurora.org/"
+HOMEPAGE = "https://git.codelinaro.org/"
 LICENSE = "ISC"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=f3b90e78ea0cffb20bf5cca7947a896d"
 

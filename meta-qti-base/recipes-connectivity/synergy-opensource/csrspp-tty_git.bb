@@ -1,7 +1,7 @@
 SUMMARY = "QTI Bluetooth SPP TTY driver for AGL Platform"
 DESCRIPTION = "Spp tty is part of Synergy BT Stack\
 distribution which implements tty driver for SPP profile."
-HOMEPAGE = "https://www.codeaurora.org"
+HOMEPAGE = "https://git.codelinaro.org"
 LICENSE = "BSD-3-Clause & GPL-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/BSD-3-Clause;md5=550794465ba0ec5312d6919e203a55f9 \
                     file://${COREBASE}/meta/files/common-licenses/GPL-2.0;md5=801f80980d171dd6425610833a22dbe6"

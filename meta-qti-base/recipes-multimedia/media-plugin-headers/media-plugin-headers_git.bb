@@ -3,7 +3,7 @@ DESCRIPTION = "Provide native media hardware headers for OPENMAX, \
 these headers are introduced by Android Open Source project, used for \
 extended features of OPENMAX, e.g. HDRStaticInfo, HDR10PlusInfo, and \
 AndroidNativeBuffers"
-HOMEPAGE = "https://www.codeaurora.org"
+HOMEPAGE = "https://git.codelinaro.org"
 SECTION = "multimedia"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${WORKDIR}/frameworks/NOTICE;md5=a3fcbe20ea5ac731ed3aa15fe59ba20a"

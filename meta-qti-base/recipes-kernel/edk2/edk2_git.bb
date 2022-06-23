@@ -1,22 +1,17 @@
 SUMMARY = "edk2"
 DESCRIPTION = "UEFI bootloader"
-HOMEPAGE = "https://www.codeaurora.org"
+HOMEPAGE = "https://git.codelinaro.org"
 LICENSE = "BSD-2-Clause & BSD-3-Clause"
 LIC_FILES_CHKSUM = "\
     file://${COMMON_LICENSE_DIR}/BSD-2-Clause;md5=cb641bc04cda31daea161b1bc15da69f \
     file://${COMMON_LICENSE_DIR}/BSD-3-Clause;md5=550794465ba0ec5312d6919e203a55f9 \
 "
-
 PROVIDES = "virtual/bootloader"
 
 PR = "r1"
 PV = "3.0"
 
 SRC_URI = "${PATH_TO_REPO}/bootable/bootloader/edk2/.git;protocol=${PROTO};destsuffix=bootable/bootloader/edk2;usehead=1"
-# FIXME for keymaster functionality, disable it for sa8295 target temporarily.
-SRC_URI:append = " ${@oe.utils.conditional('BASEMACHINE','sa8295', '', 'file://0001-avb-bring-up-keymaster-for-LV.patch \
-                                                                           file://0002-avb-send-dummy-ROT-and-boot-state-to-keymaster-from-.patch \
-                   ', d)}"
 
 SRCREV = "${AUTOREV}"
 
