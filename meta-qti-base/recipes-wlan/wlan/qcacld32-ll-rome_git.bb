@@ -39,6 +39,7 @@ EXTRA_OEMAKE:append = " \
                        MODNAME=${_MODNAME} \
                        CONFIG_AR6320_SUPPORT=y \
                        CONFIG_CNSS_GENL=n \
+                       CONFIG_IPA_OFFLOAD=n \
                        "
 
 SYSTEMD_SERVICE:${PN} = "init_qti_wlan_auto.service"
