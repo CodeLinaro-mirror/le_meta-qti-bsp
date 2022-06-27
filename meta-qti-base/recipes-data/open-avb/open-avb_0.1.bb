@@ -1,13 +1,15 @@
 SUMMARY = "Open AVB"
 DESCRIPTION = "Open Source Project for Audio Video Bridging/Time Sensitive Networking stack"
 HOMEPAGE = "https://git.codelinaro.org/"
-
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
 
-DEPENDS += "alsa-lib cmake-native glib-2.0 gstreamer1.0 gstreamer1.0-plugins-base libpcap pciutils"
-DEPENDS += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'libuhab', '', d)}"
+DEPENDS += "\
+    alsa-lib cmake-native glib-2.0 gstreamer1.0 gstreamer1.0-plugins-base libpcap \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'libuhab', '', d)} \
+    pciutils \
+"
 
 SRC_URI = "\
     ${PATH_TO_REPO}/external/open-avb/.git;protocol=${PROTO};destsuffix=external/open-avb;usehead=1 \

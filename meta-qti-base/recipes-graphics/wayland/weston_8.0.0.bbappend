@@ -52,8 +52,8 @@ EXTRA_OECONF:append:qemux86-64 = " \
 
 EXTRA_OECONF:append = "${@bb.utils.contains("DISTRO_FEATURES", "early-ethernet", " --enable-early-boot", "" ,d)}"
 
+# expose weston protocol to /usr/share/weston as video may use it
 do_install:append() {
-    # expose weston protocol to /usr/share/weston as video may use it
     install ${WORKDIR}/graphics/weston/protocol/*.xml ${D}${datadir}/weston
 }
 

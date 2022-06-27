@@ -87,5 +87,5 @@ FILES:${PN}-shutdown += "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', "${s
 FILES:${PN}-powerconfig += "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', "${sysconfdir}/initscripts/power_config", "${sysconfdir}/init.d/power_config", d)} "
 FILES:${PN} += "\
     /data/* \
-    /lib/systemd/* \
+    ${systemd_unitdir}/* \
 "

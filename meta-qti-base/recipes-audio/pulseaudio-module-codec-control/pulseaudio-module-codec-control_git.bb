@@ -19,7 +19,6 @@ do_configure:prepend () {
     sed -i -e "s|%PULSEAUDIO_VERSION%|${VERSION}|" ${S}/configure.ac
 }
 
-
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 FILES:${PN} += "${libdir}/pulse-*/modules/"
