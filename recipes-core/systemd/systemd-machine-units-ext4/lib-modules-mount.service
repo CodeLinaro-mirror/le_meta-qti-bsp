@@ -37,8 +37,8 @@ ConditionDirectoryNotEmpty=!/lib/modules
 
 # Env vars are not reflecting in [Unit] Section for selective wait.
 # Hence wait for both _a & _b dev nodes before attepting to mount
-BindsTo=dev-disk-by\x2dpartlabel-vendor_dlkm_a.device dev-disk-by\x2dpartlabel-vendor_dlkm_b.device
-After=dev-disk-by\x2dpartlabel-vendor_dlkm_a.device dev-disk-by\x2dpartlabel-vendor_dlkm_b.device
+BindsTo=@VDLKMDEVICE@
+After=@VDLKMDEVICE@
 Before=local-fs.target systemd-modules-load.service
 DefaultDependencies=no
 

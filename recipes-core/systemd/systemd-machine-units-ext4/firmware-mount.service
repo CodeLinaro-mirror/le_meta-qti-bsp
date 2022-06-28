@@ -31,8 +31,8 @@ ConditionDirectoryNotEmpty=!/firmware
 
 # Env vars are not reflecting in [Unit] Section for selective wait.
 # Hence wait for both _a & _b dev nodes before attepting to mount
-BindsTo=dev-disk-by\x2dpartlabel-modem_a.device dev-disk-by\x2dpartlabel-modem_b.device
-After=dev-disk-by\x2dpartlabel-modem_a.device dev-disk-by\x2dpartlabel-modem_b.device
+BindsTo=@MODEMDEVICE@
+After=@MODEMDEVICE@
 Before=local-fs.target
 DefaultDependencies=no
 

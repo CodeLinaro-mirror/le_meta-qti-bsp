@@ -4,6 +4,7 @@ include qti-systemd-machine-units.inc
 IMAGETYPE = "ext4"
 
 do_install[prefuncs] += " ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', '', 'fix_sepolicies', d)}"
+do_install[prefuncs] += " ${@bb.utils.contains('MACHINE_FEATURES', 'qti-ab-boot', 'fix_mount_services', '', d)}"
 
 do_install_append () {
 

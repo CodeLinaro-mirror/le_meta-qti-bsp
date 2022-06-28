@@ -72,6 +72,36 @@ fix_sepolicies () {
     sed -i "s#,rootcontext=system_u:object_r:cache_t:s0##g" ${WORKDIR}/overlay-cache.mount
 }
 
+
+# Mount units have to wait for bootable disk dev nodes before attempting to mount.
+# As selective wait by reading environment is not possible in [Unit] Section, wait
+# for required dev nodes i.e. _a & _b when a/b machine feature is enabled
+# (and for _c when a/b/c is enabled) before executing the mount service.
+fix_mount_services () {
+    devdiskstr="dev-disk-by\\\x2dpartlabel-"
+    btdevice="${devdiskstr}bluetooth.device"
+    dspdevice="${devdiskstr}dsp.device"
+    modemdevice="${devdiskstr}modem.device"
+    vdlkmdevice="${devdiskstr}vendor_dlkm.device"
+    if [[ "${MACHINE_FEATURES}" =~ .*qti-ab-boot* ]]; then
+        btdevice="${devdiskstr}bluetooth_a.device ${devdiskstr}bluetooth_b.device"
+        dspdevice="${devdiskstr}dsp_a.device ${devdiskstr}dsp_b.device"
+        modemdevice="${devdiskstr}modem_a.device ${devdiskstr}modem_b.device"
+        vdlkmdevice="${devdiskstr}vendor_dlkm_a.device ${devdiskstr}vendor_dlkm_b.device"
+    fi
+    if [[ "${MACHINE_FEATURES}" =~ .*qti-abc-boot* ]]; then
+        btdevice="$btdevice ${devdiskstr}bluetooth_c.device"
+        dspdevice="$dspdevice ${devdiskstr}dsp_c.device"
+        modemdevice="$modemdevice ${devdiskstr}modem_c.device"
+        vdlkmdevice="$vdlkmdevice ${devdiskstr}vendor_dlkm_c.device"
+    fi
+
+    sed -i "s#@BTDEVICE@#$btdevice#g" ${WORKDIR}/bt_firmware-mount.service
+    sed -i "s#@DSPDEVICE@#$dspdevice#g" ${WORKDIR}/dsp-mount.service
+    sed -i "s#@MODEMDEVICE@#$modemdevice#g" ${WORKDIR}/firmware-mount.service
+    sed -i "s#@VDLKMDEVICE@#$vdlkmdevice#g" ${WORKDIR}/lib-modules-mount.service
+}
+
 def get_mnt_services(d):
     services = []
     img = d.getVar("IMAGETYPE")
