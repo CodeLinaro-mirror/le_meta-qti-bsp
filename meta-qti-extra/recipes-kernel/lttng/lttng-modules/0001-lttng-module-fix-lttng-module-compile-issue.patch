@@ -1,21 +1,36 @@
-From 2014de8cd3d20a7626e6cca157f522069a3628d0 Mon Sep 17 00:00:00 2001
-From: Lei wang <leiwan@codeaurora.org>
-Date: Mon, 19 Jul 2021 13:30:11 +0800
+From 1327e311ca17d1d193aa2e4d3717f7387167d2d5 Mon Sep 17 00:00:00 2001
+From: Lei wang <quic_leiwan@quicinc.com>
+Date: Wed, 29 Jun 2022 13:27:38 +0800
 Subject: [PATCH] lttng-module: fix lttng-module compile issue
 
 Android kernel is a little different from linux standard kernel,
 this may cause lttng compile issue.
 Make lttng-modules use new kallsyms_lookup_name.
 Import android GKI symbol namespace.
+Add support for new itimer changes in Android kernel 5.4.
 
 Upstream-Status: Inappropriate [other]
 
-Signed-off-by: Lei wang <leiwan@codeaurora.org>
+Signed-off-by: Lei wang <quic_leiwan@quicinc.com>
 ---
- wrapper/kallsyms.c | 4 ++--
- wrapper/kallsyms.h | 3 ++-
- 2 files changed, 4 insertions(+), 3 deletions(-)
+ instrumentation/events/lttng-module/timer.h | 2 +-
+ wrapper/kallsyms.c                          | 4 ++--
+ wrapper/kallsyms.h                          | 3 ++-
+ 3 files changed, 5 insertions(+), 4 deletions(-)
 
+diff --git a/instrumentation/events/lttng-module/timer.h b/instrumentation/events/lttng-module/timer.h
+index 1a45d82..c163656 100644
+--- a/instrumentation/events/lttng-module/timer.h
++++ b/instrumentation/events/lttng-module/timer.h
+@@ -294,7 +294,7 @@ LTTNG_TRACEPOINT_EVENT_INSTANCE_MAP(timer_hrtimer_class, hrtimer_cancel,
+  *		zero, otherwise it is started
+  * @expires:	the itimers expiry time
+  */
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,5,0))
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,4,0))
+ LTTNG_TRACEPOINT_EVENT_MAP(itimer_state,
+ 
+ 	timer_itimer_state,
 diff --git a/wrapper/kallsyms.c b/wrapper/kallsyms.c
 index 6af77f5..6c100a4 100644
 --- a/wrapper/kallsyms.c
@@ -49,5 +64,5 @@ index 5f48847..d54a084 100644
  
  #else /* #if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,7,0)) */
 -- 
-2.7.4
+2.35.1
 
