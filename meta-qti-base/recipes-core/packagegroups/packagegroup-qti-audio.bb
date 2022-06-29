@@ -12,8 +12,7 @@ PACKAGES = "${PN}"
 RDEPENDS:${PN} = "\
     alsa-lib \
     alsa-utils \
-    init-audio \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-audio', 'audiodlkm', '', d)} \
-    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-audio-ar', 'agm agm-client agm-plugin agm-server agm-sndparser', '', d)} \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-audio-ar', 'agm agm-client agm-plugin agm-server agm-sndparser', 'init-audio', d)} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-audio-ar', bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', 'ar-audiodlkm', d), '', d)} \
 "
