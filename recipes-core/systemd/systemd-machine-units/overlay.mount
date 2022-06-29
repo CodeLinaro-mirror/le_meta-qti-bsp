@@ -31,5 +31,5 @@ Before=local-fs.target
 [Mount]
 What=/dev/disk/by-partlabel/userdata
 Where=/overlay
-Type=f2fs
-Options=relatime,lazytime,seclabel,background_gc=on,discard,no_heap,user_xattr,inline_xattr,acl,inline_data,inline_dentry,flush_merge,extent_cache,mode=adaptive,active_logs=6,alloc_mode=reuse,fsync_mode=posix
+Type=ext4
+Options=noatime,nosuid,nodev,barrier=1,data=ordered,noauto_da_alloc,discard,noexec,noauto,x-systemd.automount,x-systemd.growfs
