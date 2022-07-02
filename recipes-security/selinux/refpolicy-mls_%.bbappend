@@ -1,5 +1,11 @@
 FILESEXTRAPATHS_append := "${THISDIR}:${THISDIR}/files:"
 
+# Replace original git paths with CLO git paths.
+SRC_URI_remove = "git://github.com/TresysTechnology/refpolicy.git;protocol=git;branch=master;name=refpolicy;destsuffix=refpolicy"
+SRC_URI_remove = "git://github.com/TresysTechnology/refpolicy-contrib.git;protocol=git;branch=master;name=refpolicy-contrib;destsuffix=refpolicy/policy/modules/contrib"
+SRC_URI_prepend = " ${CLO_LE_GIT}/TresysTechnology/refpolicy-contrib.git;protocol=https;branch=caf_migration/treref/master;name=refpolicy-contrib;destsuffix=refpolicy/policy/modules/contrib "
+SRC_URI_prepend = " ${CLO_LE_GIT}/TresysTechnology/refpolicy.git;protocol=https;branch=caf_migration/tretech/master;name=refpolicy;destsuffix=refpolicy "
+
 SRCREV_refpolicy := "RELEASE_2_20161023"
 SRCREV_refpolicy-contrib = "RELEASE_2_20161023"
 
