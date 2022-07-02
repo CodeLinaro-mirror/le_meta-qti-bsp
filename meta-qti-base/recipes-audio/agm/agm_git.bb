@@ -4,8 +4,8 @@ HOMEPAGE = "http://git.codelinaro.org"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
 DEPENDS += "\
-    alsa-lib ar-osal ats glib-2.0 \
-    ${@bb.utils.contains('MACHINE_FEATURES','qti-hypervisor','gsl-fe-noship','gsl',d)} \
+    alsa-lib ar-acdbdata ar-osal ar-util ats glib-2.0 \
+    ${@bb.utils.contains('MACHINE_FEATURES','qti-hypervisor','gsl-fe-noship libuhab','gsl',d)} \
     linux-msm-headers mm-audio-headers spf \
 "
 
