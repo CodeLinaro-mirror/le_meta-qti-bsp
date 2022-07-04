@@ -33,6 +33,8 @@ BUSYBOX_SPLIT_SUID = "1"
 
 FILES_${PN} += "/usr/bin/env"
 
+SYSLOG_STARTUP_CONF = "syslog-startup.conf"
+
 VIRT_RM_BIN_LIST = "CONFIG_BRCTL \
              CONFIG_FDFORMAT \
              CONFIG_IPCRM \
@@ -62,30 +64,34 @@ do_install_append() {
         install -d ${D}${sysconfdir}/udev/scripts/
         install -m 0744 ${WORKDIR}/automountsdcard.sh \
             ${D}${sysconfdir}/udev/scripts/automountsdcard.sh
-        install -d ${D}${systemd_unitdir}/system/
-        install -m 0644 ${WORKDIR}/busybox-syslog.service -D ${D}${systemd_unitdir}/system/busybox-syslog.service
-        install -d ${D}${systemd_unitdir}/system/multi-user.target.wants/
-        # enable the service for multi-user.target
-        ln -sf ${systemd_unitdir}/system/busybox-syslog.service \
-           ${D}${systemd_unitdir}/system/multi-user.target.wants/busybox-syslog.service
-        install -d ${D}${sysconfdir}/initscripts
-        install -m 0755 ${WORKDIR}/syslog ${D}${sysconfdir}/initscripts/syslog
-        sed -i 's/syslogd -- -n/syslogd -n/' ${D}${sysconfdir}/initscripts/syslog
-        sed -i 's/init.d/initscripts/g'  ${D}${systemd_unitdir}/system/busybox-syslog.service
+        if grep -q "CONFIG_SYSLOGD=y" ${B}/.config; then
+            install -d ${D}${systemd_unitdir}/system/
+            install -m 0644 ${WORKDIR}/busybox-syslog.service -D ${D}${systemd_unitdir}/system/busybox-syslog.service
+
+            install -d ${D}${systemd_unitdir}/system/multi-user.target.wants/
+            # enable the service for multi-user.target
+            ln -sf ${systemd_unitdir}/system/busybox-syslog.service \
+                ${D}${systemd_unitdir}/system/multi-user.target.wants/busybox-syslog.service
+
+            install -d ${D}${sysconfdir}/initscripts
+            install -m 0755 ${WORKDIR}/syslog ${D}${sysconfdir}/initscripts/syslog
+            sed -i 's/init.d/initscripts/g'  ${D}${systemd_unitdir}/system/busybox-syslog.service
+
+            #install syslog-startup.conf
+            if [ -f ${WORKDIR}/${SYSLOG_STARTUP_CONF} ]; then
+                install -m 644 ${WORKDIR}/${SYSLOG_STARTUP_CONF} ${D}${sysconfdir}/syslog-startup.conf
+            fi
+
+            if [ -f ${D}${sysconfdir}/default/busybox-syslog ]; then
+                rm -f ${D}${sysconfdir}/default/busybox-syslog
+            fi
+        fi
     else
         install -d ${D}${sysconfdir}/mdev
         install -m 0755 ${WORKDIR}/automountsdcard.sh ${D}${sysconfdir}/mdev/
         install -m 0755 ${WORKDIR}/find-touchscreen.sh ${D}${sysconfdir}/mdev/
         install -m 0755 ${WORKDIR}/usb.sh ${D}${sysconfdir}/mdev/
         install -m 0755 ${WORKDIR}/iio.sh ${D}${sysconfdir}/mdev/
-
-        if [ ${BASEMACHINE} == "mdm9607" ];then
-            install -m 0755 ${WORKDIR}/sensors.sh ${D}${sysconfdir}/mdev/
-        elif [ ${BASEMACHINE} == "apq8053" ];then
-            install -m 0644 ${WORKDIR}/apq8053/mdev.conf ${D}${sysconfdir}/
-        elif [ "${BASEMACHINE}" == "sdxpoorwills" ] && [ "${DISTRO}" == "auto" ]; then
-            install -m 0755 ${WORKDIR}/sensors.sh ${D}${sysconfdir}/mdev/
-        fi
 
         chmod -R go-x ${D}${sysconfdir}/mdev/
     fi
