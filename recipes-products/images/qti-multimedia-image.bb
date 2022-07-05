@@ -18,6 +18,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         ifupdown \
         libxml2 \
         trace-cmd \
+        matter \
         packagegroup-android-utils \
         packagegroup-qti-audio \
         packagegroup-qti-bluetooth \
