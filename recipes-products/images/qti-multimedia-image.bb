@@ -17,6 +17,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         init-ifupdown \
         ifupdown \
         libxml2 \
+        matter \
         packagegroup-android-utils \
         packagegroup-qti-audio \
         packagegroup-qti-bluetooth \
