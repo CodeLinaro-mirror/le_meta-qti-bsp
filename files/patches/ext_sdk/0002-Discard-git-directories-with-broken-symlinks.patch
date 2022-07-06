@@ -1,0 +1,41 @@
+From 9c9712261548bc22ef534ca9781cdea0f7268353 Mon Sep 17 00:00:00 2001
+From: Raghuvar S <quic_raghuvar@quicinc.com>
+Date: Thu, 26 May 2022 11:35:15 +0530
+Subject: [PATCH] Discard .git/ directories with broken symlinks
+
+Recipes with SRC_URI pointing to locally synced
+sources having .git/ directories that have broken
+symlinks fail in "devtool modify" operation. This
+patch discards .git/ directories if they contain
+broken symlinks.
+
+Change-Id: Idcec46f46e8dcccc2980856b4c0d2ea6fe728082
+---
+ meta/classes/devtool-source.bbclass | 11 ++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/meta/classes/devtool-source.bbclass b/meta/classes/devtool-source.bbclass
+index 41900e651f..e475433881 100644
+--- a/meta/classes/devtool-source.bbclass
++++ b/meta/classes/devtool-source.bbclass
+@@ -146,6 +146,16 @@ python devtool_post_unpack() {
+                 "doesn't use any source or the correct source "
+                 "directory could not be determined" % d.getVar('PN'))
+
++#Discard .git directories which have files with broken symlinks 
++    for root, _, files in os.walk(srcsubdir):
++        if (os.path.basename(root) == ".git"):
++            for f in files:
++                f = os.path.relpath(os.path.join(root,f), srcsubdir)
++                if os.path.islink(os.path.join(srcsubdir, f)):
++                    linkto = os.readlink(os.path.join(srcsubdir, f))
++                    if not os.path.exists(linkto):
++                        shutil.rmtree(os.path.join(root))
++                        break
++
+     devbranch = d.getVar('DEVTOOL_DEVBRANCH')
+     setup_git_repo(srcsubdir, d.getVar('PV'), devbranch, d=d)
+ 
+-- 
+2.17.1
+
