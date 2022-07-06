@@ -1,0 +1,26 @@
+From 2f43797c5b94cd70a967f58c68e2a2582e25e6ed Mon Sep 17 00:00:00 2001
+From: Jing Wang <quic_jingwa@quicinc.com>
+Date: Wed, 6 Jul 2022 09:13:11 +0530
+Subject: [PATCH] pulseaudio system mode support QACT
+
+pulseaudio system mode support QACT
+
+Signed-off-by: Jing Wang <quic_jingwa@quicinc.com>
+---
+ src/daemon/system.pa.in | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/daemon/system.pa.in b/src/daemon/system.pa.in
+index b1a4a5c..49de692 100755
+--- a/src/daemon/system.pa.in
++++ b/src/daemon/system.pa.in
+@@ -64,3 +64,6 @@ load-module module-suspend-on-idle
+ 
+ ### Enable positioned event sounds
+ load-module module-position-event-sounds
++
++load-module module-acdb
++load-module agl-audio-plugin
+-- 
+2.7.4
+

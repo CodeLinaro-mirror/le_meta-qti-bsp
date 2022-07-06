@@ -28,6 +28,7 @@ SRC_URI += "\
     file://0006-Support-PulseAudio-Client-API-for-Module-Codec-Control.patch \
     file://0001-pulseaudio-config-default.pa-to-disable-default-ALSA.patch \
     file://0001-udev-bypass-udev-device-enumeration-for-auto-targets.patch \
+    file://0001-pulseaudio-system-mode-support-QACT.patch \
 "
 
 REQUIRED_DISTRO_FEATURES = "systemd"
