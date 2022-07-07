@@ -53,10 +53,10 @@ _WLAN_CFG_OVERRIDE_GVM = "\
                         CONFIG_CFG_BMISS_OFFLOAD_MAX_VDEV=4 \
                         CONFIG_BAND_6GHZ=y \
                         CONFIG_CONNECTION_ROAMING_CFG=n \
+                        CONFIG_DBR_HOLD_LARGE_MEM=n \
                         "
 EXTRA_OEMAKE:append:qtiquingvm = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
 EXTRA_OEMAKE:append:qtiquingvm8295 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
-EXTRA_OEMAKE:append:qtigvmi3 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
 EXTRA_OEMAKE:append:quin-gvm-gen4 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
 
 SYSTEMD_SERVICE:${PN} = "init_qti_wlan_auto.service"
