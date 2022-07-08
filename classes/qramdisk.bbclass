@@ -63,7 +63,6 @@ fakeroot do_ramdisk_create() {
                 cp ${IMAGE_ROOTFS}/sbin/mkfs.ext3 bin/
                 cp ${IMAGE_ROOTFS}/sbin/mkfs.ext4 bin/
                 cp ${IMAGE_ROOTFS}/sbin/ip.iproute2 bin/
-                ln -s mksh bin/sh
                 ln -s gawk bin/awk
                 ln -s expr.coreutils bin/expr
                 ln -s tr.coreutils bin/tr
