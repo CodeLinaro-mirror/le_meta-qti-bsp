@@ -11,7 +11,6 @@ DISTROOVERRIDES =. "${@['', '${BASEDISTRO}:']['${BASEDISTRO}' != '']}"
 
 # DISTRO FEATURE SELECTION
 MICRO_GOLD ?= "ld-is-gold"
-MICRO_GOLD_apq8017 = ""
 
 USE_DEVFS = "0"
 
@@ -19,7 +18,7 @@ USE_DEVFS = "0"
 INHERIT += "recipe_sanity"
 
 # TOOLCHAIN
-PREFERRED_VERSION_autoconf = "2.68"
+PREFERRED_VERSION_autoconf ?= "2.68"
 ARM_INSTRUCTION_SET       ?= "arm"
 
 ##################################################################
@@ -55,7 +54,7 @@ USE_LDCONFIG = "0"
 LDCONFIGDEPEND = ""
 COMMERCIAL_LICENSE_DEPENDEES = ""
 
-PREFERRED_VERSION_readline = "5.2"
+PREFERRED_VERSION_readline ?= "5.2"
 
 PRODUCT ??= "base"
 
