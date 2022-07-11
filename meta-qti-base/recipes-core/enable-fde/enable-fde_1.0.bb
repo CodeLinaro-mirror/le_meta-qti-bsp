@@ -12,7 +12,7 @@ SRC_URI = "\
 inherit systemd
 
 SYSTEMD_SERVICE:${PN} = "enable-fde.service"
-SYSTEMD_AUTO_ENABLE:${PN} = "disable"
+SYSTEMD_AUTO_ENABLE:${PN} = "enable"
 
 do_install:append () {
   install -d ${D}${systemd_system_unitdir}
