@@ -122,7 +122,7 @@ do_generate_gki_defconfig() {
 addtask do_generate_gki_defconfig after do_unpack before do_kernel_metadata
 do_generate_gki_defconfig[depends] += "virtual/${TARGET_PREFIX}binutils:do_populate_sysroot"
 do_generate_gki_defconfig[depends] += "virtual/${TARGET_PREFIX}binutils:do_prepare_recipe_sysroot"
-do_generate_gki_defconfig[depends] += "clang-native:do_populate_sysroot"
+do_generate_gki_defconfig[depends] += "clang-cross-${TARGET_ARCH}:do_populate_sysroot"
 
 do_kernel_checkout[noexec] = "1"
 
