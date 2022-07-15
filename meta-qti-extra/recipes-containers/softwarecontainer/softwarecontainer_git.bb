@@ -32,7 +32,7 @@ PACKAGECONFIG[dbusgateway] = "-DENABLE_DBUSGATEWAY=ON,-DENABLE_DBUSGATEWAY=OFF"
 PACKAGECONFIG[cgroupsgateway] = "-DENABLE_CGROUPSGATEWAY=ON,-DENABLE_CGROUPSGATEWAY=OFF"
 PACKAGECONFIG[examples] = "-DENABLE_EXAMPLES=ON,-DENABLE_EXAMPLES=OFF"
 PACKAGECONFIG[test] = "-DENABLE_TEST=ON,-DENABLE_TEST=OFF"
-PACKAGECONFIG ?= "filegateway networkgateway devicenodegateway cgroupsgateway"
+#PACKAGECONFIG ?= "filegateway networkgateway devicenodegateway cgroupsgateway"
 
 SYSTEMD_SERVICE:${PN} = "softwarecontainer-agent.service"
 SYSTEMD_AUTO_ENABLE:${PN} = "enable"
@@ -41,7 +41,9 @@ PACKAGES = "${PN}-examples ${PN} ${PN}-dev ${PN}-dbg ${PN}-doc ${PN}-locale"
 
 do_install:append() {
     install -d ${D}${systemd_system_unitdir}
+    install -d ${D}/etc/lxc/containername
     install -m 0644 ${S}/../../softwarecontainer-agent.service ${D}${systemd_system_unitdir}
+    install -m 0755 ${S}/containername.json ${D}/etc/lxc/containername
 }
 
 FILES:${PN} += "\
