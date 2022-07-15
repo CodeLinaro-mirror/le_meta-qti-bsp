@@ -22,6 +22,7 @@ SRC_URI:append = " file://0003-default.pa-Load-agl-audio-plugin-module.patch"
 SRC_URI:append = " file://0006-Support-PulseAudio-Client-API-for-Module-Codec-Control.patch"
 SRC_URI:append = " file://0001-pulseaudio-config-default.pa-to-disable-default-ALSA.patch"
 SRC_URI:append = " file://0001-udev-bypass-udev-device-enumeration-for-auto-targets.patch"
+SRC_URI:append = " file://0001-Avoid-pulseaudio-daemon-shutdown-after-lpm.patch"
 SRC_URI:append = " ${@bb.utils.contains('MACHINE_FEATURES', 'qti-audio-ar','file://0001-disable-realtime-schedule-in-pulseaudio.patch','',d)}"
 
 PACKAGES =+ " pulseaudio-module-dev"

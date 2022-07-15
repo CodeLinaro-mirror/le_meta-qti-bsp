@@ -14,7 +14,7 @@ SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/synergy/synergy-opensource/platform/msm/spp"
 
-inherit module module-sign
+inherit module module-sign qti-kernel-arch-clang
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 

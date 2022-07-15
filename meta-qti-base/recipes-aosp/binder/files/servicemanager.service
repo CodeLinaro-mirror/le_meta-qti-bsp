@@ -30,8 +30,6 @@ Description= Service manager Service
 SourcePath=/usr/bin/servicemanager
 
 [Service]
-User=system
-Group=system
 Restart=always
 ExecStartPre=/etc/initscripts/create-binder
 ExecStart=/usr/bin/servicemanager

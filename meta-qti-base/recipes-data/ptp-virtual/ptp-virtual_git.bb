@@ -15,18 +15,17 @@ SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/vendor/qcom/opensource/ptp-virtual"
 
-inherit module module-sign kernel-arch qperf
+inherit module module-sign kernel-arch qperf qti-kernel-arch-clang
 INHIBIT_PACKAGE_STRIP = "1"
 EXTRA_OEMAKE += "CONFIG_ARCH_MSM=y"
 
 do_install:append() {
     install -d ${D}${systemd_unitdir}/system
-    install -d ${D}/${sysconfdir}
     install -m 0644 ${WORKDIR}/ptp-virtual.service ${D}${systemd_unitdir}/system/ptp-virtual.service
 }
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-FILES:${PN} += "${systemd_unitdir}/system/ptp-virtual.service \
-                /etc/* \
+FILES:${PN} += "\
+    ${systemd_unitdir}/system/ptp-virtual.service \
 "

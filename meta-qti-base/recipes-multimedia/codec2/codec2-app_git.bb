@@ -12,14 +12,7 @@ SRC_URI = "${PATH_TO_REPO}/gstreamer/gst-plugins-qti-oss/.git;protocol=${PROTO};
 SRCREV = "${AUTOREV}"
 S = "${WORKDIR}/gstreamer/gst-plugins-qti-oss/codec2-app"
 
-inherit cmake systemd useradd
-
-CODEC2_USER = "codec2"
-CODEC2_GROUP = "${CODEC2_USER}"
-USERADD_PACKAGES = "${PN}"
-
-GROUPADD_PARAM:${PN} = "${CODEC2_GROUP}"
-USERADD_PARAM:${PN} = "--no-create-home --gid ${CODEC2_GROUP} --shell /bin/false ${CODEC2_USER}"
+inherit cmake systemd
 
 EXTRA_OECMAKE += "-DSYSTEMD_UNITDIR=${systemd_system_unitdir}"
 

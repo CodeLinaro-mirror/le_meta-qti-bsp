@@ -3,7 +3,11 @@ DESCRIPTION = "This is the server library of AGM, based on Binder IPC."
 HOMEPAGE = "http://git.codelinaro.org"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
-DEPENDS += "agm ar-osal ar-util binder glib-2.0 gsl-fe-noship libcutils libuhab libutils linux-msm-headers spf"
+DEPENDS += "\
+    agm ar-osal ar-util binder glib-2.0 \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'gsl-fe-noship libuhab', 'gsl', d)} \
+    libcutils libutils linux-msm-headers spf \
+"
 
 SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/agm/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/agm/plugins/alsalib;subpath=alsalib;usehead=1 \
            file://agm.service \
@@ -22,7 +26,14 @@ do_install:append() {
     fi
 }
 
-RDEPENDS:${PN} = "binder"
+PACKAGE_ARCH = "${MACHINE_ARCH}"
+
+RDEPENDS:${PN} += "\
+    ar-osal \
+    ar-util \
+    binder \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'gsl-fe-noship libuhab', 'gsl', d)} \
+"
 
 SOLIBS = ".so"
 FILES_SOLIBSDEV = ""

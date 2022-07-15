@@ -1,12 +1,12 @@
 require qcacld32-ll.inc
 
-SUMMARY = "Qualcomm Atheros WLAN Driver"
-DESCRIPTION = "Qualcomm Atheros WLAN CLD3.0 low latency driver for Rome WLAN chip.\
+SUMMARY = "Qualcomm Technologies, Inc. WLAN Driver"
+DESCRIPTION = "Qualcomm Technologies, Inc. WLAN CLD3.0 low latency driver for HastingsPrime WLAN chip.\
                It is a kernel extra module, which loaded by init_qti_wlan_auto.service \
-               once the system bootup. And this WLAN host driver module name is qca6696.ko,\
-               it create two interface by defaults, one is wlan0 and the other is p2p0. \
+               once the system bootup. And this WLAN host driver module name is qca6490.ko,\
+               it create two interface by default, one is wlan0 and the other is wlan1. \
                Application can use the wireless interfaces as STA/AP/P2P mode in need. \"
-HOMEPAGE = "https://git.codelinaro.org/"
+HOMEPAGE = "https://www.codeaurora.org/"
 LICENSE = "ISC"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=f3b90e78ea0cffb20bf5cca7947a896d"
 
@@ -22,8 +22,8 @@ SRC_URI = "${PATH_TO_REPO}/wlan/qcacld-3.0/.git;protocol=${PROTO};destsuffix=wla
 SRCREV = "${AUTOREV}"
 SRCREV_FORMAT = "qcacld_cmn_fw_msm"
 
-_MODNAME = "qca6574"
-FW_PATH_NAME = "qca6174"
+_MODNAME = "qca6490"
+FW_PATH_NAME = "qca6490"
 FIRMWARE_PATH = "${D}${nonarch_base_libdir}/firmware/wlan/qca_cld/${_MODNAME}"
 
 S1 = "${WORKDIR}/wlan/qca-wifi-host-cmn"
@@ -34,13 +34,30 @@ S = "${WORKDIR}/wlan/qcacld-3.0"
 EXTRA_OEMAKE:append = " \
                        CONFIG_CLD_HL_SDIO_CORE=n \
                        CONFIG_CNSS_SDIO=n \
-                       CONFIG_QCA_CLD_WLAN_PROFILE=qca6174 \
+                       CONFIG_QCA_CLD_WLAN_PROFILE=qca6490 \
                        DYNAMIC_SINGLE_CHIP=${_MODNAME} \
                        MODNAME=${_MODNAME} \
-                       CONFIG_AR6320_SUPPORT=y \
-                       CONFIG_CNSS_GENL=n \
-                       CONFIG_IPA_OFFLOAD=n \
                        "
+
+_WLAN_CFG_OVERRIDE_GVM = "\
+                        CONFIG_WLAN_DISABLE_EXPORT_SYMBOL=y \
+                        CONFIG_WLAN_OPEN_P2P_INTERFACE=n \
+                        CONFIG_SUPPORT_P2P_BY_ONE_INTF_WLAN=y \
+                        CONFIG_WLAN_PLACEMARKER_PREFIX=108 \
+                        CONFIG_FEATURE_GPIO_CFG=y \
+                        CONFIG_CNSS_GENL=n \
+                        CONFIG_MULTI_IF_LOG=y \
+                        CONFIG_FEATURE_WLAN_CH_AVOID_EXT=y \
+                        CONFIG_QCOM_TDLS=n \
+                        CONFIG_CFG_MAX_STA_VDEVS=4 \
+                        CONFIG_CFG_BMISS_OFFLOAD_MAX_VDEV=4 \
+                        CONFIG_BAND_6GHZ=y \
+                        CONFIG_CONNECTION_ROAMING_CFG=n \
+                        CONFIG_DBR_HOLD_LARGE_MEM=n \
+                        "
+EXTRA_OEMAKE:append:qtiquingvm = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
+EXTRA_OEMAKE:append:qtiquingvm8295 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
+EXTRA_OEMAKE:append:quin-gvm-gen4 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
 
 SYSTEMD_SERVICE:${PN} = "init_qti_wlan_auto.service"
 
@@ -56,27 +73,22 @@ do_install() {
     install -d ${WLAN_KO}/wlan
     install -m 0644 ${S}/${_MODNAME}.ko ${WLAN_KO}/wlan/
 
-    install -D -m 0644 ${WORKDIR}/device/qcom/wlan/msm_auto/WCNSS_qcom_cfg_qca6174.ini ${FIRMWARE_PATH}/WCNSS_qcom_cfg.ini
-    install -D -m 0644 ${WORKDIR}/device/qcom/wlan/msm_auto/wlan_mac.bin ${FIRMWARE_PATH}/wlan_mac.bin
+    install -D -m 0644 ${WORKDIR}/device/qcom/wlan/msm_auto/WCNSS_qcom_cfg_qca6490.ini ${FIRMWARE_PATH}/WCNSS_qcom_cfg.ini
+    install -D -m 0644 ${WORKDIR}/device/qcom/wlan/msm_auto/wlan_mac_hst_1.bin ${FIRMWARE_PATH}/wlan_mac.bin
     install -d ${D}${bindir}
     install -D -m 0755 ${WORKDIR}/init.qti.wlan_on.sh ${D}${bindir}/init.qti.wlan_on.sh
     install -D -m 0755 ${WORKDIR}/init.qti.wlan_off.sh ${D}${bindir}/init.qti.wlan_off.sh
 
-    install -d ${D}${nonarch_base_libdir}/firmware/${_MODNAME}/
-    ln -sf /firmware/image/${FW_PATH_NAME}/bdwlan30.b00 ${D}${nonarch_base_libdir}/firmware/${_MODNAME}/
-    ln -sf /firmware/image/${FW_PATH_NAME}/bdwlan30.bin ${D}${nonarch_base_libdir}/firmware/${_MODNAME}/
-    mv ${D}${nonarch_base_libdir}/firmware/${_MODNAME}/bdwlan30.bin ${D}${nonarch_base_libdir}/firmware/${_MODNAME}/utfbd30.bin
-    ln -sf /firmware/image/${FW_PATH_NAME}/qwlan30.bin ${D}${nonarch_base_libdir}/firmware/${_MODNAME}/
-    ln -sf /firmware/image/${FW_PATH_NAME}/utf30.bin ${D}${nonarch_base_libdir}/firmware/${_MODNAME}/
-    ln -sf /firmware/image/${FW_PATH_NAME}/otp30.bin ${D}${nonarch_base_libdir}/firmware/${_MODNAME}/
-    ln -sf /firmware/image/${FW_PATH_NAME}/data.msc ${D}${nonarch_base_libdir}/firmware/${_MODNAME}/
-    ln -sf /firmware/image/${FW_PATH_NAME}/bdwlan30.b31 ${D}${nonarch_base_libdir}/firmware/${_MODNAME}/
-    mv ${D}${nonarch_base_libdir}/firmware/${_MODNAME}/bdwlan30.b31 ${D}${nonarch_base_libdir}/firmware/${_MODNAME}/utfbd30.b31
-    ln -sf /firmware/image/${FW_PATH_NAME}/bdwlan30.bin ${D}${nonarch_base_libdir}/firmware/${_MODNAME}/
-    ln -sf /firmware/image/${FW_PATH_NAME}/bdwlan30.b31 ${D}${nonarch_base_libdir}/firmware/${_MODNAME}/
+    install -d ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/
+    ln -sf /firmware/image/${FW_PATH_NAME}/amss20.bin ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/
+    ln -sf /firmware/image/${FW_PATH_NAME}/bdwlan02.e03 ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/
+    ln -sf /firmware/image/${FW_PATH_NAME}/bdwlan02.e02 ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/
+    ln -sf /firmware/image/${FW_PATH_NAME}/bdwlan.elf ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/
+    ln -sf /firmware/image/${FW_PATH_NAME}/m3.bin ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/
 
     # Install systemd service file
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
+        install -d ${D}${systemd_unitdir}/system/
         install -m 0644 ${WORKDIR}/init_qti_wlan_auto.service -D ${D}${systemd_unitdir}/system/init_qti_wlan_auto.service
     fi
 }
@@ -84,5 +96,6 @@ do_install() {
 FILES:${PN} += "\
     ${bindir}/init.qti.wlan_on.sh \
     ${bindir}/init.qti.wlan_off.sh \
+    ${systemd_unitdir}/system/* \
+    ${sysconfdir}/* \
 "
-
