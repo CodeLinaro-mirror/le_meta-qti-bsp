@@ -31,7 +31,7 @@ get_cc_option () {
 :
 }
 
-DEPENDS += " mkbootimg-native openssl-native mod-signing-keys"
+DEPENDS += " virtual/mkbootimg-native openssl-native mod-signing-keys"
 RDEPENDS_${KERNEL_PACKAGE_NAME}-base = ""
 
 LDFLAGS_aarch64 = "-O1 --hash-style=gnu --as-needed"
@@ -223,6 +223,14 @@ do_shared_workdir_append () {
 
         # Generate kernel headers
         oe_runmake_call -C ${STAGING_KERNEL_DIR} ARCH=${ARCH} CC="${KERNEL_CC}" LD="${KERNEL_LD}" headers_install O=${STAGING_KERNEL_BUILDDIR}
+
+        # Set up hosttools for module compilation
+        cd ${WORKSPACE}/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform  && \
+              BUILD_CONFIG=${KERNEL_BUILD_CONFIG} \
+              OUT_DIR=${KERNEL_OUT_PATH}/ \
+              KERNEL_UAPI_HEADERS_DIR=${STAGING_KERNEL_BUILDDIR} \
+              INSTALL_MODULE_HEADERS=1 \
+              ./build/build_module.sh
 }
 
 # Path for dtbo generation is kernel version dependent.
