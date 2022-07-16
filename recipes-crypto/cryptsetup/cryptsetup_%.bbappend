@@ -8,4 +8,5 @@ PACKAGECONFIG_remove_class-target = " \
 
 SRC_URI += " \
             file://0001-Disable-direct-IO-use-case.patch \
+            ${@bb.utils.contains('DISTRO_FEATURES', 'nad-fde', 'file://0001-cryptsetup-Key-is-processed-in-a-buf.patch', '', d)} \
            "
