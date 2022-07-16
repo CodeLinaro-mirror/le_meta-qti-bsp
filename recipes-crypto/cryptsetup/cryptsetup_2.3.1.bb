@@ -24,7 +24,8 @@ SRC_URI = "${KERNELORG_MIRROR}/linux/utils/${BPN}/v${@d.getVar('PV').split('.')[
 SRC_URI[md5sum] = "cef482c0579f34d9524311ac70c0875f"
 SRC_URI[sha256sum] = "92aba4d559a2cf7043faed92e0f22c5addea36bd63f8c039ba5a8f3a159fe7d2"
 
-SRC_URI += "${@bb.utils.contains('DISTRO_FEATURES', 'nad-avb', 'file://0001-Disable-direct-IO-use-case.patch', '', d)}"
+SRC_URI += "${@bb.utils.contains('DISTRO_FEATURES', 'nad-prod', 'file://0001-Disable-direct-IO-use-case.patch', '', d)}"
+SRC_URI += "${@bb.utils.contains('DISTRO_FEATURES', 'nad-fde', 'file://0001-cryptsetup-Key-is-processed-in-a-buf.patch', '', d)}"
 
 inherit autotools gettext pkgconfig
 
