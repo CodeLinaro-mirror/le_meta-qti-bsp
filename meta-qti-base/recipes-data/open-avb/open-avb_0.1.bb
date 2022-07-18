@@ -88,6 +88,3 @@ FILES:libgptp += "${libdir}/libgptp.so"
 FILES:libgptp-dev += "${includedir}/gptp_helper.h"
 FILES:libgptp-test += "${bindir}/avb/libgptp_test"
 
-INHIBIT_PACKAGE_STRIP = "1"
-INHIBIT_PACKAGE_DEBUG_SPLIT = "1"
-
