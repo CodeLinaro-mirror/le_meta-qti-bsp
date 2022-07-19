@@ -7,29 +7,25 @@ HOMEPAGE = "http://developer.android.com/"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://NOTICE;md5=c1a3ff0b97f199c7ebcfdd4d3fed238e"
 
-SRCREV = "b94377adcbb3377a89edc7939d98ce76ccda1398"
+SRCREV = "f9a075a9078eaebee234fb9be2f043613fe63da8"
 SRC_URI = "\
     git://git.codelinaro.org/clo/la/platform/system/core;protocol=https;nobranch=1; \
     file://0001-libdp-add-support-for-autoconf-build.patch \
-    file://0002-libdp-update-fs_mgr-to-work-in-LV.patch \
-    file://0001-libdp-liblp-libdm-enable-write-and-test.patch \
-    file://0001-liblp-Attribute-partition-has-been-updated.patch \
-    file://0001-liblp-Expand-the-metadata-header-for-future-use.patch \
+    file://0001-libdp-Android11-ota-lib-porting-libbase_r.patch \
+    file://0002-libdp-Android11-ota-lib-porting-liblp.patch \
+    file://0003-libdp-Android11-ota-lib-porting-libdm.patch \
+    file://0004-libdp-Android11-ota-lib-porting-fs_mgr.patch \
     file://0001-libdp-Create-symlink-for-dynamic-partitions.patch \
+    file://0001-libdp-libdm-add-uuid-link-for-partions.patch \
 "
 
 S = "${WORKDIR}/git"
 
 inherit autotools pkgconfig
-do_patch:append () {
-    bb.build.exec_func('do_patch_ex', d)
-}
-
-src = "if (partition->attributes() & ~(LP_PARTITION_ATTRIBUTE_MASK))"
-dst = "        if (partition->attributes() \& LP_PARTITION_ATTR_UPDATED) {\n            static const uint16_t kMinVersion = LP_METADATA_VERSION_FOR_UPDATED_ATTR;\n            metadata->header.minor_version = std::max(metadata->header.minor_version, kMinVersion);\n        }"
-
-do_patch_ex () {
-    sed -i "/${src}/{n;n;n;s/$/\n\n${dst}/;}" ${S}/fs_mgr/liblp/builder.cpp
-}
 
 DEPENDS += "openssl gtest libsparse ext4-utils"
+
+PACKAGES =+ "${PN}-test"
+FILES_${PN}-test += "${bindir}/lp_test \
+                     ${bindir}/dm_test \
+                    "
