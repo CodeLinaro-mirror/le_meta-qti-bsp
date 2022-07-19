@@ -28,3 +28,4 @@
 # In A/B mode, recovery/updater primarily needs
 # cache and userdata entries only
 /dev/block/bootdevice/by-name/userdata    /overlay      ext4     defaults     0  2
+/dev/block/bootdevice/by-name/cache       /cache        ext4     defaults     0  2
