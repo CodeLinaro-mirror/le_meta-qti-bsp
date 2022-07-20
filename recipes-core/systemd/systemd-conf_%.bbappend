@@ -8,6 +8,7 @@ SRC_URI += "file://limits-coredump.conf"
 # Don't install coredump.conf for user builds.
 COREDUMP = "1"
 COREDUMP_qti-distro-user = ""
+no_logs_to_console = "${@d.getVar('NO_SYS_JOURNAL_LOGS_TO_CONSOLE')}"
 
 SYSTEMD_COREDUMP_PATH ?= "${userfsdatadir}/coredump"
 
@@ -33,11 +34,13 @@ FILES_${PN} += "${sysconfdir}/sysctl.d/* ${sysconfdir}/security/limits.d/* ${SYS
 
 # journald.conf
 do_install_append() {
-    # Redirect journal logs to console.
-    sed -i '$aForwardToConsole=yes' ${D}${systemd_unitdir}/journald.conf.d/00-${PN}.conf
-    sed -i '$aTTYPath=/dev/ttyMSM0' ${D}${systemd_unitdir}/journald.conf.d/00-${PN}.conf
-    sed -i '$aMaxLevelConsole=warning' ${D}${systemd_unitdir}/journald.conf.d/00-${PN}.conf
-    sed -i '$aReadKMsg=yes' ${D}${systemd_unitdir}/journald.conf.d/00-${PN}.conf
+   if [ "${no_logs_to_console}" != "1" ]; then
+       # Redirect journal logs to console.
+       sed -i '$aForwardToConsole=yes' ${D}${systemd_unitdir}/journald.conf.d/00-${PN}.conf
+       sed -i '$aTTYPath=/dev/ttyMSM0' ${D}${systemd_unitdir}/journald.conf.d/00-${PN}.conf
+       sed -i '$aMaxLevelConsole=warning' ${D}${systemd_unitdir}/journald.conf.d/00-${PN}.conf
+       sed -i '$aReadKMsg=yes' ${D}${systemd_unitdir}/journald.conf.d/00-${PN}.conf
+   fi
 }
 
 # logind.conf
@@ -48,10 +51,15 @@ do_install_append() {
 
 # system.conf
 do_install_append() {
-    # Redirect system logs to both console and syslog.
-    sed -i '$aStandardOutput=syslog+console' ${D}${systemd_unitdir}/system.conf.d/00-${PN}.conf
-    sed -i '$aTTYPath=/dev/ttyMSM0' ${D}${systemd_unitdir}/system.conf.d/00-${PN}.conf
-    sed -i '$aLogTarget=console' ${D}${systemd_unitdir}/system.conf.d/00-${PN}.conf
+   if [ "${no_logs_to_console}" != "1" ]; then
+       # Redirect system logs to both console and syslog.
+       sed -i '$aStandardOutput=syslog+console' ${D}${systemd_unitdir}/system.conf.d/00-${PN}.conf
+       sed -i '$aTTYPath=/dev/ttyMSM0' ${D}${systemd_unitdir}/system.conf.d/00-${PN}.conf
+       sed -i '$aLogTarget=console' ${D}${systemd_unitdir}/system.conf.d/00-${PN}.conf
+   else
+       # Set LogTarget as syslog
+       sed -i '$aLogTarget=syslog' ${D}${systemd_unitdir}/system.conf.d/00-${PN}.conf
+   fi
 }
 
 # user.conf
