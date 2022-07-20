@@ -30,7 +30,7 @@ SRC_URI = "\
 SRCREV = "${AUTOREV}"
 SRCREV_FORMAT = "kernel_data_display_ais_video"
 
-inherit kernel kernel-yocto qsigning ${@bb.utils.contains('TARGET_KERNEL_ARCH', 'aarch64', 'qtikernel-arch', '', d)} qti-kernel-arch-clang
+inherit kernel kernel-yocto qsigning qti-kernel-arch-clang
 
 S = "${WORKDIR}/kernel/msm-5.4"
 
