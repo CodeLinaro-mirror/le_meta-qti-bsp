@@ -35,7 +35,7 @@ if (lspci -k|grep cnss_pci);then
 	elif ((lspci -k|grep 003e) || (lspci -k|grep QCA6174));then
 		echo "##########unload qca6574#############"
 		modprobe -r qca6574
-	elif (lspci -k|grep 1101);then
+	elif ((lspci -k|grep 1101) || (lspci -k|grep QCA6390));then
 		echo "##########unload qca6696#############"
 		modprobe -r qca6696
 	elif (lspci -k|grep 1103);then
