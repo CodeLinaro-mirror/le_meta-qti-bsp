@@ -91,6 +91,10 @@ create_symlink_systemd_ext4_mount_rootfs() {
                 ln -sf ${systemd_unitdir}/system/${mountname}.mount ${IMAGE_ROOTFS_EXT4}/lib/systemd/system/multi-user.target.wants/${mountname}.mount
             elif [[ "$mountname" == "persist" ]] ; then
                 ln -sf ${systemd_unitdir}/system/${mountname}.mount ${IMAGE_ROOTFS_EXT4}/lib/systemd/system/local-fs.target.requires/${mountname}.mount
+            elif [[ "$mountname" == "overlay" ]] ; then
+                if ${@bb.utils.contains('DISTRO_FEATURES', 'full-disk-encryption', 'false', 'true', d)} ; then
+                   ln -sf ${systemd_unitdir}/system/${mountname}.mount ${IMAGE_ROOTFS_EXT4}/lib/systemd/system/local-fs.target.requires/${mountname}.mount
+                fi
             else
                 ln -sf ${systemd_unitdir}/system/${mountname}.mount ${IMAGE_ROOTFS_EXT4}/lib/systemd/system/local-fs.target.requires/${mountname}.mount
             fi
@@ -141,9 +145,10 @@ do_makesystem() {
                 ${IMAGE_EXT4_SELINUX_OPTIONS} \
                 ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMIMAGE_TARGET} ${IMAGE_ROOTFS_EXT4}
 
+        invalid_image=0
         simg2img ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMIMAGE_TARGET} /dev/null || invalid_image=1
 
-        if [ ${invalid_image:-0} -eq 1 ]; then
+        if [ ${invalid_image} -eq 1 ]; then
             echo "Unsparse image failed.. Recreating image"
             continue
         else

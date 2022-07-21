@@ -31,7 +31,7 @@ get_cc_option () {
 :
 }
 
-DEPENDS += " mkbootimg-native openssl-native mod-signing-keys"
+DEPENDS += " virtual/mkbootimg-native openssl-native mod-signing-keys"
 RDEPENDS_${KERNEL_PACKAGE_NAME}-base = ""
 
 LDFLAGS_aarch64 = "-O1 --hash-style=gnu --as-needed"
@@ -223,6 +223,14 @@ do_shared_workdir_append () {
 
         # Generate kernel headers
         oe_runmake_call -C ${STAGING_KERNEL_DIR} ARCH=${ARCH} CC="${KERNEL_CC}" LD="${KERNEL_LD}" headers_install O=${STAGING_KERNEL_BUILDDIR}
+
+        # Set up hosttools for module compilation
+        cd ${WORKSPACE}/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform  && \
+              BUILD_CONFIG=${KERNEL_BUILD_CONFIG} \
+              OUT_DIR=${KERNEL_OUT_PATH}/ \
+              KERNEL_UAPI_HEADERS_DIR=${STAGING_KERNEL_BUILDDIR} \
+              INSTALL_MODULE_HEADERS=1 \
+              ./build/build_module.sh
 }
 
 # Path for dtbo generation is kernel version dependent.
@@ -252,12 +260,13 @@ do_deploy() {
      install -d ${DEPLOYDIR}/build-artifacts
      install -d ${DEPLOYDIR}/build-artifacts/kernel_scripts/scripts
      install -d ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr/
+     install -d ${DEPLOYDIR}/build-artifacts/dtb
 
      cp  ${S}/usr/gen_initramfs.sh ${DEPLOYDIR}/build-artifacts/kernel_scripts/scripts
      cp -a ${B}/usr/gen_init_cpio ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr/
      cp -a ${B}/usr/initramfs_data.cpio ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr/
      cp -a ${B}/usr/initramfs_inc_data ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr/
-
+     cp -a ${KERNEL_PREBUILT_PATH}/*.dtb ${DEPLOYDIR}/build-artifacts/dtb
 }
 
 # Put the zImage in the kernel-dev pkg
