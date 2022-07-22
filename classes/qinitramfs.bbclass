@@ -72,6 +72,14 @@ configure_final_image () {
             ./bin/udevadm
             ./sbin/ldconfig
             ./sbin/udevd
+            ./etc/lvm
+            ./usr/sbin/dmeventd
+            ./usr/sbin/lv*
+            ./usr/sbin/pv*
+            ./usr/lib/liblvm2*
+            ./usr/lib/tmpfiles*
+            ./usr/lib/libaio*
+            ./usr/sbin/vg*
             "
 
   for file in ${known_list}; do
