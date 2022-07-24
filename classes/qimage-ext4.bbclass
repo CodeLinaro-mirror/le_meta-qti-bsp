@@ -91,6 +91,10 @@ create_symlink_systemd_ext4_mount_rootfs() {
                 ln -sf ${systemd_unitdir}/system/${mountname}.mount ${IMAGE_ROOTFS_EXT4}/lib/systemd/system/multi-user.target.wants/${mountname}.mount
             elif [[ "$mountname" == "persist" ]] ; then
                 ln -sf ${systemd_unitdir}/system/${mountname}.mount ${IMAGE_ROOTFS_EXT4}/lib/systemd/system/local-fs.target.requires/${mountname}.mount
+            elif [[ "$mountname" == "overlay" ]] ; then
+                if ${@bb.utils.contains('DISTRO_FEATURES', 'full-disk-encryption', 'false', 'true', d)} ; then
+                   ln -sf ${systemd_unitdir}/system/${mountname}.mount ${IMAGE_ROOTFS_EXT4}/lib/systemd/system/local-fs.target.requires/${mountname}.mount
+                fi
             else
                 ln -sf ${systemd_unitdir}/system/${mountname}.mount ${IMAGE_ROOTFS_EXT4}/lib/systemd/system/local-fs.target.requires/${mountname}.mount
             fi
@@ -220,4 +224,21 @@ python() {
        bb.build.addtask('do_makesystemrw', 'do_makesystem', 'do_image', d)
     if cache_img == "true":
        bb.build.addtask('do_makecache', 'do_makesystem', 'do_image', d)
+}
+
+#############################################################
+############ Generate Unsparsed images if needed ############
+#############################################################
+do_unsparse_images[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
+
+do_unsparse_images() {
+    simg2img ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMIMAGE_TARGET} ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMIMAGE_TARGET}.raw
+    simg2img ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${USERDATAIMAGE_TARGET} ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${USERDATAIMAGE_TARGET}.raw
+    simg2img ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${PERSISTIMAGE_TARGET} ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${PERSISTIMAGE_TARGET}.raw
+    if [ ${CACHE_IMG_ENABLE} == "true" ]; then
+        simg2img ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${CACHEIMAGE_TARGET} ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${CACHEIMAGE_TARGET}.raw
+    fi
+    if [ ${SYSTEMRW_IMG_ENABLE} == "true" ]; then
+        simg2img ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMRWIMAGE_TARGET} ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMRWIMAGE_TARGET}.raw
+    fi
 }
