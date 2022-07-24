@@ -17,4 +17,5 @@ RDEPENDS_packagegroup-qti-debug-tools = " \
             systemd-analyze \
             procrank \
 	    perf \
+	    atrace \
         "
