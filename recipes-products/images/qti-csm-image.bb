@@ -11,7 +11,10 @@ CORE_IMAGE_EXTRA_INSTALL += "\
               coreutils \
               packagegroup-qti-data \
               systemd-machine-units \
+              packagegroup-android-utils \
+              packagegroup-startup-scripts \
               ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
+              packagegroup-qti-core \
 "
 
 do_merge_dtbs() {
