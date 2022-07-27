@@ -58,6 +58,7 @@ _WLAN_CFG_OVERRIDE_GVM = "\
                         CONFIG_REO_DESC_DEFER_FREE=y \
                         CONFIG_HIF_DEBUG=y \
                         CONFIG_HIF_CE_DEBUG_DATA_BUF=y \
+                        CONFIG_BUS_AUTO_SUSPEND=n \
                         "
 _WLAN_CFG_OVERRIDE_METAL = "\
                         CONFIG_WLAN_DISABLE_EXPORT_SYMBOL=y \
@@ -66,6 +67,7 @@ _WLAN_CFG_OVERRIDE_METAL = "\
                         CONFIG_REO_DESC_DEFER_FREE=y \
                         CONFIG_HIF_DEBUG=y \
                         CONFIG_HIF_CE_DEBUG_DATA_BUF=y \
+                        CONFIG_BUS_AUTO_SUSPEND=n \
                         "
 EXTRA_OEMAKE:append:qtiquingvm = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
 EXTRA_OEMAKE:append:qtiquingvm8295 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"

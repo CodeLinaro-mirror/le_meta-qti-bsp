@@ -40,6 +40,12 @@ EXTRA_OEMAKE:append = " \
                        CONFIG_CNSS_GENL=n \
                        "
 
+_WLAN_CFG_OVERRIDE = " \
+                      CONFIG_BUS_AUTO_SUSPEND=n \
+                      "
+
+EXTRA_OEMAKE:append += " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE}"
+
 SYSTEMD_SERVICE:${PN} = "init_qti_wlan_auto.service"
 
 do_install() {
