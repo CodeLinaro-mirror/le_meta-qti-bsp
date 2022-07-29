@@ -1,6 +1,6 @@
-SUMMARY = "CAF Linux Kernel"
-DESCRIPTION = "CAF Linux Kernel for QTI MSM SoC"
-HOMEPAGE = "https://www.codeaurora.org"
+SUMMARY = "CLO Linux Kernel"
+DESCRIPTION = "CLO Linux Kernel for QTI MSM SoC"
+HOMEPAGE = "https://git.codelinaro.org"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
 
@@ -11,10 +11,10 @@ DEPENDS += "\
     ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'mkdtimg-native', '', d)} \
     openssl-native rsync-native \
 "
-DEPENDS_append_aarch64 = " libgcc"
+DEPENDS:append:aarch64 = " libgcc"
 
-KERNEL_CC_append_aarch64 = " ${TOOLCHAIN_OPTIONS}"
-KERNEL_LD_append_aarch64 = " ${TOOLCHAIN_OPTIONS}"
+KERNEL_CC:append:aarch64 = " ${TOOLCHAIN_OPTIONS}"
+KERNEL_LD:append:aarch64 = " ${TOOLCHAIN_OPTIONS}"
 
 SRC_URI = "\
     ${PATH_TO_REPO}/kernel/msm-5.4/.git;protocol=${PROTO};destsuffix=kernel/msm-5.4;usehead=1 \
@@ -32,13 +32,16 @@ SRC_URI = "\
 SRCREV = "${AUTOREV}"
 SRCREV_FORMAT = "kernel_data_display_ais_video"
 
-inherit kernel kernel-yocto qsigning ${@bb.utils.contains('TARGET_KERNEL_ARCH', 'aarch64', 'qtikernel-arch', '', d)}
+inherit kernel kernel-yocto qsigning qti-kernel-arch-clang
 
 S = "${WORKDIR}/kernel/msm-5.4"
 
+# Due to inherit kernel. If choose clang as a compilation chain, need unset thist variable to set clang as BASEDEPENDS.
+unset INHIBIT_DEFAULT_DEPS
+
 EXTRA_OEMAKE += "INSTALL_MOD_STRIP=1"
 
-LDFLAGS_aarch64 = "-O1 --hash-style=gnu --as-needed"
+LDFLAGS:aarch64 = "-O1 --hash-style=gnu --as-needed"
 TARGET_CXXFLAGS += "-Wno-format"
 
 python __anonymous () {
@@ -75,9 +78,9 @@ addtask do_uncompressed_kernel_patch after do_install before do_deploy
 
 KERNEL_PRIORITY = "9001"
 # Add V=1 to KERNEL_EXTRA_ARGS for verbose
-KERNEL_EXTRA_ARGS_append = " O=${B}"
-KERNEL_EXTRA_ARGS_append = " ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'DTC_EXT=${STAGING_BINDIR_NATIVE}/dtc CONFIG_BUILD_ARM64_DT_OVERLAY=y', '', d)}"
-KERNEL_EXTRA_ARGS_append_sa81x5 = " ${@bb.utils.contains('DISTRO_FEATURES', 'qti-lxc', 'CONFIG_AUTO_LXC_OVERLAY=y', '', d)}"
+KERNEL_EXTRA_ARGS:append = " O=${B}"
+KERNEL_EXTRA_ARGS:append = " ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'DTC_EXT=${STAGING_BINDIR_NATIVE}/dtc CONFIG_BUILD_ARM64_DT_OVERLAY=y', '', d)}"
+KERNEL_EXTRA_ARGS:append:sa81x5 = " ${@bb.utils.contains('DISTRO_FEATURES', 'qti-lxc', 'CONFIG_AUTO_LXC_OVERLAY=y', '', d)}"
 
 KBRANCH ?= ""
 KMETA = "kernel-meta"
@@ -87,7 +90,7 @@ KCONFIG_MODE = "--alldefconfig"
 KBUILD_DEFCONFIG ?= "${KERNEL_CONFIG}"
 LINUX_VERSION_EXTENSION = "${@['-perf', ''][d.getVar('VARIANT', True) == ('' or 'debug')]}"
 
-do_kernel_metadata_prepend() {
+do_kernel_metadata:prepend() {
     set +e
     if [ -n "${KBUILD_DEFCONFIG}"  ]; then
         if [ -f "${S}/arch/${ARCH}/configs/${KBUILD_DEFCONFIG}"  ]; then
@@ -110,7 +113,7 @@ do_generate_gki_defconfig() {
     gki_defconfig=`echo ${KERNEL_CONFIG} | sed 's/vendor\///g'`
 
     # Point to the correct CC when executing generate_defconfig.sh
-    export REAL_CC=`echo ${CC} | sed 's/-target.*//g'`
+    export REAL_CC=$(realpath $(which $(echo ${CC} | sed 's/-target.*//g')))
 
     # FIXME: Workaround for executing generate_defconfig.sh
     LD=`echo ${LD} | sed 's/--sysroot.*//g'`
@@ -121,6 +124,7 @@ do_generate_gki_defconfig() {
 addtask do_generate_gki_defconfig after do_unpack before do_kernel_metadata
 do_generate_gki_defconfig[depends] += "virtual/${TARGET_PREFIX}binutils:do_populate_sysroot"
 do_generate_gki_defconfig[depends] += "virtual/${TARGET_PREFIX}binutils:do_prepare_recipe_sysroot"
+do_generate_gki_defconfig[depends] += "clang-cross-${TARGET_ARCH}:do_populate_sysroot"
 
 do_kernel_checkout[noexec] = "1"
 
@@ -129,7 +133,7 @@ do_compile () {
 }
 
 do_shared_workdir[dirs] = "${DEPLOYDIR}"
-do_shared_workdir_append () {
+do_shared_workdir:append () {
         cp include/config/auto.conf $kerneldir/include/config/auto.conf
 
         if [ -d arch/${ARCH}/include ]; then
@@ -179,10 +183,10 @@ do_deploy () {
     cp  ${STAGING_KERNEL_BUILDDIR}/usr/gen_init_cpio ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr
 
     # Copy Image appended with dtbs to deploydir
-    cat ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} ${B}/arch/${ARCH}/boot/dts/vendor/qcom/*.dtb > ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-dtb-${KERNEL_VERSION}
+    cat ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} ${B}/arch/${ARCH}/boot/dts/vendor/qcom/*.dtb > ${DEPLOYDIR}/${KERNEL_IMAGETYPE}-dtb-${KERNEL_VERSION}
 
     # Make bootimage
-    ${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-dtb-${KERNEL_VERSION} \
+    ${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${DEPLOYDIR}/${KERNEL_IMAGETYPE}-dtb-${KERNEL_VERSION} \
         --ramdisk /dev/null \
         --cmdline "${KERNEL_CMD_PARAMS}" \
         --pagesize ${PAGE_SIZE} \
@@ -191,7 +195,7 @@ do_deploy () {
         --output ${DEPLOYDIR}/${BOOTIMAGE_TARGET}
     # Copy vmlinux and zImage into deploydir for boot.img creation
     install -m 0644 ${KERNEL_OUTPUT_DIR}/${KERNEL_IMAGETYPE} ${DEPLOYDIR}/${KERNEL_IMAGETYPE}
-    install -m 0644 ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-dtb-${KERNEL_VERSION} ${DEPLOYDIR}/${KERNEL_IMAGETYPE}-dtb
+    mv ${DEPLOYDIR}/${KERNEL_IMAGETYPE}-dtb-${KERNEL_VERSION} ${DEPLOYDIR}/${KERNEL_IMAGETYPE}-dtb
     install -m 0644 vmlinux ${DEPLOYDIR}
 
     if ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'true', 'false', d)}; then
@@ -207,9 +211,6 @@ do_deploy () {
 #Sign boot image after generation
 do_deploy[postfuncs] += "sign_bootimg"
 
-PACKAGES = "kernel kernel-base kernel-vmlinux kernel-dev kernel-modules"
-
 INHIBIT_PACKAGE_STRIP = "1"
 KERNEL_VERSION_SANITY_SKIP = "1"
 
-RDEPENDS_${KERNEL_PACKAGE_NAME}-base = ""

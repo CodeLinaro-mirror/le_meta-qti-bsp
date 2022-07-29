@@ -5,9 +5,7 @@ SECTION = "libs"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${WORKDIR}/git/LICENSE;md5=cbbd27594afd089daa160d3a16dd515a"
 
-SRC_URI = "\
-    git://git.codelinaro.org/clo/le/external/oracle/gtest;protocol=git;branch=soppiest/main \
-"
+SRC_URI = "git://git.codelinaro.org/clo/le/external/oracle/gtest;protocol=https;branch=caf_migration/soppiest/main"
 
 SRCREV = "d850e144710e330070b756c009749dc7a7302301"
 
@@ -18,6 +16,6 @@ inherit lib_package cmake
 EXTRA_OECMAKE = "-DBUILD_SHARED_LIBS=ON"
 
 FILES_SOLIBSDEV = ""
-FILES_${PN} += "${libdir}/*.so"
+FILES:${PN} += "${libdir}/*.so"
 
 BBCLASSEXTEND = "native nativesdk"

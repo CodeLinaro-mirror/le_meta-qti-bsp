@@ -24,8 +24,7 @@ SRC_URI += "file://preload14.sh"
 SRC_URI += "file://preload15.sh"
 SRC_URI += "file://preload16.sh"
 
-SECURITY_CFLAGS_pn-${PN} = "${SECURITY_NOPIE_CFLAGS}"
-
+SECURITY_CFLAGS:pn-${PN} = "${SECURITY_NOPIE_CFLAGS}"
 S = "${WORKDIR}"
 
 inherit systemd

@@ -1,6 +1,6 @@
 USERADD_PACKAGES ?= "${PN}"
 
-USERADD_PARAM_${PN} ?= 	" \
+USERADD_PARAM:${PN} ?= 	" \
 			-u 5002 -U leprop; \
 			-u 1000 -U system; \
 			-u 1001 -U radio; \
@@ -21,9 +21,12 @@ USERADD_PARAM_${PN} ?= 	" \
 			-u 4021 -U locclient; \
 			-u 4022 -U vnw; \
 			-G system,locclient -u 1021 -U gps; \
+			-G audio -u 4050 -U acdb-loader; \
+			-G audio -u 4051 -U amfs; \
+			-u 4052 -U codec2; \
 			"
 
-GROUPADD_PARAM_${PN} ?=	" \
+GROUPADD_PARAM:${PN} ?=	" \
                         -g 2901 kmsg; \
 			-g 3004 net_raw; \
 			-g 3005 net_admin; \

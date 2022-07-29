@@ -7,11 +7,11 @@ PACKAGES = "\
     packagegroup-qti-security \
 "
 
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     libcap \
     libcap-bin \
     attr \
-    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'enable-fde', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'qti-fde', 'enable-fde', '', d)} \
 "

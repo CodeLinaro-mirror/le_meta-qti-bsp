@@ -15,4 +15,4 @@ do_install() {
     install -m 0755 ${S}/init.qti.hibernate.sh -D ${D}${sysconfdir}/initscripts/init_hibernate
 }
 
-FILES_${PN} += "${sysconfdir}/initscripts/init_hibernate"
+FILES:${PN} += "${sysconfdir}/initscripts/init_hibernate"

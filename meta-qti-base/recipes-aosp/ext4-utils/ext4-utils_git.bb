@@ -17,7 +17,7 @@ S = "${WORKDIR}/system/extras/ext4_utils"
 
 inherit autotools pkgconfig
 
-CPPFLAGS_append = " \
+CPPFLAGS:append = " \
     -I${STAGING_INCDIR}/libselinux \
     -I${STAGING_INCDIR}/cutils \
 "

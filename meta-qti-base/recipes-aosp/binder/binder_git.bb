@@ -15,23 +15,23 @@ SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/frameworks/binder"
 
-inherit autotools pkgconfig systemd useradd
+inherit autotools pkgconfig systemd
 
-SYSTEMD_SERVICE_${PN} = "servicemanager.service"
-SYSTEMD_AUTO_ENABLE_${PN} = "enable"
+SYSTEMD_SERVICE:${PN} = "servicemanager.service"
+SYSTEMD_AUTO_ENABLE:${PN} = "enable"
 
 EXTRA_OECONF += "--with-glib"
 # This recipe assumes kernel always compile for default arch even when
 # multilib compilation is enabled. If kernel is 64bit and binder is compiled
 # for 32bit due to multilib settings default 64bit IPC need to be supported
 # as kernel is 64bit. Only when kernel is 32bit, 32bit IPC need to be enabled.
-EXTRA_OECONF_append_arm = " \
+EXTRA_OECONF:append:arm = " \
     ${@bb.utils.contains('MULTILIB_VARIANTS', 'lib32','','--enable-32bit-binder-ipc',d)} \
 "
 
 CFLAGS += "-I${STAGING_INCDIR}/libselinux"
 
-do_install_append() {
+do_install:append() {
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
         install -d ${D}/${sysconfdir}/initscripts/
         install -m 0755 ${WORKDIR}/create-binder.sh -D ${D}${sysconfdir}/initscripts/create-binder

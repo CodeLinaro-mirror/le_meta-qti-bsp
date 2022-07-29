@@ -1,17 +1,17 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}-${PV}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}-${PV}:"
 
 DEPENDS += "base-passwd"
 
-SRC_URI_append = " file://${BASEMACHINE}/fstab"
+SRC_URI:append = " file://${BASEMACHINE}/fstab"
 
-dirs755_append = " \
+dirs755:append = " \
     /media/cf /media/net /media/ram \
     /media/union /media/realroot /media/hdd /media/mmc1 \
     /firmware /dsp /bluetooth ${localstatedir} /media/card /persist \
     ${userfsdatadir} ${MACHINE_MNT_POINTS} \
 "
 
-do_install_append(){
+do_install:append(){
     install -m 755 -o diag -g diag -d ${D}/media
     install -m 755 -o diag -g diag -d ${D}/media/card
     ln -s /media/card ${D}/sdcard

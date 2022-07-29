@@ -1,9 +1,9 @@
 PROVIDES_NAME = "kernel-module-${_MODNAME}"
 
-inherit autotools-brokensep module qperf module-sign systemd
+inherit autotools-brokensep module qperf module-sign systemd qti-kernel-arch-clang
 
 do_unpack[deptask] = "do_populate_sysroot"
-do_compile_prepend() {
+do_compile:prepend() {
     #Add gnu99 for compiler compatible issues
     sed -i '$a\ccflags-y += -std=gnu99' ${S}/Kbuild
     #In yocto system, get build tag by 'git log' in wlan src dir instead of 'git reflog' in work dir
@@ -16,13 +16,13 @@ do_compile_prepend() {
     CFLAGS_wlan_hdd_main.o += -DBUILD_TAG=\\"$(BUILD_TAG)\\"' ${S}/Kbuild
 }
 
-RPROVIDES_${PN} += "${PROVIDES_NAME}-${KERNEL_VERSION}"
+RPROVIDES:${PN} += "${PROVIDES_NAME}-${KERNEL_VERSION}"
 
-FILES_${PN} += "lib/firmware/wlan/*"
-FILES_${PN} += "lib/firmware/*"
-FILES_${PN} += "lib/modules/${KERNEL_VERSION}/extra/${_MODNAME}.ko"
+FILES:${PN} += "lib/firmware/wlan/*"
+FILES:${PN} += "lib/firmware/*"
+FILES:${PN} += "lib/modules/${KERNEL_VERSION}/extra/${_MODNAME}.ko"
 
-LDFLAGS_aarch64 = "-O1 --hash-style=gnu --as-needed"
+LDFLAGS:aarch64 = "-O1 --hash-style=gnu --as-needed"
 
 KERNEL_CC += "-Wno-error=maybe-uninitialized"
 KERNEL_CC += "-Wno-error=stringop-overflow"

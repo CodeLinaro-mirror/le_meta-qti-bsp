@@ -1,7 +1,7 @@
 SUMMARY = "Filesystem resize service"
 DESCRIPTION = "A systemd service that runs on the first system boot \
                and expands the filesystem(s) to the size of underlying partition"
-HOMEPAGE = "https://www.codeaurora.org/"
+HOMEPAGE = "https://git.codelinaro.org/"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
 
@@ -11,8 +11,8 @@ S = "${WORKDIR}"
 
 inherit systemd
 
-SYSTEMD_SERVICE_${PN} = "resize-userdata.service"
-SYSTEMD_AUTO_ENABLE_${PN} = "enable"
+SYSTEMD_SERVICE:${PN} = "resize-userdata.service"
+SYSTEMD_AUTO_ENABLE:${PN} = "enable"
 
 do_install() {
     if ${@bb.utils.contains('IMAGE_FEATURES','read-only-rootfs','true','false',d)}; then
@@ -34,9 +34,9 @@ do_install() {
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-FILES_${PN} += "\
+FILES:${PN} += "\
     ${systemd_unitdir}/system/resize-userdata.service \
     ${localstatedir}/lib/need_resize \
 "
 
-RDEPENDS_${PN} += "e2fsprogs-resize2fs"
+RDEPENDS:${PN} += "e2fsprogs-resize2fs"

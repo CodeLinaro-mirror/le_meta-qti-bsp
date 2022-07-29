@@ -17,11 +17,11 @@ require recipes-products/images/automotive-image.inc
 
 # Remove splash feature added by agl-image-weston, as psplash does
 # not work
-IMAGE_FEATURES_remove = "splash"
+IMAGE_FEATURES:remove = "splash"
 
 # Switch to OpenSSH instead of Dropbear to support QtCreator use
 # for demo development
-IMAGE_FEATURES_remove = "ssh-server-dropbear"
+IMAGE_FEATURES:remove = "ssh-server-dropbear"
 IMAGE_FEATURES += "ssh-server-openssh"
 
 # enable sparse image to reduce the image size and faster the flash speed.

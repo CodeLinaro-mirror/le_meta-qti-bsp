@@ -1,14 +1,16 @@
 SUMMARY = "QTI package group for os common libs"
 
+PACKAGE_ARCH = "${TUNE_PKGARCH}"
+
 inherit packagegroup
 
 PACKAGES = "\
     packagegroup-qti-core-commonlibs \
     "
 
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     libcutils \
     libstdc++ \
     liblog \

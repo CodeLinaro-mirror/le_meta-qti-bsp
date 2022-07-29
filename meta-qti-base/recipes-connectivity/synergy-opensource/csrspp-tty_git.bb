@@ -1,10 +1,9 @@
 SUMMARY = "QTI Bluetooth SPP TTY driver for AGL Platform"
 DESCRIPTION = "Spp tty is part of Synergy BT Stack\
 distribution which implements tty driver for SPP profile."
-HOMEPAGE = "https://www.codeaurora.org"
-LICENSE = "BSD-3-Clause & GPL-2.0"
-LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/BSD-3-Clause;md5=550794465ba0ec5312d6919e203a55f9 \
-                    file://${COREBASE}/meta/files/common-licenses/GPL-2.0;md5=801f80980d171dd6425610833a22dbe6"
+HOMEPAGE = "https://git.codelinaro.org"
+LICENSE = "GPL-2.0-only"
+LIC_FILES_CHKSUM = "file://${QTI_LICENSE_DIR}/GPL-2.0-only;md5=801f80980d171dd6425610833a22dbe6"
 
 DEPENDS += "virtual/kernel"
 
@@ -14,13 +13,13 @@ SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/synergy/synergy-opensource/platform/msm/spp"
 
-inherit module module-sign
+inherit module module-sign qti-kernel-arch-clang
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 _MODNAME = "csrspp-tty"
 PROVIDES_NAME = "kernel-module-${_MODNAME}"
 
-FILES_${PN} += "lib/modules/${KERNEL_VERSION}/extra/${_MODNAME}.ko"
+FILES:${PN} += "lib/modules/${KERNEL_VERSION}/extra/${_MODNAME}.ko"
 
-RPROVIDES_${PN} += "${PROVIDES_NAME}-${KERNEL_VERSION}"
+RPROVIDES:${PN} += "${PROVIDES_NAME}-${KERNEL_VERSION}"

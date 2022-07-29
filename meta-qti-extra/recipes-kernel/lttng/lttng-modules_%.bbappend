@@ -1,3 +1,5 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-SRC_URI += " file://0001-lttng-module-fix-lttng-module-compile-issue.patch "
+SRC_URI:append = " file://0001-lttng-module-fix-lttng-module-compile-issue.patch"
+
+inherit qti-kernel-arch-clang

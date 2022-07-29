@@ -1,8 +1,8 @@
 DEPENDS += "linux-msm-headers media"
-DEPENDS_remove = "virtual/libomxil"
+DEPENDS:remove = "virtual/libomxil"
 
-SRC_URI_remove = "https://gstreamer.freedesktop.org/src/gst-omx/gst-omx-${PV}.tar.xz"
-SRC_URI_append = " ${PATH_TO_REPO}/gstreamer/qti-gst-omx/.git;protocol=${PROTO};destsuffix=gstreamer/qti-gst-omx;usehead=1"
+SRC_URI:remove = "https://gstreamer.freedesktop.org/src/gst-omx/gst-omx-${PV}.tar.xz"
+SRC_URI:append = " ${PATH_TO_REPO}/gstreamer/qti-gst-omx/.git;protocol=${PROTO};destsuffix=gstreamer/qti-gst-omx;usehead=1"
 
 SRCREV = "${AUTOREV}"
 
@@ -19,6 +19,6 @@ EXTRA_OEMESON = "\
                  -Denable-target-vpu554=yes \
                 "
 
-CFLAGS_append = " -DVIDC_TARGET_USES_GKI"
+CFLAGS:append = " -DVIDC_TARGET_USES_GKI"
 
-RDEPENDS_${PN} = "media"
+RDEPENDS:${PN} = "media"

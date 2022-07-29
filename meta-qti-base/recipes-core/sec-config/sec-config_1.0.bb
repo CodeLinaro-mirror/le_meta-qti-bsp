@@ -4,7 +4,7 @@ DESCRIPTION = "The secursey config file is used for QMI(Qualcomm Message Interfa
                is defined as [QMI_Service_ID:QMI_Instance_ID:QMI_Client_Group_ID]. \
                The irsc_util(IPC Router Security Utilty) binary reads this file and feed the \
                security rules to the IPC Router."
-HOMEPAGE = "https://www.codeaurora.org/"
+HOMEPAGE = "https://git.codelinaro.org/"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
 

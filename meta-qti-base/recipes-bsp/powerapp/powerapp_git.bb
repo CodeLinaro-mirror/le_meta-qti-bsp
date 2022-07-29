@@ -48,7 +48,7 @@ do_install() {
         fi
 }
 
-pkg_postinst_${PN}-reboot () {
+pkg_postinst:${PN}-reboot () {
         if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'false', 'true', d)}; then
            [ -n "$D" ] && OPT="-r $D" || OPT="-s"
            update-rc.d $OPT -f reboot remove
@@ -56,7 +56,7 @@ pkg_postinst_${PN}-reboot () {
         fi
 }
 
-pkg_postinst_${PN}-shutdown () {
+pkg_postinst:${PN}-shutdown () {
         if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'false', 'true', d)}; then
            [ -n "$D" ] && OPT="-r $D" || OPT="-s"
            update-rc.d $OPT -f shutdown remove
@@ -64,7 +64,7 @@ pkg_postinst_${PN}-shutdown () {
         fi
 }
 
-pkg_postinst_${PN}-powerconfig () {
+pkg_postinst:${PN}-powerconfig () {
         if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'false', 'true', d)}; then
            [ -n "$D" ] && OPT="-r $D" || OPT="-s"
            update-rc.d $OPT -f power_config remove
@@ -72,7 +72,7 @@ pkg_postinst_${PN}-powerconfig () {
         fi
 }
 
-pkg_postinst_${PN} () {
+pkg_postinst:${PN} () {
         if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'false', 'true', d)}; then
            [ -n "$D" ] && OPT="-r $D" || OPT="-s"
            update-rc.d $OPT -f reset_reboot_cookie remove
@@ -82,10 +82,10 @@ pkg_postinst_${PN} () {
 
 PACKAGES =+ "${PN}-reboot ${PN}-shutdown ${PN}-powerconfig"
 
-FILES_${PN}-reboot += "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', "${sysconfdir}/initscripts/reboot", "${sysconfdir}/init.d/reboot", d)} "
-FILES_${PN}-shutdown += "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', "${sysconfdir}/initscripts/shutdown", "${sysconfdir}/init.d/shutdown", d)} "
-FILES_${PN}-powerconfig += "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', "${sysconfdir}/initscripts/power_config", "${sysconfdir}/init.d/power_config", d)} "
-FILES_${PN} += "\
+FILES:${PN}-reboot += "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', "${sysconfdir}/initscripts/reboot", "${sysconfdir}/init.d/reboot", d)} "
+FILES:${PN}-shutdown += "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', "${sysconfdir}/initscripts/shutdown", "${sysconfdir}/init.d/shutdown", d)} "
+FILES:${PN}-powerconfig += "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', "${sysconfdir}/initscripts/power_config", "${sysconfdir}/init.d/power_config", d)} "
+FILES:${PN} += "\
     /data/* \
-    /lib/systemd/* \
+    ${systemd_unitdir}/* \
 "

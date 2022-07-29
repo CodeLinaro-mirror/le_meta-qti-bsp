@@ -1,14 +1,16 @@
 SUMMARY = "QTI package group for weston"
 
+PACKAGE_ARCH = "${TUNE_PKGARCH}"
+
 inherit packagegroup
 
 PACKAGES = "\
     packagegroup-qti-display \
     "
 
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     libdrm \
     wayland \
     wayland-ivi-extension \
@@ -17,4 +19,5 @@ RDEPENDS_${PN} += "\
     weston-examples \
     display-hal-linux \
     display-commonsys-intf-linux \
+    ${@bb.utils.contains('LAYERSERIES_COMPAT_yocto', 'dunfell', '', 'weston-sdm-extension', d)} \
     "

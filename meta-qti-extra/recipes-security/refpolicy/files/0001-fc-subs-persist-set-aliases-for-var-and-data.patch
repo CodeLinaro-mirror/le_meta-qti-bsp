@@ -1,0 +1,30 @@
+From e7ae834887a196d880d43f82eebb866f4e9d3b17 Mon Sep 17 00:00:00 2001
+From: Kai Meng <quic_kmeng@quicinc.com>
+Date: Tue, 17 May 2022 19:14:15 +0800
+Subject: [PATCH] fc/subs/persist: set aliases for var and data
+
+Because we mount bind /persist to /var,
+and bind /home to /data, so add aliases for them.
+
+Upstream-Status: Pending
+
+Signed-off-by: Kai Meng <quic_kmeng@quicinc.com>
+---
+ config/file_contexts.subs_dist | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/config/file_contexts.subs_dist b/config/file_contexts.subs_dist
+index c720871..e8d6a36 100644
+--- a/config/file_contexts.subs_dist
++++ b/config/file_contexts.subs_dist
+@@ -48,3 +48,7 @@
+ /usr/lib/busybox/sbin /usr/sbin
+ /usr/lib/busybox/usr /usr
+ 
++# persist and home aliases
++# in fstab, mount bind /persist to /var, and /home to /data
++/persist /var
++/home /data
+-- 
+2.7.4
+

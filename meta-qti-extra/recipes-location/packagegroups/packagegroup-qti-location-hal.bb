@@ -6,9 +6,9 @@ PACKAGES = "\
     packagegroup-qti-location-hal \
     "
 
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     gps-utils \
     location-hal-daemon \
     loc-core \
