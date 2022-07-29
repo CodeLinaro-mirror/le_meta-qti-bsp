@@ -21,6 +21,8 @@ IMAGE_FSTYPES_DEBUGFS = "tar.bz2"
 ### Don't append timestamp to image name
 IMAGE_VERSION_SUFFIX = ""
 
+ROOTFS_POSTPROCESS_COMMAND += "gen_buildprop;"
+
 # Default Image names
 BOOTIMAGE_TARGET ?= "boot.img"
 DTBOIMAGE_TARGET ?= "dtbo.img"
@@ -53,7 +55,8 @@ IMAGE_LINGUAS = ""
 PACKAGE_EXCLUDE += "readline"
 
 # Use busybox as login manager
-IMAGE_LOGIN_MANAGER = "busybox-static"
+TOYBOX_RAMDISK ?= "False"
+IMAGE_LOGIN_MANAGER = "${@oe.utils.conditional('TOYBOX_RAMDISK', 'True', "", "busybox-static", d)}"
 
 DEPENDS += "\
              ext4-utils-native \
@@ -170,4 +173,11 @@ python rootfs_ignore_packages() {
 
     d.setVar("PACKAGE_EXCLUDE", ' '.join(excl_pkgs))
     d.setVar("PACKAGE_INSTALL_ATTEMPTONLY", ' '.join(atmt_only_pkgs))
+}
+
+gen_buildprop() {
+   mkdir -p ${IMAGE_ROOTFS}/cache
+   echo ro.build.version.release=`cat ${IMAGE_ROOTFS}/etc/version ` >> ${IMAGE_ROOTFS}/build.prop
+   echo ro.product.name=${BASEMACHINE}-${DISTRO} >> ${IMAGE_ROOTFS}/build.prop
+   echo ${MACHINE} >> ${IMAGE_ROOTFS}/target
 }

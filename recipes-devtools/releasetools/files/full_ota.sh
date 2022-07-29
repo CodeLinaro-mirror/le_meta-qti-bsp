@@ -74,7 +74,7 @@ if [ "$#" -gt 4 ]; then
     done
 fi
 
-# Specify MMC or MTD type device. MTD by default
+# Specify MMC or MTD type device and support MMC device with Squash file system. MTD by default
 [[ $3 = "ext4" || $3 = "emmc_sqsh" ]] && device_type="MMC" || device_type="MTD"
 
 # Setup temp folder to unzip target files

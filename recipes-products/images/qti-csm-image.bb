@@ -4,14 +4,22 @@
 
 inherit qimage qramdisk
 
-IMAGE_FEATURES += "read-only-rootfs"
+IMAGE_FEATURES[validitems] += "csm"
+IMAGE_FEATURES += "read-only-rootfs csm"
 
 CORE_IMAGE_EXTRA_INSTALL += "\
               glib-2.0 \
               coreutils \
+              powerapp \
+              powerapp-powerconfig \
+              powerapp-reboot \
+              powerapp-shutdown \
               packagegroup-qti-data \
               systemd-machine-units \
+              packagegroup-android-utils \
+              packagegroup-startup-scripts \
               ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
+              packagegroup-qti-core \
 "
 
 do_merge_dtbs() {
