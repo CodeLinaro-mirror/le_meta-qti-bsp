@@ -16,4 +16,5 @@ RDEPENDS_${PN} += "\
     lxcfs \
     dploader \
     softwarecontainer \
+    lvm2 \
     "
