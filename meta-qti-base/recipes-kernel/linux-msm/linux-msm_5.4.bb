@@ -125,6 +125,8 @@ do_generate_gki_defconfig[depends] += "virtual/${TARGET_PREFIX}binutils:do_popul
 do_kernel_checkout() {
 }
 
+do_validate_branches[noexec] = "1"
+
 # extra task for configuration checks
 addtask kernel_configcheck after do_configure before do_compile
 
