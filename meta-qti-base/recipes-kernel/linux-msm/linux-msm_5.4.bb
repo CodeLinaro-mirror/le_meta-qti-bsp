@@ -125,6 +125,7 @@ do_generate_gki_defconfig[depends] += "virtual/${TARGET_PREFIX}binutils:do_prepa
 do_generate_gki_defconfig[depends] += "clang-cross-${TARGET_ARCH}:do_populate_sysroot"
 
 do_kernel_checkout[noexec] = "1"
+do_validate_branches[noexec] = "1"
 
 do_compile () {
     oe_runmake CC="${KERNEL_CC}" LD="${KERNEL_LD}" ${KERNEL_EXTRA_ARGS} $use_alternate_initrd
