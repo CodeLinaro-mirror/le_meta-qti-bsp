@@ -48,7 +48,7 @@ IgnoreOnIsolate=true
 Type=oneshot
 RemainAfterExit=yes
 PassEnvironment="SLOT_SUFFIX"
-ExecStart=/bin/mount -o noexec,nodev,ro -t ext4 /dev/disk/by-partlabel/vendor_dlkm${SLOT_SUFFIX} /lib/modules
+ExecStart=/bin/mount -o noexec,nodev,ro,context=system_u:object_r:lib_t:s0 -t ext4 /dev/disk/by-partlabel/vendor_dlkm${SLOT_SUFFIX} /lib/modules
 ExecStartPost=/bin/ln -sf /lib/modules/modules-load.d /run/modules-load.d
 Nice=-20
 
