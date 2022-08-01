@@ -100,9 +100,6 @@ do_compile () {
     oe_runmake CC="${KERNEL_CC}" LD="${KERNEL_LD}" ${KERNEL_EXTRA_ARGS} $use_alternate_initrd
 }
 
-# if is TARGET_KERNEL_ARCH is set inherit qtikernel-arch to compile for that arch.
-inherit ${@bb.utils.contains('TARGET_KERNEL_ARCH', 'aarch64', 'qtikernel-arch', '', d)}
-
 do_shared_workdir:append () {
         cp include/config/auto.conf $kerneldir/include/config/auto.conf
 
