@@ -16,6 +16,7 @@ RDEPENDS:${PN} += "\
     connman-client \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'setup-network', '', d)} \
     net-tools \
+    emac-rps \
     ethtool \
     iperf2 \
     iperf3 \
