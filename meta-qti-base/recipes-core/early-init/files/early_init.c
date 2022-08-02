@@ -77,10 +77,13 @@ static struct {
 #define BIT_SET(p,n) ((p) & (1 << (n)))
 #define uid_is_valid(uid) ((uid != (uid_t) UINT32_C(0xFFFFFFFF)) && \
 						(uid != (uid_t) UINT32_C(0xFFFF)))
-#define AUDIO_CONFIG_LIINE 4
+#define AUDIO_CONFIG_LIINE 7
 char audiostr[AUDIO_CONFIG_LIINE][LINE_MAX] = {
 	"[Audio]",
-	"cmd=/usr/sbin/audio.sh",
+	"msleep=100",
+	"cmd=/usr/bin/taskset",
+	"argv=0x80",
+	"argv=/usr/sbin/audio.sh",
 	"log=/early/audio.txt",
 	"<end>"};
 #define gid_is_valid(gid)  uid_is_valid(gid)

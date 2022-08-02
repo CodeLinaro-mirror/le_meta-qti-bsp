@@ -34,7 +34,7 @@ modprobe adsp_loader_dlkm
 modprobe stub_dlkm
 /bin/echo 2 > /sys/kernel/boot_adsp/boot;
 modprobe platform_dlkm
-modprobe machine_dlkm
+nice -n -20 modprobe machine_dlkm
 modprobe hdmi_dlkm
 
 while true
