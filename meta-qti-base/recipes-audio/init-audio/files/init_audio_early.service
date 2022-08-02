@@ -36,6 +36,8 @@ DefaultDependencies=no
 Type=oneshot
 Restart=no
 ExecStart=/bin/sh /usr/sbin/audio.sh
+CPUAffinity=7
+Nice=-20
 
 [Install]
 WantedBy=sysinit.target
