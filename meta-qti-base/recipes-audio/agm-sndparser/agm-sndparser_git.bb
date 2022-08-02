@@ -11,7 +11,6 @@ DEPENDS += "\
 
 SRC_URI = "\
     ${PATH_TO_REPO}/vendor/qcom/opensource/agm/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/agm/snd_parser;subpath=snd_parser;usehead=1 \
-    file://card-defs.xml \
     file://card-defs-dpk.xml \
 "
 SRCREV = "${AUTOREV}"
@@ -24,7 +23,7 @@ EXTRA_OECONF += "--with-glib"
 
 do_install:append() {
     install -d ${D}${sysconfdir}
-    install -m 0644 ${WORKDIR}/card-defs.xml ${D}${sysconfdir}/card-defs.xml
+    install -m 0644 ${S}/configs/sa8295/card-defs.xml ${D}${sysconfdir}/card-defs.xml
 }
 
 do_install:append:qti-dpk() {
