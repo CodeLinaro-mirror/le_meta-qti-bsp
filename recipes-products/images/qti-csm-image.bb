@@ -4,15 +4,21 @@
 
 inherit qimage qramdisk
 
-IMAGE_FEATURES += "read-only-rootfs"
+IMAGE_FEATURES[validitems] += "csm"
+IMAGE_FEATURES += "read-only-rootfs csm"
 
 CORE_IMAGE_EXTRA_INSTALL += "\
               glib-2.0 \
               coreutils \
+              powerapp \
+              powerapp-powerconfig \
+              powerapp-reboot \
+              powerapp-shutdown \
               packagegroup-qti-data \
               systemd-machine-units \
               packagegroup-android-utils \
               packagegroup-startup-scripts \
+              packagegroup-qti-ss-mgr \
               ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
               packagegroup-qti-core \
 "
@@ -28,4 +34,12 @@ do_merge_dtbs() {
     ${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbos ${DEPLOY_DIR_IMAGE}/dtbs
 }
 
+do_copy_abl[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
+do_copy_abl() {
+    if [ -f ${KERNEL_PREBUILT_PATH}/abl_userdebug.elf ]; then
+        cp ${KERNEL_PREBUILT_PATH}/abl_userdebug.elf .
+    fi
+}
+
 addtask do_merge_dtbs after do_makesystem before do_makeboot
+addtask do_copy_abl after do_makesystem before do_image_complete
