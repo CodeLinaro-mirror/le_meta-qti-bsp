@@ -39,15 +39,11 @@ EXTRA_OEMAKE:append = " \
                        MODNAME=${_MODNAME} \
                        "
 
-_WLAN_CFG_OVERRIDE_GVM = "\
-                        CONFIG_WLAN_DISABLE_EXPORT_SYMBOL=y \
+_WLAN_CFG_OVERRIDE = "\
                         CONFIG_WLAN_OPEN_P2P_INTERFACE=n \
                         CONFIG_SUPPORT_P2P_BY_ONE_INTF_WLAN=y \
                         CONFIG_WLAN_PLACEMARKER_PREFIX=108 \
-                        CONFIG_FEATURE_GPIO_CFG=y \
                         CONFIG_CNSS_GENL=n \
-                        CONFIG_MULTI_IF_LOG=y \
-                        CONFIG_FEATURE_WLAN_CH_AVOID_EXT=y \
                         CONFIG_QCOM_TDLS=n \
                         CONFIG_CFG_MAX_STA_VDEVS=4 \
                         CONFIG_CFG_BMISS_OFFLOAD_MAX_VDEV=4 \
@@ -55,9 +51,7 @@ _WLAN_CFG_OVERRIDE_GVM = "\
                         CONFIG_CONNECTION_ROAMING_CFG=n \
                         CONFIG_DBR_HOLD_LARGE_MEM=n \
                         "
-EXTRA_OEMAKE:append:qtiquingvm = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
-EXTRA_OEMAKE:append:qtiquingvm8295 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
-EXTRA_OEMAKE:append:quin-gvm-gen4 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
+EXTRA_OEMAKE:append = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE}"
 
 SYSTEMD_SERVICE:${PN} = "init_qti_wlan_auto.service"
 
