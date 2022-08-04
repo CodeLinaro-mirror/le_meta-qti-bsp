@@ -16,7 +16,7 @@ SRC_URI_append_cinder  +=  "${@oe.utils.conditional('KERNEL_USE_PREBUILTS', 'Tru
 S = "${WORKDIR}/kernel-5.10/kernel_platform/msm-kernel"
 PR = "r0"
 
-DEPENDS += "virtual/kernel-toolchain-native virtual/dtc-native rsync-native"
+DEPENDS += "virtual/kernel-toolchain-native virtual/dtc-native rsync-native mod-signing-keys"
 
 LDFLAGS_aarch64 = "-O1 --hash-style=gnu --as-needed"
 TARGET_CXXFLAGS += "-Wno-format"
@@ -33,7 +33,6 @@ get_cc_option () {
 :
 }
 
-DEPENDS += "openssl-native mod-signing-keys"
 RDEPENDS_${KERNEL_PACKAGE_NAME}-base = ""
 
 LDFLAGS_aarch64 = "-O1 --hash-style=gnu --as-needed"
@@ -108,9 +107,9 @@ do_prebuilt_configure() {
 
     # update paths of signature checking certificates to reflect current host
     sed -i -e '/CONFIG_MODULE_SIG_KEY[ =]/d' ${B}/.config
-    echo "CONFIG_MODULE_SIG_KEY="\"${B}/certs/signing_key.pem\" >> ${B}/.config
+    echo "CONFIG_MODULE_SIG_KEY="\"${STAGING_DIR_TARGET}/kernel-certs/signing_key.pem\" >> ${B}/.config
     sed -i -e '/CONFIG_SYSTEM_TRUSTED_KEYS[ =]/d' ${B}/.config
-    echo "CONFIG_SYSTEM_TRUSTED_KEYS="\"${B}/certs/verity_cert.pem\" >> ${B}/.config
+    echo "CONFIG_SYSTEM_TRUSTED_KEYS="\"${STAGING_DIR_TARGET}/kernel-certs/verity_cert.pem\" >> ${B}/.config
 
     install -d ${B}/${KERNEL_OUTPUT_DIR}
     for typeformake in ${KERNEL_IMAGETYPE_FOR_MAKE} ; do

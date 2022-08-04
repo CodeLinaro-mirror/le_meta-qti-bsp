@@ -97,7 +97,7 @@ python do_makeboot () {
     if (int(d.getVar("BOOT_HEADER_VERSION") or "0") >= 2):
         xtra_parms += " --header_version " + d.getVar('BOOT_HEADER_VERSION')
         # header version setting expects dtb to be passed seprately but not appended to kernel
-        xtra_parms += " --dtb " + d.getVar('DEPLOY_DIR_IMAGE', True) + "/" + "DTOverlays" + "/" + d.getVar('KERNEL_DTB_NAMES').strip()
+        xtra_parms += " --dtb " + d.getVar('DEPLOY_DIR_IMAGE', True) + "/DTOverlays" + "/dtb.img"
 
     if ((int(d.getVar("BOOT_HEADER_VERSION") or "0") >= 3) and (d.getVar("SKIP_VENDOR_BOOT") or "True") == "False"):
         xtra_parms += " --vendor_ramdisk %s" %(d.getVar('VRAMDISK'))

@@ -17,6 +17,7 @@ FILESPATH =+ "${WORKSPACE}:"
 
 SRC_URI = "file://OTA/recovery/"
 SRC_URI += "file://fstab_AB"
+SRC_URI += "file://update_engine.service"
 
 S = "${WORKDIR}/OTA/recovery/"
 
@@ -27,11 +28,14 @@ CFLAGS += "-lsparse -llog"
 PARALLEL_MAKE = ""
 
 EXTRA_OECONF_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'qti-ab-boot', 'TARGET_SUPPORTS_AB=true', '', d)}"
+EXTRA_OECONF_append = " ${@bb.utils.contains('MACHINE_FEATURES', 'qti-abc-boot', 'TARGET_SUPPORTS_ABC=true', '', d)}"
 
-FILES_${PN}  = "${bindir} ${libdir} ${includedir} /res /cache"
+FILES_${PN}  = "${bindir} ${libdir} ${systemd_unitdir} ${includedir} /res /cache"
+SYSTEMD_SERVICE_${PN} = "update_engine.service"
 
 RM_WORK_EXCLUDE += "${PN}"
-
+INITSCRIPT_NAME = "update_engine"
+INITSCRIPT_PARAMS = "defaults"
 generate_public_key() {
     openssl pkcs8 -inform DER -nocrypt -in ${WORKSPACE}/OTA/build/target/product/security/testkey.pk8 -out ${TMPDIR}/deploy/images/sxr2130-mtp/ota-scripts/private.pem
     openssl rsa -in ${TMPDIR}/deploy/images/sxr2130-mtp/ota-scripts/private.pem -outform PEM -pubout > ${WORKDIR}/public.pem
@@ -43,6 +47,9 @@ do_install_append() {
         install -d ${D}/res/
         install -d ${D}/cache/recovery
         install -m 0755 ${WORKDIR}/fstab_AB -D ${D}/res/recovery_volume_config
+        install -d ${D}${systemd_unitdir}/system/
+        install -m 0644 ${WORKDIR}/update_engine.service -D \
+                 ${D}${systemd_unitdir}/system/update_engine.service
         if ${@bb.utils.contains('MACHINE_FEATURES', 'ota-package-verification', 'true', 'false', d)}; then
             install -m 0755 ${WORKDIR}/public.pem -D ${D}/res/public.pem
         fi

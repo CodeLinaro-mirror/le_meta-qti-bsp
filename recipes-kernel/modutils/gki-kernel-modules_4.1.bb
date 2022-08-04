@@ -7,6 +7,7 @@ ${LICENSE};md5=8afb6abdac9a14cb18a0d6c9c151e9b4"
 
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI   =  "file://kernel-5.10/kernel_platform/msm-kernel"
+SRC_URI  +=  "file://linkmodulesload.service"
 
 S  =  "${WORKDIR}/kernel-5.10/kernel_platform/msm-kernel"
 
@@ -67,17 +68,28 @@ do_install() {
             install -m 0644 $mod ${D}/lib/modules/${kversion}
         fi
     done
+    # Create empty modules.load as a place holder to mimic Android GKI ramdisk
+    touch ${D}/lib/modules/${kversion}/modules.load
 
     # Install systemd configuration file for auto load
     install -d ${D}${sysconfdir}/modules-load.d/
     install -m 0644 firstmods.conf ${D}${sysconfdir}/modules-load.d/00-firstmods.conf
     install -m 0644 secondmods.conf ${D}${sysconfdir}/modules-load.d/00-secondmods.conf
+
+    install -d ${D}${systemd_unitdir}/system/
+    install -m 0644 ${WORKDIR}/linkmodulesload.service ${D}${systemd_unitdir}/system/linkmodulesload.service
 }
 
 ALLOW_EMPTY_${PN} = "1"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
-PACKAGES = "${PN}-first-stage ${PN}-second-stage"
+PACKAGES = "${PN}-first-stage ${PN}-second-stage ${PN}-linkmodulesload"
+FILES_${PN}-linkmodulesload += "${systemd_unitdir}/system/linkmodulesload.service"
+
+inherit systemd
+
+SYSTEMD_PACKAGES = "${PN}-linkmodulesload"
+SYSTEMD_SERVICE_${PN}-linkmodulesload = "linkmodulesload.service"
 
 python get_files_pn_from_conf() {
     pn = d.getVar('PN')
@@ -85,7 +97,7 @@ python get_files_pn_from_conf() {
     f_conf = os.path.join(d.getVar('D'), 'etc/modules-load.d', '00-firstmods.conf')
     s_conf = os.path.join(d.getVar('D'), 'etc/modules-load.d', '00-secondmods.conf')
 
-    f_mods = [ '/etc/modules-load.d/00-firstmods.conf' ]
+    f_mods = [ '/etc/modules-load.d/00-firstmods.conf', '/lib/modules/*/modules.load' ]
     with open(f_conf) as f:
         lines = f.readlines()
         for line in lines:

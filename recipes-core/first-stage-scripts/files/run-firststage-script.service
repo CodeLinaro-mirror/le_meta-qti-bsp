@@ -32,25 +32,15 @@
 #
 
 [Unit]
-Description=Mount vendor_dlkm partition to /lib/modules mount point
-ConditionDirectoryNotEmpty=!/lib/modules
-
-# Env vars are not reflecting in [Unit] Section for selective wait.
-# Hence wait for both _a & _b dev nodes before attepting to mount
-BindsTo=@VDLKMDEVICE@
-After=@VDLKMDEVICE@
-Before=local-fs.target systemd-modules-load.service
+SourcePath=/first_stage.sh
+Description=Service to run first_stage.sh from vendor ramdisk
+After=systemd-modules-load.service
 DefaultDependencies=no
-
-IgnoreOnIsolate=true
 
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-PassEnvironment="SLOT_SUFFIX"
-ExecStart=/bin/mount -o noexec,nodev,ro,context=system_u:object_r:lib_t:s0 -t ext4 /dev/disk/by-partlabel/vendor_dlkm${SLOT_SUFFIX} /lib/modules
-ExecStartPost=/bin/ln -sf /lib/modules/modules-load.d /run/modules-load.d
-Nice=-20
+ExecStart=/bin/sh -c "/first_stage.sh"
 
 [Install]
-WantedBy=local-fs.target systemd-modules-load.service
+WantedBy=default.target

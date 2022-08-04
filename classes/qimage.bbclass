@@ -211,6 +211,14 @@ python do_merge_techpack_dtbos () {
     else:
         bb.debug(1, "No techpack dtbos to merge")
         oe.path.copytree(dtbokpdir, dtbodir)
+
+    # Merge all dtbs into single dtb.img to pass to mkbootimg utility
+    dtbimg = dtbodir + "/" + "dtb.img"
+    with open(dtbimg, 'ab') as fout:
+        for f in os.listdir(dtbodir):
+            if f.endswith('.dtb'):
+                with open(os.path.join(dtbodir, f), 'rb') as fin:
+                    fout.write(fin.read())
 }
 do_merge_techpack_dtbos[cleandirs] = "${DEPLOY_DIR_IMAGE}/DTOverlays"
 do_merge_techpack_dtbos[depends] += " merge-dtbs-gki-native:do_populate_sysroot"

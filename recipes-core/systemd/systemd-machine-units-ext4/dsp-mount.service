@@ -31,8 +31,8 @@ ConditionDirectoryNotEmpty=!/dsp
 
 # Env vars are not reflecting in [Unit] Section for selective wait.
 # Hence wait for both _a & _b dev nodes before attepting to mount
-BindsTo=dev-disk-by\x2dpartlabel-dsp_a.device dev-disk-by\x2dpartlabel-dsp_b.device
-After=dev-disk-by\x2dpartlabel-dsp_a.device dev-disk-by\x2dpartlabel-dsp_b.device
+BindsTo=@DSPDEVICE@
+After=@DSPDEVICE@
 Before=local-fs.target
 DefaultDependencies=no
 

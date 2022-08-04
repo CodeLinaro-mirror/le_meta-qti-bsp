@@ -33,7 +33,7 @@
 
 [Unit]
 Description=Helios start service
-After=sysinit.target systemd-modules-load.service etc.mount
+After=sysinit.target systemd-modules-load.service etc.mount qseecomd.service
 
 [Service]
 Type = oneshot
