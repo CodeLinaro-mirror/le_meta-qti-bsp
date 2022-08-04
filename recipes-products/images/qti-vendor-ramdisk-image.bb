@@ -10,6 +10,7 @@ EXTRA_IMAGEDEPENDS_remove = "edk2"
 PACKAGE_INSTALL = "\
     gki-kernel-modules-first-stage \
     first-stage-scripts \
+    cryptsetup \
 "
 
 IMAGE_FSTYPES = "${INITRAMFS_FSTYPES}"
