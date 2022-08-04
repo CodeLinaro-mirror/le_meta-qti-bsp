@@ -21,7 +21,7 @@ RDEPENDS:${PN} = " \
         gstreamer1.0-plugins-qscreencapsrc \
         gdk-pixbuf-loader-bmp \
         gdk-pixbuf-loader-gif \
-        ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'gstreamer1.0-plugins-qeavb', '', d)} \
+        ${@bb.utils.contains('DISTRO_FEATURES', 'qti-gstqeavb', 'gstreamer1.0-plugins-qeavb', '', d)} \
         ${@bb.utils.contains('DISTRO_FEATURES', 'qti-omx', 'gstreamer1.0-omx mm-vdec-omx-test-lite mm-venc-omx-test-lite', '', d)} \
         ${@bb.utils.contains('DISTRO_FEATURES', 'qti-codec2', 'codec2 gstreamer1.0-plugins-codec2 secure-video-app codec2-app', '', d)} \
 "
