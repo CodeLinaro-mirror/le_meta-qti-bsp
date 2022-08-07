@@ -37,11 +37,6 @@ IMAGE_INSTALL += "systemd-machine-units"
 # this image should be flashed while using non-squashfs file
 IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES','nad-prod','abl-ubifs','',d)}"
 
-# Support verified boot
-IMAGE_INSTALL += " ${@bb.utils.contains('DISTRO_FEATURES', 'nad-avb', 'cryptsetup', '',d)}"
-IMAGE_INSTALL += " ${@bb.utils.contains('DISTRO_FEATURES', 'nad-avb', 'libdevmapper', '',d)}"
-IMAGE_INSTALL += " ${@bb.utils.contains('DISTRO_FEATURES', 'nad-avb', 'verified-boot', '',d)}"
-
 # Install A/B recovery bins and its libs in system image if A/B boot is supported
 IMAGE_INSTALL += "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'start-script-ab-slot-util recovery-ab-bin recovery-ab', '', d)}"
 
