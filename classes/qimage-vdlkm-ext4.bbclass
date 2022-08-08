@@ -35,9 +35,6 @@
 # Convert human readable partition sizes into bytes
 VDLKM_IMAGE_ROOTFS_SIZE = "${@get_size_in_bytes(d.getVar('VDLKM_SIZE_EXT4') or '32MB')}"
 
-VDLKMIMAGE_TARGET ?= "vendor_dlkm.img"
-VDLKMIMAGE_MAP_TARGET ?= "vendor_dlkm.map"
-
 # Copy systemd modules-load.d configs from /etc to /lib/modules
 # so that both modules and configs will be part of vdlkm image.
 create_vdlkm_modules_load_d() {

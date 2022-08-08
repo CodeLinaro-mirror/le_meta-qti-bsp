@@ -7,6 +7,7 @@ DEPENDS += "releasetools-native zip-native fsconfig-native applypatch-native bc-
 RM_WORK_EXCLUDE_ITEMS += "rootfs rootfs-dbg"
 
 IMAGE_SYSTEM_MOUNT_POINT = "/"
+IMAGE_VDLKM_MOUNT_POINT = "/lib/modules/"
 
 OTA_TARGET_IMAGE_ROOTFS_EXT4 = "${WORKDIR}/ota-target-image-ext4"
 
@@ -57,12 +58,21 @@ do_recovery_ext4() {
     cp ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${SYSTEMIMAGE_TARGET} ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/IMAGES/system.img
     cp ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${SYSTEMIMAGE_MAP_TARGET} ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/IMAGES/system.map
 
+    cp ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${VDLKMIMAGE_TARGET} ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/IMAGES/vendor_dlkm.img
+    cp ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${VDLKMIMAGE_MAP_TARGET} ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/IMAGES/vendor_dlkm.map
+
     cp ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${USERDATAIMAGE_TARGET} ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/IMAGES/userdata.img
     cp ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${USERDATAIMAGE_MAP_TARGET} ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/IMAGES/userdata.map
 
     # if dtbo.img file exist then copy
     if [ -f ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${DTBOIMAGE_TARGET} ]; then
         cp ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${DTBOIMAGE_TARGET} ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/IMAGES/dtbo.img
+        cp ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${DTBOIMAGE_TARGET} ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RADIO/dtbo.img
+    fi
+
+    # if vendor_boot.img file exist then copy
+    if [ -f ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${VBOOTIMAGE_TARGET} ]; then
+        cp ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${VBOOTIMAGE_TARGET} ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RADIO/vendor_boot.img
     fi
 
     # copy the contents of system rootfs
@@ -81,7 +91,7 @@ do_recovery_ext4() {
     echo /boot     emmc  /dev/block/bootdevice/by-name/boot >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/recovery.fstab
     echo /overlay     ext4  /dev/block/bootdevice/by-name/userdata >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/recovery.fstab
     echo ${IMAGE_SYSTEM_MOUNT_POINT}   ext4  /dev/block/bootdevice/by-name/system >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/recovery.fstab
-
+    echo ${IMAGE_VDLKM_MOUNT_POINT}   ext4  /dev/block/bootdevice/by-name/vendor_dlkm >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/recovery.fstab
     #Getting content for OTA folder
     mkdir -p ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/OTA/bin
     cp ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/usr/bin/applypatch ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/OTA/bin/.
@@ -103,17 +113,32 @@ do_recovery_ext4() {
     export BOOT_SIZE=$(sed -r 's/.*label="boot_a".*size_in_kb="([0-9]+\.*[0-9]*).*/\1/;t;d' ${WORKDIR}/partition.xml)
     export SYSTEM_SIZE=$(sed -r 's/.*label="system_a".*size_in_kb="([0-9]+\.*[0-9]*).*/\1/;t;d' ${WORKDIR}/partition.xml)
     export USERDATA_SIZE=$(sed -r 's/.*label="userdata".*size_in_kb="([0-9]+\.*[0-9]*).*/\1/;t;d' ${WORKDIR}/partition.xml)
+    export VDLKM_SIZE=$(sed -r 's/.*label="vendor_dlkm_a".*size_in_kb="([0-9]+\.*[0-9]*).*/\1/;t;d' ${WORKDIR}/partition.xml)
+    export DTBO_SIZE=$(sed -r 's/.*label="dtbo_a".*size_in_kb="([0-9]+\.*[0-9]*).*/\1/;t;d' ${WORKDIR}/partition.xml)
+    export VBOOT_SIZE=$(sed -r 's/.*label="vendor_boot_a".*size_in_kb="([0-9]+\.*[0-9]*).*/\1/;t;d' ${WORKDIR}/partition.xml)
 
     # convert kb to bytes
     export BOOT_SIZE="$(expr $BOOT_SIZE \* 1024)"
     export SYSTEM_SIZE="$(expr $SYSTEM_SIZE \* 1024)"
     export USERDATA_SIZE="$(expr $USERDATA_SIZE \* 1024)"
+    export VDLKM_SIZE="$(expr $VDLKM_SIZE \* 1024)"
+    export DTBO_SIZE="$(expr $DTBO_SIZE \* 1024)"
+    export VBOOT_SIZE="$(expr $VBOOT_SIZE \* 1024)"
 
     #boot_size: Size of boot partition from partition.xml
     echo "boot_size=0x$(echo "obase=16; $BOOT_SIZE" | bc)" >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 
+    #dtbo_size: Size of dtbo partition from partition.xml
+    echo "dtbo_size=0x$(echo "obase=16; $DTBO_SIZE" | bc)" >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
+
+    #vendor_boot_size: Size of vendor_boot partition from partition.xml
+    echo "vboot_size=0x$(echo "obase=16; $VBOOT_SIZE" | bc)" >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
+
     #system_size : Size of system partition from partition.xml
     echo "system_size=0x$(echo "obase=16; $SYSTEM_SIZE" | bc)" >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
+
+    #vendor_dlkm_size : Size of vendor_dlkm partition from partition.xml
+    echo "vdlkm_size=0x$(echo "obase=16; $VDLKM_SIZE" | bc)" >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 
     #userdate_size : Size of data partition from partition.xml
     echo "userdate_size=0x$(echo "obase=16; $USERDATA_SIZE" | bc)" >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt

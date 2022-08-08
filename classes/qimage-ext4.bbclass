@@ -26,6 +26,8 @@ SYSTEMIMAGE_TARGET ?= "system.img"
 SYSTEMIMAGE_MAP_TARGET ?= "system.map"
 USERDATAIMAGE_TARGET ?= "userdata.img"
 USERDATAIMAGE_MAP_TARGET ?= "userdata.map"
+VDLKMIMAGE_TARGET ?= "vendor_dlkm.img"
+VDLKMIMAGE_MAP_TARGET ?= "vendor_dlkm.map"
 
 # Ensure SELinux file context variable is defined
 SELINUX_FILE_CONTEXTS ?= ""
