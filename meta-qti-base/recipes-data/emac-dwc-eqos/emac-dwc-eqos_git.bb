@@ -1,4 +1,4 @@
-inherit module qperf ${@bb.utils.contains('TARGET_KERNEL_ARCH', 'aarch64', 'qtikernel-arch', '', d)} qti-kernel-arch-clang
+inherit module qperf qti-kernel-arch-clang
 
 DESCRIPTION = "EMAC Ethernet driver"
 LICENSE = "MIT-style"

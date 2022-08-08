@@ -1,0 +1,47 @@
+# Support systemd-user-session
+DISTRO_FEATURES:append = " pam"
+
+# Video
+DISTRO_FEATURES:append:sa6155 = " qti-carcamsrc qti-omx"
+DISTRO_FEATURES:append:sa81x5-rt = " qti-carcamsrc qti-omx"
+DISTRO_FEATURES:append:sa81x5 = " qti-carcamsrc qti-omx"
+DISTRO_FEATURES:append:sa8295 = " qti-codec2"
+DISTRO_FEATURES:append:lemans = " qti-codec2"
+DISTRO_FEATURES:append:qtiquingvm = " qti-omx"
+DISTRO_FEATURES:append:qtiquingvm8295 = " qti-codec2"
+DISTRO_FEATURES:append:quin-gvm-gen4 = " qti-codec2"
+
+# Display
+DISTRO_FEATURES:append = " wayland"
+
+
+# Use synergy, disable bluez
+DISTRO_FEATURES_BACKFILL_CONSIDERED += "bluez5 bluetooth"
+
+#Enable persist-image
+DISTRO_FEATURES:append = " persist-image "
+
+DISTRO_FEATURES:append = " early-eth"
+#DISTRO_FEATURES:append = " early_init"
+#DISTRO_FEATURES:append = " early_userspace"
+
+
+DISTRO_FEATURES:append = " hibernation"
+
+# Use systemd init manager.
+DISTRO_FEATURES:append = " systemd"
+DISTRO_FEATURES_BACKFILL_CONSIDERED += "sysvinit"
+
+DISTRO_FEATURES:append = " ipa3"
+DISTRO_FEATURES:append = " vulkan"
+
+# WLAN
+DISTRO_FEATURES:append = " qti-wlan wifi"
+
+# Support kdump
+#DISTRO_FEATURES:append = " kdump-support"
+
+# Enable FDE
+DISTRO_FEATURES:append:qtiquingvm = " qti-fde"
+DISTRO_FEATURES:append:qtiquingvm8295 = " qti-fde"
+DISTRO_FEATURES:append:quin-gvm-gen4 = " qti-fde"

@@ -81,7 +81,7 @@ while [ $n -le 5 ]
 			else
 				echo "##########Error! QCA6574 FW is not available!#####"
 			fi
-		elif (lspci -k|grep 1101);then
+		elif ((lspci -k|grep 1101) || (lspci -k|grep QCA6390));then
 			echo "##########load qca6696#############"
 			if [ -f /firmware/image/qca6390/amss20.bin ];then
 				modprobe qca6696
