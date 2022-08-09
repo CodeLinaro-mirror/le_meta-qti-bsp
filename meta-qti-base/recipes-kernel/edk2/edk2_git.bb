@@ -28,6 +28,7 @@ EARLY_ETH = "${@bb.utils.contains('DISTRO_FEATURES', 'early-eth', '1', '0', d)}"
 HIBERNATION = "${@bb.utils.contains('COMBINED_FEATURES', 'hibernation', '1', '0', d)}"
 DISABLE_NONBOOTDEVICE_ENABLED ?= "0"
 DISABLE_NONBOOTDEVICE_ENABLED_sa6155 = "1"
+DISABLE_PARALLEL_DOWNLOAD_FLASH ?= "1"
 
 EXTRA_OEMAKE = "'CLANG_BIN=${CLANG_BIN_PATH}' \
                 'CLANG_PREFIX=${STAGING_BINDIR_NATIVE}/${TARGET_SYS}/${TARGET_PREFIX}' \
@@ -44,7 +45,8 @@ EXTRA_OEMAKE = "'CLANG_BIN=${CLANG_BIN_PATH}' \
                 'UBSAN_UEFI_GCC_FLAG_ALIGNMENT=-Wno-misleading-indentation' \
                 'SUPPORT_DISABLE_NON_BOOTDEVICE=${DISABLE_NONBOOTDEVICE_ENABLED}' \
                 'TARGET_BOARD_TYPE_AUTO=1' \
-                ${@bb.utils.contains('DISTRO_FEATURES', 'qti-avb', 'VERIFIED_BOOT_2=1', '', d)} "
+                ${@bb.utils.contains('DISTRO_FEATURES', 'qti-avb', 'VERIFIED_BOOT_2=1', '', d)} \
+                'DISABLE_PARALLEL_DOWNLOAD_FLASH=${DISABLE_PARALLEL_DOWNLOAD_FLASH}'"
 
 do_configure[noexec] = "1"
 do_compile () {
