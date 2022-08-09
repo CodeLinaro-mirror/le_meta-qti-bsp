@@ -1,0 +1,28 @@
+From 50d221349552d901075793762f01f8e8ab383b56 Mon Sep 17 00:00:00 2001
+From: Deru Wang <quic_deruwang@quicinc.com>
+Date: Tue, 16 Aug 2022 14:47:57 +0800
+Subject: [PATCH] pulseaudio: disable module-suspend-on-idle
+
+Upstream-Status: Pending
+
+Signed-off-by: Deru Wang <quic_deruwang@quicinc.com>
+---
+ src/daemon/default.pa.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/daemon/default.pa.in b/src/daemon/default.pa.in
+index acd0611..62451d6 100755
+--- a/src/daemon/default.pa.in
++++ b/src/daemon/default.pa.in
+@@ -162,7 +162,7 @@ load-module module-always-sink
+ load-module module-intended-roles
+ 
+ ### Automatically suspend sinks/sources that become idle for too long
+-load-module module-suspend-on-idle
++#load-module module-suspend-on-idle
+ 
+ ### If autoexit on idle is enabled we want to make sure we only quit
+ ### when no local session needs us anymore.
+-- 
+2.17.1
+
