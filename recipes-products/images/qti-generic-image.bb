@@ -28,6 +28,10 @@ CORE_IMAGE_EXTRA_INSTALL += " \
             wayland \
             "
 
+# Force default usb composition to 4EE7 as this image can't
+# support diag, which is expected by all other compositions.
+USBCOMPOSITION_forcevariable = "4EE7"
+
 python copy_buildsystem_append() {
     # Create src directory in extensible SDK to copy the project sources
     bb.utils.mkdirhier(baseoutpath + '/src')
