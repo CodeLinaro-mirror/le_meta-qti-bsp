@@ -20,13 +20,21 @@ IMAGE_FSTYPES_DEBUGFS = "tar.bz2"
 ### Don't append timestamp to image name
 IMAGE_VERSION_SUFFIX = ""
 
-ROOTFS_POSTPROCESS_COMMAND += "gen_buildprop;"
+ROOTFS_POSTPROCESS_COMMAND += "gen_buildprop;update_usb_composition;"
 
 gen_buildprop() {
    mkdir -p ${IMAGE_ROOTFS}/cache
    echo ro.build.version.release=`cat ${IMAGE_ROOTFS}/etc/version ` >> ${IMAGE_ROOTFS}/build.prop
    echo ro.product.name=${BASEMACHINE}-${DISTRO} >> ${IMAGE_ROOTFS}/build.prop
    echo ${MACHINE} >> ${IMAGE_ROOTFS}/target
+}
+
+# Update usb composition
+USBCOMPOSITION ??= "901D"
+update_usb_composition() {
+    if [ -e ${IMAGE_ROOTFS}/etc/usb/boot_hsusb_comp ]; then
+        echo ${USBCOMPOSITION} > ${IMAGE_ROOTFS}/etc/usb/boot_hsusb_comp
+    fi
 }
 
 # Default Image names
