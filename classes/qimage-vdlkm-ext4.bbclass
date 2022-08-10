@@ -47,48 +47,11 @@ create_vdlkm_modules_load_d() {
 ROOTFS_POSTPROCESS_COMMAND += "create_vdlkm_modules_load_d;"
 
 do_makevdlkm[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
-
-python do_makevdlkm() {
-    import math
-    import os
-    import subprocess
-    vdlkmimage_map_target = d.getVar('IMGDEPLOYDIR') + '/' + d.getVar('IMAGE_BASENAME') + '/' + d.getVar('VDLKMIMAGE_MAP_TARGET')
-    vdlkmimage_target =  d.getVar('IMGDEPLOYDIR') + '/' + d.getVar('IMAGE_BASENAME') + '/' + d.getVar('VDLKMIMAGE_TARGET')
-    vdlkmimage_files = d.getVar('IMAGE_ROOTFS') + '/lib/modules'
-    vdlkm_image_rootfs_size = d.getVar('VDLKM_IMAGE_ROOTFS_SIZE')
-
-    #Compute the least required size to generate unsparsed vdlkm image using make_ext4fs tool
-    vdlkm_image_rootfs_size_actual = 0
-    for dirpath, dirnames, filenames in os.walk(vdlkmimage_files):
-        for f in filenames:
-            fp = os.path.join(dirpath, f)
-            if not os.path.islink(fp):
-                vdlkm_image_rootfs_size_actual += os.path.getsize(fp)
-    vdlkm_image_rootfs_size_limit_percentage = math.ceil(vdlkm_image_rootfs_size_actual / int(vdlkm_image_rootfs_size) * 100)
-
-    while vdlkm_image_rootfs_size_limit_percentage < 100:
-        try:
-            vdlkm_image_rootfs_size_effective = math.ceil(int(vdlkm_image_rootfs_size) * vdlkm_image_rootfs_size_limit_percentage / 100)
-            cmd = 'make_ext4fs -B ' + vdlkmimage_map_target + ' -l ' + str(vdlkm_image_rootfs_size_effective) + ' ' + vdlkmimage_target + ' '+ vdlkmimage_files
-            subprocess.check_output(cmd, shell=True)
-        except:
-            vdlkm_image_rootfs_size_limit_percentage += 1
-            continue
-        else:
-            break
-
-    vdlkm_image_rootfs_size_effective = math.ceil(int(vdlkm_image_rootfs_size) * vdlkm_image_rootfs_size_limit_percentage / 100)
-
-    # Align the effective size of unsparsed vdlkm image to block size
-    block_size = 4096
-    if (vdlkm_image_rootfs_size_effective % block_size) != 0:
-        vdlkm_image_rootfs_size_effective +=  block_size - (vdlkm_image_rootfs_size_effective % block_size)
-
-    # Generate unsparsed vdlkm image
-    cmd = 'make_ext4fs -B ' + vdlkmimage_map_target + ' -l ' + str(vdlkm_image_rootfs_size_effective) + ' ' + vdlkmimage_target + ' '+ vdlkmimage_files
-    subprocess.check_output(cmd, shell=True)
-    bb.note("Unsparsed vdlkm image size: " + str(vdlkm_image_rootfs_size_effective))
+do_makevdlkm() {
+    make_ext4fs -B ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${VDLKMIMAGE_MAP_TARGET} \
+                -s -l ${VDLKM_IMAGE_ROOTFS_SIZE} \
+                ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${VDLKMIMAGE_TARGET} \
+                ${IMAGE_ROOTFS}/lib/modules
 }
-
 # It must be before do_makesystem to remove /lib/modules
 addtask do_makevdlkm after do_image before do_makesystem
