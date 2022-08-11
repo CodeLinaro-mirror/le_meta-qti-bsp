@@ -37,6 +37,7 @@ EXTRA_OEMAKE:append = " \
                        CONFIG_QCA_CLD_WLAN_PROFILE=genoa.pci.debug \
                        DYNAMIC_SINGLE_CHIP=${_MODNAME} \
                        MODNAME=${_MODNAME} \
+                       CONFIG_CNSS_GENL=n \
                        "
 
 _WLAN_CFG_OVERRIDE = "\
@@ -45,11 +46,11 @@ _WLAN_CFG_OVERRIDE = "\
                       CONFIG_FEATURE_COEX=y \
                       CONFIG_QCACLD_FEATURE_COEX_CONFIG=y \
                       CONFIG_WLAN_FEATURE_LINK_LAYER_STATS=y \
-                      CONFIG_CNSS_GENL=n \
                       "
 
-EXTRA_OEMAKE:append:sa6155 = " WLAN_CFG_OVERRIDE="CONFIG_IPA_DISABLE_OVERRIDE=y ${_WLAN_CFG_OVERRIDE}""
-EXTRA_OEMAKE:append:sa81x5 = " WLAN_CFG_OVERRIDE="${_WLAN_CFG_OVERRIDE}""
+_WLAN_CFG_OVERRIDE:append:sa6155 = "CONFIG_IPA_DISABLE_OVERRIDE=y"
+
+EXTRA_OEMAKE:append = " WLAN_CFG_OVERRIDE="${_WLAN_CFG_OVERRIDE}""
 
 SYSTEMD_SERVICE:${PN} = "init_qti_wlan_auto.service"
 
