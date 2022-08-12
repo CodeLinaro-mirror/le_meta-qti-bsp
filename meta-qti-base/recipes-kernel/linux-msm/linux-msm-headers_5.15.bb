@@ -34,8 +34,8 @@ do_install () {
     install -d $kerneldir
 
     if [ -d $headerdir/${includedir} ]; then
-        mkdir -p $kerneldir/${includedir}
-        cp -fR $headerdir/${includedir}/* $kerneldir/${includedir}
+        mkdir -p $kerneldir
+        cp -fR $headerdir/${includedir}/* $kerneldir
     fi
 }
 
