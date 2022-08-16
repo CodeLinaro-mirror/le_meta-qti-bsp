@@ -83,3 +83,6 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 FILES:${PN} += "/boot"
 FILES:${PN}-dbg += "/boot/.debug"
+
+#set PARALLEL_MAKE to 1 to avoid edk2 parallel build issue
+PARALLEL_MAKE = "-j 1"
