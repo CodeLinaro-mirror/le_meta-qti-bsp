@@ -6,7 +6,8 @@ HOMEPAGE = "http://developer.android.com/"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://NOTICE;md5=c1a3ff0b97f199c7ebcfdd4d3fed238e"
 
-DEPENDS += "ext4-utils glib-2.0 libbase libcutils libmincrypt libselinux libutils linux-msm-headers openssl"
+DEPENDS += "ext4-utils glib-2.0 libbase libcutils libmincrypt libselinux libutils  openssl"
+DEPENDS += "${@bb.utils.contains('MACHINE', 'sa8540', 'linux-ark-headers', 'linux-msm-headers', d)}"
 
 PR = "r19"
 
