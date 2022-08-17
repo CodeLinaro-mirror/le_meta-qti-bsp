@@ -49,4 +49,4 @@ vendor.egl.default.platform=wayland
 #property to select sensor OEM registry file
 persist.vendor.sensors.enable.tdkMezzCard=false
 persist.vendor.sensors.enable.NavMezzCard=false
-
+persist.vendor.sensors.enable.NavMezzCard_Rev2=false
