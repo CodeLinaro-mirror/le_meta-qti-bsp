@@ -6,6 +6,9 @@ LICENSE = "BSD-3-Clause-Clear"
 LIC_FILES_CHKSUM = "file://${QTI_LICENSE_DIR}/${LICENSE};md5=b796c0007db682166a1721da80267bb2"
 
 DEPENDS += "\
+    display-commonsys-intf-linux \
+    gbm \
+    gbm-headers \
     adreno \
     glib-2.0 \
     gstreamer1.0 \
