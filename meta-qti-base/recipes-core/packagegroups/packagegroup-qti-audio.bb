@@ -8,11 +8,20 @@ inherit packagegroup
 
 PACKAGES = "${PN}"
 
-#qti-audio is for elite framework, qti-audio-ar is for AR framework
+# qti-audio is for elite framework, qti-audio-ar is for AR framework
 RDEPENDS:${PN} = "\
     alsa-lib \
     alsa-utils \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-audio', 'audiodlkm', '', d)} \
-    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-audio-ar', 'agm agm-client agm-plugin agm-server agm-sndparser', 'init-audio', d)} \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-audio-ar', 'agm agm-client agm-alsa-plugin agm-server agm-sndparser', 'init-audio', d)} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-audio-ar', bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', 'ar-audiodlkm', d), '', d)} \
+"
+
+RDEPENDS:${PN}:append:qti-dpk = " \
+    agm-tinyalsa-plugin \
+    ar-pal \
+    pal-control-plugin \
+    system-media \
+    tinyalsa \
+    tinycompress \
 "

@@ -9,9 +9,11 @@ DEPENDS += "\
     libcutils linux-msm-headers spf \
 "
 
-SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/agm/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/agm/snd_parser;subpath=snd_parser;usehead=1 \
-           file://card-defs.xml \
-          "
+SRC_URI = "\
+    ${PATH_TO_REPO}/vendor/qcom/opensource/agm/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/agm/snd_parser;subpath=snd_parser;usehead=1 \
+    file://card-defs.xml \
+    file://card-defs-dpk.xml \
+"
 SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/vendor/qcom/opensource/agm/snd_parser"
@@ -23,6 +25,10 @@ EXTRA_OECONF += "--with-glib"
 do_install:append() {
     install -d ${D}${sysconfdir}
     install -m 0644 ${WORKDIR}/card-defs.xml ${D}${sysconfdir}/card-defs.xml
+}
+
+do_install:append:qti-dpk() {
+    install -m 0644 ${WORKDIR}/card-defs-dpk.xml ${D}${sysconfdir}/card-defs.xml
 }
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"

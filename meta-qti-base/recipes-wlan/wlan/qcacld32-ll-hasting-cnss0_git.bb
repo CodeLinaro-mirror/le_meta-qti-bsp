@@ -18,6 +18,7 @@ SRC_URI = "${PATH_TO_REPO}/wlan/qcacld-3.0/.git;protocol=${PROTO};destsuffix=wla
            ${PATH_TO_REPO}/device/qcom/wlan/.git;protocol=${PROTO};destsuffix=device/qcom/wlan/msm_auto;subpath=msm_auto;usehead=1 \
            file://qca6696-module-load.service \
            file://qca6696_load.sh \
+           file://qca6696_unload.sh \
            "
 SRCREV = "${AUTOREV}"
 SRCREV_FORMAT = "qcacld_cmn_fw_msm"
@@ -57,6 +58,7 @@ _WLAN_CFG_OVERRIDE_GVM = "\
                         CONFIG_REO_DESC_DEFER_FREE=y \
                         CONFIG_HIF_DEBUG=y \
                         CONFIG_HIF_CE_DEBUG_DATA_BUF=y \
+                        CONFIG_BUS_AUTO_SUSPEND=n \
                         "
 _WLAN_CFG_OVERRIDE_METAL = "\
                         CONFIG_WLAN_DISABLE_EXPORT_SYMBOL=y \
@@ -64,6 +66,7 @@ _WLAN_CFG_OVERRIDE_METAL = "\
                         CONFIG_REO_DESC_DEFER_FREE=y \
                         CONFIG_HIF_DEBUG=y \
                         CONFIG_HIF_CE_DEBUG_DATA_BUF=y \
+                        CONFIG_BUS_AUTO_SUSPEND=n \
                         "
 EXTRA_OEMAKE:append:qtiquingvm = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
 EXTRA_OEMAKE:append:qtiquingvm8295 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
@@ -88,6 +91,7 @@ do_install() {
     install -D -m 0644 ${WORKDIR}/device/qcom/wlan/msm_auto/wlan_mac_hst_1.bin ${FIRMWARE_PATH}/wlan_mac.bin
     install -d ${D}${bindir}
     install -D -m 0755 ${WORKDIR}/qca6696_load.sh ${D}${bindir}/qca6696_load.sh
+    install -D -m 0755 ${WORKDIR}/qca6696_unload.sh ${D}${bindir}/qca6696_unload.sh
 
     install -d ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/
     ln -sf /firmware/image/${FW_PATH_NAME}/amss.bin ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/
@@ -106,6 +110,7 @@ do_install() {
 
 FILES:${PN} += "\
     ${bindir}/qca6696_load.sh \
+    ${bindir}/qca6696_unload.sh \
     ${systemd_unitdir}/system/* \
     ${sysconfdir}/* \
 "
