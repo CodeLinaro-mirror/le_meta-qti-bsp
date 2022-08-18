@@ -1,5 +1,5 @@
 QIMGCLASSES = "core-image qimage-utils python3native"
-QIMGCLASSES += "${@bb.utils.filter('MACHINE_FEATURES', 'dm-verity-none dm-verity-bootloader dm-verity-initramfs', d)}"
+QIMGCLASSES += "${@bb.utils.filter('MACHINE_FEATURES', 'dm-verity-none dm-verity-bootloader dm-verity-initramfs dm-verity-initramfs-v2', d)}"
 QIMGCLASSES += "${@bb.utils.contains('MACHINE_SUPPORTS_DTBO', 'True', 'qimage-dtbo', '', d)}"
 QIMGCLASSES += "${@bb.utils.contains('IMAGE_FSTYPES', 'ext4', 'qimage-ext4', '', d)}"
 QIMGCLASSES += "${@bb.utils.contains('IMAGE_FSTYPES', 'squashfs', 'qimage-squashfs', '', d)}"
@@ -195,11 +195,9 @@ python rootfs_ignore_packages() {
 python () {
     if (d.getVar("BUILD_WITH_TECHPACKS") or "0") == "1":
         bb.build.addtask('do_merge_techpack_dtbos', 'do_image', 'do_rootfs', d)
-        bb.build.addtask('do_makeboot', 'do_image_complete', 'do_merge_techpack_dtbos', d)
         if d.getVar('MACHINE_SUPPORTS_DTBO'):
            bb.build.addtask('do_makedtbo', 'do_image_complete', 'do_merge_techpack_dtbos', d)
     else:
-        bb.build.addtask('do_makeboot', 'do_image_complete', 'do_image', d)
         if d.getVar('MACHINE_SUPPORTS_DTBO'):
            bb.build.addtask('do_makedtbo', 'do_image_complete', 'do_image', d)
 }
