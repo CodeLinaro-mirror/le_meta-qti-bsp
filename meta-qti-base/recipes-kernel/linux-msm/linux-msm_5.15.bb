@@ -4,7 +4,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 
 DEPENDS += "elfutils-native kern-tools-native mkbootimg-native mkdtimg-native openssl-native rsync-native signing-keys"
 
-COMPATIBLE_MACHINE = "sa81x5"
+COMPATIBLE_MACHINE = "sa81x5|lemans"
 
 FILESPATH =+ "${KERNEL_SRC_PATH}:"
 SRC_URI = "${PATH_TO_REPO}/kernel/kernel-${PV}/kernel_platform/msm-kernel/.git;protocol=${PROTO};destsuffix=kernel/kernel-${PV}/kernel_platform/msm-kernel;usehead=1"
@@ -21,8 +21,7 @@ TARGET_CXXFLAGS += "-Wno-format"
 KERNEL_CC="${SRC_DIR_ROOT}/kernel-${PV}/kernel_platform/prebuilts/clang/host/linux-x86/clang-r450784e/bin/clang"
 
 KERNEL_USE_PREBUILTS = "True"
-KERNEL_PREBUILT_PATH ?= "${SRC_DIR_ROOT}/kernel/kernel-${PV}/out/msm-kernel-${BASEMACHINE}-${KERNEL_VARIANT}defconfig/dist"
-KERNEL_PREBUILT_PATH:sa81x5 = "${SRC_DIR_ROOT}/kernel/kernel-${PV}/out/msm-kernel-gen3auto-${KERNEL_VARIANT}defconfig/dist"
+KERNEL_PREBUILT_PATH ?= "${SRC_DIR_ROOT}/kernel/kernel-${PV}/out/msm-kernel-${KERNEL_ARCH}-${KERNEL_VARIANT}defconfig/dist"
 
 #dts path is changed to vendor/qcom
 DTB_SRC_PATH = "${STAGING_KERNEL_BUILDDIR}/arch/${ARCH}/boot/dts/vendor/qcom"
