@@ -36,15 +36,8 @@ SELINUX_FILE_CONTEXTS ?= ""
 SELINUX_IMG_S = "${@['-S ${SELINUX_FILE_CONTEXTS}', ''][d.getVar('SELINUX_FILE_CONTEXTS') == '']}"
 IMAGE_EXT4_SELINUX_OPTIONS = "${@bb.utils.contains('DISTRO_FEATURES', 'selinux', '${SELINUX_IMG_S}', '', d)}"
 
-ROOTFS_POSTPROCESS_COMMAND += "gen_buildprop;do_fsconfig;"
+ROOTFS_POSTPROCESS_COMMAND += "do_fsconfig;"
 ROOTFS_POSTPROCESS_COMMAND += "${@bb.utils.contains('MACHINE_MNT_POINTS', 'overlay', 'gen_overlayfs;', '', d)}"
-
-gen_buildprop() {
-   mkdir -p ${IMAGE_ROOTFS}/cache
-   echo ro.build.version.release=`cat ${IMAGE_ROOTFS}/etc/version ` >> ${IMAGE_ROOTFS}/build.prop
-   echo ro.product.name=${BASEMACHINE}-${DISTRO} >> ${IMAGE_ROOTFS}/build.prop
-   echo ${MACHINE} >> ${IMAGE_ROOTFS}/target
-}
 
 gen_overlayfs() {
     mkdir -p ${IMAGE_ROOTFS}/overlay
@@ -229,6 +222,7 @@ python() {
 #############################################################
 ############ Generate Unsparsed images if needed ############
 #############################################################
+UNSPARSE_IMAGE_SUPPORT_FLAG = "${@bb.utils.contains('IMAGE_FEATURES', 'csm', 'true', 'flase', d)}"
 do_unsparse_images[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
 
 do_unsparse_images() {
@@ -241,4 +235,9 @@ do_unsparse_images() {
     if [ ${SYSTEMRW_IMG_ENABLE} == "true" ]; then
         simg2img ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMRWIMAGE_TARGET} ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMRWIMAGE_TARGET}.raw
     fi
+}
+
+python() {
+    if (d.getVar("UNSPARSE_IMAGE_SUPPORT_FLAG") == "true"):
+       bb.build.addtask('do_unsparse_images', 'do_image_complete', 'do_makesystem', d)
 }
