@@ -2,7 +2,7 @@ SUMMARY = "CAF Linux Kernel"
 DESCRIPTION = "CAF Linux Kernel for QTI MSM SoC"
 HOMEPAGE = "https://www.codeaurora.org"
 LICENSE = "GPLv2"
-LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
+LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
 
 DEPENDS += "\
     dtc-native kern-tools-native  mkbootimg-native \
@@ -15,17 +15,24 @@ KERNEL_CC_append_aarch64 = " ${TOOLCHAIN_OPTIONS}"
 KERNEL_LD_append_aarch64 = " ${TOOLCHAIN_OPTIONS}"
 
 SRC_URI = "\
-    ${PATH_TO_REPO}/kernel/rh-kernel-5.14/.git;protocol=${PROTO};destsuffix=kernel/msm-5.4;usehead=1 \
+    ${PATH_TO_REPO}/kernel/msm-5.4/.git;protocol=${PROTO};destsuffix=kernel/msm-5.4;usehead=1 \
+    ${PATH_TO_REPO}/kernel/msm-5.4/techpack/display/.git;protocol=${PROTO};destsuffix=kernel/msm-5.4/techpack/display;usehead=1 \
+    ${PATH_TO_REPO}/kernel/msm-5.4/techpack/ais/.git;protocol=${PROTO};destsuffix=kernel/msm-5.4/techpack/ais;usehead=1 \
+    ${PATH_TO_REPO}/kernel/msm-5.4/techpack/video/.git;protocol=${PROTO};destsuffix=kernel/msm-5.4/techpack/video;usehead=1 \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', ' file://systemd.cfg', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', ' file://weston.cfg', '', d)} \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-dual-wlan', ' file://dual-wlan.cfg', \
+        bb.utils.contains('MACHINE_FEATURES', 'qti-wlan', ' file://wlan.cfg', '', d), d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'early_init', ' file://earlyuserspace.cfg', '', d)} \
+    file://lxc.cfg \
+    file://ipc.cfg \
 "
-SRC_URI += "file://defconfig \
-"
-
 SRCREV = "${AUTOREV}"
 SRCREV_FORMAT = "kernel_data_display_ais_video"
 
 inherit kernel kernel-yocto qsigning ${@bb.utils.contains('TARGET_KERNEL_ARCH', 'aarch64', 'qtikernel-arch', '', d)}
 
-S = "${WORKDIR}/kernel/rh-kernel-5.14"
+S = "${WORKDIR}/kernel/msm-5.4"
 
 EXTRA_OEMAKE += "INSTALL_MOD_STRIP=1"
 
@@ -109,6 +116,8 @@ do_generate_gki_defconfig() {
 }
 
 addtask do_generate_gki_defconfig after do_unpack before do_kernel_metadata
+do_generate_gki_defconfig[depends] += "virtual/${TARGET_PREFIX}binutils:do_populate_sysroot"
+do_generate_gki_defconfig[depends] += "virtual/${TARGET_PREFIX}binutils:do_prepare_recipe_sysroot"
 
 do_kernel_checkout[noexec] = "1"
 
@@ -167,24 +176,33 @@ do_deploy () {
     cp  ${STAGING_KERNEL_BUILDDIR}/usr/gen_init_cpio ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr
 
     # Copy Image appended with dtbs to deploydir
-    cat ${B}/arch/arm64/boot/Image.gz \
-        ${B}/arch/arm64/boot/dts/qcom/sa8295p-adp.dtb > ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb
+    cat ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} ${B}/arch/${ARCH}/boot/dts/vendor/qcom/*.dtb > ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-dtb-${KERNEL_VERSION}
 
     # Make bootimage
-    ${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb \
-	--kernel  ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb \
-	--ramdisk /dev/null \
+    ${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-dtb-${KERNEL_VERSION} \
+        --ramdisk /dev/null \
+        --cmdline "${KERNEL_CMD_PARAMS}" \
         --pagesize ${PAGE_SIZE} \
-	--base ${KERNEL_BASE} \
-	--ramdisk_offset 0x0 \
-        --cmdline "root=/dev/sda1 rw rootwait console=ttyMSM0,115200,n8 no_console_suspend=1 androidboot.hardware=qcom androidboot.console=ttyMSM0 lpm_levels.sleep_disabled=1 msm_rtb.filter=0x237 earlycon=qcom_geni,0x884000 fips=0 notests nokaslr ignore_loglevel" \
-	--output  ${DEPLOYDIR}/sa8540p-boot-5.14.img
+        --base ${KERNEL_BASE} \
+        --ramdisk_offset 0x0 \
+        --output ${DEPLOYDIR}/${BOOTIMAGE_TARGET}
+    # Copy vmlinux and zImage into deploydir for boot.img creation
+    install -m 0644 ${KERNEL_OUTPUT_DIR}/${KERNEL_IMAGETYPE} ${DEPLOYDIR}/${KERNEL_IMAGETYPE}
+    install -m 0644 ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-dtb-${KERNEL_VERSION} ${DEPLOYDIR}/${KERNEL_IMAGETYPE}-dtb
+    install -m 0644 vmlinux ${DEPLOYDIR}
 
     if ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'true', 'false', d)}; then
-        ${STAGING_BINDIR_NATIVE}/mkdtimg  create ${DEPLOYDIR}/${PRODUCT}-dtbo.img ${B}/arch/${ARCH}/boot/dts/qcom/sa8295p-adp-overlay.dtbo
+        ${STAGING_BINDIR_NATIVE}/mkdtimg create ${DEPLOYDIR}/${PRODUCT}-dtbo.img ${B}/arch/${ARCH}/boot/dts/vendor/qcom/*.dtbo
     fi
 
+    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'true', 'false', d)}; then
+        cp -f ${B}/arch/${ARCH}/boot/Image ${DEPLOYDIR}/linux-lv.img
+        cp -f ${B}/arch/${ARCH}/boot/dts/vendor/qcom/*.dtb ${DEPLOYDIR}/
+    fi
 }
+
+#Sign boot image after generation
+do_deploy[postfuncs] += "sign_bootimg"
 
 PACKAGES = "kernel kernel-base kernel-vmlinux kernel-dev kernel-modules"
 

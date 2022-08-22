@@ -4,7 +4,7 @@ These headers are installed in ${includedir}/linux-msm path."
 HOMEPAGE = "https://www.codeaurora.org"
 SECTION = "kernel"
 LICENSE = "GPLv2.0-with-linux-syscall-note"
-LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
+LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
 
 DEPENDS += "bison-native rsync-native unifdef-native"
 
