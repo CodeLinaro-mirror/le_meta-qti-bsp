@@ -229,7 +229,6 @@ python() {
 #############################################################
 ############ Generate Unsparsed images if needed ############
 #############################################################
-UNSPARSE_IMAGE_SUPPORT_FLAG = "${@bb.utils.contains('IMAGE_FEATURES', 'csm', 'true', 'flase', d)}"
 do_unsparse_images[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
 
 do_unsparse_images() {
@@ -242,9 +241,4 @@ do_unsparse_images() {
     if [ ${SYSTEMRW_IMG_ENABLE} == "true" ]; then
         simg2img ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMRWIMAGE_TARGET} ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMRWIMAGE_TARGET}.raw
     fi
-}
-
-python() {
-    if (d.getVar("UNSPARSE_IMAGE_SUPPORT_FLAG") == "true"):
-       bb.build.addtask('do_unsparse_images', 'do_image_complete', 'do_makesystem', d)
 }
