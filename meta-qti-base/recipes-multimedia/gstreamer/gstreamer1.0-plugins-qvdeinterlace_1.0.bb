@@ -6,13 +6,14 @@ LICENSE = "BSD-3-Clause-Clear"
 LIC_FILES_CHKSUM = "file://${QTI_LICENSE_DIR}/${LICENSE};md5=b796c0007db682166a1721da80267bb2"
 
 DEPENDS += "\
+    adreno \
     display-commonsys-intf-linux \
     gbm \
     gbm-headers \
-    adreno \
     glib-2.0 \
     gstreamer1.0 \
     gstreamer1.0-plugins-base \
+    mm-gfx-auto-prop \
 "
 
 SRC_URI = "${PATH_TO_REPO}/gstreamer/gst-plugins-qti-oss/.git;protocol=${PROTO};destsuffix=gstreamer/gst-plugins-qti-oss;usehead=1"
@@ -25,3 +26,4 @@ SOLIBS = ".so"
 FILES_SOLIBSDEV = ""
 
 FILES:${PN} += "${libdir}/gstreamer-1.0/*.so"
+RDEPENDS:${PN} += "mm-gfx-auto-prop"
