@@ -15,12 +15,15 @@ S = "${WORKDIR}/rootdir"
 PACKAGECONFIG_append_qcx40x = " debug"
 PACKAGECONFIG_append_genericarmv8 = "${@bb.utils.contains('DEBUG_BUILD', \
                                        '1', " debug", "", d)}"
+PACKAGECONFIG_append_sa410m = "debug"
 
 PACKAGECONFIG[logrestrict] = "--enable-logrestrict,--disable-logrestrict"
 PACKAGECONFIG[debug] = "--enable-debug,--disable-debug"
 
 EXTRA_OECONF_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', '--with-systemd', '',d)} \
                         --with-basemachine=${BASEMACHINE} "
+
+EXTRA_OECONF_append_sdmsteppe = " --with-basemachine=${BASEMACHINE}-2.0 "
 
 do_compile[noexec]="1"
 

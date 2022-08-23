@@ -1,8 +1,9 @@
 require recipes-kernel/linux-msm/linux-msm.inc
-COMPATIBLE_MACHINE = "genericarmv8|sdxlemur|scuba|qrbx210-rbx|sa2150p|sa2150p-nand|sa410m|qcs610|qrb5165|sa515m"
+COMPATIBLE_MACHINE = "genericarmv8|sdxlemur|scuba|qrbx210-rbx|sa2150p|sa2150p-nand|sa410m|sa410m-nand|sa410m-televm|qcs610|qrb5165|sa515m"
 
 SRC_URI_append_sdxlemur += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-audio', 'file://0001-ALSA-uapi-add-check-to-avoid-duplicate-include-of-ti.patch', '', d)}"
 SRC_URI_append_sdxlemur += "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'file://gluebi.cfg', '', d)}"
+SRC_URI_append_sdxlemur += "file://0001-wifi-Add-OCV-support-in-kernel.patch"
 
 S         =  "${WORKDIR}/kernel/msm-5.4"
 PR        =  "r0"
@@ -13,6 +14,7 @@ SRC_URI_append_qcs610 += "file://android_binderfs.cfg"
 SRC_URI_append_qcs610 += "file://squashfs.cfg"
 
 SRC_URI_append_qrb5165 += " file://qca6390.cfg"
+SRC_URI_append_qrb5165 += " file://qcn9000.cfg"
 
 DEPENDS += "llvm-arm-toolchain-native virtual/dtc-native rsync-native clang-native"
 TOOLCHAIN = "clang"
