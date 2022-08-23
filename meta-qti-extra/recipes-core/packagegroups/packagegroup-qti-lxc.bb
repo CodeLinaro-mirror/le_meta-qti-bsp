@@ -15,4 +15,7 @@ RDEPENDS_${PN} += "\
     lxc \
     lxcfs \
     dploader \
+    libdp-test \
+    softwarecontainer \
+    lvm2 \
     "
