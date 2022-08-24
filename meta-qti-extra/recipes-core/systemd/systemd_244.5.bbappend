@@ -8,6 +8,10 @@ SRC_URI:append = " \
 "
 
 do_install:append() {
-   install -d ${D}/${base_libdir}/systemd/system-sleep
-   install -m 0755 ${WORKDIR}/qti_sleep.sh -D ${D}/${base_libdir}/systemd/system-sleep/qti_sleep.sh
+    install -d ${D}/${base_libdir}/systemd/system-sleep
+    install -m 0755 ${WORKDIR}/qti_sleep.sh -D ${D}/${base_libdir}/systemd/system-sleep/qti_sleep.sh
+    # Skip pam_selinux check to systemd-user as workaround the issue that user@0 service can't start up
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'true', 'false', d)}; then
+        sed -i '/pam_selinux/s/^/#/g' ${D}${sysconfdir}/pam.d/systemd-user
+    fi
 }
