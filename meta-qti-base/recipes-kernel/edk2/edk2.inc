@@ -21,6 +21,11 @@ do_install() {
     # gets written in the folder image/boot/. Subsequently deploy stage in the
     # main recipe installs to the DEPLOYDIR where rest of the system images are located.
     #
+
+    if [[ ! -f ${S}/../abl.elf && -f ${S}/../unsigned_abl.elf ]]; then
+        install -m 0644 ${S}/../unsigned_abl.elf ${S}/../abl.elf
+    fi
+
     SECIMAGE_LOCAL_DIR=${SIGNING_TOOLS_DIR}/SecImage \
     USES_SEC_POLICY_MULTIPLE_DEFAULT_SIGN=1 \
     USES_SEC_POLICY_INTEGRITY_CHECK=1 \
