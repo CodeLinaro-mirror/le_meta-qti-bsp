@@ -24,6 +24,8 @@ SERIAL_CONSOLE ?= "115200 ttyHSL0"
 
 DISTRO ?= "mdm"
 
+DISTRO_FEATURES_append = " persist-volume"
+
 MACHINE_FEATURES += "kernel26 keyboard"
 
 PAGE_SIZE ?= '4096'
@@ -36,9 +38,10 @@ UBINIZE_ARGS ?= "-m 4096 -p 256KiB -s 4096"
 #MKUBIFS Arg
 MKUBIFS_ARGS ?= "-m 4096 -e 253952 -c 2146 -F"
 #Volume sizes
-SYSTEM_VOLUME_SIZE ?= "100MiB"
-CACHE_VOLUME_SIZE ?= "50MiB"
+SYSTEM_VOLUME_SIZE ?= "120MiB"
+CACHE_VOLUME_SIZE ?= "15MiB"
 SYSTEMRW_VOLUME_SIZE ?= "6MiB"
+PERSIST_VOLUME_SIZE ?= "6MiB"
 
 # Formats of root filesystem images.
 IMAGE_FSTYPES += "ubi"
