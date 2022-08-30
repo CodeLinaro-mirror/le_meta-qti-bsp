@@ -1,0 +1,67 @@
+From 8b4a895b4eab0144bfa810de034a11f380a9392d Mon Sep 17 00:00:00 2001
+From: Viswanath Kraleti <quic_vkraleti@quicinc.com>
+Date: Tue, 30 Aug 2022 14:03:11 +0530
+Subject: [PATCH] fstab-generator: Honor 'verity=enabled' cmdline
+
+When 'verity=enabled' is present in kernel cmdline assume verity
+is enabled even if root, roothash values are not present and use
+"root" DM device as root.
+---
+ src/fstab-generator/fstab-generator.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/src/fstab-generator/fstab-generator.c b/src/fstab-generator/fstab-generator.c
+index 75f804c..3a6126e 100644
+--- a/src/fstab-generator/fstab-generator.c
++++ b/src/fstab-generator/fstab-generator.c
+@@ -48,6 +48,7 @@ static int arg_root_rw = -1;
+ static char *arg_usr_what = NULL;
+ static char *arg_usr_fstype = NULL;
+ static char *arg_usr_options = NULL;
++static char *arg_verity = NULL;
+ static VolatileMode arg_volatile_mode = _VOLATILE_MODE_INVALID;
+ 
+ STATIC_DESTRUCTOR_REGISTER(arg_root_what, freep);
+@@ -57,6 +58,7 @@ STATIC_DESTRUCTOR_REGISTER(arg_root_hash, freep);
+ STATIC_DESTRUCTOR_REGISTER(arg_usr_what, freep);
+ STATIC_DESTRUCTOR_REGISTER(arg_usr_fstype, freep);
+ STATIC_DESTRUCTOR_REGISTER(arg_usr_options, freep);
++STATIC_DESTRUCTOR_REGISTER(arg_verity, freep);
+ 
+ static int write_options(FILE *f, const char *options) {
+         _cleanup_free_ char *o = NULL;
+@@ -803,6 +805,14 @@ static int parse_proc_cmdline_item(const char *key, const char *value, void *dat
+                 if (free_and_strdup(&arg_root_hash, value) < 0)
+                         return log_oom();
+ 
++        } else if (streq(key, "verity")) {
++
++                if (proc_cmdline_value_missing(key, value))
++                        return 0;
++
++                if (free_and_strdup(&arg_verity, value) < 0)
++                        return log_oom();
++
+         } else if (streq(key, "mount.usr")) {
+ 
+                 if (proc_cmdline_value_missing(key, value))
+@@ -848,6 +858,16 @@ static int parse_proc_cmdline_item(const char *key, const char *value, void *dat
+ }
+ 
+ static int determine_root(void) {
++        /* If we have verity=enabled then Verity is used, and we use the "root" DM device as root. */
++        if (!isempty(arg_verity) && streq(arg_verity, "enabled")) {
++                log_info("Found a verity=enabled entry on the kernel command line.");
++                if (free_and_strdup(&arg_root_what, "/dev/mapper/root") < 0)
++                        return log_oom();
++
++                log_info("Using verity root device %s.", arg_root_what);
++                return 1;
++        }
++
+         /* If we have a root hash but no root device then Verity is used, and we use the "root" DM device as root. */
+ 
+         if (arg_root_what)
+-- 
+2.7.4
+
