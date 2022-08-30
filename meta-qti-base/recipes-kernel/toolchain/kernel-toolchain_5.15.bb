@@ -1,0 +1,26 @@
+SUMMARY = "Clang based toolchain to compile QTI kernel"
+DESCRIPTION = "LLVM based C/C++ compiler from Android"
+HOMEPAGE = "https://android.googlesource.com/toolchain/llvm-project"
+LICENSE = "Apache-2.0 & Apache-2.0-with-LLVM-exception & BSD & MIT"
+LIC_FILES_CHKSUM = "file://NOTICE;md5=eeec5cfa0edfb54bfdba757236c7b531"
+
+PROVIDES = "virtual/kernel-toolchain-native"
+
+FILESPATH =+ "${SRC_DIR_ROOT}/kernel/kernel-5.15/kernel_platform/prebuilts/clang/host/linux-x86/:"
+SRC_URI = "file://clang-${CLANG_VERSION}"
+CLANG_VERSION = "r450784e"
+
+S = "${WORKDIR}/clang-${CLANG_VERSION}"
+INHIBIT_SYSROOT_STRIP = "1"
+do_compile[noexec] = "1"
+do_configure[noexec] = "1"
+
+BBCLASSEXTEND = " native"
+
+do_install() {
+    install -d ${D}/${bindir}/clang/
+    install -d ${D}/${bindir}/clang/bin/
+    cp -rf ${S}/bin/* ${D}/${bindir}/clang/bin/
+    install -d ${D}/${bindir}/clang/lib64/
+    cp -rf ${S}/lib64/* ${D}/${bindir}/clang/lib64/
+}
