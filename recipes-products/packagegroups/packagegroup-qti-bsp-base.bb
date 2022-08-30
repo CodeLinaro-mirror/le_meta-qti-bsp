@@ -36,7 +36,7 @@ ADDON_SCRIPTS_neo = "helios-start"
 RDEPENDS_packagegroup-startup-scripts-base = "\
     ${@bb.utils.contains('COMBINED_FEATURES', 'qti-ab-boot', 'ab-slot-util', '', d)} \
     ${@oe.utils.conditional('USB_SUPPORT', 'True', 'usb-composition', '', d)} \
-    ${@oe.utils.conditional('DISABLE_USB_SUPPORT', 'True', '', 'usb-composition-usbd', d)} \
+    ${@oe.utils.conditional('DISABLE_USBD_SUPPORT', 'True', '', 'usb-composition-usbd', d)} \
     post-boot \
     sdcard-scripts-automount \
     ${ADDON_SCRIPTS} \
