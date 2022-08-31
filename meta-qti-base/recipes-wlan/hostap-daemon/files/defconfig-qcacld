@@ -135,7 +135,8 @@ CONFIG_WPS_UPNP=y
 #CONFIG_IPV6=y
 
 # IEEE Std 802.11r-2008 (Fast BSS Transition)
-#CONFIG_IEEE80211R=y
+CONFIG_IEEE80211R=y
+CONFIG_WNM=y
 
 # Use the hostapd's IEEE 802.11 authentication (ACL), but without
 # the IEEE 802.11 Management capability (e.g., madwifi or FreeBSD/net80211)
@@ -221,3 +222,5 @@ CONFIG_WEP=y
 
 # BOOTUP KPI MARKER
 CONFIG_MARKER=y
+
+CONFIG_MBO=y
