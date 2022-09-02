@@ -3,6 +3,7 @@ inherit qimage qramdisk
 DEPENDS += " virtual/kernel"
 
 ENABLE_DISPLAY = "${@d.getVar('MACHINE_SUPPORTS_DISPLAY') or "True"}"
+ENABLE_TOUCH = "${@d.getVar('MACHINE_SUPPORTS_TOUCH') or "True"}"
 ENABLE_SECUREMSM = "${@d.getVar('MACHINE_SUPPORTS_SECUREMSM') or "True"}"
 
 CORE_IMAGE_EXTRA_INSTALL += " \
@@ -13,6 +14,7 @@ CORE_IMAGE_EXTRA_INSTALL += " \
     procrank \
 "
 CORE_IMAGE_EXTRA_INSTALL += " ${@oe.utils.conditional('ENABLE_DISPLAY', 'True', 'packagegroup-qti-display', '', d)}"
+CORE_IMAGE_EXTRA_INSTALL += " ${@oe.utils.conditional('ENABLE_TOUCH', 'True', 'packagegroup-qti-touch', '', d)}"
 CORE_IMAGE_EXTRA_INSTALL += " ${@oe.utils.conditional('ENABLE_SECUREMSM', 'True', 'packagegroup-qti-securemsm', '', d)}"
 
 #Exclude packages
@@ -24,3 +26,6 @@ do_gen_partition_bin[noexec] = "1"
 
 IMAGE_FEATURES[validitems] += "vm"
 IMAGE_FEATURES += "vm"
+
+do_compose_vmimage[recrdeptask] = "do_ramdisk_create"
+do_compose_vmimage[recrdeptask] += "do_merge_dtbs"

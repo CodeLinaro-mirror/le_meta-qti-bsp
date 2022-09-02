@@ -15,6 +15,7 @@ PREFERRED_VERSION_linux-msm-headers = "5.10"
 PREFERRED_VERSION_mod-signing-keys = "5.10"
 PREFERRED_VERSION_kernel-toolchain-native = "5.10"
 PREFERRED_VERSION_dtc-android-build-native = "1.6.0"
+PREFERRED_VERSION_mkbootimg-gki-native = "5.10"
 
 # Waipio abl expects boot image with header version set.
 BOOT_HEADER_VERSION = "3"
