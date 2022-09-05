@@ -372,3 +372,6 @@ do_gen_otazip_ubi_util() {
     cd ${TMPDIR}/work/x86_64-linux/releasetools-native/1.0-r0/releasetools && cp update_ubi$1.zip target-files-ubi$1.zip ${DEPLOY_DIR_IMAGE_NAND}
 }
 
+do_gen_otazip_ubi_ab() {
+  do_gen_otazip_ubi_util _ab
+}
