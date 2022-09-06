@@ -16,6 +16,7 @@ DEPLOY_DIR_IMAGE_NAND ?= "${DEPLOY_DIR_IMAGE}"
 SQUASHFS_SYS_VOLUME ?= "${BASEMACHINE}-sysfs.squash"
 SQUASHFS_RECOVERYFS_VOLUME ?= "recoveryfs.squash"
 MODEM_SQUASHFS_IMAGE ?= "NON-HLOS.squash"
+TELAF_SQUASHFS_IMAGE ?= "telaf_ro.squashfs"
 
 def nand_set_vars_and_get_dependencies(d):
     if not nand_target_supports_OTA_upgrade(d):
@@ -166,6 +167,12 @@ do_recovery_ubi() {
             echo /modem  squashfs  /dev/block/bootdevice/by-name/modem >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RECOVERY/recovery.fstab
             if [ -f ${DEPLOY_DIR_IMAGE_NAND}/${MODEM_SQUASHFS_IMAGE} ]; then
                 squashfs2sparse  ${DEPLOY_DIR_IMAGE_NAND}/${MODEM_SQUASHFS_IMAGE} ${OTA_TARGET_IMAGE_ROOTFS_UBI}/IMAGES/modem.img
+            fi
+        fi
+        if ${@bb.utils.contains('DISTRO_FEATURES', 'nad-prod', 'true', 'false', d)}; then
+            echo /telaf squashfs /dev/block/bootdevice/by-name/telaf >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RECOVERY/recovery.fstab
+            if [ -f ${DEPLOY_DIR_IMAGE_NAND}/${TELAF_SQUASHFS_IMAGE} ]; then
+                squashfs2sparse  ${DEPLOY_DIR_IMAGE_NAND}/${TELAF_SQUASHFS_IMAGE} ${OTA_TARGET_IMAGE_ROOTFS_UBI}/IMAGES/telaf.img
             fi
         fi
     else
