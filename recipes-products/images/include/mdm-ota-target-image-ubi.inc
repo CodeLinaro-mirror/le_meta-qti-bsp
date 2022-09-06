@@ -254,7 +254,7 @@ do_recovery_ubi() {
 
         # recovery_size : Size of recovery partition from partition.xml
         echo recovery_size=0x00C00000 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
-    elif [ "${BASEMACHINE}" == "sdxprairie" ] && [ "${DISTRO}" == "auto" ]; then
+    elif [ "${BASEMACHINE}" == "sdxprairie" ] && [ "${DISTRO}" == "auto" ] || [ "${BASEMACHINE}" == "sdxprairie" ] && [ "${DISTRO}" == "nad" ] ; then
         # boot_size: Size of boot partition from partition.xml
         echo boot_size=0x00EA6000 >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/misc_info.txt
 
