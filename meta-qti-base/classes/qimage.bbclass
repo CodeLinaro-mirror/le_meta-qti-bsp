@@ -122,3 +122,15 @@ do_make_avb_image(){
 }
 
 addtask do_make_avb_image after do_image_complete before do_build
+
+
+# create dummy vendor-boot & vbmeta image
+VENDORBOOT_IMG_CMD = " \
+    dd if=/dev/zero of=${DEPLOY_DIR_IMAGE}/${VENDORBOOTIMAGE_TARGET} bs=1M count=96; \
+    dd if=/dev/zero of=${DEPLOY_DIR_IMAGE}/${VBMETAIMAGE_TARGET} bs=1K count=3; \
+"
+
+# compress the image to ease the upload
+IMAGE_CMD:ext4:sa81x5:append = " \
+  ${VENDORBOOT_IMG_CMD} \
+"
