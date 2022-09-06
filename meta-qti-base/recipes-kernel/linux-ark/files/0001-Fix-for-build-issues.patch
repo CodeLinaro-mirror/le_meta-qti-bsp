@@ -1,0 +1,26 @@
+From 54ba2ce1a1c2095e6ba786fccadb8466ae470c8d Mon Sep 17 00:00:00 2001
+From: Venkat Raju Sana <vrsana@quicinc.com>
+Date: Tue, 6 Sep 2022 14:12:24 -0700
+Subject: [PATCH] Fix for build issues
+
+Change-Id: I1784f5377b7c6788478443f04bc04a2cc159d36d
+Signed-off-by: Venkat Raju Sana <vrsana@quicinc.com>
+---
+ include/linux/psi.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/include/linux/psi.h b/include/linux/psi.h
+index 65eb1476ac70..a7eb746b495b 100644
+--- a/include/linux/psi.h
++++ b/include/linux/psi.h
+@@ -5,6 +5,7 @@
+ #include <linux/psi_types.h>
+ #include <linux/sched.h>
+ #include <linux/poll.h>
++#include <linux/cgroup-defs.h>
+ 
+ struct seq_file;
+ struct css_set;
+-- 
+2.17.1
+
