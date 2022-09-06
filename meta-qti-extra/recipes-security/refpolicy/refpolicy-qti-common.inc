@@ -4,7 +4,6 @@ LICENSE += "& BSD-3-Clause-Clear"
 SRC_URI += "${PATH_TO_REPO}/lv-sepolicy/.git;protocol=${PROTO};destsuffix=lv-sepolicy;usehead=1 \
             file://Update-busybox-substitution-paths.patch \
             file://0001-fc-subs-persist-set-aliases-for-var-and-data.patch \
-            file://Allow-adbd-to-transition-to-root-user.patch \
             file://0001-refpolicy-update-booleans.patch \
 "
 SRCREV = "${AUTOREV}"
