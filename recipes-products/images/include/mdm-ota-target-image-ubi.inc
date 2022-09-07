@@ -14,9 +14,12 @@ def nand_target_supports_OTA_upgrade(d):
 
 DEPLOY_DIR_IMAGE_NAND ?= "${DEPLOY_DIR_IMAGE}"
 SQUASHFS_SYS_VOLUME ?= "${BASEMACHINE}-sysfs.squash"
+SQUASHFS_SYS_OTA_VOLUME ?= "${BASEMACHINE}-sysfs-ota.squash"
 SQUASHFS_RECOVERYFS_VOLUME ?= "recoveryfs.squash"
+SQUASHFS_RECOVERYFS_OTA_VOLUME ?= "recoveryfs-ota.squash"
 MODEM_SQUASHFS_IMAGE ?= "NON-HLOS.squash"
 TELAF_SQUASHFS_IMAGE ?= "telaf_ro.squashfs"
+TELAF_SQUASHFS_OTA_IMAGE ?= "telaf-ota_ro.squashfs"
 
 def nand_set_vars_and_get_dependencies(d):
     if not nand_target_supports_OTA_upgrade(d):
@@ -148,7 +151,14 @@ do_recovery_ubi() {
         # and adds no value to the compression of the image.
         # replacing img2simg with own util squashfs2sparse, since on 18.04 machine img2simg is failing
         if ${@bb.utils.contains('DISTRO_FEATURES', 'nad-prod', 'true', 'false', d)}; then
-            squashfs2sparse ${DEPLOY_DIR_IMAGE_NAND}/${SQUASHFS_SYS_VOLUME} ${OTA_TARGET_IMAGE_ROOTFS_UBI}/IMAGES/system.img
+            if ${@bb.utils.contains('DISTRO_FEATURES', 'nad-avb', 'true', 'false', d)}; then
+              IMAGE_SIZE=`ls -l  ${DEPLOY_DIR_IMAGE_NAND}/${SQUASHFS_SYS_VOLUME} | awk -- '{ print $5 }'`
+              cp ${DEPLOY_DIR_IMAGE_NAND}/${SQUASHFS_SYS_VOLUME} ${DEPLOY_DIR_IMAGE_NAND}/${SQUASHFS_SYS_OTA_VOLUME}
+              ota-gen-util ${DEPLOY_DIR_IMAGE_NAND}/${SQUASHFS_SYS_OTA_VOLUME} ${IMAGE_SIZE} ${SYSTEM_SQUASHFS_VOLUME_SIZE}
+              squashfs2sparse ${DEPLOY_DIR_IMAGE_NAND}/${SQUASHFS_SYS_OTA_VOLUME} ${OTA_TARGET_IMAGE_ROOTFS_UBI}/IMAGES/system.img
+            else
+              squashfs2sparse ${DEPLOY_DIR_IMAGE_NAND}/${SQUASHFS_SYS_VOLUME} ${OTA_TARGET_IMAGE_ROOTFS_UBI}/IMAGES/system.img
+            fi
         else
             img2simg ${DEPLOY_DIR_IMAGE_NAND}/${SQUASHFS_SYS_VOLUME} ${OTA_TARGET_IMAGE_ROOTFS_UBI}/IMAGES/system.img
         fi
@@ -160,7 +170,14 @@ do_recovery_ubi() {
         echo /system   squashfs  /dev/block/bootdevice/by-name/system >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RECOVERY/recovery.fstab
         # modem fstype
         if ${@bb.utils.contains('DISTRO_FEATURES', 'nad-prod', 'true', 'false', d)}; then
-            squashfs2sparse  ${DEPLOY_DIR_IMAGE_NAND}/${SQUASHFS_RECOVERYFS_VOLUME} ${OTA_TARGET_IMAGE_ROOTFS_UBI}/IMAGES/recoveryfs.img
+            if ${@bb.utils.contains('DISTRO_FEATURES', 'nad-avb', 'true', 'false', d)}; then
+              RECOVERY_IMAGE_SIZE=`ls -l  ${DEPLOY_DIR_IMAGE_NAND}/${SQUASHFS_RECOVERYFS_VOLUME} | awk -- '{ print $5 }'`
+              cp ${DEPLOY_DIR_IMAGE_NAND}/${SQUASHFS_RECOVERYFS_VOLUME} ${DEPLOY_DIR_IMAGE_NAND}/${SQUASHFS_RECOVERYFS_OTA_VOLUME}
+              ota-gen-util ${DEPLOY_DIR_IMAGE_NAND}/${SQUASHFS_RECOVERYFS_OTA_VOLUME} ${RECOVERY_IMAGE_SIZE} ${RECOVERYFS_SQUASHFS_VOLUME_SIZE}
+              squashfs2sparse  ${DEPLOY_DIR_IMAGE_NAND}/${SQUASHFS_RECOVERYFS_OTA_VOLUME} ${OTA_TARGET_IMAGE_ROOTFS_UBI}/IMAGES/recoveryfs.img
+            else
+              squashfs2sparse  ${DEPLOY_DIR_IMAGE_NAND}/${SQUASHFS_RECOVERYFS_VOLUME} ${OTA_TARGET_IMAGE_ROOTFS_UBI}/IMAGES/recoveryfs.img
+            fi
             echo /recoveryfs  squashfs  /dev/block/bootdevice/by-name/recoveryfs >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RECOVERY/recovery.fstab
         fi
         if ${@bb.utils.contains('DISTRO_FEATURES', 'modem-volume', 'true', 'false', d)}; then
@@ -172,7 +189,14 @@ do_recovery_ubi() {
         if ${@bb.utils.contains('DISTRO_FEATURES', 'nad-prod', 'true', 'false', d)}; then
             echo /telaf squashfs /dev/block/bootdevice/by-name/telaf >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RECOVERY/recovery.fstab
             if [ -f ${DEPLOY_DIR_IMAGE_NAND}/${TELAF_SQUASHFS_IMAGE} ]; then
-                squashfs2sparse  ${DEPLOY_DIR_IMAGE_NAND}/${TELAF_SQUASHFS_IMAGE} ${OTA_TARGET_IMAGE_ROOTFS_UBI}/IMAGES/telaf.img
+                if ${@bb.utils.contains('DISTRO_FEATURES', 'nad-avb', 'true', 'false', d)}; then
+                  TELAF_IMAGE_SIZE=`ls -l  ${DEPLOY_DIR_IMAGE_NAND}/${TELAF_SQUASHFS_IMAGE} | awk -- '{ print $5 }'`
+                  cp ${DEPLOY_DIR_IMAGE_NAND}/${TELAF_SQUASHFS_IMAGE} ${DEPLOY_DIR_IMAGE_NAND}/${TELAF_SQUASHFS_OTA_IMAGE}
+                  ota-gen-util ${DEPLOY_DIR_IMAGE_NAND}/${TELAF_SQUASHFS_OTA_IMAGE} ${TELAF_IMAGE_SIZE} ${TELAF_VOLUME_SIZE}
+                     squashfs2sparse  ${DEPLOY_DIR_IMAGE_NAND}/${TELAF_SQUASHFS_OTA_IMAGE} ${OTA_TARGET_IMAGE_ROOTFS_UBI}/IMAGES/telaf.img
+                 else
+                     squashfs2sparse  ${DEPLOY_DIR_IMAGE_NAND}/${TELAF_SQUASHFS_IMAGE} ${OTA_TARGET_IMAGE_ROOTFS_UBI}/IMAGES/telaf.img
+                 fi
             fi
         fi
     else
