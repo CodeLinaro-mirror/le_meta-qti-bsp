@@ -13,6 +13,9 @@ MACHINE_MNT_POINTS = "/firmware \
                       /lib/modules \
                      "
 
+# Define userdata dir to be used
+USERDATA_DIR = "${@bb.utils.contains('MACHINE_MNT_POINTS', '/overlay', 'overlay', 'data', d)}"
+
 # Sizes for EXT4 partitions
 SYSTEM_SIZE_EXT4 ?= "800MiB"
 USERDATA_SIZE_EXT4 ?= "16GiB"
