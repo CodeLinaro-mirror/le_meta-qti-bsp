@@ -43,15 +43,6 @@ case $1/$2 in
     # disable BT as hsuart could block suspend
     systemctl stop synergy.service
 
-    # disable WLAN related app
-    killall wpa_supplicant &
-    PID_KW=$!
-    killall hostapd &
-    PID_KH=$!
-    echo "wait killing... $PID_KW and $PID_KH"
-    wait $PID_KW
-    wait $PID_KH
-
     # save all usb mode to file
     if [ ! -f "$usb_mode_file" ]; then
         touch $usb_mode_file
