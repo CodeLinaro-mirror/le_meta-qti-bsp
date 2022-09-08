@@ -289,8 +289,6 @@ fi
 case $fstab_suffix in
     emmc)
         partition="$(extract_config root)"
-        ## ugly hack to mitigcate the timing issue in mmcblock
-        sleep 1
         if [ -e "$partition" ]; then
             mnt_dir="/mnt/system"
             mkdir -p $mnt_dir
