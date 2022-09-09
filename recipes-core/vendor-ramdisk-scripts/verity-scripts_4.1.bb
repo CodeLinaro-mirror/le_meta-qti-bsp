@@ -48,4 +48,4 @@ FILES_${PN} += " /verity/* ${systemd_unitdir}/system/ "
 inherit systemd
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} = "run-verity-checks-vdlkm.service run-verity-checks-root.service"
+SYSTEMD_SERVICE_${PN} = "veritysetup@vdlkm.service veritysetup@root.service"

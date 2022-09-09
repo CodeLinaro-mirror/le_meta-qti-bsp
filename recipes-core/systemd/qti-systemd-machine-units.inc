@@ -34,6 +34,10 @@ add_mount_files () {
         else
             install -m 0644 ${S}/${mountname}.mount ${D}${systemd_unitdir}/system/${mountname}-${IMAGETYPE}.mount
         fi
+	# Install mount generator
+        if [[ ! -z "${GENERATED_MACHINE_MNT_POINTS}" ]] ; then
+            install -m 0755 ${S}/qti-mount-generator -D ${D}${systemd_unitdir}/system-generators/qti-mount-generator
+        fi
     done
 
     if ${@bb.utils.contains('MACHINE_MNT_POINTS', '/overlay', 'true', 'false', d)}; then
@@ -86,24 +90,20 @@ fix_mount_services () {
     btdevice="${devdiskstr}bluetooth.device"
     dspdevice="${devdiskstr}dsp.device"
     modemdevice="${devdiskstr}modem.device"
-    vdlkmdevice="${devdiskstr}vendor_dlkm.device"
     if [[ "${MACHINE_FEATURES}" =~ .*qti-ab-boot* ]]; then
         btdevice="${devdiskstr}bluetooth_a.device ${devdiskstr}bluetooth_b.device"
         dspdevice="${devdiskstr}dsp_a.device ${devdiskstr}dsp_b.device"
         modemdevice="${devdiskstr}modem_a.device ${devdiskstr}modem_b.device"
-        vdlkmdevice="${devdiskstr}vendor_dlkm_a.device ${devdiskstr}vendor_dlkm_b.device"
     fi
     if [[ "${MACHINE_FEATURES}" =~ .*qti-abc-boot* ]]; then
         btdevice="$btdevice ${devdiskstr}bluetooth_c.device"
         dspdevice="$dspdevice ${devdiskstr}dsp_c.device"
         modemdevice="$modemdevice ${devdiskstr}modem_c.device"
-        vdlkmdevice="$vdlkmdevice ${devdiskstr}vendor_dlkm_c.device"
     fi
 
     sed -i "s#@BTDEVICE@#$btdevice#g" ${WORKDIR}/bt_firmware-mount.service
     sed -i "s#@DSPDEVICE@#$dspdevice#g" ${WORKDIR}/dsp-mount.service
     sed -i "s#@MODEMDEVICE@#$modemdevice#g" ${WORKDIR}/firmware-mount.service
-    sed -i "s#@VDLKMDEVICE@#$vdlkmdevice#g" ${WORKDIR}/lib-modules-mount.service
 }
 
 def get_mnt_services(d):
@@ -126,4 +126,13 @@ def get_mnt_services(d):
 
 SYSTEMD_SERVICE_${PN} += "${@get_mnt_services(d)}"
 
+PACKAGES =+ " ${PN}-generators "
+
 FILES_${PN} += " ${systemd_unitdir}/*"
+FILES_${PN}-generators = " ${systemd_unitdir}/system-generators/* "
+
+ALLOW_EMPTY_${PN}-generators = "1"
+
+RDEPENDS_${PN} += "${PN}-generators"
+
+PACKAGE_ARCH = "${MACHINE_ARCH}"

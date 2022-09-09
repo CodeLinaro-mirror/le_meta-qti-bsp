@@ -10,8 +10,10 @@ MACHINE_MNT_POINTS = "/firmware \
                       /bt_firmware \
                       /overlay \
                       /persist \
-                      /lib/modules \
                      "
+
+# systemd auto generated mount paths
+GENERATED_MACHINE_MNT_POINTS = "/lib/modules"
 
 # Define userdata dir to be used
 USERDATA_DIR = "${@bb.utils.contains('MACHINE_MNT_POINTS', '/overlay', 'overlay', 'data', d)}"
