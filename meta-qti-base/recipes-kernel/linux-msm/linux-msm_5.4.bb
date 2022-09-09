@@ -123,6 +123,7 @@ addtask do_generate_gki_defconfig after do_unpack before do_kernel_metadata
 do_generate_gki_defconfig[depends] += "virtual/${TARGET_PREFIX}binutils:do_populate_sysroot"
 
 do_kernel_checkout[noexec] = "1"
+do_validate_branches[noexec] = "1"
 
 # extra task for configuration checks
 addtask kernel_configcheck after do_configure before do_compile
