@@ -115,6 +115,9 @@ do_recovery_ubi() {
     else
       cp -r ${RECOVERY_IMAGE_UBI_ROOTFS}/. ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RECOVERY/.
     fi
+    cd ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RECOVERY
+    rm -rf var/run
+    ln -snf ../run var/run
 
     #generate recovery.fstab which is used by the updater-script
     #echo #mount point fstype device [device2] >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RECOVERY/recovery.fstab
