@@ -64,9 +64,6 @@ do_recovery_ext4() {
         echo vendor_dlkm_exist=1 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
     fi
 
-    cp ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${USERDATAIMAGE_TARGET} ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/IMAGES/userdata.img
-    cp ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${USERDATAIMAGE_MAP_TARGET} ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/IMAGES/userdata.map
-
     # if dtbo.img file exist then copy
     if [ -f ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${DTBOIMAGE_TARGET} ]; then
         cp ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${DTBOIMAGE_TARGET} ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/IMAGES/dtbo.img
