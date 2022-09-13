@@ -37,3 +37,4 @@ EXTRA_IMAGECMD:ext4 += " -b 4096 "
 
 IMAGE_CLASSES += "qimage"
 
+IMAGE_CLASSES += "${@oe.utils.version_less_or_equal('PREFERRED_VERSION_linux-msm', '5.14', '', 'qimage-boot', d)}"

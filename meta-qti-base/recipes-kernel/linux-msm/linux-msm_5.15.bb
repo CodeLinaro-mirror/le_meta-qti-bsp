@@ -21,7 +21,6 @@ TARGET_CXXFLAGS += "-Wno-format"
 KERNEL_CC="${SRC_DIR_ROOT}/kernel-${PV}/kernel_platform/prebuilts/clang/host/linux-x86/clang-r450784e/bin/clang"
 
 KERNEL_USE_PREBUILTS = "True"
-KERNEL_VARIANT = "${@bb.utils.contains_any('VARIANT', 'perf user', 'perf_', 'debug_', d)}"
 KERNEL_PREBUILT_PATH ?= "${SRC_DIR_ROOT}/kernel/kernel-${PV}/out/msm-kernel-${BASEMACHINE}-${KERNEL_VARIANT}defconfig/dist"
 KERNEL_PREBUILT_PATH:sa81x5 = "${SRC_DIR_ROOT}/kernel/kernel-${PV}/out/msm-kernel-gen3auto-${KERNEL_VARIANT}defconfig/dist"
 
@@ -31,9 +30,6 @@ KERNEL_CONFIG_COMMAND ?= "oe_runmake_call -C ${S} CC="${KERNEL_CC}" LD="${KERNEL
 get_cc_option () {
 :
 }
-
-MKBOOTUTIL = '${@oe.utils.conditional("PREFERRED_PROVIDER_mkbootimg-native", "mkbootimg-gki-native", "scripts/mkbootimg.py", "mkbootimg", d)}'
-KERNEL_IMAGE_HEADER_VERSION = "2"
 
 DEPENDS:append:aarch64 = " libgcc"
 KERNEL_CC:append:aarch64 = " ${TOOLCHAIN_OPTIONS}"
@@ -230,22 +226,6 @@ do_deploy() {
     install -m 0644 vmlinux ${DEPLOYDIR}
     install -m 0644 System.map ${DEPLOYDIR}
 
-    #copy dtb files into deploy dir and create dtb.img
-    cat ${DTB_SRC_PATH}/*.dtb >  ${DEPLOYDIR}/dtb.img
-
-    #Make Bootimage
-    mkboot_bin_path=${STAGING_BINDIR_NATIVE}/${MKBOOTUTIL}
-    $mkboot_bin_path --kernel ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} \
-           --dtb ${DEPLOYDIR}/dtb.img \
-           --cmdline "${KERNEL_CMD_PARAMS}" \
-           --ramdisk /dev/null \
-           --pagesize ${PAGE_SIZE} \
-           --base ${KERNEL_BASE} \
-           --ramdisk_offset 0x0 \
-           --header_version ${KERNEL_IMAGE_HEADER_VERSION} \
-           --output ${DEPLOYDIR}/${BOOTIMAGE_TARGET}
-
-
     # copy dtbo files into deplydir and create dtbo.img if DTBO support enable
     if ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'true', 'false', d)}; then
         mkdtimg create ${DEPLOYDIR}/${PRODUCT}-dtbo.img \
@@ -257,11 +237,13 @@ do_deploy() {
      install -d ${DEPLOYDIR}/build-artifacts
      install -d ${DEPLOYDIR}/build-artifacts/kernel_scripts/scripts
      install -d ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr/
+     install -d ${DEPLOYDIR}/build-artifacts/dtb/
 
      cp  ${S}/usr/gen_initramfs.sh ${DEPLOYDIR}/build-artifacts/kernel_scripts/scripts
      cp -a ${B}/usr/gen_init_cpio ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr/
      cp -a ${B}/usr/initramfs_data.cpio ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr/
      cp -a ${B}/usr/initramfs_inc_data ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr/
+     cp -a ${DTB_SRC_PATH}/*.dtb ${DEPLOYDIR}/build-artifacts/dtb/
 }
 
 # Put the zImage in the kernel-dev pkg
