@@ -10,7 +10,7 @@ PACKAGE_INSTALL = "\
     adbd \
     usb-composition \
     usb-composition-usbd \
-    busybox \
+    ${VIRTUAL-RUNTIME_base-utils} \
     ext4-utils \
     ${@d.getVar('kern_mods')} \
     fsmgr \
