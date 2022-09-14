@@ -94,22 +94,6 @@ do_kernel_metadata_prepend() {
     fi
 }
 
-do_generate_gki_defconfig() {
-    bbnote "Generating GKI defconfig"
-
-    gki_defconfig=`echo ${KERNEL_CONFIG} | sed 's/vendor\///g'`
-
-    # Point to the correct CC when executing generate_defconfig.sh
-    export REAL_CC=`echo ${CC} | sed 's/-target.*//g'`
-
-    # FIXME: Workaround for executing generate_defconfig.sh
-    LD=`echo ${LD} | sed 's/--sysroot.*//g'`
-
-    ${S}/scripts/gki/generate_defconfig.sh ${gki_defconfig}
-}
-
-addtask do_generate_gki_defconfig after do_unpack before do_kernel_metadata
-
 do_kernel_checkout[noexec] = "1"
 
 do_compile () {

@@ -1,0 +1,33 @@
+From f726fe22f8a486c98f798b8cbce29776189d8657 Mon Sep 17 00:00:00 2001
+From: Parikshit Pareek <quic_ppareek@quicinc.com>
+Date: Tue, 19 Jul 2022 13:22:37 +0530
+Subject: [PATCH] defconfig: add overrides to resolve build error
+
+Disable CONFIG_DEBUG_INFO_BTF and do other necessary overrides
+to make final defconfig generation succcesfull.
+
+Change-Id: I9e61a0f10b299033d56ab145cfc7c9c8266e56d1
+---
+ redhat/configs/custom-overrides/generic/CONFIG_DEBUG_INFO_BTF    | 1 +
+ redhat/configs/custom-overrides/generic/CONFIG_DEBUG_INFO_DWARF5 | 1 +
+ 2 files changed, 2 insertions(+)
+ create mode 100644 redhat/configs/custom-overrides/generic/CONFIG_DEBUG_INFO_BTF
+ create mode 100644 redhat/configs/custom-overrides/generic/CONFIG_DEBUG_INFO_DWARF5
+
+diff --git a/redhat/configs/custom-overrides/generic/CONFIG_DEBUG_INFO_BTF b/redhat/configs/custom-overrides/generic/CONFIG_DEBUG_INFO_BTF
+new file mode 100644
+index 000000000000..3b5ac748f282
+--- /dev/null
++++ b/redhat/configs/custom-overrides/generic/CONFIG_DEBUG_INFO_BTF
+@@ -0,0 +1 @@
++# CONFIG_DEBUG_INFO_BTF is not set
+diff --git a/redhat/configs/custom-overrides/generic/CONFIG_DEBUG_INFO_DWARF5 b/redhat/configs/custom-overrides/generic/CONFIG_DEBUG_INFO_DWARF5
+new file mode 100644
+index 000000000000..e31a11334fce
+--- /dev/null
++++ b/redhat/configs/custom-overrides/generic/CONFIG_DEBUG_INFO_DWARF5
+@@ -0,0 +1 @@
++# CONFIG_DEBUG_INFO_DWARF5 is not set
+-- 
+2.17.1
+
