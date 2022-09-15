@@ -27,3 +27,4 @@
 
 # demo app for early video to measure kpi
 /usr/bin/mm-vdec-omx-test-lite +kpi+/usr/bin/test_1080p.h264 1 4 0 1 0 0 0
+/usr/bin/mm-venc-omx-test-lite -m kpi -t h264 -w 1920 -h 1080 -f 30 -b 5000000 -c 3 -n 10
