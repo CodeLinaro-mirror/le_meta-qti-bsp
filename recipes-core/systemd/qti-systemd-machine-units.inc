@@ -6,6 +6,7 @@ SRC_URI = "file://*"
 S = "${WORKDIR}"
 
 IMAGETYPE ??= ""
+USERDATA_FSTYPE ??= "ext4"
 OVERLAY_MNT_POINTS ??= "etc data cache"
 OVERLAY_MNT_POINTS_qrb5165 = "etc data cache usr-share"
 
@@ -32,6 +33,10 @@ add_mount_files () {
            [[ "${IMAGETYPE}" == "ubi" || "${COMBINED_FEATURES}" =~ .*qti-ab-boot.* ]] ; then
             install -m 0644 ${S}/${mountname}-mount.service ${D}${systemd_unitdir}/system/${mountname}-mount-${IMAGETYPE}.service
         else
+            # Update fstype for userdata
+            if [[ "$mountname" == "overlay" ]] ; then
+                sed -i "s#@TYPE@#${USERDATA_FSTYPE}#g" ${S}/overlay.mount
+	    fi
             install -m 0644 ${S}/${mountname}.mount ${D}${systemd_unitdir}/system/${mountname}-${IMAGETYPE}.mount
         fi
 	# Install mount generator
