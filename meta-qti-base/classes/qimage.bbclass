@@ -131,6 +131,6 @@ VENDORBOOT_IMG_CMD = " \
 "
 
 # compress the image to ease the upload
-IMAGE_CMD:ext4:sa81x5:append = " \
+IMAGE_CMD:ext4:append:sa81x5 = "; \
   ${VENDORBOOT_IMG_CMD} \
 "
