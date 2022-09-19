@@ -41,10 +41,21 @@ EXTRA_OEMAKE:append = " \
                        "
 
 _WLAN_CFG_OVERRIDE = " \
-                      CONFIG_BUS_AUTO_SUSPEND=n \
+                        CONFIG_WLAN_OPEN_P2P_INTERFACE=n \
+                        CONFIG_SUPPORT_P2P_BY_ONE_INTF_WLAN=y \
+                        CONFIG_WLAN_BOOTUP_MARKER=y \
+                        CONFIG_WLAN_PLACEMARKER_PREFIX=108 \
+                        CONFIG_QCOM_TDLS=n \
+                        CONFIG_CFG_MAX_STA_VDEVS=4 \
+                        CONFIG_CFG_BMISS_OFFLOAD_MAX_VDEV=4 \
+                        CONFIG_REO_QDESC_HISTORY=y \
+                        CONFIG_REO_DESC_DEFER_FREE=y \
+                        CONFIG_HIF_DEBUG=y \
+                        CONFIG_HIF_CE_DEBUG_DATA_BUF=y \
+                        CONFIG_BUS_AUTO_SUSPEND=n \
                       "
 
-EXTRA_OEMAKE:append += " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE}"
+EXTRA_OEMAKE:append = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE}"
 
 SYSTEMD_SERVICE:${PN} = "init_qti_wlan_auto.service"
 

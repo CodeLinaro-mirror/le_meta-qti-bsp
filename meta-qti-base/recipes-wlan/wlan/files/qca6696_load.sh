@@ -35,7 +35,7 @@ fi
 n=0
 while [ $n -le 5 ]
 	do
-	if ((lspci -k|grep cnss_pci) && (lspci -k|grep 1101));then
+	if ((lspci -k|grep cnss_pci) && ((lspci -k|grep 1101) || (lspci -k|grep QCA6390)));then
 		if (ls -l /sys/bus/pci/devices/ | grep 0000:01:00.0);then
 			echo "try to load qca6696"
 			modprobe qca6696
