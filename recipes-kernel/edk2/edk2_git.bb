@@ -26,6 +26,8 @@ DM_MOD_FOR_KERNEL5_4 = "${@d.getVar('DM_MOD_FOR_KERNEL') or "0"}"
 
 EARLY_USB_INIT = "${@bb.utils.contains('DISTRO_FEATURES', 'qti-earlyusb', '1', '0', d)}"
 
+DDR_SUPPORTS_SCT_CONFIG = "${@bb.utils.contains('BASEMACHINE', 'neo', '1', '0', d)}"
+
 TARGET_HIBERNATION_INSECURE_ENABLE = "${@bb.utils.contains('HIBERNATION_INSECURE_ENABLE', 'True', 'true', 'false', d)}"
 
 EXTRA_OEMAKE = " \
@@ -43,6 +45,7 @@ EXTRA_OEMAKE = " \
     'OVERRIDE_ABL_LOAD_ADDRESS=${ABL_LOAD_ADDRESS}' \
     'HIBERNATION_SUPPORT_INSECURE=${TARGET_HIBERNATION_INSECURE_ENABLE}' \
     'TARGET_SUPPORTS_EARLY_USB_INIT=${EARLY_USB_INIT}' \
+    'DDR_SUPPORTS_SCT_CONFIG=${DDR_SUPPORTS_SCT_CONFIG}' \
 "
 EXTRA_OEMAKE_append_qcs40x = " 'DISABLE_PARALLEL_DOWNLOAD_FLASH=1'"
 NAND_SQUASHFS_SUPPORT = "${@bb.utils.contains('DISTRO_FEATURES', 'nand-squashfs', '1', '0', d)}"
