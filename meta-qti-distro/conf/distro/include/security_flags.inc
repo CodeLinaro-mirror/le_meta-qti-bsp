@@ -70,6 +70,9 @@ SECURITY_CFLAGS:pn-lib32-qmmf-sdk = "${SECURITY_PIC_CFLAGS}"
 #
 SECURITY_CFLAGS:remove:pn-ebtables = "-D_FORTIFY_SOURCE=2"
 
+# PACKAGES which will runtime sigabrt with _FORTIFY_SOURCE
+SECURITY_CFLAGS:remove:pn-tar = "-D_FORTIFY_SOURCE=2"
+
 #
 ### PACKAGES which can't compile with security format strings check
 #
