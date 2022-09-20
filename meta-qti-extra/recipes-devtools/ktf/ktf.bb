@@ -16,7 +16,7 @@ S = "${WORKDIR}/git"
 
 inherit autotools-brokensep pkgconfig module module-sign
 
-DEPENDS += "gtest libnl"
+DEPENDS += "googletest libnl"
 
 do_configure[depends] += "virtual/kernel:do_shared_workdir"
 
