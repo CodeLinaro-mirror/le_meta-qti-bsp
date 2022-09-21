@@ -16,7 +16,7 @@ do_makeuserdata() {
         bbnote "Generating ${USERDATAIMAGE_TARGET} with f2fs file system"
         dd if=${IMAGE_ROOTFS}/${USERDATA_DIR} of=${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${USERDATAIMAGE_TARGET} \
 	      seek=${USERDATA_IMAGE_ROOTFS_SIZE} count=0 bs=1
-        make_f2fs -O encrypt -S ${USERDATA_IMAGE_ROOTFS_SIZE} -f -R root:root \
+        mkfs.f2fs -O encrypt -S ${USERDATA_IMAGE_ROOTFS_SIZE} -f -R root:root \
 	      ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${USERDATAIMAGE_TARGET}
     else
         bbnote "Generating ${USERDATAIMAGE_TARGET} with ext4 file system"
