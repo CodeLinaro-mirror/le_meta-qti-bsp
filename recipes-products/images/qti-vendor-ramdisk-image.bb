@@ -10,7 +10,7 @@ EXTRA_IMAGEDEPENDS_remove = "edk2"
 PACKAGE_INSTALL = "\
     gki-kernel-modules-first-stage \
     first-stage-scripts \
-    cryptsetup \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'dm-verity-initramfs-v2', 'cryptsetup verity-scripts lvm2-udevrules', '', d)} \
 "
 
 IMAGE_FSTYPES = "${INITRAMFS_FSTYPES}"

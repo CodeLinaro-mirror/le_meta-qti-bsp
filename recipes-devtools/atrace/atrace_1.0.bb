@@ -13,11 +13,11 @@ BSD-3-Clause-Clear;md5=3771d4920bd6cdb8cbdf1e8344489ee0"
 DEPENDS = "libbase libcutils libutils zlib"
 DEPENDS += "liblog"
 
-ANDROID_MIRROR = "android.googlesource.com"
 S = "${WORKDIR}/git"
 # matches with android11-mainline-release release
-SRCREV_native = "7fcf4360299b4ef13d5ac60ce792ebce619a1c7f"
-SRC_URI = "git://${ANDROID_MIRROR}/platform/frameworks/native;name=native;protocol=https;nobranch=1;destsuffix=git \
+SRCREV= "b9adcf3bf476d7b2b529a7c21a402590480d4fdd"
+
+SRC_URI = "${CLO_LA_GIT}/platform/frameworks/native;name=native;protocol=https;branch=aosp-new/android11-gsi;destsuffix=git \
            file://atrace_le.patch;patchdir=${S} \
           "
 

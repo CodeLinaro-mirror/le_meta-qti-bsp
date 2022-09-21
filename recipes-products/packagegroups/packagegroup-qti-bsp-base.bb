@@ -9,6 +9,7 @@ PROVIDES = "${PACKAGES}"
 USB_SUPPORT = "${@d.getVar('MACHINE_SUPPORTS_USB') or "True"}"
 DISABLE_USBD_SUPPORT = "${@d.getVar('USB_PERIPHERAL_ONLY_MODE') or "False"}"
 
+USB_AUTOSUSPEND_SUPPORT = "${@d.getVar('MACHINE_SUPPORTS_USB_AUTOSUSPEND') or "True"}"
 PROPERTIES_SUPPORT = "${@d.getVar('MACHINE_SUPPORTS_ANDROID_PROPERTIES') or "True"}"
 
 PACKAGES = ' \
@@ -36,7 +37,7 @@ ADDON_SCRIPTS_neo = "helios-start"
 RDEPENDS_packagegroup-startup-scripts-base = "\
     ${@bb.utils.contains('COMBINED_FEATURES', 'qti-ab-boot', 'ab-slot-util', '', d)} \
     ${@oe.utils.conditional('USB_SUPPORT', 'True', 'usb-composition', '', d)} \
-    ${@oe.utils.conditional('DISABLE_USB_SUPPORT', 'True', '', 'usb-composition-usbd', d)} \
+    ${@oe.utils.conditional('USB_AUTOSUSPEND_SUPPORT', 'True', oe.utils.conditional('DISABLE_USBD_SUPPORT', 'True', '', 'usb-composition-usbd', d), '', d)} \
     post-boot \
     sdcard-scripts-automount \
     ${ADDON_SCRIPTS} \

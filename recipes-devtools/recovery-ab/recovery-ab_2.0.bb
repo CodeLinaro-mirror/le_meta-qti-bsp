@@ -17,6 +17,7 @@ FILESPATH =+ "${WORKSPACE}:"
 
 SRC_URI = "file://OTA/recovery/"
 SRC_URI += "file://fstab_AB"
+SRC_URI += "file://fstab_AB_cache_ext4"
 SRC_URI += "file://update_engine.service"
 
 S = "${WORKDIR}/OTA/recovery/"
@@ -46,7 +47,13 @@ do_install[prefuncs] += "${@bb.utils.contains('MACHINE_FEATURES', 'ota-package-v
 do_install_append() {
         install -d ${D}/res/
         install -d ${D}/cache/recovery
-        install -m 0755 ${WORKDIR}/fstab_AB -D ${D}/res/recovery_volume_config
+        if ${@bb.utils.contains('IMAGE_FSTYPES', 'ext4', 'true', 'false', d)}; then
+            if ${@bb.utils.contains_any('MACHINE_MNT_POINTS', '/overlay', 'true', 'false', d)}; then
+                install -m 0755 ${WORKDIR}/fstab_AB -D ${D}/res/recovery_volume_config
+            elif ${@bb.utils.contains_any('MACHINE_MNT_POINTS', '/cache', 'true', 'false', d)}; then
+                install -m 0755 ${WORKDIR}/fstab_AB_cache_ext4 -D ${D}/res/recovery_volume_config
+            fi
+        fi
         install -d ${D}${systemd_unitdir}/system/
         install -m 0644 ${WORKDIR}/update_engine.service -D \
                  ${D}${systemd_unitdir}/system/update_engine.service
