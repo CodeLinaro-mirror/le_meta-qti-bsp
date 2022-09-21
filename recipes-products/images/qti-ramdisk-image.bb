@@ -39,6 +39,8 @@ SYSTEMD_DEFAULT_TARGET = "initrd.target"
 
 inherit core-image
 
+do_rootfs[nostamp] = "1"
+
 # Add dependency on vendor ramdisk
 python () {
     if ((int(d.getVar("BOOT_HEADER_VERSION") or "0") >= 3) and (d.getVar("SKIP_VENDOR_BOOT") or "True") == "False"):

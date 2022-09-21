@@ -4,6 +4,8 @@ LICENSE = "BSD-3-Clause"
 
 inherit core-image
 
+do_rootfs[nostamp] = "1"
+
 # Ramdisk image generation doesn't need abl
 EXTRA_IMAGEDEPENDS_remove = "edk2"
 
