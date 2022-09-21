@@ -1,20 +1,20 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}-${PV}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}-${PV}:"
 DEPENDS = "base-passwd"
 
-SRC_URI_append += "file://fstab"
+SRC_URI:append += "file://fstab"
 
-dirs755_append = " /media/cf /media/net /media/ram \
+dirs755:append = " /media/cf /media/net /media/ram \
             /media/union /media/realroot /media/hdd /media/mmc1"
 
 # userdata mount point is present by default in all machines.
 # TODO: Add this path to MACHINE_MNT_POINTS in machine conf.
-dirs755_append = " ${userfsdatadir}"
-dirs755_append = " /cache /persist"
+dirs755:append = " ${userfsdatadir}"
+dirs755:append = " /cache /persist"
 
-dirs755_append = " ${MACHINE_MNT_POINTS}"
+dirs755:append = " ${MACHINE_MNT_POINTS}"
 
 # Overlay
-dirs755_append = " /overlay"
+dirs755:append = " /overlay"
 
 # Explicitly remove sepolicy entries from fstab when selinux is not present.
 fix_sepolicies () {
@@ -25,7 +25,7 @@ fix_sepolicies () {
 }
 do_install[prefuncs] += " ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', '', 'fix_sepolicies', d)}"
 
-do_install_append(){
+do_install:append(){
     install -m 755 -o diag -g diag -d ${D}/media
     install -m 755 -o diag -g diag -d ${D}/mnt/sdcard
 
@@ -39,7 +39,7 @@ do_install_append(){
 
 }
 
-do_install_append() {
+do_install:append() {
     install -d ${D}/lib/firmware
     ln -s /firmware/image ${D}/lib/firmware/updates
 # Don't install fstab for systemd targets

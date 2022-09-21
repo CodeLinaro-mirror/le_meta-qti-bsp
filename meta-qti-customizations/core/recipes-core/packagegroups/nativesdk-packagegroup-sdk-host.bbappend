@@ -1,7 +1,7 @@
 # Limit QTI eSDK only to following nativesdk packages.
 # There is no qemu support.
 
-RDEPENDS_${PN}_qti-distro-base = "\
+RDEPENDS:${PN}_qti-distro-base = "\
     nativesdk-pkgconfig \
     nativesdk-pseudo \
     nativesdk-unfs3 \
