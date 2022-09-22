@@ -22,3 +22,4 @@ RDEPENDS:${PN} += "\
     display-commonsys-intf-linux \
     ${@bb.utils.contains('LAYERSERIES_COMPAT_yocto', 'dunfell', '', 'weston-sdm-extension', d)} \
     "
+RDEPENDS:${PN}:remove:lemans = "wayland-ivi-extension"

@@ -26,6 +26,7 @@ DEPENDS += "cairo \
             wayland wayland-native wayland-protocols \
             weston \
 "
+DEPENDS:remove:lemans = " virtual/egl"
 
 TARGET_CPPFLAGS += "-I${STAGING_INCDIR}/libdrm \
                     -I${STAGING_INCDIR}/qcom/display \
@@ -38,6 +39,7 @@ TARGET_CPPFLAGS += "-I${STAGING_INCDIR}/libdrm \
 
 # fix for uapi msm_drm.h header file related compilation issue
 TARGET_CPPFLAGS += "-fno-operator-names"
+TARGET_CPPFLAGS:append:lemans += " -DPIXMAN_RENDER"
 
 PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'early_init', 'early', '', d)}"
 # early-init
