@@ -1,6 +1,5 @@
 # Convert human readable partition sizes into bytes
 SYSTEM_IMAGE_ROOTFS_SIZE   = "${@get_size_in_bytes(d.getVar('SYSTEM_SIZE_EXT4') or '256MB')}"
-USERDATA_IMAGE_ROOTFS_SIZE = "${@get_size_in_bytes(d.getVar('USERDATA_SIZE_EXT4') or '1GB')}"
 
 # if A/B support is supported, generate OTA pkg by default.
 GENERATE_AB_OTA_PACKAGE ?= "${@bb.utils.contains('COMBINED_FEATURES', 'qti-ab-boot', '1', '', d)}"
@@ -28,8 +27,6 @@ do_image_ext4[noexec] = "1"
 SYSTEMIMAGE_TARGET ?= "system.img"
 SYSTEMIMAGE_UNSPARSE_TARGET ?= "system.img.unsparse"
 SYSTEMIMAGE_MAP_TARGET ?= "system.map"
-USERDATAIMAGE_TARGET ?= "userdata.img"
-USERDATAIMAGE_MAP_TARGET ?= "userdata.map"
 VDLKMIMAGE_TARGET ?= "vendor_dlkm.img"
 VDLKMIMAGE_UNSPARSE_TARGET ?= "vendor_dlkm.img.unspase"
 VDLKMIMAGE_MAP_TARGET ?= "vendor_dlkm.map"
@@ -214,21 +211,3 @@ do_makesystem() {
     done
 }
 addtask do_makesystem after do_image before do_image_complete
-
-################################################
-### Generate userdata.img ###
-################################################
-USERDATA_DIR ??= "data"
-do_makeuserdata[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
-
-do_makeuserdata() {
-    cp ${MACHINE_FSCONFIG_CONF_FULL_PATH} ${WORKDIR}/rootfs-fsconfig.conf
-    make_ext4fs -C ${WORKDIR}/rootfs-fsconfig.conf \
-                -B ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${USERDATAIMAGE_MAP_TARGET} \
-                -a /data ${IMAGE_EXT4_SELINUX_OPTIONS} \
-                ${SPARSE_SYSTEMIMAGE_FLAG} -b 4096 -l ${USERDATA_IMAGE_ROOTFS_SIZE} \
-                ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${USERDATAIMAGE_TARGET} \
-                ${IMAGE_ROOTFS}/${USERDATA_DIR}
-}
-
-addtask do_makeuserdata after do_image before do_build

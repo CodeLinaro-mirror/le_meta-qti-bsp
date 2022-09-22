@@ -15,12 +15,13 @@ MACHINE_MNT_POINTS = "/firmware \
 # systemd auto generated mount paths
 GENERATED_MACHINE_MNT_POINTS = "/lib/modules"
 
-# Define userdata dir to be used
+# Define userdata dir, size and file system type to be used
 USERDATA_DIR = "${@bb.utils.contains('MACHINE_MNT_POINTS', '/overlay', 'overlay', 'data', d)}"
+USERDATA_SIZE ?= "16GiB"
+USERDATA_FSTYPE = "ext4"
 
 # Sizes for EXT4 partitions
 SYSTEM_SIZE_EXT4 ?= "800MiB"
-USERDATA_SIZE_EXT4 ?= "16GiB"
 VDLKM_SIZE_EXT4 ?= "64MiB"
 
 # Formats of root filesystem images.

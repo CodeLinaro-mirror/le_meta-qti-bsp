@@ -31,5 +31,5 @@ Before=local-fs.target
 [Mount]
 What=/dev/disk/by-partlabel/userdata
 Where=/overlay
-Type=ext4
+Type=@TYPE@
 Options=noatime,nosuid,nodev,barrier=1,data=ordered,noauto_da_alloc,discard,noexec,noauto,x-systemd.automount,x-systemd.growfs,rootcontext=system_u:object_r:overlay_t:s0,inlinecrypt
