@@ -36,6 +36,9 @@ TARGET_CPPFLAGS += "-I${STAGING_INCDIR}/libdrm \
                     -I${STAGING_INCDIR}/linux-msm/display \
 "
 
+# fix for uapi msm_drm.h header file related compilation issue
+TARGET_CPPFLAGS += "-fno-operator-names"
+
 PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'early_init', 'early', '', d)}"
 # early-init
 PACKAGECONFIG[early] = "-Denable-early-boot=true,-Denable-early-boot=false"
