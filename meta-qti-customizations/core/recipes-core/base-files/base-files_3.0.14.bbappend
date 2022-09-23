@@ -6,6 +6,7 @@ SRC_URI:append += "file://fstab"
 dirs755:append = " /media/cf /media/net /media/ram \
             /media/union /media/realroot /media/hdd /media/mmc1"
 
+
 # userdata mount point is present by default in all machines.
 # TODO: Add this path to MACHINE_MNT_POINTS in machine conf.
 dirs755:append = " ${userfsdatadir}"

@@ -1,1 +1,1 @@
-RDEPENDS_${PN}-module-overload += "${PN}-module-overloading"
+RDEPENDS:${PN}-module-overload += "${PN}-module-overloading"
