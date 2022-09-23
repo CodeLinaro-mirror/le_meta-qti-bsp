@@ -7,3 +7,6 @@ DEPENDS += "ext4-utils-native mkbootimg-native"
 
 inherit core-image
 
+IMAGE_ROOTFS_SIZE = "716800"
+
+USERDATA_SIZE_EXT4 = "1000000000"
