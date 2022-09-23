@@ -15,7 +15,7 @@ fix_sepolicies_ubi () {
 
 do_install[prefuncs] += " ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', '', 'fix_sepolicies_ubi', d)}"
 
-do_install_append () {
+do_install:append () {
 
     add_ubi_scripts
     if ${@bb.utils.contains('DISTRO_FEATURES','nand-squashfs','true','false',d)}; then

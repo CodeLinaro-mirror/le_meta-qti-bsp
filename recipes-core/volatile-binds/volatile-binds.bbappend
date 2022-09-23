@@ -1,8 +1,8 @@
-FILESEXTRAPATHS_prepend_cinder := "${THISDIR}/files:"
-FILESEXTRAPATHS_prepend_sdxlemur := "${THISDIR}/files:"
-FILESEXTRAPATHS_prepend_sa2150p-nand := "${THISDIR}/files:"
-FILESEXTRAPATHS_prepend_sa410m := "${THISDIR}/files:"
-FILESEXTRAPATHS_prepend_sa515m := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend_cinder := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend_sdxlemur := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend_sa2150p-nand := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend_sa410m := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend_sa515m := "${THISDIR}/files:"
 
 REQUIRED_DISTRO_FEATURES = ""
 SRC_URI += "\
@@ -10,7 +10,7 @@ SRC_URI += "\
     ${@bb.utils.contains('MACHINE_MNT_POINTS', '/systemrw', 'file://umount-copybind', '', d)} \
     ${@bb.utils.contains('MACHINE_MNT_POINTS', '/systemrw', 'file://volatile-binds.service.in', '', d)} \
 "
-do_install_append () {
+do_install:append () {
     if ${@bb.utils.contains('MACHINE_MNT_POINTS', '/systemrw', 'true', 'false', d)}; then
         install -d ${D}${base_sbindir}
         install -m 0755 mount-copybind ${D}${base_sbindir}/

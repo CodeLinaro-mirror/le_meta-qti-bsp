@@ -1,15 +1,15 @@
 SECTION = "base"
 DESCRIPTION = "Script to manage module configuration files"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM="file://update-modules;startline=3;endline=5;md5=a907c58943cce6a1032aaec56181d6d6"
 PACKAGE_ARCH = "all"
 INHIBIT_DEFAULT_DEPS = "1"
-RDEPENDS_${PN} = "${@bb.utils.contains("MACHINE_FEATURES", "kernel26",  "module-init-tools-depmod","modutils-depmod",d)} "
+RDEPENDS:${PN} = "${@bb.utils.contains("MACHINE_FEATURES", "kernel26",  "module-init-tools-depmod","modutils-depmod",d)} "
 PR = "r12"
 
 SRC_URI = "file://update-modules"
 
-pkg_postinst_${PN}() {
+pkg_postinst:${PN}() {
 if [ "x$D" != "x" ]; then
 	exit 1
 fi
