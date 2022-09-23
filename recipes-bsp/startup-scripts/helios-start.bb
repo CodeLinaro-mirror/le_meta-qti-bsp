@@ -13,6 +13,6 @@ do_install() {
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-SYSTEMD_SERVICE_${PN} = "helios_start.service"
+SYSTEMD_SERVICE:${PN} = "helios_start.service"
 
-FILES_${PN} += "${systemd_unitdir}/system"
+FILES:${PN} += "${systemd_unitdir}/system"

@@ -16,9 +16,9 @@ inherit update-rc.d
 
 INITSCRIPT_NAME = "trigger-recovery-updater.sh"
 INITSCRIPT_PARAMS = "start 72 S ."
-INITSCRIPT_PARAMS_mdm = "start 72 S ."
+INITSCRIPT_PARAMS:mdm = "start 72 S ."
 
-FILES_${PN} += "${systemd_unitdir}/system/"
+FILES:${PN} += "${systemd_unitdir}/system/"
 
 do_install() {
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then

@@ -9,7 +9,7 @@ PR = "r1"
 
 inherit systemd
 
-FILES_${PN} += "${systemd_unitdir}/system/"
+FILES:${PN} += "${systemd_unitdir}/system/"
 
 do_install() {
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', bb.utils.contains('DISTRO_FEATURES', 'userfs-factory-reset', 'true', 'false', d), 'false', d)}

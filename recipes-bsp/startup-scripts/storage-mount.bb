@@ -30,7 +30,7 @@ do_install() {
 }
 
 
-pkg_postinst_${PN} () {
+pkg_postinst:${PN} () {
         if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'false', 'true', d)}; then
          update-alternatives --install ${sysconfdir}/init.d/storage-mount.sh storage-mount.sh storage-mount.sh 60
          [ -n "$D" ] && OPT="-r $D" || OPT="-s"
@@ -40,4 +40,4 @@ pkg_postinst_${PN} () {
        fi
 }
 
-FILES_${PN} += "${systemd_unitdir}/system/"
+FILES:${PN} += "${systemd_unitdir}/system/"
