@@ -6,7 +6,7 @@ IMAGETYPE = "ext4"
 do_install[prefuncs] += " ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', '', 'fix_sepolicies', d)}"
 do_install[prefuncs] += " ${@bb.utils.contains('MACHINE_FEATURES', 'qti-ab-boot', 'fix_mount_services', '', d)}"
 
-do_install_append () {
+do_install:append () {
 
     if ${@bb.utils.contains('MACHINE_MNT_POINTS', '$userfsdatadir', 'true', 'false', d)}; then
         # Run fsck at boot
@@ -21,4 +21,4 @@ do_install_append () {
 
 }
 
-SYSTEMD_SERVICE_${PN} += "${@bb.utils.contains('COMBINED_FEATURES','qti-ab-boot',' set-slotsuffix.service','',d)}"
+SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('COMBINED_FEATURES','qti-ab-boot',' set-slotsuffix.service','',d)}"

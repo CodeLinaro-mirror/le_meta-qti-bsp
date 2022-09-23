@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/systemd:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/systemd:"
 
 SRC_URI += "file://Disable-unused-mount-points.patch"
 SRC_URI += "file://systemd-udevd.service"
@@ -58,18 +58,18 @@ PACKAGECONFIG = " \
     xz \
 "
 # Don't support coredump generation for user builds.
-PACKAGECONFIG_remove_qti-distro-user = "coredump"
+PACKAGECONFIG:remove_qti-distro-user = "coredump"
 
 EXTRA_OEMESON += " -Defi=false"
 EXTRA_OEMESON += " -Dhwdb=false"
 
-CFLAGS_append = " -fPIC"
+CFLAGS:append = " -fPIC"
 
 # In aarch64 targets systemd is not booting with -finline-functions -finline-limit=64 optimizations
 # So temporarily revert to default optimizations for systemd.
 SELECTED_OPTIMIZATION = "-O2 -fexpensive-optimizations -frename-registers -fomit-frame-pointer -ftree-vectorize"
 
-do_install_append () {
+do_install:append () {
    install -d ${D}/etc/systemd/system/
    install -d ${D}/lib/systemd/system/ffbm.target.wants
    install -d ${D}/etc/systemd/system/ffbm.target.wants
@@ -122,15 +122,15 @@ do_install_append () {
 }
 
 # Run fsck as part of local-fs-pre.target instead of local-fs.target
-do_install_append () {
+do_install:append () {
    # remove from After
    sed -i '/After/s/local-fs-pre.target//' ${D}${systemd_unitdir}/system/systemd-fsck@.service
    # Add to Before
    sed -i '/Before/s/$/ local-fs-pre.target/' ${D}${systemd_unitdir}/system/systemd-fsck@.service
 }
 
-RRECOMMENDS_${PN}_remove += "systemd-extra-utils"
-PACKAGES_remove += "${PN}-extra-utils"
+RRECOMMENDS:${PN}:remove += "systemd-extra-utils"
+PACKAGES:remove += "${PN}-extra-utils"
 
-FILES_${PN} += "/etc/initscripts \
+FILES:${PN} += "/etc/initscripts \
                 ${sysconfdir}/udev/rules.d ${userfsdatadir}/*"

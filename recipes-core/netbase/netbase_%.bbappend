@@ -1,2 +1,2 @@
 PR = "r1"
-FILESEXTRAPATHS_prepend := "${THISDIR}/${P}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${P}:"

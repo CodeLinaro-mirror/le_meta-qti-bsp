@@ -10,7 +10,7 @@ PACKAGES =  "\
 # Remote debugging can be carried out(through adb port forwarding)
 # on target gdb takes up considerable storage.
 # Avoid gdb on target.
-RDEPENDS_packagegroup-qti-debug-tools = " \
+RDEPENDS:packagegroup-qti-debug-tools = " \
             gdbserver \
             strace \
             valgrind \

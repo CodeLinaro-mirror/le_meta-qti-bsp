@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/systemd:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/systemd:"
 
 SRC_URI += "file://sysctl-coredump.conf"
 SRC_URI += "file://limits-coredump.conf"
@@ -12,7 +12,7 @@ no_logs_to_console = "${@d.getVar('NO_SYS_JOURNAL_LOGS_TO_CONSOLE')}"
 
 SYSTEMD_COREDUMP_PATH ?= "${userfsdatadir}/coredump"
 
-do_install_append() {
+do_install:append() {
    if [ "${COREDUMP}" == "1" ]; then
        sed -i "s#@COREDUMP_PATH@#${SYSTEMD_COREDUMP_PATH}#" ${WORKDIR}/sysctl-coredump.conf
 
@@ -30,10 +30,10 @@ do_install_append() {
    fi
 }
 
-FILES_${PN} += "${sysconfdir}/sysctl.d/* ${sysconfdir}/security/limits.d/* ${SYSTEMD_COREDUMP_PATH}"
+FILES:${PN} += "${sysconfdir}/sysctl.d/* ${sysconfdir}/security/limits.d/* ${SYSTEMD_COREDUMP_PATH}"
 
 # journald.conf
-do_install_append() {
+do_install:append() {
    if [ "${no_logs_to_console}" != "1" ]; then
        # Redirect journal logs to console.
        sed -i '$aForwardToConsole=yes' ${D}${systemd_unitdir}/journald.conf.d/00-${PN}.conf
@@ -44,13 +44,13 @@ do_install_append() {
 }
 
 # logind.conf
-do_install_append() {
+do_install:append() {
     # Ignore PowerKey
     sed -i '$aHandlePowerKey=ignore' ${D}${systemd_unitdir}/logind.conf.d/00-${PN}.conf
 }
 
 # system.conf
-do_install_append() {
+do_install:append() {
    if [ "${no_logs_to_console}" != "1" ]; then
        # Redirect system logs to both console and syslog.
        sed -i '$aStandardOutput=syslog+console' ${D}${systemd_unitdir}/system.conf.d/00-${PN}.conf
@@ -63,5 +63,5 @@ do_install_append() {
 }
 
 # user.conf
-do_install_append() {
+do_install:append() {
 }
