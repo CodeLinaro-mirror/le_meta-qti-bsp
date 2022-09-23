@@ -26,8 +26,8 @@ PACKAGECONFIG[sensors]  = "--enable-sensors, --disable-sensors"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 # Specify the path to look for hals
-EXTRA_OECONF_append = " --with-hal-path=${libdir}"
-EXTRA_OECONF_append_kona = " BOARD_SUPPORTS_ANDROID_Q_AUDIO=true"
-EXTRA_OECONF_append_sdxlemur = " BOARD_SUPPORTS_ANDROID_Q_AUDIO=true"
-EXTRA_OECONF_append_qrbx210-rbx = " BOARD_SUPPORTS_ANDROID_Q_AUDIO=true"
-EXTRA_OECONF_append_sdmsteppe = " BOARD_SUPPORTS_ANDROID_Q_AUDIO=true"
+EXTRA_OECONF:append = " --with-hal-path=${libdir}"
+EXTRA_OECONF:append_kona = " BOARD_SUPPORTS_ANDROID_Q_AUDIO=true"
+EXTRA_OECONF:append_sdxlemur = " BOARD_SUPPORTS_ANDROID_Q_AUDIO=true"
+EXTRA_OECONF:append_qrbx210-rbx = " BOARD_SUPPORTS_ANDROID_Q_AUDIO=true"
+EXTRA_OECONF:append_sdmsteppe = " BOARD_SUPPORTS_ANDROID_Q_AUDIO=true"

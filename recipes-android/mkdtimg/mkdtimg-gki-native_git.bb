@@ -15,8 +15,8 @@ S = "${WORKDIR}"
 do_compile[noexec] = "1"
 do_configure[noexec] = "1"
 
-SYSROOT_PREPROCESS_FUNCS_remove = "relocatable_binaries_preprocess"
-SYSROOT_PREPROCESS_FUNCS_remove = "relocatable_native_pcfiles"
+SYSROOT_PREPROCESS_FUNCS:remove = "relocatable_binaries_preprocess"
+SYSROOT_PREPROCESS_FUNCS:remove = "relocatable_native_pcfiles"
 INHIBIT_SYSROOT_STRIP = "1"
 
 # uninative.bbclass by default gets inherited into all native recipes.
