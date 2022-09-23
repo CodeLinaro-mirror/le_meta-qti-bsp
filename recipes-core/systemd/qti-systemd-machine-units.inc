@@ -2,7 +2,35 @@
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 
-SRC_URI = "file://*"
+FILESEXTRAPATHS:prepend := "${THISDIR}/systemd-machine-units:"
+SRC_URI += " file://dash.mount"
+SRC_URI += " file://dsp.mount"
+SRC_URI += " file://media-ram.mount"
+SRC_URI += " file://post_hibernate.sh"
+SRC_URI += " file://pre_hibernate.sh"
+SRC_URI += " file://proc-bus-usb.mount"
+SRC_URI += " file://var-volatile.mount"
+SRC_URI += " file://bt_firmware.mount"
+SRC_URI += " file://firmware.mount"
+SRC_URI += " file://overlay.mount"
+SRC_URI += " file://persist.mount"
+SRC_URI += " file://systemrw.mount"
+SRC_URI += " file://overlay-etc.mount"
+SRC_URI += " file://overlay-data.mount"
+SRC_URI += " file://overlay-cache.mount"
+SRC_URI += " file://overlay-workdir.sh"
+SRC_URI += " file://overlay-workdir.service"
+
+SRC_URI += " file://bt_firmware-mount.service"
+SRC_URI += " file://cache.mount"
+SRC_URI += " file://data.mount"
+SRC_URI += " file://dsp-mount.service"
+SRC_URI += " file://firmware-mount.service"
+SRC_URI += " file://overlay-usr-share.mount"
+SRC_URI += " file://set-slotsuffix.service"
+SRC_URI += " file://systemrw.conf"
+SRC_URI += " file://systemrw.mount"
+
 S = "${WORKDIR}"
 
 IMAGETYPE ??= ""
@@ -10,7 +38,7 @@ USERDATA_FSTYPE ??= "ext4"
 OVERLAY_MNT_POINTS ??= "etc data cache"
 OVERLAY_MNT_POINTS_qrb5165 = "etc data cache usr-share"
 
-do_install_append () {
+do_install:append () {
     install -d 0644 ${D}${sysconfdir}/initscripts
     install -d 0644 ${D}${systemd_unitdir}/system
     install -d 0644 ${D}${systemd_unitdir}/system/local-fs.target.requires
@@ -129,15 +157,15 @@ def get_mnt_services(d):
 
     return " ".join(services)
 
-SYSTEMD_SERVICE_${PN} += "${@get_mnt_services(d)}"
+SYSTEMD_SERVICE:${PN} += "${@get_mnt_services(d)}"
 
 PACKAGES =+ " ${PN}-generators "
 
-FILES_${PN} += " ${systemd_unitdir}/*"
-FILES_${PN}-generators = " ${systemd_unitdir}/system-generators/* "
+FILES:${PN} += " ${systemd_unitdir}/*"
+FILES:${PN}-generators = " ${systemd_unitdir}/system-generators/* "
 
-ALLOW_EMPTY_${PN}-generators = "1"
+ALLOW_EMPTY:${PN}-generators = "1"
 
-RDEPENDS_${PN} += "${PN}-generators"
+RDEPENDS:${PN} += "${PN}-generators"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
