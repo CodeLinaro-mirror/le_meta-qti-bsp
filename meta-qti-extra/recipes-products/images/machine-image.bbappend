@@ -6,7 +6,7 @@ IMAGE_INSTALL += "\
 "
 
 # Add libgomp support
-IMAGE_INSTALL += "libgomp libgomp-dev libgomp-staticdev"
+IMAGE_INSTALL += "libgomp"
 
 # Add kdump support
 do_rootfs[depends] += "${@bb.utils.contains('DISTRO_FEATURES', 'kdump-support', 'machine-kdump-image:do_image_complete', '', d)}"
