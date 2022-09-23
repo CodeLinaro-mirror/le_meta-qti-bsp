@@ -1,10 +1,10 @@
 DESCRIPTION = "A full-featured SSL VPN solution via tun device."
 HOMEPAGE = "http://openvpn.sourceforge.net"
 SECTION = "console/network"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=5aac200199fde47501876cba7263cb0c"
 DEPENDS = "lzo openssl"
-RRECOMMENDS_${PN} = "kernel-module-tun"
+RRECOMMENDS:${PN} = "kernel-module-tun"
 
 inherit autotools
 
@@ -16,7 +16,7 @@ CFLAGS += "-fno-inline"
 # I want openvpn to be able to read password from file (hrw)
 EXTRA_OECONF += "--enable-password-save"
 
-do_install_append() {
+do_install:append() {
         install -d ${D}/${sysconfdir}/init.d
         install -d ${D}/${sysconfdir}/openvpn
         install -m 755 ${WORKDIR}/openvpn ${D}/${sysconfdir}/init.d
