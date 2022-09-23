@@ -8,7 +8,7 @@ HOMEPAGE = "https://www.codeaurora.org/gitweb/quic/la?p=platform/bootable/recove
 PR = "r1"
 
 DEPENDS += "bzip2-replacement-native"
-RDEPENDS_${PN} = "zlib"
+RDEPENDS:${PN} = "zlib"
 
 FILESPATH =+ "${WORKSPACE}/OTA/recovery/:"
 SRC_URI   = "file://applypatch"
