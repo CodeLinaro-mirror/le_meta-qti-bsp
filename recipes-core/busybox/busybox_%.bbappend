@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 INIT_RAMDISK = "${@d.getVar('MACHINE_SUPPORTS_INIT_RAMDISK') or "False"}"
 
@@ -19,8 +19,6 @@ SRC_URI += "\
             file://busybox-syslog.service \
             file://busybox_klogd.patch;patchdir=.. \
             file://iio.sh \
-            file://0001-Support-MTP-function.patch \
-            file://fix-mdev-crash.patch \
             file://sensors.sh \
             file://add_lock_util.patch \
 "
@@ -30,7 +28,7 @@ SRC_URI += "\
 # Another for the rest of the components.
 BUSYBOX_SPLIT_SUID = "1"
 
-FILES_${PN} += "/usr/bin/env"
+FILES:${PN} += "/usr/bin/env"
 
 VIRT_RM_BIN_LIST = "CONFIG_BRCTL \
              CONFIG_FDFORMAT \
@@ -41,7 +39,7 @@ VIRT_RM_BIN_LIST = "CONFIG_BRCTL \
              CONFIG_SCRIPT \
              CONFIG_SETSID"
 
-do_configure_append() {
+do_configure:append() {
 
     ## virtualization will enable util-linux whose binaries will be partly same as busybox and
     ## lead to compilation issue. update-alternatives.bbclass may not be suitable for this case
@@ -55,7 +53,7 @@ do_configure_append() {
     fi
 }
 
-do_install_append() {
+do_install:append() {
     # systemd is udev compatible.
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
         install -d ${D}${systemd_unitdir}/system/
