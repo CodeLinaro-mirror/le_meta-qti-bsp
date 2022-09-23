@@ -1,6 +1,6 @@
 inherit autotools systemd useradd
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 SRC_URI   = "file://${BASEMACHINE}/system.prop"
 SRC_URI  += "file://persist-prop.sh"
@@ -8,12 +8,14 @@ SRC_URI  += "file://persist-prop.service"
 
 DESCRIPTION = "Script to populate system properties"
 
-LICENSE = "BSD"
+LICENSE = "BSD-Source-Code"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
-${LICENSE};md5=3775480a712fc46a69647678acb234cb"
+${LICENSE};md5=fe8b41221d7524c70688f7d059ff6d87"
+
+USERADD_PACKAGES = "${PN}"
 
 SYSTEMD_PACKAGES = "${@bb.utils.contains('DISTRO_FEATURES','systemd','${PN}','',d)}"
-SYSTEMD_SERVICE_${PN} = "${@bb.utils.contains('DISTRO_FEATURES','systemd','persist-prop.service','',d)}"
+SYSTEMD_SERVICE:${PN} = "${@bb.utils.contains('DISTRO_FEATURES','systemd','persist-prop.service','',d)}"
 
 do_compile() {
     # Remove empty lines and lines starting with '#'
@@ -33,6 +35,6 @@ do_install() {
 }
 
 PACKAGES = "${PN}"
-FILES_${PN} += "${base_sbindir}/"
-FILES_${PN} += "/build.prop"
-FILES_${PN} += "${systemd_unitdir}/"
+FILES:${PN} += "${base_sbindir}/"
+FILES:${PN} += "/build.prop"
+FILES:${PN} += "${systemd_unitdir}/"
