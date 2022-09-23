@@ -17,7 +17,6 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         init-ifupdown \
         ifupdown \
         libxml2 \
-        matter \
         trace-cmd \
         packagegroup-android-utils \
         packagegroup-qti-audio \
