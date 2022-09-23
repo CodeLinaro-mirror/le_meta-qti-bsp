@@ -108,25 +108,25 @@ do_install() {
    mv ${D}/usr/include/systemd ${D}/usr/include/systemdq
 }
 
-python populate_packages_prepend (){
+python populate_packages:prepend (){
     systemdlibdir = d.getVar("rootlibdir")
     do_split_packages(d, systemdlibdir, '^lib(.*)\.so\.*', 'lib%s', 'Systemd %s library', extra_depends='', allow_links=True)
 }
 PACKAGES_DYNAMIC += "^lib(systemd).*"
 
-FILES_${PN} = " ${exec_prefix}/lib/systemd \
+FILES:${PN} = " ${exec_prefix}/lib/systemd \
                "
 
-FILES_${PN}-dev += "${base_libdir}/security/*.la ${datadir}/dbus-1/interfaces/ ${sysconfdir}/rpm/macros.systemd"
+FILES:${PN}-dev += "${base_libdir}/security/*.la ${datadir}/dbus-1/interfaces/ ${sysconfdir}/rpm/macros.systemd"
 
-RDEPENDS_${PN} += "kmod dbus util-linux-mount util-linux-umount util-linux-agetty util-linux-fsck"
-RDEPENDS_${PN} += "volatile-binds update-rc.d systemd-conf"
+RDEPENDS:${PN} += "kmod dbus util-linux-mount util-linux-umount util-linux-agetty util-linux-fsck"
+RDEPENDS:${PN} += "volatile-binds update-rc.d systemd-conf"
 
-CFLAGS_append = " -fPIC"
+CFLAGS:append = " -fPIC"
 
-INSANE_SKIP_${PN} += "dev-so libdir"
-INSANE_SKIP_${PN}-dbg += "libdir"
-INSANE_SKIP_${PN}-doc += " libdir"
+INSANE_SKIP:${PN} += "dev-so libdir"
+INSANE_SKIP:${PN}-dbg += "libdir"
+INSANE_SKIP:${PN}-doc += " libdir"
 
 python __anonymous() {
     if not bb.utils.contains('DISTRO_FEATURES', 'sysvinit', True, False, d):

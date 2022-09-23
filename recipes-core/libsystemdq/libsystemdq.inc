@@ -3,7 +3,7 @@ HOMEPAGE = "http://www.freedesktop.org/wiki/Software/systemd"
 
 DESCRIPTION = "libsystemdq is library for systemd  utility library"
 
-LICENSE = "LGPLv2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://LICENSE.LGPL2.1;md5=4fbd65380cdd255951079008b364516c"
 
 SRCREV = "b7ed902b2394f94e7f1fbe6c3194b5cd9a9429e6"

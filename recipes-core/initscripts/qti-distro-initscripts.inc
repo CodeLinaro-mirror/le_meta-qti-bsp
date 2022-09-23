@@ -5,7 +5,7 @@ inherit systemd
 SRC_URI += "file://umountfs"
 SRC_URI += "file://logging-restrictions.service"
 
-do_install_append() {
+do_install:append() {
          rm  ${D}${sysconfdir}/init.d/halt
          rm  ${D}${sysconfdir}/init.d/reboot
          rm  ${D}${sysconfdir}/init.d/save-rtc.sh
