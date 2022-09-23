@@ -53,9 +53,9 @@
 # PREBUILT_STRIP_${PN}-minimal = "1"
 #
 # This will create three archives:
-#   libvendor-full_1.8_aarch64.tar.gz
-#   libvendor-stripped_1.8_aarch64.tar.gz (stripped content)
-#   libvendor-minimal_1.8_aarch64.tar.gz  (stripped content)
+#   libvendor-full_1.8:aarch64.tar.gz
+#   libvendor-stripped_1.8:aarch64.tar.gz (stripped content)
+#   libvendor-minimal_1.8:aarch64.tar.gz  (stripped content)
 #
 # These prebuilt packages can then be distribuded to customers.
 #
@@ -322,9 +322,9 @@ python () {
         # Remove build-only deps ?
         inhibit_deps = d.getVar('PREBUILT_INHIBIT_DEPS')
         if inhibit_deps == "1":
-            d.setVar('DEPENDS_remove_pn-%s' % pn, d.getVar('DEPENDS'))
+            d.setVar('DEPENDS:remove:pn-%s' % pn, d.getVar('DEPENDS'))
         elif inhibit_deps != "0":
-            d.setVar('DEPENDS_remove_pn-%s' % pn, inhibit_deps)
+            d.setVar('DEPENDS:remove:pn-%s' % pn, inhibit_deps)
 
     elif d.getVar('DEPLOY_DIR_PREBUILT'):
         # Create prebuilt tarball(s)

@@ -33,7 +33,7 @@ inherit populate_sdk_ext
 
 COPY_DIRECTORY_TREE = "${COREBASE}/meta-qti-bsp/files/copy_directory_tree.sh"
 
-python copy_buildsystem_append() {
+python copy_buildsystem:append() {
     import subprocess
     # Create src directory in extensible SDK to copy the project sources
     bb.utils.mkdirhier(baseoutpath + '/src')
@@ -55,15 +55,15 @@ python copy_buildsystem_append() {
 }
 
 # To include protoc compiler in SDK
-TOOLCHAIN_HOST_TASK_append = " nativesdk-protobuf-compiler "
+TOOLCHAIN_HOST_TASK:append = " nativesdk-protobuf-compiler "
 
 # Add nativesdk-llvm-arm-toolchain in SDK to run on SDKMACHINE
-TOOLCHAIN_HOST_TASK_append = " nativesdk-llvm-arm-toolchain"
+TOOLCHAIN_HOST_TASK:append = " nativesdk-llvm-arm-toolchain"
 
 # To include kernel headers in SDK
-TOOLCHAIN_TARGET_TASK_append = " linux-msm-headers-dev"
+TOOLCHAIN_TARGET_TASK:append = " linux-msm-headers-dev"
 
 # To include kernel sources in SDK to build kernel modules
-TOOLCHAIN_TARGET_TASK_append = " kernel-devsrc"
+TOOLCHAIN_TARGET_TASK:append = " kernel-devsrc"
 
-TOOLCHAIN_TARGET_TASK_append = "  ath6kl-utils-staticdev"
+TOOLCHAIN_TARGET_TASK:append = "  ath6kl-utils-staticdev"
