@@ -10,7 +10,6 @@ DEPENDS += "\
     gstreamer1.0 \
     gstreamer1.0-plugins-base \
     linux-msm-headers \
-    media \
 "
 
 PR = "r1"
