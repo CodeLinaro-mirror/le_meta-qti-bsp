@@ -1,17 +1,17 @@
 inherit kernel
 
 DESCRIPTION = "CAF Linux Kernel"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 
 DEPENDS += " virtual/mkbootimg-native openssl-native mod-signing-keys"
-RDEPENDS_${KERNEL_PACKAGE_NAME}-base = ""
+RDEPENDS:${KERNEL_PACKAGE_NAME}-base = ""
 
-LDFLAGS_aarch64 = "-O1 --hash-style=gnu --as-needed"
+LDFLAGS:aarch64 = "-O1 --hash-style=gnu --as-needed"
 
-DEPENDS_append_aarch64 = " libgcc"
-KERNEL_CC_append_aarch64 = " ${TOOLCHAIN_OPTIONS}"
-KERNEL_LD_append_aarch64 = " ${TOOLCHAIN_OPTIONS}"
+DEPENDS:append:aarch64 = " libgcc"
+KERNEL_CC:append:aarch64 = " ${TOOLCHAIN_OPTIONS}"
+KERNEL_LD:append:aarch64 = " ${TOOLCHAIN_OPTIONS}"
 
 KERNEL_PRIORITY           = "9001"
 # Add V=1 to KERNEL_EXTRA_ARGS for verbose
@@ -54,7 +54,7 @@ do_patch_veritycert() {
 
 do_patch[postfuncs] += " ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains('MACHINE_FEATURES', 'dm-verity-bootloader', 'do_patch_veritycert', '', d), '', d)}"
 
-do_configure_prepend() {
+do_configure:prepend() {
 
     if [ ! -f "${S}/arch/${ARCH}/configs/${KERNEL_CONFIG}" ]; then
         bbfatal "KERNEL_CONFIG '${KERNEL_CONFIG}' was specified, but not present in the source tree"
@@ -80,7 +80,7 @@ do_configure_prepend() {
 KERNEL_EXTRA_ARGS += "dtbs"
 KERNEL_EXTRA_ARGS += "DTC_EXT=${STAGING_DIR_NATIVE}/usr/bin/dtc"
 
-do_compile_append() {
+do_compile:append() {
     for dtbf in ${KERNEL_DTB_NAMES}; do
         dtbs="$dtbs arch/${ARCH}/boot/dts/$dtbf"
     done
@@ -92,7 +92,7 @@ do_compile_append() {
 # when using our own module signing key kernel.bbclass will fail to copy the public part of the key
 # since it checks if the .pem file exists which is not the case, so we need to explicitely copy
 # the x509 (public key) file
-do_shared_workdir_append () {
+do_shared_workdir:append () {
     if [ -e certs/signing_key.x509 ]; then
         mkdir -p $kerneldir/certs
         cp certs/signing_key.x509 $kerneldir/certs/
@@ -120,4 +120,4 @@ do_deploy() {
 }
 
 # Put the zImage in the kernel-dev pkg
-FILES_${KERNEL_PACKAGE_NAME}-dev += "/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}"
+FILES:${KERNEL_PACKAGE_NAME}-dev += "/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}"

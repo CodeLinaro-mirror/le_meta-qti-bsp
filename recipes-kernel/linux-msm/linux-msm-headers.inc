@@ -49,8 +49,8 @@ do_install () {
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 # Allow to build empty main package, to include -dev package into the SDK
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"
 
-FILES_${PN}-dev += "linux-msm/*"
+FILES:${PN}-dev += "linux-msm/*"
 
 INHIBIT_DEFAULT_DEPS = "1"
