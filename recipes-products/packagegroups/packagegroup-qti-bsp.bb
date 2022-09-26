@@ -15,19 +15,19 @@ PACKAGES = ' \
     '
 
 # Android Core Image and Debugging utilities
-RDEPENDS_packagegroup-android-utils = "\
+RDEPENDS:packagegroup-android-utils = "\
     packagegroup-android-utils-base \
     "
 
 # Startup scripts needed during device bootup
-RDEPENDS_packagegroup-startup-scripts = "\
+RDEPENDS:packagegroup-startup-scripts = "\
     packagegroup-startup-scripts-base \
     "
 # Other essential utilites
 CHRONY ?= "chrony"
 CHRONY_sa410m = ""
 
-RDEPENDS_packagegroup-support-utils = "\
+RDEPENDS:packagegroup-support-utils = "\
     ${CHRONY} \
     libinput \
     libinput-bin \
