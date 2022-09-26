@@ -80,7 +80,7 @@ do_install() {
     install -m 0644 ${WORKDIR}/linkmodulesload.service ${D}${systemd_unitdir}/system/linkmodulesload.service
 }
 
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 PACKAGES = "${PN}-first-stage ${PN}-second-stage ${PN}-linkmodulesload"
@@ -104,7 +104,7 @@ python get_files_pn_from_conf() {
             if line.startswith('#'):
                 continue
             f_mods += [ '/lib/modules/*/' + line.rstrip() + '.ko' ]
-    d.setVar('FILES_' + pn + '-first-stage', " ".join(f_mods))
+    d.setVar('FILES:' + pn + '-first-stage', " ".join(f_mods))
 
     s_mods = [ '/etc/modules-load.d/00-secondmods.conf' ]
     with open(s_conf) as f:
@@ -113,7 +113,7 @@ python get_files_pn_from_conf() {
             if line.startswith('#'):
                 continue
             s_mods += [ '/lib/modules/*/' + line.rstrip() + '.ko' ]
-    d.setVar('FILES_' + pn + '-second-stage', " ".join(s_mods))
+    d.setVar('FILES:' + pn + '-second-stage', " ".join(s_mods))
 }
 
 PACKAGE_PREPROCESS_FUNCS += "get_files_pn_from_conf "

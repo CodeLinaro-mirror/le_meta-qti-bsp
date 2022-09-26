@@ -6,7 +6,7 @@ SRC_URI = "file://kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/"
 S = "${WORKDIR}/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/"
 PR = "r0"
 
-LICENSE = "GPL-2.0 WITH Linux-syscall-note"
+LICENSE = "GPLv2.0-with-linux-syscall-note"
 LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 
 DEPENDS += "virtual/mkdtimg-native bison-native"
@@ -60,15 +60,15 @@ addtask do_copy_kernelsource after do_unpack before do_compile
 addtask do_copy_kernelbuild after do_unpack before do_compile
 
 do_configure () {
-	:
+    :
 }
 
 do_compile () {
-	:
+    :
 }
 
 do_install () {
-	:
+    :
 }
 
 

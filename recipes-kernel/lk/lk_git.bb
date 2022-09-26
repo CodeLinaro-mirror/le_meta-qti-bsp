@@ -41,35 +41,35 @@ ENABLE_DISPLAY = "${DISPLAY_SCREEN}"
 
 EXTRA_OEMAKE = "${MY_TARGET} TOOLCHAIN_PREFIX='${TARGET_PREFIX}'  LIBGCC='${LIBGCC}' DISPLAY_SCREEN=${DISPLAY_SCREEN} ENABLE_DISPLAY=${ENABLE_DISPLAY}"
 
-EXTRA_OEMAKE_append_mdm9650 = " ENABLE_EARLY_ETHERNET=1"
+EXTRA_OEMAKE:append_mdm9650 = " ENABLE_EARLY_ETHERNET=1"
 
-EXTRA_OEMAKE_append = " TARGET_USE_SYSTEM_AS_ROOT_IMAGE=1 VERIFIED_BOOT=0 DEFAULT_UNLOCK=true EMMC_BOOT=${emmc_bootloader}"
+EXTRA_OEMAKE:append = " TARGET_USE_SYSTEM_AS_ROOT_IMAGE=1 VERIFIED_BOOT=0 DEFAULT_UNLOCK=true EMMC_BOOT=${emmc_bootloader}"
 
-EXTRA_OEMAKE_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'ab-support', '', 'APPEND_CMDLINE=1', d)}"
+EXTRA_OEMAKE:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'ab-support', '', 'APPEND_CMDLINE=1', d)}"
 
-EXTRA_OEMAKE_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'USE_LE_SYSTEMD=true', '', d)}"
+EXTRA_OEMAKE:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'USE_LE_SYSTEMD=true', '', d)}"
 
-EXTRA_OEMAKE_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'qti-vble', 'VERIFIED_BOOT_LE=1', '', d)}"
+EXTRA_OEMAKE:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'qti-vble', 'VERIFIED_BOOT_LE=1', '', d)}"
 
-EXTRA_OEMAKE_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains('MACHINE_FEATURES', 'dm-verity-bootloader', 'VERITY_LE=1', '', d), '', d)}"
+EXTRA_OEMAKE:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains('MACHINE_FEATURES', 'dm-verity-bootloader', 'VERITY_LE=1', '', d), '', d)}"
 
-EXTRA_OEMAKE_append = " 'ENABLE_LE_VARIANT=1'"
+EXTRA_OEMAKE:append = " 'ENABLE_LE_VARIANT=1'"
 
-EXTRA_OEMAKE_append_robot-som = "TARGET_USE_QSEECOM_V4=1"
+EXTRA_OEMAKE:append_robot-som = "TARGET_USE_QSEECOM_V4=1"
 
 #enable hardfloat
-EXTRA_OEMAKE_append = " ${@bb.utils.contains('TUNE_FEATURES', 'callconvention-hard', 'ENABLE_HARD_FPU=1', '', d)}"
+EXTRA_OEMAKE:append = " ${@bb.utils.contains('TUNE_FEATURES', 'callconvention-hard', 'ENABLE_HARD_FPU=1', '', d)}"
 
 #add more cflags to lk, if GCC6.3 version
-EXTRA_OEMAKE_append = " 'LKLE_CFLAGS=-Wno-shift-negative-value -Wno-misleading-indentation -Wunused-const-variable=0 -DINIT_BIN_LE=\"/sbin/init\"' "
+EXTRA_OEMAKE:append = " 'LKLE_CFLAGS=-Wno-shift-negative-value -Wno-misleading-indentation -Wunused-const-variable=0 -DINIT_BIN_LE=\"/sbin/init\"' "
 
 do_install() {
         install -d ${D}/boot
         install build-${MY_TARGET}/*.mbn ${D}/boot
 }
 
-FILES_${PN} = "/boot"
-FILES_${PN}-dbg = "/boot/.debug"
+FILES:${PN} = "/boot"
+FILES:${PN}-dbg = "/boot/.debug"
 
 do_deploy() {
         install -d ${DEPLOYDIR}
