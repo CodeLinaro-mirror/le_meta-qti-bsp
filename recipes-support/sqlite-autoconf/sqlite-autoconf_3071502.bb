@@ -3,7 +3,7 @@ SUMMARY = "SQLite is a software library that implements a self-contained, server
 transactional SQL database engine."
 HOMEPAGE = "http://www.sqlite.org/index.html"
 BUGTRACKER = "http://sourceforge.net/tracker/?group_id=243163&atid=1121516&source=navbar"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 PRIORITY = "optional"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/GPL-2.0;md5=801f80980d171dd6425610833a22dbe6"
 DEPENDS = "readline"

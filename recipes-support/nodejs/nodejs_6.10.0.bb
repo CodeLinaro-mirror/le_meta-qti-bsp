@@ -35,6 +35,6 @@ do_install() {
 	oe_runmake install DESTDIR="${D}"
 }
 
-FILES_${PN} =+ "${exec_prefix}/lib/node_modules ${bindir}npm"
+FILES:${PN} =+ "${exec_prefix}/lib/node_modules ${bindir}npm"
 
 BBCLASSEXTEND = "native nativesdk"

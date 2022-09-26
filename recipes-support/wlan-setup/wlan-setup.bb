@@ -33,4 +33,4 @@ do_install () {
         ${D}${systemd_unitdir}/system/multi-user.target.wants/dhcpcd.service
 }
 
-FILES_${PN} += "${systemd_unitdir}/*"
+FILES:${PN} += "${systemd_unitdir}/*"
