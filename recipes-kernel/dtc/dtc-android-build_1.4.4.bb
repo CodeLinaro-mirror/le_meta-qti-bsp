@@ -11,5 +11,5 @@ BBCLASSEXTEND = "native nativesdk"
 
 # libfdt has version as part of name like lbfdt-<version>.so instead of
 # .so.<version>, so reorder and repackage to avoid QA issues.
-FILES_${PN} += "${libdir}/*-${PV}.so"
+FILES:${PN} += "${libdir}/*-${PV}.so"
 FILES_SOLIBSDEV = "${libdir}/libdft.so"
