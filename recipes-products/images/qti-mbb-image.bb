@@ -7,7 +7,7 @@ require qti-mbb-minimal-image.bb
 IMAGE_FEATURES += "nand2x"
 
 # gluebi is read only and prevents debugging/experimentation. Only enable in user variant
-IMAGE_FEATURES_append_qti-distro-base-user = " gluebi"
+IMAGE_FEATURES:append_qti-distro-base-user = " gluebi"
 
 CORE_IMAGE_EXTRA_INSTALL += "\
               packagegroup-qti-data-1g \

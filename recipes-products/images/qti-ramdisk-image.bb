@@ -4,7 +4,7 @@
 LICENSE = "BSD-3-Clause"
 
 # Ramdisk image generation doesn't need abl
-EXTRA_IMAGEDEPENDS_remove = "edk2"
+EXTRA_IMAGEDEPENDS:remove = "edk2"
 
 PACKAGE_INSTALL = "\
     adbd \

@@ -6,7 +6,7 @@ inherit qimage populate_sdk_ext
 IMAGE_FEATURES += "ssh-server-openssh"
 
 # This image doesn't support abl generation
-EXTRA_IMAGEDEPENDS_remove = "edk2"
+EXTRA_IMAGEDEPENDS:remove = "edk2"
 
 KERN_MODS ?= "kernel-modules"
 KERN_MODS_waipio = "gki-kernel-modules-second-stage"
@@ -32,7 +32,7 @@ CORE_IMAGE_EXTRA_INSTALL += " \
 # support diag, which is expected by all other compositions.
 USBCOMPOSITION_forcevariable = "4EE7"
 
-python copy_buildsystem_append() {
+python copy_buildsystem:append() {
     # Create src directory in extensible SDK to copy the project sources
     bb.utils.mkdirhier(baseoutpath + '/src')
     # Enable the use of WORKSPACE variable on an extensible SDK

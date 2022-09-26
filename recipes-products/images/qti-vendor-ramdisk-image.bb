@@ -7,7 +7,7 @@ inherit core-image
 do_rootfs[nostamp] = "1"
 
 # Ramdisk image generation doesn't need abl
-EXTRA_IMAGEDEPENDS_remove = "edk2"
+EXTRA_IMAGEDEPENDS:remove = "edk2"
 
 PACKAGE_INSTALL = "\
     gki-kernel-modules-first-stage \

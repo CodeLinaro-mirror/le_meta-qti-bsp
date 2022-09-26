@@ -13,7 +13,7 @@ CORE_IMAGE_EXTRA_INSTALL += " ${@oe.utils.conditional('ENABLE_SECUREMSM', 'True'
 
 #Exclude packages
 PACKAGE_EXCLUDE += "readline"
-ROOTFS_POSTPROCESS_COMMAND_remove = " do_fsconfig;"
+ROOTFS_POSTPROCESS_COMMAND:remove = " do_fsconfig;"
 USE_DEPMOD = "0"
 
 do_gen_partition_bin[noexec] = "1"
