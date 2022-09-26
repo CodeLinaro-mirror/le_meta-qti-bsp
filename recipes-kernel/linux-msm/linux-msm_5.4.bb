@@ -1,8 +1,8 @@
 require recipes-kernel/linux-msm/linux-msm.inc
 COMPATIBLE_MACHINE = "genericarmv8|sdxlemur|scuba|qrbx210-rbx|sa2150p|sa2150p-nand|sa410m|sa410m-televm|qcs610|qrb5165|sa515m"
 
-SRC_URI_append_sdxlemur += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-audio', 'file://0001-ALSA-uapi-add-check-to-avoid-duplicate-include-of-ti.patch', '', d)}"
-SRC_URI_append_sdxlemur += "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'file://gluebi.cfg', '', d)}"
+SRC_URI:append_sdxlemur += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-audio', 'file://0001-ALSA-uapi-add-check-to-avoid-duplicate-include-of-ti.patch', '', d)}"
+SRC_URI:append_sdxlemur += "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'file://gluebi.cfg', '', d)}"
 
 S         =  "${WORKDIR}/kernel/msm-5.4"
 PR        =  "r0"
@@ -18,7 +18,7 @@ DEPENDS += "llvm-arm-toolchain-native virtual/dtc-native rsync-native clang-nati
 TOOLCHAIN = "clang"
 RUNTIME = "llvm"
 
-LDFLAGS_aarch64 = "-O1 --hash-style=gnu --as-needed"
+LDFLAGS:aarch64 = "-O1 --hash-style=gnu --as-needed"
 TARGET_CXXFLAGS += "-Wno-format"
 KERNEL_CC = "${STAGING_BINDIR_NATIVE}/clang -target ${TARGET_ARCH}${TARGET_VENDOR}-${TARGET_OS}"
 
@@ -37,7 +37,7 @@ do_generate_defconfig () {
 }
 do_configure[prefuncs] += "${@oe.utils.conditional('DYNAMIC_DEFCONFIG', 'True', 'do_generate_defconfig', '', d)}"
 
-do_shared_workdir_append () {
+do_shared_workdir:append () {
         cp Makefile $kerneldir/
         cp -fR usr $kerneldir/
 
@@ -61,7 +61,7 @@ do_shared_workdir_append () {
         oe_runmake_call -C ${STAGING_KERNEL_DIR} ARCH=${ARCH} CC="${KERNEL_CC}" LD="${KERNEL_LD}" headers_install O=${STAGING_KERNEL_BUILDDIR}
 }
 
-do_deploy_append () {
+do_deploy:append () {
         # Copy vmlinux and zImage into deplydir for boot.img creation
         install -d ${DEPLOYDIR}/build-artifacts
         install -d ${DEPLOYDIR}/build-artifacts/kernel_scripts/scripts
@@ -78,7 +78,7 @@ do_deploy_append () {
         fi
 }
 
-do_deploy_append () {
+do_deploy:append () {
         # Copy all modules from kernel techpack(s) into deploy directory
         COPY_SRC=$(find ${D}/lib/modules/ -type d -wholename "*/techpack")
         for TECHPACK in ${COPY_SRC}; do
