@@ -12,7 +12,7 @@ FILESPATH =+ "${WORKSPACE}/bootable/bootloader/:"
 SRC_URI = "file://edk2"
 S         =  "${WORKDIR}/edk2"
 
-INSANE_SKIP_${PN} = "arch"
+INSANE_SKIP:${PN} = "arch"
 
 VBLE = "${@bb.utils.contains('DISTRO_FEATURES', 'qti-vble','1', '0', d)}"
 
@@ -44,10 +44,10 @@ EXTRA_OEMAKE = " \
     'HIBERNATION_SUPPORT_INSECURE=${TARGET_HIBERNATION_INSECURE_ENABLE}' \
     'TARGET_SUPPORTS_EARLY_USB_INIT=${EARLY_USB_INIT}' \
 "
-EXTRA_OEMAKE_append_qcs40x = " 'DISABLE_PARALLEL_DOWNLOAD_FLASH=1'"
+EXTRA_OEMAKE:append_qcs40x = " 'DISABLE_PARALLEL_DOWNLOAD_FLASH=1'"
 NAND_SQUASHFS_SUPPORT = "${@bb.utils.contains('DISTRO_FEATURES', 'nand-squashfs', '1', '0', d)}"
-EXTRA_OEMAKE_append = " 'NAND_SQUASHFS_SUPPORT=${NAND_SQUASHFS_SUPPORT}'"
-EXTRA_OEMAKE_append_qti-distro-base-user = " 'VERITY_LE_USE_EXT4_GLUEBI=1'"
+EXTRA_OEMAKE:append = " 'NAND_SQUASHFS_SUPPORT=${NAND_SQUASHFS_SUPPORT}'"
+EXTRA_OEMAKE:append_qti-distro-base-user = " 'VERITY_LE_USE_EXT4_GLUEBI=1'"
 
 do_compile () {
     export CC=${BUILD_CC}

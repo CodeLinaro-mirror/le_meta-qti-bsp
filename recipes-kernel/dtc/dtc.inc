@@ -2,7 +2,7 @@ SUMMARY = "Device Tree Compiler"
 HOMEPAGE = "https://devicetree.org/"
 DESCRIPTION = "The Device Tree Compiler is a tool used to manipulate the Open-Firmware-like device tree used by PowerPC kernels."
 SECTION = "bootloader"
-LICENSE = "GPLv2 | BSD"
+LICENSE = "GPL-2.0-only | BSD"
 DEPENDS = "flex-native bison-native"
 
 SRC_URI[md5sum] = "cdccae512205bf0303684cbe8a2a2449"
@@ -22,6 +22,6 @@ do_install () {
 }
 
 PACKAGES =+ "${PN}-misc"
-FILES_${PN}-misc = "${bindir}/convert-dtsv0 ${bindir}/ftdump ${bindir}/dtdiff"
+FILES:${PN}-misc = "${bindir}/convert-dtsv0 ${bindir}/ftdump ${bindir}/dtdiff"
 
-RDEPENDS_${PN}-misc += "bash"
+RDEPENDS:${PN}-misc += "bash"

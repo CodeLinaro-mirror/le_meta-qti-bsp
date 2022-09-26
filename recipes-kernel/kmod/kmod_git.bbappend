@@ -8,7 +8,7 @@ SRC_URI += " \
           "
 
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 SRC_URI += "file://blacklist.conf \
            "
