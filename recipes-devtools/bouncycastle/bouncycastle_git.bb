@@ -48,7 +48,7 @@ SECURITY_TOOLS_DIR = "${TMPDIR}/work-shared/security_tools"
 
 # Move the scripts to a shared directory as described by SECURITY_TOOLS_DIR
 #
-base_do_unpack_append () {
+base_do_unpack:append () {
     s = d.getVar("S_SECURITY", True)
     if s[-1] == '/':
         # drop trailing slash, so that os.symlink(signing_dir, s) doesn't use s as directory name and fail
@@ -174,12 +174,12 @@ do_compile () {
 
 BBCLASSEXTEND = "native"
 
-do_install_class-native () {
+do_install:class-native () {
     install -d ${D}/${libdir}
     install -m 755 ${BC_BUILD}/libs/VeritSigner.jar ${D}/${libdir}/VeritSigner.jar
 }
 
-do_install_append_class-native () {
+do_install:append:class-native () {
     install -d ${SYSROOT_DESTDIR}/${libdir}
     install -m 755 ${D}/${libdir}/VeritSigner.jar ${SYSROOT_DESTDIR}/${libdir}/VeritSigner.jar
 }

@@ -17,6 +17,6 @@ S = "${WORKDIR}/OTA/build/tools/fs_config/"
 
 BBCLASSEXTEND = "native"
 
-EXTRA_OECONF_append_class-target = " --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
-EXTRA_OECONF_append_class-native = " --with-core-headers=${STAGING_INCDIR_NATIVE}"
-EXTRA_OECONF_append_class-native = " --enable-selinux"
+EXTRA_OECONF:append:class-target = " --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
+EXTRA_OECONF:append:class-native = " --with-core-headers=${STAGING_INCDIR_NATIVE}"
+EXTRA_OECONF:append:class-native = " --enable-selinux"
