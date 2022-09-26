@@ -16,6 +16,6 @@ DEPENDS += "ext4-utils libsparse libfec-rs libcrypto-utils libbase zlib libfec l
 
 CPPFLAGS += "-I${WORKSPACE}/system/core/include"
 
-EXTRA_OECONF_class-native += "--with-header-includes=${WORKSPACE}/system/core/include"
+EXTRA_OECONF:class-native += "--with-header-includes=${WORKSPACE}/system/core/include"
 
 BBCLASSEXTEND += "native"
