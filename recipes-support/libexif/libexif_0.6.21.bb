@@ -2,10 +2,10 @@ inherit autotools gettext
 SUMMARY = "Library to read the extended image information (EXIF) from JPEG pictures"
 HOMEPAGE = "http://sourceforge.net/projects/libexif"
 BUGTRACKER = "http://sourceforge.net/tracker/?group_id=12272&atid=112272"
-LICENSE = "LGPLv2.1"
+LICENSE = "LGPL-2.1-only"
 PRIORITY = "optional"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/LGPL-2.1;md5=1a6d268fd218675ffea8be556788b780"
-FILES_${PN} += "/lib/*"
+FILES:${PN} += "/lib/*"
 
 SRC_URI = "\
     http://downloads.sourceforge.net/project/libexif/libexif/${PV}/libexif-${PV}.tar.gz \

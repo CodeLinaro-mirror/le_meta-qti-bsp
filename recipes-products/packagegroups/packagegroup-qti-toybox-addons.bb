@@ -9,7 +9,7 @@ inherit packagegroup
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-RDEPENDS_${PN} = "\
+RDEPENDS:${PN} = "\
     base-passwd \
     bash \
     bind-utils \
