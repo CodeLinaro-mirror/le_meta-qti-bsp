@@ -2,7 +2,7 @@ inherit autotools pkgconfig
 
 DESCRIPTION = "Build Android fec_rs"
 HOMEPAGE = "http://developer.android.com/"
-LICENSE = "LGPL-2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=1a6d268fd218675ffea8be556788b780"
 

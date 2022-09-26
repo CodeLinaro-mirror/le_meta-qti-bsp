@@ -13,10 +13,10 @@ SRC_URI += "file://Header-reference-change-to-base-from-android-base.patch"
 S = "${WORKDIR}/libfec"
 
 DEPENDS += "ext4-utils libcutils libfec-rs libcrypto-utils libsquashfs-utils libbase"
-DEPENDS_append_class-target = " system-core"
+DEPENDS:append:class-target = " system-core"
 
 EXTRA_OECONF += "--with-header-includes=${STAGING_INCDIR}"
-EXTRA_OECONF_class-native += "--with-header-includes=${STAGING_INCDIR_NATIVE}"
-EXTRA_OECONF_class-native += "--with-coreheader-includes=${WORKSPACE}/system/core/include"
+EXTRA_OECONF:class-native += "--with-header-includes=${STAGING_INCDIR_NATIVE}"
+EXTRA_OECONF:class-native += "--with-coreheader-includes=${WORKSPACE}/system/core/include"
 
 BBCLASSEXTEND += "native"

@@ -21,4 +21,4 @@ EXTRA_OECONF = "--with-glib"
 
 PACKAGES =+ "${PN}-test-bin"
 
-FILES_${PN}-test-bin = "${base_bindir}/*"
+FILES:${PN}-test-bin = "${base_bindir}/*"

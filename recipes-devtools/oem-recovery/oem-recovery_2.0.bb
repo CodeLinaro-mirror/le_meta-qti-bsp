@@ -24,7 +24,7 @@ EXTRA_OECONF = " \
 
 UFSBSG = "${@d.getVar('UFS_BSG_DEV_USAGE') or "False"}"
 
-CPPFLAGS_append = "${@oe.utils.conditional('UFSBSG', 'True', ' -D_BSG_FRAMEWORK_KERNEL_HEADERS ', '', d)}"
+CPPFLAGS:append = "${@oe.utils.conditional('UFSBSG', 'True', ' -D_BSG_FRAMEWORK_KERNEL_HEADERS ', '', d)}"
 
 PACKAGECONFIG ?= " \
     glib \
