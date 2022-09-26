@@ -8,7 +8,7 @@ SECTION = "devel"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=7530c1d01d9cfee94e67d6a55e886db5"
 
-FILESEXTRAPATHS_prepend = "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend = "${THISDIR}/files:"
 
 SRCREV = "3484fc0a88088dea00397774fc93f9acd3a23ce0"
 SRC_URI = "git://git.linaro.org/landing-teams/working/qualcomm/partioning_tool.git;branch=master"
@@ -27,6 +27,6 @@ do_install() {
    install -m 755 -D ${S}/ptool.py ${D}${bindir}/ptool.py
 }
 
-RDEPENDS_${PN} += "python3"
+RDEPENDS:${PN} += "python3"
 
 BBCLASSEXTEND = "nativesdk"

@@ -9,9 +9,9 @@ HOMEPAGE = "https://www.codeaurora.org/gitweb/quic/la?p=platform/bootable/recove
 DEPENDS += "glib-2.0 ext4-utils oem-recovery adbd libbase libsparse libmincrypt bzip2 bison-native openssl"
 DEPENDS += " ${@bb.utils.contains('COMBINED_FEATURES', 'qti-ab-boot', 'abctl', '', d)}"
 
-RDEPENDS_${PN} += "zlib"
-RDEPENDS_${PN} += "${@bb.utils.contains('MACHINE_FEATURES', 'ota-package-verification', 'openssl', '', d)}"
-RDEPENDS_${PN} += "${@bb.utils.contains('MACHINE_FEATURES', 'ota-package-verification', 'openssl-bin', '', d)}"
+RDEPENDS:${PN} += "zlib"
+RDEPENDS:${PN} += "${@bb.utils.contains('MACHINE_FEATURES', 'ota-package-verification', 'openssl', '', d)}"
+RDEPENDS:${PN} += "${@bb.utils.contains('MACHINE_FEATURES', 'ota-package-verification', 'openssl-bin', '', d)}"
 
 FILESPATH =+ "${WORKSPACE}:"
 
@@ -24,15 +24,15 @@ S = "${WORKDIR}/OTA/recovery/"
 
 EXTRA_OECONF = "--with-glib --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include \
                 --with-core-headers=${STAGING_INCDIR}"
-EXTRA_OECONF_append = "${@bb.utils.contains('MACHINE_FEATURES', 'ota-package-verification', 'TARGET_SUPPORTS_OTA_VERIFICATION=true', '', d)}"
+EXTRA_OECONF:append = "${@bb.utils.contains('MACHINE_FEATURES', 'ota-package-verification', 'TARGET_SUPPORTS_OTA_VERIFICATION=true', '', d)}"
 CFLAGS += "-lsparse -llog"
 PARALLEL_MAKE = ""
 
-EXTRA_OECONF_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'qti-ab-boot', 'TARGET_SUPPORTS_AB=true', '', d)}"
-EXTRA_OECONF_append = " ${@bb.utils.contains('MACHINE_FEATURES', 'qti-abc-boot', 'TARGET_SUPPORTS_ABC=true', '', d)}"
+EXTRA_OECONF:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'qti-ab-boot', 'TARGET_SUPPORTS_AB=true', '', d)}"
+EXTRA_OECONF:append = " ${@bb.utils.contains('MACHINE_FEATURES', 'qti-abc-boot', 'TARGET_SUPPORTS_ABC=true', '', d)}"
 
-FILES_${PN}  = "${bindir} ${libdir} ${systemd_unitdir} ${includedir} /res /cache"
-SYSTEMD_SERVICE_${PN} = "update_engine.service"
+FILES:${PN}  = "${bindir} ${libdir} ${systemd_unitdir} ${includedir} /res /cache"
+SYSTEMD_SERVICE:${PN} = "update_engine.service"
 
 RM_WORK_EXCLUDE += "${PN}"
 INITSCRIPT_NAME = "update_engine"
@@ -44,7 +44,7 @@ generate_public_key() {
 
 do_install[prefuncs] += "${@bb.utils.contains('MACHINE_FEATURES', 'ota-package-verification', 'generate_public_key', '', d)}"
 
-do_install_append() {
+do_install:append() {
         install -d ${D}/res/
         install -d ${D}/cache/recovery
         if ${@bb.utils.contains('IMAGE_FSTYPES', 'ext4', 'true', 'false', d)}; then

@@ -12,14 +12,14 @@ inherit autotools pkgconfig
 BBCLASSEXTEND = "native nativesdk"
 
 PACKAGES =+ "orc-examples"
-FILES_orc-examples = "${libdir}/orc/*"
-FILES_${PN} = "${bindir}/*"
+FILES:orc-examples = "${libdir}/orc/*"
+FILES:${PN} = "${bindir}/*"
 
-python populate_packages_prepend () {
+python populate_packages:prepend () {
     libdir = d.expand('${libdir}')
     do_split_packages(d, libdir, '^lib(.*)\.so\.*', 'lib%s', 'ORC %s library', extra_depends='', allow_links=True)
 }
 
-do_compile_prepend_class-native () {
+do_compile:prepend:class-native () {
     sed -i -e 's#/tmp#.#g' ${S}/orc/orccodemem.c
 }

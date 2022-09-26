@@ -17,7 +17,7 @@ S = "${WORKDIR}/releasetools"
 do_configure[noexec] = "1"
 do_compile[noexec] = "1"
 
-do_install_append() {
+do_install:append() {
     install -d ${D}${bindir}/releasetools/
     install -m 755 ${WORKDIR}/full_ota.sh ${D}${bindir}/releasetools/
     install -m 755 ${WORKDIR}/incremental_ota.sh ${D}${bindir}/releasetools/
