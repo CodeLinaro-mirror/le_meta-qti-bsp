@@ -76,6 +76,10 @@ IMAGE_DEV_MANAGER = "udev"
 IMAGE_INIT_MANAGER = "systemd"
 IMAGE_INITSCRIPTS = ""
 
-INITRAMFS_IMAGE_BUNDLE = "${@bb.utils.contains('DISTRO_FEATURES', 'initramfs', '1', '', d)}"
+# Make sure either INITRAMFS_IMAGE_BUNDLE or  EXT_INITRAMFS_IMAGE_BUNDLE
+# is enabled and not both are enabled at the same time
+
+#INITRAMFS_IMAGE_BUNDLE = "${@bb.utils.contains('DISTRO_FEATURES', 'initramfs', '1', '', d)}"
+EXT_INITRAMFS_IMAGE_BUNDLE = "${@bb.utils.contains('DISTRO_FEATURES', 'initramfs', '1', '', d)}"
 INITRAMFS_IMAGE = "${@bb.utils.contains('DISTRO_FEATURES', 'initramfs', 'machine-initramfs', '', d)}"
 INITRAMFS_FSTYPES += "${@bb.utils.contains('DISTRO_FEATURES', 'initramfs', 'cpio.gz tar.bz2', '', d)}"
