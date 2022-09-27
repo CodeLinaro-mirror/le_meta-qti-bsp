@@ -56,6 +56,14 @@ IMAGE_INSTALL_ATTEMPTONLY[type] = "list"
 
 RAMDISK ?= "/dev/null"
 RAMDISK_OFFSET ?= "0x0"
+INITRAMFS ?= "${DEPLOY_DIR_IMAGE}/${INITRAMFS_IMAGE}-${MACHINE}.cpio.gz"
+
+def get_initramfs_path(d):
+    if os.path.exists(d.getVar('INITRAMFS')) and d.getVar('EXT_INITRAMFS_IMAGE_BUNDLE', True):
+        return '%s' %(d.getVar('INITRAMFS'))
+    return '/dev/null'
+
+INITRAMFS_PATH = "${@get_initramfs_path(d)}"
 
 # Original definition is in image.bbclass. Overloading it with internal list of packages
 # to ensure dependencies are not messed up in case package is absent.
@@ -121,6 +129,12 @@ python do_make_bootimg () {
     xtra_parms=""
     mkboot_bin_path = d.getVar('STAGING_BINDIR_NATIVE', True) + '/mkbootimg'
     bundle_initramfs = d.getVar('INITRAMFS_IMAGE_BUNDLE', True)
+    bundle_ext_initramfs = d.getVar('EXT_INITRAMFS_IMAGE_BUNDLE', True)
+    if bundle_initramfs == '1' and bundle_ext_initramfs == '1':
+         bb.fatal("bundle_initramfs and bundle_ext_initramfs are mutually exclusive features")
+
+    initramfs_path = d.getVar('INITRAMFS_PATH', True)
+
     if bundle_initramfs == '1':
         zimg_path       = d.getVar('DEPLOY_DIR_IMAGE', True) + "/" + d.getVar('KERNEL_IMAGETYPE', True) + ".initramfs"
     else:
@@ -145,8 +159,8 @@ python do_make_bootimg () {
 
     if bb.utils.contains('IMAGE_FSTYPES', 'ubi', True, False, d):
          xtra_parms = " --tags-addr" + " " + d.getVar('KERNEL_TAGS_OFFSET')
-         cmd_nand =  mkboot_bin_path + " --kernel %s --cmdline %s --pagesize %s --base %s %s --ramdisk /dev/null --ramdisk_offset 0x0 --output %s" \
-           % (zimg_path, cmdline, pagesize, base, xtra_parms, output_nand )
+         cmd_nand =  mkboot_bin_path + " --kernel %s --cmdline %s --pagesize %s --base %s --ramdisk %s --ramdisk_offset 0x0 %s --output %s" \
+                   % (zimg_path, cmdline, pagesize, base, initramfs_path, xtra_parms, output_nand )
          bb.debug(1, "do_make_bootimg cmd_nand: %s" % (cmd_nand))
          subprocess.call(cmd_nand, shell=True)
 }
@@ -155,6 +169,7 @@ do_make_bootimg[dirs]      = "${DEPLOY_DIR_IMAGE}"
 do_make_bootimg[depends]  += "${PN}:do_prepare_recipe_sysroot"
 do_make_bootimg[depends]  += "virtual/kernel:do_shared_workdir"
 do_make_bootimg[depends]  += " ${@bb.utils.contains('INITRAMFS_IMAGE_BUNDLE', '1', 'linux-msm:do_bundle_initramfs', '', d)}"
+do_make_bootimg[depends]  += " ${@bb.utils.contains('EXT_INITRAMFS_IMAGE_BUNDLE', '1', '${INITRAMFS_IMAGE}:do_image_complete', '', d)}"
 
 addtask do_make_bootimg before do_image_complete
 
@@ -227,7 +242,8 @@ do_make_veritybootimg[depends]  += "${PN}:do_make_bootimg"
 
 python () {
     bundle_initramfs = d.getVar('INITRAMFS_IMAGE_BUNDLE', True)
-    if bundle_initramfs != '1':
+    bundle_ext_initramfs = d.getVar('EXT_INITRAMFS_IMAGE_BUNDLE', True)
+    if bundle_initramfs != '1' and bundle_ext_initramfs != '1':
         if bb.utils.contains('DISTRO_FEATURES', 'dm-verity', True, False, d):
             bb.build.addtask('do_make_veritybootimg', 'do_image_complete', 'do_rootfs', d)
 }
