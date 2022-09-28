@@ -12,6 +12,7 @@ PACKAGES = "${PN}"
 
 
 RDEPENDS:${PN} = " \
+        ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "5.15", 'videodlkm', "", d)} \
         gstreamer1.0 \
         gstreamer1.0-plugins-base \
         gstreamer1.0-plugins-good \
