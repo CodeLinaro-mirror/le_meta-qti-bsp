@@ -1,7 +1,7 @@
 SUMMARY = "MSM Linux Kernel Headers"
 DESCRIPTION = "Installs MSM kernel headers required to build userspace. \
 These headers are installed in ${includedir}/linux-msm path."
-HOMEPAGE = "https://www.codeaurora.org"
+HOMEPAGE = "https://git.codelinaro.org"
 SECTION = "kernel"
 LICENSE = "GPLv2.0-with-linux-syscall-note"
 LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
