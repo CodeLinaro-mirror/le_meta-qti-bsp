@@ -27,6 +27,7 @@ NEED_ABCTL = "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'abctl'
 EXTRA_OECONF += " ${@bb.utils.contains('DISTRO_FEATURES', 'nad-prod', '--with-nad_prod=true', '', d)}"
 EXTRA_OECONF += " ${AB_SUPPORT}"
 EXTRA_OECONF += " ${@bb.utils.contains('DISTRO_FEATURES', 'nand-boot', '--with-nand_boot=true', '', d)}"
+EXTRA_OECONF += " ${@bb.utils.contains('DISTRO_FEATURES', 'nad-fde', '--with-nad_fde=true', '', d)}"
 DEPENDS += " ${NEED_ABCTL}"
 
 PARALLEL_MAKE = ""

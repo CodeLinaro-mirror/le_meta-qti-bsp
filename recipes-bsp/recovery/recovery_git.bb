@@ -23,6 +23,7 @@ SYSTEMD_SUPPORT = "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd',
 SELINUX_SUPPORT = "${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'selinux', '', d)}"
 EXTRA_OECONF += " ${@bb.utils.contains('DISTRO_FEATURES', 'nand-boot', '--with-nand_boot=true', '', d)}"
 EXTRA_OECONF += " ${@bb.utils.contains('DISTRO_FEATURES', 'nad-prod', '--with-nad_prod=true', '', d)}"
+EXTRA_OECONF += " ${@bb.utils.contains('DISTRO_FEATURES', 'nad-fde', '--with-nad_fde=true', '', d)}"
 PARALLEL_MAKE = ""
 INITSCRIPT_NAME = "recovery"
 INITSCRIPT_PARAMS = "start 99 5 . stop 80 0 1 6 ."
