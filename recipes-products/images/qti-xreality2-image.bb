@@ -8,7 +8,6 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         gki-kernel-modules-second-stage \
         packagegroup-qti-camera-kernel \
         packagegroup-qti-mmframeworks \
-        packagegroup-qti-ppat \
 "
 
 CORE_IMAGE_EXTRA_INSTALL += "bash"
