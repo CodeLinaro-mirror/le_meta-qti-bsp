@@ -13,11 +13,10 @@ diff --git a/group.master b/group.master
 index cea9d60..d0ee227 100644
 --- a/group.master
 +++ b/group.master
-@@ -38,4 +38,6 @@ staff:*:50:
+@@ -38,4 +38,5 @@ staff:*:50:
  games:*:60:
  shutdown:*:70:
  users:*:100:
-+sdcard:*:1015:diag
 +diag:*:53:
  nogroup:*:65534:
 -- 
