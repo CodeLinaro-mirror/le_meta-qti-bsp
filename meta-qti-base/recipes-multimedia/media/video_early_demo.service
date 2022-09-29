@@ -28,8 +28,6 @@
 
 [Unit]
 Description=Video Early Demo Service
-After=firmware.mount
-Requires=firmware.mount
 DefaultDependencies=no
 
 [Service]
