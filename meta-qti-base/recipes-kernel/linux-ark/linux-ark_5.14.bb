@@ -152,7 +152,7 @@ do_deploy () {
 
     # Copy Image appended with dtbs to deploydir
     cat ${B}/arch/arm64/boot/Image.gz \
-        ${B}/arch/arm64/boot/dts/qcom/sa8295p-adp.dtb > ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb
+        ${B}/arch/arm64/boot/dts/qcom/sa8540p-adp-ride.dtb > ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb
 
     # Make bootimage
     ${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb \
