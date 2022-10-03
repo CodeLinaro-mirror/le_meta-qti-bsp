@@ -29,11 +29,8 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-dsp \
         packagegroup-qti-fastcv \
         packagegroup-qti-gfx \
-        packagegroup-qti-gst \
         packagegroup-qti-ml \
         packagegroup-qti-mmframeworks \
-        packagegroup-qti-qmmf \
-        packagegroup-qti-robotics \
         packagegroup-qti-securemsm \
         packagegroup-qti-ss-mgr \
         packagegroup-qti-test-sensors-see \
