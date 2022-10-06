@@ -3,13 +3,13 @@ inherit kernel
 DESCRIPTION = "CAF Linux Kernel"
 LICENSE = "GPLv2.0-with-linux-syscall-note"
 
-COMPATIBLE_MACHINE = "cinder"
+COMPATIBLE_MACHINE = "cinder|sa410m|scuba-auto"
 
 FILESPATH =+ "${WORKSPACE}:"
 
 SRC_URI   =  "file://kernel-${PV}/kernel_platform/msm-kernel \
+             ${@oe.utils.conditional('KERNEL_USE_PREBUILTS', 'True', '', 'file://kernel-${PV}/kernel_platform/msm-kernel/arch/${ARCH}/configs/${KERNEL_CONFIG}',d)} \
              "
-SRC_URI_append_cinder  +=  "${@oe.utils.conditional('KERNEL_USE_PREBUILTS', 'True', '', 'file://kernel-${PV}/kernel_platform/msm-kernel/arch/${ARCH}/configs/vendor/cinder_debug.config',d)}"
 
 S = "${WORKDIR}/kernel-${PV}/kernel_platform/msm-kernel"
 PR = "r0"
@@ -85,6 +85,17 @@ do_configure_prepend() {
     fi
 }
 
+# Set up hosttools for techpack module compilation
+do_setup_module_compilation() {
+    cd ${WORKSPACE}/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform  && \
+          BUILD_CONFIG=${KERNEL_BUILD_CONFIG} \
+          OUT_DIR=${KERNEL_OUT_PATH}/ \
+          KERNEL_UAPI_HEADERS_DIR=${STAGING_KERNEL_BUILDDIR} \
+          INSTALL_MODULE_HEADERS=1 \
+          ./build/build_module.sh
+}
+
+do_prebuilt_configure[nostamp] = "1"
 do_prebuilt_configure() {
     cd ${KERNEL_PREBUILT_PATH}
 
@@ -99,9 +110,9 @@ do_prebuilt_configure() {
     install -m 0644 ../msm-kernel/Module.symvers ${B}
     install -m 0644 ../msm-kernel/include/config/kernel.release ${B}/include/config/kernel.release
     install -m 0644 ../msm-kernel/scripts/module.lds ${B}/scripts/module.lds
-    install -m 0644 ../msm-kernel/scripts/sign-file ${B}/scripts/sign-file
-    install -m 0644 ../msm-kernel/certs/signing_key.x509 ${B}/certs/signing_key.x509
-    install -m 0644 ../msm-kernel/certs/signing_key.pem ${B}/certs/signing_key.pem
+    install -m 0755 ../msm-kernel/scripts/sign-file ${B}/scripts/sign-file
+    install -m 0755 ../msm-kernel/certs/signing_key.x509 ${B}/certs/signing_key.x509
+    install -m 0755 ../msm-kernel/certs/signing_key.pem ${B}/certs/signing_key.pem
     install -m 0644 ../msm-kernel/include/generated/utsrelease.h ${B}/include/generated
 
     install -d ${B}/${KERNEL_OUTPUT_DIR}
@@ -115,8 +126,11 @@ do_prebuilt_configure() {
     cp -R ../msm-kernel/usr/gen_init_cpio ${B}/usr
     cp -R ../msm-kernel/usr/initramfs_data.cpio ${B}/usr
     cp -R ../msm-kernel/usr/initramfs_inc_data ${B}/usr
+    # gen_initramfs.sh is present in kernel source
+    cp -R ../../../kernel_platform/msm-kernel/usr/gen_initramfs.sh ${B}/usr
 }
 
+do_prebuilt_shared_workdir[nostamp] = "1"
 do_prebuilt_shared_workdir[cleandirs] += " ${STAGING_KERNEL_BUILDDIR}"
 do_prebuilt_shared_workdir() {
     cd ${B}
@@ -185,6 +199,7 @@ python () {
         for task in d.getVar('PREBUILT_DISCARDED_TASKS').split():
             d.setVarFlag(task, 'noexec', '1')
         bb.build.addtask('do_prebuilt_configure', 'do_configure', 'do_unpack', d)
+        bb.build.addtask('do_setup_module_compilation', 'do_configure', 'do_unpack', d)
         bb.build.addtask('do_prebuilt_install', 'do_install', 'do_compile', d)
         bb.build.addtask('do_prebuilt_shared_workdir', 'do_compile_kernelmodules', 'do_compile', d)
 }
@@ -231,14 +246,6 @@ do_shared_workdir_append () {
 
         # Generate kernel headers
         oe_runmake_call -C ${STAGING_KERNEL_DIR} ARCH=${ARCH} CC="${KERNEL_CC}" LD="${KERNEL_LD}" headers_install O=${STAGING_KERNEL_BUILDDIR}
-
-        # Set up hosttools for module compilation
-        cd ${WORKSPACE}/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform  && \
-              BUILD_CONFIG=${KERNEL_BUILD_CONFIG} \
-              OUT_DIR=${KERNEL_OUT_PATH}/ \
-              KERNEL_UAPI_HEADERS_DIR=${STAGING_KERNEL_BUILDDIR} \
-              INSTALL_MODULE_HEADERS=1 \
-              ./build/build_module.sh
 }
 
 # Path for dtbo generation is kernel version dependent.
@@ -270,7 +277,7 @@ do_deploy() {
      install -d ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr/
      install -d ${DEPLOYDIR}/build-artifacts/dtb
 
-     cp  ${S}/usr/gen_initramfs.sh ${DEPLOYDIR}/build-artifacts/kernel_scripts/scripts
+     cp -a ${B}/usr/gen_initramfs.sh ${DEPLOYDIR}/build-artifacts/kernel_scripts/scripts
      cp -a ${B}/usr/gen_init_cpio ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr/
      cp -a ${B}/usr/initramfs_data.cpio ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr/
      cp -a ${B}/usr/initramfs_inc_data ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr/
