@@ -26,6 +26,11 @@
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
+# Changes from Qualcomm Innovation Center are provided under the following license:
+#
+# Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+# SPDX-License-Identifier: BSD-3-Clause-Clear
+#
 # find_partitions        init.d script to dynamically find partitions
 #
 
@@ -79,6 +84,8 @@ mtd_file=/proc/mtd
 fstype="UBI"
 eval FindAndMountVolume${fstype} usrfs /data
 eval FindAndMountVolume${fstype} systemrw /systemrw
+eval FindAndMountVolume${fstype} cachefs /cache
+eval FindAndMountVolume${fstype} persist /persist
 
 eval FindAndMount${fstype} modem /firmware 1 ro
 eval FindAndMount${fstype} persist /persist 2 rw
