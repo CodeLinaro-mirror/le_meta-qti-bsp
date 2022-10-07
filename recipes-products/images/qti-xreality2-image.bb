@@ -15,8 +15,6 @@ CORE_IMAGE_EXTRA_INSTALL += "bash"
 # Remove unsupported package groups
 CORE_IMAGE_EXTRA_INSTALL_remove = "packagegroup-qti-cvp"
 CORE_IMAGE_EXTRA_INSTALL_remove = "packagegroup-qti-gst"
-CORE_IMAGE_EXTRA_INSTALL_remove = "packagegroup-qti-splitxr"
-CORE_IMAGE_EXTRA_INSTALL_remove = "packagegroup-qti-splitxr-common"
 CORE_IMAGE_EXTRA_INSTALL_remove = "packagegroup-qti-pulseaudio"
 
 # Remove unsupported packages
