@@ -1,6 +1,7 @@
 DEPENDS += "display-hal-headers display-hal-linux display-noship-linux display-ship-linux \
             gbm gbm-headers \
-            libion libsync \
+            ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.4', 'libion', '', d)} \
+            libsync \
             ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'libuhab', '', d)} \
             linux-msm-headers \
 "
