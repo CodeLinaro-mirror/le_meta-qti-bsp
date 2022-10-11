@@ -38,6 +38,9 @@ DISTRO_FEATURES:append = " vulkan"
 # WLAN
 DISTRO_FEATURES:append = " qti-wlan wifi"
 
+# BT
+DISTRO_FEATURES:append:quin-gvm-gen4 = " qti-bluetooth"
+
 # Support kdump
 #DISTRO_FEATURES:append = " kdump-support"
 
