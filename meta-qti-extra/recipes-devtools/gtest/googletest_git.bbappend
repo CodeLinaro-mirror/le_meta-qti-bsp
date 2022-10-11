@@ -6,3 +6,5 @@ EXTRA_OECMAKE = "-DBUILD_SHARED_LIBS=ON"
 
 SOLIBS = ".so"
 FILES_SOLIBSDEV = ""
+
+ALLOW_EMPTY:${PN}-staticdev = "1"
