@@ -12,7 +12,7 @@ SRCREV = "${AUTOREV}"
 S = "${WORKDIR}/vendor/qcom/opensource/securemsm-kernel"
 
 TECHPACK_MODULE_OUT = "${WORKDIR}/securemsm-kernel-out"
-TECHPACK_MODULES = "qseecom_dlkm.ko"
+TECHPACK_MODULES = "qseecom_dlkm.ko tz_log_dlkm.ko"
 
 inherit qti-techpack
 
