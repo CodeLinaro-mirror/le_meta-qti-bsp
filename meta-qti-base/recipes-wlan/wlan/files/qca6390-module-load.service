@@ -61,9 +61,7 @@
 
 [Unit]
 Description=qca6390 module load
-Requires=qca6696-module-load.service
-After=qca6696-module-load.service
-Before=wpa_supplicant.service
+After=init_qti_wlan_auto.service
 
 [Service]
 Type=oneshot

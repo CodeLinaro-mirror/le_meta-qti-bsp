@@ -80,6 +80,7 @@ do_configure:append() {
 }
 
 SYSTEMD_SERVICE:${PN} = "qca6390-module-load.service"
+SYSTEMD_AUTO_ENABLE:${PN} = "disable"
 
 do_install() {
     module_do_install
