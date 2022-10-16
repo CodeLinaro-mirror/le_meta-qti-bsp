@@ -9,20 +9,22 @@ Upstream-Status: Pending
 
 Signed-off-by: siniyan <quic_siniyan@quicinc.com>
 ---
- sample-configurations/basic.conf | 3 +++
- 1 file changed, 3 insertions(+)
+ sample-configurations/basic.conf | 5 +++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/sample-configurations/basic.conf b/sample-configurations/basic.conf
 index c25f1bc..2be6389 100644
 --- a/sample-configurations/basic.conf
 +++ b/sample-configurations/basic.conf
-@@ -6,6 +6,9 @@
+@@ -6,6 +6,11 @@
  ServerName			"ProFTPD Default Installation"
  ServerType			standalone
  DefaultServer			on
 +# disable reverse DNS check
 +UseReverseDNS 			off
-+IdentLookups 			off
++<IfModule mod_ident.c>
++ IdentLookups			off
++</IfModule>
 
  #By default we bind to all interfaces.
  DefaultAddress      0.0.0.0

@@ -32,10 +32,8 @@
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 if (lspci -k|grep cnss_pci);then
-	if (lspci -k|grep 1101);then
-		echo "##########unload qca6696#############"
-		if (lsmod | grep qca6696);then
-			modprobe -r qca6696
-		fi
+	echo "##########unload qca6696#############"
+	if (lsmod | grep qca6696);then
+		modprobe -r qca6696
 	fi
 fi

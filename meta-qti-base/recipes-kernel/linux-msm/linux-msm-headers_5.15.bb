@@ -11,9 +11,7 @@ S = "${WORKDIR}/kernel-${PV}/kernel_platform/msm-kernel"
 
 inherit kernel-arch pkgconfig multilib_header
 
-KERNEL_VARIANT = "${@bb.utils.contains_any('VARIANT', 'perf user', 'perf_', 'debug_', d)}"
-KERNEL_PREBUILT_PATH ?= "${SRC_DIR_ROOT}/kernel/kernel-${PV}/out/msm-kernel-${BASEMACHINE}-${KERNEL_VARIANT}defconfig/dist"
-KERNEL_PREBUILT_PATH:sa81x5 = "${SRC_DIR_ROOT}/kernel/kernel-${PV}/out/msm-kernel-gen3auto-${KERNEL_VARIANT}defconfig/dist"
+KERNEL_PREBUILT_PATH ?= "${SRC_DIR_ROOT}/kernel/kernel-${PV}/out/msm-kernel-${KERNEL_ARCH}-${KERNEL_VARIANT}defconfig/dist"
 
 
 KERNEL_PREBUILT_PATH:lemans = "${SRC_DIR_ROOT}/kernel/kernel-${PV}/out/msm-kernel-gen4auto-${KERNEL_VARIANT}defconfig/dist"
@@ -38,8 +36,8 @@ do_install () {
     install -d $kerneldir
 
     if [ -d $headerdir/${includedir} ]; then
-        mkdir -p $kerneldir/${includedir}
-        cp -fR $headerdir/${includedir}/* $kerneldir/${includedir}
+        mkdir -p $kerneldir
+        cp -fR $headerdir/${includedir}/* $kerneldir
     fi
 }
 

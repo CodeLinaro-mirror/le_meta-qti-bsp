@@ -7,6 +7,8 @@ PREFERRED_PROVIDER_virtual/kernel = "linux-msm"
 PREFERRED_VERSION_linux-msm ?= "5.4"
 PREFERRED_VERSION_linux-msm-headers ?= "5.4"
 
+PREFERRED_VERSION_edk2 ?= "3.0"
+
 # Enables timestamping functionality during building the kernel
 KERNEL_DEBUG_TIMESTAMPS = "1"
 
@@ -35,3 +37,4 @@ EXTRA_IMAGECMD:ext4 += " -b 4096 "
 
 IMAGE_CLASSES += "qimage"
 
+IMAGE_CLASSES += "${@oe.utils.version_less_or_equal('PREFERRED_VERSION_linux-msm', '5.14', '', 'qimage-boot', d)}"
