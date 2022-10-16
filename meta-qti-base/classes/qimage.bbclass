@@ -99,6 +99,7 @@ do_make_avb_image(){
                 --output ${DEPLOY_DIR_IMAGE}/vbmeta.img
             # Workaround, to keep two vbmeta images here with different vbmeta name.
             install -m 644 ${DEPLOY_DIR_IMAGE}/vbmeta.img ${DEPLOY_DIR_IMAGE}/${PRODUCT}-vbmeta.img
+            install -m 644 ${DEPLOY_DIR_IMAGE}/vbmeta.img ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}-vbmeta.img
         else
             #For lv avb2.0, add hashtree for system image and generate vbmeta.img.
             avbtool add_hashtree_footer \
