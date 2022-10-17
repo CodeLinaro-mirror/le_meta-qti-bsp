@@ -63,7 +63,8 @@ python () {
 
 do_make_avb_image(){
     if ${@bb.utils.contains('DISTRO_FEATURES', 'qti-avb', 'true', 'false', d)}; then
-        if [[ "${IMAGE_ROOTFS_SIZE}" -lt "1048576" ]]; then
+        # In qti-image-headless.bb, need to set IMAGE_ROOTFS_ZIZE to 700M, set the value of the judgment of 500M to skip redefinition.
+        if [[ "${IMAGE_ROOTFS_SIZE}" -lt "524288" ]]; then
             # core minimal image define the IMAGE_ROOTFS_SIZE to 8192, no way to calculate
             # an appropriate partition size for hashtree footer on top of rootfs image.
             rootfs_size_kb=1572864
@@ -122,3 +123,15 @@ do_make_avb_image(){
 }
 
 addtask do_make_avb_image after do_image_complete before do_build
+
+
+# create dummy vendor-boot & vbmeta image
+VENDORBOOT_IMG_CMD = " \
+    dd if=/dev/zero of=${DEPLOY_DIR_IMAGE}/${VENDORBOOTIMAGE_TARGET} bs=1M count=96; \
+    dd if=/dev/zero of=${DEPLOY_DIR_IMAGE}/${VBMETAIMAGE_TARGET} bs=1K count=3; \
+"
+
+# compress the image to ease the upload
+IMAGE_CMD:ext4:append:sa81x5 = "; \
+  ${VENDORBOOT_IMG_CMD} \
+"
