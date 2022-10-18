@@ -2,7 +2,7 @@ require qcacld32-ll.inc
 
 SUMMARY = "Qualcomm Atheros WLAN Driver"
 DESCRIPTION = "Qualcomm Atheros WLAN CLD3.0 low latency driver for the first WLAN chip.\
-               It is a kernel extra module, which loaded by qca6696-module-load.service \
+               It is a kernel extra module, which loaded by init_qti_wlan_auto.service \
                once the system bootup. And this WLAN host driver module name is qca6696.ko,\
                it create two interface by defaults, one is wlan0 and the other is wlan1. \
                Application can use the wireless interfaces as STA or AP mode in need. \
@@ -16,9 +16,9 @@ SRC_URI = "${PATH_TO_REPO}/wlan/qcacld-3.0/.git;protocol=${PROTO};destsuffix=wla
            ${PATH_TO_REPO}/wlan/qca-wifi-host-cmn/.git;protocol=${PROTO};destsuffix=wlan/qca-wifi-host-cmn;usehead=1 \
            ${PATH_TO_REPO}/wlan/fw-api/.git;protocol=${PROTO};destsuffix=wlan/fw-api/;usehead=1 \
            ${PATH_TO_REPO}/device/qcom/wlan/.git;protocol=${PROTO};destsuffix=device/qcom/wlan/msm_auto;subpath=msm_auto;usehead=1 \
-           file://qca6696-module-load.service \
-           file://qca6696_load.sh \
-           file://qca6696_unload.sh \
+           file://init_qti_wlan_auto.service \
+           file://init.qti.wlan_on.sh \
+           file://init.qti.wlan_off.sh \
            "
 SRCREV = "${AUTOREV}"
 SRCREV_FORMAT = "qcacld_cmn_fw_msm"
@@ -73,7 +73,7 @@ EXTRA_OEMAKE:append:qtiquingvm8295 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GV
 EXTRA_OEMAKE:append:sa8295 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_METAL}"
 EXTRA_OEMAKE:append:quin-gvm-gen4 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
 
-SYSTEMD_SERVICE:${PN} = "qca6696-module-load.service"
+SYSTEMD_SERVICE:${PN} = "init_qti_wlan_auto.service"
 
 do_install() {
     module_do_install
@@ -90,8 +90,8 @@ do_install() {
     install -D -m 0644 ${WORKDIR}/device/qcom/wlan/msm_auto/WCNSS_qcom_cfg_qca6390.ini ${FIRMWARE_PATH}/WCNSS_qcom_cfg.ini
     install -D -m 0644 ${WORKDIR}/device/qcom/wlan/msm_auto/wlan_mac_hst_1.bin ${FIRMWARE_PATH}/wlan_mac.bin
     install -d ${D}${bindir}
-    install -D -m 0755 ${WORKDIR}/qca6696_load.sh ${D}${bindir}/qca6696_load.sh
-    install -D -m 0755 ${WORKDIR}/qca6696_unload.sh ${D}${bindir}/qca6696_unload.sh
+    install -D -m 0755 ${WORKDIR}/init.qti.wlan_on.sh ${D}${bindir}/init.qti.wlan_on.sh
+    install -D -m 0755 ${WORKDIR}/init.qti.wlan_off.sh ${D}${bindir}/init.qti.wlan_off.sh
 
     install -d ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/
     ln -sf /firmware/image/${FW_PATH_NAME}/amss.bin ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/
@@ -104,13 +104,13 @@ do_install() {
     # Install systemd service file
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
         install -d ${D}${systemd_unitdir}/system/
-        install -m 0644 ${WORKDIR}/qca6696-module-load.service -D ${D}${systemd_unitdir}/system/qca6696-module-load.service
+        install -m 0644 ${WORKDIR}/init_qti_wlan_auto.service -D ${D}${systemd_unitdir}/system/init_qti_wlan_auto.service
     fi
 }
 
 FILES:${PN} += "\
-    ${bindir}/qca6696_load.sh \
-    ${bindir}/qca6696_unload.sh \
+    ${bindir}/init.qti.wlan_on.sh \
+    ${bindir}/init.qti.wlan_off.sh \
     ${systemd_unitdir}/system/* \
     ${sysconfdir}/* \
 "
