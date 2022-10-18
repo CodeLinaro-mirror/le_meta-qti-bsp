@@ -1,0 +1,77 @@
+From 9660b4b9a6dce174f5fc68c3ded22b9fefe6d833 Mon Sep 17 00:00:00 2001
+From: Viswanath Kraleti <quic_vkraleti@quicinc.com>
+Date: Fri, 23 Sep 2022 15:25:54 +0530
+Subject: [PATCH] add android sparse image support
+
+---
+ configure.ac                      | 16 ++++++++++++++++
+ lib/Makefile.am                   |  4 ++--
+ tools/sg_write_buffer/Makefile.am |  2 +-
+ 3 files changed, 19 insertions(+), 3 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index a2dff96..5c655a9 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -44,6 +44,10 @@ AC_ARG_WITH([blkid],
+ 	AS_HELP_STRING([--without-blkid],
+ 	  [Ignore presence of libblkid and disable blkid support]))
+ 
++AC_ARG_WITH([android],
++	AS_HELP_STRING([--without-android],
++	  [Add support for sparse file opeartions from Android]))
++
+ # Checks for programs.
+ AC_PROG_CC
+ AC_PROG_LIBTOOL
+@@ -80,6 +84,18 @@ AS_IF([test "x$have_blkid" = "xyes"],
+ 	)]
+ )
+ 
++AS_IF([test "x$with_android" != xno],
++	[AC_CHECK_LIB([sparse], [sparse_file_block_size],
++		[AC_SUBST([libsparse_LIBS], ["-lsparse"])
++			AC_DEFINE([HAVE_ANDROID], [1],
++			[Have support for sparse file opeartions from Android])
++		],
++		[if test "x$with_android" != xcheck; then
++			AC_MSG_FAILURE(
++				[--with-android was given, but libsprase not found])
++		fi
++	], -lsparse)])
++
+ # Checks for header files.
+ AC_CHECK_HEADERS(m4_flatten([
+ 	attr/xattr.h
+diff --git a/lib/Makefile.am b/lib/Makefile.am
+index c1875a0..aaf0d0e 100644
+--- a/lib/Makefile.am
++++ b/lib/Makefile.am
+@@ -3,9 +3,9 @@
+ lib_LTLIBRARIES = libf2fs.la
+ 
+ libf2fs_la_SOURCES = libf2fs.c libf2fs_io.c libf2fs_zoned.c
+-libf2fs_la_CFLAGS = -Wall
++libf2fs_la_CFLAGS = -Wall ${libsparse_CFLAGS} -DWITH_ANDROID
+ libf2fs_la_CPPFLAGS = -I$(top_srcdir)/include
+-libf2fs_la_LDFLAGS = -version-info $(LIBF2FS_CURRENT):$(LIBF2FS_REVISION):$(LIBF2FS_AGE)
++libf2fs_la_LDFLAGS = ${libsparse_LIBS} -version-info $(LIBF2FS_CURRENT):$(LIBF2FS_REVISION):$(LIBF2FS_AGE)
+ 
+ root_libdir=@root_libdir@
+ 
+diff --git a/tools/sg_write_buffer/Makefile.am b/tools/sg_write_buffer/Makefile.am
+index 922c328..19c438d 100644
+--- a/tools/sg_write_buffer/Makefile.am
++++ b/tools/sg_write_buffer/Makefile.am
+@@ -1,7 +1,7 @@
+ ## Makefile.am
+ 
+ if LINUX
+-AM_CPPFLAGS = -I./include
++AM_CPPFLAGS = -I$(srcdir)/include
+ AM_CFLAGS = -Wall
+ sbin_PROGRAMS = sg_write_buffer
+ sg_write_buffer_SOURCES = sg_write_buffer.c \
+-- 
+2.35.1
+

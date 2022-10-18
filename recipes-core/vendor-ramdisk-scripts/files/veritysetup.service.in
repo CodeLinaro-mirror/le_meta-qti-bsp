@@ -45,4 +45,4 @@ RemainAfterExit=yes
 ExecStart=/bin/sh -c "/verity/init-verity.sh -p %I -d @MAPDEVICE@"
 
 [Install]
-WantedBy=default.target
+WantedBy=sysinit.target

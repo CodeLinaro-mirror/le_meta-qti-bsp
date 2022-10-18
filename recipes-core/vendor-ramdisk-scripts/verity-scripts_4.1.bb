@@ -7,6 +7,10 @@ ${LICENSE};md5=3771d4920bd6cdb8cbdf1e8344489ee0"
 SRC_URI  +=  "file://init-verity.sh"
 SRC_URI  +=  "file://veritysetup.service.in"
 
+# Tied to systemd. Build it only when systemd is also building.
+inherit features_check
+REQUIRED_DISTRO_FEATURES = "systemd"
+
 do_configure[noexec] = "1"
 
 do_compile[dirs] = "${WORKDIR}"
@@ -29,23 +33,26 @@ do_compile() {
 
     # Create seperate unit file for each parition to check
     sed -e "s#@DEVICE@#$vdlkmdevice#g; s#@MAPDEVICE@#vendor_dlkm#g;" \
-               veritysetup.service.in >veritysetup@vdlkm.service
+               veritysetup.service.in >veritysetup-vendor-dlkm.service
     sed -e "s#@DEVICE@#$systemdevice#g; s#@MAPDEVICE@#system#g" \
-               veritysetup.service.in >veritysetup@root.service
+               veritysetup.service.in >veritysetup-system.service
 }
 
 do_install () {
   install -d ${D}/verity/
   install -m 755 ${WORKDIR}/init-verity.sh ${D}/verity/init-verity.sh
   install -d ${D}${systemd_unitdir}/system/
-  install -m 0644 ${WORKDIR}/veritysetup@vdlkm.service ${D}${systemd_unitdir}/system/veritysetup@vdlkm.service
-  install -m 0644 ${WORKDIR}/veritysetup@root.service ${D}${systemd_unitdir}/system/veritysetup@root.service
+  install -m 0644 ${WORKDIR}/veritysetup-vendor-dlkm.service \
+      ${D}${systemd_unitdir}/system/veritysetup-vendor-dlkm@.service
+  install -m 0644 ${WORKDIR}/veritysetup-system.service \
+      ${D}${systemd_unitdir}/system/veritysetup-system@.service
+  # enable the services
+  install -d ${D}${systemd_unitdir}/system/sysinit.target.wants/
+  ln -sf ${systemd_unitdir}/system/veritysetup-vendor-dlkm@.service \
+      ${D}${systemd_unitdir}/system/sysinit.target.wants/veritysetup-vendor-dlkm@vdlkm.service
+  ln -sf ${systemd_unitdir}/system/veritysetup-system@.service \
+      ${D}${systemd_unitdir}/system/sysinit.target.wants/veritysetup-system@root.service
 }
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
-FILES_${PN} += " /verity/* ${systemd_unitdir}/system/ "
-
-inherit systemd
-
-SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} = "run-verity-checks-vdlkm.service run-verity-checks-root.service"
+FILES_${PN} += " /verity/* ${systemd_unitdir}/system/* "

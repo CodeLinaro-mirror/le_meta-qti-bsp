@@ -10,7 +10,7 @@ PACKAGE_INSTALL = "\
     adbd \
     usb-composition \
     usb-composition-usbd \
-    busybox \
+    ${VIRTUAL-RUNTIME_base-utils} \
     ext4-utils \
     ${@d.getVar('kern_mods')} \
     fsmgr \
@@ -38,6 +38,8 @@ IMAGE_LINGUAS = ""
 SYSTEMD_DEFAULT_TARGET = "initrd.target"
 
 inherit core-image
+
+do_rootfs[nostamp] = "1"
 
 # Add dependency on vendor ramdisk
 python () {

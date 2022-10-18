@@ -1,17 +1,19 @@
 # Convert human readable partition sizes into bytes
 SYSTEM_IMAGE_ROOTFS_SIZE   = "${@get_size_in_bytes(d.getVar('SYSTEM_SIZE_EXT4') or '256MB')}"
-USERDATA_IMAGE_ROOTFS_SIZE = "${@get_size_in_bytes(d.getVar('USERDATA_SIZE_EXT4') or '1GB')}"
 
 # if A/B support is supported, generate OTA pkg by default.
 GENERATE_AB_OTA_PACKAGE ?= "${@bb.utils.contains('COMBINED_FEATURES', 'qti-ab-boot', '1', '', d)}"
 
+# List all mount points
+MNT_POINTS = "${MACHINE_MNT_POINTS} ${GENERATED_MACHINE_MNT_POINTS}"
+
 QIMGEXT4CLASSES  = ""
 QIMGEXT4CLASSES += "${@bb.utils.contains('GENERATE_AB_OTA_PACKAGE', '1', 'ab-ota-ext4', '', d)}"
 QIMGEXT4CLASSES += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-recovery', 'ota-ext4', '', d)}"
-QIMGEXT4CLASSES += "${@bb.utils.contains('MACHINE_MNT_POINTS', '/cache', 'qimage-cache-ext4', '', d)}"
-QIMGEXT4CLASSES += "${@bb.utils.contains('MACHINE_MNT_POINTS', '/persist', 'qimage-persist-ext4', '', d)}"
-QIMGEXT4CLASSES += "${@bb.utils.contains('MACHINE_MNT_POINTS', '/systemrw', 'qimage-systemrw-ext4', '', d)}"
-QIMGEXT4CLASSES += "${@bb.utils.contains('MACHINE_MNT_POINTS', '/lib/modules', 'qimage-vdlkm-ext4', '', d)}"
+QIMGEXT4CLASSES += "${@bb.utils.contains('MNT_POINTS', '/cache', 'qimage-cache-ext4', '', d)}"
+QIMGEXT4CLASSES += "${@bb.utils.contains('MNT_POINTS', '/persist', 'qimage-persist-ext4', '', d)}"
+QIMGEXT4CLASSES += "${@bb.utils.contains('MNT_POINTS', '/systemrw', 'qimage-systemrw-ext4', '', d)}"
+QIMGEXT4CLASSES += "${@bb.utils.contains('MNT_POINTS', '/lib/modules', 'qimage-vdlkm-ext4', '', d)}"
 
 inherit ${QIMGEXT4CLASSES}
 
@@ -25,8 +27,6 @@ do_image_ext4[noexec] = "1"
 SYSTEMIMAGE_TARGET ?= "system.img"
 SYSTEMIMAGE_UNSPARSE_TARGET ?= "system.img.unsparse"
 SYSTEMIMAGE_MAP_TARGET ?= "system.map"
-USERDATAIMAGE_TARGET ?= "userdata.img"
-USERDATAIMAGE_MAP_TARGET ?= "userdata.map"
 VDLKMIMAGE_TARGET ?= "vendor_dlkm.img"
 VDLKMIMAGE_UNSPARSE_TARGET ?= "vendor_dlkm.img.unspase"
 VDLKMIMAGE_MAP_TARGET ?= "vendor_dlkm.map"
@@ -37,7 +37,7 @@ SELINUX_IMG_S = "${@['-S ${SELINUX_FILE_CONTEXTS}', ''][d.getVar('SELINUX_FILE_C
 IMAGE_EXT4_SELINUX_OPTIONS = "${@bb.utils.contains('DISTRO_FEATURES', 'selinux', '${SELINUX_IMG_S}', '', d)}"
 
 ROOTFS_POSTPROCESS_COMMAND += "do_fsconfig;"
-ROOTFS_POSTPROCESS_COMMAND += "${@bb.utils.contains('MACHINE_MNT_POINTS', 'overlay', 'gen_overlayfs;', '', d)}"
+ROOTFS_POSTPROCESS_COMMAND += "${@bb.utils.contains('MNT_POINTS', 'overlay', 'gen_overlayfs;', '', d)}"
 
 gen_overlayfs() {
     mkdir -p ${IMAGE_ROOTFS}/overlay
@@ -73,7 +73,7 @@ create_symlink_systemd_ext4_mount_rootfs() {
         mountname="${entry:1}"
         # Replace "/" with "-" for systemd to understand mount unit.
         mountname=${mountname//'/'/"-"}
-        if [[ "$mountname" == "firmware" || "$mountname" == "bt_firmware" || "$mountname" == "dsp" || "$mountname" == "lib-modules" ]] && \
+        if [[ "$mountname" == "firmware" || "$mountname" == "bt_firmware" || "$mountname" == "dsp" ]] && \
            [[ "${COMBINED_FEATURES}" =~ .*qti-ab-boot.* ]] ; then
             cp ${IMAGE_ROOTFS_EXT4}/lib/systemd/system/${mountname}-mount-ext4.service ${IMAGE_ROOTFS_EXT4}/lib/systemd/system/${mountname}-mount.service
             ln -sf ${systemd_unitdir}/system/${mountname}-mount.service ${IMAGE_ROOTFS_EXT4}/lib/systemd/system/local-fs.target.requires/${mountname}-mount.service
@@ -156,7 +156,7 @@ get_system_verity_metdata_info(){
 do_makesystem() {
     # Empty the folders that have seperate mount points
     # so that they doesn't end up in system image as well
-    for entry in ${MACHINE_MNT_POINTS}; do
+    for entry in ${MNT_POINTS}; do
         mountname="${entry:1}"
         rm -rf ${IMAGE_ROOTFS_EXT4}/$mountname/*
         echo "Cleared... ${IMAGE_ROOTFS_EXT4}/$mountname/"
@@ -211,21 +211,3 @@ do_makesystem() {
     done
 }
 addtask do_makesystem after do_image before do_image_complete
-
-################################################
-### Generate userdata.img ###
-################################################
-USERDATA_DIR ??= "data"
-do_makeuserdata[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
-
-do_makeuserdata() {
-    cp ${MACHINE_FSCONFIG_CONF_FULL_PATH} ${WORKDIR}/rootfs-fsconfig.conf
-    make_ext4fs -C ${WORKDIR}/rootfs-fsconfig.conf \
-                -B ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${USERDATAIMAGE_MAP_TARGET} \
-                -a /data ${IMAGE_EXT4_SELINUX_OPTIONS} \
-                ${SPARSE_SYSTEMIMAGE_FLAG} -b 4096 -l ${USERDATA_IMAGE_ROOTFS_SIZE} \
-                ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${USERDATAIMAGE_TARGET} \
-                ${IMAGE_ROOTFS}/${USERDATA_DIR}
-}
-
-addtask do_makeuserdata after do_image before do_build

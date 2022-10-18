@@ -15,6 +15,7 @@ SRC_URI += "file://fstab-generator-Honor-verity-enabled-cmdline.patch"
 SRC_URI += "file://set-mhi-nodes.rules"
 SRC_URI += "file://99-gpiochardev.rules"
 SRC_URI += "file://kmem.rules"
+SRC_URI += "file://mmc-rpmb.rules"
 
 # Custom setup for PACKAGECONFIG to get a slimmer systemd.
 # Removed following:
@@ -108,6 +109,7 @@ do_install_append () {
    install -m 0644 ${WORKDIR}/set-mhi-nodes.rules -D ${D}${sysconfdir}/udev/rules.d/set-mhi-nodes.rules
    install -m 0644 ${WORKDIR}/99-gpiochardev.rules -D ${D}${sysconfdir}/udev/rules.d/99-gpiochardev.rules
    install -m 0644 ${WORKDIR}/kmem.rules -D ${D}${sysconfdir}/udev/rules.d/kmem.rules
+   install -m 0644 ${WORKDIR}/mmc-rpmb.rules -D ${D}${sysconfdir}/udev/rules.d/mmc-rpmb.rules
 
    # Mask dev-ttyS0.device
    ln -sf /dev/null ${D}/etc/systemd/system/dev-ttyS0.device
