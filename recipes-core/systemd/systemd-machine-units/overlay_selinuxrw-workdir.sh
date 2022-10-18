@@ -26,12 +26,25 @@
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+SE_OVELAY_PATH="/data/etc_selinux"
+SE_CONTEXT_DIR="${SE_OVELAY_PATH}/mls/contexts/files/"
+SE_POLICY_DIR="${SE_OVELAY_PATH}/mls/policy/"
+
+ReloadSelinuxPolicy() {
+  if [ "$(ls -A $SE_CONTEXT_DIR)"  -a  "$(ls -A $SE_POLICY_DIR)" ]; then
+      semodule -R
+      if [ $? -ne 0 ]; then
+          echo "ERROR: Update SELinux policy failed" >/dev/kmsg
+      fi
+   fi
+}
+
 CreateSelinuxOverlayDirectories () {
    mount_operation=$1
    if [ $mount_operation == "start" ]; then
-     mkdir -p /data/etc_selinux
-     chmod 0755 /data/etc_selinux
-     chcon system_u:object_r:selinux_config_t:s0 /data/etc_selinux
+     mkdir -p ${SE_OVELAY_PATH}
+     chmod 0755 ${SE_OVELAY_PATH}
+     chcon system_u:object_r:selinux_config_t:s0 ${SE_OVELAY_PATH}
      mkdir -p /data/etc_selinux_wk
      chmod 0755 /data/etc_selinux_wk
      chcon system_u:object_r:selinux_config_t:s0 /data/etc_selinux_wk
@@ -43,8 +56,9 @@ CreateSelinuxOverlayDirectories () {
      chmod 0755 /data/var_selinux_wk
      chcon system_u:object_r:semanage_store_t:s0 /data/var_selinux_wk
 
-     mount -t overlay overlay -o context=system_u:object_r:selinux_config_t:s0,upperdir=/data/etc_selinux,lowerdir=/etc/selinux,workdir=/data/etc_selinux_wk,redirect_dir=on /etc/selinux
+     mount -t overlay overlay -o context=system_u:object_r:selinux_config_t:s0,upperdir=${SE_OVELAY_PATH},lowerdir=/etc/selinux,workdir=/data/etc_selinux_wk,redirect_dir=on /etc/selinux
      mount -t overlay overlay -o context=system_u:object_r:semanage_store_t:s0,upperdir=/data/var_selinux,lowerdir=/var/lib/selinux,workdir=/data/var_selinux_wk,redirect_dir=on /var/lib/selinux
+     ReloadSelinuxPolicy
    elif [ $mount_operation == "stop" ]; then
      umount /etc/selinux
      umount /var/lib/selinux
@@ -52,4 +66,5 @@ CreateSelinuxOverlayDirectories () {
 }
 
 eval CreateSelinuxOverlayDirectories $1
+
 exit 0
