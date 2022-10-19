@@ -14,7 +14,6 @@ LIC_FILES_CHKSUM = "file://${WORKDIR}/hardware/qcom/media/NOTICE;md5=67f520c8e55
 
 DEPENDS += "\
     display-commonsys-intf-linux \
-    display-hal-headers \
     gbm \
     gbm-headers \
     glib-2.0 \

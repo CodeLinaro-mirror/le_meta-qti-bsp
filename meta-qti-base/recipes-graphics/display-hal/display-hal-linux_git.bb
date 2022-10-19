@@ -16,6 +16,7 @@ DEPENDS += "binder \
             libhardware \
             linux-msm-headers \
             system-core \
+            ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", '5.15', 'displaydlkm', '', d)} \
 "
 
 PR = "r8"

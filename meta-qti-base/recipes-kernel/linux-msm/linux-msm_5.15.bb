@@ -249,6 +249,3 @@ do_deploy() {
 
 # Put the zImage in the kernel-dev pkg
 FILES:${KERNEL_PACKAGE_NAME}-dev += "/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}"
-
-# For Lemans, add module package directory
-FILES:${KERNEL_PACKAGE_NAME}-modules:lemans += "/lib/modules"

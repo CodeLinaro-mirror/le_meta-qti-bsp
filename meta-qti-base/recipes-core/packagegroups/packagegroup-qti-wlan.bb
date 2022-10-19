@@ -15,12 +15,11 @@ RDEPENDS:${PN} += "\
     hostap-daemon-qcacld \
     wireless-tools \
     iw \
-    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-dual-wlan', 'qcacld32-ll-hasting-cnss0', '', d)} \
+    qcacld32-ll-genoa \
+    qcacld32-ll-hasting-cnss0 \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-dual-wlan', 'qcacld32-ll-hasting-cnss2', '', d)} \
-    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-dual-wlan', '', 'qcacld32-ll-hsp', d)} \
-    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-dual-wlan', '', 'qcacld32-ll-hasting', d)} \
-    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-dual-wlan', '', 'qcacld32-ll-genoa', d)} \
-    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-dual-wlan', '', 'qcacld32-ll-rome', d)} \
+    qcacld32-ll-hsp \
+    qcacld32-ll-rome \
     wlan-sigma-dut \
     wpa-supplicant \
     wlan-conf \
