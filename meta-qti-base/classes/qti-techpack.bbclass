@@ -11,14 +11,15 @@ TECHPACK_DTBS ?= ""
 do_compile() {
     TECHPACK_MODULE_SRC="${@os.path.relpath(d.getVar('S'), d.getVar('SRC_DIR_ROOT'))}"
     cd ${SRC_DIR_ROOT}/kernel/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform && \
-    EXT_MODULES=../../../${TECHPACK_MODULE_SRC} \
+    flock ../out/msm-kernel-${KERNEL_ARCH}-${KERNEL_VARIANT}defconfig -c \
+    "EXT_MODULES=../../../${TECHPACK_MODULE_SRC} \
     BUILD_CONFIG=${KERNEL_BUILD_CONFIG} \
     VARIANT=${KERNEL_VARIANT}defconfig \
     OUT_DIR=../out/msm-kernel-${KERNEL_ARCH}-${KERNEL_VARIANT}defconfig/ \
     MODULE_OUT=${TECHPACK_MODULE_OUT} \
     KERNEL_UAPI_HEADERS_DIR=${STAGING_KERNEL_BUILDDIR} \
     INSTALL_MODULE_HEADERS=${TECHPACK_HEADERS} \
-    ./build/build_module.sh
+    ./build/build_module.sh"
 }
 
 do_install() {
