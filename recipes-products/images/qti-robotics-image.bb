@@ -47,6 +47,12 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-sdk-depends-ros \
 "
 
+#Install packages for imud
+CORE_IMAGE_EXTRA_INSTALL += " \
+        ${@bb.utils.contains('MACHINE_FEATURES', 'qti-sensors', 'imud', '', d)} \
+        ${@bb.utils.contains('MACHINE_FEATURES', 'qti-sensors', 'sensors-client', '', d)} \
+"
+
 # To include kernel headers in SDK
 TOOLCHAIN_TARGET_TASK_append = " linux-msm-headers-dev"
 
