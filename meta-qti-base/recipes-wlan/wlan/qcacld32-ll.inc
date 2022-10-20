@@ -2,6 +2,21 @@ PROVIDES_NAME = "kernel-module-${_MODNAME}"
 
 inherit autotools-brokensep module qperf module-sign systemd qti-kernel-arch-clang
 
+WLAN_PLATFORM_PATH = "${STAGING_KERNEL_BUILDDIR}/wlan-platform-dlkm"
+WLAN_KBUILD_EXTRA = "KBUILD_EXTRA_SYMBOLS=${WLAN_PLATFORM_PATH}/Module.symvers"
+WLAN_PLATFORM_CFG = " \
+                     CONFIG_CNSS_OUT_OF_TREE=y CONFIG_CNSS2=m \
+                     CONFIG_CNSS2_QMI=y CONFIG_CNSS_QMI_SVC=m \
+                     CONFIG_CNSS_PLAT_IPC_QMI_SVC=m \
+                     CONFIG_CNSS_GENL=m CONFIG_CNSS_UTILS=m \
+                     CONFIG_BUS_AUTO_SUSPEND=y \
+                     CONFIG_CNSS2_CONDITIONAL_POWEROFF=y \
+                     WLAN_PLATFORM_INC=${WLAN_PLATFORM_PATH}/inc \
+                     KBUILD_EXTRA="${WLAN_KBUILD_EXTRA}" \
+                   "
+DEPENDS += "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', 'wlan-platform-dlkm', '', d)}"
+EXTRA_OEMAKE:append = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', '${WLAN_PLATFORM_CFG}', '', d)}"
+
 do_unpack[deptask] = "do_populate_sysroot"
 do_compile:prepend() {
     #Add gnu99 for compiler compatible issues
@@ -20,7 +35,7 @@ RPROVIDES:${PN} += "${PROVIDES_NAME}-${KERNEL_VERSION}"
 
 FILES:${PN} += "lib/firmware/wlan/*"
 FILES:${PN} += "lib/firmware/*"
-FILES:${PN} += "lib/modules/${KERNEL_VERSION}/extra/${_MODNAME}.ko"
+FILES:${PN} += "lib/modules/${KERNEL_VERSION}/extra/*"
 
 LDFLAGS:aarch64 = "-O1 --hash-style=gnu --as-needed"
 
