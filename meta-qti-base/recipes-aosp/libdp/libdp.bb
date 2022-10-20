@@ -17,6 +17,7 @@ SRC_URI = "\
     file://0004-libdp-Android11-ota-lib-porting-fs_mgr.patch \
     file://0001-libdp-Create-symlink-for-dynamic-partitions.patch \
     file://0001-libdp-libdm-add-uuid-link-for-partions.patch \
+    file://0001-libdp-update-fs_mgr-to-work-in-LV.patch \
 "
 
 S = "${WORKDIR}/git"
