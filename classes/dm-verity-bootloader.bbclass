@@ -408,7 +408,7 @@ python do_makeboot () {
 }
 do_makeboot[dirs]      = "${BOOTIMGDEPLOYDIR}/${IMAGE_BASENAME}"
 # Make sure native tools and vmlinux ready to create boot.img
-do_makeboot[depends] += "virtual/kernel:do_deploy mkbootimg-native:do_populate_sysroot"
+do_makeboot[depends] += "virtual/kernel:do_deploy virtual/mkbootimg-native:do_populate_sysroot"
 do_makeboot[depends]  += "${PN}:do_make_verity_enabled_system_image"
 do_makeboot[depends]  += "${PN}:do_makeuserdata"
 SSTATETASKS += "do_makeboot"

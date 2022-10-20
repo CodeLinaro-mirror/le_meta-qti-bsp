@@ -4,7 +4,7 @@ DESCRIPTION = "CAF Linux Kernel"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 
-DEPENDS += " mkbootimg-native openssl-native mod-signing-keys"
+DEPENDS += " virtual/mkbootimg-native openssl-native mod-signing-keys"
 RDEPENDS_${KERNEL_PACKAGE_NAME}-base = ""
 
 LDFLAGS_aarch64 = "-O1 --hash-style=gnu --as-needed"
