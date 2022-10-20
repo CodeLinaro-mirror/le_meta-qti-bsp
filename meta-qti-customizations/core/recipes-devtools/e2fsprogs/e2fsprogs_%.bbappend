@@ -1,13 +1,8 @@
 #Below Package is fetch from Codelinaro
-SRC_URI = "${CLO_LE_GIT}/e2fsprogs.git;protocol=https;branch=ext2/master"
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-SRC_URI += "file://remove.ldconfig.call.patch \
-           file://run-ptest \
-           file://ptest.patch \
-           file://mkdir_p.patch \
-           file://0001-configure.ac-correct-AM_GNU_GETTEXT.patch \
-           file://0001-intl-do-not-try-to-use-gettext-defines-that-no-longe.patch \
-           file://0001-e2fsprogs-Support-the-stable_inodes-fe.patch \
-           "
+SRC_URI:remove = "git://git.kernel.org/pub/scm/fs/ext2/e2fsprogs.git;branch=master"
+SRC_URI:prepend = " ${CLO_LE_GIT}/e2fsprogs.git;protocol=https;branch=ext2/master "
+
+SRCREV = "aad34909b6648579f42dade5af5b46821aa4d845"
