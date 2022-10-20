@@ -27,16 +27,12 @@
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 cd /sys/devices/system/memory/
-n=1
-addr=`cat aligned_blocks_addr | cut -d ',' -f $n`
-num=`cat aligned_blocks_num | cut -d ',' -f $n`
-while [ -n "$addr" ]
+IFS=',' read -a addr < /sys/devices/system/memory/aligned_blocks_addr
+IFS=',' read -a num < /sys/devices/system/memory/aligned_blocks_num
+for index in "${!addr[@]}"
 do
-echo $addr > probe
-echo online > memory$num/state
-let n++
-addr=`cat aligned_blocks_addr | cut -d ',' -f $n`
-num=`cat aligned_blocks_num | cut -d ',' -f $n`
+echo ${addr[index]} > probe
+echo online > memory${num[index]}/state
 done
 # tune kernel max-threads
 totalram=`grep MemTotal /proc/meminfo | awk '{print $2}'`
