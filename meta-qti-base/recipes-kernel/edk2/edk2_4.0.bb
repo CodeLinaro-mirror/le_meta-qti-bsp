@@ -76,8 +76,11 @@ do_install() {
 }
 
 do_deploy() {
-    install -m 0644 ${D}/boot/abl.elf ${DEPLOYDIR}
-    mv ${DEPLOYDIR}/abl.elf ${DEPLOYDIR}/${PRODUCT}-abl.elf
+    if [ -f ${D}/boot/${PRODUCT}-abl.elf ]; then
+      install -m 0644 ${D}/boot/${PRODUCT}-abl.elf ${DEPLOYDIR}
+    else
+      install -m 0644 ${S}/../unsigned_abl.elf ${DEPLOYDIR}
+    fi
 }
 do_deploy[dirs] = "${S} ${DEPLOYDIR}"
 do_deploy[nostamp] = "1"
