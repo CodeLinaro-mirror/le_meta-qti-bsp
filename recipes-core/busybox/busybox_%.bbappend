@@ -24,7 +24,6 @@ SRC_URI += "\
             file://sensors.sh \
             file://add_lock_util.patch \
 "
-SRC_URI_append_apq8053 += "file://apq8053/mdev.conf"
 
 # By default, we now split BusyBox into two binaries.
 # One that is suid root for those components that need it.
@@ -77,8 +76,6 @@ do_install_append() {
 
         if [ ${BASEMACHINE} == "mdm9607" ];then
             install -m 0755 ${WORKDIR}/sensors.sh ${D}${sysconfdir}/mdev/
-        elif [ ${BASEMACHINE} == "apq8053" ];then
-            install -m 0644 ${WORKDIR}/apq8053/mdev.conf ${D}${sysconfdir}/
         elif [ "${BASEMACHINE}" == "sdxpoorwills" ] && [ "${DISTRO}" == "auto" ]; then
             install -m 0755 ${WORKDIR}/sensors.sh ${D}${sysconfdir}/mdev/
         fi
@@ -93,4 +90,4 @@ do_install_append() {
 # util-linux installs dmesg with priority 80. Use higher priority than util-linux to get busybox dmesg installed.
 ALTERNATIVE_PRIORITY[dmesg] = "100"
 
-#FILES_${PN}-mdev += "${sysconfdir}/mdev/* "
+FILES:${PN}-syslog += "${systemd_unitdir}/system/"
