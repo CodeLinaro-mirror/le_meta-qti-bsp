@@ -18,8 +18,8 @@ TECHPACK_MODULE_OUT = "${WORKDIR}/graphics-kernel"
 TECHPACK_MODULES = "msm_kgsl.ko"
 TECHPACK_HEADERS = "1"
 
-do_install:append() {
-    install -m 0644 ${S}/config/graphics_gen3_autoload.conf -D ${D}${sysconfdir}/modules-load.d/graphics_load.conf
+do_install:append:sa81x5() {
+    install -m 0644 ${S}/config/autoload_sa81x5.conf -D ${D}${sysconfdir}/modules-load.d/graphics_load.conf
 }
 
 FILES:${PN} += "${nonarch_base_libdir}/modules/${KERNEL_VERSION}/*"
