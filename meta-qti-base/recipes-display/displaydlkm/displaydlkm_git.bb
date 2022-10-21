@@ -19,7 +19,7 @@ TECHPACK_MODULE_OUT = "${WORKDIR}/display-drivers"
 TECHPACK_MODULES = "msm/msm_drm.ko"
 TECHPACK_HEADERS = "1"
 
-do_install:append(){
+do_install:append:sa81x5(){
     install -m 0755 ${S}/config/display_augen3_load.conf -D ${D}${sysconfdir}/modules-load.d/display_load.conf
 }
 
