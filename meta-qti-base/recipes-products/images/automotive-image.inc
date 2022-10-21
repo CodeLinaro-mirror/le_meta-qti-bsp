@@ -15,6 +15,7 @@ IMAGE_INSTALL += " \
     ${@bb.utils.contains('COMBINED_FEATURES', 'qti-bluetooth', 'packagegroup-qti-bluetooth', '', d)} \
     ${@bb.utils.contains('COMBINED_FEATURES', 'qti-location', 'packagegroup-qti-location-hal', '', d)} \
     ${@bb.utils.contains('COMBINED_FEATURES', 'qti-camera', 'packagegroup-qti-camera', '', d)} \
+    ${@bb.utils.contains('COMBINED_FEATURES', 'qti-graphics', 'packagegroup-qti-graphics', '', d)} \
     "
 
 IMAGE_LINGUAS = ""
