@@ -49,6 +49,8 @@ def check_stream_dependencies(d):
     if bb.utils.contains('DISTRO_FEATURES', 'nad-prod', True, False, d):
         # Generate payload.bin streaming update.
         return " payload-gen-native"
+    else:
+        return ""
 
 # Add tasks to generate recovery image, OTA zip files
 python __anonymous () {
