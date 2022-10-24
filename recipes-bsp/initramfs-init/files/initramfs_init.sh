@@ -35,6 +35,9 @@
 
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
 
+UBIFS_VOL_HEADER="1831 0610"
+RAM_SIZE_LIMIT_VOL="512"
+
 #------------------------------------------------------------
 # Below macro can be set by build scripts, if not,
 # a default volume will be set in function SetArgs()
@@ -363,35 +366,45 @@ MountSystem () {
         if dd if=${char_device}\
             count=1 bs=4 2>/dev/null | grep 'hsqs' > /dev/null; then
             image_type="squashfs"
+        elif dd if=${char_device}\
+            count=1 bs=4 2>/dev/null | hexdump | grep "${UBIFS_VOL_HEADER}" > /dev/null; then
+            image_type="ubifs"
+        else
+            image_type="unknow"
         fi
 
-        if grep 'nad_fde=1' /proc/cmdline > /dev/null; then
+        # UBIFS don't support signing, so won't work with FDE
+        if [ "${image_type}" != "ubifs" ]; then
+            if grep 'nad_fde=1' /proc/cmdline > /dev/null; then
 
-            # 4+4 device has not enough ram size for FDE encryption
-            # So, skip encryption if the memory is smaller than 512
-            supported_mem_size=`free -m | grep Mem | awk '{print $2}'`
+                # 4+4 device has not enough ram size for FDE encryption
+                # So, skip encryption if the memory is smaller than ${RAM_SIZE_LIMIT_VOL}
+                supported_mem_size=`free -m | grep Mem | awk '{print $2}'`
 
-            if [ ${supported_mem_size} -gt 512 ]; then
+                if [ ${supported_mem_size} -gt ${RAM_SIZE_LIMIT_VOL} ]; then
 
-                # Encrypt other images first, and later will encrypt the root file system.
-                EncryptNotSysPartition
-                if [ $? -ne ${STATUS_OK} ]; then
-                    echo Error: MountSystem no device: ${block_device} found
-                    return ${STATUS_ERR}
+                    # Encrypt other images first, and later will encrypt the root file system.
+                    EncryptNotSysPartition
+                    if [ $? -ne ${STATUS_OK} ]; then
+                        echo Error: MountSystem no device: ${block_device} found
+                        return ${STATUS_ERR}
+                    fi
+
+                    nad_fde_status="enabled"
+
+                    # Currently, only squashfs image is supported for FDE. If the image magic
+                    # isn't squashfs type "hsqs", then suppose this partition was encrypted.
+                    # And, after decrypted, it still squashfs type.
+                    if [ "${image_type}" == "unknow" ]; then
+                        image_type="squashfs"
+                    fi
+                else
+                    echo "Warning: Memory size ${supported_mem_size} is too small, skip FDE."
                 fi
-
-                nad_fde_status="enabled"
-
-                # Currently, only squashfs image is supported for FDE. If the image magic
-                # isn't squashfs type "hsqs", then suppose this partition was encrypted.
-                # And, after decrypted, it still squashfs type.
-                image_type="squashfs"
-            else
-                echo "Warning: Memory size ${supported_mem_size} is too small, skip FDE."
             fi
         fi
 
-        if [ "${image_type}" == "squashfs" ] || [ "${nad_fde_status}" == "enabled" ]; then
+        if [ "${image_type}" == "squashfs" ]; then
 
             if [ ! -e "${block_device}" ]; then
                 ubiblock --create "${char_device}"
@@ -451,13 +464,15 @@ MountSystem () {
                 echo Error: mount 'squashfs ${block_device}' failed
                 return ${STATUS_ERR}
             fi
-        else
-            # If not squashfs in UBI then take it as ubifs, for new image type, you need to add it
-            mount -t ${image_type} "${char_device}" ${ROOT_MOUNT} -oro
+        elif [ "${image_type}" == "ubifs" ]; then
+            mount -t ${image_type} "${char_device}" ${ROOT_MOUNT} -orw
             if [ $? -ne ${STATUS_OK} ]; then
                 echo Error: mount 'ubifs ${char_device}' failed
                 return ${STATUS_ERR}
             fi
+        else
+            echo "Unknow system type: ${image_type}"
+            return ${STATUS_ERR}
         fi
     else
         echo This is not a ubi partition, not support yet
