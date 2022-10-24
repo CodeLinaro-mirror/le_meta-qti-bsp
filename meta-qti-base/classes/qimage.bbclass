@@ -126,10 +126,13 @@ do_make_avb_image(){
 addtask do_make_avb_image after do_image_complete before do_build
 
 
-# create dummy vendor-boot & vbmeta image
 VENDORBOOT_IMG_CMD = " \
+    # create dummy vendor-boot & vbmeta image
     dd if=/dev/zero of=${DEPLOY_DIR_IMAGE}/${VENDORBOOTIMAGE_TARGET} bs=1M count=96; \
     dd if=/dev/zero of=${DEPLOY_DIR_IMAGE}/${VBMETAIMAGE_TARGET} bs=1K count=3; \
+
+    # create dummy boot-init image for Andriod container
+    dd if=/dev/zero of=${DEPLOY_DIR_IMAGE}/${BOOTINIT_TARGET} bs=1K count=1; \
 "
 
 # compress the image to ease the upload
