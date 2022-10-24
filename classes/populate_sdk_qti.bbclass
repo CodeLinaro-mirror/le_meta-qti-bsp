@@ -31,6 +31,24 @@
 
 inherit populate_sdk_ext
 
+python copy_buildsystem_append() {
+    # Create src directory in extensible SDK to copy the project sources
+    bb.utils.mkdirhier(baseoutpath + '/src')
+    # Enable the use of WORKSPACE variable on an extensible SDK
+    with open(baseoutpath + '/conf/bblayers.conf', 'a') as f:
+        f.write('WORKSPACE = "$' + '{TOPDIR}/layers/src"\n')
+        f.write('WORKSPACEROOT = "$' + '{TOPDIR}/layers"\n')
+    with open(baseoutpath + '/conf/local.conf', 'a') as f:
+        f.write('\nPREBUILT_SRC_DIR = "%s"\n' % d.getVar('PREBUILT_SRC_DIR'))
+
+    #copy image_manifest to esdk, which record the packages installed in image
+    image_manifest = d.getVar('IMAGE_MANIFEST')
+    image_name = d.getVar('IMAGE_NAME')
+    image_suffix = d.getVar('IMAGE_NAME_SUFFIX')
+    shutil.copyfile(image_manifest, baseoutpath + '/conf/' + image_name + image_suffix + '.manifest')
+}
+
+
 # To include protoc compiler in SDK
 TOOLCHAIN_HOST_TASK_append = " nativesdk-protobuf-compiler "
 
