@@ -6,8 +6,8 @@ TOYBOX_RAMDISK ?= "False"
 ENABLE_ADB ?= "True"
 ENABLE_ADB_qti-distro-base-user ?= "False"
 PACKAGE_INSTALL += "${@oe.utils.conditional('ENABLE_ADB', 'True', 'adbd usb-composition usb-composition-usbd', '', d)}"
-PACKAGE_INSTALL += "${@oe.utils.conditional('TOYBOX_RAMDISK', 'True', 'toybox mksh gawk coreutils e2fsprogs dosfstools', '', d)}"
-PACKAGE_INSTALL += "${@oe.utils.conditional('FLASHLESS_MCU', 'True', 'nbd-client', '', d)}"
+PACKAGE_INSTALL += "${@oe.utils.conditional('TOYBOX_RAMDISK', 'True', 'toybox mksh gawk coreutils e2fsprogs dosfstools ethtool iputils iperf2 iperf3 devmem2 tcpdump', '', d)}"
+PACKAGE_INSTALL += "${@oe.utils.conditional('FLASHLESS_MCU', 'True', 'nbd-client techpack-ecpri', '', d)}"
 
 do_ramdisk_create[depends] += "virtual/kernel:do_deploy"
 do_ramdisk_create[cleandirs] += "${RAMDISKDIR}"
@@ -16,6 +16,7 @@ fakeroot do_ramdisk_create() {
         mkdir -p ${RAMDISKDIR}/etc
         mkdir -p ${RAMDISKDIR}/etc/init.d
         mkdir -p ${RAMDISKDIR}/lib
+        mkdir -p ${RAMDISKDIR}/lib/modules
         mkdir -p ${RAMDISKDIR}/usr
         mkdir -p ${RAMDISKDIR}/usr/bin
         mkdir -p ${RAMDISKDIR}/usr/sbin
@@ -38,7 +39,22 @@ fakeroot do_ramdisk_create() {
             cp ${IMAGE_ROOTFS}/usr/lib/libcrypt.so.2 lib/libcrypt.so.2
             cp ${IMAGE_ROOTFS}/bin/toybox bin/
             cp ${IMAGE_ROOTFS}/bin/mksh bin/
+            cp ${IMAGE_ROOTFS}/lib/libcap.so.2 lib/libcap.so.2
+            cp ${IMAGE_ROOTFS}/usr/lib/libgcrypt.so.20 lib/libgcrypt.so.20
+            cp ${IMAGE_ROOTFS}/usr/sbin/ethtool bin/
+            cp ${IMAGE_ROOTFS}/bin/ping.iputils bin/
+            cp ${IMAGE_ROOTFS}/bin/arping bin/
+            cp ${IMAGE_ROOTFS}/usr/lib/libgpg-error.so.0 lib/libgpg-error.so.0
+            cp ${IMAGE_ROOTFS}/usr/bin/devmem2 bin/
+            cp ${IMAGE_ROOTFS}/usr/bin/iperf bin/
+            cp ${IMAGE_ROOTFS}/usr/bin/iperf3 bin/
+            cp ${IMAGE_ROOTFS}/usr/lib/libiperf.so.0 lib/libiperf.so.0
+            cp ${IMAGE_ROOTFS}/usr/sbin/tcpdump bin/
+            cp ${IMAGE_ROOTFS}/usr/lib/libpcap.so.1 lib/libpcap.so.1
+            cp ${IMAGE_ROOTFS}/usr/lib/libcrypto.so.1.1 lib/
             ln -s mksh bin/sh
+            ln -s ping.iputils bin/ping
+            ln -s devmem2 bin/devmem
 
             # Don't install redundant packages for VM image
             if ${@bb.utils.contains('IMAGE_FEATURES', 'vm', 'false', 'true', d)}; then
@@ -101,10 +117,13 @@ fakeroot do_ramdisk_create() {
             cp ${IMAGE_ROOTFS}/usr/sbin/nbd-client.nbd usr/sbin/nbd
             cp ${IMAGE_ROOTFS}/usr/sbin/setup_nbdclient usr/sbin/
             cp ${IMAGE_ROOTFS}/etc/nbdtab etc/
+
+            # DMA kos
+            cp ${IMAGE_ROOTFS}/usr/lib/modules/ecpri_dmam.ko lib/modules/
+            cp ${IMAGE_ROOTFS}/usr/lib/modules/gsim.ko lib/modules/
         fi
 
         if ${@bb.utils.contains('IMAGE_FEATURES', 'vm', 'true', 'false', d)}; then
-            cp ${IMAGE_ROOTFS}/lib/ld-linux-aarch64.so.1 lib/ld-linux-aarch64.so.1
             if [[ "${TOYBOX_RAMDISK}" == "True" ]]; then
                 cp ${COREBASE}/meta-qti-bsp/recipes-products/images/include/vmrd-init-toybox vmrd-init
             else
@@ -131,16 +150,22 @@ fakeroot do_ramdisk_create() {
                 cp -r ${IMAGE_ROOTFS}/sbin/usb/ sbin/
                 cp ${IMAGE_ROOTFS}/usr/lib/libstdc++.so.6 lib/libstdc++.so.6
             fi
+
             if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-csm', 'true', 'false', d)}; then
-                cp ${IMAGE_ROOTFS}/lib/ld-linux-aarch64.so.1 lib/ld-linux-aarch64.so.1
                 cp ${COREBASE}/meta-qti-bsp/recipes-products/images/include/csmrd-init .
                 chmod 744 csmrd-init
                 ln -s csmrd-init init
             else
-                cp ${IMAGE_ROOTFS}/lib/ld-linux-armhf.so.3 lib/ld-linux-armhf.so.3
                 ln -s bin/busybox init
             fi
         fi
+
+        if [ "${TARGET_ARCH}" = "arm" ]; then
+            cp ${IMAGE_ROOTFS}/lib/ld-linux-armhf.so.3 lib/ld-linux-armhf.so.3
+        else
+            cp ${IMAGE_ROOTFS}/lib/ld-linux-aarch64.so.1 lib/ld-linux-aarch64.so.1
+        fi
+
         cp ${IMAGE_ROOTFS}/lib/libz.so.1 lib/libz.so.1
         cp ${IMAGE_ROOTFS}/lib/libc.so.6 lib/libc.so.6
         cp ${IMAGE_ROOTFS}/lib/libm.so.6 lib/libm.so.6
@@ -190,12 +215,16 @@ fakeroot do_ramdisk_create() {
         # remove the initrd.gz file if exist
         rm -rf ${IMGDEPLOYDIR}/${PN}-initrd.gz
         if ${@bb.utils.contains_any('PREFERRED_VERSION_linux-msm', '5.10 5.15', 'true', 'false', d)}; then
-            bash ./scripts/gen_initramfs.sh -o ${IMGDEPLOYDIR}/${PN}-initrd.gz -u 0 -g 0 ${RAMDISKDIR}
+            # gen_initramfs.sh uses gen_init_cpio to generate the cpio archive.
+            bash ./scripts/gen_initramfs.sh -o ${IMGDEPLOYDIR}/${PN}-initrd -u 0 -g 0 ${RAMDISKDIR}
+            gzip -n -9 -f ${IMGDEPLOYDIR}/${PN}-initrd
         else
+            # gen_initramfs_list creates compressed initramfs file using gen_init_cpio
+            # and compressor depending on the extension
             bash ./scripts/gen_initramfs_list.sh -o ${IMGDEPLOYDIR}/${PN}-initrd.gz -u 0 -g 0 ${RAMDISKDIR}
         fi
 
         cd ${CURRENT_DIR}
 }
 
-addtask do_ramdisk_create after do_image before do_image_complete
+addtask do_ramdisk_create after do_image before do_makeboot
