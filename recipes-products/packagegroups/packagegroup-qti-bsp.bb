@@ -2,6 +2,7 @@ SUMMARY = "Basic programs and scripts required by LE system"
 DESCRIPTION = "Package group to bring in all basic packages for LE system"
 LICENSE = "BSD-3-Clause"
 
+PACKAGE_ARCH = "${TUNE_PKGARCH}"
 inherit packagegroup
 
 PROVIDES = "${PACKAGES}"
