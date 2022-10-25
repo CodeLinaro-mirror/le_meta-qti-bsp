@@ -39,7 +39,6 @@ CORE_IMAGE_EXTRA_INSTALL += "\
 
 # Following packages will be enabled later
 CORE_IMAGE_EXTRA_INSTALL_remove_sa410m = "\
-       packagegroup-qti-ss-mgr \
        qmi-shutdown-modem \
        packagegroup-qti-telsdk \
 "
@@ -60,6 +59,7 @@ do_merge_dtbs() {
     ${DEPLOY_DIR_IMAGE}/build-artifacts/dtb \
     ${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbos ${DEPLOY_DIR_IMAGE}/dtbs
 }
+do_merge_dtbs[depends] += "virtual/kernel:do_deploy"
 
 do_copy_abl[dirs] = "${DEPLOY_DIR_IMAGE}"
 do_copy_abl() {
