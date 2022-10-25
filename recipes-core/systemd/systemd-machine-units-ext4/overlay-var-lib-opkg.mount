@@ -1,0 +1,11 @@
+# Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+# SPDX-License-Identifier: BSD-3-Clause-Clear
+
+[Unit]
+After=overlay-workdir.service
+
+[Mount]
+What=overlay
+Where=/var/lib/opkg
+Type=overlay
+Options=lowerdir=/var/lib/opkg,upperdir=/overlay/var/lib/opkg,workdir=/overlay/.var-lib-opkg-work,x-systemd.automount,x-systemd.growfs,rootcontext=system_u:object_r:usr_t:s0
