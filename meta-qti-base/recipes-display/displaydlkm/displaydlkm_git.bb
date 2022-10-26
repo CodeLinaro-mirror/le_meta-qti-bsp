@@ -23,5 +23,9 @@ do_install:append:sa81x5(){
     install -m 0755 ${S}/config/display_augen3_load.conf -D ${D}${sysconfdir}/modules-load.d/display_load.conf
 }
 
+do_install:append:lemans(){
+    install -m 0755 ${S}/config/display_augen4_load.conf -D ${D}${sysconfdir}/modules-load.d/display_load.conf
+}
+
 FILES:${PN} += "${nonarch_base_libdir}/modules/${KERNEL_VERSION}/*"
 FILES_${PN} += "${sysconfdir}/*"
