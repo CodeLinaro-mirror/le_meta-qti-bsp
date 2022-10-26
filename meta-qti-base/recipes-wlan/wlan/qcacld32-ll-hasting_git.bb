@@ -53,6 +53,7 @@ _WLAN_CFG_OVERRIDE = " \
                         CONFIG_HIF_DEBUG=y \
                         CONFIG_HIF_CE_DEBUG_DATA_BUF=y \
                         CONFIG_BUS_AUTO_SUSPEND=n \
+                        CONFIG_WLAN_FEATURE_DP_EVENT_HISTORY=y \
                       "
 
 EXTRA_OEMAKE:append = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE}"
