@@ -27,7 +27,7 @@ SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/bootable/bootloader/edk2"
 
-inherit deploy
+inherit deploy qti-kernel-toolchain
 
 VBLE = "${@bb.utils.contains('DISTRO_FEATURES', 'vble','1', '0', d)}"
 VERITY_ENABLED = "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity','1', '0', d)}"
@@ -35,8 +35,8 @@ EARLY_ETH = "${@bb.utils.contains('DISTRO_FEATURES', 'early-eth', '1', '0', d)}"
 HIBERNATION = "${@bb.utils.contains('COMBINED_FEATURES', 'hibernation', '1', '0', d)}"
 AB_BOOT_LXC = "${@bb.utils.contains('MACHINE_FEATURES', 'qti-lxc', '1', '0', d)}"
 
-EXTRA_OEMAKE = "'CLANG_BIN=${STAGING_BINDIR_NATIVE}/clang/bin/' \
-                'CLANG_PREFIX=${STAGING_BINDIR_NATIVE}/clang/bin/' \
+EXTRA_OEMAKE = "'CLANG_BIN=${KERNEL_TOOLCHAIN_CLANG}/bin/' \
+                'CLANG_PREFIX=${KERNEL_TOOLCHAIN_CLANG}/bin/' \
                 'TARGET_ARCHITECTURE=${TARGET_ARCH}'\
                 'BUILDDIR=${S}'\
                 'BOOTLOADER_OUT=${S}/out'\
@@ -60,8 +60,8 @@ do_prebuilt_configure() {
 
 do_configure[noexec] = "1"
 do_compile () {
-    export BUILD_CC=${STAGING_BINDIR_NATIVE}/clang/bin/clang
-    export BUILD_CXX=${STAGING_BINDIR_NATIVE}/clang/bin/clang++
+    export BUILD_CC=${KERNEL_TOOLCHAIN_CLANG}/bin/clang
+    export BUILD_CXX=${KERNEL_TOOLCHAIN_CLANG}/bin/clang++
     export CC=clang
     export CXX=clang++
     export LD=${BUILD_LD}

@@ -76,11 +76,20 @@ do_prebuilt_configure() {
     # msm-kernel path, for now copy them for this path to avoid build failures.
     # Ask prebuilt providers to make these available in KERNEL_PREBUILT_PATH.
     install -m 0644 ../msm-kernel/.config ${B}
+    install -m 0644 ../msm-kernel/Makefile ${B}
     install -m 0644 ../msm-kernel/Module.symvers ${B}
+    install -m 0644 ../msm-kernel/include/config/auto.conf ${B}/include/config/auto.conf
     install -m 0644 ../msm-kernel/include/config/kernel.release ${B}/include/config/kernel.release
     install -m 0644 ../msm-kernel/scripts/module.lds ${B}/scripts/module.lds
     install -m 0644 ../msm-kernel/include/generated/utsrelease.h ${B}/include/generated
     install -m 0644 ../msm-kernel/certs/* ${B}/certs
+    cp -R ../msm-kernel/scripts/ ${B}/
+    cp -R ../msm-kernel/include/generated/ ${B}/include/
+
+    if [ -d ../msm-kernel/arch/${ARCH}/include ]; then
+            mkdir -p ${B}/arch/${ARCH}/include/
+            cp -fR ../msm-kernel/arch/${ARCH}/include/* ${B}/arch/${ARCH}/include/
+    fi
 
     install -d ${B}/arch/${ARCH}/boot/
     cp -R ../msm-kernel/arch/${ARCH}/boot/dts/ ${B}/arch/${ARCH}/boot/
@@ -96,6 +105,9 @@ do_prebuilt_configure() {
     cp -R ../msm-kernel/usr/gen_init_cpio ${B}/usr
     cp -R ../msm-kernel/usr/initramfs_data.cpio ${B}/usr
     cp -R ../msm-kernel/usr/initramfs_inc_data ${B}/usr
+
+    # copy external tools
+    cp -R ../host ${B}
 
     #copy modules
     install -d ${B}/modules
@@ -119,13 +131,20 @@ do_prebuilt_shared_workdir() {
     # Copy files required for module builds
     install -m 0644 System.map $kerneldir/System.map-${KERNEL_VERSION}
     [ -e Module.symvers ] && install -m 0644 Module.symvers $kerneldir/
+    install -m 0644 Makefile $kerneldir/
     install -m 0644 .config $kerneldir/
     mkdir -p $kerneldir/include/config
-    mkdir -p $kerneldir/scripts
+    install -m 0644 include/config/auto.conf $kerneldir/include/config/auto.conf
     install -m 0644 include/config/kernel.release $kerneldir/include/config/kernel.release
-    if [ -e "${B}/scripts/module.lds" ]; then
-        install -m 0644 ${B}/scripts/module.lds ${STAGING_KERNEL_BUILDDIR}/scripts/module.lds
+    cp -R include/generated/ $kerneldir/include/
+    cp -R ${B}/scripts $kerneldir
+
+    if [ -d arch/${ARCH}/include ]; then
+            mkdir -p $kerneldir/arch/${ARCH}/include/
+            cp -fR arch/${ARCH}/include/* $kerneldir/arch/${ARCH}/include/
     fi
+
+    cp -R host $kerneldir
 
     install -d $kerneldir/arch/${ARCH}/boot/
     cp -R arch/${ARCH}/boot/dts/ $kerneldir/arch/${ARCH}/boot/
