@@ -1,6 +1,9 @@
 # Convert human readable partition sizes into bytes
 SYSTEM_IMAGE_ROOTFS_SIZE   = "${@get_size_in_bytes(d.getVar('SYSTEM_SIZE_EXT4') or '256MB')}"
 
+# support veritysetup tools.
+DEPENDS += "cryptsetup-native"
+
 # if A/B support is supported, generate OTA pkg by default.
 GENERATE_AB_OTA_PACKAGE ?= "${@bb.utils.contains('COMBINED_FEATURES', 'qti-ab-boot', '1', '', d)}"
 
@@ -22,7 +25,6 @@ CORE_IMAGE_EXTRA_INSTALL += "${@bb.utils.contains('COMBINED_FEATURES', 'qti-ab-b
 CORE_IMAGE_EXTRA_INSTALL += "systemd-machine-units-ext4"
 
 do_image_ext4[noexec] = "1"
-
 # Default Image names
 SYSTEMIMAGE_TARGET ?= "system.img"
 SYSTEMIMAGE_UNSPARSE_TARGET ?= "system.img.unsparse"
