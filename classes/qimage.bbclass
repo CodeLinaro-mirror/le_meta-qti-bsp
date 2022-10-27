@@ -238,7 +238,6 @@ python do_make_veritybootimg () {
     subprocess.call(cmd, shell=True)
 }
 do_make_veritybootimg[depends]  += "${PN}:do_makesystem"
-do_make_veritybootimg[depends]  += "${PN}:do_make_bootimg"
 
 python () {
     bundle_initramfs = d.getVar('INITRAMFS_IMAGE_BUNDLE', True)
