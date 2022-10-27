@@ -3,9 +3,11 @@ inherit autotools pkgconfig native deploy
 PR = "r4"
 
 DESCRIPTION = "bsdiff tool from Android"
-LICENSE = "BSD"
-LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
-BSD;md5=3775480a712fc46a69647678acb234cb"
+LICENSE = "BSD-2-Clause & BSD-3-Clause"
+LIC_FILES_CHKSUM = " \
+    file://${COMMON_LICENSE_DIR}/BSD-2-Clause;md5=cb641bc04cda31daea161b1bc15da69f \
+    file://${COMMON_LICENSE_DIR}/BSD-3-Clause;md5=550794465ba0ec5312d6919e203a55f9 \
+"
 
 DEPENDS += "bzip2-replacement-native libdivsufsort-native"
 
