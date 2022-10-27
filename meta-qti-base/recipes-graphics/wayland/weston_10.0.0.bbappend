@@ -6,6 +6,7 @@ DEPENDS += "gbm gbm-headers \
             libcutils \
             linux-msm-headers \
             weston-sdm-extension-headers \
+            ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', 'libdmabufheap', '', d)} \
 "
 DEPENDS:remove:lemans = " virtual/egl"
 
