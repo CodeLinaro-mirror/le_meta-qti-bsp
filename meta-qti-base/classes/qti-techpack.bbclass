@@ -7,6 +7,7 @@ TECHPACK_MODULE_OUT ?= ""
 TECHPACK_HEADERS ?= ""
 TECHPACK_MODULES ?= ""
 TECHPACK_DTBS ?= ""
+TECHPACK_MAKE_ARGS ?= ""
 
 do_compile() {
     TECHPACK_MODULE_SRC="${@os.path.relpath(d.getVar('S'), d.getVar('SRC_DIR_ROOT'))}"
@@ -19,7 +20,7 @@ do_compile() {
     MODULE_OUT=${TECHPACK_MODULE_OUT} \
     KERNEL_UAPI_HEADERS_DIR=${STAGING_KERNEL_BUILDDIR} \
     INSTALL_MODULE_HEADERS=${TECHPACK_HEADERS} \
-    ./build/build_module.sh"
+    ./build/build_module.sh  ${TECHPACK_MAKE_ARGS}"
 }
 
 do_install() {
