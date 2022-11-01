@@ -1,0 +1,265 @@
+From 4fc8fb00e00fce1e15d63b0cd8fc578d0a6ccb14 Mon Sep 17 00:00:00 2001
+From: Nan Zhang <quic_nanzhan@quicinc.com>
+Date: Thu, 10 Nov 2022 16:09:10 +0800
+Subject: [PATCH] libavb: Add Makefile.am and configure.ac for libavb to build.
+
+To build libavb.
+
+Upsteam-Status: Pending
+
+Change-Id: Id62f6a96ee3ccd981769181433e7ca3fb050a9a8
+Signed-off-by: Nan Zhang <quic_nanzhan@quicinc.com>
+---
+ Makefile.am                      |  2 ++
+ configure.ac                     | 27 +++++++++++++++++++++
+ libavb/Makefile.am               | 51 ++++++++++++++++++++++++++++++++++++++++
+ libavb/avb_cmdline.h             |  9 ++++++-
+ libavb/avb_rsa.h                 |  9 ++++++-
+ libavb/avb_sha.h                 | 11 +++++++--
+ libavb/sha/avb_crypto_ops_impl.h | 11 +++++++--
+ libavb/sha/sha256_impl.c         |  9 ++++++-
+ libavb/sha/sha512_impl.c         |  9 ++++++-
+ 9 files changed, 130 insertions(+), 8 deletions(-)
+ create mode 100644 Makefile.am
+ create mode 100644 configure.ac
+ create mode 100644 libavb/Makefile.am
+
+diff --git a/Makefile.am b/Makefile.am
+new file mode 100644
+index 0000000..efca91f
+--- /dev/null
++++ b/Makefile.am
+@@ -0,0 +1,2 @@
++
++SUBDIRS := libavb
+diff --git a/configure.ac b/configure.ac
+new file mode 100644
+index 0000000..ac52ac5
+--- /dev/null
++++ b/configure.ac
+@@ -0,0 +1,27 @@
++AC_PREREQ(2.61)
++AC_INIT([libavb],1.0.0)
++AM_INIT_AUTOMAKE([-Wall gnu foreign])
++AC_CONFIG_SRCDIR([Makefile.am])
++AC_CONFIG_HEADERS([config.h])
++AC_CONFIG_MACRO_DIR([m4])
++
++AC_SUBST([LT_VERSION_INFO], [1:0:0])
++
++AM_PROG_AS
++AC_PROG_CC
++AM_PROG_CC_C_O
++AC_PROG_LIBTOOL
++AC_PROG_AWK
++AC_PROG_CPP
++AC_PROG_CXX
++AC_PROG_INSTALL
++AC_PROG_LN_S
++AC_PROG_MAKE_SET
++PKG_PROG_PKG_CONFIG
++
++AC_CONFIG_FILES([ \
++    Makefile \
++    libavb/Makefile
++])
++AC_OUTPUT
++
+diff --git a/libavb/Makefile.am b/libavb/Makefile.am
+new file mode 100644
+index 0000000..11fa65d
+--- /dev/null
++++ b/libavb/Makefile.am
+@@ -0,0 +1,51 @@
++AM_CFLAGS = -Wall -g \
++    -Wundef
++
++ACLOCAL_AMFLAGS = -I m4
++
++lib_LTLIBRARIES := libavb.la
++
++libavb_la_SOURCES := avb_chain_partition_descriptor.c \
++    avb_cmdline.c \
++    avb_crc32.c \
++    avb_crypto.c \
++    avb_descriptor.c \
++    avb_footer.c \
++    avb_hash_descriptor.c \
++    avb_hashtree_descriptor.c \
++    avb_kernel_cmdline_descriptor.c \
++    avb_property_descriptor.c \
++    avb_rsa.c \
++    avb_slot_verify.c \
++    avb_sysdeps_posix.c \
++    avb_util.c \
++    avb_vbmeta_image.c \
++    avb_version.c \
++    sha/sha256_impl.c  \
++    sha/sha512_impl.c
++
++libavb_la_CFLAGS  := -I$(top_srcdir)/libavb -I$(top_srcdir)/libavb/sha
++libavb_la_CFLAGS  := -DAVB_COMPILATION -DAVB_ENABLE_DEBUG -DAVB_INSIDE_LIBAVB_H
++
++libavb_includedir = $(includedir)/libavb
++libavb_include_HEADERS := $(top_srcdir)/libavb/libavb.h \
++    $(top_srcdir)/libavb/avb_chain_partition_descriptor.h \
++    $(top_srcdir)/libavb/avb_cmdline.h \
++    $(top_srcdir)/libavb/avb_crypto.h \
++    $(top_srcdir)/libavb/avb_descriptor.h \
++    $(top_srcdir)/libavb/avb_footer.h \
++    $(top_srcdir)/libavb/avb_hash_descriptor.h \
++    $(top_srcdir)/libavb/avb_hashtree_descriptor.h \
++    $(top_srcdir)/libavb/avb_kernel_cmdline_descriptor.h \
++    $(top_srcdir)/libavb/avb_ops.h \
++    $(top_srcdir)/libavb/avb_property_descriptor.h \
++    $(top_srcdir)/libavb/avb_rsa.h \
++    $(top_srcdir)/libavb/avb_sha.h \
++    $(top_srcdir)/libavb/avb_slot_verify.h \
++    $(top_srcdir)/libavb/avb_sysdeps.h \
++    $(top_srcdir)/libavb/avb_util.h \
++    $(top_srcdir)/libavb/avb_vbmeta_image.h \
++    $(top_srcdir)/libavb/avb_version.h  \
++    $(top_srcdir)/libavb/sha/avb_crypto_ops_impl.h
++
++libavb_la_LDFLAGS := -Wall -Werror -version-info $(LT_VERSION_INFO)
+diff --git a/libavb/avb_cmdline.h b/libavb/avb_cmdline.h
+index 377783f..1995a1d 100644
+--- a/libavb/avb_cmdline.h
++++ b/libavb/avb_cmdline.h
+@@ -22,7 +22,14 @@
+  * SOFTWARE.
+  */
+ 
+-#ifdef AVB_INSIDE_LIBAVB_H
++/*
++ * Changes from Qualcomm Innovation Center are provided under the following license:
++ *
++ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
++ * SPDX-License-Identifier: BSD-3-Clause-Clear
++ */
++
++#ifndef AVB_INSIDE_LIBAVB_H
+ #error "You can't include avb_sha.h in the public header libavb.h."
+ #endif
+ 
+diff --git a/libavb/avb_rsa.h b/libavb/avb_rsa.h
+index c2dcf47..2df20f3 100644
+--- a/libavb/avb_rsa.h
++++ b/libavb/avb_rsa.h
+@@ -27,7 +27,14 @@
+  * found in the LICENSE file.
+  */
+ 
+-#ifdef AVB_INSIDE_LIBAVB_H
++/*
++ * Changes from Qualcomm Innovation Center are provided under the following license:
++ *
++ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
++ * SPDX-License-Identifier: BSD-3-Clause-Clear
++ */
++
++#ifndef AVB_INSIDE_LIBAVB_H
+ #error "You can't include avb_rsa.h in the public header libavb.h."
+ #endif
+ 
+diff --git a/libavb/avb_sha.h b/libavb/avb_sha.h
+index f4c42ea..33a15c0 100644
+--- a/libavb/avb_sha.h
++++ b/libavb/avb_sha.h
+@@ -22,7 +22,14 @@
+  * SOFTWARE.
+  */
+ 
+-#ifdef AVB_INSIDE_LIBAVB_H
++/*
++ * Changes from Qualcomm Innovation Center are provided under the following license:
++ *
++ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
++ * SPDX-License-Identifier: BSD-3-Clause-Clear
++ */
++
++#ifndef AVB_INSIDE_LIBAVB_H
+ #error "You can't include avb_sha.h in the public header libavb.h."
+ #endif
+ 
+@@ -51,7 +58,7 @@ extern "C" {
+  * We expect the implementation to provide a header file with the name
+  * avb_crypto_ops_impl.h to do all this.
+  */
+-#include "avb_crypto_ops_impl.h"
++#include "sha/avb_crypto_ops_impl.h"
+ 
+ /* Data structure used for SHA-256. */
+ typedef struct {
+diff --git a/libavb/sha/avb_crypto_ops_impl.h b/libavb/sha/avb_crypto_ops_impl.h
+index 321e0fb..efe3040 100644
+--- a/libavb/sha/avb_crypto_ops_impl.h
++++ b/libavb/sha/avb_crypto_ops_impl.h
+@@ -22,7 +22,14 @@
+  * SOFTWARE.
+  */
+ 
+-#ifdef AVB_INSIDE_LIBAVB_H
++/*
++ * Changes from Qualcomm Innovation Center are provided under the following license:
++ *
++ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
++ * SPDX-License-Identifier: BSD-3-Clause-Clear
++ */
++
++#ifndef AVB_INSIDE_LIBAVB_H
+ #error "You can't include avb_crypto_ops_impl.h in the public header libavb.h."
+ #endif
+ 
+@@ -37,7 +44,7 @@
+ extern "C" {
+ #endif
+ 
+-#include <libavb/avb_sysdeps.h>
++#include "../avb_sysdeps.h"
+ 
+ /* Block size in bytes of a SHA-256 digest. */
+ #define AVB_SHA256_BLOCK_SIZE 64
+diff --git a/libavb/sha/sha256_impl.c b/libavb/sha/sha256_impl.c
+index 7e99358..f3ba12f 100644
+--- a/libavb/sha/sha256_impl.c
++++ b/libavb/sha/sha256_impl.c
+@@ -35,7 +35,14 @@
+  * SUCH DAMAGE.
+  */
+ 
+-#include <libavb/avb_sha.h>
++/*
++ * Changes from Qualcomm Innovation Center are provided under the following license:
++ *
++ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
++ * SPDX-License-Identifier: BSD-3-Clause-Clear
++ */
++
++#include "../avb_sha.h"
+ 
+ #include "avb_crypto_ops_impl.h"
+ 
+diff --git a/libavb/sha/sha512_impl.c b/libavb/sha/sha512_impl.c
+index 1eb9ba4..ea3ea5b 100644
+--- a/libavb/sha/sha512_impl.c
++++ b/libavb/sha/sha512_impl.c
+@@ -35,7 +35,14 @@
+  * SUCH DAMAGE.
+  */
+ 
+-#include <libavb/avb_sha.h>
++/*
++ * Changes from Qualcomm Innovation Center are provided under the following license:
++ *
++ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
++ * SPDX-License-Identifier: BSD-3-Clause-Clear
++ */
++
++#include "../avb_sha.h"
+ 
+ #include "avb_crypto_ops_impl.h"
+ 
+-- 
+2.7.4
+
