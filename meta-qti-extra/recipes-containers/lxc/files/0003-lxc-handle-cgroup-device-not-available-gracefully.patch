@@ -1,6 +1,6 @@
-From 50804cc035a6ab21ca58d0ec2d0dbf05404d5859 Mon Sep 17 00:00:00 2001
-From: lei wang <quic_leiwan@quicinc.com>
-Date: Tue, 8 Mar 2022 16:47:24 +0800
+From 528552cdcde3ea8d459f7bfc999d33083e20d384 Mon Sep 17 00:00:00 2001
+From: Lei wang <quic_leiwan@quicinc.com>
+Date: Tue, 1 Nov 2022 18:06:51 +0800
 Subject: [PATCH] lxc: handle cgroup device not available gracefully
 
 We need configure devices may not exist in some case, like uart
@@ -10,24 +10,24 @@ so handle devices not available more gracefully other than return
 error and refuse launching lxc container.
 
 Upstream-Status: Pending
-Signed-off-by: lei wang <quic_leiwan@quicinc.com>
+Signed-off-by: Lei wang <quic_leiwan@quicinc.com>
 ---
  src/lxc/cgroups/cgfsng.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/lxc/cgroups/cgfsng.c b/src/lxc/cgroups/cgfsng.c
-index a53885d..0d1404d 100644
+index 82535bc3f..93064df40 100644
 --- a/src/lxc/cgroups/cgfsng.c
 +++ b/src/lxc/cgroups/cgfsng.c
-@@ -2860,7 +2860,7 @@ __cgfsng_ops static bool cgfsng_setup_limits_legacy(struct cgroup_ops *ops,
- 
- 		if (do_devices == !strncmp("devices", cg->subsystem, 7)) {
- 			if (cg_legacy_set_data(ops, cg->subsystem, cg->value, strncmp("cpuset", cg->subsystem, 6) == 0)) {
+@@ -2770,7 +2770,7 @@ __cgfsng_ops static bool cgfsng_setup_limits_legacy(struct cgroup_ops *ops,
+ 	list_for_each_entry(cgroup, cgroup_settings, head) {
+ 		if (do_devices == strnequal("devices", cgroup->subsystem, 7)) {
+ 			if (cg_legacy_set_data(ops, cgroup->subsystem, cgroup->value, strnequal("cpuset", cgroup->subsystem, 6))) {
 -				if (do_devices && (errno == EACCES || errno == EPERM)) {
 +				if (do_devices && (errno == EACCES || errno == EPERM || errno == ENOENT)) {
- 					SYSWARN("Failed to set \"%s\" to \"%s\"", cg->subsystem, cg->value);
+ 					SYSWARN("Failed to set \"%s\" to \"%s\"", cgroup->subsystem, cgroup->value);
  					continue;
  				}
 -- 
-2.7.4
+2.37.3
 
