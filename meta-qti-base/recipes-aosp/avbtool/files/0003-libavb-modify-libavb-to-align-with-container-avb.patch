@@ -1,0 +1,542 @@
+From 8ccafd9769520cbc34439e3a12ec506f546f9da1 Mon Sep 17 00:00:00 2001
+From: Nan Zhang <quic_nanzhan@quicinc.com>
+Date: Thu, 10 Nov 2022 16:13:11 +0800
+Subject: [PATCH] libavb: modify libavb to align with container avb.
+
+To add container_id in AvbOps.
+Modify avb_slot_verify API.
+
+Upsteam-Status: Pending
+
+Change-Id: Idef4676789f54c48afe3ddb4bcb87a555a158c9c
+Signed-off-by: Nan Zhang <quic_nanzhan@quicinc.com>
+---
+ libavb/avb_ops.h          |  26 +++++++
+ libavb/avb_slot_verify.c  | 194 ++++++++++++++++++++++++++--------------------
+ libavb/avb_vbmeta_image.c |  33 ++++++--
+ libavb/avb_vbmeta_image.h |  11 ++-
+ 4 files changed, 169 insertions(+), 95 deletions(-)
+
+diff --git a/libavb/avb_ops.h b/libavb/avb_ops.h
+index dec163d..1bfa9d9 100644
+--- a/libavb/avb_ops.h
++++ b/libavb/avb_ops.h
+@@ -22,6 +22,13 @@
+  * SOFTWARE.
+  */
+ 
++/*
++ * Changes from Qualcomm Innovation Center are provided under the following license:
++ *
++ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
++ * SPDX-License-Identifier: BSD-3-Clause-Clear
++ */
++
+ #if !defined(AVB_INSIDE_LIBAVB_H) && !defined(AVB_COMPILATION)
+ #error "Never include this file directly, include libavb.h instead."
+ #endif
+@@ -109,6 +116,12 @@ struct AvbOps {
+    */
+   struct AvbAtxOps* atx_ops;
+ 
++  /* FIXME
++   * The container_id is set when passed from the container_verified_boot API,
++   * and holds the id of the container for which image are verified.
++   */
++  uint32_t container_id;
++
+   /* Reads |num_bytes| from offset |offset| from partition with name
+    * |partition| (NUL-terminated UTF-8 string). If |offset| is
+    * negative, its absolute value should be interpreted as the number
+@@ -331,6 +344,19 @@ struct AvbOps {
+       size_t public_key_metadata_length,
+       bool* out_is_trusted,
+       uint32_t* out_rollback_index_location);
++
++//FIXME
++
++  /* Set the container_id for this ops instance.
++   * Returns AVB_IO_RESULT_OK on success, otherwise an error code.
++   */
++  AvbIOResult (*set_container_id)(AvbOps* ops, uint32_t container_id);
++
++  /* Get the container_id for this ops instance.
++   * Returns AVB_IO_RESULT_OK on success, otherwise an error code.
++   */
++  AvbIOResult (*get_container_id)(AvbOps* ops, uint32_t* out_container_id);
++
+ };
+ 
+ #ifdef __cplusplus
+diff --git a/libavb/avb_slot_verify.c b/libavb/avb_slot_verify.c
+index 8e0721d..1b524d2 100644
+--- a/libavb/avb_slot_verify.c
++++ b/libavb/avb_slot_verify.c
+@@ -22,6 +22,13 @@
+  * SOFTWARE.
+  */
+ 
++/*
++ * Changes from Qualcomm Innovation Center are provided under the following license:
++ *
++ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
++ * SPDX-License-Identifier: BSD-3-Clause-Clear
++ */
++
+ #include "avb_slot_verify.h"
+ #include "avb_chain_partition_descriptor.h"
+ #include "avb_cmdline.h"
+@@ -592,7 +599,6 @@ static AvbSlotVerifyResult load_and_verify_vbmeta(
+   ret = AVB_SLOT_VERIFY_RESULT_OK;
+ 
+   avb_assert(slot_data != NULL);
+-
+   /* Since we allow top-level vbmeta in 'boot', use
+    * rollback_index_location to determine whether we're the main
+    * vbmeta struct.
+@@ -691,7 +697,6 @@ static AvbSlotVerifyResult load_and_verify_vbmeta(
+                "'.\n",
+                NULL);
+   }
+-
+   io_ret = ops->read_from_partition(ops,
+                                     full_partition_name,
+                                     vbmeta_offset,
+@@ -732,12 +737,12 @@ static AvbSlotVerifyResult load_and_verify_vbmeta(
+     }
+   }
+   avb_assert(vbmeta_num_read <= vbmeta_size);
+-
+   /* Check if the image is properly signed and get the public key used
+    * to sign the image.
+    */
++  //FIXME, add partition_name parameter.
+   vbmeta_ret =
+-      avb_vbmeta_image_verify(vbmeta_buf, vbmeta_num_read, &pk_data, &pk_len);
++      avb_vbmeta_image_verify(vbmeta_buf, vbmeta_num_read, &pk_data, &pk_len, partition_name);
+   switch (vbmeta_ret) {
+     case AVB_VBMETA_VERIFY_RESULT_OK:
+       avb_assert(pk_data != NULL && pk_len > 0);
+@@ -964,26 +969,35 @@ static AvbSlotVerifyResult load_and_verify_vbmeta(
+ 
+     switch (desc.tag) {
+       case AVB_DESCRIPTOR_TAG_HASH: {
+-        AvbSlotVerifyResult sub_ret;
+-        sub_ret = load_and_verify_hash_partition(ops,
+-                                                 requested_partitions,
+-                                                 ab_suffix,
+-                                                 allow_verification_error,
+-                                                 descriptors[n],
+-                                                 slot_data);
+-        if (sub_ret != AVB_SLOT_VERIFY_RESULT_OK) {
+-          ret = sub_ret;
+-          if (!allow_verification_error || !result_should_continue(ret)) {
+-            goto out;
+-          }
+-        }
++	//FIXME
++	if(avb_strcmp(partition_name, "la_vbmeta") == 0 || avb_strcmp(partition_name, "vbmeta") == 0){
++		/* Do nothing when loading la_vbemta, will not check la boot in la_vbemta . */
++		break;
++	}else{
++		AvbSlotVerifyResult sub_ret;
++		sub_ret = load_and_verify_hash_partition(ops,
++						requested_partitions,
++						ab_suffix,
++						allow_verification_error,
++						descriptors[n],
++						slot_data);
++		if (sub_ret != AVB_SLOT_VERIFY_RESULT_OK) {
++			ret = sub_ret;
++			if (!allow_verification_error || !result_should_continue(ret)) {
++				goto out;
++			}
++		}
++	}
+       } break;
+-
+       case AVB_DESCRIPTOR_TAG_CHAIN_PARTITION: {
+         AvbSlotVerifyResult sub_ret;
+         AvbChainPartitionDescriptor chain_desc;
+         const uint8_t* chain_partition_name;
+         const uint8_t* chain_public_key;
++	//FIXME
++	if(avb_strcmp(partition_name, "la_vbmeta") == 0){
++		is_main_vbmeta = true;
++	}
+ 
+         /* Only allow CHAIN_PARTITION descriptors in the main vbmeta image. */
+         if (!is_main_vbmeta) {
+@@ -1040,83 +1054,93 @@ static AvbSlotVerifyResult load_and_verify_vbmeta(
+       } break;
+ 
+       case AVB_DESCRIPTOR_TAG_KERNEL_CMDLINE: {
+-        const uint8_t* kernel_cmdline;
+-        AvbKernelCmdlineDescriptor kernel_cmdline_desc;
+-        bool apply_cmdline;
+-
+-        if (!avb_kernel_cmdline_descriptor_validate_and_byteswap(
++	if(avb_strcmp(partition_name, "la_vbmeta") == 0 || avb_strcmp(partition_name, "vbmeta") == 0){
++		break;
++	}
++	else{
++          const uint8_t* kernel_cmdline;
++          AvbKernelCmdlineDescriptor kernel_cmdline_desc;
++          bool apply_cmdline;
++
++          if (!avb_kernel_cmdline_descriptor_validate_and_byteswap(
+                 (AvbKernelCmdlineDescriptor*)descriptors[n],
+                 &kernel_cmdline_desc)) {
+-          avb_errorv(full_partition_name,
++            avb_errorv(full_partition_name,
+                      ": Kernel cmdline descriptor is invalid.\n",
+                      NULL);
+-          ret = AVB_SLOT_VERIFY_RESULT_ERROR_INVALID_METADATA;
+-          goto out;
+-        }
++            ret = AVB_SLOT_VERIFY_RESULT_ERROR_INVALID_METADATA;
++            goto out;
++          }
+ 
+-        kernel_cmdline = ((const uint8_t*)descriptors[n]) +
++          kernel_cmdline = ((const uint8_t*)descriptors[n]) +
+                          sizeof(AvbKernelCmdlineDescriptor);
+ 
+-        if (!avb_validate_utf8(kernel_cmdline,
++          if (!avb_validate_utf8(kernel_cmdline,
+                                kernel_cmdline_desc.kernel_cmdline_length)) {
+-          avb_errorv(full_partition_name,
++            avb_errorv(full_partition_name,
+                      ": Kernel cmdline is not valid UTF-8.\n",
+                      NULL);
+-          ret = AVB_SLOT_VERIFY_RESULT_ERROR_INVALID_METADATA;
+-          goto out;
+-        }
+-
+-        /* Compare the flags for top-level VBMeta struct with flags in
+-         * the command-line descriptor so command-line snippets only
+-         * intended for a certain mode (dm-verity enabled/disabled)
+-         * are skipped if applicable.
+-         */
+-        apply_cmdline = true;
+-        if (toplevel_vbmeta_flags & AVB_VBMETA_IMAGE_FLAGS_HASHTREE_DISABLED) {
+-          if (kernel_cmdline_desc.flags &
+-              AVB_KERNEL_CMDLINE_FLAGS_USE_ONLY_IF_HASHTREE_NOT_DISABLED) {
+-            apply_cmdline = false;
++            ret = AVB_SLOT_VERIFY_RESULT_ERROR_INVALID_METADATA;
++            goto out;
+           }
+-        } else {
+-          if (kernel_cmdline_desc.flags &
+-              AVB_KERNEL_CMDLINE_FLAGS_USE_ONLY_IF_HASHTREE_DISABLED) {
+-            apply_cmdline = false;
++
++          /* Compare the flags for top-level VBMeta struct with flags in
++           * the command-line descriptor so command-line snippets only
++           * intended for a certain mode (dm-verity enabled/disabled)
++           * are skipped if applicable.
++           */
++          apply_cmdline = true;
++          if (toplevel_vbmeta_flags & AVB_VBMETA_IMAGE_FLAGS_HASHTREE_DISABLED) {
++            if (kernel_cmdline_desc.flags &
++                AVB_KERNEL_CMDLINE_FLAGS_USE_ONLY_IF_HASHTREE_NOT_DISABLED) {
++              apply_cmdline = false;
++            }
++          } else {
++            if (kernel_cmdline_desc.flags &
++                AVB_KERNEL_CMDLINE_FLAGS_USE_ONLY_IF_HASHTREE_DISABLED) {
++              apply_cmdline = false;
++            }
+           }
+-        }
+ 
+-        if (apply_cmdline) {
+-          if (slot_data->cmdline == NULL) {
+-            slot_data->cmdline =
+-                avb_calloc(kernel_cmdline_desc.kernel_cmdline_length + 1);
++          if (apply_cmdline) {
+             if (slot_data->cmdline == NULL) {
+-              ret = AVB_SLOT_VERIFY_RESULT_ERROR_OOM;
+-              goto out;
+-            }
+-            avb_memcpy(slot_data->cmdline,
++              slot_data->cmdline =
++                  avb_calloc(kernel_cmdline_desc.kernel_cmdline_length + 1);
++              if (slot_data->cmdline == NULL) {
++                  ret = AVB_SLOT_VERIFY_RESULT_ERROR_OOM;
++                goto out;
++              }
++              avb_memcpy(slot_data->cmdline,
+                        kernel_cmdline,
+                        kernel_cmdline_desc.kernel_cmdline_length);
+-          } else {
+-            /* new cmdline is: <existing_cmdline> + ' ' + <newcmdline> + '\0' */
+-            size_t orig_size = avb_strlen(slot_data->cmdline);
+-            size_t new_size =
++            } else {
++              /* new cmdline is: <existing_cmdline> + ' ' + <newcmdline> + '\0' */
++              size_t orig_size = avb_strlen(slot_data->cmdline);
++              size_t new_size =
+                 orig_size + 1 + kernel_cmdline_desc.kernel_cmdline_length + 1;
+-            char* new_cmdline = avb_calloc(new_size);
+-            if (new_cmdline == NULL) {
+-              ret = AVB_SLOT_VERIFY_RESULT_ERROR_OOM;
+-              goto out;
+-            }
+-            avb_memcpy(new_cmdline, slot_data->cmdline, orig_size);
+-            new_cmdline[orig_size] = ' ';
+-            avb_memcpy(new_cmdline + orig_size + 1,
++              char* new_cmdline = avb_calloc(new_size);
++              if (new_cmdline == NULL) {
++                ret = AVB_SLOT_VERIFY_RESULT_ERROR_OOM;
++                goto out;
++              }
++              avb_memcpy(new_cmdline, slot_data->cmdline, orig_size);
++              new_cmdline[orig_size] = ' ';
++              avb_memcpy(new_cmdline + orig_size + 1,
+                        kernel_cmdline,
+                        kernel_cmdline_desc.kernel_cmdline_length);
+-            avb_free(slot_data->cmdline);
+-            slot_data->cmdline = new_cmdline;
++              avb_free(slot_data->cmdline);
++              slot_data->cmdline = new_cmdline;
++            }
+           }
+         }
+-      } break;
++      }break;
+ 
+       case AVB_DESCRIPTOR_TAG_HASHTREE: {
++	if(avb_strcmp(partition_name, "la_vbmeta") == 0 || avb_strcmp(partition_name, "vbmeta") == 0 || avb_strcmp(partition_name, "vbmeta_vbmeta") == 0){
++		//Do nothing
++		break;
++	}
++	else {
+         AvbHashtreeDescriptor hashtree_desc;
+ 
+         if (!avb_hashtree_descriptor_validate_and_byteswap(
+@@ -1201,7 +1225,8 @@ static AvbSlotVerifyResult load_and_verify_vbmeta(
+             }
+           }
+         }
+-      } break;
++      }
++    }break;
+ 
+       case AVB_DESCRIPTOR_TAG_PROPERTY:
+         /* Do nothing. */
+@@ -1223,7 +1248,6 @@ static AvbSlotVerifyResult load_and_verify_vbmeta(
+   if (out_algorithm_type != NULL) {
+     *out_algorithm_type = (AvbAlgorithmType)vbmeta_header.algorithm_type;
+   }
+-
+ out:
+   /* If |vbmeta_image_data| isn't NULL it means that it adopted
+    * |vbmeta_buf| so in that case don't free it here.
+@@ -1377,13 +1401,13 @@ AvbSlotVerifyResult avb_slot_verify(AvbOps* ops,
+   bool allow_verification_error =
+       (flags & AVB_SLOT_VERIFY_FLAGS_ALLOW_VERIFICATION_ERROR);
+   AvbCmdlineSubstList* additional_cmdline_subst = NULL;
+-
+   /* Fail early if we're missing the AvbOps needed for slot verification. */
++//FIXME
+   avb_assert(ops->read_is_device_unlocked != NULL);
+   avb_assert(ops->read_from_partition != NULL);
+   avb_assert(ops->get_size_of_partition != NULL);
+   avb_assert(ops->read_rollback_index != NULL);
+-  avb_assert(ops->get_unique_guid_for_partition != NULL);
++//  avb_assert(ops->get_unique_guid_for_partition != NULL);
+ 
+   if (out_data != NULL) {
+     *out_data = NULL;
+@@ -1446,13 +1470,11 @@ AvbSlotVerifyResult avb_slot_verify(AvbOps* ops,
+     ret = AVB_SLOT_VERIFY_RESULT_ERROR_OOM;
+     goto fail;
+   }
+-
+   additional_cmdline_subst = avb_new_cmdline_subst_list();
+   if (additional_cmdline_subst == NULL) {
+     ret = AVB_SLOT_VERIFY_RESULT_ERROR_OOM;
+     goto fail;
+   }
+-
+   if (flags & AVB_SLOT_VERIFY_FLAGS_NO_VBMETA_PARTITION) {
+     if (requested_partitions == NULL || requested_partitions[0] == NULL) {
+       avb_fatal(
+@@ -1507,7 +1529,6 @@ AvbSlotVerifyResult avb_slot_verify(AvbOps* ops,
+   if (!result_should_continue(ret)) {
+     goto fail;
+   }
+-
+   /* If things check out, mangle the kernel command-line as needed. */
+   if (!(flags & AVB_SLOT_VERIFY_FLAGS_NO_VBMETA_PARTITION)) {
+     if (avb_strcmp(slot_data->vbmeta_images[0].partition_name, "vbmeta") != 0) {
+@@ -1528,7 +1549,6 @@ AvbSlotVerifyResult avb_slot_verify(AvbOps* ops,
+     ret = AVB_SLOT_VERIFY_RESULT_ERROR_OOM;
+     goto fail;
+   }
+-
+   /* If verification is disabled, we are done ... we specifically
+    * don't want to add any androidboot.* options since verification
+    * is disabled.
+@@ -1570,7 +1590,6 @@ AvbSlotVerifyResult avb_slot_verify(AvbOps* ops,
+       }
+     }
+     slot_data->resolved_hashtree_error_mode = resolved_hashtree_error_mode;
+-
+     /* Add options... */
+     AvbSlotVerifyResult sub_ret;
+     sub_ret = avb_append_options(ops,
+@@ -1585,7 +1604,7 @@ AvbSlotVerifyResult avb_slot_verify(AvbOps* ops,
+       goto fail;
+     }
+   }
+-
++#if 0 //FIXME
+   /* Substitute $(ANDROID_SYSTEM_PARTUUID) and friends. */
+   if (slot_data->cmdline != NULL && avb_strlen(slot_data->cmdline) != 0) {
+     char* new_cmdline;
+@@ -1603,29 +1622,32 @@ AvbSlotVerifyResult avb_slot_verify(AvbOps* ops,
+       slot_data->cmdline = new_cmdline;
+     }
+   }
+-
++#endif
+   if (out_data != NULL) {
+     *out_data = slot_data;
+   } else {
+     avb_slot_verify_data_free(slot_data);
+   }
+-
++//FIXME
++#if 0
+   avb_free_cmdline_subst_list(additional_cmdline_subst);
+   additional_cmdline_subst = NULL;
++#endif
+ 
+   if (!allow_verification_error) {
+     avb_assert(ret == AVB_SLOT_VERIFY_RESULT_OK);
+   }
+-
+   return ret;
+-
+ fail:
+   if (slot_data != NULL) {
+     avb_slot_verify_data_free(slot_data);
+   }
++//FIXME
++#if 0
+   if (additional_cmdline_subst != NULL) {
+     avb_free_cmdline_subst_list(additional_cmdline_subst);
+   }
++#endif
+   return ret;
+ }
+ 
+diff --git a/libavb/avb_vbmeta_image.c b/libavb/avb_vbmeta_image.c
+index 8a6d898..b546a75 100644
+--- a/libavb/avb_vbmeta_image.c
++++ b/libavb/avb_vbmeta_image.c
+@@ -22,18 +22,26 @@
+  * SOFTWARE.
+  */
+ 
++/*
++ * Changes from Qualcomm Innovation Center are provided under the following license:
++ *
++ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
++ * SPDX-License-Identifier: BSD-3-Clause-Clear
++ */
++
+ #include "avb_vbmeta_image.h"
+ #include "avb_crypto.h"
+ #include "avb_rsa.h"
+ #include "avb_sha.h"
+ #include "avb_util.h"
+ #include "avb_version.h"
+-
++//FIXME add partition_name here.
+ AvbVBMetaVerifyResult avb_vbmeta_image_verify(
+     const uint8_t* data,
+     size_t length,
+     const uint8_t** out_public_key_data,
+-    size_t* out_public_key_length) {
++    size_t* out_public_key_length,
++    const char* partition_name) {
+   AvbVBMetaVerifyResult ret;
+   AvbVBMetaImageHeader h;
+   uint8_t* computed_hash;
+@@ -53,6 +61,11 @@ AvbVBMetaVerifyResult avb_vbmeta_image_verify(
+   if (out_public_key_length != NULL) {
+     *out_public_key_length = 0;
+   }
++  //FIXME
++  if (partition_name == NULL) {
++    avb_error("Invalid partition name.\n");
++    goto out;
++  }
+ 
+   /* Before we byteswap or compare Magic, ensure length is long enough. */
+   if (length < sizeof(AvbVBMetaImageHeader)) {
+@@ -200,15 +213,19 @@ AvbVBMetaVerifyResult avb_vbmeta_image_verify(
+       avb_error("Unknown algorithm.\n");
+       goto out;
+   }
+-
+-  if (avb_safe_memcmp(authentication_block + h.hash_offset,
++  //FIXME
++  if (avb_strcmp(partition_name, "vbmeta") == 0) {
++    //Do nothing to check metadata here.
++    ret = AVB_VBMETA_VERIFY_RESULT_OK;
++  } else {
++    if (avb_safe_memcmp(authentication_block + h.hash_offset,
+                       computed_hash,
+                       h.hash_size) != 0) {
+-    avb_error("Hash does not match!\n");
+-    ret = AVB_VBMETA_VERIFY_RESULT_HASH_MISMATCH;
+-    goto out;
++      avb_error("Hash does not match!\n");
++      ret = AVB_VBMETA_VERIFY_RESULT_HASH_MISMATCH;
++      goto out;
++    }
+   }
+-
+   verification_result =
+       avb_rsa_verify(auxiliary_block + h.public_key_offset,
+                      h.public_key_size,
+diff --git a/libavb/avb_vbmeta_image.h b/libavb/avb_vbmeta_image.h
+index f9cbac4..fa4e2ee 100644
+--- a/libavb/avb_vbmeta_image.h
++++ b/libavb/avb_vbmeta_image.h
+@@ -22,6 +22,13 @@
+  * SOFTWARE.
+  */
+ 
++/*
++ * Changes from Qualcomm Innovation Center are provided under the following license:
++ *
++ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
++ * SPDX-License-Identifier: BSD-3-Clause-Clear
++ */
++
+ #if !defined(AVB_INSIDE_LIBAVB_H) && !defined(AVB_COMPILATION)
+ #error "Never include this file directly, include libavb.h instead."
+ #endif
+@@ -283,11 +290,13 @@ const char* avb_vbmeta_verify_result_to_string(AvbVBMetaVerifyResult result);
+  * are likely looking for avb_slot_verify() instead for verifying
+  * integrity data for a whole set of partitions.
+  */
++//FIXME
+ AvbVBMetaVerifyResult avb_vbmeta_image_verify(
+     const uint8_t* data,
+     size_t length,
+     const uint8_t** out_public_key_data,
+-    size_t* out_public_key_length) AVB_ATTR_WARN_UNUSED_RESULT;
++    size_t* out_public_key_length,
++    const char* partition_name) AVB_ATTR_WARN_UNUSED_RESULT;
+ 
+ #ifdef __cplusplus
+ }
+-- 
+2.7.4
+
