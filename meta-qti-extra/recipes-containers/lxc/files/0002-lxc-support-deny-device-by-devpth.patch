@@ -1,26 +1,30 @@
-From ac0aeebf2691c3e2ae5c464b299cad74777936c9 Mon Sep 17 00:00:00 2001
-From: Lei wang <leiwan@codeaurora.org>
-Date: Sat, 11 Jul 2020 15:51:11 +0800
+From def9f9b620d4a133ce5e0f0e237b0207ff6c187a Mon Sep 17 00:00:00 2001
+From: Lei wang <quic_leiwan@quicinc.com>
+Date: Tue, 1 Nov 2022 18:00:41 +0800
 Subject: [PATCH] lxc: support deny device by devpth
 
-Signed-off-by: Lei wang <leiwan@codeaurora.org>
+Make LXC support deny devices by path
+
+Upstream-Status: Pending
+
+Signed-off-by: Lei wang <quic_leiwan@quicinc.com>
 ---
  src/lxc/cgroups/cgfsng.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/lxc/cgroups/cgfsng.c b/src/lxc/cgroups/cgfsng.c
-index 6103643..fac6862 100644
+index e39bde8df..82535bc3f 100644
 --- a/src/lxc/cgroups/cgfsng.c
 +++ b/src/lxc/cgroups/cgfsng.c
-@@ -2673,7 +2673,7 @@ static int cg_legacy_set_data(struct cgroup_ops *ops, const char *filename,
+@@ -2696,7 +2696,7 @@ static int cg_legacy_set_data(struct cgroup_ops *ops, const char *filename,
  	if (p)
  		*p = '\0';
  
--	if (strcmp("devices.allow", filename) == 0 && value[0] == '/') {
+-	if (strequal("devices.allow", filename) && value[0] == '/') {
 +	if (value[0] == '/') {
  		int ret;
  
  		ret = convert_devpath(value, converted_value);
 -- 
-2.7.4
+2.37.3
 
