@@ -65,6 +65,13 @@ do_make_avb_image(){
                 --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/testkey_rsa4096.pem \
                 --rollback_index 0 \
                 --do_not_generate_fec
+            if ${@bb.utils.contains('DISTRO_FEATURES', 'qti-avb-lxc', 'true', 'false', d)}; then
+                # avb2.0 for lxc container, lv host + la container
+                    avbtool extract_public_key \
+                        --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/testkey_rsa4096.pem \
+                        --output ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/public_la_key.bin
+            fi
+
             if [ -f ${DEPLOY_DIR_IMAGE}/${PRODUCT}-vendor_boot.img ]; then
                avbtool make_vbmeta_image \
                    --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET} \
@@ -72,6 +79,7 @@ do_make_avb_image(){
                    --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${PRODUCT}-vendor_boot.img \
                    --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
                    --setup_rootfs_from_kernel ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
+                   ${@bb.utils.contains('DISTRO_FEATURES', 'qti-avb-lxc', '--chain_partition la_vbmeta:1:${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/public_la_key.bin', '', d)} \
                    --algorithm SHA256_RSA4096 \
                    --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/testkey_rsa4096.pem \
                    --rollback_index 0 \
@@ -84,6 +92,7 @@ do_make_avb_image(){
                    --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${PRODUCT}-dtbo.img \
                    --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
                    --setup_rootfs_from_kernel ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
+                   ${@bb.utils.contains('DISTRO_FEATURES', 'qti-avb-lxc', '--chain_partition la_vbmeta:1:${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/public_la_key.bin', '', d)} \
                    --algorithm SHA256_RSA4096 \
                    --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/testkey_rsa4096.pem \
                    --rollback_index 0 \
