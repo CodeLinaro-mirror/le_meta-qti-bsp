@@ -3,16 +3,40 @@ DESCRIPTION = "This is the AudioReach based audio driver based on ASoC architect
 HOMEPAGE = "https://www.codelinaro.org/"
 LICENSE = "GPL-2.0-only-WITH-Linux-syscall-note"
 LIC_FILES_CHKSUM = "file://NOTICE;md5=53c09804050a00b1d27bd609c4e1fc5a"
+DEPENDS += "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', "audio-devicetree", "", d)}"
 DEPENDS += "virtual/kernel"
 
 SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/audio-kernel-ar/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/audio-kernel-ar;usehead=1 \
            file://audio_load.conf \
           "
+
 SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/vendor/qcom/opensource/audio-kernel-ar"
 
-inherit module module-sign qperf qti-kernel-arch-clang
+inherit ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', "qti-techpack", "module module-sign qperf qti-kernel-arch-clang", d)}
+
+EXTRA_OEMAKE:lemans += "TARGET_SUPPORT=lemans"
+
+MODULES = "\
+        dsp/spf_core_dlkm.ko  \
+        dsp/audpkt_ion_dlkm.ko  \
+        dsp/audio_prm_dlkm.ko  \
+        dsp/adsp_loader_dlkm.ko  \
+        dsp/q6_notifier_dlkm.ko \
+        dsp/q6_dlkm.ko \
+        ipc/gpr_dlkm.ko \
+        ipc/audio_pkt_dlkm.ko  \
+        asoc/codecs/stub_dlkm.ko \
+        asoc/platform_dlkm.ko \
+        asoc/spf_machine_dlkm.ko \
+        soc/snd_event_dlkm.ko \
+"
+
+TECHPACK_MODULE_OUT = "${WORKDIR}/audio-kernel-ar"
+TECHPACK_MODULES = "${MODULES}"
+TECHPACK_HEADERS = "1"
+TECHPACK_MAKE_ARGS = "${EXTRA_OEMAKE} QTI_TECHPACK=true"
 
 do_configure() {
     cp -f ${WORKDIR}/vendor/qcom/opensource/audio-kernel-ar/Makefile.am ${WORKDIR}/vendor/qcom/opensource/audio-kernel-ar/Makefile
@@ -20,12 +44,15 @@ do_configure() {
 
 do_install:append() {
     install -d -p ${D}${includedir}/audio-kernel-ar/audio/linux
-    install -d -p ${D}${includedir}/audio-kernel-ar/audio/linux/mfd/wcd9xxx
     install -d -p ${D}${includedir}/audio-kernel-ar/audio/sound
 
     process_headers "${S}/include/uapi/audio/linux" "${D}${includedir}/audio-kernel-ar/audio/linux"
-    process_headers "${S}/include/uapi/audio/linux/mfd/wcd9xxx" "${D}${includedir}/audio-kernel-ar/audio/linux/mfd/wcd9xxx"
     process_headers "${S}/include/uapi/audio/sound" "${D}${includedir}/audio-kernel-ar/audio/sound"
+
+    if ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.4', 'true', 'false', d)}; then
+        install -d -p ${D}${includedir}/audio-kernel-ar/audio/linux/mfd/wcd9xxx
+        process_headers "${S}/include/uapi/audio/linux/mfd/wcd9xxx" "${D}${includedir}/audio-kernel-ar/audio/linux/mfd/wcd9xxx"
+    fi
 
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
         install -m 0755 ${WORKDIR}/audio_load.conf -D ${D}${sysconfdir}/modules-load.d/audio_load.conf
@@ -34,9 +61,11 @@ do_install:append() {
     fi
 
     install -d ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra
-    for i in $(find ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/. -name "*.ko"); do
-        mv ${i} ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/
-    done
+    if ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.4', 'true', 'false', d)}; then
+        for i in $(find ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/. -name "*.ko"); do
+            mv ${i} ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/
+        done
+    fi
 
     rm -fr ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/asoc
     rm -fr ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/dsp
