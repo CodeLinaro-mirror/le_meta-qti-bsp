@@ -25,6 +25,7 @@ DEPENDS += "\
     media-plugin-headers \
     mm-video-noship \
     system-core-headers \
+    ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "5.15", "videodlkm", "", d)} \
     virtual/egl \
     virtual/libc \
     wayland \
