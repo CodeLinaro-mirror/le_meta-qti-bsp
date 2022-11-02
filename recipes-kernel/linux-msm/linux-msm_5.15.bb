@@ -3,7 +3,7 @@ inherit kernel
 DESCRIPTION = "CAF Linux Kernel"
 LICENSE = "GPLv2.0-with-linux-syscall-note"
 
-COMPATIBLE_MACHINE = "cinder"
+COMPATIBLE_MACHINE = "cinder|sa410m|scuba-auto|sa410m-televm|sa525m|sa525m-emmc"
 
 FILESPATH =+ "${WORKSPACE}:"
 
@@ -128,6 +128,9 @@ do_prebuilt_configure() {
     cp -R ../msm-kernel/usr/initramfs_inc_data ${B}/usr
     # gen_initramfs.sh is present in kernel source
     cp -R ../../../kernel_platform/msm-kernel/usr/gen_initramfs.sh ${B}/usr
+
+    install -d ${B}/${KERNEL_OUTPUT_DIR}/dts/vendor/qcom
+    cp -fR ../msm-kernel/arch/${ARCH}/boot/dts/vendor/qcom/* ${B}/${KERNEL_OUTPUT_DIR}/dts/vendor/qcom
 }
 
 do_prebuilt_shared_workdir[nostamp] = "1"
@@ -157,6 +160,11 @@ do_prebuilt_shared_workdir() {
     install -m 0644 include/config/kernel.release $kerneldir/include/config/kernel.release
     if [ -e "${B}/scripts/module.lds" ]; then
         install -m 0644 ${B}/scripts/module.lds ${STAGING_KERNEL_BUILDDIR}/scripts/module.lds
+    fi
+
+    if [ -d arch/${ARCH}/boot ]; then
+        mkdir -p $kerneldir/arch/${ARCH}/boot/
+        cp -fR arch/${ARCH}/boot/* $kerneldir/arch/${ARCH}/boot/
     fi
 }
 
@@ -262,13 +270,10 @@ do_deploy() {
     install -m 0644 vmlinux ${DEPLOYDIR}
     install -m 0644 System.map ${DEPLOYDIR}
 
-    # copy dtbo files into deplydir and create dtbo.img if DTBO support enable
+    # Copy dtbo files into deploydir
     if [  "${DTBO_MACHINE}" == "True" ]; then
-        install -m 0644 ${DTBO_SRC_PATH}/*.dtbo ${DEPLOYDIR}
-        mkdtimg create ${DEPLOYDIR}/dtbo.img \
-             --page_size=${PAGE_SIZE} \
-             ${DEPLOYDIR}/*.dtbo
-
+        install -d ${DEPLOYDIR}/DTOverlays
+        install -m 0644 ${DTBO_SRC_PATH}/*.dtbo ${DEPLOYDIR}/DTOverlays
     fi
 
     # copy initramfs scripts

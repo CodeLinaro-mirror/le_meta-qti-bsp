@@ -36,3 +36,46 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         modem-shutdown \
         ${@oe.utils.conditional('DEBUG_BUILD', '1', 'packagegroup-qti-debug-tools', '', d )} \
 "
+
+# Following packages will be enabled later
+CORE_IMAGE_EXTRA_INSTALL_remove_sa410m = "\
+       qmi-shutdown-modem \
+       packagegroup-qti-telsdk \
+"
+
+# Following packages will be enabled later
+CORE_IMAGE_EXTRA_INSTALL_remove_sa525m = "\
+       packagegroup-qti-core packagegroup-qti-ss-mgr \
+       packagegroup-qti-telsdk subsystem-ramdump \
+       qmi-shutdown-modem modem-shutdown packagegroup-android-utils \
+       packagegroup-qti-internal packagegroup-qti-security-test \
+       packagegroup-startup-scripts packagegroup-support-utils \
+"
+
+python () {
+    if d.getVar('PREFERRED_VERSION_linux-msm') == "5.15":
+        bb.build.addtask('do_merge_dtbs', 'do_makeboot', 'do_makesystem', d)
+        bb.build.addtask('do_copy_abl', 'do_image_complete', 'do_makeboot', d)
+}
+
+do_merge_dtbs() {
+    install -d ${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbos
+    cd ${WORKSPACE}/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform && \
+    LD_LIBRARY_PATH=../out/msm-kernel-${MACHINE}-${KERNEL_VARIANT}defconfig/host/lib/:LD_LIBRARY_PATH \
+    OUT_DIR=${KERNEL_OUT_PATH}/ \
+    BUILD_CONFIG=${KERNEL_BUILD_CONFIG}  \
+    ./build/android/merge_dtbs.sh \
+    ${DEPLOY_DIR_IMAGE}/build-artifacts/dtb \
+    ${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbos ${DEPLOY_DIR_IMAGE}/dtbs
+}
+do_merge_dtbs[depends] += "virtual/kernel:do_deploy"
+
+do_copy_abl[dirs] = "${DEPLOY_DIR_IMAGE}"
+do_copy_abl() {
+    if [ -f ${KERNEL_PREBUILT_PATH}/abl_userdebug.elf ]; then
+        install -m 0644 ${KERNEL_PREBUILT_PATH}/abl_userdebug.elf ${DEPLOY_DIR_IMAGE}/${PN}/abl_userdebug.elf
+    fi
+}
+
+# Following pacakges will be enabled later.
+CORE_IMAGE_EXTRA_INSTALL_remove_sa415m = "packagegroup-qti-telsdk qmi-shutdown-modem"
