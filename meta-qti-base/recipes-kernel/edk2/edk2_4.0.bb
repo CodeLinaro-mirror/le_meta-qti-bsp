@@ -20,7 +20,7 @@ FILESPATH =+ "${SRC_DIR_ROOT}/kernel:"
 EDK2_VARIANT = "${@bb.utils.contains_any('VARIANT', 'perf user', 'perf_', 'debug_', d)}"
 SRC_URI = " \
            ${PATH_TO_REPO}/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/bootable/bootloader/edk2/.git;protocol=${PROTO};destsuffix=kernel-${PREFERRED_VERSION_linux-msm}/kernl_platform/bootable/bootloader/edk2;usehead=1 \
-           ${@bb.utils.contains('EDK2_USE_PREBUILTS', 'True', 'file://kernel-${PREFERRED_VERSION_linux-msm}/out/msm-kernel-${BASEMACHINE}-${EDK2_VARIANT}defconfig/dist/', '', d)} \
+           ${@bb.utils.contains('EDK2_USE_PREBUILTS', 'True', 'file://kernel-${PREFERRED_VERSION_linux-msm}/out/msm-kernel-${KERNEL_ARCH}-${EDK2_VARIANT}defconfig/dist/', '', d)} \
           "
 
 SRCREV = "${AUTOREV}"
@@ -50,7 +50,7 @@ EXTRA_OEMAKE = "'CLANG_BIN=${STAGING_BINDIR_NATIVE}/clang/bin/' \
                 ${@bb.utils.contains('DISTRO_FEATURES', 'qti-avb', 'VERIFIED_BOOT_2=1', '', d)} "
 
 do_prebuilt_configure() {
-    cd ${WORKDIR}/kernel-${PREFERRED_VERSION_linux-msm}/out/msm-kernel-${BASEMACHINE}-${EDK2_VARIANT}defconfig/dist/
+    cd ${WORKDIR}/kernel-${PREFERRED_VERSION_linux-msm}/out/msm-kernel-${KERNEL_ARCH}-${EDK2_VARIANT}defconfig/dist/
 
     install -m 0644 unsigned_abl_user*.elf ${S}/../unsigned_abl.elf
 }
