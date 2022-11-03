@@ -19,6 +19,7 @@ DEPENDS += "\
     glib-2.0 \
     libcutils \
     libdrm \
+    ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "5.15", 'libdmabufheap graphicsdlkm', "", d)} \
     libion \
     libutils \
     linux-msm-headers \
@@ -53,7 +54,11 @@ EXTRA_OECONF:append = " \
     --enable-target-output-deinterlaced='yes' \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', ' --enable-target-hypervisor=yes', '', d)} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-direwolf-vpu', ' --enable-target-direwolf-vpu=yes', '', d)} \
+    ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "5.15", '--enable-target-uses-dmabufheap=yes', "", d)} \
 "
+
+#temp disable swcodec
+EXTRA_OECONF:remove:sa81x5 = "--enable-build-swcodec='yes' "
 
 CPPFLAGS += "\
     -I${STAGING_INCDIR} \
@@ -71,6 +76,11 @@ CPPFLAGS += "\
     -I${STAGING_INCDIR}/mm-video/swvenc \
     -include stdint.h \
     -Wno-format-truncation \
+"
+
+CPPFLAGS:remove:sa81x5 = "\
+     -I${STAGING_INCDIR}/mm-video/swvdec \
+     -I${STAGING_INCDIR}/mm-video/swvenc \
 "
 
 LDFLAGS += "\
