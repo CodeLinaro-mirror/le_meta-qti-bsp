@@ -34,7 +34,9 @@ TECHPACK_HEADERS = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', 
 TECHPACK_MAKE_ARGS = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', "${EXTRA_OEMAKE} QTI_TECHPACK=true", "", d)}"
 
 do_configure() {
-    cp -f ${WORKDIR}/vendor/qcom/opensource/audio-kernel/Makefile.am ${WORKDIR}/vendor/qcom/opensource/audio-kernel/Makefile
+    if ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.4', 'true', 'false', d)}; then
+        cp -f ${WORKDIR}/vendor/qcom/opensource/audio-kernel/Makefile.am ${WORKDIR}/vendor/qcom/opensource/audio-kernel/Makefile
+    fi
 }
 
 do_install:append() {
