@@ -25,7 +25,7 @@ SELINUX_SUPPORT = "${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'selinux',
 AB_SUPPORT = "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'TARGET_SUPPORTS_AB=true', '', d)}"
 NEED_ABCTL = "${@bb.utils.contains('DISTRO_FEATURES', 'ab-boot-support', 'abctl', '', d)}"
 EXTRA_OECONF += " ${AB_SUPPORT}"
-EXTRA_OECONF += " ${@bb.utils.contains('DISTRO_FEATURES', 'nand-ab', 'TARGET_NAND_AB_BOOT=true', '', d)}"
+EXTRA_OECONF += " ${@bb.utils.contains('DISTRO_FEATURES', 'nand-boot', '--with-nand_boot=true', '', d)}"
 DEPENDS += " ${NEED_ABCTL}"
 
 PARALLEL_MAKE = ""
