@@ -11,6 +11,7 @@ DEPENDS += "\
     gstreamer1.0-plugins-bad \
     gstreamer1.0-plugins-base \
     linux-msm-headers \
+    ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "5.15", "videodlkm", "", d)} \
     virtual/libc \
     wayland-native \
     weston \
