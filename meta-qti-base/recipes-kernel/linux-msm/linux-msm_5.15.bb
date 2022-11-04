@@ -71,6 +71,7 @@ do_prebuilt_configure() {
     install -d ${B}/include/config
     install -d ${B}/include/generated
     install -d ${B}/scripts
+    install -d ${B}/certs
     # Some of the artifacts needed for module compilation are present under
     # msm-kernel path, for now copy them for this path to avoid build failures.
     # Ask prebuilt providers to make these available in KERNEL_PREBUILT_PATH.
@@ -79,6 +80,7 @@ do_prebuilt_configure() {
     install -m 0644 ../msm-kernel/include/config/kernel.release ${B}/include/config/kernel.release
     install -m 0644 ../msm-kernel/scripts/module.lds ${B}/scripts/module.lds
     install -m 0644 ../msm-kernel/include/generated/utsrelease.h ${B}/include/generated
+    install -m 0644 ../msm-kernel/certs/* ${B}/certs
 
     install -d ${B}/arch/${ARCH}/boot/
     cp -R ../msm-kernel/arch/${ARCH}/boot/dts/ ${B}/arch/${ARCH}/boot/
@@ -106,7 +108,8 @@ do_prebuilt_shared_workdir() {
 
     kerneldir=${STAGING_KERNEL_BUILDDIR}
     install -d $kerneldir
-
+    install -d $kerneldir/certs
+    install -m 0644 certs/* $kerneldir/certs
     #
     # Store the kernel version in sysroots for module-base.bbclass
     #
