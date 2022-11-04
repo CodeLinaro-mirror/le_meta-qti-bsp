@@ -220,19 +220,44 @@ CheckTmpDirectorySizeForFde () {
     return ${STATUS_OK}
 }
 
+FdeInitialize ()
+{
+    MountModemVol
+    if [ $? -ne ${STATUS_OK} ]; then
+        echo Error: Mount modem UBI volume failed.
+        return ${STATUS_ERR}
+    fi
+
+    chmod o+rw /dev/qseecom /dev/ion
+    chmod 664 /dev/ion
+    /usr/bin/qseecomd > /dev/kmsg &
+    return ${STATUS_OK}
+}
+
 # device_name - The name of the partition
 # ubi_dev_num - UBI device number
 # ubi_vol_num - UBI volume number
 # key_index - The key use for partition encryption
+# for_vb_parameter - These parameters need to transmit to verified-boot utility
 EncryptUbiPartition () {
     local device_name=${1}
     local ubi_dev_num=${2}
     local ubi_vol_num=${3}
     local key_index=${4}
+    local for_vb_parameter="${5}"
 
     local char_device=""
     local block_device=""
     local encryption_path=${FDE_ENCRYPTION_PATH}
+
+    if [ "${FDE_INIT_STATUS}" != "DONE" ]; then
+        FdeInitialize
+        if [ $? -ne ${STATUS_OK} ]; then
+            echo Error: FDE initialization failed.
+            return ${STATUS_ERR}
+        fi
+        FDE_INIT_STATUS="DONE"
+    fi
 
     if [ "${ubi_vol_num}" == "null" ]; then
         GetUbiVolumeID ${ubi_dev_num} ${device_name}
@@ -265,7 +290,8 @@ EncryptUbiPartition () {
     # 0 -- Run encryption and/or decryption successful
     # 1 -- Fuse not blown, continue as normal boot
     # 2 -- Failed
-    nad-fde-app -n ${char_device} -d ${block_device} -t ${device_name} -p ${encryption_path} -k ${key_index}
+    nad-fde-app -c ${char_device} -d ${block_device} -n ${device_name} -p ${encryption_path} -k ${key_index} \
+                -V "${for_vb_parameter}"
     nad_fde_result=$?
     case "${nad_fde_result}" in
         0)
@@ -289,8 +315,11 @@ EncryptUbiPartition () {
     esac
 }
 
+# rootca_path - The rootCA storing path, use to verify NOT system image
 EncryptNotSysPartition () {
+    local rootca_path=${1}
     local fde_parti_list=`cat /proc/cmdline | sed 's/ /\n/g' | grep -E "fde\."`
+    local vb_parameter="-p ${rootca_path}"
 
     for parti in ${fde_parti_list}; do
         parti_name=`echo ${parti} | awk -F "." '{print $2}'`
@@ -303,7 +332,8 @@ EncryptNotSysPartition () {
         EncryptUbiPartition ${parti_name} \
                             ${SYS_UBI_DEV_NUM} \
                             "null" \
-                            ${key_index}
+                            ${key_index} \
+                            "${vb_parameter}"
 
         if [ $? -ne ${STATUS_OK} ] ; then
             echo "Encrypt partition ${parti_name} failed."
@@ -332,6 +362,7 @@ MountSystem () {
     local image_type="ubifs"
     local nad_fde_status="disabled"
     local sys_key_index="0"
+    local vb_parameter="-k /etc/keys/x509_root.der"
 
     if [ ! -e /bin/dd ]; then
         echo Error: cmd: /bin/dd not found
@@ -374,7 +405,7 @@ MountSystem () {
 
         # Check if the image type is squashfs in UBI volume
         if dd if=${char_device}\
-            count=1 bs=4 2>/dev/null | grep 'hsqs' > /dev/null; then
+                           count=1 bs=4 2>/dev/null | grep 'hsqs' > /dev/null; then
             image_type="squashfs"
         elif dd if=${char_device}\
             count=1 bs=4 2>/dev/null | hexdump | grep "1831 0610" > /dev/null; then
@@ -390,15 +421,7 @@ MountSystem () {
                 # 4+4 device has not enough ram size for FDE encryption
                 # So, skip encryption if the memory is smaller than 512
                 supported_mem_size=`free -m | grep Mem | awk '{print $2}'`
-
                 if [ ${supported_mem_size} -gt 512 ]; then
-
-                    # Encrypt other images first, and later will encrypt the root file system.
-                    EncryptNotSysPartition
-                    if [ $? -ne ${STATUS_OK} ]; then
-                        echo Error: MountSystem no device: ${block_device} found
-                        return ${STATUS_ERR}
-                    fi
 
                     nad_fde_status="enabled"
 
@@ -420,7 +443,7 @@ MountSystem () {
                 ubiblock --create "${char_device}"
                 WaitDevReady "-b" "${block_device}"
                 if [ $? -ne ${STATUS_OK} ]; then
-                    echo Error: MountSystem no device: ${block_device} found
+                    echo Error: EncryptUbiPartition no device: ${block_device} found
                     return ${STATUS_ERR}
                 fi
             fi
@@ -428,31 +451,32 @@ MountSystem () {
             # For root file system FDE enabling
             if [ "${nad_fde_status}" == "enabled" ]; then
 
-                MountModemVol
-                if [ $? -ne ${STATUS_OK} ]; then
-                    echo Error: Mount modem UBI volume failed.
-                    return ${STATUS_ERR}
-                fi
-
-                chmod o+rw /dev/qseecom /dev/ion
-                chmod 664 /dev/ion
-                /usr/bin/qseecomd > /dev/kmsg &
-
                 sys_key_index=`cat /proc/cmdline | sed 's/ /\n/g' |\
                                     grep -E 'fde\.system' | awk -F '.' '{print $3}'`
 
                 EncryptUbiPartition ${DM_SYST_NAME} \
                                     ${SYS_UBI_DEV_NUM} \
                                     ${SYS_IMAGE_VOL} \
-                                    ${sys_key_index}
+                                    ${sys_key_index} \
+                                    "${vb_parameter}"
 
                 if [ $? -ne ${STATUS_OK} ] ; then
                     echo "Encrypt partition ${DM_SYST_NAME} failed."
                     return ${STATUS_ERR}
                 fi
                 block_device=${FDE_MOUNT_NODE}
-
                 echo fde: block_device=${block_device}
+
+                # Before encryption, the not rootfs image which need to be encrypted
+                # should pass the signing verify first. And the CA for verification
+                # was stored at the end of system image. We can get it from
+                # "/dev/ubiblockx_x" or "/dev/mapper/system".
+                EncryptNotSysPartition ${block_device}
+                if [ $? -ne ${STATUS_OK} ]; then
+                    echo Error: MountSystem no device: ${block_device} found
+                    return ${STATUS_ERR}
+                fi
+
             # For root file system Verified boot enabling
             elif grep 'nad_avb=1' /proc/cmdline > /dev/null; then
                 dm_verity_device=/dev/mapper/${DM_SYST_NAME}
