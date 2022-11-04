@@ -5,11 +5,11 @@ LICENSE = "GPL-2.0"
 LIC_FILES_CHKSUM = "file://NOTICE;md5=689b0a45875711dc09b94e4b6524c3cd"
 DEPENDS += "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', "audio-devicetree", "", d)}"
 DEPENDS += "virtual/kernel"
-FILESPATH =+ "${SRC_DIR_ROOT}/vendor/qcom/opensource/:"
-SRC_URI = "file://audio-kernel/"
+
+SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/audio-kernel/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/audio-kernel;usehead=1"
 SRC_URI:append = " file://audio_load.conf"
 SRCREV = "${AUTOREV}"
-S = "${WORKDIR}/audio-kernel"
+S = "${WORKDIR}/vendor/qcom/opensource/audio-kernel"
 
 inherit ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', "qti-techpack", "module module-sign qperf qti-kernel-arch-clang", d)}
 
@@ -34,7 +34,7 @@ TECHPACK_HEADERS = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', 
 TECHPACK_MAKE_ARGS = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', "${EXTRA_OEMAKE} QTI_TECHPACK=true", "", d)}"
 
 do_configure() {
-    cp -f ${S}/Makefile.am ${S}/Makefile
+    cp -f ${WORKDIR}/vendor/qcom/opensource/audio-kernel/Makefile.am ${WORKDIR}/vendor/qcom/opensource/audio-kernel/Makefile
 }
 
 do_install:append() {
