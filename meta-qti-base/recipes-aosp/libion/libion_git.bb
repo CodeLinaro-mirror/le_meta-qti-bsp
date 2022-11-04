@@ -7,7 +7,7 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://../NOTICE;md5=c1a3ff0b97f199c7ebcfdd4d3fed238e"
 
 DEPENDS += "liblog"
-DEPENDS += "${@bb.utils.contains('MACHINE', 'sa8540', 'linux-ark-headers', 'linux-msm-headers', d)}"
+DEPENDS += "${@bb.utils.contains_any('MACHINE', 'sa8775 sa8540', 'linux-ark-headers', 'linux-msm-headers', d)}"
 
 PR = "r1"
 

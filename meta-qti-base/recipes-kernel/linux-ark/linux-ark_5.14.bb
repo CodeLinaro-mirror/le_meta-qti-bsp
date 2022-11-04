@@ -151,9 +151,23 @@ do_deploy () {
     cp  ${STAGING_KERNEL_BUILDDIR}/usr/gen_init_cpio ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr
 
     # Copy Image appended with dtbs to deploydir
+
+    if [ "${BASEMACHINE}" = "sa8775" ]; then
+    cat ${B}/arch/arm64/boot/Image.gz \
+        ${B}/arch/arm64/boot/dts/qcom/lemans.dtb > ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb
+    # Make bootimage
+    ${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb \
+	--kernel  ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb \
+	--ramdisk /dev/null \
+        --pagesize ${PAGE_SIZE} \
+	--base ${KERNEL_BASE} \
+	--ramdisk_offset 0x0 \
+        --cmdline "root=/dev/sda2 rw rootwait console=ttyMSM0,115200,n8 no_console_suspend=1 androidboot.hardware=qcom androidboot.console=ttyMSM0 lpm_levels.sleep_disabled=1 msm_rtb.filter=0x237 earlycon=qcom_geni,0x884000 fips=0 notests nokaslr ignore_loglevel" \
+	--output  ${DEPLOYDIR}/sa8775p-boot-5.14.img
+
+    else
     cat ${B}/arch/arm64/boot/Image.gz \
         ${B}/arch/arm64/boot/dts/qcom/sa8540p-adp-ride.dtb > ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb
-
     # Make bootimage
     ${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb \
 	--kernel  ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb \
@@ -163,6 +177,7 @@ do_deploy () {
 	--ramdisk_offset 0x0 \
         --cmdline "root=/dev/sda1 rw rootwait console=ttyMSM0,115200,n8 no_console_suspend=1 androidboot.hardware=qcom androidboot.console=ttyMSM0 lpm_levels.sleep_disabled=1 msm_rtb.filter=0x237 earlycon=qcom_geni,0x884000 fips=0 notests nokaslr ignore_loglevel" \
 	--output  ${DEPLOYDIR}/sa8540p-boot-5.14.img
+    fi
 
     if ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'true', 'false', d)}; then
         ${STAGING_BINDIR_NATIVE}/mkdtimg  create ${DEPLOYDIR}/${PRODUCT}-dtbo.img ${B}/arch/${ARCH}/boot/dts/qcom/sa8295p-adp-overlay.dtbo
