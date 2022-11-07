@@ -1,0 +1,297 @@
+# Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted (subject to the limitations in the
+# disclaimer below) provided that the following conditions are met:
+#
+#    * Redistributions of source code must retain the above copyright
+#      notice, this list of conditions and the following disclaimer.
+#
+#    * Redistributions in binary form must reproduce the above
+#      copyright notice, this list of conditions and the following
+#      disclaimer in the documentation and/or other materials provided
+#      with the distribution.
+#
+#    * Neither the name of Qualcomm Innovation Center, Inc. nor the names of its
+#      contributors may be used to endorse or promote products derived
+#      from this software without specific prior written permission.
+#
+# NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
+# GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
+# HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+# WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+# IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+# ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+# GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+# IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+# IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+module fix 1.0;
+
+require {
+    type audioserver;
+    type cameraserver;
+    type carservice_app;
+    type carwatchdogd;
+    type credstore;
+    type devpts;
+    type drmserver;
+    type gatekeeperd;
+    type gpuservice;
+    type hal_light_default;
+    type hal_power_default;
+    type host_exec_t;
+    type incidentd;
+    type init;
+    type installd;
+    type kernel;
+    type keystore;
+    type kmsg_device;
+    type logpersist;
+    type mediaextractor;
+    type mediametrics;
+    type mediaserver;
+    type netd;
+    type network_stack;
+    type procfsinspector;
+    type radio;
+    type secure_element;
+    type servicemanager;
+    type statsd;
+    type storaged;
+    type surfaceflinger;
+    type system_server;
+    type system_suspend;
+    type toolbox;
+    type update_engine;
+    type vendor_default_prop;
+    type vendor_perfservice;
+    type vold;
+    type wificond;
+    type block_device;
+    type bluetooth_a2dp_offload_prop;
+    type bluetooth_data_file;
+    type bluetooth_prop;
+    type bootstat;
+    type crash_dump;
+    type default_prop;
+    type device;
+    type device_config_runtime_native_boot_prop;
+    type device_config_runtime_native_prop;
+    type devpts;
+    type exported3_system_prop;
+    type fsverity_init;
+    type functionfs;
+    type hal_audio_default;
+    type hal_graphics_composer_default;
+    type hal_tetheroffload_default;
+    type host_exec_t;
+    type host_file_t;
+    type hwservicemanager_prop;
+    type init;
+    type logd;
+    type media_variant_prop;
+    type net_data_file;
+    type recovery_persist;
+    type recovery_refresh;
+    type shell_exec;
+    type shell_prop;
+    type storage_file;
+    type sysfs;
+    type system_file;
+    type system_server;
+    type system_suspend;
+    type tee;
+    type tombstone_data_file;
+    type toolbox_exec;
+    type unlabeled;
+    type vendor_audio_chime;
+    type vendor_bluetooth_prop;
+    type vendor_camera_socket;
+    type vendor_file;
+    type vendor_hal_evs_driver;
+    type vendor_hal_usb_qti;
+    type vendor_init;
+    type vendor_ipa_dev;
+    type vendor_location;
+    type vendor_qti_init_shell;
+    type vendor_sysfs_sensors;
+    type zygote;
+    class dir { add_name create getattr open read remove_name rename reparent search setattr write };
+    class file { create entrypoint execute execute_no_trans getattr ioctl link map open read setattr write };
+    class lnk_file { read setattr };
+    class capability kill;
+    class fd use;
+    class chr_file { getattr ioctl open read write };
+    class netlink_route_socket { bind create getattr nlmsg_read nlmsg_write read setopt write };
+    class udp_socket { create ioctl };
+    class property_service set;
+    class sock_file write;
+    class unix_stream_socket connectto;
+    class key view;
+    class process { sigkill getattr noatsecure rlimitinh siginh transition };
+    class unix_dgram_socket { ioctl };
+    class binder { call transfer };
+    class system syslog_read;
+}
+
+#============= bootstat ==============
+allow bootstat host_file_t:dir search;
+
+#============= crash_dump ==============
+allow crash_dump bluetooth_a2dp_offload_prop:file { getattr map open };
+allow crash_dump bluetooth_data_file:file { getattr map open read };
+allow crash_dump bluetooth_prop:file { getattr map open };
+allow crash_dump device_config_runtime_native_boot_prop:file { getattr map open };
+allow crash_dump device_config_runtime_native_prop:file { getattr map open };
+allow crash_dump hwservicemanager_prop:file { getattr map open };
+allow crash_dump media_variant_prop:file { getattr map open };
+allow crash_dump vendor_bluetooth_prop:file { getattr map open };
+allow crash_dump vendor_default_prop:file { getattr map open };
+
+#============= fsverity_init ==============
+allow fsverity_init host_exec_t:key view;
+
+#============= hal_audio_default ==============
+allow hal_audio_default unlabeled:dir search;
+
+#============= hal_graphics_composer_default ==============
+allow hal_graphics_composer_default device:chr_file { getattr ioctl open read write };
+
+#============= hal_tetheroffload_default ==============
+allow hal_tetheroffload_default unlabeled:dir search;
+
+#============= host_exec_t ==============
+
+allow host_exec_t init:dir search;
+allow host_exec_t init:file { getattr open read };
+allow host_exec_t init:lnk_file read;
+allow host_exec_t init:process { getattr noatsecure rlimitinh siginh transition };
+allow host_exec_t shell_exec:file { execute open read };
+allowxperm host_exec_t host_file_t:file ioctl { 0x9402 };
+
+#============= init ==============
+allow init devpts:chr_file { getattr ioctl };
+allow init host_exec_t:fd use;
+allow init shell_exec:file entrypoint;
+allow init vendor_file:file execute;
+allow init system_file:file execute_no_trans;
+allow init audioserver:binder call;
+allow init cameraserver:binder call;
+allow init carservice_app:binder call;
+allow init carwatchdogd:binder call;
+allow init credstore:binder call;
+allow init drmserver:binder call;
+allow init gatekeeperd:binder call;
+allow init gpuservice:binder call;
+allow init hal_light_default:binder call;
+allow init hal_power_default:binder call;
+allow init incidentd:binder call;
+allow init installd:binder call;
+allow init keystore:binder call;
+allow init mediaextractor:binder call;
+allow init mediametrics:binder call;
+allow init mediaserver:binder call;
+allow init netd:binder call;
+allow init network_stack:binder call;
+allow init procfsinspector:binder call;
+allow init radio:binder call;
+allow init secure_element:binder call;
+allow init servicemanager:binder call;
+allow init statsd:binder call;
+allow init storaged:binder call;
+allow init surfaceflinger:binder call;
+allow init system_server:binder call;
+allow init system_suspend:binder call;
+allow init update_engine:binder call;
+allow init vendor_perfservice:binder call;
+allow init vold:binder call;
+allow init wificond:binder call;
+
+#============= logd ==============
+allow logd unlabeled:dir search;
+
+#============= recovery_persist ==============
+allow recovery_persist host_file_t:dir search;
+
+#============= logpersist ==============
+allow logpersist devpts:chr_file { read write };
+allow logpersist host_exec_t:fd use;
+
+#============= recovery_refresh ==============
+allow recovery_refresh host_file_t:dir search;
+
+#============= system_server ==============
+allow system_server host_file_t:dir search;
+
+#============= system_suspend ==============
+allow system_suspend sysfs:dir { open read };
+allow system_suspend sysfs:file { getattr open read };
+
+#============= tee ==============
+allow tee unlabeled:dir search;
+
+#============= vendor_audio_chime ==============
+allow vendor_audio_chime sysfs:file { open write };
+allow vendor_audio_chime unlabeled:dir search;
+
+#============= servicemanager ==============
+allow servicemanager init:binder transfer;
+
+#============= vendor_hal_evs_driver ==============
+allow vendor_hal_evs_driver host_exec_t:unix_stream_socket connectto;
+allow vendor_hal_evs_driver host_file_t:dir search;
+allow vendor_hal_evs_driver host_file_t:sock_file write;
+allow vendor_hal_evs_driver sysfs:file { open write };
+allow vendor_hal_evs_driver vendor_camera_socket:lnk_file read;
+
+#============= vendor_hal_usb_qti ==============
+allow vendor_hal_usb_qti vendor_sysfs_sensors:dir search;
+
+#============= vendor_init ==============
+allow vendor_init block_device:lnk_file setattr;
+allow vendor_init storage_file:dir { rename reparent };
+allow vendor_init tombstone_data_file:dir { add_name create getattr search setattr write };
+allow vendor_init unlabeled:dir { add_name remove_name write };
+allow vendor_init vendor_ipa_dev:file { create open write };
+
+#============= vendor_location ==============
+allow vendor_location vendor_file:file execute_no_trans;
+
+#============= vendor_qti_init_shell ==============
+allow vendor_qti_init_shell default_prop:file { getattr map open read };
+allow vendor_qti_init_shell exported3_system_prop:file { getattr map open read };
+allow vendor_qti_init_shell net_data_file:dir search;
+allow vendor_qti_init_shell net_data_file:file { getattr open read };
+allow vendor_qti_init_shell self:netlink_route_socket { bind create getattr nlmsg_read nlmsg_write read setopt write };
+allow vendor_qti_init_shell self:udp_socket { create ioctl };
+allow vendor_qti_init_shell self:capability { kill };
+allow vendor_qti_init_shell shell_exec:file { execute getattr map open read };
+allow vendor_qti_init_shell shell_prop:property_service set;
+allow vendor_qti_init_shell system_file:file { execute execute_no_trans getattr map open read };
+allow vendor_qti_init_shell toolbox_exec:file { execute execute_no_trans getattr map open read };
+allow vendor_qti_init_shell vendor_file:file entrypoint;
+allowxperm vendor_qti_init_shell self:udp_socket ioctl { 0x8927 0x891d 0x8970 0x8916 0x8914 };
+
+#============= zygote ==============
+allow zygote device:file { open write };
+allow zygote self:capability kill;
+allow zygote system_file:dir { add_name create rename reparent setattr write };
+allow zygote system_file:file { create link setattr write };
+allow zygote unlabeled:dir { add_name remove_name search write };
+
+#============= fix lxc-stop failed, host_exec_t no sigkill permission to init ==============
+allow host_exec_t init:process { sigkill };
+
+#============= fix tcpdump can't work under sanity test  ==============
+allowxperm host_exec_t self:unix_dgram_socket ioctl { 0x8946 };
+allowxperm host_exec_t functionfs:file ioctl { 0x6703 };
+
+#============= toolbox ==============
+allow toolbox host_exec_t:fd use;
+allow toolbox kernel:system syslog_read;
+allow toolbox kmsg_device:chr_file { open read };

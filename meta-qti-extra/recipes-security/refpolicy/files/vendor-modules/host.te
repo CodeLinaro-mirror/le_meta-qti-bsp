@@ -1,0 +1,548 @@
+# Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted (subject to the limitations in the
+# disclaimer below) provided that the following conditions are met:
+#
+#    * Redistributions of source code must retain the above copyright
+#      notice, this list of conditions and the following disclaimer.
+#
+#    * Redistributions in binary form must reproduce the above
+#      copyright notice, this list of conditions and the following
+#      disclaimer in the documentation and/or other materials provided
+#      with the distribution.
+#
+#    * Neither the name of Qualcomm Innovation Center, Inc. nor the names of its
+#      contributors may be used to endorse or promote products derived
+#      from this software without specific prior written permission.
+#
+# NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
+# GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
+# HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+# WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+# IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+# ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+# GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+# IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+# IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+policy_module(host,1.0.0)
+
+########################################
+#
+# Declarations
+#
+
+attribute system_file_type;
+attribute domain;
+attribute file_type;
+attribute exec_type;
+attribute entry_type;
+attribute non_security_file_type;
+attribute non_auth_file_type;
+attribute initrc_transition_domain;
+attribute filesystem_type;
+
+type kernel;
+type nsfs_t, filesystem_type;
+type device, filesystem_type;
+
+# let kernel domain trans to host_exec_t domain
+type host_sbin_t;
+type host_bin_t;
+type host_file_t, file_type;
+type host_exec_t;
+domain_type(host_exec_t)
+domain_entry_file(host_exec_t, host_sbin_t)
+domain_entry_file(host_exec_t, host_bin_t)
+domtrans_pattern(kernel,host_sbin_t,host_exec_t)
+domtrans_pattern(kernel,host_bin_t,host_exec_t)
+
+type host_device_t, file_type;
+
+require {
+    type adsprpcd_file;
+    type ais_v4l2_proxy;
+    type apex_module_data_file;
+    type apex_permission_data_file;
+    type apex_rollback_data_file;
+    type apex_wifi_data_file;
+    type app_data_file;
+    type backup_data_file;
+    type binder_device;
+    type binderfs;
+    type binderfs_logs;
+    type binderfs_logs_proc;
+    type bluetooth_data_file;
+    type bluetooth_audio_hal_prop;
+    type bt_firmware_file;
+    type cgroup;
+    type cgroup_bpf;
+    type cgroup_desc_file;
+    type crash_dump;
+    type configfs;
+    type debugfs;
+    type debugfs_kprobes;
+    type debugfs_tracing;
+    type debugfs_tracing_debug;
+    type debugfs_tracing_instances;
+    type devpts;
+    type face_vendor_data_file;
+    type fingerprint_vendor_data_file;
+    type firmware_file;
+    type fs_bpf;
+    type fsck_exec;
+    type functionfs;
+    type fuse;
+    type fusectlfs;
+    type gsi_metadata_file;
+    type hwbinder_device;
+    type hal_audiocontrol_default;
+    type hal_bootctl_default;
+    type init;
+    type init_tmpfs;
+    type kernel;
+    type kmsg_debug_device;
+    type labeledfs;
+    type linkerconfig_file;
+    type mqueue;
+    type mediacodec;
+    type mirror_data_file;
+    type mnt_media_rw_file;
+    type mnt_user_file;
+    type mnt_pass_through_file;
+    type nfc_data_file;
+    type node;
+    type nsfs_t;
+    type persist_debug_prop;
+    type port;
+    type privapp_data_file;
+    type proc;
+    type proc_asound;
+    type proc_cmdline;
+    type proc_cpuinfo;
+    type proc_diskstats;
+    type proc_cpuinfo;
+    type proc_filesystems;
+    type proc_hostname;
+    type proc_kmsg;
+    type proc_meminfo;
+    type proc_interrupts;
+    type proc_net;
+    type proc_random;
+    type proc_pid_max;
+    type proc_security;
+    type proc_stat;
+    type proc_swaps;
+    type proc_sysrq;
+    type proc_tty_drivers;
+    type proc_uptime;
+    type pstorefs;
+    type radio_data_file;
+    type ringtone_file;
+    type rollback_data_file;
+    type rootfs;
+    type su;
+    type securityfs;
+    type selinuxfs;
+    type shell_data_file;
+    type shared_relro;
+    type storaged_data_file;
+    type sysfs;
+    type sysfs_android_usb;
+    type sysfs_devices_block;
+    type sysfs_devices_system_cpu;
+    type sysfs_dm;
+    type sysfs_dt_firmware_android;
+    type sysfs_extcon;
+    type sysfs_fs_ext4_features;
+    type sysfs_fs_f2fs;
+    type sysfs_hwrandom;
+    type sysfs_ion;
+    type sysfs_leds;
+    type sysfs_loop;
+    type sysfs_net;
+    type sysfs_rtc;
+    type sysfs_suspend_stats;
+    type sysfs_thermal;
+    type sysfs_uio;
+    type sysfs_wake_lock;
+    type sysfs_wakeup;
+    type sysfs_wakeup_reasons;
+    type sysfs_zram;
+    type sysfs_zram_uevent;
+    type system_app_data_file;
+    type system_bootstrap_lib_file;
+    type system_data_file;
+    type system_data_root_file;
+    type system_file;
+    type system_server;
+    type tmpfs;
+    type toolbox;
+    type ueventd;
+    type unlabeled;
+    type usermodehelper;
+    type vendor_adsprpcd_exec;
+    type vendor_cdsprpcd_exec;
+    type vendor_camera_socket;
+    type vendor_configs_file;
+    type vendor_debugfs_ion;
+    type vendor_debugfs_kgsl;
+    type vendor_esplash;
+    type vendor_hal_audiocontrol_qti;
+    type vendor_hal_automotive_vehicle_qti;
+    type vendor_init;
+    type vendor_file;
+    type vendor_firmware_file;
+    type vendor_proc_audiod;
+    type vendor_ssgtzd_exec;
+    type vendor_audio_prop;
+    type vendor_sysfs_aop_freq_message;
+    type vendor_sysfs_boot_adsp;
+    type vendor_sysfs_devfreq;
+    type vendor_sysfs_kgsl;
+    type vendor_sysfs_kgsl_proc;
+    type vendor_sysfs_kpi;
+    type vendor_sysfs_memory_offline;
+    type vendor_sysfs_msm_power;
+    type vendor_sysfs_msm_stats;
+    type vendor_sysfs_msm_subsys_restart;
+    type vendor_sysfs_npu;
+    type vendor_sysfs_usb_c;
+    type vendor_sysfs_usb_controller;
+    type vendor_sysfs_qdss_dev;
+    type vendor_sysfs_spmi_dev;
+    type vendor_sysfs_spss;
+    type vendor_sysfs_scsi_target;
+    type vendor_sysfs_ssr;
+    type vendor_sysfs_soc;
+    type vendor_qti_init_shell;
+    type vendor_qti_media;
+    type vfat;
+    type vndbinder_device;
+    type vold_data_file;
+    type sepolicy_file;
+    type device;
+    type securityfs;
+    type apexd;
+    type vendor_audiod;
+    type vendor_hal_ais_qti;
+    type hal_graphics_allocator_default;
+    class service { status start stop reload enable disable };
+    class dbus { acquire_svc send_msg };
+    class passwd { passwd chfn chsh rootok crontab };
+};
+
+#============= host_exec_t ==============
+grant_all_permissions(host_exec_t,adsprpcd_file)
+grant_all_permissions(host_exec_t,host_bin_t)
+grant_all_permissions(host_exec_t,host_file_t)
+grant_all_permissions(host_exec_t,host_exec_t)
+grant_all_permissions(host_exec_t,host_device_t)
+grant_all_permissions(host_exec_t,host_sbin_t)
+grant_all_permissions(host_exec_t,proc)
+grant_all_permissions(host_exec_t,kernel)
+grant_all_permissions(host_exec_t,bt_firmware_file)
+grant_all_permissions(host_exec_t,proc_cmdline)
+grant_all_permissions(host_exec_t,proc_meminfo)
+grant_all_permissions(host_exec_t,proc_hostname)
+grant_all_permissions(host_exec_t,proc_swaps)
+grant_all_permissions(host_exec_t,proc_net)
+grant_all_permissions(host_exec_t,proc_sysrq)
+grant_all_permissions(host_exec_t,proc_security)
+grant_all_permissions(host_exec_t,proc_pid_max)
+grant_all_permissions(host_exec_t,proc_kmsg)
+grant_all_permissions(host_exec_t,proc_interrupts)
+grant_all_permissions(host_exec_t,proc_asound)
+grant_all_permissions(host_exec_t,proc_uptime)
+grant_all_permissions(host_exec_t,proc_filesystems)
+grant_all_permissions(host_exec_t,proc_random)
+grant_all_permissions(host_exec_t,proc_cpuinfo)
+grant_all_permissions(host_exec_t,proc_diskstats)
+grant_all_permissions(host_exec_t,proc_stat)
+grant_all_permissions(host_exec_t,proc_iomem)
+grant_all_permissions(host_exec_t,proc_version)
+grant_all_permissions(host_exec_t,pstorefs)
+grant_all_permissions(host_exec_t,port)
+grant_all_permissions(host_exec_t,node)
+grant_all_permissions(host_exec_t,unlabeled)
+grant_all_permissions(host_exec_t,mqueue)
+grant_all_permissions(host_exec_t,tmpfs)
+grant_all_permissions(host_exec_t,binderfs)
+grant_all_permissions(host_exec_t,hwbinder_device)
+grant_all_permissions(host_exec_t,binder_device)
+grant_all_permissions(host_exec_t,vndbinder_device)
+grant_all_permissions(host_exec_t,fs_bpf)
+grant_all_permissions(host_exec_t,nsfs_t)
+grant_all_permissions(host_exec_t,fuse)
+grant_all_permissions(host_exec_t,usermodehelper)
+grant_all_permissions(host_exec_t,fusectlfs)
+grant_all_permissions(host_exec_t,functionfs)
+grant_all_permissions(host_exec_t,firmware_file)
+grant_all_permissions(host_exec_t,configfs)
+grant_all_permissions(host_exec_t,debugfs)
+grant_all_permissions(host_exec_t,labeledfs)
+grant_all_permissions(host_exec_t,rootfs)
+grant_all_permissions(host_exec_t,sysfs)
+grant_all_permissions(host_exec_t,device)
+grant_all_permissions(host_exec_t,devpts)
+grant_all_permissions(host_exec_t,cgroup_bpf)
+grant_all_permissions(host_exec_t,cgroup)
+grant_all_permissions(host_exec_t,cgroup_desc_file)
+grant_all_permissions(host_exec_t,securityfs)
+grant_all_permissions(host_exec_t,selinuxfs)
+grant_all_permissions(host_exec_t,sysfs_devices_block)
+grant_all_permissions(host_exec_t,sysfs_fs_ext4_features)
+grant_all_permissions(host_exec_t,sysfs_suspend_stats)
+grant_all_permissions(host_exec_t,sysfs_hwrandom)
+grant_all_permissions(host_exec_t,sysfs_uio)
+grant_all_permissions(host_exec_t,sysfs_android_usb)
+grant_all_permissions(host_exec_t,sysfs_wakeup)
+grant_all_permissions(host_exec_t,sysfs_loop)
+grant_all_permissions(host_exec_t,sysfs_rtc)
+grant_all_permissions(host_exec_t,sysfs_leds)
+grant_all_permissions(host_exec_t,sysfs_extcon)
+grant_all_permissions(host_exec_t,sysfs_net)
+grant_all_permissions(host_exec_t,sysfs_zram)
+grant_all_permissions(host_exec_t,sysfs_zram_uevent)
+grant_all_permissions(host_exec_t,sysfs_devices_system_cpu)
+grant_all_permissions(host_exec_t,sysfs_thermal)
+grant_all_permissions(host_exec_t,sysfs_wake_lock)
+grant_all_permissions(host_exec_t,sysfs_dm)
+grant_all_permissions(host_exec_t,system_data_root_file)
+grant_all_permissions(host_exec_t,system_file)
+grant_all_permissions(host_exec_t,sepolicy_file)
+grant_all_permissions(host_exec_t,vfat)
+grant_all_permissions(host_exec_t,vendor_file)
+grant_all_permissions(host_exec_t,vendor_sysfs_aop_freq_message)
+grant_all_permissions(host_exec_t,vendor_sysfs_uio_file)
+grant_all_permissions(host_exec_t,vendor_debugfs_ipc)
+grant_all_permissions(host_exec_t,vendor_sysfs_msm_power)
+grant_all_permissions(host_exec_t,vendor_sysfs_msm_subsys_restart)
+grant_all_permissions(host_exec_t,vendor_sysfs_msm_stats)
+grant_all_permissions(host_exec_t,vendor_sysfs_ssr)
+grant_all_permissions(host_exec_t,vendor_sysfs_memory_offline)
+grant_all_permissions(host_exec_t,vendor_sysfs_usb_controller)
+grant_all_permissions(host_exec_t,vendor_sysfs_spmi_dev)
+grant_all_permissions(host_exec_t,vendor_sysfs_qdss_dev)
+grant_all_permissions(host_exec_t,vendor_sysfs_devfreq)
+grant_all_permissions(host_exec_t,vendor_sysfs_kgsl)
+grant_all_permissions(host_exec_t,vendor_sysfs_kpi)
+grant_all_permissions(host_exec_t,vendor_sysfs_usb_c)
+grant_all_permissions(host_exec_t,vendor_sysfs_soc)
+grant_all_permissions(host_exec_t,vendor_sysfs_boot_adsp)
+grant_all_permissions(host_exec_t,vendor_sysfs_npu)
+grant_all_permissions(host_exec_t,vendor_proc_audiod)
+grant_all_permissions(host_exec_t,vendor_sysfs_usb_device)
+grant_all_permissions(host_exec_t,vendor_adsprpcd_exec)
+grant_all_permissions(host_exec_t,vendor_cdsprpcd_exec)
+grant_all_permissions(host_exec_t,vendor_ssgtzd_exec)
+grant_all_permissions(host_exec_t,vendor_configs_file)
+grant_all_permissions(host_exec_t,vendor_firmware_file)
+allow host_exec_t host_sbin_t:service { status start stop reload enable disable };
+allow host_exec_t hal_graphics_allocator_default:fd use;
+allowxperm host_exec_t self:file ioctl { 0x5401 };
+allowxperm host_exec_t self:fifo_file ioctl { 0x5413 };
+allowxperm host_exec_t self:unix_stream_socket ioctl { 0x89a0 0x89a2 0x540f };
+allowxperm host_exec_t self:unix_dgram_socket ioctl { 0x8933 0x8910};
+allowxperm host_exec_t self:udp_socket ioctl { 0x8946 0x8916 0x8914 0x8927 0x8970 0x891d 0x8924 };
+allowxperm host_exec_t self:tcp_socket ioctl { 0x89a2 };
+allowxperm host_exec_t self:blk_file ioctl { 0x1272 0x1260 0x204 };
+allowxperm host_exec_t kernel:file ioctl { 0x5401 };
+allowxperm host_exec_t host_device_t:blk_file ioctl { 0x2285 0x1272 0x1260 0x204 0x5331 0x1268 0x125e 0x125f 0x127c };
+allowxperm host_exec_t functionfs:file ioctl { 0x6782 };
+allowxperm host_exec_t devpts:chr_file ioctl { 0x5404 0x540d 0x4b45 0x5437 0x4b3a 0x5429 0x4b44 0x5456 0x5457 0x5430 0x5431 };
+allowxperm host_exec_t rootfs:blk_file ioctl { 0x1272 0x1268 };
+allowxperm host_exec_t vendor_file:blk_file ioctl { 0x1272 0x1268 };
+allowxperm host_exec_t unlabeled:file ioctl { 0x9409 };
+
+
+#============= host_device_t ==============
+grant_all_permissions(host_device_t,device)
+grant_all_permissions(host_device_t,devpts)
+
+#============= host_file_t ==============
+grant_all_permissions(host_file_t,sysfs)
+grant_all_permissions(host_file_t,debugfs)
+grant_all_permissions(host_file_t,pstorefs)
+
+#============= kernel ==============
+grant_all_permissions(kernel,unlabeled)
+grant_all_permissions(kernel,device)
+grant_all_permissions(kernel,securityfs)
+grant_all_permissions(kernel,selinuxfs)
+grant_all_permissions(kernel,kernel)
+grant_all_permissions(kernel,sysfs)
+grant_all_permissions(kernel,host_device_t)
+grant_all_permissions(kernel,host_file_t)
+grant_all_permissions(kernel,host_sbin_t)
+grant_all_permissions(kernel,host_bin_t)
+grant_all_permissions(kernel,host_exec_t)
+grant_all_permissions(kernel,tmpfs)
+grant_all_permissions(kernel,bt_firmware_file)
+grant_all_permissions(kernel,firmware_file)
+grant_all_permissions(kernel,cgroup)
+grant_all_permissions(kernel,cgroup_bpf)
+grant_all_permissions(kernel,pstorefs)
+grant_all_permissions(kernel,devpts)
+grant_all_permissions(kernel,fs_bpf)
+grant_all_permissions(kernel,fsck_exec)
+grant_all_permissions(kernel,functionfs)
+grant_all_permissions(kernel,gsi_metadata_file)
+grant_all_permissions(kernel,labeledfs)
+grant_all_permissions(kernel,proc)
+grant_all_permissions(kernel,proc_net)
+grant_all_permissions(kernel,proc_swaps)
+grant_all_permissions(kernel,proc_hostname)
+grant_all_permissions(kernel,proc_meminfo)
+grant_all_permissions(kernel,proc_security)
+grant_all_permissions(kernel,proc_kmsg)
+grant_all_permissions(kernel,proc_pid_max)
+grant_all_permissions(kernel,proc_cmdline)
+grant_all_permissions(kernel,mqueue)
+grant_all_permissions(kernel,metadata_file)
+grant_all_permissions(kernel,debugfs)
+grant_all_permissions(kernel,fusectlfs)
+grant_all_permissions(kernel,configfs)
+grant_all_permissions(kernel,rootfs)
+grant_all_permissions(kernel,sysfs_android_usb)
+grant_all_permissions(kernel,sysfs_wakeup)
+grant_all_permissions(kernel,sysfs_loop)
+grant_all_permissions(kernel,sysfs_devices_block)
+grant_all_permissions(kernel,sysfs_rtc)
+grant_all_permissions(kernel,sysfs_hwrandom)
+grant_all_permissions(kernel,sysfs_uio)
+grant_all_permissions(kernel,sysfs_leds)
+grant_all_permissions(kernel,sysfs_extcon)
+grant_all_permissions(kernel,sysfs_net)
+grant_all_permissions(kernel,sysfs_zram)
+grant_all_permissions(kernel,sysfs_zram_uevent)
+grant_all_permissions(kernel,sysfs_thermal)
+grant_all_permissions(kernel,sysfs_devices_system_cpu)
+grant_all_permissions(kernel,system_bootstrap_lib_file)
+grant_all_permissions(kernel,vfat)
+grant_all_permissions(kernel,vendor_sysfs_msm_power)
+grant_all_permissions(kernel,vendor_sysfs_msm_subsys_restart)
+grant_all_permissions(kernel,vendor_sysfs_msm_stats)
+grant_all_permissions(kernel,vendor_sysfs_ssr)
+grant_all_permissions(kernel,vendor_sysfs_spss)
+grant_all_permissions(kernel,vendor_sysfs_scsi_target)
+grant_all_permissions(kernel,vendor_sysfs_memory_offline)
+grant_all_permissions(kernel,vendor_sysfs_usb_controller)
+grant_all_permissions(kernel,vendor_sysfs_spmi_dev)
+grant_all_permissions(kernel,vendor_sysfs_uio_file)
+grant_all_permissions(kernel,vendor_sysfs_devfreq)
+grant_all_permissions(kernel,vendor_sysfs_kgsl)
+grant_all_permissions(kernel,vendor_sysfs_usb_c)
+grant_all_permissions(kernel,vendor_sysfs_soc)
+grant_all_permissions(kernel,vendor_sysfs_usb_device)
+grant_all_permissions(kernel,vendor_sysfs_qdss_dev)
+allowxperm kernel self:file ioctl { 0x5401 };
+allowxperm kernel self:udp_socket ioctl { 0x8946 };
+allowxperm kernel self:fifo_file ioctl { 0x5413 };
+allowxperm kernel host_exec_t:file ioctl { 0x5401 };
+allowxperm kernel host_device_t:blk_file ioctl { 0x2285 0x1272 0x5331 0x1268 0x127c 0x125e };
+
+#============= rootfs ==============
+grant_all_permissions(rootfs,device)
+grant_all_permissions(rootfs,labeledfs)
+
+#============= su  ==============
+grant_all_permissions(su,firmware_file)
+grant_all_permissions(su,bt_firmware_file)
+
+#============= vendor_file ==============
+grant_all_permissions(vendor_file,device)
+
+#============= vendor_esplash ==============
+grant_all_permissions(vendor_esplash,host_file_t)
+
+#============= shared_relro ==============
+grant_all_permissions(shared_relro,app_data_file)
+
+#============= tmpfs ==============
+grant_all_permissions(tmpfs,labeledfs)
+
+#============= toolbox ==============
+grant_all_permissions(toolbox,adsprpcd_file)
+grant_all_permissions(toolbox,bt_firmware_file)
+grant_all_permissions(toolbox,console_device)
+grant_all_permissions(toolbox,firmware_file)
+grant_all_permissions(toolbox,fuse)
+grant_all_permissions(toolbox,host_file_t)
+grant_all_permissions(toolbox,init)
+grant_all_permissions(toolbox,linkerconfig_file)
+grant_all_permissions(toolbox,metadata_file)
+grant_all_permissions(toolbox,mnt_user_file)
+grant_all_permissions(toolbox,mnt_pass_through_file)
+grant_all_permissions(toolbox,mnt_media_rw_file)
+grant_all_permissions(toolbox,mirror_data_file)
+grant_all_permissions(toolbox,selinuxfs)
+grant_all_permissions(toolbox,toolbox)
+grant_all_permissions(toolbox,unlabeled)
+grant_all_permissions(toolbox,user_profile_data_file)
+grant_all_permissions(toolbox,rootfs)
+grant_all_permissions(toolbox,sysfs)
+grant_all_permissions(toolbox,system_data_root_file)
+grant_all_permissions(toolbox,kernel)
+
+#============= init ==============
+allow init kernel:security { setenforce setcheckreqprot };
+allow init kernel:key write;
+grant_all_permissions(init,nsfs_t)
+grant_all_permissions(init,rootfs)
+grant_all_permissions(init,debugfs_tracing_debug)
+
+#============= vendor_init ==============
+grant_all_permissions(vendor_init,rootfs)
+grant_all_permissions(vendor_init,persist_debug_prop)
+
+#============= mediacodec ==============
+grant_all_permissions(mediacodec,kmsg_debug_device)
+
+#============= vendor_qti_init_shell  ==============
+grant_all_permissions(vendor_qti_init_shell,proc_pid_max)
+
+#============= vendor_qti_media  ==============
+grant_all_permissions(vendor_qti_media,host_file_t)
+
+#============= hal_bootctl_default  ==============
+grant_all_permissions(hal_bootctl_default,gsi_metadata_file)
+
+#============= system_server  ==============
+grant_all_permissions(system_server,crash_dump)
+grant_all_permissions(system_server,hal_audiocontrol_default)
+grant_all_permissions(system_server,vendor_hal_audiocontrol_qti)
+grant_all_permissions(system_server,vendor_hal_automotive_vehicle_qti)
+
+#============= crash_dump  ==============
+grant_all_permissions(crash_dump,vendor_audio_prop)
+grant_all_permissions(crash_dump,bluetooth_audio_hal_prop)
+grant_all_permissions(crash_dump,vendor_init)
+grant_all_permissions(crash_dump,system_bootstrap_lib_file)
+
+#============= ueventd ==============
+grant_all_permissions(ueventd,host_file_t)
+grant_all_permissions(ueventd,metadata_file)
+
+#============= apexd ==============
+grant_all_permissions(apexd,host_file_t)
+
+#============= vendor_audiod ==============
+grant_all_permissions(vendor_audiod,sysfs)
+grant_all_permissions(vendor_audiod,host_file_t)
+
+#============= ais_v4l2_proxy ==============
+grant_all_permissions(ais_v4l2_proxy,vendor_camera_socket)
+grant_all_permissions(ais_v4l2_proxy,host_file_t)
+grant_all_permissions(ais_v4l2_proxy,host_exec_t)
+
+#============= vendor_hal_ais_qti ==============
+allow vendor_hal_ais_qti vendor_camera_socket:lnk_file read;
+allow vendor_hal_ais_qti host_exec_t:unix_stream_socket connectto;
+allow vendor_hal_ais_qti host_file_t:dir search;
+allow vendor_hal_ais_qti host_file_t:sock_file write;
