@@ -3,7 +3,7 @@ inherit kernel
 DESCRIPTION = "CAF Linux Kernel"
 LICENSE = "GPLv2.0-with-linux-syscall-note"
 
-COMPATIBLE_MACHINE = "sxrneo|cinder"
+COMPATIBLE_MACHINE = "sxrneo|cinder|sm8450p"
 
 FILESEXTRAPATHS:prepend := "${WORKSPACE}:"
 
