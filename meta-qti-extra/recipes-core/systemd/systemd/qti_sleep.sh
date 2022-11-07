@@ -26,6 +26,9 @@
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+usb_mode_file="/var/usb/usb_mode.txt"
+usb_dev_path="/sys/devices/platform/soc"
+
 case $1/$2 in
   pre/*)
     echo "Entering into $2..."
@@ -51,18 +54,32 @@ case $1/$2 in
 
     systemctl stop init_qti_wlan_auto.service
 
-    # set all usb mode to none
-    echo none > /sys/devices/platform/soc/a600000.ssusb/mode
-    echo none > /sys/devices/platform/soc/a800000.ssusb/mode
-    echo none > /sys/devices/platform/soc/a400000.ssusb/mode
+    # save all usb mode to file
+    if [ ! -f "$usb_mode_file" ]; then
+        touch $usb_mode_file
+    else
+        sed -i '1,$d' $usb_mode_file
+    fi
+    for dev in `ls $usb_dev_path | grep 'ssusb$'`
+    do
+        usb_mode=`cat $usb_dev_path/$dev/mode`
+        echo $dev=$usb_mode >> $usb_mode_file
+        echo none > $usb_dev_path/$dev/mode
+    done
     ;;
   post/*)
     echo "Exiting from $2..."
 
-    echo peripheral > /sys/devices/platform/soc/a600000.ssusb/mode
-    echo host > /sys/devices/platform/soc/a800000.ssusb/mode
-    echo host > /sys/devices/platform/soc/a400000.ssusb/mode
-
+    if [ ! -f "$usb_mode_file" ]; then
+        echo "USB mode recover failed for $usb_mode_file dose not exist."
+    else
+        for line in `cat $usb_mode_file`
+        do
+            dev=`echo $line | awk -F '[=]' '{print $1}'`
+            usb_mode=`echo $line | awk -F '[=]' '{print $2}'`
+            echo $usb_mode > $usb_dev_path/$dev/mode
+        done
+    fi
     systemctl restart synergy.service
 
     if [ $2 == "hibernate" ]; then

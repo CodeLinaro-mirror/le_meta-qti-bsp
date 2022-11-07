@@ -30,4 +30,7 @@ SDK_DEPLOY = "${DEPLOY_DIR}/sdk-${PRODUCT}"
 # Add kernel header to SDK.
 TOOLCHAIN_TARGET_TASK:append = " kernel-devsrc linux-msm-headers-dev"
 
+# Add libgomp header
+TOOLCHAIN_TARGET_TASK:append = " libgomp-dev libgomp-staticdev"
+
 BAD_RECOMMENDATIONS += "rng-tools"

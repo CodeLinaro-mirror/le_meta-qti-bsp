@@ -52,6 +52,7 @@ EXTRA_OECONF:append = " \
     --enable-build-swcodec='yes' \
     --enable-target-output-deinterlaced='yes' \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', ' --enable-target-hypervisor=yes', '', d)} \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-direwolf-vpu', ' --enable-target-direwolf-vpu=yes', '', d)} \
 "
 
 CPPFLAGS += "\

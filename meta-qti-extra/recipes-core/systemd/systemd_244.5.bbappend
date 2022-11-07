@@ -8,6 +8,6 @@ SRC_URI:append = " \
 "
 
 do_install:append() {
-   install -d ${D}/${base_libdir}/systemd/system-sleep
-   install -m 0755 ${WORKDIR}/qti_sleep.sh -D ${D}/${base_libdir}/systemd/system-sleep/qti_sleep.sh
+    install -d ${D}/${base_libdir}/systemd/system-sleep
+    install -m 0755 ${WORKDIR}/qti_sleep.sh -D ${D}/${base_libdir}/systemd/system-sleep/qti_sleep.sh
 }
