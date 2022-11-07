@@ -1,0 +1,98 @@
+# Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted (subject to the limitations in the
+# disclaimer below) provided that the following conditions are met:
+#
+#    * Redistributions of source code must retain the above copyright
+#      notice, this list of conditions and the following disclaimer.
+#
+#    * Redistributions in binary form must reproduce the above
+#      copyright notice, this list of conditions and the following
+#      disclaimer in the documentation and/or other materials provided
+#      with the distribution.
+#
+#    * Neither the name of Qualcomm Innovation Center, Inc. nor the names of its
+#      contributors may be used to endorse or promote products derived
+#      from this software without specific prior written permission.
+#
+# NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
+# GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
+# HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+# WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+# IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+# ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+# GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+# IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+# IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+## <summary>host example policy</summary>
+## <desc>
+##	<p>
+##		More descriptive text about myapp.  The desc
+##		tag can also use p, ul, and ol
+##		html tags for formatting.
+##	</p>
+## </desc>
+#
+
+########################################
+## <summary>
+##	Grant all permissions
+## </summary>
+## <param name="source type">
+##	<summary>
+##	The Source type.
+##	</summary>
+## </param>
+## <param name="target type">
+##	<summary>
+##	The target type.
+##	</summary>
+## </param>
+#
+
+interface(`grant_all_permissions',`
+	gen_require(`
+		type $2;
+	')
+
+	allow $1 $2:file {ioctl read write create getattr setattr lock relabelfrom relabelto append map unlink link rename execute quotaon mounton audit_access open execmod watch watch_mount watch_sb watch_with_perm watch_reads execute_no_trans entrypoint};
+	allow $1 $2:dir {ioctl read write create getattr setattr lock relabelfrom relabelto append map unlink link rename execute quotaon mounton audit_access open execmod watch watch_mount watch_sb watch_with_perm watch_reads add_name remove_name reparent search rmdir};
+	allow $1 $2:socket {ioctl read write create getattr setattr lock relabelfrom relabelto append map bind connect listen accept getopt setopt shutdown recvfrom sendto name_bind};
+	allow $1 $2:packet_socket {ioctl read write create getattr setattr lock relabelfrom relabelto append map bind connect listen accept getopt setopt shutdown recvfrom sendto name_bind};
+	allow $1 $2:tcp_socket {node_bind name_connect ioctl read write create getattr setattr lock relabelfrom relabelto append map bind connect listen accept getopt setopt shutdown recvfrom sendto name_bind};
+	allow $1 $2:udp_socket {node_bind ioctl read write create getattr setattr lock relabelfrom relabelto append map bind connect listen accept getopt setopt shutdown recvfrom sendto name_bind};
+	allow $1 $2:unix_dgram_socket {ioctl read write create getattr setattr lock relabelfrom relabelto append map bind connect listen accept getopt setopt shutdown recvfrom sendto name_bind};
+	allow $1 $2:unix_stream_socket {connectto ioctl read write create getattr setattr lock relabelfrom relabelto append map bind connect listen accept getopt setopt shutdown recvfrom sendto name_bind};
+	allow $1 $2:netlink_generic_socket {ioctl read write create getattr setattr lock relabelfrom relabelto append map bind connect listen accept getopt setopt shutdown recvfrom sendto name_bind};
+	allow $1 $2:netlink_route_socket {nlmsg_read nlmsg_write ioctl read write create getattr setattr lock relabelfrom relabelto append map bind connect listen accept getopt setopt shutdown recvfrom sendto name_bind};
+	allow $1 $2:netlink_selinux_socket {ioctl read write create getattr setattr lock relabelfrom relabelto append map bind connect listen accept getopt setopt shutdown recvfrom sendto name_bind};
+	allow $1 $2:netlink_xfrm_socket {nlmsg_read nlmsg_write ioctl read write create getattr setattr lock relabelfrom relabelto append map bind connect listen accept getopt setopt shutdown recvfrom sendto name_bind};
+	allow $1 $2:netlink_kobject_uevent_socket {ioctl read write create getattr setattr lock relabelfrom relabelto append map bind connect listen accept getopt setopt shutdown recvfrom sendto name_bind};
+	allow $1 $2:netlink_audit_socket {nlmsg_read nlmsg_write nlmsg_relay nlmsg_readpriv nlmsg_tty_audit ioctl read write create getattr setattr lock relabelfrom relabelto append map bind connect listen accept getopt setopt shutdown recvfrom sendto name_bind};
+	allow $1 $2:qipcrtr_socket {ioctl read write create getattr setattr lock relabelfrom relabelto append map bind connect listen accept getopt setopt shutdown recvfrom sendto name_bind};
+	allow $1 $2:rawip_socket {node_bind ioctl read write create getattr setattr lock relabelfrom relabelto append map bind connect listen accept getopt setopt shutdown recvfrom sendto name_bind};
+	allow $1 $2:filesystem {mount remount unmount getattr relabelfrom relabelto associate quotamod quotaget watch};
+	allow $1 $2:chr_file {ioctl read write create getattr setattr lock relabelfrom relabelto append map unlink link rename execute quotaon mounton audit_access open execmod watch watch_mount watch_sb watch_with_perm watch_reads};
+	allow $1 $2:blk_file {ioctl read write create getattr setattr lock relabelfrom relabelto append map unlink link rename execute quotaon mounton audit_access open execmod watch watch_mount watch_sb watch_with_perm watch_reads};
+	allow $1 $2:lnk_file {ioctl read write create getattr setattr lock relabelfrom relabelto append map unlink link rename execute quotaon mounton audit_access open execmod watch watch_mount watch_sb watch_with_perm watch_reads};
+	allow $1 $2:sock_file {ioctl read write create getattr setattr lock relabelfrom relabelto append map unlink link rename execute quotaon mounton audit_access open execmod watch watch_mount watch_sb watch_with_perm watch_reads};
+	allow $1 $2:fifo_file {ioctl read write create getattr setattr lock relabelfrom relabelto append map unlink link rename execute quotaon mounton audit_access open execmod watch watch_mount watch_sb watch_with_perm watch_reads};
+	allow $1 $2:fd {use};
+	allow $1 $2:security {compute_av compute_create compute_member check_context load_policy compute_relabel compute_user setenforce setbool setsecparam setcheckreqprot read_policy validate_trans};
+	allow $1 $2:system {ipc_info syslog_read syslog_mod syslog_console module_request module_load halt reboot status start stop enable disable reload};
+	allow $1 $2:service {status start stop reload enable disable};
+	allow $1 $2:capability {chown dac_override dac_read_search fowner fsetid kill setgid setuid setpcap linux_immutable net_bind_service net_broadcast net_admin net_raw ipc_lock ipc_owner sys_module sys_rawio sys_chroot sys_ptrace sys_pacct sys_admin sys_boot sys_nice sys_resource sys_time sys_tty_config mknod lease audit_write audit_control setfcap};
+	allow $1 $2:capability2 {mac_override mac_admin syslog wake_alarm block_suspend audit_read};
+	allow $1 $2:process {fork transition sigchld sigkill sigstop signull signal siginh ptrace getsched setsched getsession getpgid setpgid getcap setcap share getattr setexec setfscreate noatsecure setrlimit rlimitinh dyntransition setcurrent execmem execstack execheap setkeycreate setsockcreate getrlimit};
+	allow $1 $2:bpf {map_create map_read map_write prog_load prog_run};
+	allow $1 $2:binder {impersonate call set_context_mgr transfer};
+	allow $1 $2:key {view read write search link setattr create};
+	allow $1 $2:dbus { acquire_svc send_msg };
+	allow $1 $2:passwd { passwd chfn chsh rootok crontab };
+')
