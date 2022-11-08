@@ -13,6 +13,9 @@ DEPENDS += "kernel-toolchain-native util-linux-native"
 PR = "r1"
 PV = "4.0"
 
+EDK2_USE_PREBUILTS ?= "False"
+KERNEL_ARCH ?= "auto"
+
 FILESPATH =+ "${SRC_DIR_ROOT}/kernel:"
 EDK2_VARIANT = "${@bb.utils.contains_any('VARIANT', 'perf user', 'perf_', 'debug_', d)}"
 SRC_URI = " \
