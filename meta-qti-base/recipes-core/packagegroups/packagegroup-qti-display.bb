@@ -24,4 +24,4 @@ RDEPENDS:${PN} += "\
     "
 
 RDEPENDS:${PN}:remove:qti-dpk = "wayland-ivi-extension"
-RDEPENDS:${PN}:qti-dpk += "weston-udev"
+RDEPENDS:${PN}:append:qti-dpk = " weston-udev"
