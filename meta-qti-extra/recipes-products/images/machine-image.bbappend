@@ -7,6 +7,9 @@ IMAGE_INSTALL += "\
 # Add libgomp support
 IMAGE_INSTALL += "libgomp"
 
+# Add resize userdata function
+IMAGE_INSTALL += "resize-service"
+
 # Add kdump support
 do_rootfs[depends] += "${@bb.utils.contains('DISTRO_FEATURES', 'kdump-support', 'machine-kdump-image:do_image_complete', '', d)}"
 ROOTFS_POSTPROCESS_COMMAND:prepend = "${@bb.utils.contains('DISTRO_FEATURES', 'kdump-support', ' add_kdump_ramdisk; ', '', d)}"
