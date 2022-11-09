@@ -37,6 +37,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-ss-mgr \
         packagegroup-qti-test-sensors-see \
         packagegroup-qti-video \
+        packagegroup-qti-qmmf \
         packagegroup-qti-wifi \
         packagegroup-startup-scripts \
         packagegroup-support-utils \
