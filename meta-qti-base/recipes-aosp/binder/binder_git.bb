@@ -35,6 +35,11 @@ do_install:append() {
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
         install -d ${D}/${sysconfdir}/initscripts/
         install -m 0755 ${WORKDIR}/create-binder.sh -D ${D}${sysconfdir}/initscripts/create-binder
+        if ${@bb.utils.contains('DISTRO_FEATURES', 'smack', 'true', 'false', d)}; then
+            # change binderfs smack label
+            sed -i "s;mount -o stats=global -t binder binder /dev/binderfs;mount -o smackfsdef=*,stats=global -t binder binder /dev/binderfs\n\tchsmack -a '*' -t -r /dev/binderfs;g" ${D}${sysconfdir}/initscripts/create-binder
+        fi
+
         install -d ${D}${systemd_unitdir}/system/
         install -m 0644 ${WORKDIR}/servicemanager.service -D ${D}${systemd_unitdir}/system/servicemanager.service
     fi
