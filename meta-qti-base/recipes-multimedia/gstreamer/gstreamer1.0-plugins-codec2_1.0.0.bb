@@ -16,6 +16,8 @@ DEPENDS += "codec2 \
             media-codec2 \
             media-external"
 
+DEPENDS:append:lemans = " displaydlkm"
+
 SRC_URI = "${PATH_TO_REPO}/gstreamer/gst-plugins-qti-oss/.git;protocol=${PROTO};destsuffix=gstreamer/gst-plugins-qti-oss;usehead=1"
 SRCREV = "${AUTOREV}"
 S = "${WORKDIR}/gstreamer/gst-plugins-qti-oss/gst-plugin-codec2"
@@ -34,6 +36,9 @@ CFLAGS += "-I${STAGING_INCDIR} \
 
 CXXFLAGS += "-I${STAGING_INCDIR}/linux-msm/vidc \
              -I${STAGING_INCDIR}/linux-msm"
+
+CFLAGS:append:lemans = " -I${STAGING_INCDIR}/linux-msm/display -DGST_USE_MMM_COLOR_FMT -DDISABLE_INTERLACE"
+CXXFLAGS:append:lemans = " -I${STAGING_INCDIR}/linux-msm/display -DGST_USE_MMM_COLOR_FMT -DDISABLE_INTERLACE"
 
 PACKAGE_ARCH ?= "${MACHINE_ARCH}"
 
