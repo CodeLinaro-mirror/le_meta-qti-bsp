@@ -1,4 +1,4 @@
-do_configure_append() {
+do_configure:append() {
     # Enable mdev
     sed -e 's/# CONFIG_MDEV is not set/CONFIG_MDEV=y/' -i .config
 

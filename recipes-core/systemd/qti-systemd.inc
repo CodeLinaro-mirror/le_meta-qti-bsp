@@ -58,7 +58,7 @@ PACKAGECONFIG = " \
     xz \
 "
 # Don't support coredump generation for user builds.
-PACKAGECONFIG:remove_qti-distro-user = "coredump"
+PACKAGECONFIG:remove:qti-distro-user = "coredump"
 
 EXTRA_OEMESON += " -Defi=false"
 EXTRA_OEMESON += " -Dhwdb=false"
@@ -129,8 +129,8 @@ do_install:append () {
    sed -i '/Before/s/$/ local-fs-pre.target/' ${D}${systemd_unitdir}/system/systemd-fsck@.service
 }
 
-RRECOMMENDS:${PN}:remove += "systemd-extra-utils"
-PACKAGES:remove += "${PN}-extra-utils"
+RRECOMMENDS:${PN}:remove = "systemd-extra-utils"
+PACKAGES:remove = "${PN}-extra-utils"
 
 FILES:${PN} += "/etc/initscripts \
                 ${sysconfdir}/udev/rules.d ${userfsdatadir}/*"

@@ -8,7 +8,7 @@ ${LICENSE};md5=8afb6abdac9a14cb18a0d6c9c151e9b4"
 # Ensure PACKAGE_ARCH is set to all even when multilib is enabled.
 PACKAGE_ARCH = "all"
 
-FILESPATH =+ "${KERNEL_PREBUILT_PATH}:"
+FILESEXTRAPATHS:prepend := "${KERNEL_PREBUILT_PATH}:"
 SRC_URI   =  "file://msm-kernel/"
 
 S = "${WORKDIR}"

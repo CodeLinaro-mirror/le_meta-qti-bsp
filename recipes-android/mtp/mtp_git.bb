@@ -10,7 +10,7 @@ BSD-3-Clause;md5=550794465ba0ec5312d6919e203a55f9"
 
 DEPENDS += "glib-2.0 libcutils liblog libutils system-core-headers virtual/kernel"
 
-FILESPATH =+ "${WORKSPACE}/frameworks/:"
+FILESEXTRAPATHS:prepend := "${WORKSPACE}/frameworks/:"
 SRC_URI   = "file://mtp/"
 SRC_URI += "file://automtp.sh"
 

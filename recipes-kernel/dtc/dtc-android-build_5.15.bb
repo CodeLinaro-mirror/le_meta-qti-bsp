@@ -7,7 +7,7 @@ ${LICENSE};md5=801f80980d171dd6425610833a22dbe6"
 S = "${WORKDIR}/bin"
 BBCLASSEXTEND = "native"
 
-FILESPATH =+ "${WORKSPACE}/kernel-5.15/kernel_platform/prebuilts/kernel-build-tools/linux-x86/:"
+FILESEXTRAPATHS:prepend := "${WORKSPACE}/kernel-5.15/kernel_platform/prebuilts/kernel-build-tools/linux-x86/:"
 SRC_URI    = "file://bin"
 
 INHIBIT_SYSROOT_STRIP = "1"

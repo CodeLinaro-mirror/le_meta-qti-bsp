@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5
 
 BBCLASSEXTEND = "native"
 
-FILESPATH =+ "${KERNEL_PREBUILT_PATH}:"
+FILESEXTRAPATHS:prepend := "${KERNEL_PREBUILT_PATH}:"
 SRC_URI   =  "file://host/"
 
 S = "${WORKDIR}/host"

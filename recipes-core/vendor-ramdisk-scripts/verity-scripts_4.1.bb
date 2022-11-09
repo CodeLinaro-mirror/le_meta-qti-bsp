@@ -55,4 +55,4 @@ do_install () {
 }
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
-FILES_${PN} += " /verity/* ${systemd_unitdir}/system/* "
+FILES:${PN} += " /verity/* ${systemd_unitdir}/system/* "

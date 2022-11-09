@@ -18,10 +18,10 @@ do_install () {
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 PACKAGES = "${PN} ${PN}-init"
-FILES_${PN}      += " /first_stage.sh "
-FILES_${PN}-init += " ${systemd_unitdir}/system/ "
+FILES:${PN}      += " /first_stage.sh "
+FILES:${PN}-init += " ${systemd_unitdir}/system/ "
 
 inherit systemd
 
 SYSTEMD_PACKAGES = "${PN}-init"
-SYSTEMD_SERVICE_${PN}-init = "run-firststage-script.service"
+SYSTEMD_SERVICE:${PN}-init = "run-firststage-script.service"

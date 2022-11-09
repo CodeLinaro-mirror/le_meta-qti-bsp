@@ -16,7 +16,7 @@ SRC_URI += "file://blacklist.conf \
 AUTOLOAD_WLAN ?= "False"
 AUTOLOAD_WLAN_neo ?= "True"
 
-do_install_append () {
+do_install:append () {
     if [ "${AUTOLOAD_WLAN}" == "True" ]; then
         sed -i '/blacklist wlan.*/s/^/# /' ${WORKDIR}/blacklist.conf
     fi

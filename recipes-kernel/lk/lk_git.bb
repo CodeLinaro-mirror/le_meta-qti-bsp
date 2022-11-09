@@ -7,7 +7,7 @@ ${LICENSE};md5=0835ade698e0bcf8506ecda2f7b4f302"
 HOMEPAGE = "https://www.codeaurora.org/gitweb/quic/la?p=kernel/lk.git"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
-FILESPATH =+ "${WORKSPACE}:"
+FILESEXTRAPATHS:prepend := "${WORKSPACE}:"
 
 SRC_URI   =  "file://bootable/bootloader/lk"
 SRC_URI  +=  "file://0001-Add-instructionset-extension.patch"
@@ -41,7 +41,7 @@ ENABLE_DISPLAY = "${DISPLAY_SCREEN}"
 
 EXTRA_OEMAKE = "${MY_TARGET} TOOLCHAIN_PREFIX='${TARGET_PREFIX}'  LIBGCC='${LIBGCC}' DISPLAY_SCREEN=${DISPLAY_SCREEN} ENABLE_DISPLAY=${ENABLE_DISPLAY}"
 
-EXTRA_OEMAKE:append_mdm9650 = " ENABLE_EARLY_ETHERNET=1"
+EXTRA_OEMAKE:append:mdm9650 = " ENABLE_EARLY_ETHERNET=1"
 
 EXTRA_OEMAKE:append = " TARGET_USE_SYSTEM_AS_ROOT_IMAGE=1 VERIFIED_BOOT=0 DEFAULT_UNLOCK=true EMMC_BOOT=${emmc_bootloader}"
 
@@ -55,7 +55,7 @@ EXTRA_OEMAKE:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.
 
 EXTRA_OEMAKE:append = " 'ENABLE_LE_VARIANT=1'"
 
-EXTRA_OEMAKE:append_robot-som = "TARGET_USE_QSEECOM_V4=1"
+EXTRA_OEMAKE:append:robot-som = "TARGET_USE_QSEECOM_V4=1"
 
 #enable hardfloat
 EXTRA_OEMAKE:append = " ${@bb.utils.contains('TUNE_FEATURES', 'callconvention-hard', 'ENABLE_HARD_FPU=1', '', d)}"

@@ -1,6 +1,6 @@
 include dbus.inc
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 SRC_URI += "file://extra-users.conf"
 SRC_URI += "file://dbus.conf"
@@ -9,9 +9,9 @@ SRC_URI += "file://extra-users-reboot.conf"
 INITSCRIPT_NAME = "dbus-1"
 INITSCRIPT_PARAMS = "start 98 5 3 2 . stop 02 0 1 6 ."
 
-GROUPADD_PARAM_${PN} = "-r netdev"
+GROUPADD_PARAM:${PN} = "-r netdev"
 
-do_install_append() {
+do_install:append() {
    install -d ${D}/${datadir}/dbus-1/system.d/
    install -m 0644 ${WORKDIR}/extra-users.conf -D ${D}${datadir}/dbus-1/system.d/extra-users.conf
    if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then

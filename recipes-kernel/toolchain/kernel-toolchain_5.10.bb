@@ -4,7 +4,7 @@ LIC_FILES_CHKSUM = "file://NOTICE;md5=eeec5cfa0edfb54bfdba757236c7b531"
 
 PROVIDES = "virtual/kernel-toolchain-native"
 
-FILESPATH =+ "${WORKSPACE}/kernel-5.10/kernel_platform/prebuilts-master/clang/host/linux-x86/:"
+FILESEXTRAPATHS:prepend := "${WORKSPACE}/kernel-5.10/kernel_platform/prebuilts-master/clang/host/linux-x86/:"
 SRC_URI    = "file://clang-${CLANG_VERSION}"
 CLANG_VERSION = "r416183b"
 

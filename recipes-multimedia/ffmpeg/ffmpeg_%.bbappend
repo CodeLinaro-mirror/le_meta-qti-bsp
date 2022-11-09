@@ -10,13 +10,13 @@ PACKAGECONFIG = "avdevice avfilter avcodec avformat swresample swscale postproc 
 # Support multilib compilation for libav
 PROVIDES += "${MLPREFIX}libav"
 
-EXTRA_CFLAGS:append += " -fPIC"
-EXTRA_CFLAGS:append += " ${@ bb.utils.contains('TUNE_FEATURES', 'callconvention-hard', '-mfloat-abi=hard', '', d)}"
-EXTRA_CFLAGS:append += " ${@ bb.utils.contains('TUNE_FEATURES', 'neon', '-mfpu=neon', '', d)}"
-EXTRA_CFLAGS:append += " ${@ bb.utils.contains('TUNE_FEATURES', 'armv7a', '-march=armv7-a', '', d)}"
-EXTRA_CFLAGS:append += " ${@ bb.utils.contains('TUNE_FEATURES', 'cortexa8', '-mtune=cortex-a8', '', d)}"
+EXTRA_CFLAGS:append = " -fPIC"
+EXTRA_CFLAGS:append = " ${@ bb.utils.contains('TUNE_FEATURES', 'callconvention-hard', '-mfloat-abi=hard', '', d)}"
+EXTRA_CFLAGS:append = " ${@ bb.utils.contains('TUNE_FEATURES', 'neon', '-mfpu=neon', '', d)}"
+EXTRA_CFLAGS:append = " ${@ bb.utils.contains('TUNE_FEATURES', 'armv7a', '-march=armv7-a', '', d)}"
+EXTRA_CFLAGS:append = " ${@ bb.utils.contains('TUNE_FEATURES', 'cortexa8', '-mtune=cortex-a8', '', d)}"
 
-EXTRA_OECONF:append += " \
+EXTRA_OECONF:append = " \
     --target-os=linux --sysroot=${STAGING_DIR_TARGET} --arch=${TARGET_ARCH} --disable-mmx \
     --enable-shared --disable-doc --disable-htmlpages --disable-manpages --disable-podpages \
     --disable-txtpages --enable-small --disable-debug --disable-ffplay  \

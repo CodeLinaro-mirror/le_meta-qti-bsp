@@ -18,4 +18,4 @@ do_install () {
   touch ${D}/etc/initrd-release
 }
 
-FILES_${PN} += " /etc/initrd-release "
+FILES:${PN} += " /etc/initrd-release "

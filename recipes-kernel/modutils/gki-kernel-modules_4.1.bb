@@ -5,7 +5,7 @@ LICENSE = "GPLv2.0-with-linux-syscall-note"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta-qti-bsp/files/common-licenses/\
 ${LICENSE};md5=8afb6abdac9a14cb18a0d6c9c151e9b4"
 
-FILESPATH =+ "${WORKSPACE}:"
+FILESEXTRAPATHS:prepend := "${WORKSPACE}:"
 SRC_URI   =  "file://kernel-5.10/kernel_platform/msm-kernel"
 SRC_URI  +=  "file://linkmodulesload.service"
 
@@ -84,12 +84,12 @@ ALLOW_EMPTY:${PN} = "1"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 PACKAGES = "${PN}-first-stage ${PN}-second-stage ${PN}-linkmodulesload"
-FILES_${PN}-linkmodulesload += "${systemd_unitdir}/system/linkmodulesload.service"
+FILES:${PN}-linkmodulesload += "${systemd_unitdir}/system/linkmodulesload.service"
 
 inherit systemd
 
 SYSTEMD_PACKAGES = "${PN}-linkmodulesload"
-SYSTEMD_SERVICE_${PN}-linkmodulesload = "linkmodulesload.service"
+SYSTEMD_SERVICE:${PN}-linkmodulesload = "linkmodulesload.service"
 
 python get_files_pn_from_conf() {
     pn = d.getVar('PN')

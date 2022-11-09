@@ -5,4 +5,4 @@ def append_recipe_for_qtidistros(d):
         return os.path.join(thisdir, "qti-distro-initscripts.inc")
 
 include ${@append_recipe_for_qtidistros(d)}
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}-${PV}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}-${PV}:"

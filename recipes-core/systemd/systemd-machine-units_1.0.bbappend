@@ -1,13 +1,13 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-SRC_URI:append += " file://media-card.mount"
-SRC_URI:append += " file://media-ram.mount"
-SRC_URI:append += " file://var-volatile.mount"
-SRC_URI:append += " file://proc-bus-usb.mount"
-SRC_URI:append += " file://dash.mount"
+SRC_URI:append = " file://media-card.mount"
+SRC_URI:append = " file://media-ram.mount"
+SRC_URI:append = " file://var-volatile.mount"
+SRC_URI:append = " file://proc-bus-usb.mount"
+SRC_URI:append = " file://dash.mount"
 
-SRC_URI:append_batcam += " file://pre_hibernate.sh"
-SRC_URI:append_batcam += " file://post_hibernate.sh"
+SRC_URI:append:batcam = " file://pre_hibernate.sh"
+SRC_URI:append:batcam = " file://post_hibernate.sh"
 
 # Various mount related files assume selinux support by default.
 # Explicitly remove sepolicy entries when selinux is not present.
@@ -28,7 +28,7 @@ do_install:append () {
 }
 
 # Scripts for pre and post hibernate functions
-do_install:append_batcam () {
+do_install:append:batcam () {
    install -d ${D}${systemd_unitdir}/system-sleep/
    install -m 0755 ${WORKDIR}/pre_hibernate.sh -D ${D}${systemd_unitdir}/system-sleep/pre_hibernate.sh
    install -m 0755 ${WORKDIR}/post_hibernate.sh -D ${D}${systemd_unitdir}/system-sleep/post_hibernate.sh

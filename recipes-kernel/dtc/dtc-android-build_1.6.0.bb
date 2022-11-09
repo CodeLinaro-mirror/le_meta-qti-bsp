@@ -8,7 +8,7 @@ BBCLASSEXTEND = "native"
 
 PROVIDES = "virtual/dtc-native"
 
-FILESPATH =+ "${KERNEL_PREBUILT_PATH}/:"
+FILESEXTRAPATHS:prepend := "${KERNEL_PREBUILT_PATH}/:"
 SRC_URI    = "file://host/"
 
 S = "${WORKDIR}/host"

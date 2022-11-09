@@ -54,7 +54,7 @@ do_fsconfig() {
  chmod -R o-rwx ${IMAGE_ROOTFS}/etc/init.d/ || :
 }
 
-do_fsconfig:append_qti-distro-user() {
+do_fsconfig:append:qti-distro-user() {
  rm ${IMAGE_ROOTFS}/lib/systemd/system/sys-kernel-debug.mount
 }
 

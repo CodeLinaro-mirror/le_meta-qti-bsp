@@ -1,8 +1,8 @@
-FILESEXTRAPATHS:prepend_cinder := "${THISDIR}/files:"
-FILESEXTRAPATHS:prepend_sdxlemur := "${THISDIR}/files:"
-FILESEXTRAPATHS:prepend_sa2150p-nand := "${THISDIR}/files:"
-FILESEXTRAPATHS:prepend_sa410m := "${THISDIR}/files:"
-FILESEXTRAPATHS:prepend_sa515m := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend:cinder := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend:sdxlemur := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend:sa2150p-nand := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend:sa410m := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend:sa515m := "${THISDIR}/files:"
 
 REQUIRED_DISTRO_FEATURES = ""
 SRC_URI += "\
@@ -16,7 +16,7 @@ do_install:append () {
         install -m 0755 mount-copybind ${D}${base_sbindir}/
         if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
             install -d ${D}${systemd_unitdir}/system
-            for service in ${SYSTEMD_SERVICE_${PN}}; do
+            for service in ${SYSTEMD_SERVICE:${PN}}; do
                 install -m 0644 $service ${D}${systemd_unitdir}/system/
                 install -m 0755 umount-copybind ${D}${base_sbindir}/
             done

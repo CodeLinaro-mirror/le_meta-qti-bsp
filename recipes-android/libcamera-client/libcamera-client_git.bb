@@ -8,7 +8,7 @@ ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 
 DEPENDS += "binder camera-metadata liblog libutils"
 
-FILESPATH =+ "${WORKSPACE}/frameworks/:"
+FILESEXTRAPATHS:prepend := "${WORKSPACE}/frameworks/:"
 SRC_URI   = "file://libcamera_client/"
 
 S = "${WORKDIR}/libcamera_client"

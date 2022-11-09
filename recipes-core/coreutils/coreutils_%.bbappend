@@ -10,8 +10,8 @@ python () {
         d.setVar("base_bindir_progs", "cp")
 }
 
-ALTERNATIVE_${PN} = "${bindir_progs} ${base_bindir_progs} ${sbindir_progs}"
-ALTERNATIVE_${PN}-doc = ""
+ALTERNATIVE:${PN} = "${bindir_progs} ${base_bindir_progs} ${sbindir_progs}"
+ALTERNATIVE:${PN}-doc = ""
 
 PACKAGE_PREPROCESS_FUNCS += "${@oe.utils.conditional('CUSTOMIZE_COREUTILS_COMMANDS', 'True', 'remove_extra_progs', '', d)}"
 remove_extra_progs() {

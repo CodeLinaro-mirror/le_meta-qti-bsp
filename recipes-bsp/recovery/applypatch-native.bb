@@ -10,7 +10,7 @@ PR = "r1"
 DEPENDS += "bzip2-replacement-native"
 RDEPENDS:${PN} = "zlib"
 
-FILESPATH =+ "${WORKSPACE}/OTA/recovery/:"
+FILESEXTRAPATHS:prepend := "${WORKSPACE}/OTA/recovery/:"
 SRC_URI   = "file://applypatch"
 
 S = "${WORKDIR}/applypatch"

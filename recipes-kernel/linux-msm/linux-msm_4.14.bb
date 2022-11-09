@@ -9,7 +9,7 @@ DBGCFG = ""
 DBGCFG_qti-distro-debug = "file://debug.cfg"
 
 # Additional configs for qcs610 machine
-SRC_URI:append_qcs610 = " \
+SRC_URI:append:qcs610 = " \
     file://disableipa3.cfg \
     file://sdmsteppe_iot_configs.cfg \
     ${@bb.utils.contains('COMBINED_FEATURES', 'qti-audio', 'file://audio_targets.cfg', '', d)} \
@@ -25,7 +25,7 @@ SRC_URI:append_qcs610 = " \
 "
 
 # Additional configs for qcs40x machines
-SRC_URI:append_qcs40x = " \
+SRC_URI:append:qcs40x = " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', '', 'file://disableselinux.cfg', d)} \
 "
 

@@ -1,7 +1,7 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}-${PV}:"
 DEPENDS = "base-passwd"
 
-SRC_URI:append += "file://fstab"
+SRC_URI:append = "file://fstab"
 
 dirs755:append = " /media/cf /media/net /media/ram \
             /media/union /media/realroot /media/hdd /media/mmc1"
@@ -52,7 +52,7 @@ do_install:append() {
 
 }
 
-do_install_prepend_trustedvm (){
+do_install:prepend:trustedvm (){
    sed -e '/-z "\$PS1"/d' -i ${WORKDIR}/profile
    sed -i "/# Set the prompt for bash/a [ -z \"\$PS1\" ] || PS1='~ # '" ${WORKDIR}/profile
 }

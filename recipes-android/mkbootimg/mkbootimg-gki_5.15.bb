@@ -6,7 +6,7 @@ PROVIDES = "virtual/mkbootimg"
 
 BBCLASSEXTEND = "native"
 
-FILESPATH =+ "${WORKSPACE}/kernel-5.15/kernel_platform/tools/mkbootimg/:"
+FILESEXTRAPATHS:prepend := "${WORKSPACE}/kernel-5.15/kernel_platform/tools/mkbootimg/:"
 SRC_URI = "file://mkbootimg.py"
 SRC_URI += "file://include"
 SRC_URI += "file://gki/generate_gki_certificate.py"
@@ -15,14 +15,14 @@ S = "${WORKDIR}"
 do_compile[noexec] = "1"
 do_configure[noexec] = "1"
 
-do_install_class-native () {
+do_install:class-native () {
     install -d ${D}/${bindir}/scripts/
     cp ${S}/mkbootimg.py ${D}/${bindir}/scripts/
     install -d ${D}/${bindir}/scripts/gki/
     cp ${S}/gki/generate_gki_certificate.py ${D}/${bindir}/scripts/gki/
 }
 
-do_install_class-target() {
+do_install:class-target() {
     install -d ${D}${includedir}
     install -d ${D}${includedir}/bootimg
     install ${S}/include/bootimg/bootimg.h ${D}${includedir}/bootimg.h

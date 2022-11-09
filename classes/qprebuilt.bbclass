@@ -37,7 +37,7 @@
 # files (content of ${D}).
 #
 # It's possible to strip binaries before packaging by setting
-# PREBUILT_STRIP_${PN} variable to "1", default is "0".
+# PREBUILT_STRIP:${PN} variable to "1", default is "0".
 #
 # It's possible to create several prebuilt packages with different
 # content, using PREBUILT_PACKAGES and PREBUILT_FILES_package-name
@@ -46,11 +46,11 @@
 # E.g. libvendor-1.8.bb - PN="libvendor" ARCH="aarch64"
 #
 # PREBUILT_PACKAGES = "${PN}-full ${PN}-stripped ${PN}-minimal"
-# PREBUILT_FILES_${PN}-full = "/"
-# PREBUILT_FILES_${PN}-stripped = "/"
-# PREBUILT_STRIP_${PN}-stripped = "1"
-# PREBUILT_FILES_${PN}-minimal = "${bindir} ${libdir}"
-# PREBUILT_STRIP_${PN}-minimal = "1"
+# PREBUILT_FILES:${PN}-full = "/"
+# PREBUILT_FILES:${PN}-stripped = "/"
+# PREBUILT_STRIP:${PN}-stripped = "1"
+# PREBUILT_FILES:${PN}-minimal = "${bindir} ${libdir}"
+# PREBUILT_STRIP:${PN}-minimal = "1"
 #
 # This will create three archives:
 #   libvendor-full_1.8:aarch64.tar.gz
@@ -61,7 +61,7 @@
 #
 # Note - by default:
 # PREBUILT_PACKAGES = "${PN}"
-# PREBUILT_FILES_${PN} = "/"
+# PREBUILT_FILES:${PN} = "/"
 #
 # ### Build dependencies
 #

@@ -80,7 +80,7 @@ do_fsconfig() {
      fi
 }
 
-do_fsconfig_append_qti-distro-user() {
+do_fsconfig:append:qti-distro-user() {
  rm ${IMAGE_ROOTFS}/lib/systemd/system/sys-kernel-debug.mount
 }
 

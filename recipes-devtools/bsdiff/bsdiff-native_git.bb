@@ -9,7 +9,7 @@ BSD;md5=3775480a712fc46a69647678acb234cb"
 
 DEPENDS += "bzip2-replacement-native libdivsufsort-native"
 
-FILESPATH =+ "${WORKSPACE}:"
+FILESEXTRAPATHS:prepend := "${WORKSPACE}:"
 SRC_URI = "file://OTA/external/bsdiff/"
 
 S = "${WORKDIR}/OTA/external/bsdiff/"

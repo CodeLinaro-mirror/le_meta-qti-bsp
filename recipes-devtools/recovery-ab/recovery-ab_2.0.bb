@@ -13,7 +13,7 @@ RDEPENDS:${PN} += "zlib"
 RDEPENDS:${PN} += "${@bb.utils.contains('MACHINE_FEATURES', 'ota-package-verification', 'openssl', '', d)}"
 RDEPENDS:${PN} += "${@bb.utils.contains('MACHINE_FEATURES', 'ota-package-verification', 'openssl-bin', '', d)}"
 
-FILESPATH =+ "${WORKSPACE}:"
+FILESEXTRAPATHS:prepend := "${WORKSPACE}:"
 
 SRC_URI = "file://OTA/recovery/"
 SRC_URI += "file://fstab_AB"

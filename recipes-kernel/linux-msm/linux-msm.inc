@@ -4,7 +4,7 @@ DESCRIPTION = "CAF Linux Kernel"
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 
-DEPENDS += " virtual/mkbootimg-native openssl-native mod-signing-keys"
+DEPENDS += " virtual/mkbootimg openssl-native mod-signing-keys"
 RDEPENDS:${KERNEL_PACKAGE_NAME}-base = ""
 
 LDFLAGS:aarch64 = "-O1 --hash-style=gnu --as-needed"
@@ -20,7 +20,7 @@ KERNEL_EXTRA_ARGS        += "O=${B}"
 # Additional configs needed for supporting DTBO partition.
 DTBO_MACHINE = "${@d.getVar('MACHINE_SUPPORTS_DTBO') or "False"}"
 
-FILESPATH =+ "${WORKSPACE}:"
+FILESEXTRAPATHS:prepend := "${WORKSPACE}:"
 SRC_URI   =  "file://kernel \
               file://overlayfs.cfg \
 	      ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'file://systemd.cfg', '', d)} \
