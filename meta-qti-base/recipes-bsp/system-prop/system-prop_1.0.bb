@@ -15,7 +15,7 @@ SRC_URI = "\
 
 SYSTEMD_SERVICE:${PN} = "persist-prop.service"
 
-inherit systemd useradd
+inherit systemd
 
 do_configure[noexec] = "1"
 do_compile[noexec] = "1"
