@@ -21,6 +21,8 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-bluetooth \
         packagegroup-qti-camera \
         ${@bb.utils.contains('DISTRO_FEATURES','virtualization', 'packagegroup-qti-containers', '', d)} \
+        ${@bb.utils.contains('DISTRO_FEATURES','ros2-foxy-sdk', 'packagegroup-ros2-foxy', '', d)} \
+        ${@bb.utils.contains('DISTRO_FEATURES','robotics-sdk', 'packagegroup-qti-robotics', '', d)} \
         packagegroup-qti-core \
         packagegroup-qti-core-prop \
         packagegroup-qti-cvp \
