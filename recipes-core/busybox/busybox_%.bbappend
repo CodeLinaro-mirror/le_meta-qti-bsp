@@ -89,3 +89,4 @@ do_install:append() {
 ALTERNATIVE_PRIORITY[dmesg] = "100"
 
 FILES:${PN}-syslog += "${systemd_unitdir}/system/"
+FILES:${PN} += "${systemd_system_unitdir}"
