@@ -129,6 +129,88 @@ SetArgs() {
     return ${STATUS_OK}
 }
 
+
+modemShutDown () {
+    if grep "${FW_DIR}" /proc/mounts -w > /dev/null; then
+        killall qseecomd
+        umount ${FW_DIR} -l
+        sleep 1
+        echo umount ${FW_DIR} -l
+    fi
+}
+
+gracefullReboot () {
+    local mode=$1
+    modemShutDown
+
+    echo InitRamFS: Found issue, rebooting ${mode}...
+    sleep 1
+    sys_reboot ${mode}
+}
+
+SlotSwitchReboot () {
+    local abctl_cmd="/usr/bin/nad-abctl"
+    local sys_vol_name=""
+    local sys_vol=""
+    local next_slot="none"
+    local ret=""
+    local mtd_device=`grep nand_ab_attr /proc/mtd | awk -F ':' '{print $1}'`
+
+    if [ ! -e ${abctl_cmd} ]; then
+        echo "${abctl_cmd}" not found.
+        return ${STATUS_ERR}
+    fi
+
+    if [ ! -e "/dev/ubi${SYS_UBI_DEV_NUM}" ]; then
+        echo Error: /dev/ubi${SYS_UBI_DEV_NUM} not found
+        return ${STATUS_ERR}
+    fi
+
+    GetUbiVolumeID ${SYS_UBI_DEV_NUM} ${DM_SYST_NAME}
+    if [ "${GetUbiVolumeID_RESULT}" == "" ]; then
+        echo "Cannot get ${DM_SYST_NAME} volume."
+        return ${STATUS_ERR}
+    fi
+    sys_vol=${GetUbiVolumeID_RESULT}
+    sys_vol_name="/sys/class/ubi/ubi${SYS_UBI_DEV_NUM}_${sys_vol}/name"
+
+    if grep ${sys_vol_name} -e "_a\|_b" > /dev/null; then
+        # A/B system case
+        curr_slot=`cat /proc/cmdline | sed 's/.*SLOT_SUFFIX=//' | awk '{print $1}'`
+        if [ x"${curr_slot}" == "x_a" ]; then
+            next_slot="1"
+        else
+            next_slot="0"
+        fi
+    else
+        # Single system (4+4)
+        gracefullReboot edl
+    fi
+
+    # check if the cookie in nand_ab_attr is bootloader cookie (i.e. BABC)
+    #  return :  1, if bootloader cookie is found
+    #         :  0, not bootloader cookie (i.e. DABC or empty)
+    #         : -1/255, on failure
+    #
+    chmod 777 /dev/${mtd_device}
+    ${abctl_cmd} --check_bl_cookie
+    ret=$?
+    if [ "$ret" == "1" ]; then
+        gracefullReboot edl
+    elif [ "$ret" == "0" ]; then
+        echo current slot ${curr_slot}, next active slot: ${next_slot}
+        ${abctl_cmd} --set_active ${next_slot}
+        if [ $? -ne ${STATUS_OK} ]; then
+            echo Error: ${abctl_cmd} --set_active ${next_slot} failed
+            return ${STATUS_ERR}
+        fi
+        gracefullReboot
+    else
+        echo Error: ${abctl_cmd} --check_bl_cookie failed
+    fi
+    return ${STATUS_ERR}
+}
+
 MountModemVol() {
     mkdir -p ${FW_DIR}
     GetUbiVolumeID ${SYS_UBI_DEV_NUM} "firmware"
@@ -162,7 +244,7 @@ MountModemVol() {
 GetStorageDev() {
     local partition_name=$1
 
-    DEV_NUM=`cat /proc/mtd | grep "\"${partition_name}\"" | cut -d ":" -f 1 | cut -b 4-`
+    DEV_NUM=`grep "\"${partition_name}\"" /proc/mtd | cut -d ":" -f 1 | cut -b 4-`
     if [ -z "${DEV_NUM}" ]; then
         echo Error: GetStorageDev: Get device of ${partition_name} failed.
         return ${STATUS_ERR}
@@ -340,6 +422,7 @@ EncryptNotSysPartition () {
             return ${STATUS_ERR}
         fi
     done
+    return ${STATUS_OK}
 }
 
 MoveMountToSystem() {
@@ -496,13 +579,13 @@ MountSystem () {
 
             mount -t ${image_type} ${block_device} ${ROOT_MOUNT} -oro
             if [ $? -ne ${STATUS_OK} ]; then
-                echo Error: mount 'squashfs ${block_device}' failed
+                echo Error: mount squashfs ${block_device} failed
                 return ${STATUS_ERR}
             fi
         elif [ "${image_type}" == "ubifs" ]; then
             mount -t ${image_type} "${char_device}" ${ROOT_MOUNT} -orw
             if [ $? -ne ${STATUS_OK} ]; then
-                echo Error: mount 'ubifs ${char_device}' failed
+                echo Error: mount ubifs ${char_device} failed
                 return ${STATUS_ERR}
             fi
         else
@@ -518,23 +601,45 @@ MountSystem () {
 
 MainBoot() {
 
-    local tasks_list="
+    local tasks_list1="
                     EarlySetup
                     SetArgs
                     MountSystem
+                    "
+
+    for task1 in ${tasks_list1}; do
+        ${task1}
+        if [ $? -ne ${STATUS_OK} ]; then
+            echo Error: ${task1} failed
+
+            # According to the conditions does system switch or reboot
+            SlotSwitchReboot
+            return ${STATUS_ERR}
+        else
+            echo Init: ${task1}
+        fi
+    done
+
+    local tasks_list2="
                     MoveMountToSystem
                     SwitchToSystem
                     "
-    for task in ${tasks_list}; do
-        ${task}
+    for task2 in ${tasks_list2}; do
+        ${task2}
         if [ $? -ne ${STATUS_OK} ]; then
-            echo Error: ${task} failed
+            echo Error: ${task2} failed
             return ${STATUS_ERR}
         else
-            echo Init: ${task}
+            echo Init: ${task2}
         fi
     done
+    return ${STATUS_OK}
 }
 
 MainBoot
+if [ $? -ne ${STATUS_OK} ]; then
+    # Go to edl for all other error cases
+    echo "Error: going to edl"
+    gracefullReboot edl
+fi
 echo "MainBoot Error: InitRamFS boot failed"

@@ -18,6 +18,9 @@ PACKAGE_INSTALL += " ${@bb.utils.contains_any('DISTRO_FEATURES', 'nad-avb nad-fd
 PACKAGE_INSTALL += " ${@bb.utils.contains('DISTRO_FEATURES', 'nad-fde', 'nad-fde-app', '',d)}"
 PACKAGE_INSTALL += " ${@bb.utils.contains('DISTRO_FEATURES', 'nad-fde', 'securemsm-noship', '',d)}"
 PACKAGE_INSTALL += " ${@bb.utils.contains('DISTRO_FEATURES', 'nad-fde', 'securemsm', '',d)}"
+
+# Support reboot management
+PACKAGE_INSTALL += " ${@bb.utils.contains('DISTRO_FEATURES', 'nad-prod', 'nad-abctl powerapp', '',d)}"
 PACKAGE_INSTALL_append = " initramfs-init"
 
 PACKAGE_EXCLUDE = " bash systemd-machine-units systemd busybox-udhcpc"
