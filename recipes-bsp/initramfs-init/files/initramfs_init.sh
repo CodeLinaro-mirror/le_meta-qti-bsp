@@ -58,12 +58,15 @@ SYS_UBI_DEV_NUM="0"
 CERT_CA_PATH="/etc/keys/x509_root.der"
 
 # FDE Encryption path
-FDE_ENCRYPTION_PATH="/tmp"
+FDE_ENCRYPTION_PATH="/tmp/test.img"
 
 #------------------------------------------------------------
 
 # Temporary rootfs mount node
 ROOT_MOUNT="/rootfs"
+
+# Firmware dir
+FW_DIR="/firmware"
 
 # Function return status
 STATUS_OK=0
@@ -108,50 +111,112 @@ SetArgs() {
     return ${STATUS_OK}
 }
 
-FindAndMountUBI () {
-   partition=$1
-   dir=$2
-   extra_opts=$3
 
-   mtd_block_number=`cat $mtd_file | grep -i $partition | sed 's/^mtd//' | awk -F ':' '{print $1}'`
-   echo "MTD : Detected block device : $dir for $partition" > /dev/kmsg
-   mkdir -p $dir
-
-   for ubivol in /sys/class/ubi/ubi[0-99]_*/name; do
-      volname=`cat $ubivol`
-      if [ $volname == $partition ]; then
-         vol_num=$(echo $ubivol | cut -d/ -f5 | awk -F "_" '{print $2}')
-         m_char_device=/dev/ubi0_$vol_num
-         m_block_device=/dev/ubiblock0_$vol_num
-         break
-      fi
-   done
-
-   ubiblock --create "${m_char_device}"
-   sleep 3
-   mount -t squashfs $m_block_device $dir -orw
+UmountModem () {
+    if grep "${FW_DIR}" /proc/mounts -w > /dev/null; then
+        killall qseecomd
+        umount ${FW_DIR} -l
+        sleep 1
+        echo umount ${FW_DIR} -l
+    fi
 }
 
-Mount_modem() {
-    mtd_file=/proc/mtd
-    #if [ -x /sbin/restorecon ]; then
-        firmware_selinux_opt=",context=system_u:object_r:firmware_t:s0"
-    #else
-    #    firmware_selinux_opt=""
-    #fi
-    SLOT_SUFFIX=`cat /proc/cmdline | sed 's/.*SLOT_SUFFIX=//' | awk '{print $1}'`
+gracefullReboot () {
+    local mode=$1
+    UmountModem
 
-    # system or system_a are used on NAD
-    volname=`cat /sys/class/ubi/ubi0_0/name`
-    if [ $volname == "system_a" ]; then
-        firmvol="firmware$SLOT_SUFFIX"
-    elif [ $volname == "system" ]; then
-        firmvol="firmware"
-    else
-        firmvol="modem"
+    echo InitRamFS: Found issue, rebooting ${mode}...
+    sleep 1
+    sys_reboot ${mode}
+}
+
+SlotSwitchReboot () {
+    local abctl_cmd="/usr/bin/nad-abctl"
+    local sys_vol_name=""
+    local sys_vol=""
+    local next_slot="none"
+    local ret=""
+    local mtd_device=`grep nand_ab_attr /proc/mtd | awk -F ':' '{print $1}'`
+
+    if [ ! -e ${abctl_cmd} ]; then
+        echo "${abctl_cmd}" not found.
+        return ${STATUS_ERR}
     fi
 
-    FindAndMountUBI $firmvol /firmware $firmware_selinux_opt
+    if [ ! -e "/dev/ubi${SYS_UBI_DEV_NUM}" ]; then
+        echo Error: /dev/ubi${SYS_UBI_DEV_NUM} not found
+        return ${STATUS_ERR}
+    fi
+
+    GetUbiVolumeID ${SYS_UBI_DEV_NUM} ${DM_SYST_NAME}
+    if [ "${GetUbiVolumeID_RESULT}" == "" ]; then
+        echo "Cannot get ${DM_SYST_NAME} volume."
+        return ${STATUS_ERR}
+    fi
+    sys_vol=${GetUbiVolumeID_RESULT}
+    sys_vol_name="/sys/class/ubi/ubi${SYS_UBI_DEV_NUM}_${sys_vol}/name"
+
+    if grep ${sys_vol_name} -e "_a\|_b" > /dev/null; then
+        # A/B system case
+        curr_slot=`cat /proc/cmdline | sed 's/.*SLOT_SUFFIX=//' | awk '{print $1}'`
+        if [ x"${curr_slot}" == "x_a" ]; then
+            next_slot="1"
+        else
+            next_slot="0"
+        fi
+    else
+        # Single system (4+4)
+        gracefullReboot edl
+    fi
+
+    # check if the cookie in nand_ab_attr is bootloader cookie (i.e. BABC)
+    #  return :  1, if bootloader cookie is found
+    #         :  0, not bootloader cookie (i.e. DABC or empty)
+    #         : -1/255, on failure
+    #
+    chmod 664 /dev/${mtd_device}
+    ${abctl_cmd} --check_bl_cookie
+    ret=$?
+    if [ "$ret" == "1" ]; then
+        gracefullReboot edl
+    elif [ "$ret" == "0" ]; then
+        echo current slot ${curr_slot}, next active slot: ${next_slot}
+        ${abctl_cmd} --set_active ${next_slot}
+        if [ $? -ne ${STATUS_OK} ]; then
+            echo Error: ${abctl_cmd} --set_active ${next_slot} failed
+            return ${STATUS_ERR}
+        fi
+        gracefullReboot
+    else
+        echo Error: ${abctl_cmd} --check_bl_cookie failed
+    fi
+    return ${STATUS_ERR}
+}
+
+MountModemVol() {
+    mkdir -p ${FW_DIR}
+    GetUbiVolumeID ${SYS_UBI_DEV_NUM} "firmware"
+    if [ "${GetUbiVolumeID_RESULT}" == "" ]; then
+        echo "Cannot get 'firmware' volume."
+        return ${STATUS_ERR}
+    fi
+    firmvol=${GetUbiVolumeID_RESULT}
+
+    m_char_device=/dev/ubi${SYS_UBI_DEV_NUM}_${firmvol}
+    m_block_device=/dev/ubiblock${SYS_UBI_DEV_NUM}_${firmvol}
+
+   ubiblock --create "${m_char_device}"
+   WaitDevReady "-b" "${m_block_device}"
+   if [ $? -ne ${STATUS_OK} ]; then
+       echo Error: wait UBI volume: ${m_block_device} timeout
+       return ${STATUS_ERR}
+   fi
+   mount -t squashfs ${m_block_device} ${FW_DIR} -oro
+   if [ $? -ne ${STATUS_OK} ]; then
+       echo Error: mount ${m_block_device} on ${FW_DIR} failed
+       return ${STATUS_ERR}
+   fi
+   return ${STATUS_OK}
 }
 
 #
@@ -161,7 +226,7 @@ Mount_modem() {
 GetStorageDev() {
     local partition_name=$1
 
-    DEV_NUM=`cat /proc/mtd | grep "\"${partition_name}\"" | cut -d ":" -f 1 | cut -b 4-`
+    DEV_NUM=`grep "\"${partition_name}\"" /proc/mtd | cut -d ":" -f 1 | cut -b 4-`
     if [ -z "${DEV_NUM}" ]; then
         echo Error: GetStorageDev: Get device of ${partition_name} failed.
         return ${STATUS_ERR}
@@ -199,9 +264,13 @@ CheckTmpDirectorySizeForFde () {
 
     local tmp_directory_size=`df -m | grep "/tmp" | awk '{print $4}'`
     local ubi_vol_size=`cat /sys/class/ubi/ubi${ubi_dev_num}_${ubi_vol_num}/data_bytes`
-    let ubi_vol_size=ubi_vol_size/1024/1024+10
 
+    # Reserved 10MiB space for FDE encryption should be safe enough.
+    let ubi_vol_size=ubi_vol_size/1024/1024+10
     if [ ${ubi_vol_size} -gt ${tmp_directory_size} ]; then
+
+        # If the reserved space is bigger than 5MiB and smaller than 10MiB,
+        # the encryption will be in a high risk, need to export warning info.
         let ubi_vol_size=ubi_vol_size-5
         if [ ${ubi_vol_size} -gt ${tmp_directory_size} ]; then
             echo "Err: Not enough RAM size for FDE."
@@ -290,16 +359,19 @@ EncryptUbiPartition () {
         0)
             echo FDE enabled for ${device_name}.
             FDE_MOUNT_NODE="/dev/mapper/${device_name}"
+            rm -rf ${encryption_path}
             return ${STATUS_OK}
         ;;
         1)
             echo FDE fuse bit not blown.
             FDE_MOUNT_NODE=${block_device}
+            rm -rf ${encryption_path}
             return ${STATUS_OK}
         ;;
         *)
             echo FDE encryption failed ${nad_fde_result}.
             FDE_MOUNT_NODE=""
+            rm -rf ${encryption_path}
             return ${STATUS_ERR}
         ;;
     esac
@@ -330,6 +402,7 @@ EncryptNotSysPartition () {
             return ${STATUS_ERR}
         fi
     done
+    return ${STATUS_OK}
 }
 
 MoveMountToSystem() {
@@ -486,13 +559,13 @@ MountSystem () {
 
             mount -t ${image_type} ${block_device} ${ROOT_MOUNT} -oro
             if [ $? -ne ${STATUS_OK} ]; then
-                echo Error: mount 'squashfs ${block_device}' failed
+                echo Error: mount squashfs ${block_device} failed
                 return ${STATUS_ERR}
             fi
         elif [ "${image_type}" == "ubifs" ]; then
             mount -t ${image_type} "${char_device}" ${ROOT_MOUNT} -orw
             if [ $? -ne ${STATUS_OK} ]; then
-                echo Error: mount 'ubifs ${char_device}' failed
+                echo Error: mount ubifs ${char_device} failed
                 return ${STATUS_ERR}
             fi
         else
@@ -508,23 +581,45 @@ MountSystem () {
 
 MainBoot() {
 
-    local tasks_list="
+    local tasks_list1="
                     EarlySetup
                     SetArgs
                     MountSystem
+                    "
+
+    for task1 in ${tasks_list1}; do
+        ${task1}
+        if [ $? -ne ${STATUS_OK} ]; then
+            echo Error: ${task1} failed
+
+            # According to the conditions does system switch or reboot
+            SlotSwitchReboot
+            return ${STATUS_ERR}
+        else
+            echo Init: ${task1}
+        fi
+    done
+
+    local tasks_list2="
                     MoveMountToSystem
                     SwitchToSystem
                     "
-    for task in ${tasks_list}; do
-        ${task}
+    for task2 in ${tasks_list2}; do
+        ${task2}
         if [ $? -ne ${STATUS_OK} ]; then
-            echo Error: ${task} failed
+            echo Error: ${task2} failed
             return ${STATUS_ERR}
         else
-            echo Init: ${task}
+            echo Init: ${task2}
         fi
     done
+    return ${STATUS_OK}
 }
 
 MainBoot
+if [ $? -ne ${STATUS_OK} ]; then
+    # Go to edl for all other error cases
+    echo "Error: going to edl"
+    gracefullReboot edl
+fi
 echo "MainBoot Error: InitRamFS boot failed"
