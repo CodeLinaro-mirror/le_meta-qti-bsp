@@ -23,6 +23,7 @@ DISTRO_FEATURES:append:sa81x5 = " qti-carcamsrc qti-omx"
 DISTRO_FEATURES:append:sa8295 = " qti-codec2"
 DISTRO_FEATURES:append:lemans = " qti-codec2"
 DISTRO_FEATURES:append:qtiquingvm = " qti-omx qti-gstqeavb"
+DISTRO_FEATURES:append:quin-gvm-4gb = " qti-omx qti-gstqeavb"
 DISTRO_FEATURES:append:qtiquingvm8295 = " qti-codec2 qti-gstqeavb"
 DISTRO_FEATURES:append:quin-gvm-gen4 = " qti-codec2"
 
@@ -63,6 +64,7 @@ INCOMPATIBLE_LICENSE = "${@bb.utils.contains('LAYERSERIES_COMPAT_yocto', 'dunfel
 
 # Enable FDE
 DISTRO_FEATURES:append:qtiquingvm = " qti-fde"
+DISTRO_FEATURES:append:quin-gvm-4gb = " qti-fde"
 DISTRO_FEATURES:append:qtiquingvm8295 = " qti-fde"
 DISTRO_FEATURES:append:quin-gvm-gen4 = " qti-fde"
 
