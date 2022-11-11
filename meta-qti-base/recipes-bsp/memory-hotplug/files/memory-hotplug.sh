@@ -27,13 +27,15 @@
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 cd /sys/devices/system/memory/
-IFS=',' read -a addr < /sys/devices/system/memory/aligned_blocks_addr
-IFS=',' read -a num < /sys/devices/system/memory/aligned_blocks_num
-for index in "${!addr[@]}"
-do
-echo ${addr[index]} > probe
-echo online > memory${num[index]}/state
-done
+if [ -e aligned_block_addr ]; then
+   IFS=',' read -a addr < /sys/devices/system/memory/aligned_blocks_addr
+   IFS=',' read -a num < /sys/devices/system/memory/aligned_blocks_num
+   for index in "${!addr[@]}"
+   do
+   echo ${addr[index]} > probe
+   echo online > memory${num[index]}/state
+   done
 # tune kernel max-threads
-totalram=`grep MemTotal /proc/meminfo | awk '{print $2}'`
-echo $((totalram/128)) > /proc/sys/kernel/threads-max
+   totalram=`grep MemTotal /proc/meminfo | awk '{print $2}'`
+   echo $((totalram/128)) > /proc/sys/kernel/threads-max
+fi
