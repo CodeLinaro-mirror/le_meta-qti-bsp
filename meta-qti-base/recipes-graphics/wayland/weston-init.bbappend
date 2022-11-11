@@ -4,6 +4,7 @@ SRC_URI = "file://weston.service_caf \
            file://weston_early.service_caf \
            file://weston.ini_caf \
            ${@bb.utils.contains('LAYERSERIES_COMPAT_yocto', 'kirkstone', 'file://weston-autologin', '', d)} \
+           file://msm-display-node.rules \
 "
 SYSTEMD_SERVICE:${PN} = "weston.service"
 SYSTEMD_AUTO_ENABLE = "enable"
@@ -39,4 +40,8 @@ do_install() {
     if [ "${@bb.utils.contains('PACKAGECONFIG', 'use-pixman', 'yes', 'no', d)}" = "yes" ]; then
         sed -i -e "/^\[core\]/a use-pixman=true" ${D}${sysconfdir}/xdg/weston/weston.ini
     fi
+
+    # Install display udev rule
+    install -d ${D}${sysconfdir}/udev/rules.d/
+    install -m 0644 ${WORKDIR}/msm-display-node.rules ${D}${sysconfdir}/udev/rules.d/msm-display-node.rules
 }
