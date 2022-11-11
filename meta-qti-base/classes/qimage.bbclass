@@ -138,15 +138,34 @@ do_make_avb_image() {
                 --do_not_generate_fec
 
             # generate vbmeta.img
-            avbtool make_vbmeta_image \
-                --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET} \
-                --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${PRODUCT}-dtbo.img \
-                --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
-                --setup_rootfs_from_kernel ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
-                --algorithm SHA256_RSA4096 \
-                --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/testkey_rsa4096.pem \
-                --rollback_index 0 \
-                --output ${DEPLOY_DIR_IMAGE}/${VBMETAIMAGE_TARGET}
+            if ${@bb.utils.contains('DISTRO_FEATURES', 'qti-avb-lxc', 'true', 'false', d)}; then
+            # avb2.0 for lxc container, lv host + la container
+                avbtool extract_public_key \
+                    --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/testkey_rsa4096.pem \
+                    --output ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/public_la_key.bin
+
+                avbtool make_vbmeta_image \
+                    --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET} \
+                    --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${PRODUCT}-dtbo.img \
+                    --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
+                    --setup_rootfs_from_kernel ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
+                    --chain_partition la_vbmeta:1:${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/public_la_key.bin \
+                    --algorithm SHA256_RSA4096 \
+                    --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/testkey_rsa4096.pem \
+                    --rollback_index 0 \
+                    --output ${DEPLOY_DIR_IMAGE}/${PRODUCT}-vbmeta.img
+            else
+            # avb2.0 for lv bare metal.
+                avbtool make_vbmeta_image \
+                    --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET} \
+                    --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${PRODUCT}-dtbo.img \
+                    --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
+                    --setup_rootfs_from_kernel ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
+                    --algorithm SHA256_RSA4096 \
+                    --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/testkey_rsa4096.pem \
+                    --rollback_index 0 \
+                    --output ${DEPLOY_DIR_IMAGE}/${VBMETAIMAGE_TARGET}
+            fi
         fi
     fi
 }
