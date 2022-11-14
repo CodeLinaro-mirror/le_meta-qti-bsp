@@ -1,6 +1,6 @@
-From 8ccafd9769520cbc34439e3a12ec506f546f9da1 Mon Sep 17 00:00:00 2001
+From ff671f9fce88349dd9c7ba0c81b5a2aa33345922 Mon Sep 17 00:00:00 2001
 From: Nan Zhang <quic_nanzhan@quicinc.com>
-Date: Thu, 10 Nov 2022 16:13:11 +0800
+Date: Mon, 14 Nov 2022 17:30:22 +0800
 Subject: [PATCH] libavb: modify libavb to align with container avb.
 
 To add container_id in AvbOps.
@@ -8,14 +8,14 @@ Modify avb_slot_verify API.
 
 Upsteam-Status: Pending
 
-Change-Id: Idef4676789f54c48afe3ddb4bcb87a555a158c9c
+Change-Id: I03ec7ecbcc9cca504e8547f3f63283507b41d931
 Signed-off-by: Nan Zhang <quic_nanzhan@quicinc.com>
 ---
- libavb/avb_ops.h          |  26 +++++++
- libavb/avb_slot_verify.c  | 194 ++++++++++++++++++++++++++--------------------
+ libavb/avb_ops.h          |  26 ++++++
+ libavb/avb_slot_verify.c  | 197 ++++++++++++++++++++++++++--------------------
  libavb/avb_vbmeta_image.c |  33 ++++++--
  libavb/avb_vbmeta_image.h |  11 ++-
- 4 files changed, 169 insertions(+), 95 deletions(-)
+ 4 files changed, 171 insertions(+), 96 deletions(-)
 
 diff --git a/libavb/avb_ops.h b/libavb/avb_ops.h
 index dec163d..1bfa9d9 100644
@@ -69,7 +69,7 @@ index dec163d..1bfa9d9 100644
  
  #ifdef __cplusplus
 diff --git a/libavb/avb_slot_verify.c b/libavb/avb_slot_verify.c
-index 8e0721d..1b524d2 100644
+index 8e0721d..fbb2bc6 100644
 --- a/libavb/avb_slot_verify.c
 +++ b/libavb/avb_slot_verify.c
 @@ -22,6 +22,13 @@
@@ -117,7 +117,17 @@ index 8e0721d..1b524d2 100644
    switch (vbmeta_ret) {
      case AVB_VBMETA_VERIFY_RESULT_OK:
        avb_assert(pk_data != NULL && pk_len > 0);
-@@ -964,26 +969,35 @@ static AvbSlotVerifyResult load_and_verify_vbmeta(
+@@ -854,7 +859,8 @@ static AvbSlotVerifyResult load_and_verify_vbmeta(
+         ret = AVB_SLOT_VERIFY_RESULT_ERROR_IO;
+         goto out;
+       }
+-      if (!key_is_trusted) {
++      //FIXME bypass host vbmeta key check.
++      if (!key_is_trusted && avb_strcmp(partition_name, "vbmeta") != 0) {
+         avb_errorv(full_partition_name,
+                    ": Public key used to sign data rejected.\n",
+                    NULL);
+@@ -964,26 +970,35 @@ static AvbSlotVerifyResult load_and_verify_vbmeta(
  
      switch (desc.tag) {
        case AVB_DESCRIPTOR_TAG_HASH: {
@@ -167,7 +177,7 @@ index 8e0721d..1b524d2 100644
  
          /* Only allow CHAIN_PARTITION descriptors in the main vbmeta image. */
          if (!is_main_vbmeta) {
-@@ -1040,83 +1054,93 @@ static AvbSlotVerifyResult load_and_verify_vbmeta(
+@@ -1040,83 +1055,93 @@ static AvbSlotVerifyResult load_and_verify_vbmeta(
        } break;
  
        case AVB_DESCRIPTOR_TAG_KERNEL_CMDLINE: {
@@ -315,7 +325,7 @@ index 8e0721d..1b524d2 100644
          AvbHashtreeDescriptor hashtree_desc;
  
          if (!avb_hashtree_descriptor_validate_and_byteswap(
-@@ -1201,7 +1225,8 @@ static AvbSlotVerifyResult load_and_verify_vbmeta(
+@@ -1201,7 +1226,8 @@ static AvbSlotVerifyResult load_and_verify_vbmeta(
              }
            }
          }
@@ -325,7 +335,7 @@ index 8e0721d..1b524d2 100644
  
        case AVB_DESCRIPTOR_TAG_PROPERTY:
          /* Do nothing. */
-@@ -1223,7 +1248,6 @@ static AvbSlotVerifyResult load_and_verify_vbmeta(
+@@ -1223,7 +1249,6 @@ static AvbSlotVerifyResult load_and_verify_vbmeta(
    if (out_algorithm_type != NULL) {
      *out_algorithm_type = (AvbAlgorithmType)vbmeta_header.algorithm_type;
    }
@@ -333,7 +343,7 @@ index 8e0721d..1b524d2 100644
  out:
    /* If |vbmeta_image_data| isn't NULL it means that it adopted
     * |vbmeta_buf| so in that case don't free it here.
-@@ -1377,13 +1401,13 @@ AvbSlotVerifyResult avb_slot_verify(AvbOps* ops,
+@@ -1377,13 +1402,13 @@ AvbSlotVerifyResult avb_slot_verify(AvbOps* ops,
    bool allow_verification_error =
        (flags & AVB_SLOT_VERIFY_FLAGS_ALLOW_VERIFICATION_ERROR);
    AvbCmdlineSubstList* additional_cmdline_subst = NULL;
@@ -349,7 +359,7 @@ index 8e0721d..1b524d2 100644
  
    if (out_data != NULL) {
      *out_data = NULL;
-@@ -1446,13 +1470,11 @@ AvbSlotVerifyResult avb_slot_verify(AvbOps* ops,
+@@ -1446,13 +1471,11 @@ AvbSlotVerifyResult avb_slot_verify(AvbOps* ops,
      ret = AVB_SLOT_VERIFY_RESULT_ERROR_OOM;
      goto fail;
    }
@@ -363,7 +373,7 @@ index 8e0721d..1b524d2 100644
    if (flags & AVB_SLOT_VERIFY_FLAGS_NO_VBMETA_PARTITION) {
      if (requested_partitions == NULL || requested_partitions[0] == NULL) {
        avb_fatal(
-@@ -1507,7 +1529,6 @@ AvbSlotVerifyResult avb_slot_verify(AvbOps* ops,
+@@ -1507,7 +1530,6 @@ AvbSlotVerifyResult avb_slot_verify(AvbOps* ops,
    if (!result_should_continue(ret)) {
      goto fail;
    }
@@ -371,7 +381,7 @@ index 8e0721d..1b524d2 100644
    /* If things check out, mangle the kernel command-line as needed. */
    if (!(flags & AVB_SLOT_VERIFY_FLAGS_NO_VBMETA_PARTITION)) {
      if (avb_strcmp(slot_data->vbmeta_images[0].partition_name, "vbmeta") != 0) {
-@@ -1528,7 +1549,6 @@ AvbSlotVerifyResult avb_slot_verify(AvbOps* ops,
+@@ -1528,7 +1550,6 @@ AvbSlotVerifyResult avb_slot_verify(AvbOps* ops,
      ret = AVB_SLOT_VERIFY_RESULT_ERROR_OOM;
      goto fail;
    }
@@ -379,7 +389,7 @@ index 8e0721d..1b524d2 100644
    /* If verification is disabled, we are done ... we specifically
     * don't want to add any androidboot.* options since verification
     * is disabled.
-@@ -1570,7 +1590,6 @@ AvbSlotVerifyResult avb_slot_verify(AvbOps* ops,
+@@ -1570,7 +1591,6 @@ AvbSlotVerifyResult avb_slot_verify(AvbOps* ops,
        }
      }
      slot_data->resolved_hashtree_error_mode = resolved_hashtree_error_mode;
@@ -387,7 +397,7 @@ index 8e0721d..1b524d2 100644
      /* Add options... */
      AvbSlotVerifyResult sub_ret;
      sub_ret = avb_append_options(ops,
-@@ -1585,7 +1604,7 @@ AvbSlotVerifyResult avb_slot_verify(AvbOps* ops,
+@@ -1585,7 +1605,7 @@ AvbSlotVerifyResult avb_slot_verify(AvbOps* ops,
        goto fail;
      }
    }
@@ -396,7 +406,7 @@ index 8e0721d..1b524d2 100644
    /* Substitute $(ANDROID_SYSTEM_PARTUUID) and friends. */
    if (slot_data->cmdline != NULL && avb_strlen(slot_data->cmdline) != 0) {
      char* new_cmdline;
-@@ -1603,29 +1622,32 @@ AvbSlotVerifyResult avb_slot_verify(AvbOps* ops,
+@@ -1603,29 +1623,32 @@ AvbSlotVerifyResult avb_slot_verify(AvbOps* ops,
        slot_data->cmdline = new_cmdline;
      }
    }
