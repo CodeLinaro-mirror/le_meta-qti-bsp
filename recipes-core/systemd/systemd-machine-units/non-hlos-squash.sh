@@ -74,6 +74,33 @@ FindAndMountUBIVol () {
    mount -t squashfs $block_device $dir -o ro
    if [ $? -ne 0 ] ; then
       echo "Unable to mount squashfs onto $block_device."
+      mtd_device=`cat /proc/mtd | grep nand_ab_attr | awk -F ':' '{print $1}'`
+      chmod 777 /dev/${mtd_device}
+      boot_slot=$(/bin/sh -c '/sbin/abctl --boot_slot')
+      echo " boot_slot $boot_slot " > /dev/kmsg
+      firmware_ab_name=$(cat /sys/class/ubi/ubi0_${volid}/name)
+      echo " firmware_ab_name $firmware_ab_name " > /dev/kmsg
+      if [ "$firmware_ab_name" == "firmware_a" ] || [ "$firmware_ab_name" == "firmware_b" ] ; then
+          echo " a/b volumes " > /dev/kmsg
+          /bin/sh -c '/usr/bin/nad-abctl --check_bl_cookie'
+          if [ "$?" == "1" ]; then
+              echo "cookie is Bootloader switch to edl mode" > /dev/kmsg
+              /bin/sh -c 'reboot edl'
+          else
+              echo "cookie is not bootloader, switch slot and reboot" > /dev/kmsg
+              if [ "$boot_slot" == "_a" ] ; then
+                  echo " set _b as active slot " > /dev/kmsg
+                  /bin/sh -c '/usr/bin/nad-abctl --set_active 1'
+              else
+                  echo " set _a as active slot " > /dev/kmsg
+                  /bin/sh -c '/usr/bin/nad-abctl --set_active 0'
+              fi
+              /bin/sh -c 'reboot'
+          fi
+      else
+          echo " non a/b volumes , reboot to edl " > /dev/kmsg
+          /bin/sh -c 'reboot edl'
+      fi
       exit 1
    fi
 }
