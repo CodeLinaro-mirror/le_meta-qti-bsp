@@ -18,6 +18,7 @@ inherit qti-techpack
 TECHPACK_MODULE_OUT = "${WORKDIR}/ais-kernel"
 TECHPACK_MODULES = "ais.ko"
 TECHPACK_HEADERS = "1"
+TECHPACK_MAKE_ARGS = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', "${EXTRA_OEMAKE} QTI_TECHPACK=true", "", d)}"
 
 do_install:append() {
     install -m 0755 ${S}/config/camera_augen3_load.conf -D ${D}${sysconfdir}/modules-load.d/camera_load.conf
