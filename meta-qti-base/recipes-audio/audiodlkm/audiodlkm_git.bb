@@ -3,6 +3,7 @@ DESCRIPTION = "This is the audio driver based on ASoC architecture, used to comm
 HOMEPAGE = "https://git.codelinaro.org"
 LICENSE = "GPL-2.0"
 LIC_FILES_CHKSUM = "file://NOTICE;md5=689b0a45875711dc09b94e4b6524c3cd"
+DEPENDS += "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', "audio-devicetree", "", d)}"
 DEPENDS += "virtual/kernel"
 
 SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/audio-kernel/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/audio-kernel;usehead=1"
@@ -10,10 +11,27 @@ SRC_URI:append = " file://audio_load.conf"
 SRCREV = "${AUTOREV}"
 S = "${WORKDIR}/vendor/qcom/opensource/audio-kernel"
 
-inherit module module-sign qperf qti-kernel-arch-clang
+inherit ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', "qti-techpack", "module module-sign qperf qti-kernel-arch-clang", d)}
 
 EXTRA_OEMAKE += "TARGET_SUPPORT=${@bb.utils.contains('BASEMACHINE', 'sa81x5', 'sa8155', '${BASEMACHINE}', d)}"
 EXTRA_OEMAKE += "AR_SUPPORT=${@bb.utils.contains('MACHINE_FEATURES', 'qti-audio-ar', 'yes', 'no', d)}"
+
+MODULES = "\
+        dsp/codecs/native_dlkm.ko  \
+        dsp/adsp_loader_dlkm.ko  \
+        dsp/q6_notifier_dlkm.ko \
+        dsp/q6_dlkm.ko \
+        ipc/apr_dlkm.ko \
+        asoc/codecs/hdmi_dlkm.ko \
+        asoc/codecs/stub_dlkm.ko \
+        asoc/platform_dlkm.ko \
+        asoc/machine_dlkm.ko \
+        soc/snd_event_dlkm.ko \
+"
+TECHPACK_MODULE_OUT = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', "${WORKDIR}/audio-kernel", "", d)}"
+TECHPACK_MODULES = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', "${MODULES}", "", d)}"
+TECHPACK_HEADERS = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', "1", "", d)}"
+TECHPACK_MAKE_ARGS = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', "${EXTRA_OEMAKE} QTI_TECHPACK=true", "", d)}"
 
 do_configure() {
     cp -f ${WORKDIR}/vendor/qcom/opensource/audio-kernel/Makefile.am ${WORKDIR}/vendor/qcom/opensource/audio-kernel/Makefile
@@ -40,9 +58,11 @@ do_install:append() {
         mv ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/asoc/spf_machine_dlkm.ko ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/
         mv ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/asoc/codecs/stub_dlkm.ko ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/
     else
-        for i in $(find ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/. -name "*.ko"); do
-            mv ${i} ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/
-        done
+        if ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', 'false', 'true', d)}; then
+            for i in $(find ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/. -name "*.ko"); do
+                mv ${i} ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/
+            done
+        fi
     fi
 
 

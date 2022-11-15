@@ -10,12 +10,6 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/BSD-3-Clause;m
 
 WESTON_MAJOR_VERSION = "10"
 
-SRC_URI = "${PATH_TO_REPO}/graphics/weston-sdm-extension/.git;protocol=${PROTO};destsuffix=graphics/weston-sdm-extension;usehead=1"
-SRCREV = "${AUTOREV}"
-S = "${WORKDIR}/graphics/weston-sdm-extension"
-
-inherit meson pkgconfig
-
 DEPENDS += "cairo \
             display-hal-headers display-hal-linux display-noship-linux display-ship-linux \
             gbm gbm-headers \
@@ -26,6 +20,13 @@ DEPENDS += "cairo \
             wayland wayland-native wayland-protocols \
             weston \
 "
+
+SRC_URI = "${PATH_TO_REPO}/graphics/weston-sdm-extension/.git;protocol=${PROTO};destsuffix=graphics/weston-sdm-extension;usehead=1"
+SRCREV = "${AUTOREV}"
+
+S = "${WORKDIR}/graphics/weston-sdm-extension"
+
+inherit meson pkgconfig
 
 TARGET_CPPFLAGS += "-I${STAGING_INCDIR}/libdrm \
                     -I${STAGING_INCDIR}/qcom/display \
@@ -43,6 +44,6 @@ PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'early_init', 'early'
 # early-init
 PACKAGECONFIG[early] = "-Denable-early-boot=true,-Denable-early-boot=false"
 
-FILES:${PN} += " \
+FILES:${PN} += "\
     ${libdir}/libweston-${WESTON_MAJOR_VERSION}/* \
 "

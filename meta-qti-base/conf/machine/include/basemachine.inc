@@ -21,6 +21,7 @@ SYSTEMRWIMAGE_TARGET ?= "${PRODUCT}-systemrw.ext4"
 USERDATAIMAGE_TARGET ?= "${PRODUCT}-usrfs.ext4"
 VBMETAIMAGE_TARGET ?= "${PRODUCT}-vbmeta.img"
 VENDORBOOTIMAGE_TARGET ?= "${PRODUCT}-vendor_boot.img"
+BOOTINIT_TARGET ?= "${PRODUCT}-boot_init.img"
 
 # Flag to Enable QPermissions
 QPERMISSIONS_ENABLE ?= "0"

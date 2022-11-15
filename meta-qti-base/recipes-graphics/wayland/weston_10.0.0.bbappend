@@ -1,10 +1,12 @@
 DEPENDS += "gbm gbm-headers \
             display-commonsys-intf-linux \
-            libion libsync \
+            ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.4', 'libion', '', d)} \
+            libsync \
             ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'libuhab', '', d)} \
             libcutils \
             linux-msm-headers \
             weston-sdm-extension-headers \
+            ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', 'libdmabufheap', '', d)} \
 "
 
 REQUIRED_DISTRO_FEATURES:remove = "opengl"

@@ -1,5 +1,4 @@
 IMAGE_INSTALL += "\
-    ${@bb.utils.contains('COMBINED_FEATURES', 'qti-qdrive', 'packagegroup-qti-qdrive', '', d)} \
     ${@bb.utils.contains('COMBINED_FEATURES', 'qti-location', 'packagegroup-qti-location-hal', '', d)} \
     ${@bb.utils.contains('COMBINED_FEATURES', 'qti-lxc', 'packagegroup-qti-lxc', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'kdump-support', 'kexec-tools makedumpfile capture-image capture-devicetree', '', d)} \
@@ -7,6 +6,9 @@ IMAGE_INSTALL += "\
 
 # Add libgomp support
 IMAGE_INSTALL += "libgomp"
+
+# Add resize userdata function
+IMAGE_INSTALL += "resize-service"
 
 # Add kdump support
 do_rootfs[depends] += "${@bb.utils.contains('DISTRO_FEATURES', 'kdump-support', 'machine-kdump-image:do_image_complete', '', d)}"

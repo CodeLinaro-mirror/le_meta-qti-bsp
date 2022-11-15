@@ -61,6 +61,9 @@
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+install_module() {
+	modprobe $1 || modprobe -d /vendor $1;
+}
 
 echo "##########Trying to load wlanhost driver ##########"
 n=0
@@ -70,34 +73,34 @@ while [ $n -le 5 ]
 		if (lspci -k|grep 1102);then
 			echo "##########load qca6595#############"
 			if [ -f /firmware/image/qcn7605/amss.bin ];then
-				modprobe qca6595
+				install_module qca6595
 			else
 				echo "##########Error! QCA6595 FW is not available!#####"
 			fi
 		elif ((lspci -k|grep 003e) || (lspci -k|grep QCA6174));then
 			echo "##########load qca6574#############"
 			if [ -f /firmware/image/qca6174/qwlan30.bin ];then
-				modprobe qca6574
+				install_module qca6574
 			else
 				echo "##########Error! QCA6574 FW is not available!#####"
 			fi
 		elif ((lspci -k|grep 1101) || (lspci -k|grep QCA6390));then
 			echo "##########load qca6696#############"
 			if [ -f /firmware/image/qca6390/amss20.bin ];then
-				modprobe qca6696
+				install_module qca6696
 			else
 				echo "##########Error! QCA6696 FW is not available!#####"
 			fi
 		elif (lspci -k|grep 1103);then
 			echo "##########load qca6490#############"
 			if [ -f /firmware/image/qca6490/amss20.bin ];then
-				modprobe qca6490
+				install_module qca6490
 			else
 				echo "##########Error! QCA6490 FW is not available!#####"
 			fi
 		else
 			echo "##########load default wlan########"
-			modprobe wlan
+			install_module wlan
 		fi
 		break
 	fi

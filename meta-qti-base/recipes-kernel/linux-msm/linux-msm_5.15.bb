@@ -4,7 +4,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 
 DEPENDS += "elfutils-native kern-tools-native mkbootimg-native mkdtimg-native openssl-native rsync-native signing-keys"
 
-COMPATIBLE_MACHINE = "sa81x5|lemans"
+COMPATIBLE_MACHINE = "sa81x5|lemans|quin-gvm-gen4-2"
 
 FILESPATH =+ "${KERNEL_SRC_PATH}:"
 SRC_URI = "${PATH_TO_REPO}/kernel/kernel-${PV}/kernel_platform/msm-kernel/.git;protocol=${PROTO};destsuffix=kernel/kernel-${PV}/kernel_platform/msm-kernel;usehead=1"
@@ -247,6 +247,3 @@ do_deploy() {
 
 # Put the zImage in the kernel-dev pkg
 FILES:${KERNEL_PACKAGE_NAME}-dev += "/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}"
-
-# For Lemans, add module package directory
-FILES:${KERNEL_PACKAGE_NAME}-modules:lemans += "/lib/modules"
