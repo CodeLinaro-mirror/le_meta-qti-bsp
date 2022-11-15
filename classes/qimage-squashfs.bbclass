@@ -23,10 +23,9 @@ PERSISTIMAGE_TARGET ?= "persist.img"
 PERSISTIMAGE_MAP_TARGET ?= "persist.map"
 DTBOIMAGE_TARGET ?= "dtbo.img"
 
-# Ensure SELinux file context variable is defined
-#SELINUX_FILE_CONTEXTS ?= ""
-#SELINUX_IMG_S = "${@['-S ${SELINUX_FILE_CONTEXTS}', ''][d.getVar('SELINUX_FILE_CONTEXTS') == '']}"
-#IMAGE_EXT4_SELINUX_OPTIONS = "${@bb.utils.contains('DISTRO_FEATURES', 'selinux', '${SELINUX_IMG_S}', '', d)}"
+DEPENDS += "\
+    squashfs-tools-native \
+"
 
 ROOTFS_POSTPROCESS_COMMAND += "gen_buildprop;do_fsconfig;"
 ROOTFS_POSTPROCESS_COMMAND += "gen_fsconfig;"

@@ -83,7 +83,6 @@ DEPENDS += "\
              pkgconfig-native \
              ptool-native \
              qdl-native \
-             squashfs-tools-native \
 "
 
 MACHINE_PARTITION_CONF_SEARCH_PATH ?= "${@':'.join('%s/conf/machine/partition' % p for p in '${BBPATH}'.split(':'))}}"
