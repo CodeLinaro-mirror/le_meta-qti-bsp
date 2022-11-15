@@ -239,24 +239,19 @@ do_deploy() {
     install -m 0644 vmlinux ${DEPLOYDIR}
     install -m 0644 System.map ${DEPLOYDIR}
 
-    # copy dtbo files into deplydir and create dtbo.img if DTBO support enable
-    if ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'true', 'false', d)}; then
-        mkdtimg create ${DEPLOYDIR}/${PRODUCT}-dtbo.img \
-             --page_size=${PAGE_SIZE} \
-             ${DTB_SRC_PATH}/*.dtbo
-    fi
-
     # copy initramfs scripts
      install -d ${DEPLOYDIR}/build-artifacts
      install -d ${DEPLOYDIR}/build-artifacts/kernel_scripts/scripts
      install -d ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr/
      install -d ${DEPLOYDIR}/build-artifacts/dtb/
+     install -d ${DEPLOYDIR}/build-artifacts/dtbo/
 
      cp  ${S}/usr/gen_initramfs.sh ${DEPLOYDIR}/build-artifacts/kernel_scripts/scripts
      cp -a ${B}/usr/gen_init_cpio ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr/
      cp -a ${B}/usr/initramfs_data.cpio ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr/
      cp -a ${B}/usr/initramfs_inc_data ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr/
      cp -a ${DTB_SRC_PATH}/*.dtb ${DEPLOYDIR}/build-artifacts/dtb/
+     cp -a ${DTB_SRC_PATH}/*.dtbo ${DEPLOYDIR}/build-artifacts/dtbo/
 }
 
 # Put the zImage in the kernel-dev pkg
