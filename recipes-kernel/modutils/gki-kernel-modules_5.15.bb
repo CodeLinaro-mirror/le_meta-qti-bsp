@@ -1,3 +1,5 @@
+inherit linux-kernel-base
+
 SUMMARY = "Linux Kernel prebuilt modules"
 DESCRIPTION = "Installs boot critical kernel modules into images. \
 These modules are auto-loaded by systemd at boot"
@@ -5,71 +7,40 @@ LICENSE = "GPLv2.0-with-linux-syscall-note"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta-qti-bsp/files/common-licenses/\
 ${LICENSE};md5=8afb6abdac9a14cb18a0d6c9c151e9b4"
 
-FILESEXTRAPATHS:prepend := "${WORKSPACE}:"
-SRC_URI   =  "file://kernel-5.10/kernel_platform/msm-kernel"
+FILESEXTRAPATHS:prepend := "${KERNEL_PREBUILT_PATH}:${KERNEL_PLATFORM_PATH}/msm-kernel:"
+SRC_URI   =  "file://dist"
+SRC_URI  +=  "file://${KERNEL_MODULES_LIST}"
 SRC_URI  +=  "file://linkmodulesload.service"
 
-S  =  "${WORKDIR}/kernel-5.10/kernel_platform/msm-kernel"
-
-do_configure () {
-    cd ${KERNEL_PREBUILT_DISTDIR}
-    install -d ${B}/include/generated
-    install -m 0644 ../msm-kernel/include/generated/utsrelease.h ${B}/include/generated
-}
+S  =  "${WORKDIR}/dist"
 
 do_compile () {
-    # Segregate modules into first and second stages.
-    mod_list=${B}/${KERNEL_MODULES_LIST}
+    existing_modules=$(ls *.ko)
+    first_mod_list=$(cat ${WORKDIR}/${KERNEL_MODULES_LIST} | sed -e '/^ *#/d;/^ *$/d')
 
-    while IFS= read -r module;
-    do
-        case "$module" in
-            \#*|"") continue;;
-        esac
-        [ -n "$(echo $first_mods | grep " $module ")" ] && continue
-        first_mods="${first_mods}${module} "
-    done < "$mod_list"
-
-    for f in $(find ${KERNEL_PREBUILT_DISTDIR} -type f -name '*.ko' -exec basename {} \;) ; do
-        found=0
-        for m in ${first_mods} ; do
-              [ "$f" = "$m" ] && found=1
-        done
-        [ "$found" = 0 ] && second_mods="${second_mods}$f "
-    done
-
-    # Copy first stage modules into ${B} and update modules-load.d conf
-    for m in $first_mods; do
-        if [ -f ${KERNEL_PREBUILT_DISTDIR}/$m ]; then
-            install -m 0644 ${KERNEL_PREBUILT_DISTDIR}/$m ${B}
-            mname=`basename ${m} .ko`
-            echo "$mname"
+    # generate conf file for 1st/2nd stage module
+    for module in ${existing_modules}; do
+        echo ${first_mod_list} | grep -q ${module} && is_1st_ko="True" || is_1st_ko="False"
+        if [ "${is_1st_ko}" == "True" ]; then
+            echo "$(basename ${module} .ko)" >> firstmods.conf
         else
-            echo "# Module $m not found"
+            echo "$(basename ${module} .ko)" >> secondmods.conf
         fi
-    done > ${B}/firstmods.conf
-
-    # Copy remaining modules into ${B} and update modules-load.d conf
-    for m in ${second_mods}; do
-        install -m 0644 ${KERNEL_PREBUILT_DISTDIR}/$m ${B}
-        mname=`basename ${m} .ko`
-        echo "$mname"
-    done > ${B}/secondmods.conf
+    done
 }
 
+KERNEL_VERSION = "${@get_kernelversion_file("${STAGING_KERNEL_BUILDDIR}")}"
+do_install[depends] += "virtual/kernel:do_prebuilt_shared_workdir"
 do_install() {
-    cd ${B}
-    kversion=$(cat include/generated/utsrelease.h | grep -w UTS_RELEASE | awk '{print $3}')
-    kversion=$(eval echo $kversion)
     # Install modules
-    mkdir -p ${D}/lib/modules/${kversion}
+    mkdir -p ${D}/lib/modules/${KERNEL_VERSION}
     for mod in *.ko; do
         if [ -f $mod ]; then
-            install -m 0644 $mod ${D}/lib/modules/${kversion}
+            install -m 0644 $mod ${D}/lib/modules/${KERNEL_VERSION}
         fi
     done
     # Create empty modules.load as a place holder to mimic Android GKI ramdisk
-    touch ${D}/lib/modules/${kversion}/modules.load
+    touch ${D}/lib/modules/${KERNEL_VERSION}/modules.load
 
     # Install systemd configuration file for auto load
     install -d ${D}${sysconfdir}/modules-load.d/
@@ -83,8 +54,9 @@ do_install() {
 ALLOW_EMPTY:${PN} = "1"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
-PACKAGES = "${PN}-first-stage ${PN}-second-stage ${PN}-linkmodulesload"
+PACKAGES = "${PN}-first-stage ${PN}-second-stage ${PN}-linkmodulesload ${PN}-dbg"
 FILES:${PN}-linkmodulesload += "${systemd_unitdir}/system/linkmodulesload.service"
+FILES:${PN}-dbg += "/lib/modules/${KERNEL_VERSION}/.debug"
 
 inherit systemd
 
