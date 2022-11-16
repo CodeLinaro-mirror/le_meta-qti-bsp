@@ -262,7 +262,7 @@ system_ext_pub_policy.cil: $(CHECKPOLICY) system_ext_pub_policy.conf reqd_policy
 ###########################################################
 system_ext_mapping_file.cil : PRIVATE_VERS := $(PLATFORM_SEPOLICY_VERSION)
 system_ext_mapping_file.cil : PRIVATE_PLAT_MAPPING_CIL := plat_mapping_file.cil
-system_ext_mapping_file.cil : system_ext_pub_policy.cil $(VERSIONPOLICY)
+system_ext_mapping_file.cil : system_ext_pub_policy.cil $(VERSIONPOLICY) plat_mapping_file.cil
 	$(VERSIONPOLICY) -b $< -m -n $(PRIVATE_VERS) -o $@.tmp
 	grep -Fxvf $(PRIVATE_PLAT_MAPPING_CIL) $@.tmp > $@
 
@@ -270,8 +270,7 @@ system_ext_mapping_file.cil : system_ext_pub_policy.cil $(VERSIONPOLICY)
 # product_mapping_file.cil: the versioned, exported 'product' policy in product partition
 ###########################################################
 product_mapping_file.cil : PRIVATE_VERS := $(PLATFORM_SEPOLICY_VERSION)
-product_mapping_file.cil : PRIVATE_FILTER_CIL_FILES := plat_mapping_file.cil
-product_mapping_file.cil : pub_policy.cil $(VERSIONPOLICY) system_ext_mapping_file.cil
+product_mapping_file.cil : pub_policy.cil $(VERSIONPOLICY) system_ext_mapping_file.cil plat_mapping_file.cil
 	$(VERSIONPOLICY) -b $< -m -n $(PRIVATE_VERS) -o $@.tmp
 	grep -Fxvf plat_mapping_file.cil $@.tmp > $@.tmp1
 	grep -Fxvf system_ext_mapping_file.cil $@.tmp1 > $@
@@ -291,7 +290,7 @@ vendor_policy.conf: $(policy_files) $(M4)
 
 vendor_sepolicy.cil: PRIVATE_REQD_MASK := reqd_policy_mask.cil
 vendor_sepolicy.cil: PRIVATE_VERS := $(BOARD_SEPOLICY_VERS)
-vendor_sepolicy.cil: $(CHECKPOLICY) $(VERSIONPOLICY) vendor_policy.conf pub_policy.cil plat_pub_versioned.cil
+vendor_sepolicy.cil: $(CHECKPOLICY) $(VERSIONPOLICY) vendor_policy.conf pub_policy.cil plat_pub_versioned.cil reqd_policy_mask.cil
 	$< -C -M -c $(POLICYVERS) -o $@.tmp1 vendor_policy.conf
 	grep -Fxvf $(PRIVATE_REQD_MASK) $@.tmp1 > $@.raw
 	$(VERSIONPOLICY) -b pub_policy.cil -n $(PRIVATE_VERS) -t $@.raw -o $@.tmp2
