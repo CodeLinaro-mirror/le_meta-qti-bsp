@@ -51,8 +51,11 @@ def create_filtered_tasklist(d, sdkbasepath, tasklistfile, conf_initpath):
     # Enable the use of WORKSPACE variable on an extensible SDK
     baseoutpath = d.getVar('SDK_OUTPUT') + '/' + d.getVar('SDKPATH')
     with open(baseoutpath + '/conf/bblayers.conf', 'a') as f:
-        f.write('WORKSPACE = "$' + '{TOPDIR}/src"\n')
-        f.write('WORKSPACEROOT = "$' + '{TOPDIR}/"\n')
+        f.write('WORKSPACE = "$' + '{TOPDIR}/layers/src"\n')
+        f.write('WORKSPACEROOT = "$' + '{TOPDIR}/layers/"\n')
+    with open(baseoutpath + '/conf/local.conf', 'a') as f:
+        f.write('\nPREBUILT_SRC_DIR = "%s"\n' % d.getVar('PREBUILT_SRC_DIR'))
+
 
     # Create a temporary build directory that we can pass to the env setup script
     shutil.copyfile(sdkbasepath + '/conf/local.conf', sdkbasepath + '/conf/local.conf.bak')
