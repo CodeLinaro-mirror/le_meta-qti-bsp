@@ -1,0 +1,34 @@
+From a528919713ffe89ebc91bb759e5a6c4ab11629bd Mon Sep 17 00:00:00 2001
+From: Nan Zhang <quic_nanzhan@quicinc.com>
+Date: Tue, 8 Nov 2022 17:42:25 +0800
+Subject: [PATCH] lxc: modify lxc.service for container avb.
+
+Add container_avb.service dependency.
+container_avb.service will verify container image, when it failed,
+will not launch lxc.service.
+
+Upsteam-Status: Pending
+
+Change-Id: Ife2bf36c49ca0bb8e9133c469f0194f7281ffb50
+Signed-off-by: Nan Zhang <quic_nanzhan@quicinc.com>
+---
+ config/init/systemd/lxc.service.in | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/config/init/systemd/lxc.service.in b/config/init/systemd/lxc.service.in
+index e3745dc..87ceb4d 100644
+--- a/config/init/systemd/lxc.service.in
++++ b/config/init/systemd/lxc.service.in
+@@ -1,7 +1,8 @@
+ [Unit]
+ Description=LXC Container Initialization and Autoboot Code
+-After=network.target lxc-net.service remote-fs.target
++After=network.target lxc-net.service remote-fs.target container_avb.service
+ Wants=lxc-net.service
++Requires=container_avb.service
+ Documentation=man:lxc-autostart man:lxc
+ 
+ [Service]
+-- 
+2.7.4
+
