@@ -239,5 +239,6 @@ python do_merge_techpack_dtbos () {
                 with open(os.path.join(dtbodir, f), 'rb') as fin:
                     fout.write(fin.read())
 }
+do_merge_techpack_dtbos[nostamp] = "1"
 do_merge_techpack_dtbos[cleandirs] = "${DEPLOY_DIR_IMAGE}/DTOverlays"
-do_merge_techpack_dtbos[depends] += " merge-dtbs-gki-native:do_populate_sysroot"
+do_merge_techpack_dtbos[depends] += " merge-dtbs-gki-native:do_populate_sysroot virtual/kernel:do_deploy"
