@@ -110,14 +110,18 @@ do_make_avb_image(){
                 --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/testkey_rsa4096.pem \
                 --rollback_index 0 \
                 --do_not_generate_fec
+
             avbtool make_vbmeta_image \
                 --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET} \
                 --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${PRODUCT}-dtbo.img \
+                --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${PRODUCT}-vendor_boot.img \
                 --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
                 --setup_rootfs_from_kernel ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
                 --algorithm SHA256_RSA4096 \
                 --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/testkey_rsa4096.pem \
                 --rollback_index 0 \
+                --prop "com.android.build.boot.security_patch:${@time.strftime('%Y-%m-%d',time.gmtime())}" \
+                --prop "com.android.build.boot.os_version:${@time.strftime('%Y-%m-%d',time.gmtime())}" \
                 --output ${DEPLOY_DIR_IMAGE}/${VBMETAIMAGE_TARGET}
         fi
     fi
@@ -128,8 +132,7 @@ addtask do_make_avb_image after do_image_complete before do_build
 # create dummy vendor-boot & vbmeta image
 # create dummy boot-init image for Andriod container
 VENDORBOOT_IMG_CMD = " \
-    dd if=/dev/zero of=${DEPLOY_DIR_IMAGE}/${VENDORBOOTIMAGE_TARGET} bs=1M count=96; \
-    dd if=/dev/zero of=${DEPLOY_DIR_IMAGE}/${VBMETAIMAGE_TARGET} bs=1K count=3; \
+    dd if=/dev/zero of=${DEPLOY_DIR_IMAGE}/${VENDORBOOTIMAGE_TARGET} bs=1M count=48; \
     dd if=/dev/zero of=${DEPLOY_DIR_IMAGE}/${BOOTINIT_TARGET} bs=1K count=1; \
 "
 
