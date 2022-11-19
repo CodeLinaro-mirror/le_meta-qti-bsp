@@ -18,6 +18,7 @@ EXTRA_OEMESON = "\
                  -Dstaging_inc_path=${STAGING_INCDIR} \
                  -Denable-target-vpu554=yes \
                 "
+EXTRA_OEMESON:append:sa6155 = " -Denable-target-vpu554-video-6155=yes"
 
 CFLAGS:append = " -DVIDC_TARGET_USES_GKI"
 
