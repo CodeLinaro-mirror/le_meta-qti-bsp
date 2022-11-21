@@ -345,6 +345,7 @@ grant_all_permissions(host_exec_t,vendor_configs_file)
 grant_all_permissions(host_exec_t,vendor_firmware_file)
 allow host_exec_t host_sbin_t:service { status start stop reload enable disable };
 allow host_exec_t hal_graphics_allocator_default:fd use;
+allow host_exec_t self:sem { associate create read write destroy unix_read unix_write };
 allowxperm host_exec_t self:file ioctl { 0x5401 };
 allowxperm host_exec_t self:fifo_file ioctl { 0x5413 };
 allowxperm host_exec_t self:unix_stream_socket ioctl { 0x89a0 0x89a2 0x540f };
