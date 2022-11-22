@@ -15,7 +15,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         e2fsprogs-mke2fs \
         e2fsprogs-tune2fs \
         glib-2.0 \
-        kernel-modules \
+        gki-kernel-modules-second-stage \
         packagegroup-android-utils \
         packagegroup-qti-audio \
         packagegroup-qti-bluetooth \
@@ -45,3 +45,25 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         systemd-machine-units \
         ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
 "
+
+CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "chronyc"
+CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-audio"
+CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-bluetooth"
+CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-camera"
+CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-cvp"
+CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-data"
+CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-display"
+CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-dsp"
+CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-fastcv"
+CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-gfx"
+CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-gst"
+CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-ml"
+CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-mmframeworks"
+CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-qmmf"
+CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-robotics"
+CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-securemsm"
+CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-ss-mgr"
+CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-test-sensors-see"
+CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-video"
+CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-wifi"
+CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-core-prop"
