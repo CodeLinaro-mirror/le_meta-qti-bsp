@@ -6,18 +6,19 @@
 #set prebuilt conf in esdk
 if [[ $OE_SKIP_SDK_CHECK =~ "1" ]]; then
         #set need variables when generate prebuilt confs
-	WS=$(readlink -f  ${BUILDDIR}/)
-	MACHINE="qrb5165-rb5"
+        WS=$(readlink -f  ${BUILDDIR}/)
+        MACHINE="qrb5165-rb5"
 
-	# Generate prebuilt conf by reading manifest.
-	#the .repo/mainfests/default.xml need place upder the path of WS
-	source "${BUILDDIR}/layers/poky/meta-qti-internal/scripts/generate_prebuilt_confs.sh"
-	# include generated prebuilt conf in auto.conf
-	cat >> ${BUILDDIR}/conf/auto.conf <<EOF
+        # Generate prebuilt conf by reading manifest.
+        #the .repo/manifests/default.xml need place upder the path of WS
+        if [[ -f "${BUILDDIR}/.repo/manifests/default.xml" ]]; then
+                source "${BUILDDIR}/layers/poky/meta-qti-internal/scripts/generate_prebuilt_confs.sh"
+                # include generated prebuilt conf in auto.conf
+                cat >> ${BUILDDIR}/conf/auto.conf <<EOF
 #----------------------------------------
 # Include prebuilt configuration file
 #----------------------------------------
 include conf/${MACHINE}_prebuilts.conf
 EOF
 fi
-
+fi
