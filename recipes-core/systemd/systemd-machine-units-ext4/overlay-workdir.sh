@@ -31,9 +31,12 @@ mkdir -p /overlay/data        || exit 1
 mkdir -p /overlay/etc         || exit 1
 mkdir -p /overlay/cache       || exit 1
 mkdir -p /overlay/usr/share   || exit 1
+mkdir -p /overlay/var/lib/opkg|| exit 1
+
 mkdir -p /overlay/.data-work  || exit 1
 mkdir -p /overlay/.etc-work   || exit 1
 mkdir -p /overlay/.cache-work || exit 1
 mkdir -p /overlay/.usr-share-work || exit 1
+mkdir -p /overlay/.var-lib-opkg-work || exit 1
 
 exit 0
