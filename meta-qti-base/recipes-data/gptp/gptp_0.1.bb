@@ -17,7 +17,13 @@ SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/external/open-avb"
 
-inherit systemd pkgconfig
+inherit systemd pkgconfig useradd
+
+# Add non-root user vnw for gptp-daemon.service
+USERADD_PACKAGES = "${PN}"
+
+USERADD_PARAM:${PN} = "--no-create-home --shell /bin/false -g vnw vnw"
+GROUPADD_PARAM:${PN} = "net_raw; net_admin; vnw;"
 
 GPTP_AUTO_START_ENABLE = "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'NO', 'YES', d)}"
 EXTRA_OEMAKE += "${@bb.utils.contains("DISTRO_FEATURES", "systemd", "SYSTEMD_SUPPORT_INCLUDED=1", "SYSTEMD_SUPPORT_INCLUDED=0", d)}"
