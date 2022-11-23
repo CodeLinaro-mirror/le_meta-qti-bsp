@@ -49,6 +49,7 @@ EXTRA_OEMAKE = "'CLANG_BIN=${STAGING_BINDIR_NATIVE}/clang/bin/' \
                 'UBSAN_UEFI_GCC_FLAG_ALIGNMENT=-Wno-misleading-indentation' \
                 'TARGET_BOARD_TYPE_AUTO=1' \
                 'SUPPORT_AB_BOOT_LXC=${AB_BOOT_LXC}' \
+                ${@bb.utils.contains('DISTRO_FEATURES', 'qti-avb', 'VERIFIED_BOOT_ENABLED=1', '', d)} \
                 ${@bb.utils.contains('DISTRO_FEATURES', 'qti-avb', 'VERIFIED_BOOT_2=1', '', d)} "
 
 do_prebuilt_configure() {
