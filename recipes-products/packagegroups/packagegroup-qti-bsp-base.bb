@@ -22,7 +22,6 @@ ENABLE_ADB_qti-distro-base-user ?= "False"
 # Android Core Image and Debugging utilities
 RDEPENDS_packagegroup-android-utils-base = "\
     ${@oe.utils.conditional('ENABLE_ADB', 'True', 'adbd', '', d)} \
-    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-sdx', '', 'binder', d)} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-sdx', '', 'leproperties', d)} \
     logcat \
     logd \
