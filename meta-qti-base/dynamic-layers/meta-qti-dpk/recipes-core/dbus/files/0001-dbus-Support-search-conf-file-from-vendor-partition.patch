@@ -1,0 +1,32 @@
+From d016afd378de1447b54c6b63004a6cd27d3ae52f Mon Sep 17 00:00:00 2001
+From: xubao <quic_xubaoj@quicinc.com>
+Date: Thu, 24 Nov 2022 11:00:41 +0800
+Subject: [PATCH] dbus: Support search conf file from vendor partition
+
+When vendor partition is enabled, some dbus conf file is installed into
+"vendor/etc/dbus-1/system.d". So update system.conf to support search
+conf file from this path.
+
+Upstream-Status: Inappropriate [vendor image]
+
+Change-Id: Ica112da6e6b5b857a756543237cb445c7dde6209
+Signed-off-by: xubao <quic_xubaoj@quicinc.com>
+---
+ bus/system.conf.in | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/bus/system.conf.in b/bus/system.conf.in
+index d2f3244..6f5c683 100644
+--- a/bus/system.conf.in
++++ b/bus/system.conf.in
+@@ -132,6 +132,7 @@
+   <includedir>system.d</includedir>
+ 
+   <includedir>@SYSCONFDIR_FROM_PKGDATADIR@/dbus-1/system.d</includedir>
++  <includedir>/vendor@SYSCONFDIR_FROM_PKGDATADIR@/dbus-1/system.d</includedir>
+ 
+   <!-- This is included last so local configuration can override what's 
+        in this standard file -->
+-- 
+2.7.4
+
