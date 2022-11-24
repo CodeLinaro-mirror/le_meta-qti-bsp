@@ -43,7 +43,8 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-support-utils \
         systemd-machine-units \
         ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
-        packagegroup-qti-sdk-depends \
+        packagegroup-qti-sdk-depends-robotics \
+        packagegroup-qti-sdk-depends-ros \
 "
 
 # To include kernel headers in SDK
