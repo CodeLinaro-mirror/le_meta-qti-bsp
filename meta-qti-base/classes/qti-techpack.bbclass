@@ -1,7 +1,7 @@
 #Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
 #SPDX-License-Identifier: BSD-3-Clause-Clear
 
-DEPENDS += "virtual/kernel kernel-toolchain-native rsync-native"
+DEPENDS += "dtc-native virtual/kernel kernel-toolchain-native rsync-native"
 
 inherit deploy kernel-arch linux-kernel-base qti-kernel-toolchain
 
@@ -37,7 +37,6 @@ do_build_tools() {
 
     install -d ${OUT_DIR}
     cp -R ${STAGING_KERNEL_BUILDDIR} ${OUT_DIR}/msm-kernel
-    cp -R ${OUT_DIR}/msm-kernel/host ${OUT_DIR}/
 }
 do_build_tools[dirs] = "${WORKDIR}/build"
 B = "${WORKDIR}/build"

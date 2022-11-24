@@ -36,6 +36,7 @@ do_shared_workdir () {
     ln -sf kernel/build_module.sh ${KERNEL_TOOLCHAIN_DIR}/build/build_module.sh
     ln -sf kernel/envsetup.sh ${KERNEL_TOOLCHAIN_DIR}/build/envsetup.sh
     ln -sf kernel/_setup_env.sh ${KERNEL_TOOLCHAIN_DIR}/build/_setup_env.sh
+    ln -sf kernel/android ${KERNEL_TOOLCHAIN_DIR}/build/android
 
     install -d ${KERNEL_TOOLCHAIN_DIR}/prebuilts/clang/host/linux-x86
     cp -rf ${S}/${BASE_PATH}/prebuilts/clang/host/linux-x86/clang-${CLANG_VERSION} ${KERNEL_TOOLCHAIN_DIR}/prebuilts/clang/host/linux-x86/
