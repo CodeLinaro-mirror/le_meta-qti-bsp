@@ -34,6 +34,6 @@ PACKAGECONFIG ?= " \
 
 PACKAGECONFIG[glib] = "--with-glib, --without-glib, glib-2.0"
 PACKAGECONFIG[ion] = "--with-ion, --without-ion, libion"
-PACKAGECONFIG[ufsbsg] = "--with-ufsbsg, --without-ufsbsg"
+#PACKAGECONFIG[ufsbsg] = "--with-ufsbsg, --without-ufsbsg"
 
 PARALLEL_MAKE = ""
