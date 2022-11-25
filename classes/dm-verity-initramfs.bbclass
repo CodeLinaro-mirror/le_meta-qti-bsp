@@ -77,7 +77,7 @@ def get_ramdisk_path(d):
 
 RAMDISK_PATH = "${@get_ramdisk_path(d)}"
 
-MKBOOTUTIL = '${@oe.utils.conditional("PREFERRED_PROVIDER_virtual/mkbootimg-native", "mkbootimg-gki-native", "scripts/mkbootimg.py", "mkbootimg", d)}'
+MKBOOTUTIL = '${@oe.utils.conditional("PREFERRED_PROVIDER_virtual/mkbootimg", "mkbootimg-gki", "scripts/mkbootimg.py", "mkbootimg", d)}'
 
 # If BOOT_HEADER_VERSION >= 3, a vendor_boot image will be built
 #  unless SKIP_VENDOR_BOOT is defined as True.

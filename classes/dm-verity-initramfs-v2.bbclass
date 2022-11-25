@@ -49,7 +49,7 @@ def get_ramdisk_path(d):
 
 RAMDISK_PATH = "${@get_ramdisk_path(d)}"
 
-MKBOOTUTIL = '${@oe.utils.conditional("PREFERRED_PROVIDER_virtual/mkbootimg-native", "mkbootimg-gki-native", "scripts/mkbootimg.py", "mkbootimg", d)}'
+MKBOOTUTIL = '${@oe.utils.conditional("PREFERRED_PROVIDER_virtual/mkbootimg", "mkbootimg-gki", "scripts/mkbootimg.py", "mkbootimg", d)}'
 
 # For initramfs based dm-verity solution on vendor_dlkm and system partitions,computed hash values
 # need to be added into vendor_ramdisk before generating boot.img
