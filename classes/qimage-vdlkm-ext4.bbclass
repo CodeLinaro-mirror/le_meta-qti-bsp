@@ -45,6 +45,12 @@ create_vdlkm_modules_load_d() {
         install -D -m 0644 $conf ${IMAGE_ROOTFS}/lib/modules/modules-load.d/
         rm -f $conf
     done
+
+    install -d ${IMAGE_ROOTFS}/lib/modules/modprobe.d/
+    for conf in ${IMAGE_ROOTFS}${sysconfdir}/modprobe.d/*.conf; do
+        install -D -m 0644 $conf ${IMAGE_ROOTFS}/lib/modules/modprobe.d/
+        rm -f $conf
+    done
 }
 ROOTFS_POSTPROCESS_COMMAND += "create_vdlkm_modules_load_d;"
 

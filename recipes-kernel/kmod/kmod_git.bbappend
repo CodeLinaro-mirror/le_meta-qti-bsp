@@ -9,16 +9,3 @@ SRC_URI += " \
 
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
-
-SRC_URI += "file://blacklist.conf \
-           "
-
-AUTOLOAD_WLAN ?= "False"
-AUTOLOAD_WLAN_neo ?= "True"
-
-do_install:append () {
-    if [ "${AUTOLOAD_WLAN}" == "True" ]; then
-        sed -i '/blacklist wlan.*/s/^/# /' ${WORKDIR}/blacklist.conf
-    fi
-    install -Dm644 "${WORKDIR}/blacklist.conf" "${D}${sysconfdir}/modprobe.d/blacklist.conf"
-}
