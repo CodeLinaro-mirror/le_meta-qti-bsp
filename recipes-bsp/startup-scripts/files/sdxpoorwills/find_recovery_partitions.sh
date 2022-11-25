@@ -34,7 +34,9 @@
 emmc_dir=/dev/block/bootdevice/by-name
 mtd_file=/proc/mtd
 fstab_file=/tmp/recovery_volume_detected
+
 ubi_device_number=1
+
 UpdateRecoveryVolume () {
    partition=$1
    dir=$2
@@ -168,5 +170,8 @@ else
 fi
 
 FindAndMountMTD misc /misc
+
+# set selinux to permissive mode before we start recovery executable
+/usr/sbin/setenforce 0
 
 exit
