@@ -14,6 +14,11 @@ do_compile:prepend() {
     TIMESTAMP = $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')\
     BUILD_TAG = "$(TIMESTAMP); cld:$(CLD_IDS); cmn:$(CMN_IDS);"\
     CFLAGS_wlan_hdd_main.o += -DBUILD_TAG=\\"$(BUILD_TAG)\\"' ${S}/Kbuild
+
+    if ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', 'true', 'false', d)}; then
+        CFG80211_FLAG="ccflags-y += -DCFG80211_SINGLE_NETDEV_MULTI_LINK_SUPPORT"
+        sed -i -e "/$(CONFIG_QCA_CLD_WLAN_PROFILE)_defconfig$/i${CFG80211_FLAG}" ${S}/Kbuild
+    fi
 }
 
 RPROVIDES:${PN} += "${PROVIDES_NAME}-${KERNEL_VERSION}"
