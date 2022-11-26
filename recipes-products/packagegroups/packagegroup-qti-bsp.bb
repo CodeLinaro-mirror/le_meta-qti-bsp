@@ -26,7 +26,8 @@ RDEPENDS:packagegroup-startup-scripts = "\
     "
 # Other essential utilites
 CHRONY ?= "chrony"
-CHRONY_sa410m = ""
+CHRONY:sa410m = ""
+CHRONY:kalama = ""
 
 RDEPENDS:packagegroup-support-utils = "\
     ${CHRONY} \
