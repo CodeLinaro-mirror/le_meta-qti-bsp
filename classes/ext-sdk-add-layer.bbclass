@@ -58,8 +58,8 @@ ext_sdk_add_external_layers_script() {
         echo '  case "$1" in' >> $add_external_layers_script
         echo '    -h|--help)' >> $add_external_layers_script
         echo '      echo " "' >> $add_external_layers_script
-        echo '      echo "add_external_layers script lets you add layers of an external workspace to the eSDK."' >> $add_external_layers_script
-        echo '      echo "Developer can choose to pass arguments as flags or enter them interactively during run-time"' >> $add_external_layers_script
+        echo '      echo "add_external_layers adds layers from workspaces synced outside eSDK and copy respective local sources from the external"' >> $add_external_layers_script
+        echo '      echo "workspace to eSDK. Developer can choose to pass arguments as flags or enter them interactively during run-time."' >> $add_external_layers_script
         echo '      echo " "' >> $add_external_layers_script
         echo '      echo "Usage:"' >> $add_external_layers_script
         echo '      echo "       source add_external_layers -p [path to external workspace] -r [list of recipes]"' >> $add_external_layers_script
@@ -70,7 +70,7 @@ ext_sdk_add_external_layers_script() {
         echo '      echo "-r, --recipes             Space separated list of recipes within a pair of double quotes,"' >> $add_external_layers_script
         echo '      echo "                          for which \"devtool modify\" operation needs to be performed"' >> $add_external_layers_script
         echo '      echo " "' >> $add_external_layers_script
-        echo '      return' >> $add_external_layers_script
+        echo '      exit 0' >> $add_external_layers_script
         echo '      ;;' >> $add_external_layers_script
         echo '    -p|--path)' >> $add_external_layers_script
         echo '     shift' >> $add_external_layers_script
@@ -102,9 +102,9 @@ ext_sdk_add_external_layers_script() {
         echo '    read -p  "Please enter the absolute path to root of the workspace: " workspace_root' >> $add_external_layers_script
         echo 'fi' >> $add_external_layers_script
         echo '' >> $add_external_layers_script
-        echo 'if [ -d "${workspace_root}/poky" ];' >> $add_external_layers_script
+        echo 'if [ -d "${workspace_root}" ];' >> $add_external_layers_script
         echo 'then' >> $add_external_layers_script
-        echo '    cd ${workspace_root}/poky' >> $add_external_layers_script
+        echo '    cd ${workspace_root}' >> $add_external_layers_script
         echo '    rm -rf layerlist.txt' >> $add_external_layers_script
         echo '    touch layerlist.txt' >> $add_external_layers_script
         echo '    echo "`find -name layer.conf`" >> layerlist.txt' >> $add_external_layers_script
@@ -137,20 +137,33 @@ ext_sdk_add_external_layers_script() {
         echo '    done' >> $add_external_layers_script
         echo '' >> $add_external_layers_script
         echo '    echo "BBLAYERS += \" \ " >> ${SDK_ROOT}/conf/bblayers.conf' >> $add_external_layers_script
+        echo '' >> $add_external_layers_script
+        echo '    new_layers=0' >> $add_external_layers_script
         echo '    for layer in ${layer_list}' >> $add_external_layers_script
         echo '    do' >> $add_external_layers_script
-        echo '        if [ -r ${workspace_root}/poky/${layer}/conf/layer.conf ] ;' >> $add_external_layers_script
+        echo '        if [ -r ${workspace_root}/${layer}/conf/layer.conf ] ;' >> $add_external_layers_script
         echo '        then' >> $add_external_layers_script
-        echo '            echo "    ${workspace_root}/poky/${layer} \ " >> ${SDK_ROOT}/conf/bblayers.conf' >> $add_external_layers_script
-        echo '            echo "`tput setaf 2`${workspace_root}/poky/${layer} has been added as a layer to the eSDK`tput sgr0`"' >> $add_external_layers_script
+        echo '            echo "    ${workspace_root}/${layer} \ " >> ${SDK_ROOT}/conf/bblayers.conf' >> $add_external_layers_script
+        echo '            echo "`tput setaf 2`${workspace_root}/${layer} has been added as a layer to the eSDK`tput sgr0`"' >> $add_external_layers_script
+        echo '            new_layers=$new_layers+1' >> $add_external_layers_script
         echo '        else' >> $add_external_layers_script
-        echo '            echo "`tput setaf 3`Unable to read ${workspace_root}/poky/${layer}/conf/layer.conf`tput sgr0`"' >> $add_external_layers_script
+        echo '            echo "`tput setaf 3`Unable to read ${workspace_root}/${layer}/conf/layer.conf`tput sgr0`"' >> $add_external_layers_script
         echo '        fi' >> $add_external_layers_script
         echo '    done' >> $add_external_layers_script
         echo '    echo "    \"" >> ${SDK_ROOT}/conf/bblayers.conf' >> $add_external_layers_script
         echo '    rm layerlist.txt' >> $add_external_layers_script
         echo '' >> $add_external_layers_script
-        echo '    cp -rf ${workspace_root}/src/* ${SDK_ROOT}/src' >> $add_external_layers_script
+        echo '    if [ "$new_layers" == "0" ] ;' >> $add_external_layers_script
+        echo '    then' >> $add_external_layers_script
+        echo '        echo "`tput setaf 3`No new layer was added. Hence, no sources were copied from the given workspace path to eSDK.`tput sgr0`"' >> $add_external_layers_script
+        echo '    elif [ -d "${workspace_root}/src" ];' >> $add_external_layers_script
+        echo '    then' >> $add_external_layers_script
+        echo '        echo "Copying local sources from ${workspace_root}/src to ${SDK_ROOT}/src"' >> $add_external_layers_script
+        echo '        cp -rf ${workspace_root}/src/* ${SDK_ROOT}/src' >> $add_external_layers_script
+        echo '        echo  "Local sources have been copied successfully"' >> $add_external_layers_script
+        echo '    else' >> $add_external_layers_script
+        echo '        echo "`tput setaf 3`Unable to find ${workspace_root}/src/ directory. Local sources are  not copied to the eSDK`tput sgr0`"' >> $add_external_layers_script
+        echo '    fi' >> $add_external_layers_script
         echo '' >> $add_external_layers_script
         echo '    if [ "$recipe_list" == "" ] ;' >> $add_external_layers_script
         echo '    then' >> $add_external_layers_script
@@ -180,4 +193,5 @@ ext_sdk_add_external_layers_script() {
         echo 'else' >> $add_external_layers_script
         echo '    echo "`tput setaf 1`${workspace_root} is not a workspace`tput sgr0`"' >> $add_external_layers_script
         echo 'fi' >> $add_external_layers_script
+        echo 'exit 0' >> $add_external_layers_script
 }
