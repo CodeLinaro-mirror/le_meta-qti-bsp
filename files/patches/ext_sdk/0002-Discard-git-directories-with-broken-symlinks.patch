@@ -1,7 +1,7 @@
-From 9c9712261548bc22ef534ca9781cdea0f7268353 Mon Sep 17 00:00:00 2001
+From cdd54a437f7027a7af24159d3c410a73036d2593 Mon Sep 17 00:00:00 2001
 From: Raghuvar S <quic_raghuvar@quicinc.com>
-Date: Thu, 26 May 2022 11:35:15 +0530
-Subject: [PATCH] Discard .git/ directories with broken symlinks
+Date: Mon, 17 Oct 2022 09:15:39 +0530
+Subject: [PATCH 2/2] Discard .git/ directories with broken symlinks
 
 Recipes with SRC_URI pointing to locally synced
 sources having .git/ directories that have broken
@@ -9,20 +9,20 @@ symlinks fail in "devtool modify" operation. This
 patch discards .git/ directories if they contain
 broken symlinks.
 
-Change-Id: Idcec46f46e8dcccc2980856b4c0d2ea6fe728082
+Change-Id: Ib9ac95aff86e82945c9d09b9333000d53595c9be
 ---
- meta/classes/devtool-source.bbclass | 11 ++++++++++
+ meta/classes/devtool-source.bbclass | 11 +++++++++++
  1 file changed, 11 insertions(+)
 
 diff --git a/meta/classes/devtool-source.bbclass b/meta/classes/devtool-source.bbclass
-index 41900e651f..e475433881 100644
+index 41900e651f..9a0e29a4be 100644
 --- a/meta/classes/devtool-source.bbclass
 +++ b/meta/classes/devtool-source.bbclass
-@@ -146,6 +146,16 @@ python devtool_post_unpack() {
+@@ -146,6 +146,17 @@ python devtool_post_unpack() {
                  "doesn't use any source or the correct source "
                  "directory could not be determined" % d.getVar('PN'))
-
-+#Discard .git directories which have files with broken symlinks 
+ 
++    #Discard .git directories which have files with broken symlinks
 +    for root, _, files in os.walk(srcsubdir):
 +        if (os.path.basename(root) == ".git"):
 +            for f in files:
