@@ -12,7 +12,7 @@ SRC_URI = "\
 inherit systemd
 
 SYSTEMD_SERVICE:${PN} = "enable-fde.service"
-SYSTEMD_AUTO_ENABLE:${PN} = "enable"
+SYSTEMD_AUTO_ENABLE:${PN} = "${@bb.utils.contains('MACHINE','quin-gvm-4gb','disable','enable',d)}"
 
 do_install:append () {
   install -d ${D}${systemd_system_unitdir}
