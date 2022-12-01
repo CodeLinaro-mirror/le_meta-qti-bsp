@@ -98,7 +98,6 @@ do_install:append () {
        install -m 0644 ${WORKDIR}/trusted_touch.conf -D ${D}/etc/tmpfiles.d/trusted_touch.conf
    fi
 
-   #  Mask journaling services by default.
    #  'systemctl unmask' can be used on device to enable them if needed.
    if [ "${SYSTEMD_ENABLE_JOURNAL}" != "1" ]; then
        ln -sf /dev/null ${D}/etc/systemd/system/systemd-journald.service
