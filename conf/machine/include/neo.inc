@@ -17,7 +17,7 @@ GENERATED_MACHINE_MNT_POINTS = "/lib/modules"
 
 # Define userdata dir, size and file system type to be used
 USERDATA_DIR = "${@bb.utils.contains('MACHINE_MNT_POINTS', '/overlay', 'overlay', 'data', d)}"
-USERDATA_SIZE ?= "16GiB"
+USERDATA_SIZE ?= "3GiB"
 USERDATA_FSTYPE = "ext4"
 
 # Sizes for EXT4 partitions
