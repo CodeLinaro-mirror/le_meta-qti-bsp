@@ -32,8 +32,6 @@ NON-HLOS.bin            modem
 
 sbl1.mbn                sbl
 tz.mbn                  tz
-rpm.mbn                 rpm
-appsboot.mbn            aboot
 aop.mbn                 aop
 xbl_cfg.elf             xbl_config
 devcfg_auto.mbn         tz_devcfg
