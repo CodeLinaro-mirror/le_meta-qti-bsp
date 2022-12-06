@@ -26,16 +26,29 @@
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
 
+IsFirmwareMounted () {
+    firmware_mounted=`cat /proc/mounts | grep -i "firmware squashfs" | wc -l`
+    if [ "$firmware_mounted" == 1 ] ; then
+        echo "firmware volume is already mounted" > /dev/kmsg
+        exit 0;
+    fi
+}
+
 GetFirmwareVolumeID () {
     firmware=$1
-    vid=0
     act_slot=`cat /proc/cmdline | sed 's/.*SLOT_SUFFIX=//' | awk '{print $1}'`
     firmware_ab_name=${firmware}${act_slot}
-    vid=`ubinfo -d 0 -N ${firmware} | grep -iw "volume ID" | awk -F ':' '{print $2}' | awk -F ' ' '{print $1}'`
-    if [ "$vid" == "" ]; then
-      vid=`ubinfo -d 0 -N ${firmware_ab_name} | grep -iw "volume ID" | awk -F ':' '{print $2}' | awk -F ' ' '{print $1}'`
-    fi
-    echo $vid
+    volcount=`cat /sys/class/ubi/ubi0/volumes_count`
+    echo "find ubi index for firmware"  > /dev/kmsg
+    for vid in `seq 0 $volcount`; do
+        echo $vid  > /dev/kmsg
+        name=`cat /sys/class/ubi/ubi0_$vid/name`
+        if [ "$name" == "$firmware" ] || [ "$name" == "$firmware_ab_name" ]; then
+            echo $vid
+            break
+        fi
+        echo $name  > /dev/kmsg
+    done
 }
 
 FindAndMountUBIVol () {
@@ -43,18 +56,25 @@ FindAndMountUBIVol () {
    dir=$2
 
    volid=$(GetFirmwareVolumeID $partition)
+   echo "found volume index for firmware mount " $volid  > /dev/kmsg
    if [ "$volid" == "" ]; then
        return
    fi
 
    device=/dev/ubi0_$volid
    block_device=/dev/ubiblock0_$volid
-    mkdir -p $dir
+   mkdir -p $dir
 
-   ubiblock --create $device
+   if [ -e "/dev/ubiblock0_$volid" ]; then
+        echo "/dev/ubiblock0_$volid exists" > /dev/kmsg
+   else
+        echo "/dev/ubiblock0_$volid desnt exists, creating" > /dev/kmsg
+        ubiblock --create $device
+   fi
+
    mount -t squashfs $block_device $dir -o ro
    if [ $? -ne 0 ] ; then
-      echo "Unable to mount squashfs onto ubiblock0_$volumeindex."
+      echo "Unable to mount squashfs onto $block_device."
       exit 1
    fi
 }
@@ -88,6 +108,12 @@ nad_ubi_present=`cat $mtd_file | grep nad_ubi | wc -l`
 if [ $nad_ubi_present -eq 0 ]; then
    eval FindAndMountUBI modem /firmware
 else
+   IsFirmwareMounted
    eval FindAndMountUBIVol firmware /firmware
+   if [ $? -ne 0 ] ; then
+      echo "Unable to mount firmware volume" > /dev/kmsg
+      exit -1
+   fi
+   echo "firmware volume is sucessfully mounted " > /dev/kmsg
 fi
 exit 0
