@@ -30,17 +30,17 @@
 # Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
 # SPDX-License-Identifier: BSD-3-Clause-Clear
 
-mount -n -o mode=0755 -t devtmpfs none "/dev"
+/bin/mount -n -o mode=0755 -t devtmpfs none "/dev"
 echo "mounted devtmpfsr"
-mount proc /proc -t proc
+/bin/mount proc /proc -t proc
 echo "mounted proc"
-mount -o remount,rw  /
-mkdir -p /mnt/vfs
+/bin/mount -o remount,rw  /
+/bin/mkdir -p /mnt/vfs
 
 # verity protection
 if [ -f /etc/verity.env ]; then
     source /etc/verity.env
-    veritysetup open /dev/vda system /dev/vda $VERITY_ROOT_HASH --salt $VERITY_SALT --hash-offset $VERITY_HASH_OFFSET --data-blocks $VERITY_DATA_BLOCKS --fec-device /dev/vda --fec-offset $VERITY_FEC_OFFSET --fec-roots $VERITY_FEC_ROOTS --root-hash-signature=/etc/verity_sig.txt
+    /usr/sbin/veritysetup open /dev/vda system /dev/vda $VERITY_ROOT_HASH --salt $VERITY_SALT --hash-offset $VERITY_HASH_OFFSET --data-blocks $VERITY_DATA_BLOCKS --fec-device /dev/vda --fec-offset $VERITY_FEC_OFFSET --fec-roots $VERITY_FEC_ROOTS --root-hash-signature=/etc/verity_sig.txt
 
     # Wait till the block device is available
     echo "waiting for /dev/mapper/system"
@@ -51,10 +51,10 @@ if [ -f /etc/verity.env ]; then
     counter=$((counter * 100))
     echo "/dev/mapper/system ready, time = $counter ms"
 
-    mount -t ext4 -o ro /dev/mapper/system /mnt/vfs
+    /bin/mount -t ext4 -o ro /dev/mapper/system /mnt/vfs
 else
-    mount -t ext4 -o ro /dev/vda /mnt/vfs
-    mount -t ext4 -o rw /dev/vdb /mnt/vfs/persist
+    /bin/mount -t ext4 -o ro /dev/vda /mnt/vfs
+    /bin/mount -t ext4 -o rw /dev/vdb /mnt/vfs/persist
 fi
 
 if [ $? -ne 0]; then
