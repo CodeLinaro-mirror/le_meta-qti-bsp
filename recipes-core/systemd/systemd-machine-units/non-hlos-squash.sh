@@ -26,6 +26,39 @@
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
 
+GetFirmwareVolumeID () {
+    firmware=$1
+    vid=0
+    act_slot=`cat /proc/cmdline | sed 's/.*SLOT_SUFFIX=//' | awk '{print $1}'`
+    firmware_ab_name=${firmware}${act_slot}
+    vid=`ubinfo -d 0 -N ${firmware} | grep -iw "volume ID" | awk -F ':' '{print $2}' | awk -F ' ' '{print $1}'`
+    if [ "$vid" == "" ]; then
+      vid=`ubinfo -d 0 -N ${firmware_ab_name} | grep -iw "volume ID" | awk -F ':' '{print $2}' | awk -F ' ' '{print $1}'`
+    fi
+    echo $vid
+}
+
+FindAndMountUBIVol () {
+   partition=$1
+   dir=$2
+
+   volid=$(GetFirmwareVolumeID $partition)
+   if [ "$volid" == "" ]; then
+       return
+   fi
+
+   device=/dev/ubi0_$volid
+   block_device=/dev/ubiblock0_$volid
+    mkdir -p $dir
+
+   ubiblock --create $device
+   mount -t squashfs $block_device $dir -o ro
+   if [ $? -ne 0 ] ; then
+      echo "Unable to mount squashfs onto ubiblock0_$volumeindex."
+      exit 1
+   fi
+}
+
 FindAndMountUBI () {
    partition=$1
    dir=$2
@@ -48,6 +81,13 @@ FindAndMountUBI () {
         fi
     done
 }
+
 mtd_file=/proc/mtd
-eval FindAndMountUBI modem /firmware
+nad_ubi_present=`cat $mtd_file | grep nad_ubi | wc -l`
+
+if [ $nad_ubi_present -eq 0 ]; then
+   eval FindAndMountUBI modem /firmware
+else
+   eval FindAndMountUBIVol firmware /firmware
+fi
 exit 0
