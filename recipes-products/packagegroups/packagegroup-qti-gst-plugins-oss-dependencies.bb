@@ -15,7 +15,10 @@ RDEPENDS_packagegroup-qti-gst-plugins-oss-dependencies = " \
       cairo-gobject \
       ffmpeg \
       gdk-pixbuf \
+      jansson \
+      json-glib \
       liba52 \
+      libdaemon \
       libgudev \
       libmp3lame \
       librsvg \
@@ -25,6 +28,7 @@ RDEPENDS_packagegroup-qti-gst-plugins-oss-dependencies = " \
       libwebp \
       mpg123 \
       orc \
+      readline \
       sbc \
       speex \
       taglib \
