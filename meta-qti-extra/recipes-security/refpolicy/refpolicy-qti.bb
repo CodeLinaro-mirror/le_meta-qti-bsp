@@ -69,11 +69,12 @@ fakeroot do_configure() {
     cp -rf ${S_GIT_REFPOLICY}/config/appconfig-mcs/* ${S_GIT_REFPOLICY}/config/appconfig-qti/
     echo "r:sshd_t:s0     r:unconfined_t:s0" > ${S_GIT_REFPOLICY}/config/appconfig-qti/default_type
     echo "r:unconfined_t:s0" > ${S_GIT_REFPOLICY}/config/appconfig-qti/failsafe_context
-    echo "r:sshd_t:s0     r:unconfined_t:s0" > ${S_GIT_REFPOLICY}/config/appconfig-qti/u_default_contexts
+    echo "r:host_exec_t:s0 r:host_exec_t:s0" > ${S_GIT_REFPOLICY}/config/appconfig-qti/u_default_contexts
     echo "root:u" > ${S_GIT_REFPOLICY}/config/appconfig-qti/seusers
     echo "__default__:u" >> ${S_GIT_REFPOLICY}/config/appconfig-qti/seusers
     echo "<summary>Policy modules for the Qti selinux.</summary>" > ${S_HOST_MODULES}/metadata.xml
     cp -rf ${S_HOST_MODULES} ${S_GIT_REFPOLICY}/policy/modules/
+    sed -i '1 i\r:host_exec_t:s0 r:host_exec_t:s0' ${S_GIT_REFPOLICY}/config/appconfig-qti/default_contexts
     sed -i 's/class system (ipc_info syslog_read syslog_mod syslog_console module_request module_load /&halt reboot status start stop enable disable reload/' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
     sed -i 's/keystore_key drmservice /&service dbus passwd/' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
     sed -i '$a (class passwd ( passwd chfn chsh rootok crontab ))' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
@@ -135,6 +136,9 @@ install_misc_files () {
     fi
     # install policy headers
     oe_runmake 'DESTDIR=${D}' 'prefix=${D}${prefix}' install-headers
+    # install seusers
+    install -m 0644 ${S_GIT_REFPOLICY}/config/appconfig-qti/seusers \
+        ${D}${sysconfdir}/selinux/${POLICY_NAME}/seusers
 }
 
 install_config () {
