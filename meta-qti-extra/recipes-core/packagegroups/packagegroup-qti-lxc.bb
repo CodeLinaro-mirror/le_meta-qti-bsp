@@ -15,5 +15,4 @@ RDEPENDS:${PN} += "\
     lxc \
     lxcfs \
     dploader \
-    softwarecontainer \
     "
