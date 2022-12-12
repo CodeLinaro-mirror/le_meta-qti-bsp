@@ -22,8 +22,8 @@ TECHPACK_MODULES += "cnss_genl/cnss_nl.ko"
 
 inherit qti-techpack
 
-do_deploy:append(){
-    dlkmdir=${STAGING_KERNEL_BUILDDIR}/wlan-platform-dlkm
+do_install:append(){
+    dlkmdir=${D}${includedir}/wlan-platform
     install -d ${dlkmdir}
     install -d ${dlkmdir}/inc
     install -m 0644 ${TECHPACK_MODULE_OUT}/Module.symvers ${dlkmdir}/
@@ -31,3 +31,4 @@ do_deploy:append(){
 }
 
 FILES:${PN} += "${nonarch_base_libdir}/modules/${KERNEL_VERSION}/*"
+FILES:${PN} += "${includedir}/wlan-platform/*"
