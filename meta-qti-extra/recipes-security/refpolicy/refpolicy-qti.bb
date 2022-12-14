@@ -14,6 +14,7 @@ SRC_URI = "\
     git://github.com/SELinuxProject/refpolicy.git;protocol=http;branch=master;name=refpolicy;destsuffix=refpolicy \
     file://vendor-modules \
     file://host-refpolicy \
+    file://android-cil-patches \
 "
 
 S = "${WORKDIR}/refpolicy"
@@ -21,6 +22,7 @@ S_GIT_REFPOLICY = "${WORKDIR}/refpolicy"
 S_HOST_REFPOLICY = "${WORKDIR}/host-refpolicy"
 S_HOST_MODULES = "${WORKDIR}/vendor-modules"
 S_ANDROID_CILS = "${STAGING_DATADIR_NATIVE}/android_cils"
+S_ANDROID_CIL_PATCHES = "${WORKDIR}/android-cil-patches"
 S_PRECOMBINED_CILS = "${WORKDIR}/precombined_cils"
 
 EXTRA_OEMAKE += "\
@@ -64,6 +66,20 @@ POLICY_NAME = "qti"
 # so set module such as "host = module" in modules.conf is neccesary.
 HOST_POLICY_MODULES += "host fix"
 
+android_cil_patch() {
+    # patches for compatibility with host policy
+    sed -i '1 i\r:host_exec_t:s0 r:host_exec_t:s0' ${S_GIT_REFPOLICY}/config/appconfig-qti/default_contexts
+    sed -i 's/class system (ipc_info syslog_read syslog_mod syslog_console module_request module_load /&halt reboot status start stop enable disable reload/' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
+    sed -i 's/keystore_key drmservice /&service dbus passwd/' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
+    sed -i '$a (class passwd ( passwd chfn chsh rootok crontab ))' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
+
+    # patches for VTS image bootup issue
+    sed -i 's/proc_kmsg proc_loadavg /&proc_locks /' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
+    sed -i 's/vndk_prop virtual_ab_prop /&adbd_config_prop /' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
+    cat ${S_ANDROID_CIL_PATCHES}/vts_plat_sepolicy_patch.cil >> ${S_ANDROID_CILS}/system/plat_sepolicy.cil
+    cat ${S_ANDROID_CIL_PATCHES}/vts_plat_mapping_patch.cil >> ${S_ANDROID_CILS}/system/30.0.cil
+}
+
 fakeroot do_configure() {
     install -d ${S_GIT_REFPOLICY}/config/appconfig-qti
     cp -rf ${S_GIT_REFPOLICY}/config/appconfig-mcs/* ${S_GIT_REFPOLICY}/config/appconfig-qti/
@@ -74,10 +90,7 @@ fakeroot do_configure() {
     echo "__default__:u" >> ${S_GIT_REFPOLICY}/config/appconfig-qti/seusers
     echo "<summary>Policy modules for the Qti selinux.</summary>" > ${S_HOST_MODULES}/metadata.xml
     cp -rf ${S_HOST_MODULES} ${S_GIT_REFPOLICY}/policy/modules/
-    sed -i '1 i\r:host_exec_t:s0 r:host_exec_t:s0' ${S_GIT_REFPOLICY}/config/appconfig-qti/default_contexts
-    sed -i 's/class system (ipc_info syslog_read syslog_mod syslog_console module_request module_load /&halt reboot status start stop enable disable reload/' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
-    sed -i 's/keystore_key drmservice /&service dbus passwd/' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
-    sed -i '$a (class passwd ( passwd chfn chsh rootok crontab ))' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
+    android_cil_patch
 }
 
 fakeroot do_compile() {
