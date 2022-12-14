@@ -6,7 +6,6 @@ SRC_URI:append = " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'variant-debug', 'file://dpk_debug-debug.cfg', 'file://dpk_debug-release.cfg', d)} \
     file://0003-Add-vendor-to-firmware-search-paths.patch;apply=no \
 "
-
 do_patch_more() {
     cd ${S}
     patch -f -p1 < ${WORKDIR}/0003-Add-vendor-to-firmware-search-paths.patch

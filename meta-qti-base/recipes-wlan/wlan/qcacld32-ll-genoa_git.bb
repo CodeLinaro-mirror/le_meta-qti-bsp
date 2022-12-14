@@ -38,6 +38,7 @@ EXTRA_OEMAKE:append = " \
                        DYNAMIC_SINGLE_CHIP=${_MODNAME} \
                        MODNAME=${_MODNAME} \
                        CONFIG_CNSS_GENL=n \
+                       CONFIG_IPA_OFFLOAD=n \
                        "
 
 _WLAN_CFG_OVERRIDE = "\
