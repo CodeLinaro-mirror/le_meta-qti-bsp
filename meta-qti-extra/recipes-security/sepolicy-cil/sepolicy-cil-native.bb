@@ -34,7 +34,8 @@ EXTRA_OEMAKE = "'VERSION_POLICY_INCLUDES=-I${B}/sepolicy-cil'\
                 'SYSTEM_SEPOLICY=${WORKDIR}/system-sepolicy'\
                 'DEVICE_SEPOLICY=${WORKDIR}/device-sepolicy'\
                 'PACKAGES_POLICY=${WORKDIR}/packages-sepolicy'\
-                'DEVICE_SEPOLICYVNDR=${WORKDIR}/device-sepolicyvndr'"
+                'DEVICE_SEPOLICYVNDR=${WORKDIR}/device-sepolicyvndr'\
+                'TARGET_BUILD_VARIANT=${@bb.utils.contains_any('VARIANT', 'perf user', 'user', 'userdebug', d)}'"
 
 do_configure() {
     cp -rf ${WORKDIR}/selinux/libsepol --no-preserve=ownership ${B}

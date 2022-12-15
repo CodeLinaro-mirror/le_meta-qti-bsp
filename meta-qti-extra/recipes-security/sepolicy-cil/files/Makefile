@@ -1,6 +1,5 @@
 MLS_SENS=1
 MLS_CATS=1024
-TARGET_BUILD_VARIANT=userdebug
 PRIVATE_TGT_WITH_NATIVE_COVERAGE=false
 PRIVATE_SEPOLICY_SPLIT=true
 PRIVATE_COMPATIBLE_PROPERTY=true
@@ -36,9 +35,16 @@ PRODUCT_PUBLIC_POLICY := ${PACKAGES_POLICY}/car_product/sepolicy/public ${PACKAG
 PRODUCT_PRIVATE_POLICY := ${PACKAGES_POLICY}/car_product/sepolicy/private ${PACKAGES_POLICY}/watchdog/sepolicy/private ${DEVICE_SEPOLICY}/generic/product/private ${DEVICE_SEPOLICY}/qva/product/private
 REQD_MASK_POLICY := ${SYSTEM_SEPOLICY}/reqd_mask
 PLAT_VENDOR_POLICY := ${SYSTEM_SEPOLICY}/vendor
+
+ifeq (user, $(TARGET_BUILD_VARIANT))
+BOARD_VENDOR_SEPOLICY_DIRS := ${DEVICE_SEPOLICYVNDR}/generic/vendor/common ${DEVICE_SEPOLICYVNDR}/qva/vendor/common/sysmonapp \
+  ${DEVICE_SEPOLICYVNDR}/qva/vendor/ssg ${DEVICE_SEPOLICYVNDR}/qva/vendor/common ${DEVICE_SEPOLICYVNDR}/generic/vendor/gen3_metal ${DEVICE_SEPOLICYVNDR}/qva/vendor/gen3_metal
+else
 BOARD_VENDOR_SEPOLICY_DIRS := ${PACKAGES_POLICY}/car_product/sepolicy/test ${PACKAGES_POLICY}/watchdog/testclient/sepolicy ${DEVICE_SEPOLICYVNDR}/generic/vendor/common ${DEVICE_SEPOLICYVNDR}/qva/vendor/common/sysmonapp \
   ${DEVICE_SEPOLICYVNDR}/qva/vendor/ssg ${DEVICE_SEPOLICYVNDR}/qva/vendor/common ${DEVICE_SEPOLICYVNDR}/generic/vendor/gen3_metal ${DEVICE_SEPOLICYVNDR}/qva/vendor/gen3_metal ${DEVICE_SEPOLICYVNDR}/generic/vendor/test \
   ${DEVICE_SEPOLICYVNDR}/qva/vendor/test
+endif
+
 
 sepolicy_build_cil_workaround_files := technical_debt.cil
 sepolicy_build_files := security_classes \
