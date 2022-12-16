@@ -60,6 +60,8 @@ do_prebuilt_configure() {
 
 do_configure[noexec] = "1"
 do_compile () {
+    export BUILD_CC=${STAGING_BINDIR_NATIVE}/clang/bin/clang
+    export BUILD_CXX=${STAGING_BINDIR_NATIVE}/clang/bin/clang++
     export CC=clang
     export CXX=clang++
     export LD=${BUILD_LD}
