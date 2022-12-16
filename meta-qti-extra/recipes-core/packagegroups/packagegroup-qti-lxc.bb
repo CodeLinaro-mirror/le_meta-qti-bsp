@@ -16,3 +16,5 @@ RDEPENDS:${PN} += "\
     lxcfs \
     dploader \
     "
+
+RDEPENDS:${PN}:append:sa81x5 = " softwarecontainer"
