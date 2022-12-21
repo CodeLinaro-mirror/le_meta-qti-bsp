@@ -38,6 +38,7 @@ EXTRA_OEMAKE:append = " \
                        DYNAMIC_SINGLE_CHIP=${_MODNAME} \
                        MODNAME=${_MODNAME} \
                        CONFIG_CNSS_GENL=n \
+                       CONFIG_IPA_OFFLOAD=n \
                        "
 
 _WLAN_CFG_OVERRIDE = "\
@@ -50,7 +51,7 @@ _WLAN_CFG_OVERRIDE = "\
                       CONFIG_HIF_CE_DEBUG_DATA_BUF=y \
                       "
 
-_WLAN_CFG_OVERRIDE:append:sa6155 = "CONFIG_IPA_DISABLE_OVERRIDE=y"
+_WLAN_CFG_OVERRIDE:append:sa6155 = " CONFIG_IPA_DISABLE_OVERRIDE=y"
 
 EXTRA_OEMAKE:append = " WLAN_CFG_OVERRIDE="${_WLAN_CFG_OVERRIDE}""
 

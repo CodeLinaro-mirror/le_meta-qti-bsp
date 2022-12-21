@@ -13,11 +13,14 @@ DEPENDS += "kernel-toolchain-native util-linux-native"
 PR = "r1"
 PV = "4.0"
 
+EDK2_USE_PREBUILTS ?= "False"
+KERNEL_ARCH ?= "auto"
+
 FILESPATH =+ "${SRC_DIR_ROOT}/kernel:"
 EDK2_VARIANT = "${@bb.utils.contains_any('VARIANT', 'perf user', 'perf_', 'debug_', d)}"
 SRC_URI = " \
            ${PATH_TO_REPO}/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/bootable/bootloader/edk2/.git;protocol=${PROTO};destsuffix=kernel-${PREFERRED_VERSION_linux-msm}/kernl_platform/bootable/bootloader/edk2;usehead=1 \
-           ${@bb.utils.contains('EDK2_USE_PREBUILTS', 'True', 'file://kernel-${PREFERRED_VERSION_linux-msm}/out/msm-kernel-${BASEMACHINE}-${EDK2_VARIANT}defconfig/dist/', '', d)} \
+           ${@bb.utils.contains('EDK2_USE_PREBUILTS', 'True', 'file://kernel-${PREFERRED_VERSION_linux-msm}/out/msm-kernel-${KERNEL_ARCH}-${EDK2_VARIANT}defconfig/dist/', '', d)} \
           "
 
 SRCREV = "${AUTOREV}"
@@ -30,7 +33,8 @@ VBLE = "${@bb.utils.contains('DISTRO_FEATURES', 'vble','1', '0', d)}"
 VERITY_ENABLED = "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity','1', '0', d)}"
 EARLY_ETH = "${@bb.utils.contains('DISTRO_FEATURES', 'early-eth', '1', '0', d)}"
 HIBERNATION = "${@bb.utils.contains('COMBINED_FEATURES', 'hibernation', '1', '0', d)}"
-VERIFIED_BOOT_ENABLED = "${@bb.utils.contains('DISTRO_FEATURES', 'qti-avb', '1', '0', d)}"
+AB_BOOT_LXC = "${@bb.utils.contains('MACHINE_FEATURES', 'qti-lxc', '1', '0', d)}"
+
 EXTRA_OEMAKE = "'CLANG_BIN=${STAGING_BINDIR_NATIVE}/clang/bin/' \
                 'CLANG_PREFIX=${STAGING_BINDIR_NATIVE}/clang/bin/' \
                 'TARGET_ARCHITECTURE=${TARGET_ARCH}'\
@@ -44,17 +48,20 @@ EXTRA_OEMAKE = "'CLANG_BIN=${STAGING_BINDIR_NATIVE}/clang/bin/' \
                 'EARLY_ETH_ENABLED=${EARLY_ETH}'\
                 'UBSAN_UEFI_GCC_FLAG_ALIGNMENT=-Wno-misleading-indentation' \
                 'TARGET_BOARD_TYPE_AUTO=1' \
+                'SUPPORT_AB_BOOT_LXC=${AB_BOOT_LXC}' \
                 ${@bb.utils.contains('DISTRO_FEATURES', 'qti-avb', 'VERIFIED_BOOT_ENABLED=1', '', d)} \
                 ${@bb.utils.contains('DISTRO_FEATURES', 'qti-avb', 'VERIFIED_BOOT_2=1', '', d)} "
 
 do_prebuilt_configure() {
-    cd ${WORKDIR}/kernel-${PREFERRED_VERSION_linux-msm}/out/msm-kernel-${BASEMACHINE}-${EDK2_VARIANT}defconfig/dist/
+    cd ${WORKDIR}/kernel-${PREFERRED_VERSION_linux-msm}/out/msm-kernel-${KERNEL_ARCH}-${EDK2_VARIANT}defconfig/dist/
 
     install -m 0644 unsigned_abl_user*.elf ${S}/../unsigned_abl.elf
 }
 
 do_configure[noexec] = "1"
 do_compile () {
+    export BUILD_CC=${STAGING_BINDIR_NATIVE}/clang/bin/clang
+    export BUILD_CXX=${STAGING_BINDIR_NATIVE}/clang/bin/clang++
     export CC=clang
     export CXX=clang++
     export LD=${BUILD_LD}

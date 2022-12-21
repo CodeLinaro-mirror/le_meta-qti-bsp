@@ -17,14 +17,15 @@ inherit qti-techpack
 
 TECHPACK_MODULE_OUT = "${WORKDIR}/display-drivers"
 TECHPACK_MODULES = "msm/msm_drm.ko"
+TECHPACK_MODULES:quin-gvm-gen4-2 = "msm-hyp/msm_hyp.ko msm-cfg/msm_cfg.ko"
 TECHPACK_HEADERS = "1"
 
 do_install:append:sa81x5(){
-    install -m 0755 ${S}/config/display_augen3_load.conf -D ${D}${sysconfdir}/modules-load.d/display_load.conf
+    install -m 0644 ${S}/config/display_augen3_load.conf -D ${D}${sysconfdir}/modules-load.d/display_load.conf
 }
 
 do_install:append:lemans(){
-    install -m 0755 ${S}/config/display_augen4_load.conf -D ${D}${sysconfdir}/modules-load.d/display_load.conf
+    install -m 0644 ${S}/config/display_augen4_load.conf -D ${D}${sysconfdir}/modules-load.d/display_load.conf
 }
 
 FILES:${PN} += "${nonarch_base_libdir}/modules/${KERNEL_VERSION}/*"

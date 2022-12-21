@@ -79,12 +79,11 @@ do_install() {
 
 PACKAGES =+ "libgptp libgptp-dev libgptp-test"
 
-RDEPENDS:libgptp += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'libuhab', '', d)}"
-RDEPENDS:libgptp-test += "libgptp"
-
 SOLIBS = ".so"
 FILES_SOLIBSDEV = ""
 FILES:libgptp += "${libdir}/libgptp.so"
 FILES:libgptp-dev += "${includedir}/gptp_helper.h"
 FILES:libgptp-test += "${bindir}/avb/libgptp_test"
 
+RDEPENDS:libgptp += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'libuhab', '', d)}"
+RDEPENDS:libgptp-test += "libgptp"

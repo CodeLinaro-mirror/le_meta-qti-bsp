@@ -11,8 +11,6 @@ SYSTEMD_AUTO_ENABLE = "enable"
 
 REQUIRED_DISTRO_FEATURES:remove = "opengl"
 
-PACKAGECONFIG:append:lemans = " use-pixman"
-
 do_install() {
     # Install systemd unit files
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
@@ -35,10 +33,6 @@ do_install() {
     # Install reuqire-input=false in weston.ini
     if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'true', 'false', d)}; then
         sed -i -e '/\[core\]/a require-input=false' ${D}${sysconfdir}/xdg/weston/weston.ini
-    fi
-    # Install use-pixman=true in weston.ini
-    if [ "${@bb.utils.contains('PACKAGECONFIG', 'use-pixman', 'yes', 'no', d)}" = "yes" ]; then
-        sed -i -e "/^\[core\]/a use-pixman=true" ${D}${sysconfdir}/xdg/weston/weston.ini
     fi
 
     # Install display udev rule

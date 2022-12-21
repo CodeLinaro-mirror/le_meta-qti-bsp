@@ -8,7 +8,6 @@ DEPENDS += "gbm gbm-headers \
             weston-sdm-extension-headers \
             ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', 'libdmabufheap', '', d)} \
 "
-DEPENDS:remove:lemans = " virtual/egl"
 
 REQUIRED_DISTRO_FEATURES:remove = "opengl"
 
@@ -31,18 +30,6 @@ PACKAGECONFIG:remove = "systemd"
 # This is a workaround for outdated GFX Benchmark tool
 PACKAGECONFIG:append = " wl-shell"
 PACKAGECONFIG[wl-shell] = "-Ddeprecated-wl-shell=true,-Ddeprecated-wl-shell=false"
-
-# Rewrite config
-PACKAGECONFIG:remove:lemans = " egl wayland clients"
-PACKAGECONFIG:append:lemans = " -Dsimple-clients=shm"
-
-VIRTUAL_EGL ?= "virtual/egl"
-VIRTUAL_EGL:lemans = ""
-VIRTUAL_GLES ?= "virtual/libgles2"
-VIRTUAL_GLES:lemans = ""
-
-PACKAGECONFIG[kms] = "-Dbackend-drm=true,-Dbackend-drm=false,drm udev ${VIRTUAL_EGL} ${VIRTUAL_GLES} virtual/libgbm mtdev"
-
 
 RRECOMMENDS_${PN}:remove = "weston-init"
 

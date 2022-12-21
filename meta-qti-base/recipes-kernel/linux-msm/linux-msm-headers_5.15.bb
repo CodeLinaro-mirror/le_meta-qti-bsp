@@ -13,9 +13,6 @@ inherit kernel-arch pkgconfig multilib_header
 
 KERNEL_PREBUILT_PATH ?= "${SRC_DIR_ROOT}/kernel/kernel-${PV}/out/msm-kernel-${KERNEL_ARCH}-${KERNEL_VARIANT}defconfig/dist"
 
-
-KERNEL_PREBUILT_PATH:lemans = "${SRC_DIR_ROOT}/kernel/kernel-${PV}/out/msm-kernel-gen4auto-${KERNEL_VARIANT}defconfig/dist"
-
 do_configure[noexec] = "1"
 do_compile[noexec] = "1"
 
