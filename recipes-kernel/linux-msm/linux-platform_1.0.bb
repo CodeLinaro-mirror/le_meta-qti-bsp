@@ -1,5 +1,5 @@
 inherit autotools pkgconfig deploy
-COMPATIBLE_MACHINE = "genericarmv8"
+COMPATIBLE_MACHINE = "genericarmv8|trustedvm"
 
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI = "file://kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/"
@@ -9,7 +9,7 @@ PR = "r0"
 LICENSE = "GPL-2.0 WITH Linux-syscall-note"
 LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 
-DEPENDS += "mkdtimg-native bison-native"
+DEPENDS += "virtual/mkdtimg-native bison-native"
 
 do_unpack[cleandirs] += " ${S}"
 do_clean[cleandirs] += " ${S} ${STAGING_KERNEL_DIR} ${B} ${STAGING_KERNEL_BUILDDIR}"
@@ -71,6 +71,19 @@ do_install () {
 	:
 }
 
+# Set up hosttools for techpack module compilation
+do_setup_module_compilation() {
+    cd ${WORKSPACE}/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform  && \
+
+    BUILD_CONFIG=${KERNEL_BUILD_CONFIG} \
+    OUT_DIR=${KERNEL_OUT_PATH}/ \
+    KERNEL_UAPI_HEADERS_DIR=${STAGING_KERNEL_BUILDDIR} \
+    INSTALL_MODULE_HEADERS=1 \
+    ./build/build_module.sh
+}
+addtask do_setup_module_compilation after do_copy_kernelbuild before do_deploy
+
+OEMVM_SUPPORT = "${@d.getVar('MACHINE_SUPPORTS_OEMVM') or "False"}"
 do_deploy () {
      # Copy vmlinux and zImage into deploydir for boot.img creation
      install -d ${DEPLOYDIR}/build-artifacts
@@ -83,15 +96,17 @@ do_deploy () {
      cp -a ${STAGING_KERNEL_BUILDDIR}/usr/initramfs_data.cpio ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr/
      cp -a ${STAGING_KERNEL_BUILDDIR}/usr/initramfs_inc_data ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr/
 
-     cp -a ${STAGING_KERNEL_BUILDDIR}/arch/arm64/boot/dts/vendor/qcom/*.dtb ${DEPLOYDIR}/build-artifacts/dtb
+     if ${@oe.utils.conditional('OEMVM_SUPPORT', 'True', 'true', 'false', d)}; then
+         mkdir -p ${DEPLOYDIR}/build-artifacts/oemvm-dtb
+         cp -a ${KERNEL_PREBUILT_PATH}/${VM_TARGET}-vm-*.dtb ${DEPLOYDIR}/build-artifacts/dtb
+         cp -a ${KERNEL_PREBUILT_PATH}/${VM_TARGET}-oemvm-*.dtb ${DEPLOYDIR}/build-artifacts/oemvm-dtb
+     else
+         cp -a ${STAGING_KERNEL_BUILDDIR}/arch/arm64/boot/dts/vendor/qcom/*.dtb  ${DEPLOYDIR}/build-artifacts/dtb
+     fi
      cp -a ${STAGING_KERNEL_BUILDDIR}/vmlinux ${DEPLOYDIR}
      cp -a ${STAGING_KERNEL_BUILDDIR}/System.map ${DEPLOYDIR}
-
      install -m 0644 ${STAGING_KERNEL_BUILDDIR}/arch/arm64/boot/${KERNEL_IMAGETYPE} ${DEPLOYDIR}/${KERNEL_IMAGETYPE}
 
-     if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-vm', 'true', 'false', d)}; then
-             mkdtimg create ${DEPLOYDIR}/${DTB_TARGET} --page_size=${PAGE_SIZE} ${DEPLOYDIR}/build-artifacts/dtb/*.dtb
-     fi
 }
 
 addtask do_deploy after do_install before do_package

@@ -18,6 +18,7 @@ FILESPATH =+ "${WORKSPACE}:"
 
 SRC_URI = "file://OTA/recovery/"
 SRC_URI += "file://fstab_AB"
+SRC_URI += "file://fstab_AB_cache_ext4"
 
 S = "${WORKDIR}/OTA/recovery/"
 
@@ -27,7 +28,7 @@ EXTRA_OECONF_append = "${@bb.utils.contains('MACHINE_FEATURES', 'ota-package-ver
 CFLAGS += "-lsparse -llog"
 PARALLEL_MAKE = ""
 
-EXTRA_OECONF_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'qti-ab-boot', 'TARGET_SUPPORTS_AB=true', '', d)}"
+EXTRA_OECONF_append = " ${@bb.utils.contains('COMBINED_FEATURES', 'qti-ab-boot', 'TARGET_SUPPORTS_AB=true', '', d)}"
 
 FILES_${PN}  = "${bindir} ${libdir} ${includedir} /res /cache"
 
@@ -44,7 +45,14 @@ do_install[prefuncs] += "${@bb.utils.contains('MACHINE_FEATURES', 'ota-package-v
 do_install_append() {
         install -d ${D}/res/
         install -d ${D}/cache/recovery
-        install -m 0755 ${WORKDIR}/fstab_AB -D ${D}/res/recovery_volume_config
+        if ${@bb.utils.contains('IMAGE_FSTYPES', 'ext4', 'true', 'false', d)}; then
+            if ${@bb.utils.contains_any('MACHINE_MNT_POINTS', '/overlay', 'true', 'false', d)}; then
+                install -m 0755 ${WORKDIR}/fstab_AB -D ${D}/res/recovery_volume_config
+            elif ${@bb.utils.contains_any('MACHINE_MNT_POINTS', '/cache', 'true', 'false', d)}; then
+                install -m 0755 ${WORKDIR}/fstab_AB_cache_ext4 -D ${D}/res/recovery_volume_config
+            fi
+        fi
+
         if ${@bb.utils.contains('MACHINE_FEATURES', 'ota-package-verification', 'true', 'false', d)}; then
             install -m 0755 ${WORKDIR}/public.pem -D ${D}/res/public.pem
         fi

@@ -48,7 +48,7 @@ add_overlay_mount_files () {
 
     install -D -m 0755 ${S}/overlay-workdir.sh ${D}${base_sbindir}/create-overlay-workdirs
     if ${@bb.utils.contains('DISTRO_FEATURES', 'full-disk-encryption', 'false', 'true', d)}; then
-       install -D -m 0644 ${S}/overlay-workdir.service ${D}${systemd_unitdir}/system/overlay-workdir.service
+        install -D -m 0644 ${S}/overlay-workdir.service ${D}${systemd_unitdir}/system/overlay-workdir.service
     else
         install -D -m 0644 ${WORKDIR}/overlay-workdir-with-fde.service ${D}${systemd_unitdir}/system/overlay-workdir.service
     fi

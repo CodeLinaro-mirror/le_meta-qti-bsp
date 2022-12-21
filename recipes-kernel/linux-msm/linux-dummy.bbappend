@@ -1,7 +1,2 @@
-DEPENDS += " linux-platform"
+do_configure[depends] += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-vm', 'linux-platform:do_deploy', '', d)}"
 
-do_compile_kernelmodules () {
-       :
-}
-
-addtask compile_kernelmodules after do_compile before do_install

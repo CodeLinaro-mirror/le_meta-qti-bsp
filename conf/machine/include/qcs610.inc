@@ -4,12 +4,11 @@ require conf/machine/include/basemachine.inc
 SOC_FAMILY ?= "qcs610"
 include conf/machine/include/soc-family.inc
 
-DEFAULTTUNE ?= "aarch64"
 include conf/machine/include/arm/arch-armv8a.inc
 
 PREFERRED_PROVIDER_virtual/kernel = "linux-msm"
-PREFERRED_VERSION_linux-msm ?= "4.14"
-PREFERRED_VERSION_linux-msm-headers ?= "4.14"
+PREFERRED_VERSION_linux-msm ?= "5.4"
+PREFERRED_VERSION_linux-msm-headers ?= "5.4"
 
 PAGE_SIZE ?= '4096'
 
@@ -28,7 +27,13 @@ SYSTEM_SIZE_EXT4  ?= "1050214400"
 USERDATA_SIZE_EXT4 ?= "8589934592"
 
 # Formats of root filesystem images.
-IMAGE_FSTYPES += "ext4"
+IMAGE_FSTYPES += "ext4 squashfs"
+
+# On msm-5.4 or above ufs driver supports BSG Device.
+UFS_BSG_DEV_USAGE = "True"
+
+# On msm-5.4 abl supports DMMOD.
+DM_MOD_FOR_KERNEL = "1"
 
 # Disable some default features supported from upstream
 MACHINE_FEATURES_BACKFILL_CONSIDERED += "qemu-usermode rtc"

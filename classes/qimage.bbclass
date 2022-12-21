@@ -1,24 +1,15 @@
 QIMGCLASSES = "core-image qimage-utils python3native"
-QIMGCLASSES += "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.filter('MACHINE_FEATURES', 'dm-verity-bootloader dm-verity-initramfs', d), '', d)}"
+QIMGCLASSES += "${@bb.utils.filter('MACHINE_FEATURES', 'dm-verity-none dm-verity-bootloader dm-verity-initramfs', d)}"
+QIMGCLASSES += "${@bb.utils.contains('MACHINE_SUPPORTS_DTBO', 'True', 'qimage-dtbo', '', d)}"
 QIMGCLASSES += "${@bb.utils.contains('IMAGE_FSTYPES', 'ext4', 'qimage-ext4', '', d)}"
+QIMGCLASSES += "${@bb.utils.contains('IMAGE_FSTYPES', 'squashfs', 'qimage-squashfs', '', d)}"
 QIMGCLASSES += "${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', 'qimage-ubi', '', d)}"
+QIMGCLASSES += "${@bb.utils.contains('MACHINE_FEATURES', 'tele-squashfs-ubi', 'qimage-tele-squashfs-ubi', '', d)}"
 
 # Use the following to extend qimage with custom functions like signing
 QIMGEXTENSION ?= ""
 
 inherit ${QIMGCLASSES} ${QIMGEXTENSION}
-
-# Sanity check to ensure dm-verity related configurations are valid
-python () {
-    if 'dm-verity' not in d.getVar('DISTRO_FEATURES'):
-        return
-    machine_features = set(d.getVar('MACHINE_FEATURES').split(' '))
-    verity_features = machine_features & set(['dm-verity-none', 'dm-verity-bootloader', 'dm-verity-initramfs'])
-    if len(verity_features) == 0:
-        bb.fatal("dm-verity in DISTRO_FEATURES but no MACHINE_FEATURES present. Add dm-verity-bootloader or dm-verity-none to MACHINE_FEATURES")
-    if len(verity_features) > 1:
-        bb.fatal("dm-verity in DISTRO_FEATURES and multiple dm-verity related MACHINE_FEATURES present. Only one may be present")
-}
 
 # The work directory for image recipes is retained as the 'rootfs' directory
 # can be used as sysroot during remote gdb debgging
@@ -31,12 +22,15 @@ IMAGE_FSTYPES_DEBUGFS = "tar.bz2"
 ### Don't append timestamp to image name
 IMAGE_VERSION_SUFFIX = ""
 
+ROOTFS_POSTPROCESS_COMMAND += "gen_buildprop;"
+
 # Default Image names
 BOOTIMAGE_TARGET ?= "boot.img"
+DTBOIMAGE_TARGET ?= "dtbo.img"
 
 #Set appropriate partion:Image map
-NONAB_BOOT_PARTITION_IMAGE_MAP = "boot='${BOOTIMAGE_TARGET}',system='${SYSTEMIMAGE_TARGET}',userdata='${USERDATAIMAGE_TARGET}',persist='${PERSISTIMAGE_TARGET}'"
-AB_BOOT_PARTITION_IMAGE_MAP = "boot_a='${BOOTIMAGE_TARGET}',boot_b='${BOOTIMAGE_TARGET}',system_a='${SYSTEMIMAGE_TARGET}',system_b='${SYSTEMIMAGE_TARGET}',userdata='${USERDATAIMAGE_TARGET}',persist='${PERSISTIMAGE_TARGET}'"
+NONAB_BOOT_PARTITION_IMAGE_MAP = "boot='${BOOTIMAGE_TARGET}',system='${SYSTEMIMAGE_TARGET}',userdata='${USERDATAIMAGE_TARGET}',persist='${PERSISTIMAGE_TARGET}',dtbo='${DTBOIMAGE_TARGET}'"
+AB_BOOT_PARTITION_IMAGE_MAP = "boot_a='${BOOTIMAGE_TARGET}',boot_b='${BOOTIMAGE_TARGET}',system_a='${SYSTEMIMAGE_TARGET}',system_b='${SYSTEMIMAGE_TARGET}',dtbo_a='${DTBOIMAGE_TARGET}',dtbo_b='${DTBOIMAGE_TARGET}',userdata='${USERDATAIMAGE_TARGET}',persist='${PERSISTIMAGE_TARGET}'"
 
 # Conf with partition entries should be provided to generate partitions artifacts
 MACHINE_PARTITION_CONF ??= ""
@@ -62,17 +56,18 @@ IMAGE_LINGUAS = ""
 PACKAGE_EXCLUDE += "readline"
 
 # Use busybox as login manager
-IMAGE_LOGIN_MANAGER = "busybox-static"
+TOYBOX_RAMDISK ?= "False"
+IMAGE_LOGIN_MANAGER = "${@oe.utils.conditional('TOYBOX_RAMDISK', 'True', "", "busybox-static", d)}"
 
 DEPENDS += "\
              ext4-utils-native \
              gen-partitions-tool-native \
-             mkbootimg-native \
              mtd-utils-native \
              openssl-native \
              pkgconfig-native \
              ptool-native \
              qdl-native \
+             squashfs-tools-native \
 "
 
 MACHINE_PARTITION_CONF_SEARCH_PATH ?= "${@':'.join('%s/conf/machine/partition' % p for p in '${BBPATH}'.split(':'))}}"
@@ -118,11 +113,6 @@ do_deploy_fixup () {
     install -m 0644 ${DEPLOY_DIR_IMAGE}/vmlinux .
     install -m 0644 ${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE} .
 
-    # copy dtbo.img
-    if [ -f ${DEPLOY_DIR_IMAGE}/dtbo.img ]; then
-       install -m 0644 ${DEPLOY_DIR_IMAGE}/dtbo.img .
-    fi
-
     # Copy nHLOS bins
     if [ -f ${DEPLOY_DIR_IMAGE}/NHLOS_IMAGES.tar ]; then
        tar -xvf ${DEPLOY_DIR_IMAGE}/NHLOS_IMAGES.tar -C .
@@ -155,6 +145,8 @@ python(){
                 deps += " %s:%s" % (dep, task)
             elif 'lk' in dep:
                 deps += " %s:%s" % (dep, task)
+            elif 'linux-host' in dep:
+                deps += " %s:%s" % (dep, task)
         return deps
 
     d.appendVarFlag('do_rootfs', 'depends', extraimage_getdepends('do_populate_sysroot'))
@@ -184,52 +176,9 @@ python rootfs_ignore_packages() {
     d.setVar("PACKAGE_INSTALL_ATTEMPTONLY", ' '.join(atmt_only_pkgs))
 }
 
-################################################
-############# Generate boot.img ################
-################################################
-BOOTIMGDEPLOYDIR = "${WORKDIR}/deploy-${PN}-bootimage-complete"
-
-python do_make_bootimg () {
-    import subprocess
-
-    xtra_parms=""
-    if bb.utils.contains('DISTRO_FEATURES', 'nand-boot', True, False, d):
-        xtra_parms = " --tags-addr" + " " + d.getVar('KERNEL_TAGS_OFFSET')
-
-    mkboot_bin_path = d.getVar('STAGING_BINDIR_NATIVE', True) + '/mkbootimg'
-    zimg_path       = d.getVar('DEPLOY_DIR_IMAGE', True) + "/" + d.getVar('KERNEL_IMAGETYPE', True)
-    cmdline         = "\"" + d.getVar('KERNEL_CMD_PARAMS', True) + "\""
-    pagesize        = d.getVar('PAGE_SIZE', True)
-    base            = d.getVar('KERNEL_BASE', True)
-
-    # When verity is enabled add '.noverity' suffix to default boot img.
-    output          = d.getVar('BOOTIMAGE_TARGET', True)
-    if bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains('MACHINE_FEATURES', 'dm-verity-bootloader', True, False, d), False, d):
-            output += ".noverity"
-
-    # cmd to make boot.img
-    cmd =  mkboot_bin_path + " --kernel %s --cmdline %s --pagesize %s --base %s %s --ramdisk /dev/null --ramdisk_offset 0x0 --output %s" \
-           % (zimg_path, cmdline, pagesize, base, xtra_parms, output )
-
-    bb.debug(1, "do_make_bootimg cmd: %s" % (cmd))
-
-    ret = subprocess.call(cmd, shell=True)
-    if ret != 0:
-        bb.error("Running: %s failed." % cmd)
-
+gen_buildprop() {
+   mkdir -p ${IMAGE_ROOTFS}/cache
+   echo ro.build.version.release=`cat ${IMAGE_ROOTFS}/etc/version ` >> ${IMAGE_ROOTFS}/build.prop
+   echo ro.product.name=${BASEMACHINE}-${DISTRO} >> ${IMAGE_ROOTFS}/build.prop
+   echo ${MACHINE} >> ${IMAGE_ROOTFS}/target
 }
-do_make_bootimg[dirs]      = "${BOOTIMGDEPLOYDIR}/${IMAGE_BASENAME}"
-# Make sure native tools and vmlinux ready to create boot.img
-do_make_bootimg[depends] += "virtual/kernel:do_deploy mkbootimg-native:do_populate_sysroot"
-SSTATETASKS += "do_make_bootimg"
-SSTATE_SKIP_CREATION_task-make-bootimg = '1'
-do_make_bootimg[sstate-inputdirs] = "${BOOTIMGDEPLOYDIR}"
-do_make_bootimg[sstate-outputdirs] = "${DEPLOY_DIR_IMAGE}"
-do_make_bootimg[stamp-extra-info] = "${MACHINE_ARCH}"
-
-python do_make_bootimg_setscene () {
-    sstate_setscene(d)
-}
-addtask do_make_bootimg_setscene
-
-addtask do_make_bootimg before do_image_complete

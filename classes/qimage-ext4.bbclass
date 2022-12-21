@@ -1,3 +1,10 @@
+# Convert human readable partition sizes into bytes
+CACHE_IMAGE_ROOTFS_SIZE    = "${@get_size_in_bytes(d.getVar('CACHE_SIZE_EXT4') or '8000KiB')}"
+SYSTEM_IMAGE_ROOTFS_SIZE   = "${@get_size_in_bytes(d.getVar('SYSTEM_SIZE_EXT4') or '256MB')}"
+SYSTEMRW_IMAGE_ROOTFS_SIZE = "${@get_size_in_bytes(d.getVar('SYSTEMRW_SIZE_EXT4') or '8000KiB')}"
+PERSIST_IMAGE_ROOTFS_SIZE  = "${@get_size_in_bytes(d.getVar('PERSIST_SIZE_EXT4') or '6MiB')}"
+USERDATA_IMAGE_ROOTFS_SIZE = "${@get_size_in_bytes(d.getVar('USERDATA_SIZE_EXT4') or '1GB')}"
+
 # if A/B support is supported, generate OTA pkg by default.
 GENERATE_AB_OTA_PACKAGE ?= "${@bb.utils.contains('COMBINED_FEATURES', 'qti-ab-boot', '1', '', d)}"
 
@@ -29,16 +36,8 @@ SELINUX_FILE_CONTEXTS ?= ""
 SELINUX_IMG_S = "${@['-S ${SELINUX_FILE_CONTEXTS}', ''][d.getVar('SELINUX_FILE_CONTEXTS') == '']}"
 IMAGE_EXT4_SELINUX_OPTIONS = "${@bb.utils.contains('DISTRO_FEATURES', 'selinux', '${SELINUX_IMG_S}', '', d)}"
 
-ROOTFS_POSTPROCESS_COMMAND += "gen_buildprop;do_fsconfig;"
+ROOTFS_POSTPROCESS_COMMAND += "do_fsconfig;"
 ROOTFS_POSTPROCESS_COMMAND += "${@bb.utils.contains('MACHINE_MNT_POINTS', 'overlay', 'gen_overlayfs;', '', d)}"
-USERDATA_DIR = "${@bb.utils.contains('MACHINE_MNT_POINTS', 'overlay', 'overlay', 'data', d)}"
-
-gen_buildprop() {
-   mkdir -p ${IMAGE_ROOTFS}/cache
-   echo ro.build.version.release=`cat ${IMAGE_ROOTFS}/etc/version ` >> ${IMAGE_ROOTFS}/build.prop
-   echo ro.product.name=${BASEMACHINE}-${DISTRO} >> ${IMAGE_ROOTFS}/build.prop
-   echo ${MACHINE} >> ${IMAGE_ROOTFS}/target
-}
 
 gen_overlayfs() {
     mkdir -p ${IMAGE_ROOTFS}/overlay
@@ -94,6 +93,14 @@ create_symlink_systemd_ext4_mount_rootfs() {
             fi
         fi
     done
+   # Remove generator binaries and ensure that we don't rely on generators for mount or service files.
+   rm -rf ${IMAGE_ROOTFS_EXT4}/lib/systemd/system-generators/systemd-debug-generator
+   rm -rf ${IMAGE_ROOTFS_EXT4}/lib/systemd/system-generators/systemd-fstab-generator
+   rm -rf ${IMAGE_ROOTFS_EXT4}/lib/systemd/system-generators/systemd-gpt-auto-generator
+   rm -rf ${IMAGE_ROOTFS_EXT4}/lib/systemd/system-generators/systemd-hibernate-resume-generator
+   rm -rf ${IMAGE_ROOTFS_EXT4}/lib/systemd/system-generators/systemd-rc-local-generator
+   rm -rf ${IMAGE_ROOTFS_EXT4}/lib/systemd/system-generators/systemd-system-update-generator
+   rm -rf ${IMAGE_ROOTFS_EXT4}/lib/systemd/system-generators/systemd-sysv-generator
 }
 
 create_rootfs_ext4[cleandirs] = "${IMAGE_ROOTFS_EXT4}"
@@ -127,13 +134,14 @@ do_makesystem() {
         make_ext4fs -C ${WORKDIR}/rootfs-fsconfig.conf \
                 -B ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMIMAGE_MAP_TARGET} \
                 -a / -b 4096 ${SPARSE_SYSTEMIMAGE_FLAG} \
-                -l ${SYSTEM_SIZE_EXT4} \
+                -l ${SYSTEM_IMAGE_ROOTFS_SIZE} \
                 ${IMAGE_EXT4_SELINUX_OPTIONS} \
                 ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMIMAGE_TARGET} ${IMAGE_ROOTFS_EXT4}
 
+        invalid_image=0
         simg2img ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMIMAGE_TARGET} /dev/null || invalid_image=1
 
-        if [ ${invalid_image:-0} -eq 1 ]; then
+        if [ ${invalid_image} -eq 1 ]; then
             echo "Unsparse image failed.. Recreating image"
             continue
         else
@@ -145,7 +153,10 @@ do_makesystem() {
 }
 addtask do_makesystem after do_image before do_image_complete
 
+################################################
 ### Generate userdata.img ###
+################################################
+USERDATA_DIR ??= "${@bb.utils.contains('MACHINE_MNT_POINTS', 'overlay', 'overlay', 'data', d)}"
 do_makeuserdata[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
 
 do_makeuserdata() {
@@ -153,7 +164,7 @@ do_makeuserdata() {
     make_ext4fs -C ${WORKDIR}/rootfs-fsconfig.conf \
                 -B ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${USERDATAIMAGE_MAP_TARGET} \
                 -a /data ${IMAGE_EXT4_SELINUX_OPTIONS} \
-                ${SPARSE_SYSTEMIMAGE_FLAG} -b 4096 -l ${USERDATA_SIZE_EXT4} \
+                ${SPARSE_SYSTEMIMAGE_FLAG} -b 4096 -l ${USERDATA_IMAGE_ROOTFS_SIZE} \
                 ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${USERDATAIMAGE_TARGET} \
                 ${IMAGE_ROOTFS}/${USERDATA_DIR}
 }
@@ -163,7 +174,6 @@ addtask do_makeuserdata after do_image before do_build
 ################################################
 ############ Generate persist image ############
 ################################################
-PERSIST_IMAGE_ROOTFS_SIZE ?= "6536668"
 do_makepersist[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
 
 do_makepersist() {
@@ -172,15 +182,16 @@ do_makepersist() {
                 -s -l ${PERSIST_IMAGE_ROOTFS_SIZE} \
                 ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${PERSISTIMAGE_TARGET} \
                 ${IMAGE_ROOTFS}/persist
-
 }
 # It must be before do_makesystem to remove /persist
 addtask do_makepersist after do_image before do_makesystem
 
+CACHE_IMG_ENABLE = "${@bb.utils.contains('MACHINE_MNT_POINTS', '/cache', 'true', 'false', d)}"
+SYSTEMRW_IMG_ENABLE = "${@bb.utils.contains('MACHINE_MNT_POINTS', '/systemrw', 'true', 'false', d)}"
+
 ################################################
 ############ Generate cache image ############
 ################################################
-CACHE_IMAGE_ROOTFS_SIZE ?= "8388608"
 do_makecache[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
 
 do_makecache() {
@@ -188,12 +199,9 @@ do_makecache() {
                 ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${CACHEIMAGE_TARGET}
 }
 
-addtask do_makecache after do_image before do_makesystem
-
 ################################################
 ############ Generate systemrw image ############
 ################################################
-SYSTEMRW_IMAGE_ROOTFS_SIZE ?= "8388608"
 do_makesystemrw[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
 
 do_makesystemrw() {
@@ -202,4 +210,34 @@ do_makesystemrw() {
                  ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMRWIMAGE_TARGET}
 }
 
-addtask do_makesystemrw after do_image before do_makesystem
+python() {
+    systemrw_img = d.getVar("SYSTEMRW_IMG_ENABLE")
+    cache_img = d.getVar("CACHE_IMG_ENABLE")
+    if systemrw_img == "true":
+       bb.build.addtask('do_makesystemrw', 'do_makesystem', 'do_image', d)
+    if cache_img == "true":
+       bb.build.addtask('do_makecache', 'do_makesystem', 'do_image', d)
+}
+
+#############################################################
+############ Generate Unsparsed images if needed ############
+#############################################################
+UNSPARSE_IMAGE_SUPPORT_FLAG = "${@bb.utils.contains('IMAGE_FEATURES', 'csm', 'true', 'flase', d)}"
+do_unsparse_images[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
+
+do_unsparse_images() {
+    simg2img ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMIMAGE_TARGET} ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMIMAGE_TARGET}.raw
+    simg2img ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${USERDATAIMAGE_TARGET} ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${USERDATAIMAGE_TARGET}.raw
+    simg2img ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${PERSISTIMAGE_TARGET} ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${PERSISTIMAGE_TARGET}.raw
+    if [ ${CACHE_IMG_ENABLE} == "true" ]; then
+        simg2img ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${CACHEIMAGE_TARGET} ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${CACHEIMAGE_TARGET}.raw
+    fi
+    if [ ${SYSTEMRW_IMG_ENABLE} == "true" ]; then
+        simg2img ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMRWIMAGE_TARGET} ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMRWIMAGE_TARGET}.raw
+    fi
+}
+
+python() {
+    if (d.getVar("UNSPARSE_IMAGE_SUPPORT_FLAG") == "true"):
+       bb.build.addtask('do_unsparse_images', 'do_image_complete', 'do_makesystem', d)
+}

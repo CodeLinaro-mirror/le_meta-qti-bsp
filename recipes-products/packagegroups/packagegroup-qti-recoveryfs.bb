@@ -6,6 +6,8 @@ inherit packagegroup
 
 PROVIDES = "${PACKAGES}"
 
+USB_AUTOSUSPEND_SUPPORT = "${@d.getVar('MACHINE_SUPPORTS_USB_AUTOSUSPEND') or "True"}"
+
 PACKAGES = ' \
     packagegroup-qti-recoveryfs \
     '
@@ -18,7 +20,8 @@ RDEPENDS_packagegroup-qti-recoveryfs = " \
             mtd-utils-ubifs \
             logd \
             recovery \
-            usb-composition \
+            usb-composition-recovery \
+            ${@oe.utils.conditional('USB_AUTOSUSPEND_SUPPORT', 'True', 'usb-composition-recovery-usbd', '', d)} \
             ${@bb.utils.contains('MACHINE_FEATURES', 'qti-sdx', 'systemd-machine-units-recovery', '', d)} \
             ${@bb.utils.contains('DISTRO_FEATURES', 'ota-package-verification', 'openssl', '', d)} \
             ${@bb.utils.contains('DISTRO_FEATURES', 'ota-package-verification', 'openssl-bin', '', d)} \

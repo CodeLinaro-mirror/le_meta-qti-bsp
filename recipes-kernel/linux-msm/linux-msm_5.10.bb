@@ -16,7 +16,7 @@ SRC_URI_append_cinder  +=  "${@oe.utils.conditional('KERNEL_USE_PREBUILTS', 'Tru
 S = "${WORKDIR}/kernel-5.10/kernel_platform/msm-kernel"
 PR = "r0"
 
-DEPENDS += "kernel-toolchain-native dtc-android-build-native rsync-native"
+DEPENDS += "virtual/kernel-toolchain-native virtual/dtc-native rsync-native"
 
 LDFLAGS_aarch64 = "-O1 --hash-style=gnu --as-needed"
 TARGET_CXXFLAGS += "-Wno-format"
@@ -33,7 +33,7 @@ get_cc_option () {
 :
 }
 
-DEPENDS += " mkbootimg-native openssl-native mod-signing-keys"
+DEPENDS += "openssl-native mod-signing-keys"
 RDEPENDS_${KERNEL_PACKAGE_NAME}-base = ""
 
 LDFLAGS_aarch64 = "-O1 --hash-style=gnu --as-needed"
@@ -88,14 +88,14 @@ do_configure_prepend() {
 }
 
 do_prebuilt_configure() {
-    cd ${KERNEL_PREBUILT_PATH}
+    cd ${KERNEL_PREBUILT_DISTDIR}
 
     install -d ${B}/include/config
     install -d ${B}/include/generated
     install -d ${B}/scripts
     # Some of the artifacts needed for module compilation are present under
     # msm-kernel path, for now copy them for this path to avoid build failures.
-    # Ask prebuilt providers to make these available in KERNEL_PREBUILT_PATH.
+    # Ask prebuilt providers to make these available in KERNEL_PREBUILT_DISTDIR.
     install -m 0644 ../msm-kernel/.config ${B}
     install -m 0644 ../msm-kernel/Module.symvers ${B}
     install -m 0644 ../msm-kernel/include/config/kernel.release ${B}/include/config/kernel.release
@@ -108,6 +108,13 @@ do_prebuilt_configure() {
     done
     install -m 0644 vmlinux ${B}
     install -m 0644 System.map ${B}
+
+    for dtbf in ${KERNEL_DTB_NAMES}; do
+        install -m 0644 $dtbf ${B}
+    done
+    for dtbof in $(find . -name "*.dtbo") ; do
+        install -m 0644 $dtbof ${B}
+    done
 }
 
 do_prebuilt_shared_workdir[cleandirs] += " ${STAGING_KERNEL_BUILDDIR}"
@@ -189,7 +196,7 @@ KERNEL_EXTRA_ARGS += "DTC_EXT=${STAGING_DIR_NATIVE}/usr/bin/dtc/bin/dtc"
 
 do_compile_append() {
     for dtbf in ${KERNEL_DTB_NAMES}; do
-        dtbs="$dtbs arch/${ARCH}/boot/dts/$dtbf"
+        dtbs="$dtbs arch/${ARCH}/boot/dts/vendor/qcom/$dtbf"
     done
     cp arch/${ARCH}/boot/${KERNEL_IMAGETYPE} arch/${ARCH}/boot/${KERNEL_IMAGETYPE}.backup
     cat arch/${ARCH}/boot/${KERNEL_IMAGETYPE}.backup $dtbs > arch/${ARCH}/boot/${KERNEL_IMAGETYPE}
@@ -236,14 +243,13 @@ do_deploy() {
     install -m 0644 vmlinux ${DEPLOYDIR}
     install -m 0644 System.map ${DEPLOYDIR}
 
-    # copy dtbo files into deplydir and create dtbo.img if DTBO support enable
-    if [  "${DTBO_MACHINE}" == "True" ]; then
-        install -m 0644 ${DTBO_SRC_PATH}/*.dtbo ${DEPLOYDIR}
-        mkdtimg create ${DEPLOYDIR}/dtbo.img \
-             --page_size=${PAGE_SIZE} \
-             ${DEPLOYDIR}/*.dtbo
-
-    fi
+    for dtbf in ${KERNEL_DTB_NAMES}; do
+        install -m 0644 $dtbf ${DEPLOYDIR}
+    done
+    install -d ${DEPLOYDIR}/DTOverlays
+    for dtbof in $(find . -name "*.dtbo") ; do
+        install -m 0644 $dtbof ${DEPLOYDIR}/DTOverlays
+    done
 }
 
 # Put the zImage in the kernel-dev pkg

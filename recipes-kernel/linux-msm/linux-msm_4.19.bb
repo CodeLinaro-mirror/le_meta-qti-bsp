@@ -11,12 +11,13 @@ SRC_URI_append_kona += " file://android_binderfs.cfg"
 # Robotics specific
 SRC_URI_append_qrb5165 += " file://fbcon.cfg"
 SRC_URI_append_qrb5165 += " file://qca6390.cfg"
+SRC_URI_append_qrb5165 += " file://qcs7230.cfg"
 SRC_URI_append_qrb5165 += "${@bb.utils.contains('DISTRO_FEATURES', 'virtualization', 'file://virtualization_robomaker.cfg', '', d)}"
 
 #XR specific
 SRC_URI_append_sxr2130 += " file://qca6490.cfg"
 
-DEPENDS += "dtc-native"
+DEPENDS += "virtual/dtc-native"
 
 EXTRA_OEMAKE += "INSTALL_MOD_STRIP=1"
 

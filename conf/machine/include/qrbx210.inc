@@ -27,5 +27,11 @@ IMAGE_FSTYPES += "ext4"
 # Size for smallest contiguous block of physical memory
 PAGE_SIZE ?= '4096'
 
+# On msm-5.4 or above ufs driver supports BSG Device.
+UFS_BSG_DEV_USAGE = "True"
+
+# On msm-5.4 abl supports DMMOD.
+DM_MOD_FOR_KERNEL = "1"
+
 #Disable some default features supported from upstream
 MACHINE_FEATURES_BACKFILL_CONSIDERED += "qemu-usermode rtc"
