@@ -12,15 +12,15 @@ diff --git a/builds/unix/unix-cc.in b/builds/unix/unix-cc.in
 index 5675866..4e2d258 100644
 --- a/builds/unix/unix-cc.in
 +++ b/builds/unix/unix-cc.in
-@@ -88,7 +88,7 @@ ANSIFLAGS := @XX_ANSIFLAGS@
- # C compiler to use -- we use libtool!
+@@ -95,7 +95,7 @@
+ # libtool call is always prepended.
  #
- CCraw := $(CC)
--CC    := $(LIBTOOL) --mode=compile $(CCraw)
-+CC    := $(LIBTOOL) --tag=CC --mode=compile $(CCraw)
+ CCraw       := $(CC)
+-override CC := $(LIBTOOL) --mode=compile $(CCraw)
++override CC := $(LIBTOOL) --tag=CC --mode=compile $(CCraw)
 
  # Resource compiler to use on Cygwin/MinGW, usually windres.
  #
 --
-1.9.1
+2.11.1
 
