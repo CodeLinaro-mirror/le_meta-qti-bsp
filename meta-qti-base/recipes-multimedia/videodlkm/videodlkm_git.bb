@@ -20,3 +20,4 @@ TECHPACK_MODULES:lemans = "msm_video.ko"
 TECHPACK_HEADERS = "1"
 
 FILES:${PN} += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', '${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/*', d)}"
+ALLOW_EMPTY:${PN} = "1"
