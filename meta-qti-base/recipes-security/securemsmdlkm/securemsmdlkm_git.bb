@@ -20,6 +20,8 @@ do_install:append() {
     install -m 0755 ${WORKDIR}/security_load.conf -D ${D}${sysconfdir}/modules-load.d/security_load.conf
     install -d ${D}${includedir}/linux
     install -m 0644 ${WORKDIR}/vendor/qcom/opensource/securemsm-kernel/linux/smcinvoke.h ${D}${includedir}/linux
+    install -m 0644 ${WORKDIR}/vendor/qcom/opensource/securemsm-kernel/linux/qcedev.h ${D}${includedir}/linux
+    install -m 0644 ${WORKDIR}/vendor/qcom/opensource/securemsm-kernel/linux/fips_status.h ${D}${includedir}/linux
 }
 
 FILES:${PN} += "${sysconfdir}/*"
