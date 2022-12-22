@@ -1,6 +1,7 @@
 SUMMARY = "CLO Linux Kernel Headers"
 DESCRIPTION = "Installs MSM kernel headers required to build userspace. \
 These headers are installed in ${includedir}/linux-msm path."
+HOMEPAGE = "https://git.codelinaro.org"
 LICENSE = "GPLv2.0-with-linux-syscall-note"
 LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 
@@ -33,8 +34,7 @@ do_install () {
     install -d $kerneldir
 
     if [ -d $headerdir/${includedir} ]; then
-        mkdir -p $kerneldir
-        cp -fR $headerdir/${includedir}/* $kerneldir
+        install -m 0664 $headerdir/${includedir}/* $kerneldir
     fi
 }
 
