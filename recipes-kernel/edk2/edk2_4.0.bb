@@ -5,13 +5,13 @@ LIC_FILES_CHKSUM = " \
     file://${COMMON_LICENSE_DIR}/BSD-2-Clause-Patent;md5=0518d409dae93098cca8dfa932f3ab1b \
 "
 
-FILESEXTRAPATHS:prepend := "${KERNEL_PREBUILT_DISTDIR}/:"
+INHIBIT_DEFAULT_DEPS = "1"
+FILESEXTRAPATHS:prepend := "${KERNEL_PREBUILT_PATH}/abl-userdebug:"
 
-SRC_URI = "file://abl.elf"
+SRC_URI = "file://unsigned_abl.elf"
 
 do_install[noexec]="1"
 do_configure[noexec]="1"
-do_compile[noexec]="1"
 
 do_deploy() {
     install -m 644 ${WORKDIR}/abl.elf ${DEPLOYDIR}
