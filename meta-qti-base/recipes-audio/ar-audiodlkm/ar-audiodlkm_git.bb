@@ -17,6 +17,7 @@ S = "${WORKDIR}/vendor/qcom/opensource/audio-kernel-ar"
 inherit ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', "qti-techpack", "module module-sign qperf qti-kernel-arch-clang", d)}
 
 EXTRA_OEMAKE:lemans += "TARGET_SUPPORT=lemans"
+EXTRA_OEMAKE:quin-gvm-gen4-2 += "TARGET_SUPPORT=quin-gvm-gen4-2"
 
 MODULES = "\
         dsp/spf_core_dlkm.ko  \
