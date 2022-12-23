@@ -15,6 +15,7 @@ RDEPENDS:${PN} += "\
     hostap-daemon-qcacld \
     wireless-tools \
     iw \
+    ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', 'wlan-platform-dlkm', '', d)} \
     qcacld32-ll-genoa \
     qcacld32-ll-hasting-cnss0 \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-dual-wlan', 'qcacld32-ll-hasting-cnss2', '', d)} \
