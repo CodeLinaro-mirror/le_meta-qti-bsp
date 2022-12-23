@@ -34,7 +34,7 @@ do_install () {
     install -d $kerneldir
 
     if [ -d $headerdir/${includedir} ]; then
-        install -m 0664 $headerdir/${includedir}/* $kerneldir
+        install -m 0664 $headerdir${includedir}/* $kerneldir
     fi
 }
 
