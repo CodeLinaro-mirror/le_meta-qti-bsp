@@ -29,6 +29,7 @@
 echo systemdsb > /dev/kmsg
 
 dd if=/lib/systemd/libsystemd-shared-244.so of=/dev/null
+dd if=/etc/systemd/system.conf of=/dev/null
 dd if=/lib/systemd/system/systemd-journald-audit.socket of=/dev/null
 dd if=/lib/systemd/system/systemd-initctl.socket of=/dev/null
 dd if=/lib/systemd/system/sshd.socket of=/dev/null
@@ -48,7 +49,7 @@ dd if=/usr/lib/libwayland-client.so.0.3.0 of=/dev/null
 dd if=/usr/lib/libwayland-client.so.0 of=/dev/null
 dd if=/usr/lib/libhardware.so.0.0.0 of=/dev/null
 dd if=/usr/lib/libhardware.so.0 of=/dev/null
-dd if=/usr/lib/libjpeg.so.8.0.2 of=/dev/null
-dd if=/usr/lib/libjpeg.so.8 of=/dev/null
+dd if=/usr/lib/libjpeg.so.62.3.0 of=/dev/null
+dd if=/usr/lib/libjpeg.so.62 of=/dev/null
 
 echo systemdeb > /dev/kmsg

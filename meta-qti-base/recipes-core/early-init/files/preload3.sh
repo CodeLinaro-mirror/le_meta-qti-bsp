@@ -34,6 +34,16 @@ ls -l /etc/rc1.d
 dd if=/lib/systemd/system/logrotate.service of=/dev/null
 dd if=/lib/systemd/system/kmod-static-nodes.service of=/dev/null
 dd if=/lib/systemd/system/init_early_boot.service of=/dev/null
+dd if=/etc/selinux/mcs/policy/policy.31 of=/dev/null
+dd if=/etc/selinux/mcs/contexts/files/file_contexts.subs_dist of=/dev/null
+dd if=/etc/selinux/mcs/contexts/files/file_contexts.bin of=/dev/null
+dd if=/etc/selinux/mcs/contexts/files/file_contexts.homedirs.bin of=/dev/null
+dd if=/lib/systemd/system/rngd.service of=/dev/null
+dd if=/lib/systemd/system/msm-bus.service of=/dev/null
+ls -l /etc/systemd/system/basic.target.wants
+ls -l /lib/systemd/system/multi-user.target.wants
+ls -l /lib/systemd/system/runlevel1.target.wants
+ls -l /etc/systemd/system/network-online.target.wants
 
 echo systemdm2 > /dev/kmsg
 
@@ -46,7 +56,25 @@ dd if=/usr/lib/libqseed3.so of=/dev/null
 dd if=/usr/lib/libfribidi.so.0.4.0 of=/dev/null
 dd if=/usr/lib/libfribidi.so.0 of=/dev/null
 dd if=/lib/libz.so.1.2.11 of=/dev/null
+dd if=/usr/lib/libsync.so.0.0.0 of=/dev/null
+dd if=/usr/lib/libgthread-2.0.so.0.6200.6 of=/dev/null
 dd if=/usr/share/fontconfig/conf.avail/60-latin.conf of=/dev/null
 ls -l /data/misc
+dd if=/usr/share/fonts/.uuid of=/dev/null
+dd if=/usr/share/fonts/wqy-microhei.ttc of=/dev/null
+dd if=/usr/share/fonts/ttf/.uuid of=/dev/null
+dd if=/usr/share/fonts/ttf/LiberationMono-Bold.ttf of=/dev/null
+dd if=/usr/share/fonts/ttf/LiberationMono-BoldItalic.ttf of=/dev/null
+dd if=/usr/share/fonts/ttf/LiberationMono-Italic.ttf of=/dev/null
+dd if=/usr/share/fonts/ttf/LiberationMono-Regular.ttf of=/dev/null
+dd if=/usr/share/fonts/ttf/LiberationSans-Bold.ttf of=/dev/null
+dd if=/usr/share/fonts/ttf/LiberationSans-BoldItalic.ttf of=/dev/null
+dd if=/usr/share/fonts/ttf/LiberationSans-Italic.ttf of=/dev/null
+dd if=/usr/share/fonts/ttf/LiberationSans-Regular.ttf of=/dev/null
+dd if=/usr/share/fonts/ttf/LiberationSerif-Bold.ttf of=/dev/null
+dd if=/usr/share/fonts/ttf/LiberationSerif-BoldItalic.ttf of=/dev/null
+dd if=/usr/share/fonts/ttf/LiberationSerif-Italic.ttf of=/dev/null
+dd if=/usr/share/fonts/ttf/LiberationSerif-Regular.ttf of=/dev/null
+dd if=/usr/share/weston/pattern.png of=/run/p.bin
 
 echo systemde2 > /dev/kmsg

@@ -28,6 +28,8 @@
 
 echo systemds9 > /dev/kmsg
 
+dd if=/lib/libcap.so.2.32 of=/dev/null
+dd if=/lib/libcap.so.2 of=/dev/null
 dd if=/lib/systemd/system/systemd-fsck-root.service of=/dev/null
 dd if=/lib/systemd/system/systemd-remount-fs.service of=/dev/null
 dd if=/lib/systemd/system/initrd-parse-etc.service of=/dev/null
@@ -38,6 +40,10 @@ dd if=/lib/systemd/system/getty.target of=/dev/null
 dd if=/lib/systemd/system/serial-getty@.service of=/dev/null
 ls -l /lib/systemd/system/sockets.target.wants
 ls -l /etc/systemd/system/sockets.target.wants
+ls -l /lib/systemd/system.conf.d
+ls -l /lib/systemd/system/local-fs.target.wants
+ls -l /lib/systemd/system/runlevel5.target.wants
+ls -l /lib/systemd/system/rescue.target.wants
 
 echo systemdm9 > /dev/kmsg
 

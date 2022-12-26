@@ -40,6 +40,11 @@ dd if=/lib/systemd/system/iptables.service of=/dev/null
 dd if=/lib/systemd/system/network-pre.target of=/dev/null
 dd if=/lib/systemd/system/slices.target of=/dev/null
 ls -l /lib/systemd/system/sysinit.target.wants
+dd if=/lib/systemd/systemd-journald of=/dev/null
+ls -l /etc/systemd/system/local-fs.target.wants
+ls -l /lib/systemd/system/runlevel2.target.wants
+ls -l /lib/systemd/system/graphical.target.wants
+dd if=/build.prop of=/dev/null
 
 echo systemdm8 > /dev/kmsg
 

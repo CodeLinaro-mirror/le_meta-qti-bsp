@@ -42,12 +42,6 @@ dd if=/lib/systemd/system/systemd-networkd.service of=/dev/null
 dd if=/lib/systemd/system/systemd-logind.service of=/dev/null
 dd if=/lib/systemd/system/systemd-ask-password-wall.service of=/dev/null
 dd if=/lib/systemd/system/systemd-networkd-wait-online.service of=/dev/null
-dd if=/lib/systemd/systemd-journald of=/dev/null
-dd if=/etc/init.d/emac_dwc_eqos_start_stop_le of=/dev/null
-ls -l /etc/systemd/system/local-fs.target.wants
-ls -l /lib/systemd/system/runlevel2.target.wants
-ls -l /lib/systemd/system/graphical.target.wants
-dd if=/build.prop of=/dev/null
 
 echo systemdmc > /dev/kmsg
 
