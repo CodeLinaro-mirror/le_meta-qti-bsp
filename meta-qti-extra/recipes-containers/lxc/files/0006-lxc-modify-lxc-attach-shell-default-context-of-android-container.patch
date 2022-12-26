@@ -1,0 +1,43 @@
+From 5559d098efa16c56deb8576979ca03362d5af3cd Mon Sep 17 00:00:00 2001
+From: naiwyu <quic_naiwyu@quicinc.com>
+Date: Tue, 20 Dec 2022 14:14:03 +0800
+Subject: [PATCH] lxc: modify lxc-attach shell default context of android container
+
+lxc-attach process have same selinux context as container init process, that will cause
+android attach shell context trans to u:r:toolbox:s0 by sepolicy transition rule.
+So need to change the attach shell default context to u:r:su:s0 for android container.
+
+Signed-off-by: naiwyu <quic_naiwyu@quicinc.com>
+---
+ src/lxc/attach.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/src/lxc/attach.c b/src/lxc/attach.c
+index bbf95bd5b..177af7766 100644
+--- a/src/lxc/attach.c
++++ b/src/lxc/attach.c
+@@ -787,11 +787,20 @@ static int attach_child_main(struct attach_clone_payload *payload)
+ 
+ 	if (needs_lsm) {
+ 		bool on_exec;
++		char* container_name = payload->init_ctx->container->name;
+ 
+ 		/* Change into our new LSM profile. */
+ 		on_exec = options->attach_flags & LXC_ATTACH_LSM_EXEC ? true : false;
+ 
+-		ret = lsm_process_label_set_at(lsm_fd, init_ctx->lsm_label, on_exec);
++		/* Change attach shell context of android container,
++		 * otherwise init_ctx->lsm_label(u:r:init:s0) would trans
++		 * to u:r:toolbox:s0 by android sepolicy
++		 */
++		if ((payload->exec_function == lxc_attach_run_shell) && (strstr(container_name, "android")))
++			ret = lsm_process_label_set_at(lsm_fd, "u:r:su:s0", on_exec);
++		else
++			ret = lsm_process_label_set_at(lsm_fd, init_ctx->lsm_label, on_exec);
++		
+ 		close(lsm_fd);
+ 		if (ret < 0)
+ 			goto on_error;
+-- 
+2.25.1
+

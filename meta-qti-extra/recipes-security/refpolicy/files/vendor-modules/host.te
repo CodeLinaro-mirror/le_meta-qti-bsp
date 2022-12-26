@@ -182,7 +182,6 @@ require {
     type system_file;
     type system_server;
     type tmpfs;
-    type toolbox;
     type ueventd;
     type unlabeled;
     type usermodehelper;
@@ -233,6 +232,7 @@ require {
     type vendor_hal_ais_qti;
     type hal_graphics_allocator_default;
     type proc_loadavg;
+    type toolbox_exec;
     class service { status start stop reload enable disable };
     class dbus { acquire_svc send_msg };
     class passwd { passwd chfn chsh rootok crontab };
@@ -349,6 +349,7 @@ allow host_exec_t hal_graphics_allocator_default:fd use;
 allow host_exec_t self:sem { associate create read write destroy unix_read unix_write };
 allow host_exec_t proc_loadavg:file { open read };
 allow host_exec_t proc_tty_drivers:file { open read };
+allow host_exec_t toolbox_exec:file { open read execute };
 allowxperm host_exec_t self:file ioctl { 0x5401 };
 allowxperm host_exec_t self:fifo_file ioctl { 0x5413 };
 allowxperm host_exec_t self:unix_stream_socket ioctl { 0x89a0 0x89a2 0x89a3 0x89f0 0x540f };
@@ -470,29 +471,6 @@ grant_all_permissions(shared_relro,app_data_file)
 
 #============= tmpfs ==============
 grant_all_permissions(tmpfs,labeledfs)
-
-#============= toolbox ==============
-grant_all_permissions(toolbox,adsprpcd_file)
-grant_all_permissions(toolbox,bt_firmware_file)
-grant_all_permissions(toolbox,console_device)
-grant_all_permissions(toolbox,firmware_file)
-grant_all_permissions(toolbox,fuse)
-grant_all_permissions(toolbox,host_file_t)
-grant_all_permissions(toolbox,init)
-grant_all_permissions(toolbox,linkerconfig_file)
-grant_all_permissions(toolbox,metadata_file)
-grant_all_permissions(toolbox,mnt_user_file)
-grant_all_permissions(toolbox,mnt_pass_through_file)
-grant_all_permissions(toolbox,mnt_media_rw_file)
-grant_all_permissions(toolbox,mirror_data_file)
-grant_all_permissions(toolbox,selinuxfs)
-grant_all_permissions(toolbox,toolbox)
-grant_all_permissions(toolbox,unlabeled)
-grant_all_permissions(toolbox,user_profile_data_file)
-grant_all_permissions(toolbox,rootfs)
-grant_all_permissions(toolbox,sysfs)
-grant_all_permissions(toolbox,system_data_root_file)
-grant_all_permissions(toolbox,kernel)
 
 #============= init ==============
 allow init kernel:security { setenforce setcheckreqprot };
