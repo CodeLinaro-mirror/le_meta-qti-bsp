@@ -100,6 +100,7 @@ define build_policy
 $(foreach type, $(1), $(foreach file, $(addsuffix /$(type), $(2)), $(sort $(wildcard $(file)))))
 endef
 
+.PHONY: all
 all: product_sepolicy.cil plat_mapping_file.cil system_ext_mapping_file.cil product_mapping_file.cil vendor_sepolicy.cil
 
 
@@ -167,7 +168,6 @@ product_sepolicy.cil: product_policy.conf plat_sepolicy.cil system_ext_sepolicy.
 	grep -Fxvf system_ext_sepolicy.cil $@.tmp1 > $@.tmp2
 	grep -v ';;' $@.tmp2 > $@.tmp3
 	mv $@.tmp3 $@
-
 
 ###########################################################
 # reqd_policy_mask - a policy.conf file which contains only the bare minimum
@@ -301,3 +301,22 @@ vendor_sepolicy.cil: $(CHECKPOLICY) $(VERSIONPOLICY) vendor_policy.conf pub_poli
 	grep -Fxvf $(PRIVATE_REQD_MASK) $@.tmp1 > $@.raw
 	$(VERSIONPOLICY) -b pub_policy.cil -n $(PRIVATE_VERS) -t $@.raw -o $@.tmp2
 	grep -Fxvf plat_pub_versioned.cil $@.tmp2 > $@
+
+.PHONY: install
+install:
+	install -d ${TARGET_INSTALL_DIR}/android_cils/product
+	install -d ${TARGET_INSTALL_DIR}/android_cils/system
+	install -d ${TARGET_INSTALL_DIR}/android_cils/system_ext
+	install -d ${TARGET_INSTALL_DIR}/android_cils/vendor
+	install -m 0644 ${CIL_OUTPUT_DIR}/product_sepolicy.cil ${TARGET_INSTALL_DIR}/android_cils/product
+	install -m 0644 ${CIL_OUTPUT_DIR}/product_mapping_file.cil ${TARGET_INSTALL_DIR}/android_cils/product/30.0.cil
+	install -m 0644 ${CIL_OUTPUT_DIR}/plat_sepolicy.cil ${TARGET_INSTALL_DIR}/android_cils/system
+	install -m 0644 ${CIL_OUTPUT_DIR}/plat_mapping_file.cil ${TARGET_INSTALL_DIR}/android_cils/system/30.0.cil
+	install -m 0644 ${CIL_OUTPUT_DIR}/system_ext_sepolicy.cil ${TARGET_INSTALL_DIR}/android_cils/system_ext
+	install -m 0644 ${CIL_OUTPUT_DIR}/system_ext_mapping_file.cil ${TARGET_INSTALL_DIR}/android_cils/system_ext/30.0.cil
+	install -m 0644 ${CIL_OUTPUT_DIR}/plat_pub_versioned.cil ${TARGET_INSTALL_DIR}/android_cils/vendor
+	install -m 0644 ${CIL_OUTPUT_DIR}/vendor_sepolicy.cil ${TARGET_INSTALL_DIR}/android_cils/vendor
+
+.PHONY: clean
+clean:
+	rm -rf *.conf *.cil *.tmp*

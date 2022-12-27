@@ -22,8 +22,6 @@ SRCREV_selinux = "8340fdb45281ef1459301d7c535b38f9e9bee598"
 SRCREV_packages-sepolicy = "3726467174eda12b6091277aff58c158d45ecfc2"
 SRCREV_device-sepolicyvndr = "f069bd8a885fa351ff7c1692cd0a47916703db14"
 
-SYSROOT_DIRS_NATIVE += "${target_datadir}"
-
 inherit native
 
 EXTRA_OEMAKE = "'VERSION_POLICY_INCLUDES=-I${B}/sepolicy-cil'\
@@ -35,7 +33,9 @@ EXTRA_OEMAKE = "'VERSION_POLICY_INCLUDES=-I${B}/sepolicy-cil'\
                 'DEVICE_SEPOLICY=${WORKDIR}/device-sepolicy'\
                 'PACKAGES_POLICY=${WORKDIR}/packages-sepolicy'\
                 'DEVICE_SEPOLICYVNDR=${WORKDIR}/device-sepolicyvndr'\
-                'TARGET_BUILD_VARIANT=${@bb.utils.contains_any('VARIANT', 'perf user', 'user', 'userdebug', d)}'"
+                'TARGET_BUILD_VARIANT=${@bb.utils.contains_any('VARIANT', 'perf user', 'user', 'userdebug', d)}'\
+                'CIL_OUTPUT_DIR=${B}/sepolicy-cil' \
+                'TARGET_INSTALL_DIR=${D}${datadir}'"
 
 do_configure() {
     cp -rf ${WORKDIR}/selinux/libsepol --no-preserve=ownership ${B}
@@ -50,6 +50,7 @@ do_compile() {
     oe_runmake -C ${B}/libsepol
     prepare_libsepol
     cd ${B}/sepolicy-cil
+    oe_runmake -f ${B}/sepolicy-cil/Makefile clean
     oe_runmake -f ${B}/sepolicy-cil/Makefile
 }
 
@@ -58,19 +59,10 @@ prepare_libsepol() {
 }
 
 do_install() {
-    install -d ${D}${datadir}/android_cils/product
-    install -d ${D}${datadir}/android_cils/system
-    install -d ${D}${datadir}/android_cils/system_ext
-    install -d ${D}${datadir}/android_cils/vendor
-    install -m 0644 ${B}/sepolicy-cil/product_sepolicy.cil ${D}${datadir}/android_cils/product
-    install -m 0644 ${B}/sepolicy-cil/product_mapping_file.cil ${D}${datadir}/android_cils/product/30.0.cil
-    install -m 0644 ${B}/sepolicy-cil/plat_sepolicy.cil ${D}${datadir}/android_cils/system
-    install -m 0644 ${B}/sepolicy-cil/plat_mapping_file.cil ${D}${datadir}/android_cils/system/30.0.cil
-    install -m 0644 ${B}/sepolicy-cil/system_ext_sepolicy.cil ${D}${datadir}/android_cils/system_ext
-    install -m 0644 ${B}/sepolicy-cil/system_ext_mapping_file.cil ${D}${datadir}/android_cils/system_ext/30.0.cil
-    install -m 0644 ${B}/sepolicy-cil/plat_pub_versioned.cil ${D}${datadir}/android_cils/vendor
-    install -m 0644 ${B}/sepolicy-cil/vendor_sepolicy.cil ${D}${datadir}/android_cils/vendor
+    oe_runmake -f ${B}/sepolicy-cil/Makefile install
 }
+
+do_compile[nostamp] = "1"
 
 B = "${WORKDIR}/build"
 
