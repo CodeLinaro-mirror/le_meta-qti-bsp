@@ -2,7 +2,7 @@ SUMMARY = "CLO Linux Kernel"
 LICENSE = "GPLv2.0-with-linux-syscall-note"
 LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 
-DEPENDS += "elfutils-native kern-tools-native mkbootimg-native mkdtimg-native openssl-native rsync-native signing-keys"
+DEPENDS += "elfutils-native kern-tools-native kernel-toolchain-native mkbootimg-native mkdtimg-native openssl-native rsync-native signing-keys"
 
 COMPATIBLE_MACHINE = "sa81x5|lemans|quin-gvm-gen4-2"
 
@@ -11,21 +11,21 @@ SRC_URI = "${PATH_TO_REPO}/kernel/kernel-${PV}/kernel_platform/msm-kernel/.git;p
 
 SRCREV = "${AUTOREV}"
 
-inherit kernel
+inherit kernel qti-kernel-toolchain
 
 S = "${WORKDIR}/kernel/kernel-${PV}/kernel_platform/msm-kernel"
 
 LDFLAGS:aarch64 = "-O1 --hash-style=gnu --as-needed"
 TARGET_CXXFLAGS += "-Wno-format"
 
-KERNEL_CC="${SRC_DIR_ROOT}/kernel-${PV}/kernel_platform/prebuilts/clang/host/linux-x86/clang-r450784e/bin/clang"
+KERNEL_CC = "${KERNEL_TOOLCHAIN_CLANG}/bin/clang"
+KERNEL_CONFIG_PATH = "${S}/arch/${ARCH}/configs"
 
-KERNEL_USE_PREBUILTS = "True"
 KERNEL_PREBUILT_PATH ?= "${SRC_DIR_ROOT}/kernel/kernel-${PV}/out/msm-kernel-${KERNEL_ARCH}-${KERNEL_VARIANT}defconfig/dist"
 
 #dts path is changed to vendor/qcom
 DTB_SRC_PATH = "${STAGING_KERNEL_BUILDDIR}/arch/${ARCH}/boot/dts/vendor/qcom"
-KERNEL_CONFIG_COMMAND ?= "oe_runmake_call -C ${S} CC="${KERNEL_CC}" LD="${KERNEL_LD}" O=${B} || oe_runmake -C ${S} O=${B} CC="${KERNEL_CC}" LD="${KERNEL_LD}"""
+KERNEL_CONFIG_COMMAND ?= "oe_runmake_call -C ${S} CC="${KERNEL_CC}" LD="${KERNEL_LD}" O=${B} || oe_runmake -C ${S} O=${B} CC="${KERNEL_CC}" LD="${KERNEL_LD}""
 get_cc_option () {
 :
 }
@@ -50,19 +50,16 @@ do_patch_veritycert() {
 do_patch[postfuncs] += "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains('MACHINE_FEATURES', 'dm-verity-bootloader', 'do_patch_veritycert', '', d), '', d)}"
 
 do_configure:prepend() {
-    if [ ! -f "${WORKDIR}/kernel-${PV}/kernel_platform/msm-kernel/arch/${ARCH}/configs/${KERNEL_CONFIG}" ]; then
-        bbfatal "KERNEL_CONFIG '${KERNEL_CONFIG}' was specified, but not present in the source tree"
+    if [ ! -f "${KERNEL_CONFIG_PATH}/vendor/${KERNEL_ARCH}.config" ]; then
+        bbfatal "KERNEL_CONFIG '${KERNEL_ARCH}.config' was specified, but not present in the source tree"
     fi
 
-    base_defconfig=${S}/arch/${ARCH}/configs/generic_auto_defconfig
-    ${S}/scripts/kconfig/merge_config.sh -m -r -y -O ${B} ${S}/arch/${ARCH}/configs/${KERNEL_CONFIG} ${base_defconfig} 1>&2
+    base_defconfig="${KERNEL_CONFIG_PATH}/generic_auto_defconfig"
+    kernel_defconfigs="${KERNEL_CONFIG_PATH}/vendor/${KERNEL_ARCH}.config ${@bb.utils.contains_any('VARIANT', 'debug user', '${KERNEL_CONFIG_PATH}/vendor/${KERNEL_ARCH}_debug.config', '', d)}"
+    ${S}/scripts/kconfig/merge_config.sh -m -r -y -O ${B} ${base_defconfig} ${kernel_defconfigs} 1>&2
 
     echo "# Global settings from linux recipe" >> ${B}/.config
     echo "CONFIG_LOCALVERSION="\"${LINUX_VERSION_EXTENSION}\" >> ${B}/.config
-    echo "CONFIG_MODULE_SIG_KEY="\"${STAGING_DIR_TARGET}/kernel-certs/signing_key.pem\" >> ${B}/.config
-    if ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains('MACHINE_FEATURES', 'dm-verity-initramfs', 'true', 'false', d), 'false', d)}; then
-    echo "CONFIG_SYSTEM_TRUSTED_KEYS="\"${STAGING_DIR_TARGET}/kernel-certs/verity_cert.pem\" >> ${B}/.config
-    fi
 }
 
 do_prebuilt_configure() {
@@ -76,11 +73,19 @@ do_prebuilt_configure() {
     # msm-kernel path, for now copy them for this path to avoid build failures.
     # Ask prebuilt providers to make these available in KERNEL_PREBUILT_PATH.
     install -m 0644 ../msm-kernel/.config ${B}
+    install -m 0644 ../msm-kernel/Makefile ${B}
     install -m 0644 ../msm-kernel/Module.symvers ${B}
+    install -m 0644 ../msm-kernel/include/config/auto.conf ${B}/include/config/auto.conf
     install -m 0644 ../msm-kernel/include/config/kernel.release ${B}/include/config/kernel.release
-    install -m 0644 ../msm-kernel/scripts/module.lds ${B}/scripts/module.lds
     install -m 0644 ../msm-kernel/include/generated/utsrelease.h ${B}/include/generated
     install -m 0644 ../msm-kernel/certs/* ${B}/certs
+    cp -R ../msm-kernel/scripts/ ${B}/
+    cp -R ../msm-kernel/include/generated/ ${B}/include/
+
+    if [ -d ../msm-kernel/arch/${ARCH}/include ]; then
+            mkdir -p ${B}/arch/${ARCH}/include/
+            cp -fR ../msm-kernel/arch/${ARCH}/include/* ${B}/arch/${ARCH}/include/
+    fi
 
     install -d ${B}/arch/${ARCH}/boot/
     cp -R ../msm-kernel/arch/${ARCH}/boot/dts/ ${B}/arch/${ARCH}/boot/
@@ -119,12 +124,17 @@ do_prebuilt_shared_workdir() {
     # Copy files required for module builds
     install -m 0644 System.map $kerneldir/System.map-${KERNEL_VERSION}
     [ -e Module.symvers ] && install -m 0644 Module.symvers $kerneldir/
+    install -m 0644 Makefile $kerneldir/
     install -m 0644 .config $kerneldir/
     mkdir -p $kerneldir/include/config
-    mkdir -p $kerneldir/scripts
+    install -m 0644 include/config/auto.conf $kerneldir/include/config/auto.conf
     install -m 0644 include/config/kernel.release $kerneldir/include/config/kernel.release
-    if [ -e "${B}/scripts/module.lds" ]; then
-        install -m 0644 ${B}/scripts/module.lds ${STAGING_KERNEL_BUILDDIR}/scripts/module.lds
+    cp -R include/generated/ $kerneldir/include/
+    cp -R ${B}/scripts $kerneldir
+
+    if [ -d arch/${ARCH}/include ]; then
+            mkdir -p $kerneldir/arch/${ARCH}/include/
+            cp -fR arch/${ARCH}/include/* $kerneldir/arch/${ARCH}/include/
     fi
 
     install -d $kerneldir/arch/${ARCH}/boot/
@@ -194,6 +204,7 @@ KERNEL_EXTRA_ARGS += "dtbs"
 do_shared_workdir:append () {
         mkdir -p $kerneldir/certs
         cp certs/signing_key.x509 $kerneldir/certs/
+        rsync -av --exclude=*.cmd --exclude=*.o scripts $kerneldir
 
         cp Makefile $kerneldir/
         cp -fR usr $kerneldir/
@@ -205,9 +216,9 @@ do_shared_workdir:append () {
                 cp -fR arch/${ARCH}/include/* $kerneldir/arch/${ARCH}/include/
         fi
 
-        if [ -d arch/${ARCH}/boot ]; then
-                mkdir -p $kerneldir/arch/${ARCH}/boot/
-                cp -fR arch/${ARCH}/boot/* $kerneldir/arch/${ARCH}/boot/
+        if [ -d arch/${ARCH}/boot/dts/vendor ]; then
+                mkdir -p $kerneldir/arch/${ARCH}/boot/dts/vendor
+                cp -fR arch/${ARCH}/boot/dts/vendor/* $kerneldir/arch/${ARCH}/boot/dts/vendor
         fi
 
         # Generate kernel headers
