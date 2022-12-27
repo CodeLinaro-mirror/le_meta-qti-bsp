@@ -13,6 +13,7 @@ DEPENDS += "\
     glib-2.0 \
     gstreamer1.0 \
     gstreamer1.0-plugins-base \
+    linux-msm-headers \
     mm-gfx-auto-prop \
 "
 
@@ -21,6 +22,8 @@ SRCREV = "${AUTOREV}"
 S = "${WORKDIR}/gstreamer/gst-plugins-qti-oss/gst-plugin-qvdeinterlace"
 
 inherit meson pkgconfig
+
+CFLAGS += "-I${STAGING_INCDIR}/linux-msm"
 
 SOLIBS = ".so"
 FILES_SOLIBSDEV = ""
