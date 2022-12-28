@@ -1,7 +1,8 @@
 [Unit]
 Description=Weston reference Wayland compositor
 Conflicts=getty@tty7.service
-After=dbus.service rc.pvr.service
+Requires=dev-dri-card0.device
+After=dbus.service rc.pvr.service dev-dri-card0.device
 
 [Service]
 User=root

@@ -13,8 +13,6 @@ DEPENDS += "\
 
 SRC_URI = "\
     ${PATH_TO_REPO}/external/open-avb/.git;protocol=${PROTO};destsuffix=external/open-avb;usehead=1 \
-    file://gptp-daemon.service \
-    file://gptp-daemon-tmpfilesd.conf \
 "
 SRCREV = "${AUTOREV}"
 
@@ -22,10 +20,7 @@ S = "${WORKDIR}/external/open-avb"
 
 inherit systemd pkgconfig
 
-GPTP_AUTO_START_ENABLE = "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'NO', 'YES', d)}"
 EXTRA_OEMAKE += "${@bb.utils.contains("DISTRO_FEATURES", "systemd", "SYSTEMD_SUPPORT_INCLUDED=1", "SYSTEMD_SUPPORT_INCLUDED=0", d)}"
-EXTRA_OEMAKE += "${@oe.utils.conditional('GPTP_AUTO_START_ENABLE', 'YES', 'GPTP_AUTO_START=1', 'GPTP_AUTO_START=0', d)}"
-SYSTEMD_SERVICE:${PN} = "${@oe.utils.conditional('GPTP_AUTO_START_ENABLE', 'YES', 'gptp-daemon.service', '', d)}"
 SYSTEMD_AUTO_ENABLE:${PN} = "disable"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
@@ -45,11 +40,9 @@ do_compile() {
     echo ${subdir}
 
     mkdir -p ${S}/daemons/maap/build
-    oe_runmake daemons_all
+    oe_runmake mrpd
+    oe_runmake maap
     make avtp_pipeline
-
-    oe_runmake libgptp
-    oe_runmake libgptp_test
 }
 
 do_install() {
@@ -60,30 +53,10 @@ do_install() {
     install -m 0755 ${S}/daemons/maap/linux/maap_daemon ${D}/${bindir}/avb
     install -m 0755 ${S}/daemons/mrpd/mrpd ${D}/${bindir}/avb
     install -m 0755 ${S}/daemons/mrpd/mrpctl ${D}/${bindir}/avb
-    install -m 0755 ${S}/daemons/gptp/linux/build/obj/daemon_cl ${D}/${bindir}/avb
     install -m 0755 ${S}/lib/avtp_pipeline/build/bin/* ${D}/${bindir}/avb
     install -m 0755 ${S}/lib/avtp_pipeline/build/lib/*.so ${D}/${libdir}
-    install -m 0755 ${S}/examples/libgptp_test/libgptp_test ${D}/${bindir}/avb
-    install -m 0755 ${S}/lib/libgptp/*.so ${D}/${libdir}
-    install -m 0644 ${S}/lib/libgptp/gptp_helper.h ${D}${includedir}
 
-    if (test "x${GPTP_AUTO_START_ENABLE}" == "xYES"); then
-        if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
-            install -d ${D}${systemd_unitdir}/system/
-            install -m 0644 ${WORKDIR}/gptp-daemon.service -D ${D}${systemd_unitdir}/system/gptp-daemon.service
-            install -d ${D}${sysconfdir}/tmpfiles.d/
-            install -m 0644 ${WORKDIR}/gptp-daemon-tmpfilesd.conf ${D}${sysconfdir}/tmpfiles.d/gptp-daemon-tmpfilesd.conf
-        fi
-    fi
 }
-
-PACKAGES =+ "libgptp libgptp-dev libgptp-test"
 
 SOLIBS = ".so"
 FILES_SOLIBSDEV = ""
-FILES:libgptp += "${libdir}/libgptp.so"
-FILES:libgptp-dev += "${includedir}/gptp_helper.h"
-FILES:libgptp-test += "${bindir}/avb/libgptp_test"
-
-RDEPENDS:libgptp += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'libuhab', '', d)}"
-RDEPENDS:libgptp-test += "libgptp"

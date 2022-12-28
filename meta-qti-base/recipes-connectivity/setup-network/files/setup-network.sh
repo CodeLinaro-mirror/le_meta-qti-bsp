@@ -61,7 +61,29 @@
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 CMDLINE_PATH=/proc/cmdline
-AGL_IFACE_ARRAY=(eth0)
+AGL1_IFACE_ARRAY=(eth0)
+AGL2_IFACE_ARRAY=(eth0)
+
+function get_gvm_version()
+{
+    local cmdline_value
+    local system_name_value
+    echo "Setup Network"
+    cmdline_value=$(cat $CMDLINE_PATH)
+    system_name_value=${cmdline_value#*system_name=}
+    system_name_value=${system_name_value%% *}
+    echo "system_name_value=${system_name_value}!"
+    case $system_name_value in
+        lv) return 1
+          ;;
+        tgvm) return 2
+          ;;
+        *) return 0
+          ;;
+    esac
+}
+
+
 
 function check_all_interfaces_up()
 {
@@ -85,7 +107,7 @@ function check_all_interfaces_up()
 }
 
 
-function setup_network_agl_vm()
+function setup_network_agl_vm_1()
 {
     echo "Assign IP address"
     ifconfig eth0 192.168.1.2 up
@@ -102,21 +124,50 @@ function setup_network_agl_vm()
     sysctl -p
 }
 
+function setup_network_agl_vm_2()
+{
+    echo "Assign IP address"
+    ifconfig eth0 192.168.1.3 up
+
+    echo "Setup route"
+    ip route add default dev eth0 via 192.168.1.10
+
+    echo "Enable forwarding"
+    sysctl -w net.ipv4.conf.all.forwarding=1
+    sysctl -p
+}
+
+get_gvm_version
+gvm_version=$?
+
 
 # try 10 times
 for i in {1..10}
 do
-        check_all_interfaces_up "${AGL_IFACE_ARRAY[*]}"
+    if [[ ${gvm_version} -eq 2 ]]
+    then
+        check_all_interfaces_up "${AGL2_IFACE_ARRAY[*]}"
         iface_is_up=$?
         echo "current interface status is ${iface_is_up}"
         if [[ "${iface_is_up}" -eq 1 ]]
         then
-            setup_network_agl_vm
+            setup_network_agl_vm_2
             break
         else
             echo " ERR : Ethernet Interfaces are not Ready !!!"
         fi
+    else
+        check_all_interfaces_up "${AGL1_IFACE_ARRAY[*]}"
+        iface_is_up=$?
+        echo "current interface status is ${iface_is_up}"
+        if [[ "${iface_is_up}" -eq 1 ]]
+        then
+            setup_network_agl_vm_1
+            break
+        else
+            echo " ERR : Ethernet Interfaces are not Ready !!!"
+        fi
+    fi
 
     sleep 2
 done
-

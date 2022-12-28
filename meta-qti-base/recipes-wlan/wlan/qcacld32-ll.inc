@@ -2,6 +2,21 @@ PROVIDES_NAME = "kernel-module-${_MODNAME}"
 
 inherit autotools-brokensep module qperf module-sign systemd qti-kernel-arch-clang
 
+WLAN_PLATFORM_PATH = "${STAGING_INCDIR}/wlan-platform"
+WLAN_KBUILD_EXTRA = "KBUILD_EXTRA_SYMBOLS=${WLAN_PLATFORM_PATH}/Module.symvers"
+WLAN_PLATFORM_CFG = " \
+                     CONFIG_CNSS_OUT_OF_TREE=y CONFIG_CNSS2=m \
+                     CONFIG_CNSS2_QMI=y CONFIG_CNSS_QMI_SVC=m \
+                     CONFIG_CNSS_PLAT_IPC_QMI_SVC=m \
+                     CONFIG_CNSS_GENL=m CONFIG_CNSS_UTILS=m \
+                     CONFIG_BUS_AUTO_SUSPEND=y \
+                     CONFIG_CNSS2_CONDITIONAL_POWEROFF=y \
+                     WLAN_PLATFORM_INC=${WLAN_PLATFORM_PATH}/inc \
+                     KBUILD_EXTRA="${WLAN_KBUILD_EXTRA}" \
+                   "
+DEPENDS += "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', 'wlan-platform-dlkm', '', d)}"
+EXTRA_OEMAKE:append = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', '${WLAN_PLATFORM_CFG}', '', d)}"
+
 do_unpack[deptask] = "do_populate_sysroot"
 do_compile:prepend() {
     #Add gnu99 for compiler compatible issues
@@ -14,13 +29,20 @@ do_compile:prepend() {
     TIMESTAMP = $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')\
     BUILD_TAG = "$(TIMESTAMP); cld:$(CLD_IDS); cmn:$(CMN_IDS);"\
     CFLAGS_wlan_hdd_main.o += -DBUILD_TAG=\\"$(BUILD_TAG)\\"' ${S}/Kbuild
+
+    if ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', 'true', 'false', d)}; then
+        CFG80211_FLAG="ccflags-y += -DCFG80211_SINGLE_NETDEV_MULTI_LINK_SUPPORT"
+        FRAME_SIZE_FLAG="ccflags-y += -Wframe-larger-than=4096"
+        sed -i -e "/$(CONFIG_QCA_CLD_WLAN_PROFILE)_defconfig$/i${CFG80211_FLAG}" ${S}/Kbuild
+        sed -i -e "/$(CONFIG_QCA_CLD_WLAN_PROFILE)_defconfig$/i${FRAME_SIZE_FLAG}" ${S}/Kbuild
+    fi
 }
 
 RPROVIDES:${PN} += "${PROVIDES_NAME}-${KERNEL_VERSION}"
 
 FILES:${PN} += "lib/firmware/wlan/*"
 FILES:${PN} += "lib/firmware/*"
-FILES:${PN} += "lib/modules/${KERNEL_VERSION}/extra/${_MODNAME}.ko"
+FILES:${PN} += "lib/modules/${KERNEL_VERSION}/extra/*"
 
 LDFLAGS:aarch64 = "-O1 --hash-style=gnu --as-needed"
 

@@ -13,7 +13,7 @@ S = "${WORKDIR}/vendor/qcom/opensource/video-driver"
 inherit qti-techpack
 
 TECHPACK_MODULE_OUT = "${WORKDIR}/vendor/qcom/opensource/video-driver-out"
-TECHPACK_MODULES = "msm-vidc.ko"
+TECHPACK_MODULES = "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', 'msm-vidc.ko',d)}"
 TECHPACK_HEADERS = "1"
 
-FILES:${PN} += "${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/*"
+FILES:${PN} += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', '${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/*', d)}"
