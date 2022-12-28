@@ -52,7 +52,7 @@ do_compile() {
     VARIANT=${KERNEL_VARIANT}defconfig \
     OUT_DIR=msm-kernel-${KERNEL_ARCH}-${KERNEL_VARIANT}defconfig/ \
     MODULE_OUT=${TECHPACK_MODULE_OUT} \
-    KERNEL_UAPI_HEADERS_DIR=${STAGING_KERNEL_BUILDDIR} \
+    KERNEL_UAPI_HEADERS_DIR=${OUT_DIR}msm-kernel/kernel-build-artifacts \
     INSTALL_MODULE_HEADERS=${TECHPACK_HEADERS} \
     ./build/build_module.sh  ${TECHPACK_MAKE_ARGS}
 }
