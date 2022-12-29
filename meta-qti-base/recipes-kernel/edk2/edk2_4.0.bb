@@ -46,6 +46,7 @@ EXTRA_OEMAKE = "'CLANG_BIN=${KERNEL_TOOLCHAIN_CLANG}/bin/' \
                 'INIT_BIN_LE=/sbin/init'\
                 'EDK_TOOLS_PATH=${S}/BaseTools'\
                 'EARLY_ETH_ENABLED=${EARLY_ETH}'\
+                'EARLY_ETH_AS_DLKM=1' \
                 'UBSAN_UEFI_GCC_FLAG_ALIGNMENT=-Wno-misleading-indentation' \
                 'TARGET_BOARD_TYPE_AUTO=1' \
                 'SUPPORT_AB_BOOT_LXC=${AB_BOOT_LXC}' \
