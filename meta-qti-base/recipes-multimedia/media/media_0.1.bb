@@ -57,9 +57,6 @@ EXTRA_OECONF:append = " \
     ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "5.15", '--enable-target-uses-dmabufheap=yes', "", d)} \
 "
 
-#temp disable swcodec
-EXTRA_OECONF:remove:sa81x5 = "--enable-build-swcodec='yes' "
-
 CPPFLAGS += "\
     -I${STAGING_INCDIR} \
     -I${STAGING_INCDIR}/drm \
@@ -76,11 +73,6 @@ CPPFLAGS += "\
     -I${STAGING_INCDIR}/mm-video/swvenc \
     -include stdint.h \
     -Wno-format-truncation \
-"
-
-CPPFLAGS:remove:sa81x5 = "\
-     -I${STAGING_INCDIR}/mm-video/swvdec \
-     -I${STAGING_INCDIR}/mm-video/swvenc \
 "
 
 LDFLAGS += "\
