@@ -71,7 +71,7 @@ do_compile () {
     export LD=${BUILD_LD}
     export AR=llvm-ar
     if ${@bb.utils.contains('MACHINE_FEATURES', 'goldcore-boot', 'true', 'false', d)}; then
-        export LINUX_BOOT_CPU_SELECTION_ENABLED=1
+        export TARGET_LINUX_BOOT_CPU_SELECTION=true
         export TARGET_LINUX_BOOT_CPU_ID=7
     fi
     oe_runmake -f makefile all
