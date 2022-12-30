@@ -12,11 +12,11 @@ index 82df9e5..cd71ae1 100644
 --- a/passwd.master
 +++ b/passwd.master
 @@ -15,4 +15,5 @@ backup:*:34:34:backup:/var/backups:/bin/sh
- list:*:38:38:Mailing List Manager:/var/list:/bin/sh
- irc:*:39:39:ircd:/var/run/ircd:/bin/sh
- gnats:*:41:41:Gnats Bug-Reporting System (admin):/var/lib/gnats:/bin/sh
-+diag:*:53:53:diag:/nonexistent:/bin/sh
- nobody:*:65534:65534:nobody:/nonexistent:/bin/sh
+ list:*:38:38:Mailing List Manager:/var/list:/sbin/nologin
+ irc:*:39:39:ircd:/var/run/ircd:/sbin/nologin
+ gnats:*:41:41:Gnats Bug-Reporting System (admin):/var/lib/gnats:/sbin/nologin
++diag:*:53:53:diag:/nonexistent:/sbin/nologin
+ nobody:*:65534:65534:nobody:/nonexistent:/sbin/nologin
 -- 
 1.7.8.3
 
