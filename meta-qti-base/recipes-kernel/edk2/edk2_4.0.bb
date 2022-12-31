@@ -31,7 +31,7 @@ inherit deploy qti-kernel-toolchain
 
 VBLE = "${@bb.utils.contains('DISTRO_FEATURES', 'vble','1', '0', d)}"
 VERITY_ENABLED = "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity','1', '0', d)}"
-EARLY_ETH = "${@bb.utils.contains('DISTRO_FEATURES', 'early-eth', '1', '0', d)}"
+EARLY_ETH = "${@bb.utils.contains('DISTRO_FEATURES', 'qti-early-eth', '1', '0', d)}"
 HIBERNATION = "${@bb.utils.contains('COMBINED_FEATURES', 'hibernation', '1', '0', d)}"
 AB_BOOT_LXC = "${@bb.utils.contains('MACHINE_FEATURES', 'qti-lxc', '1', '0', d)}"
 
@@ -46,6 +46,7 @@ EXTRA_OEMAKE = "'CLANG_BIN=${KERNEL_TOOLCHAIN_CLANG}/bin/' \
                 'INIT_BIN_LE=/sbin/init'\
                 'EDK_TOOLS_PATH=${S}/BaseTools'\
                 'EARLY_ETH_ENABLED=${EARLY_ETH}'\
+                'EARLY_ETH_AS_DLKM=1' \
                 'UBSAN_UEFI_GCC_FLAG_ALIGNMENT=-Wno-misleading-indentation' \
                 'TARGET_BOARD_TYPE_AUTO=1' \
                 'SUPPORT_AB_BOOT_LXC=${AB_BOOT_LXC}' \

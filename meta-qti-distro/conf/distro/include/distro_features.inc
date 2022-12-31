@@ -21,7 +21,7 @@ DISTRO_FEATURES_BACKFILL_CONSIDERED += "bluez5 bluetooth"
 #Enable persist-image
 DISTRO_FEATURES:append = " persist-image "
 
-DISTRO_FEATURES:append = " early-eth"
+DISTRO_FEATURES:append = " qti-early-eth"
 #DISTRO_FEATURES:append = " early_init"
 #DISTRO_FEATURES:append = " early_userspace"
 

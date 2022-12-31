@@ -2,7 +2,7 @@ PROVIDES_NAME = "kernel-module-${_MODNAME}"
 
 inherit autotools-brokensep module qperf module-sign systemd qti-kernel-arch-clang
 
-WLAN_PLATFORM_PATH = "${STAGING_KERNEL_BUILDDIR}/wlan-platform-dlkm"
+WLAN_PLATFORM_PATH = "${STAGING_INCDIR}/wlan-platform"
 WLAN_KBUILD_EXTRA = "KBUILD_EXTRA_SYMBOLS=${WLAN_PLATFORM_PATH}/Module.symvers"
 WLAN_PLATFORM_CFG = " \
                      CONFIG_CNSS_OUT_OF_TREE=y CONFIG_CNSS2=m \
