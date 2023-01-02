@@ -37,7 +37,7 @@ do_install:append() {
     install -d ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra
 
     if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-audio-ar', 'true', 'false', d)}; then
-        mv ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/asoc/spf_machine_dlkm.ko ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/
+        mv ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/asoc/gvm_spf_machine_dlkm.ko ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/
         mv ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/asoc/codecs/stub_dlkm.ko ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/
     else
         for i in $(find ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/. -name "*.ko"); do
@@ -108,6 +108,6 @@ RPROVIDES:${PN} += "${@'kernel-module-rx-macro-dlkm-${KERNEL_VERSION}'.replace('
 RPROVIDES:${PN} += "${@'kernel-module-tx-macro-dlkm-${KERNEL_VERSION}'.replace('_', '-')}"
 RPROVIDES:${PN} += "${@'kernel-module-wcd937x-dlkm-${KERNEL_VERSION}'.replace('_', '-')}"
 RPROVIDES:${PN} += "${@'kernel-module-wcd937x-slave-dlkm-${KERNEL_VERSION}'.replace('_', '-')}"
-RPROVIDES:${PN} += "${@'kernel-module-spf-machine-dlkm-${KERNEL_VERSION}'.replace('_', '-')}"
+RPROVIDES:${PN} += "${@'kernel-module-gvm-spf-machine-dlkm-${KERNEL_VERSION}'.replace('_', '-')}"
 
 KERNEL_CC += "-Wno-error=maybe-uninitialized"
