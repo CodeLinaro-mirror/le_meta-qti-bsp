@@ -51,10 +51,6 @@ MTD_UBI_BEB_LIMIT_PER1024="SET_BY_SED"
 # UBI device number for system image
 SYS_UBI_DEV_NUM="SET_BY_SED"
 
-# System image in UBI volume
-SYS_UBI_VOL_SLOT_A="SET_BY_SED"
-SYS_UBI_VOL_SLOT_B="SET_BY_SED"
-
 #------------------------------------------------------------
 
 # Temporary rootfs mount node
@@ -107,28 +103,7 @@ SetArgs() {
         SYS_UBI_DEV_NUM="0"
     fi
 
-    if [ "x${SYS_UBI_VOL_SLOT_A}" == x"SET_BY_SED" ]; then
-        SYS_UBI_VOL_SLOT_A="0"
-    fi
-
-    if [ "x${SYS_UBI_VOL_SLOT_B}" == x"SET_BY_SED" ]; then
-        SYS_UBI_VOL_SLOT_B="1"
-    fi
-
-    if grep 'recovery=' /proc/cmdline > /dev/null; then
-        SYS_IMAGE_VOL=`cat /proc/cmdline | awk -F 'recovery=' '{print $2}' | awk '{print $1}'`
-    elif grep 'SLOT_SUFFIX=_a' /proc/cmdline > /dev/null; then
-        SYS_IMAGE_VOL=${SYS_UBI_VOL_SLOT_A}
-    elif grep 'SLOT_SUFFIX=_b' /proc/cmdline > /dev/null; then
-        SYS_IMAGE_VOL=${SYS_UBI_VOL_SLOT_B}
-    fi
-
-    if [ x"${SYS_IMAGE_VOL}" == x ]; then
-        echo "Err, get system volume failed"
-        return ${STATUS_ERR}
-    fi
-
-    # Root image nam
+    # Root image name
     DM_SYST_NAME="${SYS_PART_NAME}"
 
     return ${STATUS_OK}
@@ -181,17 +156,41 @@ MountSystem () {
     # Check if it is UBI partition
     if dd if=/dev/mtd${DEV_NUM} count=1 bs=4 2>/dev/null | grep 'UBI#' > /dev/null; then
 
+        ubiattach -m ${DEV_NUM} -d ${SYS_UBI_DEV_NUM} -b ${MTD_UBI_BEB_LIMIT_PER1024}
+        WaitDevReady "-e" "/sys/class/ubi/ubi${SYS_UBI_DEV_NUM}/volumes_count"
+        if [ $? -ne ${STATUS_OK} ]; then
+            echo Error: "/sys/class/ubi/ubi${SYS_UBI_DEV_NUM}/volumes_count" not found
+            return ${STATUS_ERR}
+        fi
+
+        if grep 'recovery=' /proc/cmdline > /dev/null; then
+            SYS_IMAGE_VOL=`cat /proc/cmdline | awk -F 'recovery=' '{print $2}' | awk '{print $1}'`
+        else
+            volcount=`cat /sys/class/ubi/ubi${SYS_UBI_DEV_NUM}/volumes_count`
+            for vid in `seq 0 $volcount`; do
+                WaitDevReady "-c" "/dev/ubi${SYS_UBI_DEV_NUM}_${vid}"
+                if [ $? -ne ${STATUS_OK} ]; then
+                    echo Error: wait UBI volume: /dev/ubi${SYS_UBI_DEV_NUM}_${vid} timeout
+                    return ${STATUS_ERR}
+                fi
+
+                act_slot=`cat /proc/cmdline | sed 's/.*SLOT_SUFFIX=//' | awk '{print $1}'`
+                fs_ab_name=${DM_SYST_NAME}${act_slot}
+                name=`cat /sys/class/ubi/ubi${SYS_UBI_DEV_NUM}_${vid}/name`
+                if [ "${name}" == "${DM_SYST_NAME}" ] || [ "${name}" == "${fs_ab_name}" ]; then
+                    SYS_IMAGE_VOL=${vid}
+                    break
+                fi
+            done
+        fi
+        if [ "${SYS_IMAGE_VOL}" == "" ]; then
+            echo "Cannot get ${DM_SYST_NAME} volume."
+            return ${STATUS_ERR}
+        fi
+
         char_device=/dev/ubi${SYS_UBI_DEV_NUM}_${SYS_IMAGE_VOL}
         block_device=/dev/ubiblock${SYS_UBI_DEV_NUM}_${SYS_IMAGE_VOL}
-        # Check ubi status of system partition
-        if [ ! -e "${char_device}" ]; then
-            ubiattach -m ${DEV_NUM} -d ${SYS_UBI_DEV_NUM} -b ${MTD_UBI_BEB_LIMIT_PER1024}
-            WaitDevReady "-c" "${char_device}"
-            if [ $? -ne ${STATUS_OK} ]; then
-                echo Error: MountSystem no device: ${ubichar_devicehar} found
-                return ${STATUS_ERR}
-            fi
-        fi
+
 
         # Check if the image type is squashfs in UBI volume
         if dd if=${char_device}\
@@ -248,4 +247,3 @@ MainBoot() {
 
 MainBoot
 echo "MainBoot Error: InitRamFS boot failed"
-
