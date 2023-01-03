@@ -2,7 +2,7 @@ SUMMARY = "CLO Linux Kernel"
 LICENSE = "GPLv2.0-with-linux-syscall-note"
 LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 
-DEPENDS += "elfutils-native kern-tools-native kernel-toolchain-native mkbootimg-native mkdtimg-native openssl-native pahole-native rsync-native signing-keys"
+DEPENDS += "elfutils-native kern-tools-native mkbootimg-native mkdtimg-native openssl-native pahole-native rsync-native signing-keys"
 
 COMPATIBLE_MACHINE = "sa81x5|lemans|quin-gvm-gen4-2"
 
@@ -11,17 +11,17 @@ SRC_URI = "${PATH_TO_REPO}/kernel/kernel-${PV}/kernel_platform/msm-kernel/.git;p
 
 SRCREV = "${AUTOREV}"
 
-inherit kernel qti-kernel-toolchain
+inherit kernel qti-kernel-arch-clang
 
 S = "${WORKDIR}/kernel/kernel-${PV}/kernel_platform/msm-kernel"
+
+# Due to inherit kernel. If choose clang as a compilation chain, need unset thist variable to set clang as BASEDEPENDS.
+unset INHIBIT_DEFAULT_DEPS
 
 LDFLAGS:aarch64 = "-O1 --hash-style=gnu --as-needed"
 TARGET_CXXFLAGS += "-Wno-format"
 
-KERNEL_CC = "${KERNEL_TOOLCHAIN_CLANG}/bin/clang"
 KERNEL_CONFIG_PATH = "${S}/arch/${ARCH}/configs"
-
-KERNEL_PREBUILT_PATH ?= "${SRC_DIR_ROOT}/kernel/kernel-${PV}/out/msm-kernel-${KERNEL_ARCH}-${KERNEL_VARIANT}defconfig/dist"
 
 #dts path is changed to vendor/qcom
 DTB_SRC_PATH = "${STAGING_KERNEL_BUILDDIR}/arch/${ARCH}/boot/dts/vendor/qcom"
@@ -38,8 +38,7 @@ KERNEL_PRIORITY = "9001"
 # Add V=1 to KERNEL_EXTRA_ARGS for verbose
 KERNEL_EXTRA_ARGS += "O=${B}"
 
-# Don't set any version extention on debug build
-LINUX_VERSION_EXTENSION ?= "-perf"
+LINUX_VERSION_EXTENSION = "${@bb.utils.contains_any('VARIANT', 'perf user', '-perf', '-debug', d)}"
 LINUX_VERSION_EXTENSION_qti-distro-debug = ""
 
 # dm-verity: Patch the cert file from which kernel add key to keyring
