@@ -53,6 +53,7 @@ MSM_UAPI_HEADERS = " \
     linux/qcedev.h \
     linux/fips_status.h \
     linux/smcinvoke.h \
+    linux/habmmid.h \
 "
 
 DISPLAY_UAPI_HEADERS = " \
