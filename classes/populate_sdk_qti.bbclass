@@ -55,7 +55,10 @@ def create_filtered_tasklist(d, sdkbasepath, tasklistfile, conf_initpath):
         f.write('WORKSPACEROOT = "$' + '{TOPDIR}/layers/"\n')
     with open(baseoutpath + '/conf/local.conf', 'a') as f:
         f.write('\nPREBUILT_SRC_DIR = "%s"\n' % d.getVar('PREBUILT_SRC_DIR'))
-
+    #Copy HY11 prebuilt tar.gz to extensible SDK
+    src_prebuilt_hy11 = os.path.abspath(d.getVar('WORKSPACEROOT') + '/prebuilt_HY11')
+    dest_prebuilt_hy11 = os.path.join(baseoutpath,'prebuilt_HY11')
+    shutil.copytree(src_prebuilt_hy11,dest_prebuilt_hy11)
 
     # Create a temporary build directory that we can pass to the env setup script
     shutil.copyfile(sdkbasepath + '/conf/local.conf', sdkbasepath + '/conf/local.conf.bak')
