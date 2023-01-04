@@ -23,6 +23,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         ${@bb.utils.contains('DISTRO_FEATURES','virtualization', 'packagegroup-qti-containers', '', d)} \
         ${@bb.utils.contains('DISTRO_FEATURES','ros2-foxy-sdk', 'packagegroup-ros2-foxy', '', d)} \
         ${@bb.utils.contains('DISTRO_FEATURES','robotics-sdk', 'packagegroup-qti-robotics', '', d)} \
+        ${@bb.utils.contains('DISTRO_FEATURES','qirp-sdk', 'packagegroup-qti-qirp packagegroup-qti-qirp-prop', '', d)} \
         packagegroup-qti-core \
         packagegroup-qti-core-prop \
         packagegroup-qti-cvp \
