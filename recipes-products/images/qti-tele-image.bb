@@ -7,9 +7,6 @@ inherit qimage
 IMAGE_FEATURES += "read-only-rootfs ${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', 'persist-volume', '', d)}"
 
 CORE_IMAGE_EXTRA_INSTALL += "\
-        e2fsprogs \
-        e2fsprogs-e2fsck \
-        e2fsprogs-mke2fs \
         glib-2.0 \
         i2c-tools \
         kernel-modules \
@@ -18,6 +15,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         spitools \
         coreutils \
         packagegroup-android-utils \
+        packagegroup-filesystem-utils \
         packagegroup-qti-core \
         packagegroup-qti-data \
         ${@bb.utils.contains_any('COMBINED_FEATURES', 'qti-adsp qti-cdsp qti-modem qti-slpi', 'packagegroup-qti-dsp', '', d)} \

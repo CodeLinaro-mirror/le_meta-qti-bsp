@@ -6,13 +6,10 @@ inherit qimage populate_sdk_qti
 IMAGE_FEATURES += "ssh-server-openssh"
 
 CORE_IMAGE_EXTRA_INSTALL += "\
-        e2fsprogs \
-        e2fsprogs-e2fsck \
-        e2fsprogs-mke2fs \
-        e2fsprogs-tune2fs \
         glib-2.0 \
         kernel-modules \
         packagegroup-android-utils \
+        packagegroup-filesystem-utils \
         packagegroup-qti-audio \
         ${@bb.utils.contains('COMBINED_FEATURES', 'qti-bluetooth', "packagegroup-qti-bluetooth", "", d)} \
         packagegroup-qti-camera \

@@ -10,6 +10,7 @@ PROPERTIES_SUPPORT = "${@d.getVar('MACHINE_SUPPORTS_ANDROID_PROPERTIES') or "Tru
 
 PACKAGES = ' \
     packagegroup-android-utils \
+    packagegroup-filesystem-utils \
     packagegroup-support-utils \
     packagegroup-startup-scripts \
     '
@@ -29,8 +30,10 @@ CHRONY_sa410m = ""
 
 RDEPENDS_packagegroup-support-utils = "\
     ${CHRONY} \
-    libinput \
-    libinput-bin \
-    libnl \
-    libxml2 \
+    packagegroup-support-utils-base \
+    "
+
+# Filesystem related tools and utilities
+RDEPENDS_packagegroup-filesystem-utils = "\
+    packagegroup-filesystem-utils-base \
     "
