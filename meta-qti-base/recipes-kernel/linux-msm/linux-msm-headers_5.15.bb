@@ -1,49 +1,35 @@
-SUMMARY = "CLO Linux Kernel Headers"
+SUMMARY = "MSM Linux Kernel Headers"
 DESCRIPTION = "Installs MSM kernel headers required to build userspace. \
 These headers are installed in ${includedir}/linux-msm path."
+HOMEPAGE = "https://git.codelinaro.org"
 LICENSE = "GPLv2.0-with-linux-syscall-note"
 LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 
-FILESPATH =+ "${SRC_DIR_ROOT}/kernel:"
-SRC_URI = "file://kernel-${PV}/kernel_platform/msm-kernel"
+DEPENDS += "bison-native rsync-native unifdef-native virtual/kernel"
 
-S = "${WORKDIR}/kernel-${PV}/kernel_platform/msm-kernel"
+S = "${STAGING_KERNEL_DIR}"
+B = "${WORKDIR}/build"
 
-inherit kernel-arch pkgconfig multilib_header
+inherit linux-kernel-base kernel-arch
 
-KERNEL_PREBUILT_PATH ?= "${SRC_DIR_ROOT}/kernel/kernel-${PV}/out/msm-kernel-${KERNEL_ARCH}-${KERNEL_VARIANT}defconfig/dist"
+# We need the kernel to be unpacked and patched before we can grab the headers.
+do_install[depends] += "virtual/kernel:do_patch"
 
+# There's nothing to do here, except install the headers where we can package them
+do_fetch[noexec] = "1"
+do_unpack[noexec] = "1"
+do_patch[noexec] = "1"
 do_configure[noexec] = "1"
 do_compile[noexec] = "1"
 
-do_populate_kernel_header_artifacts() {
-    mkdir -p ${B}/headers
-    cp -a ${KERNEL_PREBUILT_PATH}/kernel-uapi-headers.tar.gz ${B}/headers
-    cd ${B}/headers
-    tar -xvzf kernel-uapi-headers.tar.gz
-    rm -f kernel-uapi-headers.tar.gz
+do_install() {
+    # Generate kernel headers
+    rm -rf ${B}
+    oe_runmake_call -C ${STAGING_KERNEL_DIR} ARCH=${ARCH} CC="${KERNEL_CC}" LD="${KERNEL_LD}" headers_install O=${B}
+    install -d ${D}${includedir}
+    mv ${B}${includedir} ${D}${includedir}/linux-msm
 }
 
-addtask do_populate_kernel_header_artifacts after do_compile before do_install
-
-do_install () {
-    cd ${B}
-    headerdir=${B}/headers
-    kerneldir=${D}${includedir}/linux-msm
-    install -d $kerneldir
-
-    if [ -d $headerdir/${includedir} ]; then
-        mkdir -p $kerneldir
-        cp -fR $headerdir/${includedir}/* $kerneldir
-    fi
-}
-
-# kernel headers are generally machine specific
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-# Allow to build empty main package, to include -dev package into the SDK
-ALLOW_EMPTY:${PN} = "1"
-
-FILES:${PN}-dev += "linux-msm/*"
-
-INHIBIT_DEFAULT_DEPS = "1"
+RDEPENDS:${PN}-dev = ""

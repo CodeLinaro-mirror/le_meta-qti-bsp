@@ -1,0 +1,25 @@
+From: Haiyi Xu <quic_haiyix@quicinc.com>
+Date: Tue, 6 Dec 2022 11:10:21 +0800
+Subject: [PATCH] Change to use standard fuse mount directory 
+
+Upstream-Status: Pending
+
+Signed-off-by: Haiyi Xu <quic_haiyix@quicinc.com>
+
+Index: lxcfs-4.0.7/config/init/systemd/lxcfs.service
+===================================================================
+--- lxcfs-4.0.7.orig/config/init/systemd/lxcfs.service	2022-12-20 10:42:41.406276522 +0800
++++ lxcfs-4.0.7/config/init/systemd/lxcfs.service	2022-12-20 10:51:43.430082073 +0800
+@@ -6,10 +6,10 @@
+ 
+ [Service]
+ ExecStartPre=-/bin/mkdir /var/lib/lxcfs
+-ExecStart=/usr/bin/lxcfs /usr/local/var/lib/lxcfs
++ExecStart=/usr/bin/lxcfs /var/lib/lxcfs
+ KillMode=process
+ Restart=on-failure
+-ExecStopPost=-/bin/fusermount -u /usr/local/var/lib/lxcfs
++ExecStopPost=-/bin/fusermount -u /var/lib/lxcfs
+ Delegate=yes
+ ExecReload=/bin/kill -USR1 $MAINPID
+ 

@@ -12,12 +12,16 @@ SRCREV = "${AUTOREV}"
 S = "${WORKDIR}/vendor/qcom/opensource/securemsm-kernel"
 
 TECHPACK_MODULE_OUT = "${WORKDIR}/securemsm-kernel-out"
-TECHPACK_MODULES = "qseecom_dlkm.ko tz_log_dlkm.ko qrng_dlkm.ko"
+TECHPACK_MODULES = "qseecom_dlkm.ko tz_log_dlkm.ko qrng_dlkm.ko smcinvoke_dlkm.ko"
 
 inherit qti-techpack
 
 do_install:append() {
     install -m 0755 ${WORKDIR}/security_load.conf -D ${D}${sysconfdir}/modules-load.d/security_load.conf
+    install -d ${D}${includedir}/linux
+    install -m 0644 ${WORKDIR}/vendor/qcom/opensource/securemsm-kernel/linux/smcinvoke.h ${D}${includedir}/linux
+    install -m 0644 ${WORKDIR}/vendor/qcom/opensource/securemsm-kernel/linux/qcedev.h ${D}${includedir}/linux
+    install -m 0644 ${WORKDIR}/vendor/qcom/opensource/securemsm-kernel/linux/fips_status.h ${D}${includedir}/linux
 }
 
 FILES:${PN} += "${sysconfdir}/*"

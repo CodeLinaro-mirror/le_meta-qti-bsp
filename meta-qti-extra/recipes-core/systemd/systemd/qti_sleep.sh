@@ -26,7 +26,8 @@
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-usb_mode_file="/var/usb/usb_mode.txt"
+mode_file_path="/var/usb"
+usb_mode_file="usb_mode.txt"
 usb_dev_path="/sys/devices/platform/soc"
 
 case $1/$2 in
@@ -44,25 +45,31 @@ case $1/$2 in
     systemctl stop synergy.service
 
     # save all usb mode to file
-    if [ ! -f "$usb_mode_file" ]; then
-        touch $usb_mode_file
+    if [ ! -d "$mode_file_path" ]; then
+        mkdir -p $mode_file_path
+        touch $mode_file_path/$usb_mode_file
     else
-        sed -i '1,$d' $usb_mode_file
+        if [ ! -f "$mode_file_path/$usb_mode_file" ]; then
+            touch $mode_file_path/$usb_mode_file
+        else
+            sed -i '1,$d' $mode_file_path/$usb_mode_file
+        fi
     fi
+
     for dev in `ls $usb_dev_path | grep 'ssusb$'`
     do
         usb_mode=`cat $usb_dev_path/$dev/mode`
-        echo $dev=$usb_mode >> $usb_mode_file
+        echo $dev=$usb_mode >> "$mode_file_path/$usb_mode_file"
         echo none > $usb_dev_path/$dev/mode
     done
     ;;
   post/*)
     echo "Exiting from $2..."
 
-    if [ ! -f "$usb_mode_file" ]; then
+    if [ ! -f "$mode_file_path/$usb_mode_file" ]; then
         echo "USB mode recover failed for $usb_mode_file dose not exist."
     else
-        for line in `cat $usb_mode_file`
+        for line in `cat $mode_file_path/$usb_mode_file`
         do
             dev=`echo $line | awk -F '[=]' '{print $1}'`
             usb_mode=`echo $line | awk -F '[=]' '{print $2}'`
