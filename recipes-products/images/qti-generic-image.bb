@@ -12,12 +12,10 @@ KERN_MODS ?= "kernel-modules"
 KERN_MODS:waipio = "gki-kernel-modules-second-stage"
 
 CORE_IMAGE_EXTRA_INSTALL += "\
-        e2fsprogs \
-        e2fsprogs-e2fsck \
-        e2fsprogs-mke2fs \
         glib-2.0 \
         ${KERN_MODS} \
         packagegroup-android-utils-base \
+        packagegroup-filesystem-utils-base \
         packagegroup-startup-scripts-base \
         systemd-machine-units \
         ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \

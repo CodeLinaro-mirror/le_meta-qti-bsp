@@ -10,13 +10,10 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         alsa-utils \
         canutils \
         chronyc \
-        e2fsprogs \
-        e2fsprogs-e2fsck \
-        e2fsprogs-mke2fs \
-        e2fsprogs-tune2fs \
         glib-2.0 \
         gki-kernel-modules-second-stage \
         packagegroup-android-utils \
+        packagegroup-filesystem-utils \
         packagegroup-qti-audio \
         packagegroup-qti-bluetooth \
         packagegroup-qti-camera \

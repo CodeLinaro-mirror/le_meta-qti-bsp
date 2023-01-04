@@ -14,7 +14,9 @@ PROPERTIES_SUPPORT = "${@d.getVar('MACHINE_SUPPORTS_ANDROID_PROPERTIES') or "Tru
 
 PACKAGES = ' \
     packagegroup-android-utils-base \
+    packagegroup-filesystem-utils-base \
     packagegroup-startup-scripts-base \
+    packagegroup-support-utils-base \
     '
 ENABLE_ADB ?= "True"
 ENABLE_ADB:qti-distro-base-user ?= "False"
@@ -42,4 +44,19 @@ RDEPENDS:packagegroup-startup-scripts-base = "\
     sdcard-scripts-automount \
     ${ADDON_SCRIPTS} \
     mod-blacklist \
+    "
+
+RDEPENDS:packagegroup-support-utils-base = "\
+    libinput \
+    libinput-bin \
+    libnl \
+    libxml2 \
+    "
+
+RDEPENDS:packagegroup-filesystem-utils-base = "\
+    e2fsprogs \
+    e2fsprogs-e2fsck \
+    e2fsprogs-mke2fs \
+    e2fsprogs-resize2fs \
+    e2fsprogs-tune2fs \
     "
