@@ -48,8 +48,9 @@ DEFAULT_ENFORCING = "permissive"
 # qti-mvm:                Machine supports QTI MVM solution
 # qseecompat:             Machine supports qseecom compat solution
 # qti-tzlog:              Machine supports tz/qsee logs
+# qti-smciqseecomd:       Machine supports smcinvoke based listeners
 
-MACHINE_FEATURES += "qti-sdx dm-verity-none qti-sensors qti-mvm qti-security qseecompat qti-tzlog"
+MACHINE_FEATURES += "qti-sdx dm-verity-none qti-sensors qti-mvm qti-security qseecompat qti-tzlog qti-remoteproc qti-data-modem qti-location qti-audio qti-smciqseecomd"
 
 MACHINE_MNT_POINTS = " \
     /dsp \
@@ -69,7 +70,7 @@ MACHINE_SUPPORTS_INIT_RAMDISK = "False"
 TOYBOX_RAMDISK = "False"
 MACHINE_SUPPORTS_ANDROID_PROPERTIES = "False"
 
-USBCOMPOSITION = "901D"
+USBCOMPOSITION = "90DB"
 
 # On msm-5.4 or above ufs driver supports BSG Device.
 UFS_BSG_DEV_USAGE = "True"

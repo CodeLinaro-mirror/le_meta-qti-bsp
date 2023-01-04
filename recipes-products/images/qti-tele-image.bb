@@ -6,11 +6,16 @@ inherit qimage
 
 IMAGE_FEATURES += "read-only-rootfs ${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', 'persist-volume', '', d)}"
 
+# Install km-loader for selected machines
+EVDEVMODULE ?= 'False'
+EVDEVMODULE_sa515m = 'True'
+
 CORE_IMAGE_EXTRA_INSTALL += "\
         ${@bb.utils.contains('MACHINE_FEATURES', 'emmc-boot', 'e2fsprogs e2fsprogs-e2fsck e2fsprogs-mke2fs', '', d)} \
         glib-2.0 \
         i2c-tools \
         kernel-modules \
+        ${@oe.utils.conditional('EVDEVMODULE', 'True', 'km-loader', '', d)} \
         net-tools \
         pps-tools \
         spitools \
@@ -39,15 +44,8 @@ CORE_IMAGE_EXTRA_INSTALL += "\
 "
 
 # Following packages will be enabled later
-CORE_IMAGE_EXTRA_INSTALL_remove_sa410m = "\
-       qmi-shutdown-modem \
-       packagegroup-qti-telsdk \
-"
-
-# Following packages will be enabled later
 CORE_IMAGE_EXTRA_INSTALL_remove_sa525m = "\
-       packagegroup-qti-ss-mgr \
-       packagegroup-qti-telsdk subsystem-ramdump \
+       subsystem-ramdump \
        qmi-shutdown-modem modem-shutdown \
        packagegroup-qti-internal packagegroup-qti-security-test \
        packagegroup-support-utils \
@@ -55,7 +53,7 @@ CORE_IMAGE_EXTRA_INSTALL_remove_sa525m = "\
 
 python () {
     if d.getVar('PREFERRED_VERSION_linux-msm') == "5.15":
-        bb.build.addtask('do_merge_dtbs', 'do_makeboot', 'do_makesystem', d)
+        bb.build.addtask('do_merge_dtbs', 'do_makeboot', bb.utils.contains('IMAGE_FSTYPES', 'ubi', 'do_makesystem_ubi', 'do_makesystem', d), d)
         bb.build.addtask('do_copy_abl', 'do_image_complete', 'do_makeboot', d)
 }
 
@@ -77,6 +75,3 @@ do_copy_abl() {
         install -m 0644 ${KERNEL_PREBUILT_PATH}/abl_userdebug.elf ${DEPLOY_DIR_IMAGE}/${PN}/abl_userdebug.elf
     fi
 }
-
-# Following pacakges will be enabled later.
-CORE_IMAGE_EXTRA_INSTALL_remove_sa415m = "qmi-shutdown-modem"
