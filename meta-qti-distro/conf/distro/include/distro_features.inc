@@ -4,7 +4,7 @@ DISTRO_FEATURES:append = " pam"
 # Video
 DISTRO_FEATURES:append:sa6155 = " qti-carcamsrc qti-omx"
 DISTRO_FEATURES:append:sa81x5-rt = " qti-carcamsrc qti-omx"
-DISTRO_FEATURES:append:sa81x5 = " qti-carcamsrc qti-omx"
+DISTRO_FEATURES:append:sa81x5 = " qti-carcamsrc qti-fastcv qti-omx"
 DISTRO_FEATURES:append:sa8295 = " qti-codec2"
 DISTRO_FEATURES:append:lemans = " qti-codec2"
 DISTRO_FEATURES:append:qtiquingvm = " qti-omx qti-gstqeavb"
