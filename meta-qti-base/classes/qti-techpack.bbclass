@@ -36,9 +36,11 @@ do_build_tools() {
     cp -R ${KERNEL_TOOLCHAIN_DIR}/build build
 
     install -d ${OUT_DIR}
-    cp -R ${STAGING_KERNEL_BUILDDIR} ${OUT_DIR}/msm-kernel
+    rsync -a --exclude=.tmp* ${STAGING_KERNEL_BUILDDIR} ${OUT_DIR}
+    mv ${OUT_DIR}/kernel-build-artifacts ${OUT_DIR}/msm-kernel
 }
 do_build_tools[dirs] = "${WORKDIR}/build"
+do_build_tools[cleandirs] = "${WORKDIR}/build"
 B = "${WORKDIR}/build"
 
 addtask do_build_tools after do_prepare_recipe_sysroot before do_configure
@@ -52,7 +54,7 @@ do_compile() {
     VARIANT=${KERNEL_VARIANT}defconfig \
     OUT_DIR=msm-kernel-${KERNEL_ARCH}-${KERNEL_VARIANT}defconfig/ \
     MODULE_OUT=${TECHPACK_MODULE_OUT} \
-    KERNEL_UAPI_HEADERS_DIR=${OUT_DIR}msm-kernel/kernel-build-artifacts \
+    KERNEL_UAPI_HEADERS_DIR=${OUT_DIR}msm-kernel/ \
     INSTALL_MODULE_HEADERS=${TECHPACK_HEADERS} \
     ./build/build_module.sh  ${TECHPACK_MAKE_ARGS}
 }
