@@ -79,5 +79,7 @@ do_copy_abl[dirs] = "${DEPLOY_DIR_IMAGE}"
 do_copy_abl() {
     if [ -f ${KERNEL_PREBUILT_PATH}/abl_userdebug.elf ]; then
         install -m 0644 ${KERNEL_PREBUILT_PATH}/abl_userdebug.elf ${DEPLOY_DIR_IMAGE}/${PN}/abl_userdebug.elf
+    elif [ -f ${KERNEL_PREBUILT_PATH}/unsigned_abl_userdebug.elf ]; then
+        install -m 0644 ${KERNEL_PREBUILT_PATH}/unsigned_abl_userdebug.elf ${DEPLOY_DIR_IMAGE}/${PN}/abl_userdebug.elf
     fi
 }
