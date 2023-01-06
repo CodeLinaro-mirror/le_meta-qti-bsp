@@ -45,8 +45,8 @@ do_install_append() {
 
 # logind.conf
 do_install_append() {
-    # Ignore PowerKey
-    sed -i '$aHandlePowerKey=ignore' ${D}${systemd_unitdir}/logind.conf.d/00-${PN}.conf
+    # Poweroff upon PowerKey press
+    sed -i '$aHandlePowerKey=poweroff' ${D}${systemd_unitdir}/logind.conf.d/00-${PN}.conf
 }
 
 # system.conf
