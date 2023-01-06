@@ -22,6 +22,8 @@ do_install:append() {
     install -m 0644 ${WORKDIR}/vendor/qcom/opensource/securemsm-kernel/linux/smcinvoke.h ${D}${includedir}/linux
     install -m 0644 ${WORKDIR}/vendor/qcom/opensource/securemsm-kernel/linux/qcedev.h ${D}${includedir}/linux
     install -m 0644 ${WORKDIR}/vendor/qcom/opensource/securemsm-kernel/linux/fips_status.h ${D}${includedir}/linux
+    install -d ${D}${includedir}/hdcp_qseecom
+    install -m 0644 ${TECHPACK_MODULE_OUT}/Module.symvers ${D}${includedir}/hdcp_qseecom
 }
 
 FILES:${PN} += "${sysconfdir}/*"
