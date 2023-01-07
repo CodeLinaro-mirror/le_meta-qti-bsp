@@ -49,7 +49,6 @@ CORE_IMAGE_EXTRA_INSTALL += "\
 "
 
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "chronyc"
-CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-audio"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-bluetooth"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-cvp"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-data"
