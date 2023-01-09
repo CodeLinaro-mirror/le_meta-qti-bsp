@@ -10,6 +10,10 @@ include conf/machine/include/arm/arch-armv8a.inc
 PREFERRED_PROVIDER_virtual/kernel = "linux-msm"
 PREFERRED_VERSION_linux-msm ?= "4.14"
 PREFERRED_VERSION_linux-msm-headers ?= "4.14"
+PREFERRED_VERSION_adreno = "1.0"
+PREFERRED_VERSION_gbm = "20.1.0"
+PREFERRED_VERSION_media = "0.1"
+PREFERRED_VERSION_qmmf-sdk = "1.0"
 
 PAGE_SIZE ?= '4096'
 
