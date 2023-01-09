@@ -7,30 +7,13 @@ IMAGE_FEATURES += "ssh-server-openssh"
 
 CORE_IMAGE_EXTRA_INSTALL += "\
         glib-2.0 \
+        gki-kernel-modules-second-stage \
         kernel-modules \
         packagegroup-android-utils \
         packagegroup-filesystem-utils \
-        packagegroup-qti-audio \
-        ${@bb.utils.contains('COMBINED_FEATURES', 'qti-bluetooth', "packagegroup-qti-bluetooth", "", d)} \
-        packagegroup-qti-camera \
         packagegroup-qti-core \
-        packagegroup-qti-cvp \
-        ${@bb.utils.contains('MACHINE_FEATURES', 'qti-eva', "packagegroup-qti-eva", "", d)} \
-        ${@bb.utils.contains('MACHINE_FEATURES', 'qti-data-modem', "packagegroup-qti-data", "", d)} \
-        packagegroup-qti-display \
         packagegroup-qti-dsp \
-        packagegroup-qti-fastcv \
-        packagegroup-qti-gfx \
-        packagegroup-qti-pulseaudio \
-        packagegroup-qti-qvr \
-        packagegroup-qti-securemsm \
-        packagegroup-qti-sensors-see \
-        packagegroup-qti-splitxr \
-        packagegroup-qti-splitxr-common \
         packagegroup-qti-ss-mgr \
-        packagegroup-qti-test-sensors-see \
-        packagegroup-qti-video \
-        ${@bb.utils.contains('COMBINED_FEATURES', 'qti-wifi', "packagegroup-qti-wifi", "", d)} \
         packagegroup-startup-scripts \
         packagegroup-support-utils \
         packagegroup-qti-perf \
@@ -38,17 +21,10 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         powerapp-powerconfig \
         systemd-machine-units \
         ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
-        ${@bb.utils.contains('MACHINE_FEATURES', 'qti-npu', "packagegroup-qti-npu", "", d)} \
 "
 
-#install drm
-CORE_IMAGE_EXTRA_INSTALL += " \
-            libdrm \
-            libdrm-tests \
-            libdrm-kms \
-            "
-#Install packages for display
-CORE_IMAGE_EXTRA_INSTALL += " \
-            wayland \
-            gbm \
-            "
+# Install bash shell
+CORE_IMAGE_EXTRA_INSTALL += "bash"
+
+# Remove unsupported SDK packages
+TOOLCHAIN_TARGET_TASK:remove = "ath6kl-utils-staticdev"
