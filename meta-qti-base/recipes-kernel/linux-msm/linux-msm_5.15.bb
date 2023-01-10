@@ -2,7 +2,7 @@ SUMMARY = "CLO Linux Kernel"
 LICENSE = "GPLv2.0-with-linux-syscall-note"
 LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 
-DEPENDS += "elfutils-native kern-tools-native mkbootimg-native mkdtimg-native openssl-native rsync-native signing-keys"
+DEPENDS += "elfutils-native kern-tools-native mkbootimg-native mkdtimg-native openssl-native pahole-native rsync-native signing-keys"
 
 COMPATIBLE_MACHINE = "sa81x5|lemans|quin-gvm-gen4-2"
 
@@ -47,6 +47,9 @@ do_patch_veritycert() {
 }
 
 do_patch[postfuncs] += "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains('MACHINE_FEATURES', 'dm-verity-bootloader', 'do_patch_veritycert', '', d), '', d)}"
+
+EXTRA_OEMAKE:remove = "PAHOLE=false"
+KCONFIG_CONFIG_COMMAND:remove = "PAHOLE=false"
 
 do_configure:prepend() {
     if [ ! -f "${KERNEL_CONFIG_PATH}/vendor/${KERNEL_ARCH}.config" ]; then
