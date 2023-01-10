@@ -198,6 +198,10 @@ python () {
 # then we can append the DTBs that we need for $MACHINE.
 KERNEL_EXTRA_ARGS += "dtbs"
 
+do_compile:prepend() {
+        export DTC_FLAGS="-@"
+}
+
 # when using our own module signing key kernel.bbclass will fail to copy the public part of the key
 # since it checks if the .pem file exists which is not the case, so we need to explicitely copy
 # the x509 (public key) file
