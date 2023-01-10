@@ -69,6 +69,9 @@ CFLAGS_append = " -fPIC"
 # So temporarily revert to default optimizations for systemd.
 SELECTED_OPTIMIZATION = "-O2 -fexpensive-optimizations -frename-registers -fomit-frame-pointer -ftree-vectorize"
 
+# Add a build flag to mask journaling services.
+SYSTEMD_ENABLE_JOURNAL ?= "1"
+
 do_install_append () {
    install -d ${D}/etc/systemd/system/
    install -d ${D}/lib/systemd/system/ffbm.target.wants
@@ -93,7 +96,6 @@ do_install_append () {
        install -m 0644 ${WORKDIR}/trusted_touch.conf -D ${D}/etc/tmpfiles.d/trusted_touch.conf
    fi
 
-   #  Mask journaling services by default.
    #  'systemctl unmask' can be used on device to enable them if needed.
    if [ "${SYSTEMD_ENABLE_JOURNAL}" != "1" ]; then
        ln -sf /dev/null ${D}/etc/systemd/system/systemd-journald.service
