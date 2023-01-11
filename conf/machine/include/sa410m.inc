@@ -39,6 +39,9 @@ KERNEL_PREBUILT_PATH ?= "${WORKSPACE}/kernel-5.15/out/msm-kernel-sa410m_auto-${K
 KERNEL_OUT_PATH ?= "${WORKSPACE}/kernel-5.15/out/msm-kernel-sa410m_auto-${KERNEL_VARIANT}defconfig"
 KERNEL_BUILD_CONFIG ?= "msm-kernel/build.config.msm.sa410m_auto"
 
+# Update this to change the SELinux mode
+DEFAULT_ENFORCING = "permissive"
+
 # Bootloader configuration
 #EXTRA_IMAGEDEPENDS += "edk2"
 
