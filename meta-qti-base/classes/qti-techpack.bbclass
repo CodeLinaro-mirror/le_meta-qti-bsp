@@ -37,7 +37,7 @@ do_build_tools() {
     cp -R ${KERNEL_TOOLCHAIN_DIR}/build build
 
     install -d ${OUT_DIR}
-    rsync -a --exclude=.tmp* ${STAGING_KERNEL_BUILDDIR} ${OUT_DIR}
+    rsync -a --include=.config --exclude=.* --exclude=*.tmp ${STAGING_KERNEL_BUILDDIR} ${OUT_DIR}
     mv ${OUT_DIR}/kernel-build-artifacts ${OUT_DIR}/msm-kernel
 }
 do_build_tools[dirs] = "${WORKDIR}/build"
