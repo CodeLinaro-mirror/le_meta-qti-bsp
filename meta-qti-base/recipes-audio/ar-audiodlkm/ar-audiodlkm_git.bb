@@ -29,9 +29,11 @@ MODULES = "\
         ipc/gpr_dlkm.ko \
         ipc/audio_pkt_dlkm.ko  \
         asoc/codecs/stub_dlkm.ko \
+        asoc/codecs/wcd9xxx_dlkm.ko \
         asoc/platform_dlkm.ko \
         asoc/spf_machine_dlkm.ko \
         soc/snd_event_dlkm.ko \
+        soc/pinctrl_lpi_dlkm.ko \
 "
 
 TECHPACK_MODULE_OUT = "${WORKDIR}/audio-kernel-ar"
