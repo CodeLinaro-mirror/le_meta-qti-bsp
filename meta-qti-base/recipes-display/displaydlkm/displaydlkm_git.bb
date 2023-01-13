@@ -17,6 +17,7 @@ inherit qti-techpack
 
 TECHPACK_MODULE_OUT = "${WORKDIR}/display-drivers"
 TECHPACK_MODULES = "msm/msm_drm.ko"
+TECHPACK_MODULES:quin-gvm-gen4-2 = "msm-hyp/msm_hyp.ko msm-cfg/msm_cfg.ko"
 TECHPACK_HEADERS = "1"
 
 do_install:append:sa81x5(){

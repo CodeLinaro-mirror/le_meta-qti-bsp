@@ -11,10 +11,10 @@ PACKAGES = "\
 ALLOW_EMPTY:${PN} = "1"
 
 RDEPENDS:${PN} += "\
-    libgptp-test \
-    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', 'open-avb', d)} \
+    gptp-test \
+    gptp \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'ptp-virtual', '', d)} \
-    hsi2s \
-    hsi2s-test \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'avb-utils', '', d)} \
     "
+
+RDEPENDS:${PN}:sa81x5:append = " open-avb"
