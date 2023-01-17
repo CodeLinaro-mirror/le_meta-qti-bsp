@@ -23,6 +23,7 @@ USERDATA_FSTYPE = "ext4"
 # Sizes for EXT4 partitions
 SYSTEM_SIZE_EXT4 ?= "1GiB"
 VDLKM_SIZE_EXT4 ?= "98MiB"
+PERSIST_SIZE_EXT4 ?= "32MiB"
 
 # Formats of root filesystem images.
 IMAGE_FSTYPES += "ext4"
