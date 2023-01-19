@@ -15,6 +15,7 @@ DEPENDS += "\
     gstreamer1.0-plugins-base \
     linux-msm-headers \
     mm-gfx-auto-prop \
+    ${@oe.utils.version_less_or_equal('PREFERRED_VERSION_linux-msm', '5.4', '', 'videodlkm', d)} \
 "
 
 SRC_URI = "${PATH_TO_REPO}/gstreamer/gst-plugins-qti-oss/.git;protocol=${PROTO};destsuffix=gstreamer/gst-plugins-qti-oss;usehead=1"
