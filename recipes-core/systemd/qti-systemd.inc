@@ -71,6 +71,7 @@ SELECTED_OPTIMIZATION = "-O2 -fexpensive-optimizations -frename-registers -fomit
 
 # Add a build flag to mask journaling services.
 SYSTEMD_ENABLE_JOURNAL ?= "1"
+SYSTEMD_ENABLE_JOURNAL_qti-distro-perf ?= "0"
 
 do_install_append () {
    install -d ${D}/etc/systemd/system/
