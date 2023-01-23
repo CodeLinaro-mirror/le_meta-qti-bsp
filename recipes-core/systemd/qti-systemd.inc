@@ -70,6 +70,10 @@ CFLAGS:append = " -fPIC"
 # So temporarily revert to default optimizations for systemd.
 SELECTED_OPTIMIZATION = "-O2 -fexpensive-optimizations -frename-registers -fomit-frame-pointer -ftree-vectorize"
 
+# Add a build flag to mask journaling services.
+SYSTEMD_ENABLE_JOURNAL ?= "1"
+SYSTEMD_ENABLE_JOURNAL:qti-distro-perf ?= "0"
+
 do_install:append () {
    install -d ${D}/etc/systemd/system/
    install -d ${D}/lib/systemd/system/ffbm.target.wants
