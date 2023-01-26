@@ -25,6 +25,7 @@ PACKAGE_INSTALL = "\
     liblog \
     logwrapper \
     packagegroup-core-boot \
+    packagegroup-filesystem-utils-base \
     udev \
     ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'libselinux libpcre', '', d)} \
 "
