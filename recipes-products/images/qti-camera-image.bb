@@ -7,12 +7,10 @@ inherit qimage
 IMAGE_FEATURES += "ssh-server-openssh"
 
 CORE_IMAGE_EXTRA_INSTALL += "\
-        e2fsprogs \
-        e2fsprogs-e2fsck \
-        e2fsprogs-mke2fs \
         glib-2.0 \
         kernel-modules \
         packagegroup-android-utils \
+        packagegroup-filesystem-utils \
         packagegroup-qti-audio \
         packagegroup-qti-bluetooth \
         packagegroup-qti-camera \
