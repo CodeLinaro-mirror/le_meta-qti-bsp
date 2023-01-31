@@ -1,0 +1,15 @@
+#Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+#SPDX-License-Identifier: BSD-3-Clause-Clear
+
+[Unit]
+Description=mount bind machine-id
+DefaultDependencies=no
+Before=etc.mount
+
+[Service]
+Type=oneshot
+ExecStart=/sbin/mount-copybind /overlay/etc/machine-id  /etc/machine-id
+ExecStart=/sbin/restorecon -RD /etc/machine-id
+
+[Install]
+WantedBy=local-fs.target
