@@ -54,6 +54,7 @@ MSM_UAPI_HEADERS = " \
     linux/fips_status.h \
     linux/smcinvoke.h \
     linux/habmmid.h \
+    linux/hab_ioctl.h \
 "
 
 DISPLAY_UAPI_HEADERS = " \
