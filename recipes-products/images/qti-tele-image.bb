@@ -9,6 +9,7 @@ IMAGE_FEATURES += "read-only-rootfs ${@bb.utils.contains('IMAGE_FSTYPES', 'ubi',
 # Install km-loader for selected machines
 EVDEVMODULE ?= 'False'
 EVDEVMODULE_sa515m = 'True'
+EVDEVMODULE_sa415m = 'True'
 
 CORE_IMAGE_EXTRA_INSTALL += "\
         ${@bb.utils.contains('MACHINE_FEATURES', 'emmc-boot', 'e2fsprogs e2fsprogs-e2fsck e2fsprogs-mke2fs', '', d)} \
@@ -29,6 +30,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         ${@bb.utils.contains('MACHINE_FEATURES', 'qti-wlan', 'packagegroup-qti-wlan', '', d)} \
         ${@bb.utils.contains('COMBINED_FEATURES', 'qti-security', 'packagegroup-qti-securemsm', '', d)} \
         ${@bb.utils.contains('COMBINED_FEATURES', 'qti-audio', 'packagegroup-qti-audio', '', d)} \
+        ${@bb.utils.contains('MACHINE_FEATURES', 'qti-cv2x', 'packagegroup-qti-telematics-cv2x', '', d)} \
         packagegroup-qti-ss-mgr \
         packagegroup-qti-telematics \
         ${@bb.utils.contains('DISTRO_FEATURES', 'qti-telux', 'packagegroup-qti-telsdk', '', d)} \
