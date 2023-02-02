@@ -40,8 +40,8 @@ EXTRA_OEMAKE:append = " \
                        "
 
 _WLAN_CFG_OVERRIDE = "\
-                        CONFIG_WLAN_OPEN_P2P_INTERFACE=n \
-                        CONFIG_SUPPORT_P2P_BY_ONE_INTF_WLAN=y \
+                        CONFIG_WLAN_OPEN_P2P_INTERFACE=y \
+                        CONFIG_SUPPORT_P2P_BY_ONE_INTF_WLAN=n \
                         CONFIG_WLAN_PLACEMARKER_PREFIX=108 \
                         CONFIG_CNSS_GENL=n \
                         CONFIG_QCOM_TDLS=n \

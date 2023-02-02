@@ -9,6 +9,7 @@ TECHPACK_MODULE_OUT ?= ""
 TECHPACK_HEADERS ?= ""
 TECHPACK_MODULES ?= ""
 TECHPACK_DTBS ?= ""
+TECHPACK_DTBOS ?= ""
 TECHPACK_MAKE_ARGS ?= ""
 
 KERNEL_VERSION = "${@oe.utils.read_file('${STAGING_KERNEL_BUILDDIR}/kernel-abiversion')}"
@@ -36,7 +37,7 @@ do_build_tools() {
     cp -R ${KERNEL_TOOLCHAIN_DIR}/build build
 
     install -d ${OUT_DIR}
-    rsync -a --exclude=.tmp* ${STAGING_KERNEL_BUILDDIR} ${OUT_DIR}
+    rsync -a --include=.config --exclude=.* --exclude=*.tmp ${STAGING_KERNEL_BUILDDIR} ${OUT_DIR}
     mv ${OUT_DIR}/kernel-build-artifacts ${OUT_DIR}/msm-kernel
 }
 do_build_tools[dirs] = "${WORKDIR}/build"
@@ -85,11 +86,21 @@ do_install() {
 
 do_deploy() {
     if [ -n "${TECHPACK_DTBS}" ]; then
-        install -d ${DEPLOYDIR}/build-artifacts/techpack-dtbos
+        install -d ${DEPLOYDIR}/build-artifacts/techpack-dtbs
 
         for dtb in ${TECHPACK_DTBS}; do
             if [ -f ${TECHPACK_MODULE_OUT}/$dtb ]; then
-                install -m 0644 ${TECHPACK_MODULE_OUT}/$dtb ${DEPLOYDIR}/build-artifacts/techpack-dtbos/
+                install -m 0644 ${TECHPACK_MODULE_OUT}/$dtb ${DEPLOYDIR}/build-artifacts/techpack-dtbs/
+            fi
+        done
+    fi
+
+    if [ -n "${TECHPACK_DTBOS}" ]; then
+        install -d ${DEPLOYDIR}/build-artifacts/techpack-dtbos
+
+        for dtbo in ${TECHPACK_DTBOS}; do
+            if [ -f ${TECHPACK_MODULE_OUT}/$dtbo ]; then
+                install -m 0644 ${TECHPACK_MODULE_OUT}/$dtbo ${DEPLOYDIR}/build-artifacts/techpack-dtbos/
             fi
         done
     fi
