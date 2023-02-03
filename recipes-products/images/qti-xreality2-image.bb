@@ -3,11 +3,14 @@
 
 require qti-xreality-image.bb
 
+# Stop abl generation
+EXTRA_IMAGEDEPENDS_remove = "edk2"
+
 # Add aurora supported package groups
 CORE_IMAGE_EXTRA_INSTALL += "\
-        gki-kernel-modules-second-stage \
-        packagegroup-qti-camera-kernel \
-        packagegroup-qti-mmframeworks \
+        lxc \
+        packagegroup-qti-splitxr \
+        packagegroup-qti-splitxr-common \
 "
 
 CORE_IMAGE_EXTRA_INSTALL += "bash"
