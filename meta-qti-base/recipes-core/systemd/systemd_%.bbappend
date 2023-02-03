@@ -43,6 +43,14 @@ LDFLAGS:append = " -lglib-2.0"
 # So temporarily revert to default optimizations for systemd.
 FULL_OPTIMIZATION = "-O2 -fexpensive-optimizations -frename-registers -fomit-frame-pointer -ftree-vectorize"
 
+do_install:append:sa81x5() {
+    # workaroud for suspend, suspend is not allowd in systemd-sleep, LA will trigger suspend
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'qti-lxc', 'true', 'false', d)}; then
+        sed -i 's/#AllowSuspend=yes/AllowSuspend=no/' ${D}${sysconfdir}/systemd/sleep.conf
+    fi
+
+}
+
 do_install:append () {
     # Use kernel rules for network iface name
     sed -i  's/^NamePolicy.*/NamePolicy=kernel/g' ${D}${systemd_unitdir}/network/99-default.link
