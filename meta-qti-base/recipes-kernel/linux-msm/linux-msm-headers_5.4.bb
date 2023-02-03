@@ -35,6 +35,7 @@ COMMON_UAPI_HEADERS = " \
     linux/mount.h \
     linux/types.h \
     linux/dma-buf.h \
+    linux/string.h \
     linux/v4l2-controls.h \
     drm/drm_fourcc.h \
     drm/drm.h \
@@ -55,6 +56,7 @@ MSM_UAPI_HEADERS = " \
     linux/smcinvoke.h \
     linux/habmmid.h \
     linux/hab_ioctl.h \
+    linux/hgsl.h \
 "
 
 DISPLAY_UAPI_HEADERS = " \
