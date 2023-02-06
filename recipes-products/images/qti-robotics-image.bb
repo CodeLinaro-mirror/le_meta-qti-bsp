@@ -65,3 +65,8 @@ CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-test-sensors-see"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-video"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-wifi"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-core-prop"
+CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-camera"
+CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-camera-kernel"
+CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-gfx"
+CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-display"
+
