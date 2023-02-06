@@ -1,16 +1,32 @@
 #Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
 #SPDX-License-Identifier: BSD-3-Clause-Clear
 
+DEPENDS += "dtc-native kernel-toolchain-native mkdtimg-native virtual/kernel"
+
+inherit qti-kernel-toolchain
+
 do_merge_dtbs() {
-     install -d ${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbos
-     cd ${SRC_DIR_ROOT}/kernel/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform && \
-     LD_LIBRARY_PATH=../out/msm-kernel-${KERNEL_ARCH}-${KERNEL_VARIANT}defconfig/host/lib/:$LD_LIBRARY_PATH \
-     OUT_DIR=${SRC_DIR_ROOT}/kernel/kernel-${PREFERRED_VERSION_linux-msm}/out/msm-kernel-${KERNEL_ARCH}-${KERNEL_VARIANT}defconfig/ \
-     BUILD_CONFIG=${KERNEL_BUILD_CONFIG}  \
-     ./build/android/merge_dtbs.sh \
+     install -d ${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbs
+     install -d ${DEPLOY_DIR_IMAGE}/dtbs
+
+     ${KERNEL_TOOLCHAIN_DIR}/build/android/merge_dtbs.py \
      ${DEPLOY_DIR_IMAGE}/build-artifacts/dtb \
-     ${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbos ${DEPLOY_DIR_IMAGE}/dtbs
+     ${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbs ${DEPLOY_DIR_IMAGE}/dtbs
+
+     cat ${DEPLOY_DIR_IMAGE}/dtbs/*.dtb > ${DEPLOY_DIR_IMAGE}/dtbs/dtb.img
+
+     if ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'true', 'false', d)}; then
+         install -d ${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbos
+         install -d ${DEPLOY_DIR_IMAGE}/dtbos
+         ${KERNEL_TOOLCHAIN_DIR}/build/android/merge_dtbs.py \
+         ${DEPLOY_DIR_IMAGE}/build-artifacts/dtbo \
+         ${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbos ${DEPLOY_DIR_IMAGE}/dtbos
+     fi
 }
+do_merge_dtbs[cleandirs] = " \
+     ${DEPLOY_DIR_IMAGE}/dtbs \
+     ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', '${DEPLOY_DIR_IMAGE}/dtbos ', ' ', d)} \
+"
 
 addtask do_merge_dtbs after do_image before do_makeboot
 
@@ -38,6 +54,12 @@ python do_makeboot () {
         ret = subprocess.check_output(cmd, shell=True)
     except RuntimeError as e:
          bb.error("do_makeboot cmd: %s failed with error %s" % (cmd, str(e)))
+
+    if bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'true', 'false', d):
+        cmd = "mkdtimg create %s-dtbo.img --page_size=%s dtbos/*.dtbo" \
+            % (d.getVar('PRODUCT'), d.getVar('PAGE_SIZE'))
+        bb.debug(1, "mkdtimg cmd: %s" % (cmd))
+        subprocess.call(cmd, shell=True)
 }
 
 do_makeboot[dirs] = "${DEPLOY_DIR_IMAGE}"
