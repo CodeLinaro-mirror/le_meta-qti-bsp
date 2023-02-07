@@ -1,0 +1,5 @@
+#
+# Default properties to be set for kalama
+#
+
+ro.hardware.camera=qcom
