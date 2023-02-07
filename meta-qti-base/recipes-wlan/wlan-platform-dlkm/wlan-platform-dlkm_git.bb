@@ -22,6 +22,24 @@ TECHPACK_MODULES += "cnss_genl/cnss_nl.ko"
 
 inherit qti-techpack
 
+WLAN_PLATFORM_CFG = "\
+                     USE_EXTERNAL_CONFIGS=y \
+                     CONFIG_CNSS_OUT_OF_TREE=y \
+                     CONFIG_CNSS2=m \
+                     CONFIG_AUTO_PROJECT=y \
+                     CONFIG_CNSS2_QMI=y \
+                     CONFIG_CNSS2_DEBUG=y \
+                     CONFIG_CNSS_QMI_SVC=m \
+                     CONFIG_CNSS_PLAT_IPC_QMI_SVC=m \
+                     CONFIG_CNSS_GENL=m \
+                     CONFIG_CNSS_UTILS=m \
+                     CONFIG_CNSS2_CONDITIONAL_POWEROFF=y \
+                     CONFIG_CNSS_SUPPORT_DUAL_DEV=y \
+                     "
+
+EXTRA_OEMAKE:append = " ${WLAN_PLATFORM_CFG}"
+TECHPACK_MAKE_ARGS = "${EXTRA_OEMAKE} QTI_TECHPACK=true"
+
 do_install:append(){
     dlkmdir=${D}${includedir}/wlan-platform
     install -d ${dlkmdir}

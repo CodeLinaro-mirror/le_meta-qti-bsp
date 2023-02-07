@@ -106,14 +106,36 @@ function check_all_interfaces_up()
     return 1;
 }
 
+function check_dns_conf()
+{
+    echo "DNS resolv.conf file is present. "
+    for i in {1..10}
+    do
+        if [[ -e /etc/resolv.conf ]];then
+            echo "DNS resolv.conf file is present. "
+            return 0;
+        fi
+        usleep 500000    ## 500ms
+    done
+
+    echo " WARN : resolv.conf file is not present, DNS not working !"
+    return 1;
+}
 
 function setup_network_agl_vm_1()
 {
-    echo "Assign IP address"
-    ifconfig eth0 192.168.1.2 up
+    if [[ -e /vendor/persist/enable_dhcp ]];then
+        echo "Start DHCP."
+        check_dns_conf
+        udhcpc -i eth0
+        echo "Start DHCP complete."
+    else
+        echo "Assign IP address"
+        ifconfig eth0 192.168.1.2 up
 
-    echo "Setup route"
-    ip route add default dev eth0 via 192.168.1.10 table default
+        echo "Setup route"
+        ip route add default dev eth0 via 192.168.1.10 table default
+    fi
 
     echo "Enable forwarding"
     sysctl -w net.ipv4.conf.all.forwarding=1
