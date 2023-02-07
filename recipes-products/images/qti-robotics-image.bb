@@ -46,6 +46,8 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         systemd-machine-units \
         ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
         yavta \
+        libdmabufheap \
+        packagegroup-qti-sensors-ship \
 "
 
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "chronyc"
