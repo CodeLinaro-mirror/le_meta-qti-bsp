@@ -145,5 +145,64 @@ do_cleanup_sepolicy() {
 
 ROOTFS_POSTPROCESS_COMMAND += "${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'do_cleanup_sepolicy;', '', d)}"
 
+# Dual NAND recovery support
+# Dual NAND deploy path for ramdisk images.
+# Default deploy path for ramdisk images.
+DEPLOY_DIR_IMAGE_RAMDISK ?= "${DEPLOY_DIR_IMAGE}"
+RAMDISK ?= "/dev/null"
+RAMDISK_OFFSET ?= "0x0"
+BUNDLED_BOOTIMAGE_TARGET ?= ""
+RAMDISK = "${@bb.utils.contains('MACHINE_FEATURES', 'dual-nand-recovery', '${IMGDEPLOYDIR}/qti-recovery-image-${MACHINE}.cpio.gz','', d)}"
+RAMDISK_OFFSET = "${@bb.utils.contains('MACHINE_FEATURES', 'dual-nand-recovery', '0x2200000','', d)}"
 
+CORE_IMAGE_EXTRA_INSTALL +=  "\
+        ${@bb.utils.contains('MACHINE_FEATURES', 'dual-nand-recovery', 'libxml2 dual-nand-recovery kernel-modules data iproute2 can-utils start-scripts-init-can canflasher curl mtd-utils-parttool', '', d)} \
+"
 
+# The default ubi image generated doesn't have provision for selinux
+# Hence, create a recoveryfs.ubi image which is selinux enabled
+# Do this only when both selinux & nand-boot is enabled
+
+# Dual NAND recovery support
+################################################
+##########  Generate ramdisk boot.img ##########
+################################################
+python do_make_recovery_ramdisk_bootimg () {
+    import subprocess
+
+# create ramdisk deploy dir.
+    #v2 ramdisk_deploy = d.getVar('IMGDEPLOYDIR', True)
+    ramdisk_deploy = d.getVar('DEPLOY_DIR_IMAGE_RAMDISK', True)
+    if not os.path.exists(ramdisk_deploy):
+     os.mkdir(ramdisk_deploy)
+    mkboot_bin_path = d.getVar('STAGING_BINDIR_NATIVE', True) + '/mkbootimg'
+    zimg_path       = d.getVar('DEPLOY_DIR_IMAGE', True) + "/" + d.getVar('KERNEL_IMAGETYPE', True) + d.getVar('KERNEL_IMAGENAME', True)
+    cmdline         = "\"" + d.getVar('KERNEL_CMD_PARAMS', True) + "\""
+    pagesize        = d.getVar('PAGE_SIZE', True)
+    base            = d.getVar('KERNEL_BASE', True)
+
+    output_ramdisk  = d.getVar('DEPLOY_DIR_IMAGE_RAMDISK', True) + "/" + d.getVar('BUNDLED_BOOTIMAGE_TARGET', True)
+
+    # Get the ramdisk
+    ramdisk         = d.getVar('RAMDISK', True)
+    ramdisk_offset  = d.getVar('RAMDISK_OFFSET', True)
+
+    # cmd to make boot.img for ramdisk/ramfs
+    xtra_parms = " --tags-addr" + " " + d.getVar('KERNEL_TAGS_OFFSET')
+
+    cmd_ramdisk =  mkboot_bin_path + " --kernel %s --cmdline %s --pagesize %s --base %s %s --ramdisk %s --ramdisk_offset %s --output %s" \
+           % (zimg_path, cmdline, pagesize, base, xtra_parms, ramdisk, ramdisk_offset, output_ramdisk )
+    ramdisk_path    = d.getVar('RAMDISK')
+
+    # cmd to make boot.img
+    bb.debug(1, "do_make_ramdisk_bootimg cmd_ramdisk: %s" % (cmd_ramdisk))
+    subprocess.call(cmd_ramdisk, shell=True)
+}
+do_make_rec_ramdisk_bootimg[dirs]      = "${IMGDEPLOYDIR}"
+do_make_rec_ramdisk_bootimg[depends]  += "virtual/kernel:do_install"
+
+python () {
+    image = d.getVar('INITRAMFS_IMAGE')
+    if image:
+        bb.build.addtask('do_make_recovery_ramdisk_bootimg', 'do_image_complete', 'do_image_cpio', d)
+}

@@ -93,3 +93,18 @@ do_deploy_append () {
                 install -m 0644 $1 $MODULE_DEST' sh {} ${COPY_DEST} ';'
         done
 }
+
+# Dual NAND recovery support
+do_deploy_append () {
+    # Rename kernel images if MACHINE_SUPPORTS_DUAL_NAND_RECOVERY is set to True
+    if ${@bb.utils.contains('MACHINE_FEATURES', 'dual-nand-recovery', 'true', 'false', d)}; then
+        if [ -f "${DEPLOYDIR}/${KERNEL_IMAGETYPE}" ]; then
+            mv ${DEPLOYDIR}/${KERNEL_IMAGETYPE} ${DEPLOYDIR}/${KERNEL_IMAGETYPE}${KERNEL_IMAGENAME}
+        fi
+
+        if [ -f "${DEPLOYDIR}/vmlinux" ]; then
+            mv ${DEPLOYDIR}/vmlinux ${DEPLOYDIR}/vmlinux${KERNEL_IMAGENAME}
+        fi
+    fi
+}
+

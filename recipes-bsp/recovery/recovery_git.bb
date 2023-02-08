@@ -31,6 +31,9 @@ RM_WORK_EXCLUDE += "${PN}"
 do_install_append() {
     install -d ${D}${systemd_unitdir}/system/
     install -d ${D}${systemd_unitdir}/system/multi-user.target.wants/
-    install -m 0644 ${WORKDIR}/recovery.service -D ${D}${systemd_unitdir}/system/recovery.service
-    ln -sf ${systemd_unitdir}/system/recovery.service ${D}${systemd_unitdir}/system/multi-user.target.wants/recovery.service
+    # Dual Nand Recovery won't use this normal recovery service
+    if ${@bb.utils.contains('MACHINE_FEATURES', 'dual-nand-recovery', 'false', 'true', d)}; then
+        install -m 0644 ${WORKDIR}/recovery.service -D ${D}${systemd_unitdir}/system/recovery.service
+        ln -sf ${systemd_unitdir}/system/recovery.service ${D}${systemd_unitdir}/system/multi-user.target.wants/recovery.service
+    fi
 }
