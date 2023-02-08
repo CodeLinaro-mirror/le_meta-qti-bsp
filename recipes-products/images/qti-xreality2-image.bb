@@ -3,8 +3,9 @@
 
 require qti-xreality2-base-image.bb
 
-# Add aurora supported package groups
+# Add sxr supported package groups
 CORE_IMAGE_EXTRA_INSTALL += "\
+        packagegroup-qti-qvr \
         packagegroup-qti-splitxr \
         packagegroup-qti-splitxr-common \
 "
