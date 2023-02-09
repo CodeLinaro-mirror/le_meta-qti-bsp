@@ -30,8 +30,9 @@ MODULES = "\
 "
 TECHPACK_MODULE_OUT = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', "${WORKDIR}/audio-kernel", "", d)}"
 TECHPACK_MODULES = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', "${MODULES}", "", d)}"
-TECHPACK_HEADERS = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', "1", "", d)}"
-TECHPACK_MAKE_ARGS = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', "${EXTRA_OEMAKE} QTI_TECHPACK=true", "", d)}"
+TECHPACK_HEADERS = "${S}/include/uapi/audio"
+TECHPACK_HEADERS_OUT = "audio-kernel/audio"
+TECHPACK_MAKE_ARGS = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', "${EXTRA_OEMAKE} QTI_TECHPACK=true", "", d)} LEGACY_PATH="${S}""
 
 do_configure() {
     if ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.4', 'true', 'false', d)}; then
@@ -40,14 +41,17 @@ do_configure() {
 }
 
 do_install:append() {
-    install -d -p ${D}${includedir}/audio-kernel/audio/linux
-    install -d -p ${D}${includedir}/audio-kernel/audio/linux/mfd/wcd9xxx
-    install -d -p ${D}${includedir}/audio-kernel/audio/sound
 
-    process_headers "${S}/include/uapi/audio/linux" "${D}${includedir}/audio-kernel/audio/linux"
-    process_headers "${S}/include/uapi/audio/linux/mfd/wcd9xxx" "${D}${includedir}/audio-kernel/audio/linux/mfd/wcd9xxx"
-    process_headers "${S}/include/uapi/audio/sound" "${D}${includedir}/audio-kernel/audio/sound"
+    if ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.4', 'true', 'false', d)}; then
+        install -d -p ${D}${includedir}/audio-kernel/audio/linux
+        install -d -p ${D}${includedir}/audio-kernel/audio/linux/mfd/wcd9xxx
+        install -d -p ${D}${includedir}/audio-kernel/audio/sound
 
+        process_headers "${S}/include/uapi/audio/linux" "${D}${includedir}/audio-kernel/audio/linux"
+        process_headers "${S}/include/uapi/audio/linux/mfd/wcd9xxx" "${D}${includedir}/audio-kernel/audi
+o/linux/mfd/wcd9xxx"
+        process_headers "${S}/include/uapi/audio/sound" "${D}${includedir}/audio-kernel/audio/sound"
+    fi
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
         install -m 0755 ${WORKDIR}/audio_load.conf -D ${D}${sysconfdir}/modules-load.d/audio_load.conf
     else
