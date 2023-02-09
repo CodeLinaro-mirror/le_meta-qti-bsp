@@ -19,7 +19,13 @@ inherit autotools pkgconfig systemd useradd
 
 COMPOSITION = "901D"
 
-QPERM_SERVICE = "${S}/leproperties/leprop.service"
+USERADD_PACKAGES = "${PN}-leprop ${PN}-adbd"
+
+GROUPADD_PARAM:${PN}-leprop = "leprop"
+USERADD_PARAM:${PN}-leprop = "-g leprop --no-create-home --shell /bin/false leprop"
+
+GROUPADD_PARAM:${PN}-adbd = "adb"
+USERADD_PARAM:${PN}-adbd = "-g adb --no-create-home --shell /bin/false adb"
 
 CPPFLAGS += "\
     -I${STAGING_INCDIR}/ext4_utils \
@@ -61,11 +67,9 @@ do_install:append() {
         install -m 0750 ${S}/adb/start_adbd -D ${D}${sysconfdir}/initscripts/adbd
         install -m 0755 ${S}/usb/start_usb -D ${D}${sysconfdir}/initscripts/usb
         install -m 0750 ${S}/rootdir/etc/init.qcom.post_boot.sh -D ${D}${sysconfdir}/initscripts/init_post_boot
-        install -m 0750 ${S}/rootdir/etc/init.qti.early_boot.sh -D ${D}${sysconfdir}/initscripts/init_early_boot
 
         install -d ${D}${systemd_unitdir}/system/
         install -d ${D}${systemd_unitdir}/system/multi-user.target.wants/
-        install -d ${D}${systemd_unitdir}/system/sysinit.target.wants/
 
         install -m 0644 ${S}/adb/adbd.service -D ${D}${systemd_unitdir}/system/adbd.service
         ln -sf ${systemd_unitdir}/system/adbd.service ${D}${systemd_unitdir}/system/multi-user.target.wants/adbd.service
@@ -76,10 +80,6 @@ do_install:append() {
         install -m 0644 ${S}/rootdir/etc/init_post_boot.service -D ${D}${systemd_unitdir}/system/init_post_boot.service
         ln -sf ${systemd_unitdir}/system/init_post_boot.service \
             ${D}${systemd_unitdir}/system/multi-user.target.wants/init_post_boot.service
-
-        install -m 0644 ${S}/rootdir/etc/init_early_boot.service -D ${D}${systemd_unitdir}/system/init_early_boot.service
-        ln -sf ${systemd_unitdir}/system/init_early_boot.service \
-            ${D}${systemd_unitdir}/system/sysinit.target.wants/init_early_boot.service
 
         install -m 0644 ${S}/leproperties/leprop.service -D ${D}${systemd_unitdir}/system/leprop.service
         ln -sf ${systemd_unitdir}/system/leprop.service \
@@ -99,7 +99,7 @@ do_install:append() {
     rm -rf ${D}${includedir}
 }
 
-PACKAGES =+ "${PN}-adbd ${PN}-usb ${PN}-post-boot ${PN}-early-boot ${PN}-leprop"
+PACKAGES =+ "${PN}-adbd ${PN}-usb ${PN}-post-boot ${PN}-leprop"
 
 FILES:${PN}-adbd += "\
     ${base_sbindir}/adbd \
@@ -128,12 +128,6 @@ FILES:${PN}-post-boot += "\
     ${systemd_unitdir}/system/init_post_boot.service \
     ${systemd_unitdir}/system/multi-user.target.wants/init_post_boot.service \
     ${sysconfdir}/initscripts/init_post_boot \
-"
-
-FILES:${PN}-early-boot += "\
-    ${systemd_unitdir}/system/init_early_boot.service \
-    ${systemd_unitdir}/system/sysinit.target.wants/init_early_boot.service \
-    ${sysconfdir}/initscripts/init_early_boot \
 "
 
 FILES:${PN}-leprop += "\
