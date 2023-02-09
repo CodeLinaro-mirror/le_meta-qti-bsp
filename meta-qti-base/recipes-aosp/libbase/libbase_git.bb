@@ -6,7 +6,7 @@ HOMEPAGE = "http://developer.android.com/"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://../NOTICE;md5=c1a3ff0b97f199c7ebcfdd4d3fed238e"
 
-DEPENDS += "libcutils libselinux"
+DEPENDS += "libcutils libselinux libutils"
 
 PR = "r1"
 
