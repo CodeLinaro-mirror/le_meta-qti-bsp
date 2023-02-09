@@ -14,6 +14,17 @@ IMAGE_INSTALL += " \
     system-core-post-boot \
     system-core-usb \
     system-prop \
+    bridge-utils \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'setup-network', '', d)} \
+    net-tools \
+    iproute2 \
+    iproute2-ss \
+    iproute2-tc \
+    vlan \
+    xinetd \
+    tcp-wrappers \
+    netkit-telnet \
+    openssh \
 "
 
 IMAGE_LINGUAS = ""
