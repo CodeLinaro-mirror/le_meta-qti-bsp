@@ -3,13 +3,13 @@ inherit kernel
 DESCRIPTION = "CAF Linux Kernel"
 LICENSE = "GPLv2.0-with-linux-syscall-note"
 
-COMPATIBLE_MACHINE = "cinder|sa410m|scuba-auto|sa410m-televm"
+COMPATIBLE_MACHINE = "cinder|sa410m|scuba-auto|sa410m-televm|sa525m-televm|sa525m|sa525m-emmc"
 
 FILESPATH =+ "${WORKSPACE}:"
 
 SRC_URI   =  "file://kernel-${PV}/kernel_platform/msm-kernel \
              ${@oe.utils.conditional('KERNEL_USE_PREBUILTS', 'True', '', 'file://kernel-${PV}/kernel_platform/msm-kernel/arch/${ARCH}/configs/${KERNEL_CONFIG}',d)} \
-             "
+             file://verity.x509.pem"
 
 S = "${WORKDIR}/kernel-${PV}/kernel_platform/msm-kernel"
 PR = "r0"

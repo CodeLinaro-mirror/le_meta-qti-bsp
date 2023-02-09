@@ -10,6 +10,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         e2fsprogs \
         e2fsprogs-e2fsck \
         e2fsprogs-mke2fs \
+        e2fsprogs-tune2fs \
         glib-2.0 \
         kernel-modules \
         libdrm-tests \
@@ -39,4 +40,5 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-support-utils \
         systemd-machine-units \
         ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
+        hibernate \
 "
