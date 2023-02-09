@@ -107,7 +107,6 @@ case $1/$2 in
             echo $usb_mode > $usb_dev_path/$dev/mode
         done
     fi
-    systemctl restart synergy.service
 
     if [ $2 == "hibernate" ]; then
         echo 1 > /sys/kernel/boot_adsp/boot
@@ -116,7 +115,23 @@ case $1/$2 in
     systemctl restart location_hal_daemon.service
     systemctl restart audiod.service
 
-    #load WLAN
+    # load WLAN
     systemctl restart init_qti_wlan_auto.service
+    n=0
+    while [ $n -le 5 ]
+    do
+        if [ $(ifconfig -a | grep wlan0 | wc -l) -ne 1 ];then
+            echo "wlan0 is not ready!"
+            let n++
+            sleep 1
+        else
+            echo "wlan0 is ready!"
+            break
+        fi
+    done
+
+    # restart BT service
+    systemctl restart synergy.service
+
     ;;
 esac
