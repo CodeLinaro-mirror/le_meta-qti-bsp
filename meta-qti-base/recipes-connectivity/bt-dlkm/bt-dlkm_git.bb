@@ -19,4 +19,6 @@ TECHPACK_MAKE_ARGS = "CONFIG_MSM_BT_POWER=m"
 
 inherit qti-techpack
 
+RPROVIDES:${PN} += "kernel-module-btpower-${KERNEL_VERSION}"
+
 FILES:${PN} += "${nonarch_base_libdir}/modules/${KERNEL_VERSION}/*"
