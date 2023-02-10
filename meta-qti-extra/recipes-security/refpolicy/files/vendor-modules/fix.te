@@ -120,6 +120,7 @@ require {
     type vendor_location;
     type vendor_qti_init_shell;
     type vendor_sysfs_sensors;
+    type su;
     type zygote;
     class dir { add_name create getattr open read remove_name rename reparent search setattr write };
     class file { create entrypoint execute execute_no_trans getattr ioctl link map open read setattr write };
@@ -171,6 +172,7 @@ allow host_exec_t init:dir search;
 allow host_exec_t init:file { getattr open read };
 allow host_exec_t init:lnk_file read;
 allow host_exec_t init:process { getattr noatsecure rlimitinh siginh transition };
+allow host_exec_t su:process { noatsecure rlimitinh siginh transition };
 allow host_exec_t shell_exec:file { execute open read };
 allowxperm host_exec_t host_file_t:file ioctl { 0x9402 };
 
@@ -178,6 +180,7 @@ allowxperm host_exec_t host_file_t:file ioctl { 0x9402 };
 allow init devpts:chr_file { getattr ioctl };
 allow init host_exec_t:fd use;
 allow init shell_exec:file entrypoint;
+allow init toolbox_exec:file entrypoint;
 allow init vendor_file:file execute;
 allow init system_file:file execute_no_trans;
 allow init audioserver:binder call;
