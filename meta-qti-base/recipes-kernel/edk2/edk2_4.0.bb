@@ -8,7 +8,9 @@ LIC_FILES_CHKSUM = "\
 "
 PROVIDES = "virtual/bootloader"
 
-DEPENDS += "kernel-toolchain-native util-linux-native"
+DEPENDS += "util-linux-native"
+
+TOOLCHAIN = "clang"
 
 PR = "r1"
 PV = "4.0"
@@ -27,16 +29,16 @@ SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/bootable/bootloader/edk2"
 
-inherit deploy qti-kernel-toolchain
+inherit deploy
 
 VBLE = "${@bb.utils.contains('DISTRO_FEATURES', 'vble','1', '0', d)}"
 VERITY_ENABLED = "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity','1', '0', d)}"
-EARLY_ETH = "${@bb.utils.contains('DISTRO_FEATURES', 'early-eth', '1', '0', d)}"
+EARLY_ETH = "${@bb.utils.contains('DISTRO_FEATURES', 'qti-early-eth', '1', '0', d)}"
 HIBERNATION = "${@bb.utils.contains('COMBINED_FEATURES', 'hibernation', '1', '0', d)}"
 AB_BOOT_LXC = "${@bb.utils.contains('MACHINE_FEATURES', 'qti-lxc', '1', '0', d)}"
 
-EXTRA_OEMAKE = "'CLANG_BIN=${KERNEL_TOOLCHAIN_CLANG}/bin/' \
-                'CLANG_PREFIX=${KERNEL_TOOLCHAIN_CLANG}/bin/' \
+EXTRA_OEMAKE = "'CLANG_BIN=${STAGING_BINDIR_NATIVE}/'\
+                'CLANG_PREFIX=${STAGING_BINDIR_NATIVE}/${TARGET_SYS}/${TARGET_PREFIX}/'\
                 'TARGET_ARCHITECTURE=${TARGET_ARCH}'\
                 'BUILDDIR=${S}'\
                 'BOOTLOADER_OUT=${S}/out'\
@@ -46,11 +48,15 @@ EXTRA_OEMAKE = "'CLANG_BIN=${KERNEL_TOOLCHAIN_CLANG}/bin/' \
                 'INIT_BIN_LE=/sbin/init'\
                 'EDK_TOOLS_PATH=${S}/BaseTools'\
                 'EARLY_ETH_ENABLED=${EARLY_ETH}'\
+                'EARLY_ETH_AS_DLKM=1' \
                 'UBSAN_UEFI_GCC_FLAG_ALIGNMENT=-Wno-misleading-indentation' \
                 'TARGET_BOARD_TYPE_AUTO=1' \
                 'SUPPORT_AB_BOOT_LXC=${AB_BOOT_LXC}' \
                 ${@bb.utils.contains('DISTRO_FEATURES', 'qti-avb', 'VERIFIED_BOOT_ENABLED=1', '', d)} \
                 ${@bb.utils.contains('DISTRO_FEATURES', 'qti-avb', 'VERIFIED_BOOT_2=1', '', d)} "
+
+EXTRA_OEMAKE:append:sa81x5 = " 'AB_RETRYCOUNT_DISABLE=1' \
+                               'ENABLE_LV_ATOMIC_AB=1' "
 
 do_prebuilt_configure() {
     cd ${WORKDIR}/kernel-${PREFERRED_VERSION_linux-msm}/out/msm-kernel-${KERNEL_ARCH}-${EDK2_VARIANT}defconfig/dist/
@@ -60,14 +66,11 @@ do_prebuilt_configure() {
 
 do_configure[noexec] = "1"
 do_compile () {
-    export BUILD_CC=${KERNEL_TOOLCHAIN_CLANG}/bin/clang
-    export BUILD_CXX=${KERNEL_TOOLCHAIN_CLANG}/bin/clang++
-    export CC=clang
-    export CXX=clang++
-    export LD=${BUILD_LD}
-    export AR=llvm-ar
+    export BUILD_CC=${STAGING_BINDIR_NATIVE}/clang
+    export BUILD_CXX=${STAGING_BINDIR_NATIVE}/clang++
+
     if ${@bb.utils.contains('MACHINE_FEATURES', 'goldcore-boot', 'true', 'false', d)}; then
-        export LINUX_BOOT_CPU_SELECTION_ENABLED=1
+        export TARGET_LINUX_BOOT_CPU_SELECTION=true
         export TARGET_LINUX_BOOT_CPU_ID=7
     fi
     oe_runmake -f makefile all

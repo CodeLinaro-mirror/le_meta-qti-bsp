@@ -39,8 +39,8 @@ if (lspci -k|grep cnss_pci);then
 		echo "##########unload qca6696#############"
 		modprobe -r qca6696
 	elif (lspci -k|grep 1103);then
-		echo "##########unload qca6490#############"
-		modprobe -r qca6490
+		echo "##########unload qca6698#############"
+		modprobe -r qca6698
 	else
 		echo "##########unload default wlan########"
 		modprobe -r wlan
