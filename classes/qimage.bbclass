@@ -1,9 +1,10 @@
 QIMGCLASSES = "core-image qimage-utils python3native"
-QIMGCLASSES += "${@bb.utils.filter('MACHINE_FEATURES', 'dm-verity-none dm-verity-bootloader dm-verity-initramfs', d)}"
+QIMGCLASSES += "${@bb.utils.filter('MACHINE_FEATURES', 'dm-verity-none dm-verity-bootloader dm-verity-initramfs dm-verity-initramfs-v3', d)}"
 QIMGCLASSES += "${@bb.utils.contains('MACHINE_SUPPORTS_DTBO', 'True', 'qimage-dtbo', '', d)}"
 QIMGCLASSES += "${@bb.utils.contains('IMAGE_FSTYPES', 'ext4', 'qimage-ext4', '', d)}"
 QIMGCLASSES += "${@bb.utils.contains('IMAGE_FSTYPES', 'squashfs', 'qimage-squashfs', '', d)}"
 QIMGCLASSES += "${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', 'qimage-ubi', '', d)}"
+QIMGCLASSES += "${@bb.utils.contains('MACHINE_FEATURES', 'tele-squashfs-ubi', 'qimage-tele-squashfs-ubi', '', d)}"
 
 # Use the following to extend qimage with custom functions like signing
 QIMGEXTENSION ?= ""

@@ -6,11 +6,17 @@ inherit qimage
 
 IMAGE_FEATURES += "read-only-rootfs ${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', 'persist-volume', '', d)}"
 
+# Install km-loader for selected machines
+EVDEVMODULE ?= 'False'
+EVDEVMODULE_sa515m = 'True'
+EVDEVMODULE_sa415m = 'True'
+
 CORE_IMAGE_EXTRA_INSTALL += "\
         ${@bb.utils.contains('MACHINE_FEATURES', 'emmc-boot', 'e2fsprogs e2fsprogs-e2fsck e2fsprogs-mke2fs', '', d)} \
         glib-2.0 \
         i2c-tools \
         kernel-modules \
+        ${@oe.utils.conditional('EVDEVMODULE', 'True', 'km-loader', '', d)} \
         net-tools \
         pps-tools \
         spitools \
@@ -24,6 +30,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         ${@bb.utils.contains('MACHINE_FEATURES', 'qti-wlan', 'packagegroup-qti-wlan', '', d)} \
         ${@bb.utils.contains('COMBINED_FEATURES', 'qti-security', 'packagegroup-qti-securemsm', '', d)} \
         ${@bb.utils.contains('COMBINED_FEATURES', 'qti-audio', 'packagegroup-qti-audio', '', d)} \
+        ${@bb.utils.contains('MACHINE_FEATURES', 'qti-cv2x', 'packagegroup-qti-telematics-cv2x', '', d)} \
         packagegroup-qti-ss-mgr \
         packagegroup-qti-telematics \
         ${@bb.utils.contains('DISTRO_FEATURES', 'qti-telux', 'packagegroup-qti-telsdk', '', d)} \
@@ -32,29 +39,23 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-support-utils \
         subsystem-ramdump \
         systemd-machine-units \
+        ${@bb.utils.contains('MACHINE_FEATURES', 'nand-boot', 'mtd-utils-ubifs', '', d)} \
         qmi-shutdown-modem \
         modem-shutdown \
         ${@oe.utils.conditional('DEBUG_BUILD', '1', 'packagegroup-qti-debug-tools', '', d )} \
 "
 
 # Following packages will be enabled later
-CORE_IMAGE_EXTRA_INSTALL_remove_sa410m = "\
-       qmi-shutdown-modem \
-       packagegroup-qti-telsdk \
-"
-
-# Following packages will be enabled later
 CORE_IMAGE_EXTRA_INSTALL_remove_sa525m = "\
-       packagegroup-qti-ss-mgr \
-       packagegroup-qti-telsdk subsystem-ramdump \
-       qmi-shutdown-modem modem-shutdown packagegroup-android-utils \
-       packagegroup-qti-internal packagegroup-qti-security-test \
-       packagegroup-startup-scripts packagegroup-support-utils \
+       subsystem-ramdump \
+       qmi-shutdown-modem modem-shutdown \
+       packagegroup-qti-security-test \
+       packagegroup-support-utils \
 "
 
 python () {
     if d.getVar('PREFERRED_VERSION_linux-msm') == "5.15":
-        bb.build.addtask('do_merge_dtbs', 'do_makeboot', 'do_makesystem', d)
+        bb.build.addtask('do_merge_dtbs', 'do_makeboot', bb.utils.contains('IMAGE_FSTYPES', 'ubi', 'do_makesystem_ubi', 'do_makesystem', d), d)
         bb.build.addtask('do_copy_abl', 'do_image_complete', 'do_makeboot', d)
 }
 
@@ -76,6 +77,3 @@ do_copy_abl() {
         install -m 0644 ${KERNEL_PREBUILT_PATH}/abl_userdebug.elf ${DEPLOY_DIR_IMAGE}/${PN}/abl_userdebug.elf
     fi
 }
-
-# Following pacakges will be enabled later.
-CORE_IMAGE_EXTRA_INSTALL_remove_sa415m = "qmi-shutdown-modem"
