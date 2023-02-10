@@ -11,7 +11,7 @@ DEPENDS += "\
     gbm \
     gbm-headers \
     libcutils \
-    ${@oe.utils.version_less_or_equal('PREFERRED_VERSION_${PREFERRED_PROVIDER_virtual/kernel}', '5.14', 'libion', 'libdmabufheap', d)} \
+    ${@oe.utils.version_less_or_equal('${preferred-kernel}', '5.4', 'libion', 'libdmabufheap', d)} \
     libstagefright-headers \
     libutils \
     virtual/kernel-headers \
@@ -36,7 +36,7 @@ CXXFLAGS += "\
 
 EXTRA_OECMAKE += "\
     -DAGL_LINUX:BOOL=ON \
-    ${@oe.utils.version_less_or_equal('PREFERRED_VERSION_${PREFERRED_PROVIDER_virtual/kernel}', '5.14', '', '-DSUPPORT_DMABUF_HEAP:BOOL=ON', d)} \
+    ${@oe.utils.version_less_or_equal('${preferred-kernel}', '5.4', '', '-DSUPPORT_DMABUF_HEAP:BOOL=ON', d)} \
 "
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"

@@ -27,8 +27,13 @@ CFLAGS += "\
     -I${STAGING_INCDIR}/ion_headers \
 "
 
+EXTRA_OEMESON += " \
+    ${@oe.utils.version_less_or_equal('${preferred-kernel}', '5.4', '', '-Dusedmaheap=true', d)} \
+"
+
 SOLIBS = ".so"
 FILES_SOLIBSDEV = ""
 
 FILES:${PN} += "${libdir}/gstreamer-1.0/*.so"
 
+RDEPENDS:${PN} += "${@oe.utils.version_less_or_equal('${preferred-kernel}', '5.4', 'libion', 'libdmabufheap', d)}"

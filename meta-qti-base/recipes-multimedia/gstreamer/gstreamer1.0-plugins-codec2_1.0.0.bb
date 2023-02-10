@@ -48,6 +48,10 @@ EXTRA_OEMESON:append:lemans = " \
     -Dmmmcolorfmt=true \
 "
 
+EXTRA_OEMESON += " \
+    ${@oe.utils.version_less_or_equal('${preferred-kernel}', '5.4', '', '-Dusedmaheap=true', d)} \
+"
+
 PACKAGE_ARCH ?= "${MACHINE_ARCH}"
 
 SOLIBS = ".so"
