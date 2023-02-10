@@ -51,6 +51,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
 "
 
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "chronyc"
+CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-core-prop"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-cvp"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-data"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-fastcv"
@@ -61,5 +62,3 @@ CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-qmmf"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-robotics"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-securemsm"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-test-sensors-see"
-CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-video"
-CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-core-prop"
