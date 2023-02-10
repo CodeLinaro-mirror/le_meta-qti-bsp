@@ -37,6 +37,10 @@ CXXFLAGS += "\
     -I${STAGING_INCDIR}/linux-msm \
 "
 
+EXTRA_OEMESON += " \
+    ${@oe.utils.version_less_or_equal('PREFERRED_VERSION_linux-msm', '5.4', '', '-Dusedmaheap=true', d)} \
+"
+
 PACKAGE_ARCH ?= "${MACHINE_ARCH}"
 
 SOLIBS = ".so"
