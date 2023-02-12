@@ -10,15 +10,22 @@ SRC_URI = "\
     ${PATH_TO_REPO}/frameworks/.git;protocol=${PROTO};destsuffix=frameworks/binder;subpath=binder;usehead=1 \
     file://servicemanager.service \
     file://create-binder.sh \
+    file://create-binder.service \
 "
 SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/frameworks/binder"
 
-inherit autotools pkgconfig systemd
+inherit autotools pkgconfig systemd useradd
 
-SYSTEMD_SERVICE:${PN} = "servicemanager.service"
+SYSTEMD_SERVICE:${PN} = "servicemanager.service create-binder.service"
 SYSTEMD_AUTO_ENABLE:${PN} = "enable"
+
+# servicemanager.service run as binder user
+USERADD_PACKAGES = "${PN}"
+
+GROUPADD_PARAM:${PN} = "binder"
+USERADD_PARAM:${PN} = "--no-create-home -g binder --shell /bin/false binder"
 
 EXTRA_OECONF += "--with-glib"
 # This recipe assumes kernel always compile for default arch even when
@@ -42,7 +49,7 @@ do_install:append() {
 
         install -d ${D}${systemd_unitdir}/system/
         install -m 0644 ${WORKDIR}/servicemanager.service -D ${D}${systemd_unitdir}/system/servicemanager.service
+        install -m 0644 ${WORKDIR}/create-binder.service -D ${D}${systemd_unitdir}/system/create-binder.service
     fi
 }
 
-QPERM_SERVICE = "${WORKDIR}/servicemanager.service"
