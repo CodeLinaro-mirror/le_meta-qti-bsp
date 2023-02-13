@@ -4,6 +4,7 @@ SOC_FAMILY ?= "sa-common"
 include conf/machine/include/soc-family.inc
 PRODUCT = "${MACHINE}"
 PREFERRED_PROVIDER_virtual/kernel = "linux-ark"
+PREFERRED_PROVIDER_virtual/kernel-headers = "linux-ark-headers"
 PREFERRED_VERSION_linux-ark = "5.14"
 
 # Prefer Wayland/Weston version
