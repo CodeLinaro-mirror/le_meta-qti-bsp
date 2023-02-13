@@ -17,7 +17,7 @@ PACKAGES = ' \
     packagegroup-startup-scripts-base \
     '
 ENABLE_ADB ?= "True"
-ENABLE_ADB_qti-distro-base-user ?= "False"
+ENABLE_ADB:qti-distro-base-user ?= "False"
 
 # Android Core Image and Debugging utilities
 RDEPENDS:packagegroup-android-utils-base = "\
@@ -31,7 +31,7 @@ RDEPENDS:packagegroup-android-utils-base = "\
     "
 
 ADDON_SCRIPTS ?= ""
-ADDON_SCRIPTS_neo = "helios-start"
+ADDON_SCRIPTS:neo = "helios-start"
 
 # Startup scripts needed during device bootup
 RDEPENDS:packagegroup-startup-scripts-base = "\
@@ -41,4 +41,5 @@ RDEPENDS:packagegroup-startup-scripts-base = "\
     post-boot \
     sdcard-scripts-automount \
     ${ADDON_SCRIPTS} \
+    mod-blacklist \
     "
