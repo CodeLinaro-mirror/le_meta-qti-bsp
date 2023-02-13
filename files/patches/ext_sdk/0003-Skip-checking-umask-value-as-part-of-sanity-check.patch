@@ -1,0 +1,32 @@
+From bf13d47724ad65d6aefbd356a4bdb58832fd77ed Mon Sep 17 00:00:00 2001
+From: Raghuvar S <quic_raghuvar@quicinc.com>
+Date: Fri, 11 Nov 2022 12:03:30 +0530
+Subject: [PATCH 3/3] Skip checking umask value as part of sanity check
+
+Skip checking umask value, as the umask value for
+each default task is already set to 022.
+
+Change-Id: I32ca0cc89774496009fa2ceaba984e44a546f605
+---
+ meta/classes/sanity.bbclass | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/meta/classes/sanity.bbclass b/meta/classes/sanity.bbclass
+index 37354af9d5..4e0b667a53 100644
+--- a/meta/classes/sanity.bbclass
++++ b/meta/classes/sanity.bbclass
+@@ -867,11 +867,6 @@ def check_sanity_everybuild(status, d):
+ 
+     check_supported_distro(d)
+ 
+-    omask = os.umask(0o022)
+-    if omask & 0o755:
+-        status.addresult("Please use a umask which allows a+rx and u+rwx\n")
+-    os.umask(omask)
+-
+     if d.getVar('TARGET_ARCH') == "arm":
+         # This path is no longer user-readable in modern (very recent) Linux
+         try:
+-- 
+2.17.1
+

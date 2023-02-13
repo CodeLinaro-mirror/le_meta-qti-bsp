@@ -2,7 +2,7 @@
 # Provides packages required to build an image with
 # robotics features support.
 
-inherit qimage
+inherit qimage populate_sdk_qti
 
 IMAGE_FEATURES += "ssh-server-openssh"
 
@@ -46,14 +46,13 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         systemd-machine-units \
         ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
         yavta \
+        libdmabufheap \
+        packagegroup-qti-sensors-ship \
 "
 
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "chronyc"
-CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-audio"
-CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-bluetooth"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-cvp"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-data"
-CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-dsp"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-fastcv"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-gst"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-ml"
@@ -63,10 +62,4 @@ CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-robotics"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-securemsm"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-test-sensors-see"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-video"
-CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-wifi"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-core-prop"
-CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-camera"
-CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-camera-kernel"
-CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-gfx"
-CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-display"
-

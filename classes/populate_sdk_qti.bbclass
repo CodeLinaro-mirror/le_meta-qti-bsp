@@ -63,7 +63,6 @@ TOOLCHAIN_HOST_TASK:append = " nativesdk-llvm-arm-toolchain"
 # To include kernel headers in SDK
 TOOLCHAIN_TARGET_TASK:append = " linux-msm-headers-dev"
 
-# To include kernel sources in SDK to build kernel modules
-TOOLCHAIN_TARGET_TASK:append = " kernel-devsrc"
-
-TOOLCHAIN_TARGET_TASK:append = "  ath6kl-utils-staticdev"
+# Following needs to be added to include kernel sources in SDK to build kernel
+# modules only if the kernel is built using toolchain provided by OE Workspace.
+#TOOLCHAIN_TARGET_TASK:append = " kernel-devsrc"

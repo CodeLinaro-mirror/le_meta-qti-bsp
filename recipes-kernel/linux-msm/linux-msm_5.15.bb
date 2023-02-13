@@ -6,9 +6,13 @@ LICENSE = "GPLv2.0-with-linux-syscall-note"
 COMPATIBLE_MACHINE = "kalama"
 
 FILESEXTRAPATHS:prepend := "${WORKSPACE}:"
+FILESEXTRAPATHS:prepend := "${WORKSPACE}:${KERNEL_PREBUILT_PATH}:"
 
-SRC_URI   =  "file://kernel-5.15/kernel_platform/msm-kernel \
-             "
+SRC_URI = "file://kernel-5.15/kernel_platform/msm-kernel \
+           file://kernel-5.15/kernel_platform/common \
+           file://dist \
+           "
+
 SRC_URI:append:cinder  =  "${@oe.utils.conditional('KERNEL_USE_PREBUILTS', 'True', '', 'file://kernel-${PV}/kernel_platform/msm-kernel/arch/${ARCH}/configs/vendor/cinder_debug.config',d)}"
 
 S = "${WORKDIR}/kernel-5.15/kernel_platform/msm-kernel"
