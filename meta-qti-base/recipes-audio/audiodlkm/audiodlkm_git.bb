@@ -3,7 +3,6 @@ DESCRIPTION = "This is the audio driver based on ASoC architecture, used to comm
 HOMEPAGE = "https://git.codelinaro.org"
 LICENSE = "GPL-2.0"
 LIC_FILES_CHKSUM = "file://NOTICE;md5=689b0a45875711dc09b94e4b6524c3cd"
-DEPENDS += "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', "audio-devicetree", "", d)}"
 DEPENDS += "virtual/kernel"
 
 SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/audio-kernel/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/audio-kernel;usehead=1"
