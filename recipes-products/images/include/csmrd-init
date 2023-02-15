@@ -363,7 +363,7 @@ mhi_ch_close() {
     return 0
 }
 
-MHI_CH_RETRIES=30
+MHI_CH_RETRIES=300
 # wait_for_mhi_ch - Waits on and opens a mhi channel to send/recv messages
 # @MHI_CH:  Path to mhi channel
 # @RETRIES: (optional) Retry count to open MHI_CH; default MHI_CH_RETRIES
@@ -454,6 +454,7 @@ do_mounts
 do_nbdtab()
 {
     portno="$(( 10809 + $2 ))"
+    config_portno="$(( 12809 + $2 ))"
     # Create nbd-server config
     echo "nbd0 $1 system.img.raw persist" > /etc/nbdtab
     echo "nbd1 $1 systemrw.img.raw  persist" >> /etc/nbdtab
@@ -461,6 +462,7 @@ do_nbdtab()
     echo "nbd3 $1 userdata.img.raw  persist" >> /etc/nbdtab
     echo "nbd4 $1 cache.img.raw  persist" >> /etc/nbdtab
     echo "nbd5 $1 NON-HLOS.bin persist" >> /etc/nbdtab
+    echo "nbd6 $1 default persist" >> /etc/nbdtab
 
     nbdclient nbd0 $portno # connect remote system.img
     nbdclient nbd1 $portno # connect remote systemrw.img
@@ -468,6 +470,7 @@ do_nbdtab()
     nbdclient nbd3 $portno # connect remote userdata.img
     nbdclient nbd4 $portno # connect remote cache.img
     nbdclient nbd5 $portno # connect NON-HLOS
+    nbdclient nbd6 $config_portno # connect Modem config files
 
     # if nbd negotiation fails, drop to ramdsik
     if [ "$?" -ne 0 ]; then
@@ -481,13 +484,26 @@ do_nbdtab()
     mount -o rw /dev/nbd0 $mnt_dir
     #umount /sys/kernel/debug /sys /proc /dev
 
+    # mount dumgr config readonly
+    mnt_qdumgr_dir="/mnt/system/etc/dumgr/config"
+    mkdir -p $mnt_qdumgr_dir
+    mount /dev/nbd6p1 $mnt_qdumgr_dir
+
     # update systemd mount files to mount it from nbd devices
-    cd /mnt/system/lib/systemd/system/
+    cd $mnt_dir/lib/systemd/system/
     sed -i 's+/dev/disk/by-partlabel/systemrw+/dev/nbd1+g' systemrw.mount
     sed -i 's+/dev/disk/by-partlabel/persist+/dev/nbd2+g' persist.mount
     sed -i 's+/dev/disk/by-partlabel/userdata+/dev/nbd3+g' data.mount
     sed -i 's+/dev/disk/by-partlabel/cache+/dev/nbd4+g' cache.mount
-    sed -i 's+/dev/disk/by-partlabel/modem+/dev/nbd5+g' firmware.mount
+    if [ -f firmware-mount.service ]; then
+        sed -i 's+/dev/disk/by-partlabel/modem${SLOT_SUFFIX}+/dev/nbd5+g' firmware-mount.service
+        sed -i '/BindsTo=/d' firmware-mount.service
+        sed -i '/After=/d' firmware-mount.service
+    elif [ -f firmware.mount ]; then
+        sed -i 's+/dev/disk/by-partlabel/modem+/dev/nbd5+g' firmware.mount
+    else
+        echo "firmware.mount or firmware-mount.service are not found"
+    fi
 
     # Switch root to remote sysfs
     echo "Switching to system partition on $partition"
@@ -519,8 +535,33 @@ case $fstab_suffix in
         #mount system partition
         mnt_dir="/mnt/system"
         mkdir -p $mnt_dir
-        mount -o ro $partition $mnt_dir
+# if DM-Verity is enabled then only this file verity.env exits
+# verity protection
+verity_cmdline="$(sed -e 's/ /\n/g' /proc/cmdline | egrep 'verity')"
+if [ -n "$verity_cmdline" ] && [ -f /etc/verity.env ]; then
+     source /etc/verity.env
+     veritysetup open $partition system $partition $VERITY_ROOT_HASH --salt $VERITY_SALT --hash-offset $VERITY_HASH_OFFSET --data-blocks $VERITY_DATA_BLOCKS --fec-device $partition --fec-offset $VERITY_FEC_OFFSET --fec-roots $VERITY_FEC_ROOTS --root-hash-signature=/etc/verity_sig.txt
 
+    timeout=30
+    # Wait till the block device is available
+     while [ ! -e /dev/mapper/system ]; do
+     echo "waiting for /dev/mapper/system $partition"
+     sleep 1
+     ((timeout -= 1))
+            if [ "$timeout" -le 0 ]; then
+                echo "$partition not available"
+# If open fails we are still starting rdshell which is not needed
+# we are expected to  reboot needs to be disable and reboot for production builds
+                 start_rdshell
+            fi
+     done
+     echo "/dev/mapper/system ready, time = $counter ms"
+     mount -t ext4 -o ro /dev/mapper/system $mnt_dir
+else
+#case when dm-verity is not eanbled
+     mount -o ro $partition $mnt_dir
+
+fi   # end of  if verity file exist check.
         umount /sys/kernel/debug /sys /proc /dev
         echo "Switching to system partition on $partition"
         exec /bin/switch_root -c /dev/console $mnt_dir /sbin/init

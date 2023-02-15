@@ -32,7 +32,6 @@ KERNEL_PREBUILT_PATH ?= "${WORKSPACE}/kernel-5.15/out/msm-kernel-sa525-${KERNEL_
 KERNEL_OUT_PATH ?= "${WORKSPACE}/kernel-5.15/out/msm-kernel-sa525-${KERNEL_VARIANT}defconfig"
 KERNEL_BUILD_CONFIG ?= "msm-kernel/build.config.msm.sa525"
 
-DEFAULT_ENFORCING = "permissive"
 
 # MACHINE_FEATURES ##
 # qti-adsp:               Machine supports QTI adsp solution
@@ -46,8 +45,14 @@ DEFAULT_ENFORCING = "permissive"
 # qti-location:           Machine supports Location solution
 # qti-data-modem:         Machine supports QTI data modem solution
 # qti-mvm:                Machine supports QTI MVM solution
+# qseecompat:             Machine supports qseecom compat solution
+# qti-tzlog:              Machine supports tz/qsee logs
+# qti-smciqseecomd:       Machine supports smcinvoke based listeners
+# android-binder:         Machine supports android binder
 
-MACHINE_FEATURES += "qti-sdx dm-verity-none qti-sensors qti-mvm"
+MACHINE_FEATURES += "qti-sdx dm-verity-none qti-sensors qti-mvm qti-security qseecompat qti-tzlog qti-remoteproc qti-data-modem qti-location qti-audio qti-smciqseecomd qti-recovery qti-wwan-plus-cv2x qti-wlan qti-bluetooth qwesd android-binder"
+
+CONFLICT_MACHINE_FEATURES += "qti-cv2x"
 
 MACHINE_MNT_POINTS = " \
     /dsp \
