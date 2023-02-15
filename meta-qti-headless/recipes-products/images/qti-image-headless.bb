@@ -25,6 +25,10 @@ IMAGE_INSTALL += " \
     tcp-wrappers \
     netkit-telnet \
     openssh \
+    libcap \
+    libcap-bin \
+    attr \
+    ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "5.15", "securemsmdlkm", "", d)} \
 "
 
 IMAGE_LINGUAS = ""
