@@ -9,5 +9,5 @@ SRC_URI:append = " \
 do_install:append() {
    install -d ${D}/${base_libdir}/systemd/system-sleep
    install -m 0755 ${WORKDIR}/qti_sleep.sh -D ${D}/${base_libdir}/systemd/system-sleep/qti_sleep.sh
-   ${@bb.utils.contains('BASEMACHINE', 'sa81x5', 'sed -i -e \'64a\    sleep 1\' ${D}/${base_libdir}/systemd/system-sleep/qti_sleep.sh','', d)}
+   ${@bb.utils.contains('BASEMACHINE', 'sa81x5', 'sed -i -e \'64a\    sleep 2\' ${D}/${base_libdir}/systemd/system-sleep/qti_sleep.sh','', d)}
 }
