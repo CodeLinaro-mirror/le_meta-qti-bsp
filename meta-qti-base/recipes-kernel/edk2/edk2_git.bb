@@ -46,6 +46,8 @@ EXTRA_OEMAKE = "'CLANG_BIN=${CLANG_BIN_PATH}' \
                 'SUPPORT_DISABLE_NON_BOOTDEVICE=${DISABLE_NONBOOTDEVICE_ENABLED}' \
                 'TARGET_BOARD_TYPE_AUTO=1' \
                 ${@bb.utils.contains('DISTRO_FEATURES', 'qti-avb', 'VERIFIED_BOOT_2=1', '', d)} \
+                'AB_RETRYCOUNT_DISABLE=1'\
+                'VERIFIED_BOOT_ENABLED=0'\
                 'DISABLE_PARALLEL_DOWNLOAD_FLASH=${DISABLE_PARALLEL_DOWNLOAD_FLASH}'"
 
 do_configure[noexec] = "1"
