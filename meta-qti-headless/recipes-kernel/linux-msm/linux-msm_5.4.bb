@@ -72,8 +72,8 @@ KERNEL_EXTRA_ARGS:append:sa81x5 = " ${@bb.utils.contains('DISTRO_FEATURES', 'qti
 
 KBRANCH ?= ""
 KMETA = "kernel-meta"
-KMACHINE ?= "${BASEMACHINE}"
-COMPATIBLE_MACHINE = "(${BASEMACHINE})"
+KMACHINE ?= "${MACHINE}"
+COMPATIBLE_MACHINE = "(${MACHINE})"
 KCONFIG_MODE = "--alldefconfig"
 KBUILD_DEFCONFIG ?= "${KERNEL_CONFIG}"
 LINUX_VERSION_EXTENSION = "${@['-perf', ''][d.getVar('VARIANT', True) == ('' or 'debug')]}"
