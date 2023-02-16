@@ -29,6 +29,7 @@ IMAGE_INSTALL += " \
     libcap-bin \
     attr \
     ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "5.15", "securemsmdlkm", "", d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'qti-fde', 'enable-fde', '', d)} \
 "
 
 IMAGE_LINGUAS = ""
