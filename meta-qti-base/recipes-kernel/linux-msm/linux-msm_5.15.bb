@@ -60,6 +60,7 @@ KERNEL_VERSION_SANITY_SKIP = "1"
 
 do_kernel_configcheck[noexec] = "1"
 do_kernel_checkout[noexec] = "1"
+do_validate_branches[noexec] = "1"
 
 do_generate_base_defconfig() {
     export KCONFIG_CONFIG=${KERNEL_CONFIG_PATH}/${KBUILD_DEFCONFIG}
