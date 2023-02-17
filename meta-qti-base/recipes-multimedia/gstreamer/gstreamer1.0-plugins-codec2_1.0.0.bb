@@ -44,6 +44,7 @@ CXXFLAGS:append:lemans = " -I${STAGING_INCDIR}/linux-msm/display"
 EXTRA_OEMESON:append:lemans = " \
     -Dinterlace=disabled \
     -Dqprange=disabled \
+    -Dir-cyclic=enabled \
     -Dmmmcolorfmt=true \
 "
 
