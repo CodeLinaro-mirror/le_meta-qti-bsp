@@ -2,7 +2,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}-${PV}:"
 
 DEPENDS += "base-passwd"
 
-SRC_URI:append = " file://${BASEMACHINE}/fstab"
+SRC_URI:append = " file://${MACHINE}/fstab"
 
 dirs755:append = " \
     /firmware /dsp ${localstatedir} /persist \
