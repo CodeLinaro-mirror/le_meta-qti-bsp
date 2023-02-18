@@ -11,6 +11,7 @@ DISTRO_FEATURES:append:qtiquingvm = " qti-omx qti-gstqeavb"
 DISTRO_FEATURES:append:qtiquingvm8295 = " qti-codec2 qti-gstqeavb qti-gstdeinterlace qti-fastcv"
 DISTRO_FEATURES:append:quin-gvm-gen4 = " qti-codec2 qti-gstqeavb qti-gstdeinterlace qti-fadas qti-fastcv"
 DISTRO_FEATURES:append:quin-gvm-gen4-2 = " qti-codec2 qti-gstdeinterlace"
+DISTRO_FEATURES:append:quin-gvm-lemans = " qti-codec2 qti-gstdeinterlace"
 
 # Display
 DISTRO_FEATURES:append = " wayland"
