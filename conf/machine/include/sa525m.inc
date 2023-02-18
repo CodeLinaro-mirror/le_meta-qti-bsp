@@ -32,7 +32,6 @@ KERNEL_PREBUILT_PATH ?= "${WORKSPACE}/kernel-5.15/out/msm-kernel-sa525-${KERNEL_
 KERNEL_OUT_PATH ?= "${WORKSPACE}/kernel-5.15/out/msm-kernel-sa525-${KERNEL_VARIANT}defconfig"
 KERNEL_BUILD_CONFIG ?= "msm-kernel/build.config.msm.sa525"
 
-DEFAULT_ENFORCING = "permissive"
 
 # MACHINE_FEATURES ##
 # qti-adsp:               Machine supports QTI adsp solution
@@ -48,8 +47,12 @@ DEFAULT_ENFORCING = "permissive"
 # qti-mvm:                Machine supports QTI MVM solution
 # qseecompat:             Machine supports qseecom compat solution
 # qti-tzlog:              Machine supports tz/qsee logs
+# qti-smciqseecomd:       Machine supports smcinvoke based listeners
+# android-binder:         Machine supports android binder
 
-MACHINE_FEATURES += "qti-sdx dm-verity-none qti-sensors qti-mvm qti-security qseecompat qti-tzlog qti-remoteproc qti-data-modem qti-location qti-audio qti-recovery qti-wlan qti-bluetooth"
+MACHINE_FEATURES += "qti-sdx dm-verity-none qti-sensors qti-mvm qti-security qseecompat qti-tzlog qti-remoteproc qti-data-modem qti-location qti-audio qti-smciqseecomd qti-recovery qti-wwan-plus-cv2x qti-wlan qti-bluetooth qwesd android-binder"
+
+CONFLICT_MACHINE_FEATURES += "qti-cv2x"
 
 MACHINE_MNT_POINTS = " \
     /dsp \
@@ -76,7 +79,6 @@ UFS_BSG_DEV_USAGE = "True"
 
 PREFERRED_VERSION_protobuf = "3.11.4"
 PREFERRED_VERSION_protobuf-native = "3.11.4"
-PREFERRED_VERSION_iproute2 = "5.5.0"
 
 # Fixes for boot image dtb appending
 BOOT_HEADER_VERSION = "2"

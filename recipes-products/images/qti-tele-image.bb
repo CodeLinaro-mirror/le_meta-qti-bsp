@@ -2,13 +2,14 @@
 # Provides packages required to build
 # QTI Linux Telematics image.
 
-inherit qimage
+inherit qimage populate_sdk_qti
 
 IMAGE_FEATURES += "read-only-rootfs ${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', 'persist-volume', '', d)}"
 
 # Install km-loader for selected machines
 EVDEVMODULE ?= 'False'
 EVDEVMODULE_sa515m = 'True'
+EVDEVMODULE_sa415m = 'True'
 
 CORE_IMAGE_EXTRA_INSTALL += "\
         ${@bb.utils.contains('MACHINE_FEATURES', 'emmc-boot', 'e2fsprogs e2fsprogs-e2fsck e2fsprogs-mke2fs', '', d)} \
@@ -22,6 +23,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         coreutils \
         packagegroup-android-utils \
         packagegroup-qti-core \
+        ${@bb.utils.contains('MACHINE_FEATURES', 'android-binder', 'binder', '', d)} \
         ${@bb.utils.contains('MACHINE_FEATURES', 'qti-data-modem', 'packagegroup-qti-data', '', d)} \
         ${@bb.utils.contains_any('COMBINED_FEATURES', 'qti-adsp qti-cdsp qti-modem qti-slpi', 'packagegroup-qti-dsp', '', d)} \
         ${@bb.utils.contains('MACHINE_FEATURES', 'qti-location', 'packagegroup-qti-location packagegroup-qti-location-auto', '', d)} \
@@ -29,6 +31,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         ${@bb.utils.contains('MACHINE_FEATURES', 'qti-wlan', 'packagegroup-qti-wlan', '', d)} \
         ${@bb.utils.contains('COMBINED_FEATURES', 'qti-security', 'packagegroup-qti-securemsm', '', d)} \
         ${@bb.utils.contains('COMBINED_FEATURES', 'qti-audio', 'packagegroup-qti-audio', '', d)} \
+        ${@bb.utils.contains('MACHINE_FEATURES', 'qti-cv2x', 'packagegroup-qti-telematics-cv2x', '', d)} \
         packagegroup-qti-ss-mgr \
         packagegroup-qti-telematics \
         ${@bb.utils.contains('DISTRO_FEATURES', 'qti-telux', 'packagegroup-qti-telsdk', '', d)} \
@@ -41,12 +44,6 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         qmi-shutdown-modem \
         modem-shutdown \
         ${@oe.utils.conditional('DEBUG_BUILD', '1', 'packagegroup-qti-debug-tools', '', d )} \
-"
-
-# Following packages will be enabled later
-CORE_IMAGE_EXTRA_INSTALL_remove_sa410m = "\
-       qmi-shutdown-modem \
-       packagegroup-qti-telsdk \
 "
 
 # Following packages will be enabled later
@@ -81,3 +78,7 @@ do_copy_abl() {
         install -m 0644 ${KERNEL_PREBUILT_PATH}/abl_userdebug.elf ${DEPLOY_DIR_IMAGE}/${PN}/abl_userdebug.elf
     fi
 }
+
+# Remove unsupported SDK packages
+TOOLCHAIN_TARGET_TASK_remove = "ath6kl-utils-staticdev"
+TOOLCHAIN_TARGET_TASK_remove = "kernel-devsrc"
