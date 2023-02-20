@@ -8,8 +8,9 @@ SRC_URI:append = " \
     file://0003-Add-vendor-to-firmware-search-paths.patch;apply=no \
 "
 
-do_patch_more() {
-    cd ${S}
-    patch -f -p1 < ${WORKDIR}/0003-Add-vendor-to-firmware-search-paths.patch
+do_patch:append() {
+    patch -d ${S} -p1 -i ${WORKDIR}/0003-Add-vendor-to-firmware-search-paths.patch
+    if [ $? != 0 ];then
+        bbfatal "patching 0003-Add-vendor-to-firmware-search-paths.patch failed"
+    fi
 }
-addtask patch_more after do_patch before do_kernel_configme
