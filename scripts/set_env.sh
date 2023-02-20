@@ -11,7 +11,7 @@ if [[ $OE_SKIP_SDK_CHECK =~ "1" ]]; then
 
         # Generate prebuilt conf by reading manifest.
         #the .repo/manifests/default.xml need place upder the path of WS
-        if [[ -f "${BUILDDIR}/.repo/manifests/default.xml" ]]; then
+        if [[ -f "${BUILDDIR}/.repo/manifests/default.xml" ]] && [[ -f "${BUILDDIR}/layers/poky/meta-qti-internal/scripts/generate_prebuilt_confs.sh" ]] ; then
                 source "${BUILDDIR}/layers/poky/meta-qti-internal/scripts/generate_prebuilt_confs.sh"
                 # include generated prebuilt conf in auto.conf
                 cat >> ${BUILDDIR}/conf/auto.conf <<EOF
