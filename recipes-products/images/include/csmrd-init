@@ -485,9 +485,9 @@ do_nbdtab()
     #umount /sys/kernel/debug /sys /proc /dev
 
     # mount dumgr config readonly
-    # mnt_qdumgr_dir="/mnt/system/etc/dumgr/config"
-    # mkdir -p $mnt_qdumgr_dir
-    # mount /dev/nbd6 $mnt_qdumgr_dir
+    mnt_qdumgr_dir="/mnt/system/etc/dumgr/config"
+    mkdir -p $mnt_qdumgr_dir
+    mount /dev/nbd6 $mnt_qdumgr_dir
 
     # update systemd mount files to mount it from nbd devices
     cd $mnt_dir/lib/systemd/system/
