@@ -1,16 +1,21 @@
 #Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
 #SPDX-License-Identifier: BSD-3-Clause-Clear
 
+DEPENDS += "dtc-native kernel-toolchain-native virtual/kernel"
+
+inherit qti-kernel-toolchain
+
 do_merge_dtbs() {
      install -d ${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbos
-     cd ${SRC_DIR_ROOT}/kernel/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform && \
-     LD_LIBRARY_PATH=../out/msm-kernel-${KERNEL_ARCH}-${KERNEL_VARIANT}defconfig/host/lib/:$LD_LIBRARY_PATH \
-     OUT_DIR=${SRC_DIR_ROOT}/kernel/kernel-${PREFERRED_VERSION_linux-msm}/out/msm-kernel-${KERNEL_ARCH}-${KERNEL_VARIANT}defconfig/ \
-     BUILD_CONFIG=${KERNEL_BUILD_CONFIG}  \
-     ./build/android/merge_dtbs.sh \
+     install -d ${DEPLOY_DIR_IMAGE}/dtbs
+
+     ${KERNEL_TOOLCHAIN_DIR}/build/android/merge_dtbs.py \
      ${DEPLOY_DIR_IMAGE}/build-artifacts/dtb \
      ${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbos ${DEPLOY_DIR_IMAGE}/dtbs
+
+     cat ${DEPLOY_DIR_IMAGE}/dtbs/*.dtb > ${DEPLOY_DIR_IMAGE}/dtbs/dtb.img
 }
+do_merge_dtbs[cleandirs] = "${DEPLOY_DIR_IMAGE}/dtbs"
 
 addtask do_merge_dtbs after do_image before do_makeboot
 
@@ -54,17 +59,26 @@ python do_makeboot_setscene () {
 #sign boot, dtbo and vendor-boot img
 do_sign_boot_img () {
     imgname="${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET}"
-    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'false', 'true', d)}; then
        if ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "5.15", "true", "false", d)}; then
           if ${@bb.utils.contains('DISTRO_FEATURES', 'qti-avb', 'true', 'false', d)}; then
              avb_sign_boot_image ${imgname}
           fi
        fi
-    fi
 }
 
 avb_sign_boot_image() {
-        img="$1"
+    img="$1"
+    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'true', 'false', d)}; then
+        # For lvgvm avb2.0, add hash for boot image.
+        avbtool add_hash_footer  \
+            --image ${img}  \
+            --partition_size 0x04000000  \
+            --partition_name boot \
+            --algorithm SHA256_RSA4096 \
+            --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/vbgvm_private_key_4096.pem \
+            --rollback_index 0
+
+    else
         # For lv avb2.0, add hash for boot image, dtbo image and vendor-boot image.
         avbtool add_hash_footer  \
             --image ${img}  \
@@ -89,6 +103,7 @@ avb_sign_boot_image() {
             --algorithm SHA256_RSA4096 \
             --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/testkey_rsa4096.pem \
             --rollback_index 0
+    fi
 }
 #Sign boot image after generation
 do_sign_boot_img[dirs] = "${DEPLOYDIR}"

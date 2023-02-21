@@ -199,6 +199,16 @@ do_deploy () {
     mv ${DEPLOYDIR}/${KERNEL_IMAGETYPE}-dtb-${KERNEL_VERSION} ${DEPLOYDIR}/${KERNEL_IMAGETYPE}-dtb
     install -m 0644 vmlinux ${DEPLOYDIR}
 
+    # Copy cnss2 module symbol file into deploydir
+    if [ -f ${B}/drivers/net/wireless/cnss2/cnss2.ko ]; then
+        install -m 0644 ${B}/drivers/net/wireless/cnss2/cnss2.ko ${DEPLOYDIR}
+    fi
+
+    # Copy pcie driver symbol file into deploydir
+    if [ -f ${B}/drivers/pci/controller/pci-msm-drv.ko ]; then
+        install -m 0644 ${B}/drivers/pci/controller/pci-msm-drv.ko ${DEPLOYDIR}
+    fi
+
     if ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'true', 'false', d)}; then
         ${STAGING_BINDIR_NATIVE}/mkdtimg create ${DEPLOYDIR}/${PRODUCT}-dtbo.img ${B}/arch/${ARCH}/boot/dts/vendor/qcom/*.dtbo
     fi
