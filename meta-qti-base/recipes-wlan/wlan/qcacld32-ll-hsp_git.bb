@@ -22,7 +22,7 @@ SRC_URI = "${PATH_TO_REPO}/wlan/qcacld-3.0/.git;protocol=${PROTO};destsuffix=wla
 SRCREV = "${AUTOREV}"
 SRCREV_FORMAT = "qcacld_cmn_fw_msm"
 
-_MODNAME = "qca6490"
+_MODNAME = "qca6698"
 FW_PATH_NAME = "qca6490"
 FIRMWARE_PATH = "${D}${nonarch_base_libdir}/firmware/wlan/qca_cld/${_MODNAME}"
 
@@ -40,8 +40,8 @@ EXTRA_OEMAKE:append = " \
                        "
 
 _WLAN_CFG_OVERRIDE = "\
-                        CONFIG_WLAN_OPEN_P2P_INTERFACE=n \
-                        CONFIG_SUPPORT_P2P_BY_ONE_INTF_WLAN=y \
+                        CONFIG_WLAN_OPEN_P2P_INTERFACE=y \
+                        CONFIG_SUPPORT_P2P_BY_ONE_INTF_WLAN=n \
                         CONFIG_WLAN_PLACEMARKER_PREFIX=108 \
                         CONFIG_CNSS_GENL=n \
                         CONFIG_QCOM_TDLS=n \

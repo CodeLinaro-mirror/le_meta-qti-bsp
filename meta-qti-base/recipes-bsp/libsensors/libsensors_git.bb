@@ -17,7 +17,7 @@ SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/hardware/qcom/sensors"
 
-inherit autotools-brokensep pkgconfig
+inherit autotools-brokensep pkgconfig useradd
 
 EXTRA_OECONF = "--with-glib"
 
@@ -31,3 +31,8 @@ do_install:append() {
         install -m 0555 ${WORKDIR}/iio.sh ${D}${sysconfdir}/udev/scripts/iio.sh
     fi
 }
+
+USERADD_PACKAGES = "${PN}"
+
+GROUPADD_PARAM:${PN} = "system; leprop; sensors; inet; diag;"
+USERADD_PARAM:${PN} = "--no-create-home -g sensors -G diag,inet,system,leprop --shell /bin/false sensors"

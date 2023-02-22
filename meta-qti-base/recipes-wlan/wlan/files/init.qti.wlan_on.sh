@@ -63,6 +63,7 @@
 
 install_module() {
 	modprobe $1 || modprobe -d /vendor $1;
+	echo 1 > /sys/kernel/cnss/fs_ready
 }
 
 echo "##########Trying to load wlanhost driver ##########"
@@ -92,11 +93,11 @@ while [ $n -le 5 ]
 				echo "##########Error! QCA6696 FW is not available!#####"
 			fi
 		elif (lspci -k|grep 1103);then
-			echo "##########load qca6490#############"
+			echo "##########load qca6698#############"
 			if [ -f /firmware/image/qca6490/amss20.bin ];then
-				install_module qca6490
+				install_module qca6698
 			else
-				echo "##########Error! QCA6490 FW is not available!#####"
+				echo "##########Error! QCA6698 FW is not available!#####"
 			fi
 		else
 			echo "##########load default wlan########"
