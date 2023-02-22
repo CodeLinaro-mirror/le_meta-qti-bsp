@@ -22,6 +22,7 @@ GROUPADD_PARAM:${PN} = "${CODEC2_GROUP}"
 USERADD_PARAM:${PN} = "--no-create-home --gid ${CODEC2_GROUP} --shell /bin/false ${CODEC2_USER}"
 
 EXTRA_OECMAKE += "-DSYSTEMD_UNITDIR=${systemd_system_unitdir}"
+EXTRA_OECMAKE:append:lemans = " -DDISABLE_BOOT_CAPS:BOOL=ON"
 
 SYSTEMD_SERVICE:${PN} = "init_codec2.service"
 
