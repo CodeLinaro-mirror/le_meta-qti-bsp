@@ -19,6 +19,8 @@ DEPENDS += "\
     ${@oe.utils.version_less_or_equal('PREFERRED_VERSION_linux-msm', '5.4', '', 'videodlkm', d)} \
 "
 
+DEPENDS:append:lemans = " displaydlkm"
+
 SRC_URI = "${PATH_TO_REPO}/gstreamer/gst-plugins-qti-oss/.git;protocol=${PROTO};destsuffix=gstreamer/gst-plugins-qti-oss;usehead=1"
 SRCREV = "${AUTOREV}"
 S = "${WORKDIR}/gstreamer/gst-plugins-qti-oss/gst-plugin-codec2"
@@ -35,6 +37,14 @@ CFLAGS += "\
 CXXFLAGS += "\
     -I${STAGING_INCDIR}/linux-msm/vidc \
     -I${STAGING_INCDIR}/linux-msm \
+"
+
+CFLAGS:append:lemans = " -I${STAGING_INCDIR}/linux-msm/display"
+CXXFLAGS:append:lemans = " -I${STAGING_INCDIR}/linux-msm/display"
+EXTRA_OEMESON:append:lemans = " \
+    -Dinterlace=disabled \
+    -Dqprange=disabled \
+    -Dmmmcolorfmt=true \
 "
 
 PACKAGE_ARCH ?= "${MACHINE_ARCH}"
