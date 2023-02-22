@@ -28,8 +28,8 @@
 
 [Unit]
 Description=Video Early Demo Service
-After=firmware.mount
-Requires=firmware.mount
+Requires=dev-dri-renderD128-device
+After=dev-dri-card0.device
 DefaultDependencies=no
 
 [Service]
