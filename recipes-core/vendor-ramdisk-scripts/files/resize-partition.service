@@ -33,6 +33,7 @@
 
 [Unit]
 Description=Check and recreate ext4 file system on %i
+Before=sysroot.mount
 BindsTo=dev-disk-by\x2dpartlabel-%i.device
 After=dev-disk-by\x2dpartlabel-%i.device systemd-modules-load.service
 DefaultDependencies=no
