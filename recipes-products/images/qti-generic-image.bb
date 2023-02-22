@@ -9,7 +9,7 @@ IMAGE_FEATURES += "ssh-server-openssh"
 EXTRA_IMAGEDEPENDS:remove = "edk2"
 
 KERN_MODS ?= "kernel-modules"
-KERN_MODS_waipio = "gki-kernel-modules-second-stage"
+KERN_MODS:waipio = "gki-kernel-modules-second-stage"
 
 CORE_IMAGE_EXTRA_INSTALL += "\
         e2fsprogs \
