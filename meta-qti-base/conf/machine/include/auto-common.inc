@@ -12,7 +12,6 @@ PREFERRED_VERSION_edk2 ?= "3.0"
 
 # Enables timestamping functionality during building the kernel
 KERNEL_DEBUG_TIMESTAMPS = "1"
-
 # Prefer gbm
 PREFERRED_PROVIDER_virtual/libgbm = "gbm"
 
