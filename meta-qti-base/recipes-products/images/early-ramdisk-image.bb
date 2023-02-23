@@ -20,6 +20,21 @@ IMAGE_INSTALL = "\
                  early-ramdisk-init libgcc kmod \
                  kernel-module-soc-sleep-stats-${KERNEL_VERSION} \
                  kernel-module-boot-stats-${KERNEL_VERSION} \
+                 kernel-module-spidev-${KERNEL_VERSION} \
+                 kernel-module-spi-msm-geni-${KERNEL_VERSION} \
+                 kernel-module-qcom-smd-${KERNEL_VERSION} \
+                 kernel-module-rproc-qcom-common-${KERNEL_VERSION} \
+                 kernel-module-qcom-ramdump-${KERNEL_VERSION} \
+                 kernel-module-ns-${KERNEL_VERSION} \
+                 kernel-module-qrtr-${KERNEL_VERSION} \
+                 kernel-module-qmi-helpers-${KERNEL_VERSION} \
+                 kernel-module-qcom-sysmon-${KERNEL_VERSION} \
+                 kernel-module-qcom-q6v5-${KERNEL_VERSION} \
+                 kernel-module-qcom-pil-info-${KERNEL_VERSION} \
+                 kernel-module-mdt-loader-${KERNEL_VERSION} \
+                 kernel-module-smp2p-${KERNEL_VERSION} \
+                 kernel-module-qcom-q6v5-pas-${KERNEL_VERSION} \
+                 audiodlkm \
 "
 
 # Do not pollute the initrd image with rootfs features
