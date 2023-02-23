@@ -6,7 +6,7 @@ HOMEPAGE = "http://developer.android.com/"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://../NOTICE;md5=c1a3ff0b97f199c7ebcfdd4d3fed238e"
 
-DEPENDS += "liblog linux-msm-headers"
+DEPENDS += "liblog virtual/kernel-headers"
 
 PR = "r1"
 
@@ -19,7 +19,7 @@ inherit autotools-brokensep pkgconfig
 
 EXTRA_OECONF += "\
     --disable-static \
-    --with-sanitized-headers=${STAGING_INCDIR}/linux-msm \
+    --with-sanitized-headers=${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel} \
 "
 
 do_install:append() {

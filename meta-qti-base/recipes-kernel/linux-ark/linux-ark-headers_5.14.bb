@@ -8,6 +8,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 
 DEPENDS += "bison-native rsync-native unifdef-native"
 
+PROVIDES += "virtual/kernel-headers"
+
 S = "${STAGING_KERNEL_DIR}"
 B = "${WORKDIR}/build"
 
