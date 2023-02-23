@@ -28,6 +28,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-cvp \
         packagegroup-qti-data \
         packagegroup-qti-display \
+        packagegroup-qti-touch \
         packagegroup-qti-dsp \
         packagegroup-qti-fastcv \
         packagegroup-qti-gfx \
