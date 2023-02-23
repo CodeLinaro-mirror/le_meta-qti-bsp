@@ -41,10 +41,19 @@ EXTRA_OEMAKE:append = " \
                        WLAN_CTRL_NAME=${_WLAN_CTRL_NAME} \
                        "
 
+_WLAN_CFG_OVERRIDE = "\
+                      CONFIG_WLAN_DISABLE_EXPORT_SYMBOL=y \
+                      CONFIG_REO_QDESC_HISTORY=y \
+                      CONFIG_REO_DESC_DEFER_FREE=y \
+                      CONFIG_HIF_DEBUG=y \
+                      CONFIG_HIF_CE_DEBUG_DATA_BUF=y \
+                      CONFIG_BUS_AUTO_SUSPEND=n \
+                      CONFIG_DUP_RX_DESC_WAR=y \
+                      CONFIG_WLAN_FEATURE_DP_EVENT_HISTORY=y \
+                      CONFIG_DP_TX_TRACKING=y \
+                      "
+
 _WLAN_CFG_OVERRIDE_GVM = "\
-                        CONFIG_WLAN_DISABLE_EXPORT_SYMBOL=y \
-                        CONFIG_WLAN_OPEN_P2P_INTERFACE=n \
-                        CONFIG_SUPPORT_P2P_BY_ONE_INTF_WLAN=y \
                         CONFIG_WLAN_BOOTUP_MARKER=y \
                         CONFIG_WLAN_PLACEMARKER_PREFIX=108 \
                         CONFIG_FEATURE_GPIO_CFG=y \
@@ -54,32 +63,23 @@ _WLAN_CFG_OVERRIDE_GVM = "\
                         CONFIG_QCOM_TDLS=n \
                         CONFIG_CFG_MAX_STA_VDEVS=4 \
                         CONFIG_CFG_BMISS_OFFLOAD_MAX_VDEV=4 \
-                        CONFIG_REO_QDESC_HISTORY=y \
-                        CONFIG_REO_DESC_DEFER_FREE=y \
-                        CONFIG_HIF_DEBUG=y \
-                        CONFIG_HIF_CE_DEBUG_DATA_BUF=y \
-                        CONFIG_BUS_AUTO_SUSPEND=n \
-                        CONFIG_DUP_RX_DESC_WAR=y \
-                        CONFIG_WLAN_FEATURE_DP_EVENT_HISTORY=y \
-                        CONFIG_DP_TX_TRACKING=y \
                         "
-_WLAN_CFG_OVERRIDE_METAL = "\
-                        CONFIG_WLAN_DISABLE_EXPORT_SYMBOL=y \
-                        CONFIG_REO_QDESC_HISTORY=y \
-                        CONFIG_REO_DESC_DEFER_FREE=y \
-                        CONFIG_HIF_DEBUG=y \
-                        CONFIG_HIF_CE_DEBUG_DATA_BUF=y \
-                        CONFIG_BUS_AUTO_SUSPEND=n \
-                        CONFIG_DUP_RX_DESC_WAR=y \
-                        CONFIG_WLAN_FEATURE_DP_EVENT_HISTORY=y \
-                        CONFIG_DP_TX_TRACKING=y \
-                        "
-EXTRA_OEMAKE:append:qtiquingvm = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
-EXTRA_OEMAKE:append:qtiquingvm8295 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
-EXTRA_OEMAKE:append:sa8295 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_METAL}"
-EXTRA_OEMAKE:append:quin-gvm-gen4 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
-EXTRA_OEMAKE:append:quin-gvm-gen4-2 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
-EXTRA_OEMAKE:append:quin-gvm-lemans = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
+
+_WLAN_CFG_NO_SEPARATE_P2P = "CONFIG_WLAN_OPEN_P2P_INTERFACE=n CONFIG_SUPPORT_P2P_BY_ONE_INTF_WLAN=y"
+
+_WLAN_CFG_SEPARATE_P2P = "CONFIG_WLAN_OPEN_P2P_INTERFACE=y CONFIG_SUPPORT_P2P_BY_ONE_INTF_WLAN=n"
+
+_WLAN_CFG_OVERRIDE:append:qtiquingvm = "${_WLAN_CFG_OVERRIDE_GVM} ${_WLAN_CFG_NO_SEPARATE_P2P}"
+
+_WLAN_CFG_OVERRIDE:append:qtiquingvm8295 = "${_WLAN_CFG_OVERRIDE_GVM} ${_WLAN_CFG_NO_SEPARATE_P2P}"
+
+_WLAN_CFG_OVERRIDE:append:quin-gvm-gen4 = "${_WLAN_CFG_OVERRIDE_GVM} ${_WLAN_CFG_NO_SEPARATE_P2P}"
+
+_WLAN_CFG_OVERRIDE:append:quin-gvm-gen4-2 = "${_WLAN_CFG_OVERRIDE_GVM} ${_WLAN_CFG_NO_SEPARATE_P2P}"
+
+_WLAN_CFG_OVERRIDE:append:sa8295adp-2 = "${_WLAN_CFG_OVERRIDE_GVM} ${_WLAN_CFG_SEPARATE_P2P}"
+
+EXTRA_OEMAKE += "WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE}"
 
 do_install() {
     module_do_install
