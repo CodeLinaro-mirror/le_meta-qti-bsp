@@ -13,10 +13,10 @@ DEPENDS += "\
     gstreamer1.0-plugins-base \
     libdrm \
     libxml2 \
-    linux-msm-headers \
+    virtual/kernel-headers \
     media-codec2 \
     media-external \
-    ${@oe.utils.version_less_or_equal('PREFERRED_VERSION_linux-msm', '5.4', '', 'videodlkm', d)} \
+    ${@oe.utils.version_less_or_equal('preferred-kernel', '5.14', '', 'videodlkm', d)} \
 "
 
 DEPENDS:append:lemans = " displaydlkm"
@@ -30,13 +30,13 @@ inherit meson pkgconfig
 CFLAGS += "\
     -I${STAGING_INCDIR}/c++ \
     -I${STAGING_INCDIR}/c++/${TARGET_SYS} \
-    -I${STAGING_INCDIR}/linux-msm/vidc \
-    -I${STAGING_INCDIR}/linux-msm \
+    -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}/vidc \
+    -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel} \
 "
 
 CXXFLAGS += "\
-    -I${STAGING_INCDIR}/linux-msm/vidc \
-    -I${STAGING_INCDIR}/linux-msm \
+    -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}/vidc \
+    -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel} \
 "
 
 CFLAGS:append:lemans = " -I${STAGING_INCDIR}/linux-msm/display"

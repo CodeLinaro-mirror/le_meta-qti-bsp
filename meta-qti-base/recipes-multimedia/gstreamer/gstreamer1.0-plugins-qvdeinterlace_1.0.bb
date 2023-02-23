@@ -13,9 +13,9 @@ DEPENDS += "\
     glib-2.0 \
     gstreamer1.0 \
     gstreamer1.0-plugins-base \
-    linux-msm-headers \
+    virtual/kernel-headers \
     mm-gfx-auto-prop \
-    ${@oe.utils.version_less_or_equal('PREFERRED_VERSION_linux-msm', '5.4', '', 'videodlkm', d)} \
+    ${@oe.utils.version_less_or_equal('preferred-kernel', '5.14', '', 'videodlkm', d)} \
 "
 
 DEPENDS:append:lemans = " displaydlkm"
@@ -26,7 +26,7 @@ S = "${WORKDIR}/gstreamer/gst-plugins-qti-oss/gst-plugin-qvdeinterlace"
 
 inherit meson pkgconfig
 
-CFLAGS += "-I${STAGING_INCDIR}/linux-msm"
+CFLAGS += "-I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}"
 
 CFLAGS:append:lemans = " -I${STAGING_INCDIR}/linux-msm/display"
 EXTRA_OEMESON:append:lemans = " \
