@@ -1,0 +1,52 @@
+From 453281427964a6e7c6e7c05831965955df42ecea Mon Sep 17 00:00:00 2001
+From: Venkat Raju Sana <quic_vrsana@quicinc.com>
+Date: Tue, 3 May 2022 10:14:06 -0700
+Subject: [PATCH 1/3] centos-5.14: Fix to bypass redhad env
+
+Change-Id: If7fac76ad98605c48e5cad50d5ea6a6e1d424440
+Signed-off-by: Venkat Raju Sana <quic_vrsana@quicinc.com>
+---
+ Makefile              | 2 +-
+ scripts/mod/modpost.c | 6 ------
+ 2 files changed, 1 insertion(+), 7 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index b4900f9f8606..c3dc0857d4bc 100644
+--- a/Makefile
++++ b/Makefile
+@@ -20,7 +20,7 @@ __all:
+ 
+ # Set RHEL variables
+ # Use this spot to avoid future merge conflicts
+-include Makefile.rhelver
++#include Makefile.rhelver
+ 
+ # We are using a recursive build, so we need to do a little thinking
+ # to get the ordering right.
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index ac41f848b8a2..04f6ec51187b 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -2343,11 +2343,6 @@ static void write_buf(struct buffer *b, const char *fname)
+ 	}
+ }
+ 
+-static void add_rhelversion(struct buffer *b, struct module *mod)
+-{
+-	buf_printf(b, "MODULE_INFO(rhelversion, \"%d.%d\");\n", RHEL_MAJOR,
+-		   RHEL_MINOR);
+-}
+ 
+ static void write_if_changed(struct buffer *b, const char *fname)
+ {
+@@ -2578,7 +2573,6 @@ int main(int argc, char **argv)
+ 		add_depends(&buf, mod);
+ 		add_moddevtable(&buf, mod);
+ 		add_srcversion(&buf, mod);
+-		add_rhelversion(&buf, mod);
+ 
+ 		sprintf(fname, "%s.mod.c", mod->name);
+ 		write_if_changed(&buf, fname);
+-- 
+2.17.1
+
