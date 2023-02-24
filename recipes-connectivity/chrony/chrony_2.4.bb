@@ -128,3 +128,5 @@ RCONFLICTS:${PN} = "ntp ntimed"
 # Separate the client program into its own package
 PACKAGES =+ "chronyc"
 FILES:chronyc = "${bindir}/chronyc"
+
+INSANE_SKIP:${PN} = "empty-dirs"
