@@ -8,7 +8,7 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 
-DEPENDS += "libbase libion linux-msm-headers"
+DEPENDS += "libbase libion virtual/kernel-headers"
 
 SRC_URI = "${PATH_TO_REPO}/src/system/memory/libdmabufheap/.git;protocol=${PROTO};destsuffix=src/system/memory/libdmabufheap;subpath=libdmabufheap;usehead=1"
 SRCREV = "${AUTOREV}"
@@ -19,7 +19,7 @@ inherit autotools-brokensep pkgconfig
 
 CPPFLAGS += "-I${STAGING_INCDIR}/ion_headers"
 
-EXTRA_OECONF:append = " --with-sanitized-headers=${STAGING_INCDIR}/linux-msm/"
+EXTRA_OECONF:append = " --with-sanitized-headers=${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}/"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 

@@ -6,7 +6,7 @@ LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
 
-DEPENDS += "libcutils libhardware-headers liblog libutils linux-msm-headers"
+DEPENDS += "libcutils libhardware-headers liblog libutils virtual/kernel-headers"
 
 PR = "r3"
 
@@ -16,7 +16,7 @@ S = "${WORKDIR}/vendor/qcom/opensource/commonsys-intf/display"
 
 inherit autotools pkgconfig
 
-EXTRA_OECONF += "--with-sanitized-headers=${STAGING_INCDIR}/linux-msm"
+EXTRA_OECONF += "--with-sanitized-headers=${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}"
 
 LDFLAGS += "-llog -lutils -lcutils"
 
