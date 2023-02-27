@@ -15,7 +15,7 @@ DEPENDS += "\
     gstreamer1.0-plugins-base \
     virtual/kernel-headers \
     mm-gfx-auto-prop \
-    ${@oe.utils.version_less_or_equal('preferred-kernel', '5.14', '', 'videodlkm', d)} \
+    ${@oe.utils.version_less_or_equal('${preferred-kernel}', '5.14', '', 'videodlkm', d)} \
 "
 
 DEPENDS:append:lemans = " displaydlkm"

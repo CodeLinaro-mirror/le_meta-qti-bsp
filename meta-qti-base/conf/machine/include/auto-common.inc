@@ -7,6 +7,7 @@ PREFERRED_PROVIDER_virtual/kernel = "linux-msm"
 PREFERRED_PROVIDER_virtual/kernel-headers = "linux-msm-headers"
 PREFERRED_VERSION_linux-msm ?= "5.4"
 PREFERRED_VERSION_linux-msm-headers ?= "5.4"
+preferred-kernel = "PREFERRED_VERSION_linux-msm"
 
 PREFERRED_VERSION_edk2 ?= "3.0"
 

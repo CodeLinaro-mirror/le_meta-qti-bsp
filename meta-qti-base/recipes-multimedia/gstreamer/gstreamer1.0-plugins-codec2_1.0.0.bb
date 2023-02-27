@@ -16,7 +16,7 @@ DEPENDS += "\
     virtual/kernel-headers \
     media-codec2 \
     media-external \
-    ${@oe.utils.version_less_or_equal('preferred-kernel', '5.14', '', 'videodlkm', d)} \
+    ${@oe.utils.version_less_or_equal('${preferred-kernel}', '5.14', '', 'videodlkm', d)} \
 "
 
 DEPENDS:append:lemans = " displaydlkm"
