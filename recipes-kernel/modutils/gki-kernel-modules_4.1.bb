@@ -6,10 +6,12 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta-qti-bsp/files/common-licenses/\
 ${LICENSE};md5=8afb6abdac9a14cb18a0d6c9c151e9b4"
 
 FILESPATH =+ "${WORKSPACE}:"
-SRC_URI   =  "file://kernel-5.10/kernel_platform/msm-kernel"
-SRC_URI  +=  "file://linkmodulesload.service"
+SRC_URI = "file://kernel-5.10/kernel_platform/msm-kernel"
+SRC_URI_sdxpinn = "file://kernel-5.15/kernel_platform/msm-kernel"
+SRC_URI_append = " file://linkmodulesload.service"
 
-S  =  "${WORKDIR}/kernel-5.10/kernel_platform/msm-kernel"
+S = "${WORKDIR}/kernel-5.10/kernel_platform/msm-kernel"
+S_sdxpinn = "${WORKDIR}/kernel-5.15/kernel_platform/msm-kernel"
 
 do_configure () {
     cd ${KERNEL_PREBUILT_DISTDIR}
