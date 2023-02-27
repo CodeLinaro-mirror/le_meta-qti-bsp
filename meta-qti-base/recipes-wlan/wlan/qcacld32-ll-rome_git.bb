@@ -23,6 +23,7 @@ SRCREV = "${AUTOREV}"
 SRCREV_FORMAT = "qcacld_cmn_fw_msm"
 
 _MODNAME = "qca6574"
+_WLAN_CTRL_NAME = "wlan"
 FW_PATH_NAME = "qca6174"
 FIRMWARE_PATH = "${D}${nonarch_base_libdir}/firmware/wlan/qca_cld/${_MODNAME}"
 
@@ -41,6 +42,7 @@ EXTRA_OEMAKE:append = " \
                        CONFIG_AR6320_SUPPORT=y \
                        CONFIG_CNSS_GENL=n \
                        CONFIG_IPA_OFFLOAD=n \
+                       WLAN_CTRL_NAME=${_WLAN_CTRL_NAME} \
                        "
 
 SYSTEMD_SERVICE:${PN} = "init_qti_wlan_auto.service"

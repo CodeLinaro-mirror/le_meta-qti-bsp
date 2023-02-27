@@ -24,6 +24,7 @@ SRCREV = "${AUTOREV}"
 SRCREV_FORMAT = "qcacld_cmn_fw_msm"
 
 _MODNAME = "qca6696"
+_WLAN_CTRL_NAME = "wlan"
 FW_PATH_NAME = "qca6390"
 FIRMWARE_PATH = "${D}${nonarch_base_libdir}/firmware/wlan/qca_cld/${_MODNAME}"
 
@@ -40,6 +41,7 @@ EXTRA_OEMAKE:append = " \
                        DYNAMIC_SINGLE_CHIP=${_MODNAME} \
                        MULTI_IF_NAME=cnss0 \
                        MODNAME=${_MODNAME} \
+                       WLAN_CTRL_NAME=${_WLAN_CTRL_NAME} \
                        "
 
 _WLAN_CFG_OVERRIDE_GVM = "\
