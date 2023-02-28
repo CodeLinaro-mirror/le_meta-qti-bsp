@@ -31,7 +31,7 @@ do_merge_dtbs[cleandirs] = " \
 addtask do_merge_dtbs after do_image before do_makeboot
 
 MKBOOTUTIL = '${@oe.utils.conditional("PREFERRED_PROVIDER_mkbootimg-native", "mkbootimg-gki-native", "scripts/mkbootimg.py", "mkbootimg", d)}'
-BOOT_RAMDISK_IMG ?= "${@bb.utils.contains('MACHINE_FEATURES', 'early-ramdisk-init', 'early-ramdisk-image-${BASEMACHINE}.cpio', '/dev/null', d)}"
+BOOT_RAMDISK_IMG ?= "${@bb.utils.contains('MACHINE_FEATURES', 'early-ramdisk-init', 'early-ramdisk-image-${PRODUCT}.cpio', '/dev/null', d)}"
 
 python do_makeboot () {
     import subprocess
