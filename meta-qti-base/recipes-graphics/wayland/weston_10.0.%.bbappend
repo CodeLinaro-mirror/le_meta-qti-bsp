@@ -4,7 +4,7 @@ DEPENDS += "gbm gbm-headers \
             libsync \
             ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'libuhab', '', d)} \
             libcutils \
-            linux-msm-headers \
+            virtual/kernel-headers \
             weston-sdm-extension-headers \
             ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', 'libdmabufheap', '', d)} \
 "

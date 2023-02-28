@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5
 DEPENDS += "\
     agm-server ar-osal ar-util binder \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'gsl-fe-noship libuhab', 'gsl', d)} \
-    libcutils liblog libutils linux-msm-headers spf \
+    libcutils liblog libutils virtual/kernel-headers spf \
 "
 
 SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/agm/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/agm/ipc/SwBinders/agm_client;subpath=agm_client;usehead=1"

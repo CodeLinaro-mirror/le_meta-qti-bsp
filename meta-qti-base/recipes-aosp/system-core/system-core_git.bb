@@ -35,7 +35,7 @@ CPPFLAGS += "\
 EXTRA_OECONF = "\
     --with-host-os=${HOST_OS} \
     --with-glib \
-    --with-sanitized-headers=${STAGING_INCDIR}/linux-msm \
+    --with-sanitized-headers=${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel} \
     --disable-debuggerd \
     --disable-libsync \
     --enable-adb-avb20 \

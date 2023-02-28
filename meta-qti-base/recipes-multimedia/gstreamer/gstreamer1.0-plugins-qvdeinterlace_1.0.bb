@@ -28,7 +28,7 @@ inherit meson pkgconfig
 
 CFLAGS += "-I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}"
 
-CFLAGS:append:lemans = " -I${STAGING_INCDIR}/linux-msm/display"
+CFLAGS:append:lemans = " -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}/display"
 EXTRA_OEMESON:append:lemans = " \
     -Dmmmcolorfmt=true \
 "
