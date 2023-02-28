@@ -15,9 +15,6 @@ SRC_URI = "${PATH_TO_REPO}/wlan/qcacld-3.0/.git;protocol=${PROTO};destsuffix=wla
            ${PATH_TO_REPO}/wlan/qca-wifi-host-cmn/.git;protocol=${PROTO};destsuffix=wlan/qca-wifi-host-cmn;usehead=1 \
            ${PATH_TO_REPO}/wlan/fw-api/.git;protocol=${PROTO};destsuffix=wlan/fw-api/;usehead=1 \
            ${PATH_TO_REPO}/device/qcom/wlan/.git;protocol=${PROTO};destsuffix=device/qcom/wlan/msm_auto;subpath=msm_auto;usehead=1 \
-           file://init_qti_wlan_auto.service \
-           file://init.qti.wlan_on.sh \
-           file://init.qti.wlan_off.sh \
            "
 SRCREV = "${AUTOREV}"
 SRCREV_FORMAT = "qcacld_cmn_fw_msm"
@@ -43,8 +40,6 @@ EXTRA_OEMAKE:append = " \
                        CONFIG_IPA_OFFLOAD=n \
                        "
 
-SYSTEMD_SERVICE:${PN} = "init_qti_wlan_auto.service"
-
 do_install() {
     module_do_install
 
@@ -59,9 +54,6 @@ do_install() {
 
     install -D -m 0644 ${WORKDIR}/device/qcom/wlan/msm_auto/WCNSS_qcom_cfg_qca6174.ini ${FIRMWARE_PATH}/WCNSS_qcom_cfg.ini
     install -D -m 0644 ${WORKDIR}/device/qcom/wlan/msm_auto/wlan_mac.bin ${FIRMWARE_PATH}/wlan_mac.bin
-    install -d ${D}${bindir}
-    install -D -m 0755 ${WORKDIR}/init.qti.wlan_on.sh ${D}${bindir}/init.qti.wlan_on.sh
-    install -D -m 0755 ${WORKDIR}/init.qti.wlan_off.sh ${D}${bindir}/init.qti.wlan_off.sh
 
     install -d ${D}${nonarch_base_libdir}/firmware/${_MODNAME}/
     ln -sf /firmware/image/${FW_PATH_NAME}/bdwlan30.b00 ${D}${nonarch_base_libdir}/firmware/${_MODNAME}/
@@ -75,15 +67,4 @@ do_install() {
     mv ${D}${nonarch_base_libdir}/firmware/${_MODNAME}/bdwlan30.b31 ${D}${nonarch_base_libdir}/firmware/${_MODNAME}/utfbd30.b31
     ln -sf /firmware/image/${FW_PATH_NAME}/bdwlan30.bin ${D}${nonarch_base_libdir}/firmware/${_MODNAME}/
     ln -sf /firmware/image/${FW_PATH_NAME}/bdwlan30.b31 ${D}${nonarch_base_libdir}/firmware/${_MODNAME}/
-
-    # Install systemd service file
-    if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
-        install -m 0644 ${WORKDIR}/init_qti_wlan_auto.service -D ${D}${systemd_unitdir}/system/init_qti_wlan_auto.service
-    fi
 }
-
-FILES:${PN} += "\
-    ${bindir}/init.qti.wlan_on.sh \
-    ${bindir}/init.qti.wlan_off.sh \
-"
-
