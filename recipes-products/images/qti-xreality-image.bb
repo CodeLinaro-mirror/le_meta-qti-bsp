@@ -17,6 +17,8 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-securemsm \
         packagegroup-startup-scripts \
         packagegroup-support-utils \
+        packagegroup-qti-sensors-see \
+        packagegroup-qti-test-sensors-see \
         packagegroup-qti-video \
         packagegroup-qti-perf \
         powerapp \
