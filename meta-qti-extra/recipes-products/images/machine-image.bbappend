@@ -16,3 +16,10 @@ ROOTFS_POSTPROCESS_COMMAND:prepend = "${@bb.utils.contains('DISTRO_FEATURES', 'k
 add_kdump_ramdisk() {
     cp ${DEPLOY_DIR_IMAGE}/machine-kdump-image-${PRODUCT}.cpio.gz ${IMAGE_ROOTFS}/boot/kdump-ramdisk.cpio.gz
 }
+
+# Introducing selinux-image.bbclass is to label selinux contexts when build.
+inherit ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'selinux-image', '', d)}
+
+IMAGE_INSTALL += "\
+    ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'packagegroup-selinux-minimal packagegroup-selinux-policycoreutils checkpolicy secilc auditd', '', d)} \
+"
