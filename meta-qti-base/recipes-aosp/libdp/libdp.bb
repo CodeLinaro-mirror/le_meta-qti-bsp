@@ -15,12 +15,13 @@ SRC_URI = "${CLO_LA_GIT}/platform/system/core;protocol=https;nobranch=1;name=cor
            file://0001-libdp-Create-symlink-for-dynamic-partitions.patch \
            file://0001-libdp-libdm-add-uuid-link-for-partions.patch \
            file://0001-libdp-update-fs_mgr-to-work-in-LV.patch \
+           file://0005-libdp-add-build-support-for-libfs_avb.patch \
            "
 SRCREV_core = "f9a075a9078eaebee234fb9be2f043613fe63da8"
 
 S = "${WORKDIR}/git"
 
-DEPENDS += "openssl gtest libsparse ext4-utils"
+DEPENDS += "openssl gtest libsparse ext4-utils avbtool fmt"
 
 PACKAGES =+ "${PN}-test"
 FILES_${PN}-test += "${bindir}/lp_test \

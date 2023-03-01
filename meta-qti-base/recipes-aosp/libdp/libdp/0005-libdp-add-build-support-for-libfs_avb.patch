@@ -1,0 +1,263 @@
+From ab6416353b92bf33e869aa1ec2620105be6a0f40 Mon Sep 17 00:00:00 2001
+From: naiwyu <quic_naiwyu@quicinc.com>
+Date: Tue, 28 Feb 2023 16:40:12 +0800
+Subject: [PATCH] avb-lxc: add build support for libfs_avb
+
+Modifications:
+1. add libfs_avb
+2. adb avb_tool depends
+3. add fs_mgr slot
+4. disable DSU
+
+Upstream-Status:Inappropriate [Android has similar design already]
+
+Change-Id: I2e0e813553e347661f37cb7d136722597e2923e8
+---
+ configure.ac                  |  3 ++-
+ fs_mgr/Makefile.am            | 11 ++++++++---
+ fs_mgr/fs_mgr_fstab.cpp       | 22 +++++++++++++++++++---
+ fs_mgr/libfs_avb/Makefile.am  | 24 ++++++++++++++++++++++++
+ fs_mgr/libfs_avb/avb_util.cpp | 11 +++++++++--
+ fs_mgr/libfs_avb/avb_util.h   |  9 +++++++++
+ fs_mgr/libfs_avb/fs_avb.cpp   | 12 ++++++++++++
+ 7 files changed, 83 insertions(+), 9 deletions(-)
+ create mode 100644 fs_mgr/libfs_avb/Makefile.am
+
+diff --git a/configure.ac b/configure.ac
+index 3f4bbe1a1d..3d7dbdc5ea 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -24,7 +24,8 @@ AC_CONFIG_FILES([ \
+     base/Makefile \
+     fs_mgr/Makefile \
+     fs_mgr/liblp/Makefile \
+-    fs_mgr/libdm/Makefile
++    fs_mgr/libdm/Makefile \
++    fs_mgr/libfs_avb/Makefile
+ ])
+ AC_OUTPUT
+ 
+diff --git a/fs_mgr/Makefile.am b/fs_mgr/Makefile.am
+index 74babc12d0..64b83a87c3 100644
+--- a/fs_mgr/Makefile.am
++++ b/fs_mgr/Makefile.am
+@@ -1,17 +1,22 @@
+-SUBDIRS := liblp libdm
++SUBDIRS := liblp libdm libfs_avb
+ 
+ lib_LTLIBRARIES := libfsmgr_dmlinear.la
+ 
+-libfsmgr_dmlinear_la_SOURCES := fs_mgr_dm_linear.cpp
++libfsmgr_dmlinear_la_SOURCES := fs_mgr_dm_linear.cpp \
++                                fs_mgr_fstab.cpp \
++                                fs_mgr_slotselect.cpp \
++                                fs_mgr_boot_config.cpp
+ 
+ libfsmgr_dmlinear_la_CPPFLAGS := -I$(srcdir)/include \
+                            -I$(srcdir)/libdm/include \
+                            -I$(srcdir)/liblp/include \
+                            -I$(top_srcdir)/base/include \
+                            -I$(srcdir)/include_fstab \
++                           -I$(srcdir)/libfs_avb/include \
+                            -std=c++17
+-libfsmgr_dmlinear_la_LDFLAGS  := -version-info $(LT_VERSION_INFO) -lcrypto
++libfsmgr_dmlinear_la_LDFLAGS  := -version-info $(LT_VERSION_INFO) -lcrypto -lavb
+ libfsmgr_dmlinear_la_LIBADD   := ./libdm/libdm.la
++libfsmgr_dmlinear_la_LIBADD   := ./libfs_avb/libfs_avb.la
+ 
+ fsmgr_dmlinear_includedir=$(includedir)
+ fsmgr_dmlinear_include_HEADERS := $(srcdir)/include/fs_mgr_dm_linear.h
+diff --git a/fs_mgr/fs_mgr_fstab.cpp b/fs_mgr/fs_mgr_fstab.cpp
+index 8a2207870f..05fdf39bd2 100644
+--- a/fs_mgr/fs_mgr_fstab.cpp
++++ b/fs_mgr/fs_mgr_fstab.cpp
+@@ -14,6 +14,13 @@
+  * limitations under the License.
+  */
+ 
++/*
++ * Changes from Qualcomm Innovation Center are provided under the following license:
++ *
++ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
++ * SPDX-License-Identifier: BSD-3-Clause-Clear
++ */
++
+ #include <ctype.h>
+ #include <dirent.h>
+ #include <errno.h>
+@@ -33,7 +40,10 @@
+ #include <android-base/properties.h>
+ #include <android-base/stringprintf.h>
+ #include <android-base/strings.h>
++//disable DSU for android container
++#if defined(__ANDROID__)
+ #include <libgsi/libgsi.h>
++#endif
+ 
+ #include "fs_mgr_priv.h"
+ 
+@@ -582,6 +592,8 @@ bool EraseFstabEntry(Fstab* fstab, const std::string& mount_point) {
+ 
+ }  // namespace
+ 
++//disable DSU for android container
++#if defined(__ANDROID__)
+ void TransformFstabForDsu(Fstab* fstab, const std::vector<std::string>& dsu_partitions) {
+     static constexpr char kDsuKeysDir[] = "/avb";
+     // Convert userdata
+@@ -655,6 +667,7 @@ void TransformFstabForDsu(Fstab* fstab, const std::vector<std::string>& dsu_part
+         }
+     }
+ }
++#endif
+ 
+ void EnableMandatoryFlags(Fstab* fstab) {
+     // Devices launched in R and after should enable fs_verity on userdata. The flag causes tune2fs
+@@ -684,11 +697,14 @@ bool ReadFstabFromFile(const std::string& path, Fstab* fstab) {
+         LERROR << __FUNCTION__ << "(): failed to load fstab from : '" << path << "'";
+         return false;
+     }
++//disable DSU for android container
++#if defined(__ANDROID__)
+     if (!is_proc_mounts && !access(android::gsi::kGsiBootedIndicatorFile, F_OK)) {
+-        std::string lp_names;
+-        ReadFileToString(gsi::kGsiLpNamesFile, &lp_names);
+-        TransformFstabForDsu(fstab, Split(lp_names, ","));
++       std::string lp_names;
++       ReadFileToString(gsi::kGsiLpNamesFile, &lp_names);
++       TransformFstabForDsu(fstab, Split(lp_names, ","));
+     }
++#endif
+ 
+ #ifndef NO_SKIP_MOUNT
+     SkipMountingPartitions(fstab);
+diff --git a/fs_mgr/libfs_avb/Makefile.am b/fs_mgr/libfs_avb/Makefile.am
+new file mode 100644
+index 0000000000..12686dba64
+--- /dev/null
++++ b/fs_mgr/libfs_avb/Makefile.am
+@@ -0,0 +1,24 @@
++ACLOCAL_AMFLAGS = -I m4
++
++lib_LTLIBRARIES := libfs_avb.la
++
++libfs_avb_la_SOURCES := avb_ops.cpp avb_util.cpp fs_avb_util.cpp fs_avb.cpp types.cpp util.cpp
++
++libfs_avb_la_CPPFLAGS := -I$(top_srcdir)/include \
++    -I$(top_srcdir)/base/include \
++    -I$(top_srcdir)/fs_mgr/include \
++    -I$(top_srcdir)/fs_mgr/include_fstab \
++    -I$(top_srcdir)/fs_mgr/libdm/include \
++    -I$(srcdir)/include \
++    -std=c++17
++
++libfs_avb_includedir=$(includedir)/libfs_avb
++libfs_avb_include_HEADERS := $(srcdir)/avb_ops.h \
++    $(srcdir)/avb_util.h \
++    $(srcdir)/sha.h \
++    $(srcdir)/util.h \
++    $(srcdir)/include/fs_avb/fs_avb.h \
++    $(srcdir)/include/fs_avb/fs_avb_util.h \
++    $(srcdir)/include/fs_avb/types.h
++
++libfs_avb_la_LDFLAGS := -Wall -Werror -version-info $(LT_VERSION_INFO)
+diff --git a/fs_mgr/libfs_avb/avb_util.cpp b/fs_mgr/libfs_avb/avb_util.cpp
+index 2288674117..32e162180e 100644
+--- a/fs_mgr/libfs_avb/avb_util.cpp
++++ b/fs_mgr/libfs_avb/avb_util.cpp
+@@ -14,6 +14,13 @@
+  * limitations under the License.
+  */
+ 
++/*
++ * Changes from Qualcomm Innovation Center are provided under the following license:
++ *
++ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
++ * SPDX-License-Identifier: BSD-3-Clause-Clear
++ */
++
+ #include "avb_util.h"
+ 
+ #include <unistd.h>
+@@ -398,8 +405,8 @@ VBMetaVerifyResult VerifyVBMetaSignature(const VBMetaData& vbmeta,
+     const uint8_t* pk_data;
+     size_t pk_len;
+     ::AvbVBMetaVerifyResult vbmeta_ret;
+-
+-    vbmeta_ret = avb_vbmeta_image_verify(vbmeta.data(), vbmeta.size(), &pk_data, &pk_len);
++    //FIXME
++    vbmeta_ret = avb_vbmeta_image_verify(vbmeta.data(), vbmeta.size(), &pk_data, &pk_len, NULL);
+ 
+     if (out_public_key_data != nullptr) {
+         out_public_key_data->clear();
+diff --git a/fs_mgr/libfs_avb/avb_util.h b/fs_mgr/libfs_avb/avb_util.h
+index e8f7c39bf4..6c64b737bd 100644
+--- a/fs_mgr/libfs_avb/avb_util.h
++++ b/fs_mgr/libfs_avb/avb_util.h
+@@ -14,11 +14,20 @@
+  * limitations under the License.
+  */
+ 
++/*
++ * Changes from Qualcomm Innovation Center are provided under the following license:
++ *
++ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
++ * SPDX-License-Identifier: BSD-3-Clause-Clear
++ */
++
+ #pragma once
+ 
+ #include <ostream>
+ #include <string>
+ #include <vector>
++//FIXME
++#include <functional>
+ 
+ #include <fstab/fstab.h>
+ #include <libavb/libavb.h>
+diff --git a/fs_mgr/libfs_avb/fs_avb.cpp b/fs_mgr/libfs_avb/fs_avb.cpp
+index 5d504ab0dc..9491503018 100644
+--- a/fs_mgr/libfs_avb/fs_avb.cpp
++++ b/fs_mgr/libfs_avb/fs_avb.cpp
+@@ -14,6 +14,13 @@
+  * limitations under the License.
+  */
+ 
++/*
++ * Changes from Qualcomm Innovation Center are provided under the following license:
++ *
++ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
++ * SPDX-License-Identifier: BSD-3-Clause-Clear
++ */
++
+ #include "fs_avb/fs_avb.h"
+ 
+ #include <fcntl.h>
+@@ -33,7 +40,9 @@
+ #include <android-base/strings.h>
+ #include <libavb/libavb.h>
+ #include <libdm/dm.h>
++#if defined(__ANDROID__)
+ #include <libgsi/libgsi.h>
++#endif
+ 
+ #include "avb_ops.h"
+ #include "avb_util.h"
+@@ -269,11 +278,14 @@ AvbUniquePtr AvbHandle::LoadAndVerifyVbmeta(
+ 
+ static bool IsAvbPermissive() {
+     if (IsDeviceUnlocked()) {
++//disable DSU for android container
++#if defined(__ANDROID__)
+         // Manually putting a file under metadata partition can enforce AVB verification.
+         if (!access(DSU_METADATA_PREFIX "avb_enforce", F_OK)) {
+             LINFO << "Enforcing AVB verification when the device is unlocked";
+             return false;
+         }
++#endif
+         return true;
+     }
+     return false;
+-- 
+2.25.1
+
