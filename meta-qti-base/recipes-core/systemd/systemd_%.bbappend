@@ -49,6 +49,12 @@ do_install:append () {
     #Remove privatetmp=true from hostname service
     sed -i  '/^PrivateTmp.*/d' ${D}${systemd_system_unitdir}/systemd-hostnamed.service
 
+    # Systemd Lockdep warning will change console level to verbose, When console flooded with log,
+    # it may lead stablity issue, so changed the level back in systemd-sysctl service.
+    if ${@bb.utils.contains_any('VARIANT', 'perf user', 'false', 'true', d)}; then
+        echo 'kernel.printk = 4' >> ${D}/${libdir}/sysctl.d/50-default.conf
+    fi
+
     # Remove orignal 60-persistent-v4l.rules which is not applicable for QTI video
     rm ${D}${nonarch_base_libdir}/udev/rules.d/60-persistent-v4l.rules
 }
