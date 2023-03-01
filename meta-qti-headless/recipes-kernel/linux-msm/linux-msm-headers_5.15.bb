@@ -15,6 +15,7 @@ B = "${WORKDIR}/build"
 inherit linux-kernel-base kernel-arch
 
 # We need the kernel to be unpacked and patched before we can grab the headers.
+do_populate_lic[depends] += "virtual/kernel:do_patch"
 do_install[depends] += "virtual/kernel:do_patch"
 
 # There's nothing to do here, except install the headers where we can package them
