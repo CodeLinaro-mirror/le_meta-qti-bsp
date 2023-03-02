@@ -18,6 +18,7 @@ inherit ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', "qti-techpac
 
 EXTRA_OEMAKE:lemans += "TARGET_SUPPORT=lemans"
 EXTRA_OEMAKE:quin-gvm-gen4-2 += "TARGET_SUPPORT=no AUTO_GVM=yes"
+EXTRA_OEMAKE:quin-gvm-lemans += "TARGET_SUPPORT=no AUTO_GVM=yes"
 
 MODULES = "\
         dsp/spf_core_dlkm.ko  \

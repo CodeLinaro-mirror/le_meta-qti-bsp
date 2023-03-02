@@ -4,6 +4,7 @@ SOC_FAMILY ?= "sa-common"
 include conf/machine/include/soc-family.inc
 
 PREFERRED_PROVIDER_virtual/kernel = "linux-msm"
+PREFERRED_PROVIDER_virtual/kernel-headers = "linux-msm-headers"
 PREFERRED_VERSION_linux-msm ?= "5.4"
 PREFERRED_VERSION_linux-msm-headers ?= "5.4"
 

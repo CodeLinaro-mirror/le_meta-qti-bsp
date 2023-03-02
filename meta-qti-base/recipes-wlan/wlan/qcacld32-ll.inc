@@ -17,6 +17,8 @@ WLAN_PLATFORM_CFG = " \
 DEPENDS += "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', 'wlan-platform-dlkm', '', d)}"
 EXTRA_OEMAKE:append = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', '${WLAN_PLATFORM_CFG}', '', d)}"
 
+_LINUX_BUILD_TOP = "${WORKDIR}/wlan"
+
 do_unpack[deptask] = "do_populate_sysroot"
 do_compile:prepend() {
     #Add gnu99 for compiler compatible issues
