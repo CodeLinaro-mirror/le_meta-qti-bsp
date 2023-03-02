@@ -1,0 +1,261 @@
+From 7a3dac1bf45d4e85bf68dc25e61f8c7fac5c922d Mon Sep 17 00:00:00 2001
+From: naiwyu <quic_naiwyu@quicinc.com>
+Date: Thu, 23 Feb 2023 10:12:08 +0800
+Subject: [PATCH] libdp: set verity devices for android container
+
+Modifications:
+1. load vbmeta data of android container
+2. set verity device for partitions with avb hashtree descriptors inside vbmeta
+
+Upstream-Status:Inappropriate [Android has similar design already]
+
+Change-Id: 32c098a2c5a8b22e1e21cbf6097cd58a003a5b7b
+Signed-off-by: naiwyu <quic_naiwyu@quicinc.com>
+---
+ fs_mgr/fs_mgr_dm_linear.cpp              | 17 +++++++-
+ fs_mgr/libfs_avb/avb_ops.cpp             |  9 +++-
+ fs_mgr/libfs_avb/avb_util.cpp            | 27 ++++++++++++
+ fs_mgr/libfs_avb/avb_util.h              |  3 ++
+ fs_mgr/libfs_avb/fs_avb.cpp              | 52 ++++++++++++++++++++++++
+ fs_mgr/libfs_avb/include/fs_avb/fs_avb.h | 14 +++++++
+ 6 files changed, 120 insertions(+), 2 deletions(-)
+
+diff --git a/fs_mgr/fs_mgr_dm_linear.cpp b/fs_mgr/fs_mgr_dm_linear.cpp
+index fc33dfb7a1..ea05ac3969 100644
+--- a/fs_mgr/fs_mgr_dm_linear.cpp
++++ b/fs_mgr/fs_mgr_dm_linear.cpp
+@@ -22,6 +22,13 @@
+  * SOFTWARE.
+  */
+ 
++/*
++ * Changes from Qualcomm Innovation Center are provided under the following license:
++ *
++ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
++ * SPDX-License-Identifier: BSD-3-Clause-Clear
++ */
++
+ #include "fs_mgr_dm_linear.h"
+ 
+ #include <inttypes.h>
+@@ -40,7 +47,7 @@
+ #include <android-base/unique_fd.h>
+ #include <fs_mgr/file_wait.h>
+ #include <liblp/reader.h>
+-
++#include <fs_avb/fs_avb.h>
+ #include "fs_mgr_priv.h"
+ 
+ // for device mapper links
+@@ -194,6 +201,14 @@ bool CreateLogicalPartitions(const LpMetadata& metadata, const std::string& supe
+             return false;
+         }
+     }
++
++    std::vector<std::string> vbmeta_images {"vbmeta_system", "la_vbmeta"};
++    std::vector<std::string> verify_images {"system", "vendor", "product", "odm", "system_ext"};
++    std::string suffix = fs_mgr_get_slot_suffix();
++    LINFO << "AvbHandle init with suffix: " << suffix;
++
++    AvbUniquePtr avb_handle_ = AvbHandle::Init(suffix, vbmeta_images, verify_images);
++
+     return true;
+ }
+ 
+diff --git a/fs_mgr/libfs_avb/avb_ops.cpp b/fs_mgr/libfs_avb/avb_ops.cpp
+index c192bf572e..a7f991efe7 100644
+--- a/fs_mgr/libfs_avb/avb_ops.cpp
++++ b/fs_mgr/libfs_avb/avb_ops.cpp
+@@ -22,6 +22,13 @@
+  * SOFTWARE.
+  */
+ 
++/*
++ * Changes from Qualcomm Innovation Center are provided under the following license:
++ *
++ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
++ * SPDX-License-Identifier: BSD-3-Clause-Clear
++ */
++
+ #include "avb_ops.h"
+ 
+ #include <errno.h>
+@@ -171,7 +178,7 @@ std::string FsManagerAvbOps::GetLogicalPath(const std::string& partition_name) {
+ AvbIOResult FsManagerAvbOps::ReadFromPartition(const char* partition, int64_t offset,
+                                                size_t num_bytes, void* buffer,
+                                                size_t* out_num_read) {
+-    std::string path = "/dev/block/by-name/"s + partition;
++    std::string path = "/dev/disk/by-partlabel/"s + partition;
+ 
+     // Ensures the device path (a symlink created by init) is ready to access.
+     if (!WaitForFile(path, 1s)) {
+diff --git a/fs_mgr/libfs_avb/avb_util.cpp b/fs_mgr/libfs_avb/avb_util.cpp
+index 32e162180e..a196d4dd50 100644
+--- a/fs_mgr/libfs_avb/avb_util.cpp
++++ b/fs_mgr/libfs_avb/avb_util.cpp
+@@ -77,6 +77,8 @@ bool ConstructVerityTable(const FsAvbHashtreeDescriptor& hashtree_desc,
+         return false;
+     }
+ 
++    LINFO << "current dm_verity_mode: " << dm_verity_mode;
++
+     std::ostringstream hash_algorithm;
+     hash_algorithm << hashtree_desc.hash_algorithm;
+ 
+@@ -131,6 +133,31 @@ bool HashtreeDmVeritySetup(FstabEntry* fstab_entry, const FsAvbHashtreeDescripto
+     return true;
+ }
+ 
++bool SetDmVerity(const FsAvbHashtreeDescriptor& hashtree_desc, std::string image,
++                 std::string blk_device, bool wait_for_verity_dev) {
++    android::dm::DmTable table;
++    if (!ConstructVerityTable(hashtree_desc, blk_device, &table) || !table.valid()) {
++        LERROR << "Failed to construct verity table.";
++        return false;
++    }
++    table.set_readonly(true);
++
++    std::chrono::milliseconds timeout = {};
++    if (wait_for_verity_dev) timeout = 1s;
++
++    std::string dev_path;
++    android::dm::DeviceMapper& dm = android::dm::DeviceMapper::Instance();
++
++    if (!dm.CreateDevice(image + "-verity", table, &dev_path, timeout)) {
++        LERROR << "Couldn't create verity device!";
++        return false;
++    }
++
++    LINFO << "dev_path for" << blk_device << " is: " << dev_path;
++
++    return true;
++}
++
+ std::unique_ptr<FsAvbHashDescriptor> GetHashDescriptor(
+         const std::string& partition_name, const std::vector<VBMetaData>& vbmeta_images) {
+     bool found = false;
+diff --git a/fs_mgr/libfs_avb/avb_util.h b/fs_mgr/libfs_avb/avb_util.h
+index 6c64b737bd..82760f4d61 100644
+--- a/fs_mgr/libfs_avb/avb_util.h
++++ b/fs_mgr/libfs_avb/avb_util.h
+@@ -118,5 +118,8 @@ VBMetaVerifyResult LoadAndVerifyVbmetaByPartition(
+     std::function<std::string(const std::string&)> device_path_constructor, bool is_chained_vbmeta,
+     std::vector<VBMetaData>* out_vbmeta_images);
+ 
++bool SetDmVerity(const FsAvbHashtreeDescriptor& hashtree_desc, std::string image,
++                 std::string blk_device, bool wait_for_verity_dev);
++
+ }  // namespace fs_mgr
+ }  // namespace android
+diff --git a/fs_mgr/libfs_avb/fs_avb.cpp b/fs_mgr/libfs_avb/fs_avb.cpp
+index 9491503018..5c78d31776 100644
+--- a/fs_mgr/libfs_avb/fs_avb.cpp
++++ b/fs_mgr/libfs_avb/fs_avb.cpp
+@@ -481,6 +481,58 @@ AvbUniquePtr AvbHandle::Open() {
+     return avb_handle;
+ }
+ 
++AvbUniquePtr AvbHandle::Init(std::string ab_suffix, std::vector<std::string> vbmeta_images,
++                             std::vector<std::string> verity_images) {
++    AvbUniquePtr avb_handle(new AvbHandle());
++    if (!avb_handle) {
++        LERROR << "Failed to allocate AvbHandle";
++        return nullptr;
++    }
++
++    for (auto image : vbmeta_images) {
++        std::unique_ptr<VBMetaData> vbmeta_image = avb_handle->LoadVbmetaByPath(image + ab_suffix);
++        avb_handle->vbmeta_images_.emplace_back(std::move(*vbmeta_image));
++    }
++
++    for (auto image : verity_images) {
++        auto hashtree_desc = GetHashtreeDescriptor(image, avb_handle->vbmeta_images_);
++        if (hashtree_desc == nullptr) {
++            continue;
++        }
++        std::string linear_device_path = "/dev/device-mapper/" + image + ab_suffix;
++        if (!SetDmVerity(*hashtree_desc, image, linear_device_path, true)) {
++            LERROR << "Failed to set verity device for " << image;
++        }
++    }
++
++    return avb_handle;
++}
++
++std::unique_ptr<VBMetaData> AvbHandle::LoadVbmetaByPath(std::string partition_name) {
++    uint64_t vbmeta_offset = 0;
++    uint64_t vbmeta_size = VBMetaData::kMaxVBMetaSize;
++    uint64_t vbmeta_num_read = 0;
++
++    auto vbmeta = std::make_unique<VBMetaData>(vbmeta_size, partition_name);
++
++    FsManagerAvbOps avb_ops;
++    AvbIOResult load_result =
++            avb_ops.ReadFromPartition(partition_name.c_str(), 0, vbmeta_size, vbmeta->data(), &vbmeta_num_read);
++    if (load_result) {
++        LERROR << partition_name << " load fail, result: " << load_result;
++        return nullptr;
++    }
++
++    std::unique_ptr<AvbVBMetaImageHeader> vbmeta_header =
++            vbmeta->GetVBMetaHeader(true /* update_vbmeta_size */);
++    if (!vbmeta_header) {
++        LERROR << partition_name << ": Failed to get vbmeta header";
++        return nullptr;
++    }
++
++    return vbmeta;
++}
++
+ AvbHashtreeResult AvbHandle::SetUpStandaloneAvbHashtree(FstabEntry* fstab_entry,
+                                                         bool wait_for_verity_dev) {
+     auto avb_handle = LoadAndVerifyVbmeta(*fstab_entry);
+diff --git a/fs_mgr/libfs_avb/include/fs_avb/fs_avb.h b/fs_mgr/libfs_avb/include/fs_avb/fs_avb.h
+index 4702e68079..ac920a9695 100644
+--- a/fs_mgr/libfs_avb/include/fs_avb/fs_avb.h
++++ b/fs_mgr/libfs_avb/include/fs_avb/fs_avb.h
+@@ -14,6 +14,13 @@
+  * limitations under the License.
+  */
+ 
++/*
++ * Changes from Qualcomm Innovation Center are provided under the following license:
++ *
++ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
++ * SPDX-License-Identifier: BSD-3-Clause-Clear
++ */
++
+ #pragma once
+ 
+ #include <functional>
+@@ -28,6 +35,8 @@
+ namespace android {
+ namespace fs_mgr {
+ 
++#define VBMETA_MAX_SIZE (64 * 1024)
++
+ struct VBMetaInfo {
+     std::string digest;
+     HashAlgorithm hash_algorithm;
+@@ -85,6 +94,8 @@ class AvbHandle {
+     // TODO(bowgotsai): remove Open() and switch to LoadAndVerifyVbmeta().
+     static AvbUniquePtr Open();                 // loads inline vbmeta, via libavb.
+     static AvbUniquePtr LoadAndVerifyVbmeta();  // loads inline vbmeta.
++    static AvbUniquePtr Init(std::string ab_suffix, std::vector<std::string> vbmeta_images,
++                             std::vector<std::string> verity_images);  // loads container vbmeta.
+ 
+     // The caller can specify optional preload_avb_key_blobs for public key matching.
+     // This is mostly for init to preload AVB keys before chroot into /system.
+@@ -101,6 +112,9 @@ class AvbHandle {
+             bool load_chained_vbmeta, bool rollback_protection,
+             std::function<std::string(const std::string&)> custom_device_path = nullptr);
+ 
++    // Load vbmeta images
++    std::unique_ptr<VBMetaData> LoadVbmetaByPath(std::string partition_name);
++
+     // Sets up dm-verity on the given fstab entry.
+     // The 'wait_for_verity_dev' parameter makes this function wait for the
+     // verity device to get created before return.
+-- 
+2.25.1
+
