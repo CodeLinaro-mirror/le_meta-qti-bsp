@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5
 DEPENDS += "\
     agm ar-osal ar-util expat glib-2.0 \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'gsl-fe-noship libuhab', 'gsl', d)} \
-    libcutils linux-msm-headers spf \
+    libcutils virtual/kernel-headers spf \
 "
 
 SRC_URI = "\
