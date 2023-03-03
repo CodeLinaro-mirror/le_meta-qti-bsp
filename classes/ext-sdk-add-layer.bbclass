@@ -108,14 +108,28 @@ ext_sdk_add_external_layers_script() {
         echo '    rm -rf layerlist.txt' >> $add_external_layers_script
         echo '    touch layerlist.txt' >> $add_external_layers_script
         echo '    echo "`find -name layer.conf`" >> layerlist.txt' >> $add_external_layers_script
-        echo '' >> $add_external_layers_script
         echo '    layer_list=`cat layerlist.txt`' >> $add_external_layers_script
         echo '    : > layerlist.txt' >> $add_external_layers_script
         echo '    for layer in $layer_list ; do' >> $add_external_layers_script
         echo '        if [[ "`grep BBFILE_COLLECTIONS $layer`"  == *"qti-"* ]]; then' >> $add_external_layers_script
-        echo '             echo $layer' >> $add_external_layers_script
+        echo '             if ! [[ "`grep BBFILE_COLLECTIONS $layer`"  == *"-esdk"* ]]; then' >> $add_external_layers_script
+        echo "                 bbfile_collection_name_old=\"\$(sed -e 's/[[:space:]]*\$//'<<<\"\`grep BBFILE_COLLECTIONS \$layer\`\")\"" >> $add_external_layers_script
+        echo "                 IFS='\"' read -ra ADDR <<< \"\$bbfile_collection_name_old\"" >> $add_external_layers_script
+        echo '                 bbfile_collection_name_old=${ADDR[1]}' >> $add_external_layers_script
+        echo '                 bbfile_collection_name_new=$bbfile_collection_name_old-esdk' >> $add_external_layers_script
+        echo '                 sed -i "s/$bbfile_collection_name_old/$bbfile_collection_name_new/" $layer' >> $add_external_layers_script
+        echo "                 bbfile_priority_old=\"\$(sed -e 's/[[:space:]]*\$//'<<<\"\`grep BBFILE_PRIORITY \$layer\`\")\"" >> $add_external_layers_script
+        echo "                 IFS='\"' read -ra ADDR <<< \"\$bbfile_priority_old\"" >> $add_external_layers_script
+        echo '                 bbfile_priority_old=${ADDR[1]}' >> $add_external_layers_script
+        echo '                 bbfile_priority_new=`expr $bbfile_priority_old + 1`' >> $add_external_layers_script
+        echo '                 oldline=`grep BBFILE_PRIORITY $layer` ' >> $add_external_layers_script
+        echo '                 newline=${oldline/"$bbfile_priority_old"/"$bbfile_priority_new"}' >> $add_external_layers_script
+        echo '                 sed -i "s/$oldline/$newline/" $layer' >> $add_external_layers_script
+        echo '             fi' >> $add_external_layers_script
+        echo '             echo $layer  >> layerlist.txt' >> $add_external_layers_script
         echo '        fi' >> $add_external_layers_script
-        echo '    done >> layerlist.txt' >> $add_external_layers_script
+        echo '    done' >> $add_external_layers_script
+        echo '' >> $add_external_layers_script
         echo '' >> $add_external_layers_script
         echo "    sed -i 's+conf/layer.conf+ +g' layerlist.txt" >> $add_external_layers_script
         echo '    layer_list=`cat layerlist.txt`' >> $add_external_layers_script
@@ -132,8 +146,12 @@ ext_sdk_add_external_layers_script() {
         echo '' >> $add_external_layers_script
         echo '    for layer in ${layer_list}' >> $add_external_layers_script
         echo '    do' >> $add_external_layers_script
-        echo '        grep -v "${layer} " ${SDK_ROOT}/conf/bblayers.conf > ${SDK_ROOT}/conf/tmp-bblayers.conf' >> $add_external_layers_script
+        echo '        grep -v "${workspace_root}.*${layer} " ${SDK_ROOT}/conf/bblayers.conf > ${SDK_ROOT}/conf/tmp-bblayers.conf' >> $add_external_layers_script
         echo '        mv ${SDK_ROOT}/conf/tmp-bblayers.conf ${SDK_ROOT}/conf/bblayers.conf' >> $add_external_layers_script
+        echo '        # Ignore changes made to layer.conf of each newly added layer' >> $add_external_layers_script
+        echo '        cd ${workspace_root}/${layer}' >> $add_external_layers_script
+        echo '        git update-index --assume-unchanged conf/layer.conf' >> $add_external_layers_script
+        echo '        cd - >/dev/null' >> $add_external_layers_script
         echo '    done' >> $add_external_layers_script
         echo '' >> $add_external_layers_script
         echo '    echo "BBLAYERS += \" \ " >> ${SDK_ROOT}/conf/bblayers.conf' >> $add_external_layers_script

@@ -1,5 +1,6 @@
 FILESEXTRAPATHS_prepend_cinder := "${THISDIR}/files:"
 FILESEXTRAPATHS_prepend_sdxlemur := "${THISDIR}/files:"
+FILESEXTRAPATHS_prepend_sdxpinn := "${THISDIR}/files:"
 FILESEXTRAPATHS_prepend_sa2150p-nand := "${THISDIR}/files:"
 FILESEXTRAPATHS_prepend_sa410m := "${THISDIR}/files:"
 FILESEXTRAPATHS_prepend_sa515m := "${THISDIR}/files:"

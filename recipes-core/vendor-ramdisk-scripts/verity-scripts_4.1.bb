@@ -6,6 +6,7 @@ ${LICENSE};md5=3771d4920bd6cdb8cbdf1e8344489ee0"
 
 SRC_URI  +=  "file://init-verity.sh"
 SRC_URI  +=  "file://veritysetup.service.in"
+SRC_URI  +=  "file://resize-partition.service"
 
 # Tied to systemd. Build it only when systemd is also building.
 inherit features_check
@@ -46,12 +47,16 @@ do_install () {
       ${D}${systemd_unitdir}/system/veritysetup-vendor-dlkm@.service
   install -m 0644 ${WORKDIR}/veritysetup-system.service \
       ${D}${systemd_unitdir}/system/veritysetup-system@.service
+  install -m 0644 ${WORKDIR}/resize-partition.service \
+      ${D}${systemd_unitdir}/system/resize-partition@.service
   # enable the services
   install -d ${D}${systemd_unitdir}/system/sysinit.target.wants/
   ln -sf ${systemd_unitdir}/system/veritysetup-vendor-dlkm@.service \
       ${D}${systemd_unitdir}/system/sysinit.target.wants/veritysetup-vendor-dlkm@vdlkm.service
   ln -sf ${systemd_unitdir}/system/veritysetup-system@.service \
       ${D}${systemd_unitdir}/system/sysinit.target.wants/veritysetup-system@root.service
+  ln -sf ${systemd_unitdir}/system/resize-partition@.service \
+      ${D}${systemd_unitdir}/system/sysinit.target.wants/resize-partition@userdata.service
 }
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"

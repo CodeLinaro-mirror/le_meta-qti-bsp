@@ -3,20 +3,26 @@ inherit kernel
 DESCRIPTION = "CAF Linux Kernel"
 LICENSE = "GPLv2.0-with-linux-syscall-note"
 
-COMPATIBLE_MACHINE = "cinder"
+COMPATIBLE_MACHINE = "kalama|qrb5165|sdxpinn"
 
-FILESPATH =+ "${WORKSPACE}:"
+FILESEXTRAPATHS:prepend := "${WORKSPACE}:"
+FILESEXTRAPATHS:prepend := "${WORKSPACE}:${KERNEL_PREBUILT_PATH}:"
 
-SRC_URI   =  "file://kernel-${PV}/kernel_platform/msm-kernel \
-             "
-SRC_URI_append_cinder  +=  "${@oe.utils.conditional('KERNEL_USE_PREBUILTS', 'True', '', 'file://kernel-${PV}/kernel_platform/msm-kernel/arch/${ARCH}/configs/vendor/cinder_debug.config',d)}"
+SRC_URI = "file://kernel-5.15/kernel_platform/msm-kernel \
+           file://kernel-5.15/kernel_platform/common \
+           file://dist \
+           "
 
-S = "${WORKDIR}/kernel-${PV}/kernel_platform/msm-kernel"
+SRC_URI:append:cinder  =  "${@oe.utils.conditional('KERNEL_USE_PREBUILTS', 'True', '', 'file://kernel-${PV}/kernel_platform/msm-kernel/arch/${ARCH}/configs/vendor/cinder_debug.config',d)}"
+
+S = "${WORKDIR}/kernel-5.15/kernel_platform/msm-kernel"
 PR = "r0"
 
-DEPENDS += "kernel-toolchain-native dtc-android-build-native rsync-native"
+DEPENDS += "virtual/kernel-toolchain-native virtual/dtc-native rsync-native mod-signing-keys"
+DEPENDS:append:aarch64 = " libgcc"
+RDEPENDS:${KERNEL_PACKAGE_NAME}-base = ""
 
-LDFLAGS_aarch64 = "-O1 --hash-style=gnu --as-needed"
+LDFLAGS:aarch64 = "-O1 --hash-style=gnu --as-needed"
 TARGET_CXXFLAGS += "-Wno-format"
 KERNEL_CC = "${STAGING_BINDIR_NATIVE}/clang/bin/clang -target ${TARGET_ARCH}${TARGET_VENDOR}-${TARGET_OS}"
 
@@ -31,21 +37,15 @@ get_cc_option () {
 :
 }
 
-DEPENDS += " virtual/mkbootimg-native openssl-native mod-signing-keys"
-RDEPENDS_${KERNEL_PACKAGE_NAME}-base = ""
-
-LDFLAGS_aarch64 = "-O1 --hash-style=gnu --as-needed"
-
-DEPENDS_append_aarch64 = " libgcc"
-KERNEL_CC_append_aarch64 = " ${TOOLCHAIN_OPTIONS}"
-KERNEL_LD_append_aarch64 = " ${TOOLCHAIN_OPTIONS}"
+KERNEL_CC:append:aarch64 = " ${TOOLCHAIN_OPTIONS}"
+KERNEL_LD:append:aarch64 = " ${TOOLCHAIN_OPTIONS}"
 
 KERNEL_PRIORITY           = "9001"
 # Add V=1 to KERNEL_EXTRA_ARGS for verbose
 KERNEL_EXTRA_ARGS        += "O=${B}"
 
 # Additional configs needed for supporting DTBO partition.
-DTBO_MACHINE = "${@d.getVar('MACHINE_SUPPORTS_DTBO') or "False"}"
+#DTBO_MACHINE = "${@d.getVar('MACHINE_SUPPORTS_DTBO') or "False"}"
 
 # Don't set any version extention on debug build
 LINUX_VERSION_EXTENSION ?= "-perf"
@@ -64,18 +64,19 @@ def find_sccs(d):
 
 # dm-verity: Patch the cert file from which kernel add key to keyring
 do_patch_veritycert() {
-   cp -f ${WORKDIR}/verity.x509.pem ${S}/certs/verity.x509.pem
+   ## TODO
+   #cp -f ${WORKDIR}/verity.x509.pem ${S}/certs/verity.x509.pem
 }
 
 do_patch[postfuncs] += " ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains('MACHINE_FEATURES', 'dm-verity-bootloader', 'do_patch_veritycert', '', d), '', d)}"
 
-do_configure_prepend() {
-    if [ ! -f "${WORKDIR}/kernel-${PV}/kernel_platform/msm-kernel/arch/${ARCH}/configs/${KERNEL_CONFIG}" ]; then
+do_configure:prepend() {
+    if [ ! -f "${WORKDIR}/kernel-5.15/kernel_platform/msm-kernel/arch/${ARCH}/configs/${KERNEL_CONFIG}" ]; then
         bbfatal "KERNEL_CONFIG '${KERNEL_CONFIG}' was specified, but not present in the source tree"
     fi
 
     sccs_from_src_uri="${@" ".join(find_sccs(d))}"
-    ${S}/scripts/kconfig/merge_config.sh -m -r -y -O ${B} ${WORKDIR}/kernel-${PV}/kernel_platform/msm-kernel/arch/${ARCH}/configs/${KERNEL_CONFIG} ${sccs_from_src_uri} 1>&2
+    ${S}/scripts/kconfig/merge_config.sh -m -r -y -O ${B} ${WORKDIR}/kernel-5.15/kernel_platform/msm-kernel/arch/${ARCH}/configs/${KERNEL_CONFIG} ${sccs_from_src_uri} 1>&2
 
     echo "# Global settings from linux recipe" >> ${B}/.config
     echo "CONFIG_LOCALVERSION="\"${LINUX_VERSION_EXTENSION}\" >> ${B}/.config
@@ -85,20 +86,32 @@ do_configure_prepend() {
     fi
 }
 
+do_prebuilt_configure[cleandirs] += "${B}"
 do_prebuilt_configure() {
-    cd ${KERNEL_PREBUILT_PATH}
+    cd ${KERNEL_PREBUILT_DISTDIR}
 
     install -d ${B}/include/config
     install -d ${B}/include/generated
     install -d ${B}/scripts
+    install -d ${B}/certs
     # Some of the artifacts needed for module compilation are present under
     # msm-kernel path, for now copy them for this path to avoid build failures.
-    # Ask prebuilt providers to make these available in KERNEL_PREBUILT_PATH.
+    # Ask prebuilt providers to make these available in KERNEL_PREBUILT_DISTDIR.
     install -m 0644 ../msm-kernel/.config ${B}
     install -m 0644 ../msm-kernel/Module.symvers ${B}
     install -m 0644 ../msm-kernel/include/config/kernel.release ${B}/include/config/kernel.release
     install -m 0644 ../msm-kernel/scripts/module.lds ${B}/scripts/module.lds
     install -m 0644 ../msm-kernel/include/generated/utsrelease.h ${B}/include/generated
+    install -m 0644 ../msm-kernel/certs/signing_key.pem ${B}/certs/signing_key.pem
+    # install -m 0644 ./dtb.img ${DEPLOY_DIR_IMAGE}//DTOverlays/dtb.img
+    #install -m 0644 ../gki_kernel/common/certs/verity_cert.pem ${B}/certs/verity_cert.pem
+    #install -m 0644 ../gki_kernel/common/certs/verity_key.pem ${B}/certs/verity_key.pem
+
+    # update paths of signature checking certificates to reflect current host
+    #sed -i -e '/CONFIG_MODULE_SIG_KEY[ =]/d' ${B}/.config
+    #echo "CONFIG_MODULE_SIG_KEY="\"${STAGING_DIR_TARGET}/kernel-certs/signing_key.pem\" >> ${B}/.config
+    #sed -i -e '/CONFIG_SYSTEM_TRUSTED_KEYS[ =]/d' ${B}/.config
+    #echo "CONFIG_SYSTEM_TRUSTED_KEYS="\"${STAGING_DIR_TARGET}/kernel-certs/verity_cert.pem\" >> ${B}/.config
 
     install -d ${B}/${KERNEL_OUTPUT_DIR}
     for typeformake in ${KERNEL_IMAGETYPE_FOR_MAKE} ; do
@@ -106,14 +119,17 @@ do_prebuilt_configure() {
     done
     install -m 0644 vmlinux ${B}
     install -m 0644 System.map ${B}
-    # copy initramfs scripts
-    install -d ${B}/usr
-    cp -R ../msm-kernel/usr/gen_init_cpio ${B}/usr
-    cp -R ../msm-kernel/usr/initramfs_data.cpio ${B}/usr
-    cp -R ../msm-kernel/usr/initramfs_inc_data ${B}/usr
+
+    for dtbf in ${ERNEL_DTB_NAMES}; do
+        install -m 0644 $dtbf ${B}
+    done
+    for dtbof in $(find . -name "*.dtbo") ; do
+        install -m 0644 $dtbof ${B}
+    done
 }
 
 do_prebuilt_shared_workdir[cleandirs] += " ${STAGING_KERNEL_BUILDDIR}"
+#do_prebuilt_shared_workdir[nostamp] = "1"
 do_prebuilt_shared_workdir() {
     cd ${B}
 
@@ -132,14 +148,19 @@ do_prebuilt_shared_workdir() {
     install -m 0644 .config $kerneldir/
     mkdir -p $kerneldir/include/config
     mkdir -p $kerneldir/scripts
+    mkdir -p $kerneldir/include/generated
     install -m 0644 include/config/kernel.release $kerneldir/include/config/kernel.release
+    install -m 0644 include/generated/utsrelease.h $kerneldir/include/generated/utsrelease.h
     if [ -e "${B}/scripts/module.lds" ]; then
         install -m 0644 ${B}/scripts/module.lds ${STAGING_KERNEL_BUILDDIR}/scripts/module.lds
     fi
 }
 
-do_prebuilt_install[dirs] = "${B}"
+#do_prebuilt_install[dirs] = "${B}"
+do_prebuilt_install[cleandirs] += "${D}"
 fakeroot do_prebuilt_install() {
+    cd ${B}
+
     #
     # Install various kernel output (zImage, map file, config, module support files)
     # From prebuilt paths
@@ -190,9 +211,9 @@ python () {
 KERNEL_EXTRA_ARGS += "dtbs"
 KERNEL_EXTRA_ARGS += "DTC_EXT=${STAGING_DIR_NATIVE}/usr/bin/dtc/bin/dtc"
 
-do_compile_append() {
+do_compile:append() {
     for dtbf in ${KERNEL_DTB_NAMES}; do
-        dtbs="$dtbs arch/${ARCH}/boot/dts/$dtbf"
+        dtbs="$dtbs arch/${ARCH}/boot/dts/vendor/qcom/$dtbf"
     done
     cp arch/${ARCH}/boot/${KERNEL_IMAGETYPE} arch/${ARCH}/boot/${KERNEL_IMAGETYPE}.backup
     cat arch/${ARCH}/boot/${KERNEL_IMAGETYPE}.backup $dtbs > arch/${ARCH}/boot/${KERNEL_IMAGETYPE}
@@ -202,7 +223,7 @@ do_compile_append() {
 # when using our own module signing key kernel.bbclass will fail to copy the public part of the key
 # since it checks if the .pem file exists which is not the case, so we need to explicitely copy
 # the x509 (public key) file
-do_shared_workdir_append () {
+do_shared_workdir:append () {
         mkdir -p $kerneldir/certs
         cp certs/signing_key.x509 $kerneldir/certs/
 
@@ -239,27 +260,22 @@ do_deploy() {
     install -m 0644 vmlinux ${DEPLOYDIR}
     install -m 0644 System.map ${DEPLOYDIR}
 
-    # copy dtbo files into deplydir and create dtbo.img if DTBO support enable
-    if [  "${DTBO_MACHINE}" == "True" ]; then
-        install -m 0644 ${DTBO_SRC_PATH}/*.dtbo ${DEPLOYDIR}
-        mkdtimg create ${DEPLOYDIR}/dtbo.img \
-             --page_size=${PAGE_SIZE} \
-             ${DEPLOYDIR}/*.dtbo
+    install -d ${DEPLOYDIR}/kernel_dtbs
+    cd ${KERNEL_PREBUILT_DISTDIR}/../msm-kernel/arch/arm64/boot/dts/
+    for dtbf in ${KERNEL_DTB_NAMES}; do
+        install -m 0644 $dtbf ${DEPLOYDIR}/kernel_dtbs
+    done
+    for dtbof in $(find . -name "*.dtbo") ; do
+        install -m 0644 $dtbof ${DEPLOYDIR}/kernel_dtbs
+    done
 
-    fi
+    install -d ${DEPLOYDIR}/kernel_modules
+    cd ${KERNEL_PREBUILT_DISTDIR}
+    for kmod in $(find . -name "*.ko") ; do
+        install -m 0644 $kmod ${DEPLOYDIR}/kernel_modules
+    done
 
-    # copy initramfs scripts
-     install -d ${DEPLOYDIR}/build-artifacts
-     install -d ${DEPLOYDIR}/build-artifacts/kernel_scripts/scripts
-     install -d ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr/
-     install -d ${DEPLOYDIR}/build-artifacts/dtb
-
-     cp  ${S}/usr/gen_initramfs.sh ${DEPLOYDIR}/build-artifacts/kernel_scripts/scripts
-     cp -a ${B}/usr/gen_init_cpio ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr/
-     cp -a ${B}/usr/initramfs_data.cpio ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr/
-     cp -a ${B}/usr/initramfs_inc_data ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr/
-     cp -a ${KERNEL_PREBUILT_PATH}/*.dtb ${DEPLOYDIR}/build-artifacts/dtb
 }
 
 # Put the zImage in the kernel-dev pkg
-FILES_${KERNEL_PACKAGE_NAME}-dev += "/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}"
+FILES:${KERNEL_PACKAGE_NAME}-dev += "/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}"
