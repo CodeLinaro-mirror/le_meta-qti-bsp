@@ -5,10 +5,13 @@ After=firmware-links.service firmware.mount sysinit.target systemd-modules-load.
 Conflicts=shutdown.target
 
 [Service]
+User=cnss-wlan
+Group=cnss-wlan
 Type=simple
 #Type=oneshot
 RemainAfterExit=yes
 ExecStart=/usr/bin/init.qti.wlan_on.sh
 ExecStop=/usr/bin/init.qti.wlan_off.sh
+AmbientCapabilities=CAP_SYS_MODULE CAP_NET_ADMIN CAP_NET_RAW
 [Install]
 WantedBy=default.target
