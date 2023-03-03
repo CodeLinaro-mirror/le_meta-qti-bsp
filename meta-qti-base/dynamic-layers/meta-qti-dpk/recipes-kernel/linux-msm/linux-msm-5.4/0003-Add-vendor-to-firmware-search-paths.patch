@@ -1,0 +1,29 @@
+From e71f534ac1935eb0ff92625db9f673664d9e33eb Mon Sep 17 00:00:00 2001
+From: xubao <quic_xubaoj@quicinc.com>
+Date: Tue, 15 Nov 2022 17:28:08 +0000
+Subject: [PATCH] Add vendor to firmware search paths
+
+Upstream-Status: Inappropriate[Vendor image]
+
+Change-Id: Ic389459a7d3abf9c8c8b33a6405a912bcf88398f
+Signed-off-by: xubao <quic_xubaoj@quicinc.com>
+---
+ drivers/base/firmware_loader/main.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/base/firmware_loader/main.c b/drivers/base/firmware_loader/main.c
+index f30a824b6ad7..540a6b7719d4 100644
+--- a/drivers/base/firmware_loader/main.c
++++ b/drivers/base/firmware_loader/main.c
+@@ -445,6 +445,8 @@ static int fw_decompress_xz(struct device *dev, struct fw_priv *fw_priv,
+ static char fw_path_para[256];
+ static const char * const fw_path[] = {
+ 	fw_path_para,
++	"/vendor/lib/firmware/" UTS_RELEASE,
++	"/vendor/lib/firmware",
+ 	"/lib/firmware/updates/" UTS_RELEASE,
+ 	"/lib/firmware/updates",
+ 	"/lib/firmware/" UTS_RELEASE,
+-- 
+2.35.2
+

@@ -9,7 +9,7 @@ DEPENDS += "avb-utils \
             glib-2.0 \
             gstreamer1.0 \
             gstreamer1.0-plugins-base \
-            linux-msm-headers \
+            virtual/kernel-headers \
             virtual/libc \
            "
 
@@ -34,6 +34,6 @@ CFLAGS += "-I${STAGING_INCDIR} \
            -I${STAGING_INCDIR}/c++ \
            -I${STAGING_INCDIR}/c++/${TARGET_SYS} \
            -I${STAGING_INCDIR}/gstreamer-1.0 \
-           -I${STAGING_INCDIR}/linux-msm"
+           -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}"
 
 RDEPENDS:${PN} += "avb-utils"

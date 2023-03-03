@@ -14,7 +14,7 @@ DEPENDS += "binder \
             gbm-headers \
             libdrm \
             libhardware \
-            linux-msm-headers \
+            virtual/kernel-headers \
             system-core \
             ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", '5.15', 'displaydlkm', '', d)} \
 "
@@ -27,7 +27,7 @@ S = "${WORKDIR}/display/display-hal"
 
 inherit autotools-brokensep pkgconfig
 
-EXTRA_OECONF += "--with-sanitized-headers=${STAGING_INCDIR}/linux-msm"
+EXTRA_OECONF += "--with-sanitized-headers=${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}"
 EXTRA_OECONF += "--enable-sdmhaldrm"
 
 LDFLAGS += "-llog -lhardware -lutils -lcutils"
@@ -49,7 +49,7 @@ CPPFLAGS += "-I${STAGING_INCDIR}/libdrm"
 CPPFLAGS += "-fno-operator-names"
 
 # add display techpack headers
-CPPFLAGS += "-I${STAGING_INCDIR}/linux-msm/display"
+CPPFLAGS += "-I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}/display"
 
 SOLIBS = ".so"
 FILES_SOLIBSDEV = ""

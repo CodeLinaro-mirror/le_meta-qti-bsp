@@ -40,6 +40,7 @@ EXTRA_OEMAKE:append = " \
                        "
 
 _WLAN_CFG_OVERRIDE = "\
+                        LINUX_BUILD_TOP=${_LINUX_BUILD_TOP} \
                         CONFIG_WLAN_OPEN_P2P_INTERFACE=y \
                         CONFIG_SUPPORT_P2P_BY_ONE_INTF_WLAN=n \
                         CONFIG_WLAN_PLACEMARKER_PREFIX=108 \
