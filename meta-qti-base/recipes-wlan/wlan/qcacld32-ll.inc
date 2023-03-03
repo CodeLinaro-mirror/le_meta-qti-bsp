@@ -1,6 +1,6 @@
 PROVIDES_NAME = "kernel-module-${_MODNAME}"
 
-inherit autotools-brokensep module qperf module-sign systemd qti-kernel-arch-clang
+inherit autotools-brokensep module qperf module-sign qti-kernel-arch-clang
 
 WLAN_PLATFORM_PATH = "${STAGING_INCDIR}/wlan-platform"
 WLAN_KBUILD_EXTRA = "KBUILD_EXTRA_SYMBOLS=${WLAN_PLATFORM_PATH}/Module.symvers"
