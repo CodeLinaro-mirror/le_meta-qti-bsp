@@ -12,9 +12,6 @@ dirs755:append = " \
 "
 
 do_install:append(){
-    install -m 755 -o diag -g diag -d ${D}/media
-    install -m 755 -o diag -g diag -d ${D}/media/card
-    ln -s /media/card ${D}/sdcard
     ln -s ${nonarch_base_libdir} ${D}/lib64
     ln -s ${libdir} ${D}/usr/lib64
 

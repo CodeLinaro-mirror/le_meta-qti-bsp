@@ -1,5 +1,6 @@
 [Unit]
 Description=SoftwareContainer agent service
+ConditionVirtualization=!container
 Wants=dbus.socket
 After=dbus.socket
 

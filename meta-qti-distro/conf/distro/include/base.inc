@@ -64,5 +64,7 @@ DEPLOY_NAME_BASE = "${MACHINE}${@bb.utils.contains_any('DISTRO', 'msm mdm', '', 
 DEPLOY_NAME = "${DEPLOY_NAME_BASE}${@['-' + d.getVar('VARIANT', True), ''][d.getVar('VARIANT', True) == ('' or 'debug')]}"
 DEPLOY_DIR_IMAGE = "${DEPLOY_DIR}/images/${DEPLOY_NAME}"
 
-# Add qti custom permissions
-USERADDEXTENSION = "qpermissions"
+# Static Users for QTI
+USERADDEXTENSION ?= "useradd-staticids"
+USERADD_UID_TABLES:append = " files/qti_passwd"
+USERADD_GID_TABLES:append = " files/qti_group"

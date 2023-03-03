@@ -32,6 +32,7 @@ S = "${WORKDIR}/wlan/qcacld-3.0"
 # Explicitly disable HL to enable LL as current WLAN driver is not having
 # simultaneous support of HL and LL.
 EXTRA_OEMAKE:append = " \
+                       LINUX_BUILD_TOP=${_LINUX_BUILD_TOP} \
                        CONFIG_CLD_HL_SDIO_CORE=n \
                        CONFIG_CNSS_SDIO=n \
                        CONFIG_QCA_CLD_WLAN_PROFILE=genoa.pci.debug \

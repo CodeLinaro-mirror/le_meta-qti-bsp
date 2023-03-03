@@ -33,6 +33,7 @@ S = "${WORKDIR}/wlan/qcacld-3.0"
 # Explicitly disable HL to enable LL as current WLAN driver is not having
 # simultaneous support of HL and LL.
 EXTRA_OEMAKE:append = " \
+                       LINUX_BUILD_TOP=${_LINUX_BUILD_TOP} \
                        CONFIG_CLD_HL_SDIO_CORE=n \
                        CONFIG_CNSS_SDIO=n \
                        CONFIG_QCA_CLD_WLAN_PROFILE=qca6390 \
@@ -79,6 +80,7 @@ EXTRA_OEMAKE:append:qtiquingvm8295 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GV
 EXTRA_OEMAKE:append:sa8295 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_METAL}"
 EXTRA_OEMAKE:append:quin-gvm-gen4 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
 EXTRA_OEMAKE:append:quin-gvm-gen4-2 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
+EXTRA_OEMAKE:append:quin-gvm-lemans = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
 
 SYSTEMD_SERVICE:${PN} = "init_qti_wlan_auto.service"
 
