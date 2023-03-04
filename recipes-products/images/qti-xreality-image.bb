@@ -14,6 +14,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-core \
         packagegroup-qti-dsp \
         packagegroup-qti-ss-mgr \
+        packagegroup-qti-securemsm \
         packagegroup-startup-scripts \
         packagegroup-support-utils \
         packagegroup-qti-video \
