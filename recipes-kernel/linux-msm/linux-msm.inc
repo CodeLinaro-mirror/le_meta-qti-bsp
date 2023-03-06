@@ -74,11 +74,13 @@ do_deploy() {
 }
 
 do_bundle_initramfs_append () {
-    realpath=`readlink -fn ${KERNEL_OUTPUT_DIR}/$imageType.initramfs`
-    if [ -n "$realpath" ]; then
-        # We need this to let the build system know the initramfs image got updated.
-        # Otherwise the mkboot image will used the old one under deply directory.
-        ln -sf ${realpath} ${DEPLOY_DIR_IMAGE}
+    if [ ! -z "${INITRAMFS_IMAGE}" -a x"${INITRAMFS_IMAGE_BUNDLE}" = x1 ]; then
+        realpath=`readlink -fn ${KERNEL_OUTPUT_DIR}/$imageType.initramfs`
+        if [ -n "$realpath" ]; then
+            # We need this to let the build system know the initramfs image got updated.
+            # Otherwise the mkboot image will used the old one under deply directory.
+            ln -sf ${realpath} ${DEPLOY_DIR_IMAGE}
+        fi
     fi
 }
 
