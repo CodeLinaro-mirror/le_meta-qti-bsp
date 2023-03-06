@@ -1,6 +1,6 @@
-# QTI Linux Telematics image file.
+# QTI Linux Telematics Host VM image file.
 # Provides packages required to build
-# QTI Linux Telematics image.
+# QTI Linux Telematics Host VM image.
 
 require qti-tele-image.inc
 
@@ -19,6 +19,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         pps-tools \
         spitools \
         coreutils \
+        android-tools \
         packagegroup-android-utils \
         packagegroup-qti-core \
         ${@bb.utils.contains('MACHINE_FEATURES', 'android-binder', 'binder', '', d)} \
@@ -41,6 +42,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         ${@bb.utils.contains('MACHINE_FEATURES', 'nand-boot', 'mtd-utils-ubifs', '', d)} \
         qmi-shutdown-modem \
         modem-shutdown \
+        ${@bb.utils.contains('MACHINE_FEATURES', 'qti-virtualization', 'qcrosvm', '', d)} \
         ${@oe.utils.conditional('DEBUG_BUILD', '1', 'packagegroup-qti-debug-tools', '', d )} \
 "
 
