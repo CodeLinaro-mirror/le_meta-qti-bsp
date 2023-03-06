@@ -14,9 +14,13 @@ SRC_URI = "\
            file://init.qti.wlan_off.sh \
            "
 
-inherit systemd
+inherit systemd useradd
 
 SYSTEMD_SERVICE:${PN} = "init_qti_wlan_auto.service"
+
+USERADD_PACKAGES = "${PN}"
+GROUPADD_PARAM:${PN} = "cnss-wlan"
+USERADD_PARAM:${PN} = "--no-create-home -g cnss-wlan --shell /bin/false cnss-wlan"
 
 do_configure[noexec] = "1"
 do_compile[noexec] = "1"
