@@ -80,3 +80,44 @@ SECURITY_CFLAGS:remove:pn-audiohal = "${SECURITY_STRINGFORMAT}"
 SECURITY_CFLAGS:remove:pn-setools = "${SECURITY_STRINGFORMAT}"
 
 SECURITY_CFLAGS:pn-tbb = "${SECURITY_PIC_CFLAGS}"
+
+# Enable some warning options to error.
+EXT_COMPILE_OPTIONS = "\
+    -Wall \
+    -Wextra \
+    -Werror=format \
+    -Werror=format-overflow=2 \
+    -Werror=format-truncation=2 \
+    -Werror=null-dereference \
+    -Werror=shift-overflow=2 \
+    -Werror=logical-op \
+    -Werror=format-signedness \
+    -Werror=switch-default \
+    -Werror=array-bounds \
+    -Werror=char-subscripts \
+    -Werror=missing-braces \
+    -Werror=nonnull \
+    -Wnonnull-compare \
+    -Werror=parentheses \
+    -Werror=return-type \
+    -Werror=sequence-point \
+    -Werror=sign-compare \
+    -Werror=switch \
+    -Werror=uninitialized \
+    -Werror=clobbered \
+    -Werror=empty-body \
+    -Werror=missing-field-initializers \
+    -Werror=type-limits \
+    -Werror=unused-parameter \
+    -Werror=conversion \
+    -Werror=sign-conversion \
+    -Werror=format-security \
+    -Werror=implicit-fallthrough \
+    -Werror=trampolines \
+ "
+
+# Platform packages
+SECURITY_CFLAGS:append:pn-liblog = " ${EXT_COMPILE_OPTIONS}"
+SECURITY_CFLAGS:remove:pn-liblog = " -Werror=format-truncation=2"
+
+# Add other packages here...
