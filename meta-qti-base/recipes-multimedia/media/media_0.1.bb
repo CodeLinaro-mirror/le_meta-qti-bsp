@@ -22,7 +22,7 @@ DEPENDS += "\
     ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "5.15", 'libdmabufheap graphicsdlkm', "", d)} \
     libion \
     libutils \
-    linux-msm-headers \
+    virtual/kernel-headers \
     media-plugin-headers \
     mm-video-noship \
     system-core-headers \
@@ -42,7 +42,7 @@ inherit autotools systemd
 SYSTEMD_SERVICE:${PN} = "${@bb.utils.contains('DISTRO_FEATURES','early_init','video_early_demo.service','',d)}"
 
 EXTRA_OECONF:append = " \
-    --with-sanitized-headers=${STAGING_INCDIR}/linux-msm \
+    --with-sanitized-headers=${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel} \
     --with-cutils-headers=${STAGING_INCDIR}/cutils/ \
     --enable-use-glib='yes' \
     --enable-target-uses-ion='yes' \

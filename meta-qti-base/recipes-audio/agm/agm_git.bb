@@ -7,7 +7,7 @@ DEPENDS += "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'qti-dpk', '', 'alsa-lib', d)} \
     ar-acdbdata ar-osal ar-util ats glib-2.0 \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'gsl-fe-noship libuhab', 'gsl', d)} \
-    linux-msm-headers mm-audio-headers spf \
+    virtual/kernel-headers mm-audio-headers spf \
     ${@bb.utils.contains('DISTRO_FEATURES', 'qti-dpk', 'tinyalsa', '', d)} \
 "
 

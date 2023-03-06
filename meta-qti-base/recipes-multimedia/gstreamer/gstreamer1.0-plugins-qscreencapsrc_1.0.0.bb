@@ -10,7 +10,7 @@ DEPENDS += "\
     gstreamer1.0 \
     gstreamer1.0-plugins-bad \
     gstreamer1.0-plugins-base \
-    linux-msm-headers \
+    virtual/kernel-headers \
     ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "5.15", "videodlkm", "", d)} \
     virtual/libc \
     wayland-native \
@@ -36,7 +36,7 @@ CFLAGS += "\
     -I${STAGING_INCDIR}/glib-2.0/glib \
     -I${STAGING_INCDIR}/c++ \
     -I${STAGING_INCDIR}/c++/${TARGET_SYS} \
-    -I${STAGING_INCDIR}/linux-msm \
+    -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel} \
     -DUSE_V6 \
 "
 
