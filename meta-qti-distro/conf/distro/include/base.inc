@@ -32,6 +32,8 @@ COMMON_OPTIMIZATION = " \
   "
 
 FULL_OPTIMIZATION         = "-O2 -fomit-frame-pointer ${COMMON_OPTIMIZATION} "
+# Enable debug option as default for variant-debug distro build
+FULL_OPTIMIZATION:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'variant-debug', '-g', '', d)}"
 DEBUG_OPTIMIZATION:append = " ${COMMON_OPTIMIZATION} "
 
 # NLS
