@@ -19,6 +19,8 @@ inherit autotools pkgconfig systemd useradd
 
 COMPOSITION = "901D"
 
+SYSTEMD_SERVICE:${PN}-dlkm = "dlkm.service"
+
 USERADD_PACKAGES = "${PN}-leprop ${PN}-post-boot"
 
 GROUPADD_PARAM:${PN}-leprop = "leprop"
@@ -59,6 +61,7 @@ do_install:append() {
 
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
         install -m 0755 ${S}/usb/start_usb -D ${D}${sysconfdir}/initscripts/usb
+        install -m 0750 ${S}/rootdir/etc/dlkm.sh -D ${D}${sysconfdir}/initscripts/dlkm
         install -m 0750 ${S}/rootdir/etc/init.qcom.post_boot.sh -D ${D}${sysconfdir}/initscripts/init_post_boot
         install -m 0750 ${S}/rootdir/etc/init.qti.early_boot.sh -D ${D}${sysconfdir}/initscripts/init_early_boot
 
@@ -68,6 +71,8 @@ do_install:append() {
 
         install -m 0644 ${S}/usb/usb.service -D ${D}${systemd_unitdir}/system/usb.service
         ln -sf ${systemd_unitdir}/system/usb.service ${D}${systemd_unitdir}/system/multi-user.target.wants/usb.service
+
+        install -m 0644 ${S}/rootdir/etc/dlkm.service -D ${D}${systemd_unitdir}/system/dlkm.service
 
         install -m 0644 ${S}/rootdir/etc/init_post_boot.service -D ${D}${systemd_unitdir}/system/init_post_boot.service
         ln -sf ${systemd_unitdir}/system/init_post_boot.service \
@@ -95,7 +100,7 @@ do_install:append() {
     rm -rf ${D}${includedir}
 }
 
-PACKAGES =+ "${PN}-usb ${PN}-post-boot ${PN}-early-boot ${PN}-leprop"
+PACKAGES =+ "${PN}-usb ${PN}-dlkm ${PN}-post-boot ${PN}-early-boot ${PN}-leprop"
 
 FILES:${PN}-usb += "\
     ${base_sbindir}/usb_composition \
@@ -108,6 +113,12 @@ FILES:${PN}-usb += "\
     ${systemd_unitdir}/system/usb.service \
     ${systemd_unitdir}/system/multi-user.target.wants/usb.service \
     ${sysconfdir}/initscripts/usb \
+"
+
+FILES:${PN}-dlkm += "\
+    ${systemd_unitdir}/system/dlkm.service \
+    ${systemd_unitdir}/system/multi-user.target.wants/dlkm.service \
+    ${sysconfdir}/initscripts/dlkm \
 "
 
 FILES:${PN}-post-boot += "\

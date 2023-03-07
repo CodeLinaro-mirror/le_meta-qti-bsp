@@ -203,6 +203,14 @@ fakeroot do_prebuilt_install() {
     find ${D} -name '*' -exec chown -h root:root {} \;
 }
 
+MODULESPATH = "${D}/lib/modules/${KERNEL_VERSION}"
+do_install:append() {
+    # if the blocklist exists and qti-dlkm is turned on in conf file, then install the blocklist
+    if [ -e ${S}/modules.vendor_blocklist.msm.${KERNEL_ARCH} ] && ${@bb.utils.contains('MACHINE_FEATURES', 'qti-dlkm', 'true', 'false', d)}; then
+        install -m 0644 ${S}/modules.vendor_blocklist.msm.${KERNEL_ARCH} ${MODULESPATH}/modules.blocklist
+    fi
+}
+
 # Must be ran no earlier than after do_kernel_checkout or else Makefile won't be in ${S}/Makefile
 PREBUILT_DISCARDED_TASKS += "\
     do_configure \
@@ -210,7 +218,6 @@ PREBUILT_DISCARDED_TASKS += "\
     do_kernel_link_images \
     do_compile_kernelmodules \
     do_shared_workdir \
-    do_install \
 "
 python () {
     if d.getVar('KERNEL_USE_PREBUILTS') == 'True':
@@ -299,3 +306,6 @@ do_deploy() {
 
 # Put the zImage in the kernel-dev pkg
 FILES:${KERNEL_PACKAGE_NAME}-dev += "/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}"
+
+FILES:${KERNEL_PACKAGE_NAME}-base += "${nonarch_base_libdir}/modules/${KERNEL_VERSION}/modules.blocklist \
+                                      ${nonarch_base_libdir}/modules/${KERNEL_VERSION}/modules.load"
