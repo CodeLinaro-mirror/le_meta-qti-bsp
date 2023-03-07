@@ -60,3 +60,5 @@ RDEPENDS:packagegroup-filesystem-utils-base = "\
     e2fsprogs-resize2fs \
     e2fsprogs-tune2fs \
     "
+
+PACKAGE_ARCH = "${MACHINE_ARCH}"
