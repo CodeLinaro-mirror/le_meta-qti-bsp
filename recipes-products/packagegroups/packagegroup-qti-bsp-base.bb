@@ -57,5 +57,4 @@ RDEPENDS_packagegroup-filesystem-utils-base = "\
     e2fsprogs-mke2fs \
     e2fsprogs-resize2fs \
     e2fsprogs-tune2fs \
-    parted \
     "
