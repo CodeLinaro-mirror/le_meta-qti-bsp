@@ -63,7 +63,7 @@
 
 install_module() {
 	modprobe $1 || modprobe -d /vendor $1;
-	echo 1 > /sys/kernel/cnss/fs_ready
+	echo 1 > /sys/kernel/cnss_0/fs_ready
 }
 
 echo "##########Trying to load wlanhost driver ##########"
