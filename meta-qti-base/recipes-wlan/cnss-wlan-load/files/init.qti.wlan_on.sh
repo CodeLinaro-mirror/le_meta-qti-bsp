@@ -71,28 +71,28 @@ n=0
 while [ $n -le 5 ]
 	do
 	if (lspci -k|grep cnss_pci);then
-		if (lspci -k|grep 1102);then
+		if ((lspci -k|grep 1102) || (lspci -n|grep 1102));then
 			echo "##########load qca6595#############"
 			if [ -f /firmware/image/qcn7605/amss.bin ];then
 				install_module qca6595
 			else
 				echo "##########Error! QCA6595 FW is not available!#####"
 			fi
-		elif ((lspci -k|grep 003e) || (lspci -k|grep QCA6174));then
+		elif ((lspci -k|grep 003e) || (lspci -k|grep QCA6174) || (lspci -n|grep 003e));then
 			echo "##########load qca6574#############"
 			if [ -f /firmware/image/qca6174/qwlan30.bin ];then
 				install_module qca6574
 			else
 				echo "##########Error! QCA6574 FW is not available!#####"
 			fi
-		elif ((lspci -k|grep 1101) || (lspci -k|grep QCA6390));then
+		elif ((lspci -k|grep 1101) || (lspci -k|grep QCA6390) || (lspci -n|grep 1101));then
 			echo "##########load qca6696#############"
 			if [ -f /firmware/image/qca6390/amss20.bin ];then
 				install_module qca6696
 			else
 				echo "##########Error! QCA6696 FW is not available!#####"
 			fi
-		elif (lspci -k|grep 1103);then
+		elif ((lspci -k|grep 1103) || (lspci -n|grep 1103));then
 			echo "##########load qca6698#############"
 			if [ -f /firmware/image/qca6490/amss20.bin ];then
 				install_module qca6698
