@@ -150,3 +150,5 @@ FILES:${PN}-leprop += "\
     ${systemd_unitdir}/system/multi-user.target.wants/leprop.service \
     ${sysconfdir}/build.prop \
 "
+
+ALLOW_EMPTY:${PN} = "1"
