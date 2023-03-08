@@ -35,6 +35,9 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 TARGET_CC_ARCH += "${LDFLAGS}"
 
 do_compile() {
+    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'true', 'false', d)}; then
+        export AVB_FEATURE_GVM_MODE=1
+    fi
     oe_runmake gptp
     oe_runmake libgptp
     oe_runmake libgptp_test
