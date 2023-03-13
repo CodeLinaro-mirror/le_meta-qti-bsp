@@ -15,7 +15,12 @@ SRC_URI = "\
 
 SYSTEMD_SERVICE:${PN} = "persist-prop.service"
 
-inherit systemd
+inherit systemd useradd
+
+USERADD_PACKAGES = "${PN}"
+
+GROUPADD_PARAM:${PN} = "leprop"
+USERADD_PARAM:${PN} = "-g leprop --no-create-home --shell /bin/false leprop"
 
 do_configure[noexec] = "1"
 do_compile[noexec] = "1"
