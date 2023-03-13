@@ -18,5 +18,6 @@ codec2:x:4052:
 leprop:x:4053:
 binder:x:4054:
 cnss-wlan:x:4055:
+ais:x:4056:
 qti-bt:x:4057:
 post-boot:x:4060:
