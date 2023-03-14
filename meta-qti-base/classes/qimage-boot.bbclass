@@ -102,7 +102,7 @@ avb_sign_boot_image() {
         # For lv avb2.0, add hash for boot image, dtbo image and vendor-boot image.
         avbtool add_hash_footer  \
             --image ${img}  \
-            --partition_size 0x04000000  \
+            --partition_size 0x06000000  \
             --partition_name boot \
             --algorithm SHA256_RSA4096 \
             --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/testkey_rsa4096.pem \
