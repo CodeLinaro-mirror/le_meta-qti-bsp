@@ -15,7 +15,7 @@ IMAGE_LINK_NAME = "${IMAGE_BASENAME}-${PRODUCT}"
 DISTRO_FEATURES_append = " pam"
 
 # Display
-DISTRO_FEATURES_append = " wayland"
+DISTRO_FEATURES_append = " wayland vulkan"
 
 # Use synergy, disable bluez
 DISTRO_FEATURES_BACKFILL_CONSIDERED += "bluez5 bluetooth"
