@@ -34,8 +34,12 @@ SourcePath=/usr/bin/enable-fde.sh
 DefaultDependencies=no
 
 [Service]
+User=fde
+Group=security
 Type=oneshot
 RemainAfterExit=yes
+CapabilityBoundingSet=CAP_DAC_OVERRIDE
+AmbientCapabilities=CAP_DAC_OVERRIDE
 ExecStart=/usr/bin/enable-fde.sh
 
 [Install]

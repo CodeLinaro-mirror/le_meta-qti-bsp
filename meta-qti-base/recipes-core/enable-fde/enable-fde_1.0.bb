@@ -9,10 +9,14 @@ SRC_URI = "\
            file://enable-fde.service \
 "
 
-inherit systemd
+inherit systemd useradd
 
 SYSTEMD_SERVICE:${PN} = "enable-fde.service"
 SYSTEMD_AUTO_ENABLE:${PN} = "enable"
+
+USERADD_PACKAGES = "${PN}"
+GROUPADD_PARAM:${PN} = "security"
+USERADD_PARAM:${PN} = "--no-create-home -g security --shell /bin/false fde"
 
 do_install:append () {
   install -d ${D}${systemd_system_unitdir}
