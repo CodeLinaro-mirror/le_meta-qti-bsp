@@ -12,5 +12,5 @@ PACKAGES = "\
 ALLOW_EMPTY:${PN} = "1"
 
 RDEPENDS:${PN} += "\
-    ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "5.15", "cameradlkm", "", d)} \
+    ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "5.15", "cameraqcxdlkm", "", d)} \
     "
