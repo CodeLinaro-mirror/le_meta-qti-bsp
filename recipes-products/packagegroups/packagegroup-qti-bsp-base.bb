@@ -2,6 +2,8 @@ SUMMARY = "Basic programs and scripts required by LE system"
 DESCRIPTION = "Package group to bring in all basic packages for LE system"
 LICENSE = "BSD-3-Clause"
 
+PACKAGE_ARCH = "${MACHINE_ARCH}"
+
 inherit packagegroup
 
 PROVIDES = "${PACKAGES}"
@@ -59,5 +61,3 @@ RDEPENDS:packagegroup-filesystem-utils-base = "\
     e2fsprogs-resize2fs \
     e2fsprogs-tune2fs \
     "
-
-PACKAGE_ARCH = "${MACHINE_ARCH}"
