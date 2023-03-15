@@ -12,6 +12,6 @@ Type=simple
 RemainAfterExit=yes
 ExecStart=/usr/bin/init.qti.wlan_on.sh
 ExecStop=/usr/bin/init.qti.wlan_off.sh
-AmbientCapabilities=CAP_SYS_MODULE CAP_NET_ADMIN CAP_NET_RAW
+AmbientCapabilities=CAP_SYS_MODULE CAP_NET_ADMIN CAP_NET_RAW CAP_DAC_OVERRIDE
 [Install]
 WantedBy=default.target
