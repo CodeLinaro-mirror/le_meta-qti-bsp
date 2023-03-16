@@ -4,6 +4,8 @@ FILESEXTRAPATHS =. "${FILESBBAPPENDPATH}/${BP}:${FILESBBAPPENDPATH}/${BPN}:"
 SRC_URI:append = " \
     file://60-misc.rules \
     file://0032-systemd-add-bootkpi-marker-for-user-session.patch \
+    file://power-switch.rules \
+    file://qti_sleep.sh \
 "
 SRC_URI:append = " ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "5.15", "file://platform_load.conf", "", d)}"
 
@@ -18,4 +20,7 @@ do_install:append () {
     if ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "5.15", "true", "false", d)}; then
         install -m 0664 ${WORKDIR}/platform_load.conf ${D}${sysconfdir}/modules-load.d/
     fi
+
+    install -d ${D}/${base_libdir}/systemd/system-sleep
+    install -m 0755 ${WORKDIR}/qti_sleep.sh -D ${D}/${base_libdir}/systemd/system-sleep/qti_sleep.sh
 }
