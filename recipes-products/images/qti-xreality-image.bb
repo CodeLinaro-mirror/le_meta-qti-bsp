@@ -10,6 +10,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         gki-kernel-modules-second-stage \
         kernel-modules \
         packagegroup-android-utils \
+        packagegroup-qti-mmframeworks \
         packagegroup-filesystem-utils \
         packagegroup-qti-core \
         packagegroup-qti-dsp \
