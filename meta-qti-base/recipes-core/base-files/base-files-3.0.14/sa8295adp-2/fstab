@@ -22,6 +22,7 @@ tmpfs                /tmp            tmpfs     defaults              0  0
 # uncomment this if your device has a SD/MMC/Transflash slot
 /dev/mmcblk0p1       /media/card          auto       defaults,sync,noauto  0  0
 
-
+#Automatically mount binder drivers
+binder               /dev/binderfs        binder     auto,exec,dev,nofail  0  0
 
 
