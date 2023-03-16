@@ -48,6 +48,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         yavta \
         libdmabufheap \
         packagegroup-qti-sensors-ship \
+        packagegroup-qti-perf \
 "
 
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "chronyc"
