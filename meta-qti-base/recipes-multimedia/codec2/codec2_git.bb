@@ -38,6 +38,7 @@ EXTRA_OECMAKE += "\
     -DAGL_LINUX:BOOL=ON \
     ${@oe.utils.version_less_or_equal('${preferred-kernel}', '5.4', '', '-DSUPPORT_DMABUF_HEAP:BOOL=ON', d)} \
 "
+EXTRA_OECMAKE:append:lemans = " -DLOAD_CORE_LIB:BOOL=ON"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
