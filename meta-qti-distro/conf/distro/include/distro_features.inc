@@ -45,8 +45,3 @@ DISTRO_FEATURES:append:quin-gvm-gen4 = " qti-bluetooth"
 DISTRO_FEATURES:append:quin-gvm-gen4-2 = " qti-bluetooth"
 DISTRO_FEATURES:append:quin-gvm-lemans = " qti-bluetooth"
 
-# Enable FDE
-DISTRO_FEATURES:append:qtiquingvm = " qti-fde"
-DISTRO_FEATURES:append:qtiquingvm8295 = " qti-fde"
-DISTRO_FEATURES:append:quin-gvm-gen4 = " qti-fde"
-DISTRO_FEATURES:append:quin-gvm-gen4-2 = " qti-fde"
