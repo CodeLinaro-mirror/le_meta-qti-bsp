@@ -6,7 +6,7 @@ HOMEPAGE = "http://developer.android.com/"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://NOTICE;md5=c1a3ff0b97f199c7ebcfdd4d3fed238e"
 
-DEPENDS += "ext4-utils glib-2.0 libbase libcutils libmincrypt libselinux libutils linux-msm-headers openssl"
+DEPENDS += "ext4-utils glib-2.0 libbase libcutils libmincrypt libselinux libutils linux-msm-headers logwrapper openssl"
 
 PR = "r19"
 
@@ -144,3 +144,5 @@ FILES:${PN}-leprop += "\
     ${systemd_unitdir}/system/multi-user.target.wants/leprop.service \
     ${sysconfdir}/build.prop \
 "
+
+ALLOW_EMPTY:${PN} = "1"
