@@ -66,7 +66,6 @@ CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-test-sensors-see"
 
 
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-audio"
-CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-bluetooth"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-camera"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-cvp"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-data"
