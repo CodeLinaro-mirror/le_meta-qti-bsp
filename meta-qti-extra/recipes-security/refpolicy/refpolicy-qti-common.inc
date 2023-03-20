@@ -4,13 +4,17 @@ LICENSE += "& BSD-3-Clause-Clear"
 SRC_URI += "${PATH_TO_REPO}/lv-sepolicy/.git;protocol=${PROTO};destsuffix=lv-sepolicy;usehead=1 \
             file://Update-busybox-substitution-paths.patch \
             file://0001-fc-subs-persist-set-aliases-for-var-and-data.patch \
+            file://0001-refpolicy-update-booleans.patch \
+            file://Move-root-user-to-unconfined-context.patch \
 "
 SRCREV = "${AUTOREV}"
 
 # Modules outside of 'services' and 'apps' layer to be removed
 PURGE_POLICY_MODULES += "cgmanager automount xguest amanda portage"
 # Modules inside 'services' and 'apps' layers to keep. All others in these layers are turned off
-CONTRIB_MODULES ?= "chronyd networkmanager shutdown gnome dhcp avahi apache minidlna mta dbus pulseaudio ppp dnsmasq ddclient bluetooth tinyproxy hostapd xserver nscd"
+CONTRIB_MODULES ?= "chronyd networkmanager shutdown gnome dhcp avahi apache minidlna mta dbus \
+                    pulseaudio ppp dnsmasq ddclient bluetooth tinyproxy hostapd xserver nscd \
+                    ais_server qcarcam_test qcarcam_rvc"
 
 def append_policy_file(src_path, dst_path):
     # Append our policy fragment to the end of the upstream file
