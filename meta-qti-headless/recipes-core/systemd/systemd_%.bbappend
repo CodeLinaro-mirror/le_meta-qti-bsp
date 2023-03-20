@@ -3,6 +3,7 @@ FILESEXTRAPATHS =. "${FILESBBAPPENDPATH}/${BP}:${FILESBBAPPENDPATH}/${BPN}:"
 
 SRC_URI:append = " \
     file://60-misc.rules \
+    file://0032-systemd-add-bootkpi-marker-for-user-session.patch \
 "
 SRC_URI:append = " ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "5.15", "file://platform_load.conf", "", d)}"
 
