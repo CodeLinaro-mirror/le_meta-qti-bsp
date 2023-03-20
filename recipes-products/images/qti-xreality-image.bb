@@ -12,6 +12,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-android-utils \
         packagegroup-filesystem-utils \
         packagegroup-qti-core \
+        ${@bb.utils.contains('MACHINE_FEATURES', 'qti-eva', "packagegroup-qti-eva", "", d)} \
         packagegroup-qti-dsp \
         packagegroup-qti-ss-mgr \
         packagegroup-startup-scripts \
