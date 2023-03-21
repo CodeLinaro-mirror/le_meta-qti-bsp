@@ -19,13 +19,16 @@ inherit autotools pkgconfig systemd useradd
 
 COMPOSITION = "901D"
 
-USERADD_PACKAGES = "${PN}-leprop ${PN}-adbd"
+USERADD_PACKAGES = "${PN}-leprop ${PN}-adbd ${PN}-post-boot"
 
 GROUPADD_PARAM:${PN}-leprop = "leprop"
 USERADD_PARAM:${PN}-leprop = "-g leprop --no-create-home --shell /bin/false leprop"
 
 GROUPADD_PARAM:${PN}-adbd = "adb"
 USERADD_PARAM:${PN}-adbd = "-g adb --no-create-home --shell /bin/false adb"
+
+GROUPADD_PARAM:${PN}-post-boot = "post-boot"
+USERADD_PARAM:${PN}-post-boot = "-g post-boot --no-create-home --shell /bin/false post-boot"
 
 CPPFLAGS += "\
     -I${STAGING_INCDIR}/ext4_utils \

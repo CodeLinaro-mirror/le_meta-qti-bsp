@@ -18,3 +18,5 @@ codec2:x:4052:
 leprop:x:4053:
 binder:x:4054:
 cnss-wlan:x:4055:
+
+post-boot:x:4060:
