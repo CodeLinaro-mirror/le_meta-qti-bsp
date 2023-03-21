@@ -16,7 +16,7 @@ inherit qti-techpack
 
 TECHPACK_MODULE_OUT = "${WORKDIR}/graphics-kernel"
 TECHPACK_MODULES = "msm_kgsl.ko"
-TECHPACK_HEADERS = "1"
+TECHPACK_HEADERS = "${S}/include/uapi"
 
 do_install:append:sa81x5() {
     install -m 0644 ${S}/config/autoload_sa81x5.conf -D ${D}${sysconfdir}/modules-load.d/graphics_load.conf
@@ -26,5 +26,7 @@ do_install:append:lemans() {
     install -m 0644 ${S}/config/autoload_lemans.conf -D ${D}${sysconfdir}/modules-load.d/graphics_load.conf
 }
 
+RPROVIDES:${PN} += "kernel-module-msm-kgsl-${KERNEL_VERSION}"
+
 FILES:${PN} += "${nonarch_base_libdir}/modules/${KERNEL_VERSION}/*"
-FILES_${PN} += "${sysconfdir}/*"
+FILES:${PN} += "${sysconfdir}/*"
