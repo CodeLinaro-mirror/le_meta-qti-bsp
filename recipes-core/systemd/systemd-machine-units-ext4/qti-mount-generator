@@ -43,6 +43,7 @@ else
      echo "ExecStart=/bin/mount -o noexec,nodev,ro,context=system_u:object_r:lib_t:s0 -t ext4 /dev/disk/by-partlabel/vendor_dlkm\${SLOT_SUFFIX} /lib/modules" >> $LIB_MODULES_MOUNT_SERVICE
 fi
 echo "ExecStartPost=/bin/ln -sf /lib/modules/modules-load.d /run/modules-load.d" >> $LIB_MODULES_MOUNT_SERVICE
+echo "ExecStartPost=/bin/ln -sf /lib/modules/modprobe.d /run/modprobe.d" >> $LIB_MODULES_MOUNT_SERVICE
 echo "" >> $LIB_MODULES_MOUNT_SERVICE
 echo "[Install]" >> $LIB_MODULES_MOUNT_SERVICE
 echo "WantedBy=local-fs.target systemd-modules-load.service" >> $LIB_MODULES_MOUNT_SERVICE

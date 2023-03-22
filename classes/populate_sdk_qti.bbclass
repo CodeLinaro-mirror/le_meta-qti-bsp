@@ -54,6 +54,9 @@ python copy_buildsystem:append() {
     subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
 }
 
+# To include llvm-arm-toolchain as part of sysroots in eSDK tmp directory
+DEPENDS:append = " llvm-arm-toolchain-native "
+
 # To include protoc compiler in SDK
 TOOLCHAIN_HOST_TASK:append = " nativesdk-protobuf-compiler "
 
