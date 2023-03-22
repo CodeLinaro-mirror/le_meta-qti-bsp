@@ -46,6 +46,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         ${@bb.utils.contains('DISTRO_FEATURES', 'qirp-sdk', 'packagegroup-qti-qirp', '', d)} \
         packagegroup-startup-scripts \
         packagegroup-support-utils \
+        ${@bb.utils.contains('DISTRO_FEATURES', 'qti-ib2c', 'qti-ib2c', '', d)} \
         systemd-machine-units \
         ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
         yavta \
