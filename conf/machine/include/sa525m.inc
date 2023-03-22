@@ -15,6 +15,7 @@ PREFERRED_VERSION_dtc-android-build = "5.15"
 PREFERRED_VERSION_mkbootimg-gki-native = "5.15"
 PREFERRED_VERSION_dtc-android-build-native = "5.15"
 PREFERRED_VERSION_mkdtimg-gki-native = "5.15"
+PREFERRED_VERSION_qcrosvm = "1.1"
 SERIAL_CONSOLES = "115200;ttyMSM0"
 KERNEL_IMAGETYPE = "Image"
 KERNEL_BASE = "0xa8000000"
@@ -55,7 +56,6 @@ MACHINE_FEATURES += "qti-sdx dm-verity-none qti-sensors qti-mvm qti-security qse
 CONFLICT_MACHINE_FEATURES += "qti-cv2x"
 
 MACHINE_MNT_POINTS = " \
-    /dsp \
     /firmware \
     /systemrw \
     /persist \

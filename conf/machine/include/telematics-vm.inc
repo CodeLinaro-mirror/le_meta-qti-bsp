@@ -28,7 +28,7 @@ KERNEL_CMD_PARAMS = ""
 KERNEL_DYNAMIC_DEFCONFIG = "True"
 SERIAL_CONSOLE = "115200 hvc0"
 
-MACHINE_FEATURES += "qti-vm qti-location qti-sensors"
+MACHINE_FEATURES += "qti-vm-guest gh-loader qti-location qti-sensors"
 
 MACHINE_SUPPORTS_INIT_RAMDISK = "False"
 TOYBOX_RAMDISK = "False"
@@ -38,7 +38,7 @@ MACHINE_SUPPORTS_USB = "False"
 # Required to set service.adb.tcp.port for SVM
 MACHINE_SUPPORTS_ANDROID_PROPERTIES = "True"
 MACHINE_SUPPORTS_DISPLAY = "False"
-MACHINE_SUPPORTS_SECUREMSM = "False"
+MACHINE_SUPPORTS_SECUREMSM = "True"
 MACHINE_MNT_POINTS = ""
 ENABLE_ADB = "True"
 
