@@ -21,6 +21,7 @@ DEPENDS += "\
 
 DEPENDS:append:lemans = " displaydlkm"
 DEPENDS:append:quin-gvm-lemans = " displaydlkm"
+DEPENDS:append:monaco = " displaydlkm"
 
 SRC_URI = "${PATH_TO_REPO}/gstreamer/gst-plugins-qti-oss/.git;protocol=${PROTO};destsuffix=gstreamer/gst-plugins-qti-oss;usehead=1"
 SRCREV = "${AUTOREV}"
@@ -53,6 +54,15 @@ CFLAGS:append:quin-gvm-lemans = " -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtu
 CXXFLAGS:append:quin-gvm-lemans = " -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}/display"
 EXTRA_OEMESON:append:quin-gvm-lemans = " \
     -Dc2dec-deinterlace=disabled \
+    -Dqprange=disabled \
+    -Dir-cyclic=enabled \
+    -Dmmmcolorfmt=true \
+"
+
+CFLAGS:append:monaco = " -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}/display"
+CXXFLAGS:append:monaco = " -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}/display"
+EXTRA_OEMESON:append:monaco = " \
+    -Dinterlace=disabled \
     -Dqprange=disabled \
     -Dir-cyclic=enabled \
     -Dmmmcolorfmt=true \
