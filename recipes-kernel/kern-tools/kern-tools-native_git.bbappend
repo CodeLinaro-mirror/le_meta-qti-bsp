@@ -1,3 +1,3 @@
 PR = "r14"
 
-SRC_URI = "${CAF_GIT}/platform/external/yocto-kernel-tools;protocol=git;branch=yocto/master"
+SRC_URI = "${GIT_URI}/platform/external/yocto-kernel-tools;protocol=${PROTOCOL};branch=${BRANCH_PREFIX}yocto/master"
