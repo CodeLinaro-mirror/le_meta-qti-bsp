@@ -36,3 +36,5 @@
 /dev(/.*)? u:object_r:host_device_t:s0
 /dev/dm-0 u:object_r:rootfs:s0
 /dev/dm-1 u:object_r:vendor_file:s0
+/etc/lxc/overlay/android[0-9](/.*)? u:object_r:vendor_file:s0
+/etc/lxc/overlay/android[0-9]/vendor/etc(/.*)? u:object_r:vendor_configs_file:s0

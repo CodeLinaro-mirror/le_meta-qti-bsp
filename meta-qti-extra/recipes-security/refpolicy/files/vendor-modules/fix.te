@@ -138,6 +138,7 @@ require {
     class unix_dgram_socket { ioctl };
     class binder { call transfer };
     class system syslog_read;
+    class blk_file { read write open ioctl };
 }
 
 #============= bootstat ==============
@@ -298,3 +299,6 @@ allowxperm host_exec_t functionfs:file ioctl { 0x6703 };
 allow toolbox host_exec_t:fd use;
 allow toolbox kernel:system syslog_read;
 allow toolbox kmsg_device:chr_file { open read };
+
+#============= vold ==============
+allow vold block_device:blk_file { read write open ioctl };
