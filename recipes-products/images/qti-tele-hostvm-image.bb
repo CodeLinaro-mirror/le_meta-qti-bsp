@@ -44,7 +44,6 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         qmi-shutdown-modem \
         modem-shutdown \
         ${@bb.utils.contains('MACHINE_FEATURES', 'qti-virtualization', 'qcrosvm', '', d)} \
-        ${@oe.utils.conditional('DEBUG_BUILD', '1', 'packagegroup-qti-debug-tools', '', d )} \
 "
 
 # Following packages will be enabled later
