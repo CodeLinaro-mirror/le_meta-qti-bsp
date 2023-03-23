@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+# Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted (subject to the limitations in the
@@ -37,3 +37,4 @@ ACTION=="add" SUBSYSTEM=="qti_virtio_mem", GROUP="system", MODE="0660"
 ACTION=="add" SUBSYSTEM=="smcinvoke", GROUP="system", MODE="0660"
 ACTION=="add" SUBSYSTEM=="bsg", GROUP="system", MODE="0660"
 ACTION=="add" SUBSYSTEM=="bsg/0:0:0:49476", GROUP="system", MODE="0660"
+ACTION=="add" SUBSYSTEM=="qti-smmu-proxy", GROUP="system", MODE="0660"
