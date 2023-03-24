@@ -9,6 +9,8 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         glib-2.0 \
         gki-kernel-modules-second-stage \
         kernel-modules \
+        packagegroup-qti-camera \
+        packagegroup-qti-camera-kernel \
         packagegroup-android-utils \
         packagegroup-qti-mmframeworks \
         packagegroup-filesystem-utils \
