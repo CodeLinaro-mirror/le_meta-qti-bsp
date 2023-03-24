@@ -17,9 +17,6 @@ KERNEL_PRIORITY           = "9001"
 # Add V=1 to KERNEL_EXTRA_ARGS for verbose
 KERNEL_EXTRA_ARGS        += "O=${B}"
 
-# Additional configs needed for supporting DTBO partition.
-DTBO_MACHINE = "${@d.getVar('MACHINE_SUPPORTS_DTBO') or "False"}"
-
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI   =  "file://kernel \
               file://overlayfs.cfg \
@@ -28,7 +25,7 @@ SRC_URI   =  "file://kernel \
               ${@bb.utils.contains('DISTRO_FEATURES', 'nand-squashfs', 'file://squashfs.cfg', '', d)} \
               ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'file://selinux.cfg', '', d)} \
               ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains('MACHINE_FEATURES', 'dm-verity-bootloader', 'file://verity.x509.pem', '', d), '', d)} \
-              ${@oe.utils.conditional('DTBO_MACHINE', 'True', 'file://dt_overlay.cfg', '',d)} \
+              ${@bb.utils.contains('MACHINE_SUPPORTS_DTBO', '1', 'file://dt_overlay.cfg', '', d)} \
               ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'file://verity.cfg', '', d)} \
               ${@bb.utils.contains('COMBINED_FEATURES', 'qti-audio', 'file://audio_common.cfg', '', d)} \
 	      "
