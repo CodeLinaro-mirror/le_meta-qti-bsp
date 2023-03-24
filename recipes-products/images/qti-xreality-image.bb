@@ -16,6 +16,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-dsp \
         packagegroup-qti-ss-mgr \
         packagegroup-qti-securemsm \
+        packagegroup-qti-fastcv \
         packagegroup-startup-scripts \
         packagegroup-support-utils \
         packagegroup-qti-sensors-see \
