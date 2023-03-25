@@ -19,7 +19,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
 
 do_cleanup_sepolicy() {
 
-        policy_version=31
+        policy_version=33
         policy_type=mls
         policy_dir=${IMAGE_ROOTFS}/etc/selinux/${policy_type}/policy
         recovery_policy=${policy_dir}/recovery.policy.${policy_version}

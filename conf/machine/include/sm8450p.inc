@@ -1,4 +1,4 @@
-BASEMACHINE ?= "neo"
+BASEMACHINE ?= "waipio"
 require conf/machine/include/basemachine.inc
 
 include conf/machine/include/waipio.inc
@@ -17,13 +17,12 @@ GENERATED_MACHINE_MNT_POINTS = "/lib/modules"
 
 # Define userdata dir, size and file system type to be used
 USERDATA_DIR = "${@bb.utils.contains('MACHINE_MNT_POINTS', '/overlay', 'overlay', 'data', d)}"
-USERDATA_SIZE ?= "3GiB"
+USERDATA_SIZE ?= "16GiB"
 USERDATA_FSTYPE = "ext4"
 
 # Sizes for EXT4 partitions
 SYSTEM_SIZE_EXT4 ?= "1GiB"
 VDLKM_SIZE_EXT4 ?= "98MiB"
-PERSIST_SIZE_EXT4 ?= "32MiB"
 
 # Formats of root filesystem images.
 IMAGE_FSTYPES += "ext4"
