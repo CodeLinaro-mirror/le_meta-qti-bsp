@@ -18,8 +18,12 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         ${@bb.utils.contains('MACHINE_FEATURES', 'qti-eva', "packagegroup-qti-eva", "", d)} \
         packagegroup-qti-dsp \
         packagegroup-qti-ss-mgr \
+        packagegroup-qti-securemsm \
+        packagegroup-qti-fastcv \
         packagegroup-startup-scripts \
         packagegroup-support-utils \
+        packagegroup-qti-sensors-see \
+        packagegroup-qti-test-sensors-see \
         packagegroup-qti-video \
         packagegroup-qti-perf \
         powerapp \

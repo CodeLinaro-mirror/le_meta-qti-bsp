@@ -146,7 +146,7 @@ get_system_verity_metdata_info(){
     rm -f ${WORKDIR}/system.verityfec
     rm -f ${WORKDIR}/system_verity_metadata.txt
 
-    veritysetup format $1 \
+    veritysetup format ${1} \
         ${WORKDIR}/system.verityhash \
         --fec-device ${WORKDIR}/system.verityfec \
         --fec-roots ${FEC_ROOTS} \
