@@ -44,9 +44,6 @@ DISTRO_FEATURES:append = " qti-wlan wifi"
 DISTRO_FEATURES:append:quin-gvm-gen4 = " qti-bluetooth"
 DISTRO_FEATURES:append:quin-gvm-gen4-2 = " qti-bluetooth"
 
-# Support kdump
-#DISTRO_FEATURES:append = " kdump-support"
-
 # Enable FDE
 DISTRO_FEATURES:append:qtiquingvm = " qti-fde"
 DISTRO_FEATURES:append:qtiquingvm8295 = " qti-fde"
