@@ -1,8 +1,11 @@
 require recipes-kernel/linux-msm/linux-msm.inc
-COMPATIBLE_MACHINE = "genericarmv8|sdxlemur|scuba|qrbx210-rbx|sa2150p|sa2150p-nand|sa410m|sa410m-nand|sa410m-televm|qcs610|qrb5165|sa515m|sa415m"
+COMPATIBLE_MACHINE = "genericarmv8|sdxlemur|scuba|qrbx210-rbx|sa2150p|sa2150p-nand|sa410m|sa410m-nand|sa410m-televm|qcs610|qrb5165|sa515m|sa415m|qcs6490"
 
 SRC_URI_append_sdxlemur += "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'file://gluebi.cfg', '', d)}"
 SRC_URI_append_sdxlemur += "file://0001-wifi-Add-OCV-support-in-kernel.patch"
+
+SRC_URI_append_sa515m += "${@bb.utils.contains('COMBINED_FEATURES', 'vbleevm', 'file://vbleevm.cfg', '', d)}"
+SRC_URI_append_sa515m += "${@bb.utils.contains('COMBINED_FEATURES', 'vbleima', 'file://vbleima.cfg', '', d)}"
 
 S         =  "${WORKDIR}/kernel/msm-5.4"
 PR        =  "r0"

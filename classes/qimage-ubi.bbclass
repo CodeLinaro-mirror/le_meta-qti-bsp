@@ -16,7 +16,12 @@ SYSTEMIMAGE_UBIFS_TARGET ?= "${@bb.utils.contains('IMAGE_FEATURES', 'gluebi', bb
 USERIMAGE_UBIFS_TARGET ?= "${IMGDEPLOYDIR}/${IMAGE_BASENAME}/userfs.ubifs"
 USERIMAGE_ROOTFS ?= "${WORKDIR}/usrfs"
 
+VMIMAGE_UBI_TARGET ?= "vm-bootsys.ubi"
+VMIMAGE_UBIFS_TARGET ?= "vm-bootsys.ubifs"
+VMIMAGE_ROOTFS ?= "${DEPLOY_DIR_IMAGE}/vm-images/"
+
 UBINIZE_CFG ?= "${IMGDEPLOYDIR}/${IMAGE_BASENAME}/ubinize_system.cfg"
+UBINIZE_VM_CFG ?= "${IMGDEPLOYDIR}/${IMAGE_BASENAME}/ubinize_vm.cfg"
 
 # Ensure SELinux file context variable is defined
 SELINUX_FILE_CONTEXTS ?= ""
@@ -59,7 +64,7 @@ create_symlink_systemd_ubi_mount_rootfs() {
     # Symlink ubi mount files to systemd targets
     for entry in ${MACHINE_MNT_POINTS}; do
         mountname="${entry:1}"
-        if [[ "$mountname" == "firmware" || "$mountname" == "bt_firmware" || "$mountname" == "dsp" ]] ; then
+        if [[ "$mountname" == "firmware" || "$mountname" == "bt_firmware" || "$mountname" == "dsp" || "$mountname" == "vm-bootsys" ]] ; then
             cp -f ${IMAGE_ROOTFS_UBI}/lib/systemd/system/${mountname}-mount-ubi.service ${IMAGE_ROOTFS_UBI}/lib/systemd/system/${mountname}-mount.service
             ln -sf ${systemd_unitdir}/system/${mountname}-mount.service ${IMAGE_ROOTFS_UBI}/lib/systemd/system/local-fs.target.requires/${mountname}-mount.service
         else
@@ -89,6 +94,7 @@ create_symlink_systemd_ubi_mount_rootfs() {
     rm -rf ${IMAGE_ROOTFS_UBI}/lib/systemd/system/sysinit.target.wants/rmt_storage.service
     rm -rf ${IMAGE_ROOTFS_UBI}/etc/udev/rules.d/rmtstorage.rules
     rm -rf ${IMAGE_ROOTFS_UBI}/etc/systemd/system/local-fs-pre.target.wants/set-slotsuffix.service
+    rm -rf ${IMAGE_ROOTFS_UBI}/lib/systemd/system/local-fs.target.requires/vm-bootsys.mount
     # Recheck when overlay support added for ubi
     rm -rf ${IMAGE_ROOTFS_UBI}/lib/systemd/system/local-fs.target.wants/overlay-restore.service
 
@@ -118,6 +124,58 @@ create_symlink_systemd_ubi_mount_rootfs() {
 do_create_ubinize_config[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
 
 do_create_ubinize_config() {
+if $(echo ${COMBINED_FEATURES} | grep -q "qti-ab-boot") ; then
+cat << EOF >> ${UBINIZE_CFG}
+[sysfs_a_volume]
+mode=ubi
+image="${SYSTEMIMAGE_UBIFS_TARGET}"
+vol_id=0
+vol_type=dynamic
+vol_name=rootfs_a
+vol_size="${ROOTFS_VOLUME_SIZE}"
+
+[sysfs_b_volume]
+mode=ubi
+image="${SYSTEMIMAGE_UBIFS_TARGET}"
+vol_id=1
+vol_type=dynamic
+vol_name=rootfs_b
+vol_size="${ROOTFS_VOLUME_SIZE}"
+
+[usrfs_volume]
+mode=ubi
+image="${USERIMAGE_UBIFS_TARGET}"
+vol_id=2
+vol_type=dynamic
+vol_name=usrfs
+vol_flags=autoresize
+
+[cache_volume]
+mode=ubi
+vol_id=3
+vol_type=dynamic
+vol_name=cachefs
+vol_size="${CACHE_VOLUME_SIZE}"
+
+[systemrw_volume]
+mode=ubi
+vol_id=4
+vol_type=dynamic
+vol_name=systemrw
+vol_size="${SYSTEMRW_VOLUME_SIZE}"
+
+EOF
+    if $(echo ${IMAGE_FEATURES} | grep -q "persist-volume"); then
+        cat << EOF >> ${UBINIZE_CFG}
+[persist_volume]
+mode=ubi
+vol_id=5
+vol_type=dynamic
+vol_name=persist
+vol_size="${PERSIST_VOLUME_SIZE}"
+EOF
+    fi
+else
     cat << EOF > ${UBINIZE_CFG}
 [sysfs_volume]
 mode=ubi
@@ -126,6 +184,7 @@ vol_id=0
 vol_type=dynamic
 vol_name=rootfs
 vol_size="${ROOTFS_VOLUME_SIZE}"
+
 [usrfs_volume]
 mode=ubi
 image="${USERIMAGE_UBIFS_TARGET}"
@@ -133,12 +192,14 @@ vol_id=1
 vol_type=dynamic
 vol_name=usrfs
 vol_flags=autoresize
+
 [cache_volume]
 mode=ubi
 vol_id=2
 vol_type=dynamic
 vol_name=cachefs
 vol_size="${CACHE_VOLUME_SIZE}"
+
 [systemrw_volume]
 mode=ubi
 vol_id=3
@@ -148,6 +209,7 @@ vol_size="${SYSTEMRW_VOLUME_SIZE}"
 EOF
     if $(echo ${IMAGE_FEATURES} | grep -q "persist-volume"); then
         cat << EOF >> ${UBINIZE_CFG}
+
 [persist_volume]
 mode=ubi
 vol_id=4
@@ -156,7 +218,7 @@ vol_name=persist
 vol_size="${PERSIST_VOLUME_SIZE}"
 EOF
     fi
-
+fi
 }
 
 create_rootfs_ubi[cleandirs] = "${IMAGE_ROOTFS_UBI}"
@@ -182,8 +244,34 @@ fakeroot do_makesystem_ubi() {
     ubinize -o ${SYSTEMIMAGE_UBI_TARGET} ${UBINIZE_ARGS} ${UBINIZE_CFG}
 }
 
+# Need to copy ubinize_vm.cfg file in the deploy directory
+do_create_ubinize_vm_config[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
+
+do_create_ubinize_vm_config() {
+    cat << EOF > ${UBINIZE_VM_CFG}
+[vm_volume]
+mode=ubi
+image="${VMIMAGE_UBIFS_TARGET}"
+vol_id=0
+vol_type=dynamic
+vol_name=vm
+vol_flags=autoresize
+EOF
+
+}
+
+do_make_vmbootsys_ubi[prefuncs] += "do_create_ubinize_vm_config"
+do_make_vmbootsys_ubi[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
+
+fakeroot do_make_vmbootsys_ubi() {
+    mkfs.ubifs -r ${VMIMAGE_ROOTFS} ${IMAGE_UBIFS_SELINUX_OPTIONS} -o ${VMIMAGE_UBIFS_TARGET} ${MKUBIFS_ARGS}
+    ubinize -o ${VMIMAGE_UBI_TARGET} ${UBINIZE_ARGS} ${UBINIZE_VM_CFG}
+}
+
 python () {
-    if bb.utils.contains('IMAGE_FEATURES', 'gluebi', True, False, d) and bb.utils.contains('DISTRO_FEATURES', 'dm-verity', True, False, d):
+    if bb.utils.contains('IMAGE_FEATURES', 'vm', True, False, d):
+        bb.build.addtask('do_make_vmbootsys_ubi', 'do_image_complete', 'do_compose_vmimage', d)
+    elif bb.utils.contains('IMAGE_FEATURES', 'gluebi', True, False, d) and bb.utils.contains('DISTRO_FEATURES', 'dm-verity', True, False, d):
         bb.build.addtask('do_makesystem_gluebi', 'do_image_complete', 'do_image', d)
     else:
         bb.build.addtask('do_makesystem_ubi', 'do_image_complete', 'do_image', d)

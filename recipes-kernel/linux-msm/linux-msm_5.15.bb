@@ -3,13 +3,13 @@ inherit kernel
 DESCRIPTION = "CAF Linux Kernel"
 LICENSE = "GPLv2.0-with-linux-syscall-note"
 
-COMPATIBLE_MACHINE = "cinder|sa410m|scuba-auto|sa410m-televm|sa525m|sa525m-emmc"
+COMPATIBLE_MACHINE = "cinder|sa410m|scuba-auto|sa410m-televm|sa525m-televm|sa525m-fotavm|sa525m|sa525m-emmc"
 
 FILESPATH =+ "${WORKSPACE}:"
 
 SRC_URI   =  "file://kernel-${PV}/kernel_platform/msm-kernel \
              ${@oe.utils.conditional('KERNEL_USE_PREBUILTS', 'True', '', 'file://kernel-${PV}/kernel_platform/msm-kernel/arch/${ARCH}/configs/${KERNEL_CONFIG}',d)} \
-             "
+             file://verity.x509.pem"
 
 S = "${WORKDIR}/kernel-${PV}/kernel_platform/msm-kernel"
 PR = "r0"
@@ -114,6 +114,16 @@ do_prebuilt_configure() {
     install -m 0755 ../msm-kernel/certs/signing_key.x509 ${B}/certs/signing_key.x509
     install -m 0755 ../msm-kernel/certs/signing_key.pem ${B}/certs/signing_key.pem
     install -m 0644 ../msm-kernel/include/generated/utsrelease.h ${B}/include/generated
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains('MACHINE_FEATURES', 'dm-verity-initramfs-v3', 'true', 'false', d), 'false', d)}; then
+        install -m 0644 ../msm-kernel/certs/verity_cert.pem ${B}/certs/verity_cert.pem
+        install -m 0644 ../msm-kernel/certs/verity_key.pem ${B}/certs/verity_key.pem
+
+        # update paths of signature checking certificates to reflect current host
+        sed -i -e '/CONFIG_MODULE_SIG_KEY[ =]/d' ${B}/.config
+        echo "CONFIG_MODULE_SIG_KEY="\"${STAGING_DIR_TARGET}/kernel-certs/signing_key.pem\" >> ${B}/.config
+        sed -i -e '/CONFIG_SYSTEM_TRUSTED_KEYS[ =]/d' ${B}/.config
+        echo "CONFIG_SYSTEM_TRUSTED_KEYS="\"${STAGING_DIR_TARGET}/kernel-certs/verity_cert.pem\" >> ${B}/.config
+    fi
 
     install -d ${B}/${KERNEL_OUTPUT_DIR}
     for typeformake in ${KERNEL_IMAGETYPE_FOR_MAKE} ; do
