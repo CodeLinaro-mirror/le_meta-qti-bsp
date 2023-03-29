@@ -18,3 +18,6 @@ EXTRA_OECONF += "--with-glib"
 inherit autotools pkgconfig
 
 BBCLASSEXTEND = "native"
+
+PACKAGE_BEFORE_PN = "${PN}-utils"
+FILES:${PN}-utils = "${bindir}/fs_mgr"

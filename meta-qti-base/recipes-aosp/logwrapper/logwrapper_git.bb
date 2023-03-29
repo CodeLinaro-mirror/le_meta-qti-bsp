@@ -15,3 +15,6 @@ S = "${WORKDIR}/system/core/logwrapper"
 inherit autotools pkgconfig
 
 BBCLASSEXTEND = "native"
+
+PACKAGE_BEFORE_PN = "${PN}-utils"
+FILES:${PN}-utils = "${bindir}/logwrapper"

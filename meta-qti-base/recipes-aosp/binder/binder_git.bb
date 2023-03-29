@@ -53,3 +53,5 @@ do_install:append() {
     fi
 }
 
+PACKAGE_BEFORE_PN = "${PN}-test"
+FILES:${PN}-test = "${bindir}/test_binder"
