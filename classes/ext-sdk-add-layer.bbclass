@@ -159,7 +159,7 @@ ext_sdk_add_external_layers_script() {
         echo '    elif [ -d "${workspace_root}/src" ];' >> $add_external_layers_script
         echo '    then' >> $add_external_layers_script
         echo '        echo "Copying local sources from ${workspace_root}/src to ${SDK_ROOT}/src"' >> $add_external_layers_script
-        echo '        cp -rf ${workspace_root}/src/* ${SDK_ROOT}/src' >> $add_external_layers_script
+        echo '        cp -Lrf ${workspace_root}/src/* ${SDK_ROOT}/src' >> $add_external_layers_script
         echo '        echo  "Local sources have been copied successfully"' >> $add_external_layers_script
         echo '    else' >> $add_external_layers_script
         echo '        echo "`tput setaf 3`Unable to find ${workspace_root}/src/ directory. Local sources are  not copied to the eSDK`tput sgr0`"' >> $add_external_layers_script
