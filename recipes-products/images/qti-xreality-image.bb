@@ -9,12 +9,17 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         glib-2.0 \
         gki-kernel-modules-second-stage \
         kernel-modules \
+        packagegroup-qti-camera \
+        packagegroup-qti-camera-kernel \
         packagegroup-android-utils \
+        packagegroup-qti-mmframeworks \
         packagegroup-filesystem-utils \
         packagegroup-qti-core \
+        ${@bb.utils.contains('MACHINE_FEATURES', 'qti-eva', "packagegroup-qti-eva", "", d)} \
         packagegroup-qti-dsp \
         packagegroup-qti-ss-mgr \
         packagegroup-qti-securemsm \
+        packagegroup-qti-fastcv \
         packagegroup-startup-scripts \
         packagegroup-support-utils \
         packagegroup-qti-sensors-see \
