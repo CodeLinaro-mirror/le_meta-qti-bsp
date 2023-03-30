@@ -24,6 +24,7 @@ USERADD_PARAM:${PN} ?= 	" \
 			-G audio -u 4050 -U acdb-loader; \
 			-G audio -u 4051 -U amfs; \
 			-u 4052 -U codec2; \
+			-u 4060 -U post-boot; \
 			"
 
 GROUPADD_PARAM:${PN} ?=	" \
