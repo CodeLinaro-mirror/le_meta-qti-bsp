@@ -14,6 +14,5 @@ DEPENDS = "virtual/kernel"
 S = "${WORKDIR}/vendor/qcom/opensource/hsi2s-kernel"
 
 inherit module module-sign kernel-arch qperf
-INHIBIT_PACKAGE_STRIP = "1"
 
 EXTRA_OEMAKE += "CONFIG_ARCH_MSM=y"
