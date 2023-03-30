@@ -191,14 +191,15 @@ do_deploy () {
     cp  ${STAGING_KERNEL_DIR}/usr/gen_initramfs_list.sh ${DEPLOYDIR}/build-artifacts/kernel_scripts/scripts
     cp  ${STAGING_KERNEL_BUILDDIR}/usr/gen_init_cpio ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr
 
-    # Copy Image appended with dtbs to deploydir
+    # Copy Image and dtbs to deploydir
 
     if [ "${BASEMACHINE}" = "sa8775" ]; then
-    cat ${B}/arch/arm64/boot/Image.gz \
-        ${B}/arch/arm64/boot/dts/qcom/lemans.dtb > ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb
+    cp ${B}/arch/arm64/boot/Image ${D}/${KERNEL_IMAGEDEST}/Image
+    cp ${B}/arch/arm64/boot/dts/qcom/lemans.dtb ${D}/${KERNEL_IMAGEDEST}/lemans.dtb
     # Make bootimage
-    ${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb \
-	--kernel  ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb \
+    ${STAGING_BINDIR_NATIVE}/scripts/mkbootimg.py --header_version ${KERNEL_IMAGE_HEADER_VERSION} \
+	--kernel  ${D}/${KERNEL_IMAGEDEST}/Image \
+	--dtb  ${D}/${KERNEL_IMAGEDEST}/lemans.dtb \
 	--ramdisk /dev/null \
         --pagesize ${PAGE_SIZE} \
 	--base ${KERNEL_BASE} \
