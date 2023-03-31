@@ -1,0 +1,29 @@
+From e0083bc54a4e7bec2f9a3b508c248678c2c63620 Mon Sep 17 00:00:00 2001
+From: Yao Jiang <quic_c_yaojia@quicinc.com>
+Date: Tue, 9 May 2023 01:29:34 +0000
+Subject: [PATCH] Remove useless fault func handler to fix build issue
+
+fault_handler not used in ktf probehandler, it should be fixed upstream but no available
+patch for it, remove now to fix building issue on kernel 5.15
+
+Upstream-Status: Pending
+Signed-off-by: Yao Jiang <quic_c_yaojia@quicinc.com>
+---
+ kernel/ktf.h | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/kernel/ktf.h b/kernel/ktf.h
+index 941c923..d909f03 100644
+--- a/kernel/ktf.h
++++ b/kernel/ktf.h
+@@ -313,7 +313,6 @@ static inline int ktf_no_probe_support(void)
+ 		.symbol_name = #func, \
+ 		.pre_handler = probehandler, \
+ 		.post_handler = ktf_post_handler, \
+-		.fault_handler = NULL, \
+ 		.flags = 0, \
+         }; \
+         static int probehandler(struct kprobe *kp, struct pt_regs *regs)
+-- 
+2.35.2
+
