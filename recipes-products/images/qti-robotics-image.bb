@@ -16,6 +16,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-filesystem-utils \
         packagegroup-qti-audio \
         packagegroup-qti-bluetooth \
+        packagegroup-qti-camera \
         packagegroup-qti-camera-kernel \
         ${@bb.utils.contains('DISTRO_FEATURES','virtualization', 'packagegroup-qti-containers', '', d)} \
         packagegroup-qti-core \
@@ -53,7 +54,6 @@ CORE_IMAGE_EXTRA_INSTALL += "\
 "
 
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "chronyc"
-CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-camera"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-cvp"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-data"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-fastcv"
