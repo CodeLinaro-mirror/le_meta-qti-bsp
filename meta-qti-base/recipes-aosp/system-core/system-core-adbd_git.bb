@@ -5,7 +5,7 @@ HOMEPAGE = "https://www.codelinaro.org/"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5=89aea4e17d99a7cacdbeed46a0096b10"
 
-DEPENDS += "libselinux libbase fs-mgr glib-2.0"
+DEPENDS += "libbase fs-mgr glib-2.0"
 
 SRC_URI = "${PATH_TO_REPO}/system/core/.git;protocol=${PROTO};destsuffix=system/core;usehead=1"
 SRCREV = "${AUTOREV}"
@@ -13,6 +13,9 @@ SRCREV = "${AUTOREV}"
 S = "${WORKDIR}/system/core/adb"
 
 inherit autotools pkgconfig systemd useradd
+
+PACKAGECONFIG ?= "${@bb.utils.filter('DISTRO_FEATURES', 'selinux', d)}"
+PACKAGECONFIG[selinux] = "--enable-selinux,--disable-selinux,libselinux"
 
 USERADD_PACKAGES = "${PN}"
 GROUPADD_PARAM:${PN} = "adb"
