@@ -1,7 +1,7 @@
 DEFAULT_PREFERENCE = "-1"
 
 SRC_URI   =  "${PATH_TO_REPO}/gstreamer/gstreamer/.git;protocol=${PROTO};destsuffix=gstreamer/gstreamer;usehead=1"
-SRC_URI_append = " ${CAF_GIT}/gstreamer/common;destsuffix=gstreamer/gstreamer/common;branch=gstreamer/common/master;name=common"
+SRC_URI_append = " ${CLO_LE_GIT}/gstreamer/common;destsuffix=gstreamer/gstreamer/common;nobranch=1;name=common"
 
 SRCREV = "${AUTOREV}"
 SRCREV_FORMAT = "gstreamer_common"
