@@ -5,5 +5,14 @@ do_install:append:class-native () {
         mkdir -p ${D}${nonarch_libdir}/clang/${PV}/share
         touch ${D}${nonarch_libdir}/clang/${PV}/share/cfi_blacklist.txt
     fi
-
 }
+
+# Disable -fPIE and -pie on Linux
+EXTRA_OECMAKE:remove:class-target = "-DCLANG_DEFAULT_PIE_ON_LINUX=ON"
+EXTRA_OECMAKE:remove:class-nativesdk = "-DCLANG_DEFAULT_PIE_ON_LINUX=ON"
+EXTRA_OECMAKE:remove:class-native = "-DCLANG_DEFAULT_PIE_ON_LINUX=ON"
+
+# Disable libgcc unwind library to use
+EXTRA_OECMAKE:remove:class-target = "-DCLANG_DEFAULT_UNWINDLIB=libgcc"
+EXTRA_OECMAKE:remove:class-nativesdk = "-DCLANG_DEFAULT_UNWINDLIB=libgcc"
+EXTRA_OECMAKE:remove:class-native = "-DCLANG_DEFAULT_UNWINDLIB=libgcc"

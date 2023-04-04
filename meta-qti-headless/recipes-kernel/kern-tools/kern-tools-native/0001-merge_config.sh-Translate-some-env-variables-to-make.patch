@@ -1,0 +1,82 @@
+From 1aa90463ad5d63f51aeeefed84fd6618b17da157 Mon Sep 17 00:00:00 2001
+From: Tyler Hicks <tyhicks@linux.microsoft.com>
+Date: Tue, 17 Nov 2020 10:34:48 -0600
+Subject: [PATCH] merge_config.sh: Translate some env variables to make
+ variables
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Pass certain environment variables, meant to convey information about
+the toolchain to use, as make variables when creating a kernel config
+file. The kernel build system checks for toolchain capabilities when
+generating the merged config file and a valid toolchain is required to
+enable some options.
+
+OpenEmbedded has attempted, for a couple years now, to specify the
+compiler by setting the CC environment variable:
+
+ https://git.openembedded.org/openembedded-core/commit/?id=ff1bdd75d50f0ebac3d599e461685ace29559a82
+
+This was unsuccessful due to the kernel's top-level Makefile explicitly
+assigning variables, such as CC, and ignoring what's present in the
+environment. It is possible to override this behavior by invoking make
+with the '-e' option but the make manual discourages this:
+
+ Every environment variable that make sees when it starts up is
+ transformed into a make variable with the same name and value.
+ However, an explicit assignment in the makefile, or with a command
+ argument, overrides the environment. (If the ‘-e’ flag is specified,
+ then values from the environment override assignments in the makefile.
+ See Summary of Options. But this is not recommended practice.)
+
+A simple test case is to create a defconfig while specifying clang as
+the compiler to use:
+
+ $ make CC=clang-10 defconfig
+ ...
+
+Create a config fragment that attempts to enable
+CONFIG_INIT_STACK_ALL_PATTERN which is currently only possible to enable
+when building with clang:
+
+ $ echo "CONFIG_INIT_STACK_ALL_PATTERN=y" > init-stack-all.cfg
+
+Specify clang in the environment when running merge_config.sh and see
+that the option couldn't be enabled:
+
+ $ CC=clang-10 merge_config.sh .config init-stack-all.cfg
+ ...
+ Value requested for CONFIG_INIT_STACK_ALL_PATTERN not in final .config
+ Requested value:  CONFIG_INIT_STACK_ALL_PATTERN=y
+ Actual value:
+
+Note that the less secure CONFIG_INIT_STACK_NONE option is enabled,
+instead:
+
+ $ grep CONFIG_INIT_STACK .config
+ CONFIG_INIT_STACK_NONE=y
+
+Signed-off-by: Tyler Hicks <tyhicks@linux.microsoft.com>
+Signed-off-by: Bruce Ashfield <bruce.ashfield@gmail.com>
+---
+ tools/merge_config.sh | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/tools/merge_config.sh b/tools/merge_config.sh
+index 14b4c1f..38eb85a 100755
+--- a/tools/merge_config.sh
++++ b/tools/merge_config.sh
+@@ -153,7 +153,8 @@ fi
+ # Use the merged file as the starting point for:
+ # alldefconfig: Fills in any missing symbols with Kconfig default
+ # allnoconfig: Fills in any missing symbols with # CONFIG_* is not set
+-make LD="$LD" KCONFIG_ALLCONFIG=$TMP_FILE $OUTPUT_ARG $ALLTARGET
++make HOSTCC="$HOSTCC" HOSTLD="$HOSTLD" CC="$CC" LD="$LD" \
++	KCONFIG_ALLCONFIG=$TMP_FILE $OUTPUT_ARG $ALLTARGET
+ 
+ 
+ # Check all specified config values took (might have missed-dependency issues)
+-- 
+2.17.1
+

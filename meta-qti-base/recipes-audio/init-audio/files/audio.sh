@@ -26,19 +26,51 @@
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 # demo app for early audio to measure boot kpi
-modprobe snd_event_dlkm
-modprobe q6_notifier_dlkm
-modprobe apr_dlkm
-modprobe q6_dlkm
-modprobe adsp_loader_dlkm
-modprobe stub_dlkm
-/bin/mount -o ro /dev/sde4 /firmware
-/bin/mount -o ro /dev/mmcblk0p30 /firmware
-/bin/echo 0 > /sys/module/subsystem_restart/parameters/enable_debug;
-/bin/echo 2 > /sys/kernel/boot_adsp/boot;
-modprobe platform_dlkm
-modprobe machine_dlkm
-modprobe hdmi_dlkm
+
+count=0
+while true
+do
+    if [ -f "/sys/devices/soc0/machine" ]; then
+        if [ -b "/dev/sde4" ] || [ -b "/dev/mmcblk0p30"]; then
+            machine=$(cat /sys/devices/soc0/machine)
+            break
+        fi
+    else
+        sleep 0.1
+        count=$(( $count + 1 ))
+        if [ $count -ge 50 ]; then
+            /bin/echo \"early_audio mount partition not found \"  > /dev/kmsg
+            exit 1
+        fi
+    fi
+done
+
+if [ $machine == SA81*5P ]; then
+    /bin/mount -o ro /dev/sde4 /firmware
+elif [ $machine == SA6155P ]; then
+    /bin/mount -o ro /dev/mmcblk0p30 /firmware
+fi
+
+if [ -f /sys/module/subsystem_restart/parameters/enable_debug ]; then
+    /bin/echo 0 > /sys/module/subsystem_restart/parameters/enable_debug;
+else
+    /bin/echo \"early_audio: not found enable_debug node\" > /dev/kmsg;
+fi
+
+while true
+do
+    if [ -d "/firmware/image" ] && [ -f "/sys/kernel/boot_adsp/boot" ]; then
+        /bin/echo 2 > /sys/kernel/boot_adsp/boot;
+        break
+    else
+        sleep 0.1
+        count=$(( $count + 1 ))
+        if [ $count -ge 100 ]; then
+            /bin/echo \"early_audio: /firmware/image was not mounted\" > /dev/kmsg;
+            exit 1
+        fi
+    fi
+done
 
 while true
 do

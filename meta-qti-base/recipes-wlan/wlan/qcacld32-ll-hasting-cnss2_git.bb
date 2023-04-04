@@ -30,9 +30,12 @@ FIRMWARE_PATH = "${D}${nonarch_base_libdir}/firmware/wlan/qca_cld/${_MODNAME}"
 S1 = "${WORKDIR}/wlan/qca-wifi-host-cmn"
 S = "${WORKDIR}/wlan/qcacld-3.0"
 
+inherit systemd
+
 # Explicitly disable HL to enable LL as current WLAN driver is not having
 # simultaneous support of HL and LL.
 EXTRA_OEMAKE:append = " \
+                       LINUX_BUILD_TOP=${_LINUX_BUILD_TOP} \
                        CONFIG_CLD_HL_SDIO_CORE=n \
                        CONFIG_CNSS_SDIO=n \
                        CONFIG_QCA_CLD_WLAN_PROFILE=qca6390 \
@@ -79,6 +82,8 @@ EXTRA_OEMAKE:append:qtiquingvm = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
 EXTRA_OEMAKE:append:qtiquingvm8295 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
 EXTRA_OEMAKE:append:sa8295 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_METAL}"
 EXTRA_OEMAKE:append:quin-gvm-gen4 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
+EXTRA_OEMAKE:append:quin-gvm-gen4-2 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
+EXTRA_OEMAKE:append:quin-gvm-lemans = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
 
 do_configure:append() {
     sed -i -e 's/^gEnableConcurrentSTA=wlan1/gEnableConcurrentSTA=wlan3/g' ${WORKDIR}/device/qcom/wlan/msm_auto/WCNSS_qcom_cfg_qca6390.ini

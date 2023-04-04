@@ -8,3 +8,4 @@ SRC_URI:append = " \
 
 # Enable container launching automatically
 SYSTEMD_AUTO_ENABLE:${PN} = "enable"
+SYSTEMD_AUTO_ENABLE:${PN}:sa81x5 = "disable"

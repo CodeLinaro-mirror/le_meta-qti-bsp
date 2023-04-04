@@ -12,11 +12,12 @@ dirs755:append = " \
 "
 
 do_install:append(){
-    install -m 755 -o diag -g diag -d ${D}/media
-    install -m 755 -o diag -g diag -d ${D}/media/card
-    ln -s /media/card ${D}/sdcard
     ln -s ${nonarch_base_libdir} ${D}/lib64
     ln -s ${libdir} ${D}/usr/lib64
+
+    if(${@bb.utils.contains('MACHINE_FEATURES', 'early-ramdisk-init', 'true', 'false', d)}); then
+        install -d ${D}/boot/early-ramdisk
+    fi
 
     install -m 0644 ${WORKDIR}/fstab ${D}${sysconfdir}/fstab
 

@@ -16,7 +16,7 @@ SRC_URI = "\
 SRCREV = "${AUTOREV}"
 S = "${WORKDIR}/qcom-opensource/location/location_hal_daemon"
 
-inherit autotools-brokensep update-rc.d systemd pkgconfig
+inherit autotools-brokensep update-rc.d systemd pkgconfig useradd
 
 EXTRA_OECONF += "--enable-target=${BASEMACHINE}"
 # location-hal-daemon_git.bbappend has additional configs
@@ -24,6 +24,14 @@ EXTRA_OECONF += "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', '--with-syst
 
 INITSCRIPT_NAME = "location_hal_initializer"
 INITSCRIPT_PARAMS = "start 98 2 3 4 5 . stop 2 0 1 6 ."
+
+USERADD_PACKAGES = "${PN}"
+
+GROUPADD_PARAM:${PN} = "system; locclient; gps; diag; inet; radio"
+USERADD_PARAM:${PN} = "\
+    --no-create-home -g locclient --shell /bin/false locclient; \
+    --no-create-home -g gps -G system,locclient --shell /bin/false gps; \
+"
 
 do_install:append () {
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then

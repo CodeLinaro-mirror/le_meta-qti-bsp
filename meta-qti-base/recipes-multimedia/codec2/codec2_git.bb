@@ -11,10 +11,10 @@ DEPENDS += "\
     gbm \
     gbm-headers \
     libcutils \
-    ${@oe.utils.version_less_or_equal('PREFERRED_VERSION_linux-msm', '5.4', 'libion', 'libdmabufheap', d)} \
+    ${@oe.utils.version_less_or_equal('${preferred-kernel}', '5.4', 'libion', 'libdmabufheap', d)} \
     libstagefright-headers \
     libutils \
-    linux-msm-headers \
+    virtual/kernel-headers \
     media-plugin-headers \
     system-core-headers \
 "
@@ -26,7 +26,7 @@ S = "${WORKDIR}/frameworks/av/media/codec2"
 inherit cmake
 
 CXXFLAGS += "\
-    -I${STAGING_INCDIR}/linux-msm \
+    -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel} \
     -I${STAGING_INCDIR}/drm \
     -I${STAGING_INCDIR}/ion_headers \
     -I${STAGING_INCDIR}/kernel-headers \
@@ -36,8 +36,9 @@ CXXFLAGS += "\
 
 EXTRA_OECMAKE += "\
     -DAGL_LINUX:BOOL=ON \
-    ${@oe.utils.version_less_or_equal('PREFERRED_VERSION_linux-msm', '5.4', '', '-DSUPPORT_DMABUF_HEAP:BOOL=ON', d)} \
+    ${@oe.utils.version_less_or_equal('${preferred-kernel}', '5.4', '', '-DSUPPORT_DMABUF_HEAP:BOOL=ON', d)} \
 "
+EXTRA_OECMAKE:append:lemans = " -DLOAD_CORE_LIB:BOOL=ON"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 

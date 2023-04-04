@@ -2,26 +2,26 @@ SUMMARY = "CLO Linux Kernel"
 LICENSE = "GPLv2.0-with-linux-syscall-note"
 LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 
-DEPENDS += "elfutils-native kern-tools-native kernel-toolchain-native mkbootimg-native mkdtimg-native openssl-native pahole-native rsync-native signing-keys"
+DEPENDS += "elfutils-native kern-tools-native mkbootimg-native mkdtimg-native openssl-native pahole-native rsync-native signing-keys"
 
-COMPATIBLE_MACHINE = "sa81x5|lemans|quin-gvm-gen4-2"
+COMPATIBLE_MACHINE = "sa81x5|lemans|quin-gvm-gen4-2|quin-gvm-lemans"
 
 FILESPATH =+ "${KERNEL_SRC_PATH}:"
 SRC_URI = "${PATH_TO_REPO}/kernel/kernel-${PV}/kernel_platform/msm-kernel/.git;protocol=${PROTO};destsuffix=kernel/kernel-${PV}/kernel_platform/msm-kernel;usehead=1"
 
 SRCREV = "${AUTOREV}"
 
-inherit kernel qti-kernel-toolchain
+inherit kernel kernel-yocto qti-kernel-arch-clang
 
 S = "${WORKDIR}/kernel/kernel-${PV}/kernel_platform/msm-kernel"
+
+# Due to inherit kernel. If choose clang as a compilation chain, need unset thist variable to set clang as BASEDEPENDS.
+unset INHIBIT_DEFAULT_DEPS
 
 LDFLAGS:aarch64 = "-O1 --hash-style=gnu --as-needed"
 TARGET_CXXFLAGS += "-Wno-format"
 
-KERNEL_CC = "${KERNEL_TOOLCHAIN_CLANG}/bin/clang"
 KERNEL_CONFIG_PATH = "${S}/arch/${ARCH}/configs"
-
-KERNEL_PREBUILT_PATH ?= "${SRC_DIR_ROOT}/kernel/kernel-${PV}/out/msm-kernel-${KERNEL_ARCH}-${KERNEL_VARIANT}defconfig/dist"
 
 #dts path is changed to vendor/qcom
 DTB_SRC_PATH = "${STAGING_KERNEL_BUILDDIR}/arch/${ARCH}/boot/dts/vendor/qcom"
@@ -38,8 +38,7 @@ KERNEL_PRIORITY = "9001"
 # Add V=1 to KERNEL_EXTRA_ARGS for verbose
 KERNEL_EXTRA_ARGS += "O=${B}"
 
-# Don't set any version extention on debug build
-LINUX_VERSION_EXTENSION ?= "-perf"
+LINUX_VERSION_EXTENSION = "${@bb.utils.contains_any('VARIANT', 'perf user', '-perf', '-debug', d)}"
 LINUX_VERSION_EXTENSION_qti-distro-debug = ""
 
 # dm-verity: Patch the cert file from which kernel add key to keyring
@@ -52,15 +51,32 @@ do_patch[postfuncs] += "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.
 EXTRA_OEMAKE:remove = "PAHOLE=false"
 KCONFIG_CONFIG_COMMAND:remove = "PAHOLE=false"
 
-do_configure:prepend() {
+KMETA = "kernel-meta"
+KMACHINE ?= "${KERNEL_ARCH}"
+KCONFIG_MODE = "--alldefconfig"
+KBUILD_DEFCONFIG ?= "vendor/${KERNEL_ARCH}${@bb.utils.contains_any('VARIANT', 'debug user', '-debug', '', d)}_defconfig"
+
+KERNEL_VERSION_SANITY_SKIP = "1"
+
+do_kernel_configcheck[noexec] = "1"
+do_kernel_checkout[noexec] = "1"
+do_validate_branches[noexec] = "1"
+
+do_generate_base_defconfig() {
+    export KCONFIG_CONFIG=${KERNEL_CONFIG_PATH}/${KBUILD_DEFCONFIG}
     if [ ! -f "${KERNEL_CONFIG_PATH}/vendor/${KERNEL_ARCH}.config" ]; then
         bbfatal "KERNEL_CONFIG '${KERNEL_ARCH}.config' was specified, but not present in the source tree"
     fi
 
     base_defconfig="${KERNEL_CONFIG_PATH}/generic_auto_defconfig"
     kernel_defconfigs="${KERNEL_CONFIG_PATH}/vendor/${KERNEL_ARCH}.config ${@bb.utils.contains_any('VARIANT', 'debug user', '${KERNEL_CONFIG_PATH}/vendor/${KERNEL_ARCH}_debug.config', '', d)}"
-    ${S}/scripts/kconfig/merge_config.sh -m -r -y -O ${B} ${base_defconfig} ${kernel_defconfigs} 1>&2
+    ${S}/scripts/kconfig/merge_config.sh -m -r -y ${base_defconfig} ${kernel_defconfigs} 1>&2
+}
+addtask do_generate_base_defconfig after do_unpack before do_kernel_metadata
+do_generate_base_defconfig[depends] += "virtual/${TARGET_PREFIX}binutils:do_populate_sysroot"
+do_generate_base_defconfig[depends] += "clang-cross-${TARGET_ARCH}:do_populate_sysroot"
 
+do_configure:prepend() {
     echo "# Global settings from linux recipe" >> ${B}/.config
     echo "CONFIG_LOCALVERSION="\"${LINUX_VERSION_EXTENSION}\" >> ${B}/.config
 }
@@ -200,6 +216,12 @@ python () {
 # make sure that we generate all DTBs using the kernel 'dtbs' target,
 # then we can append the DTBs that we need for $MACHINE.
 KERNEL_EXTRA_ARGS += "dtbs"
+
+do_compile:prepend() {
+        if ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'true', 'false', d)}; then
+            export DTC_FLAGS="-@"
+        fi
+}
 
 # when using our own module signing key kernel.bbclass will fail to copy the public part of the key
 # since it checks if the .pem file exists which is not the case, so we need to explicitely copy

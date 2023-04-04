@@ -8,12 +8,12 @@ HOMEPAGE = "http://git.codelinaro.org/"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://NOTICE;md5=b45eb38359bd16993272b40c311aa89f"
 
-DEPENDS += "glib-2.0"
+DEPENDS += "glib-2.0 open-avb"
 
 SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/avb-utils/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/avb-utils;usehead=1"
 
 SRCREV = "${AUTOREV}"
-
+TARGET_CC_ARCH += "${LDFLAGS}"
 CFLAGS += "\
     -DUSE_GLIB \
     -I${STAGING_INCDIR}/glib-2.0 \
@@ -27,8 +27,10 @@ do_install() {
     install -d ${D}/${libdir}
     install -d ${D}/${includedir}
     install -m 644 ${S}/libeavbfe/*.so ${D}/${libdir}
-    install -m 644 ${S}/libeavbfe/*.h ${D}/${includedir}
+    install -m 644 ${S}/libeavbfe/inc/*.h ${D}/${includedir}
 }
 
 SOLIBS = ".so"
 FILES_SOLIBSDEV = ""
+
+RDEPENDS:avb-utils += "open-avb"

@@ -31,6 +31,7 @@ do_merge_dtbs[cleandirs] = " \
 addtask do_merge_dtbs after do_image before do_makeboot
 
 MKBOOTUTIL = '${@oe.utils.conditional("PREFERRED_PROVIDER_mkbootimg-native", "mkbootimg-gki-native", "scripts/mkbootimg.py", "mkbootimg", d)}'
+BOOT_RAMDISK_IMG ?= "${@bb.utils.contains('MACHINE_FEATURES', 'early-ramdisk-init', 'early-ramdisk-image-${PRODUCT}.cpio', '/dev/null', d)}"
 
 python do_makeboot () {
     import subprocess
@@ -43,11 +44,12 @@ python do_makeboot () {
     cmdline = "\"" + d.getVar('KERNEL_CMD_PARAMS', True) + "\""
     pagesize = d.getVar('PAGE_SIZE', True)
     base = d.getVar('KERNEL_BASE', True)
+    ramdisk = d.getVar('BOOT_RAMDISK_IMG', True)
     output = d.getVar('BOOTIMAGE_TARGET', True)
 
     # cmd to make boot.img
-    cmd = mkboot_bin_path + " --kernel %s --dtb %s --cmdline %s --pagesize %s --base %s --header_version %s --ramdisk /dev/null --output %s" \
-        % (kernel_path, dtb_path, cmdline, pagesize, base, header_version, output )
+    cmd = mkboot_bin_path + " --kernel %s --dtb %s --cmdline %s --pagesize %s --base %s --header_version %s --ramdisk %s --output %s" \
+        % (kernel_path, dtb_path, cmdline, pagesize, base, header_version, ramdisk, output )
 
     bb.debug(1, "do_makeboot cmd: %s" % (cmd))
     try:
@@ -65,6 +67,7 @@ python do_makeboot () {
 do_makeboot[dirs] = "${DEPLOY_DIR_IMAGE}"
 # Make sure native tools and vmlinux ready to create boot.img
 do_makeboot[depends] += "virtual/kernel:do_deploy mkbootimg-native:do_populate_sysroot"
+do_makeboot[depends] += "${@bb.utils.contains('MACHINE_FEATURES', 'early-ramdisk-init', 'early-ramdisk-image:do_image_complete', ' ', d)}"
 do_makeboot[sstate-inputdirs] = "${DEPLOY_DIR_IMAGE}"
 do_makeboot[sstate-outputdirs] = "${DEPLOY_DIR_IMAGE}"
 do_makeboot[stamp-extra-info] = "${MACHINE_ARCH}"

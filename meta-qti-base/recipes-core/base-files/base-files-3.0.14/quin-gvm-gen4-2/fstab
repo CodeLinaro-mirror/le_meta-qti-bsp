@@ -19,7 +19,7 @@ tmpfs                /tmp            tmpfs     defaults              0  0
 
 /dev/vdc             /var            auto      defaults,nofail       0  2
 /dev/vdb             /data           auto      defaults,nofail       0  2
-/dev/vdh             /dsp            auto      defaults,nofail       0  2
+/dev/vdg             /dsp            auto      defaults,nofail       0  2
 /dev/vde             /firmware       auto      defaults,nofail       0  2
 /dev/vdd             /bluetooth      auto      defaults,nofail       0  0
 

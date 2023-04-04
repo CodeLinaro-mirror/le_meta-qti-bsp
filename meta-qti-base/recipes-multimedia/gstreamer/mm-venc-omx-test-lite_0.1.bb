@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5
 DEPENDS += "\
     glib-2.0 \
     libcutils \
-    linux-msm-headers \
+    virtual/kernel-headers \
     media \
 "
 
@@ -37,6 +37,6 @@ CXXFLAGS += "\
     -I${STAGING_INCDIR}/mm-osal/include \
     -I${STAGING_INCDIR}/mm-core/include \
     -I${STAGING_INCDIR}/mm-core \
-    -I${STAGING_INCDIR}/linux-msm \
+    -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel} \
     -I${STAGING_INCDIR}/ion_headers \
 "

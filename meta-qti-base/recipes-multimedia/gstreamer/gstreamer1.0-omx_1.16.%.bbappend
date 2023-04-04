@@ -1,4 +1,4 @@
-DEPENDS += "linux-msm-headers media"
+DEPENDS += "virtual/kernel-headers media"
 DEPENDS:remove = "virtual/libomxil"
 
 SRC_URI:remove = "https://gstreamer.freedesktop.org/src/gst-omx/gst-omx-${PV}.tar.xz"
@@ -14,7 +14,7 @@ GSTREAMER_1_0_OMX_CORE_NAME = "${libdir}/libOmxCore.so"
 EXTRA_OEMESON = "\
                  -Dtarget=qti \
                  -Dheader_path=${STAGING_INCDIR}/mm-core \
-                 -Dkernel_path=${STAGING_INCDIR}/linux-msm \
+                 -Dkernel_path=${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel} \
                  -Dstaging_inc_path=${STAGING_INCDIR} \
                  -Denable-target-vpu554=yes \
                 "

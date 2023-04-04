@@ -9,7 +9,7 @@ DEPENDS += "\
     glib-2.0 \
     gstreamer1.0 \
     gstreamer1.0-plugins-base \
-    linux-msm-headers \
+    virtual/kernel-headers \
 "
 
 PR = "r1"
@@ -25,7 +25,7 @@ CFLAGS += "\
     -I${STAGING_INCDIR}/../lib/glib-2.0/include \
     -I${STAGING_INCDIR}/glib-2.0/glib \
     -I${STAGING_INCDIR}/gstreamer-1.0 \
-    -I${STAGING_INCDIR}/linux-msm \
+    -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel} \
     -I${STAGING_INCDIR}/ion_headers \
     -I${STAGING_INCDIR}/mm-core/ \
 "

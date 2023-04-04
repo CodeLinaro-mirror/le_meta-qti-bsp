@@ -14,4 +14,5 @@ RDEPENDS:${PN} += "\
     usbutils \
     util-linux \
     libgpiod-tools \
+    exfat-utils \
     "

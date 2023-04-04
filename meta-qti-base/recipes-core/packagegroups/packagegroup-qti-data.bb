@@ -12,8 +12,6 @@ ALLOW_EMPTY:${PN} = "1"
 
 RDEPENDS:${PN} += "\
     bridge-utils \
-    connman \
-    connman-client \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'setup-network', '', d)} \
     net-tools \
     ethtool \
@@ -28,6 +26,6 @@ RDEPENDS:${PN} += "\
     xinetd \
     tcp-wrappers \
     netkit-telnet \
-    proftpd \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', 'proftpd', d)} \
     openssh \
 "

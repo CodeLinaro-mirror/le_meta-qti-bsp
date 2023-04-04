@@ -5,7 +5,7 @@ LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=801f80980d171dd6425610833a22dbe6"
 
-DEPENDS += "display-devicetree"
+DEPENDS += "display-devicetree securemsmdlkm"
 
 SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/display-drivers/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/display-drivers;;usehead=1"
 
@@ -18,7 +18,10 @@ inherit qti-techpack
 TECHPACK_MODULE_OUT = "${WORKDIR}/display-drivers"
 TECHPACK_MODULES = "msm/msm_drm.ko"
 TECHPACK_MODULES:quin-gvm-gen4-2 = "msm-hyp/msm_hyp.ko msm-cfg/msm_cfg.ko"
+TECHPACK_MODULES:quin-gvm-lemans = "msm-hyp/msm_hyp.ko msm-cfg/msm_cfg.ko"
 TECHPACK_HEADERS = "1"
+HDCP_QSEECOM_PATCH = "${STAGING_INCDIR}/hdcp_qseecom"
+TECHPACK_MAKE_ARGS = "KBUILD_EXTRA_SYMBOLS=${HDCP_QSEECOM_PATCH}/Module.symvers"
 
 do_install:append:sa81x5(){
     install -m 0644 ${S}/config/display_augen3_load.conf -D ${D}${sysconfdir}/modules-load.d/display_load.conf

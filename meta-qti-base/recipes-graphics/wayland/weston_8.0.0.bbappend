@@ -3,7 +3,7 @@ DEPENDS += "display-hal-headers display-hal-linux display-noship-linux display-s
             ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.4', 'libion', '', d)} \
             libsync \
             ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'libuhab', '', d)} \
-            linux-msm-headers \
+            virtual/kernel-headers \
 "
 
 FILESEXTRAPATHS:append := " :${THISDIR}/weston/"
@@ -22,8 +22,8 @@ REQUIRED_DISTRO_FEATURES:remove = "opengl"
 TARGET_CFLAGS += "-I${STAGING_INCDIR}/libdrm"
 TARGET_CFLAGS += "-I${STAGING_INCDIR}/sdm"
 TARGET_CFLAGS += "-I${STAGING_INCDIR}/sdm/core"
-TARGET_CFLAGS += "-I${STAGING_INCDIR}/linux-msm"
-TARGET_CFLAGS += "-I${STAGING_INCDIR}/linux-msm/display"
+TARGET_CFLAGS += "-I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}"
+TARGET_CFLAGS += "-I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}/display"
 TARGET_CPPFLAGS += "-I${STAGING_INCDIR}/qcom/display"
 TARGET_CPPFLAGS += "-I${STAGING_INCDIR}/sdm"
 TARGET_CPPFLAGS += "-I${STAGING_INCDIR}/sdm/core"

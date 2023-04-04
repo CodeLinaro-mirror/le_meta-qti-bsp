@@ -9,7 +9,7 @@ DEPENDS += "\
     glib-2.0 \
     gstreamer1.0 \
     gstreamer1.0-plugins-base \
-    linux-msm-headers \
+    virtual/kernel-headers \
 "
 
 SRC_URI = "${PATH_TO_REPO}/gstreamer/gst-plugins-qti-oss/.git;protocol=${PROTO};destsuffix=gstreamer/gst-plugins-qti-oss;usehead=1"
@@ -23,8 +23,12 @@ CFLAGS += "\
     -I${STAGING_LIBDIR}/glib-2.0/include \
     -I${STAGING_INCDIR}/glib-2.0/glib \
     -I${STAGING_INCDIR}/gstreamer-1.0 \
-    -I${STAGING_INCDIR}/linux-msm \
+    -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel} \
     -I${STAGING_INCDIR}/ion_headers \
+"
+
+EXTRA_OEMESON += " \
+    ${@oe.utils.version_less_or_equal('${preferred-kernel}', '5.4', '', '-Dusedmaheap=true', d)} \
 "
 
 SOLIBS = ".so"
@@ -32,3 +36,4 @@ FILES_SOLIBSDEV = ""
 
 FILES:${PN} += "${libdir}/gstreamer-1.0/*.so"
 
+RDEPENDS:${PN} += "${@oe.utils.version_less_or_equal('${preferred-kernel}', '5.4', 'libion', 'libdmabufheap', d)}"
