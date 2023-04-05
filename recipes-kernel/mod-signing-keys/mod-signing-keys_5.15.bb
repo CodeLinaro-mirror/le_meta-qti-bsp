@@ -9,8 +9,7 @@ ${LICENSE};md5=8afb6abdac9a14cb18a0d6c9c151e9b4"
 PACKAGE_ARCH = "all"
 
 FILESEXTRAPATHS:prepend := "${KERNEL_PREBUILT_PATH}:"
-SRC_URI   =  "file://gki_kernel/"
-
+SRC_URI   =  "file://${KERNEL_TYPE}/"
 S = "${WORKDIR}"
 
 do_configure[noexec] = "1"
@@ -19,7 +18,7 @@ do_compile[noexec] = "1"
 do_install() {
     # Copy kernel certs
     install -d ${D}/kernel-certs
-    install -m 0644 ${S}/gki_kernel/common/certs/signing_key.pem ${D}/kernel-certs/
+    install -m 0644 ${S}/${KERNEL_TYPE}/certs/signing_key.pem ${D}/kernel-certs/
 }
 
 SYSROOT_DIRS += "/kernel-certs"
