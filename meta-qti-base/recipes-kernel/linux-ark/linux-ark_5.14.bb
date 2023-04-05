@@ -204,7 +204,7 @@ do_deploy () {
         --pagesize ${PAGE_SIZE} \
 	--base ${KERNEL_BASE} \
 	--ramdisk_offset 0x0 \
-        --cmdline "root=/dev/sda2 rw rootwait console=ttyMSM0,115200,n8 no_console_suspend=1 androidboot.hardware=qcom androidboot.console=ttyMSM0 lpm_levels.sleep_disabled=1 msm_rtb.filter=0x237 earlycon=qcom_geni,0x884000 fips=0 notests nokaslr ignore_loglevel" \
+        --cmdline "root=/dev/sde42 rw rootwait console=ttyMSM0,115200,n8 no_console_suspend=1 androidboot.hardware=qcom androidboot.console=ttyMSM0 lpm_levels.sleep_disabled=1 msm_rtb.filter=0x237 earlycon=qcom_geni,0xa8c000 fips=0 notests nokaslr ignore_loglevel" \
 	--output  ${DEPLOYDIR}/sa8775p-boot-5.14.img
     cp ${DEPLOYDIR}/sa8775p-boot-5.14.img ${DEPLOYDIR}/sa8775-boot.img
     else
