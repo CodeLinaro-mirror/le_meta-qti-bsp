@@ -4,7 +4,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5
 SECTION = "libs"
 PR = "r0"
 SRCREV = "${AUTOREV}"
-SRC_URI = "git://source.codeaurora.org/quic/la/platform/external/jsoncpp;protocol=git;branch=android-external.lnx.2.0-rel;destsuffix=${PN}-src-${PV} \
+SRC_URI = "git://git.codelinaro.org/clo/la/platform/external/jsoncpp;protocol=https;branch=caf_migration/android-external.lnx.2.0-rel;destsuffix=${PN}-src-${PV} \
         file://${PN}-src-${PV}/Makefile.am \
         file://${PN}-src-${PV}/configure.ac \
         file://${PN}-src-${PV}/jsoncpp.pc.in \
