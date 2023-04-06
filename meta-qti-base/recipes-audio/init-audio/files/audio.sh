@@ -27,6 +27,13 @@
 
 # demo app for early audio to measure boot kpi
 
+modprobe snd_event_dlkm
+modprobe q6_notifier_dlkm
+modprobe apr_dlkm
+modprobe q6_dlkm
+modprobe adsp_loader_dlkm
+modprobe stub_dlkm
+
 count=0
 while true
 do
@@ -71,6 +78,9 @@ do
         fi
     fi
 done
+
+modprobe platform_dlkm
+modprobe machine_dlkm
 
 while true
 do
