@@ -136,6 +136,7 @@ do_kernel_metadata:prepend() {
 }
 
 do_kernel_checkout[noexec] = "1"
+do_validate_branches[noexec] = "1"
 
 do_compile () {
     oe_runmake CC="${KERNEL_CC}" LD="${KERNEL_LD}" ${KERNEL_EXTRA_ARGS} $use_alternate_initrd
