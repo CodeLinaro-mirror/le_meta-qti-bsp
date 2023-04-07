@@ -31,7 +31,7 @@ do_merge_dtbs[cleandirs] = " \
 addtask do_merge_dtbs after do_image before do_makeboot
 
 MKBOOTUTIL = '${@oe.utils.conditional("PREFERRED_PROVIDER_mkbootimg-native", "mkbootimg-gki-native", "scripts/mkbootimg.py", "mkbootimg", d)}'
-BOOT_RAMDISK_IMG ?= "${@bb.utils.contains('MACHINE_FEATURES', 'early-ramdisk-init', 'early-ramdisk-image-${PRODUCT}.cpio', '/dev/null', d)}"
+BOOT_RAMDISK_IMG ?= "${@bb.utils.contains('MACHINE_FEATURES', 'early-ramdisk-init', 'early-ramdisk-image-${PRODUCT}.cpio.lz4', '/dev/null', d)}"
 
 python do_makeboot () {
     import subprocess
@@ -102,7 +102,7 @@ avb_sign_boot_image() {
         # For lv avb2.0, add hash for boot image, dtbo image and vendor-boot image.
         avbtool add_hash_footer  \
             --image ${img}  \
-            --partition_size 0x06000000  \
+            --partition_size 0x04000000  \
             --partition_name boot \
             --algorithm SHA256_RSA4096 \
             --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/testkey_rsa4096.pem \
