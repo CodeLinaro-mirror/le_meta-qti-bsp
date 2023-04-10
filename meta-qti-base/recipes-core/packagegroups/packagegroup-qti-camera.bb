@@ -12,5 +12,6 @@ PACKAGES = "\
 ALLOW_EMPTY:${PN} = "1"
 
 RDEPENDS:${PN} += "\
-    ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "5.15", "cameradlkm", "", d)} \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', \
+        bb.utils.contains('PREFERRED_VERSION_${PREFERRED_PROVIDER_virtual/kernel}', '5.15', 'cameradlkm', '', d), d)} \
     "
