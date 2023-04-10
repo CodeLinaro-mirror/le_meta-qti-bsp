@@ -6,6 +6,8 @@ DEPENDS += "releasetools-native zip-native fsconfig-native applypatch-native bc-
 
 RM_WORK_EXCLUDE_ITEMS += "rootfs rootfs-dbg"
 
+RECOVERY_IMAGE_ROOTFS = "$(echo ${IMAGE_ROOTFS} | sed 's#/${PN}/#/qti-recovery-image/#')"
+
 IMAGE_SYSTEM_MOUNT_POINT = "/"
 
 OTA_TARGET_IMAGE_ROOTFS_EXT4 = "${WORKDIR}/ota-target-image-ext4"
@@ -100,7 +102,7 @@ do_recovery_ext4() {
     echo blocksize=131072 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 
     # boot_size: Size of boot partition from partition.xml
-    echo boot_size=0x011DC000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
+    echo boot_size=0x04600000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 
     # recovery_size : Size of recovery partition from partition.xml
     echo recovery_size=0x011DC000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
