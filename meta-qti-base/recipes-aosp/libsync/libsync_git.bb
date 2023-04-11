@@ -11,6 +11,7 @@ DEPENDS += "glib-2.0 liblog"
 SRC_URI = "\
     git://git.codelinaro.org/clo/la/platform/system/core;protocol=https;branch=android-framework.lnx.3.1.r8-rel;subpath=libsync; \
     file://0001-Build-libsync-with-autotool.patch \
+    file://0001-Libsync-fix-freed-issue.patch \
 "
 SRCREV = "8fbe56b11ee7c1f8c87e9b71d89caa306c6cdebb"
 
