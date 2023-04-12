@@ -1,12 +1,12 @@
 #package libs from correct libdir after adding mulitilib support.
 
-SOURCE_IVIEXT_PATCHES = "https://source.codeaurora.org/quic/le/AGL/meta-agl-demo/plain/recipes-graphics/wayland/wayland-ivi-extension/"
+SOURCE_IVIEXT_PATCHES = "https://git.codelinaro.org/clo/le/AGL/meta-agl-demo/-/raw/0535df2c32dc562bd5f7704a599b982bc9e102df/recipes-graphics/wayland/wayland-ivi-extension/"
 SRC_URI = "git://github.com/GENIVI/${PN}.git;protocol=https \
           "
 SRCREV = "44598504503eea5ac7f94c88477a5a78bda01f30"
 
 SRC_URI_append = "\
-    ${SOURCE_IVIEXT_PATCHES}/0001-wayland-ivi-extension-patch-for-wl-shell-emulator.patch?h=automotivelinux/chinook;downloadfilename=0001-wayland-ivi-extension-patch-for-wl-shell-emulator.patch;md5sum=a5752111a6f0737ab37d7b23dbd674b9 \
+    ${SOURCE_IVIEXT_PATCHES}/0001-wayland-ivi-extension-patch-for-wl-shell-emulator.patch;downloadfilename=0001-wayland-ivi-extension-patch-for-wl-shell-emulator.patch;md5sum=a5752111a6f0737ab37d7b23dbd674b9 \
     "
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"

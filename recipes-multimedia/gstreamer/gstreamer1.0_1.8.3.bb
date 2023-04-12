@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=6762ed442b3822387a51c92d928ead0d \
 
 FILESPATH =+ "${WORKSPACE}/gstreamer:"
 SRC_URI = "file://gstreamer"
-SRC_URI += "${CAF_GIT}/gstreamer/common;protocol=https;destsuffix=gstreamer/common;branch=gstreamer/common/master;name=common"
+SRC_URI += "${CLO_LE_GIT}/gstreamer/common;protocol=${CLO_PROTOCOL};destsuffix=gstreamer/common;nobranch=1;name=common"
 SRC_URI_remove = " \
     file://0001-introspection.m4-prefix-pkgconfig-paths-with-PKG_CON.patch \
 "

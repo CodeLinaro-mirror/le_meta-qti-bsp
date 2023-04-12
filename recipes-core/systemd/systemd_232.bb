@@ -9,36 +9,106 @@ DEPENDS = "kmod intltool-native gperf-native acl readline libcap libcgroup util-
 SECTION = "base/shell"
 
 inherit useradd pkgconfig autotools perlnative update-rc.d update-alternatives qemu systemd ptest gettext bash-completion
+SOURCE_SYSTEMD_PATCHES = "https://git.codelinaro.org/clo/ype/external/yoctoproject.org/poky/-/raw/b7e7b5e294f944c27fb1d2be61c0cf38f6c81ba8/meta/recipes-core/systemd/systemd/"
 
-SOURCE_SYSTEMD_PATCHES = "https://source.codeaurora.org/quic/ype/external/yoctoproject.org/poky/plain/meta/recipes-core/systemd/systemd/"
+SRC_URI_append += "${SOURCE_SYSTEMD_PATCHES}touchscreen.rules;downloadfilename=touchscreen.rules;name=touchscreen"
+SRC_URI[touchscreen.md5sum] = "c4f9091e52415d87947975b6b659fac7"
+SRC_URI[touchscreen.sha256sum] = "e85f922aa4636aae146c426cec72b66fc3511283b0e90d176bd5400f568bb3a4"
 
-SRC_URI += " \
-           ${SOURCE_SYSTEMD_PATCHES}/touchscreen.rules?h=yocto/pyro;downloadfilename=touchscreen.rules;md5sum=c4f9091e52415d87947975b6b659fac7 \
-           ${SOURCE_SYSTEMD_PATCHES}/00-create-volatile.conf?h=yocto/pyro;downloadfilename=00-create-volatile.conf;md5sum=c7b13af0e99a8a07bc7fb261d3839dcb \
-           ${SOURCE_SYSTEMD_PATCHES}/init?h=yocto/pyro;downloadfilename=init;md5sum=93e9a1eca70811c731fdcb34c82800b7 \
-           ${SOURCE_SYSTEMD_PATCHES}/run-ptest?h=yocto/pyro;downloadfilename=run-ptest;md5sum=8c94b5e6cfd634725213e8ebdd9de64d \
-           ${SOURCE_SYSTEMD_PATCHES}/0002-units-Prefer-getty-to-agetty-in-console-setup-system.patch?h=yocto/pyro;downloadfilename=0002-units-Prefer-getty-to-agetty-in-console-setup-system.patch;md5sum=5e915f1b0a98317ac4a865816a8c8672 \
-           ${SOURCE_SYSTEMD_PATCHES}/0003-define-exp10-if-missing.patch?h=yocto/pyro;downloadfilename=0003-define-exp10-if-missing.patch;md5sum=c5c712980912f47726440c97ee69b9af \
-           ${SOURCE_SYSTEMD_PATCHES}/0004-Use-getenv-when-secure-versions-are-not-available.patch?h=yocto/pyro;downloadfilename=0004-Use-getenv-when-secure-versions-are-not-available.patch;md5sum=ccae80fcbff696b58b39e46ef622256c \
-           ${SOURCE_SYSTEMD_PATCHES}/0005-binfmt-Don-t-install-dependency-links-at-install-tim.patch?h=yocto/pyro;downloadfilename=0005-binfmt-Don-t-install-dependency-links-at-install-tim.patch;md5sum=78ab57a5e746495c004112fd1bec7322 \
-           ${SOURCE_SYSTEMD_PATCHES}/0006-configure-Check-for-additional-features-that-uclibc-.patch?h=yocto/pyro;downloadfilename=0006-configure-Check-for-additional-features-that-uclibc-.patch;md5sum=70a624b40f8c79d1214e7eac35c8c3c9 \
-           ${SOURCE_SYSTEMD_PATCHES}/0007-use-lnr-wrapper-instead-of-looking-for-relative-opti.patch?h=yocto/pyro;downloadfilename=0007-use-lnr-wrapper-instead-of-looking-for-relative-opti.patch;md5sum=7f22617486e7e49323fd085f20a3b7b9 \
-           ${SOURCE_SYSTEMD_PATCHES}/0008-nspawn-Use-execvpe-only-when-libc-supports-it.patch?h=yocto/pyro;downloadfilename=0008-nspawn-Use-execvpe-only-when-libc-supports-it.patch;md5sum=68325a5e73052b1f65107b00d801aff5 \
-           ${SOURCE_SYSTEMD_PATCHES}/0009-util-bypass-unimplemented-_SC_PHYS_PAGES-system-conf.patch?h=yocto/pyro;downloadfilename=0009-util-bypass-unimplemented-_SC_PHYS_PAGES-system-conf.patch;md5sum=fa3692177004531c1ebb3c4ef0b15b5a \
-           ${SOURCE_SYSTEMD_PATCHES}/0010-implment-systemd-sysv-install-for-OE.patch?h=yocto/pyro;downloadfilename=0010-implment-systemd-sysv-install-for-OE.patch;md5sum=4b6717eb6aeb9f3fe8186deb0e41470b \
-           ${SOURCE_SYSTEMD_PATCHES}/0011-nss-mymachines-Build-conditionally-when-HAVE_MYHOSTN.patch?h=yocto/pyro;downloadfilename=0011-nss-mymachines-Build-conditionally-when-HAVE_MYHOSTN.patch;md5sum=7a15cfc395770fbf59fa43194a559850 \
-           ${SOURCE_SYSTEMD_PATCHES}/0012-rules-whitelist-hd-devices.patch?h=yocto/pyro;downloadfilename=0012-rules-whitelist-hd-devices.patch;md5sum=9bf93ad3f0224c84595ecf94ab1f3364 \
-           ${SOURCE_SYSTEMD_PATCHES}/0013-Make-root-s-home-directory-configurable.patch?h=yocto/pyro;downloadfilename=0013-Make-root-s-home-directory-configurable.patch;md5sum=a3f2e8d0de013060815a62c286fc1118 \
-           ${SOURCE_SYSTEMD_PATCHES}/0014-Revert-rules-remove-firmware-loading-rules.patch?h=yocto/pyro;downloadfilename=0014-Revert-rules-remove-firmware-loading-rules.patch;md5sum=f8dc87f8904d8c16704114b10f1d8904 \
-           ${SOURCE_SYSTEMD_PATCHES}/0015-Revert-udev-remove-userspace-firmware-loading-suppor.patch?h=yocto/pyro;downloadfilename=0015-Revert-udev-remove-userspace-firmware-loading-suppor.patch;md5sum=71621696b34e1cc63ab0f3aee20727c3 \
-           ${SOURCE_SYSTEMD_PATCHES}/0016-make-test-dir-configurable.patch?h=yocto/pyro;downloadfilename=0016-make-test-dir-configurable.patch;md5sum=cb042f2f01f0512a791c0f4e57b4ee7f \
-           ${SOURCE_SYSTEMD_PATCHES}/0017-remove-duplicate-include-uchar.h.patch?h=yocto/pyro;downloadfilename=0017-remove-duplicate-include-uchar.h.patch;md5sum=875cee9573dec01e7b901c0d923f6135 \
-           ${SOURCE_SYSTEMD_PATCHES}/0018-check-for-uchar.h-in-configure.patch?h=yocto/pyro;downloadfilename=0018-check-for-uchar.h-in-configure.patch;md5sum=b77090b6ebfc4a61fb7ee590fbf69fd7 \
-           ${SOURCE_SYSTEMD_PATCHES}/0019-socket-util-don-t-fail-if-libc-doesn-t-support-IDN.patch?h=yocto/pyro;downloadfilename=0019-socket-util-don-t-fail-if-libc-doesn-t-support-IDN.patch;md5sum=cb10493c7d0dc12f4804954e4437a4c0 \
-           ${SOURCE_SYSTEMD_PATCHES}/0020-back-port-233-don-t-use-the-unified-hierarchy-for-the-systemd.patch?h=yocto/pyro;downloadfilename=0020-back-port-233-don-t-use-the-unified-hierarchy-for-the-systemd.patch;md5sum=2ded3d8934d3f0498eee21e351db9625 \
-           ${SOURCE_SYSTEMD_PATCHES}/0001-core-load-fragment-refuse-units-with-errors-in-certa.patch?h=yocto/pyro;downloadfilename=0001-core-load-fragment-refuse-units-with-errors-in-certa.patch;md5sum=0368ab50ecc1f1749f6665cee59427bc \
-           "
-SRC_URI_append_qemuall = " ${SOURCE_SYSTEMD_PATCHES}/0001-core-device.c-Change-the-default-device-timeout-to-2.patch?h=yocto/pyro;downloadfilename=0001-core-device.c-Change-the-default-device-timeout-to-2.patch;md5sum=e01761b342499b017ccbe936ba28d0a1 "
+SRC_URI_append += "${SOURCE_SYSTEMD_PATCHES}/00-create-volatile.conf;downloadfilename=00-create-volatile.conf;name=cv-c"
+SRC_URI[cv-c.md5sum] = "c7b13af0e99a8a07bc7fb261d3839dcb"
+SRC_URI[cv-c.sha256sum] = "f40abf4b7ee1b0d09b62cdcb360b77aaf0e1f2da3dbc2324f579decc9984dfe5"
+
+SRC_URI_append += "${SOURCE_SYSTEMD_PATCHES}/init;downloadfilename=init;name=init"
+SRC_URI[init.md5sum] = "93e9a1eca70811c731fdcb34c82800b7"
+SRC_URI[init.sha256sum] = "bfa59349069020d05d9c344a6f871e4e2e1b1a4e1aeeb5886c7f7e5d2dbbb841"
+
+SRC_URI_append += "${SOURCE_SYSTEMD_PATCHES}/run-ptest;downloadfilename=run-ptest;name=rp"
+SRC_URI[rp.md5sum] = "8c94b5e6cfd634725213e8ebdd9de64d"
+SRC_URI[rp.sha256sum] = "5093b11e9ad55047c0b6ac00e32c0634586643d19560503026eabc7387fa3276"
+
+SRC_URI_append += "${SOURCE_SYSTEMD_PATCHES}/0002-units-Prefer-getty-to-agetty-in-console-setup-system.patch;downloadfilename=0002-units-Prefer-getty-to-agetty-in-console-setup-system.patch;name=upga-p"
+SRC_URI[upga-p.md5sum] = "5e915f1b0a98317ac4a865816a8c8672"
+SRC_URI[upga-p.sha256sum] = "afe9a65ff940a4be038152f4e187b8b93686406ff90237642c73aa6ff18343c6"
+
+SRC_URI_append += "${SOURCE_SYSTEMD_PATCHES}/0003-define-exp10-if-missing.patch;downloadfilename=0003-define-exp10-if-missing.patch;name=deim-p"
+SRC_URI[deim-p.md5sum] = "c5c712980912f47726440c97ee69b9af"
+SRC_URI[deim-p.sha256sum] = "bf10de90a5a6441f9a5cedbfed6c2a8cc67adff34bc2aabb99b905f912b18c0a"
+
+SRC_URI_append += "${SOURCE_SYSTEMD_PATCHES}/0004-Use-getenv-when-secure-versions-are-not-available.patch;downloadfilename=0004-Use-getenv-when-secure-versions-are-not-available.patch;name=ugws-p"
+SRC_URI[ugws-p.md5sum] = "ccae80fcbff696b58b39e46ef622256c"
+SRC_URI[ugws-p.sha256sum] = "a5fe8ab77ed707cb2fe1c5755f5605ec8d9b44a7b5821aef67b006f7c037f89b"
+
+
+SRC_URI_append += "${SOURCE_SYSTEMD_PATCHES}/0005-binfmt-Don-t-install-dependency-links-at-install-tim.patch;downloadfilename=0005-binfmt-Don-t-install-dependency-links-at-install-tim.patch;name=didl-p"
+SRC_URI[didl-p.md5sum] = "78ab57a5e746495c004112fd1bec7322"
+SRC_URI[didl-p.sha256sum] = "72cbc3478c76e0888beeb196cbcb3570aae2aa39a3173c18fe16d60c509eeca8"
+
+SRC_URI_append += "${SOURCE_SYSTEMD_PATCHES}/0006-configure-Check-for-additional-features-that-uclibc-.patch;downloadfilename=0006-configure-Check-for-additional-features-that-uclibc-.patch;name=ccfa-p"
+SRC_URI[ccfa-p.md5sum] = "70a624b40f8c79d1214e7eac35c8c3c9"
+SRC_URI[ccfa-p.sha256sum] = "5bfc58b48bac34a44de9348905d5b49b41b561618dd38d82420f1a622e5094bc"
+
+SRC_URI_append += "${SOURCE_SYSTEMD_PATCHES}/0007-use-lnr-wrapper-instead-of-looking-for-relative-opti.patch;downloadfilename=0007-use-lnr-wrapper-instead-of-looking-for-relative-opti.patch;name=0007-p"
+SRC_URI[0007-p.md5sum] = "7f22617486e7e49323fd085f20a3b7b9"
+SRC_URI[0007-p.sha256sum] = "f4b81ad3caa17c59dcb25c7686d55f09862ada64376a8641342c2260bd76b6ce"
+
+SRC_URI_append += "${SOURCE_SYSTEMD_PATCHES}/0008-nspawn-Use-execvpe-only-when-libc-supports-it.patch;downloadfilename=0008-nspawn-Use-execvpe-only-when-libc-supports-it.patch;name=0008-p"
+SRC_URI[0008-p.md5sum] = "68325a5e73052b1f65107b00d801aff5"
+SRC_URI[0008-p.sha256sum] = "f8651b7838cc07e54723d4690522686f4dd61334346fee649004b0b158e90952"
+
+SRC_URI_append += "${SOURCE_SYSTEMD_PATCHES}/0009-util-bypass-unimplemented-_SC_PHYS_PAGES-system-conf.patch;downloadfilename=0009-util-bypass-unimplemented-_SC_PHYS_PAGES-system-conf.patch;name=0009-p"
+SRC_URI[0009-p.md5sum] = "fa3692177004531c1ebb3c4ef0b15b5a"
+SRC_URI[0009-p.sha256sum] = "2d3a1ea4e23d78c0724a0de5506700134a11350ec5da29cea82182e0f8dc4bb4"
+
+SRC_URI_append += "${SOURCE_SYSTEMD_PATCHES}/0010-implment-systemd-sysv-install-for-OE.patch;downloadfilename=0010-implment-systemd-sysv-install-for-OE.patch;name=0010-p"
+SRC_URI[0010-p.md5sum] = "4b6717eb6aeb9f3fe8186deb0e41470b"
+SRC_URI[0010-p.sha256sum] = "879cba9fbdc43725dfe64a03a429c9d20f2c753c0e4f97d9650ad312021e19b8"
+
+SRC_URI_append += "${SOURCE_SYSTEMD_PATCHES}/0011-nss-mymachines-Build-conditionally-when-HAVE_MYHOSTN.patch;downloadfilename=0011-nss-mymachines-Build-conditionally-when-HAVE_MYHOSTN.patch.patch;name=0011-p"
+SRC_URI[0011-p.md5sum] = "7a15cfc395770fbf59fa43194a559850"
+SRC_URI[0011-p.sha256sum] = "4f136d1de322b480a317d8469575badb4500d043428b587c1be3ad28777a0d1b"
+
+SRC_URI_append += "${SOURCE_SYSTEMD_PATCHES}/0012-rules-whitelist-hd-devices.patch;downloadfilename=0012-rules-whitelist-hd-devices.patch;name=0012-p"
+SRC_URI[0012-p.md5sum] = "9bf93ad3f0224c84595ecf94ab1f3364"
+SRC_URI[0012-p.sha256sum] = "093901adf34cb41a543efed127a0f5e04957f4b95698c89274dfea1a098049b8"
+
+SRC_URI_append += "${SOURCE_SYSTEMD_PATCHES}/0013-Make-root-s-home-directory-configurable.patch;downloadfilename=0013-Make-root-s-home-directory-configurable.patch;name=0013-p"
+SRC_URI[0013-p.md5sum] = "a3f2e8d0de013060815a62c286fc1118"
+SRC_URI[0013-p.sha256sum] = "edb7e155b30891a22382eb42bde4011b574e4c6eb5c8355e15587344a66b9e2c"
+
+SRC_URI_append += "${SOURCE_SYSTEMD_PATCHES}/0014-Revert-rules-remove-firmware-loading-rules.patch;downloadfilename=0014-Revert-rules-remove-firmware-loading-rules.patch;name=0014-p"
+SRC_URI[0014-p.md5sum] = "f8dc87f8904d8c16704114b10f1d8904"
+SRC_URI[0014-p.sha256sum] = "0c3b83d5ecd720058ec426986da581c4cf31eb8a193aaa3804581c3a4dbd9cb0"
+
+SRC_URI_append += "${SOURCE_SYSTEMD_PATCHES}/0015-Revert-udev-remove-userspace-firmware-loading-suppor.patch;downloadfilename=0015-Revert-udev-remove-userspace-firmware-loading-suppor.patch;name=0015-p"
+SRC_URI[0015-p.md5sum] = "71621696b34e1cc63ab0f3aee20727c3"
+SRC_URI[0015-p.sha256sum] = "7681f004f2ce744bc15af1618c122e0c71b440df3900238f6680b4ffec630716"
+
+SRC_URI_append += "${SOURCE_SYSTEMD_PATCHES}/0016-make-test-dir-configurable.patch;downloadfilename=0016-make-test-dir-configurable.patch;name=0016-p"
+SRC_URI[0016-p.md5sum] = "cb042f2f01f0512a791c0f4e57b4ee7f"
+SRC_URI[0016-p.sha256sum] = "0d719c048a35b112bc960810c44daa971893855f27078a344153c1a34c656214"
+
+SRC_URI_append += "${SOURCE_SYSTEMD_PATCHES}/0017-remove-duplicate-include-uchar.h.patch;downloadfilename=0017-remove-duplicate-include-uchar.h.patch;name=0017-p"
+SRC_URI[0017-p.md5sum] = "875cee9573dec01e7b901c0d923f6135"
+SRC_URI[0017-p.sha256sum] = "2101e7378f4724590814a9bbd451548b9197529617a9b3ec08fb549bd1e3259d"
+
+SRC_URI_append += "${SOURCE_SYSTEMD_PATCHES}/0018-check-for-uchar.h-in-configure.patch;downloadfilename=0018-check-for-uchar.h-in-configure.patch;name=0018-p"
+SRC_URI[0018-p.md5sum] = "b77090b6ebfc4a61fb7ee590fbf69fd7"
+SRC_URI[0018-p.sha256sum] = "2e5243ac0588de31805614e7b16de36f99fb973016e0b2bea8ea4abc123e78bc"
+
+SRC_URI_append += "${SOURCE_SYSTEMD_PATCHES}/0019-socket-util-don-t-fail-if-libc-doesn-t-support-IDN.patch;downloadfilename=0019-socket-util-don-t-fail-if-libc-doesn-t-support-IDN.patch;name=0019-p"
+SRC_URI[0019-p.md5sum] = "cb10493c7d0dc12f4804954e4437a4c0"
+SRC_URI[0019-p.sha256sum] = "ed2e431a6dd8e171fe69f5678b4a31764f2dd5e6e8957a763ac343fc5e8553bb"
+
+SRC_URI_append += "${SOURCE_SYSTEMD_PATCHES}/0020-back-port-233-don-t-use-the-unified-hierarchy-for-the-systemd.patch;downloadfilename=0020-back-port-233-don-t-use-the-unified-hierarchy-for-the-systemd.patch;name=0020-p"
+SRC_URI[0020-p.md5sum] = "2ded3d8934d3f0498eee21e351db9625"
+SRC_URI[0020-p.sha256sum] = "7a3942baeabc7c1a207554e70ee67f8b769e3fe604a02591bd56d8b3afd40441"
+
+SRC_URI_append += "${SOURCE_SYSTEMD_PATCHES}/0001-core-load-fragment-refuse-units-with-errors-in-certa.patch;downloadfilename=0001-core-load-fragment-refuse-units-with-errors-in-certa.patch;name=0001-p"
+SRC_URI[0001-p.md5sum] = "0368ab50ecc1f1749f6665cee59427bc"
+SRC_URI[0001-p.sha256sum] = "d0e298826c82f289db468c575f29ca4a66a28068e8ca1f7cff42d1efa2d951dd"
+
+SRC_URI_append_qemuall = "${SOURCE_SYSTEMD_PATCHES}/0001-core-device.c-Change-the-default-device-timeout-to-2.patch;downloadfilename=0001-core-device.c-Change-the-default-device-timeout-to-2.patch;name=0cdc-p"
 
 PACKAGECONFIG ??= "xz \
                    ldconfig \

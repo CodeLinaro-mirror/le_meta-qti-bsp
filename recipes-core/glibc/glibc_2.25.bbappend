@@ -1,2 +1,2 @@
-GLIBC_GIT_URI = "git://source.codeaurora.org/quic/le/glibc;protocol=https"
+GLIBC_GIT_URI = "${CLO_LE_GIT}/glibc;protocol=${CLO_PROTOCOL}"
 SRCBRANCH = "drains/release/${PV}/master"
