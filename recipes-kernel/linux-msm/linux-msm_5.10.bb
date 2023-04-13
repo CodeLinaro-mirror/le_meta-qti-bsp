@@ -3,16 +3,12 @@ inherit kernel
 DESCRIPTION = "CAF Linux Kernel"
 LICENSE = "GPLv2.0-with-linux-syscall-note"
 
-COMPATIBLE_MACHINE = "sxrneo|cinder"
+COMPATIBLE_MACHINE = "sxrneo|cinder|sm8450p"
 
 FILESEXTRAPATHS:prepend := "${WORKSPACE}:"
 
-SRC_URI   =  "file://kernel-5.10/kernel_platform/msm-kernel \
-              ${@oe.utils.conditional('KERNEL_USE_PREBUILTS', 'True', '', 'file://kernel-5.10/kernel_platform/msm-kernel/arch/${ARCH}/configs/vendor/neo.config',d)} \
-              ${@oe.utils.conditional('KERNEL_USE_PREBUILTS', 'True', '', 'file://kernel-5.10/kernel_platform/msm-kernel/arch/${ARCH}/configs/vendor/waipio_tuivm_debug.config',d)} \
+SRC_URI   =  "file://kernel-5.10/kernel_platform \
              "
-SRC_URI:append:cinder  =  "${@oe.utils.conditional('KERNEL_USE_PREBUILTS', 'True', '', 'file://kernel-5.10/kernel_platform/msm-kernel/arch/${ARCH}/configs/vendor/cinder_debug.config',d)}"
-
 S = "${WORKDIR}/kernel-5.10/kernel_platform/msm-kernel"
 PR = "r0"
 
@@ -105,6 +101,17 @@ do_prebuilt_configure() {
     install -m 0644 ../msm-kernel/certs/verity_cert.pem ${B}/certs/verity_cert.pem
     install -m 0644 ../msm-kernel/certs/verity_key.pem ${B}/certs/verity_key.pem
 
+    # Copy build scripts and config fragments
+    install -d ${B}/build
+    install -d ${B}/common
+    install -m 0755 ${WORKDIR}/kernel-5.10/kernel_platform/build/build_module.sh ${B}/build
+    install -m 0755 ${WORKDIR}/kernel-5.10/kernel_platform/build/_setup_env.sh ${B}/build
+    install -m 0644 ${WORKDIR}/kernel-5.10/kernel_platform/msm-kernel/${KERNEL_CONFIG} ${B}
+    install -m 0644 ${WORKDIR}/kernel-5.10/kernel_platform/msm-kernel/build.config.msm.common ${B}
+    install -m 0644 ${WORKDIR}/kernel-5.10/kernel_platform/msm-kernel/build.config.sxr.common ${B}
+    install -m 0644 ${WORKDIR}/kernel-5.10/kernel_platform/common/build.config.common ${B}/common
+    install -m 0644 ${WORKDIR}/kernel-5.10/kernel_platform/common/build.config.aarch64 ${B}/common
+
     # update paths of signature checking certificates to reflect current host
     sed -i -e '/CONFIG_MODULE_SIG_KEY[ =]/d' ${B}/.config
     echo "CONFIG_MODULE_SIG_KEY="\"${STAGING_DIR_TARGET}/kernel-certs/signing_key.pem\" >> ${B}/.config
@@ -144,12 +151,22 @@ do_prebuilt_shared_workdir() {
     install -m 0644 System.map $kerneldir/System.map-${KERNEL_VERSION}
     [ -e Module.symvers ] && install -m 0644 Module.symvers $kerneldir/
     install -m 0644 .config $kerneldir/
+    install -m 0644 ${KERNEL_CONFIG} $kerneldir/
+    install -m 0644 build.config.msm.common $kerneldir/
+    install -m 0644 build.config.sxr.common $kerneldir/
+    mkdir -p $kerneldir/common
+    install -m 0644 common/build.config.common $kerneldir/common/
+    install -m 0644 common/build.config.aarch64 $kerneldir/common/
     mkdir -p $kerneldir/include/config
-    mkdir -p $kerneldir/scripts
     install -m 0644 include/config/kernel.release $kerneldir/include/config/kernel.release
+    mkdir -p $kerneldir/scripts
     if [ -e "${B}/scripts/module.lds" ]; then
         install -m 0644 ${B}/scripts/module.lds ${STAGING_KERNEL_BUILDDIR}/scripts/module.lds
     fi
+    #Install build scripts
+    mkdir -p $kerneldir/build
+    install -m 0755 ${B}/build/build_module.sh $kerneldir/build
+    install -m 0755 ${B}/build/_setup_env.sh $kerneldir/build
 }
 
 do_prebuilt_install[dirs] = "${B}"

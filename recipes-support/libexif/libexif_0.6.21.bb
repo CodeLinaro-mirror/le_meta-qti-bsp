@@ -4,7 +4,7 @@ HOMEPAGE = "http://sourceforge.net/projects/libexif"
 BUGTRACKER = "http://sourceforge.net/tracker/?group_id=12272&atid=112272"
 LICENSE = "LGPL-2.1-only"
 PRIORITY = "optional"
-LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/LGPL-2.1;md5=1a6d268fd218675ffea8be556788b780"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/LGPL-2.1-only;md5=1a6d268fd218675ffea8be556788b780"
 FILES:${PN} += "/lib/*"
 
 SRC_URI = "\

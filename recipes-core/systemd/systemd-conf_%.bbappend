@@ -7,7 +7,7 @@ SRC_URI += "file://limits-coredump.conf"
 
 # Don't install coredump.conf for user builds.
 COREDUMP = "1"
-COREDUMP_qti-distro-user = ""
+COREDUMP:qti-distro-user = ""
 no_logs_to_console = "${@d.getVar('NO_SYS_JOURNAL_LOGS_TO_CONSOLE')}"
 
 SYSTEMD_COREDUMP_PATH ?= "${userfsdatadir}/coredump"
@@ -45,8 +45,8 @@ do_install:append() {
 
 # logind.conf
 do_install:append() {
-    # Ignore PowerKey
-    sed -i '$aHandlePowerKey=ignore' ${D}${systemd_unitdir}/logind.conf.d/00-${PN}.conf
+    # Poweroff upon PowerKey press
+    sed -i '$aHandlePowerKey=poweroff' ${D}${systemd_unitdir}/logind.conf.d/00-${PN}.conf
 }
 
 # system.conf

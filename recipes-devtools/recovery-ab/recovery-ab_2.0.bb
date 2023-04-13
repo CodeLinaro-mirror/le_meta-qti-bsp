@@ -20,7 +20,7 @@ SRC_URI += "file://fstab_AB"
 SRC_URI += "file://fstab_AB_cache_ext4"
 SRC_URI += "file://update_engine.service"
 
-S = "${WORKDIR}/OTA/recovery/"
+S = "${WORKDIR}/OTA/recovery"
 
 EXTRA_OECONF = "--with-glib --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include \
                 --with-core-headers=${STAGING_INCDIR}"
