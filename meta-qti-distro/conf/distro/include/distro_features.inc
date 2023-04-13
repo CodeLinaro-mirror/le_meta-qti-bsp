@@ -6,11 +6,11 @@ DISTRO_FEATURES:append:sa6155 = " qti-carcamsrc qti-omx"
 DISTRO_FEATURES:append:sa81x5-rt = " qti-carcamsrc qti-omx"
 DISTRO_FEATURES:append:sa81x5 = " qti-carcamsrc qti-fastcv qti-omx"
 DISTRO_FEATURES:append:sa8295 = " qti-codec2"
-DISTRO_FEATURES:append:lemans = " qti-codec2"
+DISTRO_FEATURES:append:lemans = " qti-codec2 qti-gstdeinterlace"
 DISTRO_FEATURES:append:qtiquingvm = " qti-omx qti-gstqeavb"
 DISTRO_FEATURES:append:qtiquingvm8295 = " qti-codec2 qti-gstqeavb qti-gstdeinterlace qti-fastcv"
 DISTRO_FEATURES:append:quin-gvm-gen4 = " qti-codec2 qti-gstqeavb qti-gstdeinterlace qti-fadas qti-fastcv"
-DISTRO_FEATURES:append:quin-gvm-gen4-2 = " qti-codec2 qti-gstdeinterlace qti-gstqeavb"
+DISTRO_FEATURES:append:quin-gvm-gen4-2 = " qti-codec2 qti-gstdeinterlace qti-gstqeavb qti-gstqvrate"
 DISTRO_FEATURES:append:quin-gvm-lemans = " qti-codec2 qti-gstdeinterlace"
 
 # Display
@@ -43,12 +43,5 @@ DISTRO_FEATURES:append = " qti-wlan wifi"
 # BT
 DISTRO_FEATURES:append:quin-gvm-gen4 = " qti-bluetooth"
 DISTRO_FEATURES:append:quin-gvm-gen4-2 = " qti-bluetooth"
+DISTRO_FEATURES:append:quin-gvm-lemans = " qti-bluetooth"
 
-# Support kdump
-#DISTRO_FEATURES:append = " kdump-support"
-
-# Enable FDE
-DISTRO_FEATURES:append:qtiquingvm = " qti-fde"
-DISTRO_FEATURES:append:qtiquingvm8295 = " qti-fde"
-DISTRO_FEATURES:append:quin-gvm-gen4 = " qti-fde"
-DISTRO_FEATURES:append:quin-gvm-gen4-2 = " qti-fde"

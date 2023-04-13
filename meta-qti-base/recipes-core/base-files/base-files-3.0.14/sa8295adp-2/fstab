@@ -16,19 +16,13 @@ tmpfs                /media/ram      tmpfs     defaults,noauto       0  0
 # mounting /tmp as a tmpfs is some usual implementation.
 tmpfs                /tmp            tmpfs     defaults              0  0
 
-/dev/vdc             /persist            auto      defaults,nofail       0  2
-/dev/vdb             /data           auto      defaults,nofail       0  2
-/dev/vdg             /dsp            auto      defaults,nofail       0  2
-/dev/vde             /firmware       auto      defaults,nofail       0  2
-/dev/vdd             /bluetooth      auto      defaults,ro           0  0
-/dev/vdl             /persist/dha    ext4      defaults,nofail       0  0
-
 # Bind /home to /data
 /data                /home                auto       defaults,bind         0  0
 
 # uncomment this if your device has a SD/MMC/Transflash slot
 /dev/mmcblk0p1       /media/card          auto       defaults,sync,noauto  0  0
 
-
+#Automatically mount binder drivers
+binder               /dev/binderfs        binder     auto,exec,dev,nofail  0  0
 
 

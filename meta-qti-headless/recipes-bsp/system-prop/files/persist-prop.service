@@ -4,6 +4,8 @@ After=leprop.service
 Requires=leprop.service
 
 [Service]
+User=leprop
+Group=leprop
 ExecStart=/sbin/persist-prop.sh
 Type=oneshot
 

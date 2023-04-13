@@ -26,3 +26,7 @@ do_install:append() {
     install -d ${D}${includedir}/kernel-headers/linux
     install -m 0644 ${S}/kernel-headers/linux/*.h  ${D}${includedir}/kernel-headers/linux
 }
+
+PACKAGES += "${PN}-test"
+
+FILES:${PN}-test = "/bin/iontest"

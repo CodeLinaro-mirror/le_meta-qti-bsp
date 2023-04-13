@@ -136,6 +136,7 @@ do_kernel_metadata:prepend() {
 }
 
 do_kernel_checkout[noexec] = "1"
+do_validate_branches[noexec] = "1"
 
 do_compile () {
     oe_runmake CC="${KERNEL_CC}" LD="${KERNEL_LD}" ${KERNEL_EXTRA_ARGS} $use_alternate_initrd
@@ -191,19 +192,20 @@ do_deploy () {
     cp  ${STAGING_KERNEL_DIR}/usr/gen_initramfs_list.sh ${DEPLOYDIR}/build-artifacts/kernel_scripts/scripts
     cp  ${STAGING_KERNEL_BUILDDIR}/usr/gen_init_cpio ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr
 
-    # Copy Image appended with dtbs to deploydir
+    # Copy Image and dtbs to deploydir
 
     if [ "${BASEMACHINE}" = "sa8775" ]; then
-    cat ${B}/arch/arm64/boot/Image.gz \
-        ${B}/arch/arm64/boot/dts/qcom/lemans.dtb > ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb
+    cp ${B}/arch/arm64/boot/Image ${D}/${KERNEL_IMAGEDEST}/Image
+    cp ${B}/arch/arm64/boot/dts/qcom/lemans.dtb ${D}/${KERNEL_IMAGEDEST}/lemans.dtb
     # Make bootimage
-    ${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb \
-	--kernel  ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb \
+    ${STAGING_BINDIR_NATIVE}/scripts/mkbootimg.py --header_version ${KERNEL_IMAGE_HEADER_VERSION} \
+	--kernel  ${D}/${KERNEL_IMAGEDEST}/Image \
+	--dtb  ${D}/${KERNEL_IMAGEDEST}/lemans.dtb \
 	--ramdisk /dev/null \
         --pagesize ${PAGE_SIZE} \
 	--base ${KERNEL_BASE} \
 	--ramdisk_offset 0x0 \
-        --cmdline "root=/dev/sda2 rw rootwait console=ttyMSM0,115200,n8 no_console_suspend=1 androidboot.hardware=qcom androidboot.console=ttyMSM0 lpm_levels.sleep_disabled=1 msm_rtb.filter=0x237 earlycon=qcom_geni,0x884000 fips=0 notests nokaslr ignore_loglevel" \
+        --cmdline "console=ttyMSM0,115200,n8 no_console_suspend=1 androidboot.hardware=qcom androidboot.console=ttyMSM0 lpm_levels.sleep_disabled=1 msm_rtb.filter=0x237 earlycon=qcom_geni,0xa8c000 fips=0 notests nokaslr ignore_loglevel" \
 	--output  ${DEPLOYDIR}/sa8775p-boot-5.14.img
     cp ${DEPLOYDIR}/sa8775p-boot-5.14.img ${DEPLOYDIR}/sa8775-boot.img
     else
@@ -216,7 +218,7 @@ do_deploy () {
         --pagesize ${PAGE_SIZE} \
 	--base ${KERNEL_BASE} \
 	--ramdisk_offset 0x0 \
-        --cmdline "root=/dev/sda1 rw rootwait console=ttyMSM0,115200,n8 no_console_suspend=1 androidboot.hardware=qcom androidboot.console=ttyMSM0 lpm_levels.sleep_disabled=1 msm_rtb.filter=0x237 earlycon=qcom_geni,0x884000 fips=0 notests nokaslr ignore_loglevel" \
+        --cmdline "console=ttyMSM0,115200,n8 no_console_suspend=1 androidboot.hardware=qcom androidboot.console=ttyMSM0 lpm_levels.sleep_disabled=1 msm_rtb.filter=0x237 earlycon=qcom_geni,0x884000 fips=0 notests nokaslr ignore_loglevel" \
 	--output  ${DEPLOYDIR}/sa8540p-boot-5.14.img
     fi
 

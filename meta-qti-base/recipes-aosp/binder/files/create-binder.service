@@ -3,11 +3,15 @@
 
 [Unit]
 Description=Create binderfs related device node for servicemanager
-DefaultDependencies=no
+After=dev-binderfs.mount
 
 [Service]
+User=binder
+Group=binder
 Type=oneshot
 RemainAfterExit=yes
+CapabilityBoundingSet=CAP_FOWNER CAP_CHOWN CAP_DAC_OVERRIDE
+AmbientCapabilities=CAP_FOWNER CAP_CHOWN CAP_DAC_OVERRIDE
 ExecStart=/etc/initscripts/create-binder
 
 [Install]

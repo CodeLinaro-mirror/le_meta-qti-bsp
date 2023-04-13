@@ -27,27 +27,6 @@ SYSTEMD_AUTO_ENABLE = "disable"
 export BINDIR = "${sbindir}"
 
 do_configure() {
-    sed -i -e 's/^CONFIG_EAP_PROXY=qmi/#CONFIG_EAP_PROXY=qmi/g' ${WORKDIR}/defconfig-qcacld
-    sed -i -e 's/^CONFIG_EAP_PROXY_DUAL_SIM := true/#CONFIG_EAP_PROXY_DUAL_SIM := true/g' ${WORKDIR}/defconfig-qcacld
-    sed -i -e 's/^CONFIG_EAP_PROXY_AKA_PRIME := true/#CONFIG_EAP_PROXY_AKA_PRIME := true/g' ${WORKDIR}/defconfig-qcacld
-    #enable CONFIG_WNM
-    if (( `grep -c "^CONFIG_WNM=y" ${WORKDIR}/defconfig-qcacld` )); then
-        break
-    elif (( `grep -c "^#CONFIG_WNM=y" ${WORKDIR}/defconfig-qcacld` )); then
-        sed -i -e 's/^#CONFIG_WNM=y/CONFIG_WNM=y/g' ${WORKDIR}/defconfig-qcacld
-    else
-        sed -i '$a\CONFIG_WNM=y' ${WORKDIR}/defconfig-qcacld
-    fi
-
-    #enable CONFIG_WIFI_DISPLAY
-    if (( `grep -c "^CONFIG_WIFI_DISPLAY=y" ${WORKDIR}/defconfig-qcacld` )); then
-        break
-    elif (( `grep -c "^#CONFIG_WIFI_DISPLAY=y" ${WORKDIR}/defconfig-qcacld` )); then
-        sed -i -e 's/^#CONFIG_WIFI_DISPLAY=y/CONFIG_WIFI_DISPLAY=y/g' ${WORKDIR}/defconfig-qcacld
-    else
-        sed -i '$a\CONFIG_WIFI_DISPLAY=y' ${WORKDIR}/defconfig-qcacld
-    fi
-
     install -m 0644 ${WORKDIR}/defconfig-qcacld .config
     echo "CFLAGS +=\"-I${STAGING_INCDIR}/libnl3\"" >> .config
 }
