@@ -26,8 +26,13 @@
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+# Changes from Qualcomm Innovation Center are provided under the following license:
+
+# Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+# SPDX-License-Identifier: BSD-3-Clause-Clear
+
 cd /sys/devices/system/memory/
-if [ -e aligned_block_addr ]; then
+if [ -e aligned_blocks_addr ]; then
    IFS=',' read -a addr < /sys/devices/system/memory/aligned_blocks_addr
    IFS=',' read -a num < /sys/devices/system/memory/aligned_blocks_num
    for index in "${!addr[@]}"
