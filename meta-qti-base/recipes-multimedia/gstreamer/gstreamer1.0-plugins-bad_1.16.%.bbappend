@@ -1,7 +1,7 @@
 DEFAULT_PREFERENCE = "-1"
 
 SRC_URI = "${PATH_TO_REPO}/gstreamer/gst-plugins-bad/.git;protocol=${PROTO};destsuffix=gstreamer/gst-plugins-bad;usehead=1"
-SRC_URI_append = " ${CAF_GIT}/gstreamer/common;destsuffix=gstreamer/gst-plugins-bad/common;branch=gstreamer/common/master;name=common"
+SRC_URI_append = " ${CLO_LE_GIT}/gstreamer/common;destsuffix=gstreamer/gst-plugins-bad/common;nobranch=1;name=common"
 
 GI_DATA_ENABLED="0"
 SRCREV = "${AUTOREV}"
