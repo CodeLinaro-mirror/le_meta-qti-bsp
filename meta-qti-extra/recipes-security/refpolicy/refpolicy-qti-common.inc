@@ -2,10 +2,10 @@ FILESEXTRAPATHS:append := "${THISDIR}/files:"
 LICENSE += "& BSD-3-Clause-Clear"
 
 SRC_URI += "${PATH_TO_REPO}/lv-sepolicy/.git;protocol=${PROTO};destsuffix=lv-sepolicy;usehead=1 \
-            file://Update-busybox-substitution-paths.patch \
             file://0001-fc-subs-persist-set-aliases-for-var-and-data.patch \
-            file://0001-refpolicy-update-booleans.patch \
+            file://0002-refpolicy-update-booleans.patch \
             file://Move-root-user-to-unconfined-context.patch \
+            file://0003-add-u-user-for-android.patch \
 "
 SRCREV = "${AUTOREV}"
 
