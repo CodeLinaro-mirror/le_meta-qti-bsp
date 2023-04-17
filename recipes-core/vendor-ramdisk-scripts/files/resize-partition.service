@@ -41,7 +41,7 @@ DefaultDependencies=no
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/bin/sh -c "/sbin/e2fsck -n /dev/disk/by-partlabel/%i; if [ $? -gt 1 ]; then /sbin/mkfs.ext4 /dev/disk/by-partlabel/%i; fi; /sbin/resize2fs /dev/disk/by-partlabel/%i;"
+ExecStart=/bin/sh -c "/sbin/e2fsck -n /dev/disk/by-partlabel/%i; if [ $? -gt 1 ]; then /sbin/mkfs.ext4 /dev/disk/by-partlabel/%i; fi; /sbin/resize2fs /dev/disk/by-partlabel/%i; exit 0;"
 
 [Install]
 WantedBy=sysinit.target
