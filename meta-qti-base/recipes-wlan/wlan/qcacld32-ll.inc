@@ -9,7 +9,6 @@ WLAN_PLATFORM_CFG = " \
                      CONFIG_CNSS2_QMI=y CONFIG_CNSS_QMI_SVC=m \
                      CONFIG_CNSS_PLAT_IPC_QMI_SVC=m \
                      CONFIG_CNSS_UTILS=m \
-                     CONFIG_BUS_AUTO_SUSPEND=y \
                      CONFIG_CNSS2_CONDITIONAL_POWEROFF=y \
                      WLAN_PLATFORM_INC=${WLAN_PLATFORM_PATH}/inc \
                      KBUILD_EXTRA="${WLAN_KBUILD_EXTRA}" \

@@ -99,6 +99,13 @@ while [ $n -le 5 ]
 			else
 				echo "##########Error! QCA6698 FW is not available!#####"
 			fi
+		elif ((lspci -k|grep 1107) || (lspci -n|grep 1107));then
+			echo "##########load qca6797#############"
+			if [ -f /firmware/image/kiwi/amss20.bin ];then
+				install_module qca6797
+			else
+				echo "##########Error! QCA6797 FW is not available!#####"
+			fi
 		else
 			echo "##########load default wlan########"
 			install_module wlan
