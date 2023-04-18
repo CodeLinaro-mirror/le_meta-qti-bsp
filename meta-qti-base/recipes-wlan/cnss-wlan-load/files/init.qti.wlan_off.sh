@@ -46,6 +46,9 @@ if (lspci -k|grep cnss_pci);then
 	elif ((lspci -k|grep 1103) || (lspci -n|grep 1103));then
 		echo "##########unload qca6698#############"
 		uninstall_module qca6698
+	elif ((lspci -k|grep 1107) || (lspci -n|grep 1107));then
+		echo "##########unload qca6797#############"
+		uninstall_module qca6797
 	else
 		echo "##########unload default wlan########"
 		uninstall_module wlan
