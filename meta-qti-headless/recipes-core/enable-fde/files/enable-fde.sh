@@ -81,35 +81,8 @@ seed_data() {
         echo " failed to format data"
         return 1
     fi
-    chmod 644  $DEV_PATH/$DEV_NAME
-
-    DATA_DIR="/data"
-    CONFIG_DIR="${DATA_DIR}/configs"
-    LOGS_DIR="${DATA_DIR}/logs"
-
-    if [ ! -d ${DATA_DIR} ]; then
-        mkdir ${DATA_DIR}
-    fi
-
-    mount $DEV_PATH/$DEV_NAME ${DATA_DIR}
-
-    if [ $? -ne 0 ] ; then
-       echo " failed to mount ${DATA_DIR}"
-       return 1
-    fi
-
-    if [ ! -d ${CONFIG_DIR} ]; then
-        mkdir ${CONFIG_DIR}
-    fi
-    if [ ! -d ${LOGS_DIR} ]; then
-       mkdir ${LOGS_DIR}
-    fi
-    #All done, sync it up
-    sync && umount $DEV_PATH/$DEV_NAME
     return 0
 }
-
-
 
 DEV_PATH="/dev";
 DEV_NAME="vdb";
