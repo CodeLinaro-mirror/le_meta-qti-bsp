@@ -2,7 +2,7 @@
 # add the MACHINE name to this list.
 # This is the "only" list that will control whether
 # OTA upgrade will be supported on a target.
-DEPENDS += "releasetools-native zip-native fsconfig-native applypatch-native bc-native bsdiff-native"
+DEPENDS += "releasetools-native zip-native fsconfig-native applypatch-native bc-native bsdiff-native qti-recovery-image"
 
 RM_WORK_EXCLUDE_ITEMS += "rootfs rootfs-dbg"
 
