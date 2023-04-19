@@ -34,6 +34,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         ${@bb.utils.contains('MACHINE_FEATURES', 'qti-location', 'packagegroup-qti-location', '', d)} \
         packagegroup-qti-ml \
         packagegroup-qti-mmframeworks \
+        packagegroup-qti-pulseaudio \
         packagegroup-qti-qmmf \
         packagegroup-qti-robotics \
         packagegroup-qti-robos \
@@ -57,7 +58,6 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-perf \
         tdk-chx01-get-data-app \
         tdk-thermistor-app \
-        packagegroup-qti-gst-basic \
 "
 
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "chronyc"
@@ -70,16 +70,12 @@ CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-test-sensors-see"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "tdk-chx01-get-data-app"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "tdk-thermistor-app"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-sensors-see"
-CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-gst-basic"
 
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-data"
-CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-gst"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-ml"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-eva"
-CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-qmmf"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-ss-mgr"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-touch"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-perf"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-sensors-ship"
-CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-gst-basic"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-audio"
