@@ -32,6 +32,8 @@ COMMON_OPTIMIZATION = " \
   "
 
 FULL_OPTIMIZATION         = "-O2 -fomit-frame-pointer ${COMMON_OPTIMIZATION} "
+# Enable debug option as default for variant-debug distro build
+FULL_OPTIMIZATION:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'variant-debug', '-g', '', d)}"
 DEBUG_OPTIMIZATION:append = " ${COMMON_OPTIMIZATION} "
 
 # NLS
@@ -50,8 +52,6 @@ ENABLE_BINARY_LOCALE_GENERATION = "0"
 PACKAGE_SNAP_LIB_SYMLINKS = "0"
 
 # Don't install ldconfig and associated gubbins
-USE_LDCONFIG = "0"
-LDCONFIGDEPEND = ""
 COMMERCIAL_LICENSE_DEPENDEES = ""
 
 PREFERRED_VERSION_readline ?= "5.2"

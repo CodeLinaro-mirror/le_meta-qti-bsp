@@ -16,9 +16,13 @@ SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/vendor/qcom/opensource/agm/ipc/SwBinders/agm_server"
 
-inherit autotools pkgconfig systemd
+inherit autotools pkgconfig systemd useradd
 
 SYSTEMD_SERVICE:${PN} = "agm.service"
+
+USERADD_PACKAGES = "${PN}"
+GROUPADD_PARAM:${PN} = "agm"
+USERADD_PARAM:${PN} = "--no-create-home -g agm --shell /bin/false agm"
 
 do_install:append() {
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then

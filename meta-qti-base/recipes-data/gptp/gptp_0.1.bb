@@ -17,7 +17,7 @@ SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/external/open-avb"
 
-inherit systemd pkgconfig useradd
+inherit pkgconfig useradd
 
 # Add non-root user vnw for gptp-daemon.service
 USERADD_PACKAGES = "${PN}"
@@ -28,13 +28,14 @@ GROUPADD_PARAM:${PN} = "net_raw; net_admin; vnw;"
 GPTP_AUTO_START_ENABLE = "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'NO', 'YES', d)}"
 EXTRA_OEMAKE += "${@bb.utils.contains("DISTRO_FEATURES", "systemd", "SYSTEMD_SUPPORT_INCLUDED=1", "SYSTEMD_SUPPORT_INCLUDED=0", d)}"
 EXTRA_OEMAKE += "${@oe.utils.conditional('GPTP_AUTO_START_ENABLE', 'YES', 'GPTP_AUTO_START=1', 'GPTP_AUTO_START=0', d)}"
-SYSTEMD_SERVICE:${PN} = "${@oe.utils.conditional('GPTP_AUTO_START_ENABLE', 'YES', 'gptp-daemon.service', '', d)}"
-SYSTEMD_AUTO_ENABLE:${PN} = "disable"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 TARGET_CC_ARCH += "${LDFLAGS}"
 
 do_compile() {
+    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'true', 'false', d)}; then
+        export AVB_FEATURE_GVM_MODE=1
+    fi
     oe_runmake gptp
     oe_runmake libgptp
     oe_runmake libgptp_test
@@ -50,14 +51,6 @@ do_install() {
     install -m 0755 ${S}/lib/libgptp/*.so ${D}/${libdir}
     install -m 0644 ${S}/lib/libgptp/gptp_helper.h ${D}${includedir}
 
-    if (test "x${GPTP_AUTO_START_ENABLE}" == "xYES"); then
-        if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
-            install -d ${D}${systemd_unitdir}/system/
-            install -m 0644 ${S}/files/gptp-daemon.service -D ${D}${systemd_unitdir}/system/gptp-daemon.service
-            install -d ${D}${sysconfdir}/tmpfiles.d/
-            install -m 0644 ${S}/files/gptp-daemon-tmpfilesd.conf ${D}${sysconfdir}/tmpfiles.d/gptp-daemon-tmpfilesd.conf
-        fi
-    fi
 }
 
 PACKAGES =+ "${PN}-test"

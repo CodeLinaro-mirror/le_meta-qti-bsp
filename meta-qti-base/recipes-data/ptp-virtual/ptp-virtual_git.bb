@@ -28,4 +28,7 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 FILES:${PN} += "\
     ${systemd_unitdir}/system/ptp-virtual.service \
+    ${nonarch_base_libdir}/modules/${KERNEL_VERSION}/* \
 "
+
+RPROVIDES:${PN} += "kernel-module-ptp-virtual-${KERNEL_VERSION}"

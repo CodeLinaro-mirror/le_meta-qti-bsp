@@ -1,0 +1,31 @@
+From 6b89fae5795dbe5b31e1e94ffb7517b08959c404 Mon Sep 17 00:00:00 2001
+From: Kai Meng <quic_kmeng@quicinc.com>
+Date: Fri, 11 Nov 2022 16:08:28 +0800
+Subject: [PATCH] Move root user to unconfined context
+
+Start the root user in unconfined context instead of sysadm
+
+Upstream-Status: Pending
+
+Signed-off-by: Kai Meng <quic_kmeng@quicinc.com>
+---
+ policy/users | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/policy/users b/policy/users
+index ca20375..a473dfa 100644
+--- a/policy/users
++++ b/policy/users
+@@ -43,7 +43,7 @@ ifdef(`direct_sysadm_daemon',`
+ # not in the sysadm_r.
+ #
+ ifdef(`direct_sysadm_daemon',`
+-	gen_user(root, sysadm, sysadm_r staff_r ifdef(`enable_mls',`secadm_r auditadm_r') system_r, s0, s0 - mls_systemhigh, mcs_allcats)
++	gen_user(root, unconfined, unconfined_r sysadm_r staff_r ifdef(`enable_mls',`secadm_r auditadm_r') system_r, s0, s0 - mls_systemhigh, mcs_allcats)
+ ',`
+-	gen_user(root, sysadm, sysadm_r staff_r ifdef(`enable_mls',`secadm_r auditadm_r'), s0, s0 - mls_systemhigh, mcs_allcats)
++	gen_user(root, unconfined, unconfined_r sysadm_r staff_r ifdef(`enable_mls',`secadm_r auditadm_r'), s0, s0 - mls_systemhigh, mcs_allcats)
+ ')
+-- 
+2.7.4
+

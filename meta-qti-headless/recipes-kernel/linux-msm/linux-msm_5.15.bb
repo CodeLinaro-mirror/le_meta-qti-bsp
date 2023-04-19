@@ -11,7 +11,7 @@ SRC_URI = "${PATH_TO_REPO}/kernel/kernel-${PV}/kernel_platform/msm-kernel/.git;p
 
 SRCREV = "${AUTOREV}"
 
-inherit kernel qti-kernel-arch-clang
+inherit kernel kernel-yocto qti-kernel-arch-clang
 
 S = "${WORKDIR}/kernel/kernel-${PV}/kernel_platform/msm-kernel"
 
@@ -51,15 +51,32 @@ do_patch[postfuncs] += "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.
 EXTRA_OEMAKE:remove = "PAHOLE=false"
 KCONFIG_CONFIG_COMMAND:remove = "PAHOLE=false"
 
-do_configure:prepend() {
+KMETA = "kernel-meta"
+KMACHINE ?= "${KERNEL_ARCH}"
+KCONFIG_MODE = "--alldefconfig"
+KBUILD_DEFCONFIG ?= "vendor/${KERNEL_ARCH}${@bb.utils.contains_any('VARIANT', 'debug user', '-debug', '', d)}_defconfig"
+
+KERNEL_VERSION_SANITY_SKIP = "1"
+
+do_kernel_configcheck[noexec] = "1"
+do_kernel_checkout[noexec] = "1"
+do_validate_branches[noexec] = "1"
+
+do_generate_base_defconfig() {
+    export KCONFIG_CONFIG=${KERNEL_CONFIG_PATH}/${KBUILD_DEFCONFIG}
     if [ ! -f "${KERNEL_CONFIG_PATH}/vendor/${KERNEL_ARCH}.config" ]; then
         bbfatal "KERNEL_CONFIG '${KERNEL_ARCH}.config' was specified, but not present in the source tree"
     fi
 
     base_defconfig="${KERNEL_CONFIG_PATH}/generic_auto_defconfig"
     kernel_defconfigs="${KERNEL_CONFIG_PATH}/vendor/${KERNEL_ARCH}.config ${@bb.utils.contains_any('VARIANT', 'debug user', '${KERNEL_CONFIG_PATH}/vendor/${KERNEL_ARCH}_debug.config', '', d)}"
-    ${S}/scripts/kconfig/merge_config.sh -m -r -y -O ${B} ${base_defconfig} ${kernel_defconfigs} 1>&2
+    ${S}/scripts/kconfig/merge_config.sh -m -r -y ${base_defconfig} ${kernel_defconfigs} 1>&2
+}
+addtask do_generate_base_defconfig after do_unpack before do_kernel_metadata
+do_generate_base_defconfig[depends] += "virtual/${TARGET_PREFIX}binutils:do_populate_sysroot"
+do_generate_base_defconfig[depends] += "clang-cross-${TARGET_ARCH}:do_populate_sysroot"
 
+do_configure:prepend() {
     echo "# Global settings from linux recipe" >> ${B}/.config
     echo "CONFIG_LOCALVERSION="\"${LINUX_VERSION_EXTENSION}\" >> ${B}/.config
 }
