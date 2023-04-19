@@ -33,6 +33,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         ${@bb.utils.contains('MACHINE_FEATURES', 'qti-location', 'packagegroup-qti-location', '', d)} \
         packagegroup-qti-ml \
         packagegroup-qti-mmframeworks \
+        packagegroup-qti-pulseaudio \
         packagegroup-qti-qmmf \
         packagegroup-qti-robotics \
         packagegroup-qti-robos \
@@ -75,7 +76,6 @@ CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-camera"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-data"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-gst"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-ml"
-CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-qmmf"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-ss-mgr"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-camera-kernel"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-touch"
