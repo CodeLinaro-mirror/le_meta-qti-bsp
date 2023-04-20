@@ -1,0 +1,26 @@
+From 522dd254f67d9f211cd450b09dfcf803c3f25a8b Mon Sep 17 00:00:00 2001
+From: chalia <quic_chalia@quicinc.com>
+Date: Tue, 25 Jan 2022 16:58:08 +0800
+Subject: [PATCH] fix_strcnpy_error_with_ubuntu
+
+Change-Id: I46d8df6725c45b4d794dbd9f16b08060b2b4e885
+---
+ BaseTools/Source/C/Makefiles/header.makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/BaseTools/Source/C/Makefiles/header.makefile b/BaseTools/Source/C/Makefiles/header.makefile
+index 8a8b2b3d7..26de337c9 100644
+--- a/BaseTools/Source/C/Makefiles/header.makefile
++++ b/BaseTools/Source/C/Makefiles/header.makefile
+@@ -51,7 +51,7 @@ ifeq ($(DARWIN),Darwin)
+ # assume clang or clang compatible flags on OS X
+ CFLAGS = -MD -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-deprecated-declarations -Wno-shift-negative-value -Wno-self-assign -nostdlib -c -g
+ else
+-CFLAGS = -MD -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-deprecated-declarations -Wno-shift-negative-value -nostdlib -c -g
++CFLAGS = -MD -fshort-wchar -fno-strict-aliasing -Wall -Wno-deprecated-declarations -Wno-shift-negative-value -nostdlib -c -g
+ endif
+ LFLAGS =
+ 
+-- 
+2.25.1
+

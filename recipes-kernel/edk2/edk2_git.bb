@@ -10,9 +10,12 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 FILESPATH =+ "${WORKSPACE}/bootable/bootloader/:"
 
 SRC_URI = "file://edk2"
+SRC_URI += "file://fix_strcnpy_error_with_ubuntu.patch"
 S         =  "${WORKDIR}/edk2"
 
 INSANE_SKIP_${PN} = "arch"
+
+PARALLEL_MAKE += "-j 1"
 
 VBLE = "${@bb.utils.contains('DISTRO_FEATURES', 'qti-vble','1', '0', d)}"
 
