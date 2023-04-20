@@ -23,9 +23,9 @@ KERNEL_TAGS_OFFSET = "0x1e00000"
 KERNEL_CONFIG ?= "vendor/sa525_defconfig"
 KERNEL_CONFIG_qti-distro-debug ?= "vendor/sa525-debug_defconfig"
 KERNEL_CMD_PARAMS = "ro rootwait console=ttyMSM0,115200,n8 androidboot.hardware=qcom msm_rtb.filter=0x237 androidboot.console=ttyMSM0 lpm_levels.sleep_disabled=1 firmware_class.path=/lib/firmware/updates service_locator.enable=1 net.ifnames=0"
-KERNEL_VARIANT = ""
-KERNEL_VARIANT_qti-distro-debug = "debug_"
-KERNEL_VARIANT_qti-distro-perf = "perf_"
+KERNEL_VARIANT ??= ""
+KERNEL_VARIANT_qti-distro-debug ??= "debug_"
+KERNEL_VARIANT_qti-distro-perf ??= "perf_"
 KERNEL_DTB_NAMES = "dtbs/dtb.img"
 
 MACHINE_USES_KERNEL_PREBUILTS = "True"
@@ -50,8 +50,9 @@ KERNEL_BUILD_CONFIG ?= "msm-kernel/build.config.msm.sa525"
 # qti-tzlog:              Machine supports tz/qsee logs
 # qti-smciqseecomd:       Machine supports smcinvoke based listeners
 # android-binder:         Machine supports android binder
+# dm-verity-initramfs-v4  Machine supports Initramfs and dm-verity working with AVB
 
-MACHINE_FEATURES += "qti-sdx dm-verity-none qti-sensors qti-mvm qti-security qseecompat qti-tzlog qti-remoteproc qti-data-modem qti-location qti-audio qti-smciqseecomd qti-recovery qti-wwan-plus-cv2x qti-wlan qti-bluetooth qwesd android-binder"
+MACHINE_FEATURES += "qti-sdx dm-verity-initramfs-v4 qti-sensors qti-mvm qti-security qseecompat qti-tzlog qti-remoteproc qti-data-modem qti-location qti-audio qti-smciqseecomd qti-recovery qti-wwan-plus-cv2x qti-wlan qti-bluetooth qwesd android-binder qti-c2c"
 
 CONFLICT_MACHINE_FEATURES += "qti-cv2x"
 
