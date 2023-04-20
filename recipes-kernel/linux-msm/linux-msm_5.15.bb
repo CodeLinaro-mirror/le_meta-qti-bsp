@@ -260,7 +260,7 @@ do_deploy() {
     install -m 0644 System.map ${DEPLOYDIR}
 
     install -d ${DEPLOYDIR}/kernel_dtbs
-    cd ${KERNEL_PREBUILT_DISTDIR}/../msm-kernel/arch/arm64/boot/dts/
+    cd ${KERNEL_PREBUILT_DISTDIR}/
     for dtbf in ${KERNEL_DTB_NAMES}; do
         install -m 0644 $dtbf ${DEPLOYDIR}/kernel_dtbs
     done
