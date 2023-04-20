@@ -14,7 +14,6 @@ SRCREV = "${AUTOREV}"
 S = "${WORKDIR}/vendor/qcom/opensource/hsi2s-kernel"
 
 inherit module module-sign kernel-arch qperf qti-kernel-arch-clang
-INHIBIT_PACKAGE_STRIP = "1"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 

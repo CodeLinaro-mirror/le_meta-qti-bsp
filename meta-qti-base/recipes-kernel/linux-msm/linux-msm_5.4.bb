@@ -217,6 +217,5 @@ do_deploy () {
 #Sign boot image after generation
 do_deploy[postfuncs] += "sign_bootimg"
 
-INHIBIT_PACKAGE_STRIP = "1"
 KERNEL_VERSION_SANITY_SKIP = "1"
 

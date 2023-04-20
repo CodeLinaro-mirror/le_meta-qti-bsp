@@ -16,7 +16,6 @@ SRCREV = "${AUTOREV}"
 S = "${WORKDIR}/vendor/qcom/opensource/ptp-virtual"
 
 inherit module module-sign kernel-arch qperf qti-kernel-arch-clang
-INHIBIT_PACKAGE_STRIP = "1"
 EXTRA_OEMAKE += "CONFIG_ARCH_MSM=y"
 
 do_install:append() {
