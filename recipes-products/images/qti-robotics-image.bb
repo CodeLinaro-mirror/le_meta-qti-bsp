@@ -41,7 +41,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-video \
         packagegroup-qti-wifi \
         ${@bb.utils.contains('BBFILE_COLLECTIONS', 'ros2-humble-layer', 'packagegroup-ros2-humble', '', d)} \
-        ${@bb.utils.contains('BBFILE_COLLECTIONS', 'ros2-foxy-layer', 'packagegroup-ros2-foxy', '', d)} \
+        ${@bb.utils.contains('BBFILE_COLLECTIONS', 'ros2-foxy-layer', 'packagegroup-ros2-foxy packagegroup-qti-ros2-node', '', d)} \
         ${@bb.utils.contains('DISTRO_FEATURES', 'qirp-sdk', 'packagegroup-qti-qirp', '', d)} \
         packagegroup-startup-scripts \
         packagegroup-support-utils \
