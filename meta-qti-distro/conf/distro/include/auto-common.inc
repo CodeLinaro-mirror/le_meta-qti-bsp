@@ -24,6 +24,8 @@ DISTRO_FEATURES:append:sa8295 = " qti-codec2"
 DISTRO_FEATURES:append:lemans = " qti-codec2"
 DISTRO_FEATURES:append:qtiquingvm = " qti-omx qti-gstqeavb"
 DISTRO_FEATURES:append:quin-gvm-4gb = " qti-omx qti-gstqeavb"
+DISTRO_FEATURES:append:qtiquingvm = " qti-carcamsrc qti-omx qti-gstqeavb"
+DISTRO_FEATURES:append:quin-gvm-4gb = " qti-carcamsrc qti-omx qti-gstqeavb"
 DISTRO_FEATURES:append:qtiquingvm8295 = " qti-codec2 qti-gstqeavb"
 DISTRO_FEATURES:append:quin-gvm-gen4 = " qti-codec2"
 

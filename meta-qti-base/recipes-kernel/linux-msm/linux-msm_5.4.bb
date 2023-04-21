@@ -135,6 +135,8 @@ do_compile () {
 
 do_shared_workdir[dirs] = "${DEPLOYDIR}"
 do_shared_workdir:append () {
+        cp Makefile $kerneldir/
+        cp -fR usr $kerneldir/
         cp include/config/auto.conf $kerneldir/include/config/auto.conf
 
         if [ -d arch/${ARCH}/include ]; then
@@ -169,6 +171,7 @@ do_shared_workdir:append () {
         fi
 
         cp ${STAGING_KERNEL_DIR}/usr/gen_initramfs_list.sh $kerneldir/scripts/
+        cp scripts/unifdef $kerneldir/scripts/
         if [ -f usr/gen_init_cpio ]; then
             mkdir -p $kerneldir/usr/
             cp -f usr/gen_init_cpio $kerneldir/usr/
