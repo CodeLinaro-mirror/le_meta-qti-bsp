@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://googlemock/LICENSE;md5=cbbd27594afd089daa160d3a16dd51
 PROVIDES += "gmock"
 
 SRC_URI = "\
-    git://source.codeaurora.org/quic/le/external/oracle/gtest;protocol=git;branch=soppiest/master \
+    ${CLO_LE_GIT}/external/oracle/gtest;protocol=${CLO_PROTOCOL};nobranch=1 \
 "
 SRCREV = "d850e144710e330070b756c009749dc7a7302301"
 

@@ -15,7 +15,7 @@ PV = '1'
 inherit cmake pkgconfig
 
 SRCREV = "v1.1.126"
-SRC_URI = "git://source.codeaurora.org/quic/le/external/khronosgroup/vulkan-headers;nobranch=1;protocol=https"
+SRC_URI = "${CLO_LE_GIT}/external/khronosgroup/vulkan-headers;nobranch=1;protocol=${CLO_PROTOCOL}"
 
 S = "${WORKDIR}/git"
 
