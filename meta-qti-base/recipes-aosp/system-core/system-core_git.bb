@@ -6,7 +6,7 @@ HOMEPAGE = "http://developer.android.com/"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://NOTICE;md5=c1a3ff0b97f199c7ebcfdd4d3fed238e"
 
-DEPENDS += "ext4-utils glib-2.0 libbase libcutils libmincrypt libselinux libutils virtual/kernel-headers openssl fs-mgr"
+DEPENDS += "ext4-utils glib-2.0 libbase libcutils libmincrypt libselinux libutils virtual/kernel-headers openssl system-core-adbd"
 
 PR = "r19"
 
@@ -19,17 +19,13 @@ inherit autotools pkgconfig systemd useradd
 
 COMPOSITION = "901D"
 
-USERADD_PACKAGES = "${PN}-leprop ${PN}-adbd ${PN}-post-boot"
+USERADD_PACKAGES = "${PN}-leprop ${PN}-post-boot"
 
 GROUPADD_PARAM:${PN}-leprop = "leprop"
 USERADD_PARAM:${PN}-leprop = "-g leprop --no-create-home --shell /bin/false leprop"
 
-GROUPADD_PARAM:${PN}-adbd = "adb"
-USERADD_PARAM:${PN}-adbd = "-g adb --no-create-home --shell /bin/false adb"
-
 GROUPADD_PARAM:${PN}-post-boot = "post-boot"
 USERADD_PARAM:${PN}-post-boot = "-g post-boot --no-create-home --shell /bin/false post-boot"
-
 CPPFLAGS += "\
     -I${STAGING_INCDIR}/ext4_utils \
     -I${STAGING_INCDIR}/libselinux \
@@ -41,14 +37,9 @@ EXTRA_OECONF = "\
     --with-sanitized-headers=${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel} \
     --disable-debuggerd \
     --disable-libsync \
-    --enable-adb-avb20 \
-    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', '--enable-adb-verity', d)} \
 "
 
 do_install:append() {
-    install -m 0755 ${S}/adb/launch_adbd -D ${D}${sysconfdir}/launch_adbd
-    install -b -m 0644 /dev/null ${D}${sysconfdir}/adb_devid
-
     install -d ${D}${sysconfdir}/usb/
     install -b -m 0644 /dev/null ${D}${sysconfdir}/usb/boot_hsusb_comp
     install -b -m 0644 /dev/null ${D}${sysconfdir}/usb/boot_hsic_comp
@@ -67,7 +58,6 @@ do_install:append() {
     install -b -m 0644 /dev/null -D ${D}${sysconfdir}/build.prop
 
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
-        install -m 0750 ${S}/adb/start_adbd -D ${D}${sysconfdir}/initscripts/adbd
         install -m 0755 ${S}/usb/start_usb -D ${D}${sysconfdir}/initscripts/usb
         install -m 0750 ${S}/rootdir/etc/init.qcom.post_boot.sh -D ${D}${sysconfdir}/initscripts/init_post_boot
         install -m 0750 ${S}/rootdir/etc/init.qti.early_boot.sh -D ${D}${sysconfdir}/initscripts/init_early_boot
@@ -75,9 +65,6 @@ do_install:append() {
         install -d ${D}${systemd_unitdir}/system/
         install -d ${D}${systemd_unitdir}/system/multi-user.target.wants/
         install -d ${D}${systemd_unitdir}/system/sysinit.target.wants/
-
-        install -m 0644 ${S}/adb/adbd.service -D ${D}${systemd_unitdir}/system/adbd.service
-        ln -sf ${systemd_unitdir}/system/adbd.service ${D}${systemd_unitdir}/system/multi-user.target.wants/adbd.service
 
         install -m 0644 ${S}/usb/usb.service -D ${D}${systemd_unitdir}/system/usb.service
         ln -sf ${systemd_unitdir}/system/usb.service ${D}${systemd_unitdir}/system/multi-user.target.wants/usb.service
@@ -108,17 +95,7 @@ do_install:append() {
     rm -rf ${D}${includedir}
 }
 
-PACKAGES =+ "${PN}-adbd ${PN}-usb ${PN}-post-boot ${PN}-early-boot ${PN}-leprop"
-
-FILES:${PN}-adbd += "\
-    ${base_sbindir}/adbd \
-    ${libdir}/libadbd.so.* \
-    ${systemd_unitdir}/system/adbd.service \
-    ${systemd_unitdir}/system/multi-user.target.wants/adbd.service \
-    ${sysconfdir}/launch_adbd \
-    ${sysconfdir}/initscripts/adbd \
-    ${sysconfdir}/adb_devid \
-"
+PACKAGES =+ "${PN}-usb ${PN}-post-boot ${PN}-early-boot ${PN}-leprop"
 
 FILES:${PN}-usb += "\
     ${base_sbindir}/usb_composition \
@@ -155,3 +132,4 @@ FILES:${PN}-leprop += "\
 "
 
 ALLOW_EMPTY:${PN} = "1"
+ALLOW_EMPTY:${PN}-dev = "1"
