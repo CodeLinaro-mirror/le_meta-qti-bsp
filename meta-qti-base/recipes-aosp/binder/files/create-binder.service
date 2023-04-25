@@ -10,6 +10,7 @@ User=binder
 Group=binder
 Type=oneshot
 RemainAfterExit=yes
+NoNewPrivileges=true
 CapabilityBoundingSet=CAP_FOWNER CAP_CHOWN CAP_DAC_OVERRIDE
 AmbientCapabilities=CAP_FOWNER CAP_CHOWN CAP_DAC_OVERRIDE
 ExecStart=/etc/initscripts/create-binder
