@@ -12,9 +12,8 @@ PACKAGES = "${PN}"
 RDEPENDS:${PN} = "\
     alsa-lib \
     alsa-utils \
-    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-audio', 'audiodlkm', '', d)} \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-audio', 'audiodlkm init-audio', '', d)} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-audio-ar', 'agm agm-client agm-alsa-plugin agm-server agm-sndparser', '', d)} \
-    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', 'init-audio', d)} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-audio-ar', bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', 'ar-audiodlkm', d), '', d)} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-audio-ar', oe.utils.version_less_or_equal('${preferred-kernel}', '5.14', '', 'ar-audiodlkm', d), '', d)} \
 "
