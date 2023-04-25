@@ -17,7 +17,7 @@ KERNEL_VERSION = "${@oe.utils.read_file('${STAGING_KERNEL_BUILDDIR}/kernel-abive
 
 # We really need just kexecboot, kexec and ubiattach
 IMAGE_INSTALL = "\
-                 early-ramdisk-init libgcc kmod \
+                 early-ramdisk-init libgcc kmod util-linux-libblkid \
                  kernel-module-soc-sleep-stats-${KERNEL_VERSION} \
                  kernel-module-boot-stats-${KERNEL_VERSION} \
                  kernel-module-spidev-${KERNEL_VERSION} \
