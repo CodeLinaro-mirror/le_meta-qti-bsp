@@ -34,6 +34,9 @@ IMAGE_INSTALL += "\
     packagegroup-qti-agl-demo-tools \
     "
 
+# default value for rootfs size
+IMAGE_ROOTFS_SIZE = "1572864"
+
 #
 # Add hook to honor debug-tweaks/empty-root-password, since otherwise
 # the password patched into base-passwd will be present.
