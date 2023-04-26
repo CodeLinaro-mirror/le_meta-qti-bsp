@@ -1,0 +1,38 @@
+From ee416e200272f4c711d526ddaaa6f1b06fc73d59 Mon Sep 17 00:00:00 2001
+From: Brian Masney <bmasney@redhat.com>
+Date: Wed, 18 May 2022 14:21:31 -0400
+Subject: [PATCH] redhat: HACK: remove rpm-build dependency
+Content-type: text/plain
+
+Remove the rpm-build dependency in order to get 'make dist-configs'
+working inside an Ubuntu 18.04 container. The rpmbuild command is
+provided by the rpm-build package on Red Hat-based systems, and
+it's provided by the rpm package on Ubuntu 18.04.
+
+Here's the packages I had to install in order to get 'make dist-configs'
+working inside the Ubuntu 18.04 container:
+
+    apt update
+    apt install bison flex gcc git make python3 rpm
+
+Signed-off-by: Brian Masney <bmasney@redhat.com>
+---
+ redhat/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/redhat/Makefile b/redhat/Makefile
+index cc3893fa04a0..6d419b980270 100644
+--- a/redhat/Makefile
++++ b/redhat/Makefile
+@@ -222,7 +222,7 @@ dist-git-version-check:
+ 	fi
+ 
+ dist-buildreq-check: setup-source
+-	@PKGLIST="rpm-build $(rpmspec -q --buildrequires $(SOURCES)/$(SPECFILE) | cut -d ' ' -f 1)"; \
++	@PKGLIST=$(rpmspec -q --buildrequires $(SOURCES)/$(SPECFILE) | cut -d ' ' -f 1); \
+ 	MISSING=""; \
+ 	for pkg in $$PKGLIST; do \
+ 		rpm -q --whatprovides $$pkg >/dev/null || MISSING="$$MISSING $$pkg"; \
+-- 
+2.36.0
+

@@ -1,0 +1,31 @@
+From 3ad40621a0685ee25eb343dbbe186ac63fbc375f Mon Sep 17 00:00:00 2001
+From: Kai Meng <quic_kmeng@quicinc.com>
+Date: Fri, 7 Apr 2023 11:11:23 +0800
+Subject: [PATCH] add u user for android
+
+In lxc config, android need to start init process with
+u:r:kernel:s0, but no u about selinux user and r about
+selinux role, and kernel type in refpolicy.
+
+Upstream-Status: Inappropriate
+
+Signed-off-by: Kai Meng <quic_kmeng@quicinc.com>
+---
+ policy/users | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/policy/users b/policy/users
+index a473dfa7e..e892e77dc 100644
+--- a/policy/users
++++ b/policy/users
+@@ -16,6 +16,7 @@
+ # identity.
+ #
+ gen_user(system_u,, system_r, s0, s0 - mls_systemhigh, mcs_allcats)
++gen_user(u, user, r, s0, s0 - mls_systemhigh, mcs_allcats)
+ 
+ #
+ # user_u is a generic user identity for Linux users who have no
+-- 
+2.25.1
+

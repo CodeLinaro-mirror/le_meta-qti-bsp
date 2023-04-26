@@ -13,10 +13,13 @@ DEPENDS += "\
     glib-2.0 \
     gstreamer1.0 \
     gstreamer1.0-plugins-base \
-    linux-msm-headers \
+    virtual/kernel-headers \
     mm-gfx-auto-prop \
-    ${@oe.utils.version_less_or_equal('PREFERRED_VERSION_linux-msm', '5.4', '', 'videodlkm', d)} \
+    ${@oe.utils.version_less_or_equal('${preferred-kernel}', '5.14', '', 'videodlkm', d)} \
 "
+
+DEPENDS:append:lemans = " displaydlkm"
+DEPENDS:append:quin-gvm-lemans = " displaydlkm"
 
 SRC_URI = "${PATH_TO_REPO}/gstreamer/gst-plugins-qti-oss/.git;protocol=${PROTO};destsuffix=gstreamer/gst-plugins-qti-oss;usehead=1"
 SRCREV = "${AUTOREV}"
@@ -24,7 +27,17 @@ S = "${WORKDIR}/gstreamer/gst-plugins-qti-oss/gst-plugin-qvdeinterlace"
 
 inherit meson pkgconfig
 
-CFLAGS += "-I${STAGING_INCDIR}/linux-msm"
+CFLAGS += "-I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}"
+
+CFLAGS:append:lemans = " -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}/display"
+EXTRA_OEMESON:append:lemans = " \
+    -Dmmmcolorfmt=true \
+"
+
+CFLAGS:append:quin-gvm-lemans = " -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}/display"
+EXTRA_OEMESON:append:quin-gvm-lemans = " \
+    -Dmmmcolorfmt=true \
+"
 
 SOLIBS = ".so"
 FILES_SOLIBSDEV = ""

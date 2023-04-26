@@ -17,8 +17,11 @@ inherit qti-techpack
 
 TECHPACK_MODULE_OUT = "${WORKDIR}/display-drivers"
 TECHPACK_MODULES = "msm/msm_drm.ko"
+TECHPACK_MODULES:qtiquingvm8295 = "msm-hyp/msm_hyp.ko msm-cfg/msm_cfg.ko"
 TECHPACK_MODULES:quin-gvm-gen4-2 = "msm-hyp/msm_hyp.ko msm-cfg/msm_cfg.ko"
-TECHPACK_HEADERS = "${S}/include/uapi"
+TECHPACK_MODULES:quin-gvm-lemans = "msm-hyp/msm_hyp.ko msm-cfg/msm_cfg.ko"
+TECHPACK_HEADERS = "1"
+
 HDCP_QSEECOM_PATCH = "${STAGING_INCDIR}/hdcp_qseecom"
 TECHPACK_MAKE_ARGS = "KBUILD_EXTRA_SYMBOLS=${HDCP_QSEECOM_PATCH}/Module.symvers"
 

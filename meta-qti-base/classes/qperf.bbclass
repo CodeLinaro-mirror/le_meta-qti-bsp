@@ -20,7 +20,7 @@ python __anonymous() {
             revision += "_user"
         else:
             revision += "_perf"
-    d.setVar('PR', revision)
+    d.setVar('PR', revision.replace("-","_"))
 
     # While building kernel module recipes add a task to
     # copy build artifacts into DEPLOY_DIR for ease of access

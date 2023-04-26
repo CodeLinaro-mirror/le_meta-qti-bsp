@@ -24,4 +24,5 @@ RDEPENDS:${PN} += "\
     wlan-sigma-dut \
     wpa-supplicant \
     wlan-conf \
+    cnss-wlan-load \
     "

@@ -22,3 +22,5 @@ RDEPENDS:${PN} += "\
     sec-config \
     libsensors \
     "
+
+RDEPENDS:${PN}:remove:qti-dpk = "resize-service"

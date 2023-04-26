@@ -1,0 +1,46 @@
+From c6a50ce7f5c625dbf8276167123eebde62201d78 Mon Sep 17 00:00:00 2001
+From: Kai Meng <quic_kmeng@quicinc.com>
+Date: Thu, 23 Mar 2023 14:02:55 +0800
+Subject: [PATCH] refpolicy: update booleans
+
+1.Allow users to resolve user passwd entries directly
+from ldap rather then using a sssd server
+2.Allow the mount command to mount any directory or file
+
+Upstream-Status: Pending
+
+Signed-off-by: Kai Meng <quic_kmeng@quicinc.com>
+---
+ policy/modules/system/authlogin.te | 2 +-
+ policy/modules/system/mount.te     | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/policy/modules/system/authlogin.te b/policy/modules/system/authlogin.te
+index f22cfcdc7..caf83b3ee 100644
+--- a/policy/modules/system/authlogin.te
++++ b/policy/modules/system/authlogin.te
+@@ -17,7 +17,7 @@ gen_tunable(authlogin_pam, true)
+ ## Allow users to resolve user passwd entries directly from ldap rather then using a sssd server
+ ## </p>
+ ## </desc>
+-gen_tunable(authlogin_nsswitch_use_ldap, false)
++gen_tunable(authlogin_nsswitch_use_ldap, true)
+ 
+ attribute can_read_shadow_passwords;
+ attribute can_write_shadow_passwords;
+diff --git a/policy/modules/system/mount.te b/policy/modules/system/mount.te
+index e8467e962..b6bd7bdec 100644
+--- a/policy/modules/system/mount.te
++++ b/policy/modules/system/mount.te
+@@ -10,7 +10,7 @@ policy_module(mount, 1.25.0)
+ ## Allow the mount command to mount any directory or file.
+ ## </p>
+ ## </desc>
+-gen_tunable(allow_mount_anyfile, false)
++gen_tunable(allow_mount_anyfile, true)
+ 
+ attribute_role mount_roles;
+ roleattribute system_r mount_roles;
+-- 
+2.25.1
+

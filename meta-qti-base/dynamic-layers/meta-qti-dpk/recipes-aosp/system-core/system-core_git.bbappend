@@ -7,6 +7,3 @@ do_install:append() {
     sed -i '29 a\ETC=/vendor/etc\n[ -f /etc/initscripts/usb ] && ETC=/etc\n' ${D}${sysconfdir}/initscripts/usb
 }
 
-# USERADDEXTENSION was set to "useradd-staticids"
-# USERADDEXTENSION not equal to "qpermissions" anymore
-inherit qpermissions

@@ -7,6 +7,7 @@ inherit image
 
 DEPENDS += "mkbootimg-native virtual/kernel"
 
+
 IMAGE_FSTYPES = "cpio.lz4"
 
 # avoid circular dependencies

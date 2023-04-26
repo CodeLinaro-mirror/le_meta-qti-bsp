@@ -31,8 +31,12 @@ After=servicemanager.service
 Requires=servicemanager.service
 
 [Service]
+User=agm
+Group=agm
 ExecStart=/usr/bin/agm_server
 Restart=on-failure
+CapabilityBoundingSet=CAP_SYS_RAWIO CAP_SYS_MODULE CAP_DAC_OVERRIDE CAP_IPC_OWNER CAP_SYS_NICE
+AmbientCapabilities=CAP_SYS_RAWIO CAP_SYS_MODULE CAP_DAC_OVERRIDE CAP_IPC_OWNER CAP_SYS_NICE
 
 [Install]
 WantedBy=multi-user.target

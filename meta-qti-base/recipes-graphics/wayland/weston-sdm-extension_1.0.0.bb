@@ -15,7 +15,7 @@ DEPENDS += "cairo \
             gbm gbm-headers \
             ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'libuhab', '', d)} \
             libinput \
-            linux-msm-headers \
+            virtual/kernel-headers \
             pixman virtual/egl \
             wayland wayland-native wayland-protocols \
             weston \
@@ -33,8 +33,8 @@ TARGET_CPPFLAGS += "-I${STAGING_INCDIR}/libdrm \
                     -I${STAGING_INCDIR}/sdm \
                     -I${STAGING_INCDIR}/sdm/core \
                     -I${STAGING_INCDIR}/libweston-${WESTON_MAJOR_VERSION} \
-                    -I${STAGING_INCDIR}/linux-msm \
-                    -I${STAGING_INCDIR}/linux-msm/display \
+                    -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel} \
+                    -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}/display \
 "
 
 # fix for uapi msm_drm.h header file related compilation issue

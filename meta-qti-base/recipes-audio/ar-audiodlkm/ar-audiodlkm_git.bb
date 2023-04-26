@@ -18,6 +18,8 @@ inherit ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', "qti-techpac
 
 EXTRA_OEMAKE:lemans += "TARGET_SUPPORT=lemans"
 EXTRA_OEMAKE:quin-gvm-gen4-2 += "TARGET_SUPPORT=no AUTO_GVM=yes"
+EXTRA_OEMAKE:quin-gvm-lemans += "TARGET_SUPPORT=no AUTO_GVM=yes"
+EXTRA_OEMAKE:qtiquingvm8295 += "TARGET_SUPPORT=no AUTO_GVM=yes"
 
 MODULES = "\
         dsp/spf_core_dlkm.ko  \
@@ -29,9 +31,11 @@ MODULES = "\
         ipc/gpr_dlkm.ko \
         ipc/audio_pkt_dlkm.ko  \
         asoc/codecs/stub_dlkm.ko \
+        asoc/codecs/wcd9xxx_dlkm.ko \
         asoc/platform_dlkm.ko \
         asoc/spf_machine_dlkm.ko \
         soc/snd_event_dlkm.ko \
+        soc/pinctrl_lpi_dlkm.ko \
 "
 
 TECHPACK_MODULE_OUT = "${WORKDIR}/audio-kernel-ar"

@@ -15,14 +15,12 @@ SRC_URI = "${PATH_TO_REPO}/wlan/qcacld-3.0/.git;protocol=${PROTO};destsuffix=wla
            ${PATH_TO_REPO}/wlan/qca-wifi-host-cmn/.git;protocol=${PROTO};destsuffix=wlan/qca-wifi-host-cmn;usehead=1 \
            ${PATH_TO_REPO}/wlan/fw-api/.git;protocol=${PROTO};destsuffix=wlan/fw-api/;usehead=1 \
            ${PATH_TO_REPO}/device/qcom/wlan/.git;protocol=${PROTO};destsuffix=device/qcom/wlan/msm_auto;subpath=msm_auto;usehead=1 \
-           file://init_qti_wlan_auto.service \
-           file://init.qti.wlan_on.sh \
-           file://init.qti.wlan_off.sh \
            "
 SRCREV = "${AUTOREV}"
 SRCREV_FORMAT = "qcacld_cmn_fw_msm"
 
 _MODNAME = "qca6595"
+_WLAN_CTRL_NAME = "wlan"
 FW_PATH_NAME = "qcn7605"
 FIRMWARE_PATH = "${D}${nonarch_base_libdir}/firmware/wlan/qca_cld/${_MODNAME}"
 
@@ -32,6 +30,7 @@ S = "${WORKDIR}/wlan/qcacld-3.0"
 # Explicitly disable HL to enable LL as current WLAN driver is not having
 # simultaneous support of HL and LL.
 EXTRA_OEMAKE:append = " \
+                       LINUX_BUILD_TOP=${_LINUX_BUILD_TOP} \
                        CONFIG_CLD_HL_SDIO_CORE=n \
                        CONFIG_CNSS_SDIO=n \
                        CONFIG_QCA_CLD_WLAN_PROFILE=genoa.pci.debug \
@@ -39,6 +38,7 @@ EXTRA_OEMAKE:append = " \
                        MODNAME=${_MODNAME} \
                        CONFIG_CNSS_GENL=n \
                        CONFIG_IPA_OFFLOAD=n \
+                       WLAN_CTRL_NAME=${_WLAN_CTRL_NAME} \
                        "
 
 _WLAN_CFG_OVERRIDE = "\
@@ -55,8 +55,6 @@ _WLAN_CFG_OVERRIDE:append:sa6155 = " CONFIG_IPA_DISABLE_OVERRIDE=y"
 
 EXTRA_OEMAKE:append = " WLAN_CFG_OVERRIDE="${_WLAN_CFG_OVERRIDE}""
 
-SYSTEMD_SERVICE:${PN} = "init_qti_wlan_auto.service"
-
 do_install() {
     module_do_install
 
@@ -71,9 +69,6 @@ do_install() {
 
     install -D -m 0644 ${WORKDIR}/device/qcom/wlan/msm_auto/WCNSS_qcom_cfg_qcn7605.ini ${FIRMWARE_PATH}/WCNSS_qcom_cfg.ini
     install -D -m 0644 ${WORKDIR}/device/qcom/wlan/msm_auto/wlan_mac.bin ${FIRMWARE_PATH}/wlan_mac.bin
-    install -d ${D}${bindir}
-    install -D -m 0755 ${WORKDIR}/init.qti.wlan_on.sh ${D}${bindir}/init.qti.wlan_on.sh
-    install -D -m 0755 ${WORKDIR}/init.qti.wlan_off.sh ${D}${bindir}/init.qti.wlan_off.sh
 
     install -d ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/
     ln -sf /firmware/image/${FW_PATH_NAME}/amss.bin ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/
@@ -88,15 +83,4 @@ do_install() {
     mv ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/bdwlan02.b03 ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/bdwlan03.b02
     #For GNA04.1 boardid = 0x203
     ln -sf /firmware/image/${FW_PATH_NAME}/bdwlan02.b03 ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}/
-
-    # Install systemd service file
-    if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
-        install -m 0644 ${WORKDIR}/init_qti_wlan_auto.service -D ${D}${systemd_unitdir}/system/init_qti_wlan_auto.service
-    fi
 }
-
-FILES:${PN} += "\
-    ${bindir}/init.qti.wlan_on.sh \
-    ${bindir}/init.qti.wlan_off.sh \
-"
-

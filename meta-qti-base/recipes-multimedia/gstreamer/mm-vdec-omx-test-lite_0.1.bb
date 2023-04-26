@@ -10,7 +10,7 @@ DEPENDS += "\
     glib-2.0 \
     libcutils \
     libion \
-    linux-msm-headers \
+    virtual/kernel-headers \
     media \
 "
 
@@ -38,6 +38,6 @@ CXXFLAGS += "\
     -I${STAGING_INCDIR}/c++/${TARGET_SYS} \
     -I${STAGING_INCDIR}/common/inc \
     -I${STAGING_INCDIR}/mm-core \
-    -I${STAGING_INCDIR}/linux-msm \
+    -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel} \
     -I${STAGING_INCDIR}/ion_headers \
 "

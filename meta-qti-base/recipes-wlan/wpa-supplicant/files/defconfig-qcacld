@@ -512,9 +512,9 @@ CONFIG_P2P=y
 CONFIG_AP=y
 
 # Enable QMI EAP PROXY
-CONFIG_EAP_PROXY=qmi
-CONFIG_EAP_PROXY_DUAL_SIM := true
-CONFIG_EAP_PROXY_AKA_PRIME := true
+#CONFIG_EAP_PROXY=qmi
+#CONFIG_EAP_PROXY_DUAL_SIM := true
+#CONFIG_EAP_PROXY_AKA_PRIME := true
 
 # IEEE 802.11ax HE support
 # Note: This is experimental and work in progress. The definitions are still
@@ -556,3 +556,10 @@ CONFIG_WAPI_AP=y
 # ACS for SAP
 CONFIG_ACS=y
 
+# WFD
+CONFIG_WIFI_DISPLAY=y
+
+# Enable OCV, SAE_PK and SUITEB in WPA3 R3
+CONFIG_OCV=y
+NEED_AES_SIV=y
+CONFIG_SAE_PK=y
