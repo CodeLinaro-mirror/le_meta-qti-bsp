@@ -35,6 +35,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-mmframeworks \
         packagegroup-qti-qmmf \
         packagegroup-qti-robotics \
+        packagegroup-qti-robos \
         packagegroup-qti-securemsm \
         packagegroup-qti-ss-mgr \
         packagegroup-qti-test-sensors-see \
@@ -63,6 +64,7 @@ CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-fastcv"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-ml"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-qmmf"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-robotics"
+CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-robos"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-securemsm"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-test-sensors-see"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "tdk-chx01-get-data-app"
