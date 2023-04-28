@@ -41,6 +41,8 @@ do_recovery_ext4[cleandirs] += "${OTA_TARGET_IMAGE_ROOTFS_EXT4}/BOOT/RAMDISK"
 # recovery rootfs is required for generating OTA files.
 # Wait till all tasks of machine-recovery-image complete.
 
+do_recovery_ext4[depends] += "qti-recovery-image:do_build"
+
 do_recovery_ext4() {
     echo "base image rootfs: ${IMAGE_ROOTFS_EXT4}"
     echo "recovery image rootfs: ${RECOVERY_IMAGE_ROOTFS}"
