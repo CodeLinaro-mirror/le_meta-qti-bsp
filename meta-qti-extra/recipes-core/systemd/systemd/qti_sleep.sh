@@ -38,6 +38,9 @@ case $1/$2 in
     # disable BT as hsuart could block suspend
     systemctl stop synergy.service
 
+    # send signal SIGUSR1 to ais_server when suspend
+    systemctl kill -s SIGUSR1 ais_server.service
+
     # set all usb mode to none
     echo none > /sys/devices/platform/soc/a600000.ssusb/mode
     echo none > /sys/devices/platform/soc/a800000.ssusb/mode
