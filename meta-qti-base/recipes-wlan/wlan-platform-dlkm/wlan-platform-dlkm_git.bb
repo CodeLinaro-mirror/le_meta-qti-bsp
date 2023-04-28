@@ -38,6 +38,21 @@ WLAN_PLATFORM_CFG = "\
                      CONFIG_CNSS_REQ_FW_DIRECT=y \
                      "
 
+WLAN_PLATFORM_CFG_PROD = "\
+                     USE_EXTERNAL_CONFIGS=y \
+                     CONFIG_CNSS_OUT_OF_TREE=y \
+                     CONFIG_CNSS2=m \
+                     CONFIG_AUTO_PROJECT=y \
+                     CONFIG_CNSS2_QMI=y \
+                     CONFIG_CNSS_QMI_SVC=m \
+                     CONFIG_CNSS_PLAT_IPC_QMI_SVC=m \
+                     CONFIG_CNSS_GENL=m \
+                     CONFIG_CNSS_UTILS=m \
+                     CONFIG_CNSS2_CONDITIONAL_POWEROFF=y \
+                     CONFIG_CNSS_SUPPORT_DUAL_DEV=y \
+                     CONFIG_CNSS_REQ_FW_DIRECT=y \
+                     "
+
 EXTRA_OEMAKE:append = " ${WLAN_PLATFORM_CFG}"
 TECHPACK_MAKE_ARGS = "${EXTRA_OEMAKE} QTI_TECHPACK=true"
 
