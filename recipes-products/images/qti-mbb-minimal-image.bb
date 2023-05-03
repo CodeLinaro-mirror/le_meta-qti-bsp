@@ -17,3 +17,6 @@ CORE_IMAGE_EXTRA_INSTALL += "\
               packagegroup-android-utils \
               packagegroup-startup-scripts \
 "
+
+#Install bash
+CORE_IMAGE_EXTRA_INSTALL += "bash"
