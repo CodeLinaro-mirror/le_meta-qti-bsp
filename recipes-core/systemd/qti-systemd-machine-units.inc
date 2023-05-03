@@ -20,7 +20,7 @@ SRC_URI += " file://overlay-data.mount"
 SRC_URI += " file://overlay-cache.mount"
 SRC_URI += " file://overlay-workdir.sh"
 SRC_URI += " file://overlay-workdir.service"
-
+SRC_URI += " file://overlay-workdir-with-fde.service"
 SRC_URI += " file://bt_firmware-mount.service"
 SRC_URI += " file://cache.mount"
 SRC_URI += " file://data.mount"
