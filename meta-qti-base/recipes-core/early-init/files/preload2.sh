@@ -34,17 +34,40 @@ dd if=/lib/systemd/system/multi-user.target of=/dev/null
 dd if=/lib/systemd/system/local-fs-pre.target of=/dev/null
 ls -l /etc/systemd/system/local-fs-pre.target.wants
 dd if=/lib/systemd/system/init_data.service of=/dev/null
+dd if=/lib/systemd/system/ninfod.service of=/dev/null
+dd if=/etc/systemd/system/location_hal_daemon.service of=/dev/null
+dd if=/etc/systemd/system/loc_launcher.service of=/dev/null
+dd if=/lib/systemd/system/init_qti_wlan_auto.service of=/dev/null
+dd if=/lib/systemd/system/video_early_demo.service of=/dev/null
+dd if=/lib/systemd/system/sys-kernel-debug.mount of=/dev/null
+dd if=/lib/systemd/system/qrtr_ns.service of=/dev/null
+dd if=/lib/systemd/system/qcarcam_rvc.service of=/dev/null
+dd if=/lib/systemd/system/diag-router.service of=/dev/null
 
 echo systemdm1 > /dev/kmsg
 
 dd if=/usr/lib/libweston-8.so.0.0.0 of=/dev/null
 dd if=/usr/lib/libweston-8.so.0 of=/dev/null
 dd if=/usr/lib/libuhab.so of=/dev/null
+dd if=/usr/lib/weston/libexec_weston.so.0.0.0 of=/dev/null
 dd if=/usr/libexec/weston-keyboard of=/dev/null
 dd if=/usr/lib/libEGL_adreno.so of=/dev/null
 dd if=/usr/share/fontconfig/conf.avail/40-nonlatin.conf of=/dev/null
 dd if=/usr/share/fontconfig/conf.avail/50-user.conf of=/dev/null
 dd if=/usr/share/fontconfig/conf.avail/10-hinting-none.conf of=/dev/null
 dd if=/usr/share/fontconfig/conf.avail/10-no-sub-pixel.conf of=/dev/null
+dd if=/etc/fonts/conf.d/10-hinting-slight.conf of=/dev/null
+dd if=/etc/fonts/conf.d/10-scale-bitmap-fonts.conf of=/dev/null
+dd if=/etc/fonts/conf.d/20-unhint-small-vera.conf of=/dev/null
+dd if=/etc/fonts/conf.d/30-metric-aliases.conf of=/dev/null
+dd if=/etc/fonts/conf.d/65-fonts-persian.conf of=/dev/null
+dd if=/usr/share/fontconfig/conf.avail/10-unhinted.conf of=/dev/null
+dd if=/usr/share/fontconfig/conf.avail/11-lcdfilter-default.conf of=/dev/null
+dd if=/usr/share/fontconfig/conf.avail/11-lcdfilter-legacy.conf of=/dev/null
+dd if=/usr/share/fontconfig/conf.avail/11-lcdfilter-light.conf of=/dev/null
+dd if=/usr/share/fontconfig/conf.avail/25-unhint-nonlatin.conf of=/dev/null
+dd if=/usr/share/fontconfig/conf.avail/65-khmer.conf of=/dev/null
+dd if=/usr/share/fontconfig/conf.avail/70-no-bitmaps.conf of=/dev/null
+dd if=/usr/share/fontconfig/conf.avail/70-yes-bitmaps.conf of=/dev/null
 
 echo systemde1 > /dev/kmsg

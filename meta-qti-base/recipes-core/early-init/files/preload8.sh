@@ -30,11 +30,16 @@ echo systemds7 > /dev/kmsg
 
 dd if=/lib/ld-2.31.so of=/dev/null
 dd if=/lib/ld-linux-aarch64.so.1 of=/dev/null
-dd if=/etc/systemd/system.conf of=/dev/null
-dd if=/etc/systemd/system/syslog.service of=/dev/null
-dd if=/lib/systemd/system-generators/systemd-gpt-auto-generator of=/dev/null
+dd if=/lib/libpam.so.0.84.2 of=/dev/null
 dd if=/usr/lib/liblzma.so.5.2.4 of=/dev/null
 dd if=/usr/lib/liblzma.so.5 of=/dev/null
+dd if=/lib/libsepol.so.1 of=/dev/null
+dd if=/lib/libaudit.so.1.0.0 of=/dev/null
+dd if=/usr/lib/libkmod.so.2.3.4 of=/dev/null
+dd if=/lib/libcap-ng.so.0.0.0 of=/dev/null
+dd if=/etc/selinux/config of=/dev/null
+dd if=/etc/systemd/system/syslog.service of=/dev/null
+dd if=/lib/systemd/system-generators/systemd-gpt-auto-generator of=/dev/null
 dd if=/lib/systemd/system/resize-userdata.service of=/dev/null
 dd if=/lib/systemd/system/systemd-fsck@.service of=/dev/null
 

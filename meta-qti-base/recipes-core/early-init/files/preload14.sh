@@ -41,12 +41,6 @@ dd if=/lib/systemd/system/systemd-resolved.service of=/dev/null
 dd if=/lib/systemd/system/nss-lookup.target of=/dev/null
 dd if=/lib/systemd/system/strongswan.service of=/dev/null
 dd if=/lib/systemd/system/network-online.target of=/dev/null
-dd if=/lib/systemd/system/rngd.service of=/dev/null
-dd if=/lib/systemd/system/msm-bus.service of=/dev/null
-ls -l /etc/systemd/system/basic.target.wants
-ls -l /lib/systemd/system/multi-user.target.wants
-ls -l /lib/systemd/system/runlevel1.target.wants
-ls -l /etc/systemd/system/network-online.target.wants
 
 echo systemdmd > /dev/kmsg
 

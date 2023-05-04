@@ -38,6 +38,13 @@ dd if=/lib/systemd/system/rc-local.service of=/dev/null
 dd if=/lib/systemd/system/getty@.service of=/dev/null
 dd if=/lib/systemd/system/systemd-tmpfiles-clean.service of=/dev/null
 dd if=/lib/systemd/system/logrotate.timer of=/dev/null
+dd if=/etc/default/rng-tools of=/dev/null
+dd if=/etc/systemd/journald.conf of=/dev/null
+dd if=/lib/systemd/journald.conf.d/00-systemd-conf.conf of=/dev/null
+ls -l /etc/systemd/system/multi-user.target.wants
+ls -l /etc/systemd/system/getty.target.wants
+ls -l /etc/systemd/system/timers.target.wants
+ls -l /lib/systemd/system/timers.target.wants
 
 echo systemdma > /dev/kmsg
 

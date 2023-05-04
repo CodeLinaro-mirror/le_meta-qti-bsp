@@ -43,12 +43,6 @@ dd if=/lib/systemd/system/subsystem-ramdump.service of=/dev/null
 dd if=/lib/systemd/system/servicemanager.service of=/dev/null
 dd if=/usr/bin/servicemanager of=/dev/null
 dd if=/lib/systemd/system/lxc-init.service of=/dev/null
-dd if=/lib/libcap.so.2.32 of=/dev/null
-dd if=/lib/libcap.so.2 of=/dev/null
-ls -l /lib/systemd/system.conf.d
-ls -l /lib/systemd/system/local-fs.target.wants
-ls -l /lib/systemd/system/runlevel5.target.wants
-ls -l /lib/systemd/system/rescue.target.wants
 
 echo systemdme > /dev/kmsg
 

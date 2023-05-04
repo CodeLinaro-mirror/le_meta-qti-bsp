@@ -33,9 +33,22 @@ ls -l /lib/systemd/system/runlevel3.target.wants
 ls -l /lib/systemd/system/runlevel4.target.wants
 dd if=/lib/systemd/system/leprop.service of=/dev/null
 dd if=/lib/systemd/system/emergency.target of=/dev/null
+dd if=/usr/lib/os-release of=/dev/null
+dd if=/lib/systemd/system/selinux-labeldev.service of=/dev/null
+dd if=/lib/systemd/system/selinux-init.service of=/dev/null
+dd if=/lib/systemd/system/rdisc.service of=/dev/null
+dd if=/lib/systemd/system/proftpd.service of=/dev/null
+dd if=/lib/systemd/system/emac_rps.service of=/dev/null
+dd if=/lib/systemd/system/cdsprpcd.service of=/dev/null
+dd if=/lib/systemd/system/cdsp.service of=/dev/null
+dd if=/lib/systemd/system/auditd.service of=/dev/null
+dd if=/lib/systemd/system/audiod.service of=/dev/null
+dd if=/lib/systemd/system/adsprpcd_audiopd.service of=/dev/null
+dd if=/lib/systemd/system/adsprpcd.service of=/dev/null
 
 echo systemdm6 > /dev/kmsg
 
+dd if=/usr/lib/libllvm-qgl.so of=/dev/null
 dd if=/usr/lib/libxkbcommon.so.0.0.0 of=/dev/null
 dd if=/usr/lib/libxkbcommon.so.0 of=/dev/null
 dd if=/usr/lib/libweston-8/sdm-service.so of=/dev/null
