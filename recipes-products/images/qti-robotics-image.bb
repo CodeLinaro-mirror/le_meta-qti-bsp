@@ -16,7 +16,6 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-filesystem-utils \
         packagegroup-qti-audio \
         packagegroup-qti-bluetooth \
-        packagegroup-qti-camera \
         packagegroup-qti-camera-kernel \
         ${@bb.utils.contains('DISTRO_FEATURES','virtualization', 'packagegroup-qti-containers', '', d)} \
         packagegroup-qti-core \
@@ -40,7 +39,8 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-test-sensors-see \
         packagegroup-qti-video \
         packagegroup-qti-wifi \
-        ${@bb.utils.contains('DISTRO_FEATURES', 'ros2', 'packagegroup-ros2-foxy', '', d)} \
+        ${@bb.utils.contains('BBFILE_COLLECTIONS', 'ros2-humble-layer', 'packagegroup-ros2-humble', '', d)} \
+        ${@bb.utils.contains('BBFILE_COLLECTIONS', 'ros2-foxy-layer', 'packagegroup-ros2-foxy', '', d)} \
         ${@bb.utils.contains('DISTRO_FEATURES', 'qirp-sdk', 'packagegroup-qti-qirp', '', d)} \
         packagegroup-startup-scripts \
         packagegroup-support-utils \
@@ -53,16 +53,16 @@ CORE_IMAGE_EXTRA_INSTALL += "\
 "
 
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "chronyc"
+CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-camera"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-cvp"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-data"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-fastcv"
-CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-gst"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-ml"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-mmframeworks"
-CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-qmmf"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-robotics"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-securemsm"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-test-sensors-see"
+CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-perf"
 
 
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-camera"
