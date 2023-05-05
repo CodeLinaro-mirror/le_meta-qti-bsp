@@ -18,3 +18,6 @@ CORE_IMAGE_EXTRA_INSTALL += "\
               packagegroup-startup-scripts \
               ${@bb.utils.contains('BBFILE_COLLECTIONS', 'qti-ss-mgr', 'packagegroup-qti-ss-mgr', '', d)} \
 "
+
+#Install bash
+CORE_IMAGE_EXTRA_INSTALL += "bash"
