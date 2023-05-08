@@ -4,3 +4,6 @@ ALTERNATIVE_PRIORITY = "40"
 
 # Need od.coreutils for post boot script
 ALTERNATIVE_PRIORITY[od] = "100"
+
+# Need head.coreutils for post boot script
+ALTERNATIVE_PRIORITY[head] = "100"
