@@ -60,6 +60,10 @@ NAND_SQUASHFS_SUPPORT = "${@bb.utils.contains('DISTRO_FEATURES', 'nand-squashfs'
 EXTRA_OEMAKE_append = " 'NAND_SQUASHFS_SUPPORT=${NAND_SQUASHFS_SUPPORT}'"
 EXTRA_OEMAKE_append_qti-distro-base-user = " 'VERITY_LE_USE_EXT4_GLUEBI=1'"
 
+# Dual NAND recovery support
+DUALNANDRECOVERY = "${@bb.utils.contains('MACHINE_FEATURES', 'dual-nand-recovery', 'true', 'false', d)}"
+EXTRA_OEMAKE_append = " 'RAMDISK_RECOVERYFS=${DUALNANDRECOVERY}'"
+
 do_compile () {
     export CC=${BUILD_CC}
     export CXX=${BUILD_CXX}
