@@ -12,7 +12,6 @@ PR = "r1"
 
 SRCREV = "${AUTOREV}"
 SRC_URI = "${PATH_TO_REPO}/system/libufdt/.git;protocol=${PROTO};destsuffix=system/libufdt;usehead=1"
-SRC_URI:append = " file://0001-libufdt-support-autoconf-compile.patch"
 
 S = "${WORKDIR}/system/libufdt"
 
