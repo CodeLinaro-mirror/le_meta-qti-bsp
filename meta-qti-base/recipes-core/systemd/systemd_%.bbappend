@@ -25,7 +25,7 @@ SRC_URI:append = " ${@oe.utils.conditional("PV", "250.4", "file://0001-Disable-c
 #                 system-ldconfig.service runs "ldconfig -X", but as / is read-only
 #                 cache may not be created. Disabling this may introduce app
 #                 start time latency.
-PACKAGECONFIG:remove = " backlight ldconfig "
+PACKAGECONFIG:remove = " backlight ldconfig rfkill"
 
 # Use glib-2.0 for g_strlcat
 CFLAGS:append = " \
