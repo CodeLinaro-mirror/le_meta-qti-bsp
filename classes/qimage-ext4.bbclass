@@ -181,26 +181,28 @@ do_makesystem() {
             break
         fi
 
-        # Get verity metadata for generated image.
-        get_system_verity_metdata_info "${ImgPath}"
+        if ${@bb.utils.contains('MACHINE_FEATURES', 'dm-verity-none', 'false', 'true', d)} ; then
+            # Get verity metadata for generated image.
+            get_system_verity_metdata_info "${ImgPath}"
 
-        # Append hash and fec data to the image
-        cat ${WORKDIR}/system.verityhash >> ${ImgPath}
-        cat ${WORKDIR}/system.verityfec >> ${ImgPath}
+            # Append hash and fec data to the image
+            cat ${WORKDIR}/system.verityhash >> ${ImgPath}
+            cat ${WORKDIR}/system.verityfec >> ${ImgPath}
 
-        # Check if size is within the range
-        systemSize=`wc -c ${ImgPath} | awk '{print $1}'`
-        if [ "$systemSize" -gt "${SYSTEM_IMAGE_ROOTFS_SIZE}" ]; then
-            echo "Size mismatch ($systemSize Vs ${SYSTEM_IMAGE_ROOTFS_SIZE})...recreating unsparse image."
-            continue
+            # Check if size is within the range
+            systemSize=`wc -c ${ImgPath} | awk '{print $1}'`
+            if [ "$systemSize" -gt "${SYSTEM_IMAGE_ROOTFS_SIZE}" ]; then
+                echo "Size mismatch ($systemSize Vs ${SYSTEM_IMAGE_ROOTFS_SIZE})...recreating unsparse image."
+                continue
+            fi
+
+            # Calculate offset
+            hash_offset=$adjustedSystemSize
+            hash_size=`wc -c ${WORKDIR}/system.verityhash | awk '{print $1}'`
+            fec_offset=`expr ${hash_offset} + ${hash_size}`
+            echo "fec_offset:$fec_offset" >> ${WORKDIR}/system_verity_metadata.txt
+            echo "Calculated fec offset: $fec_offset"
         fi
-
-        # Calculate offset
-        hash_offset=$adjustedSystemSize
-        hash_size=`wc -c ${WORKDIR}/system.verityhash | awk '{print $1}'`
-        fec_offset=`expr ${hash_offset} + ${hash_size}`
-        echo "fec_offset:$fec_offset" >> ${WORKDIR}/system_verity_metadata.txt
-        echo "Calculated fec offset: $fec_offset"
 
         # Convert to sparse image
         sparseImgPath="${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMIMAGE_TARGET}"
@@ -211,3 +213,4 @@ do_makesystem() {
     done
 }
 addtask do_makesystem after do_image before do_image_complete
+
