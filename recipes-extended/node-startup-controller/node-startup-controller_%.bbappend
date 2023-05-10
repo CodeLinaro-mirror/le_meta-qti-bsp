@@ -1,4 +1,4 @@
-SRC_URI = "${CAF_GIT}/genivi/lifecycle/node-startup-controller;nobranch=1;protocol=git;branch=genivi/node-startup-controller/master \
+SRC_URI = "${CLO_LE_GIT}/genivi/lifecycle/node-startup-controller;nobranch=1;protocol=${CLO_PROTOCOL};nobranch=1\
            file://use-systemd-unit-dir.patch \
            file://fix-no-libsystemd-daemon.patch \
           "

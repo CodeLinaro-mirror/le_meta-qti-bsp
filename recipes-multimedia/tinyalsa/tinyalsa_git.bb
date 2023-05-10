@@ -7,8 +7,8 @@ ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 PR = "r1"
 
 SRCREV = "b47a014f1460ffd6479fd8306c679475b03f27f1"
-SRC_URI = "git://codeaurora.org/quic/le/platform/external/tinyalsa.git;protocol=git;branch=github/master \
-           file://Makefile.am \
+SRC_URI = "${CLO_LE_GIT}/platform/external/tinyalsa.git;protocol=${CLO_PROTOCOL};nobranch=1 \           
+	   file://Makefile.am \
            file://configure.ac \
            file://tinyalsa.pc.in \
            file://0001-tinyalsa-Added-avail_min-member.patch \

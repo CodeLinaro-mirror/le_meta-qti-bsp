@@ -18,7 +18,7 @@ SRCREV = "a6189acd18b00611c1dc7042299ad75486f08a1a"
 
 PV = "3.3.0+git${SRCPV}"
 
-SRC_URI = "git://source.codeaurora.org/quic/le/protobuf.git;protocol=https;branch=protobuf/master"
+SRC_URI ="${CLO_LE_GIT}/protobuf.git;protocol=${CLO_PROTOCOL};nobranch=1"
 
 EXTRA_OECONF += " --with-protoc=echo"
 
