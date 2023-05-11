@@ -23,8 +23,17 @@ do_install:append() {
     install -m 0644 ${WORKDIR}/vendor/qcom/opensource/securemsm-kernel/linux/qcedev.h ${D}${includedir}/linux
     install -m 0644 ${WORKDIR}/vendor/qcom/opensource/securemsm-kernel/linux/fips_status.h ${D}${includedir}/linux
     install -d ${D}${includedir}/hdcp_qseecom
-    install -m 0644 ${TECHPACK_MODULE_OUT}/Module.symvers ${D}${includedir}/hdcp_qseecom
+    install -m 0644 ${S}/Module.symvers ${D}${includedir}/hdcp_qseecom
 }
+
+RPROVIDES:${PN} += "kernel-module-qseecom-dlkm-${KERNEL_VERSION}"
+RPROVIDES:${PN} += "kernel-module-tz-log-dlkm-${KERNEL_VERSION}"
+RPROVIDES:${PN} += "kernel-module-qrng-dlkm-${KERNEL_VERSION}"
+RPROVIDES:${PN} += "kernel-module-smcinvoke-dlkm-${KERNEL_VERSION}"
+RPROVIDES:${PN} += "kernel-module-hdcp-qseecom-dlkm-${KERNEL_VERSION}"
+RPROVIDES:${PN} += "kernel-module-qcrypto-msm-dlkm-${KERNEL_VERSION}"
+RPROVIDES:${PN} += "kernel-module-qce50-dlkm-${KERNEL_VERSION}"
+RPROVIDES:${PN} += "kernel-module-qcedev-mod-dlkm-${KERNEL_VERSION}"
 
 FILES:${PN} += "${sysconfdir}/*"
 FILES:${PN} += "${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/*"

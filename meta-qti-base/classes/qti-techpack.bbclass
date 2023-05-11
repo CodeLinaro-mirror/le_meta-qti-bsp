@@ -1,12 +1,13 @@
 #Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
 #SPDX-License-Identifier: BSD-3-Clause-Clear
 
-DEPENDS += "dtc-native virtual/kernel kernel-toolchain-native rsync-native"
+DEPENDS += "dtc-native virtual/kernel"
 
-inherit deploy kernel-arch linux-kernel-base qti-kernel-toolchain
+inherit deploy kernel-arch linux-kernel-base module qti-kernel-arch-clang
 
 TECHPACK_MODULE_OUT ?= ""
 TECHPACK_HEADERS ?= ""
+TECHPACK_HEADERS_OUT ?= ""
 TECHPACK_MODULES ?= ""
 TECHPACK_DTBS ?= ""
 TECHPACK_DTBOS ?= ""
@@ -14,52 +15,23 @@ TECHPACK_MAKE_ARGS ?= ""
 
 KERNEL_VERSION = "${@oe.utils.read_file('${STAGING_KERNEL_BUILDDIR}/kernel-abiversion')}"
 
-do_build_tools() {
-    cd ${B}
-    OUT_DIR=msm-kernel-${KERNEL_ARCH}-${KERNEL_VARIANT}defconfig
-    ln -sf ${KERNEL_TOOLCHAIN_DIR}/prebuilts prebuilts
-
-    rsync -a --include=arch/ --include=arch/${ARCH}/*** \
-    --include=build.config* --include=*.*h \
-    --include=drivers/ --include=drivers/clk/ \
-    --include=drivers/clk/qcom/ \
-    --include=drivers/devfreq/ \
-    --include=drivers/iommu/ \
-    --include=drivers/pinctrl/ \
-    --include=include/*** \
-    --include=Kconfig* \
-    --include=Makefile* \
-    --include=mm/ \
-    --include=scripts/*** \
-    --include=sound/ \
-    --exclude=* ${STAGING_KERNEL_DIR}/ msm-kernel
-
-    cp -R ${KERNEL_TOOLCHAIN_DIR}/build build
-
-    install -d ${OUT_DIR}
-    rsync -a --include=.config --exclude=.* --exclude=*.tmp ${STAGING_KERNEL_BUILDDIR} ${OUT_DIR}
-    mv ${OUT_DIR}/kernel-build-artifacts ${OUT_DIR}/msm-kernel
-}
-do_build_tools[dirs] = "${WORKDIR}/build"
-do_build_tools[cleandirs] = "${WORKDIR}/build"
-B = "${WORKDIR}/build"
-
-addtask do_build_tools after do_prepare_recipe_sysroot before do_configure
+MAKE_TARGETS = "\
+    M=${@os.path.relpath('${S}', '${STAGING_KERNEL_DIR}')} ${TECHPACK_MAKE_ARGS} \
+    ${@oe.utils.ifelse(d.getVar('TECHPACK_MODULES') != '', 'modules', '')} \
+    ${@oe.utils.ifelse(d.getVar('TECHPACK_DTBS') != '', 'dtbs', '')} \
+    "
 
 do_compile() {
-    cd ${B}
-    TECHPACK_MODULE_SRC="${@os.path.relpath(d.getVar('S'), d.getVar('B'))}"
-    KERNEL_DIR=msm-kernel \
-    EXT_MODULES=${TECHPACK_MODULE_SRC} \
-    BUILD_CONFIG=${KERNEL_BUILD_CONFIG} \
-    VARIANT=${KERNEL_VARIANT}defconfig \
-    OUT_DIR=msm-kernel-${KERNEL_ARCH}-${KERNEL_VARIANT}defconfig/ \
-    MODULE_OUT=${TECHPACK_MODULE_OUT} \
-    KERNEL_UAPI_HEADERS_DIR=${OUT_DIR}msm-kernel/ \
-    INSTALL_MODULE_HEADERS=${TECHPACK_HEADERS} \
-    ./build/build_module.sh  ${TECHPACK_MAKE_ARGS}
+    if [ -n "${TECHPACK_DTBS}" ]; then
+        # lock to avoid parallel compiling
+        (
+        flock -x 9 || exit 1
+        module_do_compile
+        ) 9>${TMPDIR}/dtbs_lock.lock
+    elif [ -n "${TECHPACK_MODULES}" ]; then
+        module_do_compile
+    fi
 }
-do_compile[dirs] = "${WORKDIR}/build"
 
 do_install() {
     # install modules
@@ -68,20 +40,42 @@ do_install() {
         install -d ${D}/${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra
 
         for mod in ${TECHPACK_MODULES}; do
-            if [ -f ${TECHPACK_MODULE_OUT}/$mod ]; then
-                install -m 0644 ${TECHPACK_MODULE_OUT}/$mod ${D}/${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra
+            if [ -f ${S}/$mod ]; then
+                install -m 0644 ${S}/$mod ${D}/${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra
             fi
+
+        done
+    fi
+    # install headers
+    if [ -n "${TECHPACK_HEADERS}" ]; then
+
+        for uapi_header_files in $(find ${TECHPACK_HEADERS}/* -name "*.h"); do
+            uapi_dir_name=$(basename ${TECHPACK_HEADERS})
+            uapi_base_dir=$(dirname $uapi_header_files)
+
+            if [ -n "${TECHPACK_HEADERS_OUT}" ]; then
+                out_uapi_dir_name=$(basename ${TECHPACK_HEADERS_OUT})
+
+                if [ ! -d ${D}${includedir}/${TECHPACK_HEADERS_OUT} ]; then
+                    install -d -p ${D}${includedir}/${TECHPACK_HEADERS_OUT}
+                fi
+
+                if [ ! -d ${D}${includedir}/${TECHPACK_HEADERS_OUT}/${uapi_base_dir#*"${out_uapi_dir_name}"/} ]; then
+                    install -d -p ${D}${includedir}/${TECHPACK_HEADERS_OUT}/${uapi_base_dir#*"${out_uapi_dir_name}"/}
+
+                fi
+
+                out_dir=${D}${includedir}/${TECHPACK_HEADERS_OUT}/${uapi_base_dir#*"${out_uapi_dir_name}"/}
+
+            elif [ ! -d ${D}${includedir}/linux-msm/${uapi_base_dir#*"${uapi_dir_name}"/} ]; then
+                install -d -p ${D}${includedir}/linux-msm/${uapi_base_dir#*"${uapi_dir_name}"/}
+                out_dir=${D}${includedir}/linux-msm/${uapi_base_dir#*"${uapi_dir_name}"/}
+            fi
+
+            process_one_header "$uapi_header_files" "${out_dir}"
         done
     fi
 
-    # install headers
-    if [ -n "${TECHPACK_HEADERS}" ]; then
-        install -d ${D}/usr/include/linux-msm
-
-        if [ -d ${TECHPACK_MODULE_OUT}/usr/include ]; then
-            cp -r ${TECHPACK_MODULE_OUT}/usr/include/* ${D}/usr/include/linux-msm
-        fi
-    fi
 }
 
 do_deploy() {
@@ -89,8 +83,8 @@ do_deploy() {
         install -d ${DEPLOYDIR}/build-artifacts/techpack-dtbs
 
         for dtb in ${TECHPACK_DTBS}; do
-            if [ -f ${TECHPACK_MODULE_OUT}/$dtb ]; then
-                install -m 0644 ${TECHPACK_MODULE_OUT}/$dtb ${DEPLOYDIR}/build-artifacts/techpack-dtbs/
+            if [ -f ${S}/$dtb ]; then
+                install -m 0644 ${S}/$dtb ${DEPLOYDIR}/build-artifacts/techpack-dtbs/
             fi
         done
     fi
@@ -99,11 +93,16 @@ do_deploy() {
         install -d ${DEPLOYDIR}/build-artifacts/techpack-dtbos
 
         for dtbo in ${TECHPACK_DTBOS}; do
-            if [ -f ${TECHPACK_MODULE_OUT}/$dtbo ]; then
-                install -m 0644 ${TECHPACK_MODULE_OUT}/$dtbo ${DEPLOYDIR}/build-artifacts/techpack-dtbos/
+            if [ -f ${S}/$dtbo ]; then
+                install -m 0644 ${S}/$dtbo ${DEPLOYDIR}/build-artifacts/techpack-dtbos/
             fi
         done
     fi
 }
 
 addtask do_deploy after do_install
+
+process_one_header() {
+    cd ${STAGING_KERNEL_BUILDDIR}
+    ${STAGING_KERNEL_DIR}/scripts/headers_install.sh $1 $2/$(basename $1)
+}

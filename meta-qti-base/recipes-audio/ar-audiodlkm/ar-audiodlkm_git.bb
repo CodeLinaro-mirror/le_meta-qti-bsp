@@ -17,6 +17,7 @@ S = "${WORKDIR}/vendor/qcom/opensource/audio-kernel-ar"
 inherit ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', "qti-techpack qperf", "module module-sign qperf qti-kernel-arch-clang", d)}
 
 EXTRA_OEMAKE:lemans += "TARGET_SUPPORT=lemans"
+EXTRA_OEMAKE:sa81x5 += "TARGET_SUPPORT=sa8155"
 EXTRA_OEMAKE:quin-gvm-gen4-2 += "TARGET_SUPPORT=no AUTO_GVM=yes"
 EXTRA_OEMAKE:quin-gvm-lemans += "TARGET_SUPPORT=no AUTO_GVM=yes"
 EXTRA_OEMAKE:qtiquingvm8295 += "TARGET_SUPPORT=no AUTO_GVM=yes"
@@ -40,8 +41,9 @@ MODULES = "\
 
 TECHPACK_MODULE_OUT = "${WORKDIR}/audio-kernel-ar"
 TECHPACK_MODULES = "${MODULES}"
-TECHPACK_HEADERS = "1"
-TECHPACK_MAKE_ARGS = "${EXTRA_OEMAKE} QTI_TECHPACK=true"
+TECHPACK_HEADERS = "${S}/include/uapi"
+TECHPACK_HEADERS_OUT = "audio-kernel-ar/audio"
+TECHPACK_MAKE_ARGS = "${EXTRA_OEMAKE} QTI_TECHPACK=true KERNEL_SRC=${STAGING_KERNEL_DIR}"
 
 do_configure() {
     if ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.4', 'true', 'false', d)}; then
@@ -50,11 +52,6 @@ do_configure() {
 }
 
 do_install:append() {
-    install -d -p ${D}${includedir}/audio-kernel-ar/audio/linux
-    install -d -p ${D}${includedir}/audio-kernel-ar/audio/sound
-
-    process_headers "${S}/include/uapi/audio/linux" "${D}${includedir}/audio-kernel-ar/audio/linux"
-    process_headers "${S}/include/uapi/audio/sound" "${D}${includedir}/audio-kernel-ar/audio/sound"
 
     if ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.4', 'true', 'false', d)}; then
         install -d -p ${D}${includedir}/audio-kernel-ar/audio/linux/mfd/wcd9xxx
@@ -89,7 +86,7 @@ process_headers() {
 
 # install subdirectories under ${sysconfdir}
 FILES:${PN} += "${sysconfdir}/*"
-FILES:${PN} += "${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/*"
+FILES:${PN} += "${nonarch_base_libdir}/modules/${KERNEL_VERSION}/*"
 
 # The inherit of module.bbclass will automatically name module packages with
 # kernel-module-" prefix as required by the oe-core build environment. Also it
@@ -106,5 +103,7 @@ RPROVIDES:${PN} += "${@' kernel-module-q6-notifier-dlkm-${KERNEL_VERSION}'.repla
 RPROVIDES:${PN} += "${@' kernel-module-snd-event-dlkm-${KERNEL_VERSION}'.replace('_', '-')}"
 RPROVIDES:${PN} += "${@' kernel-module-spf-core-dlkm-${KERNEL_VERSION}'.replace('_', '-')}"
 RPROVIDES:${PN} += "${@' kernel-module-stub-dlkm-${KERNEL_VERSION}'.replace('_', '-')}"
+RPROVIDES:${PN} += "${@' kernel-module-pinctrl-lpi-dlkm-${KERNEL_VERSION}'.replace('_', '-')}"
+RPROVIDES:${PN} += "${@' kernel-module-wcd9xxx-dlkm-${KERNEL_VERSION}'.replace('_', '-')}"
 
 KERNEL_CC += "-Wno-error=maybe-uninitialized"
