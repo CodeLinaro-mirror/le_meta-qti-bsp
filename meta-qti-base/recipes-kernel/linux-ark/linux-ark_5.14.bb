@@ -158,6 +158,7 @@ do_shared_workdir:append () {
 
         if [ -d scripts ]; then
             for i in \
+                scripts/unifdef \
                 scripts/basic/bin2c \
                 scripts/basic/fixdep \
                 scripts/conmakehash \
