@@ -10,7 +10,7 @@ DEPENDS += "\
 "
 
 SRC_URI = "\
-    ${PATH_TO_REPO}/vendor/qcom/opensource/agm/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/agm/snd_parser;subpath=snd_parser;usehead=1 \
+    ${PATH_TO_REPO}/vendor/qcom/opensource/agm/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/agm;usehead=1 \
     file://card-defs-dpk.xml \
 "
 SRCREV = "${AUTOREV}"

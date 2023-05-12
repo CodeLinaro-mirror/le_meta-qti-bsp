@@ -9,7 +9,7 @@ DEPENDS += "\
     virtual/kernel-headers spf \
 "
 
-SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/agm/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/agm/plugins/alsalib;subpath=alsalib;usehead=1 \
+SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/agm/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/agm;usehead=1 \
            file://agm.conf \
           "
 SRCREV = "${AUTOREV}"
