@@ -7,9 +7,9 @@ DEPENDS += "elfutils-native kern-tools-native mkbootimg-native mkdtimg-native op
 COMPATIBLE_MACHINE = "quin-tgvm-gen4"
 
 FILESPATH =+ "${KERNEL_SRC_PATH}:"
-SRC_URI = "${PATH_TO_REPO}/kernel/kernel-${PV}/kernel_platform/msm-kernel/.git;protocol=${PROTO};destsuffix=kernel/kernel-${PV}/kernel_platform/msm-kernel;usehead=1"
+SRC_URI = "${PATH_TO_REPO}/kernel/kernel-${PV}/kernel_platform/msm-kernel/.git;protocol=${PROTO};name=kernel;destsuffix=kernel/kernel-${PV}/kernel_platform/msm-kernel;usehead=1"
 
-SRCREV = "${AUTOREV}"
+SRCREV_kernel = "${AUTOREV}"
 
 inherit kernel kernel-yocto qti-kernel-arch-clang
 
