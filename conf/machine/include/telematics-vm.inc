@@ -38,7 +38,7 @@ MACHINE_SUPPORTS_USB = "False"
 # Required to set service.adb.tcp.port for SVM
 MACHINE_SUPPORTS_ANDROID_PROPERTIES = "True"
 MACHINE_SUPPORTS_DISPLAY = "False"
-MACHINE_SUPPORTS_SECUREMSM = "True"
+MACHINE_SUPPORTS_SECUREMSM = "False"
 MACHINE_MNT_POINTS = ""
 ENABLE_ADB = "True"
 
@@ -48,6 +48,8 @@ IMAGE_INIT_MANAGER = "systemd"
 
 SYSTEMIMAGE_TARGET = "system.img"
 VMIMAGE_TARGET = "vm-bootsys.img"
+
+VM_SPLIT_BINS_PATH = "boot"
 
 # UBI arguments
 UBINIZE_ARGS = "-m 4096 -p 256KiB -s 4096"

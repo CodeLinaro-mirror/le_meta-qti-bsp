@@ -1,5 +1,5 @@
 QIMGCLASSES = "core-image qimage-utils python3native"
-QIMGCLASSES += "${@bb.utils.filter('MACHINE_FEATURES', 'dm-verity-none dm-verity-bootloader dm-verity-initramfs dm-verity-initramfs-v3', d)}"
+QIMGCLASSES += "${@bb.utils.filter('MACHINE_FEATURES', 'dm-verity-none dm-verity-bootloader dm-verity-initramfs dm-verity-initramfs-v3 dm-verity-cpio-cmdline dm-verity-initramfs-v4', d)}"
 QIMGCLASSES += "${@bb.utils.contains('MACHINE_SUPPORTS_DTBO', 'True', 'qimage-dtbo', '', d)}"
 QIMGCLASSES += "${@bb.utils.contains('IMAGE_FSTYPES', 'ext4', 'qimage-ext4', '', d)}"
 QIMGCLASSES += "${@bb.utils.contains('IMAGE_FSTYPES', 'squashfs', 'qimage-squashfs', '', d)}"
@@ -62,7 +62,7 @@ IMAGE_LOGIN_MANAGER = "${@oe.utils.conditional('TOYBOX_RAMDISK', 'True', "", "bu
 DEPENDS += "\
              ext4-utils-native \
              gen-partitions-tool-native \
-             mtd-utils-native \
+             ${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', 'mtd-utils-native', '', d)} \
              openssl-native \
              pkgconfig-native \
              ptool-native \
