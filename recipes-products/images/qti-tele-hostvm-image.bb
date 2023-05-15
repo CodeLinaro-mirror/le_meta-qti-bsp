@@ -4,6 +4,7 @@
 
 require qti-tele-image.inc
 
+IMAGE_FEATURES += "vm-bootsys-volume"
 
 # Install km-loader for selected machines
 EVDEVMODULE ?= 'False'
