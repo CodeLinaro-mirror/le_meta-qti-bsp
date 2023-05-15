@@ -21,6 +21,9 @@ do_install_append () {
     if ${@bb.utils.contains('DISTRO_FEATURES','nand-squashfs','true','false',d)}; then
         add_squashfs_scripts
     fi
+    if ${@bb.utils.contains('MACHINE_FEATURES','tele-squashfs-ubi','true','false',d)}; then
+        add_squashfs_scripts
+    fi
     install -d 0644 ${D}${sysconfdir}/udev/rules.d
     install -m 0744 ${S}/mountpartitions.rules ${D}${sysconfdir}/udev/rules.d/mountpartitions
 }
@@ -28,7 +31,7 @@ do_install_append () {
 add_ubi_scripts () {
     for entry in ${MACHINE_MNT_POINTS}; do
         mountname="${entry:1}"
-        if [ "$mountname" = "firmware" -o "$mountname" = "bt_firmware" -o "$mountname" = "dsp" ]; then
+        if [ "$mountname" = "firmware" -o "$mountname" = "bt_firmware" -o "$mountname" = "dsp" -o "$mountname" = "vm-bootsys" ]; then
             install -m 0744 ${S}/${mountname}-ubi-mount.sh ${D}${sysconfdir}/initscripts/${mountname}-ubi-mount.sh
         fi
 
@@ -39,7 +42,10 @@ add_ubi_scripts () {
 }
 
 add_squashfs_scripts () {
-    if ${@bb.utils.contains('MACHINE_MNT_POINTS', '/firmware', 'true', 'false', d)}; then
+    if ${@bb.utils.contains('MACHINE_FEATURES','tele-squashfs-ubi','true','false',d)}; then
+        install -m 0744 ${S}/non-hlos-squash.sh ${D}${sysconfdir}/initscripts/non-hlos-squash.sh
+        sed -i -e 's/FindAndMountUBI modem/FindAndMountUBIVol firmware/' ${D}${sysconfdir}/initscripts/non-hlos-squash.sh
+    elif ${@bb.utils.contains('MACHINE_MNT_POINTS', '/firmware', 'true', 'false', d)}; then
         install -m 0744 ${S}/non-hlos-squash.sh ${D}${sysconfdir}/initscripts/firmware-ubi-mount.sh
     fi
 }

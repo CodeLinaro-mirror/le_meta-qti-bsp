@@ -1,4 +1,4 @@
-inherit qimage qramdisk
+inherit qimage qramdisk qimage-vm
 
 DEPENDS += "virtual/kernel"
 
@@ -13,6 +13,12 @@ CORE_IMAGE_EXTRA_INSTALL += " \
     systemd-machine-units \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-location', 'packagegroup-qti-location-vm', '', d)} \
     packagegroup-qti-telematics \
+    packagegroup-qti-data-vm \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'qti-telux', 'packagegroup-qti-telsdk', '', d)} \
+"
+
+CORE_IMAGE_EXTRA_INSTALL_append_sa525m += " \
+    packagegroup-qti-core-vm \
 "
 
 # Exclude packages
@@ -21,9 +27,6 @@ PACKAGE_EXCLUDE += "readline"
 ROOTFS_POSTPROCESS_COMMAND_remove = " do_fsconfig;"
 USE_DEPMOD = "0"
 
-do_gen_partition_bin[noexec] = "1"
-
-do_compose_vmimage[recrdeptask] = "do_ramdisk_create"
-
-IMAGE_FEATURES[validitems] += "vm"
-IMAGE_FEATURES += "vm"
+# Remove build time dependency on squashfs-tools-native.
+# To Do: Clean up and remove based on IMAGE_FSTYPES check in qimage.bbclass
+DEPENDS_remove = "squashfs-tools-native"
