@@ -17,7 +17,10 @@ do_compile() {
    for file in ${KERNEL_MODULES_BLACKLIST} ; do
        cat ${WORKDIR}/${file} | sed -e '/^ *#/d;/^ *$/d' >> ${B}/blacklist.conf
    done
-   sed -i 's/^blocklist /blacklist /g' ${B}/blacklist.conf
+
+   if [ -e ${B}/blacklist.conf ]; then
+      sed -i 's/^blocklist /blacklist /g' ${B}/blacklist.conf
+   fi
 
    for mod in ${EXTRA_BLACKLIST_MOD}; do
        echo "blacklist ${mod}" >> ${B}/blacklist.conf

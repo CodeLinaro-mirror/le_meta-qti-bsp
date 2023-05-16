@@ -16,6 +16,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-filesystem-utils \
         packagegroup-qti-audio \
         packagegroup-qti-bluetooth \
+        packagegroup-qti-camera \
         packagegroup-qti-camera-kernel \
         ${@bb.utils.contains('DISTRO_FEATURES','virtualization', 'packagegroup-qti-containers', '', d)} \
         packagegroup-qti-core \
@@ -34,13 +35,14 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-mmframeworks \
         packagegroup-qti-qmmf \
         packagegroup-qti-robotics \
+        packagegroup-qti-robos \
         packagegroup-qti-securemsm \
         packagegroup-qti-ss-mgr \
         packagegroup-qti-test-sensors-see \
         packagegroup-qti-video \
         packagegroup-qti-wifi \
         ${@bb.utils.contains('BBFILE_COLLECTIONS', 'ros2-humble-layer', 'packagegroup-ros2-humble', '', d)} \
-        ${@bb.utils.contains('BBFILE_COLLECTIONS', 'ros2-foxy-layer', 'packagegroup-ros2-foxy', '', d)} \
+        ${@bb.utils.contains('BBFILE_COLLECTIONS', 'ros2-foxy-layer', 'packagegroup-ros2-foxy packagegroup-qti-ros2-node', '', d)} \
         ${@bb.utils.contains('DISTRO_FEATURES', 'qirp-sdk', 'packagegroup-qti-qirp', '', d)} \
         packagegroup-startup-scripts \
         packagegroup-support-utils \
@@ -49,37 +51,35 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         yavta \
         libdmabufheap \
         packagegroup-qti-sensors-ship \
+        packagegroup-qti-sensors-see \
         packagegroup-qti-perf \
+        tdk-chx01-get-data-app \
+        tdk-thermistor-app \
 "
 
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "chronyc"
-CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-camera"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-cvp"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-data"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-fastcv"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-ml"
-CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-mmframeworks"
+CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-qmmf"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-robotics"
+CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-robos"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-securemsm"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-test-sensors-see"
-CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-perf"
-
+CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "tdk-chx01-get-data-app"
+CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "tdk-thermistor-app"
+CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-sensors-see"
 
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-camera"
-CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-cvp"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-data"
-CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-fastcv"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-gst"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-ml"
-CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-mmframeworks"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-qmmf"
-CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-robotics"
-CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-securemsm"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-ss-mgr"
-CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-test-sensors-see"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-camera-kernel"
-CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-sensors-ship"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-touch"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-perf"
+CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-sensors-ship"
 
 CORE_IMAGE_EXTRA_INSTALL:append:qrb5165 = " packagegroup-qti-gst-basic "

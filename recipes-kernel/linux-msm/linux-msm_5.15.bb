@@ -3,7 +3,7 @@ inherit kernel
 DESCRIPTION = "CAF Linux Kernel"
 LICENSE = "GPLv2.0-with-linux-syscall-note"
 
-COMPATIBLE_MACHINE = "kalama|qrb5165"
+COMPATIBLE_MACHINE = "kalama|qrb5165|vt-64"
 
 FILESEXTRAPATHS:prepend := "${WORKSPACE}:"
 FILESEXTRAPATHS:prepend := "${WORKSPACE}:${KERNEL_PREBUILT_PATH}:"
@@ -97,14 +97,14 @@ do_prebuilt_configure() {
     # Some of the artifacts needed for module compilation are present under
     # msm-kernel path, for now copy them for this path to avoid build failures.
     # Ask prebuilt providers to make these available in KERNEL_PREBUILT_DISTDIR.
-    install -m 0644 ../gki_kernel/common/.config ${B}
-    install -m 0644 ../gki_kernel/common/Module.symvers ${B}
-    install -m 0644 ../gki_kernel/common/include/config/kernel.release ${B}/include/config/kernel.release
-    install -m 0644 ../gki_kernel/common/scripts/module.lds ${B}/scripts/module.lds
-    install -m 0644 ../gki_kernel/common/include/generated/utsrelease.h ${B}/include/generated
-    install -m 0644 ../gki_kernel/common/certs/signing_key.pem ${B}/certs/signing_key.pem
-    #install -m 0644 ../gki_kernel/common/certs/verity_cert.pem ${B}/certs/verity_cert.pem
-    #install -m 0644 ../gki_kernel/common/certs/verity_key.pem ${B}/certs/verity_key.pem
+    install -m 0644 ../${KERNEL_TYPE}/.config ${B}
+    install -m 0644 ../${KERNEL_TYPE}/Module.symvers ${B}
+    install -m 0644 ../${KERNEL_TYPE}/include/config/kernel.release ${B}/include/config/kernel.release
+    install -m 0644 ../${KERNEL_TYPE}/scripts/module.lds ${B}/scripts/module.lds
+    install -m 0644 ../${KERNEL_TYPE}/include/generated/utsrelease.h ${B}/include/generated
+    install -m 0644 ../${KERNEL_TYPE}/certs/signing_key.pem ${B}/certs/signing_key.pem
+    #install -m 0644 ../${KERNEL_TYPE}/certs/verity_cert.pem ${B}/certs/verity_cert.pem
+    #install -m 0644 ../${KERNEL_TYPE}/certs/verity_key.pem ${B}/certs/verity_key.pem
 
     # update paths of signature checking certificates to reflect current host
     #sed -i -e '/CONFIG_MODULE_SIG_KEY[ =]/d' ${B}/.config
@@ -260,7 +260,7 @@ do_deploy() {
     install -m 0644 System.map ${DEPLOYDIR}
 
     install -d ${DEPLOYDIR}/kernel_dtbs
-    cd ${KERNEL_PREBUILT_DISTDIR}/../msm-kernel/arch/arm64/boot/dts/
+    cd ${KERNEL_PREBUILT_DISTDIR}/
     for dtbf in ${KERNEL_DTB_NAMES}; do
         install -m 0644 $dtbf ${DEPLOYDIR}/kernel_dtbs
     done
