@@ -30,9 +30,9 @@
 modprobe snd_event_dlkm
 modprobe q6_notifier_dlkm
 modprobe apr_dlkm
-modprobe q6_dlkm
-modprobe adsp_loader_dlkm
-modprobe stub_dlkm
+modprobe q6_dlkm &
+modprobe adsp_loader_dlkm &
+modprobe stub_dlkm &
 
 count=0
 while true
@@ -52,7 +52,7 @@ do
     fi
 done
 
-if [ $machine == SA81*5P ]; then
+if [ $machine == SA8155P ] || [ $machine == SA8195P ]; then
     /bin/mount -o ro /dev/sde4 /firmware
 elif [ $machine == SA6155P ]; then
     /bin/mount -o ro /dev/mmcblk0p30 /firmware
