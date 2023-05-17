@@ -65,6 +65,27 @@ _WLAN_CFG_OVERRIDE_GVM = "\
                         CONFIG_CFG_BMISS_OFFLOAD_MAX_VDEV=4 \
                         "
 
+_WLAN_CFG_OVERRIDE_PRODUCT = "\
+                        CONFIG_WLAN_DISABLE_EXPORT_SYMBOL=y \
+                        CONFIG_WLAN_OPEN_P2P_INTERFACE=n \
+                        CONFIG_SUPPORT_P2P_BY_ONE_INTF_WLAN=y \
+                        CONFIG_FEATURE_GPIO_CFG=y \
+                        CONFIG_WLAN_MAC_ADDR_UPDATE_DISABLE=y \
+                        CONFIG_FEATURE_WLAN_CH_AVOID_EXT=y \
+                        CONFIG_QCOM_TDLS=n \
+                        CONFIG_CFG_MAX_STA_VDEVS=4 \
+                        CONFIG_CFG_BMISS_OFFLOAD_MAX_VDEV=4 \
+                        CONFIG_REO_DESC_DEFER_FREE=y \
+                        CONFIG_FEATURE_MEMDUMP_ENABLE=n \
+                        WLAN_OPEN_SOURCE=n \
+                        CONFIG_REMOVE_PKT_LOG=y \
+                        CONFIG_DEBUG_FS=n \
+                        CONFIG_WLAN_SYSFS=n \
+                        CONFIG_WLAN_SYSFS_MEM_STATS=n \
+                        CONFIG_SLUB_DEBUG=n \
+                        CONFIG_PERF_DEBUG=n \
+                        "
+
 _WLAN_CFG_NO_SEPARATE_P2P = "CONFIG_WLAN_OPEN_P2P_INTERFACE=n CONFIG_SUPPORT_P2P_BY_ONE_INTF_WLAN=y"
 
 _WLAN_CFG_SEPARATE_P2P = "CONFIG_WLAN_OPEN_P2P_INTERFACE=y CONFIG_SUPPORT_P2P_BY_ONE_INTF_WLAN=n"

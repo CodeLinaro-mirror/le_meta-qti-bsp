@@ -78,6 +78,28 @@ _WLAN_CFG_OVERRIDE_METAL = "\
                         CONFIG_WLAN_FEATURE_DP_EVENT_HISTORY=y \
                         CONFIG_DP_TX_TRACKING=y \
                         "
+
+_WLAN_CFG_OVERRIDE_PRODUCT = "\
+                        CONFIG_WLAN_DISABLE_EXPORT_SYMBOL=y \
+                        CONFIG_WLAN_OPEN_P2P_INTERFACE=n \
+                        CONFIG_SUPPORT_P2P_BY_ONE_INTF_WLAN=y \
+                        CONFIG_FEATURE_GPIO_CFG=y \
+                        CONFIG_WLAN_MAC_ADDR_UPDATE_DISABLE=y \
+                        CONFIG_FEATURE_WLAN_CH_AVOID_EXT=y \
+                        CONFIG_QCOM_TDLS=n \
+                        CONFIG_CFG_MAX_STA_VDEVS=4 \
+                        CONFIG_CFG_BMISS_OFFLOAD_MAX_VDEV=4 \
+                        CONFIG_REO_DESC_DEFER_FREE=y \
+                        CONFIG_FEATURE_MEMDUMP_ENABLE=n \
+                        WLAN_OPEN_SOURCE=n \
+                        CONFIG_REMOVE_PKT_LOG=y \
+                        CONFIG_DEBUG_FS=n \
+                        CONFIG_WLAN_SYSFS=n \
+                        CONFIG_WLAN_SYSFS_MEM_STATS=n \
+                        CONFIG_SLUB_DEBUG=n \
+                        CONFIG_PERF_DEBUG=n \
+                        "
+
 EXTRA_OEMAKE:append:qtiquingvm = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
 EXTRA_OEMAKE:append:qtiquingvm8295 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
 EXTRA_OEMAKE:append:sa8295 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_METAL}"

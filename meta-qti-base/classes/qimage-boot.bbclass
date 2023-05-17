@@ -28,6 +28,8 @@ do_merge_dtbs[cleandirs] = " \
      ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', '${DEPLOY_DIR_IMAGE}/dtbos ', ' ', d)} \
 "
 
+do_merge_dtbs[depends] += "kernel-toolchain-native:do_shared_workdir"
+
 addtask do_merge_dtbs after do_image before do_makeboot
 
 MKBOOTUTIL = '${@oe.utils.conditional("PREFERRED_PROVIDER_mkbootimg-native", "mkbootimg-gki-native", "scripts/mkbootimg.py", "mkbootimg", d)}'

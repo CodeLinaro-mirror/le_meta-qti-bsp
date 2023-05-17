@@ -120,4 +120,54 @@ EXT_COMPILE_OPTIONS = "\
 SECURITY_CFLAGS:append:pn-liblog = " ${EXT_COMPILE_OPTIONS}"
 SECURITY_CFLAGS:remove:pn-liblog = " -Werror=format-truncation=2"
 
+SECURITY_CFLAGS:append:pn-libcutils = " ${EXT_COMPILE_OPTIONS}"
+SECURITY_CFLAGS:remove:pn-libcutils = " -Werror=conversion \
+                                        -Werror=sign-conversion \
+                                        -Werror=format-truncation=2 \
+                                        -Werror=format"
+
+SECURITY_CFLAGS:append:pn-libutils = " ${EXT_COMPILE_OPTIONS}"
+SECURITY_CFLAGS:remove:pn-libutils = " -Werror=conversion \
+                                       -Werror=sign-conversion"
+
+SECURITY_CFLAGS:append:pn-libsparse = " ${EXT_COMPILE_OPTIONS}"
+SECURITY_CFLAGS:remove:pn-libsparse = " -Werror=conversion \
+                                        -Werror=sign-conversion"
+
+SECURITY_CFLAGS:append:pn-libion = " ${EXT_COMPILE_OPTIONS}"
+SECURITY_CFLAGS:remove:pn-libion = " -Werror=conversion \
+                                     -Werror=sign-conversion \
+                                     -Werror=null-dereference \
+                                     -Werror=shift-overflow=2"
+
+SECURITY_CFLAGS:append:pn-safe-iop = " ${EXT_COMPILE_OPTIONS}"
+SECURITY_CFLAGS:remove:pn-safe-iop = " -Werror=shift-overflow=2"
+
+SECURITY_CFLAGS:append:pn-libmincrypt = " ${EXT_COMPILE_OPTIONS}"
+SECURITY_CFLAGS:remove:pn-libmincrypt = " -Werror=conversion \
+                                          -Werror=sign-conversion"
+
+SECURITY_CFLAGS:append:pn-binder = " ${EXT_COMPILE_OPTIONS}"
+SECURITY_CFLAGS:remove:pn-binder = " -Werror=conversion \
+                                     -Werror=sign-conversion \
+                                     -Werror=format-overflow=2"
+
+SECURITY_CFLAGS:append:pn-libdmabufheap = " ${EXT_COMPILE_OPTIONS}"
+SECURITY_CFLAGS:remove:pn-libdmabufheap = " -Werror=conversion \
+                                            -Werror=sign-conversion"
+
+SECURITY_CFLAGS:append:pn-ext4-utils = " ${EXT_COMPILE_OPTIONS}"
+SECURITY_CFLAGS:remove:pn-ext4-utils = " -Werror=conversion \
+                                         -Werror=sign-conversion \
+                                         -Werror=clobbered"
+
+SECURITY_CFLAGS:append:pn-libbase = " ${EXT_COMPILE_OPTIONS}"
+SECURITY_CFLAGS:remove:pn-libbase = " -Werror=conversion \
+                                      -Werror=sign-conversion"
+
+SECURITY_CFLAGS:append:pn-system-core = " ${EXT_COMPILE_OPTIONS}"
+SECURITY_CFLAGS:remove:pn-system-core = " -Werror=conversion \
+                                          -Werror=sign-conversion \
+                                          -Werror=missing-field-initializers"
+
 # Add other packages here...
