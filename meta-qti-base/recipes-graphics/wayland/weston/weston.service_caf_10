@@ -1,6 +1,6 @@
 [Unit]
 Description=Weston reference Wayland compositor
-Conflicts=getty@tty7.service
+Conflicts=getty@tty2.service
 Requires=dev-dri-card0.device
 After=dbus.service rc.pvr.service dev-dri-card0.device
 
@@ -8,11 +8,12 @@ After=dbus.service rc.pvr.service dev-dri-card0.device
 User=root
 PAMName=weston-autologin
 Environment="XDG_RUNTIME_DIR=/run/user/0"
-ExecStart=weston --tty=2 --idle-time=0 --socket=wayland-0 --log=/tmp/weston.log
+ExecStart=weston --idle-time=0 --socket=wayland-0 --log=/tmp/weston.log
 ExecStop=/usr/bin/killall -s KILL weston
 Type=simple
 PIDFile=/run/early/weston.pid
 Restart=always
+TTYPath=/dev/tty2
 
 [Install]
 WantedBy=multi-user.target

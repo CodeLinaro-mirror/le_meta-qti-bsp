@@ -23,9 +23,6 @@ S = "${WORKDIR}/graphics/weston"
 
 UPSTREAM_CHECK_URI:remove = "https://wayland.freedesktop.org/releases.html"
 
-# Disable systemd-logind D-Bus protocol
-PACKAGECONFIG:remove = "systemd"
-
 # Enable support for the deprecated wl_shell interface
 # This is a workaround for outdated GFX Benchmark tool
 PACKAGECONFIG:append = " wl-shell"
