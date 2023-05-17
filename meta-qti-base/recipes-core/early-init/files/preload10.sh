@@ -41,6 +41,8 @@ ls -l /etc/systemd/system/sockets.target.wants
 
 echo systemdm9 > /dev/kmsg
 
+dd if=/usr/lib/libbase.so.0.0.0 of=/dev/null
+dd if=/usr/lib/libbase.so.0 of=/dev/null
 dd if=/usr/lib/libsdedrm.so of=/dev/null
 dd if=/usr/lib/liblog.so.0.0.0 of=/dev/null
 dd if=/usr/lib/liblog.so.0 of=/dev/null

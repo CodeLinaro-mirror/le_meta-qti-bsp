@@ -29,6 +29,8 @@
 echo systemdsd > /dev/kmsg
 
 #dd if=/lib/libc-2.31.so of=/dev/null
+dd if=/lib/libc.so.6 of=/dev/null
+dd if=/lib/libm.so.6 of=/dev/null
 dd if=/lib/systemd/system/systemd-update-done.service of=/dev/null
 dd if=/lib/systemd/system/systemd-udevd.service of=/dev/null
 dd if=/lib/systemd/system/systemd-udevd-kernel.socket of=/dev/null
@@ -50,6 +52,9 @@ ls -l /etc/systemd/system/network-online.target.wants
 
 echo systemdmd > /dev/kmsg
 
+dd if=/usr/lib/libllvm-qgl.so of=/dev/null
+dd if=/usr/lib/libsync.so.0.0.0 of=/dev/null
+dd if=/usr/lib/libsync.so.0 of=/dev/null
 dd if=/usr/lib/libstdc++.so.6.0.29 of=/dev/null
 dd if=/usr/lib/libstdc++.so.6 of=/dev/null
 dd if=/usr/lib/libpcre.so.1.2.13 of=/dev/null

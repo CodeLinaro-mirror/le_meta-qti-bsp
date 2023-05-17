@@ -52,6 +52,8 @@ ls -l /lib/systemd/system/rescue.target.wants
 
 echo systemdme > /dev/kmsg
 
+dd if=/usr/lib/libdmabufheap.so.0.0.0 of=/dev/null
+dd if=/usr/lib/libdmabufheap.so.0 of=/dev/null
 dd if=/usr/lib/libdrm.so.2.4.0 of=/dev/null
 dd if=/usr/lib/libdrm.so.2 of=/dev/null
 dd if=/usr/lib/libdisplaydebug.so of=/dev/null
