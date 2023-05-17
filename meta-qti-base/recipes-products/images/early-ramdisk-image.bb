@@ -38,6 +38,7 @@ IMAGE_INSTALL = "\
                  kernel-module-iommu-logger-${KERNEL_VERSION} \
                  kernel-module-llcc-qcom-${KERNEL_VERSION} \
                  kernel-module-mem-buf-${KERNEL_VERSION} \
+                 kernel-module-qcom-va-minidump-${KERNEL_VERSION} \
                  kernel-module-minidump-${KERNEL_VERSION} \
                  kernel-module-msm-qmp-${KERNEL_VERSION} \
                  kernel-module-msm-dma-iommu-mapping-${KERNEL_VERSION} \
@@ -76,6 +77,7 @@ IMAGE_INSTALL = "\
                  kernel-module-gdsc-regulator-${KERNEL_VERSION} \
                  kernel-module-gcc-sm8150-${KERNEL_VERSION} \
                  kernel-module-gcc-sc8180x-${KERNEL_VERSION} \
+                 kernel-module-scc-sm8150-${KERNEL_VERSION} \
                  kernel-module-camcc-sc8180x-${KERNEL_VERSION} \
                  kernel-module-camcc-sm8150-${KERNEL_VERSION} \
                  kernel-module-gpucc-sm8150-${KERNEL_VERSION} \
