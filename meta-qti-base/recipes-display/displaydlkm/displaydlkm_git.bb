@@ -33,6 +33,8 @@ do_install:append:lemans(){
 }
 
 RPROVIDES:${PN} += "kernel-module-msm-drm-${KERNEL_VERSION}"
+RPROVIDES:${PN}:qtiquingvm8295 += "kernel-module-msm-hyp-${KERNEL_VERSION}"
+RPROVIDES:${PN}:qtiquingvm8295 += "kernel-module-msm-cfg-${KERNEL_VERSION}"
 RPROVIDES:${PN}:quin-gvm-gen4-2 += "kernel-module-msm-hyp-${KERNEL_VERSION}"
 RPROVIDES:${PN}:quin-gvm-gen4-2 += "kernel-module-msm-cfg-${KERNEL_VERSION}"
 RPROVIDES:${PN}:quin-gvm-lemans += "kernel-module-msm-hyp-${KERNEL_VERSION}"
