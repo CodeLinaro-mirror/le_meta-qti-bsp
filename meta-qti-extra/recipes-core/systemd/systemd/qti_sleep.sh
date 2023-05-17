@@ -62,7 +62,7 @@ case $1/$2 in
         echo $dev=$usb_mode >> "$mode_file_path/$usb_mode_file"
         echo none > $usb_dev_path/$dev/mode
     done
-    sleep 2
+    sleep 5
     ;;
   post/*)
     echo "Exiting from $2..."
