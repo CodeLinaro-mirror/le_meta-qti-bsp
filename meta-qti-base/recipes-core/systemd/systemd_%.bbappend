@@ -8,6 +8,7 @@ SRC_URI:append = " \
     file://0001-systemd-add-slotselect-support-in-fstab.patch \
     file://0033-systemd-Make-root-s-home-directory-configurable-2.patch \
     file://0001-systemd-skip-smack-copy-issue-in-systemd.patch \
+    file://0001-systemd-ignore-VT-switch-signal-between-host-and-container.patch \
     file://60-misc.rules \
 "
 SRC_URI:append = " ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "5.15", "file://platform_load.conf", "", d)}"
