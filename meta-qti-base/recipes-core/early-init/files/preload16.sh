@@ -53,6 +53,9 @@ ls -l /lib/systemd/system/timers.target.wants
 echo systemdmf > /dev/kmsg
 
 #21.5MB libGLESv2_adreno
+dd if=/usr/lib/libGLESv2.so.2 of=/dev/null
+dd if=/usr/lib/libGLESv2.so.2.0 of=/dev/null
+dd if=/usr/lib/libGLESv2.so.2.0.0 of=/dev/null
 dd if=/usr/lib/libGLESv2_adreno.so of=/dev/null
 
 echo systemdef > /dev/kmsg
