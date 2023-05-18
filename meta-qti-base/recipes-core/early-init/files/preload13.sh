@@ -51,6 +51,8 @@ dd if=/build.prop of=/dev/null
 
 echo systemdmc > /dev/kmsg
 
+dd if=/usr/lib/libgthread-2.0.so.0.7200.3 of=/dev/null
+dd if=/usr/lib/libgthread-2.0.so.0 of=/dev/null
 dd if=/usr/lib/libglib-2.0.so.0.7200.0 of=/dev/null
 dd if=/usr/lib/libglib-2.0.so.0 of=/dev/null
 #dd if=/usr/lib/lib_drm_fe.so of=/dev/null
