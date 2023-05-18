@@ -30,8 +30,7 @@
 
 [Unit]
 Description=Weston reference Wayland compositor
-Requires=dev-dri-card0.device
-After=leprop.service dev-dri-card0.device
+After=leprop.service
 DefaultDependencies=no
 
 [Service]
