@@ -16,8 +16,6 @@ PREFERRED_VERSION_camx ?= "0.1"
 PREFERRED_VERSION_chi-cdk ?= "0.1"
 PREFERRED_VERSION_cameradlkm ?= "0.1"
 
-# Enables timestamping functionality during building the kernel
-KERNEL_DEBUG_TIMESTAMPS = "1"
 # Prefer gbm
 PREFERRED_PROVIDER_virtual/libgbm = "gbm"
 
