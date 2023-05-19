@@ -1,4 +1,4 @@
-inherit qimage qramdisk
+inherit qimage
 
 DEPENDS += " virtual/kernel"
 

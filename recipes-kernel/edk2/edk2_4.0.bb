@@ -6,17 +6,16 @@ LIC_FILES_CHKSUM = " \
 "
 
 INHIBIT_DEFAULT_DEPS = "1"
-FILESEXTRAPATHS:prepend := "${KERNEL_PREBUILT_PATH}/dist:"
+FILESEXTRAPATHS:prepend := "${KERNEL_PREBUILT_PATH}/abl-userdebug:"
 
-SRC_URI = "file://abl_userdebug.elf"
+SRC_URI = "file://unsigned_abl.elf"
 
 do_install[noexec]="1"
 do_configure[noexec]="1"
 
 do_deploy() {
-    install -m 644 ${WORKDIR}/abl_userdebug.elf ${DEPLOYDIR}/abl.elf
+    install -m 644 ${WORKDIR}/abl.elf ${DEPLOYDIR}
 }
 
 do_deploy[dirs] = "${DEPLOYDIR}"
 addtask deploy before do_build after do_install
-

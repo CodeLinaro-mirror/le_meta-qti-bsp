@@ -25,6 +25,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-sensors-see \
         packagegroup-qti-test-sensors-see \
         packagegroup-qti-video \
+        packagegroup-qti-gst \
         packagegroup-qti-perf \
         powerapp \
         powerapp-powerconfig \

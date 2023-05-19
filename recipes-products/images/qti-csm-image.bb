@@ -2,7 +2,7 @@
 # Provides packages required to build a csm image with
 # boot to console
 
-inherit qimage qramdisk
+inherit qimage
 
 IMAGE_FEATURES += "read-only-rootfs"
 

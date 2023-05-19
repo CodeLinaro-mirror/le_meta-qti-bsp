@@ -25,7 +25,6 @@ do_image_multiubi[noexec] = "1"
 
 CORE_IMAGE_EXTRA_INSTALL += "\
             packagegroup-qti-recoveryfs \
-            packagegroup-qti-core-recovery \
 "
 
 RM_WORK_EXCLUDE += "${PN}"
