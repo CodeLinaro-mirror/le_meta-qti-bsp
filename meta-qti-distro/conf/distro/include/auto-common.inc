@@ -3,6 +3,7 @@ require conf/distro/include/msm.inc
 
 require conf/distro/include/security_flags.inc
 
+INHERIT += "reproducible_build"
 DISTRO_NAME = "automotive"
 DISTROOVERRIDES =. "automotive:"
 # Support SDP

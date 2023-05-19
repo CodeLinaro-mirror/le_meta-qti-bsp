@@ -130,6 +130,21 @@ do_kernel_checkout[noexec] = "1"
 do_validate_branches[noexec] = "1"
 
 do_compile () {
+    if [ "${BUILD_REPRODUCIBLE_BINARIES}" = "1" ]; then
+        # kernel sources do not use do_unpack, so SOURCE_DATE_EPOCH may not
+        # be set....
+        if [ "${SOURCE_DATE_EPOCH}" = "" -o "${SOURCE_DATE_EPOCH}" = "0" ]; then
+            # The source directory is not necessarily a git repository, so we
+            # specify the git-dir to ensure that git does not query a
+            # repository in any parent directory.
+            SOURCE_DATE_EPOCH=`git --git-dir="${S}/.git" log -1 --pretty=%ct 2>/dev/null || echo "${REPRODUCIBLE_TIMESTAMP_ROOTFS}"`
+        fi
+
+        ts=`LC_ALL=C date -d @$SOURCE_DATE_EPOCH`
+        export KBUILD_BUILD_TIMESTAMP="$ts"
+        export KCONFIG_NOTIMESTAMP=1
+        bbnote "KBUILD_BUILD_TIMESTAMP: $ts"
+    fi
     oe_runmake CC="${KERNEL_CC}" LD="${KERNEL_LD}" ${KERNEL_EXTRA_ARGS} $use_alternate_initrd
 }
 
