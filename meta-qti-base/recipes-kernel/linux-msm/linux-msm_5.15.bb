@@ -58,6 +58,18 @@ KBUILD_DEFCONFIG ?= "vendor/${KERNEL_ARCH}${@bb.utils.contains_any('VARIANT', 'd
 
 KERNEL_VERSION_SANITY_SKIP = "1"
 
+# append DTB
+# msm kernel trees have a special treatment for DTS, and both arm and
+# arm64 DTS are located in arch/arm64/boot/dts/qcom folder, which
+# confuses kernel-devicetree class, so we can't use it. Instead let's
+# make sure that we generate all DTBs using the kernel 'dtbs' target,
+# then we can append the DTBs that we need for $MACHINE.
+KERNEL_IMAGETYPE_FOR_MAKE += "dtbs"
+KERNEL_IMAGETYPE_FOR_MAKE += "${KERNEL_IMAGETYPE}"
+KERNEL_IMAGETYPE_FOR_MAKE += "modules"
+
+do_compile_kernelmodules[noexec] = "1"
+
 do_kernel_configcheck[noexec] = "1"
 do_kernel_checkout[noexec] = "1"
 do_validate_branches[noexec] = "1"
@@ -214,14 +226,6 @@ python () {
         bb.build.addtask('do_prebuilt_shared_workdir', 'do_compile_kernelmodules', 'do_compile', d)
 }
 
-# append DTB
-# msm kernel trees have a special treatment for DTS, and both arm and
-# arm64 DTS are located in arch/arm64/boot/dts/qcom folder, which
-# confuses kernel-devicetree class, so we can't use it. Instead let's
-# make sure that we generate all DTBs using the kernel 'dtbs' target,
-# then we can append the DTBs that we need for $MACHINE.
-KERNEL_EXTRA_ARGS += "dtbs"
-
 do_compile:prepend() {
         if ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'true', 'false', d)}; then
             export DTC_FLAGS="-@"
@@ -253,6 +257,20 @@ do_shared_workdir:append () {
 
         # Generate kernel headers
         oe_runmake_call -C ${STAGING_KERNEL_DIR} ARCH=${ARCH} CC="${KERNEL_CC}" LD="${KERNEL_LD}" headers_install O=${STAGING_KERNEL_BUILDDIR}
+
+        if (grep -q -i -e '^CONFIG_MODULES=y$' ${B}/.config); then
+            # Module.symvers gets updated during the
+            # building of the kernel modules. We need to
+            # update this in the shared workdir since some
+            # external kernel modules has a dependency on
+            # other kernel modules and will look at this
+            # file to do symbol lookups
+            cp ${B}/Module.symvers ${STAGING_KERNEL_BUILDDIR}/
+            # 5.10+ kernels have module.lds that we need to copy for external module builds
+            if [ -e "${B}/scripts/module.lds" ]; then
+                install -Dm 0644 ${B}/scripts/module.lds ${STAGING_KERNEL_BUILDDIR}/scripts/module.lds
+            fi
+        fi
 }
 
 # Path for dtbo generation is kernel version dependent.
