@@ -54,21 +54,22 @@ python copy_buildsystem:append() {
     cmd = "%s %s %s" % (d.getVar('COPY_DIRECTORY_TREE'), src_kernel_defconfig, dest_kernel_defconfig)
     subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
 
-    #Copy HY11 prebuilt tar.gz to extensible SDK
-    src_prebuilt_hy11 = os.path.abspath(d.getVar('TOPDIR') + '/../prebuilt_HY11')
-    dest_prebuilt_hy11 = os.path.join(baseoutpath,'prebuilt_HY11')
-    bb.note("src_prebuilt_hy11 is %s" % src_prebuilt_hy11)
-    if os.path.exists(src_prebuilt_hy11):
-            shutil.copytree(src_prebuilt_hy11,dest_prebuilt_hy11)
+    # Copy prebuilt tar to eSDK and set PREBUILT_SRC_DIR
+    prebuilt_src_dir_sdk = ""
+    default_prebuilt_src_dir = d.getVar('DEFAULT_PREBUILT_SRC_DIR')
+    default_prebuilt_src_dir_list = default_prebuilt_src_dir.split()
+    for dir in default_prebuilt_src_dir_list:
+        if os.path.exists(str(dir)):
+            destdir = baseoutpath + str(dir).replace(d.getVar('WORKSPACEROOT'),"")
+            bb.utils.mkdirhier(destdir)
+            cmd = "%s %s %s" % (d.getVar('COPY_DIRECTORY_TREE'), str(dir), destdir)
+            subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
+            prebuilt_src_dir_sdk = prebuilt_src_dir_sdk + '${TOPDIR}/'  + str(dir).replace(d.getVar('WORKSPACEROOT'),"") + " "
+        else:
+            pass
 
-    src_prebuilt_hy22 = os.path.abspath(d.getVar('TOPDIR') + '/../prebuilt_HY22')
-    dest_prebuilt_hy22 = os.path.join(baseoutpath,'prebuilt_HY22')
-    if os.path.exists(src_prebuilt_hy22):
-            shutil.copytree(src_prebuilt_hy22,dest_prebuilt_hy22)
-
-    #set prebuilt tar.gz path when esdk generation
     with open(baseoutpath + '/conf/local.conf', 'a') as f:
-        f.write('\nPREBUILT_SRC_DIR = "%s"\n' % '${TOPDIR}/prebuilt_HY11 ${TOPDIR}/prebuilt_HY22')
+        f.write('\nPREBUILT_SRC_DIR = "%s"\n' % prebuilt_src_dir_sdk)
 }
 
 # To include llvm-arm-toolchain as part of sysroots in eSDK tmp directory
