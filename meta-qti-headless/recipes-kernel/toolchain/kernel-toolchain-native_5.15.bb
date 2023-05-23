@@ -8,15 +8,20 @@ BASE_GIT_PATH = "${PATH_TO_REPO}/kernel/kernel-${PREFERRED_VERSION_linux-msm}/ke
 BASE_PATH = "kernel/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform"
 
 SRC_URI = " \
-    ${BASE_GIT_PATH}/prebuilts/clang/host/linux-x86/.git;protocol=${PROTO};destsuffix=${BASE_PATH}/prebuilts/clang/host/linux-x86 \
-    ${BASE_GIT_PATH}/prebuilts/build-tools/.git;protocol=${PROTO};destsuffix=${BASE_PATH}/prebuilts/build-tools \
-    ${BASE_GIT_PATH}/prebuilts/kernel-build-tools/.git;protocol=${PROTO};destsuffix=${BASE_PATH}/prebuilts/kernel-build-tools \
-    ${BASE_GIT_PATH}/prebuilts/gcc/linux-x86/host/x86_64-linux-glibc2.17-4.8/.git;protocol=${PROTO};destsuffix=${BASE_PATH}/prebuilts/gcc/linux-x86/host/x86_64-linux-glibc2.17-4.8 \
-    ${BASE_GIT_PATH}/prebuilts/ndk-r23/.git;protocol=${PROTO};destsuffix=${BASE_PATH}/prebuilts/ndk-r23 \
-    ${BASE_GIT_PATH}/build/kernel/.git;protocol=${PROTO};destsuffix=${BASE_PATH}/build/kernel \
+    ${BASE_GIT_PATH}/prebuilts/clang/host/linux-x86/.git;protocol=${PROTO};name=clang;destsuffix=${BASE_PATH}/prebuilts/clang/host/linux-x86 \
+    ${BASE_GIT_PATH}/prebuilts/build-tools/.git;protocol=${PROTO};name=build-tools;destsuffix=${BASE_PATH}/prebuilts/build-tools \
+    ${BASE_GIT_PATH}/prebuilts/kernel-build-tools/.git;protocol=${PROTO};name=kernel-build-tools;destsuffix=${BASE_PATH}/prebuilts/kernel-build-tools \
+    ${BASE_GIT_PATH}/prebuilts/gcc/linux-x86/host/x86_64-linux-glibc2.17-4.8/.git;protocol=${PROTO};name=glibc;destsuffix=${BASE_PATH}/prebuilts/gcc/linux-x86/host/x86_64-linux-glibc2.17-4.8 \
+    ${BASE_GIT_PATH}/prebuilts/ndk-r23/.git;protocol=${PROTO};name=ndk;destsuffix=${BASE_PATH}/prebuilts/ndk-r23 \
+    ${BASE_GIT_PATH}/build/kernel/.git;protocol=${PROTO};name=build-kernel;destsuffix=${BASE_PATH}/build/kernel \
 "
 
-SRCREV = "${AUTOREV}"
+SRCREV_clang = "${AUTOREV}"
+SRCREV_build-tools = "${AUTOREV}"
+SRCREV_kernel-build-tools = "${AUTOREV}"
+SRCREV_glibc = "${AUTOREV}"
+SRCREV_ndk = "${AUTOREV}"
+SRCREV_build-kernel = "${AUTOREV}"
 
 CLANG_VERSION = "r450784e"
 

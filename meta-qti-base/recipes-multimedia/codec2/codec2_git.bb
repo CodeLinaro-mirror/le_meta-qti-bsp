@@ -19,7 +19,7 @@ DEPENDS += "\
     system-core-headers \
 "
 
-SRC_URI = "${PATH_TO_REPO}/frameworks/.git;protocol=${PROTO};destsuffix=frameworks/av/media/codec2;usehead=1"
+SRC_URI = "${PATH_TO_REPO}/frameworks/.git;protocol=${PROTO};destsuffix=frameworks;usehead=1"
 SRCREV = "${AUTOREV}"
 S = "${WORKDIR}/frameworks/av/media/codec2"
 

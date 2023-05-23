@@ -7,7 +7,7 @@ ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 DEPENDS += "glib-2.0 libcutils libhardware liblog libselinux system-core"
 
 SRC_URI = "\
-    ${PATH_TO_REPO}/frameworks/.git;protocol=${PROTO};destsuffix=frameworks/binder;subpath=binder;usehead=1 \
+    ${PATH_TO_REPO}/frameworks/.git;protocol=${PROTO};destsuffix=frameworks;usehead=1 \
     file://servicemanager.service \
     file://create-binder.sh \
     file://create-binder.service \
