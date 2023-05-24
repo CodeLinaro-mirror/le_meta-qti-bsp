@@ -26,7 +26,8 @@ do_install() {
 
     install -D -p -m0644 ${WORKDIR}/weston.ini_caf ${D}${sysconfdir}/xdg/weston/weston.ini
     # Install reuqire-input=false in weston.ini
-    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'true', 'false', d)}; then
+    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'true', 'false', d)} ||
+       ${@bb.utils.contains('DISTRO_FEATURES', 'early_init', 'true', 'false', d)}; then
         sed -i -e '/\[core\]/a require-input=false' ${D}${sysconfdir}/xdg/weston/weston.ini
     fi
 
