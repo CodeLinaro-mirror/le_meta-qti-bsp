@@ -6,11 +6,12 @@ inherit qimage
 
 DEPENDS += "mtd-utils-native"
 
-IMAGE_FEATURES += "read-only-rootfs nand2x ssh-server-openssh"
+IMAGE_FEATURES += "read-only-rootfs nand2x ssh-server-openssh persist-volume"
 
 CORE_IMAGE_EXTRA_INSTALL += "\
               glib-2.0 \
               kernel-modules \
+              coreutils \
               powerapp \
               powerapp-powerconfig \
               powerapp-reboot \
