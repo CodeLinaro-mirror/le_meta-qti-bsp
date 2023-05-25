@@ -33,6 +33,8 @@ do_compile() {
     fi
 }
 
+do_compile[depends] += "virtual/kernel:do_shared_workdir"
+
 do_install() {
     # install modules
     if [ -n "${TECHPACK_MODULES}" ]; then
