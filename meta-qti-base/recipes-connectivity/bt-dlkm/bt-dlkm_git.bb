@@ -16,9 +16,9 @@ SRCREV = "${AUTOREV}"
 TECHPACK_MODULE_OUT = "${WORKDIR}/bt-dlkm"
 TECHPACK_MODULES  = "pwr/btpower.ko"
 TECHPACK_MAKE_ARGS = "CONFIG_MSM_BT_POWER=m"
-TECHPACK_HEADERS = "${S}/include/uapi"
 
 inherit qti-techpack
 
 RPROVIDES:${PN} += "kernel-module-btpower-${KERNEL_VERSION}"
+
 FILES:${PN} += "${nonarch_base_libdir}/modules/${KERNEL_VERSION}/*"

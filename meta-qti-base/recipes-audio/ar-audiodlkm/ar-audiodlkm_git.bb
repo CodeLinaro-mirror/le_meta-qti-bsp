@@ -3,6 +3,7 @@ DESCRIPTION = "This is the AudioReach based audio driver based on ASoC architect
 HOMEPAGE = "https://www.codelinaro.org/"
 LICENSE = "GPL-2.0-only-WITH-Linux-syscall-note"
 LIC_FILES_CHKSUM = "file://NOTICE;md5=53c09804050a00b1d27bd609c4e1fc5a"
+DEPENDS += "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', "audio-devicetree", "", d)}"
 DEPENDS += "virtual/kernel"
 
 SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/audio-kernel-ar/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/audio-kernel-ar;usehead=1 \
@@ -102,5 +103,7 @@ RPROVIDES:${PN} += "${@' kernel-module-q6-notifier-dlkm-${KERNEL_VERSION}'.repla
 RPROVIDES:${PN} += "${@' kernel-module-snd-event-dlkm-${KERNEL_VERSION}'.replace('_', '-')}"
 RPROVIDES:${PN} += "${@' kernel-module-spf-core-dlkm-${KERNEL_VERSION}'.replace('_', '-')}"
 RPROVIDES:${PN} += "${@' kernel-module-stub-dlkm-${KERNEL_VERSION}'.replace('_', '-')}"
+RPROVIDES:${PN} += "${@' kernel-module-pinctrl-lpi-dlkm-${KERNEL_VERSION}'.replace('_', '-')}"
+RPROVIDES:${PN} += "${@' kernel-module-wcd9xxx-dlkm-${KERNEL_VERSION}'.replace('_', '-')}"
 
 KERNEL_CC += "-Wno-error=maybe-uninitialized"

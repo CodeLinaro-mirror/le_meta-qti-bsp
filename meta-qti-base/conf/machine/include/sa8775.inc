@@ -42,3 +42,13 @@ EXTRA_IMAGECMD_ext4 += " -b 4096 "
 
 IMAGE_CLASSES += "qimage"
 
+IMAGE_INSTALL += "\
+    openssh-scp \
+    openssh-ssh \
+    openssh-sshd \
+    openssh-sftp \
+    openssh-sftp-server \
+    "
+
+IMAGE_FEATURES += "ssh-server-openssh"
+

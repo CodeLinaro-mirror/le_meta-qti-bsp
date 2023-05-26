@@ -17,17 +17,18 @@ KERNEL_VERSION = "${@oe.utils.read_file('${STAGING_KERNEL_BUILDDIR}/kernel-abive
 
 MAKE_TARGETS = "\
     M=${@os.path.relpath('${S}', '${STAGING_KERNEL_DIR}')} ${TECHPACK_MAKE_ARGS} \
-    ${@oe.utils.ifelse(d.getVar('TECHPACK_DTBS') == '', 'modules', 'dtbs')} \
+    ${@oe.utils.ifelse(d.getVar('TECHPACK_MODULES') != '', 'modules', '')} \
+    ${@oe.utils.ifelse(d.getVar('TECHPACK_DTBS') != '', 'dtbs', '')} \
     "
 
 do_compile() {
-    # lock to avoid parallel compiling
     if [ -n "${TECHPACK_DTBS}" ]; then
+        # lock to avoid parallel compiling
         (
-        flock -x 100 || exit 1
+        flock -x 9 || exit 1
         module_do_compile
-        )   100>${TMPDIR}/dtbs_lock.lock
-    else
+        ) 9>${TMPDIR}/dtbs_lock.lock
+    elif [ -n "${TECHPACK_MODULES}" ]; then
         module_do_compile
     fi
 }
@@ -45,7 +46,6 @@ do_install() {
 
         done
     fi
-
     # install headers
     if [ -n "${TECHPACK_HEADERS}" ]; then
 
@@ -73,8 +73,9 @@ do_install() {
             fi
 
             process_one_header "$uapi_header_files" "${out_dir}"
-       done
+        done
     fi
+
 }
 
 do_deploy() {

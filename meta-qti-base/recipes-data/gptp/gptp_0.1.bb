@@ -17,7 +17,7 @@ SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/external/open-avb"
 
-inherit pkgconfig useradd
+inherit systemd pkgconfig useradd
 
 # Add non-root user vnw for gptp-daemon.service
 USERADD_PACKAGES = "${PN}"
@@ -25,9 +25,6 @@ USERADD_PACKAGES = "${PN}"
 USERADD_PARAM:${PN} = "--no-create-home --shell /bin/false -g vnw vnw"
 GROUPADD_PARAM:${PN} = "net_raw; net_admin; vnw;"
 
-GPTP_AUTO_START_ENABLE = "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'NO', 'YES', d)}"
-EXTRA_OEMAKE += "${@bb.utils.contains("DISTRO_FEATURES", "systemd", "SYSTEMD_SUPPORT_INCLUDED=1", "SYSTEMD_SUPPORT_INCLUDED=0", d)}"
-EXTRA_OEMAKE += "${@oe.utils.conditional('GPTP_AUTO_START_ENABLE', 'YES', 'GPTP_AUTO_START=1', 'GPTP_AUTO_START=0', d)}"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 TARGET_CC_ARCH += "${LDFLAGS}"
@@ -51,6 +48,14 @@ do_install() {
     install -m 0755 ${S}/lib/libgptp/*.so ${D}/${libdir}
     install -m 0644 ${S}/lib/libgptp/gptp_helper.h ${D}${includedir}
 
+    if (test "x${GPTP_AUTO_START_ENABLE}" == "xYES"); then
+        if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
+            install -d ${D}${systemd_unitdir}/system/
+            install -m 0644 ${S}/files/gptp-daemon.service -D ${D}${systemd_unitdir}/system/gptp-daemon.service
+            install -d ${D}${sysconfdir}/tmpfiles.d/
+            install -m 0644 ${S}/files/gptp-daemon-tmpfilesd.conf ${D}${sysconfdir}/tmpfiles.d/gptp-daemon-tmpfilesd.conf
+        fi
+    fi
 }
 
 PACKAGES =+ "${PN}-test"

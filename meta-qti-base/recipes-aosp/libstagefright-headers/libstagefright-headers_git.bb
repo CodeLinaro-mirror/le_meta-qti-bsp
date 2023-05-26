@@ -15,7 +15,7 @@ do_compile[noexec] = "1"
 
 do_install() {
     install -d ${D}${includedir}/media/stagefright/foundation
-    install -m 0644 ${S}/av/include/media/stagefright/MediaErrors.h -D ${D}${includedir}/media/stagefright
+    install -m 0644 ${S}/av/include/media/stagefright/*.h -D ${D}${includedir}/media/stagefright
     install -m 0644 ${S}/av/media/libstagefright/foundation/include/media/stagefright/foundation/*.h -D ${D}${includedir}/media/stagefright/foundation
 }
 

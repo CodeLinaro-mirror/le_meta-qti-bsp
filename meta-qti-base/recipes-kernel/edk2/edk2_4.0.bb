@@ -47,7 +47,6 @@ EXTRA_OEMAKE = "'CLANG_BIN=${STAGING_BINDIR_NATIVE}/'\
                 'VERITY_LE=${VERITY_ENABLED}'\
                 'INIT_BIN_LE=/sbin/init'\
                 'EDK_TOOLS_PATH=${S}/BaseTools'\
-                'BOOTIMAGE_LOAD_VERIFY_IN_PARALLEL=1' \
                 'EARLY_ETH_ENABLED=${EARLY_ETH}'\
                 'EARLY_ETH_AS_DLKM=1' \
                 'UBSAN_UEFI_GCC_FLAG_ALIGNMENT=-Wno-misleading-indentation' \
@@ -58,6 +57,7 @@ EXTRA_OEMAKE = "'CLANG_BIN=${STAGING_BINDIR_NATIVE}/'\
                 'EXTRA_TARGET_OPTFLAGS=--sysroot=${STAGING_DIR_TARGET}'"
 
 EXTRA_OEMAKE:append:sa81x5 = " 'AB_RETRYCOUNT_DISABLE=1' \
+                               'BOOTIMAGE_LOAD_VERIFY_IN_PARALLEL=1' \
                                'ENABLE_LV_ATOMIC_AB=1' "
 
 do_prebuilt_configure() {

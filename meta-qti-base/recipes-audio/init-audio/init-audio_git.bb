@@ -24,13 +24,15 @@ do_compile[noexec] = "1"
 do_install() {
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
         install -m 0644 ${S}/msm-audio-node.rules -D ${D}${sysconfdir}/udev/rules.d/msm-audio-node.rules
-        if ${@bb.utils.contains('DISTRO_FEATURES', 'early_init', 'true', 'false', d)}; then
-            install -m 0755 ${S}/audio.sh -D ${D}${sbindir}/audio.sh
-        else
-            install -m 0644 ${S}/init_audio.service -D ${D}${systemd_unitdir}/system/init_audio.service
+        if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'false', 'true', d)}; then
+            if ${@bb.utils.contains('DISTRO_FEATURES', 'early_init', 'true', 'false', d)}; then
+                install -m 0755 ${S}/audio.sh -D ${D}${sbindir}/audio.sh
+            else
+                install -m 0644 ${S}/init_audio.service -D ${D}${systemd_unitdir}/system/init_audio.service
+            fi
+            install -d ${D}/${systemd_unitdir}/system/sysinit.target.wants
+            ln -sf ${systemd_unitdir}/system/init_audio.service ${D}${systemd_unitdir}/system/sysinit.target.wants/init_audio.service
         fi
-        install -d ${D}/${systemd_unitdir}/system/sysinit.target.wants
-        ln -sf ${systemd_unitdir}/system/init_audio.service ${D}${systemd_unitdir}/system/sysinit.target.wants/init_audio.service
     else
         install -m 0755 ${S}/init_qcom_audio -D ${D}${sysconfdir}/init.d/init_qcom_audio
     fi

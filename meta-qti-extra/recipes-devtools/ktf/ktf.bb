@@ -2,19 +2,21 @@ DESCRIPTION = "Kernel Test Framework(KTF) implements an unit test framework for 
 HOMEPAGE = "https://github.com/oracle/ktf/"
 
 LICENSE = "GPL-2.0"
-LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/GPL-2.0;md5=801f80980d171dd6425610833a22dbe6"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/GPL-2.0-only;md5=801f80980d171dd6425610833a22dbe6"
 
 KTF_MODULE_NAME = "ktf"
 
 SRC_URI = "\
     git://git.codelinaro.org/clo/le/external/oracle/ktf;protocol=http;branch=circumflex/master \
     file://0001-Remove-Wno-packed-bitfield-compat-option-in-Makefile.patch \
+    file://0002-Fix-module_mutex-undeclared-issue-for-kernel-5.15.patch \
+    file://0003-Remove-useless-fault-func-handler-to-fix-build-issue.patch \
 "
 
-SRCREV = "25c855b0c5c2f3903ce915ece1586f3a87c710f4"
+SRCREV = "707335c6285a1e4c3bc4eb8eafd2faebb4c03da0"
 S = "${WORKDIR}/git"
 
-inherit autotools-brokensep pkgconfig module module-sign
+inherit autotools-brokensep pkgconfig module module-sign qti-kernel-arch-clang
 
 DEPENDS += "googletest libnl"
 
@@ -37,6 +39,8 @@ do_install:append () {
     install -m 0755 ${S}/lib/.libs/libktf.so.0 ${D}${libdir}
     install -m 0644 ${S}/kernel/*.h ${STAGING_KERNEL_DIR}/include/linux
 }
+
+FULL_OPTIMIZATION:remove = "-fexpensive-optimizations -frename-registers -finline-limit=64 -Wno-error=maybe-uninitialized"
 
 FILES:${PN} += "${bindir} ${libdir} ${base_libdir}/modules/${KERNEL_VERSION}/unit_test/${KTF_MODULE_NAME}.ko"
 FILES:${PN}-dbg += "${bindir}/.debug/ktfrun ${libdir}/.debug"
