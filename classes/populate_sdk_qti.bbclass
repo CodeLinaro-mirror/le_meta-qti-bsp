@@ -40,7 +40,6 @@ python copy_buildsystem:append() {
     # Enable the use of WORKSPACE variable on an extensible SDK
     with open(baseoutpath + '/conf/bblayers.conf', 'a') as f:
         f.write('WORKSPACE = "$' + '{TOPDIR}/src"\n')
-
     # Copy kernel artifacts to extensible SDK
     src_kernel_platform = os.path.abspath(d.getVar('WORKSPACE') + '/kernel-' + d.getVar('PREFERRED_VERSION_linux-msm')) + '/kernel_platform'
     dest_kernel_platform = baseoutpath + '/src/kernel-' + d.getVar('PREFERRED_VERSION_linux-msm') + '/kernel_platform'
@@ -53,22 +52,6 @@ python copy_buildsystem:append() {
     bb.utils.mkdirhier(dest_kernel_defconfig)
     cmd = "%s %s %s" % (d.getVar('COPY_DIRECTORY_TREE'), src_kernel_defconfig, dest_kernel_defconfig)
     subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
-
-    #Copy HY11 prebuilt tar.gz to extensible SDK
-    src_prebuilt_hy11 = os.path.abspath(d.getVar('TOPDIR') + '/../prebuilt_HY11')
-    dest_prebuilt_hy11 = os.path.join(baseoutpath,'prebuilt_HY11')
-    bb.note("src_prebuilt_hy11 is %s" % src_prebuilt_hy11)
-    if os.path.exists(src_prebuilt_hy11):
-            shutil.copytree(src_prebuilt_hy11,dest_prebuilt_hy11)
-
-    src_prebuilt_hy22 = os.path.abspath(d.getVar('TOPDIR') + '/../prebuilt_HY22')
-    dest_prebuilt_hy22 = os.path.join(baseoutpath,'prebuilt_HY22')
-    if os.path.exists(src_prebuilt_hy22):
-            shutil.copytree(src_prebuilt_hy22,dest_prebuilt_hy22)
-
-    #set prebuilt tar.gz path when esdk generation
-    with open(baseoutpath + '/conf/local.conf', 'a') as f:
-        f.write('\nPREBUILT_SRC_DIR = "%s"\n' % '${TOPDIR}/prebuilt_HY11 ${TOPDIR}/prebuilt_HY22')
 }
 
 # To include llvm-arm-toolchain as part of sysroots in eSDK tmp directory

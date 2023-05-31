@@ -11,14 +11,18 @@ FILESEXTRAPATHS:prepend := "${KERNEL_PREBUILT_PATH}:${KERNEL_PLATFORM_PATH}/msm-
 SRC_URI   =  "file://dist"
 SRC_URI  +=  "file://${KERNEL_MODULES_LIST}"
 SRC_URI  +=  "file://linkmodulesload.service"
+SRC_URI:remove:qcs40x = "file://${KERNEL_MODULES_LIST}"
 
 S  =  "${WORKDIR}/dist"
 
 do_compile () {
-    existing_modules=$(ls *.ko)
+    existing_modules=$(ls *.ko 2> /dev/null || true)
     first_mod_list=$(cat ${WORKDIR}/${KERNEL_MODULES_LIST} | sed -e '/^ *#/d;/^ *$/d')
 
     # generate conf file for 1st/2nd stage module
+    touch firstmods.conf
+    touch secondmods.conf
+
     for module in ${existing_modules}; do
         echo ${first_mod_list} | grep -q ${module} && is_1st_ko="True" || is_1st_ko="False"
         if [ "${is_1st_ko}" == "True" ]; then

@@ -43,6 +43,3 @@ CORE_IMAGE_EXTRA_INSTALL:remove:vt-64 = "packagegroup-android-utils"
 CORE_IMAGE_EXTRA_INSTALL:remove:vt-64 = "packagegroup-startup-scripts"
 CORE_IMAGE_EXTRA_INSTALL:remove:vt-64 = "packagegroup-support-utils"
 CORE_IMAGE_EXTRA_INSTALL:remove:vt-64 = "packagegroup-filesystem-utils"
-
-# This image doesn't support abl generation
-EXTRA_IMAGEDEPENDS:remove:vt-64 = "edk2"

@@ -23,4 +23,4 @@ USERDATA_SIZE_EXT4 ?= "2147483648"
 IMAGE_FSTYPES += "ext4"
 
 # Disable some default features supported from upstream
-MACHINE_FEATURES_BACKFILL_CONSIDERED += "qemu-usermode rtc"
+MACHINE_FEATURES_BACKFILL_CONSIDERED += "rtc"
