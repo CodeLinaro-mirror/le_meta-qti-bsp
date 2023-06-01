@@ -10,8 +10,8 @@ FILESEXTRAPATHS:prepend := "${WORKSPACE}:${KERNEL_PREBUILT_PATH}:"
 
 SRC_URI = "file://kernel-5.15/kernel_platform/msm-kernel \
            file://kernel-5.15/kernel_platform/common \
-           file://dist/ \
-           "
+           file://dist \
+           file://verity.x509.pem"
 
 SRC_URI:append:cinder  =  "${@oe.utils.conditional('KERNEL_USE_PREBUILTS', 'True', '', 'file://kernel-${PV}/kernel_platform/msm-kernel/arch/${ARCH}/configs/vendor/cinder_debug.config',d)}"
 
@@ -36,6 +36,8 @@ KERNEL_CONFIG_COMMAND ?= "oe_runmake_call -C ${S} CC="${KERNEL_CC}" LD="${KERNEL
 get_cc_option () {
 :
 }
+
+DEPENDS += " virtual/mkbootimg-native openssl-native mod-signing-keys"
 
 KERNEL_CC:append:aarch64 = " ${TOOLCHAIN_OPTIONS}"
 KERNEL_LD:append:aarch64 = " ${TOOLCHAIN_OPTIONS}"
@@ -62,7 +64,7 @@ def find_sccs(d):
 # dm-verity: Patch the cert file from which kernel add key to keyring
 do_patch_veritycert() {
    ## TODO
-   #cp -f ${WORKDIR}/verity.x509.pem ${S}/certs/verity.x509.pem
+   cp -f ${WORKDIR}/verity.x509.pem ${S}/certs/verity.x509.pem
 }
 
 do_patch[postfuncs] += " ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains('MACHINE_FEATURES', 'dm-verity-bootloader', 'do_patch_veritycert', '', d), '', d)}"
@@ -98,8 +100,10 @@ do_prebuilt_configure() {
     install -m 0644 ../msm-kernel/Module.symvers ${B}
     install -m 0644 ../msm-kernel/include/config/kernel.release ${B}/include/config/kernel.release
     install -m 0644 ../msm-kernel/scripts/module.lds ${B}/scripts/module.lds
-    install -m 0644 ../msm-kernel/include/generated/utsrelease.h ${B}/include/generated
+    install -m 0755 ../msm-kernel/scripts/sign-file ${B}/scripts/sign-file
+    install -m 0755 ../msm-kernel/certs/signing_key.x509 ${B}/certs/signing_key.x509
     install -m 0644 ../msm-kernel/certs/signing_key.pem ${B}/certs/signing_key.pem
+    install -m 0644 ../msm-kernel/include/generated/utsrelease.h ${B}/include/generated
     # install -m 0644 ./dtb.img ${DEPLOY_DIR_IMAGE}//DTOverlays/dtb.img
     #install -m 0644 ../gki_kernel/common/certs/verity_cert.pem ${B}/certs/verity_cert.pem
     #install -m 0644 ../gki_kernel/common/certs/verity_key.pem ${B}/certs/verity_key.pem
@@ -146,6 +150,10 @@ do_prebuilt_shared_workdir() {
     mkdir -p $kerneldir/include/config
     mkdir -p $kerneldir/scripts
     mkdir -p $kerneldir/include/generated
+    mkdir -p $kerneldir/certs
+    install -m 0755 ${B}/scripts/sign-file ${STAGING_KERNEL_BUILDDIR}/scripts/sign-file
+    install -m 0755 ${B}/certs/signing_key.x509 ${STAGING_KERNEL_BUILDDIR}/certs/signing_key.x509
+    install -m 0755 ${B}/certs/signing_key.pem ${STAGING_KERNEL_BUILDDIR}/certs/signing_key.pem
     install -m 0644 include/config/kernel.release $kerneldir/include/config/kernel.release
     install -m 0644 include/generated/utsrelease.h $kerneldir/include/generated/utsrelease.h
     if [ -e "${B}/scripts/module.lds" ]; then
