@@ -4,7 +4,9 @@
 
 inherit qimage
 
-IMAGE_FEATURES += "read-only-rootfs ssh-server-openssh"
+DEPENDS += "mtd-utils-native"
+
+IMAGE_FEATURES += "read-only-rootfs nand2x ssh-server-openssh"
 
 CORE_IMAGE_EXTRA_INSTALL += "\
               glib-2.0 \
@@ -16,6 +18,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
               systemd-machine-units \
               packagegroup-android-utils \
               packagegroup-startup-scripts \
+              ${@bb.utils.contains('MACHINE_FEATURES', 'nand-boot', 'mtd-utils-ubifs', '', d)} \
               ${@bb.utils.contains('BBFILE_COLLECTIONS', 'location', \
                     bb.utils.contains('MACHINE_FEATURES', 'qti-location', 'packagegroup-qti-location', '', d), '', d)} \
               ${@bb.utils.contains('BBFILE_COLLECTIONS', 'qti-ss-mgr', 'packagegroup-qti-ss-mgr', '', d)} \
