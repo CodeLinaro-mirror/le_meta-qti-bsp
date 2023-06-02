@@ -27,6 +27,13 @@ vendor.voice.path.for.pcm.voip=true
 #enable dsp gapless mode by default
 vendor.audio.offload.gapless.enabled=true
 
+#enable HFP Client support
+vendor.audio.feature.hfp.enable=true
+
+#enable A2DP Offload support
+vendor.audio.feature.a2dp_offload.enable=true
+ro.bluetooth.a2dp_offload.supported=true
+
 #Audio voice concurrency related flags
 vendor.voice.playback.conc.disabled=true
 vendor.voice.record.conc.disabled=true
