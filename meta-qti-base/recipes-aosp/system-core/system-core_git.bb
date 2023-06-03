@@ -19,6 +19,7 @@ inherit autotools pkgconfig systemd useradd
 
 COMPOSITION = "901D"
 
+SYSTEMD_PACKAGES = "${PN}-dlkm"
 SYSTEMD_SERVICE:${PN}-dlkm = "dlkm.service"
 
 USERADD_PACKAGES = "${PN}-leprop ${PN}-post-boot"
