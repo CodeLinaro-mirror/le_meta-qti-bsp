@@ -28,4 +28,10 @@ do_install:append(){
         sed -i "/^\/data/d" ${D}${sysconfdir}/fstab
         sed -i "/^\${localstatedir}/d" ${D}${sysconfdir}/fstab
     fi
+
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'volatiled-var', 'true', 'false', d)}; then
+        sed -i "/\/var\/volatile/s/\/volatile/         /" ${D}${sysconfdir}/fstab
+        sed -i "s/^\PARTLABEL=persist.*var/PARTLABEL=persist    \/persist/" ${D}${sysconfdir}/fstab
+        sed -i "/^\${localstatedir}/d" ${D}${sysconfdir}/fstab
+    fi
 }
