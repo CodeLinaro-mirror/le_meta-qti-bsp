@@ -1,5 +1,5 @@
 require recipes-kernel/linux-msm/linux-msm.inc
-COMPATIBLE_MACHINE = "genericarmv8|sdxlemur|scuba|qrbx210-rbx|sa2150p|sa2150p-nand|sa410m|sa410m-nand|sa410m-televm|qcs610|qrb5165|sa515m|sa415m|qcs6490"
+COMPATIBLE_MACHINE = "genericarmv8|sdxlemur|scuba|qrbx210-rbx|sa2150p|sa2150p-nand|sa410m|sa410m-nand|sa410m-televm|qcs610|qrb5165|sa515m|sa415m|mdm9607|qcs6490"
 
 SRC_URI_append_sdxlemur += "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'file://gluebi.cfg', '', d)}"
 SRC_URI_append_sdxlemur += "file://0001-wifi-Add-OCV-support-in-kernel.patch"
@@ -17,6 +17,9 @@ SRC_URI_append_qcs610 += "file://squashfs.cfg"
 
 SRC_URI_append_qrb5165 += " file://qca6390.cfg"
 SRC_URI_append_qrb5165 += " file://qcn9000.cfg"
+
+SRC_URI_append_qcs6490 += " file://qcs6490.cfg"
+SRC_URI_append_qcs6490 += " file://android_binderfs.cfg"
 
 DEPENDS += "llvm-arm-toolchain-native virtual/dtc-native rsync-native clang-native"
 TOOLCHAIN = "clang"

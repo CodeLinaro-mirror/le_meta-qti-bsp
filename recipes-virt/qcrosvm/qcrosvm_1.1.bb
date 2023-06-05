@@ -16,26 +16,8 @@ SRC_URI = "\
         file://external/crosvm/ \
         file://external/rust/crates/ \
         file://external/minijail/ \
-        file://qvirtmgr.service \
-        file://Cargo.toml \
-        file://devices-Cargo.toml \
 "
 
 S = "${WORKDIR}/telematics/apps/open-source/qcrosvm"
-
-do_patch_cargo () {
-  mv -f ${WORKDIR}/Cargo.toml ${WORKDIR}/external/crosvm/Cargo.toml
-  mv -f ${WORKDIR}/devices-Cargo.toml ${WORKDIR}/external/crosvm/devices/Cargo.toml
-}
-
-do_patch[postfuncs] += "do_patch_cargo"
-
-SYSTEMD_SERVICE_${PN} = "qvirtmgr.service"
-
-do_install_append() {
-    if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
-        install -m 0644 ${WORKDIR}/qvirtmgr.service -D ${D}${systemd_unitdir}/system/qvirtmgr.service
-    fi
-}
 
 CARGO_DISABLE_BITBAKE_VENDORING = "1"

@@ -4,6 +4,8 @@
 
 require qti-tele-image.inc
 
+IMAGE_FEATURES += "vm-bootsys-volume"
+
 # Install km-loader for selected machines
 EVDEVMODULE ?= 'False'
 EVDEVMODULE_sa515m = 'True'
@@ -43,7 +45,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         ${@bb.utils.contains('MACHINE_FEATURES', 'nand-boot', 'mtd-utils-ubifs', '', d)} \
         qmi-shutdown-modem \
         modem-shutdown \
-        ${@bb.utils.contains('MACHINE_FEATURES', 'qti-virtualization', 'qcrosvm', '', d)} \
+        ${@bb.utils.contains('MACHINE_FEATURES', 'qti-virtualization', 'packagegroup-qti-virtualization', '', d)} \
         ${@oe.utils.conditional('DEBUG_BUILD', '1', 'packagegroup-qti-debug-tools', '', d )} \
 "
 

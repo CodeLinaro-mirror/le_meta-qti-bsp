@@ -9,6 +9,9 @@ PACKAGE_INSTALL += "${@oe.utils.conditional('ENABLE_ADB', 'True', 'adbd usb-comp
 PACKAGE_INSTALL += "${@oe.utils.conditional('TOYBOX_RAMDISK', 'True', 'toybox mksh gawk coreutils e2fsprogs dosfstools ethtool iputils iperf2 iperf3 devmem2 tcpdump', '', d)}"
 PACKAGE_INSTALL += "${@oe.utils.conditional('FLASHLESS_MCU', 'True', 'nbd-client techpack-ecpri', '', d)}"
 
+# Adding mtd-utils to support dm-verity v4 for NAND
+PACKAGE_INSTALL += "${@bb.utils.contains('MACHINE_FEATURES', 'dm-verity-initramfs-v4', 'mtd-utils', '', d)}"
+
 do_ramdisk_create[depends] += "virtual/kernel:do_deploy"
 do_ramdisk_create[cleandirs] += "${RAMDISKDIR}"
 fakeroot do_ramdisk_create() {
@@ -20,6 +23,13 @@ fakeroot do_ramdisk_create() {
         mkdir -p ${RAMDISKDIR}/usr
         mkdir -p ${RAMDISKDIR}/usr/bin
         mkdir -p ${RAMDISKDIR}/usr/sbin
+        if [[ "${FLASHLESS_MCU}" == "True" ]]; then
+            mkdir -p ${RAMDISKDIR}/lib/firmware/qcom_aw_phy/
+            mkdir -p ${RAMDISKDIR}/usr/share/dhcpcd/hooks/
+            mkdir -p ${RAMDISKDIR}/usr/libexec/dhcpcd-hooks
+            mkdir -p ${RAMDISKDIR}/usr/lib/dhcpcd/dev/
+            mkdir -p ${RAMDISKDIR}/var/db/dhcpcd/
+        fi
         mkdir -p ${RAMDISKDIR}/dev
         mknod -m 0600 ${RAMDISKDIR}/dev/console c 5 1
         mknod -m 0600 ${RAMDISKDIR}/dev/tty c 5 0
@@ -118,8 +128,27 @@ fakeroot do_ramdisk_create() {
             cp ${IMAGE_ROOTFS}/etc/nbdtab etc/
 
             # DMA kos
-            cp ${IMAGE_ROOTFS}/usr/lib/modules/ecpri_dmam.ko lib/modules/
             cp ${IMAGE_ROOTFS}/usr/lib/modules/gsim.ko lib/modules/
+            cp ${IMAGE_ROOTFS}/usr/lib/modules/ecpri_dmam.ko lib/modules/
+            cp ${IMAGE_ROOTFS}/usr/lib/modules/fpc_qsfp.ko lib/modules/
+            cp ${IMAGE_ROOTFS}/usr/lib/modules/lassen_qcom_aw_phy.ko lib/modules/
+            cp ${IMAGE_ROOTFS}/usr/lib/modules/lassen_mtip.ko lib/modules/
+            cp ${IMAGE_ROOTFS}/usr/lib/modules/lassen_secure_eip.ko lib/modules/
+            cp ${IMAGE_ROOTFS}/usr/lib/modules/ecpri_core.ko lib/modules/
+            cp ${IMAGE_ROOTFS}/lib/firmware/qcom_aw_phy/eth_custom_rates_1.hex lib/firmware/qcom_aw_phy/
+            # install dhcpcd
+            cp ${IMAGE_ROOTFS}/etc/dhcpcd.conf etc/
+            cp ${IMAGE_ROOTFS}/usr/lib/dhcpcd/dev/udev.so usr/lib/dhcpcd/dev/
+            cp ${IMAGE_ROOTFS}/usr/libexec/dhcpcd-hooks/01-test usr/libexec/dhcpcd-hooks/
+            cp ${IMAGE_ROOTFS}/usr/libexec/dhcpcd-hooks/02-dump usr/libexec/dhcpcd-hooks/
+            cp ${IMAGE_ROOTFS}/usr/libexec/dhcpcd-hooks/20-resolv.conf usr/libexec/dhcpcd-hooks/
+            cp ${IMAGE_ROOTFS}/usr/libexec/dhcpcd-hooks/30-hostname usr/libexec/dhcpcd-hooks/3
+            cp ${IMAGE_ROOTFS}/usr/libexec/dhcpcd-hooks/50-ntp.conf usr/libexec/dhcpcd-hooks/
+            cp ${IMAGE_ROOTFS}/usr/libexec/dhcpcd-run-hooks usr/libexec/
+            cp ${IMAGE_ROOTFS}/usr/sbin/dhcpcd usr/sbin/
+            cp ${IMAGE_ROOTFS}/usr/share/dhcpcd/hooks/10-wpa_supplicant usr/share/dhcpcd/hooks/
+            cp ${IMAGE_ROOTFS}/usr/share/dhcpcd/hooks/15-timezone usr/share/dhcpcd/hooks/
+            cp ${IMAGE_ROOTFS}/usr/share/dhcpcd/hooks/29-lookup-hostname usr/share/dhcpcd/hooks/
         fi
 
         if ${@bb.utils.contains('IMAGE_FEATURES', 'vm', 'true', 'false', d)}; then
@@ -154,6 +183,10 @@ fakeroot do_ramdisk_create() {
                 cp ${COREBASE}/meta-qti-bsp/recipes-products/images/include/csmrd-init .
                 chmod 744 csmrd-init
                 ln -s csmrd-init init
+            elif ${@bb.utils.contains('MACHINE_FEATURES', 'dm-verity-initramfs-v4', 'true', 'false', d)}; then
+                install -m 744 ${COREBASE}/meta-qti-bsp/recipes-products/images/include/ramdisk-init.sh init
+                cp ${IMAGE_ROOTFS}/usr/sbin/ubi* usr/sbin/
+                ln -s busybox bin/dd
             else
                 ln -s bin/busybox init
             fi
