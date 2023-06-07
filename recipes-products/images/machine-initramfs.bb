@@ -13,14 +13,9 @@ PACKAGE_INSTALL += " busybox"
 PACKAGE_INSTALL += " mtd-utils-ubifs"
 PACKAGE_INSTALL += " ${@bb.utils.contains_any('DISTRO_FEATURES', 'nad-avb nad-fde', 'cryptsetup', '',d)}"
 PACKAGE_INSTALL += " ${@bb.utils.contains_any('DISTRO_FEATURES', 'nad-avb nad-fde', 'libdevmapper', '',d)}"
-PACKAGE_INSTALL += " ${@bb.utils.contains_any('DISTRO_FEATURES', 'nad-avb nad-fde', 'verified-boot', '',d)}"
-PACKAGE_INSTALL += " ${@bb.utils.contains_any('DISTRO_FEATURES', 'nad-avb nad-fde', 'avbtool', '',d)}"
-PACKAGE_INSTALL += " ${@bb.utils.contains('DISTRO_FEATURES', 'nad-fde', 'nad-fde-app', '',d)}"
-PACKAGE_INSTALL += " ${@bb.utils.contains('DISTRO_FEATURES', 'nad-fde', 'securemsm-noship', '',d)}"
-PACKAGE_INSTALL += " ${@bb.utils.contains('DISTRO_FEATURES', 'nad-fde', 'securemsm', '',d)}"
 
 # Support reboot management
-PACKAGE_INSTALL += " ${@bb.utils.contains('DISTRO_FEATURES', 'nad-prod', 'nad-abctl powerapp', '',d)}"
+PACKAGE_INSTALL += " ${@bb.utils.contains('DISTRO_FEATURES', 'nad-prod', 'powerapp', '',d)}"
 PACKAGE_INSTALL += " initramfs-init"
 
 PACKAGE_EXCLUDE = " bash systemd-machine-units systemd busybox-udhcpc"
