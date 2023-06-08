@@ -21,5 +21,4 @@ cnss-wlan:x:4055:
 ais:x:4056:
 qti-bt:x:4057:
 agm:x:4058:
-post-boot:x:4060:
 security:x:4070:
