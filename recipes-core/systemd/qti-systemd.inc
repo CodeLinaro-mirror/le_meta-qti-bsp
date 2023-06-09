@@ -1,7 +1,7 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/systemd:"
 
 # Fetch systemd.git from CAF.
-SRC_URI  = "git://source.codeaurora.org/quic/le/systemd.git;protocol=https;branch=systemd/main"
+SRC_URI  = "git://git.codelinaro.org/clo/le/systemd.git;protocol=https;branch=caf_migration/systemd/main"
 
 
 SRC_URI += "file://touchscreen.rules \
