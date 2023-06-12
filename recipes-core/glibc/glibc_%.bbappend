@@ -19,6 +19,8 @@ SRC_URI += "file://CVE-2019-25013.patch \
             file://CVE-2022-23218-01.patch \
             file://CVE-2022-23219.patch \
             file://CVE-2021-43396.patch \
+            file://0001-malloc-tcache-double-free-check.patch \
+            file://0001-Fix-tcache-count-maximum-BZ-24531.patch \
 "
 
 # glibc expects -fstack-protector optimization passed as a configuration option
