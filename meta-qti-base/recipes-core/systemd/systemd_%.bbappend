@@ -12,9 +12,6 @@ SRC_URI:append = " \
 "
 SRC_URI:append = " ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "5.15", "file://platform_load.conf", "", d)}"
 
-# Disable close_range in systemd v250.4 as it doesn't work with linux-msm 5.4
-SRC_URI:append = " ${@oe.utils.conditional("PV", "250.4", "file://0001-Disable-close_range.patch", "", d)}"
-
 # Remove backlight - Loads/Saves Screen Backlight Brightness, not required.
 PACKAGECONFIG:remove = " backlight "
 
