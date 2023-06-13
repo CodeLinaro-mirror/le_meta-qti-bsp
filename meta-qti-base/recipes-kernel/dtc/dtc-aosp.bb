@@ -8,11 +8,11 @@ LIC_FILES_CHKSUM = "file://libfdt/libfdt.h;beginline=4;endline=7;md5=05bb357cfb7
 
 PROVIDES = "dtc-native"
 
-SRC_URI = "${PATH_TO_REPO}/kernel/kernel-${PV}/kernel_platform/external/dtc/.git;protocol=${PROTO};destsuffix=kernel/kernel-${PV}/kernel_platform/external/dtc;usehead=1 "
+SRC_URI = "${PATH_TO_REPO}/kernel/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/external/dtc/.git;protocol=${PROTO};destsuffix=kernel/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/external/dtc;usehead=1 "
 
 SRCREV = "${AUTOREV}"
 
-S = "${WORKDIR}/kernel/kernel-${PV}/kernel_platform/external/dtc"
+S = "${WORKDIR}/kernel/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/external/dtc"
 
 inherit autotools-brokensep pkgconfig
 

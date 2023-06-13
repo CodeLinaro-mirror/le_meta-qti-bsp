@@ -1,44 +1,57 @@
-#Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+#Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
 #SPDX-License-Identifier: BSD-3-Clause-Clear
 
-DEPENDS += "dtc-native kernel-toolchain-native mkdtimg-native virtual/kernel"
-
-inherit qti-kernel-toolchain
+DEPENDS += "dtc-native kernel-aosp-tools-native mkdtimg-native virtual/kernel"
 
 do_merge_dtbs() {
      install -d ${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbs
      install -d ${DEPLOY_DIR_IMAGE}/dtbs
 
-     ${KERNEL_TOOLCHAIN_DIR}/build/android/merge_dtbs.py \
-     ${DEPLOY_DIR_IMAGE}/build-artifacts/dtb \
-     ${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbs ${DEPLOY_DIR_IMAGE}/dtbs
+     if ${@oe.utils.version_less_or_equal('PREFERRED_VERSION_linux-msm', '6.0', 'true', 'false', d)}; then
+         ${STAGING_BINDIR_NATIVE}/build/android/merge_dtbs.py \
+         ${DEPLOY_DIR_IMAGE}/build-artifacts/dtb \
+         ${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbs \
+         ${DEPLOY_DIR_IMAGE}/dtbs
+
+         if ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'true', 'false', d)}; then
+             install -d ${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbos
+             install -d ${DEPLOY_DIR_IMAGE}/dtbos
+             ${STAGING_BINDIR_NATIVE}/build/android/merge_dtbs.py \
+             ${DEPLOY_DIR_IMAGE}/build-artifacts/dtbo \
+             ${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbos \
+             ${DEPLOY_DIR_IMAGE}/dtbos
+         fi
+     else
+         ${STAGING_BINDIR_NATIVE}/build/android/merge_dtbs.py \
+         --base ${DEPLOY_DIR_IMAGE}/build-artifacts/dtb \
+         --techpack ${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbs \
+         --out ${DEPLOY_DIR_IMAGE}/dtbs
+
+         if ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'true', 'false', d)}; then
+             install -d ${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbos
+             install -d ${DEPLOY_DIR_IMAGE}/dtbos
+             ${STAGING_BINDIR_NATIVE}/build/android/merge_dtbs.py \
+             --base ${DEPLOY_DIR_IMAGE}/build-artifacts/dtbo \
+             --techpack ${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbos \
+             --out ${DEPLOY_DIR_IMAGE}/dtbos
+         fi
+     fi
 
      cat ${DEPLOY_DIR_IMAGE}/dtbs/*.dtb > ${DEPLOY_DIR_IMAGE}/dtbs/dtb.img
-
-     if ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'true', 'false', d)}; then
-         install -d ${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbos
-         install -d ${DEPLOY_DIR_IMAGE}/dtbos
-         ${KERNEL_TOOLCHAIN_DIR}/build/android/merge_dtbs.py \
-         ${DEPLOY_DIR_IMAGE}/build-artifacts/dtbo \
-         ${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbos ${DEPLOY_DIR_IMAGE}/dtbos
-     fi
 }
 do_merge_dtbs[cleandirs] = " \
      ${DEPLOY_DIR_IMAGE}/dtbs \
      ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', '${DEPLOY_DIR_IMAGE}/dtbos ', ' ', d)} \
 "
 
-do_merge_dtbs[depends] += "kernel-toolchain-native:do_shared_workdir"
-
 addtask do_merge_dtbs after do_image before do_makeboot
 
-MKBOOTUTIL = '${@oe.utils.conditional("PREFERRED_PROVIDER_mkbootimg-native", "mkbootimg-gki-native", "scripts/mkbootimg.py", "mkbootimg", d)}'
 BOOT_RAMDISK_IMG ?= "${@bb.utils.contains('MACHINE_FEATURES', 'early-ramdisk-init', 'early-ramdisk-image-${PRODUCT}.cpio.lz4', '/dev/null', d)}"
 
 python do_makeboot () {
     import subprocess
 
-    mkboot_bin_path = d.getVar('STAGING_BINDIR_NATIVE', True) + "/" + d.getVar('MKBOOTUTIL')
+    mkboot_bin_path = d.getVar('STAGING_BINDIR_NATIVE', True) + "/scripts/mkbootimg.py"
 
     kernel_path = d.getVar('DEPLOY_DIR_IMAGE', True) + "/" + d.getVar('KERNEL_IMAGETYPE', True)
     dtb_path = d.getVar('DEPLOY_DIR_IMAGE', True) + "/dtbs/dtb.img"
