@@ -26,6 +26,7 @@ PREFERRED_PROVIDER_virtual/libgles2     = "adreno"
 
 BBMASK += "meta-qti-bsp/meta-qti-base/recipes-wlan"
 BBMASK += "meta-qti-bsp/meta-qti-base/recipes-kernel/edk2/edk2_4.0.bb"
+BBMASK += "meta-qti-bsp/meta-qti-base/recipes-kernel/edk2/edk2_5.0.bb"
 
 # mesa provides these packags and others like virtual/libgl.
 # This is to enable mesa, adreno and gbm work together, and pass
