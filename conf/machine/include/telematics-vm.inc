@@ -14,6 +14,7 @@ PREFERRED_VERSION_dtc-android-build ?= "5.15"
 PREFERRED_VERSION_mkbootimg-gki-native ?= "5.15"
 PREFERRED_VERSION_dtc-android-build-native ?= "5.15"
 PREFERRED_VERSION_mkdtimg-gki-native ?= "5.15"
+PREFERRED_VERSION:securemsmdlkm ?= "1.0"
 
 KERNEL_VARIANT = ""
 KERNEL_VARIANT_qti-distro-debug = "debug_"
@@ -48,6 +49,8 @@ IMAGE_INIT_MANAGER = "systemd"
 
 SYSTEMIMAGE_TARGET = "system.img"
 VMIMAGE_TARGET = "vm-bootsys.img"
+
+VM_SPLIT_BINS_PATH = "boot"
 
 # UBI arguments
 UBINIZE_ARGS = "-m 4096 -p 256KiB -s 4096"

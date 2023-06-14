@@ -13,6 +13,7 @@ CORE_IMAGE_EXTRA_INSTALL += " \
     post-boot \
     systemd-machine-units \
     packagegroup-qti-telematics \
+    packagegroup-qti-data-vm \
 "
 
 # Exclude packages
@@ -20,3 +21,7 @@ PACKAGE_EXCLUDE += "readline"
 
 ROOTFS_POSTPROCESS_COMMAND_remove = " do_fsconfig;"
 USE_DEPMOD = "0"
+
+# Remove build time dependency on squashfs-tools-native.
+# To Do: Clean up and remove based on IMAGE_FSTYPES check in qimage.bbclass
+DEPENDS_remove = "squashfs-tools-native"
