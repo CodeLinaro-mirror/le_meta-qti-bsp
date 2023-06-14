@@ -50,3 +50,6 @@ PARTLABEL=persist    /var            auto      defaults                         
 
 #Automatically mount binder drivers
 binder               /dev/binderfs        binder     auto,exec,dev,nofail  0  0
+
+# automount 2nd UFS
+LABEL=ufs2           /data/mnt       auto      defaults,nofail       0  0
