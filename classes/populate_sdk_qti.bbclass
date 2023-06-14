@@ -40,6 +40,7 @@ python copy_buildsystem:append() {
     # Enable the use of WORKSPACE variable on an extensible SDK
     with open(baseoutpath + '/conf/bblayers.conf', 'a') as f:
         f.write('WORKSPACE = "$' + '{TOPDIR}/src"\n')
+
     # Copy kernel artifacts to extensible SDK
     src_kernel_platform = os.path.abspath(d.getVar('WORKSPACE') + '/kernel-' + d.getVar('PREFERRED_VERSION_linux-msm')) + '/kernel_platform'
     dest_kernel_platform = baseoutpath + '/src/kernel-' + d.getVar('PREFERRED_VERSION_linux-msm') + '/kernel_platform'
@@ -52,6 +53,23 @@ python copy_buildsystem:append() {
     bb.utils.mkdirhier(dest_kernel_defconfig)
     cmd = "%s %s %s" % (d.getVar('COPY_DIRECTORY_TREE'), src_kernel_defconfig, dest_kernel_defconfig)
     subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
+
+    # Copy prebuilt tar to eSDK and set PREBUILT_SRC_DIR
+    prebuilt_src_dir_sdk = ""
+    default_prebuilt_src_dir = d.getVar('DEFAULT_PREBUILT_SRC_DIR')
+    default_prebuilt_src_dir_list = default_prebuilt_src_dir.split()
+    for dir in default_prebuilt_src_dir_list:
+        if os.path.exists(str(dir)):
+            destdir = baseoutpath + str(dir).replace(d.getVar('WORKSPACEROOT'),"")
+            bb.utils.mkdirhier(destdir)
+            cmd = "%s %s %s" % (d.getVar('COPY_DIRECTORY_TREE'), str(dir), destdir)
+            subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
+            prebuilt_src_dir_sdk = prebuilt_src_dir_sdk + '${TOPDIR}/'  + str(dir).replace(d.getVar('WORKSPACEROOT'),"") + " "
+        else:
+            pass
+
+    with open(baseoutpath + '/conf/local.conf', 'a') as f:
+        f.write('\nPREBUILT_SRC_DIR = "%s"\n' % prebuilt_src_dir_sdk)
 }
 
 # To include llvm-arm-toolchain as part of sysroots in eSDK tmp directory
