@@ -7,9 +7,9 @@ DEPENDS += "elfutils-native kern-tools-native mkbootimg-native mkdtimg-native op
 COMPATIBLE_MACHINE = "sa81x5|lemans|quin-gvm-gen4-2|quin-gvm-lemans|monaco|qtiquingvm8295"
 
 FILESPATH =+ "${KERNEL_SRC_PATH}:"
-SRC_URI = "${PATH_TO_REPO}/kernel/kernel-${PV}/kernel_platform/msm-kernel/.git;protocol=${PROTO};destsuffix=kernel/kernel-${PV}/kernel_platform/msm-kernel;usehead=1"
+SRC_URI = "${PATH_TO_REPO}/kernel/kernel-${PV}/kernel_platform/msm-kernel/.git;protocol=${PROTO};name=kernel;destsuffix=kernel/kernel-${PV}/kernel_platform/msm-kernel;usehead=1"
 
-SRCREV = "${AUTOREV}"
+SRCREV_kernel = "${AUTOREV}"
 
 inherit kernel kernel-yocto qti-kernel-arch-clang
 
@@ -57,6 +57,18 @@ KCONFIG_MODE = "--alldefconfig"
 KBUILD_DEFCONFIG ?= "vendor/${KERNEL_ARCH}${@bb.utils.contains_any('VARIANT', 'debug user', '-debug', '', d)}_defconfig"
 
 KERNEL_VERSION_SANITY_SKIP = "1"
+
+# append DTB
+# msm kernel trees have a special treatment for DTS, and both arm and
+# arm64 DTS are located in arch/arm64/boot/dts/qcom folder, which
+# confuses kernel-devicetree class, so we can't use it. Instead let's
+# make sure that we generate all DTBs using the kernel 'dtbs' target,
+# then we can append the DTBs that we need for $MACHINE.
+KERNEL_IMAGETYPE_FOR_MAKE += "dtbs"
+KERNEL_IMAGETYPE_FOR_MAKE += "${KERNEL_IMAGETYPE}"
+KERNEL_IMAGETYPE_FOR_MAKE += "modules"
+
+do_compile_kernelmodules[noexec] = "1"
 
 do_kernel_configcheck[noexec] = "1"
 do_kernel_checkout[noexec] = "1"
@@ -191,6 +203,14 @@ fakeroot do_prebuilt_install() {
     find ${D} -name '*' -exec chown -h root:root {} \;
 }
 
+MODULESPATH = "${D}/lib/modules/${KERNEL_VERSION}"
+do_install:append() {
+    # if the blocklist exists and qti-dlkm is turned on in conf file, then install the blocklist
+    if [ -e ${S}/modules.vendor_blocklist.msm.${KERNEL_ARCH} ] && ${@bb.utils.contains('MACHINE_FEATURES', 'qti-dlkm', 'true', 'false', d)}; then
+        install -m 0644 ${S}/modules.vendor_blocklist.msm.${KERNEL_ARCH} ${MODULESPATH}/modules.blocklist
+    fi
+}
+
 # Must be ran no earlier than after do_kernel_checkout or else Makefile won't be in ${S}/Makefile
 PREBUILT_DISCARDED_TASKS += "\
     do_configure \
@@ -198,7 +218,6 @@ PREBUILT_DISCARDED_TASKS += "\
     do_kernel_link_images \
     do_compile_kernelmodules \
     do_shared_workdir \
-    do_install \
 "
 python () {
     if d.getVar('KERNEL_USE_PREBUILTS') == 'True':
@@ -208,14 +227,6 @@ python () {
         bb.build.addtask('do_prebuilt_install', 'do_install', 'do_compile', d)
         bb.build.addtask('do_prebuilt_shared_workdir', 'do_compile_kernelmodules', 'do_compile', d)
 }
-
-# append DTB
-# msm kernel trees have a special treatment for DTS, and both arm and
-# arm64 DTS are located in arch/arm64/boot/dts/qcom folder, which
-# confuses kernel-devicetree class, so we can't use it. Instead let's
-# make sure that we generate all DTBs using the kernel 'dtbs' target,
-# then we can append the DTBs that we need for $MACHINE.
-KERNEL_EXTRA_ARGS += "dtbs"
 
 do_compile:prepend() {
         if ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'true', 'false', d)}; then
@@ -248,6 +259,20 @@ do_shared_workdir:append () {
 
         # Generate kernel headers
         oe_runmake_call -C ${STAGING_KERNEL_DIR} ARCH=${ARCH} CC="${KERNEL_CC}" LD="${KERNEL_LD}" headers_install O=${STAGING_KERNEL_BUILDDIR}
+
+        if (grep -q -i -e '^CONFIG_MODULES=y$' ${B}/.config); then
+            # Module.symvers gets updated during the
+            # building of the kernel modules. We need to
+            # update this in the shared workdir since some
+            # external kernel modules has a dependency on
+            # other kernel modules and will look at this
+            # file to do symbol lookups
+            cp ${B}/Module.symvers ${STAGING_KERNEL_BUILDDIR}/
+            # 5.10+ kernels have module.lds that we need to copy for external module builds
+            if [ -e "${B}/scripts/module.lds" ]; then
+                install -Dm 0644 ${B}/scripts/module.lds ${STAGING_KERNEL_BUILDDIR}/scripts/module.lds
+            fi
+        fi
 }
 
 # Path for dtbo generation is kernel version dependent.
@@ -281,3 +306,6 @@ do_deploy() {
 
 # Put the zImage in the kernel-dev pkg
 FILES:${KERNEL_PACKAGE_NAME}-dev += "/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}"
+
+FILES:${KERNEL_PACKAGE_NAME}-base += "${nonarch_base_libdir}/modules/${KERNEL_VERSION}/modules.blocklist \
+                                      ${nonarch_base_libdir}/modules/${KERNEL_VERSION}/modules.load"

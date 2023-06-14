@@ -10,7 +10,7 @@ ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 
 DEPENDS += "libbase libion virtual/kernel-headers"
 
-SRC_URI = "${PATH_TO_REPO}/src/system/memory/libdmabufheap/.git;protocol=${PROTO};destsuffix=src/system/memory/libdmabufheap;subpath=libdmabufheap;usehead=1"
+SRC_URI = "${PATH_TO_REPO}/src/system/memory/libdmabufheap/.git;protocol=${PROTO};destsuffix=src/system/memory/libdmabufheap;usehead=1"
 SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/src/system/memory/libdmabufheap"

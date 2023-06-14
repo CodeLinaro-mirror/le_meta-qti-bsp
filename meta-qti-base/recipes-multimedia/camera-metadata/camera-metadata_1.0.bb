@@ -8,7 +8,7 @@ ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 DEPENDS += "libcutils"
 
 SRC_URI = "\
-    ${PATH_TO_REPO}/frameworks/.git;protocol=${PROTO};destsuffix=frameworks/camera_metadata;subpath=camera_metadata;usehead=1 \
+    ${PATH_TO_REPO}/frameworks/.git;protocol=${PROTO};destsuffix=frameworks;usehead=1 \
 "
 
 SRCREV = "${AUTOREV}"

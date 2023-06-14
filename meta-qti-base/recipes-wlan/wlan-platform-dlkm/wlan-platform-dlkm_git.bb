@@ -36,6 +36,7 @@ WLAN_PLATFORM_CFG = "\
                      CONFIG_CNSS2_CONDITIONAL_POWEROFF=y \
                      CONFIG_CNSS_SUPPORT_DUAL_DEV=y \
                      CONFIG_CNSS_REQ_FW_DIRECT=y \
+                     CONFIG_CNSS2_ENUM_WITH_LOW_SPEED=y \
                      "
 
 WLAN_PLATFORM_CFG_PROD = "\
@@ -60,9 +61,15 @@ do_install:append(){
     dlkmdir=${D}${includedir}/wlan-platform
     install -d ${dlkmdir}
     install -d ${dlkmdir}/inc
-    install -m 0644 ${TECHPACK_MODULE_OUT}/Module.symvers ${dlkmdir}/
+    install -m 0644 ${S}/Module.symvers ${dlkmdir}/
     install -m 0644 ${S}/inc/* ${dlkmdir}/inc/
 }
+
+RPROVIDES:${PN} += "kernel-module-cnss-nl-${KERNEL_VERSION}"
+RPROVIDES:${PN} += "kernel-module-cnss-plat-ipc-qmi-svc-${KERNEL_VERSION}"
+RPROVIDES:${PN} += "kernel-module-wlan-firmware-service-${KERNEL_VERSION}"
+RPROVIDES:${PN} += "kernel-module-cnss-utils-${KERNEL_VERSION}"
+RPROVIDES:${PN} += "kernel-module-cnss2-${KERNEL_VERSION}"
 
 FILES:${PN} += "${nonarch_base_libdir}/modules/${KERNEL_VERSION}/*"
 FILES:${PN} += "${includedir}/wlan-platform/*"

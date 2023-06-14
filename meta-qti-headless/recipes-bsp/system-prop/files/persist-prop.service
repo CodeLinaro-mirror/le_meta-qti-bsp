@@ -6,6 +6,7 @@ Requires=leprop.service
 [Service]
 User=leprop
 Group=leprop
+NoNewPrivileges=true
 ExecStart=/sbin/persist-prop.sh
 Type=oneshot
 
