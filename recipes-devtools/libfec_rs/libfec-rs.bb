@@ -8,7 +8,7 @@ ${LICENSE};md5=1a6d268fd218675ffea8be556788b780"
 
 PR = "r0"
 
-SRC_URI = "git://source.codeaurora.org/quic/la/platform/external/fec;protocol=https;nobranch=1;rev=4342555427f5bb0788dfacd1eb07d2876afab733"
+SRC_URI = "git://git.codelinaro.org/clo/la/platform/external/fec;protocol=https;nobranch=1;rev=4342555427f5bb0788dfacd1eb07d2876afab733"
 SRC_URI += "file://0001-Add-gnu-autotools-make-files-to-build-libfec_rs.patch"
 
 S = "${WORKDIR}/git"
