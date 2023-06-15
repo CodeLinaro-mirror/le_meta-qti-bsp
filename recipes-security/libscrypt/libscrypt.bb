@@ -1,17 +1,15 @@
 inherit autotools pkgconfig
 
 DESCRIPTION = "Build scrypt library"
-LICENSE = "BSD-Source-Code"
-LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};\
-md5=fe8b41221d7524c70688f7d059ff6d87"
+LICENSE = "BSD-2-Clause"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=cb641bc04cda31daea161b1bc15da69f"
 
-SRC_URI = "${CLO_LA_GIT}/platform/external/scrypt;protocol=https;nobranch=1;\
-rev=72691396f9fa84fd39cb72d031750e580e648aa3;destsuffix=scrypt"
-
+SRC_URI = "${CLO_LA_GIT}/platform/external/scrypt;protocol=https;nobranch=1;rev=72691396f9fa84fd39cb72d031750e580e648aa3;destsuffix=scrypt"
 SRC_URI += "file://0001-Add-GNU-autotools-build-files.patch"
 
 S = "${WORKDIR}/scrypt"
 
 DEPENDS = "liblog openssl"
 RDEPENDS:${PN} = "liblog libcrypto"
+
 EXTRA_OECONF += "${@bb.utils.contains('TUNE_FEATURES','neon','--with-arm-neon','',d)}"
