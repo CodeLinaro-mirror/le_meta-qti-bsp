@@ -17,4 +17,4 @@ RDEPENDS:${PN} += "\
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'avb-utils', '', d)} \
     "
 
-RDEPENDS:${PN}:sa81x5:append = " gptp-test gptp open-avb"
+RDEPENDS:${PN}:sa81x5:append = " hsi2s hsi2s-test gptp-test gptp open-avb"
