@@ -39,42 +39,38 @@ FindAndMountUBIVolume () {
    fi
 }
 
-CreateSplitBinsSymlink () {
-   vmbootsys_dir=$1
-   device=$2
-   for dir in $vmbootsys_dir/*/boot
-    do
-        ln -sf $dir/* $device/
-    done
-}
-
 if [ -x /sbin/restorecon ]; then
     vm_bootsys_selinux_opt=",context=system_u:object_r:vm-bootsys_t:s0"
 else
     vm_bootsys_selinux_opt=""
 fi
 
+# SLOT_SUFFIX is not available it is hardcode for now
+num_volume=`ubinfo -a | grep -o -i "vm-bootsys" | wc -l`
+if [ "x${SLOT_SUFFIX}" == "x" ] && [ ${num_volume} == "2" ]; then
+    SLOT_SUFFIX="_a"
+fi
+
 mtd_file=/proc/mtd
 vm_bootsys_part_name="vm-bootsys$SLOT_SUFFIX"
-is_vm_bootsys_vol_enabled=`ubinfo -a | grep -i -w $vm_bootsys_part_name`
+is_vm_bootsys_vol_enabled=`ubinfo -d 0 -N $vm_bootsys_part_name`
 
 if [ ! -z "$is_vm_bootsys_vol_enabled" ];
 then
     eval FindAndMountUBIVolume ubi0:$vm_bootsys_part_name /vm-bootsys $vm_bootsys_selinux_opt
 else
-    ubi_dev_id=3
-    if [ "$SLOT_SUFFIX" = "_b" ];
+    ubi_dev_id=4
+    if [ "$SLOT_SUFFIX" != "_b" ];
     then
-        ubi_dev_id=4
+        ubi_dev_id=3
+        vm_bootsys_part_name="vm-bootsys$SLOT_SUFFIX|vm-bootsys"
     fi
     mtd_block_number=`cat $mtd_file | grep -i -w -E $vm_bootsys_part_name | sed 's/^mtd//' | awk -F ':' '{print $1}'`
     ubiattach -m $mtd_block_number -d $ubi_dev_id /dev/ubi_ctrl
 
-    eval FindAndMountUBI $vm_bootsys_part_name /vm-bootsys $vm_bootsys_selinux_opt $ubi_dev_id
+    eval FindAndMountUBI vm-bootsys$SLOT_SUFFIX /vm-bootsys $vm_bootsys_selinux_opt $ubi_dev_id
 fi
 
 chown -R root:root /vm-bootsys
-
-eval CreateSplitBinsSymlink /vm-bootsys /firmware/image/
 
 exit 0
