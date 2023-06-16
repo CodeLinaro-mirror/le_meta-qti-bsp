@@ -2,7 +2,6 @@ FILESBBAPPENDPATH := "${QTI_METAPATH_BASE}/recipes-core/systemd/"
 FILESEXTRAPATHS =. "${FILESBBAPPENDPATH}/${BP}:${FILESBBAPPENDPATH}/${BPN}:"
 
 SRC_URI:append = " file://60-misc.rules"
-SRC_URI:append = " file://0001-Disable-close_range.patch"
 
 do_install:append() {
     # Use kernel rules for network iface name
