@@ -9,7 +9,6 @@ User=root
 PAMName=weston-autologin
 Environment="XDG_RUNTIME_DIR=/run/user/0"
 ExecStart=weston --idle-time=0 --socket=wayland-0 --log=/tmp/weston.log
-ExecStop=/usr/bin/killall -s KILL weston
 Type=simple
 PIDFile=/run/early/weston.pid
 Restart=always
