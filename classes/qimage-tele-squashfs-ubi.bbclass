@@ -7,12 +7,13 @@ QIMGUBICLASSES += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-recovery', 'ota
 
 inherit ${QIMGUBICLASSES}
 
-IMAGE_FEATURES[validitems] += "nand2x gluebi nad-modem-volume telaf-volume persist-volume"
+IMAGE_FEATURES[validitems] += "nand2x gluebi nad-modem-volume persist-volume vm-bootsys-volume vm-systemrw-volume"
+IMAGE_FEATURES[validitems] += "${@bb.utils.contains('COMBINED_FEATURES', 'qti-nad-telaf', 'telaf-volume', '', d)}"
 
 CORE_IMAGE_EXTRA_INSTALL += "systemd-machine-units-ubi"
 
 SYSTEM_IMAGE_UBI_TARGET ?= "${IMGDEPLOYDIR}/${IMAGE_BASENAME}/squashfs/sysfs.ubi"
-SYSTEM_IMAGE_UBIFS_TARGET ?= "${@bb.utils.contains('IMAGE_FEATURES', 'gluebi', bb.utils.contains('DISTRO_FEATURES', 'dm-verity', '${IMGDEPLOYDIR}/${IMAGE_BASENAME}/verity/${SYSTEMIMAGE_GLUEBI_TARGET}/${SYSTEMIMAGE_GLUEBI_TARGET}', '${SYSTEMIMAGE_GLUEBI_TARGET}', d), 'sysfs.ubifs', d)}"
+SYSTEM_IMAGE_UBIFS_TARGET ?= "${@bb.utils.contains('IMAGE_FEATURES', 'gluebi', bb.utils.contains('DISTRO_FEATURES', 'dm-verity', '${IMGDEPLOYDIR}/${IMAGE_BASENAME}/verity/${SYSTEMIMAGE_GLUEBI_TARGET}/${SYSTEMIMAGE_GLUEBI_TARGET}', '${SYSTEMIMAGE_GLUEBI_TARGET}', d), 'squashfs/sysfs.ubifs', d)}"
 USER_IMAGE_UBIFS_TARGET ?= "${IMGDEPLOYDIR}/${IMAGE_BASENAME}/squashfs/userfs.ubifs"
 USER_IMAGE_ROOTFS ?= "${WORKDIR}/usrfs-data"
 MODEM_UBIFS_IMAGE = "${WORKSPACE}/NON-HLOS.ubifs"
@@ -20,6 +21,7 @@ MODEM_UBIFS_IMAGE = "${WORKSPACE}/NON-HLOS.ubifs"
 VM_IMAGE_UBI_TARGET ?= "vm-bootsys.ubi"
 VM_IMAGE_UBIFS_TARGET ?= "vm-bootsys.ubifs"
 VM_IMAGE_ROOTFS ?= "${DEPLOY_DIR_IMAGE}/vm-images/"
+VM_BOOTSYS_VOLUME_SIZE ??= "128MiB"
 
 UBINIZE_SYSTEM_CFG ?= "${IMGDEPLOYDIR}/${IMAGE_BASENAME}/squashfs/ubinize_system.cfg"
 UBINIZE_VM_CFG ?= "${IMGDEPLOYDIR}/${IMAGE_BASENAME}/ubinize_vm.cfg"
@@ -31,6 +33,10 @@ SQUASHFS_UBINIZE_CFG_AB ?= "${IMGDEPLOYDIR}/${IMAGE_BASENAME}/squashfs/squashfs_
 MODEM_IMAGE_DIR = "${WORKSPACE}/modem_image"
 SELINUX_CONTEXT_MODEM = "${WORKSPACE}/fctx1"
 MODEM_SQUASHFS_IMAGE = "${WORKSPACE}/NON-HLOS.squash"
+
+TELAF_RO_SQUASHFS_TARGET ?= "${IMGDEPLOYDIR}/${IMAGE_BASENAME}/squashfs/telaf_ro.squashfs"
+TELAF_RO_IMAGE_PATH ?= "${DEPLOY_DIR_IMAGE}/telaf-images/telaf_ro"
+TELAF_RO_SELINUX_FILE_CONTEXTS ?= "${DEPLOY_DIR_IMAGE}/telaf-images/security/selinux/sepolicy/files/file_contexts"
 
 # Ensure SELinux file context variable is defined
 SELINUX_FILE_CONTEXTS ?= ""
@@ -135,209 +141,293 @@ create_symlink_systemd_ubi_mount_tele_rootfs() {
 
 # Need to copy ubinize.cfg file in the deploy directory
 do_create_ubinize_tele_config[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}/squashfs"
+do_create_squash_ubinize_config_ab[depends] += "${@bb.utils.contains('COMBINED_FEATURES', 'qti-nad-telaf', 'do_maketelaf_squashfs', '', d)}"
 
 do_create_ubinize_tele_config() {
+vol_id=0
     cat << EOF > ${UBINIZE_SYSTEM_CFG}
 [sysfs_a_volume]
 mode=ubi
 image="${SYSTEM_IMAGE_UBIFS_TARGET}"
-vol_id=0
+vol_id=$vol_id
 vol_type=dynamic
 vol_name=rootfs_a
 vol_size="${ROOTFS_VOLUME_SIZE}"
+
 [sysfs_b_volume]
 mode=ubi
 image="${SYSTEM_IMAGE_UBIFS_TARGET}"
-vol_id=1
+vol_id=$((++vol_id))
 vol_type=dynamic
 vol_name=rootfs_b
 vol_size="${ROOTFS_VOLUME_SIZE}"
+
 EOF
-        if $(echo ${IMAGE_FEATURES} | grep -q "nad-modem-volume"); then
-            cat << EOF >> ${UBINIZE_SYSTEM_CFG}
+    if $(echo ${IMAGE_FEATURES} | grep -q "nad-modem-volume"); then
+        cat << EOF >> ${UBINIZE_SYSTEM_CFG}
 [modem_a_volume]
 mode=ubi
 EOF
-            if [ -f ${MODEM_UBIFS_IMAGE} ]; then
-               cat << EOF >> ${UBINIZE_SYSTEM_CFG}
+        if [ -f ${MODEM_UBIFS_IMAGE} ]; then
+            cat << EOF >> ${UBINIZE_SYSTEM_CFG}
 image="${MODEM_UBIFS_IMAGE}"
 EOF
-            fi
+        fi
+vol_id=$(echo $(grep -rc "vol_id" ${UBINIZE_SYSTEM_CFG}))
 cat << EOF >> ${UBINIZE_SYSTEM_CFG}
-vol_id=2
+vol_id=$vol_id
 vol_type=dynamic
 vol_name=firmware_a
 vol_size="${MODEM_VOLUME_SIZE}"
+
 [modem_b_volume]
 mode=ubi
 EOF
-            if [ -f ${MODEM_UBIFS_IMAGE} ]; then
-               cat << EOF >> ${UBINIZE_SYSTEM_CFG}
+        if [ -f ${MODEM_UBIFS_IMAGE} ]; then
+            cat << EOF >> ${UBINIZE_SYSTEM_CFG}
 image="${MODEM_UBIFS_IMAGE}"
 EOF
-            fi
+        fi
+vol_id=$(echo $(grep -rc "vol_id" ${UBINIZE_SYSTEM_CFG}))
 cat << EOF >> ${UBINIZE_SYSTEM_CFG}
-vol_id=3
+vol_id=$vol_id
 vol_type=dynamic
 vol_name=firmware_b
 vol_size="${MODEM_VOLUME_SIZE}"
+
 EOF
-        fi
-        if $(echo ${IMAGE_FEATURES} | grep -q "telaf-volume"); then
-            cat << EOF >> ${UBINIZE_SYSTEM_CFG}
+    fi
+vol_id=$(echo $(grep -rc "vol_id" ${UBINIZE_SYSTEM_CFG}))
+    if $(echo ${IMAGE_FEATURES} | grep -q "telaf-volume"); then
+        cat << EOF >> ${UBINIZE_SYSTEM_CFG}
 [telaf_a_volume]
 mode=ubi
-vol_id=4
+vol_id=$vol_id
 vol_type=dynamic
 vol_name=telaf_a
 vol_size="${TELAF_SQUASHFS_VOLUME_SIZE}"
+
 [telaf_b_volume]
 mode=ubi
-vol_id=5
+vol_id=$((++vol_id))
 vol_type=dynamic
 vol_name=telaf_b
 vol_size="${TELAF_SQUASHFS_VOLUME_SIZE}"
+
 [telaf_app_volume]
 mode=ubi
-vol_id=6
+vol_id=$((++vol_id))
 vol_type=dynamic
 vol_name=telaf_app
 vol_size="${TELAF_APP_VOLUME_SIZE}"
+
 EOF
-        fi
+    fi
+vol_id=$(echo $(grep -rc "vol_id" ${UBINIZE_SYSTEM_CFG}))
 cat << EOF >> ${UBINIZE_SYSTEM_CFG}
 [usrfs_volume]
 mode=ubi
 image="${USER_IMAGE_UBIFS_TARGET}"
-vol_id=7
+vol_id=$vol_id
 vol_type=dynamic
 vol_name=usrfs
 vol_flags=autoresize
+
 [cache_volume]
 mode=ubi
-vol_id=8
+vol_id=$((++vol_id))
 vol_type=dynamic
 vol_name=cachefs
 vol_size="${CACHE_VOLUME_SIZE}"
+
 [systemrw_volume]
 mode=ubi
-vol_id=9
+vol_id=$((++vol_id))
 vol_type=dynamic
 vol_name=systemrw
 vol_size="${SYSTEMRW_VOLUME_SIZE}"
+
 EOF
-        if $(echo ${IMAGE_FEATURES} | grep -q "persist-volume"); then
-            cat << EOF >> ${UBINIZE_SYSTEM_CFG}
+vol_id=$(echo $(grep -rc "vol_id" ${UBINIZE_SYSTEM_CFG}))
+    if $(echo ${IMAGE_FEATURES} | grep -q "persist-volume"); then
+        cat << EOF >> ${UBINIZE_SYSTEM_CFG}
 [persist_volume]
 mode=ubi
-vol_id=10
+vol_id=$vol_id
 vol_type=dynamic
 vol_name=persist
 vol_size="${PERSIST_VOLUME_SIZE}"
+
 EOF
-        fi
+    fi
 }
 
 # Squahshfs cfg
 do_create_squash_ubinize_config_ab[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
+do_create_squash_ubinize_config_ab[depends] += "${@bb.utils.contains('COMBINED_FEATURES', 'qti-nad-telaf', 'do_maketelaf_squashfs', '', d)}"
+
 do_create_squash_ubinize_config_ab() {
+vol_id=0
     cat << EOF > ${SQUASHFS_UBINIZE_CFG_AB}
 [sysfs_a_volume]
 mode=ubi
 image="${SYSTEMIMAGE_SQUASHFS_TARGET}"
-vol_id=0
+vol_id=$vol_id
 vol_type=dynamic
 vol_name=rootfs_a
 vol_size="${SYSTEM_SQUASHFS_VOLUME_SIZE}"
+
 [sysfs_b_volume]
 mode=ubi
 image="${SYSTEMIMAGE_SQUASHFS_TARGET}"
-vol_id=1
+vol_id=$((++vol_id))
 vol_type=dynamic
 vol_name=rootfs_b
 vol_size="${SYSTEM_SQUASHFS_VOLUME_SIZE}"
+
 EOF
     if $(echo ${IMAGE_FEATURES} | grep -q "nad-modem-volume"); then
         cat << EOF >> ${SQUASHFS_UBINIZE_CFG_AB}
 [modem_a_volume]
 mode=ubi
 EOF
-            if [ -f ${MODEM_SQUASHFS_IMAGE} ]; then
-               cat << EOF >> ${SQUASHFS_UBINIZE_CFG_AB}
+        if [ -f ${MODEM_SQUASHFS_IMAGE} ]; then
+            cat << EOF >> ${SQUASHFS_UBINIZE_CFG_AB}
 image="${MODEM_SQUASHFS_IMAGE}"
 EOF
-            fi
+        fi
+vol_id=$(echo $(grep -rc "vol_id" ${SQUASHFS_UBINIZE_CFG_AB}))
 cat << EOF >> ${SQUASHFS_UBINIZE_CFG_AB}
-vol_id=2
+vol_id=$vol_id
 vol_type=dynamic
 vol_name=firmware_a
 vol_size="${MODEM_SQUASHFS_VOLUME_SIZE}"
+
 [modem_b_volume]
 mode=ubi
 EOF
-            if [ -f ${MODEM_SQUASHFS_IMAGE} ]; then
-               cat << EOF >> ${SQUASHFS_UBINIZE_CFG_AB}
+        if [ -f ${MODEM_SQUASHFS_IMAGE} ]; then
+            cat << EOF >> ${SQUASHFS_UBINIZE_CFG_AB}
 image="${MODEM_SQUASHFS_IMAGE}"
 EOF
-            fi
+        fi
+vol_id=$(echo $(grep -rc "vol_id" ${SQUASHFS_UBINIZE_CFG_AB}))
 cat << EOF >> ${SQUASHFS_UBINIZE_CFG_AB}
-vol_id=3
+vol_id=$vol_id
 vol_type=dynamic
 vol_name=firmware_b
 vol_size="${MODEM_SQUASHFS_VOLUME_SIZE}"
+
 EOF
     fi
+vol_id=$(echo $(grep -rc "vol_id" ${SQUASHFS_UBINIZE_CFG_AB}))
     if $(echo ${IMAGE_FEATURES} | grep -q "telaf-volume"); then
         cat << EOF >> ${SQUASHFS_UBINIZE_CFG_AB}
 [telaf_a_volume]
 mode=ubi
-vol_id=4
+EOF
+        if [ -f ${TELAF_RO_SQUASHFS_TARGET} ]; then
+            cat << EOF >> ${SQUASHFS_UBINIZE_CFG_AB}
+image="${TELAF_RO_SQUASHFS_TARGET}"
+EOF
+        fi
+vol_id=$(echo $(grep -rc "vol_id" ${SQUASHFS_UBINIZE_CFG_AB}))
+cat << EOF >> ${SQUASHFS_UBINIZE_CFG_AB}
+vol_id=$vol_id
 vol_type=dynamic
 vol_name=telaf_a
 vol_size="${TELAF_SQUASHFS_VOLUME_SIZE}"
+
 [telaf_b_volume]
 mode=ubi
-vol_id=5
+EOF
+        if [ -f ${TELAF_RO_SQUASHFS_TARGET} ]; then
+            cat << EOF >> ${SQUASHFS_UBINIZE_CFG_AB}
+image="${TELAF_RO_SQUASHFS_TARGET}"
+EOF
+        fi
+vol_id=$(echo $(grep -rc "vol_id" ${SQUASHFS_UBINIZE_CFG_AB}))
+cat << EOF >> ${SQUASHFS_UBINIZE_CFG_AB}
+vol_id=$vol_id
 vol_type=dynamic
 vol_name=telaf_b
 vol_size="${TELAF_SQUASHFS_VOLUME_SIZE}"
+
 [telaf_app_volume]
 mode=ubi
-vol_id=6
+vol_id=$((++vol_id))
 vol_type=dynamic
 vol_name=telaf_app
 vol_size="${TELAF_APP_VOLUME_SIZE}"
+
 EOF
     fi
+vol_id=$(echo $(grep -rc "vol_id" ${SQUASHFS_UBINIZE_CFG_AB}))
 cat << EOF >> ${SQUASHFS_UBINIZE_CFG_AB}
 [usrfs_volume]
 mode=ubi
 image="${USER_IMAGE_UBIFS_TARGET}"
-vol_id=7
+vol_id=$vol_id
 vol_type=dynamic
 vol_name=usrfs
 vol_flags=autoresize
+
 [cache_volume]
 mode=ubi
-vol_id=8
+vol_id=$((++vol_id))
 vol_type=dynamic
 vol_name=cachefs
 vol_size="${CACHE_VOLUME_SIZE}"
+
 [systemrw_volume]
 mode=ubi
-vol_id=9
+vol_id=$((++vol_id))
 vol_type=dynamic
 vol_name=systemrw
 vol_size="${SYSTEMRW_VOLUME_SIZE}"
+
 EOF
+vol_id=$(echo $(grep -rc "vol_id" ${SQUASHFS_UBINIZE_CFG_AB}))
     if $(echo ${IMAGE_FEATURES} | grep -q "persist-volume"); then
         cat << EOF >> ${SQUASHFS_UBINIZE_CFG_AB}
 [persist_volume]
 mode=ubi
-vol_id=10
+vol_id=$vol_id
 vol_type=dynamic
 vol_name=persist
 vol_size="${PERSIST_VOLUME_SIZE}"
+
+EOF
+    fi
+vol_id=$(echo $(grep -rc "vol_id" ${SQUASHFS_UBINIZE_CFG_AB}))
+    if $(echo ${IMAGE_FEATURES} | grep -q "vm-bootsys-volume"); then
+        cat << EOF >> ${SQUASHFS_UBINIZE_CFG_AB}
+[vm-bootsys_a_volume]
+mode=ubi
+vol_id=$vol_id
+vol_type=dynamic
+vol_name=vm-bootsys_a
+vol_size="${VM_BOOTSYS_VOLUME_SIZE}"
+
+[vm-bootsys_b_volume]
+mode=ubi
+vol_id=$((++vol_id))
+vol_type=dynamic
+vol_name=vm-bootsys_b
+vol_size="${VM_BOOTSYS_VOLUME_SIZE}"
+
+EOF
+    fi
+vol_id=$(echo $(grep -rc "vol_id" ${SQUASHFS_UBINIZE_CFG_AB}))
+    if $(echo ${IMAGE_FEATURES} | grep -q "vm-systemrw-volume"); then
+        cat << EOF >> ${SQUASHFS_UBINIZE_CFG_AB}
+[vm_systemrw_volume]
+mode=ubi
+vol_id=$vol_id
+vol_type=dynamic
+vol_name=vm_systemrw
+vol_size="${VM_SYSTEMRW_VOLUME_SIZE}"
+
 EOF
     fi
 }
@@ -387,6 +477,17 @@ fakeroot do_makesystem_squashfs() {
     ubinize -o ${SYSTEMIMAGE_SQUASHFS_UBI_AB_TARGET} ${UBINIZE_ARGS} ${SQUASHFS_UBINIZE_CFG_AB}
 }
 
+do_maketelaf_squashfs[depends] += "${@bb.utils.contains('IMAGE_FEATURES', 'telaf-volume', 'telaf-image:do_deploy', '', d)}"
+do_maketelaf_squashfs[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}/squashfs"
+
+fakeroot do_maketelaf_squashfs() {
+    if [[ "${DISTRO_FEATURES}" =~ "selinux" ]] ; then
+        mksquashfs ${TELAF_RO_IMAGE_PATH} ${TELAF_RO_SQUASHFS_TARGET} -context-file ${TELAF_RO_SELINUX_FILE_CONTEXTS} -noappend -comp xz -Xdict-size 32K -noI -Xbcj arm -b 65536 -processors 1
+    else
+        mksquashfs ${TELAF_RO_IMAGE_PATH} ${TELAF_RO_SQUASHFS_TARGET} -noappend -comp xz -Xdict-size 32K -noI -Xbcj arm -b 65536 -processors 1
+    fi
+}
+
 # Need to copy ubinize_vm.cfg file in the deploy directory
 do_create_ubinize_vm_config[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
 
@@ -412,13 +513,13 @@ fakeroot do_make_vmbootsys_ubi() {
 }
 
 python () {
-    if bb.utils.contains('IMAGE_FEATURES', 'vm', True, False, d):
-        bb.build.addtask('do_make_vmbootsys_ubi', 'do_image_complete', 'do_compose_vmimage', d)
-    elif bb.utils.contains('IMAGE_FEATURES', 'gluebi', True, False, d) and bb.utils.contains('DISTRO_FEATURES', 'dm-verity', True, False, d):
+    if bb.utils.contains('IMAGE_FEATURES', 'gluebi', True, False, d) and bb.utils.contains('DISTRO_FEATURES', 'dm-verity', True, False, d):
         bb.build.addtask('do_makesystem_gluebi', 'do_image_complete', 'do_image', d)
     else:
-        bb.build.addtask('do_makesystem_tele_ubi', 'do_image_complete', 'do_image', d)
+        bb.build.addtask('do_makesystem_tele_ubi', 'do_image_complete', 'do_makesystem_ubi', d)
         bb.build.addtask('do_makesystem_squashfs', 'do_image_complete', 'do_makesystem_tele_ubi', d)
+        if bb.utils.contains('COMBINED_FEATURES', 'qti-nad-telaf', True, False, d):
+            bb.build.addtask('do_maketelaf_squashfs', 'do_image_complete', 'do_makesystem_ubi', d)
 }
 
 do_patch_ubi_tools() {
