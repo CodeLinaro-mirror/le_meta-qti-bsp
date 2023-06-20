@@ -16,6 +16,7 @@ PREFERRED_VERSION_mkbootimg-gki-native = "5.15"
 PREFERRED_VERSION_dtc-android-build-native = "5.15"
 PREFERRED_VERSION_mkdtimg-gki-native = "5.15"
 PREFERRED_VERSION_qcrosvm = "1.1"
+PREFERRED_VERSION:securemsmdlkm ?= "1.0"
 SERIAL_CONSOLES = "115200;ttyMSM0"
 KERNEL_IMAGETYPE = "Image"
 KERNEL_BASE = "0xa8000000"
@@ -54,7 +55,7 @@ KERNEL_BUILD_CONFIG ?= "msm-kernel/build.config.msm.sa525"
 # android-binder:         Machine supports android binder
 # dm-verity-initramfs-v4  Machine supports Initramfs and dm-verity working with AVB
 
-MACHINE_FEATURES += "qti-sdx dm-verity-initramfs-v4 qti-sensors qti-mvm qti-security qseecompat qti-tzlog qti-remoteproc qti-data-modem qti-location qti-audio qti-smciqseecomd qti-recovery qti-wwan-plus-cv2x qti-wlan qti-bluetooth qwesd android-binder qti-c2c qti-cv2x-compensator"
+MACHINE_FEATURES += "qti-sdx dm-verity-initramfs-v4 qti-sensors qti-mvm qti-security qseecompat qti-tzlog qti-data-modem qti-location qti-audio qti-smciqseecomd qti-recovery qti-wwan-plus-cv2x qti-wlan qti-bluetooth qwesd android-binder qti-c2c qti-cv2x-compensator qti-dynamic-tsensreset"
 
 CONFLICT_MACHINE_FEATURES += "qti-cv2x"
 
