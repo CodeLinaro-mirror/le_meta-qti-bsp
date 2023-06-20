@@ -47,7 +47,8 @@ do_install:append() {
         install -m 0644 ${WORKDIR}/create-binder.service -D ${D}${systemd_unitdir}/system/create-binder.service
         if ${@bb.utils.contains('DISTRO_FEATURES', 'smack', 'true', 'false', d)}; then
             #Add capabilities for create-binder.service to set smack lable
-            sed -i "s;CAP_FOWNER CAP_CHOWN CAP_DAC_OVERRIDE;CAP_FOWNER CAP_CHOWN CAP_DAC_OVERRIDE CAP_MAC_ADMIN;g" ${D}${systemd_unitdir}/system/create-binder.service
+            sed -i "/^CapabilityBoundingSet/s/$/ CAP_MAC_ADMIN CAP_MAC_OVERRIDE/" ${D}${systemd_unitdir}/system/create-binder.service
+            sed -i "/^AmbientCapabilities/s/$/ CAP_MAC_ADMIN CAP_MAC_OVERRIDE/" ${D}${systemd_unitdir}/system/create-binder.service
             #change binderfs smack label
             sed -i "30i\        chsmack -a '*' -t -r /dev/binderfs" ${D}${sysconfdir}/initscripts/create-binder
         fi
