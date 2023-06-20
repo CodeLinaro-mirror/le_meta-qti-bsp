@@ -12,4 +12,5 @@ PACKAGES =  "\
 
 RDEPENDS:packagegroup-mesa = " \
             mesa \
+            graphics-loader \
         "
