@@ -18,6 +18,7 @@ kernel-version = "${@oe.utils.ifelse(d.getVar('PREFERRED_PROVIDER_virtual/kernel
 # Prefer gbm
 PREFERRED_PROVIDER_virtual/libgbm = "gbm"
 
+PREFERRED_VERSION_adreno = "0.1"
 # Prefer adreno
 PREFERRED_PROVIDER_virtual/wayland-egl  = "adreno"
 PREFERRED_PROVIDER_virtual/egl          = "adreno"
