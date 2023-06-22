@@ -67,6 +67,16 @@ IMAGE_ROOTFS_EXT4 = "${WORKDIR}/rootfs-ext4"
 MACHINE_FSCONFIG_CONF_SEARCH_PATH ?= "${@':'.join('%s/conf/machine/fsconfig' % p for p in '${BBPATH}'.split(':'))}}"
 MACHINE_FSCONFIG_CONF_FULL_PATH = "${@machine_search(d.getVar('MACHINE_FSCONFIG_CONF'), d.getVar('MACHINE_FSCONFIG_CONF_SEARCH_PATH')) or ''}"
 
+create_symlink_ext4_modules() {
+    #Symlink modules
+     LIB_MODULES="${IMAGE_ROOTFS_EXT4}/lib/modules"
+     if [ -d ${LIB_MODULES} ]; then
+         cp -rp ${LIB_MODULES} ${IMAGE_ROOTFS_EXT4}/usr/lib/
+         rm -rf ${LIB_MODULES}
+     fi
+     ln -sf /usr/lib/modules ${IMAGE_ROOTFS_EXT4}/lib
+}
+
 create_symlink_systemd_ext4_mount_rootfs() {
     # Symlink ext4 mount files to systemd targets
     for entry in ${MACHINE_MNT_POINTS}; do
@@ -116,6 +126,7 @@ python create_rootfs_ext4 () {
 
 do_makesystem[prefuncs] += "create_rootfs_ext4"
 do_makesystem[prefuncs] += "create_symlink_systemd_ext4_mount_rootfs"
+do_makesystem[prefuncs] += "create_symlink_ext4_modules"
 
 # To successfully flash generated images on device, need to ensure combined size of
 # unsparsed image and verity fec metadata is with in actual rootfs size. As there is
