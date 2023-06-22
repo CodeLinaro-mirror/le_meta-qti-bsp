@@ -20,6 +20,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
                     bb.utils.contains('MACHINE_FEATURES', 'qti-location', 'packagegroup-qti-location', '', d), '', d)} \
               ${@bb.utils.contains('BBFILE_COLLECTIONS', 'qti-ss-mgr', 'packagegroup-qti-ss-mgr', '', d)} \
               ${@bb.utils.contains('BBFILE_COLLECTIONS', 'qti-core', 'packagegroup-qti-core', '', d)} \
+              ${@bb.utils.contains('BBFILE_COLLECTIONS', 'msm-data', 'packagegroup-qti-data', '', d)} \
 "
 
 #Install bash
