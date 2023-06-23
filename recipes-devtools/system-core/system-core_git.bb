@@ -63,7 +63,7 @@ do_install_append() {
    install -m 0755 ${S}/usb/debuger/usb_debug -D ${D}${base_sbindir}/
    install -d ${D}${userfsdatadir}/persist
    install -b -m 0666 /dev/null -D ${D}${userfsdatadir}/persist/build.prop
-   ln -s  /sbin/usb/compositions/${COMPOSITION} ${D}${userfsdatadir}/usb/boot_hsusb_composition
+   ln -s  /sbin/usb/compositions/${COMPOSITION} ${D}${base_sbindir}/usb/boot_hsusb_composition
    ln -s  /sbin/usb/compositions/empty ${D}${userfsdatadir}/usb/boot_hsic_composition
    if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
       install -m 0755 ${S}/adb/start_adbd -D ${D}${sysconfdir}/initscripts/adbd
