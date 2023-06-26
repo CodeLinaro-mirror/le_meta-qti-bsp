@@ -23,7 +23,7 @@ do_install() {
             ${D}${sysconfdir}/udev/scripts/automountsdcard.sh
         sed -i "s/SLOT/"\"${SDCARD_DEVICE}\""/g" ${WORKDIR}/automountsdcard.rules
         install -d 0644 ${D}${sysconfdir}/udev/rules.d
-        install -m 0744 ${WORKDIR}/automountsdcard.rules ${D}${sysconfdir}/udev/rules.d/
+        install -m 0644 ${WORKDIR}/automountsdcard.rules ${D}${sysconfdir}/udev/rules.d/
     else
         install -d ${D}${sysconfdir}/mdev
         install -m 0755 ${WORKDIR}/automountsdcard.sh ${D}${sysconfdir}/mdev/
