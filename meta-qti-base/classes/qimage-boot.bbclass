@@ -1,7 +1,14 @@
 #Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
 #SPDX-License-Identifier: BSD-3-Clause-Clear
 
-DEPENDS += "dtc-native kernel-aosp-tools-native mkdtimg-native virtual/kernel"
+DEPENDS += "\
+    ${@bb.utils.contains('DISTRO_FEATURES', 'qti-avb', 'avbtool-native', '', d)} \
+    dtc-native \
+    kernel-aosp-tools-native \
+    mkdtimg-native \
+    sectool5-native \
+    virtual/kernel \
+"
 
 do_merge_dtbs() {
      install -d ${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbs
@@ -91,6 +98,18 @@ python do_makeboot_setscene () {
     sstate_setscene(d)
 }
 
+# create dummy vendor-boot & vbmeta image
+# create dummy boot-init image for Andriod container
+do_make_vendor_boot() {
+    if ${@bb.utils.contains('MACHINE_FEATURES', 'vendor-boot-image', 'true', 'false', d)}; then
+        dd if=/dev/zero of=${VENDORBOOTIMAGE_TARGET} bs=1M count=48;
+        dd if=/dev/zero of=${BOOTINIT_TARGET} bs=1K count=1;
+    fi
+}
+do_make_vendor_boot[dirs] = "${DEPLOY_DIR_IMAGE}"
+
+addtask do_make_vendor_boot after do_makeboot before do_sign_boot_img
+
 #sign boot, dtbo and vendor-boot img
 do_sign_boot_img () {
     imgname="${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET}"
@@ -143,5 +162,5 @@ do_sign_boot_img[dirs] = "${DEPLOYDIR}"
 
 addtask do_makeboot_setscene
 
-addtask do_makeboot before do_image_complete
-addtask do_sign_boot_img after do_image_complete before do_make_avb_image
+addtask do_makeboot after do_merge_dtbs before do_sign_boot_img
+addtask do_sign_boot_img after do_makeboot before do_build
