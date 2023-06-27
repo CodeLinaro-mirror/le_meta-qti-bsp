@@ -5,6 +5,7 @@ DEPENDS += "virtual/kernel"
 ENABLE_SECUREMSM = "${@d.getVar('MACHINE_SUPPORTS_SECUREMSM') or "True"}"
 
 CORE_IMAGE_EXTRA_INSTALL += " \
+    coreutils \
     e2fsprogs-mke2fs \
     packagegroup-android-utils \
     ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'packagegroup-selinux-minimal', '', d)} \
