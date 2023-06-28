@@ -21,22 +21,38 @@ LICENSE_${PN}-perf-utils = "GPLv3+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=e73e999e0c72b5ac9012424fa157ad77"
 
 DEPENDS = "fontconfig glib-2.0 libpng pixman zlib"
-UBUNTU_VERSION_cairo = "1.15.10"
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
-SRC_URI = "git://gitlab.freedesktop.org/miso/cairo.git;protocol=https;nobranch=1;tag=${UBUNTU_VERSION_cairo}"
-SRC_URI += "file://fix-double-free-and-failed-assertions-in-cairo_scaled_font_destroy.patch"
+SRC_URI = "http://cairographics.org/releases/cairo-${PV}.tar.xz \
+           file://cairo-get_bitmap_surface-bsc1036789-CVE-2017-7475.diff \
+           file://CVE-2018-19876.patch \
+           file://CVE-2019-6461.patch \
+           file://CVE-2019-6462.patch \
+           file://CVE-2020-35492.patch \
+           file://fix-double-free-and-failed-assertions-in-cairo_scaled_font_destroy.patch \
+          "
+
+SRC_URI[md5sum] = "f19e0353828269c22bd72e271243a552"
+SRC_URI[sha256sum] = "5e7b29b3f113ef870d1e3ecf8adf21f923396401604bda16d44be45e66052331"
 
 inherit autotools pkgconfig upstream-version-is-even gtk-doc multilib_script
 
 MULTILIB_SCRIPTS = "${PN}-perf-utils:${bindir}/cairo-trace"
 
+X11DEPENDS = "virtual/libx11 libsm libxrender libxext"
+
+PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'directfb', d)} \
+                   ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11 xcb', '', d)} \
+                   ${@bb.utils.contains('DISTRO_FEATURES', 'x11 opengl', 'opengl', '', d)} \
+                   trace"
+
+PACKAGECONFIG[x11] = "--with-x=yes -enable-xlib,--with-x=no --disable-xlib,${X11DEPENDS}"
 PACKAGECONFIG[xcb] = "--enable-xcb,--disable-xcb,libxcb"
 PACKAGECONFIG[directfb] = "--enable-directfb=yes,,directfb"
 PACKAGECONFIG[valgrind] = "--enable-valgrind=yes,--disable-valgrind,valgrind"
 PACKAGECONFIG[egl] = "--enable-egl=yes,--disable-egl,virtual/egl"
 PACKAGECONFIG[glesv2] = "--enable-glesv2,--disable-glesv2,virtual/libgles2"
 PACKAGECONFIG[opengl] = "--enable-gl,--disable-gl,virtual/libgl"
+PACKAGECONFIG[trace] = "--enable-trace,--disable-trace"
 
 EXTRA_OECONF += " \
     ${@bb.utils.contains('TARGET_FPU', 'soft', '--disable-some-floating-point', '', d)} \
@@ -47,14 +63,6 @@ EXTRA_OECONF += " \
 export ac_cv_lib_bfd_bfd_openr="no"
 # Ensure we don't depend on LZO
 export ac_cv_lib_lzo2_lzo2a_decompress="no"
-
-S="${WORKDIR}/git"
-
-do_configure_prepend () {
-	touch ${S}/boilerplate/Makefile.am.features
-	touch ${S}/src/Makefile.am.features
-	touch ${S}/ChangeLog
-}
 
 do_install_append () {
 	rm -rf ${D}${bindir}/cairo-sphinx
@@ -67,8 +75,6 @@ do_install_append () {
 	[ ! -d ${D}${libdir}/cairo ] ||
 		rmdir -p --ignore-fail-on-non-empty ${D}${libdir}/cairo
 }
-
-do_package_qa[noexec] = "1"
 
 PACKAGES =+ "cairo-gobject cairo-script-interpreter cairo-perf-utils"
 
@@ -86,6 +92,7 @@ FILES_${PN} = "${libdir}/libcairo.so.*"
 FILES_${PN}-gobject = "${libdir}/libcairo-gobject.so.*"
 FILES_${PN}-script-interpreter = "${libdir}/libcairo-script-interpreter.so.*"
 FILES_${PN}-perf-utils = "${bindir}/cairo-trace* ${libdir}/cairo/*.la ${libdir}/cairo/libcairo-trace.so"
-FILES_${PN}-dev += "${libdir}/cairo/*.so"
+
 BBCLASSEXTEND = "native nativesdk"
 
+UPSTREAM_CHECK_REGEX = "cairo-(?P<pver>\d+(\.\d+)+).tar.xz"
