@@ -28,7 +28,7 @@ CORE_IMAGE_EXTRA_INSTALL += " \
 
 # Force default usb composition to 4EE7 as this image can't
 # support diag, which is expected by all other compositions.
-USBCOMPOSITION_forcevariable = "4EE7"
+USBCOMPOSITION:forcevariable = "4EE7"
 
 python copy_buildsystem:append() {
     # Create src directory in extensible SDK to copy the project sources
