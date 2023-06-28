@@ -17,9 +17,12 @@ S = "${WORKDIR}/system/extras/ext4_utils"
 
 inherit autotools pkgconfig
 
-PACKAGECONFIG ?= "${@bb.utils.filter('DISTRO_FEATURES', 'selinux', d)}"
+PACKAGECONFIG:class-target ?= "${@bb.utils.filter('DISTRO_FEATURES', 'selinux', d)}"
+PACKAGECONFIG:class-native ?= "${@bb.utils.filter('DISTRO_FEATURES_NATIVE', 'selinux', d)}"
 PACKAGECONFIG[selinux] = "--enable-selinux,--disable-selinux,libselinux"
 
 CPPFLAGS:append = " -I${STAGING_INCDIR}/cutils"
 
 BBCLASSEXTEND = "native"
+
+MACHINEOVERRIDES:class-native = "${MACHINE}"
