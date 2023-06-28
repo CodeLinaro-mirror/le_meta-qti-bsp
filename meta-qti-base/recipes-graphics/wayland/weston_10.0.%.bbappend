@@ -31,6 +31,11 @@ PACKAGECONFIG[wl-shell] = "-Ddeprecated-wl-shell=true,-Ddeprecated-wl-shell=fals
 
 RRECOMMENDS_${PN}:remove = "weston-init"
 
+do_install:append() {
+    install -d ${D}${datadir}/weston
+    mv ${D}${libdir}/libweston-${WESTON_MAJOR_VERSION}/drm-backend.so ${D}${datadir}/weston/drm-backend.so
+}
+
 FILES:${PN}-dev = "${includedir} \
                 ${libdir}/pkgconfig ${datadir}/pkgconfig \
                 ${libdir}/${BPN}/libexec_weston.so \
