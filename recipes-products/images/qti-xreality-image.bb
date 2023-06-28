@@ -29,6 +29,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-sensors-see \
         packagegroup-qti-splitxr \
         packagegroup-qti-splitxr-common \
+        packagegroup-qti-xrcomm \
         packagegroup-qti-ss-mgr \
         packagegroup-qti-test-sensors-see \
         packagegroup-qti-video \
