@@ -15,16 +15,20 @@ PREFERRED_VERSION_dtc-android-build = "5.15"
 PREFERRED_VERSION_mkbootimg-gki-native = "5.15"
 PREFERRED_VERSION_dtc-android-build-native = "5.15"
 PREFERRED_VERSION_mkdtimg-gki-native = "5.15"
+PREFERRED_VERSION_qcrosvm = "1.1"
+PREFERRED_VERSION:securemsmdlkm ?= "1.0"
 SERIAL_CONSOLES = "115200;ttyMSM0"
 KERNEL_IMAGETYPE = "Image"
 KERNEL_BASE = "0xa8000000"
 KERNEL_TAGS_OFFSET = "0x1e00000"
 KERNEL_CONFIG ?= "vendor/sa525_defconfig"
 KERNEL_CONFIG_qti-distro-debug ?= "vendor/sa525-debug_defconfig"
-KERNEL_CMD_PARAMS = "ro rootwait console=ttyMSM0,115200,n8 androidboot.hardware=qcom msm_rtb.filter=0x237 androidboot.console=ttyMSM0 lpm_levels.sleep_disabled=1 firmware_class.path=/lib/firmware/updates service_locator.enable=1 net.ifnames=0"
-KERNEL_VARIANT = ""
-KERNEL_VARIANT_qti-distro-debug = "debug_"
-KERNEL_VARIANT_qti-distro-perf = "perf_"
+CONSOLE_PARAM ?= "console=ttyMSM0,115200,n8 no_console_suspend=1"
+CONSOLE_PARAM_qti-distro-perf ?= "console=ttyMSM0,115200,n8 no_console_suspend=1 loglevel=0 systemd.log_level=0 systemd.show_status=0"
+KERNEL_CMD_PARAMS = "ro rootwait ${CONSOLE_PARAM} androidboot.console=ttyMSM0 lpm_levels.sleep_disabled=1 firmware_class.path=/lib/firmware/updates,/vm-bootsys/boot service_locator.enable=1 net.ifnames=0"
+KERNEL_VARIANT ??= ""
+KERNEL_VARIANT_qti-distro-debug ??= "debug_"
+KERNEL_VARIANT_qti-distro-perf ??= "perf_"
 KERNEL_DTB_NAMES = "dtbs/dtb.img"
 
 MACHINE_USES_KERNEL_PREBUILTS = "True"
@@ -32,7 +36,6 @@ KERNEL_PREBUILT_PATH ?= "${WORKSPACE}/kernel-5.15/out/msm-kernel-sa525-${KERNEL_
 KERNEL_OUT_PATH ?= "${WORKSPACE}/kernel-5.15/out/msm-kernel-sa525-${KERNEL_VARIANT}defconfig"
 KERNEL_BUILD_CONFIG ?= "msm-kernel/build.config.msm.sa525"
 
-DEFAULT_ENFORCING = "permissive"
 
 # MACHINE_FEATURES ##
 # qti-adsp:               Machine supports QTI adsp solution
@@ -49,11 +52,16 @@ DEFAULT_ENFORCING = "permissive"
 # qseecompat:             Machine supports qseecom compat solution
 # qti-tzlog:              Machine supports tz/qsee logs
 # qti-smciqseecomd:       Machine supports smcinvoke based listeners
+# android-binder:         Machine supports android binder
+# dm-verity-initramfs-v4: Machine supports Initramfs and dm-verity working with AVB
+# qti-nad-telaf:          Machine supports telematics application framework
+# qti-nad-mrc             Machine supports mrcd feature
 
-MACHINE_FEATURES += "qti-sdx dm-verity-none qti-sensors qti-mvm qti-security qseecompat qti-tzlog qti-remoteproc qti-data-modem qti-location qti-audio qti-smciqseecomd qti-recovery qti-cv2x"
+MACHINE_FEATURES += "qti-sdx dm-verity-initramfs-v4 qti-sensors qti-mvm qti-security qseecompat qti-tzlog qti-data-modem qti-location qti-audio qti-smciqseecomd qti-recovery qti-wwan-plus-cv2x qti-wlan qti-bluetooth qwesd android-binder qti-c2c qti-cv2x-compensator qti-dynamic-tsensreset qti-nad-telaf qti-nad-mrc"
+
+CONFLICT_MACHINE_FEATURES += "qti-cv2x"
 
 MACHINE_MNT_POINTS = " \
-    /dsp \
     /firmware \
     /systemrw \
     /persist \
@@ -77,7 +85,6 @@ UFS_BSG_DEV_USAGE = "True"
 
 PREFERRED_VERSION_protobuf = "3.11.4"
 PREFERRED_VERSION_protobuf-native = "3.11.4"
-PREFERRED_VERSION_iproute2 = "5.5.0"
 
 # Fixes for boot image dtb appending
 BOOT_HEADER_VERSION = "2"

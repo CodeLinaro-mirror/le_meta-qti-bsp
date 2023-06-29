@@ -6,8 +6,12 @@ TOYBOX_RAMDISK ?= "False"
 ENABLE_ADB ?= "True"
 ENABLE_ADB_qti-distro-base-user ?= "False"
 PACKAGE_INSTALL += "${@oe.utils.conditional('ENABLE_ADB', 'True', 'adbd usb-composition usb-composition-usbd', '', d)}"
-PACKAGE_INSTALL += "${@oe.utils.conditional('TOYBOX_RAMDISK', 'True', 'toybox mksh gawk coreutils e2fsprogs dosfstools ethtool iputils iperf2 iperf3 devmem2 tcpdump', '', d)}"
+PACKAGE_INSTALL += "${@oe.utils.conditional('TOYBOX_RAMDISK', 'True', 'toybox mksh gawk coreutils ethtool iputils devmem2 tcpdump', '', d)}"
 PACKAGE_INSTALL += "${@oe.utils.conditional('FLASHLESS_MCU', 'True', 'nbd-client techpack-ecpri', '', d)}"
+DEPENDS += "${@oe.utils.conditional('FLASHLESS_MCU', 'True', 'binutils-cross-${TARGET_ARCH}', '', d)}"
+
+# Adding mtd-utils to support dm-verity v4 for NAND
+PACKAGE_INSTALL += "${@bb.utils.contains('MACHINE_FEATURES', 'dm-verity-initramfs-v4', 'mtd-utils avbtool cryptsetup', '', d)}"
 
 do_ramdisk_create[depends] += "virtual/kernel:do_deploy"
 do_ramdisk_create[cleandirs] += "${RAMDISKDIR}"
@@ -20,6 +24,13 @@ fakeroot do_ramdisk_create() {
         mkdir -p ${RAMDISKDIR}/usr
         mkdir -p ${RAMDISKDIR}/usr/bin
         mkdir -p ${RAMDISKDIR}/usr/sbin
+        if [[ "${FLASHLESS_MCU}" == "True" ]]; then
+            mkdir -p ${RAMDISKDIR}/lib/firmware/qcom_aw_phy/
+            mkdir -p ${RAMDISKDIR}/usr/share/dhcpcd/hooks/
+            mkdir -p ${RAMDISKDIR}/usr/libexec/dhcpcd-hooks
+            mkdir -p ${RAMDISKDIR}/usr/lib/dhcpcd/dev/
+            mkdir -p ${RAMDISKDIR}/var/db/dhcpcd/
+        fi
         mkdir -p ${RAMDISKDIR}/dev
         mknod -m 0600 ${RAMDISKDIR}/dev/console c 5 1
         mknod -m 0600 ${RAMDISKDIR}/dev/tty c 5 0
@@ -46,9 +57,6 @@ fakeroot do_ramdisk_create() {
             cp ${IMAGE_ROOTFS}/bin/arping bin/
             cp ${IMAGE_ROOTFS}/usr/lib/libgpg-error.so.0 lib/libgpg-error.so.0
             cp ${IMAGE_ROOTFS}/usr/bin/devmem2 bin/
-            cp ${IMAGE_ROOTFS}/usr/bin/iperf bin/
-            cp ${IMAGE_ROOTFS}/usr/bin/iperf3 bin/
-            cp ${IMAGE_ROOTFS}/usr/lib/libiperf.so.0 lib/libiperf.so.0
             cp ${IMAGE_ROOTFS}/usr/sbin/tcpdump bin/
             cp ${IMAGE_ROOTFS}/usr/lib/libpcap.so.1 lib/libpcap.so.1
             cp ${IMAGE_ROOTFS}/usr/lib/libcrypto.so.1.1 lib/
@@ -74,16 +82,10 @@ fakeroot do_ramdisk_create() {
                 cp ${IMAGE_ROOTFS}/usr/bin/gawk bin/
                 cp ${IMAGE_ROOTFS}/usr/bin/expr.coreutils bin/
                 cp ${IMAGE_ROOTFS}/usr/bin/tr.coreutils bin/
-                cp ${IMAGE_ROOTFS}/usr/sbin/mkfs.vfat.dosfstools bin/
-                cp ${IMAGE_ROOTFS}/sbin/mkfs.ext2.e2fsprogs bin/
-                cp ${IMAGE_ROOTFS}/sbin/mkfs.ext3 bin/
-                cp ${IMAGE_ROOTFS}/sbin/mkfs.ext4 bin/
                 cp ${IMAGE_ROOTFS}/sbin/ip.iproute2 bin/
                 ln -s gawk bin/awk
                 ln -s expr.coreutils bin/expr
                 ln -s tr.coreutils bin/tr
-                ln -s mkfs.vfat.dosfstools bin/mkfs.vfat
-                ln -s mkfs.ext2.e2fsprogs bin/mkfs.ext2
                 ln -s ip.iproute2 bin/ip
             fi
             # install all the toybox commands
@@ -118,8 +120,29 @@ fakeroot do_ramdisk_create() {
             cp ${IMAGE_ROOTFS}/etc/nbdtab etc/
 
             # DMA kos
-            cp ${IMAGE_ROOTFS}/usr/lib/modules/ecpri_dmam.ko lib/modules/
             cp ${IMAGE_ROOTFS}/usr/lib/modules/gsim.ko lib/modules/
+            cp ${IMAGE_ROOTFS}/usr/lib/modules/ecpri_dmam.ko lib/modules/
+            cp ${IMAGE_ROOTFS}/usr/lib/modules/fpc_qsfp.ko lib/modules/
+            cp ${IMAGE_ROOTFS}/usr/lib/modules/lassen_qcom_aw_phy.ko lib/modules/
+            cp ${IMAGE_ROOTFS}/usr/lib/modules/lassen_mtip.ko lib/modules/
+            cp ${IMAGE_ROOTFS}/usr/lib/modules/lassen_secure_eip.ko lib/modules/
+            cp ${IMAGE_ROOTFS}/usr/lib/modules/ecpri_core.ko lib/modules/
+            cp ${IMAGE_ROOTFS}/lib/firmware/qcom_aw_phy/eth_custom_rates_1.hex lib/firmware/qcom_aw_phy/
+            # strip debug symbols from kos
+            ${STRIP} --strip-unneeded lib/modules/*ko
+            # install dhcpcd
+            cp ${IMAGE_ROOTFS}/etc/dhcpcd.conf etc/
+            cp ${IMAGE_ROOTFS}/usr/lib/dhcpcd/dev/udev.so usr/lib/dhcpcd/dev/
+            cp ${IMAGE_ROOTFS}/usr/libexec/dhcpcd-hooks/01-test usr/libexec/dhcpcd-hooks/
+            cp ${IMAGE_ROOTFS}/usr/libexec/dhcpcd-hooks/02-dump usr/libexec/dhcpcd-hooks/
+            cp ${IMAGE_ROOTFS}/usr/libexec/dhcpcd-hooks/20-resolv.conf usr/libexec/dhcpcd-hooks/
+            cp ${IMAGE_ROOTFS}/usr/libexec/dhcpcd-hooks/30-hostname usr/libexec/dhcpcd-hooks/3
+            cp ${IMAGE_ROOTFS}/usr/libexec/dhcpcd-hooks/50-ntp.conf usr/libexec/dhcpcd-hooks/
+            cp ${IMAGE_ROOTFS}/usr/libexec/dhcpcd-run-hooks usr/libexec/
+            cp ${IMAGE_ROOTFS}/usr/sbin/dhcpcd usr/sbin/
+            cp ${IMAGE_ROOTFS}/usr/share/dhcpcd/hooks/10-wpa_supplicant usr/share/dhcpcd/hooks/
+            cp ${IMAGE_ROOTFS}/usr/share/dhcpcd/hooks/15-timezone usr/share/dhcpcd/hooks/
+            cp ${IMAGE_ROOTFS}/usr/share/dhcpcd/hooks/29-lookup-hostname usr/share/dhcpcd/hooks/
         fi
 
         if ${@bb.utils.contains('IMAGE_FEATURES', 'vm', 'true', 'false', d)}; then
@@ -154,6 +177,22 @@ fakeroot do_ramdisk_create() {
                 cp ${COREBASE}/meta-qti-bsp/recipes-products/images/include/csmrd-init .
                 chmod 744 csmrd-init
                 ln -s csmrd-init init
+            elif ${@bb.utils.contains('MACHINE_FEATURES', 'dm-verity-initramfs-v4', 'true', 'false', d)}; then
+                install -m 744 ${COREBASE}/meta-qti-bsp/recipes-products/images/include/ramdisk-init.sh init
+                cp ${IMAGE_ROOTFS}/usr/sbin/ubi* usr/sbin/
+                cp ${IMAGE_ROOTFS}/usr/bin/nad-abctl usr/bin/nad-abctl
+                cp ${IMAGE_ROOTFS}/usr/lib/libnad_ab_al.so.1 lib/libnad_ab_al.so.1
+                ln -s busybox bin/dd
+
+                # The verity need to work with verified boot lib
+                if [[ -e "${IMAGE_ROOTFS}/etc/verity.env" ]]; then
+                    mkdir -p etc/keys
+                    cp ${IMAGE_ROOTFS}/usr/lib/libavb.so.1 lib/
+                    cp ${IMAGE_ROOTFS}/usr/sbin/verified-boot usr/sbin/
+                    cp ${IMAGE_ROOTFS}/usr/lib/libnad-vb.so.1 lib/
+                    cp ${IMAGE_ROOTFS}/etc/verity.env  etc/
+                    cp ${IMAGE_ROOTFS}/etc/keys/x509_root.der etc/keys/x509_root.der
+                fi
             else
                 ln -s bin/busybox init
             fi
@@ -191,10 +230,14 @@ fakeroot do_ramdisk_create() {
             cp ${IMAGE_ROOTFS}/lib/libpcre.so.1 lib/libpcre.so.1
         fi
 
-        if ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains('MACHINE_FEATURES', 'dm-verity-initramfs', 'true', 'false', d), 'false', d)}; then
-            cp ${IMAGE_ROOTFS}/usr/sbin/veritysetup bin/
-            cp ${WORKDIR}/verity.env etc/
-            cp ${WORKDIR}/verity_sig.txt etc/
+        if ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains_any('MACHINE_FEATURES', 'dm-verity-initramfs dm-verity-initramfs-v3 dm-verity-initramfs-v4', 'true', 'false', d), 'false', d)}; then
+
+            if ${@bb.utils.contains('MACHINE_FEATURES', 'dm-verity-initramfs-v4', 'true', 'false', d)}; then
+                cp ${IMAGE_ROOTFS}/usr/sbin/veritysetup bin/
+            else
+                cp ${WORKDIR}/verity.env etc/
+                cp ${WORKDIR}/verity_sig.txt etc/
+            fi
 
             # Shared library dependencies for dm-verity feature
             cp ${IMAGE_ROOTFS}/usr/lib/libcryptsetup.so.12 lib/

@@ -363,7 +363,7 @@ mhi_ch_close() {
     return 0
 }
 
-MHI_CH_RETRIES=90
+MHI_CH_RETRIES=300
 # wait_for_mhi_ch - Waits on and opens a mhi channel to send/recv messages
 # @MHI_CH:  Path to mhi channel
 # @RETRIES: (optional) Retry count to open MHI_CH; default MHI_CH_RETRIES
@@ -450,7 +450,7 @@ do_mounts
 # do_nbdtab - create nbd tab and negotiate images on nbd blocks. Then mount systemfs ans switch root
 # @1:  HOST_ADDR
 # @2:  MHI Channel no
-#
+# @3: Debug transport
 do_nbdtab()
 {
     portno="$(( 10809 + $2 ))"
@@ -484,10 +484,10 @@ do_nbdtab()
     mount -o rw /dev/nbd0 $mnt_dir
     #umount /sys/kernel/debug /sys /proc /dev
 
-    # mount dumgr config readonly
-    mnt_qdumgr_dir="/mnt/system/etc/dumgr/config"
-    mkdir -p $mnt_qdumgr_dir
-    mount /dev/nbd6 $mnt_qdumgr_dir
+    # mount hostmgr config readonly
+    mnt_hostmgr_dir="/mnt/system/etc/csm/x100"
+    mkdir -p $mnt_hostmgr_dir
+    mount /dev/nbd6p1 $mnt_hostmgr_dir
 
     # update systemd mount files to mount it from nbd devices
     cd $mnt_dir/lib/systemd/system/
@@ -495,7 +495,24 @@ do_nbdtab()
     sed -i 's+/dev/disk/by-partlabel/persist+/dev/nbd2+g' persist.mount
     sed -i 's+/dev/disk/by-partlabel/userdata+/dev/nbd3+g' data.mount
     sed -i 's+/dev/disk/by-partlabel/cache+/dev/nbd4+g' cache.mount
-    sed -i 's+/dev/disk/by-partlabel/modem+/dev/nbd5+g' firmware.mount
+    if [ -f firmware-mount.service ]; then
+        sed -i 's+/dev/disk/by-partlabel/modem${SLOT_SUFFIX}+/dev/nbd5+g' firmware-mount.service
+        sed -i '/BindsTo=/d' firmware-mount.service
+        sed -i '/After=/d' firmware-mount.service
+    elif [ -f firmware.mount ]; then
+        sed -i 's+/dev/disk/by-partlabel/modem+/dev/nbd5+g' firmware.mount
+    else
+        echo "firmware.mount or firmware-mount.service are not found"
+    fi
+
+    # set debug transport
+    echo "Set debug transport to $3"
+    # mount userdata.img
+    mnt_data_dir="/mnt/system/data"
+    mkdir -p $mnt_data_dir
+    mount -o rw /dev/nbd3 $mnt_data_dir
+    echo $3 > $mnt_data_dir/debug_transport.conf
+    umount $mnt_data_dir
 
     # Switch root to remote sysfs
     echo "Switching to system partition on $partition"
@@ -511,6 +528,77 @@ else
 fi
 
 case $fstab_suffix in
+    network_boot)
+        echo "In Network boot configuration"
+
+        LOCAL_INTERFACE="eth00"
+
+        # change log level
+        echo 2 > /proc/sys/kernel/printk
+
+        # source /usr/bin/ecpri_install
+        /sbin/insmod /lib/modules/gsim.ko
+        /sbin/insmod /lib/modules/ecpri_dmam.ko
+        /sbin/insmod /lib/modules/fpc_qsfp.ko
+        /sbin/insmod /lib/modules/lassen_qcom_aw_phy.ko qcom_aw_phy_ref_clk_mode=1
+        /sbin/insmod /lib/modules/lassen_mtip.ko
+        /sbin/insmod /lib/modules/lassen_secure_eip.ko
+        /sbin/insmod /lib/modules/ecpri_core.ko
+        ethtool -s $LOCAL_INTERFACE msglvl 1
+        ethtool -s $LOCAL_INTERFACE autoneg off
+
+        # Dynamic IP
+        INTERFACE_TIMEOUT=60
+        ifconfig -a $LOCAL_INTERFACE >/dev/null 2>&1
+        while [ "$?" -ne 0 ]; do
+            echo "Waiting for $LOCAL_INTERFACE..."
+            sleep 1
+            if [ "$INTERFACE_TIMEOUT" -le 0 ]; then
+                start_rdshell
+            fi
+            (( INTERFACE_TIMEOUT -= 1 ))
+            ifconfig -a $LOCAL_INTERFACE >/dev/null 2>&1
+        done
+
+        ifconfig $LOCAL_INTERFACE up
+
+        INTERFACE_LINKUP_TIMEOUT=60
+        IP_LINK_STATUS="$(ip address | grep $LOCAL_INTERFACE: | cut -d' ' -f9)"
+        while [[ $IP_LINK_STATUS != "UP" ]]; do
+            echo "wait for $INTERFACE_LINKUP_TIMEOUT sec, IP link to be up, current status : $IP_LINK_STATUS"
+            sleep 1
+            if [ $INTERFACE_LINKUP_TIMEOUT -le 0 ]; then
+                start_rdshell
+            fi
+            (( INTERFACE_LINKUP_TIMEOUT -= 1 ))
+            IP_LINK_STATUS="$(ip address | grep $LOCAL_INTERFACE: | cut -d' ' -f9)"
+        done
+        echo "IP Link is $IP_LINK_STATUS..."
+
+        /usr/sbin/dhcpcd $LOCAL_INTERFACE
+        if [ "$?" -ne 0 ]; then
+            echo "error starting dhcpcd..."
+            start_rdshell
+        fi
+
+        HOST_ADDRESS_TIMEOUT=5
+        while [[ -z $HOST_ADDR ]]; do
+            echo "Waiting to get HOST Address..."
+            sleep 1
+            if [ "$HOST_ADDRESS_TIMEOUT" -le 0 ]; then
+                start_rdshell
+            fi
+            (( HOST_ADDRESS_TIMEOUT -= 1 ))
+            # /usr/sbin/dhcpcd $LOCAL_INTERFACE
+            # sleep 1
+            HOST_ADDR="$(echo $(/usr/sbin/dhcpcd -U $LOCAL_INTERFACE | grep "dhcp_server_identifier=" | cut -d'=' -f2))"
+        done
+        echo "Server Address : $HOST_ADDR"
+
+        # Create /etc/nbdtab and nbd-client connect remote nbdkit
+        do_nbdtab $HOST_ADDR 0 "usb"
+
+        ;;
     emmc)
         partition="$(extract_config root)"
         ## wait for system partition for 60sec
@@ -527,8 +615,33 @@ case $fstab_suffix in
         #mount system partition
         mnt_dir="/mnt/system"
         mkdir -p $mnt_dir
-        mount -o ro $partition $mnt_dir
+# if DM-Verity is enabled then only this file verity.env exits
+# verity protection
+verity_cmdline="$(sed -e 's/ /\n/g' /proc/cmdline | egrep 'verity')"
+if [ -n "$verity_cmdline" ] && [ -f /etc/verity.env ]; then
+     source /etc/verity.env
+     veritysetup open $partition system $partition $VERITY_ROOT_HASH --salt $VERITY_SALT --hash-offset $VERITY_HASH_OFFSET --data-blocks $VERITY_DATA_BLOCKS --fec-device $partition --fec-offset $VERITY_FEC_OFFSET --fec-roots $VERITY_FEC_ROOTS --root-hash-signature=/etc/verity_sig.txt
 
+    timeout=30
+    # Wait till the block device is available
+     while [ ! -e /dev/mapper/system ]; do
+     echo "waiting for /dev/mapper/system $partition"
+     sleep 1
+     ((timeout -= 1))
+            if [ "$timeout" -le 0 ]; then
+                echo "$partition not available"
+# If open fails we are still starting rdshell which is not needed
+# we are expected to  reboot needs to be disable and reboot for production builds
+                 start_rdshell
+            fi
+     done
+     echo "/dev/mapper/system ready, time = $counter ms"
+     mount -t ext4 -o ro /dev/mapper/system $mnt_dir
+else
+#case when dm-verity is not eanbled
+     mount -o ro $partition $mnt_dir
+
+fi   # end of  if verity file exist check.
         umount /sys/kernel/debug /sys /proc /dev
         echo "Switching to system partition on $partition"
         exec /bin/switch_root -c /dev/console $mnt_dir /sbin/init
@@ -563,8 +676,16 @@ case $fstab_suffix in
             echo "Could not receive config from Host"
             start_rdshell
         fi
-
         echo "Received config: $config_string"
+
+        echo "Receive debug transport"
+        debug_transport="$(mhi_ch_recvmsg $CTRL_DEV 30)"
+        if [ -z "$debug_transport" ]; then
+            echo "Could not receive debug_transport from Host"
+            start_rdshell
+        fi
+        echo "Received debug transport: $debug_transport"
+
 
         mhi_ch_sendmsg $CTRL_DEV "Config received '$HOST_ADDR' '$LOCAL_ADDR'"
         ret="$?"
@@ -597,7 +718,7 @@ case $fstab_suffix in
             echo "Failed to config interface: $MPLANE_INTERFACE"
         fi
         # Create /etc/nbdtab and nbd-client connect remote nbdkit
-        do_nbdtab $HOST_ADDR $config_string
+        do_nbdtab $HOST_ADDR $config_string $debug_transport
         ;;
     rdshell)
         echo "Starting ramdisk shell"
