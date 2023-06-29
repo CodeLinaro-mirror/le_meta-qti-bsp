@@ -33,12 +33,14 @@
 
 cd /sys/devices/system/memory/
 if [ -e aligned_blocks_addr ]; then
-   IFS=',' read -a addr < /sys/devices/system/memory/aligned_blocks_addr
-   IFS=',' read -a num < /sys/devices/system/memory/aligned_blocks_num
-   for index in "${!addr[@]}"
+   addrlist=$(cat aligned_blocks_addr | tr , " ")
+   numlist=$(cat aligned_blocks_num | tr , " ")
+   set -- $numlist
+   for addr in $addrlist
    do
-   echo ${addr[index]} > probe
-   echo online > memory${num[index]}/state
+      echo $addr > probe
+      echo online > memory$1/state
+      shift
    done
 # tune kernel max-threads
    totalram=`grep MemTotal /proc/meminfo | awk '{print $2}'`
