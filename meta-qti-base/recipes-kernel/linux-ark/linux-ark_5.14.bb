@@ -84,7 +84,7 @@ do_rh_config () {
     rm -rf ${SRC_DIR_ROOT}/kernel/rh-kernel-5.14/.config ${SRC_DIR_ROOT}/kernel/rh-kernel-5.14/include/config/ \
     ${SRC_DIR_ROOT}/kernel/rh-kernel-5.14/include/generated/ ${SRC_DIR_ROOT}/kernel/rh-kernel-5.14/arch/$ARCH/include/generated/
 }
-addtask rh_config after do_fetch before do_unpack
+addtask rh_config after do_prepare_recipe_sysroot before do_unpack
 
 do_patch_config() {
      do_patch_config_call() {
