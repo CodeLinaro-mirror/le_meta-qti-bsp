@@ -51,13 +51,6 @@ KBUILD_DEFCONFIG ?= "vendor/${KERNEL_ARCH}${@bb.utils.contains_any('VARIANT', 'd
 
 KERNEL_VERSION_SANITY_SKIP = "1"
 
-# append DTB
-# msm kernel trees have a special treatment for DTS, and both arm and
-# arm64 DTS are located in arch/arm64/boot/dts/qcom folder, which
-# confuses kernel-devicetree class, so we can't use it. Instead let's
-# make sure that we generate all DTBs using the kernel 'dtbs' target,
-# then we can append the DTBs that we need for $MACHINE.
-KERNEL_IMAGETYPE_FOR_MAKE += "dtbs"
 KERNEL_IMAGETYPE_FOR_MAKE += "${KERNEL_IMAGETYPE}"
 KERNEL_IMAGETYPE_FOR_MAKE += "modules"
 
@@ -118,11 +111,6 @@ do_shared_workdir:append () {
                 cp -fR arch/${ARCH}/include/* $kerneldir/arch/${ARCH}/include/
         fi
 
-        if [ -d arch/${ARCH}/boot/dts/vendor ]; then
-                mkdir -p $kerneldir/arch/${ARCH}/boot/dts/vendor
-                cp -fR arch/${ARCH}/boot/dts/vendor/* $kerneldir/arch/${ARCH}/boot/dts/vendor
-        fi
-
         # Generate kernel headers
         oe_runmake_call -C ${STAGING_KERNEL_DIR} ARCH=${ARCH} CC="${KERNEL_CC}" LD="${KERNEL_LD}" headers_install O=${STAGING_KERNEL_BUILDDIR}
 
@@ -141,9 +129,6 @@ do_shared_workdir:append () {
         fi
 }
 
-# Path for dtbo generation is kernel version dependent.
-DTB_SRC_PATH ?= "${STAGING_KERNEL_BUILDDIR}/arch/${ARCH}/boot/dts/qcom"
-
 do_deploy() {
     if [ -f ${D}/${KERNEL_IMAGEDEST}/-${KERNEL_VERSION} ]; then
         mv ${D}/${KERNEL_IMAGEDEST}/-${KERNEL_VERSION} ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}
@@ -159,16 +144,16 @@ do_deploy() {
      install -d ${DEPLOYDIR}/build-artifacts
      install -d ${DEPLOYDIR}/build-artifacts/kernel_scripts/scripts
      install -d ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr/
-     install -d ${DEPLOYDIR}/build-artifacts/dtb/
-     install -d ${DEPLOYDIR}/build-artifacts/dtbo/
 
      cp  ${S}/usr/gen_initramfs.sh ${DEPLOYDIR}/build-artifacts/kernel_scripts/scripts
      cp -a ${B}/usr/gen_init_cpio ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr/
      cp -a ${B}/usr/initramfs_data.cpio ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr/
      cp -a ${B}/usr/initramfs_inc_data ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr/
-     cp -a ${DTB_SRC_PATH}/*.dtb ${DEPLOYDIR}/build-artifacts/dtb/
-     cp -a ${DTB_SRC_PATH}/*.dtbo ${DEPLOYDIR}/build-artifacts/dtbo/
 }
+
+# remove package kernel-devicetree append in kernel-devicetree.bbclass, kernel-devicetree
+# provide by kernel-devicetree.bb
+PACKAGES:remove = "${KERNEL_PACKAGE_NAME}-devicetree"
 
 # Put the zImage in the kernel-dev pkg
 FILES:${KERNEL_PACKAGE_NAME}-dev += "/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}"
