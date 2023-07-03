@@ -23,6 +23,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-core-prop \
         diag-router \
         packagegroup-qti-cvp \
+        packagegroup-qti-eva \
         packagegroup-qti-data \
         packagegroup-qti-display \
         packagegroup-qti-touch \
@@ -57,16 +58,15 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-perf \
         tdk-chx01-get-data-app \
         tdk-thermistor-app \
+        system-sample-apps \
 "
 
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "chronyc"
-CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-cvp"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-data"
-CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-fastcv"
-CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-gst"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-ml"
+CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-cvp"
+CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-gst"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-robotics"
-CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-securemsm"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-test-sensors-see"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "tdk-chx01-get-data-app"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "tdk-thermistor-app"
@@ -74,8 +74,9 @@ CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-sensors-see"
 
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-data"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-ml"
+CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-eva"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-ss-mgr"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-touch"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-perf"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-sensors-ship"
-
+CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "system-sample-apps"
