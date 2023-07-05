@@ -11,7 +11,7 @@ S = "${WORKDIR}"
 
 inherit systemd
 
-export localstatedir = "/persist"
+export localstatedir = "${@bb.utils.contains('DISTRO_FEATURES','volatiled-var','/persist','/var',d)}"
 
 SYSTEMD_SERVICE:${PN} = "resize-userdata.service"
 SYSTEMD_AUTO_ENABLE:${PN} = "enable"
