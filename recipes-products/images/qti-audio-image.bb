@@ -17,6 +17,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-data \
         packagegroup-qti-dsp \
         packagegroup-qti-fastcv \
+	packagegroup-qti-gfx \
         packagegroup-qti-ml \
         packagegroup-qti-securemsm \
         packagegroup-qti-ss-mgr \
