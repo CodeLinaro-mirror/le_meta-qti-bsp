@@ -16,6 +16,8 @@ VMBOOTSYS_DEPLOY_DIR ?= "${DEPLOY_DIR}/images/${BASEMACHINE}-vmbootsys/"
 VMPACKIMAGE_UBI_TARGET ?= "${VMBOOTSYS_DEPLOY_DIR}/vm-bootsys.ubi"
 VMPACKIMAGE_UBIFS_TARGET ?= "${VMBOOTSYS_DEPLOY_DIR}/vm-bootsys.ubifs"
 VMPACKIMAGE_ROOTFS ?= "${VMBOOTSYS_DEPLOY_DIR}/vm-images/"
+VMPACKIMAGE_SQUASHFS_TARGET ?= "${VMBOOTSYS_DEPLOY_DIR}/vm-bootsys.squash"
+
 UBINIZE_VMPACK_CFG ?= "${VMBOOTSYS_DEPLOY_DIR}/ubinize_vm.cfg"
 VMSYSTEMRW_PACKIMAGE_UBIFS_TARGET ?= "${VMBOOTSYS_DEPLOY_DIR}/vm-systemrw.ubifs"
 VMSYSTEMRW_PACKIMAGE_ROOTFS ?= "${VMBOOTSYS_DEPLOY_DIR}/vm-systemrw/"
@@ -63,7 +65,7 @@ EOF
 do_pack_vm_images[nostamp] = "1"
 do_pack_vm_images[prefuncs] += 'do_setup_package'
 do_pack_vm_images[prefuncs] += "${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', 'do_create_ubinize_vmpack_config', '', d)}"
-do_pack_vm_images[postfuncs] += "${@bb.utils.contains('INHERIT', 'uninative', 'do_patch_ubitools', '', d)}"
+do_pack_vm_images[postfuncs] += "${@bb.utils.contains('INHERIT', 'uninative', 'do_patch_ubitools do_patch_ubi_tools', '', d)}"
 do_pack_vm_images[depends] += "${PN}:do_make_vmbootsys_ubi"
 
 do_pack_vm_images() {
@@ -81,6 +83,12 @@ do_pack_vm_images() {
         mkfs.ubifs -r ${VMPACKIMAGE_ROOTFS} ${IMAGE_UBIFS_SELINUX_OPTIONS} \
                    -o ${VMPACKIMAGE_UBIFS_TARGET} ${MKUBIFS_ARGS}
         ubinize -o ${VMPACKIMAGE_UBI_TARGET} ${UBINIZE_ARGS} ${UBINIZE_VMPACK_CFG}
+
+        if [[ "${DISTRO_FEATURES}" =~ "selinux" ]] ; then
+            mksquashfs ${VMPACKIMAGE_ROOTFS} ${VMPACKIMAGE_SQUASHFS_TARGET} -context-file ${SELINUX_FILE_CONTEXTS} -noappend -comp xz -Xdict-size 32K -noI -Xbcj arm -b 65536 -processors 1
+        else
+            mksquashfs ${VMPACKIMAGE_ROOTFS} ${VMPACKIMAGE_SQUASHFS_TARGET} -noappend -comp xz -Xdict-size 32K -noI -Xbcj arm -b 65536 -processors 1
+        fi
 
         if ${@bb.utils.contains('MACHINE_FEATURES','qti-vm-systemrw', 'true', 'false', d)}; then
             mkfs.ubifs -r ${VMSYSTEMRW_PACKIMAGE_ROOTFS} ${IMAGE_UBIFS_SELINUX_OPTIONS} \

@@ -4,7 +4,7 @@ GENERATE_AB_OTA_PACKAGE ?= "${@bb.utils.contains('COMBINED_FEATURES', 'qti-ab-bo
 QIMGUBICLASSES  = ""
 # To be implemented
 QIMGUBICLASSES += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-recovery', 'ota-ubi', '', d)}"
-
+QIMGUBICLASSES += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-ab-boot', 'ab-ota-ubi', '', d)}"
 inherit ${QIMGUBICLASSES}
 
 IMAGE_FEATURES[validitems] += "persist-volume nand2x gluebi vm-bootsys-volume vm-systemrw-volume"
@@ -20,7 +20,7 @@ USERIMAGE_ROOTFS ?= "${WORKDIR}/usrfs"
 VMIMAGE_UBI_TARGET ?= "vm-bootsys.ubi"
 VMIMAGE_UBIFS_TARGET ?= "vm-bootsys.ubifs"
 VMIMAGE_ROOTFS ?= "${DEPLOY_DIR_IMAGE}/vm-images/"
-VMSYSTEMRW_IMAGE_UBIFS_TARGET ?= "vm-systemrw.ubifs"
+VMSYSTEMRW_IMAGE_UBIFS_TARGET ?= "${IMGDEPLOYDIR}/${IMAGE_BASENAME}/vm-systemrw.ubifs"
 VMSYSTEMRW_IMAGE_ROOTFS ?= "${DEPLOY_DIR_IMAGE}/vm-systemrw/"
 
 UBINIZE_CFG ?= "${IMGDEPLOYDIR}/${IMAGE_BASENAME}/ubinize_system.cfg"
