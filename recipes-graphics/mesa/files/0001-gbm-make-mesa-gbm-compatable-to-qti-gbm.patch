@@ -1,0 +1,49 @@
+From 5b1e2c037d235c1988a7fd87270d4c697d64f793 Mon Sep 17 00:00:00 2001
+From: vishnu <quic_vishsain@quicinc.com>
+Date: Thu, 15 Jun 2023 17:05:38 +0530
+Subject: [PATCH] gbm: make mesa gbm compatable to qti gbm
+
+Added changes to make mesa gbm compatable to qti gbm
+
+Upstream-Status: Inappropriate
+
+Signed-off-by: Vishnu Saini <quic_vishsain@quicinc.com>
+---
+ src/gbm/main/gbm.c | 6 ++++++
+ src/gbm/main/gbm.h | 3 +++
+ 2 files changed, 9 insertions(+)
+
+diff --git a/src/gbm/main/gbm.c b/src/gbm/main/gbm.c
+index 599f7aa..fd20db7 100644
+--- a/src/gbm/main/gbm.c
++++ b/src/gbm/main/gbm.c
+@@ -45,6 +45,12 @@
+ #include "gbmint.h"
+ #include "backend.h"
+ 
++GBM_EXPORT int
++gbm_perform(int operation,...)
++{
++    return 0;
++}
++
+ /** Returns the file description for the gbm device
+  *
+  * \return The fd that the struct gbm_device was created with
+diff --git a/src/gbm/main/gbm.h b/src/gbm/main/gbm.h
+index 1a1e2ca..b93447b 100644
+--- a/src/gbm/main/gbm.h
++++ b/src/gbm/main/gbm.h
+@@ -267,6 +267,9 @@ enum gbm_bo_flags {
+ };
+ 
+ int
++gbm_perform(int operation,...);
++
++int
+ gbm_device_get_fd(struct gbm_device *gbm);
+ 
+ const char *
+-- 
+2.7.4
+
