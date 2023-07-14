@@ -5,6 +5,7 @@
 inherit qimage
 
 DEPENDS += "mtd-utils-native"
+USBCOMPOSITION_sdxpinn = "${@bb.utils.contains('BBFILE_COLLECTIONS', 'qti-core', '90DB', '4EE7', d)}"
 
 IMAGE_FEATURES += "read-only-rootfs nand2x ssh-server-openssh persist-volume"
 
