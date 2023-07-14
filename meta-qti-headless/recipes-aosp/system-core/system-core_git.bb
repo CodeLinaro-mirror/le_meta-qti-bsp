@@ -6,7 +6,7 @@ HOMEPAGE = "http://developer.android.com/"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://NOTICE;md5=c1a3ff0b97f199c7ebcfdd4d3fed238e"
 
-DEPENDS += "ext4-utils glib-2.0 libbase libcutils libmincrypt libselinux libutils virtual/kernel-headers openssl system-core-adbd"
+DEPENDS += "ext4-utils glib-2.0 libbase libcutils libmincrypt libutils virtual/kernel-headers openssl system-core-adbd"
 
 PR = "r19"
 
@@ -19,18 +19,12 @@ inherit autotools pkgconfig systemd useradd
 
 COMPOSITION = "901D"
 
-USERADD_PACKAGES = "${PN}-leprop ${PN}-post-boot"
+USERADD_PACKAGES = "${PN}-leprop"
 
 GROUPADD_PARAM:${PN}-leprop = "leprop"
 USERADD_PARAM:${PN}-leprop = "-g leprop --no-create-home --shell /bin/false leprop"
 
-GROUPADD_PARAM:${PN}-post-boot = "post-boot"
-USERADD_PARAM:${PN}-post-boot = "-g post-boot --no-create-home --shell /bin/false post-boot"
-
-CPPFLAGS += "\
-    -I${STAGING_INCDIR}/ext4_utils \
-    -I${STAGING_INCDIR}/libselinux \
-"
+CPPFLAGS += "-I${STAGING_INCDIR}/ext4_utils"
 
 EXTRA_OECONF = "\
     --with-host-os=${HOST_OS} \

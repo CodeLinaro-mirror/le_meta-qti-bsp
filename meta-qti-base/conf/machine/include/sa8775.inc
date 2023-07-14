@@ -18,6 +18,7 @@ kernel-version = "${@oe.utils.ifelse(d.getVar('PREFERRED_PROVIDER_virtual/kernel
 # Prefer gbm
 PREFERRED_PROVIDER_virtual/libgbm = "gbm"
 
+PREFERRED_VERSION_adreno = "0.1"
 # Prefer adreno
 PREFERRED_PROVIDER_virtual/wayland-egl  = "adreno"
 PREFERRED_PROVIDER_virtual/egl          = "adreno"
@@ -26,6 +27,11 @@ PREFERRED_PROVIDER_virtual/libgles2     = "adreno"
 
 BBMASK += "meta-qti-bsp/meta-qti-base/recipes-wlan"
 BBMASK += "meta-qti-bsp/meta-qti-base/recipes-kernel/edk2/edk2_4.0.bb"
+BBMASK += "meta-qti-bsp/meta-qti-base/recipes-kernel/edk2/edk2_5.0.bb"
+
+RUSTVERSION = "1.66%"
+BBMASK += "poky/meta/recipes-devtools/cargo"
+BBMASK += "poky/meta/recipes-devtools/rust"
 
 # mesa provides these packags and others like virtual/libgl.
 # This is to enable mesa, adreno and gbm work together, and pass

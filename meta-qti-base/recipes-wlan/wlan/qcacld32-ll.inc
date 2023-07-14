@@ -34,7 +34,8 @@ do_compile:prepend() {
     if ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', 'true', 'false', d)}; then
         CFG80211_FLAG="ccflags-y += -DCFG80211_SINGLE_NETDEV_MULTI_LINK_SUPPORT \
                        -DCFG80211_TX_CONTROL_PORT_LINK_SUPPORT \
-                       -DCFG80211_11BE_BASIC"
+                       -DCFG80211_11BE_BASIC \
+                       -DCFG80211_EXTERNAL_AUTH_MLO_SUPPORT"
         FRAME_SIZE_FLAG="ccflags-y += -Wframe-larger-than=4096"
         sed -i -e "/$(CONFIG_QCA_CLD_WLAN_PROFILE)_defconfig$/i${CFG80211_FLAG}" ${S}/Kbuild
         sed -i -e "/$(CONFIG_QCA_CLD_WLAN_PROFILE)_defconfig$/i${FRAME_SIZE_FLAG}" ${S}/Kbuild
