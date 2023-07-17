@@ -29,7 +29,8 @@ RUST_BACKTRACE=full qcrosvm \
 sleep 2
 ip link add name br0 type bridge
 ip link set br0 up
-ip addr del 192.168.1.13/24 dev vmtap0
-ip addr add 192.168.1.13/24 dev br0
-ip link set dev vmtap0 master br0
 ip link set dev eth0 master br0
+ip link set dev vmtap0 master br0
+ip addr add 192.168.1.13/24 dev br0
+ifconfig vmtap0 0.0.0.0
+ifconfig eth0 0.0.0.0
