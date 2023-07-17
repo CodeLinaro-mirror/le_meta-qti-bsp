@@ -6,6 +6,11 @@ inherit qimage populate_sdk_qti
 
 IMAGE_FEATURES += "ssh-server-openssh"
 
+ROS_FEATURES_PKG += "\
+    ${@bb.utils.contains('BBFILE_COLLECTIONS', 'ros2-humble-layer', 'packagegroup-ros2-humble packagegroup-qti-ros2-node', '', d)} \
+    ${@bb.utils.contains('BBFILE_COLLECTIONS', 'ros2-foxy-layer', 'packagegroup-ros2-foxy packagegroup-qti-ros2-node', '', d)} \
+"
+
 CORE_IMAGE_EXTRA_INSTALL += "\
         alsa-utils \
         canutils \
@@ -44,8 +49,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-test-sensors-see \
         packagegroup-qti-video \
         packagegroup-qti-wifi \
-        ${@bb.utils.contains('BBFILE_COLLECTIONS', 'ros2-humble-layer', 'packagegroup-ros2-humble packagegroup-qti-ros2-node', '', d)} \
-        ${@bb.utils.contains('BBFILE_COLLECTIONS', 'ros2-foxy-layer', 'packagegroup-ros2-foxy packagegroup-qti-ros2-node', '', d)} \
+        ${@bb.utils.contains('DISTRO_FEATURES', 'ros2', '${ROS_FEATURES_PKG}', '', d)} \
         ${@bb.utils.contains('DISTRO_FEATURES', 'qirp-sdk', 'packagegroup-qti-qirp', '', d)} \
         packagegroup-startup-scripts \
         packagegroup-support-utils \
