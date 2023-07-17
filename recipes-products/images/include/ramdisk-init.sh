@@ -154,6 +154,11 @@ gracefullReboot () {
     #sys_reboot ${mode}
 }
 
+IsGPIOEnabled () {
+    gpio_enable_status=`${Bcat} /proc/cmdline | ${Bawk} -F'recoveryinfo_gpio=' '{print $2}' | ${Bawk} '{print $1}' | ${Btr} -d '"'`
+    return ${gpio_enable_status}
+}
+
 SlotSwitchReboot () {
     local abctl_cmd="/usr/bin/nad-abctl"
     local sys_vol_name=""
@@ -172,7 +177,6 @@ SlotSwitchReboot () {
     local dont_use_set_ab=3
     local mtd_device=`${Bgrep} recoveryinfo /proc/mtd | ${Bawk} -F ':' '{print $1}'`
 
-    # TODO GPIO needs to be handled
     if [ ! -e ${abctl_cmd} ]; then
         LOGD "${abctl_cmd} not found."
         return ${STATUS_ERR}
@@ -656,7 +660,16 @@ MainBoot() {
             LOGD "Error: ${task1} failed"
 
             # According to the conditions does system switch or reboot
-            SlotSwitchReboot
+            IsGPIOEnabled
+            if [ $? -eq 1 ]; then
+                #GPIO Enabled keeping behavior similar to Mount failure.
+                LOGD "GPIO Enabled donot switch slots "
+            elif [ $? -eq 0 ]; then
+                LOGD "GPIO disabled switch slots "
+                SlotSwitchReboot
+            else
+                LOGD "GPIO status invalid "
+            fi
             return ${STATUS_ERR}
         else
             LOGD "Init: ${task1}"
