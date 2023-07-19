@@ -1,7 +1,6 @@
 IMAGE_INSTALL += "\
     ${@bb.utils.contains('COMBINED_FEATURES', 'qti-location', 'packagegroup-qti-location-hal', '', d)} \
     ${@bb.utils.contains('COMBINED_FEATURES', 'qti-lxc', 'packagegroup-qti-lxc', '', d)} \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'kdump-support', 'kexec-tools makedumpfile capture-image capture-devicetree', '', d)} \
 "
 
 # Add libgomp support
@@ -9,13 +8,6 @@ IMAGE_INSTALL += "libgomp"
 
 # Add resize userdata function
 IMAGE_INSTALL += "resize-service"
-
-# Add kdump support
-do_rootfs[depends] += "${@bb.utils.contains('DISTRO_FEATURES', 'kdump-support', 'machine-kdump-image:do_image_complete', '', d)}"
-ROOTFS_POSTPROCESS_COMMAND:prepend = "${@bb.utils.contains('DISTRO_FEATURES', 'kdump-support', ' add_kdump_ramdisk; ', '', d)}"
-add_kdump_ramdisk() {
-    cp ${DEPLOY_DIR_IMAGE}/machine-kdump-image-${PRODUCT}.cpio.gz ${IMAGE_ROOTFS}/boot/kdump-ramdisk.cpio.gz
-}
 
 # Introducing selinux-image.bbclass is to label selinux contexts when build.
 inherit ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'selinux-image', '', d)}

@@ -57,6 +57,7 @@ EXTRA_OEMAKE = "'CLANG_BIN=${STAGING_BINDIR_NATIVE}/'\
                 'EXTRA_TARGET_OPTFLAGS=--sysroot=${STAGING_DIR_TARGET}'"
 
 EXTRA_OEMAKE:append:sa81x5 = " 'AB_RETRYCOUNT_DISABLE=1' \
+                               'BOOTIMAGE_LOAD_VERIFY_IN_PARALLEL=1' \
                                'ENABLE_LV_ATOMIC_AB=1' "
 
 do_prebuilt_configure() {

@@ -32,7 +32,7 @@ proc                 /proc           proc      defaults              0  0
 devpts               /dev/pts        devpts    mode=0620,gid=5       0  0
 usbdevfs             /proc/bus/usb   usbdevfs  noauto                0  0
 tmpfs                /run            tmpfs     mode=0755,nodev,nosuid,strictatime,rootcontext=system_u:object_r:var_run_t:s0 0  0
-tmpfs                /var/volatile   tmpfs     defaults,rootcontext=system_u:object_r:var_t:s0 0  0
+#tmpfs                /var/volatile   tmpfs     defaults,rootcontext=system_u:object_r:var_t:s0 0  0
 tmpfs                /media/ram      tmpfs     defaults,noauto       0  0
 
 PARTLABEL=userdata   /data           auto      defaults,noauto_da_alloc,discard,nodev,nofail   0  2
@@ -47,3 +47,6 @@ PARTLABEL=persist    /var            auto      defaults                         
 
 # uncomment this if your device has a SD/MMC/Transflash slot
 #/dev/mmcblk0p1       /media/card          auto       defaults,sync,noauto  0  0
+
+#Automatically mount binder drivers
+binder               /dev/binderfs        binder     auto,exec,dev,nofail  0  0
