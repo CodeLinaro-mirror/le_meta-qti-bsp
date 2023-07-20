@@ -64,7 +64,6 @@ CORE_IMAGE_EXTRA_INSTALL += "\
 
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "chronyc"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-data"
-CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-ml"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-cvp"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-gst"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-robotics"
@@ -74,7 +73,6 @@ CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "tdk-thermistor-app"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-sensors-see"
 
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-data"
-CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-ml"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-eva"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-ss-mgr"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-touch"
