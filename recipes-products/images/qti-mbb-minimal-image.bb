@@ -30,6 +30,8 @@ CORE_IMAGE_EXTRA_INSTALL += "\
                     bb.utils.contains('MACHINE_SUPPORTS_PDMAPPER', 'True', 'ss-services', '', d), '', d)} \
               ${@bb.utils.contains('BBFILE_COLLECTIONS', 'qti-ss-mgr-prop', \
                     bb.utils.contains('MACHINE_SUPPORTS_SSR', 'True', 'subsystem-ramdump', '', d), '', d)} \
+              ${@bb.utils.contains('BBFILE_COLLECTIONS', 'qti-sec', \
+                    bb.utils.contains('MACHINE_FEATURES', 'qti-security', 'packagegroup-qti-securemsm', '', d), '', d)} \
 "
 
 #Install bash
