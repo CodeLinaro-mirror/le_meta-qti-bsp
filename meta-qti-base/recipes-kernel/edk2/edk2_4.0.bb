@@ -60,6 +60,9 @@ EXTRA_OEMAKE:append:sa81x5 = " 'AB_RETRYCOUNT_DISABLE=1' \
                                'BOOTIMAGE_LOAD_VERIFY_IN_PARALLEL=1' \
                                'ENABLE_LV_ATOMIC_AB=1' "
 
+EXTRA_OEMAKE:append:lemans = " 'AB_RETRYCOUNT_DISABLE=1' \
+                               'ENABLE_LV_ATOMIC_AB=1' "
+
 do_prebuilt_configure() {
     cd ${WORKDIR}/kernel-${PREFERRED_VERSION_linux-msm}/out/msm-kernel-${KERNEL_ARCH}-${EDK2_VARIANT}defconfig/dist/
 
