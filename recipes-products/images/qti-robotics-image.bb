@@ -13,7 +13,7 @@ ROS_FEATURES_PKG += "\
 
 CORE_IMAGE_EXTRA_INSTALL += "\
         alsa-utils \
-        canutils \
+        can-utils \
         chronyc \
         glib-2.0 \
         gki-kernel-modules-second-stage \
