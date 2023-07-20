@@ -36,7 +36,7 @@ do_recovery_ubi() {
     cp -r ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/base-files-recovery/${BASEMACHINE}/radio/. ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RADIO/.
 
     # copy firmware images to RADIO directory
-    cp -r ${WORKSPACE}/fw-images/. ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RADIO/.
+    cp -r ${WORKSPACE}/fw-images/. ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RADIO/. || true
 
     # copy the boot\recovery images
     cp ${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET} ${OTA_TARGET_IMAGE_ROOTFS_UBI}/BOOTABLE_IMAGES/boot.img
