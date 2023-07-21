@@ -1,0 +1,14 @@
+Fix regular expression to compile with perl 5.26
+
+From: Sidharth Mehta <quic_sidhmeht@quicinc.com>
+
+--- a/bin/automake.in   2015-01-05 11:25:55.000000000 -0800
++++ b/bin/automake.in   2022-10-20 11:14:41.452790203 -0700
+@@ -3878,7 +3878,7 @@
+ sub substitute_ac_subst_variables
+ {
+   my ($text) = @_;
+-  $text =~ s/\${([^ \t=:+{}]+)}/substitute_ac_subst_variables_worker ($1)/ge;
++  $text =~ s/\$\{([^ \\t=:+\\{\\}]+)\}/substitute_ac_subst_variables_worker ($1)/ge;
+   return $text;
+ }
