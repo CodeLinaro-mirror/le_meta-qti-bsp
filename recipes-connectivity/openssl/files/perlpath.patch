@@ -1,0 +1,19 @@
+Update perlpath file for compatibility with perl 5.26
+
+From: Sidharth Mehta <quic_sidhmeht@quicinc.com>
+
+--- a/util/perlpath.pl	2016-05-03 06:44:42.000000000 -0700
++++ b/util/perlpath.pl	2023-07-18 10:05:51.957116576 -0700
+@@ -4,10 +4,10 @@
+ # line in all scripts that rely on perl.
+ #
+ 
+-require "find.pl";
++use File::Find;
+ 
+ $#ARGV == 0 || print STDERR "usage: perlpath newpath  (eg /usr/bin)\n";
+-&find(".");
++&find(\&wanted, ".");
+ 
+ sub wanted
+ 	{
