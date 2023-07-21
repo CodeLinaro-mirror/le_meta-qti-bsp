@@ -8,6 +8,7 @@ SRC_URI:append = " \
     file://0001-systemd-add-slotselect-support-in-fstab.patch \
     file://0033-systemd-Make-root-s-home-directory-configurable-2.patch \
     file://0001-systemd-skip-smack-copy-issue-in-systemd.patch \
+    file://0001-systemd-avoid-active-seat-change-to-NULL.patch \
     file://60-misc.rules \
 "
 # Config root user as lingering to avoid weston socket lost after LPM in build with early_init
