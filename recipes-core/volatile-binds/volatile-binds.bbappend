@@ -89,8 +89,24 @@ VOLATILE_BINDS_sa525m = "\
 /systemrw/data/usb /etc/data/usb/\n\
 /systemrw/data/ipa /etc/data/ipa/\n\
 /systemrw/boot_hsusb_comp /etc/usb/boot_hsusb_comp\n\
+/systemrw/misc/wifi /etc/misc/wifi/\n\
 /systemrw/c2c /etc/c2c/\n\
-/systemrw/tel.conf  /etc/tel.conf \n\
+/systemrw/tel.conf /etc/tel.conf\n\
+/systemrw/enable /etc/cv2x/enable\n\
+/systemrw/ObeConfig.conf /etc/ObeConfig.conf\n\
+"
+
+VOLATILE_BINDS_sa525m-televm = "\
+/systemrw/enable /etc/cv2x/enable\n\
+/systemrw/data /etc/data/\n\
+/systemrw/power_state.conf /etc/power_state.conf\n\
+/systemrw/tel.conf /etc/tel.conf\n\
+/systemrw/ObeConfig.conf /etc/ObeConfig.conf\n\
+"
+
+VOLATILE_BINDS_sa525m-fotavm = "\
+/systemrw/power_state.conf /etc/power_state.conf\n\
+/systemrw/tel.conf /etc/tel.conf\n\
 "
 
 VOLATILE_BINDS_sa515m = "\
