@@ -19,10 +19,11 @@ MAKE_TARGETS = "\
     M=${@os.path.relpath('${S}', '${STAGING_KERNEL_DIR}')} ${TECHPACK_MAKE_ARGS} \
     ${@oe.utils.ifelse(d.getVar('TECHPACK_MODULES') != '', 'modules', '')} \
     ${@oe.utils.ifelse(d.getVar('TECHPACK_DTBS') != '', 'dtbs', '')} \
+    ${@oe.utils.ifelse(d.getVar('TECHPACK_DTBOS') != '', 'dtbs', '')} \
     "
 
 do_compile() {
-    if [ -n "${TECHPACK_DTBS}" ]; then
+    if [ -n "${TECHPACK_DTBS}" ] || [ -n "${TECHPACK_DTBOS}" ]; then
         # lock to avoid parallel compiling
         (
         flock -x 9 || exit 1
