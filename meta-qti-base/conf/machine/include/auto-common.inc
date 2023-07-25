@@ -40,4 +40,5 @@ EXTRA_IMAGECMD:ext4 += " -b 4096 "
 
 IMAGE_CLASSES += "qimage"
 
-IMAGE_CLASSES += "${@oe.utils.version_less_or_equal('PREFERRED_VERSION_linux-msm', '5.14', '', 'qimage-boot', d)}"
+EXTRA_IMAGEDEPENDS += "qti-image-boot:do_sign_boot_img"
+EXTRA_IMAGEDEPENDS:remove:qti-dpk = "qti-image-boot:do_sign_boot_img"
