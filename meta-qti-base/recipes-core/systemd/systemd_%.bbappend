@@ -10,6 +10,9 @@ SRC_URI:append = " \
     file://0001-systemd-skip-smack-copy-issue-in-systemd.patch \
     file://60-misc.rules \
 "
+# Config root user as lingering to avoid weston socket lost after LPM in build with early_init
+SRC_URI:append = " ${@bb.utils.contains("DISTRO_FEATURES", "early_init", "file://0001-systemd-config-linger-for-root-user.patch", "", d)}"
+
 SRC_URI:append = " ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "5.15", "file://platform_load.conf", "", d)}"
 
 # Remove backlight - Loads/Saves Screen Backlight Brightness, not required.
@@ -36,6 +39,11 @@ do_install:append:sa81x5() {
         sed -i 's/#AllowSuspend=yes/AllowSuspend=no/' ${D}${sysconfdir}/systemd/sleep.conf
     fi
 
+}
+
+do_install:append:sa8775() {
+    echo "DefaultLimitNOFILE=infinity" >> ${D}${sysconfdir}/systemd/system.conf
+    echo "DefaultLimitMSGQUEUE=infinity" >> ${D}${sysconfdir}/systemd/system.conf
 }
 
 do_install:append () {

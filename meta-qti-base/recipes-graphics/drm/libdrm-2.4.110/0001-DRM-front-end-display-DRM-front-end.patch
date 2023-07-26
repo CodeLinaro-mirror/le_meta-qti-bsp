@@ -1,4 +1,4 @@
-From 191624164fe064ff3e66e23eecedc41d1ee978a2 Mon Sep 17 00:00:00 2001
+From 940c11594ed069aa73f20376dc59b17d540e9c2d Mon Sep 17 00:00:00 2001
 From: Wanteng Zhang <wantzhan@codeaurora.org>
 Date: Thu, 20 Aug 2020 17:34:59 +0800
 Subject: [PATCH] Subject: [PATCH] [DRM front-end] display DRM front-end
@@ -11,8 +11,8 @@ Upstream-Status: Pending
  include/drm/fe_drm.h | 48 ++++++++++++++++++++++
  meson.build          | 26 ++++++++++--
  meson_options.txt    |  6 +++
- xf86drm.c            | 95 +++++++++++++++++++++++++++++++++++++++++++-
- 5 files changed, 172 insertions(+), 7 deletions(-)
+ xf86drm.c            | 96 ++++++++++++++++++++++++++++++++++++++++++--
+ 5 files changed, 171 insertions(+), 9 deletions(-)
  mode change 100644 => 100755 Makefile.sources
  create mode 100755 include/drm/fe_drm.h
  mode change 100644 => 100755 meson_options.txt
@@ -180,7 +180,7 @@ index 8af33f1..ba58b15
 diff --git a/xf86drm.c b/xf86drm.c
 old mode 100644
 new mode 100755
-index 5933e4b..17b9920
+index 5933e4b..e985365
 --- a/xf86drm.c
 +++ b/xf86drm.c
 @@ -79,6 +79,11 @@
@@ -304,23 +304,22 @@ index 5933e4b..17b9920
      drmHashDestroy(entry->tagTable);
      entry->fd       = 0;
      entry->f        = NULL;
-@@ -1696,8 +1776,15 @@ drm_public int drmClose(int fd)
+@@ -1696,8 +1776,12 @@ drm_public int drmClose(int fd)
  
      drmHashDelete(drmHashTable, key);
      drmFree(entry);
+-
+-    return close(fd);
 +#ifdef DRM_FE
 +    drm_intf_fe = get_drm_fe();
 +    if (drm_intf_fe)
 +        drm_intf_fe->drmclose_fe(fd);
- 
-+    return drmClose(fd);
-+#else
-     return close(fd);
 +#endif
++    return close(fd);
  }
  
  
-@@ -2617,7 +2704,11 @@ drm_public int drmWaitVBlank(int fd, drmVBlankPtr vbl)
+@@ -2617,7 +2701,11 @@ drm_public int drmWaitVBlank(int fd, drmVBlankPtr vbl)
      timeout.tv_sec++;
  
      do {

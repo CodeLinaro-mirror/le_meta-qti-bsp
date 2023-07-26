@@ -29,8 +29,6 @@
 python __anonymous(){
     import re
 
-    d.prependVar("FILESPATH", "${SRC_DIR_ROOT}/:")
-
     pre_pathname = d.getVar('PATH_TO_REPO')
     src_uri_list = d.getVar('SRC_URI').replace("\t"," ").split(" ")
     new_src_uri_list = []
@@ -64,6 +62,7 @@ python __anonymous(){
                           "SRCREV_audio-kernel"]
 
     if need_change:
+        d.prependVar("FILESPATH", "${SRC_DIR_ROOT}/:")
         new_src_uri = " ".join(new_src_uri_list)
         d.setVar("SRC_URI", new_src_uri)
         d.setVar("SRCREV", '')

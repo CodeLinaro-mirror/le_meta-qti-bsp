@@ -7,7 +7,7 @@ DEPENDS += "gbm gbm-headers \
             virtual/kernel-headers \
             weston-sdm-extension-headers \
             ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', 'libdmabufheap', '', d)} \
-            ${@bb.utils.contains('MACHINE_FEATURES', 'qti-usermode-display', 'owfds', '', d)} \
+            ${@bb.utils.contains('MACHINE_FEATURES', 'qti-usermode-display', 'owfds libuhab libkiumd', '', d)} \
 "
 
 REQUIRED_DISTRO_FEATURES:remove = "opengl"
@@ -30,6 +30,11 @@ PACKAGECONFIG:append = " wl-shell"
 PACKAGECONFIG[wl-shell] = "-Ddeprecated-wl-shell=true,-Ddeprecated-wl-shell=false"
 
 RRECOMMENDS_${PN}:remove = "weston-init"
+
+do_install:append() {
+    install -d ${D}${datadir}/weston
+    mv ${D}${libdir}/libweston-${WESTON_MAJOR_VERSION}/drm-backend.so ${D}${datadir}/weston/drm-backend.so
+}
 
 FILES:${PN}-dev = "${includedir} \
                 ${libdir}/pkgconfig ${datadir}/pkgconfig \

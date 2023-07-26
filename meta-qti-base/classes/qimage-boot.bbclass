@@ -94,11 +94,9 @@ python do_makeboot_setscene () {
 #sign boot, dtbo and vendor-boot img
 do_sign_boot_img () {
     imgname="${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET}"
-       if ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "5.15", "true", "false", d)}; then
-          if ${@bb.utils.contains('DISTRO_FEATURES', 'qti-avb', 'true', 'false', d)}; then
-             avb_sign_boot_image ${imgname}
-          fi
-       fi
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'qti-avb', 'true', 'false', d)}; then
+        avb_sign_boot_image ${imgname}
+    fi
 }
 
 avb_sign_boot_image() {
