@@ -26,7 +26,7 @@ vendor.audio.pcm.offload.buffer.duration.ms=20
 #enable voice path for PCM VoIP by default
 vendor.voice.path.for.pcm.voip=true
 #enable dsp gapless mode by default
-vendor.audio.offload.gapless.enabled=true
+vendor.audio.offload.gapless.enabled=false
 #enable multiple concurrent recordings
 vendor.audio.record.multiple.enabled=true
 
