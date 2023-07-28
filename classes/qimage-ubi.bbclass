@@ -36,6 +36,8 @@ do_image_multiubi[noexec] = "1"
 SYSTEM_VOLUME_SIZE_G ??= "200MiB"
 ROOTFS_VOLUME_SIZE = "${@bb.utils.contains('IMAGE_FEATURES', 'nand2x', '${SYSTEM_VOLUME_SIZE_G}', '${SYSTEM_VOLUME_SIZE}', d)}"
 IMAGE_ROOTFS_UBI = "${WORKDIR}/rootfs-ubi"
+NVRAM_VOLUME_SIZE = "56MiB"
+RDKLOGS_VOLUME_SIZE = "6MiB"
 
 create_symlink_userfs[cleandirs] = "${USERIMAGE_ROOTFS}"
 create_symlink_userfs() {
@@ -73,6 +75,10 @@ create_symlink_systemd_ubi_mount_rootfs() {
             elif [[ "$mountname" == "cache" ]] ; then
                 ln -sf ${systemd_unitdir}/system/${mountname}.mount ${IMAGE_ROOTFS_UBI}/lib/systemd/system/multi-user.target.wants/${mountname}.mount
             elif [[ "$mountname" == "persist" ]] ; then
+                ln -sf ${systemd_unitdir}/system/${mountname}.mount ${IMAGE_ROOTFS_UBI}/lib/systemd/system/sysinit.target.wants/${mountname}.mount
+            elif [[ "$mountname" == "nvram" ]] ; then
+                ln -sf ${systemd_unitdir}/system/${mountname}.mount ${IMAGE_ROOTFS_UBI}/lib/systemd/system/sysinit.target.wants/${mountname}.mount
+            elif [[ "$mountname" == "rdklogs" ]] ; then
                 ln -sf ${systemd_unitdir}/system/${mountname}.mount ${IMAGE_ROOTFS_UBI}/lib/systemd/system/sysinit.target.wants/${mountname}.mount
             else
                 ln -sf ${systemd_unitdir}/system/${mountname}.mount ${IMAGE_ROOTFS_UBI}/lib/systemd/system/local-fs.target.requires/${mountname}.mount
@@ -156,7 +162,22 @@ vol_name=persist
 vol_size="${PERSIST_VOLUME_SIZE}"
 EOF
     fi
-
+    if $(echo ${MACHINE_MNT_POINTS} | grep -q "nvram"); then
+        cat << EOF >> ${UBINIZE_CFG}
+[nvram_volume]
+mode=ubi
+vol_id=5
+vol_type=dynamic
+vol_name=nvram
+vol_size="${NVRAM_VOLUME_SIZE}"
+[rdklogs_volume]
+mode=ubi
+vol_id=6
+vol_type=dynamic
+vol_name=rdklogs
+vol_size="${RDKLOGS_VOLUME_SIZE}"
+EOF
+    fi
 }
 
 create_rootfs_ubi[cleandirs] = "${IMAGE_ROOTFS_UBI}"
