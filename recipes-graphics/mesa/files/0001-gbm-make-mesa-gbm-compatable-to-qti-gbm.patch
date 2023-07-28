@@ -1,0 +1,131 @@
+From 5b1e2c037d235c1988a7fd87270d4c697d64f793 Mon Sep 17 00:00:00 2001
+From: vishnu <quic_vishsain@quicinc.com>
+Date: Thu, 15 Jun 2023 17:05:38 +0530
+Subject: [PATCH] gbm: make mesa gbm compatable to qti gbm
+
+Added changes to make mesa gbm compatable to qti gbm
+
+Upstream-Status: Inappropriate
+
+Signed-off-by: Vishnu Saini <quic_vishsain@quicinc.com>
+---
+ src/gbm/main/gbm.c | 6 ++++++
+ src/gbm/main/gbm.h | 3 +++
+ 2 files changed, 9 insertions(+)
+
+diff --git a/src/gbm/main/gbm.c b/src/gbm/main/gbm.c
+index 599f7aae9b6..4bf27c0a171 100644
+--- a/src/gbm/main/gbm.c
++++ b/src/gbm/main/gbm.c
+@@ -30,7 +30,7 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <stdint.h>
+-
++#include <stdarg.h>
+ #ifdef MAJOR_IN_MKDEV
+ #include <sys/mkdev.h>
+ #endif
+@@ -45,6 +45,58 @@
+ #include "gbmint.h"
+ #include "backend.h"
+ 
++GBM_EXPORT int
++gbm_perform(int operation,...)
++{
++    va_list args;
++    va_start(args, operation);
++    uint32_t res = 0;
++    switch (operation) {
++      case GBM_PERFORM_GET_BO_ALIGNED_WIDTH:
++      {
++        struct gbm_bo *gbo = va_arg(args, struct gbm_bo *);
++        uint32_t *alignedWidth = va_arg(args, uint32_t *);
++        uint32_t bpp = gbm_bo_get_bpp(gbo);
++        *alignedWidth = gbm_bo_get_aligned_width(gbo, bpp/8);
++        break;
++      }
++      default:
++        res = 0;
++        break;
++    }
++    return res;
++}
++
++/** Get the aligned width of the buffer object
++ *
++ * \param bo The buffer object
++  * \param bpp
++ * \return The aligned width of the allocated buffer object
++ *
++ */
++GBM_EXPORT uint32_t
++gbm_bo_get_aligned_width(struct gbm_bo *gbo, int bpp) {
++    uint32_t alignment = 256;
++    uint32_t aligned_width = gbo->v0.width;
++    switch (gbo->v0.format) {
++      case GBM_FORMAT_RGBA8888:
++      case GBM_FORMAT_RGBX8888:
++      case GBM_FORMAT_BGRA8888:
++      case GBM_FORMAT_RGB565:
++      case GBM_FORMAT_XRGB2101010:
++      case GBM_FORMAT_XBGR2101010:
++      case GBM_FORMAT_ARGB8888:
++      case GBM_FORMAT_ABGR8888:
++      case GBM_FORMAT_ABGR2101010:
++      case GBM_FORMAT_BGR888:
++        aligned_width = ALIGN((gbo->v0.width * bpp), alignment)/bpp;
++        break;
++      default:
++        return aligned_width;
++    }
++    return aligned_width;
++}
++
+ /** Returns the file description for the gbm device
+  *
+  * \return The fd that the struct gbm_device was created with
+diff --git a/src/gbm/main/gbm.h b/src/gbm/main/gbm.h
+index 1a1e2caecb4..132bd903a25 100644
+--- a/src/gbm/main/gbm.h
++++ b/src/gbm/main/gbm.h
+@@ -37,6 +37,8 @@
+ extern "C" {
+ #endif
+ 
++#define ALIGN(value, alignment)                           \
++        (((value) + (alignment) - 1) & ~((alignment) - 1))
+ 
+ /**
+  * \file gbm.h
+@@ -266,6 +268,9 @@ enum gbm_bo_flags {
+    GBM_BO_USE_FRONT_RENDERING = (1 << 6),
+ };
+ 
++int
++gbm_perform(int operation,...);
++
+ int
+ gbm_device_get_fd(struct gbm_device *gbm);
+ 
+@@ -311,6 +316,7 @@ gbm_bo_create_with_modifiers2(struct gbm_device *gbm,
+ #define GBM_BO_IMPORT_EGL_IMAGE         0x5502
+ #define GBM_BO_IMPORT_FD                0x5503
+ #define GBM_BO_IMPORT_FD_MODIFIER       0x5504
++#define GBM_PERFORM_GET_BO_ALIGNED_WIDTH  0x27
+ 
+ struct gbm_import_fd_data {
+    int fd;
+@@ -462,6 +468,9 @@ gbm_surface_destroy(struct gbm_surface *surface);
+ char *
+ gbm_format_get_name(uint32_t gbm_format, struct gbm_format_name_desc *desc);
+ 
++uint32_t
++gbm_bo_get_aligned_width(struct gbm_bo *gbo, int bpp);
++
+ #ifdef __cplusplus
+ }
+ #endif
+-- 
+2.7.4
+

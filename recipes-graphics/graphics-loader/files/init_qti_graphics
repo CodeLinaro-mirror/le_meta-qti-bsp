@@ -1,0 +1,19 @@
+#!/bin/sh
+########################################################################
+# Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+# SPDX-License-Identifier: BSD-3-Clause-Clear
+#########################################################################
+
+if [ -f /sys/devices/soc0/pcode ]; then
+    soc_pcode=`cat /sys/devices/soc0/pcode` 2> /dev/null
+fi
+if [ -f /sys/devices/soc0/feature_code ]; then
+    soc_feature_code=`cat /sys/devices/soc0/feature_code` 2> /dev/null
+fi
+if [[ $soc_pcode == 0x2 && "$soc_feature_code" = "AD" ]]; then
+    mount --bind /usr/lib/aarch64-linux-gnu/libEGL.so.1.0.0       /usr/lib/libEGL_adreno.so
+    mount --bind /usr/lib/aarch64-linux-gnu/libGLESv1_CM.so.1.1.0 /usr/lib/libGLESv1_CM_adreno.so
+    mount --bind /usr/lib/aarch64-linux-gnu/libGLESv2.so.2.0.0    /usr/lib/libGLESv2_adreno.so
+fi
+
+exit 0
