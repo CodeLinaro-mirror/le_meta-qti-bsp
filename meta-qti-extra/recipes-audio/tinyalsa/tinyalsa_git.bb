@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/BSD-3-Clause;m
 DEPENDS += "libcutils"
 
 SRC_URI = "\
-    git://codeaurora.org/quic/le/platform/external/tinyalsa.git;protocol=git;branch=github/master \
+    ${CLO_LE_GIT}/platform/external/tinyalsa.git;protocol=git;branch=github/master \
     file://Makefile.am \
     file://configure.ac \
     file://tinyalsa.pc.in \
