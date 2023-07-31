@@ -7,11 +7,11 @@ ENABLE_ADB ?= "True"
 ENABLE_ADB_qti-distro-base-user ?= "False"
 PACKAGE_INSTALL += "${@oe.utils.conditional('ENABLE_ADB', 'True', 'adbd usb-composition usb-composition-usbd', '', d)}"
 PACKAGE_INSTALL += "${@oe.utils.conditional('TOYBOX_RAMDISK', 'True', 'toybox mksh gawk coreutils ethtool iputils devmem2 tcpdump', '', d)}"
-PACKAGE_INSTALL += "${@oe.utils.conditional('FLASHLESS_MCU', 'True', 'nbd-client techpack-ecpri', '', d)}"
+PACKAGE_INSTALL += "${@oe.utils.conditional('FLASHLESS_MCU', 'True', 'nbd-client techpack-ecpri csm-ru-nwboot-client', '', d)}"
 DEPENDS += "${@oe.utils.conditional('FLASHLESS_MCU', 'True', 'binutils-cross-${TARGET_ARCH}', '', d)}"
 
 # Adding mtd-utils to support dm-verity v4 for NAND
-PACKAGE_INSTALL += "${@bb.utils.contains('MACHINE_FEATURES', 'dm-verity-initramfs-v4', 'mtd-utils', '', d)}"
+PACKAGE_INSTALL += "${@bb.utils.contains('MACHINE_FEATURES', 'dm-verity-initramfs-v4', 'mtd-utils avbtool cryptsetup', '', d)}"
 
 do_ramdisk_create[depends] += "virtual/kernel:do_deploy"
 do_ramdisk_create[cleandirs] += "${RAMDISKDIR}"
@@ -143,6 +143,8 @@ fakeroot do_ramdisk_create() {
             cp ${IMAGE_ROOTFS}/usr/share/dhcpcd/hooks/10-wpa_supplicant usr/share/dhcpcd/hooks/
             cp ${IMAGE_ROOTFS}/usr/share/dhcpcd/hooks/15-timezone usr/share/dhcpcd/hooks/
             cp ${IMAGE_ROOTFS}/usr/share/dhcpcd/hooks/29-lookup-hostname usr/share/dhcpcd/hooks/
+            #install csm_ru_nwboot_client
+            cp ${IMAGE_ROOTFS}/usr/sbin/csm_ru_nwboot_client usr/sbin
         fi
 
         if ${@bb.utils.contains('IMAGE_FEATURES', 'vm', 'true', 'false', d)}; then
@@ -180,7 +182,19 @@ fakeroot do_ramdisk_create() {
             elif ${@bb.utils.contains('MACHINE_FEATURES', 'dm-verity-initramfs-v4', 'true', 'false', d)}; then
                 install -m 744 ${COREBASE}/meta-qti-bsp/recipes-products/images/include/ramdisk-init.sh init
                 cp ${IMAGE_ROOTFS}/usr/sbin/ubi* usr/sbin/
+                cp ${IMAGE_ROOTFS}/usr/bin/nad-abctl usr/bin/nad-abctl
+                cp ${IMAGE_ROOTFS}/usr/lib/libnad_ab_al.so.1 lib/libnad_ab_al.so.1
                 ln -s busybox bin/dd
+
+                # The verity need to work with verified boot lib
+                if [[ -e "${IMAGE_ROOTFS}/etc/verity.env" ]]; then
+                    mkdir -p etc/keys
+                    cp ${IMAGE_ROOTFS}/usr/lib/libavb.so.1 lib/
+                    cp ${IMAGE_ROOTFS}/usr/sbin/verified-boot usr/sbin/
+                    cp ${IMAGE_ROOTFS}/usr/lib/libnad-vb.so.1 lib/
+                    cp ${IMAGE_ROOTFS}/etc/verity.env  etc/
+                    cp ${IMAGE_ROOTFS}/etc/keys/x509_root.der etc/keys/x509_root.der
+                fi
             else
                 ln -s bin/busybox init
             fi
@@ -218,10 +232,13 @@ fakeroot do_ramdisk_create() {
             cp ${IMAGE_ROOTFS}/lib/libpcre.so.1 lib/libpcre.so.1
         fi
 
-        if ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains_any('MACHINE_FEATURES', 'dm-verity-initramfs dm-verity-initramfs-v3', 'true', 'false', d), 'false', d)}; then
+        if ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains_any('MACHINE_FEATURES', 'dm-verity-initramfs dm-verity-initramfs-v3 dm-verity-initramfs-v4', 'true', 'false', d), 'false', d)}; then
+
             cp ${IMAGE_ROOTFS}/usr/sbin/veritysetup bin/
-            cp ${WORKDIR}/verity.env etc/
-            cp ${WORKDIR}/verity_sig.txt etc/
+            if ${@bb.utils.contains('MACHINE_FEATURES', 'dm-verity-initramfs-v4', 'false', 'true', d)}; then
+                cp ${WORKDIR}/verity.env etc/
+                cp ${WORKDIR}/verity_sig.txt etc/
+            fi
 
             # Shared library dependencies for dm-verity feature
             cp ${IMAGE_ROOTFS}/usr/lib/libcryptsetup.so.12 lib/
@@ -229,8 +246,13 @@ fakeroot do_ramdisk_create() {
             cp ${IMAGE_ROOTFS}/usr/lib/libpopt.so.0 lib/
             cp ${IMAGE_ROOTFS}/lib/libuuid.so.1 lib/
             cp ${IMAGE_ROOTFS}/usr/lib/libdevmapper.so.1.02 lib/
-            cp ${IMAGE_ROOTFS}/usr/lib/libssl.so.1.1 lib/
-            cp ${IMAGE_ROOTFS}/usr/lib/libcrypto.so.1.1 lib/
+            if ${@bb.utils.contains_any('PREFERRED_VERSION_openssl', '3.0.9', 'true', 'false', d)}; then
+                cp ${IMAGE_ROOTFS}/usr/lib/libssl.so.3 lib/
+                cp ${IMAGE_ROOTFS}/usr/lib/libcrypto.so.3 lib/
+            else
+                cp ${IMAGE_ROOTFS}/usr/lib/libssl.so.1.1 lib/
+                cp ${IMAGE_ROOTFS}/usr/lib/libcrypto.so.1.1 lib/
+            fi
             cp ${IMAGE_ROOTFS}/usr/lib/libjson-c.so.4 lib/
             cp ${IMAGE_ROOTFS}/lib/libudev.so.1 lib/
             cp ${IMAGE_ROOTFS}/lib/libmount.so.1 lib/
