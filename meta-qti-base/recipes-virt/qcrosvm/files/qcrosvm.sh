@@ -2,14 +2,6 @@
 # Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
 # SPDX-License-Identifier: BSD-3-Clause-Clear
 
-ulimit -q unlimited
-VirtIOGPU2DBackendService /usr/bin/config.xml >/dev/null 2>&1 &
-sleep 1
-glink_service_lrm -s lpass -s cdsp0 -s cdsp1 -s gpdsp0 -s gpdsp1 >/dev/null 2>&1 &
-fastrpc-rm >/dev/null 2>&1 &
-exp-dac-setup >/dev/null 2>&1 &
-audio_service >/dev/null 2>&1 &
-
 RUST_BACKTRACE=full qcrosvm \
 --vm=autoghgvm \
 --disk=/dev/disk/by-partlabel/la_super,label=17,rw=true \
@@ -31,6 +23,6 @@ ip link add name br0 type bridge
 ip link set br0 up
 ip link set dev eth0 master br0
 ip link set dev vmtap0 master br0
-ip addr add 192.168.1.13/24 dev br0
+ip addr add 192.168.1.1/24 dev br0
 ifconfig vmtap0 0.0.0.0
 ifconfig eth0 0.0.0.0
