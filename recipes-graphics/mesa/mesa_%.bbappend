@@ -91,6 +91,10 @@ FILES:${PN} = "\
                ${libdir}/aarch64-linux-gnu/* \
               "
 
+SYSROOT_DIRS_IGNORE += " \
+               ${includedir} \
+              "
+
 # catch all to get all the tools and data
 FILES:${PN}-tools = "${bindir} ${datadir}"
 ALLOW_EMPTY:${PN}-tools = "1"
