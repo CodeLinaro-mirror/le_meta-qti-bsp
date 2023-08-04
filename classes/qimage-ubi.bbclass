@@ -4,10 +4,10 @@ GENERATE_AB_OTA_PACKAGE ?= "${@bb.utils.contains('COMBINED_FEATURES', 'qti-ab-bo
 QIMGUBICLASSES  = ""
 # To be implemented
 QIMGUBICLASSES += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-recovery', 'ota-ubi', '', d)}"
-
+QIMGUBICLASSES += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-ab-boot', 'ab-ota-ubi', '', d)}"
 inherit ${QIMGUBICLASSES}
 
-IMAGE_FEATURES[validitems] += "persist-volume nand2x gluebi vm-bootsys-volume"
+IMAGE_FEATURES[validitems] += "persist-volume nand2x gluebi vm-bootsys-volume vm-systemrw-volume"
 
 CORE_IMAGE_EXTRA_INSTALL += "systemd-machine-units-ubi"
 CORE_IMAGE_EXTRA_INSTALL += "${@bb.utils.contains('COMBINED_FEATURES', 'qti-ab-boot', ' recovery-ab', '', d)}"
@@ -20,6 +20,8 @@ USERIMAGE_ROOTFS ?= "${WORKDIR}/usrfs"
 VMIMAGE_UBI_TARGET ?= "vm-bootsys.ubi"
 VMIMAGE_UBIFS_TARGET ?= "vm-bootsys.ubifs"
 VMIMAGE_ROOTFS ?= "${DEPLOY_DIR_IMAGE}/vm-images/"
+VMSYSTEMRW_IMAGE_UBIFS_TARGET ?= "${IMGDEPLOYDIR}/${IMAGE_BASENAME}/vm-systemrw.ubifs"
+VMSYSTEMRW_IMAGE_ROOTFS ?= "${DEPLOY_DIR_IMAGE}/vm-systemrw/"
 
 UBINIZE_CFG ?= "${IMGDEPLOYDIR}/${IMAGE_BASENAME}/ubinize_system.cfg"
 UBINIZE_VM_CFG ?= "${IMGDEPLOYDIR}/${IMAGE_BASENAME}/ubinize_vm.cfg"
@@ -123,6 +125,7 @@ create_symlink_systemd_ubi_mount_rootfs() {
 }
 
 VM_BOOTSYS_VOLUME_SIZE ??= "128MiB"
+VM_SYSTEMRW_VOLUME_SIZE ??= "16MiB"
 
 # Need to copy ubinize.cfg file in the deploy directory
 do_create_ubinize_config[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
@@ -183,7 +186,7 @@ vol_size="${PERSIST_VOLUME_SIZE}"
 EOF
     fi
 vol_id=$(echo $(grep -rc "vol_id" ${UBINIZE_CFG}))
-    if $(echo ${IMAGE_FEATURES} | grep -q -w "^modem-volume$"); then
+    if $(echo ${IMAGE_FEATURES} | grep -q "modem-volume"); then
         cat << EOF >> ${UBINIZE_CFG}
 [modem_a_volume]
 mode=ubi
@@ -217,6 +220,18 @@ vol_id=$((++vol_id))
 vol_type=dynamic
 vol_name=vm-bootsys_b
 vol_size="${VM_BOOTSYS_VOLUME_SIZE}"
+
+EOF
+    fi
+vol_id=$(echo $(grep -rc "vol_id" ${UBINIZE_CFG}))
+    if $(echo ${IMAGE_FEATURES} | grep -q "vm-systemrw-volume"); then
+        cat << EOF >> ${UBINIZE_CFG}
+[vm_systemrw_volume]
+mode=ubi
+vol_id=$vol_id
+vol_type=dynamic
+vol_name=vm_systemrw
+vol_size="${VM_SYSTEMRW_VOLUME_SIZE}"
 
 EOF
     fi
@@ -266,7 +281,7 @@ vol_size="${PERSIST_VOLUME_SIZE}"
 EOF
     fi
 vol_id=$(echo $(grep -rc "vol_id" ${UBINIZE_CFG}))
-    if $(echo ${IMAGE_FEATURES} | grep -q -w "^modem-volume$"); then
+    if $(echo ${IMAGE_FEATURES} | grep -q "modem-volume"); then
         cat << EOF >> ${UBINIZE_CFG}
 [modem_volume]
 mode=ubi
@@ -286,6 +301,18 @@ vol_id=$vol_id
 vol_type=dynamic
 vol_name=vm-bootsys
 vol_size="${VM_BOOTSYS_VOLUME_SIZE}"
+
+EOF
+    fi
+vol_id=$(echo $(grep -rc "vol_id" ${UBINIZE_CFG}))
+    if $(echo ${IMAGE_FEATURES} | grep -q "vm-systemrw-volume"); then
+        cat << EOF >> ${UBINIZE_CFG}
+[vm_systemrw_volume]
+mode=ubi
+vol_id=$vol_id
+vol_type=dynamic
+vol_name=vm_systemrw
+vol_size="${VM_SYSTEMRW_VOLUME_SIZE}"
 
 EOF
     fi
@@ -337,6 +364,10 @@ do_make_vmbootsys_ubi[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
 fakeroot do_make_vmbootsys_ubi() {
     mkfs.ubifs -r ${VMIMAGE_ROOTFS} ${IMAGE_UBIFS_SELINUX_OPTIONS} -o ${VMIMAGE_UBIFS_TARGET} ${MKUBIFS_ARGS}
     ubinize -o ${VMIMAGE_UBI_TARGET} ${UBINIZE_ARGS} ${UBINIZE_VM_CFG}
+
+    if ${@bb.utils.contains('MACHINE_FEATURES','qti-vm-systemrw', 'true', 'false', d)}; then
+        mkfs.ubifs -r ${VMSYSTEMRW_IMAGE_ROOTFS} ${IMAGE_UBIFS_SELINUX_OPTIONS} -o ${VMSYSTEMRW_IMAGE_UBIFS_TARGET} ${MKUBIFS_ARGS}
+    fi
 }
 
 python () {
