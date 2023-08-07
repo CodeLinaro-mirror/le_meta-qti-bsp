@@ -2,9 +2,11 @@
 # add the MACHINE name to this list.
 # This is the "only" list that will control whether
 # OTA upgrade will be supported on a target.
-DEPENDS += "releasetools-native zip-native fsconfig-native applypatch-native bc-native bsdiff-native"
+DEPENDS += "releasetools-native zip-native fsconfig-native applypatch-native bc-native bsdiff-native qti-recovery-image"
 
 RM_WORK_EXCLUDE_ITEMS += "rootfs rootfs-dbg"
+
+RECOVERY_IMAGE_ROOTFS = "$(echo ${IMAGE_ROOTFS} | sed 's#/${PN}/#/qti-recovery-image/#')"
 
 IMAGE_SYSTEM_MOUNT_POINT = "/"
 
@@ -38,6 +40,8 @@ do_recovery_ext4[cleandirs] += "${OTA_TARGET_IMAGE_ROOTFS_EXT4}/BOOT/RAMDISK"
 
 # recovery rootfs is required for generating OTA files.
 # Wait till all tasks of machine-recovery-image complete.
+
+do_recovery_ext4[depends] += "qti-recovery-image:do_build"
 
 do_recovery_ext4() {
     echo "base image rootfs: ${IMAGE_ROOTFS_EXT4}"
@@ -100,7 +104,7 @@ do_recovery_ext4() {
     echo blocksize=131072 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 
     # boot_size: Size of boot partition from partition.xml
-    echo boot_size=0x011DC000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
+    echo boot_size=0x04600000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 
     # recovery_size : Size of recovery partition from partition.xml
     echo recovery_size=0x011DC000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt

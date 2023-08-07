@@ -17,10 +17,12 @@ do_compile[noexec] = "1"
 
 do_populate_kernel_header_artifacts() {
     mkdir -p ${B}/headers
-    cp -a ${KERNEL_PREBUILT_PATH}/kernel-uapi-headers.tar.gz ${B}/headers
-    cd ${B}/headers
-    tar -xvzf kernel-uapi-headers.tar.gz
-    rm -f kernel-uapi-headers.tar.gz
+    cp -a ${KERNEL_PREBUILT_PATH}/kernel_uapi_headers/* ${B}/headers
+    # TODO: Uncomment follwing lines when kernel provides kernel-uapi-headers.tar.gz
+    # cp -a ${KERNEL_PREBUILT_PATH}/kernel-uapi-headers.tar.gz ${B}/headers
+    # cd ${B}/headers
+    # tar -xvzf kernel-uapi-headers.tar.gz
+    # rm -f kernel-uapi-headers.tar.gz
 }
 
 addtask do_populate_kernel_header_artifacts after do_compile before do_install

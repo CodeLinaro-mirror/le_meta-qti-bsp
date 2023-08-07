@@ -9,6 +9,8 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         glib-2.0 \
         gki-kernel-modules-second-stage \
         kernel-modules \
+        packagegroup-qti-camera \
+        packagegroup-qti-camera-kernel \
         packagegroup-android-utils \
         packagegroup-qti-mmframeworks \
         packagegroup-filesystem-utils \
@@ -23,6 +25,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-sensors-see \
         packagegroup-qti-test-sensors-see \
         packagegroup-qti-video \
+        packagegroup-qti-gst \
         packagegroup-qti-perf \
         powerapp \
         powerapp-powerconfig \

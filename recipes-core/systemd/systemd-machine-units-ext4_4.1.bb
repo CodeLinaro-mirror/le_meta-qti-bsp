@@ -3,8 +3,13 @@ include qti-systemd-machine-units.inc
 
 IMAGETYPE = "ext4"
 
+fix_sepolicies_ext4 () {
+    sed -i "s#,rootcontext=system_u:object_r:cache_t:s0##g" ${WORKDIR}/cache.mount
+}
+
 do_install[prefuncs] += " ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', '', 'fix_sepolicies', d)}"
 do_install[prefuncs] += " ${@bb.utils.contains('MACHINE_FEATURES', 'qti-ab-boot', 'fix_mount_services', '', d)}"
+do_install[prefuncs] += " ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', '', 'fix_sepolicies_ext4', d)}"
 
 do_install_append () {
 
@@ -19,7 +24,7 @@ do_install_append () {
         install -m 0644 ${S}/set-slotsuffix.service ${D}${systemd_unitdir}/system
     fi
 
-    if ${@bb.utils.contains('BASEMACHINE', 'neo', 'true', 'false', d)}; then
+    if ${@bb.utils.contains('MACHINE_MNT_POINTS', '/overlay', 'true', 'false', d)}; then
         install -m 0644 ${S}/machine-id-mount.service ${D}${systemd_unitdir}/system
         ln -s ${systemd_unitdir}/system/machine-id-mount.service ${D}${systemd_unitdir}/system/local-fs.target.wants/machine-id-mount.service
     fi
