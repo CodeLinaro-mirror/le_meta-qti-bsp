@@ -57,6 +57,7 @@ EXTRA_OEMESON:append:quin-gvm-lemans = " \
     -Dc2dec-deinterlace=disabled \
     -Dqprange=disabled \
     -Dir-cyclic=enabled \
+    -Dav1-dec=enabled \
     -Dmmmcolorfmt=true \
 "
 
