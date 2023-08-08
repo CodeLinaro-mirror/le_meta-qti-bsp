@@ -26,8 +26,6 @@
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 [Unit]
-After=format.service
-Requires=format.service
 Before=local-fs.target
 
 [Mount]
