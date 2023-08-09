@@ -14,3 +14,5 @@ S = "${WORKDIR}/logwrapper"
 DEPENDS += "glib-2.0 libcutils"
 
 EXTRA_OECONF = " --with-glib"
+
+BBCLASSEXTEND = "native"
