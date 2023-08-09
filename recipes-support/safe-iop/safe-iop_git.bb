@@ -12,3 +12,5 @@ SRC_URI   = "file://safe-iop"
 SRC_URI  += "file://autotools.patch"
 
 S = "${WORKDIR}/safe-iop"
+
+BBCLASSEXTEND = "native"

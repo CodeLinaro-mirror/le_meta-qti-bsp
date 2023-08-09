@@ -15,3 +15,5 @@ SRC_URI   =  "file://libutils \
 S = "${WORKDIR}/libutils"
 
 DEPENDS += "safe-iop"
+
+BBCLASSEXTEND = "native"
