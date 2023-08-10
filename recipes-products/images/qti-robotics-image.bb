@@ -54,6 +54,8 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-startup-scripts \
         packagegroup-support-utils \
         ${@bb.utils.contains('DISTRO_FEATURES', 'qti-ib2c', 'qti-ib2c', '', d)} \
+        ${@bb.utils.contains("COMBINED_FEATURES", "qti-uvc", "qti-umd-gadget", "", d)} \
+        ${@bb.utils.contains("COMBINED_FEATURES", "qti-uvc", "qti-auto-framing-stabilization", "", d)} \
         systemd-machine-units \
         ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
         yavta \
