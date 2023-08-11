@@ -7,6 +7,12 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 SRC_URI = "file://*"
 S = "${WORKDIR}"
 
+fix_sepolicies_recovery () {
+    sed -i "s#,rootcontext=system_u:object_r:system_data_t:s0##g" ${S}/systemrw-ubi.mount
+}
+
+do_install[prefuncs] += " ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', '', 'fix_sepolicies_recovery', d)}"
+
 do_install_append () {
     install -d ${D}${systemd_unitdir}/system
     install -d ${D}${systemd_unitdir}/system/systemrw.mount.d
