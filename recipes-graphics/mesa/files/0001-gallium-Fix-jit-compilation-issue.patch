@@ -1,0 +1,29 @@
+From 2337b566e34f6b787c554089e6cdc4fd7072d873 Mon Sep 17 00:00:00 2001
+From: vishnu <quic_vishsain@quicinc.com>
+Date: Thu, 15 Jun 2023 17:25:22 +0530
+Subject: [PATCH] gallium: Fix jit compilation issue
+
+Fixed compilation issue in gallium llvm jit
+
+Upstream-Status: Pending
+Signed-off-by: Vishnu Saini <quic_vishsain@quicinc.com>
+---
+ src/gallium/auxiliary/gallivm/lp_bld_misc.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/gallium/auxiliary/gallivm/lp_bld_misc.cpp b/src/gallium/auxiliary/gallivm/lp_bld_misc.cpp
+index a79cbdf..6b2866a 100644
+--- a/src/gallium/auxiliary/gallivm/lp_bld_misc.cpp
++++ b/src/gallium/auxiliary/gallivm/lp_bld_misc.cpp
+@@ -334,7 +334,7 @@ public:
+  * - http://markmail.org/message/ttkuhvgj4cxxy2on#query:+page:1+mid:aju2dggerju3ivd3+state:results
+  */
+ extern "C"
+-LLVMBool
++int
+ lp_build_create_jit_compiler_for_module(LLVMExecutionEngineRef *OutJIT,
+                                         lp_generated_code **OutCode,
+                                         struct lp_cached_code *cache_out,
+-- 
+2.7.4
+

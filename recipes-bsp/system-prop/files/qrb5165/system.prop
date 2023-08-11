@@ -25,8 +25,12 @@ audio.offload.video=true
 #enable voice path for PCM VoIP by default
 vendor.voice.path.for.pcm.voip=true
 #enable dsp gapless mode by default
-vendor.audio.offload.gapless.enabled=true
-
+vendor.audio.offload.gapless.enabled=false
+#enable display port support
+vendor.audio.feature.display_port.enable=true
+vendor.audio.feature.hdmi_edid.enable=true
+#Enable multiple offload usescases
+vendor.audio.offload.multiple.enabled=true
 #enable HFP Client support
 vendor.audio.feature.hfp.enable=true
 

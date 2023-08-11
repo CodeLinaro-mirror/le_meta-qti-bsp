@@ -1,0 +1,19 @@
+# Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+# SPDX-License-Identifier: BSD-3-Clause-Clear
+
+[Unit]
+Description=Init-graphics Service
+SourcePath=/etc/initscripts/init_qti_graphics
+Requires=leprop.service
+After=leprop.service
+[Service]
+User=graphics
+Group=graphics
+Restart=no
+Type=oneshot
+RemainAfterExit=no
+ExecStart=+/etc/initscripts/init_qti_graphics
+ExecStop=+/etc/initscripts/init_qti_graphics
+
+[Install]
+WantedBy=multi-user.target

@@ -1,8 +1,8 @@
 #
-# Default properties to be set for neo
+# Default properties to be set for sm8450p
 #
 
-ro.product.board=neo
+ro.product.board=sm8450p
 
 # If ro.debuggable is 1, then enable adb root
 ro.debuggable=1

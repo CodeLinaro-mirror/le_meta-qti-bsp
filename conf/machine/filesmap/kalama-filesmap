@@ -63,4 +63,5 @@ uefi_sec.mbn            /dev/block/bootdevice/by-name/uefisecapp
 vm-bootsys.img          /dev/block/bootdevice/by-name/vm-bootsys
 vm-persist.img          /dev/block/bootdevice/by-name/vm-persist
 xbl_config.elf          /dev/block/bootdevice/by-name/xbl_config
-Xbl_Ramdump.elf         /dev/block/bootdevice/by-name/xbl_ramdump
+XblRamdump.elf          /dev/block/bootdevice/by-name/xbl_ramdump
+xbl_s.melf              /dev/block/bootdevice/by-name/xbl

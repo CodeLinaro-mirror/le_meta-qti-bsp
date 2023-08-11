@@ -1,0 +1,22 @@
+#!/bin/sh
+########################################################################
+# Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+# SPDX-License-Identifier: BSD-3-Clause-Clear
+#########################################################################
+
+soc_subset_parts=0
+if [ -f /sys/devices/soc0/subset_parts ]; then
+    soc_subset_parts=`cat /sys/devices/soc0/subset_parts` 2> /dev/null
+fi
+
+# GPU - bit 1
+gpu_mask=0x00000002
+is_no_gpu=$(( gpu_mask&soc_subset_parts ))
+
+if [ $is_no_gpu -eq 2 ]; then
+    mount --bind /usr/lib/aarch64-linux-gnu/libEGL.so.1.0.0       /usr/lib/libEGL_adreno.so
+    mount --bind /usr/lib/aarch64-linux-gnu/libGLESv1_CM.so.1.1.0 /usr/lib/libGLESv1_CM_adreno.so
+    mount --bind /usr/lib/aarch64-linux-gnu/libGLESv2.so.2.0.0    /usr/lib/libGLESv2_adreno.so
+fi
+
+exit 0
