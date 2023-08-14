@@ -30,14 +30,14 @@ CORE_IMAGE_EXTRA_INSTALL += "\
 RM_WORK_EXCLUDE += "${PN}"
 
 # Configs for generating recovery.ubi
-RECOVERY_MKUBIFS_ARGS = "-m 4096 -e 253952 -c 200 -F"
+RECOVERY_MKUBIFS_ARGS = "-m 4096 -e 253952 -c 236 -F"
 RECOVERY_UBINIZE_CFG = "ubinize-recoveryfs.cfg"
 RECOVOERY_UBIFS_IMAGE = "recoveryfs.ubifs"
 RECOVOERY_UBI_IMAGE = "recoveryfs.ubi"
 RECOVERY_SYSTEMRW_VOLUME_SIZE ?= "4MiB"
 
 #configs for ext4
-RECOVERYFS_SIZE_EXT4 ?= "100000000"
+RECOVERYFS_SIZE_EXT4 ?= "150MiB"
 RECOVOERY_EXT4_IMAGE = "recoveryfs.img"
 
 RECOVERY_UBI_SELINUX_OPTIONS = "${@bb.utils.contains('DISTRO_FEATURES', 'selinux', '--selinux=${SELINUX_FILE_CONTEXTS}', '', d)}"

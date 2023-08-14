@@ -4,3 +4,6 @@
 
 require qti-mbb-minimal-image.bb
 
+IMAGE_INSTALL_append = "\
+${@bb.utils.contains('BBFILE_COLLECTIONS', 'qti-rdkb', 'packagegroup-rdkb', '', d)} \
+"
