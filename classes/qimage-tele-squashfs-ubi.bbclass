@@ -1,6 +1,7 @@
 # if A/B support is supported, generate OTA pkg by default.
 GENERATE_AB_OTA_PACKAGE ?= "${@bb.utils.contains('COMBINED_FEATURES', 'qti-ab-boot', '1', '', d)}"
 
+MLIBPREFIX ?= ""
 QIMGUBICLASSES  = ""
 # To be implemented
 QIMGUBICLASSES += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-recovery', 'ota-ubi', '', d)}"
@@ -11,8 +12,8 @@ IMAGE_FEATURES[validitems] += "nand2x gluebi modem-volume cache-volume persist-v
 IMAGE_FEATURES[validitems] += "${@bb.utils.contains('COMBINED_FEATURES', 'qti-nad-telaf', 'telaf-volume', '', d)}"
 
 CORE_IMAGE_EXTRA_INSTALL += "\
-                            systemd-machine-units-ubi \
-                            ${@bb.utils.contains('COMBINED_FEATURES', 'qti-nad-core', 'recovery-ab', '', d)} \
+                            ${MLIBPREFIX}systemd-machine-units-ubi \
+                            ${@bb.utils.contains('COMBINED_FEATURES', 'qti-nad-core', '${MLIBPREFIX}recovery-ab', '', d)} \
                             "
 
 SYSTEM_IMAGE_UBI_TARGET ?= "${IMGDEPLOYDIR}/${IMAGE_BASENAME}/ubifs/sysfs.ubi"
@@ -514,7 +515,7 @@ do_makesystem_squashfs_ubi () {
     ubinize -o ${SYSTEMIMAGE_SQUASHFS_UBI_AB_TARGET} ${UBINIZE_ARGS} ${SQUASHFS_UBINIZE_CFG_AB}
 }
 
-do_maketelaf_squashfs[depends] += "${@bb.utils.contains('IMAGE_FEATURES', 'telaf-volume', 'telaf-image:do_deploy', '', d)}"
+do_maketelaf_squashfs[depends] += "${@bb.utils.contains('IMAGE_FEATURES', 'telaf-volume', '${MLIBPREFIX}telaf-image:do_deploy', '', d)}"
 do_maketelaf_squashfs[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}/squashfs"
 
 fakeroot do_maketelaf_squashfs() {

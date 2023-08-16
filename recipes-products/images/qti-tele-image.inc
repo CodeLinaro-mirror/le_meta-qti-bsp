@@ -1,5 +1,14 @@
 inherit qimage populate_sdk_qti ${@bb.utils.contains('MACHINE_FEATURES', 'dm-verity-initramfs-v4', 'qramdisk', '', d)}
 
+MLIBPREFIX ?= ""
+
+CORE_IMAGE_BASE_INSTALL = '\
+    ${MLIBPREFIX}packagegroup-core-boot \
+    ${MLIBPREFIX}packagegroup-base-extended \
+    \
+    ${CORE_IMAGE_EXTRA_INSTALL} \
+    '
+
 IMAGE_FEATURES += " \
         read-only-rootfs ${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', 'persist-volume', '', d)} \
         ${@bb.utils.contains('MACHINE_FEATURES', 'tele-squashfs-ubi', 'modem-volume', '', d)} \

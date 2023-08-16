@@ -8,6 +8,7 @@ QIMGCLASSES += "${@bb.utils.contains('MACHINE_FEATURES', 'tele-squashfs-ubi', 'q
 
 # Use the following to extend qimage with custom functions like signing
 QIMGEXTENSION ?= ""
+MLIBPREFIX ?= ""
 
 inherit ${QIMGCLASSES} ${QIMGEXTENSION}
 

@@ -23,9 +23,18 @@ do_image_ubi[noexec] = "1"
 do_image_ubifs[noexec] = "1"
 do_image_multiubi[noexec] = "1"
 
+MLIBPREFIX ?= ""
+
+CORE_IMAGE_BASE_INSTALL = '\
+    ${MLIBPREFIX}packagegroup-core-boot \
+    ${MLIBPREFIX}packagegroup-base-extended \
+    \
+    ${CORE_IMAGE_EXTRA_INSTALL} \
+    '
+
 CORE_IMAGE_EXTRA_INSTALL += "\
-            packagegroup-qti-recoveryfs \
-            packagegroup-qti-core-recovery \
+            ${MLIBPREFIX}packagegroup-qti-recoveryfs \
+            ${MLIBPREFIX}packagegroup-qti-core-recovery \
 "
 
 RM_WORK_EXCLUDE += "${PN}"

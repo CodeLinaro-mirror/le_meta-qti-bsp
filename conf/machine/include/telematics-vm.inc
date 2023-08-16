@@ -3,6 +3,14 @@ require conf/machine/include/basemachine.inc
 DEFAULTTUNE ?= "aarch64"
 include conf/machine/include/arm/arch-armv8a.inc
 
+# Multilib configuration
+require conf/multilib.conf
+MULTILIBS = "multilib:lib32"
+DEFAULTTUNE:virtclass-multilib-lib32 = "armv7athf-neon"
+MLIBPREFIX = "lib32-"
+
+NON_MULTILIB_RECIPES += "iproute2 mvm-devicetree"
+
 PREFERRED_PROVIDER_virtual/kernel ?= "linux-msm"
 PREFERRED_PROVIDER_virtual/mkbootimg-native ?= "mkbootimg-gki-native"
 PREFERRED_PROVIDER_virtual/dtc-native ?= "dtc-android-build-native"
