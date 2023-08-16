@@ -1,4 +1,4 @@
-DEPENDS += "mesa-dri-glsl-native"
+iDEPENDS += "mesa-dri-glsl-native"
 
 SRCREV = "983fa4ad523535debf2e94cf6ac1fd4c5630c0d2"
 PV = "7.11+gitr${SRCPV}"
@@ -8,7 +8,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/mesa-git:"
 
 #file://uclibc.patch 
 
-SRC_URI = "git://anongit.freedesktop.org/git/mesa/mesa;protocol=git \
+SRC_URI = "git://anongit.freedesktop.org/git/mesa/mesa;protocol=https \
            file://crossfix.patch \
            "
 S = "${WORKDIR}/git"

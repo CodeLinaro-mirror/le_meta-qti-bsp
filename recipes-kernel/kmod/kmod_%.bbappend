@@ -1,6 +1,6 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
-# Fetch from the CAF location. 
-SRC_URI = "git://source.codeaurora.org/quic/le/kmod.git;protocol=https;branch=kmod/master"
+# Fetch from the codelinaro location. 
+SRC_URI = "${CLO_LE_GIT}/kmod.git;protocol=https;branch=caf_migration/kmod/master"
 SRC_URI += "file://depmod-search.conf \
             file://avoid_parallel_tests.patch \
             file://fix-O_CLOEXEC.patch \

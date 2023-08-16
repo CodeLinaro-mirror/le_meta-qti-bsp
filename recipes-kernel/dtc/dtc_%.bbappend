@@ -1,3 +1,3 @@
-# Fetch from the CAF location.
-SRC_URI = "git://source.codeaurora.org/quic/le/dtc.git;protocol=https;branch=dtc/main"
+# Fetch from the codelinaro location.
+SRC_URI = "${CLO_LE_GIT}/dtc.git;protocol=https;branch=caf_migration/dtc/main"
 SRC_URI += "file://make_install.patch"

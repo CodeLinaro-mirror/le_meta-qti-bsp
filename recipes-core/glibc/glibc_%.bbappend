@@ -1,5 +1,5 @@
-#Glibc pakage is fetch from the CAF 
-SRC_URI = "git://source.codeaurora.org/quic/le/glibc.git;protocol=https;branch=drains/${SRCBRANCH}"
+#Glibc pakage is fetch from the codeliaro 
+SRC_URI = "${CLO_LE_GIT}/glibc.git;protocol=https;branch=caf_migration/drains/${SRCBRANCH}"
 SRC_URI += " \
            file://etc/ld.so.conf \
            file://generate-supported.mk \

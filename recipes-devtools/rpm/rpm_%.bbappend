@@ -1,5 +1,5 @@
-#RPM package is fetch from CAF location
-SRC_URI = "git://source.codeaurora.org/quic/le/rpm.git;protocol=https;branch=rpm/rpm-4.14.x"
+#RPM package is fetch from Codelinaro location
+SRC_URI = "${CLO_LE_GIT}/rpm.git;protocol=https;branch=caf_migration/rpm/rpm-4.14.x"
 
 SRC_URI += " \
            file://0001-Do-not-add-an-unsatisfiable-dependency-when-building.patch \

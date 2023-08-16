@@ -1,4 +1,4 @@
-SRC_URI = "git://source.codeaurora.org/quic/le/e2fsprogs.git;branch=ext2/master;protocol=https"
+SRC_URI = "${CLO_LE_GIT}/e2fsprogs.git;branch=caf_migration/ext2/master;protocol=https"
 
 SRC_URI += "file://acinclude.m4 \
             file://remove.ldconfig.call.patch \

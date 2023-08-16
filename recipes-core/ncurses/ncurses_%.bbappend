@@ -1,2 +1,2 @@
-#Ncurses is fetching from CAF
-SRC_URI = "git://source.codeaurora.org/quic/le/ncurses.git;protocol=https;branch=debian/master"
+#Ncurses is fetching from codelinaro
+SRC_URI = "${CLO_LE_GIT}/ncurses.git;protocol=https;branch=caf_migration/debian/master"
