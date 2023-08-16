@@ -18,6 +18,7 @@ IMAGE_INSTALL += " \
     ${@bb.utils.contains('COMBINED_FEATURES', 'qti-graphics', 'packagegroup-qti-graphics', '', d)} \
     ${@bb.utils.contains('COMBINED_FEATURES', 'qti-usermode-display', 'packagegroup-qti-display', '', d)}  \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-qcrosvm', 'packagegroup-qti-qcrosvm', '', d)}  \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-lvumd', 'packagegroup-qti-lvumd', '', d)}  \
     "
 
 IMAGE_LINGUAS = ""
