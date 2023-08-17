@@ -1,6 +1,5 @@
 [Unit]
 Description=Recovery partition service
-After=tmp.mount
 
 [Service]
 Type=forking
