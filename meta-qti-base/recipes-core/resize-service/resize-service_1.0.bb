@@ -16,7 +16,7 @@ SYSTEMD_AUTO_ENABLE:${PN} = "enable"
 
 do_install() {
     if ${@bb.utils.contains('IMAGE_FEATURES','read-only-rootfs','true','false',d)}; then
-        sed -i -e 's/^After=.*$/After=dev-disk-by\x2dpartlabel-userdata.device var.mount/' ${S}/resize-userdata.service
+        sed -i -e 's/^After=.*$/After=dev-disk-by\\x2dpartlabel-userdata.device var.mount/' ${S}/resize-userdata.service
         sed -i    '/ConditionPathExists=.*$/d' ${S}/resize-userdata.service
         sed -i    '/^Before=.*$/a\ConditionPathExists=\${localstatedir}\/lib\/need_resize' ${S}/resize-userdata.service
         sed -i -e 's/^ExecStartPost=.*$/ExecStartPost=\/bin\/rm -rf \${localstatedir}\/lib\/need_resize/' ${S}/resize-userdata.service

@@ -21,6 +21,7 @@ RDEPENDS:${PN} += "\
     display-hal-linux \
     display-commonsys-intf-linux \
     weston-sdm-extension \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-usermode-display', 'kiumd-headers', '', d)} \
     "
 
 RDEPENDS:${PN}:remove:qti-dpk = "wayland-ivi-extension"

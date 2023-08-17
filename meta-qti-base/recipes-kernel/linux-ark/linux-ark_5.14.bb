@@ -84,7 +84,7 @@ do_rh_config () {
     rm -rf ${SRC_DIR_ROOT}/kernel/rh-kernel-5.14/.config ${SRC_DIR_ROOT}/kernel/rh-kernel-5.14/include/config/ \
     ${SRC_DIR_ROOT}/kernel/rh-kernel-5.14/include/generated/ ${SRC_DIR_ROOT}/kernel/rh-kernel-5.14/arch/$ARCH/include/generated/
 }
-addtask rh_config after do_fetch before do_unpack
+addtask rh_config after do_prepare_recipe_sysroot before do_unpack
 
 do_patch_config() {
      do_patch_config_call() {
@@ -206,7 +206,7 @@ do_deploy () {
         --pagesize ${PAGE_SIZE} \
 	--base ${KERNEL_BASE} \
 	--ramdisk_offset 0x0 \
-        --cmdline "console=ttyMSM0,115200,n8 no_console_suspend=1 androidboot.hardware=qcom androidboot.console=ttyMSM0 lpm_levels.sleep_disabled=1 msm_rtb.filter=0x237 earlycon=qcom_geni,0xa8c000 fips=0 notests nokaslr ignore_loglevel" \
+        --cmdline "console=ttyMSM0,115200,n8 no_console_suspend=1 androidboot.hardware=qcom androidboot.console=ttyMSM0 lpm_levels.sleep_disabled=1 msm_rtb.filter=0x237 earlycon=qcom_geni,0xa8c000 fips=0 notests nokaslr ignore_loglevel firmware_class.path=/firmware" \
 	--output  ${DEPLOYDIR}/sa8775p-boot-5.14.img
     cp ${DEPLOYDIR}/sa8775p-boot-5.14.img ${DEPLOYDIR}/sa8775-boot.img
     else
@@ -219,7 +219,7 @@ do_deploy () {
         --pagesize ${PAGE_SIZE} \
 	--base ${KERNEL_BASE} \
 	--ramdisk_offset 0x0 \
-        --cmdline "console=ttyMSM0,115200,n8 no_console_suspend=1 androidboot.hardware=qcom androidboot.console=ttyMSM0 lpm_levels.sleep_disabled=1 msm_rtb.filter=0x237 earlycon=qcom_geni,0x884000 fips=0 notests nokaslr ignore_loglevel" \
+        --cmdline "console=ttyMSM0,115200,n8 no_console_suspend=1 androidboot.hardware=qcom androidboot.console=ttyMSM0 lpm_levels.sleep_disabled=1 msm_rtb.filter=0x237 earlycon=qcom_geni,0x884000 fips=0 notests nokaslr ignore_loglevel firmware_class.path=/firmware" \
 	--output  ${DEPLOYDIR}/sa8540p-boot-5.14.img
     fi
 

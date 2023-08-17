@@ -48,10 +48,8 @@ EXTRA_OEMAKE = "'CLANG_BIN=${STAGING_BINDIR_NATIVE}/' \
 
 do_configure[noexec] = "1"
 do_compile () {
-    export CC=${BUILD_CC}
-    export CXX=${BUILD_CXX}
-    export LD=${BUILD_LD}
-    export AR=${BUILD_AR}
+    export BUILD_CC=${STAGING_BINDIR_NATIVE}/clang
+    export BUILD_CXX=${STAGING_BINDIR_NATIVE}/clang++
     if ${@bb.utils.contains('MACHINE_FEATURES', 'goldcore-boot', 'true', 'false', d)}; then
         export LINUX_BOOT_CPU_SELECTION_ENABLED=1
         export TARGET_LINUX_BOOT_CPU_ID=7

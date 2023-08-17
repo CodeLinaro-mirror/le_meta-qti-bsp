@@ -1,0 +1,37 @@
+SUMMARY = "Platform kernel drivers"
+DESCRIPTION = "Build platform drivers to kernel module"
+HOMEPAGE = "https://git.codelinaro.org/"
+LICENSE = "GPL-2.0 WITH Linux-syscall-note"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/GPL-2.0-only;md5=801f80980d171dd6425610833a22dbe6"
+
+SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/platform-kernel/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/platform-kernel;;usehead=1"
+
+SRCREV = "${AUTOREV}"
+
+S = "${WORKDIR}/vendor/qcom/opensource/platform-kernel"
+
+inherit qti-techpack
+
+METAL_MODULES_BUILD = "drivers/aop-set-ddr.ko drivers/silent_boot.ko drivers/wallpower_charger.ko drivers/dump_boot_log.ko drivers/silent-mode-hw-monitoring.ko"
+
+VIRT_MODULES_BUILD = "drivers/socinfo_dt.ko drivers/subsystem_notif_virt.ko"
+
+TECHPACK_MODULES = "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '${VIRT_MODULES_BUILD}', '${METAL_MODULES_BUILD}', d)}"
+
+METAL_PROVIDES_MODULES = "\
+    kernel-module-aop-set-ddr-${KERNEL_VERSION} \
+    kernel-module-silent-boot-${KERNEL_VERSION} \
+    kernel-module-wallpower-charger-${KERNEL_VERSION} \
+    kernel-module-dump-boot-log-${KERNEL_VERSION} \
+    kernel-module-slient-mode-hw-monitoring-${KERNEL_VERSION} \
+"
+
+VIRT_PROVIDES_MODULES = "\
+    kernel-module-socinfo-dt-${KERNEL_VERSION} \
+    kernel-module-subsystem-notif-virt-${KERNEL_VERSION} \
+"
+
+PROVIDES:${PN} += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '${METAL_PROVIDES_MODULES}', '${VIRT_PROVIDES_MODULES}', d)}"
+
+FILES:${PN} += "${nonarch_base_libdir}/modules/${KERNEL_VERSION}/*"
+FILES:${PN} += "${sysconfdir}/*"

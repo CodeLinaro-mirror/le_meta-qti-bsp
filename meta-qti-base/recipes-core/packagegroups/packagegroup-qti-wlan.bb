@@ -21,6 +21,7 @@ RDEPENDS:${PN} += "\
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-dual-wlan', 'qcacld32-ll-hasting-cnss2', '', d)} \
     qcacld32-ll-hsp \
     qcacld32-ll-rome \
+    qcacld32-ll-hmt \
     wlan-sigma-dut \
     wpa-supplicant \
     wlan-conf \

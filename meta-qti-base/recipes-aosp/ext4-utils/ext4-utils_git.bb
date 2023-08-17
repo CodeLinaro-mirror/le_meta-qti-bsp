@@ -6,7 +6,7 @@ HOMEPAGE = "http://developer.android.com/"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://NOTICE;md5=bb2810bf31da2f6bb39e0bfa86091da3"
 
-DEPENDS += "libcutils libpcre libselinux libsparse"
+DEPENDS += "libcutils libpcre libsparse"
 
 PR = "r1"
 
@@ -17,9 +17,12 @@ S = "${WORKDIR}/system/extras/ext4_utils"
 
 inherit autotools pkgconfig
 
-CPPFLAGS:append = " \
-    -I${STAGING_INCDIR}/libselinux \
-    -I${STAGING_INCDIR}/cutils \
-"
+PACKAGECONFIG:class-target ?= "${@bb.utils.filter('DISTRO_FEATURES', 'selinux', d)}"
+PACKAGECONFIG:class-native ?= "${@bb.utils.filter('DISTRO_FEATURES_NATIVE', 'selinux', d)}"
+PACKAGECONFIG[selinux] = "--enable-selinux,--disable-selinux,libselinux"
+
+CPPFLAGS:append = " -I${STAGING_INCDIR}/cutils"
 
 BBCLASSEXTEND = "native"
+
+MACHINEOVERRIDES:class-native = "${MACHINE}"

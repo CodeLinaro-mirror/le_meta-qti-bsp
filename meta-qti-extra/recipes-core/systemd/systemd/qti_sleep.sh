@@ -82,9 +82,9 @@ case $1/$2 in
 
     # Put the connected devices with qcom usb controllers to suspend
     echo "Putting all connected USB devices to auto suspend forcefully"
-    for j in /sys/bus/usb/devices/*/power/control;
+    for j in /sys/bus/usb/devices/*/power/control
     do
-        echo auto > $j;
+        echo auto > $j
     done
 
     # Add delay to allow usb instance tear down for msm usb controllers

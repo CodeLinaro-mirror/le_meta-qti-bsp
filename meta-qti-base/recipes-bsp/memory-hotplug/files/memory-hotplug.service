@@ -36,7 +36,7 @@ After=sysinit.target
 
 [Service]
 Type=oneshot
-ExecStart=/bin/bash /usr/bin/memory-hotplug.sh
+ExecStart=/bin/sh /usr/bin/memory-hotplug.sh
 
 [Install]
 WantedBy=sysinit.target
