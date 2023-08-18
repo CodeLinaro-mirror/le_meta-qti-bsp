@@ -38,6 +38,7 @@ RM_WORK_EXCLUDE += "${PN}"
 INITSCRIPT_NAME = "update_engine"
 INITSCRIPT_PARAMS = "defaults"
 generate_public_key() {
+    mkdir -p ${TMPDIR}/deploy/images/${MACHINE}/ota-scripts
     openssl pkcs8 -inform DER -nocrypt -in ${WORKSPACE}/OTA/build/target/product/security/testkey.pk8 -out ${TMPDIR}/deploy/images/${MACHINE}/ota-scripts/private.pem
     openssl rsa -in ${TMPDIR}/deploy/images/${MACHINE}/ota-scripts/private.pem -outform PEM -pubout > ${WORKDIR}/public.pem
 }
