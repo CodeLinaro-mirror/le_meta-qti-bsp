@@ -15,6 +15,12 @@ INITSCRIPT_NAME = "find_recovery_partitions.sh"
 INITSCRIPT_PARAMS = "start 38 S ."
 INITSCRIPT_PARAMS_mdm = "start 38 S ."
 
+fix_find_recovery () {
+    sed -i "/ExecStart=/i ExecStartPre=/bin/mount -t tmpfs tmpfs /tmp" ${WORKDIR}/find-recovery-partitions.service
+
+}
+do_install[prefuncs] += " ${@bb.utils.contains('MACHINE', 'sdxpinn', 'fix_find_recovery', '', d)}"
+
 do_install() {
     install -m 0755 ${WORKDIR}/${BASEMACHINE}/find_recovery_partitions.sh -D ${D}${sysconfdir}/init.d/find_recovery_partitions.sh
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
