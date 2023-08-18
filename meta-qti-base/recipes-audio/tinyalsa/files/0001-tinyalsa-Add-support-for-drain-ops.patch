@@ -1,0 +1,137 @@
+From 8e5b2e9a337d60dd241179ba4402789defe761bb Mon Sep 17 00:00:00 2001
+From: Guodong Hu <quic_guodhu@quicinc.com>
+Date: Fri, 18 Aug 2023 17:53:31 +0800
+Subject: [PATCH] tinyalsa: Add support for drain ops
+
+Signed-off-by: Guodong Hu <quic_guodhu@quicinc.com>
+---
+ include/tinyalsa/asoundlib.h  |  3 +++
+ include/tinyalsa/pcm_plugin.h |  1 +
+ pcm.c                         |  8 ++++++++
+ pcm_hw.c                      |  8 ++++++++
+ pcm_io.h                      |  1 +
+ pcm_plugin.c                  | 15 +++++++++++++++
+ 6 files changed, 36 insertions(+)
+
+diff --git a/include/tinyalsa/asoundlib.h b/include/tinyalsa/asoundlib.h
+index 063a256..705ad05 100644
+--- a/include/tinyalsa/asoundlib.h
++++ b/include/tinyalsa/asoundlib.h
+@@ -278,6 +278,9 @@ int pcm_prepare(struct pcm *pcm);
+ int pcm_start(struct pcm *pcm);
+ int pcm_stop(struct pcm *pcm);
+ 
++/* drain PCM streams */
++int pcm_drain(struct pcm *pcm);
++
+ /* ioctl function for PCM driver */
+ int pcm_ioctl(struct pcm *pcm, int request, ...);
+ 
+diff --git a/include/tinyalsa/pcm_plugin.h b/include/tinyalsa/pcm_plugin.h
+index f1708b1..04a5f84 100644
+--- a/include/tinyalsa/pcm_plugin.h
++++ b/include/tinyalsa/pcm_plugin.h
+@@ -63,6 +63,7 @@ struct pcm_plugin_ops {
+     int (*prepare) (struct pcm_plugin *plugin);
+     int (*start) (struct pcm_plugin *plugin);
+     int (*drop) (struct pcm_plugin *plugin);
++    int (*drain) (struct pcm_plugin *plugin);
+     int (*ioctl) (struct pcm_plugin *plugin,
+                   int cmd, void *arg);
+     void* (*mmap) (struct pcm_plugin *plugin, void *addr, size_t length, int prot,
+diff --git a/pcm.c b/pcm.c
+index 1709be9..4768849 100644
+--- a/pcm.c
++++ b/pcm.c
+@@ -1366,6 +1366,14 @@ int pcm_mmap_read(struct pcm *pcm, void *data, unsigned int count)
+     return pcm_mmap_transfer(pcm, data, count);
+ }
+ 
++int pcm_drain(struct pcm *pcm)
++{
++    if (!pcm_is_ready(pcm))
++        return -1;
++
++    return pcm->ops->drain(pcm->data);
++}
++
+ int pcm_ioctl(struct pcm *pcm, int request, ...)
+ {
+     va_list ap;
+diff --git a/pcm_hw.c b/pcm_hw.c
+index f19f07b..0609eef 100644
+--- a/pcm_hw.c
++++ b/pcm_hw.c
+@@ -62,6 +62,13 @@ static void pcm_hw_close(void *data)
+     free(hw_data);
+ }
+ 
++static int pcm_hw_drain(void *data)
++{
++    struct pcm_hw_data *hw_data = data;
++
++    return ioctl(hw_data->fd, SNDRV_PCM_IOCTL_DRAIN);
++}
++
+ static int pcm_hw_ioctl(void *data, unsigned int cmd, ...)
+ {
+     struct pcm_hw_data *hw_data = data;
+@@ -143,4 +150,5 @@ struct pcm_ops hw_ops = {
+     .mmap = pcm_hw_mmap,
+     .munmap = pcm_hw_munmap,
+     .poll = pcm_hw_poll,
++    .drain = pcm_hw_drain,
+ };
+diff --git a/pcm_io.h b/pcm_io.h
+index 4d9746d..018b7a3 100644
+--- a/pcm_io.h
++++ b/pcm_io.h
+@@ -42,6 +42,7 @@ struct pcm_ops {
+                  off_t offset);
+     int (*munmap) (void *data, void *addr, size_t length);
+     int (*poll) (void *data, struct pollfd *pfd, nfds_t nfds, int timeout);
++    int (*drain) (void *data);
+ };
+ 
+ #endif /* end of __PCM_H__ */
+diff --git a/pcm_plugin.c b/pcm_plugin.c
+index 14c6cdb..f1167a7 100644
+--- a/pcm_plugin.c
++++ b/pcm_plugin.c
+@@ -67,6 +67,7 @@ enum {
+     PCM_PLUG_STATE_SETUP,
+     PCM_PLUG_STATE_PREPARED,
+     PCM_PLUG_STATE_RUNNING,
++    PCM_PLUG_STATE_DRAINING,
+ };
+ 
+ struct pcm_plug_data {
+@@ -617,6 +618,19 @@ static int pcm_plug_drop(struct pcm_plug_data *plug_data)
+     return rc;
+ }
+ 
++static int pcm_plug_drain(void *data)
++{
++    int rc;
++    struct pcm_plug_data *plug_data = data;
++    struct pcm_plugin *plugin = plug_data->plugin;
++
++    rc = plugin->ops->drain(plugin);
++    if (!rc)
++        plugin->state = PCM_PLUG_STATE_DRAINING;
++
++    return rc;
++}
++
+ static int pcm_plug_ioctl(void *data, unsigned int cmd, ...)
+ {
+     struct pcm_plug_data *plug_data = data;
+@@ -796,4 +810,5 @@ struct pcm_ops plug_ops = {
+     .mmap = pcm_plug_mmap,
+     .munmap = pcm_plug_munmap,
+     .poll = pcm_plug_poll,
++    .drain = pcm_plug_drain,
+ };
+-- 
+2.8.4
+

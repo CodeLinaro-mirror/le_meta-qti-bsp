@@ -8,6 +8,7 @@ DEPENDS += "libcutils"
 SRC_URI = "\
     git://git.codelinaro.org/clo/la/platform/external/tinyalsa;protocol=https;branch=aosp-new/master \
     file://0001-tinyalsa-support-tinyalsa-build-for-Linux.patch \
+    file://0001-tinyalsa-Add-support-for-drain-ops.patch \
 "
 SRCREV = "61bf563f1df205cf14df142721aaafb854bbbd82"
 
