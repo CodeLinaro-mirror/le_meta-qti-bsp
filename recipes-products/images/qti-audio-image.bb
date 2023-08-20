@@ -29,7 +29,6 @@ CORE_IMAGE_EXTRA_INSTALL += "\
 CORE_IMAGE_EXTRA_INSTALL:remove:vt-64 = "packagegroup-qti-audio"
 CORE_IMAGE_EXTRA_INSTALL:remove:vt-64 = "packagegroup-qti-bluetooth"
 CORE_IMAGE_EXTRA_INSTALL:remove:vt-64 = "packagegroup-qti-data"
-CORE_IMAGE_EXTRA_INSTALL:remove:vt-64 = "packagegroup-qti-dsp"
 CORE_IMAGE_EXTRA_INSTALL:remove:vt-64 = "packagegroup-qti-fastcv"
 CORE_IMAGE_EXTRA_INSTALL:remove:vt-64 = "packagegroup-qti-ml"
 CORE_IMAGE_EXTRA_INSTALL:remove:vt-64 = "packagegroup-qti-ss-mgr"
