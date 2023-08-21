@@ -9,6 +9,7 @@ DEPENDS += "glib-2.0 libcutils libhardware liblog system-core"
 SRC_URI = "\
     ${PATH_TO_REPO}/frameworks/.git;protocol=${PROTO};destsuffix=frameworks;usehead=1 \
     file://servicemanager.service \
+    file://vndservicemanager.service \
     file://create-binder.sh \
     file://create-binder.service \
 "
@@ -18,10 +19,15 @@ S = "${WORKDIR}/frameworks/binder"
 
 inherit autotools pkgconfig systemd useradd
 
-PACKAGECONFIG ?= "${@bb.utils.filter('DISTRO_FEATURES', 'selinux', d)}"
+PACKAGECONFIG ?= " \
+                   ${@bb.utils.filter('DISTRO_FEATURES', 'selinux', d)} \
+                   ${@bb.utils.filter('DISTRO_FEATURES', 'qti-vndbinder', d)} \
+                   "
 PACKAGECONFIG[selinux] = "--enable-selinux,--disable-selinux,libselinux"
+PACKAGECONFIG[qti-vndbinder] = "--enable-vendor-binder,--disable-vendor-binder"
 
 SYSTEMD_SERVICE:${PN} = "servicemanager.service create-binder.service"
+SYSTEMD_SERVICE:${PN} += " ${@bb.utils.contains('DISTRO_FEATURES', 'qti-vndbinder', 'vndservicemanager.service', '', d)}"
 SYSTEMD_AUTO_ENABLE:${PN} = "enable"
 
 # servicemanager.service and create-binder.service run as binder user
@@ -48,6 +54,9 @@ do_install:append() {
         install -d ${D}${systemd_unitdir}/system/
         install -m 0644 ${WORKDIR}/servicemanager.service -D ${D}${systemd_unitdir}/system/servicemanager.service
         install -m 0644 ${WORKDIR}/create-binder.service -D ${D}${systemd_unitdir}/system/create-binder.service
+        if ${@bb.utils.contains('DISTRO_FEATURES', 'qti-vndbinder', 'true', 'false', d)}; then
+            install -m 0644 ${WORKDIR}/vndservicemanager.service -D ${D}${systemd_unitdir}/system/vndservicemanager.service
+        fi
         if ${@bb.utils.contains('DISTRO_FEATURES', 'smack', 'true', 'false', d)}; then
             #Add capabilities for create-binder.service to set smack lable
             sed -i "/^CapabilityBoundingSet/s/$/ CAP_MAC_ADMIN CAP_MAC_OVERRIDE/" ${D}${systemd_unitdir}/system/create-binder.service
