@@ -31,7 +31,6 @@ CORE_IMAGE_EXTRA_INSTALL += "\
               packagegroup-startup-scripts \
               packagegroup-qti-ss-mgr \
               ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
-              ${@bb.utils.contains('MACHINE_FEATURES', 'qti-mplane', 'packagegroup-mplane', '', d)} \
               packagegroup-qti-core \
               packagegroup-qti-transceiver \
               packagegroup-transceiver-perf-measurement \
