@@ -166,11 +166,9 @@ FindAndMountUBIVolume () {
        if [ "$?" -eq "1" ]; then
           #GPIO Enabled keeping behavior similar to Mount failure.
           echo "GPIO Enabled donot switch slots" > /dev/kmsg
-       elif [ "$?" -eq "0" ]; then
-          echo "GPIO disabled switch slots" > /dev/kmsg
-          SlotSwitchReboot
        else
-          echo "GPIO status invalid" > /dev/kmsg
+          echo "GPIO disabled switch the slots or boot to EDL " > /dev/kmsg
+          SlotSwitchReboot
        fi
        exit 0
     fi
@@ -180,12 +178,6 @@ if [ -x /sbin/restorecon ]; then
     vm_bootsys_selinux_opt=",context=system_u:object_r:vm-bootsys_t:s0"
 else
     vm_bootsys_selinux_opt=""
-fi
-
-# SLOT_SUFFIX is not available it is hardcode for now
-num_volume=`ubinfo -a | grep -o -i "vm-bootsys" | wc -l`
-if [ "x${SLOT_SUFFIX}" == "x" ] && [ ${num_volume} == "2" ]; then
-    SLOT_SUFFIX="_a"
 fi
 
 mtd_file=/proc/mtd
