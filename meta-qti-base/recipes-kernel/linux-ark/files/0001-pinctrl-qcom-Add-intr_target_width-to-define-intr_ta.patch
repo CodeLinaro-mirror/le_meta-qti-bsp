@@ -1,0 +1,98 @@
+From 4b76306353c094727ac8ccdaf3326c13cef3feba Mon Sep 17 00:00:00 2001
+From: Ninad Naik <quic_ninanaik@quicinc.com>
+Date: Fri, 30 Jun 2023 15:49:59 +0530
+Subject: [PATCH] pinctrl: qcom: Add intr_target_width to define
+ intr_target_bit field width
+
+On SA8775 and newer target have added support for an increased number of
+interrupt targets. To implement this change, the intr_target field width
+in the interrupt configuration register has increased from 3 bits to
+4 bits.
+
+In accordance to these updates, a new intr_target_width field is
+introduced in msm_pingroup structure. This field is used to dynamically
+calculate the intr_target field width and generate its mask. By default,
+the mask is set to 3 bit wide, to ensure backward compatibility with the
+older targets.
+
+Change-Id: I12bbc381f78a3f5d8e821b62f14eaa88f97f9308
+---
+ drivers/pinctrl/qcom/pinctrl-lemans.c | 1 +
+ drivers/pinctrl/qcom/pinctrl-msm.c    | 9 ++++++---
+ drivers/pinctrl/qcom/pinctrl-msm.h    | 2 ++
+ 3 files changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/pinctrl/qcom/pinctrl-lemans.c b/drivers/pinctrl/qcom/pinctrl-lemans.c
+index 0cfc4d503e6f..14464d32c3c9 100644
+--- a/drivers/pinctrl/qcom/pinctrl-lemans.c
++++ b/drivers/pinctrl/qcom/pinctrl-lemans.c
+@@ -53,6 +53,7 @@
+ 		.intr_enable_bit = 0,		\
+ 		.intr_status_bit = 0,		\
+ 		.intr_target_bit = 5,		\
++		.intr_target_width = 4,		\
+ 		.intr_target_kpss_val = 3,	\
+ 		.intr_raw_status_bit = 4,	\
+ 		.intr_polarity_bit = 1,		\
+diff --git a/drivers/pinctrl/qcom/pinctrl-msm.c b/drivers/pinctrl/qcom/pinctrl-msm.c
+index 7ac607b1311a..400f7f30bfc5 100644
+--- a/drivers/pinctrl/qcom/pinctrl-msm.c
++++ b/drivers/pinctrl/qcom/pinctrl-msm.c
+@@ -974,6 +974,7 @@ static int msm_gpio_irq_set_type(struct irq_data *d, unsigned int type)
+ 	struct gpio_chip *gc = irq_data_get_irq_chip_data(d);
+ 	struct msm_pinctrl *pctrl = gpiochip_get_data(gc);
+ 	const struct msm_pingroup *g;
++	u32 intr_target_mask = 0x7;
+ 	unsigned long flags;
+ 	bool was_enabled;
+ 	u32 val;
+@@ -1010,13 +1011,15 @@ static int msm_gpio_irq_set_type(struct irq_data *d, unsigned int type)
+ 	 * With intr_target_use_scm interrupts are routed to
+ 	 * application cpu using scm calls.
+ 	 */
++        if (g->intr_target_width)
++	        intr_target_mask = GENMASK(g->intr_target_width - 1, 0);
++
+ 	if (pctrl->intr_target_use_scm) {
+ 		u32 addr = pctrl->phys_base[0] + g->intr_target_reg;
+ 		int ret;
+ 
+ 		qcom_scm_io_readl(addr, &val);
+-
+-		val &= ~(7 << g->intr_target_bit);
++		val &= ~(intr_target_mask << g->intr_target_bit);
+ 		val |= g->intr_target_kpss_val << g->intr_target_bit;
+ 
+ 		ret = qcom_scm_io_writel(addr, val);
+@@ -1026,7 +1029,7 @@ static int msm_gpio_irq_set_type(struct irq_data *d, unsigned int type)
+ 				d->hwirq);
+ 	} else {
+ 		val = msm_readl_intr_target(pctrl, g);
+-		val &= ~(7 << g->intr_target_bit);
++		val &= ~(intr_target_mask << g->intr_target_bit);
+ 		val |= g->intr_target_kpss_val << g->intr_target_bit;
+ 		msm_writel_intr_target(val, pctrl, g);
+ 	}
+diff --git a/drivers/pinctrl/qcom/pinctrl-msm.h b/drivers/pinctrl/qcom/pinctrl-msm.h
+index dd0d949f7a9e..d54e3d0d761f 100644
+--- a/drivers/pinctrl/qcom/pinctrl-msm.h
++++ b/drivers/pinctrl/qcom/pinctrl-msm.h
+@@ -46,6 +46,7 @@ struct msm_function {
+  * @intr_status_bit:      Offset in @intr_status_reg for reading and acking the interrupt
+  *                        status.
+  * @intr_target_bit:      Offset in @intr_target_reg for configuring the interrupt routing.
++ * @intr_target_width:    Number of bits used for specifying interrupt routing target.
+  * @intr_target_kpss_val: Value in @intr_target_bit for specifying that the interrupt from
+  *                        this gpio should get routed to the KPSS processor.
+  * @intr_raw_status_bit:  Offset in @intr_cfg_reg for the raw status bit.
+@@ -88,6 +89,7 @@ struct msm_pingroup {
+ 	unsigned intr_ack_high:1;
+ 
+ 	unsigned intr_target_bit:5;
++	unsigned intr_target_width:5;
+ 	unsigned intr_target_kpss_val:5;
+ 	unsigned intr_raw_status_bit:5;
+ 	unsigned intr_polarity_bit:5;
+-- 
+2.17.1
+
