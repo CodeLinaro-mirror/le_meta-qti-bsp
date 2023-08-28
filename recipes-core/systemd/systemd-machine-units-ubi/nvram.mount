@@ -6,7 +6,7 @@ Before=local-fs.target
 DefaultDependencies=no
 
 [Mount]
-What=ubi2:nvram
+What=ubi0:nvram
 Where=/nvram
 Type=ubifs
-Options=noatime,data=ordered,noauto_da_alloc,discard,noexec,nodev,nosuid,noauto,x-systemd.automount
+Options=bulk_read,rw
