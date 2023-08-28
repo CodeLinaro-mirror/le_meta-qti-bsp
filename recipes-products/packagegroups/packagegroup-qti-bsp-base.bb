@@ -54,10 +54,14 @@ RDEPENDS:packagegroup-support-utils-base = "\
     libxml2 \
     "
 
+EXFAT_SUPPORT ?= "False"
+EXFAT_SUPPORT:kalama = "True"
+
 RDEPENDS:packagegroup-filesystem-utils-base = "\
     e2fsprogs \
     e2fsprogs-e2fsck \
     e2fsprogs-mke2fs \
     e2fsprogs-resize2fs \
     e2fsprogs-tune2fs \
+    ${@oe.utils.conditional('EXFAT_SUPPORT', 'True', 'exfat-utils', '', d)} \
     "
