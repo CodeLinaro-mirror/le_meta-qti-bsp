@@ -29,10 +29,10 @@
 ev="$1"
 find="/dev/input/event"
 replace="/sys/class/input/input"
-result=${ev//$find/$replace}
+result=$(echo "$ev" | sed "s/$find/$replace/g")
 sensor_name=$(cat $result/name)
 replace=""
-num=${ev//$find/$replace}
+num=$(echo "$ev" | sed "s/$find/$replace/g")
 
 case "x$sensor_name" in
    "xsmi130_accbuf" | "xbmi160_accbuf" | "xinv_accbuf" | "xasm_accbuf")
