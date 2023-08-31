@@ -40,6 +40,7 @@ VOLATILE_BINDS:sdxpinn = "\
 /systemrw/misc/wifi /etc/misc/wifi/\n\
 /systemrw/bluetooth /etc/bluetooth/\n\
 /systemrw/allplay /etc/allplay/\n\
+/systemrw/resolv.conf /etc/resolv.conf\n\
 /var/volatile/lib /var/lib\n\
 "
 
