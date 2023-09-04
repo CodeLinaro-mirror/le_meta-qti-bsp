@@ -13,15 +13,25 @@ S = "${WORKDIR}/vendor/qcom/opensource/securemsm-kernel"
 
 TECHPACK_MODULE_OUT = "${WORKDIR}/securemsm-kernel-out"
 TECHPACK_MODULES = "qseecom_dlkm.ko tz_log_dlkm.ko qrng_dlkm.ko smcinvoke_dlkm.ko hdcp_qseecom_dlkm.ko qcrypto-msm_dlkm.ko qce50_dlkm.ko qcedev-mod_dlkm.ko"
+TECHPACK_HEADERS = "${S}/include/uapi"
 
 inherit qti-techpack
 
 do_install:append() {
     install -m 0755 ${WORKDIR}/security_load.conf -D ${D}${sysconfdir}/modules-load.d/security_load.conf
     install -d ${D}${includedir}/linux
-    install -m 0644 ${WORKDIR}/vendor/qcom/opensource/securemsm-kernel/linux/smcinvoke.h ${D}${includedir}/linux
-    install -m 0644 ${WORKDIR}/vendor/qcom/opensource/securemsm-kernel/linux/qcedev.h ${D}${includedir}/linux
-    install -m 0644 ${WORKDIR}/vendor/qcom/opensource/securemsm-kernel/linux/fips_status.h ${D}${includedir}/linux
+    if [ -e ${WORKDIR}/vendor/qcom/opensource/securemsm-kernel/linux/smcinvoke.h ]; then
+        install -m 0644 ${WORKDIR}/vendor/qcom/opensource/securemsm-kernel/linux/smcinvoke.h ${D}${includedir}/linux
+    fi
+    if [ -e ${WORKDIR}/vendor/qcom/opensource/securemsm-kernel/linux/qcedev.h ]; then
+        install -m 0644 ${WORKDIR}/vendor/qcom/opensource/securemsm-kernel/linux/qcedev.h ${D}${includedir}/linux
+    fi
+    if [ -e ${WORKDIR}/vendor/qcom/opensource/securemsm-kernel/linux/fips_status.h ]; then
+        install -m 0644 ${WORKDIR}/vendor/qcom/opensource/securemsm-kernel/linux/fips_status.h ${D}${includedir}/linux
+    fi
+    if [ -e ${WORKDIR}/vendor/qcom/opensource/securemsm-kernel/crypto-qti/fips_status.h ]; then
+        install -m 0644 ${WORKDIR}/vendor/qcom/opensource/securemsm-kernel/crypto-qti/fips_status.h ${D}${includedir}/linux
+    fi
     install -d ${D}${includedir}/hdcp_qseecom
     install -m 0644 ${S}/Module.symvers ${D}${includedir}/hdcp_qseecom
 }
