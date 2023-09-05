@@ -30,12 +30,9 @@ if [ ! -c /dev/binder ] && [ ! -L /dev/binder ]; then
 	ln -s /dev/binderfs/binder     /dev/binder
 	ln -s /dev/binderfs/hwbinder   /dev/hwbinder
 	ln -s /dev/binderfs/vndbinder  /dev/vndbinder
-	chmod 0660 /dev/binderfs/hwbinder
-	chmod 0660 /dev/binderfs/binder
-	chmod 0660 /dev/binderfs/vndbinder
-	chown binder:binder /dev/binderfs/hwbinder
-	chown binder:binder /dev/binderfs/binder
-	chown binder:binder /dev/binderfs/vndbinder
+	chmod 0666 /dev/binderfs/hwbinder
+	chmod 0666 /dev/binderfs/binder
+	chmod 0666 /dev/binderfs/vndbinder
 	if [ -c /dev/binderfs/puddlejumper ]; then
 		ln -s /dev/binderfs/puddlejumper /dev/puddlejumper
 		ln -s /dev/binderfs/vndpuddlejumper /dev/vndpuddlejumper
