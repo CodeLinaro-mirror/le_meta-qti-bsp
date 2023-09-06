@@ -1,0 +1,27 @@
+From 82dcff062b7dc4bc753a2f09ebf49d214b2dd3b6 Mon Sep 17 00:00:00 2001
+From: Shabbir Limdiwala <quic_slimdiwa@quicinc.com>
+Date: Mon, 5 Jun 2023 16:34:29 -0700
+Subject: [PATCH] Remove -Werror=format=2 to ignore --format-nonliteral
+ compilation errors
+
+Signed-off-by: Shabbir Limdiwala <quic_slimdiwa@quicinc.com>
+---
+ glib/configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/glib/configure.ac b/glib/configure.ac
+index ffa7869..3ba718e 100644
+--- a/glib/configure.ac
++++ b/glib/configure.ac
+@@ -3340,7 +3340,7 @@ AS_IF([test "x$enable_compile_warnings" = xyes], [
+    -Wall -Wstrict-prototypes -Werror=declaration-after-statement \
+    -Werror=missing-prototypes -Werror=implicit-function-declaration \
+    -Werror=pointer-arith -Werror=init-self -Werror=format-security \
+-   -Werror=format=2 -Werror=missing-include-dirs])
++   -Werror=missing-include-dirs])
+ ])
+ AC_SUBST(GLIB_WARN_CFLAGS)
+ 
+-- 
+2.17.1
+
