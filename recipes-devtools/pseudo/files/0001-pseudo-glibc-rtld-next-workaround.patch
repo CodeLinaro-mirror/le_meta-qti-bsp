@@ -1,0 +1,29 @@
+From ff298c6cf79d746e412f1f949af50b308e280e5d Mon Sep 17 00:00:00 2001
+From: Shabbir Limdiwala <quic_slimdiwa@quicinc.com>
+Date: Tue, 30 May 2023 21:41:30 -0700
+Subject: [PATCH] pseudo glibc rtld next workaround
+
+Signed-off-by: Shabbir Limdiwala <quic_slimdiwa@quicinc.com>
+---
+ pseudo_wrappers.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/pseudo_wrappers.c b/pseudo_wrappers.c
+index 34d7f23..a238321 100644
+--- a/pseudo_wrappers.c
++++ b/pseudo_wrappers.c
+@@ -146,9 +146,9 @@ pseudo_init_one_wrapper(pseudo_function *func) {
+ 			return;
+ 		}
+ #else
+-		if (e != NULL) {
++/*		if (e != NULL) {
+ 			pseudo_diag("No real function for %s: %s\n", func->name, e);
+-		}
++		}*/
+ #endif
+ 	}
+ }
+-- 
+2.17.1
+
