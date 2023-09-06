@@ -1,0 +1,28 @@
+From dd60a749098291bf9d584dbf294a1564ef87eac4 Mon Sep 17 00:00:00 2001
+From: Shabbir Limdiwala <quic_slimdiwa@quicinc.com>
+Date: Mon, 5 Jun 2023 16:59:30 -0700
+Subject: [PATCH] Fix to ignore --Wformat-nonliteral errors
+
+Signed-off-by: Shabbir Limdiwala <quic_slimdiwa@quicinc.com>
+---
+ glib/gdate.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/glib/gdate.c b/glib/gdate.c
+index 670f7aa..74280d6 100644
+--- a/glib/gdate.c
++++ b/glib/gdate.c
+@@ -2494,7 +2494,10 @@ g_date_strftime (gchar       *s,
+        * recognize whether strftime actually failed or just returned "".
+        */
+       tmpbuf[0] = '\1';
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+       tmplen = strftime (tmpbuf, tmpbufsize, locale_format, &tm);
++#pragma GCC diagnostic pop
+ 
+       if (tmplen == 0 && tmpbuf[0] != '\0')
+         {
+-- 
+2.17.1
+
