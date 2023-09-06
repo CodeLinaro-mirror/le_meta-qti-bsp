@@ -1,0 +1,55 @@
+From 84482e2fb350d5c40e794bfd7e6bcc47fca7eb6e Mon Sep 17 00:00:00 2001
+From: Shabbir Limdiwala <quic_slimdiwa@quicinc.com>
+Date: Mon, 5 Jun 2023 15:42:13 -0700
+Subject: [PATCH 1/4] Remove -Wextra to ignore --implicit-fallthrough errors
+
+Signed-off-by: Shabbir Limdiwala <quic_slimdiwa@quicinc.com>
+---
+ config/eu.am | 3 +--
+ configure.ac | 9 ---------
+ 2 files changed, 1 insertion(+), 11 deletions(-)
+
+diff --git a/config/eu.am b/config/eu.am
+index 65af085..613099a 100644
+--- a/config/eu.am
++++ b/config/eu.am
+@@ -29,7 +29,6 @@
+ ## not, see <http://www.gnu.org/licenses/>.
+ ##
+ 
+-WEXTRA = @WEXTRA@
+ LD_AS_NEEDED = @LD_AS_NEEDED@
+ 
+ DEFS = -D_GNU_SOURCE -DHAVE_CONFIG_H -DLOCALEDIR='"${localedir}"'
+@@ -43,7 +42,7 @@ STACK_USAGE_WARNING=
+ endif
+ AM_CFLAGS = -std=gnu99 -Wall -Wshadow \
+ 	    $(if $($(*F)_no_Werror),,-Werror) \
+-	    $(if $($(*F)_no_Wunused),,-Wunused $(WEXTRA)) \
++	    $(if $($(*F)_no_Wunused),,-Wunused ) \
+ 	    $(if $($(*F)_no_Wformat),-Wno-format,-Wformat=2) \
+ 	    $(if $($(*F)_no_Wstack_usage),,$(STACK_USAGE_WARNING)) \
+ 	    $($(*F)_CFLAGS)
+diff --git a/configure.ac b/configure.ac
+index 4b08817..f7dadfa 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -106,15 +106,6 @@ CFLAGS="$old_CFLAGS"])
+ AS_IF([test "x$ac_cv_c99" != xyes],
+       AC_MSG_ERROR([gcc with GNU99 support required]))
+ 
+-AC_CACHE_CHECK([for -Wextra option to $CC], ac_cv_cc_wextra, [dnl
+-old_CFLAGS="$CFLAGS"
+-CFLAGS="$CFLAGS -Wextra"
+-AC_COMPILE_IFELSE([AC_LANG_SOURCE([void foo (void) { }])],
+-		  ac_cv_cc_wextra=yes, ac_cv_cc_wextra=no)
+-CFLAGS="$old_CFLAGS"])
+-AC_SUBST(WEXTRA)
+-AS_IF([test "x$ac_cv_cc_wextra" = xyes], [WEXTRA=-Wextra], [WEXTRA=-W])
+-
+ AC_CACHE_CHECK([for -fgnu89-inline option to $CC], ac_cv_cc_gnu89_inline, [dnl
+ old_CFLAGS="$CFLAGS"
+ CFLAGS="$CFLAGS -fgnu89-inline -Werror"
+-- 
+2.17.1
+

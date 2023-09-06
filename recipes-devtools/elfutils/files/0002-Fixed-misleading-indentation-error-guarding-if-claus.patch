@@ -1,0 +1,33 @@
+From f2bf98b5e18d8a69a95cfa3d020767f2e47d46ee Mon Sep 17 00:00:00 2001
+From: Shabbir Limdiwala <quic_slimdiwa@quicinc.com>
+Date: Mon, 5 Jun 2023 15:44:09 -0700
+Subject: [PATCH 2/4] Fixed --misleading-indentation error, guarding if clause
+
+Signed-off-by: Shabbir Limdiwala <quic_slimdiwa@quicinc.com>
+---
+ libebl/eblobjnote.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/libebl/eblobjnote.c b/libebl/eblobjnote.c
+index b9bf1c0..ca0fe74 100644
+--- a/libebl/eblobjnote.c
++++ b/libebl/eblobjnote.c
+@@ -47,8 +47,8 @@ ebl_object_note (ebl, name, type, descsz, desc)
+      const char *desc;
+ {
+   if (! ebl->object_note (name, type, descsz, desc))
++  {
+     /* The machine specific function did not know this type.  */
+-
+     if (strcmp ("stapsdt", name) == 0)
+       {
+ 	if (type != 3)
+@@ -232,4 +232,5 @@ ebl_object_note (ebl, name, type, descsz, desc)
+ 	/* Unknown type.  */
+ 	break;
+       }
++  }
+ }
+-- 
+2.17.1
+

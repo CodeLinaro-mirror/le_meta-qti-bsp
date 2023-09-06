@@ -1,0 +1,125 @@
+From 905eebf6bfe78ee135c31a556fa4059a511c92fb Mon Sep 17 00:00:00 2001
+From: Shabbir Limdiwala <quic_slimdiwa@quicinc.com>
+Date: Mon, 5 Jun 2023 15:45:33 -0700
+Subject: [PATCH 3/4] Fixed --nonnull-compare errors
+
+Signed-off-by: Shabbir Limdiwala <quic_slimdiwa@quicinc.com>
+---
+ libdw/dwarf_macro_getsrcfiles.c | 3 ---
+ libdw/dwarf_siblingof.c         | 3 ---
+ libdwfl/dwfl_frame.c            | 2 +-
+ libdwfl/dwfl_module_getelf.c    | 3 ---
+ libebl/ebldwarftoregno.c        | 2 --
+ libebl/eblinitreg.c             | 2 +-
+ libebl/eblnormalizepc.c         | 2 +-
+ libebl/eblunwind.c              | 2 +-
+ 8 files changed, 4 insertions(+), 15 deletions(-)
+
+diff --git a/libdw/dwarf_macro_getsrcfiles.c b/libdw/dwarf_macro_getsrcfiles.c
+index cc19043..a466ffd 100644
+--- a/libdw/dwarf_macro_getsrcfiles.c
++++ b/libdw/dwarf_macro_getsrcfiles.c
+@@ -36,9 +36,6 @@ int
+ dwarf_macro_getsrcfiles (Dwarf *dbg, Dwarf_Macro *macro,
+ 			 Dwarf_Files **files, size_t *nfiles)
+ {
+-  if (macro == NULL)
+-    return -1;
+-
+   Dwarf_Macro_Op_Table *const table = macro->table;
+   if (table->files == NULL)
+     {
+diff --git a/libdw/dwarf_siblingof.c b/libdw/dwarf_siblingof.c
+index e598ae4..dd04109 100644
+--- a/libdw/dwarf_siblingof.c
++++ b/libdw/dwarf_siblingof.c
+@@ -45,9 +45,6 @@ dwarf_siblingof (die, result)
+   if (die == NULL)
+     return -1;
+ 
+-  if (result == NULL)
+-    return -1;
+-
+   if (result != die)
+     result->addr = NULL;
+ 
+diff --git a/libdwfl/dwfl_frame.c b/libdwfl/dwfl_frame.c
+index f6f86c0..24e45cf 100644
+--- a/libdwfl/dwfl_frame.c
++++ b/libdwfl/dwfl_frame.c
+@@ -143,7 +143,7 @@ dwfl_attach_state (Dwfl *dwfl, Elf *elf, pid_t pid,
+ 
+   /* Reset any previous error, we are just going to try again.  */
+   dwfl->attacherr = DWFL_E_NOERROR;
+-  if (thread_callbacks == NULL || thread_callbacks->next_thread == NULL
++  if (thread_callbacks->next_thread == NULL
+       || thread_callbacks->set_initial_registers == NULL)
+     {
+       dwfl->attacherr = DWFL_E_INVALID_ARGUMENT;
+diff --git a/libdwfl/dwfl_module_getelf.c b/libdwfl/dwfl_module_getelf.c
+index f20fb04..65ad17a 100644
+--- a/libdwfl/dwfl_module_getelf.c
++++ b/libdwfl/dwfl_module_getelf.c
+@@ -31,9 +31,6 @@
+ Elf *
+ dwfl_module_getelf (Dwfl_Module *mod, GElf_Addr *loadbase)
+ {
+-  if (mod == NULL)
+-    return NULL;
+-
+   __libdwfl_getelf (mod);
+   if (mod->elferr == DWFL_E_NOERROR)
+     {
+diff --git a/libebl/ebldwarftoregno.c b/libebl/ebldwarftoregno.c
+index 8fb8540..3a8cc1a 100644
+--- a/libebl/ebldwarftoregno.c
++++ b/libebl/ebldwarftoregno.c
+@@ -35,7 +35,5 @@
+ bool
+ ebl_dwarf_to_regno (Ebl *ebl, unsigned *regno)
+ {
+-  if (ebl == NULL)
+-    return false;
+   return ebl->dwarf_to_regno == NULL ? true : ebl->dwarf_to_regno (ebl, regno);
+ }
+diff --git a/libebl/eblinitreg.c b/libebl/eblinitreg.c
+index ca681c0..2dd13f9 100644
+--- a/libebl/eblinitreg.c
++++ b/libebl/eblinitreg.c
+@@ -47,7 +47,7 @@ ebl_set_initial_registers_tid (Ebl *ebl, pid_t tid,
+ size_t
+ ebl_frame_nregs (Ebl *ebl)
+ {
+-  return ebl == NULL ? 0 : ebl->frame_nregs;
++  return ebl->frame_nregs;
+ }
+ 
+ GElf_Addr
+diff --git a/libebl/eblnormalizepc.c b/libebl/eblnormalizepc.c
+index a5fea77..e1422df 100644
+--- a/libebl/eblnormalizepc.c
++++ b/libebl/eblnormalizepc.c
+@@ -35,6 +35,6 @@
+ void
+ ebl_normalize_pc (Ebl *ebl, Dwarf_Addr *pc)
+ {
+-  if (ebl != NULL && ebl->normalize_pc != NULL)
++  if (ebl->normalize_pc != NULL)
+     ebl->normalize_pc (ebl, pc);
+ }
+diff --git a/libebl/eblunwind.c b/libebl/eblunwind.c
+index 1251c1b..218579a 100644
+--- a/libebl/eblunwind.c
++++ b/libebl/eblunwind.c
+@@ -37,7 +37,7 @@ ebl_unwind (Ebl *ebl, Dwarf_Addr pc, ebl_tid_registers_t *setfunc,
+ 	    ebl_tid_registers_get_t *getfunc, ebl_pid_memory_read_t *readfunc,
+ 	    void *arg, bool *signal_framep)
+ {
+-  if (ebl == NULL || ebl->unwind == NULL)
++  if (ebl->unwind == NULL)
+     return false;
+   return ebl->unwind (ebl, pc, setfunc, getfunc, readfunc, arg, signal_framep);
+ }
+-- 
+2.17.1
+
