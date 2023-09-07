@@ -13,13 +13,15 @@ SRC_URI:append= " \
 "
 
 do_patch:append() {
-    PATCH_LIST=`ls ${WORKDIR}/lvumd/*.patch`
-    for PATCH_FILE in ${PATCH_LIST}; do
-        patch -f -p1 < ${PATCH_FILE}
-        if [ $? != 0 ];then
-            bbfatal "patching ${PATCH_FILE} failed"
-        fi
-    done
+    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-lvumd', 'true', 'false', d)} ; then
+        PATCH_LIST=`ls ${WORKDIR}/lvumd/*.patch`
+        for PATCH_FILE in ${PATCH_LIST}; do
+            patch -f -p1 < ${PATCH_FILE}
+            if [ $? != 0 ];then
+                bbfatal "patching ${PATCH_FILE} failed"
+            fi
+        done
+    fi
 }
 
 S = "${WORKDIR}/kernel/kernel-${PV}/kernel_platform/msm-kernel"
