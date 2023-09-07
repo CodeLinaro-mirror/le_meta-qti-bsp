@@ -50,5 +50,6 @@ IMAGE_INSTALL += "system-core-usb"
 IMAGE_INSTALL += "tcpdump"
 IMAGE_INSTALL += "wireless-tools"
 IMAGE_INSTALL += "procrank"
+IMAGE_INSTALL += "libbsd"
 
 IMAGE_PREPROCESS_COMMAND += "echo ${MACHINE} >> ${IMAGE_ROOTFS}/target;"
