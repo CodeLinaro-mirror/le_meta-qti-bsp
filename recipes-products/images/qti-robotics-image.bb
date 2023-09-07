@@ -54,6 +54,8 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-startup-scripts \
         packagegroup-support-utils \
         ${@bb.utils.contains('DISTRO_FEATURES', 'qti-ib2c', 'qti-ib2c', '', d)} \
+        ${@bb.utils.contains("COMBINED_FEATURES", "qti-uvc", "qti-umd-gadget", "", d)} \
+        ${@bb.utils.contains("COMBINED_FEATURES", "qti-uvc", "qti-auto-framing-stabilization", "", d)} \
         systemd-machine-units \
         ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
         yavta \
@@ -67,7 +69,6 @@ CORE_IMAGE_EXTRA_INSTALL += "\
 "
 
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "chronyc"
-CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-data"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-ml"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-cvp"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-gst"
@@ -76,6 +77,8 @@ CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-test-sensors-see"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "tdk-chx01-get-data-app"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "tdk-thermistor-app"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-sensors-see"
+
+TOOLCHAIN_TARGET_TASK:remove:kalama = "packagegroup-qti-containers"
 
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-data"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-eva"

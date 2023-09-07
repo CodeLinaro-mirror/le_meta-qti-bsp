@@ -89,6 +89,8 @@ FILES:libxatracker-dev = " "
 FILES:${PN} = "\
                ${libdir}/libglapi.so.0 \
                ${libdir}/aarch64-linux-gnu/* \
+               /usr/share/vulkan/icd.d/* \
+               /usr/share/drirc.d/* \
               "
 
 SYSROOT_DIRS_IGNORE += " \
