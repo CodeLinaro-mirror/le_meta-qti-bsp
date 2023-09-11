@@ -44,7 +44,7 @@ fde_setup () {
                 echo "failed to seed data partition"
                 return 1
             fi
-            if [[ ! -e /persist/.data_formatted ]]; then
+            if [ ! -e /persist/.data_formatted ]; then
                 touch /persist/.data_formatted && sync;
                 if [ $? -ne 0 ] ; then
                     echo "failed to create data formatted file"
@@ -54,7 +54,7 @@ fde_setup () {
             return 0
             ;;
         0)  echo "Successfully set the FDE key for /data"
-            if [[ ! -e /persist/.data_formatted ]]; then
+            if [ ! -e /persist/.data_formatted ]; then
                 touch /persist/.data_formatted && sync;
                 if [ $? -ne 0 ] ; then
                     echo "failed to create data formatted file"
