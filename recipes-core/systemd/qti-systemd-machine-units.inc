@@ -5,6 +5,10 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 SRC_URI = "file://*"
 S = "${WORKDIR}"
 
+inherit features_check
+
+CONFLICT_COMBINED_FEATURES += "${@bb.utils.contains('COMBINED_FEATURES', 'qti-ab-boot', '', 'qti-recoveryinfo', d)}"
+
 IMAGETYPE ??= ""
 USERDATA_FSTYPE ??= "ext4"
 OVERLAY_MNT_POINTS ??= "etc data cache"
@@ -31,7 +35,12 @@ add_mount_files () {
         mountname=${mountname//'/'/"-"}
         if [[ "$mountname" == "firmware" || "$mountname" == "bt_firmware" || "$mountname" == "dsp" || "$mountname" == "lib-modules" ]] && \
            [[ "${IMAGETYPE}" == "ubi" || "${COMBINED_FEATURES}" =~ .*qti-ab-boot.* ]] ; then
-            install -m 0644 ${S}/${mountname}-mount.service ${D}${systemd_unitdir}/system/${mountname}-mount-${IMAGETYPE}.service
+         
+            if [[ "${COMBINED_FEATURES}" =~ .*qti-recoveryinfo.* ]] ; then
+                    install -m 0644 ${S}/${mountname}-mount-v2.service ${D}${systemd_unitdir}/system/${mountname}-mount-${IMAGETYPE}.service
+            else
+                    install -m 0644 ${S}/${mountname}-mount.service ${D}${systemd_unitdir}/system/${mountname}-mount-${IMAGETYPE}.service
+            fi
         else
             # Update fstype for userdata
             if [[ "$mountname" == "overlay" ]] ; then
@@ -71,6 +80,7 @@ add_overlay_mount_files () {
 fix_sepolicies () {
     sed -i "s#,context=system_u:object_r:firmware_t:s0##g" ${WORKDIR}/firmware.mount
     sed -i "s#,context=system_u:object_r:firmware_t:s0##g" ${WORKDIR}/firmware-mount.service
+    sed -i "s#,context=system_u:object_r:firmware_t:s0##g" ${WORKDIR}/firmware-mount-v2.service
     sed -i "s#,context=system_u:object_r:firmware_t:s0##g" ${WORKDIR}/bt_firmware.mount
     sed -i "s#,context=system_u:object_r:firmware_t:s0##g" ${WORKDIR}/bt_firmware-mount.service
     sed -i "s#,context=system_u:object_r:adsprpcd_t:s0##g" ${WORKDIR}/dsp-mount.service
