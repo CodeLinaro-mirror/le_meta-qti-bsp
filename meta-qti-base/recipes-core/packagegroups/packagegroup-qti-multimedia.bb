@@ -19,7 +19,6 @@ RDEPENDS:${PN} = " \
         gstreamer1.0-plugins-bad \
         gstreamer1.0-plugins-ugly \
         gstreamer1.0-libav \
-        gstreamer1.0-plugins-qscreencapsrc \
         gdk-pixbuf-loader-bmp \
         gdk-pixbuf-loader-gif \
         ${@bb.utils.contains('DISTRO_FEATURES', 'qti-gstqeavb', 'gstreamer1.0-plugins-qeavb', '', d)} \
