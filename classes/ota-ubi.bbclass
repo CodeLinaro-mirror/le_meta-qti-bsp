@@ -217,10 +217,15 @@ do_recovery_ubi() {
     if ${@bb.utils.contains('COMBINED_FEATURES', 'qti-nad-core', 'true', 'false', d)}; then
         cd ${OTA_TARGET_IMAGE_ROOTFS_UBI} && zip -qry ${OTA_TARGET_FILES_UBI_AB_PATH} *
     fi
+
+#    if ${@bb.utils.contains('COMBINED_FEATURES', 'qti-nad-core', 'true', 'false', d)}; then
+#        do_gen_otazip_ubi[depends] += "payload-gen-native:do_compile"
+#    fi
 }
 
 addtask do_recovery_ubi after do_image_complete before do_build
 
+do_gen_otazip_ubi[depends] += "payload-gen-native:do_compile"
 do_gen_otazip_ubi[dirs] += "${DEPLOY_DIR_IMAGE}/ota-scripts"
 do_gen_otazip_ubi() {
     ./full_ota.sh ${OTA_TARGET_FILES_UBI_PATH} ${IMAGE_ROOTFS_UBI} ubi --system_path ${IMAGE_SYSTEM_MOUNT_POINT}
@@ -241,6 +246,11 @@ do_gen_otazip_ubi() {
        else
            bbwarn "update_ubi_ab.zip failed to create"
        fi
+    fi
+
+    if ${@bb.utils.contains('COMBINED_FEATURES', 'qti-nad-core', 'true', 'false', d)}; then
+        cd ${TMPDIR}/work/x86_64-linux/payload-gen-native/1.0-r0/payload/ && ./gen_full_stream.sh ${OTA_TARGET_FILES_UBI_AB_PATH}
+        cd ${TMPDIR}/work/x86_64-linux/payload-gen-native/1.0-r0/payload/ && cp payload.bin properties.txt ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}
     fi
 }
 addtask do_gen_otazip_ubi after do_recovery_ubi before do_build
