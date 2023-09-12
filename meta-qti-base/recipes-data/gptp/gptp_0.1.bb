@@ -40,11 +40,10 @@ do_compile() {
 
 do_install() {
     install -d ${D}/${bindir}/
-    install -d ${D}/${bindir}/gptp/
     install -d ${D}/${libdir}/
     install -d ${D}/${includedir}/
-    install -m 0755 ${S}/daemons/gptp/linux/build/obj/daemon_cl ${D}/${bindir}/gptp
-    install -m 0755 ${S}/examples/libgptp_test/libgptp_test ${D}/${bindir}/gptp
+    install -m 0755 ${S}/daemons/gptp/linux/build/obj/daemon_cl ${D}/${bindir}
+    install -m 0755 ${S}/examples/libgptp_test/libgptp_test ${D}/${bindir}
     install -m 0755 ${S}/lib/libgptp/*.so ${D}/${libdir}
     install -m 0644 ${S}/lib/libgptp/gptp_helper.h ${D}${includedir}
 
