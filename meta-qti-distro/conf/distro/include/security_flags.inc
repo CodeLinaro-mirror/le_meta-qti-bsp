@@ -170,4 +170,10 @@ SECURITY_CFLAGS:remove:pn-system-core = " -Werror=conversion \
                                           -Werror=sign-conversion \
                                           -Werror=missing-field-initializers"
 
+# Video packages
+SECURITY_CFLAGS:append:quin-gvm-gen4-2:pn-codec2-app = " ${EXT_COMPILE_OPTIONS}"
+SECURITY_CFLAGS:remove:quin-gvm-gen4-2:pn-codec2-app = " -Werror=conversion \
+                                                         -Werror=sign-conversion \
+                                                         -Werror=missing-field-initializers"
+
 # Add other packages here...
