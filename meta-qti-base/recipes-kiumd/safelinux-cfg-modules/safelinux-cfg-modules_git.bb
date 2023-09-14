@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5
 
 SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/safelinux-cfg-modules/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/safelinux-cfg-modules;usehead=1"
 SRC_URI:append = " \
-    file://0001-safelinux-cfg-mdoules-fix-build-issue-on-msm-6.1.patch;patchdir=../ \
+    ${@bb.utils.contains('PREFERRED_PROVIDER_virtual/kernel', 'linux-ark', '', 'file://0001-safelinux-cfg-mdoules-fix-build-issue-on-msm-6.1.patch;patchdir=../', d)} \
     file://umd_load.conf \
     file://Kbuild \
     file://Makefile \
