@@ -1,14 +1,14 @@
 [Unit]
 Description=Weston reference Wayland compositor
 Conflicts=getty@tty2.service
-Requires=dev-dri-card0.device
-After=dbus.service rc.pvr.service dev-dri-card0.device
+Requires=openwfd_server_@0.service
+After=dbus.service rc.pvr.service openwfd_server_@0.service
 
 [Service]
 User=root
 PAMName=weston-autologin
 Environment="XDG_RUNTIME_DIR=/run/user/0"
-ExecStart=weston --idle-time=0 --socket=wayland-0 --log=/tmp/weston.log
+ExecStart=weston --tty=2 --use-pixman --idle-time=0 --socket=wayland-0 --log=/tmp/weston.log
 Type=simple
 PIDFile=/run/early/weston.pid
 Restart=always
