@@ -1,0 +1,41 @@
+From 787cfad002e8ec9c19b3116e12b02c7bf584fe0b Mon Sep 17 00:00:00 2001
+From: Shabbir Limdiwala <quic_slimdiwa@quicinc.com>
+Date: Mon, 5 Jun 2023 15:46:18 -0700
+Subject: [PATCH 4/4] Ignore -Wformat-truncation errors for snprintf
+
+Signed-off-by: Shabbir Limdiwala <quic_slimdiwa@quicinc.com>
+---
+ src/ar.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/src/ar.c b/src/ar.c
+index 1320d07..215be4c 100644
+--- a/src/ar.c
++++ b/src/ar.c
+@@ -862,8 +862,11 @@ write_member (struct armem *memb, off_t *startp, off_t *lenp, Elf *elf,
+ 	 changed and we write it here.  */
+       memcpy (&arhdr, elf_rawfile (elf, NULL) + *startp, sizeof (arhdr));
+ 
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wformat-truncation"
+       snprintf (tmpbuf, sizeof (tmpbuf), "/%-*ld",
+ 		(int) sizeof (arhdr.ar_name), memb->long_name_off);
++#pragma GCC diagnostic pop
+       changed_header = memcmp (arhdr.ar_name, tmpbuf,
+ 			       sizeof (arhdr.ar_name)) != 0;
+     }
+@@ -1465,8 +1468,11 @@ do_oper_insert (int oper, const char *arfname, char **argv, int argc,
+ 		}
+ 	      else
+ 		{
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wformat-truncation"
+ 		  snprintf (tmpbuf, sizeof (arhdr.ar_name) + 1, "/%-*ld",
+ 			    (int) sizeof (arhdr.ar_name), all->long_name_off);
++#pragma GCC diagnostic pop
+ 		  memcpy (arhdr.ar_name, tmpbuf, sizeof (arhdr.ar_name));
+ 		}
+ 
+-- 
+2.17.1
+
