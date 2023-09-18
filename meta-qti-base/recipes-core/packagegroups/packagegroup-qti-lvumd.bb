@@ -13,4 +13,5 @@ ALLOW_EMPTY:${PN} = "1"
 
 RDEPENDS:${PN} = "\
     safelinux-cfg-modules \
+    safelinux-system-cfg \
 "
