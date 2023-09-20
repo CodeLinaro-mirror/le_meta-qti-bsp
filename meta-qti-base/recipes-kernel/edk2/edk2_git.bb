@@ -27,6 +27,8 @@ EARLY_ETH = "${@bb.utils.contains('DISTRO_FEATURES', 'qti-early-eth', '1', '0', 
 HIBERNATION = "${@bb.utils.contains('COMBINED_FEATURES', 'hibernation', '1', '0', d)}"
 DISABLE_NONBOOTDEVICE_ENABLED ?= "0"
 DISABLE_NONBOOTDEVICE_ENABLED:sa6155 = "1"
+LOAD_KM_SET_ROT ?= "0"
+LOAD_KM_SET_ROT:sa8775 = "1"
 
 EXTRA_OEMAKE = "'CLANG_BIN=${STAGING_BINDIR_NATIVE}/' \
                 'CLANG_PREFIX=${STAGING_BINDIR_NATIVE}/${TARGET_SYS}/${TARGET_PREFIX}' \
@@ -37,6 +39,7 @@ EXTRA_OEMAKE = "'CLANG_BIN=${STAGING_BINDIR_NATIVE}/' \
                 'HIBERNATION_SUPPORT=${HIBERNATION}'\
                 'VERIFIED_BOOT_LE=${VBLE}'\
                 'VERITY_LE=${VERITY_ENABLED}'\
+                'LOAD_KM_AND_SET_ROT=${LOAD_KM_SET_ROT}'\
                 'INIT_BIN_LE=\"/sbin/init\"'\
                 'EDK_TOOLS_PATH=${S}/BaseTools'\
                 'EARLY_ETH_ENABLED=${EARLY_ETH}'\

@@ -9,5 +9,6 @@ PACKAGES = "\
 ALLOW_EMPTY:${PN} = "1"
 
 RDEPENDS:${PN} += "\
+    ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '6.1', 'platformdlkm ', '', d)} \
     packagegroup-core-boot \
     "
