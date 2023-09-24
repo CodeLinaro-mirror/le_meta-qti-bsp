@@ -101,7 +101,7 @@ SlotSwitchReboot () {
         exit 0
     fi
 
-    chmod 664 /dev/${mtd_device}
+    chmod 666 /dev/${mtd_device}
     firmware_ab_name=$(cat /sys/class/ubi/ubi0_${volid}/name)
     if [ "$firmware_ab_name" == "$firmware_a" ] || [ "$firmware_ab_name" == "$firmware_b" ] ; then
         if [ "x${SLOT_SUFFIX}" == "x" ]; then
@@ -151,6 +151,7 @@ SlotSwitchReboot () {
             /bin/sh -c 'reboot edl'
             exit 0
         fi
+        chmod 660 /dev/${mtd_device}
         echo "Reboot for switching slots or EDL mode" > /dev/kmsg
         /bin/sh -c 'reboot'
     else
@@ -205,8 +206,9 @@ FindAndMountUBIVol () {
        echo "not an ubi partiton" > /dev/kmsg
        IsGPIOEnabled
        if [ $? -eq 1 ]; then
-           #GPIO Enabled keeping behavior similar to Mount failure.
-           echo "GPIO Enabled donot switch slots" > /dev/kmsg
+           #GPIO Enabled moving device to EDL.
+           echo "GPIO Enabled boot to EDL" > /dev/kmsg
+           /bin/sh -c 'reboot edl'
        else
            echo "GPIO disabled switch the slots or boot to EDL" > /dev/kmsg
            SlotSwitchReboot
@@ -218,8 +220,9 @@ FindAndMountUBIVol () {
       echo "Unable to mount firmware volume " > /dev/kmsg
       IsGPIOEnabled
       if [ $? -eq 1 ]; then
-          #GPIO Enabled keeping behavior similar to Mount failure.
-          echo "GPIO Enabled donot switch slots" > /dev/kmsg
+           #GPIO Enabled moving device to EDL.
+           echo "GPIO Enabled boot to EDL" > /dev/kmsg
+           /bin/sh -c 'reboot edl'
       else
           echo "GPIO disabled switch the slots or boot to EDL" > /dev/kmsg
           SlotSwitchReboot
