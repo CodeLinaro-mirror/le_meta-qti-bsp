@@ -165,25 +165,26 @@ do_makesystem() {
     done
 
     cp ${MACHINE_FSCONFIG_CONF_FULL_PATH} ${WORKDIR}/rootfs-fsconfig.conf
+    invalid_image=0
 
-    for count in {99..1}
-    do
-        invalid_image=0
-        adjustedSystemSize=$(echo $(adjust_system_size_for_verity "${count}" ))
-        echo adjustedSystemSize: $adjustedSystemSize
-        ImgPath="${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMIMAGE_UNSPARSE_TARGET}"
-        make_ext4fs -C ${WORKDIR}/rootfs-fsconfig.conf \
-                -B ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMIMAGE_MAP_TARGET} \
-                -a / -b 4096 -l ${adjustedSystemSize} \
-                ${IMAGE_EXT4_SELINUX_OPTIONS} \
-                ${ImgPath} ${IMAGE_ROOTFS_EXT4} /dev/null || invalid_image=1
+    if ${@bb.utils.contains('MACHINE_FEATURES', 'dm-verity-none', 'false', 'true', d)} ; then 
+    # Generate unsparsed image, append hash and fec data to the image and then sparse the image
+        for count in {99..1}
+        do
+            adjustedSystemSize=$(echo $(adjust_system_size_for_verity "${count}" ))
+            echo adjustedSystemSize: $adjustedSystemSize
+            ImgPath="${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMIMAGE_UNSPARSE_TARGET}"
+            make_ext4fs -C ${WORKDIR}/rootfs-fsconfig.conf \
+                        -B ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMIMAGE_MAP_TARGET} \
+                        -a / -b 4096 -l ${adjustedSystemSize} \
+                        ${IMAGE_EXT4_SELINUX_OPTIONS} \
+                        ${ImgPath} ${IMAGE_ROOTFS_EXT4} /dev/null || invalid_image=1
 
         if [ $invalid_image -eq 1 ]; then
             echo "Unsparse image generation failed...exiting."
             break
         fi
 
-        if ${@bb.utils.contains('MACHINE_FEATURES', 'dm-verity-none', 'false', 'true', d)} ; then
             # Get verity metadata for generated image.
             get_system_verity_metdata_info "${ImgPath}"
 
@@ -196,7 +197,7 @@ do_makesystem() {
             if [ "$systemSize" -gt "${SYSTEM_IMAGE_ROOTFS_SIZE}" ]; then
                 echo "Size mismatch ($systemSize Vs ${SYSTEM_IMAGE_ROOTFS_SIZE})...recreating unsparse image."
                 continue
-            fi
+           fi
 
             # Calculate offset
             hash_offset=$adjustedSystemSize
@@ -204,15 +205,24 @@ do_makesystem() {
             fec_offset=`expr ${hash_offset} + ${hash_size}`
             echo "fec_offset:$fec_offset" >> ${WORKDIR}/system_verity_metadata.txt
             echo "Calculated fec offset: $fec_offset"
-        fi
 
-        # Convert to sparse image
-        sparseImgPath="${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMIMAGE_TARGET}"
-        img2simg ${ImgPath} ${sparseImgPath}
+            # Convert to sparse image
+            sparseImgPath="${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMIMAGE_TARGET}"
+            img2simg ${ImgPath} ${sparseImgPath}
+            break
+        done
+
+    else
+    # Directly generate sparsed image
+            sparseImgPath="${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMIMAGE_TARGET}"
+            make_ext4fs -s -C ${WORKDIR}/rootfs-fsconfig.conf \
+                        -B ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMIMAGE_MAP_TARGET} \
+                        -a / -b 4096 -l ${SYSTEM_IMAGE_ROOTFS_SIZE} \
+                        ${IMAGE_EXT4_SELINUX_OPTIONS} \
+                        ${sparseImgPath} ${IMAGE_ROOTFS_EXT4} /dev/null || invalid_image=1
+    fi
 
         echo "image is good to use..."
-        break
-    done
 }
 addtask do_makesystem after do_image before do_image_complete
 
