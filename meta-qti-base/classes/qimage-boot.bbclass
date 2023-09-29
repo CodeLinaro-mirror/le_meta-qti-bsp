@@ -158,7 +158,7 @@ avb_sign_boot_image() {
     fi
 }
 #Sign boot image after generation
-do_sign_boot_img[dirs] = "${DEPLOYDIR}"
+do_sign_boot_img[dirs] = "${DEPLOY_DIR_IMAGE}"
 
 addtask do_makeboot_setscene
 
