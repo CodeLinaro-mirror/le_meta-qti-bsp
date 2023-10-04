@@ -6,7 +6,6 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5
 
 SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/safelinux-cfg-modules/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/safelinux-cfg-modules;usehead=1"
 SRC_URI:append = " \
-    ${@bb.utils.contains('PREFERRED_PROVIDER_virtual/kernel', 'linux-ark', '', 'file://0001-safelinux-cfg-mdoules-fix-build-issue-on-msm-6.1.patch;patchdir=../', d)} \
     file://umd_load.conf \
     file://Kbuild \
     file://Makefile \
@@ -16,7 +15,7 @@ SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/vendor/qcom/opensource/safelinux-cfg-modules/safelinux-modules"
 
-TECHPACK_MODULES = "apps_pinctrl.ko vfio_iommu_qcom.ko iommu_iova_map.ko kiumd.ko"
+TECHPACK_MODULES = "apps_pinctrl.ko scm_user_intf.ko vfio_iommu_qcom.ko iommu_iova_map.ko kiumd.ko qcom_uscmi.ko kryo_arm64_edac.ko kiumd_kgsl.ko"
 inherit qti-techpack
 
 do_patch_more() {
@@ -32,14 +31,20 @@ do_install:append() {
     install -m 0644 ${WORKDIR}/vendor/qcom/opensource/safelinux-cfg-modules/safelinux-modules/include/linux/iommu_iova_map.h ${D}${includedir}/linux
     install -m 0644 ${WORKDIR}/vendor/qcom/opensource/safelinux-cfg-modules/safelinux-modules/include/uapi/misc/iommu_iova_map_user.h ${D}${includedir}/uapi/misc
     install -m 0644 ${WORKDIR}/vendor/qcom/opensource/safelinux-cfg-modules/safelinux-modules/include/uapi/misc/kiumd.h ${D}${includedir}/uapi/misc
+    install -m 0644 ${WORKDIR}/vendor/qcom/opensource/safelinux-cfg-modules/safelinux-modules/include/uapi/misc/scm_user_intf.h ${D}${includedir}/uapi/misc
+    install -m 0644 ${WORKDIR}/vendor/qcom/opensource/safelinux-cfg-modules/safelinux-modules/include/uapi/misc/qcom_uscmi.h ${D}${includedir}/uapi/misc
 }
 
 EXTRA_OECONF += "--disable-doc --disable-Werror"
 
 RPROVIDES:${PN} += "kernel-module-apps-pinctrl-${KERNEL_VERSION}"
+RPROVIDES:${PN} += "kernel-module-scm_user_intf-${KERNEL_VERSION}"
 RPROVIDES:${PN} += "kernel-module-vfio-iommu-qcom-${KERNEL_VERSION}"
 RPROVIDES:${PN} += "kernel-module-iommu-iova-map-${KERNEL_VERSION}"
 RPROVIDES:${PN} += "kernel-module-kiumd-${KERNEL_VERSION}"
+RPROVIDES:${PN} += "kernel-module-qcom_uscmi-${KERNEL_VERSION}"
+RPROVIDES:${PN} += "kernel-module-kryo_arm64_edac-${KERNEL_VERSION}"
+RPROVIDES:${PN} += "kernel-module-kiumd_kgsl-${KERNEL_VERSION}"
 
 FILES:${PN} += "${libdir}/modules-load.d/*"
 FILES:${PN} += "${nonarch_base_libdir}/modules/*"
