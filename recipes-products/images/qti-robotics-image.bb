@@ -66,6 +66,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         tdk-chx01-get-data-app \
         tdk-thermistor-app \
         system-sample-apps \
+        qti-c2-module \
 "
 
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "chronyc"
