@@ -15,8 +15,8 @@ CORE_IMAGE_EXTRA_INSTALL += "\
                             ${@bb.utils.contains('COMBINED_FEATURES', 'qti-nad-core', 'recovery-ab', '', d)} \
                             "
 
-SYSTEM_IMAGE_UBI_TARGET ?= "${IMGDEPLOYDIR}/${IMAGE_BASENAME}/squashfs/sysfs.ubi"
-SYSTEM_IMAGE_UBIFS_TARGET ?= "${@bb.utils.contains('IMAGE_FEATURES', 'gluebi', bb.utils.contains('DISTRO_FEATURES', 'dm-verity', '${IMGDEPLOYDIR}/${IMAGE_BASENAME}/verity/${SYSTEMIMAGE_GLUEBI_TARGET}/${SYSTEMIMAGE_GLUEBI_TARGET}', '${SYSTEMIMAGE_GLUEBI_TARGET}', d), 'squashfs/sysfs.ubifs', d)}"
+SYSTEM_IMAGE_UBI_TARGET ?= "${IMGDEPLOYDIR}/${IMAGE_BASENAME}/ubifs/sysfs.ubi"
+SYSTEM_IMAGE_UBIFS_TARGET ?= "${@bb.utils.contains('IMAGE_FEATURES', 'gluebi', bb.utils.contains('DISTRO_FEATURES', 'dm-verity', '${IMGDEPLOYDIR}/${IMAGE_BASENAME}/verity/${SYSTEMIMAGE_GLUEBI_TARGET}/${SYSTEMIMAGE_GLUEBI_TARGET}', '${SYSTEMIMAGE_GLUEBI_TARGET}', d), 'ubifs/sysfs.ubifs', d)}"
 USER_IMAGE_UBIFS_TARGET ?= "${IMGDEPLOYDIR}/${IMAGE_BASENAME}/squashfs/userfs.ubifs"
 USER_IMAGE_ROOTFS ?= "${WORKDIR}/usrfs-data"
 MODEM_UBIFS_IMAGE = "${WORKSPACE}/NON-HLOS.ubifs"
@@ -26,7 +26,7 @@ VM_IMAGE_SQUASHFS_TARGET ?= "vm-bootsys.squash"
 VM_IMAGE_ROOTFS ?= "${DEPLOY_DIR_IMAGE}/vm-images/"
 VM_BOOTSYS_SQUASHFS_VOLUME_SIZE ??= "80MiB"
 
-UBINIZE_SYSTEM_CFG ?= "${IMGDEPLOYDIR}/${IMAGE_BASENAME}/squashfs/ubinize_system.cfg"
+UBINIZE_SYSTEM_CFG ?= "${IMGDEPLOYDIR}/${IMAGE_BASENAME}/ubifs/ubifs_ubinize_ab.cfg"
 SQUASHFS_UBINIZE_VM_CFG ?= "${IMGDEPLOYDIR}/${IMAGE_BASENAME}/squashfs/squashfs_ubinize_vm.cfg"
 
 #squashfs files
@@ -59,6 +59,7 @@ do_image_multiubi[noexec] = "1"
 SYSTEM_VOLUME_SIZE_G ??= "200MiB"
 ROOTFS_VOLUME_SIZE = "${@bb.utils.contains('IMAGE_FEATURES', 'nand2x', '${SYSTEM_VOLUME_SIZE_G}', '${SYSTEM_VOLUME_SIZE}', d)}"
 IMAGE_ROOTFS_SQUASHFS_UBI = "${WORKDIR}/rootfs-squashfs-ubi"
+IMAGE_ROOTFS_UBIFS_UBI = "${WORKDIR}/rootfs-ubifs-ubi"
 
 create_symlink_tele_userfs[cleandirs] = "${USER_IMAGE_ROOTFS}"
 create_symlink_tele_userfs() {
@@ -143,15 +144,15 @@ create_symlink_systemd_ubi_mount_tele_rootfs() {
 }
 
 # Need to copy ubinize.cfg file in the deploy directory
-do_create_ubinize_tele_config[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}/squashfs"
+do_create_ubinize_tele_config[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}/ubifs"
 do_create_squash_ubinize_config_ab[depends] += "${@bb.utils.contains('COMBINED_FEATURES', 'qti-nad-telaf', 'do_maketelaf_squashfs', '', d)}"
 
 do_create_ubinize_tele_config() {
 vol_id=0
-    cat << EOF > ${UBINIZE_SYSTEM_CFG}
+cat << EOF > ${UBINIZE_SYSTEM_CFG}
 [sysfs_a_volume]
 mode=ubi
-image="${SYSTEM_IMAGE_UBIFS_TARGET}"
+image="${SYSTEMIMAGE_UBIFS_TARGET}"
 vol_id=$vol_id
 vol_type=dynamic
 vol_name=rootfs_a
@@ -159,79 +160,16 @@ vol_size="${ROOTFS_VOLUME_SIZE}"
 
 [sysfs_b_volume]
 mode=ubi
-image="${SYSTEM_IMAGE_UBIFS_TARGET}"
+image="${SYSTEMIMAGE_UBIFS_TARGET}"
 vol_id=$((++vol_id))
 vol_type=dynamic
 vol_name=rootfs_b
 vol_size="${ROOTFS_VOLUME_SIZE}"
 
-EOF
-    if $(echo ${IMAGE_FEATURES} | grep -q "modem-volume"); then
-        cat << EOF >> ${UBINIZE_SYSTEM_CFG}
-[modem_a_volume]
-mode=ubi
-EOF
-        if [ -f ${MODEM_UBIFS_IMAGE} ]; then
-            cat << EOF >> ${UBINIZE_SYSTEM_CFG}
-image="${MODEM_UBIFS_IMAGE}"
-EOF
-        fi
-vol_id=$(echo $(grep -rc "vol_id" ${UBINIZE_SYSTEM_CFG}))
-cat << EOF >> ${UBINIZE_SYSTEM_CFG}
-vol_id=$vol_id
-vol_type=dynamic
-vol_name=firmware_a
-vol_size="${MODEM_VOLUME_SIZE}"
-
-[modem_b_volume]
-mode=ubi
-EOF
-        if [ -f ${MODEM_UBIFS_IMAGE} ]; then
-            cat << EOF >> ${UBINIZE_SYSTEM_CFG}
-image="${MODEM_UBIFS_IMAGE}"
-EOF
-        fi
-vol_id=$(echo $(grep -rc "vol_id" ${UBINIZE_SYSTEM_CFG}))
-cat << EOF >> ${UBINIZE_SYSTEM_CFG}
-vol_id=$vol_id
-vol_type=dynamic
-vol_name=firmware_b
-vol_size="${MODEM_VOLUME_SIZE}"
-
-EOF
-    fi
-vol_id=$(echo $(grep -rc "vol_id" ${UBINIZE_SYSTEM_CFG}))
-    if $(echo ${IMAGE_FEATURES} | grep -q "telaf-volume"); then
-        cat << EOF >> ${UBINIZE_SYSTEM_CFG}
-[telaf_a_volume]
-mode=ubi
-vol_id=$vol_id
-vol_type=dynamic
-vol_name=telaf_a
-vol_size="${TELAF_SQUASHFS_VOLUME_SIZE}"
-
-[telaf_b_volume]
-mode=ubi
-vol_id=$((++vol_id))
-vol_type=dynamic
-vol_name=telaf_b
-vol_size="${TELAF_SQUASHFS_VOLUME_SIZE}"
-
-[telaf_app_volume]
-mode=ubi
-vol_id=$((++vol_id))
-vol_type=dynamic
-vol_name=telaf_app
-vol_size="${TELAF_APP_VOLUME_SIZE}"
-
-EOF
-    fi
-vol_id=$(echo $(grep -rc "vol_id" ${UBINIZE_SYSTEM_CFG}))
-cat << EOF >> ${UBINIZE_SYSTEM_CFG}
 [usrfs_volume]
 mode=ubi
-image="${USER_IMAGE_UBIFS_TARGET}"
-vol_id=$vol_id
+image="${USERIMAGE_UBIFS_TARGET}"
+vol_id=$((++vol_id))
 vol_type=dynamic
 vol_name=usrfs
 vol_flags=autoresize
@@ -268,6 +206,56 @@ vol_id=$vol_id
 vol_type=dynamic
 vol_name=persist
 vol_size="${PERSIST_VOLUME_SIZE}"
+
+EOF
+    fi
+vol_id=$(echo $(grep -rc "vol_id" ${UBINIZE_SYSTEM_CFG}))
+    if $(echo ${IMAGE_FEATURES} | grep -q "modem-volume"); then
+        cat << EOF >> ${UBINIZE_SYSTEM_CFG}
+[modem_a_volume]
+mode=ubi
+vol_id=$vol_id
+vol_type=dynamic
+vol_name=firmware_a
+vol_size="${MODEM_VOLUME_SIZE}"
+
+[modem_b_volume]
+mode=ubi
+vol_id=$((++vol_id))
+vol_type=dynamic
+vol_name=firmware_b
+vol_size="${MODEM_VOLUME_SIZE}"
+
+EOF
+    fi
+vol_id=$(echo $(grep -rc "vol_id" ${UBINIZE_SYSTEM_CFG}))
+    if $(echo ${IMAGE_FEATURES} | grep -q "vm-bootsys-volume"); then
+        cat << EOF >> ${UBINIZE_SYSTEM_CFG}
+[vm-bootsys_a_volume]
+mode=ubi
+vol_id=$vol_id
+vol_type=dynamic
+vol_name=vm-bootsys_a
+vol_size="${VM_BOOTSYS_VOLUME_SIZE}"
+
+[vm-bootsys_b_volume]
+mode=ubi
+vol_id=$((++vol_id))
+vol_type=dynamic
+vol_name=vm-bootsys_b
+vol_size="${VM_BOOTSYS_VOLUME_SIZE}"
+
+EOF
+    fi
+vol_id=$(echo $(grep -rc "vol_id" ${UBINIZE_SYSTEM_CFG}))
+    if $(echo ${IMAGE_FEATURES} | grep -q "vm-systemrw-volume"); then
+        cat << EOF >> ${UBINIZE_SYSTEM_CFG}
+[vm_systemrw_volume]
+mode=ubi
+vol_id=$vol_id
+vol_type=dynamic
+vol_name=vm_systemrw
+vol_size="${VM_SYSTEMRW_VOLUME_SIZE}"
 
 EOF
     fi
@@ -461,24 +449,49 @@ python create_rootfs_tele_ubi () {
         bb.error("rootfs is not generated")
 }
 
+create_rootfs_tele_ubifs[cleandirs] = "${IMAGE_ROOTFS_UBIFS_UBI}"
+python create_rootfs_tele_ubifs () {
+    src_dir = d.getVar("IMAGE_ROOTFS_SQUASHFS_UBI")
+    dest_dir = d.getVar("IMAGE_ROOTFS_UBIFS_UBI")
+    if os.path.isdir(src_dir):
+        oe.path.copyhardlinktree(src_dir, dest_dir)
+    else:
+        bb.error("rootfs is not generated")
+}
+
 do_makesystem_tele_ubi[prefuncs] += "create_rootfs_tele_ubi"
 do_makesystem_tele_ubi[prefuncs] += "create_symlink_tele_userfs"
 do_makesystem_tele_ubi[prefuncs] += "create_symlink_systemd_ubi_mount_tele_rootfs"
 do_makesystem_tele_ubi[prefuncs] += "do_create_ubinize_tele_config"
+do_makesystem_tele_ubi[prefuncs] += "create_rootfs_tele_ubifs"
 do_makesystem_tele_ubi[postfuncs] += "${@bb.utils.contains('INHERIT', 'uninative', 'do_patch_ubi_tools', '', d)}"
 do_makesystem_tele_ubi[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
 
 fakeroot do_makesystem_tele_ubi() {
    mkdir ${USER_IMAGE_ROOTFS}/cache
+   rm -rf ${IMAGE_ROOTFS_UBIFS_UBI}/cache
+   ln -sf /data/cache ${IMAGE_ROOTFS_UBIFS_UBI}/cache
+
    rm -rf ${IMAGE_ROOTFS_SQUASHFS_UBI}/cache
    ln -sf /data/cache ${IMAGE_ROOTFS_SQUASHFS_UBI}/cache
+
+   rm -rf ${IMAGE_ROOTFS_UBIFS_UBI}/lib/systemd/system/telaf.mount.service
+   rm -rf ${IMAGE_ROOTFS_UBIFS_UBI}/lib/systemd/system/telaf.service
+   rm -rf ${IMAGE_ROOTFS_UBIFS_UBI}/lib/systemd/system/mrc-daemon.service
+   rm -rf ${IMAGE_ROOTFS_UBIFS_UBI}/lib/systemd/system-preset/98-mrc-daemon.preset
+   rm -rf ${IMAGE_ROOTFS_UBIFS_UBI}/lib/systemd/system/gluebi-dlkm.service
+   rm -rf ${IMAGE_ROOTFS_UBIFS_UBI}/lib/systemd/system/multi-user.target.wants/telaf.service
+   rm -rf ${IMAGE_ROOTFS_UBIFS_UBI}/lib/systemd/system/multi-user.target.wants/telaf.mount.service
+   rm -rf ${IMAGE_ROOTFS_UBIFS_UBI}/etc/systemd/system/multi-user.target.wants/mrc-daemon.service
+   rm -rf ${IMAGE_ROOTFS_UBIFS_UBI}/etc/systemd/system/multi-user.target.wants/gluebi-dlkm.service
+
    mkfs.ubifs -r ${USER_IMAGE_ROOTFS} ${IMAGE_UBIFS_SELINUX_OPTIONS_DATA} -o ${USER_IMAGE_UBIFS_TARGET} ${MKUBIFS_ARGS}
    if ${@bb.utils.contains('IMAGE_FEATURES', 'modem-volume', 'true', 'false', d)}; then
        if [ -d ${MODEM_IMAGE_DIR} ]; then
            mkfs.ubifs -r ${MODEM_IMAGE_DIR} --selinux=${SELINUX_CONTEXT_MODEM} -o ${MODEM_UBIFS_IMAGE} ${MKUBIFS_ARGS}
        fi
    fi
-   mkfs.ubifs -r ${IMAGE_ROOTFS_SQUASHFS_UBI} ${IMAGE_UBIFS_SELINUX_OPTIONS} -o ${SYSTEM_IMAGE_UBIFS_TARGET} ${MKUBIFS_ARGS}
+   mkfs.ubifs -r ${IMAGE_ROOTFS_UBIFS_UBI} ${IMAGE_UBIFS_SELINUX_OPTIONS} -o ${SYSTEM_IMAGE_UBIFS_TARGET} ${MKUBIFS_ARGS}
    ubinize -o ${SYSTEM_IMAGE_UBI_TARGET} ${UBINIZE_ARGS} ${UBINIZE_SYSTEM_CFG}
 }
 
