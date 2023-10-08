@@ -20,6 +20,9 @@ inherit qti-techpack
 do_install:append() {
     install -m 0755 ${WORKDIR}/security_load.conf -D ${D}${sysconfdir}/modules-load.d/security_load.conf
     install -d ${D}${includedir}/linux
+    if [ -e ${WORKDIR}/vendor/qcom/opensource/securemsm-kernel/include/linux/smcinvoke.h ]; then
+        install -m 0644 ${WORKDIR}/vendor/qcom/opensource/securemsm-kernel/include/linux/smcinvoke.h ${D}${includedir}/linux
+    fi
     if [ -e ${WORKDIR}/vendor/qcom/opensource/securemsm-kernel/linux/smcinvoke.h ]; then
         install -m 0644 ${WORKDIR}/vendor/qcom/opensource/securemsm-kernel/linux/smcinvoke.h ${D}${includedir}/linux
     fi
