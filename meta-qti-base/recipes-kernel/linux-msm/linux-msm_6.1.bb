@@ -9,12 +9,12 @@ COMPATIBLE_MACHINE = "monaco|quin-gvm-lemans|quin-gvm-gen4|quin-gvm-monaco"
 
 SRC_URI = "${PATH_TO_REPO}/kernel/kernel-${PV}/kernel_platform/msm-kernel/.git;protocol=${PROTO};destsuffix=kernel/kernel-${PV}/kernel_platform/msm-kernel;usehead=1"
 SRC_URI:append = " \
-    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-lvumd', 'file://lvumd.cfg', '', d)} \
-    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-lvumd', 'file://lvumd', '', d)} \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'file://lvumd.cfg', '', d)} \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'file://lvumd', '', d)} \
 "
 
 do_patch:append() {
-    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-lvumd', 'true', 'false', d)} ; then
+    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'true', 'false', d)} ; then
         PATCH_LIST=`ls ${WORKDIR}/lvumd/*.patch`
         for PATCH_FILE in ${PATCH_LIST}; do
             patch -f -p1 < ${PATCH_FILE}

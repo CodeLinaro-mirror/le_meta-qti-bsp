@@ -20,7 +20,7 @@ do_install() {
             install -m 644 -p -D ${WORKDIR}/weston_early.service_caf_10 ${D}${systemd_system_unitdir}/weston.service
         fi
     fi
-    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-usermode-display', 'true', 'false', d)}; then
+    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'true', 'false', d)}; then
         sed -i 's/dev-dri-card0.device/openwfd_server_@0.service kgsl.service/g' ${D}${systemd_system_unitdir}/weston.service
         sed -i '/PAMName/d' ${D}${systemd_system_unitdir}/weston.service
         sed -i '/TTYPath/d' ${D}${systemd_system_unitdir}/weston.service
@@ -40,7 +40,7 @@ do_install() {
     if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'true', 'false', d)}; then
         sed -i -e '/\[core\]/a require-input=false' ${D}${sysconfdir}/xdg/weston/weston.ini
     fi
-    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-usermode-display', 'true', 'false', d)}; then
+    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'true', 'false', d)}; then
         sed -i -e '/\[core\]/a require-input=false' ${D}${sysconfdir}/xdg/weston/weston.ini
     fi
 
@@ -50,7 +50,7 @@ do_install() {
 }
 
 do_install:append:monaco() {
-    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-usermode-display', 'true', 'false', d)}; then
+    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'true', 'false', d)}; then
         sed -i 's/openwfd_server_@0.service kgsl.service/openwfd_server_@0.service/g' ${D}${systemd_system_unitdir}/weston.service
         sed -i 's/rc.pvr.service openwfd_server_@0.service/rc.pvr.service openwfd_server_@0.service multi-user.target/g' ${D}${systemd_system_unitdir}/weston.service
     fi
