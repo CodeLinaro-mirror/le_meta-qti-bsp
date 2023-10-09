@@ -10,7 +10,8 @@ DEPENDS += "liblog libcutils libutils system-core-headers libselinux glib-2.0"
 
 FILESPATH =+ "${WORKSPACE}/frameworks/:"
 SRC_URI   = "file://binder"
-
+SRC_URI += "file://CVE-2020-27044.patch \
+"
 S = "${WORKDIR}/binder"
 
 EXTRA_OECONF += "--with-glib \
