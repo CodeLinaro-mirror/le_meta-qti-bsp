@@ -34,7 +34,7 @@ fakeroot do_ramdisk_create() {
         else
             cp ${IMAGE_ROOTFS}/lib/ld-linux-armhf.so.3 lib/ld-linux-armhf.so.3
         fi
-		
+        
         if ${@bb.utils.contains('IMAGE_FEATURES', 'vm', 'true', 'false', d)}; then
             cp ${COREBASE}/meta-qti-bsp/recipes-products/images/include/vmrd-init .
             chmod 744 vmrd-init

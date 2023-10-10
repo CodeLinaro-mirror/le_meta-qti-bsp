@@ -39,4 +39,4 @@ python do_make_dm_verity_image(){
         bb.build.exec_func('do_rebuild_dtb',d)
 }
 
-addtask do_make_dm_verity_image after do_populate_sysroot before do_build 
+addtask do_make_dm_verity_image after do_populate_sysroot before do_build

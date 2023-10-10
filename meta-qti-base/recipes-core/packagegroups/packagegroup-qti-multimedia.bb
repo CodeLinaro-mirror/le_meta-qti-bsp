@@ -10,7 +10,6 @@ inherit packagegroup
 ALLOW_EMPTY:${PN} = "1"
 PACKAGES = "${PN}"
 
-
 RDEPENDS:${PN} = " \
         ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "5.15", 'videodlkm', "", d)} \
         gstreamer1.0 \

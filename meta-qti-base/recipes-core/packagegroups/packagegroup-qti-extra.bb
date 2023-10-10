@@ -11,7 +11,7 @@ PACKAGES = "\
 ALLOW_EMPTY:${PN} = "1"
 
 RDEPENDS:${PN} += "\
-    python3 \ 
+    python3 \
     resize-service \
     openssl \
     libxml2 \
