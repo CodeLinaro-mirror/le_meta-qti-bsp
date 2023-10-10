@@ -126,7 +126,7 @@ do_recovery_ubi() {
                 fi
             fi
 
-            if ${@bb.utils.contains('IMAGE_FEATURES', 'vm-bootsys_volume', 'true', 'false', d)}; then
+            if ${@bb.utils.contains('IMAGE_FEATURES', 'vm-bootsys-volume', 'true', 'false', d)}; then
                 echo /vm-bootsys squashfs /dev/block/bootdevice/by-name/vm-bootsys >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RECOVERY/recovery.fstab
                 if [ -f ${DEPLOY_DIR_IMAGE}/vm-bootsys.squash ]; then
                     squashfs2sparse  ${DEPLOY_DIR_IMAGE}/vm-bootsys.squash ${OTA_TARGET_IMAGE_ROOTFS_UBI}/IMAGES/vm-bootsys.img
