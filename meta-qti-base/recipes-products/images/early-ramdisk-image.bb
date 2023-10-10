@@ -19,7 +19,7 @@ KERNEL_VERSION = "${@oe.utils.read_file('${STAGING_KERNEL_BUILDDIR}/kernel-abive
 IMAGE_INSTALL = "\
                  early-ramdisk-init libgcc kmod util-linux-libblkid \
 "
-IMAGE_INSTALL:sa81x5 += " \
+IMAGE_INSTALL:sa81x5 += "\
                  kernel-module-spidev-${KERNEL_VERSION} \
                  kernel-module-spi-msm-geni-${KERNEL_VERSION} \
                  kernel-module-qcom-smd-${KERNEL_VERSION} \

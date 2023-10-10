@@ -12,4 +12,4 @@ S = "${WORKDIR}/git"
 
 inherit pkgconfig autotools-brokensep
 
-EXTRA_OECONF += " --without-tools --without-tests"
+EXTRA_OECONF += "--without-tools --without-tests"

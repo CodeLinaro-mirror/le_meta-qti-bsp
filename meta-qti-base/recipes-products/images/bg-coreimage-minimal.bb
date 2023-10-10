@@ -20,7 +20,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
     media \
     "
 
-IMAGE_FEATURES += " \
+IMAGE_FEATURES += "\
     debug-tweaks \
     ssh-server-openssh \
 "

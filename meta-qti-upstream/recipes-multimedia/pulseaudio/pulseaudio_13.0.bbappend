@@ -20,7 +20,7 @@ do_install:append() {
        install -m 755 -p -D ${WORKDIR}/build/src/.libs/pacat ${D}/${bindir}/
 }
 
-FILES:${PN}-server += " \
+FILES:${PN}-server += "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', '${systemd_user_unitdir}/pulseaudio.socket', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', '${systemd_user_unitdir}/sockets.target.wants/pulseaudio.socket', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', '${systemd_user_unitdir}/pulseaudio.service', '', d)} \

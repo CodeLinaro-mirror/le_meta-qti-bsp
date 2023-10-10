@@ -1,4 +1,4 @@
-IMAGE_INSTALL += " \
+IMAGE_INSTALL += "\
     ${@bb.utils.contains('COMBINED_FEATURES', 'qti-core', 'packagegroup-qti-core-minimal', '', d)} \
     ${@bb.utils.contains('COMBINED_FEATURES', 'qti-display', 'packagegroup-qti-display', '', d)} \
     ${@bb.utils.contains('COMBINED_FEATURES', 'qti-multimedia', 'packagegroup-qti-multimedia', '', d)} \

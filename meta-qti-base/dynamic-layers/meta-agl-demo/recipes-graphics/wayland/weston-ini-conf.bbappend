@@ -1,6 +1,6 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-SRC_URI += " \
+SRC_URI += "\
     file://dsi-0-270.cfg \
     file://dsi-1-off.cfg \
 "

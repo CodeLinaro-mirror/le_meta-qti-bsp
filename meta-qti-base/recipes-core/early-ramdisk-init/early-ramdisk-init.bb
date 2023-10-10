@@ -28,7 +28,7 @@ do_install:append() {
     install -m 0755 ${S}/conf/${MACHINE}/* -D ${D}/etc/modules-load.f/
 }
 
-FILES:${PN} += " \
+FILES:${PN} += "\
          init \
          dev/ \
          sys/ \
