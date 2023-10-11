@@ -1,5 +1,6 @@
 SUMMARY = "QTI Boot image"
 DESCRIPTION = "Build QTI boot image with qimage-boot.bbclass"
+HOMEPAGE = "https://git.codelinaro.org"
 LICENSE = "BSD-3-Clause-Clear"
 
 DEPENDS += "openssl-native python3-native virtual/kernel"

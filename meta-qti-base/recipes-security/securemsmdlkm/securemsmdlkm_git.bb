@@ -1,5 +1,6 @@
 SUMMARY = "QTI securemsm drivers"
 DESCRIPTION = "This is the security driver, used to communicate with TrustZone."
+HOMEPAGE = "https://git.codelinaro.org"
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=801f80980d171dd6425610833a22dbe6"

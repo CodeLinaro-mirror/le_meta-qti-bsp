@@ -1,4 +1,5 @@
 SUMMARY = "early-ramdisk-init for load kernel modules and start rootfs init"
+HOMEPAGE = "https://git.codelinaro.org"
 LICENSE = "BSD-3-Clause-Clear"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=7a434440b651f4a472ca93716d01033a"
 DEPENDS = "kmod util-linux"

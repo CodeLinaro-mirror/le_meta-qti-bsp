@@ -2,7 +2,7 @@
 #to the mctm and AGL project. The project specific
 #modules needs to added in specific machine related
 #{MACHINE}-dm-verity-image.inc file
-
+HOMEPAGE = "https://git.codelinaro.org"
 LICENSE = "GPLv2"
 
 DEPENDS = "cryptsetup-native"
