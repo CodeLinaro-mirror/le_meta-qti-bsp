@@ -6,7 +6,7 @@ DEPENDS = "ktf"
 
 SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/unit-test/kernel-unit-test/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/unit-test/kernel-unit-test/khab_test;subpath=khab_test;usehead=1"
 
-SRCREV  = "${AUTOREV}"
+SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/vendor/qcom/opensource/unit-test/kernel-unit-test/khab_test"
 

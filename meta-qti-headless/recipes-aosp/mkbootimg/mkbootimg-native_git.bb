@@ -21,7 +21,7 @@ inherit native
 CFLAGS += " -Dstrlcpy=g_strlcpy "
 EXTRA_OEMAKE = "INCLUDES='-Imincrypt' LIBS='-lmincrypt -lglib-2.0'"
 
-do_configure[noexec]="1"
+do_configure[noexec] = "1"
 
 do_install() {
         install -d ${D}${bindir}

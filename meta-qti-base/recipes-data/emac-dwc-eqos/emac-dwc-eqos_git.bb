@@ -5,16 +5,16 @@ LICENSE = "MIT-style"
 LIC_FILES_CHKSUM = "file://DWC_ETH_QOS_dev.c;\
 startline=1;endline=71;md5=62b57cd65ebb8a65e225a5fbfbc26932"
 
-FILES:${PN}     += "${sysconfdir}/init.d/emac_dwc_eqos_start_stop_le"
-FILES:${PN}     += "${sysconfdir}/init.d/setup_avtp_routing_le"
-FILES:${PN}     += "${systemd_unitdir}/system/emac_dwc_eqos.service"
-FILES:${PN}     += "${systemd_unitdir}/system/multi-user.target.wants/emac_dwc_eqos.service"
-FILES:${PN}     += "${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/*"
+FILES:${PN} += "${sysconfdir}/init.d/emac_dwc_eqos_start_stop_le"
+FILES:${PN} += "${sysconfdir}/init.d/setup_avtp_routing_le"
+FILES:${PN} += "${systemd_unitdir}/system/emac_dwc_eqos.service"
+FILES:${PN} += "${systemd_unitdir}/system/multi-user.target.wants/emac_dwc_eqos.service"
+FILES:${PN} += "${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/*"
 
 do_unpack[deptask] = "do_populate_sysroot"
 PR = "r0"
 
-SRC_URI   =  "${PATH_TO_REPO}/data-kernel/.git;protocol=${PROTO};destsuffix=data-kernel;usehead=1"
+SRC_URI = "${PATH_TO_REPO}/data-kernel/.git;protocol=${PROTO};destsuffix=data-kernel;usehead=1"
 SRC_URI:append = " file://emac_dwc_eqos_start_stop_le"
 SRC_URI:append = " file://setup_avtp_routing_le"
 SRC_URI:append = " file://emac_dwc_eqos.service"

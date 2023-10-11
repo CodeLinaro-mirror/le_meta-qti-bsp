@@ -7,7 +7,7 @@ require recipes-kernel/linux-msm/linux-msm.inc
 COMPATIBLE_MACHINE = "monaco|quin-gvm-lemans|quin-gvm-gen4"
 
 SRC_URI = "${PATH_TO_REPO}/kernel/kernel-${PV}/kernel_platform/msm-kernel/.git;protocol=${PROTO};destsuffix=kernel/kernel-${PV}/kernel_platform/msm-kernel;usehead=1"
-SRC_URI:append= " \
+SRC_URI:append = " \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-lvumd', 'file://lvumd.cfg', '', d)} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-lvumd', 'file://lvumd', '', d)} \
 "

@@ -14,7 +14,7 @@ S = "${WORKDIR}/vendor/qcom/opensource/bt-kernel"
 SRCREV = "${AUTOREV}"
 
 TECHPACK_MODULE_OUT = "${WORKDIR}/bt-dlkm"
-TECHPACK_MODULES  = "pwr/btpower.ko"
+TECHPACK_MODULES = "pwr/btpower.ko"
 TECHPACK_MAKE_ARGS = "CONFIG_MSM_BT_POWER=m"
 
 inherit qti-techpack
