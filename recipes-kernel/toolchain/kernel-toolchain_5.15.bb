@@ -6,7 +6,7 @@ PROVIDES = "virtual/kernel-toolchain-native"
 
 FILESEXTRAPATHS:prepend := "${WORKSPACE}/kernel-5.15/kernel_platform/prebuilts/clang/host/linux-x86/:"
 SRC_URI    = "file://clang-${CLANG_VERSION}"
-CLANG_VERSION = "r416183b"
+CLANG_VERSION = "r450784e"
 
 
 S = "${WORKDIR}/clang-${CLANG_VERSION}"
