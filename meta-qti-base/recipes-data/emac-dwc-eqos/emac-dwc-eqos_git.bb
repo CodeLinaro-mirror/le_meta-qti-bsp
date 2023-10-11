@@ -1,6 +1,7 @@
 inherit module qperf qti-kernel-arch-clang
 
 DESCRIPTION = "EMAC Ethernet driver"
+HOMEPAGE = "https://git.codelinaro.org"
 LICENSE = "MIT-style"
 LIC_FILES_CHKSUM = "file://DWC_ETH_QOS_dev.c;\
 startline=1;endline=71;md5=62b57cd65ebb8a65e225a5fbfbc26932"
