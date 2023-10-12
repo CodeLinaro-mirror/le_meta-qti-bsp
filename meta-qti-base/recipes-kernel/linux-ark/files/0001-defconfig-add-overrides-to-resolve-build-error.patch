@@ -7,6 +7,7 @@ Disable CONFIG_DEBUG_INFO_BTF and do other necessary overrides
 to make final defconfig generation succcesfull.
 
 Change-Id: I9e61a0f10b299033d56ab145cfc7c9c8266e56d1
+Signed-off-by: Parikshit Pareek <quic_ppareek@quicinc.com>
 ---
  redhat/configs/custom-overrides/generic/CONFIG_DEBUG_INFO_BTF    | 1 +
  redhat/configs/custom-overrides/generic/CONFIG_DEBUG_INFO_DWARF5 | 1 +

@@ -6,6 +6,9 @@ Subject: [PATCH] Subject: [PATCH] [DRM front-end] display DRM front-end
 Add a display DRM front-end software for the new architecture
 
 Upstream-Status: Pending
+
+Signed-off-by: Wanteng Zhang <wantzhan@codeaurora.org>
+
 ---
  Makefile.sources     |  4 +-
  include/drm/fe_drm.h | 48 ++++++++++++++++++++++
