@@ -25,6 +25,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-adk \
         packagegroup-startup-scripts \
         packagegroup-support-utils \
+        packagegroup-qti-ppat \
         systemd-machine-units \
 "
 
