@@ -1,10 +1,12 @@
 PROVIDES_NAME = "kernel-module-${_MODNAME}"
 
+DEPENDS += "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', 'wlan-platform-dlkm', '', d)}"
+
 inherit autotools-brokensep module qperf module-sign qti-kernel-arch-clang
 
 WLAN_PLATFORM_PATH = "${STAGING_INCDIR}/wlan-platform"
 WLAN_KBUILD_EXTRA = "KBUILD_EXTRA_SYMBOLS=${WLAN_PLATFORM_PATH}/Module.symvers"
-WLAN_PLATFORM_CFG = " \
+WLAN_PLATFORM_CFG = "\
                      CONFIG_CNSS_OUT_OF_TREE=y CONFIG_CNSS2=m \
                      CONFIG_CNSS2_QMI=y CONFIG_CNSS_QMI_SVC=m \
                      CONFIG_CNSS_PLAT_IPC_QMI_SVC=m \
@@ -13,8 +15,7 @@ WLAN_PLATFORM_CFG = " \
                      WLAN_PLATFORM_INC=${WLAN_PLATFORM_PATH}/inc \
                      KBUILD_EXTRA="${WLAN_KBUILD_EXTRA}" \
                    "
-DEPENDS += "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', 'wlan-platform-dlkm', '', d)}"
-EXTRA_OEMAKE:append = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', '${WLAN_PLATFORM_CFG}', '', d)}"
+EXTRA_OEMAKE:append = " ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', '${WLAN_PLATFORM_CFG}', '', d)}"
 
 _LINUX_BUILD_TOP = "${WORKDIR}/wlan"
 

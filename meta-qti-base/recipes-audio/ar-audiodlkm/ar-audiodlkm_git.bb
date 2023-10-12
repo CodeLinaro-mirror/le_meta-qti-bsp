@@ -22,6 +22,7 @@ EXTRA_OEMAKE:quin-gvm-gen4-2 += "TARGET_SUPPORT=no AUTO_GVM=yes"
 EXTRA_OEMAKE:quin-gvm-lemans += "TARGET_SUPPORT=no AUTO_GVM=yes"
 EXTRA_OEMAKE:qtiquingvm8295 += "TARGET_SUPPORT=no AUTO_GVM=yes"
 EXTRA_OEMAKE:monaco += "TARGET_SUPPORT=monaco"
+EXTRA_OEMAKE:quin-gvm-monaco += "TARGET_SUPPORT=no AUTO_GVM=yes"
 
 MODULES = "\
         dsp/spf_core_dlkm.ko  \
