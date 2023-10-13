@@ -11,6 +11,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 
 DEPENDS += "virtual/mkdtimg-native bison-native"
 
+do_setup_module_compilation[lockfiles] = "${TMPDIR}/build_modules.lock"
+
 do_unpack[cleandirs] += " ${S}"
 
 do_unpack () {
@@ -70,9 +72,15 @@ do_deploy () {
      if ${@oe.utils.conditional('OEMVM_SUPPORT', 'True', 'true', 'false', d)}; then
          mkdir -p ${DEPLOYDIR}/build-artifacts/oemvm-dtb
          cp -a ${KERNEL_PREBUILT_PATH}/${VM_TARGET}-vm-*.dtb ${DEPLOYDIR}/build-artifacts/dtb
+         cp -a ${KERNEL_PREBUILT_PATH}/${VM_TARGET}p-vm-*.dtb ${DEPLOYDIR}/build-artifacts/dtb
          cp -a ${KERNEL_PREBUILT_PATH}/${VM_TARGET}-oemvm-*.dtb ${DEPLOYDIR}/build-artifacts/oemvm-dtb
+         cp -a ${KERNEL_PREBUILT_PATH}/${VM_TARGET}p-oemvm-*.dtb ${DEPLOYDIR}/build-artifacts/oemvm-dtb
+         cp -a ${KERNEL_PREBUILT_PATH}/cliffs-vm-*.dtb ${DEPLOYDIR}/build-artifacts/dtb
+         cp -a ${KERNEL_PREBUILT_PATH}/cliffs-oemvm-*.dtb ${DEPLOYDIR}/build-artifacts/oemvm-dtb
      else
          cp -a ${KERNEL_PREBUILT_PATH}/${VM_TARGET}-vm-*.dtb  ${DEPLOYDIR}/build-artifacts/dtb
+         cp -a ${KERNEL_PREBUILT_PATH}/${VM_TARGET}p-vm-*.dtb  ${DEPLOYDIR}/build-artifacts/dtb
+         cp -a ${KERNEL_PREBUILT_PATH}/cliffs-vm-*.dtb ${DEPLOYDIR}/build-artifacts/dtb
      fi
      cp -a ${KERNEL_PREBUILT_PATH}/vmlinux ${DEPLOYDIR}
      cp -a ${KERNEL_PREBUILT_PATH}/System.map ${DEPLOYDIR}
