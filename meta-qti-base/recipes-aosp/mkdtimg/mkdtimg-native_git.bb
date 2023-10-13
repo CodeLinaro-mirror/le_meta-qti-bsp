@@ -10,8 +10,8 @@ PROVIDES = "mkdtimg-native"
 
 PR = "r1"
 
-SRCREV = "${AUTOREV}"
 SRC_URI = "${PATH_TO_REPO}/system/libufdt/.git;protocol=${PROTO};destsuffix=system/libufdt;usehead=1"
+SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/system/libufdt"
 

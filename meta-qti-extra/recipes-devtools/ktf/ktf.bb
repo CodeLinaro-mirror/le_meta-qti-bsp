@@ -1,8 +1,9 @@
 DESCRIPTION = "Kernel Test Framework(KTF) implements an unit test framework for the Linux Kernel"
 HOMEPAGE = "https://github.com/oracle/ktf/"
-
 LICENSE = "GPL-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/GPL-2.0-only;md5=801f80980d171dd6425610833a22dbe6"
+
+DEPENDS += "googletest libnl"
 
 KTF_MODULE_NAME = "ktf"
 
@@ -17,8 +18,6 @@ SRCREV = "707335c6285a1e4c3bc4eb8eafd2faebb4c03da0"
 S = "${WORKDIR}/git"
 
 inherit autotools-brokensep pkgconfig module module-sign qti-kernel-arch-clang
-
-DEPENDS += "googletest libnl"
 
 do_configure[depends] += "virtual/kernel:do_shared_workdir"
 

@@ -5,8 +5,8 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/${LICENSE};md5=89aea4e17d99a7ca
 
 PROVIDES = "mkbootimg-native"
 
-SRCREV = "${AUTOREV}"
 SRC_URI = "${PATH_TO_REPO}/kernel/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/tools/mkbootimg/.git;protocol=${PROTO};destsuffix=kernel/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/tools/mkbootimg;usehead=1"
+SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/kernel/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/tools/mkbootimg"
 
