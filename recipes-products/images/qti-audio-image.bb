@@ -17,19 +17,17 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-data \
         packagegroup-qti-dsp \
         packagegroup-qti-fastcv \
+	packagegroup-qti-gfx \
         packagegroup-qti-ml \
         packagegroup-qti-securemsm \
         packagegroup-qti-ss-mgr \
         packagegroup-qti-wifi \
+        packagegroup-qti-adk \
         packagegroup-startup-scripts \
         packagegroup-support-utils \
         systemd-machine-units \
 "
 
-CORE_IMAGE_EXTRA_INSTALL:remove:vt-64 = "packagegroup-qti-audio"
-CORE_IMAGE_EXTRA_INSTALL:remove:vt-64 = "packagegroup-qti-bluetooth"
-CORE_IMAGE_EXTRA_INSTALL:remove:vt-64 = "packagegroup-qti-data"
-CORE_IMAGE_EXTRA_INSTALL:remove:vt-64 = "packagegroup-qti-dsp"
 CORE_IMAGE_EXTRA_INSTALL:remove:vt-64 = "packagegroup-qti-fastcv"
 CORE_IMAGE_EXTRA_INSTALL:remove:vt-64 = "packagegroup-qti-ml"
 CORE_IMAGE_EXTRA_INSTALL:remove:vt-64 = "packagegroup-qti-ss-mgr"

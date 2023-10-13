@@ -60,6 +60,9 @@ persist.vendor.audio.speaker.prot.enable=true
 persist.vendor.audio.spv3.enable=true
 persist.vendor.audio.avs.afe_api_version=2
 
+#display specific properties
+vendor.display.force_allow_gpu_downscale=1
+
 #enable weston during boot
 persist.display.launch.weston.at.bootup=true
 

@@ -65,6 +65,12 @@ add_mount_files () {
             # Update fstype for userdata
             if [[ "$mountname" == "overlay" ]] ; then
                 sed -i "s#@TYPE@#${USERDATA_FSTYPE}#g" ${S}/overlay.mount
+                if ${@bb.utils.contains('MACHINE_FEATURES', 'file-based-encryption', 'true', 'false', d)}; then
+                    if ${@bb.utils.contains_any('BASEMACHINE', 'qrb5165', 'true', 'false', d)}; then
+                        sed -i "/Unit/a Requires=format.service" ${S}/overlay.mount
+                        sed -i "/Unit/a After=format.service" ${S}/overlay.mount
+                    fi
+                fi
 	    fi
             install -m 0644 ${S}/${mountname}.mount ${D}${systemd_unitdir}/system/${mountname}-${IMAGETYPE}.mount
         fi
