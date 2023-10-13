@@ -27,8 +27,6 @@ SRC_URI += "file://defconfig \
             file://0001-centos-5.14-Fix-to-bypass-redhad-env.patch \
             file://0002-centos-5.14-build-fixes-while-porting-from-5.4.patch \
             file://0001-defconfig-add-overrides-to-resolve-build-error.patch \
-            file://0001-redhat-HACK-remove-rpm-build-dependency.patch \
-            file://0001-pinctrl-qcom-Add-intr_target_width-to-define-intr_ta.patch \
 "
 
 SRCREV = "${AUTOREV}"
@@ -91,7 +89,6 @@ do_patch_config() {
      do_patch_config_call() {
          cd ${MY_SRC}
          patch -f -p1 < ${PATCH_DIR}/0001-defconfig-add-overrides-to-resolve-build-error.patch
-         patch -f -p1 < ${PATCH_DIR}/0001-redhat-HACK-remove-rpm-build-dependency.patch
     }
 
     do_patch_config_call || bbwarn "do_patch_config_call failed"
@@ -103,7 +100,6 @@ do_patch_more() {
     cd ${MY_WDIR}
     patch -f -p1 < ${WORKDIR}/0001-centos-5.14-Fix-to-bypass-redhad-env.patch
     patch -f -p1 < ${WORKDIR}/0002-centos-5.14-build-fixes-while-porting-from-5.4.patch
-    patch -f -p1 < ${WORKDIR}/0001-pinctrl-qcom-Add-intr_target_width-to-define-intr_ta.patch
 }
 addtask patch_more after do_unpack before do_kernel_metadata
 
@@ -199,11 +195,11 @@ do_deploy () {
 
     if [ "${BASEMACHINE}" = "sa8775" ]; then
     cp ${B}/arch/arm64/boot/Image ${D}/${KERNEL_IMAGEDEST}/Image
-    cp ${B}/arch/arm64/boot/dts/qcom/lemans.dtb ${D}/${KERNEL_IMAGEDEST}/lemans.dtb
+    cp ${B}/arch/arm64/boot/dts/qcom/sa8775p-ride.dtb ${D}/${KERNEL_IMAGEDEST}/sa8775p-ride.dtb
     # Make bootimage
     ${STAGING_BINDIR_NATIVE}/scripts/mkbootimg.py --header_version ${KERNEL_IMAGE_HEADER_VERSION} \
         --kernel  ${D}/${KERNEL_IMAGEDEST}/Image \
-        --dtb  ${D}/${KERNEL_IMAGEDEST}/lemans.dtb \
+        --dtb  ${D}/${KERNEL_IMAGEDEST}/sa8775p-ride.dtb \
         --ramdisk /dev/null \
         --pagesize ${PAGE_SIZE} \
         --base ${KERNEL_BASE} \
