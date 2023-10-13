@@ -55,4 +55,8 @@ do_install_append() {
     else
         install -m 0644 ${WORKDIR}/fstab ${D}${sysconfdir}/fstab
     fi
+
+    if [ ${@bb.utils.contains('MACHINE_FEATURES', 'qti-vm-guest', 'True', 'False', d)} = True ]; then
+        echo "192.168.225.1 qti-modem" >> ${D}${sysconfdir}/hosts
+    fi
 }
