@@ -1,6 +1,6 @@
-PROVIDES = "virtual/bootloader"
-
 DEPENDS += "util-linux-native"
+
+PROVIDES = "virtual/bootloader"
 
 TOOLCHAIN = "clang"
 

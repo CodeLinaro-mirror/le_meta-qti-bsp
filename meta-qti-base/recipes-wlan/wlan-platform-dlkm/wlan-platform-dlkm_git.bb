@@ -8,10 +8,9 @@ ${LICENSE};md5=801f80980d171dd6425610833a22dbe6"
 DEPENDS = "wlan-devicetree"
 
 SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/wlan/platform/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/wlan/platform;;usehead=1"
+SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/vendor/qcom/opensource/wlan/platform"
-
-SRCREV = "${AUTOREV}"
 
 TECHPACK_MODULE_OUT = "${WORKDIR}/wlan-platform-dlkm"
 TECHPACK_MODULES = "cnss2/cnss2.ko"

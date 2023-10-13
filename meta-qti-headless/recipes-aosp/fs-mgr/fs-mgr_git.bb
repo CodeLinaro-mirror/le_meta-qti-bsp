@@ -13,9 +13,9 @@ SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/system/core/fs_mgr"
 
-EXTRA_OECONF += "--with-glib"
-
 inherit autotools pkgconfig
+
+EXTRA_OECONF += "--with-glib"
 
 BBCLASSEXTEND = "native"
 
