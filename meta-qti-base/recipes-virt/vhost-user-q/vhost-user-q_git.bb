@@ -13,7 +13,8 @@ SYSTEMD_SERVICE:${PN} = "\
     vhost-user-cam.service \
 "
 
-DEPENDS += "virtual/kernel-headers msmhab"
+DEPENDS += "virtual/kernel-headers"
+DEPENDS += "${@bb.utils.contains("PREFERRED_PROVIDER_virtual/kernel", "linux-ark", "msmhab", "", d)}"
 
 SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/vhost-user/.git;protocol=${PROTO};destsuffix=vhost-user-q;usehead=1"
 SRCREV = "${AUTOREV}"
