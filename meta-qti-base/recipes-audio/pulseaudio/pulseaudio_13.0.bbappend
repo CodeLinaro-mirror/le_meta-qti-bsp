@@ -25,7 +25,7 @@ SRC_URI:append = " file://0001-udev-bypass-udev-device-enumeration-for-auto-targ
 SRC_URI:append = " file://0001-Avoid-pulseaudio-daemon-shutdown-after-lpm.patch"
 SRC_URI:append = " ${@bb.utils.contains('MACHINE_FEATURES', 'qti-audio-ar','file://0001-disable-realtime-schedule-in-pulseaudio.patch','',d)}"
 
-PACKAGES =+ " pulseaudio-module-dev"
+PACKAGES =+ "pulseaudio-module-dev"
 
 RDEPENDS:pulseaudio-server += "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'pulseaudio-module-systemd-login', '', d)} \

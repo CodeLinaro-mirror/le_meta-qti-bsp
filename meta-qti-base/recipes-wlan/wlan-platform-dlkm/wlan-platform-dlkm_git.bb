@@ -14,10 +14,10 @@ S = "${WORKDIR}/vendor/qcom/opensource/wlan/platform"
 
 TECHPACK_MODULE_OUT = "${WORKDIR}/wlan-platform-dlkm"
 TECHPACK_MODULES = "cnss2/cnss2.ko"
-TECHPACK_MODULES += "cnss_utils/cnss_utils.ko"
-TECHPACK_MODULES += "cnss_utils/wlan_firmware_service.ko"
-TECHPACK_MODULES += "cnss_utils/cnss_plat_ipc_qmi_svc.ko"
-TECHPACK_MODULES += "cnss_genl/cnss_nl.ko"
+TECHPACK_MODULES:append = " cnss_utils/cnss_utils.ko"
+TECHPACK_MODULES:append = " cnss_utils/wlan_firmware_service.ko"
+TECHPACK_MODULES:append = " cnss_utils/cnss_plat_ipc_qmi_svc.ko"
+TECHPACK_MODULES:append = " cnss_genl/cnss_nl.ko"
 
 inherit qti-techpack
 

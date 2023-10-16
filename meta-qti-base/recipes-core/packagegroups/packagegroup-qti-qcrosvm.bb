@@ -1,11 +1,11 @@
-SUMMARY = "Grouping of programs for running VMs on Embedded Linux System"
-DESCRIPTION = "Package group to bring in packages for running VMs"
-
-inherit packagegroup
+SUMMARY = "Package group to bring in packages for running VMs"
+DESCRIPTION = "Grouping of programs for running VMs on Embedded Linux System"
 
 PROVIDES = "${PACKAGES}"
 
-PACKAGES = " \
+inherit packagegroup
+
+PACKAGES = "\
     packagegroup-qti-qcrosvm \
 "
 

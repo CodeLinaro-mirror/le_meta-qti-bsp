@@ -19,7 +19,7 @@ S = "${WORKDIR}/frameworks/binder"
 
 inherit autotools pkgconfig systemd useradd
 
-PACKAGECONFIG ?= " \
+PACKAGECONFIG ?= "\
                    ${@bb.utils.filter('DISTRO_FEATURES', 'selinux', d)} \
                    ${@bb.utils.filter('DISTRO_FEATURES', 'qti-vndbinder', d)} \
                    "

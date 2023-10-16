@@ -1,5 +1,5 @@
 SUMMARY = "Install extra headers for the Weston Wayland compositor"
-DESCRIPTION = "Provide weston header file for dpk image"
+DESCRIPTION = "Provide additional header files required by Weston, mainly for dpk image"
 HOMEPAGE = "https://git.codelinaro.org/"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"

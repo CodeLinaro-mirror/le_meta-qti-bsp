@@ -16,7 +16,7 @@ do_install:append() {
               install -d ${D}${systemd_user_unitdir}/default.target.wants/
               ln -sf ${systemd_user_unitdir}/pulseaudio.service ${D}${systemd_user_unitdir}/default.target.wants/
        fi
-       mkdir -p ${D}/${bindir}
+       install -d ${D}/${bindir}
        install -m 755 -p -D ${WORKDIR}/build/src/.libs/pacat ${D}/${bindir}/
 }
 

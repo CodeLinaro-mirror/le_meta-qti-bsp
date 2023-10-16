@@ -7,7 +7,6 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 MY_SRC = "${SRC_DIR_ROOT}/kernel/rh-kernel-5.14"
 PATCH_DIR = "${SRC_DIR_ROOT}/meta-qti-bsp/meta-qti-base/recipes-kernel/linux-ark/files/"
 MY_WDIR = "${WORKDIR}/kernel/rh-kernel-5.14"
-FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 DEPENDS += "\
     oot-dtbo dtc-native kern-tools-native  mkbootimg-native \
@@ -23,10 +22,11 @@ KERNEL_LD:append:aarch64 = " ${TOOLCHAIN_OPTIONS}"
 SRC_URI = "\
     ${PATH_TO_REPO}/kernel/rh-kernel-5.14/.git;protocol=${PROTO};destsuffix=kernel/msm-5.4;usehead=1 \
 "
-SRC_URI += "file://defconfig \
-            file://0001-centos-5.14-Fix-to-bypass-redhad-env.patch \
-            file://0002-centos-5.14-build-fixes-while-porting-from-5.4.patch \
-            file://0001-defconfig-add-overrides-to-resolve-build-error.patch \
+SRC_URI:append = " \
+    file://defconfig \
+    file://0001-centos-5.14-Fix-to-bypass-redhad-env.patch \
+    file://0002-centos-5.14-build-fixes-while-porting-from-5.4.patch \
+    file://0001-defconfig-add-overrides-to-resolve-build-error.patch \
 "
 
 SRCREV = "${AUTOREV}"

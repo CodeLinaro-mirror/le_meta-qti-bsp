@@ -8,7 +8,7 @@ SRC_URI += "\
 do_install:append() {
     install -D -m 0644 ${WORKDIR}/smack-adbd ${D}${sysconfdir}/smack/accesses.d/adbd
 
-    mkdir -p ${D}${systemd_unitdir}/system/adbd.service.d
+    install -d ${D}${systemd_unitdir}/system/adbd.service.d
     install -m 0644 ${WORKDIR}/smack.conf ${D}${systemd_unitdir}/system/adbd.service.d/
 }
 

@@ -1,11 +1,11 @@
-SUMMARY = "Grouping of programs for userspace drivers on Linux System"
-DESCRIPTION = "Package group to support userspace drivers"
-
-inherit packagegroup
+SUMMARY = "Package group to support userspace drivers"
+DESCRIPTION = "Grouping of programs for userspace drivers on Linux System"
 
 PROVIDES = "${PACKAGES}"
 
-PACKAGES = " \
+inherit packagegroup
+
+PACKAGES = "\
     packagegroup-qti-lvumd \
 "
 
