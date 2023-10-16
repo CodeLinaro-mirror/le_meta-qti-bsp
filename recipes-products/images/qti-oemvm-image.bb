@@ -1,4 +1,4 @@
-inherit qimage qramdisk qcpioimage
+inherit qimage qcpioimage
 
 DEPENDS += " virtual/kernel"
 
@@ -10,7 +10,7 @@ CORE_IMAGE_EXTRA_INSTALL += " \
     sdcard-scripts-automount \
     e2fsprogs-mke2fs \
 "
-CORE_IMAGE_EXTRA_INSTALL += " ${@oe.utils.conditional('ENABLE_SECUREMSM', 'True', 'packagegroup-qti-securemsm-oemvm', '', d)}"
+#CORE_IMAGE_EXTRA_INSTALL += " ${@oe.utils.conditional('ENABLE_SECUREMSM', 'True', 'packagegroup-qti-securemsm-oemvm', '', d)}"
 
 #Exclude packages
 PACKAGE_EXCLUDE += "readline"
