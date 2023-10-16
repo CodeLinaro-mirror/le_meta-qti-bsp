@@ -11,8 +11,8 @@ S = "${WORKDIR}/vendor/qcom/opensource/safelinux-system-cfg/devicetree"
 
 do_prepare_kernel_source() {
     rm -rf ${WORKDIR}/kernel/rh-kernel-5.14/.git/{config,hooks,logs,objects,packed-refs,refs,rr-cache,svn}
-    cp -rf ${SRC_DIR_ROOT}/.repo/projects/kernel/rh-kernel-5.14.git/{config,logs,packed-refs,refs} ${WORKDIR}/kernel/rh-kernel-5.14/.git
-    cp -rf ${SRC_DIR_ROOT}/.repo/project-objects/kernel/ark-5.14.git/{hooks,objects,rr-cache,svn} ${WORKDIR}/kernel/rh-kernel-5.14/.git
+    cp -rf ${SRC_DIR_ROOT}/.repo/projects/kernel/rh-kernel-5.14.git/{config,logs,refs} ${WORKDIR}/kernel/rh-kernel-5.14/.git
+    cp -rf ${SRC_DIR_ROOT}/.repo/project-objects/kernel/ark-5.14.git/{hooks,objects} ${WORKDIR}/kernel/rh-kernel-5.14/.git
     rm -rf ${WORKDIR}/vendor/qcom/opensource/safelinux-system-cfg/devicetree/centos-stream-9
     mv ${WORKDIR}/kernel/rh-kernel-5.14 ${WORKDIR}/vendor/qcom/opensource/safelinux-system-cfg/devicetree/centos-stream-9
 }
