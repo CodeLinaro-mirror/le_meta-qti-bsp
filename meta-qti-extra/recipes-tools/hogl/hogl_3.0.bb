@@ -1,11 +1,11 @@
 SUMMARY = "HOGL Logging"
-DESCRIPTION = ""
+DESCRIPTION = "HOGL Logging recipe"
 HOMEPAGE = "https://github.com/maxk-org/hogl"
 LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=41eb136c1374ae06b70ae866d31b14f6"
 
 SRC_URI = "git://github.com/maxk-org/hogl.git;protocol=git"
-SRC_URI += "file://0001-Fix-compilation-issues-from-hogl-module.patch"
+SRC_URI:append = " file://0001-Fix-compilation-issues-from-hogl-module.patch"
 SRCREV = "v3.0-rc1"
 
 S = "${WORKDIR}/git"
