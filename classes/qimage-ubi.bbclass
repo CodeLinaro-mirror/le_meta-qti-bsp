@@ -93,6 +93,7 @@ create_symlink_systemd_ubi_mount_rootfs() {
     rm -rf ${IMAGE_ROOTFS_UBI}/lib/systemd/system/local-fs.target.requires/bt_firmware.mount
     rm -rf ${IMAGE_ROOTFS_UBI}/lib/systemd/system/sysinit.target.wants/ab-updater.service
     rm -rf ${IMAGE_ROOTFS_UBI}/lib/systemd/system/sysinit.target.wants/rmt_storage.service
+    rm -rf ${IMAGE_ROOTFS_UBI}/lib/systemd/system/rmt_storage.service
     rm -rf ${IMAGE_ROOTFS_UBI}/etc/udev/rules.d/rmtstorage.rules
     rm -rf ${IMAGE_ROOTFS_UBI}/etc/systemd/system/local-fs-pre.target.wants/set-slotsuffix.service
     # Recheck when overlay support added for ubi
@@ -118,6 +119,11 @@ create_symlink_systemd_ubi_mount_rootfs() {
 
    # Copy sdcard mount rules
    cp ${IMAGE_ROOTFS_UBI}/etc/udev/rules.d/mountpartitions ${IMAGE_ROOTFS_UBI}/etc/udev/rules.d/mountpartitions.rules
+
+   # Remove rmt_storage.service dependency
+   if [ -e ${IMAGE_ROOTFS_UBI}/lib/systemd/system/init_sys_mss.service ]; then
+      sed -i "/BindsTo=rmt_storage.service/d" ${IMAGE_ROOTFS_UBI}/lib/systemd/system/init_sys_mss.service
+   fi
 }
 
 # Need to copy ubinize.cfg file in the deploy directory
