@@ -16,4 +16,5 @@ RDEPENDS:${PN} = "\
     vhost-user-q \
     safelinux-system-cfg \
     dspfirmware-mount \
+    gvm-net-config \
 "
