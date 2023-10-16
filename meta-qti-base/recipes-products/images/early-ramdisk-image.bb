@@ -52,6 +52,38 @@ IMAGE_INSTALL:sa81x5 += " \
                  kernel-module-stub-regulator-${KERNEL_VERSION} \
                  cameradlkm \
 "
+
+IMAGE_INSTALL:sa8775 += "\
+                 early-ramdisk-init libgcc kmod util-linux-libblkid \
+                 kernel-module-clk-qcom-${KERNEL_VERSION} \
+                 kernel-module-gcc-sa8775p-${KERNEL_VERSION} \
+                 kernel-module-pinctrl-msm-${KERNEL_VERSION} \
+                 kernel-module-pinctrl-sa8775p-${KERNEL_VERSION} \
+                 kernel-module-clk-rpmh-${KERNEL_VERSION} \
+                 kernel-module-cmd-db-${KERNEL_VERSION} \
+                 kernel-module-qcom-rpmh-${KERNEL_VERSION} \
+                 kernel-module-rpmhpd-${KERNEL_VERSION} \
+                 kernel-module-qcom-geni-se-${KERNEL_VERSION} \
+                 kernel-module-qcom-geni-serial-${KERNEL_VERSION} \
+                 kernel-module-icc-bcm-voter-${KERNEL_VERSION} \
+                 kernel-module-icc-rpmh-${KERNEL_VERSION} \
+                 kernel-module-qnoc-sa8775p-${KERNEL_VERSION} \
+                 kernel-module-qcom-rpmh-regulator-${KERNEL_VERSION} \
+                 kernel-module-phy-qcom-qmp-ufs-${KERNEL_VERSION} \
+                 kernel-module-ufs-qcom-${KERNEL_VERSION} \
+                 kernel-module-mbcache-${KERNEL_VERSION} \
+                 kernel-module-ext4-${KERNEL_VERSION} \
+                 kernel-module-jbd2-${KERNEL_VERSION} \
+                 kernel-module-governor-simpleondemand-${KERNEL_VERSION} \
+                 kernel-module-ufshcd-core-${KERNEL_VERSION} \
+                 kernel-module-ufshcd-pltfrm-${KERNEL_VERSION} \
+                 kernel-module-camcc-sa8775p-${KERNEL_VERSION} \
+                 kernel-module-dispcc0-sa8775p-${KERNEL_VERSION} \
+                 kernel-module-dispcc1-sa8775p-${KERNEL_VERSION} \
+                 kernel-module-gpucc-sa8775p-${KERNEL_VERSION} \
+                 kernel-module-videocc-sa8775p-${KERNEL_VERSION} \
+"
+
 python do_rootfs:prepend() {
     import re
 
