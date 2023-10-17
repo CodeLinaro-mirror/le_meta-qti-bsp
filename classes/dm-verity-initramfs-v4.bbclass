@@ -67,11 +67,23 @@ addtask do_makeboot before do_image_complete
 
 #squashfs files
 SYSTEMIMAGE_SQUASHFS_TARGET = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}/squashfs/sysfs.squash"
+SYSTEMIMAGE_SQUASHFS_TARGET_WITH_LXC = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}/lxc/squashfs/sysfs.squash"
 
 do_sign_system_squashfs () {
     # Sign the system image
     ${TMPDIR}/work-shared/avbtool/avbtool add_hashtree_footer \
         --image ${SYSTEMIMAGE_SQUASHFS_TARGET} \
+        --partition_name rootfs \
+        --algorithm SHA256_RSA2048 \
+        --key ${TMPDIR}/work-shared/avbtool/qpsa_attestca.key \
+        --public_key_metadata ${TMPDIR}/work-shared/avbtool/qpsa_attestca.der \
+        --do_not_generate_fec --rollback_index 0
+}
+
+do_sign_system_squashfs_with_lxc () {
+    # Sign the system image
+    ${TMPDIR}/work-shared/avbtool/avbtool add_hashtree_footer \
+        --image ${SYSTEMIMAGE_SQUASHFS_TARGET_WITH_LXC} \
         --partition_name rootfs \
         --algorithm SHA256_RSA2048 \
         --key ${TMPDIR}/work-shared/avbtool/qpsa_attestca.key \

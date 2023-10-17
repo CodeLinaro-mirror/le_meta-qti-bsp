@@ -69,6 +69,7 @@ MACHINE_MNT_POINTS = " \
     /systemrw \
     /persist \
     /data \
+    /lxcrootfs \
 "
 
 PAGE_SIZE ?= '4096'
