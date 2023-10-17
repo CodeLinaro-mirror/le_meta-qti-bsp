@@ -31,7 +31,7 @@ add_mount_files () {
 
     for entry in ${MACHINE_MNT_POINTS}; do
         mountname="${entry:1}"
-        if [[ "$mountname" == "firmware" || "$mountname" == "bt_firmware" || "$mountname" == "dsp" || "$mountname" == "vm-bootsys" ]] && \
+        if [[ "$mountname" == "firmware" || "$mountname" == "bt_firmware" || "$mountname" == "dsp" || "$mountname" == "vm-bootsys" ||  "$mountname" == "lxcrootfs" ]] && \
            [[ "${IMAGETYPE}" == "ubi" || "${COMBINED_FEATURES}" =~ .*qti-ab-boot.* ]] ; then
                 if [[ "${COMBINED_FEATURES}" =~ .*qti-recoveryinfo.* ]] ; then
                     install -m 0644 ${S}/${mountname}-mount-v2.service ${D}${systemd_unitdir}/system/${mountname}-mount-${IMAGETYPE}.service
@@ -77,6 +77,8 @@ fix_sepolicies () {
     sed -i "s#,rootcontext=system_u:object_r:system_data_t:s0##g" ${WORKDIR}/systemrw.mount
     sed -i "s#,context=system_u:object_r:vm-bootsys_t:s0##g" ${WORKDIR}/vm-bootsys.mount
     sed -i "s#,context=system_u:object_r:vm-bootsys_t:s0##g" ${WORKDIR}/vm-bootsys-mount.service
+    sed -i "s#,context=system_u:object_r:lxcrootfs_t:s0##g" ${WORKDIR}/lxcrootfs.mount
+    sed -i "s#,context=system_u:object_r:lxcrootfs_t:s0##g" ${WORKDIR}/lxcrootfs-mount.service
 
     # TODO: figure out the selinux context for the overlays
     sed -i "s#,rootcontext=system_u:object_r:overlay_t:s0##g" ${WORKDIR}/overlay.mount
