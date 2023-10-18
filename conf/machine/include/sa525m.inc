@@ -100,3 +100,10 @@ PREFERRED_VERSION_openssl-native = "3.0.9"
 
 # Fixes for boot image dtb appending
 BOOT_HEADER_VERSION = "2"
+
+# Y2038: Support for Y2038 safe time on 32 bit systems
+TARGET_CFLAGS += "-D_TIME_BITS=64 -D_FILE_OFFSET_BITS=64"
+TARGET_CPPFLAGS += "-D_TIME_BITS=64 -D_FILE_OFFSET_BITS=64"
+
+TARGET_CFLAGS_remove_pn-glibc = "-D_TIME_BITS=64 -D_FILE_OFFSET_BITS=64"
+TARGET_CPPFLAGS_remove_pn-glibc = "-D_TIME_BITS=64 -D_FILE_OFFSET_BITS=64"
