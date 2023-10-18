@@ -6,9 +6,11 @@ inherit qimage populate_sdk_qti
 IMAGE_FEATURES += "ssh-server-openssh"
 
 CORE_IMAGE_EXTRA_INSTALL += "\
+        dsmf \
         glib-2.0 \
         gki-kernel-modules-second-stage \
         kernel-modules \
+        libmeminfo \
         packagegroup-android-utils \
         packagegroup-filesystem-utils \
         packagegroup-qti-audio \
@@ -35,7 +37,6 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         powerapp \
         powerapp-powerconfig \
         systemd-machine-units \
-        libmeminfo \
         ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
 "
 
