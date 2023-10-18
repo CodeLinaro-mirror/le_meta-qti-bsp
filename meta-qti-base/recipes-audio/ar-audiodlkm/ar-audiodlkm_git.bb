@@ -14,13 +14,14 @@ SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/vendor/qcom/opensource/audio-kernel-ar"
 
-inherit ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', "qti-techpack qperf", "module module-sign qperf qti-kernel-arch-clang", d)}
+inherit ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.4', "module module-sign qperf qti-kernel-arch-clang", "qti-techpack qperf", d)}
 
 EXTRA_OEMAKE:lemans += "TARGET_SUPPORT=lemans"
 EXTRA_OEMAKE:sa81x5 += "TARGET_SUPPORT=sa8155"
 EXTRA_OEMAKE:quin-gvm-gen4-2 += "TARGET_SUPPORT=no AUTO_GVM=yes"
 EXTRA_OEMAKE:quin-gvm-lemans += "TARGET_SUPPORT=no AUTO_GVM=yes"
 EXTRA_OEMAKE:qtiquingvm8295 += "TARGET_SUPPORT=no AUTO_GVM=yes"
+EXTRA_OEMAKE:monaco += "TARGET_SUPPORT=monaco"
 
 MODULES = "\
         dsp/spf_core_dlkm.ko  \
