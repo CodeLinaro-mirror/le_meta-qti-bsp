@@ -192,50 +192,23 @@ do_deploy () {
     cp  ${STAGING_KERNEL_BUILDDIR}/usr/gen_init_cpio ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr
 
     # Copy Image and dtbs to deploydir
+    install -m 0644 vmlinux ${DEPLOYDIR}
 
     if [ "${BASEMACHINE}" = "sa8775" ]; then
-    cp ${B}/arch/arm64/boot/Image ${D}/${KERNEL_IMAGEDEST}/Image
-    cp ${B}/arch/arm64/boot/dts/qcom/sa8775p-ride.dtb ${D}/${KERNEL_IMAGEDEST}/sa8775p-ride.dtb
-    # Make bootimage
-    ${STAGING_BINDIR_NATIVE}/scripts/mkbootimg.py --header_version ${KERNEL_IMAGE_HEADER_VERSION} \
-        --kernel  ${D}/${KERNEL_IMAGEDEST}/Image \
-        --dtb  ${D}/${KERNEL_IMAGEDEST}/sa8775p-ride.dtb \
-        --ramdisk /dev/null \
-        --pagesize ${PAGE_SIZE} \
-        --base ${KERNEL_BASE} \
-        --ramdisk_offset 0x0 \
-    --cmdline "root=PARTLABEL=system_a rw rootwait console=ttyMSM0,115200,n8 no_console_suspend=1 androidboot.hardware=qcom androidboot.console=ttyMSM0 lpm_levels.sleep_disabled=1 msm_rtb.filter=0x237 earlycon=qcom_geni,0xa8c000 fips=0 notests nokaslr ignore_loglevel firmware_class.path=/firmware/vm/boot androidboot.slot_suffix=_a systemd.gpt_auto=0" \
-        --output  ${DEPLOYDIR}/sa8775p-boot-5.14.img
-    cp ${DEPLOYDIR}/sa8775p-boot-5.14.img ${DEPLOYDIR}/sa8775-boot.img
-    cp ${B}/arch/arm64/boot/vmlinux ${DEPLOYDIR}/vmlinux
+        cp ${B}/arch/arm64/boot/Image ${D}/${KERNEL_IMAGEDEST}/Image
+        cp ${B}/arch/arm64/boot/dts/qcom/sa8775p-ride.dtb ${D}/${KERNEL_IMAGEDEST}/sa8775p-ride.dtb
+        install -m 0644 ${D}/${KERNEL_IMAGEDEST}/Image ${DEPLOYDIR}
+        install -m 0644 arch/arm64/boot/dts/qcom/sa8775p-ride.dtb ${DEPLOYDIR}
 
-    # If Overlayed DTB exists, generate corresponding bootimage
-    if [ -f ${WORKDIR}/recipe-sysroot/sysroot-only/sa8775p-ride.dtb.overlay ]; then
-        cp ${WORKDIR}/recipe-sysroot/sysroot-only/sa8775p-ride.dtb.overlay ${D}/${KERNEL_IMAGEDEST}/sa8775p-ride.dtb.overlay
-        # Make bootimage for overlayed DTB
-        ${STAGING_BINDIR_NATIVE}/scripts/mkbootimg.py --header_version ${KERNEL_IMAGE_HEADER_VERSION} \
-        --kernel  ${D}/${KERNEL_IMAGEDEST}/Image \
-        --dtb  ${D}/${KERNEL_IMAGEDEST}/sa8775p-ride.dtb.overlay \
-        --ramdisk /dev/null \
-        --pagesize ${PAGE_SIZE} \
-        --base ${KERNEL_BASE} \
-        --ramdisk_offset 0x0 \
-        --cmdline "root=PARTLABEL=system_a rw rootwait console=ttyMSM0,115200,n8 no_console_suspend=1 androidboot.hardware=qcom androidboot.console=ttyMSM0 lpm_levels.sleep_disabled=1 msm_rtb.filter=0x237 earlycon=qcom_geni,0xa8c000 fips=0 notests nokaslr ignore_loglevel firmware_class.path=/firmware/vm/boot androidboot.slot_suffix=_a systemd.gpt_auto=0" \
-        --output  ${DEPLOYDIR}/sa8775p-boot-5.14-overlayed-dtb.img
-        cp ${DEPLOYDIR}/sa8775p-boot-5.14-overlayed-dtb.img ${DEPLOYDIR}/sa8775-boot-overlayed-dtb.img
-    fi
+        # If Overlayed DTB exists, generate corresponding bootimage
+        if [ -f ${WORKDIR}/recipe-sysroot/sysroot-only/sa8775p-ride.dtb.overlay ]; then
+            cp ${WORKDIR}/recipe-sysroot/sysroot-only/sa8775p-ride.dtb.overlay ${D}/${KERNEL_IMAGEDEST}/sa8775p-ride.dtb.overlay
+            install -m 0644 ${D}/${KERNEL_IMAGEDEST}/sa8775p-ride.dtb.overlay ${DEPLOYDIR}
+        fi
     else
-    cat ${B}/arch/arm64/boot/Image.gz \
-        ${B}/arch/arm64/boot/dts/qcom/sa8540p-adp-ride.dtb > ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb
-    # Make bootimage
-    ${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb \
-        --kernel  ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb \
-        --ramdisk /dev/null \
-        --pagesize ${PAGE_SIZE} \
-        --base ${KERNEL_BASE} \
-        --ramdisk_offset 0x0 \
-    --cmdline "root=PARTLABEL=system_a rw rootwait console=ttyMSM0,115200,n8 no_console_suspend=1 androidboot.hardware=qcom androidboot.console=ttyMSM0 lpm_levels.sleep_disabled=1 msm_rtb.filter=0x237 earlycon=qcom_geni,0x884000 fips=0 notests nokaslr ignore_loglevel firmware_class.path=/firmware androidboot.slot_suffix=_a" \
-        --output  ${DEPLOYDIR}/sa8540p-boot-5.14.img
+        cat ${B}/arch/arm64/boot/Image.gz \
+            ${B}/arch/arm64/boot/dts/qcom/sa8540p-adp-ride.dtb > ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb
+        install -m 0644 ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb ${DEPLOYDIR}
     fi
 
     if ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'true', 'false', d)}; then
