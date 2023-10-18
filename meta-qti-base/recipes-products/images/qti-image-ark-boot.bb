@@ -20,7 +20,7 @@ do_makeboot () {
         # Make bootimage
         ${STAGING_BINDIR_NATIVE}/scripts/mkbootimg.py --header_version ${KERNEL_IMAGE_HEADER_VERSION} \
         --kernel  ${DEPLOY_DIR_IMAGE}/Image \
-        --dtb  ${DEPLOY_DIR_IMAGE}/sa8775p-ride.dtb \
+        --dtb  ${DEPLOY_DIR_IMAGE}/sa8775p-ride.dtb.overlay \
         --ramdisk ${BOOT_RAMDISK_IMG} \
         --pagesize ${PAGE_SIZE} \
         --base ${KERNEL_BASE} \
@@ -28,21 +28,6 @@ do_makeboot () {
         --cmdline "${BOOT_RAMDISK_CMD} root=PARTLABEL=system_a rw rootwait console=ttyMSM0,115200,n8 no_console_suspend=1 androidboot.hardware=qcom androidboot.console=ttyMSM0 lpm_levels.sleep_disabled=1 msm_rtb.filter=0x237 earlycon=qcom_geni,0xa8c000 fips=0 notests nokaslr ignore_loglevel firmware_class.path=/firmware/vm/boot androidboot.slot_suffix=_a systemd.gpt_auto=0" \
         --output  ${DEPLOY_DIR_IMAGE}/sa8775p-boot-5.14.img
         cp ${DEPLOY_DIR_IMAGE}/sa8775p-boot-5.14.img ${DEPLOY_DIR_IMAGE}/sa8775-boot.img
-
-        # If Overlayed DTB exists, generate corresponding bootimage
-        if [ -f ${DEPLOY_DIR_IMAGE}/sa8775p-ride.dtb.overlay ]; then
-            # Make bootimage for overlayed DTB
-            ${STAGING_BINDIR_NATIVE}/scripts/mkbootimg.py --header_version ${KERNEL_IMAGE_HEADER_VERSION} \
-            --kernel  ${DEPLOY_DIR_IMAGE}/Image \
-            --dtb  ${DEPLOY_DIR_IMAGE}/sa8775p-ride.dtb.overlay \
-            --ramdisk ${BOOT_RAMDISK_IMG} \
-            --pagesize ${PAGE_SIZE} \
-            --base ${KERNEL_BASE} \
-            --ramdisk_offset 0x0 \
-            --cmdline "${BOOT_RAMDISK_CMD} root=PARTLABEL=system_a rw rootwait console=ttyMSM0,115200,n8 no_console_suspend=1 androidboot.hardware=qcom androidboot.console=ttyMSM0 lpm_levels.sleep_disabled=1 msm_rtb.filter=0x237 earlycon=qcom_geni,0xa8c000 fips=0 notests nokaslr ignore_loglevel firmware_class.path=/firmware/vm/boot androidboot.slot_suffix=_a systemd.gpt_auto=0" \
-            --output  ${DEPLOY_DIR_IMAGE}/sa8775p-boot-5.14-overlayed-dtb.img
-            cp ${DEPLOY_DIR_IMAGE}/sa8775p-boot-5.14-overlayed-dtb.img ${DEPLOY_DIR_IMAGE}/sa8775-boot-overlayed-dtb.img
-        fi
     else
         # Make bootimage
         ${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb \
