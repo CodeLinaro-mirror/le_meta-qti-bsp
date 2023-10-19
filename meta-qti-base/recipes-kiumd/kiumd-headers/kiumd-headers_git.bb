@@ -22,7 +22,6 @@ do_install:append() {
 
     install -d -p ${D}${includedir}/uapi/misc
     cd ${STAGING_KERNEL_BUILDDIR}
-    ${STAGING_KERNEL_DIR}/scripts/headers_install.sh ${S}/kiumd.h ${D}${includedir}/uapi/misc/kiumd.h
     ${STAGING_KERNEL_DIR}/scripts/headers_install.sh ${S}/scmioctl.h ${D}${includedir}/uapi/misc/scmioctl.h
 }
 
