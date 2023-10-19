@@ -11,10 +11,14 @@ ro.debuggable=1
 ro.vendor.audio.sdk.ssr=false
 ##fluencetype can be "fluence" or "fluencepro" or "none"
 ro.vendor.audio.sdk.fluencetype=none
+ro.vendor.audio.dts.vendorid=none
+ro.vendor.audio.trumpet.enable=false
 persist.vendor.audio.fluence.voicecall=false
 persist.vendor.audio.fluence.voicerec=false
 persist.vendor.audio.fluence.speaker=false
 persist.vendor.audio.fluence.audiorec=false
+persist.vendor.audio.fluence.hfpcall=false
+persist.vendor.audio.fluence.speaker=false
 vendor.audio.tunnel.encode = false
 #Buffer size in kbytes for compress offload playback
 vendor.audio.offload.buffer.size.kb=64
@@ -29,13 +33,29 @@ vendor.voice.path.for.pcm.voip=true
 vendor.audio.offload.gapless.enabled=false
 #enable multiple concurrent recordings
 vendor.audio.record.multiple.enabled=true
+#enable offload buffer duration
+vendor.audio.offload.buffer.duration.enabled=true
+vendor.audio.feature.compress_in.enable=true
+vendor.audio.feature.hfp.enable=true
+vendor.audio.feature.compress_meta_data.enable=true
+vendor.audio.feature.a2dp_offload.enable=true
+vendor.audio.feature.spkr_prot.enable=true
+vendor.audio.playback.dsp.pathdelay=true
+
+#enable ttp in capture and playback path
+persist.vendor.audio.ttp.render.mode=true
 
 #Audio voice concurrency related flags
 vendor.voice.playback.conc.disabled=true
 vendor.voice.record.conc.disabled=true
 vendor.voice.voip.conc.disabled=true
 
+vendor.audio.capture.pcm.32bit.enable=true
+
 #property to select 3/6 MICS
 ro.qc.sdk.fwk.mic_support=6
 
 ro.board.platform=qcs40x
+
+#Bluetooth address path
+ro.vendor.bt.bdaddr_path=/persist/factory/bluetooth/bdaddr.txt

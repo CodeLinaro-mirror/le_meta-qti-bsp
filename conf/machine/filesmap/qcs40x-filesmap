@@ -34,7 +34,9 @@ sbl1.mbn                /dev/block/bootdevice/by-name/sbl1
 tz.mbn                  /dev/block/bootdevice/by-name/tz
 rpm.mbn                 /dev/block/bootdevice/by-name/rpm
 emmc_appsboot.mbn       /dev/block/bootdevice/by-name/aboot
-dspso.bin              /dev/block/bootdevice/by-name/dsp
+dspso.bin               /dev/block/bootdevice/by-name/dsp
+dtbo.img                /dev/block/bootdevice/by-name/dtbo
+keymasterapp.mbn        /dev/block/bootdevice/by-name/keymaster
 cmnlib.mbn              /dev/block/bootdevice/by-name/cmnlib
 cmnlib64.mbn            /dev/block/bootdevice/by-name/cmnlib64
 devcfg.mbn              /dev/block/bootdevice/by-name/devcfg

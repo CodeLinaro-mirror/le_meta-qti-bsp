@@ -83,7 +83,7 @@ pack_verity_metadata_into_vendor_ramdisk() {
     # Verify that the above step found a valid initramfs, fail otherwise
     [ -f ${WORKDIR}/vramdisk/${VENDOR_INITRAMFS_IMAGE}-${MACHINE}.cpio ] && echo "Finished copy of initramfs into ${WORKDIR}/vramdisk" || die "No valid .cpio found"
 
-    # Copy verity keys into vramdisk_cpio_append folder
+    # Copy verity keys into vramdisk_cpio:append folder
     mkdir -p ${WORKDIR}/vramdisk_cpio_append/verity
     VERITY_SALT="aee087a5be3b982978c923f566a94613496b417f2af592639bc80d141e34dfe7"
     BLOCK_SIZE="4096"
@@ -134,7 +134,7 @@ EOF
             ${STAGING_DIR_TARGET}/kernel-certs/verity_cert.pem -outform der -out ${WORKDIR}/vramdisk_cpio_append/verity/root.sig
     echo "completed signing root_hash for system"
 
-    # Pack all files from vramdisk_cpio_append folder into vendor-ramdisk cpio.
+    # Pack all files from vramdisk_cpio:append folder into vendor-ramdisk cpio.
     (cd  ${WORKDIR}/vramdisk_cpio_append && find . -type f | cpio -ovA -H newc -F ${WORKDIR}/vramdisk/${VENDOR_INITRAMFS_IMAGE}-${MACHINE}.cpio)
 
     # Compress again and Copy back to deploydir

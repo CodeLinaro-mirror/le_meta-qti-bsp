@@ -66,6 +66,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         tdk-chx01-get-data-app \
         tdk-thermistor-app \
         system-sample-apps \
+        qti-c2-module \
 "
 
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "chronyc"
@@ -78,8 +79,6 @@ CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "tdk-chx01-get-data-app"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "tdk-thermistor-app"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-sensors-see"
 
-TOOLCHAIN_TARGET_TASK:remove:kalama = "packagegroup-qti-containers"
-
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-data"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-eva"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-ss-mgr"
@@ -87,3 +86,5 @@ CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-touch"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-perf"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-sensors-ship"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "system-sample-apps"
+CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "tdk-chx01-get-data-app"
+CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "tdk-thermistor-app"

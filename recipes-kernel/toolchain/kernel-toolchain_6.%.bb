@@ -1,10 +1,10 @@
 DESCRIPTION = "Clang based toolchain to compile QTI kernel"
-LICENSE = "Apache-2.0"
+LICENSE = "Apache-2.0 & MIT & NCSA"
 LIC_FILES_CHKSUM = "file://NOTICE;md5=eeec5cfa0edfb54bfdba757236c7b531"
 
 PROVIDES = "virtual/kernel-toolchain-native"
 
-FILESEXTRAPATHS:prepend := "${WORKSPACE}/kernel-5.15/kernel_platform/prebuilts/clang/host/linux-x86/:"
+FILESEXTRAPATHS:prepend := "${KERNEL_PLATFORM_PATH}/prebuilts/clang/host/linux-x86/:"
 SRC_URI    = "file://clang-${CLANG_VERSION}"
 CLANG_VERSION = "r450784e"
 
