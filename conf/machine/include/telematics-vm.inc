@@ -3,13 +3,7 @@ require conf/machine/include/basemachine.inc
 DEFAULTTUNE ?= "aarch64"
 include conf/machine/include/arm/arch-armv8a.inc
 
-# Multilib configuration
-require conf/multilib.conf
-MULTILIBS = "multilib:lib32"
-DEFAULTTUNE:virtclass-multilib-lib32 = "armv7athf-neon"
-MLIBPREFIX = "lib32-"
-
-NON_MULTILIB_RECIPES += "iproute2 mvm-devicetree"
+MLIBPREFIX = ""
 
 PREFERRED_PROVIDER_virtual/kernel ?= "linux-msm"
 PREFERRED_PROVIDER_virtual/mkbootimg-native ?= "mkbootimg-gki-native"
@@ -78,10 +72,3 @@ MKUBIFS_ARGS = "-m 4096 -e 253952 -c 2146 -F"
 UFS_BSG_DEV_USAGE = "True"
 
 SYSTEMD_COREDUMP_PATH = "/systemrw/coredump"
-
-# Y2038: Support for Y2038 safe time on 32 bit systems
-TARGET_CFLAGS += "-D_TIME_BITS=64 -D_FILE_OFFSET_BITS=64"
-TARGET_CPPFLAGS += "-D_TIME_BITS=64 -D_FILE_OFFSET_BITS=64"
-
-TARGET_CFLAGS_remove_pn-glibc = "-D_TIME_BITS=64 -D_FILE_OFFSET_BITS=64"
-TARGET_CPPFLAGS_remove_pn-glibc = "-D_TIME_BITS=64 -D_FILE_OFFSET_BITS=64"

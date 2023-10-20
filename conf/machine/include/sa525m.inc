@@ -4,13 +4,7 @@ require conf/machine/include/basemachine.inc
 DEFAULTTUNE ?= "aarch64"
 include conf/machine/include/arm/arch-armv8a.inc
 
-# Multilib configuration
-require conf/multilib.conf
-MULTILIBS = "multilib:lib32"
-DEFAULTTUNE:virtclass-multilib-lib32 = "armv7athf-neon"
-MLIBPREFIX = "lib32-"
-
-NON_MULTILIB_RECIPES += "iproute2 qcrosvm mvm-firmware mvm-devicetree"
+MLIBPREFIX = ""
 
 PREFERRED_PROVIDER_virtual/kernel = "linux-msm"
 PREFERRED_PROVIDER_virtual/mkbootimg-native = "mkbootimg-gki-native"
@@ -100,10 +94,3 @@ PREFERRED_VERSION_openssl-native = "3.0.9"
 
 # Fixes for boot image dtb appending
 BOOT_HEADER_VERSION = "2"
-
-# Y2038: Support for Y2038 safe time on 32 bit systems
-TARGET_CFLAGS += "-D_TIME_BITS=64 -D_FILE_OFFSET_BITS=64"
-TARGET_CPPFLAGS += "-D_TIME_BITS=64 -D_FILE_OFFSET_BITS=64"
-
-TARGET_CFLAGS_remove_pn-glibc = "-D_TIME_BITS=64 -D_FILE_OFFSET_BITS=64"
-TARGET_CPPFLAGS_remove_pn-glibc = "-D_TIME_BITS=64 -D_FILE_OFFSET_BITS=64"
