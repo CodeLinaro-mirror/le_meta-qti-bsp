@@ -31,7 +31,7 @@ do_install:append() {
 
 EXTRA_OECONF += "--disable-doc --disable-Werror"
 
-RPROVIDES:${PN} += "kernel-module-msm_hab-${KERNEL_VERSION}"
+RPROVIDES:${PN} += "kernel-module-msm-hab-${KERNEL_VERSION}"
 
 FILES:${PN} += "${libdir}/modules-load.d/*"
 FILES:${PN} += "${nonarch_base_libdir}/modules/*"

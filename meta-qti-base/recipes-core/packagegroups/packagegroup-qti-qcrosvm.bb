@@ -14,6 +14,7 @@ ALLOW_EMPTY:${PN} = "1"
 RDEPENDS:${PN} = "\
     qcrosvm \
     gunyah-drivers \
+    msmhab \
     vhost-user-q \
     safelinux-system-cfg \
     dspfirmware-mount \
