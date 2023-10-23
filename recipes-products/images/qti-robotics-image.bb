@@ -78,6 +78,7 @@ CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-test-sensors-see"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "tdk-chx01-get-data-app"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "tdk-thermistor-app"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-sensors-see"
+CORE_IMAGE_EXTRA_INSTALL:append:kalama = "packagegroup-qti-qcawifi"
 
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-data"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-eva"
