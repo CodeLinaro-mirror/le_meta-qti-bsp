@@ -1,5 +1,6 @@
 SUMMARY = "External/Out of tree (OOT) device tree overlay"
 DESCRIPTION = "External/out of tree (OOT) device tree overlay"
+HOMEPAGE = "https://git.codelinaro.org"
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=801f80980d171dd6425610833a22dbe6"
 
@@ -10,9 +11,15 @@ SRCREV = "${AUTOREV}"
 S = "${WORKDIR}/vendor/qcom/opensource/safelinux-system-cfg/devicetree"
 
 do_prepare_kernel_source() {
-    rm -rf ${WORKDIR}/kernel/rh-kernel-5.14/.git/{config,hooks,logs,objects,packed-refs,refs,rr-cache,svn}
-    cp -rf ${SRC_DIR_ROOT}/.repo/projects/kernel/rh-kernel-5.14.git/{config,logs,refs} ${WORKDIR}/kernel/rh-kernel-5.14/.git
-    cp -rf ${SRC_DIR_ROOT}/.repo/project-objects/kernel/ark-5.14.git/{hooks,objects} ${WORKDIR}/kernel/rh-kernel-5.14/.git
+    for altfile in config hooks logs objects packed-refs refs rr-cache svn ; do
+        rm -rf ${WORKDIR}/kernel/rh-kernel-5.14/.git/${altfile}
+    done
+    for altfile in config logs refs ; do
+        cp -rf ${SRC_DIR_ROOT}/.repo/projects/kernel/rh-kernel-5.14.git/${altfile} ${WORKDIR}/kernel/rh-kernel-5.14/.git
+    done
+    for altfile in hooks objects ; do
+        cp -rf ${SRC_DIR_ROOT}/.repo/project-objects/kernel/ark-5.14.git/${altfile} ${WORKDIR}/kernel/rh-kernel-5.14/.git
+    done
     rm -rf ${WORKDIR}/vendor/qcom/opensource/safelinux-system-cfg/devicetree/centos-stream-9
     mv ${WORKDIR}/kernel/rh-kernel-5.14 ${WORKDIR}/vendor/qcom/opensource/safelinux-system-cfg/devicetree/centos-stream-9
 }
