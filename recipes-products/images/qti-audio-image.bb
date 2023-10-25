@@ -25,10 +25,10 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-adk \
         packagegroup-startup-scripts \
         packagegroup-support-utils \
+        packagegroup-qti-ppat \
         systemd-machine-units \
 "
 
 CORE_IMAGE_EXTRA_INSTALL:remove:vt-64 = "packagegroup-qti-fastcv"
 CORE_IMAGE_EXTRA_INSTALL:remove:vt-64 = "packagegroup-qti-ml"
 CORE_IMAGE_EXTRA_INSTALL:remove:vt-64 = "packagegroup-qti-ss-mgr"
-CORE_IMAGE_EXTRA_INSTALL:remove:vt-64 = "packagegroup-qti-wifi"
