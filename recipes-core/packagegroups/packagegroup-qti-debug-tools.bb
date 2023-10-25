@@ -16,6 +16,6 @@ RDEPENDS:packagegroup-qti-debug-tools = " \
             valgrind \
             systemd-analyze \
             procrank \
-	    perf \
-	    atrace \
+	      ${@bb.utils.contains('MACHINE_FEATURES', 'qti-vm', '', 'perf', d)} \
+            atrace \
         "
