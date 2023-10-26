@@ -85,6 +85,7 @@ then
 else
         fstype="UBI"
         eval FindAndMountVolume${fstype} usrfs /data
+        eval FindAndMountVolume${fstype} cachefs /cache
 fi
 
 eval FindAndMount${fstype} modem /firmware
