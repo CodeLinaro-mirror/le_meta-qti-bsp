@@ -16,6 +16,7 @@ RDEPENDS:${PN} = "\
     gunyah-drivers \
     msmhab \
     vhost-user-q \
+    safelinux-cfg-modules \
     safelinux-system-cfg \
     dspfirmware-mount \
     gvm-net-config \
