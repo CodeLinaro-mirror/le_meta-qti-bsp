@@ -33,6 +33,8 @@ RUSTVERSION = "1.66%"
 BBMASK += "poky/meta/recipes-devtools/cargo"
 BBMASK += "poky/meta/recipes-devtools/rust"
 
+# Enables timestamping functionality during building the kernel
+KERNEL_DEBUG_TIMESTAMPS = "1"
 # mesa provides these packags and others like virtual/libgl.
 # This is to enable mesa, adreno and gbm work together, and pass
 # yocot-check-layer script check.
@@ -58,3 +60,4 @@ IMAGE_INSTALL += "\
 
 IMAGE_FEATURES += "ssh-server-openssh"
 
+EXTRA_IMAGEDEPENDS += "qti-image-ark-boot:do_makeboot"

@@ -11,12 +11,12 @@ SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/display-drivers/.git;protocol=
 
 SRCREV = "${AUTOREV}"
 
-S = "${WORKDIR}/vendor/qcom/opensource/display-drivers"
+S = "${WORKDIR}/vendor/qcom/opensource/display-drivers/umd-mm"
 
 inherit qti-techpack
 
 TECHPACK_MODULE_OUT = "${WORKDIR}/display-drivers"
-TECHPACK_MODULES = "umd-mm/umd_power.ko"
+TECHPACK_MODULES = "umd_power.ko"
 TECHPACK_HEADERS = "${S}/include/uapi"
 
 RPROVIDES:${PN} += "kernel-module-umd-power-${KERNEL_VERSION}"

@@ -2,7 +2,7 @@
 #to the mctm and AGL project. The project specific
 #modules needs to added in specific machine related
 #{MACHINE}-dm-verity-image.inc file
-
+HOMEPAGE = "https://git.codelinaro.org"
 LICENSE = "GPLv2"
 
 DEPENDS = "cryptsetup-native"
@@ -39,4 +39,4 @@ python do_make_dm_verity_image(){
         bb.build.exec_func('do_rebuild_dtb',d)
 }
 
-addtask do_make_dm_verity_image after do_populate_sysroot before do_build 
+addtask do_make_dm_verity_image after do_populate_sysroot before do_build

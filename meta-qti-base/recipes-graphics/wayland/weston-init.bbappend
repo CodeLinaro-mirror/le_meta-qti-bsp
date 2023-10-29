@@ -20,6 +20,9 @@ do_install() {
             install -m 644 -p -D ${WORKDIR}/weston_early.service_caf_10 ${D}${systemd_system_unitdir}/weston.service
         fi
     fi
+    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-usermode-display', 'true', 'false', d)}; then
+        sed -i 's/dev-dri-card0.device/openwfd_server_@0.service kgsl.service/g' ${D}${systemd_system_unitdir}/weston.service
+    fi
     if [ "${@bb.utils.filter('DISTRO_FEATURES', 'pam', d)}" ]; then
         install -D -p -m0644 ${WORKDIR}/weston-autologin ${D}${sysconfdir}/pam.d/weston-autologin
     fi

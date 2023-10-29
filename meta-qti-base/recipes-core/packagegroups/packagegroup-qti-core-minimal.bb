@@ -25,5 +25,5 @@ RDEPENDS:${PN} += "\
     ${@bb.utils.contains("MACHINE_FEATURES", "qti-hypervisor", "", "system-core-early-boot", d)} \
     ${@bb.utils.contains("DISTRO_FEATURES", "early_init", "early-init", "" ,d)} \
     ${@bb.utils.contains("COMBINED_FEATURES", "hibernation", "hibernation", "" ,d)} \
-    system-core-dlkm \
+    ${@bb.utils.contains("MACHINE_FEATURES", "qti-dlkm", "system-core-dlkm", "", d)} \
     "

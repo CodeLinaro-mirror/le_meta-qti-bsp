@@ -1,8 +1,10 @@
 SUMMARY = "CLO Linux Kernel"
+HOMEPAGE = "https://git.codelinaro.org"
 LICENSE = "GPLv2.0-with-linux-syscall-note"
 LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 
 DEPENDS += "elfutils-native kern-tools-native mkbootimg-native mkdtimg-native openssl-native pahole-native rsync-native signing-keys"
+DEPENDS:append:aarch64 = " libgcc"
 
 COMPATIBLE_MACHINE = "quin-tgvm-gen4"
 
@@ -30,7 +32,6 @@ get_cc_option () {
 :
 }
 
-DEPENDS:append:aarch64 = " libgcc"
 KERNEL_CC:append:aarch64 = " ${TOOLCHAIN_OPTIONS}"
 KERNEL_LD:append:aarch64 = " ${TOOLCHAIN_OPTIONS}"
 

@@ -19,7 +19,7 @@ S = "${WORKDIR}/frameworks/binder"
 
 inherit autotools pkgconfig systemd useradd
 
-PACKAGECONFIG ?= " \
+PACKAGECONFIG ?= "\
                    ${@bb.utils.filter('DISTRO_FEATURES', 'selinux', d)} \
                    ${@bb.utils.filter('DISTRO_FEATURES', 'qti-vndbinder', d)} \
                    "
@@ -27,7 +27,7 @@ PACKAGECONFIG[selinux] = "--enable-selinux,--disable-selinux,libselinux"
 PACKAGECONFIG[qti-vndbinder] = "--enable-vendor-binder,--disable-vendor-binder"
 
 SYSTEMD_SERVICE:${PN} = "servicemanager.service create-binder.service"
-SYSTEMD_SERVICE:${PN} += " ${@bb.utils.contains('DISTRO_FEATURES', 'qti-vndbinder', 'vndservicemanager.service', '', d)}"
+SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'qti-vndbinder', 'vndservicemanager.service', '', d)}"
 SYSTEMD_AUTO_ENABLE:${PN} = "enable"
 
 # servicemanager.service and create-binder.service run as binder user

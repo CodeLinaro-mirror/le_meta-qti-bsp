@@ -1,12 +1,10 @@
-From 16a9d8f6ca4bb600659fa92576ca81513089f74d Mon Sep 17 00:00:00 2001
-From: Yimin Peng <quic_yiminp@quicinc.com>
-Date: Fri, 25 Aug 2023 21:47:28 +0800
-Subject: [PATCH] safelinux-cfg-mdoules: fix build issue on msm-6.1
+From 908a946a342b330b86aed15fdd0dad048b98b02f Mon Sep 17 00:00:00 2001
+From: Yao Jiang <quic_c_yaojia@quicinc.com>
+Date: Thu, 19 Oct 2023 11:09:06 +0800
+Subject: [PATCH] safelinux-cfg-mdoules: fix build issue for msm-6.1
 
-resovle API conflicts for msm-6.1 branch.
-
-Change-Id: Icb37d14e3c2ce6da8e3e8c62665fbfdf9949f2cc
-Signed-off-by: Yimin Peng <quic_yiminp@quicinc.com>
+Change-Id: Id58e506236e8ccd24eda68364d670368f821c13a
+Signed-off-by: Yao Jiang <quic_c_yaojia@quicinc.com>
 ---
  safelinux-modules/drivers/iommu_iova_map.c       | 4 ++--
  safelinux-modules/drivers/kiumd.c                | 4 ++--
@@ -36,7 +34,7 @@ index 27387d4..9f3f6d9 100644
  static int iommu_iova_open(struct inode *inode, struct file *filp)
  {
 diff --git a/safelinux-modules/drivers/kiumd.c b/safelinux-modules/drivers/kiumd.c
-index 99a4a93..69d54ff 100644
+index 9b14ecb..4607ccc 100644
 --- a/safelinux-modules/drivers/kiumd.c
 +++ b/safelinux-modules/drivers/kiumd.c
 @@ -26,7 +26,7 @@
@@ -47,8 +45,8 @@ index 99a4a93..69d54ff 100644
 +#include <linux/qcom_scm.h>
  #include <linux/iommu_iova_map.h>
  #include <linux/sizes.h>
- 
-@@ -320,7 +320,7 @@ int kiumd_dmabuf_custom_iova_init(struct kiumd_dev *ki_dev, char __user *arg)
+ #include <linux/xarray.h>
+@@ -572,7 +572,7 @@ int kiumd_dmabuf_custom_iova_init(struct kiumd_dev *ki_dev, char __user *arg)
  	iovad = &cookie->iovad;
  
  	LIST_HEAD(resrvd);

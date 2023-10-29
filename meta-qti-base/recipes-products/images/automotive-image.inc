@@ -1,4 +1,4 @@
-IMAGE_INSTALL += " \
+IMAGE_INSTALL += "\
     ${@bb.utils.contains('COMBINED_FEATURES', 'qti-core', 'packagegroup-qti-core-minimal', '', d)} \
     ${@bb.utils.contains('COMBINED_FEATURES', 'qti-display', 'packagegroup-qti-display', '', d)} \
     ${@bb.utils.contains('COMBINED_FEATURES', 'qti-multimedia', 'packagegroup-qti-multimedia', '', d)} \
@@ -8,7 +8,6 @@ IMAGE_INSTALL += " \
     ${@bb.utils.contains('COMBINED_FEATURES', 'qti-data', 'packagegroup-qti-data', '', d)} \
     ${@bb.utils.contains('COMBINED_FEATURES', 'qti-extra', 'packagegroup-qti-extra', '', d)} \
     ${@bb.utils.contains('COMBINED_FEATURES', 'qti-multimedia', 'packagegroup-qti-multimedia', '', d)} \
-    ${@bb.utils.contains('COMBINED_FEATURES', 'qti-vnw', 'packagegroup-qti-vnw', '', d)} \
     ${@bb.utils.contains('COMBINED_FEATURES', 'qti-wlan', 'packagegroup-qti-wlan', '', d)} \
     ${@bb.utils.contains('COMBINED_FEATURES', 'qti-tools', 'packagegroup-qti-tools', '', d)} \
     ${@bb.utils.contains_any('COMBINED_FEATURES', 'qti-audio qti-audio-ar', 'packagegroup-qti-audio', '', d)} \

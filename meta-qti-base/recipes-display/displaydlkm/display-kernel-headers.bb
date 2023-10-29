@@ -8,12 +8,12 @@ SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/display-drivers/.git;protocol=
 SRCREV = "${AUTOREV}"
 S = "${WORKDIR}/vendor/qcom/opensource/display-drivers/include/uapi"
 
-DRM_UAPI_HEADERS = " \
+DRM_UAPI_HEADERS = "\
     drm/msm_drm_pp.h \
     drm/sde_drm.h \
 "
 
-MEDIA_UAPI_HEADERS = " \
+MEDIA_UAPI_HEADERS = "\
     media/mmm_color_fmt.h \
     media/msm_sde_rotator.h \
 "

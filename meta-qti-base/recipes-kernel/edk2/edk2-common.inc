@@ -1,6 +1,6 @@
-PROVIDES = "virtual/bootloader"
-
 DEPENDS += "util-linux-native"
+
+PROVIDES = "virtual/bootloader"
 
 TOOLCHAIN = "clang"
 
@@ -35,7 +35,6 @@ EXTRA_OEMAKE:append:sa81x5 = " 'AB_RETRYCOUNT_DISABLE=1' \
 
 EXTRA_OEMAKE:append:lemans = " 'AB_RETRYCOUNT_DISABLE=1' \
                                'ENABLE_LV_ATOMIC_AB=1' "
-
 
 do_configure[noexec] = "1"
 do_compile () {
