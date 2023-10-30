@@ -34,13 +34,6 @@ KERNEL_EXTRA_ARGS += "O=${B}"
 LINUX_VERSION_EXTENSION = "${@bb.utils.contains_any('VARIANT', 'perf user', '-perf', '-debug', d)}"
 LINUX_VERSION_EXTENSION_qti-distro-debug = ""
 
-# dm-verity: Patch the cert file from which kernel add key to keyring
-do_patch_veritycert() {
-   cp -f ${WORKDIR}/verity.x509.pem ${S}/certs/verity.x509.pem
-}
-
-do_patch[postfuncs] += "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains('MACHINE_FEATURES', 'dm-verity-bootloader', 'do_patch_veritycert', '', d), '', d)}"
-
 EXTRA_OEMAKE:remove = "PAHOLE=false"
 KCONFIG_CONFIG_COMMAND:remove = "PAHOLE=false"
 

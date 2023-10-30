@@ -21,8 +21,6 @@ inherit deploy
 
 TOOLCHAIN = "clang"
 
-VBLE = "${@bb.utils.contains('DISTRO_FEATURES', 'vble','1', '0', d)}"
-VERITY_ENABLED = "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity','1', '0', d)}"
 EARLY_ETH = "${@bb.utils.contains('DISTRO_FEATURES', 'qti-early-eth', '1', '0', d)}"
 HIBERNATION = "${@bb.utils.contains('COMBINED_FEATURES', 'hibernation', '1', '0', d)}"
 DISABLE_NONBOOTDEVICE_ENABLED ?= "0"
@@ -39,8 +37,8 @@ EXTRA_OEMAKE = "'CLANG_BIN=${STAGING_BINDIR_NATIVE}/' \
                 'BOOTLOADER_OUT=${S}/out'\
                 'ENABLE_LE_VARIANT=true'\
                 'HIBERNATION_SUPPORT=${HIBERNATION}'\
-                'VERIFIED_BOOT_LE=${VBLE}'\
-                'VERITY_LE=${VERITY_ENABLED}'\
+                'VERIFIED_BOOT_LE=0'\
+                'VERITY_LE=0'\
                 'LOAD_KM_AND_SET_ROT=${LOAD_KM_SET_ROT}'\
                 'INIT_BIN_LE=\"/sbin/init\"'\
                 'EDK_TOOLS_PATH=${S}/BaseTools'\
