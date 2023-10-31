@@ -34,19 +34,19 @@ uninstall_module() {
 }
 
 if (lspci -k|grep cnss_pci);then
-	if ((lspci -k|grep 1102) || (lspci -n|grep 1102));then
+	if [ "$(lspci -k | grep 1102)" ] || [ "$(lspci -n | grep 1102)" ]; then
 		echo "##########unload qca6595#############"
 		uninstall_module qca6595
-	elif ((lspci -k|grep 003e) || (lspci -k|grep QCA6174) || (lspci -n|grep 003e));then
+	elif [ "$(lspci -k | grep 003e)" ] || [ "$(lspci -n | grep 003e)" ] || [ "$(lspci -k|grep QCA6174)" ];then
 		echo "##########unload qca6574#############"
 		uninstall_module qca6574
-	elif ((lspci -k|grep 1101) || (lspci -k|grep QCA6390) || (lspci -n|grep 1101));then
+	elif [ "$(lspci -k | grep 1101)" ] || [ "$(lspci -n | grep 1101)" ] || [ "$(lspci -k|grep QCA6390)" ];then
 		echo "##########unload qca6696#############"
 		uninstall_module qca6696
-	elif ((lspci -k|grep 1103) || (lspci -n|grep 1103));then
+	elif [ "$(lspci -k | grep 1103)" ] || [ "$(lspci -n | grep 1103)" ];then
 		echo "##########unload qca6698#############"
 		uninstall_module qca6698
-	elif ((lspci -k|grep 1107) || (lspci -n|grep 1107));then
+	elif [ "$(lspci -k | grep 1107)" ] || [ "$(lspci -n | grep 1107)" ];then
 		echo "##########unload qca6797#############"
 		uninstall_module qca6797
 	else
