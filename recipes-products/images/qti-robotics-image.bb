@@ -7,7 +7,7 @@ inherit qimage populate_sdk_qti
 IMAGE_FEATURES += "ssh-server-openssh"
 
 ROS_FEATURES_PKG += "\
-    ${@bb.utils.contains('BBFILE_COLLECTIONS', 'ros2-humble-layer', 'packagegroup-ros2-humble packagegroup-qti-ros2-node', '', d)} \
+    ${@bb.utils.contains('BBFILE_COLLECTIONS', 'ros2-humble-layer', 'packagegroup-ros2-humble', '', d)} \
     ${@bb.utils.contains('BBFILE_COLLECTIONS', 'ros2-foxy-layer', 'packagegroup-ros2-foxy packagegroup-qti-ros2-node', '', d)} \
 "
 
