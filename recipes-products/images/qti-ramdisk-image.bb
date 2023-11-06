@@ -28,6 +28,7 @@ PACKAGE_INSTALL = "\
     packagegroup-filesystem-utils-base \
     udev \
     ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'libselinux libpcre', '', d)} \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'dm-verity-initramfs-v3', 'cryptsetup verity-scripts lvm2-udevrules', '', d)} \
 "
 
 IMAGE_FSTYPES = "${INITRAMFS_FSTYPES}"
