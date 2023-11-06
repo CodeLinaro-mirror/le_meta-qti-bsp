@@ -26,6 +26,10 @@ do_install:append:lemans() {
     install -m 0644 ${S}/config/autoload_lemans.conf -D ${D}${sysconfdir}/modules-load.d/graphics_load.conf
 }
 
+do_install:append:monaco() {
+    install -m 0644 ${S}/config/autoload_monaco_auto.conf -D ${D}${sysconfdir}/modules-load.d/graphics_load.conf
+}
+
 RPROVIDES:${PN} += "kernel-module-msm-kgsl-${KERNEL_VERSION}"
 
 FILES:${PN} += "${nonarch_base_libdir}/modules/${KERNEL_VERSION}/*"

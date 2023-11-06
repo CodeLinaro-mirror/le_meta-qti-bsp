@@ -8,7 +8,7 @@ inherit core-image
 
 IMAGE_ROOTFS_SIZE = "716800"
 
-IMAGE_INSTALL += " \
+IMAGE_INSTALL += "\
     system-core-adbd \
     system-core-leprop \
     system-core-post-boot \

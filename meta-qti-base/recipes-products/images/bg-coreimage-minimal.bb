@@ -1,4 +1,5 @@
 SUMMARY = "A small image for BG."
+LICENSE = "BSD-3-Clause-Clear"
 
 IMAGE_INSTALL = "packagegroup-core-boot ${CORE_IMAGE_EXTRA_INSTALL}"
 
@@ -19,7 +20,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
     media \
     "
 
-IMAGE_FEATURES += " \
+IMAGE_FEATURES += "\
     debug-tweaks \
     ssh-server-openssh \
 "

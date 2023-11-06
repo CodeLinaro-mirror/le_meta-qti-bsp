@@ -5,7 +5,6 @@ LICENSE = "GPL-2.0 WITH Linux-syscall-note"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/GPL-2.0-only;md5=801f80980d171dd6425610833a22dbe6"
 
 SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/platform-kernel/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/platform-kernel;;usehead=1"
-
 SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/vendor/qcom/opensource/platform-kernel"
@@ -23,7 +22,7 @@ METAL_PROVIDES_MODULES = "\
     kernel-module-silent-boot-${KERNEL_VERSION} \
     kernel-module-wallpower-charger-${KERNEL_VERSION} \
     kernel-module-dump-boot-log-${KERNEL_VERSION} \
-    kernel-module-slient-mode-hw-monitoring-${KERNEL_VERSION} \
+    kernel-module-silent-mode-hw-monitoring-${KERNEL_VERSION} \
 "
 
 VIRT_PROVIDES_MODULES = "\
@@ -31,7 +30,7 @@ VIRT_PROVIDES_MODULES = "\
     kernel-module-subsystem-notif-virt-${KERNEL_VERSION} \
 "
 
-PROVIDES:${PN} += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '${METAL_PROVIDES_MODULES}', '${VIRT_PROVIDES_MODULES}', d)}"
+RPROVIDES:${PN} += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '${VIRT_PROVIDES_MODULES}', '${METAL_PROVIDES_MODULES}', d)}"
 
 FILES:${PN} += "${nonarch_base_libdir}/modules/${KERNEL_VERSION}/*"
 FILES:${PN} += "${sysconfdir}/*"
