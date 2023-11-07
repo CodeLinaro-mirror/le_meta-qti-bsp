@@ -5,6 +5,7 @@ RAMDISKDIR = "${WORKDIR}/ramdisk"
 TOYBOX_RAMDISK ?= "False"
 ENABLE_ADB ?= "True"
 ENABLE_ADB_qti-distro-base-user ?= "False"
+ENABLE_ADB_sa525m ?= "False"
 USB_AUTOSUSPEND_SUPPORT = "${@d.getVar('MACHINE_SUPPORTS_USB_AUTOSUSPEND') or "True"}"
 PACKAGE_INSTALL += "${@oe.utils.conditional('ENABLE_ADB', 'True', 'adbd usb-composition', '', d)}"
 PACKAGE_INSTALL += "${@oe.utils.conditional('USB_AUTOSUSPEND_SUPPORT', 'True', 'usb-composition-usbd', '', d)}"
@@ -196,6 +197,8 @@ fakeroot do_ramdisk_create() {
                 cp ${IMAGE_ROOTFS}/usr/sbin/ubi* usr/sbin/
                 cp ${IMAGE_ROOTFS}/usr/bin/nad-abctl usr/bin/nad-abctl
                 cp ${IMAGE_ROOTFS}/usr/lib/libnad_ab_al.so.1 lib/libnad_ab_al.so.1
+                cp ${IMAGE_ROOTFS}/usr/lib/libgthread-2.0.so.0 lib/libgthread-2.0.so.0
+                cp ${IMAGE_ROOTFS}/usr/lib/libglib-2.0.so.0 lib/libglib-2.0.so.0
                 ln -s busybox bin/dd
 
                 # The verity need to work with verified boot lib
