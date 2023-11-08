@@ -43,7 +43,6 @@ do_install() {
 
 do_install:append:monaco() {
     if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-usermode-display', 'true', 'false', d)}; then
-        sed -i 's/ExecStart=weston/ExecStart=weston --use-pixman/g' ${D}${systemd_system_unitdir}/weston.service
         sed -i 's/rc.pvr.service openwfd_server_@0.service kgsl.service/rc.pvr.service openwfd_server_@0.service kgsl.service multi-user.target/g' ${D}${systemd_system_unitdir}/weston.service
     fi
 }
