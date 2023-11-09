@@ -18,9 +18,8 @@ SRC_URI = "\
     ${PATH_TO_REPO}/external/rust/crates/android_logger/.git;protocol=${PROTO};destsuffix=external/rust/crates/android_logger;usehead=1 \
     ${PATH_TO_REPO}/external/rust/crates/simplelog/.git;protocol=${PROTO};destsuffix=external/rust/crates/simplelog;usehead=1 \
     ${PATH_TO_REPO}/external/rust/crates/vmm_vhost/.git;protocol=${PROTO};destsuffix=external/rust/crates/vmm_vhost;usehead=1 \
-    file://qcrosvm.service \
-    file://qcrosvm.sh \
 "
+
 SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/vendor/qcom/opensource/crosvm-gunyah"
@@ -30,9 +29,6 @@ inherit ${@bb.utils.contains("BBFILE_COLLECTIONS", "rust-layer", "cargo", "", d)
 CARGO_DISABLE_BITBAKE_VENDORING = "1"
 
 do_install:append() {
-    install -d ${D}${bindir}
-    install -m 0755 ${WORKDIR}/qcrosvm.sh -D ${D}${bindir}/
-
     install -d ${D}${systemd_unitdir}/system/
-    install -m 0644 ${WORKDIR}/qcrosvm.service ${D}/${systemd_unitdir}/system/qcrosvm.service
+    install -m 0644 ${S}/qcrosvm.service ${D}/${systemd_unitdir}/system/qcrosvm.service
 }

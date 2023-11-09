@@ -28,7 +28,7 @@ CFLAGS += "\
     -I${STAGING_INCDIR}/${@oe.utils.version_less_or_equal('${preferred-kernel}', '5.4', 'ion_headers', 'vmmem', d)} \
 "
 
-EXTRA_OEMESON += " \
+EXTRA_OEMESON += "\
     ${@oe.utils.version_less_or_equal('${preferred-kernel}', '5.4', '', '-Dusedmaheap=true', d)} \
 "
 

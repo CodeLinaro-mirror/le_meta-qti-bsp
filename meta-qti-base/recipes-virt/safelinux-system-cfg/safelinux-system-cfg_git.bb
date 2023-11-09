@@ -14,6 +14,7 @@ SRC_URI = "\
     file://vm_net.conf \
     file://vfio.conf \
     file://vfio_param.conf \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-lvumd', 'file://vfio-device-bind.sh', '', d)} \
 "
 
 SRCREV = "${AUTOREV}"
@@ -24,7 +25,7 @@ inherit systemd
 
 do_compile[noexec] = "1"
 
-do_install:append() {
+do_install:append:sa8775() {
     install -m 0755 ${S}/modules-autoload-config/i2cdev.conf -D ${D}${libdir}/modules-load.d/i2cdev.conf
     install -m 0755 ${WORKDIR}/vm_net.conf -D ${D}${libdir}/modules-load.d/vm_net.conf
     install -m 0755 ${WORKDIR}/vfio.conf -D ${D}${libdir}/modules-load.d/vfio.conf
@@ -36,6 +37,17 @@ do_install:append() {
     install -d ${D}${bindir}
     install -m 0644 ${S}/vfio-device-probe/vfio-device-probe.service -D ${D}${systemd_unitdir}/system/vfio-device-probe.service
     install -m 0755 ${S}/vfio-device-probe/vfio-device-bind.sh -D ${D}${bindir}/vfio-device-bind.sh
+}
+
+do_install:append:monaco() {
+    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-lvumd', 'true', 'false', d)} ; then
+        install -m 0755 ${WORKDIR}/vfio.conf -D ${D}${libdir}/modules-load.d/vfio.conf
+        install -m 0755 ${WORKDIR}/vfio_param.conf -D ${D}${sysconfdir}/modprobe.d/vfio.conf
+
+        install -d ${D}${bindir}
+        install -m 0644 ${S}/vfio-device-probe/vfio-device-probe.service -D ${D}${systemd_unitdir}/system/vfio-device-probe.service
+        install -m 0755 ${WORKDIR}/vfio-device-bind.sh -D ${D}${bindir}/vfio-device-bind.sh
+    fi
 }
 
 FILES:${PN} += "${libdir}/modules-load.d/*"

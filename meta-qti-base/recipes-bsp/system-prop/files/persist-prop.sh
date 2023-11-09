@@ -42,7 +42,7 @@ if systemd-detect-virt -cq ; then
 		if [ $PORT -eq "5555" ]; then
 			break
 		fi
-		let RETRY+=1
+		RETRY=$((RETRY + 1))
 		sleep 0.01
 		setprop service.adb.tcp.port 5555
 	done

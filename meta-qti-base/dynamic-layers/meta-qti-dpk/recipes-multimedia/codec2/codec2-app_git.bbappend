@@ -8,6 +8,6 @@ WantedBy=multi-user.target
 EOF
 }
 
-FILES:${PN} += "\    
+FILES:${PN} += "\
     ${sysconfdir}/systemd/system/init_codec2.service.d/override.conf \
 "

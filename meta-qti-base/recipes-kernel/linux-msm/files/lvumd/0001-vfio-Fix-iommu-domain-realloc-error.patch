@@ -1,0 +1,47 @@
+From 65e1d2a53ef18e1051d61c9d25c196c1bf0f5519 Mon Sep 17 00:00:00 2001
+From: Kaisheng Yang <quic_kaisheng@quicinc.com>
+Date: Mon, 11 Sep 2023 10:34:58 +0800
+Subject: [PATCH] vfio: Fix iommu domain realloc error
+
+Vfio attach group realloc a new iommu default domain, but new domain not
+attach to device, cause vfio device smmu context fault. Remove iommu domain
+realloc to fix smmu context fault.
+
+
+Change-Id: Idaa06b31330c556f97c63e7e565d9aff31c4ccec
+Signed-off-by: Kaisheng Yang <quic_kaisheng@quicinc.com>
+---
+ drivers/vfio/container.c | 10 ----------
+ 1 file changed, 10 deletions(-)
+
+diff --git a/drivers/vfio/container.c b/drivers/vfio/container.c
+index d74164abbf40..69ff614c21ae 100644
+--- a/drivers/vfio/container.c
++++ b/drivers/vfio/container.c
+@@ -444,12 +444,6 @@ int vfio_container_attach_group(struct vfio_container *container,
+ 		goto out_unlock_container;
+ 	}
+ 
+-	if (group->type == VFIO_IOMMU) {
+-		ret = iommu_group_claim_dma_owner(group->iommu_group, group);
+-		if (ret)
+-			goto out_unlock_container;
+-	}
+-
+ 	driver = container->iommu_driver;
+ 	if (driver) {
+ 		ret = driver->ops->attach_group(container->iommu_data,
+@@ -490,10 +484,6 @@ void vfio_group_detach_container(struct vfio_group *group)
+ 	if (driver)
+ 		driver->ops->detach_group(container->iommu_data,
+ 					  group->iommu_group);
+-
+-	if (group->type == VFIO_IOMMU)
+-		iommu_group_release_dma_owner(group->iommu_group);
+-
+ 	group->container = NULL;
+ 	group->container_users = 0;
+ 	list_del(&group->container_next);
+-- 
+2.17.1
+

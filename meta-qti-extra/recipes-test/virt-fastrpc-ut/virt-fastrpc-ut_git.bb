@@ -1,5 +1,6 @@
 SUMMARY = "Virtual fastrpc driver unit test"
 DESCRIPTION = "This test application depend on googletest framework and compiled as executable binary, it can test on cdsp signed PD."
+HOMEPAGE = "https://git.codelinaro.org"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://../NOTICE;md5=13f203e044394131efb7effadef55476"
 

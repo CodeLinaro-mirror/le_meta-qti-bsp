@@ -10,8 +10,7 @@ inherit packagegroup
 ALLOW_EMPTY:${PN} = "1"
 PACKAGES = "${PN}"
 
-
-RDEPENDS:${PN} = " \
+RDEPENDS:${PN} = "\
         ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "5.15", 'videodlkm', "", d)} \
         gstreamer1.0 \
         gstreamer1.0-plugins-base \
@@ -19,7 +18,6 @@ RDEPENDS:${PN} = " \
         gstreamer1.0-plugins-bad \
         gstreamer1.0-plugins-ugly \
         gstreamer1.0-libav \
-        gstreamer1.0-plugins-qscreencapsrc \
         gdk-pixbuf-loader-bmp \
         gdk-pixbuf-loader-gif \
         ${@bb.utils.contains('DISTRO_FEATURES', 'qti-gstqeavb', 'gstreamer1.0-plugins-qeavb', '', d)} \

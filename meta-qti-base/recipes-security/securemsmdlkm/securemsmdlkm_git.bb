@@ -1,5 +1,6 @@
 SUMMARY = "QTI securemsm drivers"
 DESCRIPTION = "This is the security driver, used to communicate with TrustZone."
+HOMEPAGE = "https://git.codelinaro.org"
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=801f80980d171dd6425610833a22dbe6"
@@ -20,6 +21,9 @@ inherit qti-techpack
 do_install:append() {
     install -m 0755 ${WORKDIR}/security_load.conf -D ${D}${sysconfdir}/modules-load.d/security_load.conf
     install -d ${D}${includedir}/linux
+    if [ -e ${WORKDIR}/vendor/qcom/opensource/securemsm-kernel/include/linux/smcinvoke.h ]; then
+        install -m 0644 ${WORKDIR}/vendor/qcom/opensource/securemsm-kernel/include/linux/smcinvoke.h ${D}${includedir}/linux
+    fi
     if [ -e ${WORKDIR}/vendor/qcom/opensource/securemsm-kernel/linux/smcinvoke.h ]; then
         install -m 0644 ${WORKDIR}/vendor/qcom/opensource/securemsm-kernel/linux/smcinvoke.h ${D}${includedir}/linux
     fi

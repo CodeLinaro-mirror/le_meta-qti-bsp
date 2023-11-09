@@ -1,0 +1,71 @@
+From 908a946a342b330b86aed15fdd0dad048b98b02f Mon Sep 17 00:00:00 2001
+From: Yao Jiang <quic_c_yaojia@quicinc.com>
+Date: Thu, 19 Oct 2023 11:09:06 +0800
+Subject: [PATCH] safelinux-cfg-mdoules: fix build issue for msm-6.1
+
+Change-Id: Id58e506236e8ccd24eda68364d670368f821c13a
+Signed-off-by: Yao Jiang <quic_c_yaojia@quicinc.com>
+---
+ safelinux-modules/drivers/iommu_iova_map.c       | 4 ++--
+ safelinux-modules/drivers/kiumd.c                | 4 ++--
+ safelinux-modules/include/linux/iommu_iova_map.h | 2 +-
+ 3 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/safelinux-modules/drivers/iommu_iova_map.c b/safelinux-modules/drivers/iommu_iova_map.c
+index 27387d4..9f3f6d9 100644
+--- a/safelinux-modules/drivers/iommu_iova_map.c
++++ b/safelinux-modules/drivers/iommu_iova_map.c
+@@ -200,7 +200,7 @@ out_err:
+ }
+ 
+ /* Used by iommu drivers to generate reserved regions for qcom,iommu-dma-addr-pool property */
+-void qcom_iommu_generate_resv_regions(struct device *dev,
++void qcom_iommu_generate_resv_regions_v1(struct device *dev,
+ 						      struct list_head *head)
+ {
+ 	struct iommu_resv_region *region;
+@@ -225,7 +225,7 @@ void qcom_iommu_generate_resv_regions(struct device *dev,
+ 	list_splice(&resv_regions, head);
+ }
+ 
+-EXPORT_SYMBOL(qcom_iommu_generate_resv_regions);
++EXPORT_SYMBOL(qcom_iommu_generate_resv_regions_v1);
+ 
+ static int iommu_iova_open(struct inode *inode, struct file *filp)
+ {
+diff --git a/safelinux-modules/drivers/kiumd.c b/safelinux-modules/drivers/kiumd.c
+index 9b14ecb..4607ccc 100644
+--- a/safelinux-modules/drivers/kiumd.c
++++ b/safelinux-modules/drivers/kiumd.c
+@@ -26,7 +26,7 @@
+ #include <linux/kvm_host.h>
+ #include <linux/cdev.h>
+ #include <linux/module.h>
+-#include <linux/firmware/qcom/qcom_scm.h>
++#include <linux/qcom_scm.h>
+ #include <linux/iommu_iova_map.h>
+ #include <linux/sizes.h>
+ #include <linux/xarray.h>
+@@ -572,7 +572,7 @@ int kiumd_dmabuf_custom_iova_init(struct kiumd_dev *ki_dev, char __user *arg)
+ 	iovad = &cookie->iovad;
+ 
+ 	LIST_HEAD(resrvd);
+-	qcom_iommu_generate_resv_regions(vfio_dev->dev, &resrvd);
++	qcom_iommu_generate_resv_regions_v1(vfio_dev->dev, &resrvd);
+ 	list_for_each_entry(region, &resrvd, list) {
+ 		lo = iova_pfn(iovad, region->start);
+ 		hi = iova_pfn(iovad, region->start + region->length - 1);
+diff --git a/safelinux-modules/include/linux/iommu_iova_map.h b/safelinux-modules/include/linux/iommu_iova_map.h
+index 7d07f39..770201f 100644
+--- a/safelinux-modules/include/linux/iommu_iova_map.h
++++ b/safelinux-modules/include/linux/iommu_iova_map.h
+@@ -12,5 +12,5 @@ struct device_node *qcom_iommu_group_parse_phandle(struct device *dev);
+ int qcom_iommu_generate_dma_regions(struct device *dev,
+ 			    struct list_head *head);
+ 
+-void qcom_iommu_generate_resv_regions(struct device *dev,
++void qcom_iommu_generate_resv_regions_v1(struct device *dev,
+ 			struct list_head *list);
+-- 
+2.17.1
+

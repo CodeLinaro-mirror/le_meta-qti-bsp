@@ -6,5 +6,7 @@ LD:toolchain-clang = "${HOST_PREFIX}ld.lld${TOOLCHAIN_OPTIONS} ${HOST_LD_ARCH}"
 KERNEL_CC:toolchain-clang = "${CCACHE}${HOST_PREFIX}clang -target ${HOST_SYS} ${HOST_CC_KERNEL_ARCH} "
 KERNEL_LD:toolchain-clang = "${CCACHE}${HOST_PREFIX}ld.lld ${HOST_LD_KERNEL_ARCH}"
 KERNEL_AR:toolchain-clang = "${CCACHE}${HOST_PREFIX}llvm-ar ${HOST_AR_KERNEL_ARCH}"
+# Pass LLVM_IAS=1 to ensure Clang use cross toolchain compatible for LLVM 14.x.x version.
+EXTRA_OEMAKE:append:toolchain-clang = " LLVM_IAS=1"
 TOOLCHAIN = "clang"
 
