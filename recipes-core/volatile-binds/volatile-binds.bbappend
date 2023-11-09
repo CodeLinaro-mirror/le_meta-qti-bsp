@@ -42,6 +42,7 @@ VOLATILE_BINDS:sdxpinn = "\
 /systemrw/allplay /etc/allplay/\n\
 /systemrw/resolv.conf /etc/resolv.conf\n\
 /var/volatile/lib /var/lib\n\
+${@bb.utils.contains('BBFILE_COLLECTIONS', 'qti-rdkb', '/systemrw/dibbler /etc/dibbler', '', d)}\n\
 "
 
 VOLATILE_BINDS_sdxlemur = "\
