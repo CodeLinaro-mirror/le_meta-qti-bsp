@@ -28,6 +28,7 @@ CORE_IMAGE_EXTRA_INSTALL += " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'qti-telux', '${MLIBPREFIX}packagegroup-qti-telsdk', '', d)} \
     ${MLIBPREFIX}packagegroup-support-utils \
 "
+TOOLCHAIN_TARGET_TASK += "sensor-hal-daemon-hdr telux"
 
 # Exclude packages
 PACKAGE_EXCLUDE += "readline"

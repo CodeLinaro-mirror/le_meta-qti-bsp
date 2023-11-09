@@ -26,6 +26,7 @@ CORE_IMAGE_EXTRA_INSTALL += " \
     ${MLIBPREFIX}packagegroup-qti-telematics \
     ${MLIBPREFIX}packagegroup-qti-data-vm \
 "
+TOOLCHAIN_TARGET_TASK += "sensor-hal-daemon-hdr telux"
 
 # Exclude packages
 PACKAGE_EXCLUDE += "readline"
