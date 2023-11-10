@@ -821,11 +821,13 @@ fakeroot do_makesystem_tele_ubi() {
    rm -rf ${IMAGE_ROOTFS_UBIFS_UBI}/lib/systemd/system/telaf.mount.service
    rm -rf ${IMAGE_ROOTFS_UBIFS_UBI}/lib/systemd/system/telaf.service
    rm -rf ${IMAGE_ROOTFS_UBIFS_UBI}/lib/systemd/system/mrc-daemon.service
+   rm -rf ${IMAGE_ROOTFS_UBIFS_UBI}/lib/systemd/system/rbm-daemon.service
    rm -rf ${IMAGE_ROOTFS_UBIFS_UBI}/lib/systemd/system-preset/98-mrc-daemon.preset
    rm -rf ${IMAGE_ROOTFS_UBIFS_UBI}/lib/systemd/system/gluebi-dlkm.service
    rm -rf ${IMAGE_ROOTFS_UBIFS_UBI}/lib/systemd/system/multi-user.target.wants/telaf.service
    rm -rf ${IMAGE_ROOTFS_UBIFS_UBI}/lib/systemd/system/multi-user.target.wants/telaf.mount.service
    rm -rf ${IMAGE_ROOTFS_UBIFS_UBI}/etc/systemd/system/multi-user.target.wants/mrc-daemon.service
+   rm -rf ${IMAGE_ROOTFS_UBIFS_UBI}/etc/systemd/system/multi-user.target.wants/rbm-daemon.service
    rm -rf ${IMAGE_ROOTFS_UBIFS_UBI}/etc/systemd/system/multi-user.target.wants/gluebi-dlkm.service
 
    mkfs.ubifs -r ${USER_IMAGE_ROOTFS} ${IMAGE_UBIFS_SELINUX_OPTIONS_DATA} -o ${USER_IMAGE_UBIFS_TARGET} ${MKUBIFS_ARGS}
