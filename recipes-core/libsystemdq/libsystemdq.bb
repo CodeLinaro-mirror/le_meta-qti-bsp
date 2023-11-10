@@ -2,7 +2,7 @@ require libsystemdq.inc
 
 PE = "1"
 
-DEPENDS = "intltool-native gperf-native libcap util-linux"
+DEPENDS = "intltool-native gperf-native libcap util-linux rsync-native"
 
 SECTION = "base/shell"
 PACKAGE = "libsystemdq"
@@ -17,6 +17,7 @@ SRC_URI += "file://touchscreen.rules \
            file://init \
            file://99-default.preset \
            file://0001-binfmt-Don-t-install-dependency-links-at-install-tim.patch \
+           file://0001-libsystemd-Changes-to-build-on-yocto-kirkstone.patch \
            file://0003-implment-systemd-sysv-install-for-OE.patch \
            "
 
@@ -53,7 +54,7 @@ EXTRA_OEMESON += "-Dkexec-path=${sbindir}/kexec \
                   -Dumount-path=${base_bindir}/umount"
 
 EXTRA_OEMESON += "-Denvironment-d=false \
-                  -Dnss-systemd=false -Dmyhostname=false \
+                  -Dnss-systemd=false \
                   -Dhibernate=false \
                   -Dblkid=false \
                   -Dresolve=false \
@@ -65,7 +66,6 @@ EXTRA_OEMESON += "-Denvironment-d=false \
                   -Dbacklight=false \
                   -Drfkill=false \
                   -Dlibcryptsetup=false \
-                  -Dsysv-compat=false \
                   -Dhostnamed=false \
                   -Dlocaled=false \
                   -Dtimedated=false \
