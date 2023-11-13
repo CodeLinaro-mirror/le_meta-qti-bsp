@@ -1,4 +1,4 @@
-inherit qimage
+inherit qimage qcpioimage
 
 DEPENDS += " virtual/kernel"
 
