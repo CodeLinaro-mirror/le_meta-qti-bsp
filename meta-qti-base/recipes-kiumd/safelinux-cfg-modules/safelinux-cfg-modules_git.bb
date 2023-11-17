@@ -26,7 +26,7 @@ do_patch_more() {
 addtask patch_more after do_patch before do_compile
 
 do_install:append() {
-    install -m 0755 ${WORKDIR}/umd_load.conf -D ${D}${libdir}/modules-load.d/umd_load.conf
+    install -m 0755 ${WORKDIR}/umd_load.conf -D ${D}${sysconfdir}/modules-load.d/umd_load.conf
     install -d ${D}${includedir}/linux
     install -d ${D}${includedir}/uapi/misc
     install -m 0644 ${WORKDIR}/vendor/qcom/opensource/safelinux-cfg-modules/safelinux-modules/include/linux/iommu_iova_map.h ${D}${includedir}/linux
@@ -47,5 +47,5 @@ RPROVIDES:${PN} += "kernel-module-qcom-uscmi-${KERNEL_VERSION}"
 RPROVIDES:${PN} += "kernel-module-kryo-arm64-edac-${KERNEL_VERSION}"
 RPROVIDES:${PN} += "kernel-module-kiumd-kgsl-${KERNEL_VERSION}"
 
-FILES:${PN} += "${libdir}/modules-load.d/*"
+FILES:${PN} += "${sysconfdir}/modules-load.d/*"
 FILES:${PN} += "${nonarch_base_libdir}/modules/*"

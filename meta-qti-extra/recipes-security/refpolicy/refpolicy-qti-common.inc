@@ -14,7 +14,9 @@ PURGE_POLICY_MODULES += "cgmanager automount xguest amanda portage"
 # Modules inside 'services' and 'apps' layers to keep. All others in these layers are turned off
 CONTRIB_MODULES ?= "chronyd networkmanager shutdown gnome dhcp avahi apache minidlna mta dbus \
                     pulseaudio ppp dnsmasq ddclient bluetooth tinyproxy hostapd xserver nscd \
-                    ais_server qcarcam_test qcarcam_rvc"
+                    qti_ais_server vendor_bluetooth vendor_dbus vendor_hostapd vendor_networkmanager \
+                    vendor_pulseaudio qti_qcarcam_rvc qti_qcarcam_test \
+                    "
 
 def append_policy_file(src_path, dst_path):
     # Append our policy fragment to the end of the upstream file
@@ -35,6 +37,8 @@ def install_device_policy(d, src_root):
     dst_dir = os.path.join(d.getVar("S"), "policy", "modules")
     for root, dirs, files in os.walk(src_dir):
         for file in files:
+            if (file.split('.')[0] == "qti_compatible"):
+                continue
             policy_file = os.path.relpath(os.path.join(root, file), src_dir)
             dst_path = os.path.join(dst_dir, policy_file)
             if os.path.exists(dst_path):

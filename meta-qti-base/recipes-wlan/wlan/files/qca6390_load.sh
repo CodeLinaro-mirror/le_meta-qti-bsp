@@ -34,9 +34,12 @@ else
 fi
 
 if (lspci -k|grep cnss_pci);then
-	if ((lspci -k|grep 1101) || (lspci -k|grep QCA6390));then
-		if (ls -l /sys/bus/pci/devices/ | grep 0002:01:00.0 ||
-		ls -l /sys/bus/pci/devices/ | grep 0004:01:00.0 ); then
+	if [ "$(lspci -k | grep 1101)" ] || [ "$(lspci -n | grep 1101)" ] || [ "$(lspci -k|grep QCA6390)" ];then
+			OUTPUT1=`ls -l /sys/bus/pci/devices/ | grep 0002:01:00.0`
+			echo $OUTPUT1
+			OUTPUT2=`ls -l /sys/bus/pci/devices/ | grep 0004:01:00.0`
+			echo $OUTPUT2
+		if [ -n "$OUTPUT1" ] || [ -n "$OUTPUT2" ];then
 			modprobe qca6390
 		else
 			echo "cnss: No Second Hastings wlan chipset attached"
