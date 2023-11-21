@@ -1,4 +1,4 @@
-From 908a946a342b330b86aed15fdd0dad048b98b02f Mon Sep 17 00:00:00 2001
+From c928dcfb9a56d5565f459d93f24d3cb5e5e9b291 Mon Sep 17 00:00:00 2001
 From: Yao Jiang <quic_c_yaojia@quicinc.com>
 Date: Thu, 19 Oct 2023 11:09:06 +0800
 Subject: [PATCH] safelinux-cfg-mdoules: fix build issue for msm-6.1
@@ -7,9 +7,9 @@ Change-Id: Id58e506236e8ccd24eda68364d670368f821c13a
 Signed-off-by: Yao Jiang <quic_c_yaojia@quicinc.com>
 ---
  safelinux-modules/drivers/iommu_iova_map.c       | 4 ++--
- safelinux-modules/drivers/kiumd.c                | 4 ++--
+ safelinux-modules/drivers/kiumd.c                | 8 ++++----
  safelinux-modules/include/linux/iommu_iova_map.h | 2 +-
- 3 files changed, 5 insertions(+), 5 deletions(-)
+ 3 files changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/safelinux-modules/drivers/iommu_iova_map.c b/safelinux-modules/drivers/iommu_iova_map.c
 index 27387d4..9f3f6d9 100644
@@ -34,27 +34,51 @@ index 27387d4..9f3f6d9 100644
  static int iommu_iova_open(struct inode *inode, struct file *filp)
  {
 diff --git a/safelinux-modules/drivers/kiumd.c b/safelinux-modules/drivers/kiumd.c
-index 9b14ecb..4607ccc 100644
+index e5b1ff5..199c1a8 100644
 --- a/safelinux-modules/drivers/kiumd.c
 +++ b/safelinux-modules/drivers/kiumd.c
-@@ -26,7 +26,7 @@
- #include <linux/kvm_host.h>
+@@ -22,7 +22,6 @@
+ #include <linux/io-pgtable.h>
+ #include <linux/kernel.h>
  #include <linux/cdev.h>
- #include <linux/module.h>
 -#include <linux/firmware/qcom/qcom_scm.h>
-+#include <linux/qcom_scm.h>
  #include <linux/iommu_iova_map.h>
  #include <linux/sizes.h>
  #include <linux/xarray.h>
-@@ -572,7 +572,7 @@ int kiumd_dmabuf_custom_iova_init(struct kiumd_dev *ki_dev, char __user *arg)
+@@ -107,13 +106,14 @@ struct kiumd_iommu_group {
+ 	struct kobject kobj;
+ 	struct kobject *devices_kobj;
+ 	struct list_head devices;
++	struct xarray passid_array;
+ 	struct mutex mutex;
+-	struct blocking_notifier_head notifier;
+ 	void *iommu_data;
+ 	void (*iommu_data_release)(void *iommu_data);
+ 	char *name;
+ 	int id;
+ 	struct iommu_domain *default_domain;
++	struct iommu_domain *blocking_domian;
+ 	struct iommu_domain *domain;
+ 	struct list_head entry;
+ };
+@@ -590,7 +590,7 @@ int kiumd_dmabuf_custom_iova_init(char __user *arg)
+ 	cookie = (struct kiumd_iommu_dma_cookie *)domain->iova_cookie;
  	iovad = &cookie->iovad;
  
- 	LIST_HEAD(resrvd);
 -	qcom_iommu_generate_resv_regions(vfio_dev->dev, &resrvd);
 +	qcom_iommu_generate_resv_regions_v1(vfio_dev->dev, &resrvd);
  	list_for_each_entry(region, &resrvd, list) {
  		lo = iova_pfn(iovad, region->start);
  		hi = iova_pfn(iovad, region->start + region->length - 1);
+@@ -819,7 +819,7 @@ int kiumd_dmabuf_vfio_map(char __user *arg)
+ 			 * dma_buf_map_attachment and then take the sg list
+ 			 * and map it at iova - 0x0
+ 			 * */
+-			size = iommu_map_sg(iommu_dom, iova_zero, sgt->sgl, sgt->orig_nents, prot, GFP_ATOMIC);
++			size = iommu_map_sg(iommu_dom, iova_zero, sgt->sgl, sgt->orig_nents, prot);
+ 			if (size < 0) {
+ 				pr_err("%s:iommu_map_sg failed\n", __func__);
+ 				dma_buf_unmap_attachment(dmabufattach, sgt, kiumd_dma_direction);
 diff --git a/safelinux-modules/include/linux/iommu_iova_map.h b/safelinux-modules/include/linux/iommu_iova_map.h
 index 7d07f39..770201f 100644
 --- a/safelinux-modules/include/linux/iommu_iova_map.h
