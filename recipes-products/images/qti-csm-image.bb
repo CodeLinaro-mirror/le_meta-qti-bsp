@@ -38,6 +38,8 @@ CORE_IMAGE_EXTRA_INSTALL += "\
               packagegroup-transceiver-fault-management \
               packagegroup-sw-management \
               libbootreason \
+              packagegroup-modem-ald-transport-simulation \
+              packagegroup-ru-modem-client \
 "
 
 do_merge_dtbs() {
