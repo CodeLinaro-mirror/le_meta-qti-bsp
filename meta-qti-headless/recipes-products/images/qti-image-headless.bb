@@ -5,6 +5,8 @@ LICENSE = "BSD-3-Clause-Clear"
 DEPENDS += "ext4-utils-native mkbootimg-native"
 
 inherit core-image
+# Introducing selinux-image.bbclass is to label selinux contexts when build.
+inherit ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'selinux-image', '', d)}
 
 IMAGE_ROOTFS_SIZE = "716800"
 
@@ -30,6 +32,7 @@ IMAGE_INSTALL += "\
     attr \
     ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "5.15", "securemsmdlkm", "", d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'qti-fde', 'enable-fde', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'packagegroup-selinux-minimal packagegroup-selinux-policycoreutils checkpolicy secilc auditd', '', d)} \
 "
 
 IMAGE_LINGUAS = ""
