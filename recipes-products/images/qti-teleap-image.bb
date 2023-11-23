@@ -16,6 +16,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         spitools \
         packagegroup-android-utils \
         packagegroup-qti-core \
+        packagegroup-qti-ppat \
         packagegroup-qti-data \
         packagegroup-qti-teleap \
         packagegroup-qti-telematics \
