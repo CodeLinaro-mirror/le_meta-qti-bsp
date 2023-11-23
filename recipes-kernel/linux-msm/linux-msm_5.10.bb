@@ -46,7 +46,7 @@ DTBO_MACHINE = "${@d.getVar('MACHINE_SUPPORTS_DTBO') or "False"}"
 
 # Don't set any version extention on debug build
 LINUX_VERSION_EXTENSION ?= "-perf"
-LINUX_VERSION_EXTENSION_qti-distro-debug = ""
+LINUX_VERSION_EXTENSION:qti-distro-debug = ""
 
 # returns all the elements from the src uri that are config fragments
 def find_sccs(d):
