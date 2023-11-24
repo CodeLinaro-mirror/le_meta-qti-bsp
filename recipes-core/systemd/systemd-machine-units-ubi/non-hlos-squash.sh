@@ -201,7 +201,11 @@ FindAndMountUBIVol () {
    if [ "$image_type" == "squashfs" ]; then
        mount -t squashfs $block_device $dir -o ro
    elif [ "$image_type" == "ubifs" ]; then
-       mount -t ubifs $device $dir -o bulk_read
+       if [ -x /sbin/restorecon ]; then
+           mount -t ubifs $device $dir -o bulk_read,context=system_u:object_r:firmware_t:s0
+       else
+           mount -t ubifs $device $dir -o bulk_read
+       fi
    else
        echo "not an ubi partiton" > /dev/kmsg
        IsGPIOEnabled

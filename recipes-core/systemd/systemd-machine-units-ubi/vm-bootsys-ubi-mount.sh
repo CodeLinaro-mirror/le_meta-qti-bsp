@@ -231,7 +231,7 @@ FindAndMountUBIVolume () {
         eval mount -t ubifs ubi$ubi_dev_id:$partition $dir -o bulk_read$extra_opts
     else
         echo "unknown image type " > /dev/kmsg
-        exit 0
+        return 1
     fi
 }
 

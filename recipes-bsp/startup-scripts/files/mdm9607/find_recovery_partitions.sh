@@ -153,12 +153,4 @@ eval FindAndMountUBI cachefs /cache
 
 FindAndMountMTD misc /misc
 
-# For debugging purposes, log df/mount comamnds to kmsg
-
-echo "df -h:" > /dev/kmsg
-df > /dev/kmsg
-
-echo "mount:" > /dev/kmsg
-mount > /dev/kmsg
-
 exit
