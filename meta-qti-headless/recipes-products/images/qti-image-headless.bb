@@ -32,7 +32,7 @@ IMAGE_INSTALL += "\
     attr \
     ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "5.15", "securemsmdlkm", "", d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'qti-fde', 'enable-fde', '', d)} \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'packagegroup-selinux-minimal packagegroup-selinux-policycoreutils checkpolicy secilc auditd', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'packagegroup-selinux-minimal packagegroup-selinux-policycoreutils checkpolicy secilc auditd selinux-relabelvar selinux-relabeldata', '', d)} \
 "
 
 IMAGE_LINGUAS = ""
