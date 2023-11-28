@@ -51,6 +51,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         ${@oe.utils.conditional('POWERAPPMODULE', 'True', 'powerapp powerapp-powerconfig', '', d)} \
         ${@oe.utils.conditional('DEBUG_BUILD', '1', 'packagegroup-qti-debug-tools', '', d )} \
         ${@bb.utils.contains('COMBINED_FEATURES', 'qti-nad-telaf', 'packagegroup-qti-telaf', '', d)} \
+        ${@bb.utils.contains('MACHINE_FEATURES', 'qti-tele-lxc', 'packagegroup-qti-lxc', '', d)} \
 "
 
 # Following packages will be enabled later

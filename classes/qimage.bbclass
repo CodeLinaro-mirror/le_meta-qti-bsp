@@ -5,6 +5,7 @@ QIMGCLASSES += "${@bb.utils.contains('IMAGE_FSTYPES', 'ext4', 'qimage-ext4', '',
 QIMGCLASSES += "${@bb.utils.contains('IMAGE_FSTYPES', 'squashfs', 'qimage-squashfs', '', d)}"
 QIMGCLASSES += "${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', 'qimage-ubi', '', d)}"
 QIMGCLASSES += "${@bb.utils.contains('MACHINE_FEATURES', 'tele-squashfs-ubi', 'qimage-tele-squashfs-ubi', '', d)}"
+QIMGCLASSES += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-tele-lxc', 'qlxcrootfs', '', d)}"
 
 # Use the following to extend qimage with custom functions like signing
 QIMGEXTENSION ?= ""
