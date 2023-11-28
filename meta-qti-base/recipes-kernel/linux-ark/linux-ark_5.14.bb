@@ -181,6 +181,19 @@ do_shared_workdir:append () {
             mkdir -p $kerneldir/usr/
             cp -f usr/gen_init_cpio $kerneldir/usr/
         fi
+        if (grep -q -i -e '^CONFIG_MODULES=y$' ${B}/.config); then
+            # Module.symvers gets updated during the
+            # building of the kernel modules. We need to
+            # update this in the shared workdir since some
+            # external kernel modules has a dependency on
+            # other kernel modules and will look at this
+            # file to do symbol lookups
+            cp ${B}/Module.symvers ${STAGING_KERNEL_BUILDDIR}/
+            # 5.10+ kernels have module.lds that we need to copy for external module builds
+            if [ -e "${B}/scripts/module.lds" ]; then
+                install -Dm 0644 ${B}/scripts/module.lds ${STAGING_KERNEL_BUILDDIR}/scripts/module.lds
+            fi
+        fi
 }
 
 do_deploy () {
@@ -215,4 +228,8 @@ do_deploy () {
 
 INHIBIT_PACKAGE_STRIP = "1"
 KERNEL_VERSION_SANITY_SKIP = "1"
+KERNEL_IMAGETYPE_FOR_MAKE += "dtbs"
+KERNEL_IMAGETYPE_FOR_MAKE += "${KERNEL_IMAGETYPE}"
+KERNEL_IMAGETYPE_FOR_MAKE += "modules"
 
+do_compile_kernelmodules[noexec] = "1"

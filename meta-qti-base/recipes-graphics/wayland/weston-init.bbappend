@@ -20,8 +20,16 @@ do_install() {
             install -m 644 -p -D ${WORKDIR}/weston_early.service_caf_10 ${D}${systemd_system_unitdir}/weston.service
         fi
     fi
-    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-usermode-display', 'true', 'false', d)}; then
+    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'true', 'false', d)}; then
         sed -i 's/dev-dri-card0.device/openwfd_server_@0.service kgsl.service/g' ${D}${systemd_system_unitdir}/weston.service
+        sed -i '/PAMName/d' ${D}${systemd_system_unitdir}/weston.service
+        sed -i '/TTYPath/d' ${D}${systemd_system_unitdir}/weston.service
+        sed -i 's/weston --idle-time=0/weston --tty=2 --idle-time=0/' ${D}${systemd_system_unitdir}/weston.service
+        sed -i '/Environment/a\ExecStartPre=\/bin\/chmod 700 \/run\/early' ${D}${systemd_system_unitdir}/weston.service
+        sed -i '/Environment/a\ExecStartPre=\/bin\/mkdir -p \/run\/early' ${D}${systemd_system_unitdir}/weston.service
+        sed -i '/Environment/a\ExecStartPre=\/bin\/chmod 700 \/run\/user\/0' ${D}${systemd_system_unitdir}/weston.service
+        sed -i '/Environment/a\ExecStartPre=\/bin\/chmod 700 \/run\/user' ${D}${systemd_system_unitdir}/weston.service
+        sed -i '/Environment/a\ExecStartPre=\/bin\/mkdir -p \/run\/user\/0' ${D}${systemd_system_unitdir}/weston.service
     fi
     if [ "${@bb.utils.filter('DISTRO_FEATURES', 'pam', d)}" ]; then
         install -D -p -m0644 ${WORKDIR}/weston-autologin ${D}${sysconfdir}/pam.d/weston-autologin
@@ -32,11 +40,18 @@ do_install() {
     if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'true', 'false', d)}; then
         sed -i -e '/\[core\]/a require-input=false' ${D}${sysconfdir}/xdg/weston/weston.ini
     fi
-    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-usermode-display', 'true', 'false', d)}; then
+    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'true', 'false', d)}; then
         sed -i -e '/\[core\]/a require-input=false' ${D}${sysconfdir}/xdg/weston/weston.ini
     fi
 
     # Install display udev rule
     install -d ${D}${sysconfdir}/udev/rules.d/
     install -m 0644 ${WORKDIR}/msm-display-node.rules ${D}${sysconfdir}/udev/rules.d/msm-display-node.rules
+}
+
+do_install:append:monaco() {
+    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'true', 'false', d)}; then
+        sed -i 's/openwfd_server_@0.service kgsl.service/openwfd_server_@0.service/g' ${D}${systemd_system_unitdir}/weston.service
+        sed -i 's/rc.pvr.service openwfd_server_@0.service/rc.pvr.service openwfd_server_@0.service multi-user.target/g' ${D}${systemd_system_unitdir}/weston.service
+    fi
 }

@@ -7,8 +7,8 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5
 SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/safelinux-cfg-modules/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/safelinux-cfg-modules;usehead=1"
 SRC_URI:append = " \
     file://umd_load.conf \
-    ${@bb.utils.contains('PREFERRED_PROVIDER_virtual/kernel', 'linux-ark', '', 'file://0001-safelinux-cfg-mdoules-fix-build-issue-for-msm-6.1.patch;patchdir=../', d)} \
-    ${@bb.utils.contains('PREFERRED_PROVIDER_virtual/kernel', 'linux-ark', '', 'file://Kbuild', d)} \
+    ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "6.1", 'file://0001-safelinux-cfg-mdoules-fix-build-issue-for-msm-6.1.patch;patchdir=../', '', d)} \
+    ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "6.1", 'file://Kbuild', '', d)} \
 "
 
 SRCREV = "${AUTOREV}"
@@ -19,14 +19,14 @@ TECHPACK_MODULES = "apps_pinctrl.ko scm_user_intf.ko vfio_iommu_qcom.ko iommu_io
 inherit qti-techpack
 
 do_patch_more() {
-    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-lvumd', 'true', 'false', d)} ; then
+    if ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "6.1", 'true', 'false', d)} ; then
         mv ${WORKDIR}/Kbuild ${WORKDIR}/vendor/qcom/opensource/safelinux-cfg-modules/safelinux-modules/
     fi
 }
 addtask patch_more after do_patch before do_compile
 
 do_install:append() {
-    install -m 0755 ${WORKDIR}/umd_load.conf -D ${D}${libdir}/modules-load.d/umd_load.conf
+    install -m 0755 ${WORKDIR}/umd_load.conf -D ${D}${sysconfdir}/modules-load.d/umd_load.conf
     install -d ${D}${includedir}/linux
     install -d ${D}${includedir}/uapi/misc
     install -m 0644 ${WORKDIR}/vendor/qcom/opensource/safelinux-cfg-modules/safelinux-modules/include/linux/iommu_iova_map.h ${D}${includedir}/linux
@@ -47,5 +47,5 @@ RPROVIDES:${PN} += "kernel-module-qcom-uscmi-${KERNEL_VERSION}"
 RPROVIDES:${PN} += "kernel-module-kryo-arm64-edac-${KERNEL_VERSION}"
 RPROVIDES:${PN} += "kernel-module-kiumd-kgsl-${KERNEL_VERSION}"
 
-FILES:${PN} += "${libdir}/modules-load.d/*"
+FILES:${PN} += "${sysconfdir}/modules-load.d/*"
 FILES:${PN} += "${nonarch_base_libdir}/modules/*"

@@ -73,17 +73,18 @@ do_configure:prepend() {
 }
 
 MODULESPATH = "${D}/lib/modules/${KERNEL_VERSION}"
-do_install:append() {
-    # if the blocklist exists and qti-dlkm is turned on in conf file, then install the blocklist
-    if [ -e ${S}/modules.vendor_blocklist.msm.${KERNEL_ARCH} ] && ${@bb.utils.contains('MACHINE_FEATURES', 'qti-dlkm', 'true', 'false', d)}; then
-        install -m 0644 ${S}/modules.vendor_blocklist.msm.${KERNEL_ARCH} ${MODULESPATH}/modules.blocklist
-    fi
-}
 
 do_compile:prepend() {
         if ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'true', 'false', d)}; then
             export DTC_FLAGS="-@"
         fi
+}
+
+do_install:append() {
+    # if the blocklist exists and qti-dlkm is turned on in conf file, then install the blocklist
+    if [ -e ${S}/modules.vendor_blocklist.msm.${KERNEL_ARCH} ] && ${@bb.utils.contains('MACHINE_FEATURES', 'qti-dlkm', 'true', 'false', d)}; then
+        install -m 0644 ${S}/modules.vendor_blocklist.msm.${KERNEL_ARCH} ${MODULESPATH}/modules.blocklist
+    fi
 }
 
 # when using our own module signing key kernel.bbclass will fail to copy the public part of the key
