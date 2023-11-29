@@ -25,9 +25,9 @@ EXTRA_OECONF:append = " \
     --disable-protocol=tcp --disable-protocol=rtp --disable-protocol=pipe --disable-protocol=http \
     --disable-parser=cavsvideo --disable-parser=dca --disable-parser=dirac --disable-parser=dnxhd --disable-parser=mjpeg \
     --disable-parser=mlp --disable-parser=pnm --disable-parser=vp3 --disable-demuxer=amr --disable-demuxer=apc \
-    --disable-demuxer=ape --disable-demuxer=ass --disable-demuxer=bethsoftvid --disable-demuxer=bfi \
+    --disable-demuxer=ass --disable-demuxer=bethsoftvid --disable-demuxer=bfi \
     --disable-demuxer=c93 --disable-demuxer=daud --disable-demuxer=dnxhd --disable-demuxer=dsicin --disable-demuxer=dxa \
-    --disable-demuxer=ffm --disable-demuxer=gsm --disable-demuxer=gxf --disable-demuxer=idcin --disable-demuxer=iff \
+    --disable-demuxer=ffm --disable-demuxer=gsm --disable-demuxer=gxf --disable-demuxer=idcin \
     --disable-demuxer=image2 --disable-demuxer=image2pipe --disable-demuxer=ingenient --disable-demuxer=ipmovie \
     --disable-demuxer=lmlm4 --disable-demuxer=mm --disable-demuxer=mmf --disable-demuxer=msnwc_tcp \
     --disable-demuxer=mtv --disable-demuxer=mxf --disable-demuxer=nsv --disable-demuxer=nut \
