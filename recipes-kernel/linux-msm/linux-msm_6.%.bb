@@ -100,14 +100,14 @@ do_prebuilt_configure() {
     install -m 0644 ../${KERNEL_TYPE}/.config ${B}
     install -m 0644 ../${KERNEL_TYPE}/Module.symvers ${B}
     install -m 0644 ../${KERNEL_TYPE}/signing_key.pem ${B}/certs/signing_key.pem
-    #install -m 0644 ../${KERNEL_TYPE}/verity_cert.pem ${B}/certs/verity_cert.pem
-    #install -m 0644 ../${KERNEL_TYPE}/verity_key.pem ${B}/certs/verity_key.pem
+    install -m 0644 ../${KERNEL_TYPE}/verity_cert.pem ${B}/certs/verity_cert.pem
+    install -m 0644 ../${KERNEL_TYPE}/verity_key.pem ${B}/certs/verity_key.pem
 
     # update paths of signature checking certificates to reflect current host
-    #sed -i -e '/CONFIG_MODULE_SIG_KEY[ =]/d' ${B}/.config
-    #echo "CONFIG_MODULE_SIG_KEY="\"${STAGING_DIR_TARGET}/kernel-certs/signing_key.pem\" >> ${B}/.config
-    #sed -i -e '/CONFIG_SYSTEM_TRUSTED_KEYS[ =]/d' ${B}/.config
-    #echo "CONFIG_SYSTEM_TRUSTED_KEYS="\"${STAGING_DIR_TARGET}/kernel-certs/verity_cert.pem\" >> ${B}/.config
+    sed -i -e '/CONFIG_MODULE_SIG_KEY[ =]/d' ${B}/.config
+    echo "CONFIG_MODULE_SIG_KEY="\"${STAGING_DIR_TARGET}/kernel-certs/signing_key.pem\" >> ${B}/.config
+    sed -i -e '/CONFIG_SYSTEM_TRUSTED_KEYS[ =]/d' ${B}/.config
+    echo "CONFIG_SYSTEM_TRUSTED_KEYS="\"${STAGING_DIR_TARGET}/kernel-certs/verity_cert.pem\" >> ${B}/.config
 
     install -d ${B}/${KERNEL_OUTPUT_DIR}
     for typeformake in ${KERNEL_IMAGETYPE_FOR_MAKE} ; do

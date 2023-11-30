@@ -44,6 +44,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-qmmf \
         packagegroup-qti-robotics \
         packagegroup-qti-robos \
+        packagegroup-qti-robos-addon \
         packagegroup-qti-securemsm \
         packagegroup-qti-ss-mgr \
         packagegroup-qti-test-sensors-see \
@@ -78,6 +79,7 @@ CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-test-sensors-see"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "tdk-chx01-get-data-app"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "tdk-thermistor-app"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-sensors-see"
+CORE_IMAGE_EXTRA_INSTALL:append:kalama = "packagegroup-qti-qcawifi"
 
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-data"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-eva"
@@ -85,6 +87,7 @@ CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-ss-mgr"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-touch"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-perf"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-sensors-ship"
+CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-robos-addon"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "system-sample-apps"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "tdk-chx01-get-data-app"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "tdk-thermistor-app"
