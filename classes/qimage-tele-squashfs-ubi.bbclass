@@ -326,20 +326,12 @@ EOF
 vol_id=$(echo $(grep -rc "vol_id" ${UBINIZE_SYSTEM_CFG_WITH_LXC}))
     if $(echo ${IMAGE_FEATURES} | grep -q "lxcrootfs-volume"); then
         cat << EOF >> ${UBINIZE_SYSTEM_CFG_WITH_LXC}
-[lxcrootfs_volume_a]
+[lxcrootfs_volume]
 mode=ubi
 image="${LXCRFSIMAGE_UBIFS_TARGET}"
 vol_id=$((vol_id++))
 vol_type=dynamic
-vol_name=lxcrootfs_a
-vol_size=${LXCRFS_VOLUME_SIZE}
-
-[lxcrootfs_volume_b]
-mode=ubi
-image="${LXCRFSIMAGE_UBIFS_TARGET}"
-vol_id=$((vol_id++))
-vol_type=dynamic
-vol_name=lxcrootfs_b
+vol_name=lxcrootfs
 vol_size=${LXCRFS_VOLUME_SIZE}
 EOF
    fi
@@ -718,20 +710,12 @@ EOF
 vol_id=$(echo $(grep -rc "vol_id" ${SQUASHFS_UBINIZE_CFG_AB_WITH_LXC}))
     if $(echo ${IMAGE_FEATURES} | grep -q "lxcrootfs-volume"); then
         cat << EOF >> ${SQUASHFS_UBINIZE_CFG_AB_WITH_LXC}
-[lxcrootfs_volume_a]
+[lxcrootfs_volume]
 mode=ubi
 image="${LXCRFSIMAGE_SQUASHFS_TARGET}"
 vol_id=$((vol_id++))
 vol_type=dynamic
-vol_name=lxcrootfs_a
-vol_size=${LXCRFS_SQUASHFS_VOLUME_SIZE}
-
-[lxcrootfs_volume_b]
-mode=ubi
-image="${LXCRFSIMAGE_SQUASHFS_TARGET}"
-vol_id=$((vol_id++))
-vol_type=dynamic
-vol_name=lxcrootfs_b
+vol_name=lxcrootfs
 vol_size=${LXCRFS_SQUASHFS_VOLUME_SIZE}
 EOF
    fi
