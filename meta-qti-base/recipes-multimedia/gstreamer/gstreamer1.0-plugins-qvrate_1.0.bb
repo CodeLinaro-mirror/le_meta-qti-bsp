@@ -13,8 +13,8 @@ DEPENDS += "\
     gstreamer1.0 \
     gstreamer1.0-plugins-base \
     hyp-vpp \
+    videodlkm \
     virtual/kernel-headers \
-    ${@oe.utils.version_less_or_equal('${preferred-kernel}', '5.14', '', 'videodlkm', d)} \
     vpp-headers \
 "
 
