@@ -11,7 +11,7 @@ DEPENDS += "\
     gbm \
     gbm-headers \
     libcutils \
-    ${@oe.utils.version_less_or_equal('${preferred-kernel}', '5.4', 'libion', 'libdmabufheap', d)} \
+    libdmabufheap \
     libstagefright-headers \
     libutils \
     virtual/kernel-headers \
