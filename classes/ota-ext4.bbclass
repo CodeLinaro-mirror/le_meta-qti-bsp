@@ -36,6 +36,8 @@ do_recovery_ext4[cleandirs] += "${OTA_TARGET_IMAGE_ROOTFS_EXT4}/DTBO"
 # It will be used to generate OTA packages when selinux_fc is set.
 do_recovery_ext4[cleandirs] += "${OTA_TARGET_IMAGE_ROOTFS_EXT4}/BOOT/RAMDISK"
 
+RECOVERY_IMAGE_ROOTFS = "$(echo ${IMAGE_ROOTFS} | sed 's#/${PN}/#/qti-recovery-image/#')"
+
 # recovery rootfs is required for generating OTA files.
 # Wait till all tasks of machine-recovery-image complete.
 
