@@ -11,10 +11,10 @@ PACKAGES = "\
 ALLOW_EMPTY:${PN} = "1"
 
 RDEPENDS:${PN} += "\
-    gptp-test \
     gptp \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'ptp-virtual', '', d)} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'avb-utils', '', d)} \
+    ${@bb.utils.contains('PREFERRED_PROVIDER_virtual/kernel', 'linux-ark', 'aurix-can', '', d)} \
     "
 
-RDEPENDS:${PN}:sa81x5:append = " gptp-test gptp open-avb"
+RDEPENDS:${PN}:append:sa81x5 = " gptp open-avb"

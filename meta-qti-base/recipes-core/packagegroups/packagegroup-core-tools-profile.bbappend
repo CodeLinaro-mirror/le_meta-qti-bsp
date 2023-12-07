@@ -1,10 +1,3 @@
-RRECOMMENDS:${PN}:remove = "\
-    ${PERF} \
-    blktrace \
-    ${PROFILE_TOOLS_X} \
-    ${PROFILE_TOOLS_SYSTEMD} \
-    "
-
 RDEPENDS:${PN}:remove = "\
     ${PROFILETOOLS} \
     ${BABELTRACE} \
@@ -13,3 +6,9 @@ RDEPENDS:${PN}:remove = "\
     ${VALGRIND} \
     "
 
+RRECOMMENDS:${PN}:remove = "\
+    ${PERF} \
+    blktrace \
+    ${PROFILE_TOOLS_X} \
+    ${PROFILE_TOOLS_SYSTEMD} \
+    "

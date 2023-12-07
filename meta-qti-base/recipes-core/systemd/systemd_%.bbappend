@@ -17,7 +17,7 @@ SRC_URI:append = " ${@bb.utils.contains("DISTRO_FEATURES", "early_init", "file:/
 SRC_URI:append = " ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "5.15", "file://platform_load.conf", "", d)}"
 
 # Remove backlight - Loads/Saves Screen Backlight Brightness, not required.
-PACKAGECONFIG:remove = " backlight "
+PACKAGECONFIG:remove = "backlight "
 
 # Use glib-2.0 for g_strlcat
 CFLAGS:append = " \

@@ -3,7 +3,7 @@
 
 DEPENDS += "dtc-native virtual/kernel"
 
-inherit deploy kernel-arch linux-kernel-base module qti-kernel-arch-clang
+inherit deploy kernel-arch linux-kernel-base module ${@oe.utils.ifelse(d.getVar('PREFERRED_PROVIDER_virtual/kernel') == 'linux-msm',"qti-kernel-arch-clang", "")}
 
 TECHPACK_MODULE_OUT ?= ""
 TECHPACK_HEADERS ?= ""

@@ -25,5 +25,6 @@ RDEPENDS:${PN} += "\
     ${@bb.utils.contains("MACHINE_FEATURES", "qti-hypervisor", "", "system-core-early-boot", d)} \
     ${@bb.utils.contains("DISTRO_FEATURES", "early_init", "early-init", "" ,d)} \
     ${@bb.utils.contains("COMBINED_FEATURES", "hibernation", "hibernation", "" ,d)} \
-    ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "5.15", "system-core-dlkm", "", d)} \
+    ${@bb.utils.contains("MACHINE_FEATURES", "qti-dlkm", "system-core-dlkm", "", d)} \
     "
+RDEPENDS:${PN}:append:monaco = " reboot-daemon"

@@ -45,3 +45,4 @@ do_install() {
 }
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
+ALLOW_EMPTY:${PN} = "1"

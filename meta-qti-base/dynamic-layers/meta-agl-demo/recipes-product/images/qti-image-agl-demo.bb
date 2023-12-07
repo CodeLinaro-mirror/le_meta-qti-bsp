@@ -1,6 +1,8 @@
 require recipes-platform/images/agl-demo-platform.inc
 require recipes-products/images/qti-image-weston-prop.bb
 
+LICENSE = "BSD-3-Clause-Clear"
+
 # Pull in to reuse the COMBINED_FEATURES logic for packagegroups
 # from machine-image
 require recipes-products/images/automotive-image.inc

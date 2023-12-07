@@ -1,0 +1,72 @@
+From 46af8ff20eca70b1d5e36a50dd86398645a04d0b Mon Sep 17 00:00:00 2001
+From: Lei wang <quic_leiwan@quicinc.com>
+Date: Mon, 4 Sep 2023 13:41:32 +0800
+Subject: [PATCH] Support Linux syscall 438 pidfd_getfd
+
+Upstream-Status: Pending
+
+Signed-off-by: Lei wang <quic_leiwan@quicinc.com>
+---
+ coregrind/m_syswrap/priv_syswrap-linux.h  | 3 +++
+ coregrind/m_syswrap/syswrap-arm64-linux.c | 1 +
+ coregrind/m_syswrap/syswrap-linux.c       | 5 +++++
+ include/vki/vki-scnums-shared-linux.h     | 1 +
+ 4 files changed, 10 insertions(+)
+
+diff --git a/coregrind/m_syswrap/priv_syswrap-linux.h b/coregrind/m_syswrap/priv_syswrap-linux.h
+index 25488e3..5688cf9 100644
+--- a/coregrind/m_syswrap/priv_syswrap-linux.h
++++ b/coregrind/m_syswrap/priv_syswrap-linux.h
+@@ -323,6 +323,9 @@ DECL_TEMPLATE(linux, sys_io_uring_register);
+ // Linux-specific (new in Linux 5.3)
+ DECL_TEMPLATE(linux, sys_pidfd_open);
+ 
++// Linux-specific (new in Linux 5.x)
++DECL_TEMPLATE(linux, sys_pidfd_getfd);
++
+ // Linux-specific (new in Linux 5.9)
+ DECL_TEMPLATE(linux, sys_close_range);
+ 
+diff --git a/coregrind/m_syswrap/syswrap-arm64-linux.c b/coregrind/m_syswrap/syswrap-arm64-linux.c
+index ae37fc8..79f2e73 100644
+--- a/coregrind/m_syswrap/syswrap-arm64-linux.c
++++ b/coregrind/m_syswrap/syswrap-arm64-linux.c
+@@ -835,6 +835,7 @@ static SyscallTableEntry syscall_main_table[] = {
+    GENX_(__NR_clone3,            sys_ni_syscall),        // 435
+    LINXY(__NR_close_range,       sys_close_range),       // 436
+ 
++   LINX_(__NR_pidfd_getfd,       sys_pidfd_getfd),      // 438
+    LINX_(__NR_faccessat2,        sys_faccessat2),        // 439
+ };
+ 
+diff --git a/coregrind/m_syswrap/syswrap-linux.c b/coregrind/m_syswrap/syswrap-linux.c
+index 882c1fc..825ff9a 100644
+--- a/coregrind/m_syswrap/syswrap-linux.c
++++ b/coregrind/m_syswrap/syswrap-linux.c
+@@ -13420,6 +13420,11 @@ POST(sys_pidfd_open)
+    }
+ }
+ 
++PRE(sys_pidfd_getfd)
++{
++  PRINT("sys_pidfd_getfd ( %d, %d, %lu )", SARG1, ARG2, ARG3);
++}
++
+ #undef PRE
+ #undef POST
+ 
+diff --git a/include/vki/vki-scnums-shared-linux.h b/include/vki/vki-scnums-shared-linux.h
+index 3bb4981..43941bb 100644
+--- a/include/vki/vki-scnums-shared-linux.h
++++ b/include/vki/vki-scnums-shared-linux.h
+@@ -43,6 +43,7 @@
+ #define __NR_clone3		435
+ #define __NR_close_range	436
+ 
++#define __NR_pidfd_getfd	438
+ #define __NR_faccessat2		439
+ 
+ #endif
+-- 
+2.34.1
+

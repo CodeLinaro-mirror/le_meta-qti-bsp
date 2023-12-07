@@ -8,17 +8,16 @@ ${LICENSE};md5=801f80980d171dd6425610833a22dbe6"
 DEPENDS = "wlan-devicetree"
 
 SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/wlan/platform/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/wlan/platform;;usehead=1"
+SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/vendor/qcom/opensource/wlan/platform"
 
-SRCREV = "${AUTOREV}"
-
 TECHPACK_MODULE_OUT = "${WORKDIR}/wlan-platform-dlkm"
 TECHPACK_MODULES = "cnss2/cnss2.ko"
-TECHPACK_MODULES += "cnss_utils/cnss_utils.ko"
-TECHPACK_MODULES += "cnss_utils/wlan_firmware_service.ko"
-TECHPACK_MODULES += "cnss_utils/cnss_plat_ipc_qmi_svc.ko"
-TECHPACK_MODULES += "cnss_genl/cnss_nl.ko"
+TECHPACK_MODULES:append = " cnss_utils/cnss_utils.ko"
+TECHPACK_MODULES:append = " cnss_utils/wlan_firmware_service.ko"
+TECHPACK_MODULES:append = " cnss_utils/cnss_plat_ipc_qmi_svc.ko"
+TECHPACK_MODULES:append = " cnss_genl/cnss_nl.ko"
 
 inherit qti-techpack
 

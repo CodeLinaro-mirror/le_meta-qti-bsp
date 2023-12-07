@@ -19,6 +19,8 @@ do_install:append() {
 
     install -m 0777 ${S}/firmware-qcom-sa8775p.mount -D ${D}${systemd_unitdir}/system/firmware-qcom-sa8775p.mount
     install -m 0777 ${S}/vendor-dsp.mount -D ${D}${systemd_unitdir}/system/vendor-dsp.mount
+    install -m 0777 ${S}/firmware-vm-boot.automount ${D}${systemd_unitdir}/system/firmware-vm-boot.automount
+    install -m 0777 ${S}/firmware-vm-boot.mount ${D}${systemd_unitdir}/system/firmware-vm-boot.mount
     install -d -p ${D}${systemd_unitdir}/system/multi-user.target.wants/
     install -d -p ${D}/firmware/qcom/sa8775p
     install -d -p ${D}/vendor/dsp
@@ -26,10 +28,15 @@ do_install:append() {
         ${D}${systemd_unitdir}/system/multi-user.target.wants/firmware-qcom-sa8775p.mount
     ln -sf ${systemd_unitdir}/system/vendor-dsp.mount \
         ${D}${systemd_unitdir}/system/multi-user.target.wants/vendor-dsp.mount
+    ln -sf ${systemd_unitdir}/system/firmware-vm-boot.automount \
+        ${D}${systemd_unitdir}/system/multi-user.target.wants/firmware-vm-boot.automount
+    ln -sf ${systemd_unitdir}/system/firmware-vm-boot.mount \
+        ${D}${systemd_unitdir}/system/multi-user.target.wants/firmware-vm-boot.mount
 
     install -d ${D}${sysconfdir}/sysconfig/
     install -m 0777 ${S}/lpass_cfg ${D}${sysconfdir}/sysconfig/lpass_cfg
     install -m 0777 ${S}/cdsp0_cfg ${D}${sysconfdir}/sysconfig/cdsp0_cfg
+    install -m 0777 ${S}/cdsp1_cfg ${D}${sysconfdir}/sysconfig/cdsp1_cfg
     install -m 0777 ${S}/gpdsp0_cfg ${D}${sysconfdir}/sysconfig/gpdsp0_cfg
     install -m 0777 ${S}/gpdsp1_cfg ${D}${sysconfdir}/sysconfig/gpdsp1_cfg
 }
