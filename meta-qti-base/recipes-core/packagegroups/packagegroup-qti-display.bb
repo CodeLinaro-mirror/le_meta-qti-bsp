@@ -11,7 +11,7 @@ PACKAGES = "\
 ALLOW_EMPTY:${PN} = "1"
 
 RDEPENDS:${PN} += "\
-    ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "5.15", "displaydlkm", "", d)} \
+    ${@bb.utils.contains_any("PREFERRED_VERSION_linux-msm", "5.15 6.1", "displaydlkm", "", d)} \
     libdrm \
     wayland \
     wayland-ivi-extension \
