@@ -20,9 +20,8 @@ EXTRA_OECONF_append += " \
     --target-os=linux --sysroot=${STAGING_DIR_TARGET} --arch=${TARGET_ARCH} --disable-mmx \
     --enable-shared --disable-doc --disable-htmlpages --disable-manpages --disable-podpages \
     --disable-txtpages --enable-small --disable-debug --disable-ffplay  \
-    --extra-cflags="${EXTRA_CFLAGS}" --disable-network --disable-zlib --disable-ffmpeg \
-    --disable-muxers --disable-bsfs --disable-devices --disable-protocol=udp \
-    --disable-protocol=tcp --disable-protocol=rtp --disable-protocol=pipe --disable-protocol=http \
+    --extra-cflags="${EXTRA_CFLAGS}" --disable-zlib \
+    --disable-bsfs \
     --disable-parser=cavsvideo --disable-parser=dca --disable-parser=dirac --disable-parser=dnxhd --disable-parser=mjpeg \
     --disable-parser=mlp --disable-parser=pnm --disable-parser=vp3 --disable-demuxer=amr --disable-demuxer=apc \
     --disable-demuxer=ape --disable-demuxer=ass --disable-demuxer=bethsoftvid --disable-demuxer=bfi \
@@ -31,7 +30,7 @@ EXTRA_OECONF_append += " \
     --disable-demuxer=image2 --disable-demuxer=image2pipe --disable-demuxer=ingenient --disable-demuxer=ipmovie \
     --disable-demuxer=lmlm4 --disable-demuxer=mm --disable-demuxer=mmf --disable-demuxer=msnwc_tcp \
     --disable-demuxer=mtv --disable-demuxer=mxf --disable-demuxer=nsv --disable-demuxer=nut \
-    --disable-demuxer=oma --disable-demuxer=pva --disable-demuxer=rawvideo --disable-demuxer=rl2 \
+    --disable-demuxer=oma --disable-demuxer=pva --disable-demuxer=rl2 \
     --disable-demuxer=roq --disable-demuxer=rpl --disable-demuxer=segafilm --disable-demuxer=shorten \
     --disable-demuxer=siff --disable-demuxer=smacker --disable-demuxer=sol --disable-demuxer=str \
     --disable-demuxer=thp --disable-demuxer=tiertexseq --disable-demuxer=tta --disable-demuxer=txd \
