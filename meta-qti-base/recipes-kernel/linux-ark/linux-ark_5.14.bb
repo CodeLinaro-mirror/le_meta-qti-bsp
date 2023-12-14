@@ -212,9 +212,12 @@ do_deploy () {
         cp ${WORKDIR}/recipe-sysroot/sysroot-only/sa8775p-ride.dtb.overlay ${D}/${KERNEL_IMAGEDEST}/sa8775p-ride.dtb.overlay
         install -m 0644 ${D}/${KERNEL_IMAGEDEST}/Image ${DEPLOYDIR}
         install -m 0644 ${D}/${KERNEL_IMAGEDEST}/sa8775p-ride.dtb.overlay ${DEPLOYDIR}
-    else
+    elif [ "${BASEMACHINE}" = "sa8540" ]; then
         cat ${B}/arch/arm64/boot/Image.gz \
             ${B}/arch/arm64/boot/dts/qcom/sa8540p-adp-ride.dtb > ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb
+        install -m 0644 ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb ${DEPLOYDIR}
+    else
+        cat ${B}/arch/arm64/boot/Image.gz > ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb
         install -m 0644 ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb ${DEPLOYDIR}
     fi
 
