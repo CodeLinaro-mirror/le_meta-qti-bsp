@@ -11,6 +11,11 @@ SRC_URI += "\
     ${@bb.utils.contains('MACHINE_MNT_POINTS', '/systemrw', 'file://umount-copybind', '', d)} \
     ${@bb.utils.contains('MACHINE_MNT_POINTS', '/systemrw', 'file://volatile-binds.service.in', '', d)} \
 "
+fix_etcdibbler_service () {
+    sed -i "s#systemrw/dibbler /etc/dibbler#systemrw/dibbler /etc/dibbler dir#g" ${WORKDIR}/systemrw-dibbler.service
+}
+do_install[prefuncs] += " ${@bb.utils.contains('BBFILE_COLLECTIONS', 'qti-rdkb', 'fix_etcdibbler_service', '', d)}"
+
 do_install_append () {
     if ${@bb.utils.contains('MACHINE_MNT_POINTS', '/systemrw', 'true', 'false', d)}; then
         install -d ${D}${base_sbindir}
