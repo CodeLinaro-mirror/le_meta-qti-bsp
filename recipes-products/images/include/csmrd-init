@@ -562,15 +562,29 @@ case $fstab_suffix in
             ifconfig -a $LOCAL_INTERFACE >/dev/null 2>&1
         done
 
+        echo "Trying IP link up for speed 25000"
         ifconfig $LOCAL_INTERFACE up
 
-        INTERFACE_LINKUP_TIMEOUT=60
+        INTERFACE_LINKUP_TIMEOUT=15
+        INTERFACE_LINKUP_SPEED_ARR=("100000" "50000" "40000" "10000")
+        INTERFACE_LINKUP_SPEED_INDEX=0
         IP_LINK_STATUS="$(ip address | grep $LOCAL_INTERFACE: | cut -d' ' -f9)"
         while [[ $IP_LINK_STATUS != "UP" ]]; do
             echo "wait for $INTERFACE_LINKUP_TIMEOUT sec, IP link to be up, current status : $IP_LINK_STATUS"
             sleep 1
             if [ $INTERFACE_LINKUP_TIMEOUT -le 0 ]; then
-                start_rdshell
+                if [ $INTERFACE_LINKUP_SPEED_INDEX -ge 4 ]; then
+                    start_rdshell
+                else
+                    INTERFACE_SPEED="${INTERFACE_LINKUP_SPEED_ARR[$INTERFACE_LINKUP_SPEED_INDEX]}"
+                    ifconfig $LOCAL_INTERFACE down
+                    ethtool -s $LOCAL_INTERFACE speed $INTERFACE_SPEED autoneg off
+                    echo "Trying IP link up for speed $INTERFACE_SPEED"
+                    ifconfig $LOCAL_INTERFACE up
+                    (( INTERFACE_LINKUP_SPEED_INDEX += 1))
+                    INTERFACE_LINKUP_TIMEOUT=15
+                fi
+
             fi
             (( INTERFACE_LINKUP_TIMEOUT -= 1 ))
             IP_LINK_STATUS="$(ip address | grep $LOCAL_INTERFACE: | cut -d' ' -f9)"
