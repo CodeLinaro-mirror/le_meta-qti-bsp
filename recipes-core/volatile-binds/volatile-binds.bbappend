@@ -97,6 +97,7 @@ VOLATILE_BINDS_sa525m = "\
 /systemrw/ObeConfig.conf /etc/ObeConfig.conf\n\
 /systemrw/qgptp_params /etc/qgptp_params\n\
 /systemrw/power_state.conf /etc/power_state.conf\n\
+/systemrw/qvirtmgr.json  /etc/qvirtmgr.json\n\
 "
 
 VOLATILE_BINDS_sa525m-televm = "\
