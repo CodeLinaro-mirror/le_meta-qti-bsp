@@ -935,13 +935,13 @@ python () {
             bb.build.addtask('do_sign_system_squashfs', 'do_image_complete', 'do_makesystem_squashfs', d)
             bb.build.addtask('do_makesystem_squashfs_ubi', 'do_image_complete', 'do_sign_system_squashfs', d)
             if bb.utils.contains('MACHINE_FEATURES', 'qti-tele-lxc', True, False, d):
-               bb.build.addtask('do_makesystem_squashfs_ubi_with_lxc', 'do_image_complete', 'do_makesystem_squashfs', d)
+               bb.build.addtask('do_makesystem_squashfs_ubi_with_lxc', 'do_image_complete', 'do_makesystem_squashfs_ubi', d)
             if bb.utils.contains('COMBINED_FEATURES', 'qti-nad-telaf', True, False, d):
                bb.build.addtask('do_sign_telaf_squashfs', 'do_image_complete', 'do_maketelaf_squashfs', d)
         else:
             bb.build.addtask('do_makesystem_squashfs_ubi', 'do_image_complete', 'do_makesystem_squashfs', d)
             if bb.utils.contains('MACHINE_FEATURES', 'qti-tele-lxc', True, False, d):
-               bb.build.addtask('do_makesystem_squashfs_ubi_with_lxc', 'do_image_complete', 'do_makesystem_squashfs', d)
+               bb.build.addtask('do_makesystem_squashfs_ubi_with_lxc', 'do_image_complete', 'do_makesystem_squashfs_ubi', d)
 }
 
 do_patch_ubi_tools() {
