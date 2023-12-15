@@ -15,6 +15,10 @@ SDCARD_DEVICE ?= "mmcblk0p1"
 do_configure[noexec] = "1"
 do_compile[noexec] = "1"
 
+fix_sepolicies_sdcard () {
+    sed -i "s#,context=system_u:object_r:sdcard_t:s0##g" ${WORKDIR}/automountsdcard.sh
+}
+do_install[prefuncs] += " ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', '', 'fix_sepolicies_sdcard', d)}"
 
 do_install() {
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
