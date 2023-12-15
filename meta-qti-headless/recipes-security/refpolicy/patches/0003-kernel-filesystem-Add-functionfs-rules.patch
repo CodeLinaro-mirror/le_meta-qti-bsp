@@ -1,0 +1,39 @@
+From 2f25271e6ea69e0b612a75c84d04297be064221f Mon Sep 17 00:00:00 2001
+From: Kai Meng <quic_kmeng@quicinc.com>
+Date: Mon, 27 Nov 2023 09:46:04 +0800
+Subject: [PATCH] kernel/filesystem: Add functionfs rules
+
+Create functionfs rules for below command:
+mount -o uid=2000,gid=2000 -t functionfs adb /dev/usb-ffs/adb
+
+To fix the denial:
+avc:  denied  { mount } for  pid=346 comm="mount" name="/"
+dev="functionfs" ino=17700 scontext=system_u:system_r:mount_t:s0
+tcontext=system_u:object_r:unlabeled_t:s0 tclass=filesystem permissive=1
+
+Upstream-Status: Pending
+
+Signed-off-by: Kai Meng <quic_kmeng@quicinc.com>
+---
+ policy/modules/kernel/filesystem.te | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/policy/modules/kernel/filesystem.te b/policy/modules/kernel/filesystem.te
+index 9d4a4318e..b94fbd40f 100644
+--- a/policy/modules/kernel/filesystem.te
++++ b/policy/modules/kernel/filesystem.te
+@@ -93,6 +93,11 @@ type configfs_t;
+ fs_type(configfs_t)
+ genfscon configfs / gen_context(system_u:object_r:configfs_t,s0)
+ 
++type functionfs_t;
++fs_type(functionfs_t)
++files_mountpoint(functionfs_t)
++genfscon functionfs / gen_context(system_u:object_r:functionfs_t,s0)
++
+ type cpusetfs_t;
+ fs_type(cpusetfs_t)
+ allow cpusetfs_t self:filesystem associate;
+-- 
+2.25.1
+

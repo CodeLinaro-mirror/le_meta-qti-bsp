@@ -1,0 +1,63 @@
+From 4a433937feb2dcd44fa4e216ed35ece5a5f4df54 Mon Sep 17 00:00:00 2001
+From: Kai Meng <quic_kmeng@quicinc.com>
+Date: Tue, 21 Nov 2023 16:23:23 +0800
+Subject: [PATCH] policy/modules/system/logging: Fix busybox sh wrappers
+ permission
+
+In busybox recipe of meta-selinux, busybox uses sh wrappers instead
+of links to apply for the respective policy rules, when klogd and
+syslogd run from /bin/busybox.nosuid, will meet below avc denials:
+
+type=AVC msg=audit(1651430034.719:55): avc:  denied  { map } for
+pid=305 comm="klogd" path="/bin/busybox.nosuid" dev=
+"vda" ino=18 scontext=system_u:system_r:klogd_t:s0
+tcontext=system_u:object_r:bin_t:s0 tclass=file permissive=1
+type=AVC msg=audit(1651430034.719:55): avc:  denied  { read execute }
+for  pid=305 comm="klogd" path="/bin/busybox.nos
+uid" dev="vda" ino=18 scontext=system_u:system_r:klogd_t:s0
+tcontext=system_u:object_r:bin_t:s0 tclass=file permissive
+=1
+type=AVC msg=audit(1651430034.723:56): avc:  denied  { map } for
+pid=307 comm="syslogd" path="/bin/busybox.nosuid" de
+v="vda" ino=18 scontext=system_u:system_r:syslogd_t:s0
+tcontext=system_u:object_r:bin_t:s0 tclass=file permissive=1
+type=AVC msg=audit(1651430034.723:56): avc:  denied  { read execute }
+for  pid=307 comm="syslogd" path="/bin/busybox.n
+osuid" dev="vda" ino=18 scontext=system_u:system_r:syslogd_t:s0
+tcontext=system_u:object_r:bin_t:s0 tclass=file permis
+sive=1
+
+Upstream-Status: Pending
+
+Signed-off-by: Kai Meng <quic_kmeng@quicinc.com>
+---
+ policy/modules/system/logging.te | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/policy/modules/system/logging.te b/policy/modules/system/logging.te
+index badf56f16..2a575c6d2 100644
+--- a/policy/modules/system/logging.te
++++ b/policy/modules/system/logging.te
+@@ -364,6 +364,9 @@ mls_file_read_all_levels(klogd_t)
+ 
+ userdom_dontaudit_search_user_home_dirs(klogd_t)
+ 
++# map,read,execute to /bin/busybox.nosuid
++corecmd_mmap_bin_files(klogd_t)
++
+ ifdef(`distro_ubuntu',`
+ 	optional_policy(`
+ 		unconfined_domain(klogd_t)
+@@ -527,6 +530,9 @@ seutil_read_config(syslogd_t)
+ userdom_dontaudit_use_unpriv_user_fds(syslogd_t)
+ userdom_dontaudit_search_user_home_dirs(syslogd_t)
+ 
++# map,read,execute to /bin/busybox.nosuid
++corecmd_mmap_bin_files(syslogd_t)
++
+ ifdef(`init_systemd',`
+ 	# for systemd-journal
+ 	allow syslogd_t self:capability audit_control;
+-- 
+2.25.1
+
