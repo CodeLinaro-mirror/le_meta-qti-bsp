@@ -29,6 +29,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-ss-mgr \
 	packagegroup-qti-wifi \
 	packagegroup-qti-qcawifi \
+        ${@bb.utils.contains('DEBUG_BUILD', '1', 'packagegroup-qti-drone', '', d)} \
         packagegroup-startup-scripts \
         systemd-machine-units \
 "
