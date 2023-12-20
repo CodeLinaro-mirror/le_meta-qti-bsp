@@ -60,4 +60,4 @@ IMAGE_INSTALL += "\
 
 IMAGE_FEATURES += "ssh-server-openssh"
 
-EXTRA_IMAGEDEPENDS += "qti-image-ark-boot:do_makeboot"
+EXTRA_IMAGEDEPENDS += "qti-image-ark-boot:do_sign_boot_img"
