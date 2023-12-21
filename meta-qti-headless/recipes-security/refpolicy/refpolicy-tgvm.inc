@@ -3,6 +3,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/tgvm_selinux_policies:"
 FILESEXTRAPATHS:prepend := "${THISDIR}/tgvm_selinux_policies/common_policy/system:"
 FILESEXTRAPATHS:prepend := "${THISDIR}/tgvm_selinux_policies/common_policy/kernel:"
 FILESEXTRAPATHS:prepend := "${THISDIR}/tgvm_selinux_policies/common_policy/admin:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/tgvm_selinux_policies/common_policy/services:"
 LICENSE += "& BSD-3-Clause-Clear"
 
 SRC_URI:append := "\
@@ -13,9 +14,12 @@ SRC_URI:append := "\
     file://0005-refpolicy-update-booleans.patch \
     file://qcom_policy/ \
     file://filesystem.if \
-	file://dmesg.te \
+    file://dmesg.te \
     file://systemd.te \
-	file://logging.te \
+    file://logging.te \
+    file://selinuxutil.te \
+    file://netutils.te \
+    file://ntp.te \
 "
 
 SRCREV = "${AUTOREV}"
@@ -81,17 +85,21 @@ python update_modules_conf () {
         modules_file.write(new_file)
 }
 do_compile[prefuncs] += "install_policy"
-do_compile[postfuncs] += "update_modules_conf"
+#do_compile[postfuncs] += "update_modules_conf"
 
 do_configure:append() {
     mkdir -p ${S}/policy/modules/qcom
     mkdir -p ${WORKDIR}/common_policy/kernel
     mkdir -p ${WORKDIR}/common_policy/admin
     mkdir -p ${WORKDIR}/common_policy/system
+    mkdir -p ${WORKDIR}/common_policy/services
 
     cp -r ${WORKDIR}/qcom_policy/* ${S}/policy/modules/qcom/
     cp ${WORKDIR}/filesystem.if ${WORKDIR}/common_policy/kernel/
     cp ${WORKDIR}/dmesg.te ${WORKDIR}/common_policy/admin/
+    cp ${WORKDIR}/netutils.te ${WORKDIR}/common_policy/admin/
     cp ${WORKDIR}/systemd.te ${WORKDIR}/common_policy/system/
     cp ${WORKDIR}/logging.te ${WORKDIR}/common_policy/system/
+    cp ${WORKDIR}/selinuxutil.te ${WORKDIR}/common_policy/system/
+    cp ${WORKDIR}/ntp.te ${WORKDIR}/common_policy/services/
 }

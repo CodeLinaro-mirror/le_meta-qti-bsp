@@ -70,7 +70,7 @@ interface(`relabel_qseecomd_date',`
 	')
 
 	# restorecon /data
-	allow setfiles_t $1:dir { relabelto_dir_perms read open };
+	allow setfiles_t $1:dir { relabelto_dir_perms read open search };
 	allow $1 fs_t:filesystem { associate };
 
 	# restorecon /dev/qseecom
