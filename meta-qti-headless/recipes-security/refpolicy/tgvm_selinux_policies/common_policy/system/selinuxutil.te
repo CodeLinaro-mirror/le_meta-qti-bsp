@@ -30,8 +30,7 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# /var/log is symbolic link to volatile/log
-files_read_var_symlinks(syslogd_t)
+leprop_relabelto_leprop_sock_files(setfiles_t)
 
-# /var/run is symlinks to /run
-files_read_var_symlinks(auditd_t)
+# /dev/pts/0
+term_use_generic_ptys(setfiles_t)
