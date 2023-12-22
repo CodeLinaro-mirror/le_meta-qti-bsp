@@ -16,6 +16,7 @@ RDEPENDS:${PN} = "\
     gunyah-drivers \
     msmhab \
     vhost-user-q \
+    vhost-user-lib \
     safelinux-cfg-modules \
     safelinux-system-cfg \
     safelinux-dbg-modules \
