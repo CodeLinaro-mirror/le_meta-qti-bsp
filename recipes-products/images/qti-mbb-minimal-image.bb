@@ -2,8 +2,7 @@
 # Provides packages required to build an mbb minimal image with
 # boot to console
 
-inherit qimage qramdisk
-
+inherit qimage ${@bb.utils.contains_any('MACHINE_FEATURES', 'dm-verity-initramfs-v2 dm-verity-initramfs', 'qramdisk', '', d)}
 IMAGE_FEATURES += "read-only-rootfs persist-volume"
 
 CORE_IMAGE_EXTRA_INSTALL += "\
