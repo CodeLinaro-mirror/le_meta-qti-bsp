@@ -210,3 +210,22 @@ interface(`rw_leprop_socket',`
 	allow adbd_t $1:sock_file rw_sock_file_perms;
 	allow init_t $1:sock_file rw_sock_file_perms;
 ')
+
+########################################
+## <summary>
+##  Allow domain to relabelto leprop sock_files
+## </summary>
+## <param name="domain">
+##  <summary>
+##  Domain allowed access.
+##  </summary>
+## </param>
+## <rolecap/>
+#
+interface(`leprop_relabelto_leprop_sock_files',`
+gen_require(`
+        type leprop_socket_t;
+    ')
+
+    allow $1 leprop_socket_t:sock_file relabelto_sock_file_perms;
+')
