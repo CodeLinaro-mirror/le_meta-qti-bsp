@@ -36,6 +36,11 @@ CORE_IMAGE_EXTRA_INSTALL += "\
               packagegroup-qti-transceiver \
               packagegroup-transceiver-perf-measurement \
               packagegroup-transceiver-fault-management \
+              packagegroup-transceiver-logger \
+              packagegroup-sw-management \
+              libbootreason \
+              packagegroup-modem-ald-transport-simulation \
+              packagegroup-ru-modem-client \
 "
 
 do_merge_dtbs() {
