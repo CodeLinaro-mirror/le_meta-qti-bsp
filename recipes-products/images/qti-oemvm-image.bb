@@ -3,6 +3,7 @@ inherit qimage qcpioimage
 DEPENDS += " virtual/kernel"
 
 ENABLE_SECUREMSM = "${@d.getVar('MACHINE_SUPPORTS_SECUREMSM') or "True"}"
+ENABLE_MINK = "${@d.getVar('MACHINE_SUPPORTS_MINK') or "True"}"
 
 CORE_IMAGE_EXTRA_INSTALL += " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'packagegroup-selinux-minimal', '', d)} \
@@ -11,6 +12,7 @@ CORE_IMAGE_EXTRA_INSTALL += " \
     e2fsprogs-mke2fs \
 "
 #CORE_IMAGE_EXTRA_INSTALL += " ${@oe.utils.conditional('ENABLE_SECUREMSM', 'True', 'packagegroup-qti-securemsm-oemvm', '', d)}"
+#CORE_IMAGE_EXTRA_INSTALL += " ${@oe.utils.conditional('ENABLE_MINK', 'True', 'packagegroup-qti-mink-oemvm', '', d)}"
 
 #Exclude packages
 PACKAGE_EXCLUDE += "readline"

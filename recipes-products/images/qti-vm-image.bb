@@ -5,6 +5,7 @@ DEPENDS += " virtual/kernel"
 ENABLE_DISPLAY = "${@d.getVar('MACHINE_SUPPORTS_DISPLAY') or "True"}"
 ENABLE_TOUCH = "${@d.getVar('MACHINE_SUPPORTS_TOUCH') or "True"}"
 ENABLE_SECUREMSM = "${@d.getVar('MACHINE_SUPPORTS_SECUREMSM') or "True"}"
+ENABLE_MINK = "${@d.getVar('MACHINE_SUPPORTS_MINK') or "True"}"
 
 CORE_IMAGE_EXTRA_INSTALL += " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'packagegroup-selinux-minimal', '', d)} \
@@ -18,6 +19,7 @@ CORE_IMAGE_EXTRA_INSTALL += " ${@bb.utils.contains('MACHINE_FEATURES', 'qti-vm-p
 #CORE_IMAGE_EXTRA_INSTALL += " ${@oe.utils.conditional('ENABLE_DISPLAY', 'True', 'packagegroup-qti-display', '', d)}"
 #CORE_IMAGE_EXTRA_INSTALL += " ${@oe.utils.conditional('ENABLE_TOUCH', 'True', 'packagegroup-qti-touch', '', d)}"
 CORE_IMAGE_EXTRA_INSTALL += " ${@oe.utils.conditional('ENABLE_SECUREMSM', 'True', 'packagegroup-qti-securemsm', '', d)}"
+CORE_IMAGE_EXTRA_INSTALL += " ${@oe.utils.conditional('ENABLE_MINK', 'True', 'packagegroup-qti-mink', '', d)}"
 #CORE_IMAGE_EXTRA_INSTALL += " ${@bb.utils.contains('MACHINE_FEATURES', 'qti-dsp_trusted', 'adsprpc-kernel', '', d)}"
 CORE_IMAGE_EXTRA_INSTALL += " ${@bb.utils.contains('MACHINE_FEATURES', 'vm-dynamic-memresize', 'psi-daemon', '', d)}"
 
