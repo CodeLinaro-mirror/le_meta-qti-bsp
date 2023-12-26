@@ -94,6 +94,7 @@ VOLATILE_BINDS_sa525m = "\
 /systemrw/tel.conf /etc/tel.conf\n\
 /systemrw/enable /etc/cv2x/enable\n\
 /systemrw/ObeConfig.conf /etc/ObeConfig.conf\n\
+/systemrw/qgptp_params /etc/qgptp_params\n\
 "
 
 VOLATILE_BINDS_sa525m-televm = "\
