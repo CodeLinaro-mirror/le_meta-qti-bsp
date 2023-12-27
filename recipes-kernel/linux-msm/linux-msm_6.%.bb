@@ -3,16 +3,24 @@ inherit kernel
 DESCRIPTION = "CAF Linux Kernel"
 LICENSE = "GPLv2.0-with-linux-syscall-note"
 
-COMPATIBLE_MACHINE = "sxrneo|cinder|sm8450p"
+COMPATIBLE_MACHINE = "trustedvm-v3"
 
 FILESEXTRAPATHS:prepend := "${WORKSPACE}:"
+FILESEXTRAPATHS:prepend := "${WORKSPACE}:${KERNEL_PREBUILT_PATH}:"
 
-SRC_URI   =  "file://kernel-5.10/kernel_platform \
-             "
-S = "${WORKDIR}/kernel-5.10/kernel_platform/msm-kernel"
+SRC_URI = "file://kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/msm-kernel \
+           file://kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/common \
+           file://dist \
+           "
+
+SRC_URI:append:cinder  =  "${@oe.utils.conditional('KERNEL_USE_PREBUILTS', 'True', '', 'file://kernel-${PV}/kernel_platform/msm-kernel/arch/${ARCH}/configs/vendor/cinder_debug.config',d)}"
+
+S = "${WORKDIR}/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/msm-kernel"
 PR = "r0"
 
 DEPENDS += "virtual/kernel-toolchain-native virtual/dtc-native rsync-native mod-signing-keys"
+DEPENDS:append:aarch64 = " libgcc"
+RDEPENDS:${KERNEL_PACKAGE_NAME}-base = ""
 
 LDFLAGS:aarch64 = "-O1 --hash-style=gnu --as-needed"
 TARGET_CXXFLAGS += "-Wno-format"
@@ -29,11 +37,6 @@ get_cc_option () {
 :
 }
 
-RDEPENDS:${KERNEL_PACKAGE_NAME}-base = ""
-
-LDFLAGS:aarch64 = "-O1 --hash-style=gnu --as-needed"
-
-DEPENDS:append:aarch64 = " libgcc"
 KERNEL_CC:append:aarch64 = " ${TOOLCHAIN_OPTIONS}"
 KERNEL_LD:append:aarch64 = " ${TOOLCHAIN_OPTIONS}"
 
@@ -46,7 +49,7 @@ DTBO_MACHINE = "${@d.getVar('MACHINE_SUPPORTS_DTBO') or "False"}"
 
 # Don't set any version extention on debug build
 LINUX_VERSION_EXTENSION ?= "-perf"
-LINUX_VERSION_EXTENSION:qti-distro-debug = ""
+LINUX_VERSION_EXTENSION_qti-distro-debug = ""
 
 # returns all the elements from the src uri that are config fragments
 def find_sccs(d):
@@ -61,18 +64,19 @@ def find_sccs(d):
 
 # dm-verity: Patch the cert file from which kernel add key to keyring
 do_patch_veritycert() {
-   cp -f ${WORKDIR}/verity.x509.pem ${S}/certs/verity.x509.pem
+   ## TODO
+   #cp -f ${WORKDIR}/verity.x509.pem ${S}/certs/verity.x509.pem
 }
 
 do_patch[postfuncs] += " ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains('MACHINE_FEATURES', 'dm-verity-bootloader', 'do_patch_veritycert', '', d), '', d)}"
 
 do_configure:prepend() {
-    if [ ! -f "${WORKDIR}/kernel-5.10/kernel_platform/msm-kernel/arch/${ARCH}/configs/${KERNEL_CONFIG}" ]; then
+    if [ ! -f "${WORKDIR}/kernel-5.15/kernel_platform/msm-kernel/arch/${ARCH}/configs/${KERNEL_CONFIG}" ]; then
         bbfatal "KERNEL_CONFIG '${KERNEL_CONFIG}' was specified, but not present in the source tree"
     fi
 
     sccs_from_src_uri="${@" ".join(find_sccs(d))}"
-    ${S}/scripts/kconfig/merge_config.sh -m -r -y -O ${B} ${WORKDIR}/kernel-5.10/kernel_platform/msm-kernel/arch/${ARCH}/configs/${KERNEL_CONFIG} ${sccs_from_src_uri} 1>&2
+    ${S}/scripts/kconfig/merge_config.sh -m -r -y -O ${B} ${WORKDIR}/kernel-5.15/kernel_platform/msm-kernel/arch/${ARCH}/configs/${KERNEL_CONFIG} ${sccs_from_src_uri} 1>&2
 
     echo "# Global settings from linux recipe" >> ${B}/.config
     echo "CONFIG_LOCALVERSION="\"${LINUX_VERSION_EXTENSION}\" >> ${B}/.config
@@ -82,6 +86,7 @@ do_configure:prepend() {
     fi
 }
 
+do_prebuilt_configure[cleandirs] += "${B}"
 do_prebuilt_configure() {
     cd ${KERNEL_PREBUILT_DISTDIR}
 
@@ -92,25 +97,11 @@ do_prebuilt_configure() {
     # Some of the artifacts needed for module compilation are present under
     # msm-kernel path, for now copy them for this path to avoid build failures.
     # Ask prebuilt providers to make these available in KERNEL_PREBUILT_DISTDIR.
-    install -m 0644 ../msm-kernel/.config ${B}
-    install -m 0644 ../msm-kernel/Module.symvers ${B}
-    install -m 0644 ../msm-kernel/include/config/kernel.release ${B}/include/config/kernel.release
-    install -m 0644 ../msm-kernel/scripts/module.lds ${B}/scripts/module.lds
-    install -m 0644 ../msm-kernel/include/generated/utsrelease.h ${B}/include/generated
-    install -m 0644 ../msm-kernel/certs/signing_key.pem ${B}/certs/signing_key.pem
-    install -m 0644 ../msm-kernel/certs/verity_cert.pem ${B}/certs/verity_cert.pem
-    install -m 0644 ../msm-kernel/certs/verity_key.pem ${B}/certs/verity_key.pem
-
-    # Copy build scripts and config fragments
-    install -d ${B}/build
-    install -d ${B}/common
-    install -m 0755 ${WORKDIR}/kernel-5.10/kernel_platform/build/build_module.sh ${B}/build
-    install -m 0755 ${WORKDIR}/kernel-5.10/kernel_platform/build/_setup_env.sh ${B}/build
-    install -m 0644 ${WORKDIR}/kernel-5.10/kernel_platform/msm-kernel/${KERNEL_CONFIG} ${B}
-    install -m 0644 ${WORKDIR}/kernel-5.10/kernel_platform/msm-kernel/build.config.msm.common ${B}
-    install -m 0644 ${WORKDIR}/kernel-5.10/kernel_platform/msm-kernel/build.config.sxr.common ${B}
-    install -m 0644 ${WORKDIR}/kernel-5.10/kernel_platform/common/build.config.common ${B}/common
-    install -m 0644 ${WORKDIR}/kernel-5.10/kernel_platform/common/build.config.aarch64 ${B}/common
+    install -m 0644 ../${KERNEL_TYPE}/.config ${B}
+    install -m 0644 ../${KERNEL_TYPE}/Module.symvers ${B}
+    install -m 0644 ../${KERNEL_TYPE}/signing_key.pem ${B}/certs/signing_key.pem
+    install -m 0644 ../${KERNEL_TYPE}/verity_cert.pem ${B}/certs/verity_cert.pem
+    install -m 0644 ../${KERNEL_TYPE}/verity_key.pem ${B}/certs/verity_key.pem
 
     # update paths of signature checking certificates to reflect current host
     sed -i -e '/CONFIG_MODULE_SIG_KEY[ =]/d' ${B}/.config
@@ -134,7 +125,7 @@ do_prebuilt_configure() {
 }
 
 do_prebuilt_shared_workdir[cleandirs] += " ${STAGING_KERNEL_BUILDDIR}"
-do_prebuilt_shared_workdir[nostamp] = "1"
+#do_prebuilt_shared_workdir[nostamp] = "1"
 do_prebuilt_shared_workdir() {
     cd ${B}
 
@@ -151,42 +142,35 @@ do_prebuilt_shared_workdir() {
     install -m 0644 System.map $kerneldir/System.map-${KERNEL_VERSION}
     [ -e Module.symvers ] && install -m 0644 Module.symvers $kerneldir/
     install -m 0644 .config $kerneldir/
-    install -m 0644 ${KERNEL_CONFIG} $kerneldir/
-    install -m 0644 build.config.msm.common $kerneldir/
-    install -m 0644 build.config.sxr.common $kerneldir/
-    mkdir -p $kerneldir/common
-    install -m 0644 common/build.config.common $kerneldir/common/
-    install -m 0644 common/build.config.aarch64 $kerneldir/common/
     mkdir -p $kerneldir/include/config
-    install -m 0644 include/config/kernel.release $kerneldir/include/config/kernel.release
     mkdir -p $kerneldir/scripts
+    mkdir -p $kerneldir/include/generated
     if [ -e "${B}/scripts/module.lds" ]; then
         install -m 0644 ${B}/scripts/module.lds ${STAGING_KERNEL_BUILDDIR}/scripts/module.lds
     fi
-    #Install build scripts
-    mkdir -p $kerneldir/build
-    install -m 0755 ${B}/build/build_module.sh $kerneldir/build
-    install -m 0755 ${B}/build/_setup_env.sh $kerneldir/build
 }
 
-do_prebuilt_install[dirs] = "${B}"
+#do_prebuilt_install[dirs] = "${B}"
+do_prebuilt_install[cleandirs] += "${D}"
 fakeroot do_prebuilt_install() {
+    cd ${B}
+
     #
     # Install various kernel output (zImage, map file, config, module support files)
     # From prebuilt paths
     #
-    install -d ${D}/${KERNEL_IMAGEDEST}
-    install -d ${D}/boot
-    for imageType in ${KERNEL_IMAGETYPES} ; do
-        install -m 0644 ${KERNEL_OUTPUT_DIR}/${imageType} ${D}/${KERNEL_IMAGEDEST}/${imageType}-${KERNEL_VERSION}
-        if [ "${KERNEL_PACKAGE_NAME}" = "kernel" ]; then
-            ln -sf ${imageType}-${KERNEL_VERSION} ${D}/${KERNEL_IMAGEDEST}/${imageType}
-        fi
-    done
-    install -m 0644 System.map ${D}/boot/System.map-${KERNEL_VERSION}
-    install -m 0644 .config ${D}/boot/config-${KERNEL_VERSION}
-    install -m 0644 vmlinux ${D}/boot/vmlinux-${KERNEL_VERSION}
-    [ -e Module.symvers ] && install -m 0644 Module.symvers ${D}/boot/Module.symvers-${KERNEL_VERSION}
+#    install -d ${D}/${KERNEL_IMAGEDEST}
+#    install -d ${D}/boot
+#    for imageType in ${KERNEL_IMAGETYPES} ; do
+#        install -m 0644 ${KERNEL_OUTPUT_DIR}/${imageType} ${D}/${KERNEL_IMAGEDEST}/${imageType}-${KERNEL_VERSION}
+#        if [ "${KERNEL_PACKAGE_NAME}" = "kernel" ]; then
+#            ln -sf ${imageType}-${KERNEL_VERSION} ${D}/${KERNEL_IMAGEDEST}/${imageType}
+#        fi
+#    done
+    #install -m 0644 System.map ${D}/boot/System.map-${KERNEL_VERSION}
+    #install -m 0644 .config ${D}/boot/config-${KERNEL_VERSION}
+    #install -m 0644 vmlinux ${D}/boot/vmlinux-${KERNEL_VERSION}
+#    [ -e Module.symvers ] && install -m 0644 Module.symvers ${D}/boot/Module.symvers-${KERNEL_VERSION}
     install -d ${D}${sysconfdir}/modules-load.d
     install -d ${D}${sysconfdir}/modprobe.d
 
@@ -271,6 +255,7 @@ do_deploy() {
     install -m 0644 System.map ${DEPLOYDIR}
 
     install -d ${DEPLOYDIR}/kernel_dtbs
+    cd ${KERNEL_PREBUILT_DISTDIR}/
     for dtbf in ${KERNEL_DTB_NAMES}; do
         install -m 0644 $dtbf ${DEPLOYDIR}/kernel_dtbs
     done
@@ -283,6 +268,7 @@ do_deploy() {
     for kmod in $(find . -name "*.ko") ; do
         install -m 0644 $kmod ${DEPLOYDIR}/kernel_modules
     done
+
 }
 
 # Put the zImage in the kernel-dev pkg

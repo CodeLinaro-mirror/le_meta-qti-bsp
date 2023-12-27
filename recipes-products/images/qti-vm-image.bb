@@ -1,4 +1,4 @@
-inherit qimage qramdisk
+inherit qimage qcpioimage
 
 DEPENDS += " virtual/kernel"
 
@@ -8,14 +8,18 @@ ENABLE_SECUREMSM = "${@d.getVar('MACHINE_SUPPORTS_SECUREMSM') or "True"}"
 
 CORE_IMAGE_EXTRA_INSTALL += " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'packagegroup-selinux-minimal', '', d)} \
-    packagegroup-startup-scripts \
+    post-boot \
+    sdcard-scripts-automount \
     e2fsprogs-mke2fs \
-    powerapp \
     procrank \
 "
-CORE_IMAGE_EXTRA_INSTALL += " ${@oe.utils.conditional('ENABLE_DISPLAY', 'True', 'packagegroup-qti-display', '', d)}"
-CORE_IMAGE_EXTRA_INSTALL += " ${@oe.utils.conditional('ENABLE_TOUCH', 'True', 'packagegroup-qti-touch', '', d)}"
+
+CORE_IMAGE_EXTRA_INSTALL += " ${@bb.utils.contains('MACHINE_FEATURES', 'qti-vm-persist', 'packagegroup-qti-encryption', '', d)}"
+#CORE_IMAGE_EXTRA_INSTALL += " ${@oe.utils.conditional('ENABLE_DISPLAY', 'True', 'packagegroup-qti-display', '', d)}"
+#CORE_IMAGE_EXTRA_INSTALL += " ${@oe.utils.conditional('ENABLE_TOUCH', 'True', 'packagegroup-qti-touch', '', d)}"
 CORE_IMAGE_EXTRA_INSTALL += " ${@oe.utils.conditional('ENABLE_SECUREMSM', 'True', 'packagegroup-qti-securemsm', '', d)}"
+#CORE_IMAGE_EXTRA_INSTALL += " ${@bb.utils.contains('MACHINE_FEATURES', 'qti-dsp_trusted', 'adsprpc-kernel', '', d)}"
+#CORE_IMAGE_EXTRA_INSTALL += " ${@bb.utils.contains('MACHINE_FEATURES', 'vm-dynamic-memresize', 'psi-daemon', '', d)}"
 
 #Exclude packages
 PACKAGE_EXCLUDE += "readline"
@@ -29,3 +33,4 @@ IMAGE_FEATURES += "vm"
 
 do_compose_vmimage[recrdeptask] = "do_ramdisk_create"
 do_compose_vmimage[recrdeptask] += "do_merge_dtbs"
+do_compose_vmimage[recrdeptask] += "do_extracpio_create"
