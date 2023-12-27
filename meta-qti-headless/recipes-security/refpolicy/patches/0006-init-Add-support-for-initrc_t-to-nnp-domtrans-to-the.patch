@@ -1,0 +1,40 @@
+From 84d8ab56c8b9fb1da9c2dc541668982f68dbde4d Mon Sep 17 00:00:00 2001
+From: Kai Meng <quic_kmeng@quicinc.com>
+Date: Thu, 28 Dec 2023 16:49:09 +0800
+Subject: [PATCH] init: Add support for initrc_t to nnp domtrans to the target
+
+Because we add NoNewPrivileges option for some services, that
+prevent initrc_t transfering to the targeted domain when start
+relevant binary from service.
+This is a workaround solution until there is better way on community
+
+Upstream-Status:Inappropriate[Expose key permission]
+
+Signed-off-by: Kai Meng <quic_kmeng@quicinc.com>
+---
+ policy/modules/system/init.if | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/policy/modules/system/init.if b/policy/modules/system/init.if
+index 8ca29f6..eb778f8 100644
+--- a/policy/modules/system/init.if
++++ b/policy/modules/system/init.if
+@@ -351,6 +351,7 @@ interface(`init_daemon_domain',`
+ 
+ 	domain_type($1)
+ 	domain_entry_file($1, $2)
++	allow initrc_t $1:process2 { nnp_transition };
+ 
+ 	role system_r types $1;
+ 
+@@ -548,6 +549,7 @@ interface(`init_system_domain',`
+ 	role system_r types $1;
+ 
+ 	domtrans_pattern(initrc_t, $2, $1)
++	allow initrc_t $1:process2 { nnp_transition };
+ 
+ 	ifdef(`init_systemd',`
+ 		init_domain($1, $2)
+-- 
+2.25.1
+
