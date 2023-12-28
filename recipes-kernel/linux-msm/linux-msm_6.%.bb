@@ -3,7 +3,7 @@ inherit kernel
 DESCRIPTION = "CAF Linux Kernel"
 LICENSE = "GPLv2.0-with-linux-syscall-note"
 
-COMPATIBLE_MACHINE = "trustedvm-v3"
+COMPATIBLE_MACHINE = "trustedvm-v3|mdm9607"
 
 FILESEXTRAPATHS:prepend := "${WORKSPACE}:"
 FILESEXTRAPATHS:prepend := "${WORKSPACE}:${KERNEL_PREBUILT_PATH}:"
@@ -71,12 +71,12 @@ do_patch_veritycert() {
 do_patch[postfuncs] += " ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains('MACHINE_FEATURES', 'dm-verity-bootloader', 'do_patch_veritycert', '', d), '', d)}"
 
 do_configure:prepend() {
-    if [ ! -f "${WORKDIR}/kernel-5.15/kernel_platform/msm-kernel/arch/${ARCH}/configs/${KERNEL_CONFIG}" ]; then
+    if [ ! -f "${WORKDIR}/${PREFERRED_VERSION_linux-msm}/kernel_platform/msm-kernel/arch/${ARCH}/configs/${KERNEL_CONFIG}" ]; then
         bbfatal "KERNEL_CONFIG '${KERNEL_CONFIG}' was specified, but not present in the source tree"
     fi
 
     sccs_from_src_uri="${@" ".join(find_sccs(d))}"
-    ${S}/scripts/kconfig/merge_config.sh -m -r -y -O ${B} ${WORKDIR}/kernel-5.15/kernel_platform/msm-kernel/arch/${ARCH}/configs/${KERNEL_CONFIG} ${sccs_from_src_uri} 1>&2
+    ${S}/scripts/kconfig/merge_config.sh -m -r -y -O ${B} ${WORKDIR}/${PREFERRED_VERSION_linux-msm}/kernel_platform/msm-kernel/arch/${ARCH}/configs/${KERNEL_CONFIG} ${sccs_from_src_uri} 1>&2
 
     echo "# Global settings from linux recipe" >> ${B}/.config
     echo "CONFIG_LOCALVERSION="\"${LINUX_VERSION_EXTENSION}\" >> ${B}/.config
@@ -211,6 +211,16 @@ do_compile:append() {
     done
     cp arch/${ARCH}/boot/${KERNEL_IMAGETYPE} arch/${ARCH}/boot/${KERNEL_IMAGETYPE}.backup
     cat arch/${ARCH}/boot/${KERNEL_IMAGETYPE}.backup $dtbs > arch/${ARCH}/boot/${KERNEL_IMAGETYPE}
+    rm -f arch/${ARCH}/boot/${KERNEL_IMAGETYPE}.backup
+}
+
+do_prebuilt_configure:append:mdm9607() {
+    for dtbf in ${KERNEL_DTB_NAMES}; do
+        dtbs="$dtbs ${B}/$dtbf"
+    done
+    bbplain "$ Appending DTBS:${dtbs}"
+    cp ${B}/${KERNEL_OUTPUT_DIR}/${KERNEL_IMAGETYPE} ${B}/${KERNEL_OUTPUT_DIR}/${KERNEL_IMAGETYPE}.backup
+    cat ${B}/${KERNEL_OUTPUT_DIR}/${KERNEL_IMAGETYPE}.backup ${dtbs} > ${B}/${KERNEL_OUTPUT_DIR}/${KERNEL_IMAGETYPE}
     rm -f arch/${ARCH}/boot/${KERNEL_IMAGETYPE}.backup
 }
 
