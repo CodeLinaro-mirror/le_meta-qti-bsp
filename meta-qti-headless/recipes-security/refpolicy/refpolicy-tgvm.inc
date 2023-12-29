@@ -12,6 +12,7 @@ SRC_URI:append := "\
     file://0003-kernel-filesystem-Add-functionfs-rules.patch \
     file://0004-logging-recover-the-context-of-dev-log.patch \
     file://0005-refpolicy-update-booleans.patch \
+    file://0006-init-Add-support-for-initrc_t-to-nnp-domtrans-to-the.patch \
     file://qcom_policy/ \
     file://filesystem.if \
     file://dmesg.te \
@@ -20,6 +21,7 @@ SRC_URI:append := "\
     file://selinuxutil.te \
     file://netutils.te \
     file://ntp.te \
+    file://init.te \
 "
 
 SRCREV = "${AUTOREV}"
@@ -101,5 +103,6 @@ do_configure:append() {
     cp ${WORKDIR}/systemd.te ${WORKDIR}/common_policy/system/
     cp ${WORKDIR}/logging.te ${WORKDIR}/common_policy/system/
     cp ${WORKDIR}/selinuxutil.te ${WORKDIR}/common_policy/system/
+    cp ${WORKDIR}/init.te ${WORKDIR}/common_policy/system/
     cp ${WORKDIR}/ntp.te ${WORKDIR}/common_policy/services/
 }
