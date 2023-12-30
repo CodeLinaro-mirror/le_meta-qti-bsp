@@ -7,6 +7,7 @@ IMAGE_FEATURES += "ssh-server-openssh"
 
 # This image doesn't support abl generation
 EXTRA_IMAGEDEPENDS:remove = "edk2"
+EXTRA_IMAGEDEPENDS:remove = "lk"
 
 KERN_MODS ?= "kernel-modules"
 KERN_MODS:waipio = "gki-kernel-modules-second-stage"
