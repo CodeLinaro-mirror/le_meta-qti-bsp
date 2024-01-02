@@ -1,0 +1,69 @@
+# Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted (subject to the limitations in the
+# disclaimer below) provided that the following conditions are met:
+#
+#    * Redistributions of source code must retain the above copyright
+#      notice, this list of conditions and the following disclaimer.
+#
+#    * Redistributions in binary form must reproduce the above
+#      copyright notice, this list of conditions and the following
+#      disclaimer in the documentation and/or other materials provided
+#      with the distribution.
+#
+#    * Neither the name of Qualcomm Innovation Center, Inc. nor the names of its
+#      contributors may be used to endorse or promote products derived
+#      from this software without specific prior written permission.
+#
+# NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
+# GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
+# HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+# WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+# IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+# ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+# GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+# IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+# IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+policy_module(leprop, 1.0)
+
+type leprop_t;
+type leprop_exec_t;
+type leprop_socket_t;
+type setprop_t;
+type setprop_exec_t;
+type leprop_unit_t;
+type leprop_etc_t;
+
+init_daemon_domain(leprop_t, leprop_exec_t)
+
+init_unit_file(leprop_unit_t)
+files_config_file(leprop_etc_t)
+
+init_use_fds(setprop_t)
+init_rw_stream_sockets(setprop_t)
+connect_to_leprop_sockets(setprop_t)
+
+# /dev/socket/leprop-service
+dev_associate(leprop_socket_t)
+dev_write_generic_sock_files(setprop_t)
+rw_leprop_socket(leprop_socket_t)
+files_rw_leprop_sockets(leprop_t)
+
+files_manage_etc_files(leprop_t)
+
+# leprop-service search systemd and journal runtime
+init_search_runtime(leprop_t)
+#leprop_search_journal_dir(leprop_t)
+logging_send_syslog_msg(leprop_t)
+
+allow leprop_t self:unix_dgram_socket { create connect };
+
+# for /etc/build.prop
+files_manage_var_files(leprop_t)
+manage_leprop_etc_file(leprop_t, leprop_etc_t)

@@ -96,6 +96,18 @@ do_patch_config() {
 }
 addtask patch_config after do_fetch before do_rh_config
 
+python do_perf_config () {
+    dstdir = d.getVar('SRC_DIR_ROOT')
+    if (d.getVar('VARIANT', True) == 'perf'):
+         import shutil
+         srcdir = d.getVar('PATCH_DIR')
+         shutil.copy(srcdir + "/CONFIG_PERF", dstdir + "/kernel/rh-kernel-5.14/redhat/configs/custom-overrides/generic")
+    else:
+         if os.path.exists(dstdir + "/kernel/rh-kernel-5.14/redhat/configs/custom-overrides/generic/CONFIG_PERF"):
+             os.remove(dstdir + "/kernel/rh-kernel-5.14/redhat/configs/custom-overrides/generic/CONFIG_PERF")
+}
+addtask do_perf_config after do_fetch before do_patch_config
+
 do_patch_more() {
     cd ${MY_WDIR}
     patch -f -p1 < ${WORKDIR}/0001-centos-5.14-Fix-to-bypass-redhad-env.patch
@@ -212,9 +224,12 @@ do_deploy () {
         cp ${WORKDIR}/recipe-sysroot/sysroot-only/sa8775p-ride.dtb.overlay ${D}/${KERNEL_IMAGEDEST}/sa8775p-ride.dtb.overlay
         install -m 0644 ${D}/${KERNEL_IMAGEDEST}/Image ${DEPLOYDIR}
         install -m 0644 ${D}/${KERNEL_IMAGEDEST}/sa8775p-ride.dtb.overlay ${DEPLOYDIR}
-    else
+    elif [ "${BASEMACHINE}" = "sa8540" ]; then
         cat ${B}/arch/arm64/boot/Image.gz \
             ${B}/arch/arm64/boot/dts/qcom/sa8540p-adp-ride.dtb > ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb
+        install -m 0644 ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb ${DEPLOYDIR}
+    else
+        cat ${B}/arch/arm64/boot/Image.gz > ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb
         install -m 0644 ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb ${DEPLOYDIR}
     fi
 

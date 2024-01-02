@@ -13,10 +13,10 @@ DEPENDS += "\
     gstreamer1.0-plugins-base \
     libdrm \
     libxml2 \
-    virtual/kernel-headers \
     media-codec2 \
     media-external \
-    ${@oe.utils.version_less_or_equal('${preferred-kernel}', '5.14', '', 'videodlkm', d)} \
+    videodlkm \
+    virtual/kernel-headers \
 "
 
 DEPENDS:append:lemans = " displaydlkm"

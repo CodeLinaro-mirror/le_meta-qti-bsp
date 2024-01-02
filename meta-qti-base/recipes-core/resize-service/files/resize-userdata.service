@@ -36,6 +36,7 @@ Before=data.mount
 [Service]
 Type=oneshot
 ExecStart=/lib/systemd/systemd-fsck /dev/disk/by-partlabel/userdata ; /sbin/resize2fs -f /dev/disk/by-partlabel/userdata
+NoNewPrivileges=true
 ExecStartPost=/bin/systemctl disable resize-userdata.service
 
 [Install]

@@ -66,6 +66,7 @@ After=init_qti_wlan_auto.service
 [Service]
 Type=oneshot
 RemainAfterExit=yes
+NoNewPrivileges=true
 ExecStart=/usr/bin/qca6390_load.sh
 ExecStop=/usr/bin/qca6390_unload.sh
 
