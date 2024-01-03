@@ -41,6 +41,10 @@ volatile_lib_path=/var/volatile/lib
 
 spec=$1
 mountpoint=$2
+if [ "$#" -ge 3 ]; then
+    flag=$3
+fi
+
 
 if [ -f "$mountpoint" ]; then
     #Skip if already mount-binded
@@ -57,7 +61,20 @@ if [ -f "$mountpoint" ]; then
     test ! -x /sbin/restorecon || /sbin/restorecon "$mountpoint"
 fi
 
-if [ -d "$mountpoint" ]; then
+if [[ -d "$mountpoint" ]] && [[ "$flag" == "dir" ]]; then
+    mkdir -p $spec
+    cd $mountpoint
+    mountpath=$(echo $mountpoint | sed 's:/*$::')
+    if grep -qs "$mountpath " /proc/mounts; then
+        return
+    fi
+    for file in *
+    do
+        cp --preserve=all -r "$file" "$spec/"
+    done
+    mount -o "bind" "$spec" "$mountpoint"
+    test ! -x /sbin/restorecon || /sbin/restorecon -r "$mountpoint"
+elif [ -d "$mountpoint" ]; then
     mkdir -p $spec
     cd $mountpoint
     for file in *
