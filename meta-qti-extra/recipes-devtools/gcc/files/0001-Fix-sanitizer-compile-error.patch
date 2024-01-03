@@ -1,0 +1,51 @@
+From e960b86d57c7722a0eb495b07bf6ced139bb3c97 Mon Sep 17 00:00:00 2001
+From: Baihui Zeng <quic_baihzeng@quicinc.com>
+Date: Fri, 22 Dec 2023 09:06:03 +0000
+Subject: [PATCH] Fix-sanitizer-compile-error
+
+Signed-off-by: Baihui Zeng <quic_baihzeng@quicinc.com>
+---
+ libsanitizer/asan/Makefile.in   | 1 +
+ libsanitizer/hwasan/Makefile.in | 1 +
+ libsanitizer/tsan/Makefile.in   | 1 +
+ 3 files changed, 3 insertions(+)
+
+diff --git a/libsanitizer/asan/Makefile.in b/libsanitizer/asan/Makefile.in
+index 25c7fd7b7..af80ceacc 100644
+--- a/libsanitizer/asan/Makefile.in
++++ b/libsanitizer/asan/Makefile.in
+@@ -214,6 +214,7 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
+ am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
+ am__v_CXXLD_0 = @echo "  CXXLD   " $@;
+ am__v_CXXLD_1 = 
++AM_LIBTOOLFLAGS = --tag=CC
+ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+ 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+ LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+diff --git a/libsanitizer/hwasan/Makefile.in b/libsanitizer/hwasan/Makefile.in
+index 542af8f19..be42734e9 100644
+--- a/libsanitizer/hwasan/Makefile.in
++++ b/libsanitizer/hwasan/Makefile.in
+@@ -206,6 +206,7 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
+ am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
+ am__v_CXXLD_0 = @echo "  CXXLD   " $@;
+ am__v_CXXLD_1 = 
++AM_LIBTOOLFLAGS = --tag=CC
+ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+ 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+ LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+diff --git a/libsanitizer/tsan/Makefile.in b/libsanitizer/tsan/Makefile.in
+index ce11d2497..fa75e4428 100644
+--- a/libsanitizer/tsan/Makefile.in
++++ b/libsanitizer/tsan/Makefile.in
+@@ -210,6 +210,7 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
+ am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
+ am__v_CXXLD_0 = @echo "  CXXLD   " $@;
+ am__v_CXXLD_1 = 
++AM_LIBTOOLFLAGS = --tag=CC
+ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+ 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+ LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+-- 
+2.35.2
+
