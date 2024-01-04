@@ -2,7 +2,7 @@ SUMMARY = "QTI ARK Kernel Boot image"
 DESCRIPTION = "Build QTI ARK kernel boot image"
 LICENSE = "BSD-3-Clause-Clear"
 
-DEPENDS += "mkbootimg-native mkdtimg-native openssl-native python3-native virtual/kernel"
+DEPENDS += "mkbootimg-native mkdtimg-native openssl-native oot-dtbo python3-native virtual/kernel"
 
 IMAGE_CLASSES:remove = "qimage"
 IMAGE_FEATURES:remove = "ssh-server-openssh"
@@ -11,36 +11,44 @@ inherit image
 
 EXTRA_IMAGE_FEATURES = ""
 
+KERNEL_VERSION = "${@oe.utils.read_file('${STAGING_KERNEL_BUILDDIR}/kernel-abiversion')}"
+
+do_make_dtb() {
+     cat ${DEPLOY_DIR_IMAGE}/dtbs/*.dtb* > ${DEPLOY_DIR_IMAGE}/dtbs/dtb.img
+}
+do_make_dtb[depends] += "oot-dtbo:do_deploy"
+
+addtask do_make_dtb after do_image before do_makeboot
+
 BOOT_RAMDISK_IMG ?= "${@bb.utils.contains('MACHINE_FEATURES', 'early-ramdisk-init', 'early-ramdisk-image-${PRODUCT}.cpio.lz4', '/dev/null', d)}"
 
-BOOT_RAMDISK_CMD ?= "${@bb.utils.contains('MACHINE_FEATURES', 'early-ramdisk-init', 'rdinit=/sbin/early-ramdisk-init early-ramdisk.mode=0', '', d)}"
-
-CONSOLE_CMD = "${@bb.utils.contains('PERF_BUILD', '1', '', 'console=ttyMSM0,115200,n8 earlycon=qcom_geni,0xa8c000' , d)}"
-
 do_makeboot () {
-    if [ "${BASEMACHINE}" = "sa8775" ]; then
+    if [ "${KERNEL_IMAGE_HEADER_VERSION}" = "2" ]; then
         # Make bootimage
         ${STAGING_BINDIR_NATIVE}/scripts/mkbootimg.py --header_version ${KERNEL_IMAGE_HEADER_VERSION} \
         --kernel  ${DEPLOY_DIR_IMAGE}/Image \
-        --dtb  ${DEPLOY_DIR_IMAGE}/sa8775p-ride.dtb.overlay \
+        --dtb  ${DEPLOY_DIR_IMAGE}/dtbs/dtb.img \
         --ramdisk ${BOOT_RAMDISK_IMG} \
         --pagesize ${PAGE_SIZE} \
         --base ${KERNEL_BASE} \
         --ramdisk_offset 0x0 \
-        --cmdline "${BOOT_RAMDISK_CMD} ${CONSOLE_CMD} rw rootwait no_console_suspend=1 androidboot.hardware=qcom androidboot.console=ttyMSM0 lpm_levels.sleep_disabled=1 msm_rtb.filter=0x237 fips=0 notests nokaslr ignore_loglevel firmware_class.path=/firmware/vm/boot systemd.gpt_auto=0 cgroup.memory=nokmem,nosocket" \
-        --output  ${DEPLOY_DIR_IMAGE}/sa8775p-boot-5.14.img
-        cp ${DEPLOY_DIR_IMAGE}/sa8775p-boot-5.14.img ${DEPLOY_DIR_IMAGE}/sa8775-boot.img
-    else
+        --cmdline "${KERNEL_CMD_PARAMS}" \
+        --output  ${DEPLOY_DIR_IMAGE}/${PRODUCT}-boot-${KERNEL_VERSION}.img
+    elif [ "${KERNEL_IMAGE_HEADER_VERSION}" = "1" ]; then
         # Make bootimage
-        ${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb \
+        ${STAGING_BINDIR_NATIVE}/scripts/mkbootimg.py \
         --kernel  ${DEPLOY_DIR_IMAGE}/Image.gz-dtb \
         --ramdisk ${BOOT_RAMDISK_IMG} \
         --pagesize ${PAGE_SIZE} \
         --base ${KERNEL_BASE} \
         --ramdisk_offset 0x0 \
-        --cmdline "${BOOT_RAMDISK_CMD} rw rootwait console=ttyMSM0,115200,n8 no_console_suspend=1 androidboot.hardware=qcom androidboot.console=ttyMSM0 lpm_levels.sleep_disabled=1 msm_rtb.filter=0x237 earlycon=qcom_geni,0x884000 fips=0 notests nokaslr ignore_loglevel firmware_class.path=/firmware " \
-        --output  ${DEPLOY_DIR_IMAGE}/sa8540p-boot-5.14.img
+        --cmdline "${KERNEL_CMD_PARAMS}" \
+        --output  ${DEPLOY_DIR_IMAGE}/${PRODUCT}-boot-${KERNEL_VERSION}.img
+    else
+        echo "Unknown Boot Image Header Version"
+        return 1
     fi
+    cp ${DEPLOY_DIR_IMAGE}/${PRODUCT}-boot-${KERNEL_VERSION}.img ${DEPLOY_DIR_IMAGE}/${PRODUCT}-boot.img
 }
 
 do_makeboot[dirs] = "${DEPLOY_DIR_IMAGE}"
