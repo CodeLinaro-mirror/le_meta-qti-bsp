@@ -17,5 +17,6 @@ RDEPENDS:${PN} = "\
     msmhab \
     vhost-user-q \
     vhost-user-lib \
+    vhost-user-scmi \
     gvm-net-config \
 "
