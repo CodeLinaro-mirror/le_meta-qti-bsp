@@ -38,6 +38,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         powerapp-powerconfig \
         systemd-machine-units \
         ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
+        packagegroup-qti-qesdk-core \
 "
 
 #Install packages for display
