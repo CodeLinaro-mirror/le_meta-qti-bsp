@@ -4,6 +4,8 @@ HOMEPAGE = "https://git.codelinaro.org"
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=801f80980d171dd6425610833a22dbe6"
 
+DEPENDS += "bison-native"
+
 SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/safelinux-system-cfg/devicetree/.git;protocol=${PROTO};usehead=1"
 SRC_URI += "${PATH_TO_REPO}/kernel/rh-kernel-5.14/.git;protocol=${PROTO};usehead=1"
 SRCREV = "${AUTOREV}"

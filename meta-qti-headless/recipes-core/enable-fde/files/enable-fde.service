@@ -38,6 +38,7 @@ User=fde
 Group=security
 Type=oneshot
 RemainAfterExit=yes
+NoNewPrivileges=true
 CapabilityBoundingSet=CAP_DAC_OVERRIDE
 AmbientCapabilities=CAP_DAC_OVERRIDE
 ExecStart=/usr/bin/enable-fde.sh

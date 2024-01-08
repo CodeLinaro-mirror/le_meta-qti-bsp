@@ -77,6 +77,14 @@ IMAGE_INSTALL:sa8775 += "\
                  kernel-module-governor-simpleondemand-${KERNEL_VERSION} \
                  kernel-module-ufshcd-core-${KERNEL_VERSION} \
                  kernel-module-ufshcd-pltfrm-${KERNEL_VERSION} \
+                 kernel-module-spmi-${KERNEL_VERSION} \
+                 kernel-module-regmap-spmi-${KERNEL_VERSION} \
+                 kernel-module-spmi-pmic-arb-${KERNEL_VERSION} \
+                 kernel-module-pinctrl-spmi-gpio-${KERNEL_VERSION} \
+                 kernel-module-pinctrl-spmi-mpp-${KERNEL_VERSION} \
+                 kernel-module-qcom-spmi-pmic-${KERNEL_VERSION} \
+                 kernel-module-nvmem-qcom-spmi-sdam-${KERNEL_VERSION} \
+                 kernel-module-marvell-${KERNEL_VERSION} \
                  kernel-module-camcc-sa8775p-${KERNEL_VERSION} \
                  kernel-module-dispcc0-sa8775p-${KERNEL_VERSION} \
                  kernel-module-dispcc1-sa8775p-${KERNEL_VERSION} \

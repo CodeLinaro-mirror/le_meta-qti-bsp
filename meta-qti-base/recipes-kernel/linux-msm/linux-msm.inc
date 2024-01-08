@@ -34,13 +34,6 @@ KERNEL_EXTRA_ARGS += "O=${B}"
 LINUX_VERSION_EXTENSION = "${@bb.utils.contains_any('VARIANT', 'perf user', '-perf', '-debug', d)}"
 LINUX_VERSION_EXTENSION_qti-distro-debug = ""
 
-# dm-verity: Patch the cert file from which kernel add key to keyring
-do_patch_veritycert() {
-   cp -f ${WORKDIR}/verity.x509.pem ${S}/certs/verity.x509.pem
-}
-
-do_patch[postfuncs] += "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains('MACHINE_FEATURES', 'dm-verity-bootloader', 'do_patch_veritycert', '', d), '', d)}"
-
 EXTRA_OEMAKE:remove = "PAHOLE=false"
 KCONFIG_CONFIG_COMMAND:remove = "PAHOLE=false"
 
@@ -80,17 +73,18 @@ do_configure:prepend() {
 }
 
 MODULESPATH = "${D}/lib/modules/${KERNEL_VERSION}"
-do_install:append() {
-    # if the blocklist exists and qti-dlkm is turned on in conf file, then install the blocklist
-    if [ -e ${S}/modules.vendor_blocklist.msm.${KERNEL_ARCH} ] && ${@bb.utils.contains('MACHINE_FEATURES', 'qti-dlkm', 'true', 'false', d)}; then
-        install -m 0644 ${S}/modules.vendor_blocklist.msm.${KERNEL_ARCH} ${MODULESPATH}/modules.blocklist
-    fi
-}
 
 do_compile:prepend() {
         if ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'true', 'false', d)}; then
             export DTC_FLAGS="-@"
         fi
+}
+
+do_install:append() {
+    # if the blocklist exists and qti-dlkm is turned on in conf file, then install the blocklist
+    if [ -e ${S}/modules.vendor_blocklist.msm.${KERNEL_ARCH} ] && ${@bb.utils.contains('MACHINE_FEATURES', 'qti-dlkm', 'true', 'false', d)}; then
+        install -m 0644 ${S}/modules.vendor_blocklist.msm.${KERNEL_ARCH} ${MODULESPATH}/modules.blocklist
+    fi
 }
 
 # when using our own module signing key kernel.bbclass will fail to copy the public part of the key

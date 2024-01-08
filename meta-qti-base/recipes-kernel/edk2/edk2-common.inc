@@ -16,8 +16,8 @@ EXTRA_OEMAKE = "'CLANG_BIN=${STAGING_BINDIR_NATIVE}/'\
                 'BUILDDIR=${S}'\
                 'BOOTLOADER_OUT=${S}/out'\
                 'ENABLE_LE_VARIANT=true'\
-                'VERIFIED_BOOT_LE=${VBLE}'\
-                'VERITY_LE=${VERITY_ENABLED}'\
+                'VERIFIED_BOOT_LE=0'\
+                'VERITY_LE=0'\
                 'INIT_BIN_LE=/sbin/init'\
                 'EDK_TOOLS_PATH=${S}/BaseTools'\
                 'EARLY_ETH_ENABLED=${EARLY_ETH}'\
@@ -34,6 +34,9 @@ EXTRA_OEMAKE:append:sa81x5 = " 'AB_RETRYCOUNT_DISABLE=1' \
                                'ENABLE_LV_ATOMIC_AB=1' "
 
 EXTRA_OEMAKE:append:lemans = " 'AB_RETRYCOUNT_DISABLE=1' \
+                               'ENABLE_LV_ATOMIC_AB=1' "
+
+EXTRA_OEMAKE:append:monaco = " 'AB_RETRYCOUNT_DISABLE=1' \
                                'ENABLE_LV_ATOMIC_AB=1' "
 
 do_configure[noexec] = "1"

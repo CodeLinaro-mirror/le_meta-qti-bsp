@@ -1,0 +1,30 @@
+From 39f3570177463a814ce66e8e1bfc32ca5b97db3b Mon Sep 17 00:00:00 2001
+From: Kai Meng <quic_kmeng@quicinc.com>
+Date: Thu, 30 Nov 2023 17:17:18 +0800
+Subject: [PATCH] logging: recover the context of dev-log
+
+dev-log should be devlog_t label, but always be changed
+to syslogd_runtime_t, use filetrans to set its label
+
+Upstream-Status: Pending
+
+Signed-off-by: Kai Meng <quic_kmeng@quicinc.com>
+---
+ policy/modules/system/logging.te | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/policy/modules/system/logging.te b/policy/modules/system/logging.te
+index 2a575c6d2..c489680cf 100644
+--- a/policy/modules/system/logging.te
++++ b/policy/modules/system/logging.te
+@@ -409,6 +409,7 @@ allow syslogd_t syslog_conf_t:dir list_dir_perms;
+ allow syslogd_t devlog_t:sock_file manage_sock_file_perms;
+ files_runtime_filetrans(syslogd_t, devlog_t, sock_file)
+ init_runtime_filetrans(syslogd_t, devlog_t, sock_file, "dev-log")
++filetrans_pattern(syslogd_t, syslogd_runtime_t, devlog_t, sock_file, "dev-log")
+ 
+ # create/append log files.
+ manage_files_pattern(syslogd_t, var_log_t, var_log_t)
+-- 
+2.25.1
+

@@ -96,6 +96,18 @@ do_patch_config() {
 }
 addtask patch_config after do_fetch before do_rh_config
 
+python do_perf_config () {
+    dstdir = d.getVar('SRC_DIR_ROOT')
+    if (d.getVar('VARIANT', True) == 'perf'):
+         import shutil
+         srcdir = d.getVar('PATCH_DIR')
+         shutil.copy(srcdir + "/CONFIG_PERF", dstdir + "/kernel/rh-kernel-5.14/redhat/configs/custom-overrides/generic")
+    else:
+         if os.path.exists(dstdir + "/kernel/rh-kernel-5.14/redhat/configs/custom-overrides/generic/CONFIG_PERF"):
+             os.remove(dstdir + "/kernel/rh-kernel-5.14/redhat/configs/custom-overrides/generic/CONFIG_PERF")
+}
+addtask do_perf_config after do_fetch before do_patch_config
+
 do_patch_more() {
     cd ${MY_WDIR}
     patch -f -p1 < ${WORKDIR}/0001-centos-5.14-Fix-to-bypass-redhad-env.patch
@@ -181,6 +193,19 @@ do_shared_workdir:append () {
             mkdir -p $kerneldir/usr/
             cp -f usr/gen_init_cpio $kerneldir/usr/
         fi
+        if (grep -q -i -e '^CONFIG_MODULES=y$' ${B}/.config); then
+            # Module.symvers gets updated during the
+            # building of the kernel modules. We need to
+            # update this in the shared workdir since some
+            # external kernel modules has a dependency on
+            # other kernel modules and will look at this
+            # file to do symbol lookups
+            cp ${B}/Module.symvers ${STAGING_KERNEL_BUILDDIR}/
+            # 5.10+ kernels have module.lds that we need to copy for external module builds
+            if [ -e "${B}/scripts/module.lds" ]; then
+                install -Dm 0644 ${B}/scripts/module.lds ${STAGING_KERNEL_BUILDDIR}/scripts/module.lds
+            fi
+        fi
 }
 
 do_deploy () {
@@ -199,9 +224,12 @@ do_deploy () {
         cp ${WORKDIR}/recipe-sysroot/sysroot-only/sa8775p-ride.dtb.overlay ${D}/${KERNEL_IMAGEDEST}/sa8775p-ride.dtb.overlay
         install -m 0644 ${D}/${KERNEL_IMAGEDEST}/Image ${DEPLOYDIR}
         install -m 0644 ${D}/${KERNEL_IMAGEDEST}/sa8775p-ride.dtb.overlay ${DEPLOYDIR}
-    else
+    elif [ "${BASEMACHINE}" = "sa8540" ]; then
         cat ${B}/arch/arm64/boot/Image.gz \
             ${B}/arch/arm64/boot/dts/qcom/sa8540p-adp-ride.dtb > ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb
+        install -m 0644 ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb ${DEPLOYDIR}
+    else
+        cat ${B}/arch/arm64/boot/Image.gz > ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb
         install -m 0644 ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb ${DEPLOYDIR}
     fi
 
@@ -215,4 +243,8 @@ do_deploy () {
 
 INHIBIT_PACKAGE_STRIP = "1"
 KERNEL_VERSION_SANITY_SKIP = "1"
+KERNEL_IMAGETYPE_FOR_MAKE += "dtbs"
+KERNEL_IMAGETYPE_FOR_MAKE += "${KERNEL_IMAGETYPE}"
+KERNEL_IMAGETYPE_FOR_MAKE += "modules"
 
+do_compile_kernelmodules[noexec] = "1"

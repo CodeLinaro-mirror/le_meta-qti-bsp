@@ -15,6 +15,8 @@ BOOT_RAMDISK_IMG ?= "${@bb.utils.contains('MACHINE_FEATURES', 'early-ramdisk-ini
 
 BOOT_RAMDISK_CMD ?= "${@bb.utils.contains('MACHINE_FEATURES', 'early-ramdisk-init', 'rdinit=/sbin/early-ramdisk-init early-ramdisk.mode=0', '', d)}"
 
+CONSOLE_CMD = "${@bb.utils.contains('PERF_BUILD', '1', '', 'console=ttyMSM0,115200,n8 earlycon=qcom_geni,0xa8c000' , d)}"
+
 do_makeboot () {
     if [ "${BASEMACHINE}" = "sa8775" ]; then
         # Make bootimage
@@ -25,7 +27,7 @@ do_makeboot () {
         --pagesize ${PAGE_SIZE} \
         --base ${KERNEL_BASE} \
         --ramdisk_offset 0x0 \
-        --cmdline "${BOOT_RAMDISK_CMD} root=PARTLABEL=system_a rw rootwait console=ttyMSM0,115200,n8 no_console_suspend=1 androidboot.hardware=qcom androidboot.console=ttyMSM0 lpm_levels.sleep_disabled=1 msm_rtb.filter=0x237 earlycon=qcom_geni,0xa8c000 fips=0 notests nokaslr ignore_loglevel firmware_class.path=/firmware/vm/boot androidboot.slot_suffix=_a systemd.gpt_auto=0" \
+        --cmdline "${BOOT_RAMDISK_CMD} ${CONSOLE_CMD} rw rootwait no_console_suspend=1 androidboot.hardware=qcom androidboot.console=ttyMSM0 lpm_levels.sleep_disabled=1 msm_rtb.filter=0x237 fips=0 notests nokaslr ignore_loglevel firmware_class.path=/firmware/vm/boot systemd.gpt_auto=0" \
         --output  ${DEPLOY_DIR_IMAGE}/sa8775p-boot-5.14.img
         cp ${DEPLOY_DIR_IMAGE}/sa8775p-boot-5.14.img ${DEPLOY_DIR_IMAGE}/sa8775-boot.img
     else
@@ -36,7 +38,7 @@ do_makeboot () {
         --pagesize ${PAGE_SIZE} \
         --base ${KERNEL_BASE} \
         --ramdisk_offset 0x0 \
-        --cmdline "${BOOT_RAMDISK_CMD} root=PARTLABEL=system_a rw rootwait console=ttyMSM0,115200,n8 no_console_suspend=1 androidboot.hardware=qcom androidboot.console=ttyMSM0 lpm_levels.sleep_disabled=1 msm_rtb.filter=0x237 earlycon=qcom_geni,0x884000 fips=0 notests nokaslr ignore_loglevel firmware_class.path=/firmware androidboot.slot_suffix=_a" \
+        --cmdline "${BOOT_RAMDISK_CMD} rw rootwait console=ttyMSM0,115200,n8 no_console_suspend=1 androidboot.hardware=qcom androidboot.console=ttyMSM0 lpm_levels.sleep_disabled=1 msm_rtb.filter=0x237 earlycon=qcom_geni,0x884000 fips=0 notests nokaslr ignore_loglevel firmware_class.path=/firmware " \
         --output  ${DEPLOY_DIR_IMAGE}/sa8540p-boot-5.14.img
     fi
 }
