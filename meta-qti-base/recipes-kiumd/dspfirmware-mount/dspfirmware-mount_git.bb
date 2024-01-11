@@ -23,6 +23,7 @@ do_install:append() {
     install -m 0777 ${S}/firmware-vm-boot.mount ${D}${systemd_unitdir}/system/firmware-vm-boot.mount
     install -d -p ${D}${systemd_unitdir}/system/multi-user.target.wants/
     install -d -p ${D}/firmware/qcom/sa8775p
+    install -d -p ${D}/firmware/vm/boot
     install -d -p ${D}/vendor/dsp
     ln -sf ${systemd_unitdir}/system/firmware-qcom-sa8775p.mount \
         ${D}${systemd_unitdir}/system/multi-user.target.wants/firmware-qcom-sa8775p.mount

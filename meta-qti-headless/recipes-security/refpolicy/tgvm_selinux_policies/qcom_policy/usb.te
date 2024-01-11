@@ -1,0 +1,78 @@
+# Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted (subject to the limitations in the
+# disclaimer below) provided that the following conditions are met:
+#
+#    * Redistributions of source code must retain the above copyright
+#      notice, this list of conditions and the following disclaimer.
+#
+#    * Redistributions in binary form must reproduce the above
+#      copyright notice, this list of conditions and the following
+#      disclaimer in the documentation and/or other materials provided
+#      with the distribution.
+#
+#    * Neither the name of Qualcomm Innovation Center, Inc. nor the names of its
+#      contributors may be used to endorse or promote products derived
+#      from this software without specific prior written permission.
+#
+# NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
+# GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
+# HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+# WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+# IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+# ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+# GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+# IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+# IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+policy_module(usb, 1.0)
+
+type usb_initscript_t;
+type usb_initscript_exec_t;
+
+type usb_boot_etc_t;
+files_config_file(usb_boot_etc_t)
+usb_config_filetrans(usb_boot_etc_t)
+
+#init_script_domain(usb_initscript_t, usb_initscript_exec_t)
+init_script_file(usb_initscript_exec_t)
+
+# /etc/initscripts/usb access to serialnumber in /sys/fs/config
+fs_manage_configfs_files(usb_initscript_t)
+
+# /etc/initscripts/usb process the restorecon command to relabel new /dev nodes
+#seutil_domtrans_setfiles(usb_initscript_t)
+
+# request kernel to load related modules when configure the usb gadget using configfs
+kernel_request_load_module(usb_initscript_t)
+
+kernel_search_debugfs(usb_initscript_t)
+fs_manage_configfs_dirs(usb_initscript_t)
+files_manage_etc_files(usb_initscript_t)
+
+# Process the /usr/bin/setprop program in /etc/initscripts/usb
+#leprop_domtrans_setprop(usb_initscript_t)
+
+# sync command in /etc/initscripts/usb
+corecmd_exec_bin(usb_initscript_t)
+corecmd_manage_bin_files(usb_initscript_t)
+corecmd_mmap_bin_files(usb_initscript_t)
+
+files_rw_leprop_sockets(usb_initscript_t)
+connect_to_leprop_sockets(usb_initscript_t)
+
+# Need to read some information in /sys
+usb_read_sysfs(usb_initscript_t)
+
+# todo: /dev/usb-ffs, current is device_t
+dev_manage_generic_dirs(usb_initscript_t)
+
+# execute mount in usb script with mount domain
+#mount_domtrans(usb_initscript_t)
+
+allow usb_initscript_t self:fifo_file rw_fifo_file_perms;
