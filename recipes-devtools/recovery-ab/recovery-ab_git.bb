@@ -7,10 +7,10 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 HOMEPAGE = "https://www.codeaurora.org/gitweb/quic/la?p=platform/bootable/recovery.git"
 
-DEPENDS += "glib-2.0 ext4-utils oem-recovery adbd libbase libsparse libmincrypt bzip2 bison-native openssl"
+DEPENDS += "glib-2.0 ext4-utils oem-recovery adbd libbase libsparse libmincrypt bzip2 bison-native openssl libxml2"
 DEPENDS += " ${@bb.utils.contains('COMBINED_FEATURES', 'qti-ab-boot', 'abctl', '', d)}"
 
-RDEPENDS_${PN} += "zlib"
+RDEPENDS_${PN} += "zlib libxml2"
 RDEPENDS_${PN} += "${@bb.utils.contains('MACHINE_FEATURES', 'ota-package-verification', 'openssl', '', d)}"
 RDEPENDS_${PN} += "${@bb.utils.contains('MACHINE_FEATURES', 'ota-package-verification', 'openssl-bin', '', d)}"
 
@@ -50,7 +50,9 @@ do_install[prefuncs] += "${@bb.utils.contains('MACHINE_FEATURES', 'ota-package-v
 do_install_append() {
         install -d ${D}/res/
         if ${@bb.utils.contains('COMBINED_FEATURES', 'qti-nad-core', 'false', 'true', d)}; then
-            install -d ${D}/cache/recovery
+            if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-mplane-spec', 'false', 'true', d)}; then
+                install -d ${D}/cache/recovery
+            fi
         fi
         if ${@bb.utils.contains('IMAGE_FSTYPES', 'ext4', 'true', 'false', d)}; then
             if ${@bb.utils.contains_any('MACHINE_MNT_POINTS', '/overlay', 'true', 'false', d)}; then
