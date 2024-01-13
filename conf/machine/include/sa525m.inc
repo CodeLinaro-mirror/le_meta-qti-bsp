@@ -69,7 +69,7 @@ MACHINE_MNT_POINTS = " \
     /systemrw \
     /persist \
     /data \
-    /lxcrootfs \
+    ${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', '/lxcrootfs', '', d)} \
 "
 
 PAGE_SIZE ?= '4096'
