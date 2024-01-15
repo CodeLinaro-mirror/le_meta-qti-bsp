@@ -8,7 +8,6 @@ SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/safelinux-cfg-modules/.git;pro
 SRC_URI:append = " \
     file://umd_load.conf \
     ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "6.1", 'file://0001-safelinux-cfg-mdoules-fix-build-issue-for-msm-6.1.patch;patchdir=../', '', d)} \
-    ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "6.1", 'file://0002-modify-redefinetion-of-arm_smmu_domain-to-aglin-with-msm-kernel.patch;patchdir=../', '', d)} \
     ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "6.1", 'file://Kbuild', '', d)} \
 "
 
