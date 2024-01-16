@@ -1,6 +1,22 @@
 DESCRIPTION = "Systemd machine units for ubi image"
 include qti-systemd-machine-units.inc
 
+SRC_URI += " file://post_hibernate.sh"
+SRC_URI += " file://pre_hibernate.sh"
+SRC_URI += " file://proc-bus-usb.mount"
+SRC_URI += " file://var-volatile.mount"
+SRC_URI += " file://persist.mount"
+SRC_URI += " file://cache.mount"
+SRC_URI += " file://data.mount"
+SRC_URI += " file://dsp-mount.service"
+SRC_URI += " file://firmware-mount.service"
+SRC_URI += " file://systemrw.conf"
+SRC_URI += " file://systemrw.mount"
+SRC_URI += " file://firmware-ubi-mount.sh"
+SRC_URI += " file://bt_firmware-mount.service"
+SRC_URI += " file://mountpartitions.rules"
+SRC_URI += " file://bt_firmware-ubi-mount.sh"
+
 IMAGETYPE = "ubi"
 
 fix_sepolicies_ubi () {
