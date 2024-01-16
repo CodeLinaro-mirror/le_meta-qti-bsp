@@ -18,10 +18,12 @@ OTA_INCREMENTAL_UPDATE_EXT4 = "incremental_update_ext4.zip"
 OTA_INCREMENTAL_UPDATE_EXT4_PATH = "${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${OTA_INCREMENTAL_UPDATE_EXT4}"
 
 MACHINE_FILESMAP_SEARCH_PATH ?= "${@':'.join('%s/conf/machine/filesmap' % p for p in '${BBPATH}'.split(':'))}}"
-MACHINE_FILESMAP_FULL_PATH = "${@machine_search(d.getVar('MACHINE_FILESMAP_CONF'), d.getVar('MACHINE_FILESMAP_SEARCH_PATH')) or ''}"
+MACHINE_FILESMAP_FULL_PATH = "${@machine_search(d.getVar('MACHINE_FILESMAP_CONF_EMMC'), d.getVar('MACHINE_FILESMAP_SEARCH_PATH')) or ''}"
 
 SIGN_OTA_PACKAGE ?= "${@bb.utils.contains('MACHINE_FEATURES', 'ota-package-verification', '--sign', '', d)}"
 MIRROR_SYNC ?= "${@bb.utils.contains('MACHINE_FEATURES', 'qti-ab-mirror-sync', '--mirror_sync', '', d)}"
+
+SLOT_A_SUFFIX ?= "_a"
 
 #Create directory structure for targetfiles.zip
 do_recovery_ext4[cleandirs] += "${OTA_TARGET_IMAGE_ROOTFS_EXT4}"
@@ -101,8 +103,8 @@ do_recovery_ext4() {
     #blocksize = BOARD_FLASH_BLOCK_SIZE
     echo blocksize=131072 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 
-    export BOOT_SIZE=$(sed -r 's/.*label="boot_a".*size_in_kb="([0-9]+\.*[0-9]*).*/\1/;t;d' ${WORKDIR}/partition.xml)
-    export SYSTEM_SIZE=$(sed -r 's/.*label="system_a".*size_in_kb="([0-9]+\.*[0-9]*).*/\1/;t;d' ${WORKDIR}/partition.xml)
+    export BOOT_SIZE=$(sed -r 's/.*label="boot${SLOT_A_SUFFIX}".*size_in_kb="([0-9]+\.*[0-9]*).*/\1/;t;d' ${WORKDIR}/partition.xml)
+    export SYSTEM_SIZE=$(sed -r 's/.*label="system${SLOT_A_SUFFIX}".*size_in_kb="([0-9]+\.*[0-9]*).*/\1/;t;d' ${WORKDIR}/partition.xml)
     export USERDATA_SIZE=$(sed -r 's/.*label="userdata".*size_in_kb="([0-9]+\.*[0-9]*).*/\1/;t;d' ${WORKDIR}/partition.xml)
 
     # convert kb to bytes
