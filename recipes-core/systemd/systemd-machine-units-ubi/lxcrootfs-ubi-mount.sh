@@ -83,8 +83,7 @@ FindAndMountUBIVolume () {
    fi
 }
 
-#lxcrfs_part_name="lxcrootfs$SLOT_SUFFIX"
-lxcrfs_part_name="lxcrootfs"
+lxcrfs_part_name="lxcrootfs$SLOT_SUFFIX"
 is_lxcrfs_vol_enabled=`ubinfo -d 0 -N $lxcrfs_part_name`
 
 if [ -x /sbin/restorecon ]; then
