@@ -34,7 +34,6 @@ DISTRO_FEATURES:append = " hibernation"
 DISTRO_FEATURES:append = " systemd"
 DISTRO_FEATURES_BACKFILL_CONSIDERED += "sysvinit"
 
-DISTRO_FEATURES:append = " ipa3"
 DISTRO_FEATURES:append = " vulkan"
 
 # WLAN
