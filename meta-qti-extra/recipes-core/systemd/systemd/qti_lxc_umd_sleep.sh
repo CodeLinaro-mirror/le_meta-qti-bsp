@@ -6,6 +6,7 @@ case $1/$2 in
     echo "Entering into lxc umd $2..."
 
     systemctl stop video-driver.service
+    systemctl stop qcx_server.service
     systemctl stop weston
     sleep 2
     systemctl stop openwfd_server_@0.service
@@ -17,6 +18,7 @@ case $1/$2 in
     systemctl restart openwfd_server_@0.service
     sleep 20
     systemctl restart weston
+    systemctl restart qcx_server.service
     systemctl restart video-driver.service
     ulimit -q unlimited
     ;;
