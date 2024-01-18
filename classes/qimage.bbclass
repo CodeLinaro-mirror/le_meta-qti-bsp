@@ -28,9 +28,11 @@ ROOTFS_POSTPROCESS_COMMAND += "gen_buildprop;"
 BOOTIMAGE_TARGET ?= "boot.img"
 DTBOIMAGE_TARGET ?= "dtbo.img"
 
+SLOT_A_SUFFIX ?= "_a"
+
 #Set appropriate partion:Image map
 NONAB_BOOT_PARTITION_IMAGE_MAP = "boot='${BOOTIMAGE_TARGET}',system='${SYSTEMIMAGE_TARGET}',userdata='${USERDATAIMAGE_TARGET}',persist='${PERSISTIMAGE_TARGET}',dtbo='${DTBOIMAGE_TARGET}'"
-AB_BOOT_PARTITION_IMAGE_MAP = "boot_a='${BOOTIMAGE_TARGET}',boot_b='${BOOTIMAGE_TARGET}',system_a='${SYSTEMIMAGE_TARGET}',system_b='${SYSTEMIMAGE_TARGET}',dtbo_a='${DTBOIMAGE_TARGET}',dtbo_b='${DTBOIMAGE_TARGET}',userdata='${USERDATAIMAGE_TARGET}',persist='${PERSISTIMAGE_TARGET}'"
+AB_BOOT_PARTITION_IMAGE_MAP = "boot${SLOT_A_SUFFIX}='${BOOTIMAGE_TARGET}',boot_b='${BOOTIMAGE_TARGET}',system${SLOT_A_SUFFIX}='${SYSTEMIMAGE_TARGET}',system_b='${SYSTEMIMAGE_TARGET}',dtbo${SLOT_A_SUFFIX}='${DTBOIMAGE_TARGET}',dtbo_b='${DTBOIMAGE_TARGET}',userdata='${USERDATAIMAGE_TARGET}',persist='${PERSISTIMAGE_TARGET}'"
 
 # Conf with partition entries should be provided to generate partitions artifacts
 MACHINE_PARTITION_CONF ??= ""

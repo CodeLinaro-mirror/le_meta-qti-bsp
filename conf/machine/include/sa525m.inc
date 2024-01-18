@@ -25,7 +25,7 @@ KERNEL_CONFIG ?= "vendor/sa525_defconfig"
 KERNEL_CONFIG_qti-distro-debug ?= "vendor/sa525-debug_defconfig"
 CONSOLE_PARAM ?= "console=ttyMSM0,115200,n8 no_console_suspend=1"
 CONSOLE_PARAM_qti-distro-perf ?= "console=ttyMSM0,115200,n8 no_console_suspend=1 loglevel=0 systemd.log_level=0 systemd.show_status=0"
-KERNEL_CMD_PARAMS = "ro rootwait ${CONSOLE_PARAM} androidboot.console=ttyMSM0 lpm_levels.sleep_disabled=1 firmware_class.path=/lib/firmware/updates,/vm-bootsys/boot service_locator.enable=1 net.ifnames=0"
+KERNEL_CMD_PARAMS = "ro rootwait ${CONSOLE_PARAM} androidboot.console=ttyMSM0 lpm_levels.sleep_disabled=1 firmware_class.path=/data/firmware/image,/lib/firmware/updates,/vm-bootsys/boot service_locator.enable=1 net.ifnames=0"
 KERNEL_VARIANT ??= ""
 KERNEL_VARIANT_qti-distro-debug ??= "debug_"
 KERNEL_VARIANT_qti-distro-perf ??= "perf_"
@@ -69,7 +69,7 @@ MACHINE_MNT_POINTS = " \
     /systemrw \
     /persist \
     /data \
-    /lxcrootfs \
+    ${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', '/lxcrootfs', '', d)} \
 "
 
 PAGE_SIZE ?= '4096'

@@ -20,6 +20,7 @@ ENABLE_ADB_qti-distro-base-user ?= "False"
 RDEPENDS_packagegroup-android-utils-base = "\
     ${@oe.utils.conditional('ENABLE_ADB', 'True', 'adbd', '', d)} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-sdx', '', 'binder', d)} \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-vm-host', 'leproperties', '', d)} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-sdx', '', 'leproperties', d)} \
     logcat \
     logd \

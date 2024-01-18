@@ -57,6 +57,8 @@ SELINUX_IMG_UBI_S_DATA = "${@['--selinux=${SELINUX_FILE_CONTEXTS_DATA}', ''][d.g
 IMAGE_UBIFS_SELINUX_OPTIONS = "${@bb.utils.contains('DISTRO_FEATURES', 'selinux', '${SELINUX_IMG_UBI_S}', '', d)}"
 IMAGE_UBIFS_SELINUX_OPTIONS_DATA = "${@bb.utils.contains('DISTRO_FEATURES', 'selinux', '${SELINUX_IMG_UBI_S_DATA}', '', d)}"
 
+MKUBIFS_USERFS_ARGS ?= "-m 4096 -e 253952 -c 2146 -F"
+
 do_image_ubi[noexec] = "1"
 do_image_ubifs[noexec] = "1"
 do_image_multiubi[noexec] = "1"
@@ -324,12 +326,20 @@ EOF
 vol_id=$(echo $(grep -rc "vol_id" ${UBINIZE_SYSTEM_CFG_WITH_LXC}))
     if $(echo ${IMAGE_FEATURES} | grep -q "lxcrootfs-volume"); then
         cat << EOF >> ${UBINIZE_SYSTEM_CFG_WITH_LXC}
-[lxcrootfs_volume]
+[lxcrootfs_volume_a]
 mode=ubi
 image="${LXCRFSIMAGE_UBIFS_TARGET}"
 vol_id=$((vol_id++))
 vol_type=dynamic
-vol_name=lxcrootfs
+vol_name=lxcrootfs_a
+vol_size=${LXCRFS_VOLUME_SIZE}
+
+[lxcrootfs_volume_b]
+mode=ubi
+image="${LXCRFSIMAGE_UBIFS_TARGET}"
+vol_id=$((vol_id++))
+vol_type=dynamic
+vol_name=lxcrootfs_b
 vol_size=${LXCRFS_VOLUME_SIZE}
 EOF
    fi
@@ -708,12 +718,20 @@ EOF
 vol_id=$(echo $(grep -rc "vol_id" ${SQUASHFS_UBINIZE_CFG_AB_WITH_LXC}))
     if $(echo ${IMAGE_FEATURES} | grep -q "lxcrootfs-volume"); then
         cat << EOF >> ${SQUASHFS_UBINIZE_CFG_AB_WITH_LXC}
-[lxcrootfs_volume]
+[lxcrootfs_volume_a]
 mode=ubi
 image="${LXCRFSIMAGE_SQUASHFS_TARGET}"
 vol_id=$((vol_id++))
 vol_type=dynamic
-vol_name=lxcrootfs
+vol_name=lxcrootfs_a
+vol_size=${LXCRFS_SQUASHFS_VOLUME_SIZE}
+
+[lxcrootfs_volume_b]
+mode=ubi
+image="${LXCRFSIMAGE_SQUASHFS_TARGET}"
+vol_id=$((vol_id++))
+vol_type=dynamic
+vol_name=lxcrootfs_b
 vol_size=${LXCRFS_SQUASHFS_VOLUME_SIZE}
 EOF
    fi
@@ -813,7 +831,7 @@ fakeroot do_makesystem_tele_ubi() {
    rm -rf ${IMAGE_ROOTFS_UBIFS_UBI}/etc/systemd/system/multi-user.target.wants/rbm-daemon.service
    rm -rf ${IMAGE_ROOTFS_UBIFS_UBI}/etc/systemd/system/multi-user.target.wants/gluebi-dlkm.service
 
-   mkfs.ubifs -r ${USER_IMAGE_ROOTFS} ${IMAGE_UBIFS_SELINUX_OPTIONS_DATA} -o ${USER_IMAGE_UBIFS_TARGET} ${MKUBIFS_ARGS}
+   mkfs.ubifs -r ${USER_IMAGE_ROOTFS} ${IMAGE_UBIFS_SELINUX_OPTIONS_DATA} -o ${USER_IMAGE_UBIFS_TARGET} ${MKUBIFS_USERFS_ARGS}
    if ${@bb.utils.contains('IMAGE_FEATURES', 'modem-volume', 'true', 'false', d)}; then
        if [ -d ${MODEM_IMAGE_DIR} ]; then
            mkfs.ubifs -r ${MODEM_IMAGE_DIR} --selinux=${SELINUX_CONTEXT_MODEM} -o ${MODEM_UBIFS_IMAGE} ${MKUBIFS_ARGS}
@@ -933,13 +951,13 @@ python () {
             bb.build.addtask('do_sign_system_squashfs', 'do_image_complete', 'do_makesystem_squashfs', d)
             bb.build.addtask('do_makesystem_squashfs_ubi', 'do_image_complete', 'do_sign_system_squashfs', d)
             if bb.utils.contains('MACHINE_FEATURES', 'qti-tele-lxc', True, False, d):
-               bb.build.addtask('do_makesystem_squashfs_ubi_with_lxc', 'do_image_complete', 'do_makesystem_squashfs', d)
+               bb.build.addtask('do_makesystem_squashfs_ubi_with_lxc', 'do_image_complete', 'do_makesystem_squashfs_ubi', d)
             if bb.utils.contains('COMBINED_FEATURES', 'qti-nad-telaf', True, False, d):
                bb.build.addtask('do_sign_telaf_squashfs', 'do_image_complete', 'do_maketelaf_squashfs', d)
         else:
             bb.build.addtask('do_makesystem_squashfs_ubi', 'do_image_complete', 'do_makesystem_squashfs', d)
             if bb.utils.contains('MACHINE_FEATURES', 'qti-tele-lxc', True, False, d):
-               bb.build.addtask('do_makesystem_squashfs_ubi_with_lxc', 'do_image_complete', 'do_makesystem_squashfs', d)
+               bb.build.addtask('do_makesystem_squashfs_ubi_with_lxc', 'do_image_complete', 'do_makesystem_squashfs_ubi', d)
 }
 
 do_patch_ubi_tools() {
