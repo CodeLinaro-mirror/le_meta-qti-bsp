@@ -76,6 +76,25 @@ interface(`qseecomd_relabel_data',`
 
 ########################################
 ## <summary>
+##	Relabel /persist/data.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`qseecomd_relabel_persist',`
+    gen_require(`
+        type fs_t, qseecomd_persist_t;
+    ')
+
+    allow $1 qseecomd_persist_t:dir { relabelto_dir_perms read open search };
+    allow qseecomd_persist_t fs_t:filesystem { associate };
+')
+
+########################################
+## <summary>
 ##	Relabel qseecomd device.
 ## </summary>
 ## <param name="domain">
@@ -108,6 +127,26 @@ interface(`qseecomd_manage_data',`
         type qseecomd_data_t;
     ')
 
-    # sfs_config and chmod to /data/tzstorage
-    allow $1 qseecomd_data_t:dir manage_dir_perms;
+    create_dirs_pattern($1, qseecomd_data_t, qseecomd_data_t)
+    delete_dirs_pattern($1, qseecomd_data_t, qseecomd_data_t)
+    manage_files_pattern($1, qseecomd_data_t, qseecomd_data_t)
+')
+
+########################################
+## <summary>
+##	Read and write /persist/data.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`qseecomd_rw_persist',`
+    gen_require(`
+        type qseecomd_persist_t;
+    ')
+
+    allow $1 qseecomd_persist_t:dir rw_dir_perms;
+    rw_files_pattern($1, qseecomd_persist_t, qseecomd_persist_t)
 ')
