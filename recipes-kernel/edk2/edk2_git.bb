@@ -1,10 +1,12 @@
-inherit deploy ${@bb.utils.contains("BBFILE_COLLECTIONS", "meta-python2", "pythonnative", "", d)}
+inherit deploy python3native
 DESCRIPTION = "UEFI bootloader"
 LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 
 BUILD_OS = "linux"
+
+DEPENDS += "util-linux-native"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 FILESEXTRAPATHS:prepend := "${WORKSPACE}/bootable/bootloader/:"
