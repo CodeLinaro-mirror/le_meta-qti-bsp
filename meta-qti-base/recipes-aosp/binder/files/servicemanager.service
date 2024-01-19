@@ -37,6 +37,7 @@ SourcePath=/usr/bin/servicemanager
 User=binder
 Group=binder
 Restart=always
+NoNewPrivileges=true
 AmbientCapabilities=CAP_SYS_NICE
 ExecStart=/usr/bin/servicemanager
 

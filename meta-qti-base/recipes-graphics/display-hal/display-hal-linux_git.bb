@@ -8,15 +8,15 @@ LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
 
-DEPENDS += "binder \
-            display-commonsys-intf-linux \
+DEPENDS += "display-commonsys-intf-linux \
             drm \
             gbm-headers \
             libdrm \
             libhardware \
             virtual/kernel-headers \
             system-core \
-            ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", '5.15', 'displaydlkm', '', d)} \
+            ${@bb.utils.contains_any("PREFERRED_VERSION_linux-msm", '5.15 6.1', 'displaydlkm', '', d)} \
+            ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'display-kernel-headers', '', d)} \
 "
 
 PR = "r8"

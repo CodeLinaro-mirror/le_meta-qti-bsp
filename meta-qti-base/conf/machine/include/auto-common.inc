@@ -6,7 +6,6 @@ include conf/machine/include/soc-family.inc
 PREFERRED_PROVIDER_virtual/kernel = "linux-msm"
 PREFERRED_PROVIDER_virtual/kernel-headers = "linux-msm-headers"
 PREFERRED_VERSION_linux-msm ?= "5.4"
-PREFERRED_VERSION_linux-msm-headers ?= "5.4"
 preferred-kernel = "PREFERRED_VERSION_linux-msm"
 
 PREFERRED_VERSION_edk2 ?= "3.0"
@@ -39,4 +38,6 @@ EXTRA_IMAGECMD:ext4 += " -b 4096 "
 
 IMAGE_CLASSES += "qimage"
 
-IMAGE_CLASSES += "${@oe.utils.version_less_or_equal('PREFERRED_VERSION_linux-msm', '5.14', '', 'qimage-boot', d)}"
+EXTRA_IMAGEDEPENDS += "qti-image-boot:do_sign_boot_img"
+EXTRA_IMAGEDEPENDS:remove:qti-dpk = "qti-image-boot:do_sign_boot_img"
+EXTRA_IMAGEDEPENDS:remove:sa7255 = "qti-image-boot:do_sign_boot_img"

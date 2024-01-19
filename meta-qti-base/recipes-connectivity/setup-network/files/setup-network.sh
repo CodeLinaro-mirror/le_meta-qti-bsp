@@ -127,7 +127,7 @@ function setup_network_agl_vm_1()
     if [[ -e /vendor/persist/enable_dhcp ]];then
         echo "Start DHCP."
         check_dns_conf
-        udhcpc -i eth0
+        udhcpc -i eth0 -b
         echo "Start DHCP complete."
     else
         echo "Assign IP address"

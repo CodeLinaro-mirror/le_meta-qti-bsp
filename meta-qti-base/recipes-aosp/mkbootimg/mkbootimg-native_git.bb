@@ -10,18 +10,18 @@ PROVIDES = "mkbootimg-native"
 
 PR = "r6"
 
-SRCREV = "${AUTOREV}"
-SRC_URI = "${PATH_TO_REPO}/system/core/.git;protocol=${PROTO};destsuffix=system/core/mkbootimg;subpath=mkbootimg;usehead=1"
+SRC_URI = "${PATH_TO_REPO}/system/core/.git;protocol=${PROTO};destsuffix=system/core;usehead=1"
 SRC_URI:append = " file://makefile;subdir=system/core/mkbootimg"
+SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/system/core/mkbootimg"
 
 inherit native
 
-CFLAGS += " -Dstrlcpy=g_strlcpy "
+CFLAGS += "-Dstrlcpy=g_strlcpy "
 EXTRA_OEMAKE = "INCLUDES='-Imincrypt' LIBS='-lmincrypt -lglib-2.0'"
 
-do_configure[noexec]="1"
+do_configure[noexec] = "1"
 
 do_install() {
         install -d ${D}${bindir}

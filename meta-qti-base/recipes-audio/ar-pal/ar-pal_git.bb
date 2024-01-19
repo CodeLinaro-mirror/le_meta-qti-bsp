@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/${LICENSE};md5=550794465ba0ec53
 DEPENDS += "agm agm-client ar-acdbdata ar-osal expat glib-2.0 gsl-fe-noship mm-audio-headers spf system-media tinyalsa tinycompress"
 
 SRC_URI = "\
-    ${PATH_TO_REPO}/vendor/qcom/opensource/pal/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/pal;subpath=pal;usehead=1 \
+    ${PATH_TO_REPO}/vendor/qcom/opensource/pal/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/pal;usehead=1 \
     file://mixer_paths-dpk.xml \
 "
 SRCREV = "${AUTOREV}"

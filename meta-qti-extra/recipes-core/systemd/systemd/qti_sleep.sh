@@ -37,7 +37,7 @@ case $1/$2 in
     systemctl stop loc_launcher.service
     systemctl stop location_hal_daemon.service
     systemctl stop audiod.service
-    if [ $2 == "hibernate" ]; then
+    if [ $2 = "hibernate" ]; then
         echo 0 > /sys/kernel/boot_adsp/boot
     fi
 
@@ -56,13 +56,23 @@ case $1/$2 in
         fi
     fi
 
-    for dev in `ls $usb_dev_path | grep 'ssusb$'`
+    # Disable the ssusb and hsusb for the msm usb controllers
+    for dev in `ls $usb_dev_path | grep 'susb$'`
     do
         usb_mode=`cat $usb_dev_path/$dev/mode`
         echo $dev=$usb_mode >> "$mode_file_path/$usb_mode_file"
         echo none > $usb_dev_path/$dev/mode
     done
-    sleep 5
+
+    # Put the connected devices with qcom usb controllers to suspend
+    echo "Putting all connected USB devices to auto suspend forcefully"
+    for j in /sys/bus/usb/devices/*/power/control
+    do
+        echo auto > $j
+    done
+
+    # Add delay to allow usb instance tear down for msm usb controllers
+    sleep 2
     ;;
   post/*)
     echo "Exiting from $2..."
@@ -79,7 +89,7 @@ case $1/$2 in
     fi
     systemctl restart synergy.service
 
-    if [ $2 == "hibernate" ]; then
+    if [ $2 = "hibernate" ]; then
         echo 1 > /sys/kernel/boot_adsp/boot
     fi
     systemctl restart loc_launcher.service

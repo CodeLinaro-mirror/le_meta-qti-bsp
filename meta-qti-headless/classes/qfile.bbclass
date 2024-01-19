@@ -29,8 +29,6 @@
 python __anonymous(){
     import re
 
-    d.prependVar("FILESPATH", "${SRC_DIR_ROOT}/:")
-
     pre_pathname = d.getVar('PATH_TO_REPO')
     src_uri_list = d.getVar('SRC_URI').replace("\t"," ").split(" ")
     new_src_uri_list = []
@@ -48,12 +46,28 @@ python __anonymous(){
             bb.warn("[qfile debug] Change SRC_URI failed")
         new_src_uri_list.append(new_srcuri)
 
+    extra_srcrev_lists = ["SRCREV_kernel",
+                          "SRCREV_clang",
+                          "SRCREV_build-kernel",
+                          "SRCREV_build-tools",
+                          "SRCREV_kernel-build-tools",
+                          "SRCREV_ndk",
+                          "SRCREV_glibc",
+                          "SRCREV_qcacld",
+                          "SRCREV_qca-wifi-host-cmn",
+                          "SRCREV_fw-api",
+                          "SRCREV_wlan",
+                          "SRCREV_devicetree",
+                          "SRCREV_audio-kernel-ar",
+                          "SRCREV_audio-kernel"]
+
     if need_change:
+        d.prependVar("FILESPATH", "${SRC_DIR_ROOT}/:")
         new_src_uri = " ".join(new_src_uri_list)
         d.setVar("SRC_URI", new_src_uri)
         d.setVar("SRCREV", '')
+
+        # Some recipes have multiple SRCREV, set them to empty.
+        for rev in extra_srcrev_lists:
+            d.setVar(rev, "")
 }
-
-
-
-

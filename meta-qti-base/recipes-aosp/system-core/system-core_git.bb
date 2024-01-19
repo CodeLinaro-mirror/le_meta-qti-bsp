@@ -6,7 +6,7 @@ HOMEPAGE = "http://developer.android.com/"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://NOTICE;md5=c1a3ff0b97f199c7ebcfdd4d3fed238e"
 
-DEPENDS += "ext4-utils glib-2.0 libbase libcutils libmincrypt libselinux libutils virtual/kernel-headers openssl system-core-adbd"
+DEPENDS += "ext4-utils glib-2.0 libbase libcutils libmincrypt libutils virtual/kernel-headers openssl system-core-adbd"
 
 PR = "r19"
 
@@ -19,17 +19,15 @@ inherit autotools pkgconfig systemd useradd
 
 COMPOSITION = "901D"
 
-USERADD_PACKAGES = "${PN}-leprop ${PN}-post-boot"
+SYSTEMD_PACKAGES = "${PN}-dlkm"
+SYSTEMD_SERVICE:${PN}-dlkm = "dlkm.service"
+
+USERADD_PACKAGES = "${PN}-leprop"
 
 GROUPADD_PARAM:${PN}-leprop = "leprop"
 USERADD_PARAM:${PN}-leprop = "-g leprop --no-create-home --shell /bin/false leprop"
 
-GROUPADD_PARAM:${PN}-post-boot = "post-boot"
-USERADD_PARAM:${PN}-post-boot = "-g post-boot --no-create-home --shell /bin/false post-boot"
-CPPFLAGS += "\
-    -I${STAGING_INCDIR}/ext4_utils \
-    -I${STAGING_INCDIR}/libselinux \
-"
+CPPFLAGS += "-I${STAGING_INCDIR}/ext4_utils"
 
 EXTRA_OECONF = "\
     --with-host-os=${HOST_OS} \
@@ -71,8 +69,6 @@ do_install:append() {
         ln -sf ${systemd_unitdir}/system/usb.service ${D}${systemd_unitdir}/system/multi-user.target.wants/usb.service
 
         install -m 0644 ${S}/rootdir/etc/dlkm.service -D ${D}${systemd_unitdir}/system/dlkm.service
-        ln -sf ${systemd_unitdir}/system/dlkm.service \
-            ${D}${systemd_unitdir}/system/multi-user.target.wants/dlkm.service
 
         install -m 0644 ${S}/rootdir/etc/init_post_boot.service -D ${D}${systemd_unitdir}/system/init_post_boot.service
         ln -sf ${systemd_unitdir}/system/init_post_boot.service \
@@ -90,7 +86,9 @@ do_install:append() {
         sed -i -e '/^After/d' ${D}${systemd_unitdir}/system/usb.service
         sed -i -e '/^Requires/d' ${D}${systemd_unitdir}/system/usb.service
         sed -i -e '/^Descr/a\RequiresMountsFor=\/var' ${D}${systemd_unitdir}/system/usb.service
-        sed -i -e '/^Descr/a\Requires=var-usb.service' ${D}${systemd_unitdir}/system/usb.service
+        if ${@bb.utils.contains('TCMODE', 'external-ubuntu', 'false', 'true', d)}; then
+            sed -i -e '/^Descr/a\Requires=var-usb.service' ${D}${systemd_unitdir}/system/usb.service
+        fi
         sed -i -e '/^Descr/a\After=var-volatile.mount leprop.service' ${D}${systemd_unitdir}/system/usb.service
         sed -i -e '/^ExecStartPre/d' ${D}${systemd_unitdir}/system/usb.service
         sed -i -e '/^Descr/a\ConditionVirtualization=!container' ${D}${systemd_unitdir}/system/usb.service

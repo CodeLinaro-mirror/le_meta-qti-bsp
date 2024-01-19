@@ -20,7 +20,7 @@ PERSIST_IMAGE_ROOTFS_SIZE ?= "128M"
 VIRTUAL-RUNTIME_dev_manager = "udev"
 VIRTUAL-RUNTIME_init_manager = "systemd"
 
-INCOMPATIBLE_LICENSE = "${@bb.utils.contains('LAYERSERIES_COMPAT_yocto', 'dunfell', 'GPL-3.0 LGPL-3.0 AGPL-3.0', 'GPL-3.0-only LGPL-3.0-only AGPL-3.0-only', d)}"
+INCOMPATIBLE_LICENSE = "GPL-3.0-only LGPL-3.0-only AGPL-3.0-only"
 
 IMAGE_FEATURES:append = " read-only-rootfs"
 

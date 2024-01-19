@@ -1,6 +1,6 @@
 DESCRIPTION = "QTI image capable of booting a device to the shell. The kernel includes \
 the Minimal RAM-based Initial Root Filesystem (initramfs)"
-
+HOMEPAGE = "https://git.codelinaro.org"
 LICENSE = "BSD-3-Clause"
 
 addtask mkbootimage after do_rootfs before do_build

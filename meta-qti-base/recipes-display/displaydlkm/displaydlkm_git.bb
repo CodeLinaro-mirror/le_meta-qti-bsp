@@ -20,8 +20,9 @@ TECHPACK_MODULES = "msm/msm_drm.ko"
 TECHPACK_MODULES:qtiquingvm8295 = "msm-hyp/msm_hyp.ko msm-cfg/msm_cfg.ko"
 TECHPACK_MODULES:quin-gvm-gen4-2 = "msm-hyp/msm_hyp.ko msm-cfg/msm_cfg.ko"
 TECHPACK_MODULES:quin-gvm-lemans = "msm-hyp/msm_hyp.ko msm-cfg/msm_cfg.ko"
+TECHPACK_MODULES:quin-gvm-monaco = "msm-hyp/msm_hyp.ko msm-cfg/msm_cfg.ko"
+TECHPACK_MODULES:quin-gvm-gen4-dpk = "msm-hyp/msm_hyp.ko msm-cfg/msm_cfg.ko"
 TECHPACK_HEADERS = "${S}/include/uapi"
-
 HDCP_QSEECOM_PATCH = "${STAGING_INCDIR}/hdcp_qseecom"
 TECHPACK_MAKE_ARGS = "KBUILD_EXTRA_SYMBOLS=${HDCP_QSEECOM_PATCH}/Module.symvers"
 
@@ -34,6 +35,16 @@ do_install:append:lemans(){
 }
 
 RPROVIDES:${PN} += "kernel-module-msm-drm-${KERNEL_VERSION}"
+RPROVIDES:${PN}:qtiquingvm8295 += "kernel-module-msm-hyp-${KERNEL_VERSION}"
+RPROVIDES:${PN}:qtiquingvm8295 += "kernel-module-msm-cfg-${KERNEL_VERSION}"
+RPROVIDES:${PN}:quin-gvm-gen4-2 += "kernel-module-msm-hyp-${KERNEL_VERSION}"
+RPROVIDES:${PN}:quin-gvm-gen4-2 += "kernel-module-msm-cfg-${KERNEL_VERSION}"
+RPROVIDES:${PN}:quin-gvm-lemans += "kernel-module-msm-hyp-${KERNEL_VERSION}"
+RPROVIDES:${PN}:quin-gvm-lemans += "kernel-module-msm-cfg-${KERNEL_VERSION}"
+RPROVIDES:${PN}:quin-gvm-monaco += "kernel-module-msm-hyp-${KERNEL_VERSION}"
+RPROVIDES:${PN}:quin-gvm-monaco += "kernel-module-msm-cfg-${KERNEL_VERSION}"
+RPROVIDES:${PN}:quin-gvm-gen4-dpk += "kernel-module-msm-hyp-${KERNEL_VERSION}"
+RPROVIDES:${PN}:quin-gvm-gen4-dpk += "kernel-module-msm-cfg-${KERNEL_VERSION}"
 
 FILES:${PN} += "${nonarch_base_libdir}/modules/${KERNEL_VERSION}/*"
 FILES:${PN} += "${sysconfdir}/*"

@@ -7,10 +7,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 MY_SRC = "${SRC_DIR_ROOT}/kernel/rh-kernel-5.14"
 PATCH_DIR = "${SRC_DIR_ROOT}/meta-qti-bsp/meta-qti-base/recipes-kernel/linux-ark/files/"
 MY_WDIR = "${WORKDIR}/kernel/rh-kernel-5.14"
-FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 DEPENDS += "\
-    dtc-native kern-tools-native  mkbootimg-native \
+    oot-dtbo dtc-native kern-tools-native  mkbootimg-native \
     ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'mkdtimg-native', '', d)} \
     openssl-native rsync-native \
     flex-native \
@@ -23,11 +22,11 @@ KERNEL_LD:append:aarch64 = " ${TOOLCHAIN_OPTIONS}"
 SRC_URI = "\
     ${PATH_TO_REPO}/kernel/rh-kernel-5.14/.git;protocol=${PROTO};destsuffix=kernel/msm-5.4;usehead=1 \
 "
-SRC_URI += "file://defconfig \
-			file://0001-centos-5.14-Fix-to-bypass-redhad-env.patch \
-            file://0002-centos-5.14-build-fixes-while-porting-from-5.4.patch \
-            file://0001-defconfig-add-overrides-to-resolve-build-error.patch \
-            file://0001-redhat-HACK-remove-rpm-build-dependency.patch \
+SRC_URI:append = " \
+    file://defconfig \
+    file://0001-centos-5.14-Fix-to-bypass-redhad-env.patch \
+    file://0002-centos-5.14-build-fixes-while-porting-from-5.4.patch \
+    file://0001-defconfig-add-overrides-to-resolve-build-error.patch \
 "
 
 SRCREV = "${AUTOREV}"
@@ -84,19 +83,30 @@ do_rh_config () {
     rm -rf ${SRC_DIR_ROOT}/kernel/rh-kernel-5.14/.config ${SRC_DIR_ROOT}/kernel/rh-kernel-5.14/include/config/ \
     ${SRC_DIR_ROOT}/kernel/rh-kernel-5.14/include/generated/ ${SRC_DIR_ROOT}/kernel/rh-kernel-5.14/arch/$ARCH/include/generated/
 }
-addtask rh_config after do_fetch before do_unpack
+addtask rh_config after do_prepare_recipe_sysroot before do_unpack
 
 do_patch_config() {
      do_patch_config_call() {
          cd ${MY_SRC}
          patch -f -p1 < ${PATCH_DIR}/0001-defconfig-add-overrides-to-resolve-build-error.patch
-         patch -f -p1 < ${PATCH_DIR}/0001-redhat-HACK-remove-rpm-build-dependency.patch
     }
 
     do_patch_config_call || bbwarn "do_patch_config_call failed"
 
 }
 addtask patch_config after do_fetch before do_rh_config
+
+python do_perf_config () {
+    dstdir = d.getVar('SRC_DIR_ROOT')
+    if (d.getVar('VARIANT', True) == 'perf'):
+         import shutil
+         srcdir = d.getVar('PATCH_DIR')
+         shutil.copy(srcdir + "/CONFIG_PERF", dstdir + "/kernel/rh-kernel-5.14/redhat/configs/custom-overrides/generic")
+    else:
+         if os.path.exists(dstdir + "/kernel/rh-kernel-5.14/redhat/configs/custom-overrides/generic/CONFIG_PERF"):
+             os.remove(dstdir + "/kernel/rh-kernel-5.14/redhat/configs/custom-overrides/generic/CONFIG_PERF")
+}
+addtask do_perf_config after do_fetch before do_patch_config
 
 do_patch_more() {
     cd ${MY_WDIR}
@@ -158,6 +168,7 @@ do_shared_workdir:append () {
 
         if [ -d scripts ]; then
             for i in \
+                scripts/unifdef \
                 scripts/basic/bin2c \
                 scripts/basic/fixdep \
                 scripts/conmakehash \
@@ -182,6 +193,19 @@ do_shared_workdir:append () {
             mkdir -p $kerneldir/usr/
             cp -f usr/gen_init_cpio $kerneldir/usr/
         fi
+        if (grep -q -i -e '^CONFIG_MODULES=y$' ${B}/.config); then
+            # Module.symvers gets updated during the
+            # building of the kernel modules. We need to
+            # update this in the shared workdir since some
+            # external kernel modules has a dependency on
+            # other kernel modules and will look at this
+            # file to do symbol lookups
+            cp ${B}/Module.symvers ${STAGING_KERNEL_BUILDDIR}/
+            # 5.10+ kernels have module.lds that we need to copy for external module builds
+            if [ -e "${B}/scripts/module.lds" ]; then
+                install -Dm 0644 ${B}/scripts/module.lds ${STAGING_KERNEL_BUILDDIR}/scripts/module.lds
+            fi
+        fi
 }
 
 do_deploy () {
@@ -193,33 +217,20 @@ do_deploy () {
     cp  ${STAGING_KERNEL_BUILDDIR}/usr/gen_init_cpio ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr
 
     # Copy Image and dtbs to deploydir
+    install -m 0644 vmlinux ${DEPLOYDIR}
 
     if [ "${BASEMACHINE}" = "sa8775" ]; then
-    cp ${B}/arch/arm64/boot/Image ${D}/${KERNEL_IMAGEDEST}/Image
-    cp ${B}/arch/arm64/boot/dts/qcom/lemans.dtb ${D}/${KERNEL_IMAGEDEST}/lemans.dtb
-    # Make bootimage
-    ${STAGING_BINDIR_NATIVE}/scripts/mkbootimg.py --header_version ${KERNEL_IMAGE_HEADER_VERSION} \
-	--kernel  ${D}/${KERNEL_IMAGEDEST}/Image \
-	--dtb  ${D}/${KERNEL_IMAGEDEST}/lemans.dtb \
-	--ramdisk /dev/null \
-        --pagesize ${PAGE_SIZE} \
-	--base ${KERNEL_BASE} \
-	--ramdisk_offset 0x0 \
-        --cmdline "console=ttyMSM0,115200,n8 no_console_suspend=1 androidboot.hardware=qcom androidboot.console=ttyMSM0 lpm_levels.sleep_disabled=1 msm_rtb.filter=0x237 earlycon=qcom_geni,0xa8c000 fips=0 notests nokaslr ignore_loglevel" \
-	--output  ${DEPLOYDIR}/sa8775p-boot-5.14.img
-    cp ${DEPLOYDIR}/sa8775p-boot-5.14.img ${DEPLOYDIR}/sa8775-boot.img
+        cp ${B}/arch/arm64/boot/Image ${D}/${KERNEL_IMAGEDEST}/Image
+        cp ${WORKDIR}/recipe-sysroot/sysroot-only/sa8775p-ride.dtb.overlay ${D}/${KERNEL_IMAGEDEST}/sa8775p-ride.dtb.overlay
+        install -m 0644 ${D}/${KERNEL_IMAGEDEST}/Image ${DEPLOYDIR}
+        install -m 0644 ${D}/${KERNEL_IMAGEDEST}/sa8775p-ride.dtb.overlay ${DEPLOYDIR}
+    elif [ "${BASEMACHINE}" = "sa8540" ]; then
+        cat ${B}/arch/arm64/boot/Image.gz \
+            ${B}/arch/arm64/boot/dts/qcom/sa8540p-adp-ride.dtb > ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb
+        install -m 0644 ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb ${DEPLOYDIR}
     else
-    cat ${B}/arch/arm64/boot/Image.gz \
-        ${B}/arch/arm64/boot/dts/qcom/sa8540p-adp-ride.dtb > ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb
-    # Make bootimage
-    ${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb \
-	--kernel  ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb \
-	--ramdisk /dev/null \
-        --pagesize ${PAGE_SIZE} \
-	--base ${KERNEL_BASE} \
-	--ramdisk_offset 0x0 \
-        --cmdline "console=ttyMSM0,115200,n8 no_console_suspend=1 androidboot.hardware=qcom androidboot.console=ttyMSM0 lpm_levels.sleep_disabled=1 msm_rtb.filter=0x237 earlycon=qcom_geni,0x884000 fips=0 notests nokaslr ignore_loglevel" \
-	--output  ${DEPLOYDIR}/sa8540p-boot-5.14.img
+        cat ${B}/arch/arm64/boot/Image.gz > ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb
+        install -m 0644 ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb ${DEPLOYDIR}
     fi
 
     if ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'true', 'false', d)}; then
@@ -232,4 +243,8 @@ do_deploy () {
 
 INHIBIT_PACKAGE_STRIP = "1"
 KERNEL_VERSION_SANITY_SKIP = "1"
+KERNEL_IMAGETYPE_FOR_MAKE += "dtbs"
+KERNEL_IMAGETYPE_FOR_MAKE += "${KERNEL_IMAGETYPE}"
+KERNEL_IMAGETYPE_FOR_MAKE += "modules"
 
+do_compile_kernelmodules[noexec] = "1"

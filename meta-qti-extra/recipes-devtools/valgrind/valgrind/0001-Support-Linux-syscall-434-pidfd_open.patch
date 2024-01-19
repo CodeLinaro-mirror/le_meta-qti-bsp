@@ -1,0 +1,183 @@
+commit e118d31c0bf8c8c5069e6000764e98c37edea25e
+Author: Earl Chew <earl_chew@yahoo.com>
+Date:   Sat Jan 21 09:48:48 2023 -0800
+
+    Support Linux syscall 434 pidfd_open
+
+Upstream-Status: Backport [https://sourceware.org/git/?p=valgrind.git;a=commit;h=d387566dd7dbb2ebe6fea5bfb4b2353bd5ab86ba]
+
+Signed-off-by: Earl Chew <earl_chew@yahoo.com>
+
+diff --git a/coregrind/m_syswrap/priv_syswrap-linux.h b/coregrind/m_syswrap/priv_syswrap-linux.h
+index d929caf5e..83aa727d0 100644
+--- a/coregrind/m_syswrap/priv_syswrap-linux.h
++++ b/coregrind/m_syswrap/priv_syswrap-linux.h
+@@ -320,6 +320,9 @@ DECL_TEMPLATE(linux, sys_io_uring_setup);
+ DECL_TEMPLATE(linux, sys_io_uring_enter);
+ DECL_TEMPLATE(linux, sys_io_uring_register);
+ 
++// Linux-specific (new in Linux 5.3)
++DECL_TEMPLATE(linux, sys_pidfd_open);
++
+ // Linux-specific (new in Linux 5.9)
+ DECL_TEMPLATE(linux, sys_close_range);
+ 
+diff --git a/coregrind/m_syswrap/syswrap-amd64-linux.c b/coregrind/m_syswrap/syswrap-amd64-linux.c
+index 430907c49..b4e30eaa6 100644
+--- a/coregrind/m_syswrap/syswrap-amd64-linux.c
++++ b/coregrind/m_syswrap/syswrap-amd64-linux.c
+@@ -876,6 +876,7 @@ static SyscallTableEntry syscall_table[] = {
+    LINXY(__NR_io_uring_enter,    sys_io_uring_enter),    // 426
+    LINXY(__NR_io_uring_register, sys_io_uring_register), // 427
+ 
++   LINXY(__NR_pidfd_open,        sys_pidfd_open),        // 434
+    GENX_(__NR_clone3,            sys_ni_syscall),        // 435
+    LINXY(__NR_close_range,       sys_close_range),       // 436
+ 
+diff --git a/coregrind/m_syswrap/syswrap-arm-linux.c b/coregrind/m_syswrap/syswrap-arm-linux.c
+index d583cef0c..8b1a8fe70 100644
+--- a/coregrind/m_syswrap/syswrap-arm-linux.c
++++ b/coregrind/m_syswrap/syswrap-arm-linux.c
+@@ -1052,6 +1052,7 @@ static SyscallTableEntry syscall_main_table[] = {
+    LINXY(__NR_io_uring_enter,    sys_io_uring_enter),    // 426
+    LINXY(__NR_io_uring_register, sys_io_uring_register), // 427
+ 
++   LINXY(__NR_pidfd_open,        sys_pidfd_open),        // 434
+    GENX_(__NR_clone3,            sys_ni_syscall),        // 435
+    LINXY(__NR_close_range,       sys_close_range),       // 436
+ 
+diff --git a/coregrind/m_syswrap/syswrap-arm64-linux.c b/coregrind/m_syswrap/syswrap-arm64-linux.c
+index 3ed71e143..953236000 100644
+--- a/coregrind/m_syswrap/syswrap-arm64-linux.c
++++ b/coregrind/m_syswrap/syswrap-arm64-linux.c
+@@ -831,6 +831,7 @@ static SyscallTableEntry syscall_main_table[] = {
+    LINXY(__NR_io_uring_enter,    sys_io_uring_enter),    // 426
+    LINXY(__NR_io_uring_register, sys_io_uring_register), // 427
+ 
++   LINXY(__NR_pidfd_open,        sys_pidfd_open),        // 434
+    GENX_(__NR_clone3,            sys_ni_syscall),        // 435
+    LINXY(__NR_close_range,       sys_close_range),       // 436
+ 
+diff --git a/coregrind/m_syswrap/syswrap-linux.c b/coregrind/m_syswrap/syswrap-linux.c
+index 35724660e..e07bd8163 100644
+--- a/coregrind/m_syswrap/syswrap-linux.c
++++ b/coregrind/m_syswrap/syswrap-linux.c
+@@ -13434,6 +13434,22 @@ POST(sys_close_range)
+       ML_(record_fd_close)(fd);
+ }
+ 
++PRE(sys_pidfd_open)
++{
++  PRINT("sys_pidfd_open ( %ld, %lu )", SARG1, ARG2);
++}
++
++POST(sys_pidfd_open)
++{
++   if (!ML_(fd_allowed)(RES, "pidfd", tid, True)) {
++      VG_(close)(RES);
++      SET_STATUS_Failure( VKI_EMFILE );
++   } else {
++      if (VG_(clo_track_fds))
++         ML_(record_fd_open_nameless) (tid, RES);
++   }
++}
++
+ #undef PRE
+ #undef POST
+ 
+diff --git a/coregrind/m_syswrap/syswrap-mips32-linux.c b/coregrind/m_syswrap/syswrap-mips32-linux.c
+index f556e063f..de27998b3 100644
+--- a/coregrind/m_syswrap/syswrap-mips32-linux.c
++++ b/coregrind/m_syswrap/syswrap-mips32-linux.c
+@@ -1136,6 +1136,7 @@ static SyscallTableEntry syscall_main_table[] = {
+    LINXY(__NR_io_uring_enter,          sys_io_uring_enter),          // 426
+    LINXY(__NR_io_uring_register,       sys_io_uring_register),       // 427
+ 
++   LINXY(__NR_pidfd_open,              sys_pidfd_open),              // 434
+    GENX_(__NR_clone3,                  sys_ni_syscall),              // 435
+    LINXY(__NR_close_range,       sys_close_range),       // 436
+ 
+diff --git a/coregrind/m_syswrap/syswrap-mips64-linux.c b/coregrind/m_syswrap/syswrap-mips64-linux.c
+index 41a5404c5..67e7c2c2f 100644
+--- a/coregrind/m_syswrap/syswrap-mips64-linux.c
++++ b/coregrind/m_syswrap/syswrap-mips64-linux.c
+@@ -815,6 +815,7 @@ static SyscallTableEntry syscall_main_table[] = {
+    LINXY (__NR_io_uring_setup, sys_io_uring_setup),
+    LINXY (__NR_io_uring_enter, sys_io_uring_enter),
+    LINXY (__NR_io_uring_register, sys_io_uring_register),
++   LINXY (__NR_pidfd_open, sys_pidfd_open),
+    GENX_ (__NR_clone3, sys_ni_syscall),
+    LINXY (__NR_close_range, sys_close_range),
+    LINX_ (__NR_faccessat2, sys_faccessat2),
+diff --git a/coregrind/m_syswrap/syswrap-nanomips-linux.c b/coregrind/m_syswrap/syswrap-nanomips-linux.c
+index f9d4b19f4..9c535c68e 100644
+--- a/coregrind/m_syswrap/syswrap-nanomips-linux.c
++++ b/coregrind/m_syswrap/syswrap-nanomips-linux.c
+@@ -824,6 +824,7 @@ static SyscallTableEntry syscall_main_table[] = {
+    LINXY (__NR_io_uring_setup,         sys_io_uring_setup),
+    LINXY (__NR_io_uring_enter,         sys_io_uring_enter),
+    LINXY (__NR_io_uring_register,      sys_io_uring_register),
++   LINXY (__NR_pidfd_open,             sys_pidfd_open),
+    GENX_ (__NR_clone3,                 sys_ni_syscall),
+    LINXY (__NR_close_range,            sys_close_range),
+    LINX_ (__NR_faccessat2,             sys_faccessat2),
+diff --git a/coregrind/m_syswrap/syswrap-ppc32-linux.c b/coregrind/m_syswrap/syswrap-ppc32-linux.c
+index 637b2504e..12c073027 100644
+--- a/coregrind/m_syswrap/syswrap-ppc32-linux.c
++++ b/coregrind/m_syswrap/syswrap-ppc32-linux.c
+@@ -1056,6 +1056,7 @@ static SyscallTableEntry syscall_table[] = {
+    LINXY(__NR_io_uring_enter,    sys_io_uring_enter),    // 426
+    LINXY(__NR_io_uring_register, sys_io_uring_register), // 427
+ 
++   LINXY(__NR_pidfd_open,        sys_pidfd_open),        // 434
+    GENX_(__NR_clone3,            sys_ni_syscall),        // 435
+    LINXY(__NR_close_range,       sys_close_range),       // 436
+ 
+diff --git a/coregrind/m_syswrap/syswrap-ppc64-linux.c b/coregrind/m_syswrap/syswrap-ppc64-linux.c
+index 93956d3cc..3c33d1267 100644
+--- a/coregrind/m_syswrap/syswrap-ppc64-linux.c
++++ b/coregrind/m_syswrap/syswrap-ppc64-linux.c
+@@ -1025,6 +1025,7 @@ static SyscallTableEntry syscall_table[] = {
+    LINXY(__NR_io_uring_enter,    sys_io_uring_enter),    // 426
+    LINXY(__NR_io_uring_register, sys_io_uring_register), // 427
+ 
++   LINXY(__NR_pidfd_open,        sys_pidfd_open),        // 434
+    GENX_(__NR_clone3,            sys_ni_syscall),        // 435
+    LINXY(__NR_close_range,       sys_close_range),       // 436
+ 
+diff --git a/coregrind/m_syswrap/syswrap-s390x-linux.c b/coregrind/m_syswrap/syswrap-s390x-linux.c
+index 73f9684c4..a377cb731 100644
+--- a/coregrind/m_syswrap/syswrap-s390x-linux.c
++++ b/coregrind/m_syswrap/syswrap-s390x-linux.c
+@@ -866,6 +866,7 @@ static SyscallTableEntry syscall_table[] = {
+    LINXY(__NR_io_uring_enter, sys_io_uring_enter),                    // 426
+    LINXY(__NR_io_uring_register, sys_io_uring_register),              // 427
+ 
++   LINXY(__NR_pidfd_open, sys_pidfd_open),                            // 434
+    GENX_(__NR_clone3, sys_ni_syscall),                                // 435
+    LINXY(__NR_close_range, sys_close_range),                          // 436
+ 
+diff --git a/coregrind/m_syswrap/syswrap-x86-linux.c b/coregrind/m_syswrap/syswrap-x86-linux.c
+index 120cefc77..2df3ba243 100644
+--- a/coregrind/m_syswrap/syswrap-x86-linux.c
++++ b/coregrind/m_syswrap/syswrap-x86-linux.c
+@@ -1647,6 +1647,7 @@ static SyscallTableEntry syscall_table[] = {
+    LINXY(__NR_io_uring_enter,    sys_io_uring_enter),   // 426
+    LINXY(__NR_io_uring_register, sys_io_uring_register),// 427
+ 
++   LINXY(__NR_pidfd_open,        sys_pidfd_open),       // 434
+    GENX_(__NR_clone3,            sys_ni_syscall),       // 435
+    LINXY(__NR_close_range,       sys_close_range),      // 436
+ 
+diff --git a/include/vki/vki-scnums-shared-linux.h b/include/vki/vki-scnums-shared-linux.h
+index f591611f6..b48c88246 100644
+--- a/include/vki/vki-scnums-shared-linux.h
++++ b/include/vki/vki-scnums-shared-linux.h
+@@ -39,6 +39,7 @@
+ #define __NR_fsmount		432
+ #define __NR_fspick		433
+ 
++#define __NR_pidfd_open		434
+ #define __NR_clone3		435
+ #define __NR_close_range	436
+ 

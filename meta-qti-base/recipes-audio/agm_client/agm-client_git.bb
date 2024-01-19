@@ -9,7 +9,7 @@ DEPENDS += "\
     libcutils liblog libutils virtual/kernel-headers spf \
 "
 
-SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/agm/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/agm/ipc/SwBinders/agm_client;subpath=agm_client;usehead=1"
+SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/agm/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/agm;usehead=1"
 SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/vendor/qcom/opensource/agm/ipc/SwBinders/agm_client"

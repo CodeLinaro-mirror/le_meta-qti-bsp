@@ -20,5 +20,6 @@ TECHPACK_MODULES:lemans = "msm_video.ko"
 TECHPACK_HEADERS = "${S}/include/uapi"
 
 RPROVIDES:${PN} += "kernel-module-msm-vidc-${KERNEL_VERSION}"
+RPROVIDES:${PN}:lemans += "kernel-module-msm-video-${KERNEL_VERSION}"
 FILES:${PN} += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', '${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/*', d)}"
 ALLOW_EMPTY:${PN} = "1"

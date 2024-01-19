@@ -21,7 +21,7 @@ inherit cmake pkgconfig
 
 EXTRA_OECMAKE := "-DWITH_ILM_INPUT=1"
 
-FILES:${PN} += " \
+FILES:${PN} += "\
         ${libdir}/weston/* \
         ${datadir}/wayland-protocols \
     "

@@ -8,7 +8,7 @@ DEPENDS += "expat libutils tinyalsa"
 
 PROVIDES += "audio-route audio-utils audio-effects"
 
-SRC_URI = "${PATH_TO_REPO}/frameworks/.git;protocol=${PROTO};destsuffix=frameworks/system/media;subpath=system/media;usehead=1"
+SRC_URI = "${PATH_TO_REPO}/frameworks/.git;protocol=${PROTO};destsuffix=frameworks;usehead=1"
 
 SRCREV = "${AUTOREV}"
 

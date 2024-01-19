@@ -1,0 +1,29 @@
+From 0b9d0e434527aa75efe8a19c391af3a12e266c26 Mon Sep 17 00:00:00 2001
+From: Yao Jiang <quic_c_yaojia@quicinc.com>
+Date: Tue, 9 May 2023 01:26:07 +0000
+Subject: [PATCH] Fix module_mutex undeclared issue for kernel 5.15
+
+It should be fixed upstream future due to it's a building conflict issue on kernel 5.15
+
+Upstream-Status: Pending
+Signed-off-by: Yao Jiang <quic_c_yaojia@quicinc.com>
+---
+ kernel/ktf_cov.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/kernel/ktf_cov.c b/kernel/ktf_cov.c
+index 99c4fef..5a9a779 100644
+--- a/kernel/ktf_cov.c
++++ b/kernel/ktf_cov.c
+@@ -19,6 +19,8 @@
+ #include "ktf_compat.h"
+ #include "ktf_kallsyms.h"
+ 
++static DEFINE_MUTEX(module_mutex);
++
+ /* It may seem odd that we use a refcnt field in ktf_cov_entry structures
+  * in addition to using krefcount management via the ktf_map.  The reasoning
+  * here is that if we enable and then disable coverage, we do not want to
+-- 
+2.35.2
+

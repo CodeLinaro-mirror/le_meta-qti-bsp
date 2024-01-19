@@ -18,4 +18,4 @@ add_extra_modules() {
     awk -F / '{print $NF > "modules.load"}' modules.order
 }
 
-ROOTFS_POSTPROCESS_COMMAND:append = " ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "5.15", "add_extra_modules", "", d)};"
+ROOTFS_POSTPROCESS_COMMAND:append = " add_extra_modules;"

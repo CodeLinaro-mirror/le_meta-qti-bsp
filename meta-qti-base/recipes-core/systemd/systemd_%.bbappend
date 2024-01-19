@@ -16,11 +16,8 @@ SRC_URI:append = " ${@bb.utils.contains("DISTRO_FEATURES", "early_init", "file:/
 
 SRC_URI:append = " ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "5.15", "file://platform_load.conf", "", d)}"
 
-# Disable close_range in systemd v250.4 as it doesn't work with linux-msm 5.4
-SRC_URI:append = " ${@oe.utils.conditional("PV", "250.4", "file://0001-Disable-close_range.patch", "", d)}"
-
 # Remove backlight - Loads/Saves Screen Backlight Brightness, not required.
-PACKAGECONFIG:remove = " backlight "
+PACKAGECONFIG:remove = "backlight "
 
 # Use glib-2.0 for g_strlcat
 CFLAGS:append = " \
@@ -42,10 +39,14 @@ do_install:append:sa81x5() {
     if ${@bb.utils.contains('DISTRO_FEATURES', 'qti-lxc', 'true', 'false', d)}; then
         sed -i 's/#AllowSuspend=yes/AllowSuspend=no/' ${D}${sysconfdir}/systemd/sleep.conf
     fi
-
 }
 
 do_install:append () {
+    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'true', 'false', d)}; then
+        echo "DefaultLimitNOFILE=infinity" >> ${D}${sysconfdir}/systemd/system.conf
+        echo "DefaultLimitMSGQUEUE=infinity" >> ${D}${sysconfdir}/systemd/system.conf
+    fi
+
     # Use kernel rules for network iface name
     sed -i  's/^NamePolicy.*/NamePolicy=kernel/g' ${D}${systemd_unitdir}/network/99-default.link
 

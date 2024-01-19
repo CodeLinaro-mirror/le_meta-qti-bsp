@@ -5,7 +5,7 @@ LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
 DEPENDS += "acdbloader audcal glib-2.0 json-c pulseaudio"
 
-SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/mm-audio/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/mm-audio/pulseaudio-module-acdb;subpath=pulseaudio-module-acdb;usehead=1"
+SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/mm-audio/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/mm-audio;usehead=1"
 SRCREV = "${AUTOREV}"
 S = "${WORKDIR}/vendor/qcom/opensource/mm-audio/pulseaudio-module-acdb"
 

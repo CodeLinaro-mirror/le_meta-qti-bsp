@@ -12,15 +12,18 @@ LICENSE = "ISC"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=f3b90e78ea0cffb20bf5cca7947a896d"
 
 PR = "r8"
-SRC_URI = "${PATH_TO_REPO}/wlan/qcacld-3.0/.git;protocol=${PROTO};destsuffix=wlan/qcacld-3.0;usehead=1 \
-           ${PATH_TO_REPO}/wlan/qca-wifi-host-cmn/.git;protocol=${PROTO};destsuffix=wlan/qca-wifi-host-cmn;usehead=1 \
-           ${PATH_TO_REPO}/wlan/fw-api/.git;protocol=${PROTO};destsuffix=wlan/fw-api/;usehead=1 \
-           ${PATH_TO_REPO}/device/qcom/wlan/.git;protocol=${PROTO};destsuffix=device/qcom/wlan/msm_auto;subpath=msm_auto;usehead=1 \
+SRC_URI = "${PATH_TO_REPO}/wlan/qcacld-3.0/.git;protocol=${PROTO};name=qcacld;destsuffix=wlan/qcacld-3.0;usehead=1 \
+           ${PATH_TO_REPO}/wlan/qca-wifi-host-cmn/.git;protocol=${PROTO};name=qca-wifi-host-cmn;destsuffix=wlan/qca-wifi-host-cmn;usehead=1 \
+           ${PATH_TO_REPO}/wlan/fw-api/.git;protocol=${PROTO};name=fw-api;destsuffix=wlan/fw-api/;usehead=1 \
+           ${PATH_TO_REPO}/device/qcom/wlan/.git;protocol=${PROTO};name=wlan;destsuffix=device/qcom/wlan;usehead=1 \
            file://qca6390-module-load.service \
            file://qca6390_load.sh \
            file://qca6390_unload.sh \
            "
-SRCREV = "${AUTOREV}"
+SRCREV_qcacld = "${AUTOREV}"
+SRCREV_qca-wifi-host-cmn = "${AUTOREV}"
+SRCREV_fw-api = "${AUTOREV}"
+SRCREV_wlan = "${AUTOREV}"
 SRCREV_FORMAT = "qcacld_cmn_fw_msm"
 
 _MODNAME = "qca6390"
@@ -78,12 +81,35 @@ _WLAN_CFG_OVERRIDE_METAL = "\
                         CONFIG_WLAN_FEATURE_DP_EVENT_HISTORY=y \
                         CONFIG_DP_TX_TRACKING=y \
                         "
+
+_WLAN_CFG_OVERRIDE_PRODUCT = "\
+                        CONFIG_WLAN_DISABLE_EXPORT_SYMBOL=y \
+                        CONFIG_WLAN_OPEN_P2P_INTERFACE=n \
+                        CONFIG_SUPPORT_P2P_BY_ONE_INTF_WLAN=y \
+                        CONFIG_FEATURE_GPIO_CFG=y \
+                        CONFIG_WLAN_MAC_ADDR_UPDATE_DISABLE=y \
+                        CONFIG_FEATURE_WLAN_CH_AVOID_EXT=y \
+                        CONFIG_QCOM_TDLS=n \
+                        CONFIG_CFG_MAX_STA_VDEVS=4 \
+                        CONFIG_CFG_BMISS_OFFLOAD_MAX_VDEV=4 \
+                        CONFIG_REO_DESC_DEFER_FREE=y \
+                        CONFIG_FEATURE_MEMDUMP_ENABLE=n \
+                        WLAN_OPEN_SOURCE=n \
+                        CONFIG_REMOVE_PKT_LOG=y \
+                        CONFIG_DEBUG_FS=n \
+                        CONFIG_WLAN_SYSFS=n \
+                        CONFIG_WLAN_SYSFS_MEM_STATS=n \
+                        CONFIG_SLUB_DEBUG=n \
+                        CONFIG_PERF_DEBUG=n \
+                        "
+
 EXTRA_OEMAKE:append:qtiquingvm = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
 EXTRA_OEMAKE:append:qtiquingvm8295 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
 EXTRA_OEMAKE:append:sa8295 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_METAL}"
 EXTRA_OEMAKE:append:quin-gvm-gen4 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
 EXTRA_OEMAKE:append:quin-gvm-gen4-2 = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
 EXTRA_OEMAKE:append:quin-gvm-lemans = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
+EXTRA_OEMAKE:append:quin-gvm-monaco = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE_GVM}"
 
 do_configure:append() {
     sed -i -e 's/^gEnableConcurrentSTA=wlan1/gEnableConcurrentSTA=wlan3/g' ${WORKDIR}/device/qcom/wlan/msm_auto/WCNSS_qcom_cfg_qca6390.ini
