@@ -6,7 +6,7 @@ PROVIDES = "${PACKAGES}"
 inherit packagegroup
 
 PACKAGES = "\
-    packagegroup-qti-qcrosvm \
+    packagegroup-qti-vmm \
 "
 
 ALLOW_EMPTY:${PN} = "1"
@@ -17,9 +17,5 @@ RDEPENDS:${PN} = "\
     msmhab \
     vhost-user-q \
     vhost-user-lib \
-    safelinux-cfg-modules \
-    safelinux-system-cfg \
-    safelinux-dbg-modules \
-    dspfirmware-mount \
     gvm-net-config \
 "
