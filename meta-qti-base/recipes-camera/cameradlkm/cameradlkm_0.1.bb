@@ -18,7 +18,7 @@ inherit qti-techpack
 TECHPACK_MODULE_OUT = "${WORKDIR}/ais-kernel"
 TECHPACK_MODULES = "ais.ko"
 TECHPACK_HEADERS = "${S}/include/uapi"
-TECHPACK_MAKE_ARGS = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', "${EXTRA_OEMAKE} QTI_TECHPACK=true", "", d)}"
+TECHPACK_MAKE_ARGS = "${@bb.utils.contains_any('PREFERRED_VERSION_linux-msm', '5.15 6.1', "${EXTRA_OEMAKE} QTI_TECHPACK=true", "", d)}"
 
 do_compile:prepend() {
     export ROOT_DIR=""
