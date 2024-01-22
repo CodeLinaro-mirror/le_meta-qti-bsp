@@ -7,7 +7,7 @@ inherit qimage
 DEPENDS += "mtd-utils-native"
 USBCOMPOSITION_sdxpinn = "${@bb.utils.contains('BBFILE_COLLECTIONS', 'qti-core', '90DB', '4EE7', d)}"
 
-IMAGE_FEATURES += "read-only-rootfs nand2x ssh-server-openssh persist-volume"
+IMAGE_FEATURES += "read-only-rootfs nand2x persist-volume"
 
 CORE_IMAGE_EXTRA_INSTALL += "\
               glib-2.0 \
