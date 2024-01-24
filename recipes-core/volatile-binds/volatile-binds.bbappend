@@ -92,6 +92,7 @@ VOLATILE_BINDS_sa525m = "\
 /systemrw/misc/wifi /etc/misc/wifi/\n\
 /systemrw/c2c /etc/c2c/\n\
 /systemrw/tel.conf /etc/tel.conf\n\
+/systemrw/resourcemanager.xml /etc/resourcemanager.xml\n\
 /systemrw/enable /etc/cv2x/enable\n\
 /systemrw/ObeConfig.conf /etc/ObeConfig.conf\n\
 /systemrw/qvirtmgr.json  /etc/qvirtmgr.json\n\
