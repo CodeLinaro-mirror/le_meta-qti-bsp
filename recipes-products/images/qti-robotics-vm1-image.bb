@@ -1,6 +1,6 @@
 inherit qimage qramdisk
 
-DEPENDS += " virtual/kernel"
+DEPENDS += " virtual/kernel virtual/mkdtimg-native"
 
 ENABLE_DISPLAY = "${@d.getVar('MACHINE_SUPPORTS_DISPLAY') or "True"}"
 ENABLE_TOUCH = "${@d.getVar('MACHINE_SUPPORTS_TOUCH') or "True"}"
@@ -42,6 +42,7 @@ do_merge_dtbs() {
 
 addtask do_merge_dtbs after do_makesystem before do_makeboot
 
+do_makeandsign_vmimage[depends] += "qti-robotics-vm2-image:do_image_complete"
 do_compose_vmimage[recrdeptask] = "do_ramdisk_create"
 do_compose_vmimage[recrdeptask] += "do_merge_dtbs"
 do_compose_vmimage[recrdeptask] += "do_extracpio_create"

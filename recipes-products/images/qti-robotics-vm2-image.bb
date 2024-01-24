@@ -1,6 +1,6 @@
 inherit qimage qramdisk
 
-DEPENDS += " virtual/kernel"
+DEPENDS += " virtual/kernel virtual/mkdtimg-native"
 
 ENABLE_SECUREMSM = "${@d.getVar('MACHINE_SUPPORTS_SECUREMSM') or "True"}"
 
