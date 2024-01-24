@@ -30,7 +30,7 @@
 echo "##########Trying to unload wlanhost driver ##########"
 
 uninstall_module() {
-	modprobe -r $1 || modprobe -d /vendor -r $1;
+	rmmod $1;
 }
 
 if (lspci -k|grep cnss_pci);then
