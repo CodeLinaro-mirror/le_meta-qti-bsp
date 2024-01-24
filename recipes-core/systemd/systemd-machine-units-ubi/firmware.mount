@@ -27,9 +27,9 @@
 
 [Unit]
 Before=local-fs.target
+ConditionDirectoryNotEmpty=!/firmware
 
 [Mount]
-Type=ubifs
-What=ubi0:usrfs
-Where=/data
-Options=bulk_read,rw,rootcontext=system_u:object_r:data_t:s0
+What=/dev/disk/by-partlabel/modem
+Where=/firmware
+Options=noexec,nodev,ro,context=system_u:object_r:firmware_t:s0
