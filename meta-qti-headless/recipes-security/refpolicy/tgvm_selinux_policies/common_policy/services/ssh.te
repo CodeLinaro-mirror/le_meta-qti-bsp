@@ -30,40 +30,12 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#######################################
-## <summary>
-##	Create, read, write, and delete dirs
-##	on a functionfs filesystem.
-## </summary>
-## <param name="domain">
-##	<summary>
-##	Domain allowed access.
-##	</summary>
-## </param>
-#
-interface(`fs_manage_functionfs_dirs',`
-	gen_require(`
-		type functionfs_t;
-	')
+# Some ssh key files restore in /run/ssh
+init_daemon_runtime_file(sshd_runtime_t, dir, "ssh")
+filetrans_pattern(ssh_keygen_t, sshd_runtime_t, sshd_key_t, file)
 
-	manage_dirs_pattern($1, functionfs_t, functionfs_t)
-')
+#/etc/machine-id
+init_read_runtime_files(sshd_t)
 
-#######################################
-## <summary>
-##	Create, read, write, and delete files
-##	on a functionfs filesystem.
-## </summary>
-## <param name="domain">
-##	<summary>
-##	Domain allowed access.
-##	</summary>
-## </param>
-#
-interface(`fs_manage_functionfs_files',`
-	gen_require(`
-		type functionfs_t;
-	')
-
-	manage_files_pattern($1, functionfs_t, functionfs_t)
-')
+# when login in with ssh, will transfer bash domain to unconfined_t under targeted policy
+unconfined_transition(sshd_t)

@@ -34,3 +34,11 @@ leprop_relabelto_leprop_sock_files(setfiles_t)
 
 # /dev/pts/0
 term_use_generic_ptys(setfiles_t)
+
+# selinux-relabeldata.service will restorecon /data
+# /data/tzstorage
+qseecomd_relabel_data(setfiles_t)
+
+# selinux-relabeldev.service will restorecon /dev
+# /dev/qseecom
+qseecomd_relabel_dev(setfiles_t)

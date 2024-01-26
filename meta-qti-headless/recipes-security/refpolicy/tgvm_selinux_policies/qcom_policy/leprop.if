@@ -229,3 +229,22 @@ gen_require(`
 
     allow $1 leprop_socket_t:sock_file relabelto_sock_file_perms;
 ')
+
+########################################
+## <summary>
+##  Start, stop and status to the leprop service.
+## </summary>
+## <param name="domain">
+##  <summary>
+##  Domain allowed access.
+##  </summary>
+## </param>
+#
+interface(`leprop_manage_service',`
+    gen_require(`
+        class service { start status stop };
+        type leprop_exec_t;
+    ')
+
+    allow $1 leprop_exec_t:service { start status stop };
+')

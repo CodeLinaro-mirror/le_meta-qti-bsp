@@ -15,4 +15,5 @@ RDEPENDS:${PN} += "\
     util-linux \
     libgpiod-tools \
     exfat-utils \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'asan', 'gcc-sanitizers', '', d)}  \
     "

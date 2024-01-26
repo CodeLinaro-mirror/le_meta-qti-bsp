@@ -30,52 +30,22 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-policy_module(qseecomd, 1.0)
+## <summary>Policy for SELinux policy and userland applications.</summary>
 
-type qseecomd_t;
-type qseecomd_exec_t;
-type qseecomd_data_t;
-type qseecomd_persist_t;
-type qseecomd_initscript_t;
-type qseecomd_initscript_exec_t;
-type qseecomd_unit_t;
-type qseecom_device_t;
+########################################
+## <summary>
+##	Allow domain transition to unconfined_t, but this action is not automatically.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`unconfined_transition',`
+	gen_require(`
+		type unconfined_t;
+	')
 
-init_daemon_domain(qseecomd_t, qseecomd_exec_t)
-init_script_file(qseecomd_initscript_exec_t)
-init_unit_file(qseecomd_unit_t)
-
-dev_associate(qseecom_device_t)
-
-logging_send_syslog_msg(qseecomd_t)
-
-# /dev/qseecom
-dev_manage_qseecom(qseecomd_t)
-#dev_manage_generic_dirs(qseecomd_t)
-dev_read_generic_chr_files(qseecomd_t)
-
-# /dev/vde, dosfs_t
-fs_list_dos(qseecomd_t)
-fs_read_dos_files(qseecomd_t)
-
-files_list_var(qseecomd_t)
-files_manage_var_dirs(qseecomd_t)
-files_manage_var_files(qseecomd_t)
-files_read_etc_files(qseecomd_t)
-files_rw_leprop_sockets(qseecomd_t)
-files_list_mnt(qseecomd_t)
-
-# local
-allow qseecomd_t self:unix_dgram_socket { create connect };
-allow qseecomd_t self:capability { setgid setpcap setuid };
-allow qseecomd_t self:process { setcap };
-
-# search root directory
-files_list_default(qseecomd_t)
-
-# /data/tzstorage
-files_manage_default_dirs(qseecomd_t)
-files_manage_default_files(qseecomd_t)
-
-# connect to leprop-service socket
-connect_to_leprop_sockets(qseecomd_t)
+    allow $1 unconfined_t:process { transition noatsecure rlimitinh siginh };
+')
