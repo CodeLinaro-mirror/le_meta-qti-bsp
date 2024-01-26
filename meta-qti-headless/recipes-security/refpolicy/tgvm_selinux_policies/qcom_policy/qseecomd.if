@@ -150,3 +150,23 @@ interface(`qseecomd_rw_persist',`
     allow $1 qseecomd_persist_t:dir rw_dir_perms;
     rw_files_pattern($1, qseecomd_persist_t, qseecomd_persist_t)
 ')
+
+########################################
+## <summary>
+##	Manage qseecomd /persist/data.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`qseecomd_manage_persist',`
+    gen_require(`
+        type qseecomd_persist_t;
+    ')
+
+    create_dirs_pattern($1, qseecomd_persist_t, qseecomd_persist_t)
+    delete_dirs_pattern($1, qseecomd_persist_t, qseecomd_persist_t)
+    manage_files_pattern($1, qseecomd_persist_t, qseecomd_persist_t)
+')
