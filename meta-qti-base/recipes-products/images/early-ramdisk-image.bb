@@ -16,10 +16,8 @@ KERNELDEPMODDEPEND = ""
 KERNEL_VERSION = "${@oe.utils.read_file('${STAGING_KERNEL_BUILDDIR}/kernel-abiversion')}"
 
 # We really need just kexecboot, kexec and ubiattach
-IMAGE_INSTALL = "\
-                 early-ramdisk-init libgcc kmod util-linux-libblkid \
-"
 IMAGE_INSTALL:sa81x5 += "\
+                 early-ramdisk-init libgcc kmod util-linux-libblkid \
                  kernel-module-spidev-${KERNEL_VERSION} \
                  kernel-module-spi-msm-geni-${KERNEL_VERSION} \
                  kernel-module-qcom-smd-${KERNEL_VERSION} \
@@ -41,7 +39,6 @@ IMAGE_INSTALL:sa81x5 += "\
                  kernel-module-minidump-${KERNEL_VERSION} \
                  kernel-module-msm-qmp-${KERNEL_VERSION} \
                  kernel-module-msm-dma-iommu-mapping-${KERNEL_VERSION} \
-                 kernel-module-ns-${KERNEL_VERSION} \
                  kernel-module-pinctrl-slpi-${KERNEL_VERSION} \
                  kernel-module-pinctrl-sm8150-${KERNEL_VERSION} \
                  kernel-module-pinctrl-sdmshrike-${KERNEL_VERSION} \
