@@ -23,11 +23,14 @@ do_install:append() {
     install -m 0755 ${WORKDIR}/mnt_fs.conf -D ${D}${libdir}/modules-load.d/mnt_fs.conf
     install -m 0777 ${S}/firmware-qcom-sa8775p.mount -D ${D}${systemd_unitdir}/system/firmware-qcom-sa8775p.mount
     install -m 0777 ${S}/vendor-dsp.mount -D ${D}${systemd_unitdir}/system/vendor-dsp.mount
+    install -m 0777 ${S}/vendor-dsp.automount -D ${D}${systemd_unitdir}/system/vendor-dsp.automount
 
     ln -sf ${systemd_unitdir}/system/firmware-qcom-sa8775p.mount \
         ${D}${systemd_unitdir}/system/multi-user.target.wants/firmware-qcom-sa8775p.mount
     ln -sf ${systemd_unitdir}/system/vendor-dsp.mount \
         ${D}${systemd_unitdir}/system/multi-user.target.wants/vendor-dsp.mount
+    ln -sf ${systemd_unitdir}/system/vendor-dsp.automount \
+        ${D}${systemd_unitdir}/system/multi-user.target.wants/vendor-dsp.automount
 
     if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-vmm', 'true', 'false', d)}; then
         install -d -p ${D}/firmware/vm/boot
