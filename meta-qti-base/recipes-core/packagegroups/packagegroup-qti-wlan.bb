@@ -27,3 +27,9 @@ RDEPENDS:${PN} += "\
     wlan-conf \
     cnss-wlan-load \
     "
+
+RDEPENDS:${PN}:remove:quin-gvm-gen4-2 = "\
+    qcacld32-ll-rome \
+    qcacld32-ll-genoa \
+    qcacld32-ll-hmt \
+    "
