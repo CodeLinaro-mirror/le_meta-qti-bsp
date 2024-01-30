@@ -30,52 +30,5 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-policy_module(adbd, 1.0)
-
-type adbd_t;
-type adbd_exec_t;
-type adbd_initscript_t;
-type adbd_initscript_exec_t;
-type adbd_launch_t;
-type adbd_devpts_t;
-type machine_id_t;
-
-role system_r types adbd_t;
-
-access_machine_id(machine_id_t)
-
-#init_daemon_domain(adbd_t, adbd_exec_t)
-init_can_exec_adbd(adbd_exec_t)
-init_script_file(adbd_initscript_exec_t)
-init_script_file(adbd_launch_t)
-
-files_search_default(adbd_t)
-
-corecmd_exec_bin(adbd_t)
-corecmd_manage_bin_files(adbd_t)
-corecmd_mmap_bin_files(adbd_t)
-
-
-# /dev/socket/leprop-service
-dev_write_generic_sock_files(adbd_t)
-
-connect_to_leprop_sockets(adbd_t)
-
-# local
-allow adbd_t self:capability { setgid setpcap setuid dac_read_search dac_override };
-allow adbd_t self:tcp_socket create_stream_socket_perms;
-
-# adbd connect ip:5555 port
-corenet_tcp_bind_all_unreserved_ports(adbd_t)
-corenet_tcp_bind_generic_node(adbd_t)
-
-# /sysfs
-dev_read_sysfs(adbd_t)
-
-# /dev/ptmx, /dev/pts/0
-term_pty(adbd_devpts_t)
-ubac_constrained(adbd_devpts_t)
-term_create_pty(adbd_t, adbd_devpts_t)
-
-# su
-su_exec(adbd_t)
+# /var/.usb-work/work
+files_manage_var_dirs(mount_t)

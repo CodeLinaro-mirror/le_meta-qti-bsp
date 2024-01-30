@@ -27,7 +27,7 @@ do_makeboot () {
         --pagesize ${PAGE_SIZE} \
         --base ${KERNEL_BASE} \
         --ramdisk_offset 0x0 \
-        --cmdline "${BOOT_RAMDISK_CMD} ${CONSOLE_CMD} rw rootwait no_console_suspend=1 androidboot.hardware=qcom androidboot.console=ttyMSM0 lpm_levels.sleep_disabled=1 msm_rtb.filter=0x237 fips=0 notests nokaslr ignore_loglevel firmware_class.path=/firmware/vm/boot systemd.gpt_auto=0" \
+        --cmdline "${BOOT_RAMDISK_CMD} ${CONSOLE_CMD} rw rootwait no_console_suspend=1 androidboot.hardware=qcom androidboot.console=ttyMSM0 lpm_levels.sleep_disabled=1 msm_rtb.filter=0x237 fips=0 notests nokaslr ignore_loglevel firmware_class.path=/firmware/vm/boot systemd.gpt_auto=0 cgroup.memory=nokmem,nosocket" \
         --output  ${DEPLOY_DIR_IMAGE}/sa8775p-boot-5.14.img
         cp ${DEPLOY_DIR_IMAGE}/sa8775p-boot-5.14.img ${DEPLOY_DIR_IMAGE}/sa8775-boot.img
     else

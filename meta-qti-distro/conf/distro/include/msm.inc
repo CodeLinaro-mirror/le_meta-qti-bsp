@@ -16,9 +16,6 @@ DISTROOVERRIDES =. "msm:"
 # Basic distribution features
 DISTRO_FEATURES += "eabi ipv6 ipv4 largefile thumb-interwork xattr ${DISTRO_FEATURES_LIBC}"
 
-# MSMs are emmc based targets
-DISTRO_FEATURES += "emmc-boot"
-
 # Enable performance features
 PERF_BUILD = "${@['0', '1'][d.getVar('VARIANT', True) != ('' or 'debug')]}"
 

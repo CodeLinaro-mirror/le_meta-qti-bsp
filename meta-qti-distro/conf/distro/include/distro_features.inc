@@ -9,7 +9,7 @@ DISTRO_FEATURES:append:sa8295 = " qti-codec2"
 DISTRO_FEATURES:append:lemans = " qti-codec2 qti-gstdeinterlace qti-camx2 qti-qcx"
 DISTRO_FEATURES:append:qtiquingvm = " qti-omx qti-gstqeavb"
 DISTRO_FEATURES:append:qtiquingvm8295 = " qti-codec2 qti-gstdeinterlace qti-gstqeavb qti-gstqvrate"
-DISTRO_FEATURES:append:quin-gvm-gen4 = " qti-codec2 qti-gstqeavb qti-gstdeinterlace qti-fadas qti-fastcv"
+DISTRO_FEATURES:append:quin-gvm-gen4 = " qti-codec2 qti-gstqeavb qti-gstdeinterlace"
 DISTRO_FEATURES:append:quin-gvm-gen4-2 = " qti-codec2 qti-gstdeinterlace qti-gstqeavb qti-gstqvrate"
 DISTRO_FEATURES:append:quin-gvm-lemans = " qti-codec2 qti-gstdeinterlace qti-qcx"
 
@@ -34,7 +34,6 @@ DISTRO_FEATURES:append = " hibernation"
 DISTRO_FEATURES:append = " systemd"
 DISTRO_FEATURES_BACKFILL_CONSIDERED += "sysvinit"
 
-DISTRO_FEATURES:append = " ipa3"
 DISTRO_FEATURES:append = " vulkan"
 
 # WLAN

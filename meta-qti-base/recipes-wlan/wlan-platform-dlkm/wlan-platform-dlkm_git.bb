@@ -33,7 +33,6 @@ WLAN_PLATFORM_CFG = "\
                      CONFIG_CNSS_GENL=m \
                      CONFIG_CNSS_UTILS=m \
                      CONFIG_CNSS2_CONDITIONAL_POWEROFF=y \
-                     CONFIG_CNSS_SUPPORT_DUAL_DEV=y \
                      CONFIG_CNSS_REQ_FW_DIRECT=y \
                      CONFIG_CNSS2_ENUM_WITH_LOW_SPEED=y \
                      "
