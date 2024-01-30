@@ -19,4 +19,5 @@ RDEPENDS:${PN} = "\
     vhost-user-lib \
     vhost-user-scmi \
     gvm-net-config \
+    vhost-device-i2c \
 "
