@@ -4,9 +4,8 @@ HOMEPAGE = "https://git.codelinaro.org"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 
-MY_SRC = "${SRC_DIR_ROOT}/kernel/rh-kernel-5.14"
+RH_SRC = "${SRC_DIR_ROOT}/kernel/rh-kernel-5.14"
 PATCH_DIR = "${SRC_DIR_ROOT}/meta-qti-bsp/meta-qti-base/recipes-kernel/linux-ark/files/"
-MY_WDIR = "${WORKDIR}/kernel/rh-kernel-5.14"
 
 DEPENDS += "\
     oot-dtbo dtc-native elfutils-native flex-native kern-tools-native \
@@ -17,12 +16,7 @@ DEPENDS:append:aarch64 = " libgcc"
 KERNEL_CC:append:aarch64 = " ${TOOLCHAIN_OPTIONS}"
 KERNEL_LD:append:aarch64 = " ${TOOLCHAIN_OPTIONS}"
 
-SRC_URI = "\
-    ${PATH_TO_REPO}/kernel/rh-kernel-5.14/.git;protocol=${PROTO};name=kernel;destsuffix=kernel/rh-kernel-5.14;usehead=1 \
-    file://defconfig \
-    file://0001-centos-5.14-Fix-to-bypass-redhad-env.patch \
-    file://0002-centos-5.14-build-fixes-while-porting-from-5.4.patch \
-"
+SRC_URI = "${PATH_TO_REPO}/kernel/rh-kernel-5.14/.git;protocol=${PROTO};name=kernel;destsuffix=kernel/rh-kernel-5.14;usehead=1"
 
 SRCREV_kernel = "${AUTOREV}"
 
@@ -30,7 +24,7 @@ inherit kernel kernel-yocto qsigning ${@bb.utils.contains('TARGET_KERNEL_ARCH', 
 
 S = "${WORKDIR}/kernel/rh-kernel-5.14"
 
-EXTRA_OEMAKE += "INSTALL_MOD_STRIP=1"
+EXTRA_OEMAKE += "INSTALL_MOD_STRIP=1 --include-dir=${S}"
 
 LDFLAGS:aarch64 = "-O1 --hash-style=gnu --as-needed"
 TARGET_CXXFLAGS += "-Wno-format"
@@ -68,16 +62,17 @@ python do_uncompressed_kernel_patch () {
 addtask do_uncompressed_kernel_patch after do_install before do_deploy
 
 do_rh_config () {
-    make -C ${SRC_DIR_ROOT}/kernel/rh-kernel-5.14/redhat  ARCH=arm64 dist-configs
-    cp ${SRC_DIR_ROOT}/kernel/rh-kernel-5.14/redhat/configs/kernel-automotive-5.14.0-aarch64.config ${SRC_DIR_ROOT}/kernel/rh-kernel-5.14/arch/arm64/configs/defconfig
-    make -C ${SRC_DIR_ROOT}/kernel/rh-kernel-5.14 CROSS_COMPILE="" defconfig
-    make -C ${SRC_DIR_ROOT}/kernel/rh-kernel-5.14 CROSS_COMPILE="" savedefconfig
-    cp ${SRC_DIR_ROOT}/kernel/rh-kernel-5.14/defconfig ${SRC_DIR_ROOT}/kernel/rh-kernel-5.14/arch/arm64/configs/defconfig
-    cp ${SRC_DIR_ROOT}/kernel/rh-kernel-5.14/defconfig ${SRC_DIR_ROOT}/meta-qti-bsp/meta-qti-base/recipes-kernel/linux-ark/files/defconfig
-    rm -rf ${SRC_DIR_ROOT}/kernel/rh-kernel-5.14/.config ${SRC_DIR_ROOT}/kernel/rh-kernel-5.14/include/config/ \
-    ${SRC_DIR_ROOT}/kernel/rh-kernel-5.14/include/generated/ ${SRC_DIR_ROOT}/kernel/rh-kernel-5.14/arch/$ARCH/include/generated/
+    make -C ${RH_SRC}/redhat ARCH=arm64 dist-configs
+    cp ${RH_SRC}/redhat/configs/kernel-automotive-5.14.0-aarch64.config ${S}/arch/arm64/configs/defconfig
+    rm -rf ${RH_SRC}/.config ${RH_SRC}/include/config/ \
+    ${RH_SRC}/include/generated/ ${RH_SRC}/arch/$ARCH/include/generated/
+    make -C ${S} O=${B} CROSS_COMPILE="" defconfig
+    make -C ${S} O=${B} CROSS_COMPILE="" savedefconfig
+    cp ${B}/defconfig ${S}/arch/arm64/configs/defconfig
 }
-addtask rh_config after do_prepare_recipe_sysroot before do_unpack
+addtask do_rh_config after do_unpack before do_kernel_metadata
+do_rh_config[depends] += "virtual/${TARGET_PREFIX}binutils:do_populate_sysroot"
+do_rh_config[depends] += "gcc-cross-${TARGET_ARCH}:do_populate_sysroot"
 
 python do_perf_config () {
     dstdir = d.getVar('SRC_DIR_ROOT')
@@ -89,14 +84,7 @@ python do_perf_config () {
          if os.path.exists(dstdir + "/kernel/rh-kernel-5.14/redhat/configs/custom-overrides/generic/CONFIG_PERF"):
              os.remove(dstdir + "/kernel/rh-kernel-5.14/redhat/configs/custom-overrides/generic/CONFIG_PERF")
 }
-addtask do_perf_config after do_fetch before rh_config
-
-do_patch_more() {
-    cd ${MY_WDIR}
-    patch -f -p1 < ${WORKDIR}/0001-centos-5.14-Fix-to-bypass-redhad-env.patch
-    patch -f -p1 < ${WORKDIR}/0002-centos-5.14-build-fixes-while-porting-from-5.4.patch
-}
-addtask patch_more after do_unpack before do_kernel_metadata
+addtask do_perf_config after do_fetch before do_unpack
 
 KERNEL_PRIORITY = "9001"
 # Add V=1 to KERNEL_EXTRA_ARGS for verbose
@@ -110,25 +98,8 @@ KMETA = "kernel-meta"
 KMACHINE ?= "${BASEMACHINE}"
 COMPATIBLE_MACHINE = "(${BASEMACHINE})"
 KCONFIG_MODE = "--alldefconfig"
-#KBUILD_DEFCONFIG ?= "${KERNEL_CONFIG}"
+KBUILD_DEFCONFIG ?= "${KERNEL_CONFIG}"
 LINUX_VERSION_EXTENSION = "${@['-perf', ''][d.getVar('VARIANT', True) == ('' or 'debug')]}"
-
-do_kernel_metadata:prepend() {
-    set +e
-    if [ -n "${KBUILD_DEFCONFIG}"  ]; then
-        if [ -f "${S}/arch/${ARCH}/configs/${KBUILD_DEFCONFIG}"  ]; then
-            if [ -f "${WORKDIR}/defconfig"  ]; then
-                # If the two defconfig's are different, warn that we overwrote the
-                # one already placed in WORKDIR.
-                cmp "${WORKDIR}/defconfig" "${S}/arch/${ARCH}/configs/${KBUILD_DEFCONFIG}"
-                if [ $? -ne 0  ]; then
-                    bbwarn "defconfig detected in WORKDIR. ${KBUILD_DEFCONFIG} copied over it"
-                    cp -f ${S}/arch/${ARCH}/configs/${KBUILD_DEFCONFIG} ${WORKDIR}/defconfig
-                fi
-            fi
-        fi
-    fi
-}
 
 do_kernel_checkout[noexec] = "1"
 do_validate_branches[noexec] = "1"
@@ -173,7 +144,6 @@ do_shared_workdir:append () {
             done
         fi
 
-        cp ${STAGING_KERNEL_DIR}/usr/gen_initramfs_list.sh $kerneldir/scripts/
         if [ -f usr/gen_init_cpio ]; then
             mkdir -p $kerneldir/usr/
             cp -f usr/gen_init_cpio $kerneldir/usr/
@@ -200,7 +170,6 @@ do_deploy () {
     install -d ${DEPLOYDIR}/build-artifacts
     install -d ${DEPLOYDIR}/build-artifacts/kernel_scripts/scripts
     install -d ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr
-    cp  ${STAGING_KERNEL_DIR}/usr/gen_initramfs_list.sh ${DEPLOYDIR}/build-artifacts/kernel_scripts/scripts
     cp  ${STAGING_KERNEL_BUILDDIR}/usr/gen_init_cpio ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr
 
     # Copy Image and dtbs to deploydir
