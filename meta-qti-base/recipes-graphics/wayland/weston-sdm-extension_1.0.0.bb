@@ -19,6 +19,7 @@ DEPENDS += "cairo \
             pixman virtual/egl \
             wayland wayland-native wayland-protocols \
             weston \
+            ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'bootkpi-logging', '', d)} \
 "
 
 SRC_URI = "${PATH_TO_REPO}/graphics/weston-sdm-extension/.git;protocol=${PROTO};destsuffix=graphics/weston-sdm-extension;usehead=1"
