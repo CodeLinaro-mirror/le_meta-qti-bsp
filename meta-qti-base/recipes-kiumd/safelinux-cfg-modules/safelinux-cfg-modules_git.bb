@@ -7,8 +7,8 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5
 SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/safelinux-cfg-modules/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/safelinux-cfg-modules;usehead=1"
 SRC_URI:append = " \
     file://umd_load.conf \
-    ${@bb.utils.contains('PREFERRED_PROVIDER_virtual/kernel', 'linux-ark', '', 'file://0001-safelinux-cfg-mdoules-fix-build-issue-for-msm-6.1.patch;patchdir=../', d)} \
-    ${@bb.utils.contains('PREFERRED_PROVIDER_virtual/kernel', 'linux-ark', '', 'file://Kbuild', d)} \
+    ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "6.1", 'file://0001-safelinux-cfg-mdoules-fix-build-issue-for-msm-6.1.patch;patchdir=../', '', d)} \
+    ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "6.1", 'file://Kbuild', '', d)} \
 "
 
 SRCREV = "${AUTOREV}"
@@ -19,7 +19,7 @@ TECHPACK_MODULES = "apps_pinctrl.ko scm_user_intf.ko vfio_iommu_qcom.ko iommu_io
 inherit qti-techpack
 
 do_patch_more() {
-    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-lvumd', 'true', 'false', d)} ; then
+    if ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "6.1", 'true', 'false', d)} ; then
         mv ${WORKDIR}/Kbuild ${WORKDIR}/vendor/qcom/opensource/safelinux-cfg-modules/safelinux-modules/
     fi
 }

@@ -8,7 +8,7 @@ DEPENDS += "gbm gbm-headers \
             weston-sdm-extension-headers \
             ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', 'libdmabufheap', '', d)} \
             ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '6.1', 'libdmabufheap', '', d)} \
-            ${@bb.utils.contains('MACHINE_FEATURES', 'qti-usermode-display', 'owfds libuhab libkiumd', '', d)} \
+            ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'owfds libuhab libkiumd', '', d)} \
 "
 
 REQUIRED_DISTRO_FEATURES:remove = "opengl"

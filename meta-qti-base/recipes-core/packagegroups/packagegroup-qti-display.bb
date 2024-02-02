@@ -11,7 +11,7 @@ PACKAGES = "\
 ALLOW_EMPTY:${PN} = "1"
 
 RDEPENDS:${PN} += "\
-    ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "5.15", "displaydlkm", "", d)} \
+    ${@bb.utils.contains_any("PREFERRED_VERSION_linux-msm", "5.15 6.1", "displaydlkm", "", d)} \
     libdrm \
     wayland \
     wayland-ivi-extension \
@@ -21,7 +21,7 @@ RDEPENDS:${PN} += "\
     display-hal-linux \
     display-commonsys-intf-linux \
     weston-sdm-extension \
-    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-usermode-display', 'kiumd-headers', '', d)} \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'kiumd-headers', '', d)} \
     "
 
 RDEPENDS:${PN}:remove:qti-dpk = "wayland-ivi-extension"

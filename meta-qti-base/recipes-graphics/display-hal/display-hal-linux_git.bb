@@ -15,8 +15,8 @@ DEPENDS += "display-commonsys-intf-linux \
             libhardware \
             virtual/kernel-headers \
             system-core \
-            ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", '5.15', 'displaydlkm', '', d)} \
-            ${@bb.utils.contains('MACHINE_FEATURES', 'qti-usermode-display', 'display-kernel-headers', '', d)} \
+            ${@bb.utils.contains_any("PREFERRED_VERSION_linux-msm", '5.15 6.1', 'displaydlkm', '', d)} \
+            ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'display-kernel-headers', '', d)} \
 "
 
 PR = "r8"

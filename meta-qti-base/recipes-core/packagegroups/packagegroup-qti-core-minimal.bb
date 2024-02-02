@@ -27,3 +27,4 @@ RDEPENDS:${PN} += "\
     ${@bb.utils.contains("COMBINED_FEATURES", "hibernation", "hibernation", "" ,d)} \
     ${@bb.utils.contains("MACHINE_FEATURES", "qti-dlkm", "system-core-dlkm", "", d)} \
     "
+RDEPENDS:${PN}:append:monaco = " reboot-daemon"
