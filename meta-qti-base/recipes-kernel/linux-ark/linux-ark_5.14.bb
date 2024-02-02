@@ -9,9 +9,8 @@ PATCH_DIR = "${SRC_DIR_ROOT}/meta-qti-bsp/meta-qti-base/recipes-kernel/linux-ark
 MY_WDIR = "${WORKDIR}/kernel/rh-kernel-5.14"
 
 DEPENDS += "\
-    dtc-native kern-tools-native  mkbootimg-native \
-    openssl-native rsync-native \
-    flex-native \
+    dtc-native elfutils-native flex-native kern-tools-native \
+    mkbootimg-native openssl-native pahole-native rsync-native \
 "
 DEPENDS:append:aarch64 = " libgcc"
 
@@ -102,6 +101,9 @@ addtask patch_more after do_unpack before do_kernel_metadata
 KERNEL_PRIORITY = "9001"
 # Add V=1 to KERNEL_EXTRA_ARGS for verbose
 KERNEL_EXTRA_ARGS:append = " O=${B}"
+
+EXTRA_OEMAKE:remove = "PAHOLE=false"
+KCONFIG_CONFIG_COMMAND:remove = "PAHOLE=false"
 
 KBRANCH ?= ""
 KMETA = "kernel-meta"
