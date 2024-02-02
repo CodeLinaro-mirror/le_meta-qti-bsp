@@ -8,6 +8,7 @@ ro.product.board=qcs6490
 ro.debuggable=1
 
 ro.hardware.camera=qcom
+ro.board.platform=lahaina
 
 #Audio features
 ro.vendor.audio.sdk.ssr=false
