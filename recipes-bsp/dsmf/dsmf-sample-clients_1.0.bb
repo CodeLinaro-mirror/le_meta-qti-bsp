@@ -10,3 +10,8 @@ FILESEXTRAPATHS:prepend = "${WORKSPACE}/:"
 SRC_URI   = "file://dsmf/sample-clients"
 
 S = "${WORKDIR}/dsmf/sample-clients"
+
+PACKAGECONFIG ??= " \
+    glib \
+"
+PACKAGECONFIG[glib] = "--with-glib, --without-glib, glib-2.0"
