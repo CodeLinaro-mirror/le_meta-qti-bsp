@@ -1,32 +1,33 @@
-From 6419748c6b8888eb4bedd58b0663c522cb179f3d Mon Sep 17 00:00:00 2001
-From: Mohamad Ayyash <mkayyash@google.com>
-Date: Tue, 24 Feb 2015 19:21:29 -0800
+From c0ecdeafe3c69487ad3749c6c1c473ab3d88f521 Mon Sep 17 00:00:00 2001
+From: mohit pal singh <mohitpal@qti.qualcomm.com>
+Date: Tue, 6 Feb 2024 13:01:10 -0800
 Subject: [PATCH] squashfs-tools: Allow setting selinux xattrs through
  file_context
 
-Add a context-file flag that allows passing an selinux security context
-file to set security.selinux xattrs rather than reading xattrs from
-filesystem's source directory.
+Add a context-file flag that allows passing an selinux
+security context file to set security.selinux xattrs
+rather than reading xattrs from filesystem's
+source directory.
 
-Change-Id: Icad4d38a736137d85835a0eab9650c0c99908721
-Signed-off-by: Mohamad Ayyash <mkayyash@google.com>
-[stummala@codeaurora.org: Port the change to LE environment.
-Change the path provided to selabel_lookup() to use the
-path from the root of the filesystem. Add WITH_SELINUX to
-CFLAGS to ensure the code compiles fine even when selinux
-library support is not available.]
-Signed-off-by: Sahitya Tummala <stummala@codeaurora.org>
+Port the change to LE environment. Change the path provided
+to selabel_lookup() to use the path from the root of the
+filesystem. Add WITH_SELINUX to CFLAGS to ensure the code
+compiles fine even when selinux
+library support is not available.
 ---
- squashfs-tools/Makefile     |  6 ++++
- squashfs-tools/mksquashfs.c | 15 +++++++-
- squashfs-tools/xattr.c      | 85 ++++++++++++++++++++++++++++++++++++++++++++-
- 3 files changed, 104 insertions(+), 2 deletions(-)
+ squashfs-tools/Makefile     | 16 +++++--
+ squashfs-tools/mksquashfs.c | 11 ++++-
+ squashfs-tools/xattr.c      | 86 ++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 106 insertions(+), 7 deletions(-)
+ mode change 100755 => 100644 squashfs-tools/Makefile
 
 diff --git a/squashfs-tools/Makefile b/squashfs-tools/Makefile
-index 52d2582..73d0aaf 100644
+old mode 100755
+new mode 100644
+index 5795d0d0..7c2a8eda
 --- a/squashfs-tools/Makefile
 +++ b/squashfs-tools/Makefile
-@@ -123,6 +123,12 @@ CFLAGS += $(EXTRA_CFLAGS) $(INCLUDEDIR) -D_FILE_OFFSET_BITS=64 \
+@@ -169,6 +169,12 @@ CFLAGS += $(EXTRA_CFLAGS) $(INCLUDEDIR) -D_FILE_OFFSET_BITS=64 \
  	-Wall
  
  LIBS = -lpthread -lm
@@ -40,54 +41,43 @@ index 52d2582..73d0aaf 100644
  CFLAGS += -DGZIP_SUPPORT
  MKSQUASHFS_OBJS += gzip_wrapper.o
 diff --git a/squashfs-tools/mksquashfs.c b/squashfs-tools/mksquashfs.c
-index d221c35..6341137 100644
+index aaa4b002..dfeb2214 100644
 --- a/squashfs-tools/mksquashfs.c
 +++ b/squashfs-tools/mksquashfs.c
-@@ -129,6 +129,8 @@ unsigned int cache_bytes = 0, cache_size = 0, inode_count = 0;
+@@ -130,6 +130,7 @@ unsigned int cache_bytes = 0, cache_size = 0, inode_count = 0;
  /* inode lookup table */
  squashfs_inode *inode_lookup_table = NULL;
  
 +char *context_file = NULL;
-+
- /* in memory directory data */
- #define I_COUNT_SIZE		128
- #define DIR_ENTRIES		32
-@@ -5088,7 +5090,6 @@ void calculate_queue_sizes(int mem, int *readq, int *fragq, int *bwriteq,
- 	*fragq = mem - *readq - *bwriteq - *fwriteq;
- }
+ struct inode_info *inode_info[INODE_HASH_SIZE];
  
--
- #define VERSION() \
- 	printf("mksquashfs version 4.3-git (2014/09/12)\n");\
- 	printf("copyright (C) 2014 Phillip Lougher "\
-@@ -5521,6 +5522,15 @@ print_compressor_options:
- 		else if(strcmp(argv[i], "-xattrs") == 0)
- 			no_xattrs = FALSE;
+ /* hash tables used to do fast duplicate searches in duplicate check */
+@@ -6094,6 +6095,7 @@ static void print_sqfstar_options(FILE *stream, char *name, int total_mem)
+ 	fprintf(stream, "-no-sparse\t\tdon't detect sparse files\n");
+ 	fprintf(stream, "-no-xattrs\t\tdon't store extended attributes" NOXOPT_STR "\n");
+ 	fprintf(stream, "-xattrs\t\t\tstore extended attributes" XOPT_STR "\n");
++	fprintf(stream, "-context-file <file>\tApply selinux security xattrs from context-file instead of reading xattrs from file system\n");
+ 	fprintf(stream, "-noI\t\t\tdo not compress inode table\n");
+ 	fprintf(stream, "-noId\t\t\tdo not compress the uid/gid table (implied by ");
+ 	fprintf(stream, "-noI)\n");
+@@ -6651,7 +6653,14 @@ print_sqfstar_compressor_options:
+ 				exit(1);
+ 			}
  
-+		else if(strcmp(argv[i], "-context-file") == 0) {
+-		} else if(strcmp(argv[i], "-nopad") == 0)
++		} else if(strcmp(argv[i], "-context-file") == 0) {
 +			if(++i == argc) {
 +				ERROR("%s: -context-file: missing file name\n",
 +					argv[0]);
 +				exit(1);
 +			}
-+			context_file = argv[i];
 +		}
-+
- 		else if(strcmp(argv[i], "-nopad") == 0)
++		else if(strcmp(argv[i], "-nopad") == 0)
  			nopad = TRUE;
  
-@@ -5569,6 +5579,9 @@ printOptions:
- 				NOXOPT_STR "\n");
- 			ERROR("-xattrs\t\t\tstore extended attributes" XOPT_STR
- 				"\n");
-+			ERROR("-context-file <file>\tApply selinux security "
-+				"xattrs from context-file instead\n\t\t\t"
-+				"of reading xattrs from file system\n");
- 			ERROR("-noI\t\t\tdo not compress inode table\n");
- 			ERROR("-noD\t\t\tdo not compress data blocks\n");
- 			ERROR("-noF\t\t\tdo not compress fragment blocks\n");
+ 		else if(strcmp(argv[i], "-info") == 0)
 diff --git a/squashfs-tools/xattr.c b/squashfs-tools/xattr.c
-index b46550c..49fc836 100644
+index 8cfb8d50..82b08c95 100644
 --- a/squashfs-tools/xattr.c
 +++ b/squashfs-tools/xattr.c
 @@ -36,6 +36,11 @@
@@ -102,16 +92,16 @@ index b46550c..49fc836 100644
  #include "squashfs_fs.h"
  #include "squashfs_swap.h"
  #include "mksquashfs.h"
-@@ -43,6 +48,8 @@
- #include "error.h"
- #include "progressbar.h"
+@@ -45,6 +50,8 @@
+ #include "pseudo.h"
+ #include "tar.h"
  
 +#define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
 +
  /* compressed xattr table */
  static char *xattr_table = NULL;
  static unsigned int xattr_size = 0;
-@@ -76,6 +83,7 @@ extern int no_xattrs, noX;
+@@ -78,6 +85,7 @@ extern int no_xattrs, noX;
  extern long long bytes;
  extern int fd;
  extern unsigned int xattr_bytes, total_xattr_bytes;
@@ -119,7 +109,7 @@ index b46550c..49fc836 100644
  
  /* helper functions from mksquashfs.c */
  extern unsigned short get_checksum(char *, int, unsigned short);
-@@ -110,7 +118,69 @@ static int get_prefix(struct xattr_list *xattr, char *name)
+@@ -112,7 +120,69 @@ int xattr_get_prefix(struct xattr_list *xattr, char *name)
  	return prefix_table[i].type;
  }
  
@@ -189,7 +179,7 @@ index b46550c..49fc836 100644
  static int read_xattrs_from_system(char *filename, struct xattr_list **xattrs)
  {
  	ssize_t size, vsize;
-@@ -603,18 +673,31 @@ int generate_xattrs(int xattrs, struct xattr_list *xattr_list)
+@@ -611,11 +681,13 @@ int generate_xattrs(int xattrs, struct xattr_list *xattr_list)
  }
  
  
@@ -203,22 +193,27 @@ index b46550c..49fc836 100644
  	struct xattr_list *xattr_list;
  	int xattrs;
  
- 	if(no_xattrs || IS_PSEUDO(inode) || inode->root_entry)
- 		return SQUASHFS_INVALID_XATTR;
+@@ -624,8 +696,18 @@ int read_xattrs(void *d)
  
--	xattrs = read_xattrs_from_system(filename, &xattr_list);
-+#ifdef WITH_SELINUX
-+	if (context_file) {
-+		if (sehnd == NULL)
-+			sehnd = get_sehnd(context_file);
-+		xattrs = read_xattrs_from_context_file(subpath, inode->buf.st_mode,
-+				sehnd, &xattr_list);
-+	} else {
-+		xattrs = read_xattrs_from_system(filename, &xattr_list);
+ 	if(IS_TARFILE(inode))
+ 		xattrs = read_xattrs_from_tarfile(inode, &xattr_list);
+-	else
+-		xattrs = read_xattrs_from_system(filename, &xattr_list);
++	else {
++			#ifdef WITH_SELINUX
++				if (context_file) {
++					if (sehnd == NULL)
++						sehnd = get_sehnd(context_file);
++						xattrs = read_xattrs_from_context_file(subpath, inode->buf.st_mode,
++						sehnd, &xattr_list);
++					} else {
++			#else
++				xattrs = read_xattrs_from_system(filename, &xattr_list);
++			#endif
 +	}
-+#else
-+		xattrs = read_xattrs_from_system(filename, &xattr_list);
-+#endif
  	if(xattrs == 0)
  		return SQUASHFS_INVALID_XATTR;
  
+-- 
+2.17.1
+
