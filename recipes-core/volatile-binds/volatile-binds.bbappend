@@ -98,6 +98,8 @@ VOLATILE_BINDS_sa525m = "\
 /systemrw/qgptp_params /etc/qgptp_params\n\
 /systemrw/power_state.conf /etc/power_state.conf\n\
 /systemrw/qvirtmgr.json  /etc/qvirtmgr.json\n\
+/systemrw/izat.conf /etc/izat.conf\n\
+/systemrw/gps.conf /etc/gps.conf\n\
 "
 
 VOLATILE_BINDS_sa525m-televm = "\
