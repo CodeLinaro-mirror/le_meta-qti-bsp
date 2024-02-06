@@ -3,7 +3,7 @@ DESCRIPTION = "This is the AudioReach based audio driver based on ASoC architect
 HOMEPAGE = "https://www.codelinaro.org/"
 LICENSE = "GPL-2.0-only-WITH-Linux-syscall-note"
 LIC_FILES_CHKSUM = "file://NOTICE;md5=53c09804050a00b1d27bd609c4e1fc5a"
-DEPENDS += "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', "audio-devicetree", "", d)}"
+DEPENDS += "audio-devicetree"
 DEPENDS += "virtual/kernel"
 
 SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/audio-kernel-ar/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/audio-kernel-ar;usehead=1 \
@@ -23,6 +23,7 @@ EXTRA_OEMAKE:quin-gvm-lemans += "TARGET_SUPPORT=no AUTO_GVM=yes"
 EXTRA_OEMAKE:qtiquingvm8295 += "TARGET_SUPPORT=no AUTO_GVM=yes"
 EXTRA_OEMAKE:monaco += "TARGET_SUPPORT=monaco"
 EXTRA_OEMAKE:quin-gvm-monaco += "TARGET_SUPPORT=no AUTO_GVM=yes"
+EXTRA_OEMAKE:quin-gvm-gen4 += "TARGET_SUPPORT=no AUTO_GVM=yes"
 
 MODULES = "\
         dsp/spf_core_dlkm.ko  \
