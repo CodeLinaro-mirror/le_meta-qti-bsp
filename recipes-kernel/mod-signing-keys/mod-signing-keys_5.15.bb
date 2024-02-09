@@ -30,7 +30,7 @@ do_compile() {
 do_install() {
     install -d ${D}/kernel-certs
     install -m 0644 signing_key.pem ${D}/kernel-certs/
-    if "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains('MACHINE_FEATURES', 'dm-verity-initramfs', 'true', 'false', d), 'false', d)}"; then
+    if "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains_any('MACHINE_FEATURES', 'dm-verity-initramfs dm-verity-initramfs-v3', 'true', 'false', d), 'false', d)}"; then
         install -m 0644 verity_key.pem ${D}/kernel-certs/
         install -m 0644 verity_cert.pem ${D}/kernel-certs/
     fi
