@@ -10,7 +10,7 @@ FILESPATH =+ "${WORKSPACE}/system/memory/:"
 SRC_URI   = "file://libdmabufheap"
 
 S = "${WORKDIR}/libdmabufheap"
-DEPENDS += "linux-msm-headers libbase"
+DEPENDS += "linux-msm-headers libbase libion"
 
 EXTRA_OECONF_append = " \
     --disable-static \
@@ -18,9 +18,6 @@ EXTRA_OECONF_append = " \
 "
 
 PACKAGES +="${PN}-test-bin"
-
-PACKAGECONFIG = "ion"
-PACKAGECONFIG[ion] = "--with-ion, --without-ion, libion"
 
 FILES_${PN}     = "${libdir}/pkgconfig/* ${libdir}/* ${sysconfdir}/*"
 FILES_${PN}-test-bin = "${base_bindir}/*"

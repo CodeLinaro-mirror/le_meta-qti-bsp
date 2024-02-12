@@ -20,6 +20,19 @@ do_compile() {
     # As selective wait by reading environment is not possible in [Unit] Section, wait
     # for required dev nodes i.e. _a & _b when a/b machine feature is enabled
     # (and for _c when a/b/c is enabled) before executing veritysetup.
+if [[ ${BOOT_HEADER_VERSION} -eq 2 ]] && [[ ${SKIP_VENDOR_BOOT} == False ]]; then
+    devdiskstr="dev-disk-by\\\x2dpartlabel-"
+    systemdevice="${devdiskstr}system.device"
+    if [[ "${MACHINE_FEATURES}" =~ .*qti-ab-boot* ]]; then
+    systemdevice="${devdiskstr}system_a.device ${devdiskstr}system_b.device"
+    fi
+    if [[ "${MACHINE_FEATURES}" =~ .*qti-abc-boot* ]]; then
+        systemdevice="$systemdevice ${devdiskstr}system_c.device"
+    fi
+    # Create seperate unit file for each parition to check
+    sed -e "s#@DEVICE@#$systemdevice#g; s#@MAPDEVICE@#system#g" \
+               veritysetup.service.in >veritysetup-system.service
+else
     devdiskstr="dev-disk-by\\\x2dpartlabel-"
     vdlkmdevice="${devdiskstr}vendor_dlkm.device"
     systemdevice="${devdiskstr}system.device"
@@ -31,15 +44,33 @@ do_compile() {
         vdlkmdevice="$vdlkmdevice ${devdiskstr}vendor_dlkm_c.device"
         systemdevice="$systemdevice ${devdiskstr}system_c.device"
     fi
-
     # Create seperate unit file for each parition to check
     sed -e "s#@DEVICE@#$vdlkmdevice#g; s#@MAPDEVICE@#vendor_dlkm#g;" \
                veritysetup.service.in >veritysetup-vendor-dlkm.service
     sed -e "s#@DEVICE@#$systemdevice#g; s#@MAPDEVICE@#system#g" \
                veritysetup.service.in >veritysetup-system.service
+fi
 }
 
 do_install () {
+if [[ ${BOOT_HEADER_VERSION} -eq 2 ]] && [[ ${SKIP_VENDOR_BOOT} == False ]]; then
+  install -d ${D}/verity/
+  install -m 755 ${WORKDIR}/init-verity.sh ${D}/verity/init-verity.sh
+  install -d ${D}${systemd_unitdir}/system/
+  install -m 0644 ${WORKDIR}/veritysetup-system.service \
+      ${D}${systemd_unitdir}/system/veritysetup-system@.service
+  install -m 0644 ${WORKDIR}/resize-partition.service \
+      ${D}${systemd_unitdir}/system/resize-partition@.service
+
+ 
+  # enable the services
+  install -d ${D}${systemd_unitdir}/system/sysinit.target.wants/
+  ln -sf ${systemd_unitdir}/system/veritysetup-system@.service \
+      ${D}${systemd_unitdir}/system/sysinit.target.wants/veritysetup-system@root.service
+ 
+ ln -sf ${systemd_unitdir}/system/resize-partition@.service \
+      ${D}${systemd_unitdir}/system/sysinit.target.wants/resize-partition@userdata.service
+else
   install -d ${D}/verity/
   install -m 755 ${WORKDIR}/init-verity.sh ${D}/verity/init-verity.sh
   install -d ${D}${systemd_unitdir}/system/
@@ -57,7 +88,8 @@ do_install () {
       ${D}${systemd_unitdir}/system/sysinit.target.wants/veritysetup-system@root.service
   ln -sf ${systemd_unitdir}/system/resize-partition@.service \
       ${D}${systemd_unitdir}/system/sysinit.target.wants/resize-partition@userdata.service
+fi
 }
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
-FILES_${PN} += " /verity/* ${systemd_unitdir}/system/* "
+FILES:${PN} += " /verity/* ${systemd_unitdir}/system/* "
