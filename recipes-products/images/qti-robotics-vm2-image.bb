@@ -19,21 +19,21 @@ do_gen_partition_bin[noexec] = "1"
 
 IMAGE_FEATURES[validitems] += "vm oemvm"
 IMAGE_FEATURES += "vm oemvm"
-
+do_merge_dtbs[cleandirs] = "${DEPLOY_DIR_IMAGE}/kernel_dtbs/${OEMVM_IMAGE_ALIAS}-dtbs"
 do_merge_dtbs() {
 
+    cp -rp ${DEPLOY_DIR_IMAGE}/kernel_dtbs/kalamale_roboticsvm2*.dtb ${DEPLOY_DIR_IMAGE}/kernel_dtbs/${OEMVM_IMAGE_ALIAS}-dtbs/
+
     cd ${WORKSPACE}/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform && \
-    mkdir -p ${DEPLOY_DIR_IMAGE}/kernel_dtbs/oemvm-dtbs && \
-    cp -rp ${DEPLOY_DIR_IMAGE}/kernel_dtbs/kalamale_roboticsvm2*.dtb ${DEPLOY_DIR_IMAGE}/kernel_dtbs/oemvm-dtbs/ && \
     LD_LIBRARY_PATH=../../host/lib/:LD_LIBRARY_PATH \
     OUT_DIR=${KERNEL_PREBUILT_PATH} \
     BUILD_CONFIG=msm-kernel/build.config.msm.${VM_TARGET}.roboticsvm  \
     ./build/android/merge_dtbs.sh \
-    ${DEPLOY_DIR_IMAGE}/kernel_dtbs/oemvm-dtbs \
-    ${DEPLOY_DIR_IMAGE}/build-artifacts/oemvm-techpack-dtbos ${DEPLOY_DIR_IMAGE}/merged-oemvm-dtbs/
+    ${DEPLOY_DIR_IMAGE}/kernel_dtbs/${OEMVM_IMAGE_ALIAS}-dtbs \
+    ${DEPLOY_DIR_IMAGE}/build-artifacts/${OEMVM_IMAGE_ALIAS}-techpack-dtbos ${DEPLOY_DIR_IMAGE}/merged-${OEMVM_IMAGE_ALIAS}-dtbs/
 
-    mkdtimg create ${DEPLOY_DIR_IMAGE}/oemvm-${DTB_TARGET} --page_size=${PAGE_SIZE} \
-    ${DEPLOY_DIR_IMAGE}/merged-oemvm-dtbs/*.dtb
+    mkdtimg create ${DEPLOY_DIR_IMAGE}/${OEMVM_IMAGE_ALIAS}-${DTB_TARGET} --page_size=${PAGE_SIZE} \
+    ${DEPLOY_DIR_IMAGE}/merged-${OEMVM_IMAGE_ALIAS}-dtbs/*.dtb
 }
 
 addtask do_merge_dtbs after do_makesystem before do_makeboot
