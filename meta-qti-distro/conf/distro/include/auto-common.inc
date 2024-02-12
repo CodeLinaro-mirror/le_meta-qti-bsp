@@ -38,3 +38,6 @@ CACHE_SIZE_EXT4 ?= "80000000"
 PERSIST_IMAGE_ROOTFS_SIZE ?= "128M"
 
 BB_DANGLINGAPPENDS_WARNONLY = "yes"
+
+#Align with poky/meta-poky/conf/distro/poky.conf
+OE_VERSION ?= "4.0.7"

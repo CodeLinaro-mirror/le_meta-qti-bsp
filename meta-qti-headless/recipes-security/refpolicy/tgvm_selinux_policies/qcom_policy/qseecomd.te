@@ -58,10 +58,27 @@ dev_read_generic_chr_files(qseecomd_t)
 fs_list_dos(qseecomd_t)
 fs_read_dos_files(qseecomd_t)
 
-# /data/tzstorage
-relabel_qseecomd_date(qseecomd_data_t)
+files_list_var(qseecomd_t)
+files_manage_var_dirs(qseecomd_t)
+files_manage_var_files(qseecomd_t)
+files_read_etc_files(qseecomd_t)
+files_rw_leprop_sockets(qseecomd_t)
+files_list_mnt(qseecomd_t)
 
 # local
 allow qseecomd_t self:unix_dgram_socket { create connect };
 allow qseecomd_t self:capability { setgid setpcap setuid };
 allow qseecomd_t self:process { setcap };
+
+# search root directory
+files_list_default(qseecomd_t)
+
+# /data/tzstorage
+qseecomd_manage_data(qseecomd_t)
+
+# /persist/data
+qseecomd_rw_persist(qseecomd_t)
+qseecomd_manage_persist(qseecomd_t)
+
+# connect to leprop-service socket
+connect_to_leprop_sockets(qseecomd_t)

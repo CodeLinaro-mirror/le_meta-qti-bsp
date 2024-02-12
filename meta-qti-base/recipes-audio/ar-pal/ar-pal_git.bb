@@ -21,10 +21,15 @@ EXTRA_OECONF += "\
     --with-acdbdata=${STAGING_INCDIR}/acdbdata \
 "
 
+MIXER_PATHS_XML ?= "mixer_paths_gvmauto8295_adp_star.xml"
+MIXER_PATHS_XML:quin-gvm-lemans = "mixer_paths_gvmauto8255_adp_star.xml"
+
 do_install:append() {
     install -d ${D}${sysconfdir}
-    install -m 0644 ${WORKDIR}/mixer_paths-dpk.xml ${D}${sysconfdir}/mixer_paths_gvmauto8295_adp_star.xml
+    install -m 0644 ${WORKDIR}/mixer_paths-dpk.xml ${D}${sysconfdir}/${MIXER_PATHS_XML}
 }
+
+PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 SOLIBS = ".so"
 FILES_SOLIBSDEV = ""

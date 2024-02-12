@@ -65,10 +65,6 @@ connect_to_leprop_sockets(adbd_t)
 allow adbd_t self:capability { setgid setpcap setuid dac_read_search dac_override };
 allow adbd_t self:tcp_socket create_stream_socket_perms;
 
-# functionfs
-fs_manage_functionfs_dirs(adbd_t)
-fs_manage_functionfs_files(adbd_t)
-
 # adbd connect ip:5555 port
 corenet_tcp_bind_all_unreserved_ports(adbd_t)
 corenet_tcp_bind_generic_node(adbd_t)

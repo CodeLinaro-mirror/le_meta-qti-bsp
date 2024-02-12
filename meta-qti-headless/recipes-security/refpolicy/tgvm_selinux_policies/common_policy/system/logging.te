@@ -32,3 +32,6 @@
 
 # /var/log is symbolic link to volatile/log
 files_read_var_symlinks(syslogd_t)
+
+# /var/run is symlinks to /run
+files_read_var_symlinks(auditd_t)

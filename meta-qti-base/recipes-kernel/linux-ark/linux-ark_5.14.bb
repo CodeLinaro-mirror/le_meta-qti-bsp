@@ -9,10 +9,8 @@ PATCH_DIR = "${SRC_DIR_ROOT}/meta-qti-bsp/meta-qti-base/recipes-kernel/linux-ark
 MY_WDIR = "${WORKDIR}/kernel/rh-kernel-5.14"
 
 DEPENDS += "\
-    oot-dtbo dtc-native kern-tools-native  mkbootimg-native \
-    ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'mkdtimg-native', '', d)} \
-    openssl-native rsync-native \
-    flex-native \
+    dtc-native elfutils-native flex-native kern-tools-native \
+    mkbootimg-native openssl-native pahole-native rsync-native \
 "
 DEPENDS:append:aarch64 = " libgcc"
 
@@ -20,17 +18,13 @@ KERNEL_CC:append:aarch64 = " ${TOOLCHAIN_OPTIONS}"
 KERNEL_LD:append:aarch64 = " ${TOOLCHAIN_OPTIONS}"
 
 SRC_URI = "\
-    ${PATH_TO_REPO}/kernel/rh-kernel-5.14/.git;protocol=${PROTO};destsuffix=kernel/msm-5.4;usehead=1 \
-"
-SRC_URI:append = " \
+    ${PATH_TO_REPO}/kernel/rh-kernel-5.14/.git;protocol=${PROTO};name=kernel;destsuffix=kernel/rh-kernel-5.14;usehead=1 \
     file://defconfig \
     file://0001-centos-5.14-Fix-to-bypass-redhad-env.patch \
     file://0002-centos-5.14-build-fixes-while-porting-from-5.4.patch \
-    file://0001-defconfig-add-overrides-to-resolve-build-error.patch \
 "
 
-SRCREV = "${AUTOREV}"
-SRCREV_FORMAT = "kernel_data_display_ais_video"
+SRCREV_kernel = "${AUTOREV}"
 
 inherit kernel kernel-yocto qsigning ${@bb.utils.contains('TARGET_KERNEL_ARCH', 'aarch64', 'qtikernel-arch', '', d)}
 
@@ -85,16 +79,17 @@ do_rh_config () {
 }
 addtask rh_config after do_prepare_recipe_sysroot before do_unpack
 
-do_patch_config() {
-     do_patch_config_call() {
-         cd ${MY_SRC}
-         patch -f -p1 < ${PATCH_DIR}/0001-defconfig-add-overrides-to-resolve-build-error.patch
-    }
-
-    do_patch_config_call || bbwarn "do_patch_config_call failed"
-
+python do_perf_config () {
+    dstdir = d.getVar('SRC_DIR_ROOT')
+    if (d.getVar('VARIANT', True) == 'perf'):
+         import shutil
+         srcdir = d.getVar('PATCH_DIR')
+         shutil.copy(srcdir + "/CONFIG_PERF", dstdir + "/kernel/rh-kernel-5.14/redhat/configs/custom-overrides/generic")
+    else:
+         if os.path.exists(dstdir + "/kernel/rh-kernel-5.14/redhat/configs/custom-overrides/generic/CONFIG_PERF"):
+             os.remove(dstdir + "/kernel/rh-kernel-5.14/redhat/configs/custom-overrides/generic/CONFIG_PERF")
 }
-addtask patch_config after do_fetch before do_rh_config
+addtask do_perf_config after do_fetch before rh_config
 
 do_patch_more() {
     cd ${MY_WDIR}
@@ -106,7 +101,9 @@ addtask patch_more after do_unpack before do_kernel_metadata
 KERNEL_PRIORITY = "9001"
 # Add V=1 to KERNEL_EXTRA_ARGS for verbose
 KERNEL_EXTRA_ARGS:append = " O=${B}"
-KERNEL_EXTRA_ARGS:append = " ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'DTC_EXT=${STAGING_BINDIR_NATIVE}/dtc CONFIG_BUILD_ARM64_DT_OVERLAY=y', '', d)}"
+
+EXTRA_OEMAKE:remove = "PAHOLE=false"
+KCONFIG_CONFIG_COMMAND:remove = "PAHOLE=false"
 
 KBRANCH ?= ""
 KMETA = "kernel-meta"
@@ -196,6 +193,8 @@ do_shared_workdir:append () {
         fi
 }
 
+KERNEL_MACHINE_DTB ?= ""
+
 do_deploy () {
     # Copy Kernel scripts to deploydir
     install -d ${DEPLOYDIR}/build-artifacts
@@ -207,24 +206,17 @@ do_deploy () {
     # Copy Image and dtbs to deploydir
     install -m 0644 vmlinux ${DEPLOYDIR}
 
-    if [ "${BASEMACHINE}" = "sa8775" ]; then
+    if [ "${KERNEL_IMAGE_HEADER_VERSION}" = "2" ]; then
         cp ${B}/arch/arm64/boot/Image ${D}/${KERNEL_IMAGEDEST}/Image
-        cp ${WORKDIR}/recipe-sysroot/sysroot-only/sa8775p-ride.dtb.overlay ${D}/${KERNEL_IMAGEDEST}/sa8775p-ride.dtb.overlay
         install -m 0644 ${D}/${KERNEL_IMAGEDEST}/Image ${DEPLOYDIR}
-        install -m 0644 ${D}/${KERNEL_IMAGEDEST}/sa8775p-ride.dtb.overlay ${DEPLOYDIR}
-    elif [ "${BASEMACHINE}" = "sa8540" ]; then
+    elif [ "${KERNEL_IMAGE_HEADER_VERSION}" = "1" ]; then
         cat ${B}/arch/arm64/boot/Image.gz \
-            ${B}/arch/arm64/boot/dts/qcom/sa8540p-adp-ride.dtb > ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb
+            ${B}/arch/arm64/boot/dts/qcom/${KERNEL_MACHINE_DTB} > ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb
         install -m 0644 ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb ${DEPLOYDIR}
     else
-        cat ${B}/arch/arm64/boot/Image.gz > ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb
-        install -m 0644 ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb ${DEPLOYDIR}
+        echo "Unknown Boot Image Header Version"
+        return 1
     fi
-
-    if ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'true', 'false', d)}; then
-        ${STAGING_BINDIR_NATIVE}/mkdtimg  create ${DEPLOYDIR}/${PRODUCT}-dtbo.img ${B}/arch/${ARCH}/boot/dts/qcom/sa8295p-adp-overlay.dtbo
-    fi
-
 }
 
 #PACKAGES = "kernel kernel-base kernel-vmlinux kernel-dev kernel-modules"

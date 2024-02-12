@@ -6,7 +6,7 @@ PROVIDES = "${PACKAGES}"
 inherit packagegroup
 
 PACKAGES = "\
-    packagegroup-qti-lvumd \
+    packagegroup-qti-umd \
 "
 
 ALLOW_EMPTY:${PN} = "1"
@@ -14,5 +14,6 @@ ALLOW_EMPTY:${PN} = "1"
 RDEPENDS:${PN} = "\
     safelinux-cfg-modules \
     safelinux-system-cfg \
-    umd-power \
+    ${@bb.utils.contains('PREFERRED_PROVIDER_virtual/kernel', 'linux-ark', '', 'umd-power', d)} \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-gunyah', 'safelinux-dbg-modules dspfirmware-mount', '', d)} \
 "
