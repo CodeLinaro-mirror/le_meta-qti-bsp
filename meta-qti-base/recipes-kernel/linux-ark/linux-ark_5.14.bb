@@ -9,7 +9,7 @@ PATCH_DIR = "${SRC_DIR_ROOT}/meta-qti-bsp/meta-qti-base/recipes-kernel/linux-ark
 MY_WDIR = "${WORKDIR}/kernel/rh-kernel-5.14"
 
 DEPENDS += "\
-    dtc-native elfutils-native flex-native kern-tools-native \
+    oot-dtbo dtc-native elfutils-native flex-native kern-tools-native \
     mkbootimg-native openssl-native pahole-native rsync-native \
 "
 DEPENDS:append:aarch64 = " libgcc"
