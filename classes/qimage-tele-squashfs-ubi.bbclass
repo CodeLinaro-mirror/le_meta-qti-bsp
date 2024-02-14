@@ -19,6 +19,8 @@ CORE_IMAGE_EXTRA_INSTALL += "\
 SYSTEM_IMAGE_UBI_TARGET ?= "${IMGDEPLOYDIR}/${IMAGE_BASENAME}/ubifs/sysfs.ubi"
 SYSTEM_IMAGE_UBI_TARGET_WITH_LXC ?= "${IMGDEPLOYDIR}/${IMAGE_BASENAME}/lxc/ubifs/sysfs.ubi"
 SYSTEM_IMAGE_UBIFS_TARGET ?= "${@bb.utils.contains('IMAGE_FEATURES', 'gluebi', bb.utils.contains('DISTRO_FEATURES', 'dm-verity', '${IMGDEPLOYDIR}/${IMAGE_BASENAME}/verity/${SYSTEMIMAGE_GLUEBI_TARGET}/${SYSTEMIMAGE_GLUEBI_TARGET}', '${SYSTEMIMAGE_GLUEBI_TARGET}', d), 'ubifs/sysfs.ubifs', d)}"
+SYSTEMRW_UBIFS_TARGET ?= "${IMGDEPLOYDIR}/${IMAGE_BASENAME}/squashfs/systemrw.ubifs"
+SYSTEMRW_ROOTFS ?= "${WORKDIR}/systemrw"
 USER_IMAGE_UBIFS_TARGET ?= "${IMGDEPLOYDIR}/${IMAGE_BASENAME}/squashfs/userfs.ubifs"
 USER_IMAGE_ROOTFS ?= "${WORKDIR}/usrfs-data"
 MODEM_UBIFS_IMAGE = "${WORKSPACE}/NON-HLOS.ubifs"
@@ -52,11 +54,15 @@ TELAF_RO_SELINUX_FILE_CONTEXTS ?= "${DEPLOY_DIR_IMAGE}/telaf-images/security/sel
 # Ensure SELinux file context variable is defined
 SELINUX_FILE_CONTEXTS ?= ""
 SELINUX_FILE_CONTEXTS_DATA ?= ""
+SELINUX_FILE_CONTEXTS_SYSTEMRW ?= ""
 SELINUX_IMG_UBI_S = "${@['--selinux=${SELINUX_FILE_CONTEXTS}', ''][d.getVar('SELINUX_FILE_CONTEXTS') == '']}"
 SELINUX_IMG_UBI_S_DATA = "${@['--selinux=${SELINUX_FILE_CONTEXTS_DATA}', ''][d.getVar('SELINUX_FILE_CONTEXTS_DATA') == '']}"
+SELINUX_IMG_UBI_S_SYSTEMRW = "${@['--selinux=${SELINUX_FILE_CONTEXTS_SYSTEMRW}', ''][d.getVar('SELINUX_FILE_CONTEXTS_SYSTEMRW') == '']}"
 IMAGE_UBIFS_SELINUX_OPTIONS = "${@bb.utils.contains('DISTRO_FEATURES', 'selinux', '${SELINUX_IMG_UBI_S}', '', d)}"
 IMAGE_UBIFS_SELINUX_OPTIONS_DATA = "${@bb.utils.contains('DISTRO_FEATURES', 'selinux', '${SELINUX_IMG_UBI_S_DATA}', '', d)}"
+IMAGE_UBIFS_SELINUX_OPTIONS_SYSTEMRW = "${@bb.utils.contains('DISTRO_FEATURES', 'selinux', '${SELINUX_IMG_UBI_S_SYSTEMRW}', '', d)}"
 
+MKUBIFS_SYSTEMRW_ARGS ?= "-m 4096 -e 253952 -c 25 -F"
 MKUBIFS_USERFS_ARGS ?= "-m 4096 -e 253952 -c 2146 -F"
 
 do_image_ubi[noexec] = "1"
@@ -70,6 +76,10 @@ SYSTEM_VOLUME_SIZE_G ??= "200MiB"
 ROOTFS_VOLUME_SIZE = "${@bb.utils.contains('IMAGE_FEATURES', 'nand2x', '${SYSTEM_VOLUME_SIZE_G}', '${SYSTEM_VOLUME_SIZE}', d)}"
 IMAGE_ROOTFS_SQUASHFS_UBI = "${WORKDIR}/rootfs-squashfs-ubi"
 IMAGE_ROOTFS_UBIFS_UBI = "${WORKDIR}/rootfs-ubifs-ubi"
+
+create_tele_systemrw[cleandirs] = "${SYSTEMRW_ROOTFS}"
+# Nothing to do, empty volume
+create_tele_systemrw[noexec] = "1"
 
 create_symlink_tele_userfs[cleandirs] = "${USER_IMAGE_ROOTFS}"
 create_symlink_tele_userfs() {
@@ -203,6 +213,7 @@ vol_id=$(echo $(grep -rc "vol_id" ${UBINIZE_SYSTEM_CFG}))
 cat << EOF >> ${UBINIZE_SYSTEM_CFG}
 [systemrw_volume]
 mode=ubi
+image="${SYSTEMRW_UBIFS_TARGET}"
 vol_id=$vol_id
 vol_type=dynamic
 vol_name=systemrw
@@ -317,6 +328,7 @@ vol_id=$(echo $(grep -rc "vol_id" ${UBINIZE_SYSTEM_CFG_WITH_LXC}))
 cat << EOF >> ${UBINIZE_SYSTEM_CFG_WITH_LXC}
 [systemrw_volume]
 mode=ubi
+image="${SYSTEMRW_UBIFS_TARGET}"
 vol_id=$vol_id
 vol_type=dynamic
 vol_name=systemrw
@@ -535,6 +547,7 @@ vol_id=$(echo $(grep -rc "vol_id" ${SQUASHFS_UBINIZE_CFG_AB}))
 cat << EOF >> ${SQUASHFS_UBINIZE_CFG_AB}
 [systemrw_volume]
 mode=ubi
+image="${SYSTEMRW_UBIFS_TARGET}"
 vol_id=$vol_id
 vol_type=dynamic
 vol_name=systemrw
@@ -709,6 +722,7 @@ vol_id=$(echo $(grep -rc "vol_id" ${SQUASHFS_UBINIZE_CFG_AB_WITH_LXC}))
 cat << EOF >> ${SQUASHFS_UBINIZE_CFG_AB_WITH_LXC}
 [systemrw_volume]
 mode=ubi
+image="${SYSTEMRW_UBIFS_TARGET}"
 vol_id=$vol_id
 vol_type=dynamic
 vol_name=systemrw
@@ -805,6 +819,7 @@ do_makesystem_tele_ubi[prefuncs] += "create_symlink_tele_userfs"
 do_makesystem_tele_ubi[prefuncs] += "create_symlink_systemd_ubi_mount_tele_rootfs"
 do_makesystem_tele_ubi[prefuncs] += "do_create_ubinize_tele_config"
 do_makesystem_tele_ubi[prefuncs] += "create_rootfs_tele_ubifs"
+do_makesystem_tele_ubi[prefuncs] += "create_tele_systemrw"
 do_makesystem_tele_ubi[postfuncs] += "${@bb.utils.contains('INHERIT', 'uninative', 'do_patch_ubi_tools', '', d)}"
 do_makesystem_tele_ubi[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
 do_makesystem_tele_ubi_with_lxc[prefuncs] += "do_create_ubinize_tele_config_with_lxc"
@@ -831,6 +846,7 @@ fakeroot do_makesystem_tele_ubi() {
    rm -rf ${IMAGE_ROOTFS_UBIFS_UBI}/etc/systemd/system/multi-user.target.wants/rbm-daemon.service
    rm -rf ${IMAGE_ROOTFS_UBIFS_UBI}/etc/systemd/system/multi-user.target.wants/gluebi-dlkm.service
 
+   mkfs.ubifs -r ${SYSTEMRW_ROOTFS} ${IMAGE_UBIFS_SELINUX_OPTIONS_SYSTEMRW} -o ${SYSTEMRW_UBIFS_TARGET} ${MKUBIFS_SYSTEMRW_ARGS}
    mkfs.ubifs -r ${USER_IMAGE_ROOTFS} ${IMAGE_UBIFS_SELINUX_OPTIONS_DATA} -o ${USER_IMAGE_UBIFS_TARGET} ${MKUBIFS_USERFS_ARGS}
    if ${@bb.utils.contains('IMAGE_FEATURES', 'modem-volume', 'true', 'false', d)}; then
        if [ -d ${MODEM_IMAGE_DIR} ]; then
