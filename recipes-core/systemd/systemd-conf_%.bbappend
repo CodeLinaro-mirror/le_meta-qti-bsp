@@ -9,11 +9,15 @@ SRC_URI += "file://limits-coredump.conf"
 COREDUMP = "1"
 COREDUMP_qti-distro-user = ""
 
+COREDUMP_SUID_DUMPABLE ?= "2"
+COREDUMP_SUID_DUMPABLE:cinder = "0"
+
 SYSTEMD_COREDUMP_PATH ?= "${userfsdatadir}/coredump"
 
 do_install_append() {
    if [ "${COREDUMP}" == "1" ]; then
        sed -i "s#@COREDUMP_PATH@#${SYSTEMD_COREDUMP_PATH}#" ${WORKDIR}/sysctl-coredump.conf
+       sed -i "s#@SUID_DUMPABLE_VALUE@#${COREDUMP_SUID_DUMPABLE}#" ${WORKDIR}/sysctl-coredump.conf
 
        install -m 0644 ${WORKDIR}/sysctl-coredump.conf -D ${D}${sysconfdir}/sysctl.d/sys-coredump.conf
        install -m 0644 ${WORKDIR}/limits-coredump.conf -D ${D}${sysconfdir}/security/limits.d/sys-coredump.conf
