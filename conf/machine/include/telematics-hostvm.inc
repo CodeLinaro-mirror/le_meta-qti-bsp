@@ -13,3 +13,4 @@ KERNEL_VARIANT_qti-distro-debug ??= "hostvm_debug_"
 KERNEL_VARIANT_qti-distro-perf ??= "hostvm_perf_"
 
 MACHINE_FEATURES_remove = "qti-wwan-plus-cv2x"
+FLAVOR = "hostvm"
