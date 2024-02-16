@@ -6,7 +6,7 @@ PROVIDES = "virtual/kernel-toolchain-native"
 
 FILESEXTRAPATHS:prepend := "${KERNEL_PLATFORM_PATH}/prebuilts/clang/host/linux-x86/:"
 SRC_URI    = "file://clang-${CLANG_VERSION}"
-CLANG_VERSION = "r450784e"
+CLANG_VERSION = "r498229b"
 
 
 S = "${WORKDIR}/clang-${CLANG_VERSION}"
@@ -20,6 +20,4 @@ do_install() {
     install -d ${D}/${bindir}/clang/
     install -d ${D}/${bindir}/clang/bin/
     cp -rf ${S}/bin/* ${D}/${bindir}/clang/bin/
-    install -d ${D}/${bindir}/clang/lib64/
-    cp -rf ${S}/lib64/* ${D}/${bindir}/clang/lib64/
 }
