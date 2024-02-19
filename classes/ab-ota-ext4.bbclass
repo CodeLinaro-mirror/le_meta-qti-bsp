@@ -50,6 +50,12 @@ do_recovery_ext4() {
     radiofilesmap=${MACHINE_FILESMAP_FULL_PATH}
     [[ ! -z "$radiofilesmap" ]] && install -m 755 $radiofilesmap ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RADIO/filesmap
 
+    # if manifest.xml exist then copy into RADIO directory
+    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-mplane-spec', 'true', 'false', d)}; then
+        radiomanifest=${WORKSPACE}/OTA/recovery/manifest.xml
+        [[ ! -z ${WORKSPACE}/OTA/recovery/manifest.xml ]] && install -m 755 ${WORKSPACE}/OTA/recovery/manifest.xml ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RADIO/
+    fi
+
     # copy the boot\recovery images
     cp ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${BOOTIMAGE_TARGET} ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/BOOTABLE_IMAGES/boot.img
     cp ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${BOOTIMAGE_TARGET} ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/BOOTABLE_IMAGES/recovery.img

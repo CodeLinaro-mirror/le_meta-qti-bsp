@@ -19,19 +19,19 @@ ENABLE_ADB_qti-distro-base-user ?= "False"
 # Android Core Image and Debugging utilities
 RDEPENDS_packagegroup-android-utils-base = "\
     ${@oe.utils.conditional('ENABLE_ADB', 'True', 'adbd', '', d)} \
-    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-sdx', '', 'binder', d)} \
+    ${@bb.utils.contains_any('MACHINE_FEATURES', 'qti-sdx qti-csm', '', 'binder', d)} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-sdx', '', 'leproperties', d)} \
     logcat \
     logd \
-    libsync \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-csm', '', 'libsync', d)} \
     ${@oe.utils.conditional('PROPERTIES_SUPPORT', 'True', 'system-prop', '', d)} \
     "
 
 # Startup scripts needed during device bootup
 RDEPENDS_packagegroup-startup-scripts-base = "\
-    ${@bb.utils.contains('COMBINED_FEATURES', 'qti-ab-boot', 'ab-slot-util', '', d)} \
+    ${@bb.utils.contains('COMBINED_FEATURES', 'qti-ab-boot', bb.utils.contains('MACHINE_FEATURES', 'qti-csm', '', 'ab-slot-util', d), '', d)} \
     ${@oe.utils.conditional('USB_SUPPORT', 'True', 'usb-composition', '', d)} \
     ${@oe.utils.conditional('USB_AUTOSUSPEND_SUPPORT', 'True', 'usb-composition-usbd', '', d)} \
     post-boot \
-    sdcard-scripts-automount \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-csm', '', 'sdcard-scripts-automount', d)} \
     "
