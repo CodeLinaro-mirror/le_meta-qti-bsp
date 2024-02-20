@@ -69,6 +69,7 @@ MACHINE_MNT_POINTS = " \
     /systemrw \
     /persist \
     /data \
+    ${@bb.utils.contains('IMAGE_FSTYPES', 'ext4', '/cache', '', d)} \
     ${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', '/lxcrootfs', '', d)} \
 "
 
