@@ -10,7 +10,7 @@ PACKAGES = "${PN}"
 
 # qti-audio is for elite framework, qti-audio-ar is for AR framework
 # NOTE: For kernel 5.4 + AR + hyp, uses audiodlkm rather than ar-audiodlkm
-RDEPENDS:${PN} = "\
+AUDIO_RDEPENDS = "\
     alsa-lib \
     alsa-utils \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-audio', 'audiodlkm  init-audio', '', d)} \
@@ -19,7 +19,7 @@ RDEPENDS:${PN} = "\
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-audio-ar', oe.utils.version_less_or_equal('${preferred-kernel}', '5.14', '', 'ar-audiodlkm', d), '', d)} \
 "
 
-RDEPENDS:${PN}:append:qti-dpk = " \
+AUDIO_RDEPENDS:append:qti-dpk = " \
     agm-tinyalsa-plugin \
     ar-pal \
     pal-control-plugin \
@@ -27,3 +27,5 @@ RDEPENDS:${PN}:append:qti-dpk = " \
     tinyalsa \
     tinycompress \
 "
+
+RDEPENDS:${PN} += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd qti-gunyah', '', '${AUDIO_RDEPENDS}', d)}"

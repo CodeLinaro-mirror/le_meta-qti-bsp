@@ -1,7 +1,9 @@
-RDEPENDS:${PN} += "\
+AUDIO_EXTRA_RDEPENDS = "\
     agl-audio-plugin \
     pulseaudio-misc \
     pulseaudio-module-null-source \
     pulseaudio-server \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-audio-ar', bb.utils.contains('MACHINE_FEATURES','qti-hypervisor','', 'pulseaudio-module-codec-control',d), 'pulseaudio-module-acdb pulseaudio-module-codec-control' ,d)} \
 "
+
+RDEPENDS:${PN} += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd qti-gunyah', '', '${AUDIO_EXTRA_RDEPENDS}', d)}"
