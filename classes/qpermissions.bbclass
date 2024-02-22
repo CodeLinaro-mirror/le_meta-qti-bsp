@@ -1,4 +1,8 @@
-require conf/distro/include/user_permissions.inc
+INCLUDE_FILE = "${@bb.utils.contains_any('MACHINE', 'cinder', \
+                                            'conf/distro/include/user_permissions_${MACHINE}.inc', \
+                                            'conf/distro/include/user_permissions.inc', d)}"
+
+require ${INCLUDE_FILE}
 
 do_update_files() {
     set +e
