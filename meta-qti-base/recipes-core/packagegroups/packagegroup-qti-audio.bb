@@ -28,4 +28,13 @@ AUDIO_RDEPENDS:append:qti-dpk = " \
     tinycompress \
 "
 
-RDEPENDS:${PN} += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd qti-gunyah', '', '${AUDIO_RDEPENDS}', d)}"
+AUDIOLITE_RDEPENDS = "\
+    audiolite-dlkm \
+"
+
+RDEPENDS:${PN} += " \
+    ${@bb.utils.contains('TARGET_USES_AUDIO_FRAMEWORK', 'audiolite', \
+    '${AUDIOLITE_RDEPENDS}', \
+    bb.utils.contains('MACHINE_FEATURES', 'qti-umd qti-gunyah', '', '${AUDIO_RDEPENDS}', d), \
+    d)} \
+"
