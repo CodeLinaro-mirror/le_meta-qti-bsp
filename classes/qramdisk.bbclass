@@ -133,7 +133,7 @@ fakeroot do_ramdisk_create() {
             cp ${IMAGE_ROOTFS}/usr/lib/modules/lassen_secure_eip.ko lib/modules/
             cp ${IMAGE_ROOTFS}/usr/lib/modules/ecpri_core.ko lib/modules/
             cp ${IMAGE_ROOTFS}/lib/firmware/qcom_aw_phy/eth_custom_rates_1.hex lib/firmware/qcom_aw_phy/
-            
+
             # strip and sign the KOs
             do_strip_and_sign_dlkm lib/modules/gsim.ko
             do_strip_and_sign_dlkm lib/modules/ecpri_dmam.ko
@@ -150,7 +150,6 @@ fakeroot do_ramdisk_create() {
             cp ${IMAGE_ROOTFS}/usr/libexec/dhcpcd-hooks/02-dump usr/libexec/dhcpcd-hooks/
             cp ${IMAGE_ROOTFS}/usr/libexec/dhcpcd-hooks/20-resolv.conf usr/libexec/dhcpcd-hooks/
             cp ${IMAGE_ROOTFS}/usr/libexec/dhcpcd-hooks/30-hostname usr/libexec/dhcpcd-hooks/3
-            cp ${IMAGE_ROOTFS}/usr/libexec/dhcpcd-hooks/50-ntp.conf usr/libexec/dhcpcd-hooks/
             cp ${IMAGE_ROOTFS}/usr/libexec/dhcpcd-run-hooks usr/libexec/
             cp ${IMAGE_ROOTFS}/usr/sbin/dhcpcd usr/sbin/
             cp ${IMAGE_ROOTFS}/usr/share/dhcpcd/hooks/10-wpa_supplicant usr/share/dhcpcd/hooks/
