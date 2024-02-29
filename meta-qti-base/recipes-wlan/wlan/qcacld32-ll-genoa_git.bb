@@ -46,6 +46,8 @@ _WLAN_CFG_OVERRIDE = "\
                       CONFIG_FEATURE_COEX=y \
                       CONFIG_QCACLD_FEATURE_COEX_CONFIG=y \
                       CONFIG_WLAN_FEATURE_LINK_LAYER_STATS=y \
+                      CONFIG_WLAN_CUSTOM_DSCP_UP_MAP=y \
+                      CONFIG_WLAN_SEND_DSCP_UP_MAP_TO_FW=y \
                       "
 _WLAN_CFG_OVERRIDE:append:sa6155 = "CONFIG_IPA_DISABLE_OVERRIDE=y"
 
