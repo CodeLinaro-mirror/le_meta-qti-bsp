@@ -18,3 +18,7 @@ inherit module module-sign kernel-arch qperf qti-kernel-arch-clang
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 EXTRA_OEMAKE += "CONFIG_ARCH_MSM=y"
+
+RPROVIDES:${PN} += "kernel-module-hsi2s-${KERNEL_VERSION}"
+
+FILES:${PN} += "${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/*"
