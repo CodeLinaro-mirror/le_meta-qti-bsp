@@ -1,0 +1,32 @@
+From 476db8ed269406844a76e5a3811549a3f95fc162 Mon Sep 17 00:00:00 2001
+From: Naiwen Yu <quic_naiwyu@quicinc.com>
+Date: Wed, 28 Feb 2024 15:12:13 +0800
+Subject: [PATCH] libkmod: change linux module directory for vendor build
+
+For dpk build /lib/modules is incomplete, missing modules.builtin,
+causing kmod_new always return NULL. Change default linux module's
+directory to /vendor/lib/modules to avoid that.
+
+Upstream-Status: Inappropriate
+Change-Id:476db8ed269406844a76e5a3811549a3f95fc162
+Signed-off-by: Naiwen Yu <quic_naiwyu@quicinc.com>
+---
+ libkmod/libkmod.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libkmod/libkmod.c b/libkmod/libkmod.c
+index 0441835..5c0bbe5 100644
+--- a/libkmod/libkmod.c
++++ b/libkmod/libkmod.c
+@@ -217,7 +217,7 @@ static int log_priority(const char *priority)
+ 	return 0;
+ }
+ 
+-static const char *dirname_default_prefix = "/lib/modules";
++static const char *dirname_default_prefix = "/vendor/lib/modules";
+ 
+ static char *get_kernel_release(const char *dirname)
+ {
+-- 
+2.25.1
+

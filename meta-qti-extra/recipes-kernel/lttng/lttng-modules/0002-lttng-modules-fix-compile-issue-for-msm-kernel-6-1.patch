@@ -1,0 +1,42 @@
+From 9880f919cc5f0f6fd0663213fadfde8b763cc791 Mon Sep 17 00:00:00 2001
+From: Naiwen Yu <quic_naiwyu@quicinc.com>
+Date: Sun, 18 Feb 2024 15:56:38 +0800
+Subject: [PATCH] lttng-modules: Fix compile issue for msm-kernel 6.1
+
+use vm_flags_set for msm-kernel version after 6.1 to solve
+vm_flags type mismatch issue.
+
+Upstream-Status: Inappropriate
+
+Signed-off-by: Naiwen Yu <quic_naiwyu@quicinc.com>
+---
+ src/lib/ringbuffer/ring_buffer_mmap.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/src/lib/ringbuffer/ring_buffer_mmap.c b/src/lib/ringbuffer/ring_buffer_mmap.c
+index 25e2d8d..2758c4a 100644
+--- a/src/lib/ringbuffer/ring_buffer_mmap.c
++++ b/src/lib/ringbuffer/ring_buffer_mmap.c
+@@ -16,6 +16,7 @@
+ #include <ringbuffer/backend.h>
+ #include <ringbuffer/frontend.h>
+ #include <ringbuffer/vfs.h>
++#include <lttng/kernel-version.h>
+ 
+ /*
+  * fault() vm_op implementation for ring buffer file mapping.
+@@ -113,7 +114,11 @@ static int lib_ring_buffer_mmap_buf(struct lttng_kernel_ring_buffer *buf,
+ 		return -EINVAL;
+ 
+ 	vma->vm_ops = &lib_ring_buffer_mmap_ops;
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,1,0))
++	vm_flags_set(vma, VM_DONTEXPAND);
++#else
+ 	vma->vm_flags |= VM_DONTEXPAND;
++#endif
+ 	vma->vm_private_data = buf;
+ 
+ 	return 0;
+-- 
+2.25.1
+
