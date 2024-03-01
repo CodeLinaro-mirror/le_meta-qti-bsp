@@ -19,6 +19,7 @@ KERNEL_LD:append:aarch64 = " ${TOOLCHAIN_OPTIONS}"
 SRC_URI = "\
     ${PATH_TO_REPO}/kernel/rh-kernel-5.14/.git;protocol=${PROTO};name=kernel;destsuffix=kernel/rh-kernel-5.14;usehead=1 \
     file://dm.cfg \
+    ${@bb.utils.contains_any('VARIANT', 'perf user', 'file://perf.cfg', '', d)} \
 "
 
 SRCREV_kernel = "${AUTOREV}"
@@ -76,18 +77,6 @@ do_rh_config () {
 addtask do_rh_config after do_unpack before do_kernel_metadata
 do_rh_config[depends] += "virtual/${TARGET_PREFIX}binutils:do_populate_sysroot"
 do_rh_config[depends] += "gcc-cross-${TARGET_ARCH}:do_populate_sysroot"
-
-python do_perf_config () {
-    dstdir = d.getVar('SRC_DIR_ROOT')
-    if (d.getVar('VARIANT', True) == 'perf'):
-         import shutil
-         srcdir = d.getVar('PATCH_DIR')
-         shutil.copy(srcdir + "/CONFIG_PERF", dstdir + "/kernel/rh-kernel-5.14/redhat/configs/custom-overrides/generic")
-    else:
-         if os.path.exists(dstdir + "/kernel/rh-kernel-5.14/redhat/configs/custom-overrides/generic/CONFIG_PERF"):
-             os.remove(dstdir + "/kernel/rh-kernel-5.14/redhat/configs/custom-overrides/generic/CONFIG_PERF")
-}
-addtask do_perf_config after do_fetch before do_unpack
 
 KERNEL_PRIORITY = "9001"
 # Add V=1 to KERNEL_EXTRA_ARGS for verbose
