@@ -54,6 +54,8 @@ EXTRA_OEMAKE:append:sa8775 = " 'SUPPORT_AB_BOOT_LXC=1' \
                                'AB_RETRYCOUNT_DISABLE=1' \
                                'ENABLE_LV_ATOMIC_AB=1' "
 
+EXTRA_OEMAKE:append:sa7255 = " 'SUPPORT_AB_BOOT_LXC=1'"
+
 do_configure[noexec] = "1"
 do_compile () {
     export BUILD_CC=${STAGING_BINDIR_NATIVE}/clang
