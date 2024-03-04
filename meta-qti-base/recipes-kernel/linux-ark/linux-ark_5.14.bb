@@ -20,6 +20,7 @@ SRC_URI = "\
     ${PATH_TO_REPO}/kernel/rh-kernel-5.14/.git;protocol=${PROTO};name=kernel;destsuffix=kernel/rh-kernel-5.14;usehead=1 \
     file://dm.cfg \
     ${@bb.utils.contains_any('VARIANT', 'perf user', 'file://perf.cfg', '', d)} \
+    file://usb_adb.cfg \
 "
 
 SRCREV_kernel = "${AUTOREV}"
