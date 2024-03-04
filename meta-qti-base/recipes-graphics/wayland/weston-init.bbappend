@@ -62,6 +62,7 @@ do_install:append:sa7255() {
     if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'true', 'false', d)}; then
         sed -i 's/openwfd_server_@0.service kgsl.service/openwfd_server_@0.service/g' ${D}${systemd_system_unitdir}/weston.service
         sed -i 's/rc.pvr.service openwfd_server_@0.service/rc.pvr.service openwfd_server_@0.service multi-user.target/g' ${D}${systemd_system_unitdir}/weston.service
+        sed -i 's/--modules=systemd-notify.so/--modules=systemd-notify.so --use-pixman/g' ${D}${systemd_system_unitdir}/weston.service
     fi
 }
 
