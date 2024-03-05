@@ -74,8 +74,6 @@ do_rh_config () {
     cp ${B}/defconfig ${S}/arch/arm64/configs/defconfig
 }
 addtask do_rh_config after do_unpack before do_kernel_metadata
-do_rh_config[depends] += "virtual/${TARGET_PREFIX}binutils:do_populate_sysroot"
-do_rh_config[depends] += "gcc-cross-${TARGET_ARCH}:do_populate_sysroot"
 
 python do_perf_config () {
     dstdir = d.getVar('SRC_DIR_ROOT')
