@@ -63,9 +63,42 @@ python do_makeboot_setscene () {
     sstate_setscene(d)
 }
 
+#sign boot img
+do_sign_boot_img () {
+    imgname="${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET}"
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'qti-avb', 'true', 'false', d)}; then
+        avb_sign_boot_image ${imgname}
+    fi
+}
+
+avb_sign_boot_image() {
+    img="$1"
+    avbtool add_hash_footer  \
+        --image ${img}  \
+        --partition_size 0x04000000  \
+        --partition_name boot \
+        --algorithm SHA256_RSA4096 \
+        --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/testkey_rsa4096.pem \
+        --rollback_index 0
+    if ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'true', 'false', d)}; then
+       avbtool add_hash_footer  \
+              --image ${DEPLOY_DIR_IMAGE}/${PRODUCT}-dtbo.img  \
+              --partition_size 0x00200000 \
+              --partition_name dtbo \
+              --algorithm SHA256_RSA4096 \
+              --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/testkey_rsa4096.pem \
+              --rollback_index 0
+    fi
+}
+
+#Sign boot image after generation
+do_sign_boot_img[dirs] = "${DEPLOY_DIR_IMAGE}"
+do_sign_boot_img[depends] += "sectool5-native:do_populate_sysroot avbtool-native:do_populate_sysroot"
+
 addtask do_makeboot_setscene
 
 addtask do_makeboot before do_build
+addtask do_sign_boot_img after do_makeboot before do_build
 
 do_rootfs[noexec] = "1"
 do_image[noexec] = "1"
