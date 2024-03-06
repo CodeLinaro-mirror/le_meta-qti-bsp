@@ -1,10 +1,12 @@
 #!/bin/sh
-# Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+# Copyright (c) 2023-2024 Qualcomm Innovation Center, Inc. All rights reserved.
 # SPDX-License-Identifier: BSD-3-Clause-Clear
 
 UBI_SYS_CLASS="/sys/class/ubi/ubi0"
 UBI_DEV_BLOCK="/dev/ubiblock0"
 UBIFS_VOL_HEADER="1831 0610"
+VERITY_ENV="/etc/verity.env"
+
 GetLXCRFSVolumeID () {
 
     partition=$1
@@ -60,7 +62,6 @@ FindAndMountUBIVolume () {
    else
        image_type="unknown"
    fi
-   echo "lxcrfs root fstype is $image_type " > /dev/kmsg
 
    if [ "$image_type" == "squashfs" ]; then
         ubiblock --create $device
@@ -68,6 +69,38 @@ FindAndMountUBIVolume () {
         if [ $? -ne 0 ]; then
            echo "Failed to wait on ${block_device}, exiting." > /dev/kmsg
            exit 0
+        fi
+        if [ ! -e "${VERITY_ENV}" ]; then
+          VERITY_ENV="/proc/cmdline"
+        fi
+        if grep 'nad_avb=1' ${VERITY_ENV} > /dev/null; then
+          # The system certificate CA is in the rootfs volume, verified-boot utility
+          # need to use this CA to verify the user certificate.
+          volid=$(GetLXCRFSVolumeID "rootfs"$SLOT_SUFFIX)
+          if [ "$volid" == "" ]; then
+            echo "volume index not found for rootfs "  > /dev/kmsg
+            return 1
+          fi
+          if dd if=/dev/ubi0_$volid count=1 bs=4 2>/dev/null | grep 'hsqs' > /dev/null; then
+            CERT_CA_PATH=/dev/ubiblock0_$volid
+          else
+            CERT_CA_PATH=/dev/mapper/system
+          fi
+          dm_verity_name=lxcrootfs
+          dm_verity_device=/dev/mapper/${dm_verity_name}
+          verified-boot -n ${dm_verity_name} -d $block_device -p ${CERT_CA_PATH} > /dev/kmsg
+          if [ $? -ne 0 ] ; then
+            echo CERT_CA_PATH=${CERT_CA_PATH} > /dev/kmsg
+            echo "Creation of dm-verity device ${dm_verity_device} failed." > /dev/kmsg
+            return 1
+          fi
+
+          WaitDevReady "-b" "${dm_verity_device}"
+          if [ $? -ne 0 ]; then
+             echo "Failed to wait on ${dm_verity_device}, exiting." > /dev/kmsg
+             return 1
+          fi
+          block_device=${dm_verity_device}
         fi
         mount -t squashfs $block_device $dir -o ro$extra_opts
    elif [ "$image_type" == "ubifs" ]; then
