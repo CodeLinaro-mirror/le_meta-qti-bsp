@@ -19,6 +19,8 @@ S = "${WORKDIR}/vendor/qcom/opensource/safelinux-system-cfg/devicetree"
 
 inherit deploy
 
+do_unpack[depends] += "virtual/kernel:do_configure"
+
 do_compile:prepend() {
     # Copy only the required git metadata needed for "git log", so that we can build defconfigs
     GIT_METADATA_PATH_REFS=`realpath ${KERNEL_DIR_SRC}/.git/refs`
