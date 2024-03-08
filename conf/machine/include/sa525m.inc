@@ -82,6 +82,9 @@ MACHINE_SUPPORTS_INIT_RAMDISK = "False"
 TOYBOX_RAMDISK = "False"
 MACHINE_SUPPORTS_ANDROID_PROPERTIES = "False"
 
+# Disable autosuspend for USB peripheral mode
+MACHINE_SUPPORTS_USB_AUTOSUSPEND = "False"
+
 USBCOMPOSITION = "90DB"
 
 # On msm-5.4 or above ufs driver supports BSG Device.
