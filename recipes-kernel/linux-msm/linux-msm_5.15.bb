@@ -3,7 +3,7 @@ inherit kernel
 DESCRIPTION = "CAF Linux Kernel"
 LICENSE = "GPLv2.0-with-linux-syscall-note"
 
-COMPATIBLE_MACHINE = "kalama|qrb5165|vt-64"
+COMPATIBLE_MACHINE = "kalama|qrb5165|vt-64|kalama-robotics-vm"
 
 FILESEXTRAPATHS:prepend := "${WORKSPACE}:"
 FILESEXTRAPATHS:prepend := "${WORKSPACE}:${KERNEL_PREBUILT_PATH}:"
@@ -148,8 +148,13 @@ do_prebuilt_shared_workdir() {
     mkdir -p $kerneldir/include/config
     mkdir -p $kerneldir/scripts
     mkdir -p $kerneldir/include/generated
+    mkdir -p $kerneldir/usr
+
     install -m 0644 include/config/kernel.release $kerneldir/include/config/kernel.release
     install -m 0644 include/generated/utsrelease.h $kerneldir/include/generated/utsrelease.h
+    cp -a ${KERNEL_OUT_PATH}/msm-kernel/usr/* $kerneldir/usr/
+    cp -a ${KERNEL_PLATFORM_PATH}/msm-kernel/usr/gen_initramfs.sh $kerneldir/usr/
+
     if [ -e "${B}/scripts/module.lds" ]; then
         install -m 0644 ${B}/scripts/module.lds ${STAGING_KERNEL_BUILDDIR}/scripts/module.lds
     fi
@@ -274,6 +279,13 @@ do_deploy() {
         install -m 0644 $kmod ${DEPLOYDIR}/kernel_modules
     done
 
+    install -d ${DEPLOYDIR}/build-artifacts
+    install -d ${DEPLOYDIR}/build-artifacts/kernel_scripts/scripts
+    install -d ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr/
+    install -d ${DEPLOYDIR}/build-artifacts/dtb
+
+    cp  ${STAGING_KERNEL_DIR}/usr/gen_initramfs.sh ${DEPLOYDIR}/build-artifacts/kernel_scripts/scripts
+    cp -a ${STAGING_KERNEL_BUILDDIR}/usr/* ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr/
 }
 
 # Put the zImage in the kernel-dev pkg
