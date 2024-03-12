@@ -18,7 +18,9 @@ PACKAGECONFIG[glib] = "--with-glib, --without-glib, glib-2.0"
 
 do_install_append() {
       install -d ${D}${systemd_unitdir}/system/
+      install -d ${D}${systemd_unitdir}/system/multi-user.target.wants/
       install -m 0644 ${S}/crash-collect.service -D ${D}${systemd_unitdir}/system/crash-collect.service
+      ln -sf ${systemd_unitdir}/system/crash-collect.service ${D}${systemd_unitdir}/system/multi-user.target.wants/crash-collect.service
 }
 
 SYSTEMD_SERVICE_${PN} = "crash-collect.service"
