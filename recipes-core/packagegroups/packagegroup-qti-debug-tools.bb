@@ -7,7 +7,7 @@ PACKAGES =  "\
             "
 
 VALG ?= 'True'
-VALG_qti-distro-tele = 'False'
+VALG:qti-distro-tele = 'False'
 # Add debug support packages to RDEPENDS list for a debug build.
 # Remote debugging can be carried out(through adb port forwarding)
 # on target gdb takes up considerable storage.
