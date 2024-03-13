@@ -100,6 +100,10 @@ VOLATILE_BINDS_sa525m = "\
 /systemrw/qvirtmgr.json  /etc/qvirtmgr.json\n\
 /systemrw/izat.conf /etc/izat.conf\n\
 /systemrw/gps.conf /etc/gps.conf\n\
+/systemrw/sap.conf /etc/sap.conf\n\
+/systemrw/apdr.conf /etc/apdr.conf\n\
+/systemrw/commonapi4someip.ini /etc/commonapi4someip.ini\n\
+/systemrw/vsomeip-location.json /etc/vsomeip-location.json\n\
 "
 
 VOLATILE_BINDS_sa525m-televm = "\
