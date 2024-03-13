@@ -168,7 +168,7 @@ do_makesystem() {
     cp ${MACHINE_FSCONFIG_CONF_FULL_PATH} ${WORKDIR}/rootfs-fsconfig.conf
     invalid_image=0
 
-    if ${@bb.utils.contains('MACHINE_FEATURES', 'dm-verity-none', 'false', 'true', d)} ; then 
+    if ${@bb.utils.contains('MACHINE_FEATURES', 'dm-verity-none', 'false', 'true', d)} ; then
     # Generate unsparsed image, append hash and fec data to the image and then sparse the image
         for count in {99..1}
         do
