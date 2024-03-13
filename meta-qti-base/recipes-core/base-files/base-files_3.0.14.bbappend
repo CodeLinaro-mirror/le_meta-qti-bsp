@@ -12,6 +12,11 @@ dirs755:append = " \
 "
 
 do_install:append(){
+    if(${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'true', 'false', d)}); then
+        ln -s ${nonarch_base_libdir} ${D}/lib64
+        ln -s ${libdir} ${D}/usr/lib64
+    fi
+
     if(${@bb.utils.contains('MACHINE_FEATURES', 'early-ramdisk-init', 'true', 'false', d)}); then
         install -d ${D}/boot/early-ramdisk
     fi
