@@ -72,7 +72,7 @@ case $1/$2 in
     done
 
     # Add delay to allow usb instance tear down for msm usb controllers
-    sleep 2
+    sleep 5
     ;;
   post/*)
     echo "Exiting from $2..."
