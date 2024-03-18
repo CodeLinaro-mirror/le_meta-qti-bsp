@@ -104,6 +104,7 @@ VOLATILE_BINDS_sa525m = "\
 /systemrw/apdr.conf /etc/apdr.conf\n\
 /systemrw/commonapi4someip.ini /etc/commonapi4someip.ini\n\
 /systemrw/vsomeip-location.json /etc/vsomeip-location.json\n\
+/systemrw/sensors.conf /etc/sensors.conf\n\
 "
 
 VOLATILE_BINDS_sa525m-televm = "\
