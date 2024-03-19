@@ -59,7 +59,9 @@ python __anonymous(){
                           "SRCREV_wlan",
                           "SRCREV_devicetree",
                           "SRCREV_audio-kernel-ar",
-                          "SRCREV_audio-kernel"]
+                          "SRCREV_audio-kernel",
+                          "SRCREV_dspkernel",
+                          "SRCREV_platformkernel"]
 
     if need_change:
         d.prependVar("FILESPATH", "${SRC_DIR_ROOT}/:")
