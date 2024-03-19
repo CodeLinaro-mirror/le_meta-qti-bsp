@@ -2,7 +2,8 @@ SUMMARY = "QTI ARK Kernel Boot image"
 DESCRIPTION = "Build QTI ARK kernel boot image"
 LICENSE = "BSD-3-Clause-Clear"
 
-DEPENDS += "mkbootimg-native mkdtimg-native openssl-native oot-dtbo python3-native virtual/kernel"
+DEPENDS += "mkbootimg-native mkdtimg-native openssl-native python3-native virtual/kernel"
+DEPENDS += "${@bb.utils.contains('TARGET_USES_AUDIO_FRAMEWORK', 'audiolite', 'audiolite-devicetree', 'oot-dtbo', d)}"
 
 IMAGE_CLASSES:remove = "qimage"
 IMAGE_FEATURES:remove = "ssh-server-openssh"
@@ -16,7 +17,7 @@ KERNEL_VERSION = "${@oe.utils.read_file('${STAGING_KERNEL_BUILDDIR}/kernel-abive
 do_make_dtb() {
      cat ${DEPLOY_DIR_IMAGE}/dtbs/*.dtb* > ${DEPLOY_DIR_IMAGE}/dtbs/dtb.img
 }
-do_make_dtb[depends] += "oot-dtbo:do_deploy"
+do_make_dtb[depends] += "${@bb.utils.contains('TARGET_USES_AUDIO_FRAMEWORK', 'audiolite', 'audiolite-devicetree:do_deploy', 'oot-dtbo:do_deploy', d)}"
 
 addtask do_make_dtb after do_image before do_makeboot
 
