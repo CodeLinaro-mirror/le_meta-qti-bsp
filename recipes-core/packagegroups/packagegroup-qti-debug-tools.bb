@@ -8,6 +8,13 @@ PACKAGES =  "\
 
 VALG ?= 'True'
 VALG:qti-distro-tele = 'False'
+
+PERF ?= 'True'
+PERF:qti-distro-tele = 'False'
+
+ATRACE ?= 'True'
+ATRACE:qti-distro-tele = 'False'
+
 # Add debug support packages to RDEPENDS list for a debug build.
 # Remote debugging can be carried out(through adb port forwarding)
 # on target gdb takes up considerable storage.
@@ -18,6 +25,6 @@ RDEPENDS:packagegroup-qti-debug-tools = " \
             ${@oe.utils.conditional('VALG', 'True', 'valgrind', '', d)} \
             systemd-analyze \
             procrank \
-	      perf \
-            atrace \
+            ${@oe.utils.conditional('PERF', 'True', 'perf', '', d)} \
+            ${@oe.utils.conditional('ATRACE', 'True', 'atrace', '', d)} \
         "
