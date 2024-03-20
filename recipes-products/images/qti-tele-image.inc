@@ -11,6 +11,7 @@ python () {
     if d.getVar('PREFERRED_VERSION_linux-msm') == "5.15":
         bb.build.addtask('do_merge_dtbs', 'do_makeboot', bb.utils.contains('IMAGE_FSTYPES', 'ubi', 'do_makesystem_ubi', 'do_makesystem', d), d)
         bb.build.addtask('do_copy_abl', 'do_image_complete', 'do_makeboot', d)
+        bb.build.addtask('do_gen_kpi', 'do_image_complete', 'do_makeboot', d)
 }
 
 do_merge_dtbs() {
@@ -31,6 +32,13 @@ do_copy_abl() {
         install -m 0644 ${KERNEL_PREBUILT_PATH}/abl_userdebug.elf ${DEPLOY_DIR_IMAGE}/${PN}/abl_userdebug.elf
     fi
 }
+
+# enable boot kpi generation
+do_gen_kpi(){
+   python3 ${WORKSPACE}/telematics/platform/ship/nand-kpi/meta-size.py -p ${TOPDIR}/buildhistory/images/${MACHINE}/glibc/${PN}/installed-package-sizes.txt -b ${TOPDIR}/conf/bblayers.conf
+   cp -R  ${TOPDIR}/Installed_Packages.html ${DEPLOY_DIR_IMAGE}/${PN}/
+}
+
 
 TOOLCHAIN_TARGET_TASK += "sensor-hal-daemon-hdr telux"
 
