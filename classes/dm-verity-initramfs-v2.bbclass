@@ -108,8 +108,8 @@ EOF
     # Sign the root hash
     echo -n "${root_hash}" > ${WORKDIR}/roothash.txt
     openssl smime -sign -nocerts -noattr -binary -in ${WORKDIR}/roothash.txt \
-            -inkey ${STAGING_DIR_TARGET}/kernel-certs/verity_key.pem -signer \
-            ${STAGING_DIR_TARGET}/kernel-certs/verity_cert.pem -outform der -out ${WORKDIR}/vramdisk_cpio_append/verity/vdlkm.sig
+            -inkey ${STAGING_KERNEL_BUILDDIR}/kernel-certs/verity_key.pem -signer \
+            ${STAGING_KERNEL_BUILDDIR}/kernel-certs/verity_cert.pem -outform der -out ${WORKDIR}/vramdisk_cpio_append/verity/vdlkm.sig
     echo "completed signing root_hash for vdlkm"
 
     #Compute for system
@@ -130,8 +130,8 @@ EOF
     # Sign the root hash
     echo -n "${root_hash}" > ${WORKDIR}/roothash.txt
     openssl smime -sign -nocerts -noattr -binary -in ${WORKDIR}/roothash.txt \
-            -inkey ${STAGING_DIR_TARGET}/kernel-certs/verity_key.pem -signer \
-            ${STAGING_DIR_TARGET}/kernel-certs/verity_cert.pem -outform der -out ${WORKDIR}/vramdisk_cpio_append/verity/root.sig
+            -inkey ${STAGING_KERNEL_BUILDDIR}/kernel-certs/verity_key.pem -signer \
+            ${STAGING_KERNEL_BUILDDIR}/kernel-certs/verity_cert.pem -outform der -out ${WORKDIR}/vramdisk_cpio_append/verity/root.sig
     echo "completed signing root_hash for system"
 
     # Pack all files from vramdisk_cpio:append folder into vendor-ramdisk cpio.
