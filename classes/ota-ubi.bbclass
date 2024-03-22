@@ -132,6 +132,13 @@ do_recovery_ubi() {
                     squashfs2sparse  ${DEPLOY_DIR_IMAGE}/vm-bootsys.squash ${OTA_TARGET_IMAGE_ROOTFS_UBI}/IMAGES/vm-bootsys.img
                 fi
             fi
+
+            if ${@bb.utils.contains('IMAGE_FEATURES', 'lxcrootfs-volume', 'true', 'false', d)}; then
+                echo /lxcrootfs squashfs /dev/block/bootdevice/by-name/lxcrootfs >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RECOVERY/recovery.fstab
+                if [ -f ${DEPLOY_DIR_IMAGE}/lxcrootfs.squash ]; then
+                    squashfs2sparse  ${DEPLOY_DIR_IMAGE}/lxcrootfs.squash ${OTA_TARGET_IMAGE_ROOTFS_UBI}/IMAGES/lxcrootfs.img
+                fi
+            fi
         fi
     else
         # File-based OTA upgrade
