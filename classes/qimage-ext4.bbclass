@@ -104,6 +104,7 @@ create_symlink_systemd_ext4_mount_rootfs() {
    rm -rf ${IMAGE_ROOTFS_EXT4}/lib/systemd/system-generators/systemd-rc-local-generator
    rm -rf ${IMAGE_ROOTFS_EXT4}/lib/systemd/system-generators/systemd-system-update-generator
    rm -rf ${IMAGE_ROOTFS_EXT4}/lib/systemd/system-generators/systemd-sysv-generator
+   rm -rf ${IMAGE_ROOTFS_EXT4}/usr/lib/python3.10
 }
 
 create_rootfs_ext4[cleandirs] = "${IMAGE_ROOTFS_EXT4}"
