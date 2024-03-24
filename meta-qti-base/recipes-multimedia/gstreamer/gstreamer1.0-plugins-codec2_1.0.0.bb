@@ -19,6 +19,12 @@ DEPENDS += "\
     virtual/kernel-headers \
 "
 
+# Enable AGL C2 service only on Makena, TODO: remove this when it's ready on Lemans
+DEPENDS:append:quin-gvm-gen4-2 = " codec2-service"
+EXTRA_OEMESON:append:quin-gvm-gen4-2 = " \
+    -Dagl-c2service=true \
+"
+
 DEPENDS:append:lemans = " displaydlkm"
 DEPENDS:append:quin-gvm-lemans = " displaydlkm"
 DEPENDS:append:monaco = " displaydlkm"
