@@ -6,14 +6,20 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5
 
 DEPENDS += "bison-native"
 
-SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/safelinux-system-cfg/devicetree/.git;protocol=${PROTO};usehead=1"
-SRC_URI += "${PATH_TO_REPO}/kernel/rh-kernel-5.14/.git;protocol=${PROTO};usehead=1"
+SRC_URI = "\
+           ${PATH_TO_REPO}/vendor/qcom/opensource/safelinux-system-cfg/devicetree/.git;protocol=${PROTO};usehead=1 \
+           ${PATH_TO_REPO}/kernel/rh-kernel-5.14/.git;protocol=${PROTO};usehead=1 \
+"
 SRCREV = "${AUTOREV}"
 KERNEL_DIR_SRC = "${SRC_DIR_ROOT}/kernel/rh-kernel-5.14"
 KERNEL_DIR_DESTINATION = "${WORKDIR}/vendor/qcom/opensource/safelinux-system-cfg/devicetree/centos-stream-9"
 KERNEL_WORKDIR = "${WORKDIR}/kernel/rh-kernel-5.14"
 
 S = "${WORKDIR}/vendor/qcom/opensource/safelinux-system-cfg/devicetree"
+
+inherit deploy
+
+do_unpack[depends] += "virtual/kernel:do_configure"
 
 do_compile:prepend() {
     # Copy only the required git metadata needed for "git log", so that we can build defconfigs
@@ -29,9 +35,17 @@ do_compile() {
     make
 }
 
-do_install() {
-    install -d ${D}/sysroot-only
-    install -m 0755 ${WORKDIR}/vendor/qcom/opensource/safelinux-system-cfg/devicetree/centos-stream-9/arch/arm64/boot/dts/qcom/sa8775p-ride.dtb.overlay ${D}/sysroot-only
-}
+OOT_DTBS ?= ""
 
-FILES:${PN} += "sysroot-only/*"
+do_deploy() {
+    if [ -n "${OOT_DTBS}" ]; then
+        install -d ${DEPLOYDIR}/dtbs
+
+        for dtb in ${OOT_DTBS}; do
+            if [ -f ${S}/$dtb ]; then
+                install -m 0644 ${S}/$dtb ${DEPLOYDIR}/dtbs/
+            fi
+        done
+    fi
+}
+addtask do_deploy after do_install

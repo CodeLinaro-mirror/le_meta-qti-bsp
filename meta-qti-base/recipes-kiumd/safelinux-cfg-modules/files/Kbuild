@@ -18,4 +18,3 @@ vfio_iommu_qcom-objs := drivers/vfio_iommu_qcom.o
 
 obj-m += kiumd.o
 kiumd-objs := drivers/kiumd.o
-

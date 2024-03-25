@@ -17,6 +17,9 @@ SRC_URI = "\
     file://vfio.conf \
     file://vfio_param.conf \
     file://vmm_pwr_key.conf \
+"
+
+SRC_URI:append:sa7255 = " \
     file://vfio-device-bind.sh \
 "
 
@@ -30,8 +33,8 @@ do_compile[noexec] = "1"
 
 do_install:append:sa8775() {
     install -m 0755 ${S}/modules-autoload-config/i2cdev.conf -D ${D}${libdir}/modules-load.d/i2cdev.conf
-    install -m 0755 ${WORKDIR}/vm_net.conf -D ${D}${libdir}/modules-load.d/vm_net.conf
     install -m 0755 ${WORKDIR}/vfio.conf -D ${D}${libdir}/modules-load.d/vfio.conf
+    install -m 0755 ${WORKDIR}/vm_net.conf -D ${D}${libdir}/modules-load.d/vm_net.conf
     install -m 0755 ${WORKDIR}/vmm_pwr_key.conf -D ${D}${libdir}/modules-load.d/vmm_pwr_key.conf
     install -m 0755 ${WORKDIR}/vfio_param.conf -D ${D}${sysconfdir}/modprobe.d/vfio.conf
 
@@ -45,7 +48,9 @@ do_install:append:sa8775() {
     install -m 0755 ${S}/vfio-device-probe/vfio-device-bind.sh -D ${D}${bindir}/vfio-device-bind.sh
 }
 
-do_install:append:monaco() {
+# fixme: unify do_install when all MM functions are ready on sa7255
+do_install:append:sa7255() {
+    install -m 0755 ${S}/modules-autoload-config/i2cdev.conf -D ${D}${libdir}/modules-load.d/i2cdev.conf
     install -m 0755 ${WORKDIR}/vfio.conf -D ${D}${libdir}/modules-load.d/vfio.conf
     install -m 0755 ${WORKDIR}/vfio_param.conf -D ${D}${sysconfdir}/modprobe.d/vfio.conf
 

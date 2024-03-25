@@ -9,7 +9,7 @@ IMAGE_INSTALL += "\
     ${@bb.utils.contains('COMBINED_FEATURES', 'qti-extra', 'packagegroup-qti-extra', '', d)} \
     ${@bb.utils.contains('COMBINED_FEATURES', 'qti-wlan', 'packagegroup-qti-wlan', '', d)} \
     ${@bb.utils.contains('COMBINED_FEATURES', 'qti-tools', 'packagegroup-qti-tools', '', d)} \
-    ${@bb.utils.contains_any('COMBINED_FEATURES', 'qti-audio qti-audio-ar', bb.utils.contains('MACHINE_FEATURES', 'qti-umd qti-gunyah', '', 'packagegroup-qti-audio', d), '', d)} \
+    ${@bb.utils.contains_any('COMBINED_FEATURES', 'qti-audio qti-audio-ar', 'packagegroup-qti-audio', '', d)} \
     ${@bb.utils.contains('COMBINED_FEATURES', 'qti-bluetooth', 'packagegroup-qti-bluetooth', '', d)} \
     ${@bb.utils.contains('COMBINED_FEATURES', 'qti-location', 'packagegroup-qti-location-hal', '', d)} \
     ${@bb.utils.contains('COMBINED_FEATURES', 'qti-camera', bb.utils.contains('MACHINE_FEATURES', 'qti-umd', '', 'packagegroup-qti-camera', d), '', d)} \

@@ -1,3 +1,6 @@
+# Copyright (c) 2024 Qualcomm Innovation Center, Inc. All rights reserved.
+# SPDX-License-Identifier: BSD-3-Clause-Clear
+
 # stock fstab - you probably want to override this with a machine specific one
 
 proc                 /proc           proc      defaults              0  0
@@ -13,15 +16,8 @@ tmpfs                /media/ram      tmpfs     defaults,noauto       0  0
 # mounting /tmp as a tmpfs is some usual implementation.
 tmpfs                /tmp            tmpfs     defaults              0  0
 
-/dev/vdc             /var            auto      defaults,nofail       0  2
-/dev/vdb             /data           auto      defaults,nofail       0  2
-/dev/vdg             /dsp            auto      defaults,nofail       0  2
-/dev/vde             /firmware       auto      defaults,nofail       0  2
-/dev/vdd             /bluetooth      auto      defaults,ro           0  0
-
 # Bind /home to /data
 /data                /home                auto       defaults,bind         0  0
-/var                 /persist             auto       defaults,bind         0  0
 
 # uncomment this if your device has a SD/MMC/Transflash slot
 /dev/mmcblk0p1       /media/card          auto       defaults,sync,noauto  0  0
