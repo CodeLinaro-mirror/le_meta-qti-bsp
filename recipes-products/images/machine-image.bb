@@ -16,7 +16,6 @@ require include/mdm-ota-target-image-ext4.inc
 MULTILIBRE_ALLOW_REP =. "/usr/include/python2.7/*|${base_bindir}|${base_sbindir}|${bindir}|${sbindir}|${libexecdir}|${sysconfdir}|${nonarch_base_libdir}/udev|/lib/modules/[^/]*/modules.*|"
 
 do_fsconfig() {
- chmod go-r ${IMAGE_ROOTFS}/etc/passwd || :
  chmod -R o-rwx ${IMAGE_ROOTFS}/etc/init.d/ || :
  if [ "${DISTRO_NAME}" == "msm-user" ]; then
   if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
