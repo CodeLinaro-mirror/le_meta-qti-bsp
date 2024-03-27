@@ -4,9 +4,13 @@ HOMEPAGE = "https://git.codelinaro.org/"
 LICENSE = "GPL-2.0 WITH Linux-syscall-note"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/GPL-2.0-only;md5=801f80980d171dd6425610833a22dbe6"
 
-SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/dsp-kernel/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/dsp-kernel;usehead=1 \
-${PATH_TO_REPO}/vendor/qcom/opensource/platform-kernel/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/platform-kernel;;usehead=1"
-SRCREV = "${AUTOREV}"
+SRC_URI = "\
+    ${PATH_TO_REPO}/vendor/qcom/opensource/dsp-kernel/.git;protocol=${PROTO};name=dspkernel;destsuffix=vendor/qcom/opensource/dsp-kernel;usehead=1 \
+    ${PATH_TO_REPO}/vendor/qcom/opensource/platform-kernel/.git;protocol=${PROTO};name=platformkernel;destsuffix=vendor/qcom/opensource/platform-kernel;;usehead=1 \
+"
+SRCREV_dspkernel = "${AUTOREV}"
+SRCREV_platformkernel = "${AUTOREV}"
+SRCREV_FORMAT = "dspkernel_platformkernel"
 
 S = "${WORKDIR}/vendor/qcom/opensource/platform-kernel"
 
