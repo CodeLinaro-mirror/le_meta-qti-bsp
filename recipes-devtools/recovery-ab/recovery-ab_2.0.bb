@@ -18,6 +18,7 @@ FILESEXTRAPATHS:prepend := "${WORKSPACE}:"
 SRC_URI = "file://OTA/recovery/"
 SRC_URI += "file://fstab_AB"
 SRC_URI += "file://fstab_AB_cache_ext4"
+SRC_URI += "file://fstab_AB_nad"
 SRC_URI += "file://update_engine.service"
 
 S = "${WORKDIR}/OTA/recovery"
@@ -56,6 +57,10 @@ do_install:append() {
             elif ${@bb.utils.contains_any('MACHINE_MNT_POINTS', '/cache', 'true', 'false', d)}; then
                 install -m 0755 ${WORKDIR}/fstab_AB_cache_ext4 -D ${D}/res/recovery_volume_config
             fi
+        fi
+
+        if ${@bb.utils.contains('COMBINED_FEATURES', 'qti-nad-core', 'true', 'false', d)}; then
+            install -m 0755 ${WORKDIR}/fstab_AB_nad -D ${D}/res/recovery_volume_config
         fi
 
         install -d ${D}${systemd_unitdir}/system/
