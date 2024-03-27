@@ -1,0 +1,54 @@
+SUMMARY = "Audiolite device tree overlay"
+DESCRIPTION = "Audiolite device tree overlay"
+HOMEPAGE = "https://git.codelinaro.org"
+LICENSE = "GPL-2.0-only"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=801f80980d171dd6425610833a22dbe6"
+
+DEPENDS += "bison-native"
+
+SRC_URI = "\
+           ${PATH_TO_REPO}/vendor/qcom/opensource/audiolite/devicetree/.git;protocol=${PROTO};usehead=1 \
+           ${PATH_TO_REPO}/kernel/rh-kernel-5.14/.git;protocol=${PROTO};usehead=1 \
+           ${PATH_TO_REPO}/vendor/qcom/opensource/safelinux-system-cfg/devicetree/.git;protocol=${PROTO};usehead=1 \
+"
+SRCREV = "${AUTOREV}"
+KERNEL_DIR_SRC = "${SRC_DIR_ROOT}/kernel/rh-kernel-5.14"
+KERNEL_DIR_DESTINATION = "${WORKDIR}/vendor/qcom/opensource/audiolite/devicetree/centos-stream-9"
+KERNEL_WORKDIR = "${WORKDIR}/kernel/rh-kernel-5.14"
+SAFELINUX_WORKDIR = "${WORKDIR}/vendor/qcom/opensource/safelinux-system-cfg/devicetree"
+SAFELINUX_DIR_DESTINATION = "${WORKDIR}/vendor/qcom/opensource/audiolite/devicetree/safelinux-system-cfg"
+
+S = "${WORKDIR}/vendor/qcom/opensource/audiolite/devicetree"
+
+inherit deploy
+
+do_compile:prepend() {
+    # Copy only the required git metadata needed for "git log", so that we can build defconfigs
+    GIT_METADATA_PATH_REFS=`realpath ${KERNEL_DIR_SRC}/.git/refs`
+    GIT_METADATA_PATH_OBJECTS=`realpath ${KERNEL_DIR_SRC}/.git/objects`
+    rm -rf ${KERNEL_DIR_DESTINATION}
+    cp -rf ${KERNEL_WORKDIR} ${KERNEL_DIR_DESTINATION}
+    rm -rf ${KERNEL_DIR_DESTINATION}/.git/objects ${KERNEL_DIR_DESTINATION}/.git/refs
+    cp -rf ${GIT_METADATA_PATH_OBJECTS} ${GIT_METADATA_PATH_REFS} ${KERNEL_DIR_DESTINATION}/.git
+    rm -rf ${SAFELINUX_DIR_DESTINATION}
+    cp -rf ${SAFELINUX_WORKDIR} ${SAFELINUX_DIR_DESTINATION}
+}
+
+do_compile() {
+    make
+}
+
+OOT_DTBS ?= ""
+
+do_deploy() {
+    if [ -n "${OOT_DTBS}" ]; then
+        install -d ${DEPLOYDIR}/dtbs
+
+        for dtb in ${OOT_DTBS}; do
+            if [ -f ${S}/$dtb ]; then
+                install -m 0644 ${S}/$dtb ${DEPLOYDIR}/dtbs/
+            fi
+        done
+    fi
+}
+addtask do_deploy after do_install
