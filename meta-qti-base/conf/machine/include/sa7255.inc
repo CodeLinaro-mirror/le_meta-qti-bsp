@@ -70,6 +70,10 @@ MACHINE_FEATURES += "\
     qti-safety \
 "
 
+MACHINE_FEATURES:append = "\
+    ${@bb.utils.contains('FACTORY_TEST', '1', 'qti-bluetooth', '', d)} \
+"
+
 MACHINE_FEATURES:remove = "\
     ${@bb.utils.contains('FACTORY_TEST', '1', 'qti-vmm', '', d)} \
 "

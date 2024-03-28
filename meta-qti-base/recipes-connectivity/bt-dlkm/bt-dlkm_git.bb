@@ -5,7 +5,7 @@ HOMEPAGE = "https://git.codelinaro.org/"
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://${QTI_LICENSE_DIR}/${LICENSE};md5=801f80980d171dd6425610833a22dbe6"
 
-DEPENDS = "bt-devicetree"
+DEPENDS = "${@bb.utils.contains('PREFERRED_PROVIDER_virtual/kernel', 'linux-msm', 'bt-devicetree', '', d)}"
 
 SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/bt-kernel/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/bt-kernel;usehead=1"
 SRCREV = "${AUTOREV}"
