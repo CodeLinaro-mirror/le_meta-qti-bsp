@@ -16,7 +16,10 @@ DEPENDS:append:aarch64 = " libgcc"
 KERNEL_CC:append:aarch64 = " ${TOOLCHAIN_OPTIONS}"
 KERNEL_LD:append:aarch64 = " ${TOOLCHAIN_OPTIONS}"
 
-SRC_URI = "${PATH_TO_REPO}/kernel/rh-kernel-5.14/.git;protocol=${PROTO};name=kernel;destsuffix=kernel/rh-kernel-5.14;usehead=1"
+SRC_URI = "\
+    ${PATH_TO_REPO}/kernel/rh-kernel-5.14/.git;protocol=${PROTO};name=kernel;destsuffix=kernel/rh-kernel-5.14;usehead=1 \
+    file://dm.cfg \
+"
 
 SRCREV_kernel = "${AUTOREV}"
 
