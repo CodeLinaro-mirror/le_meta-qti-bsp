@@ -8,7 +8,7 @@ RH_SRC = "${SRC_DIR_ROOT}/kernel/rh-kernel-5.14"
 PATCH_DIR = "${SRC_DIR_ROOT}/meta-qti-bsp/meta-qti-base/recipes-kernel/linux-ark/files/"
 
 DEPENDS += "\
-    dtc-native elfutils-native flex-native kern-tools-native \
+    dtc-native elfutils-native kern-tools-native \
     mkbootimg-native openssl-native pahole-native rsync-native \
 "
 DEPENDS:append:aarch64 = " libgcc"
@@ -65,6 +65,9 @@ python do_uncompressed_kernel_patch () {
 }
 
 addtask do_uncompressed_kernel_patch after do_install before do_deploy
+
+do_rh_config[depends] += "flex-native:do_populate_sysroot"
+do_rh_config[depends] += "bison-native:do_populate_sysroot"
 
 do_rh_config () {
     make -C ${RH_SRC}/redhat ARCH=arm64 dist-configs
