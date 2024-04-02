@@ -32,8 +32,17 @@ modprobe apr_dlkm
 modprobe q6_dlkm
 modprobe adsp_loader_dlkm
 modprobe stub_dlkm
-/bin/mount -o ro /dev/sde4 /firmware
-/bin/mount -o ro /dev/mmcblk0p30 /firmware
+a_p='_a'
+ab_partition=$(/sbin/abctl --boot_slot)
+if [[ $ab_partition == $a_p ]]
+then
+  modema=$(/usr/sbin/findfs PARTLABEL="modem_a")
+  /bin/mount -o ro $modema /firmware
+else
+  modemb=$(/usr/sbin/findfs PARTLABEL="modem_b")
+  /bin/mount -o ro $modemb /firmware
+fi
+
 /bin/echo 0 > /sys/module/subsystem_restart/parameters/enable_debug;
 /bin/echo 2 > /sys/kernel/boot_adsp/boot;
 modprobe platform_dlkm
