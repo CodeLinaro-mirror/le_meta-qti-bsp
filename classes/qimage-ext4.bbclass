@@ -167,7 +167,7 @@ do_makesystem() {
     cp ${MACHINE_FSCONFIG_CONF_FULL_PATH} ${WORKDIR}/rootfs-fsconfig.conf
     invalid_image=0
 
-    if ${@bb.utils.contains('MACHINE_FEATURES', 'dm-verity-none', 'false', 'true', d)} ; then 
+    if ${@bb.utils.contains_any('MACHINE_FEATURES', 'dm-verity-none qti-vm-guest', 'false', 'true', d)} ; then
     # Generate unsparsed image, append hash and fec data to the image and then sparse the image
         for count in {99..1}
         do
@@ -213,13 +213,13 @@ do_makesystem() {
         done
 
     else
-    # Directly generate sparsed image
-            sparseImgPath="${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMIMAGE_TARGET}"
-            make_ext4fs -s -C ${WORKDIR}/rootfs-fsconfig.conf \
+    # Directly generate image
+            ImgPath="${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMIMAGE_TARGET}"
+            make_ext4fs ${SPARSE_SYSTEMIMAGE_FLAG} -C ${WORKDIR}/rootfs-fsconfig.conf \
                         -B ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMIMAGE_MAP_TARGET} \
                         -a / -b 4096 -l ${SYSTEM_IMAGE_ROOTFS_SIZE} \
                         ${IMAGE_EXT4_SELINUX_OPTIONS} \
-                        ${sparseImgPath} ${IMAGE_ROOTFS_EXT4} /dev/null || invalid_image=1
+                        ${ImgPath} ${IMAGE_ROOTFS_EXT4} /dev/null || invalid_image=1
     fi
 
         echo "image is good to use..."
