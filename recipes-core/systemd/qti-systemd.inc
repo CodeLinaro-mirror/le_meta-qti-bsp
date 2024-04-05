@@ -125,6 +125,8 @@ do_install:append () {
        ${D}/lib/udev/rules.d/60-persistent-storage.rules
    sed -i 's/LABEL="persistent_storage_end"/ENV{ID_PART_ENTRY_SCHEME}=="gpt", ENV{ID_PART_ENTRY_NAME}=="?*", SYMLINK+="block\/bootdevice\/by-name\/$env{ID_PART_ENTRY_NAME}"'"\n\n"'LABEL="persistent_storage_end"/g' \
        ${D}/lib/udev/rules.d/60-persistent-storage.rules
+   sed -i 's/SUBSYSTEM!="block|ubi", GOTO="persistent_storage_end"/SUBSYSTEM!="block", GOTO="persistent_storage_end"/g' \
+       ${D}/lib/udev/rules.d/60-persistent-storage.rules
 }
 
 # Run fsck as part of local-fs-pre.target instead of local-fs.target
