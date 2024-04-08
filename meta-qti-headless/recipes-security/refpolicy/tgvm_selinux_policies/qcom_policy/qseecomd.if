@@ -89,7 +89,7 @@ interface(`qseecomd_relabel_persist',`
         type fs_t, qseecomd_persist_t;
     ')
 
-    allow $1 qseecomd_persist_t:dir { relabelto_dir_perms read open search };
+    allow $1 qseecomd_persist_t:dir { relabel_dir_perms read open search };
     allow qseecomd_persist_t fs_t:filesystem { associate };
 ')
 
@@ -149,4 +149,60 @@ interface(`qseecomd_rw_persist',`
 
     allow $1 qseecomd_persist_t:dir rw_dir_perms;
     rw_files_pattern($1, qseecomd_persist_t, qseecomd_persist_t)
+')
+
+########################################
+## <summary>
+##	Create directory or files under /persist/data.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`qseecomd_create_persist',`
+    gen_require(`
+        type qseecomd_persist_t;
+    ')
+
+    create_dirs_pattern($1, qseecomd_persist_t, qseecomd_persist_t)
+    create_files_pattern($1, qseecomd_persist_t, qseecomd_persist_t)
+')
+
+########################################
+## <summary>
+##	Delete directory or files under /persist/data.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`qseecomd_delete_persist',`
+    gen_require(`
+        type qseecomd_persist_t;
+    ')
+
+    delete_dirs_pattern($1, qseecomd_persist_t, qseecomd_persist_t)
+    delete_files_pattern($1, qseecomd_persist_t, qseecomd_persist_t)
+')
+
+########################################
+## <summary>
+##	Delete directory or files under /persist/data.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`qseecomd_manage_persist_dirs',`
+    gen_require(`
+        type qseecomd_persist_t;
+    ')
+
+    manage_dirs_pattern($1, qseecomd_persist_t, qseecomd_persist_t)
 ')

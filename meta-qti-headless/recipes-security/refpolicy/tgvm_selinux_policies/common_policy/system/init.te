@@ -40,3 +40,4 @@ leprop_manage_service(initrc_t)
 qseecomd_manage_data(initrc_t)
 
 qseecomd_rw_persist(initrc_t)
+qseecomd_manage_persist_dirs(initrc_t)
