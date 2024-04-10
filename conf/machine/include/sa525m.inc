@@ -69,6 +69,7 @@ MACHINE_MNT_POINTS = " \
     /systemrw \
     /persist \
     /data \
+    ${@bb.utils.contains('IMAGE_FSTYPES', 'ext4', '/cache', '', d)} \
     ${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', '/lxcrootfs', '', d)} \
 "
 
@@ -80,6 +81,9 @@ MACHINE_SUPPORTS_PDMAPPER = "False"
 MACHINE_SUPPORTS_INIT_RAMDISK = "False"
 TOYBOX_RAMDISK = "False"
 MACHINE_SUPPORTS_ANDROID_PROPERTIES = "False"
+
+# Disable autosuspend for USB peripheral mode
+MACHINE_SUPPORTS_USB_AUTOSUSPEND = "False"
 
 USBCOMPOSITION = "90DB"
 

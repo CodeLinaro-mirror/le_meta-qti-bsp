@@ -33,8 +33,9 @@ RDEPENDS_packagegroup-support-utils = "\
     libxml2 \
     "
 
-# Sa525m overwrite the packagegroup to only include chrony
+# Sa525m overwrite the packagegroup to only include chrony and procrank
 RDEPENDS_packagegroup-support-utils_sa525m = "\
     chrony \
     chronyc \
+    procrank\
     "

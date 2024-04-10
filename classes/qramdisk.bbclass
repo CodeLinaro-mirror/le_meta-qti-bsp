@@ -193,10 +193,20 @@ fakeroot do_ramdisk_create() {
                 chmod 744 csmrd-init
                 ln -s csmrd-init init
             elif ${@bb.utils.contains('MACHINE_FEATURES', 'dm-verity-initramfs-v4', 'true', 'false', d)}; then
-                install -m 744 ${COREBASE}/meta-qti-bsp/recipes-products/images/include/ramdisk-init.sh init
+                if ${@bb.utils.contains('MACHINE_FEATURES', 'emmc-boot', 'true', 'false', d)}; then
+                    install -m 744 ${COREBASE}/meta-qti-bsp/recipes-products/images/include/ramdisk-init-emmc.sh init
+                else
+                    install -m 744 ${COREBASE}/meta-qti-bsp/recipes-products/images/include/ramdisk-init.sh init
+                    # As NAD is disabled for EMMC build, so skipping NAD bin & lib copy
+                    # TODO: Once NAD is enabled for EMMC build, check should be removed
+                    cp ${IMAGE_ROOTFS}/usr/bin/nad-abctl usr/bin/nad-abctl
+                    cp ${IMAGE_ROOTFS}/usr/lib/libnad_ab_al.so.1 lib/libnad_ab_al.so.1
+                fi
+
+                # Creating actual rootfs dir mountpoint for initramfs
+                mkdir -p ${RAMDISKDIR}/rootfs
+
                 cp ${IMAGE_ROOTFS}/usr/sbin/ubi* usr/sbin/
-                cp ${IMAGE_ROOTFS}/usr/bin/nad-abctl usr/bin/nad-abctl
-                cp ${IMAGE_ROOTFS}/usr/lib/libnad_ab_al.so.1 lib/libnad_ab_al.so.1
                 cp ${IMAGE_ROOTFS}/usr/lib/libgthread-2.0.so.0 lib/libgthread-2.0.so.0
                 cp ${IMAGE_ROOTFS}/usr/lib/libglib-2.0.so.0 lib/libglib-2.0.so.0
                 ln -s busybox bin/dd
