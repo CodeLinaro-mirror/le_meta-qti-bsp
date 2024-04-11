@@ -102,7 +102,12 @@ do_prebuilt_configure() {
     install -m 0644 ../${KERNEL_TYPE}/signing_key.pem ${B}/certs/signing_key.pem
     install -m 0644 ../${KERNEL_TYPE}/verity_cert.pem ${B}/certs/verity_cert.pem
     install -m 0644 ../${KERNEL_TYPE}/verity_key.pem ${B}/certs/verity_key.pem
-
+    if [ -f module.lds ]; then
+    install -m 0644 module.lds ${B}/scripts/module.lds
+    fi
+    if [ -f utsrelease.h ]; then
+    install -m 0644 utsrelease.h ${B}/include/generated
+    fi
     # update paths of signature checking certificates to reflect current host
     sed -i -e '/CONFIG_MODULE_SIG_KEY[ =]/d' ${B}/.config
     echo "CONFIG_MODULE_SIG_KEY="\"${STAGING_DIR_TARGET}/kernel-certs/signing_key.pem\" >> ${B}/.config
