@@ -9,4 +9,5 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-splitxr \
         packagegroup-qti-splitxr-common \
         packagegroup-qti-xrcomm \
+        packagegroup-qti-dcf-prop \
 "
