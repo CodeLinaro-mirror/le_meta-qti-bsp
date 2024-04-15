@@ -25,7 +25,7 @@ do_install:append() {
        rm -f ${D}${sysconfdir}/systemd/coredump.conf
    fi
 
-   if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-vm', 'true', 'false', d)}; then
+   if ${@bb.utils.contains_any('MACHINE_FEATURES', 'qti-vm qti-vm-guest', 'true', 'false', d)}; then
       sed -i -e 's/.*RuntimeMaxUse.*/RuntimeMaxUse=5M/' ${D}${systemd_unitdir}/journald.conf.d/00-${PN}.conf
    fi
 }
@@ -34,12 +34,14 @@ FILES:${PN} += "${sysconfdir}/sysctl.d/* ${sysconfdir}/security/limits.d/* ${SYS
 
 # journald.conf
 do_install:append() {
-   if [ "${no_logs_to_console}" != "1" ]; then
-       # Redirect journal logs to console.
-       sed -i '$aForwardToConsole=yes' ${D}${systemd_unitdir}/journald.conf.d/00-${PN}.conf
-       sed -i '$aTTYPath=/dev/ttyMSM0' ${D}${systemd_unitdir}/journald.conf.d/00-${PN}.conf
-       sed -i '$aMaxLevelConsole=warning' ${D}${systemd_unitdir}/journald.conf.d/00-${PN}.conf
-       sed -i '$aReadKMsg=yes' ${D}${systemd_unitdir}/journald.conf.d/00-${PN}.conf
+   if ${@bb.utils.contains_any('MACHINE_FEATURES', 'qti-vm qti-vm-guest', 'false', 'true', d)}; then
+      if [ "${no_logs_to_console}" != "1" ]; then
+         # Redirect journal logs to console.
+         sed -i '$aForwardToConsole=yes' ${D}${systemd_unitdir}/journald.conf.d/00-${PN}.conf
+         sed -i '$aTTYPath=/dev/ttyMSM0' ${D}${systemd_unitdir}/journald.conf.d/00-${PN}.conf
+         sed -i '$aMaxLevelConsole=warning' ${D}${systemd_unitdir}/journald.conf.d/00-${PN}.conf
+         sed -i '$aReadKMsg=yes' ${D}${systemd_unitdir}/journald.conf.d/00-${PN}.conf
+     fi
    fi
 }
 
@@ -52,10 +54,10 @@ do_install:append() {
 # system.conf
 do_install:append() {
    if [ "${no_logs_to_console}" != "1" ]; then
-       # Redirect system logs to both console and syslog.
-       sed -i '$aStandardOutput=syslog+console' ${D}${systemd_unitdir}/system.conf.d/00-${PN}.conf
-       sed -i '$aTTYPath=/dev/ttyMSM0' ${D}${systemd_unitdir}/system.conf.d/00-${PN}.conf
-       sed -i '$aLogTarget=console' ${D}${systemd_unitdir}/system.conf.d/00-${PN}.conf
+         # Redirect system logs to both console and syslog.
+         sed -i '$aStandardOutput=syslog+console' ${D}${systemd_unitdir}/system.conf.d/00-${PN}.conf
+         sed -i '$aTTYPath=/dev/ttyMSM0' ${D}${systemd_unitdir}/system.conf.d/00-${PN}.conf
+         sed -i '$aLogTarget=console' ${D}${systemd_unitdir}/system.conf.d/00-${PN}.conf
    else
        # Set LogTarget as syslog
        sed -i '$aLogTarget=syslog' ${D}${systemd_unitdir}/system.conf.d/00-${PN}.conf
