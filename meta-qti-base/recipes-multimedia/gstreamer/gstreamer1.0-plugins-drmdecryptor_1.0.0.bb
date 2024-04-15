@@ -12,6 +12,7 @@ DEPENDS += "\
     virtual/kernel-headers \
     media-plugin-headers \
     libstagefright-headers \
+    libutils \
 "
 
 SRC_URI = "${PATH_TO_REPO}/gstreamer/gst-plugins-qti-oss/.git;protocol=${PROTO};destsuffix=gstreamer/gst-plugins-qti-oss;usehead=1"
