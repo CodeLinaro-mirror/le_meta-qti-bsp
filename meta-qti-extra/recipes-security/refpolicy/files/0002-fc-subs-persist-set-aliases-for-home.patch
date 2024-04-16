@@ -1,0 +1,24 @@
+From 376f8ac6a948b2ba57e834a3d591be362db5114b Mon Sep 17 00:00:00 2001
+From: Kai Meng <quic_kmeng@quicinc.com>
+Date: Mon, 15 Apr 2024 15:33:26 +0800
+Subject: [PATCH] fc/subs/persist: set aliases for home
+
+Signed-off-by: Kai Meng <quic_kmeng@quicinc.com>
+---
+ config/file_contexts.subs_dist | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/config/file_contexts.subs_dist b/config/file_contexts.subs_dist
+index c720871..bfad429 100644
+--- a/config/file_contexts.subs_dist
++++ b/config/file_contexts.subs_dist
+@@ -48,3 +48,6 @@
+ /usr/lib/busybox/sbin /usr/sbin
+ /usr/lib/busybox/usr /usr
+ 
++# home aliases
++# in fstab, mount bind /home to /data
++/home /data
+-- 
+2.25.1
+
