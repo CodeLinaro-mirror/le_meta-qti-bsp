@@ -38,3 +38,5 @@ leprop_manage_service(initrc_t)
 # shell need to access /data/tzstorage, such as execute find to /data
 # shell can't see anything under /data/tzstorage if no this rules.
 qseecomd_manage_data(initrc_t)
+
+qseecomd_rw_persist(initrc_t)

@@ -6,34 +6,46 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5
 
 DEPENDS += "bison-native"
 
-SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/safelinux-system-cfg/devicetree/.git;protocol=${PROTO};usehead=1"
-SRC_URI += "${PATH_TO_REPO}/kernel/rh-kernel-5.14/.git;protocol=${PROTO};usehead=1"
+SRC_URI = "\
+           ${PATH_TO_REPO}/vendor/qcom/opensource/safelinux-system-cfg/devicetree/.git;protocol=${PROTO};usehead=1 \
+           ${PATH_TO_REPO}/kernel/rh-kernel-5.14/.git;protocol=${PROTO};usehead=1 \
+"
 SRCREV = "${AUTOREV}"
+KERNEL_DIR_SRC = "${SRC_DIR_ROOT}/kernel/rh-kernel-5.14"
+KERNEL_DIR_DESTINATION = "${WORKDIR}/vendor/qcom/opensource/safelinux-system-cfg/devicetree/centos-stream-9"
+KERNEL_WORKDIR = "${WORKDIR}/kernel/rh-kernel-5.14"
 
 S = "${WORKDIR}/vendor/qcom/opensource/safelinux-system-cfg/devicetree"
 
-do_prepare_kernel_source() {
-    for altfile in config hooks logs objects packed-refs refs rr-cache svn ; do
-        rm -rf ${WORKDIR}/kernel/rh-kernel-5.14/.git/${altfile}
-    done
-    for altfile in config logs refs ; do
-        cp -rf ${SRC_DIR_ROOT}/.repo/projects/kernel/rh-kernel-5.14.git/${altfile} ${WORKDIR}/kernel/rh-kernel-5.14/.git
-    done
-    for altfile in hooks objects ; do
-        cp -rf ${SRC_DIR_ROOT}/.repo/project-objects/kernel/ark-5.14.git/${altfile} ${WORKDIR}/kernel/rh-kernel-5.14/.git
-    done
-    rm -rf ${WORKDIR}/vendor/qcom/opensource/safelinux-system-cfg/devicetree/centos-stream-9
-    mv ${WORKDIR}/kernel/rh-kernel-5.14 ${WORKDIR}/vendor/qcom/opensource/safelinux-system-cfg/devicetree/centos-stream-9
+inherit deploy
+
+do_unpack[depends] += "virtual/kernel:do_configure"
+
+do_compile:prepend() {
+    # Copy only the required git metadata needed for "git log", so that we can build defconfigs
+    GIT_METADATA_PATH_REFS=`realpath ${KERNEL_DIR_SRC}/.git/refs`
+    GIT_METADATA_PATH_OBJECTS=`realpath ${KERNEL_DIR_SRC}/.git/objects`
+    rm -rf ${KERNEL_DIR_DESTINATION}
+    cp -rf ${KERNEL_WORKDIR} ${KERNEL_DIR_DESTINATION}
+    rm -rf ${KERNEL_DIR_DESTINATION}/.git/objects ${KERNEL_DIR_DESTINATION}/.git/refs
+    cp -rf ${GIT_METADATA_PATH_OBJECTS} ${GIT_METADATA_PATH_REFS} ${KERNEL_DIR_DESTINATION}/.git
 }
-addtask prepare_kernel_source after do_patch before do_compile
 
 do_compile() {
     make
 }
 
-do_install() {
-    install -d ${D}/sysroot-only
-    install -m 0755 ${WORKDIR}/vendor/qcom/opensource/safelinux-system-cfg/devicetree/centos-stream-9/arch/arm64/boot/dts/qcom/sa8775p-ride.dtb.overlay ${D}/sysroot-only
-}
+OOT_DTBS ?= ""
 
-FILES:${PN} += "sysroot-only/*"
+do_deploy() {
+    if [ -n "${OOT_DTBS}" ]; then
+        install -d ${DEPLOYDIR}/dtbs
+
+        for dtb in ${OOT_DTBS}; do
+            if [ -f ${S}/$dtb ]; then
+                install -m 0644 ${S}/$dtb ${DEPLOYDIR}/dtbs/
+            fi
+        done
+    fi
+}
+addtask do_deploy after do_install

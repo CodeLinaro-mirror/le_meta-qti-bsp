@@ -9,14 +9,24 @@ SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/vendor/qcom/opensource/safelinux-dbg-modules"
 
-TECHPACK_MODULES = "minidump.ko kaslr_store.ko memory_dump_v2.ko"
+TECHPACK_MODULES = "minidump/minidump.ko \
+                    kaslr_store/kaslr_store.ko \
+                    memory_dump_v2/memory_dump_v2.ko \
+                    xbl_log/dump_boot_log.ko \
+"
 inherit qti-techpack
-
 EXTRA_OEMAKE += "KDIR=${STAGING_KERNEL_DIR}"
 
-RPROVIDES:${PN} += "kernel-module-minidump-${KERNEL_VERSION}"
-RPROVIDES:${PN} += "kernel-module-kaslr_store-${KERNEL_VERSION}"
-RPROVIDES:${PN} += "kernel-module-memory_dump_v2-${KERNEL_VERSION}"
+do_install:append() {
+    install -d ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/
+    install -d ${D}${libdir}/modules-load.d/
+    install -m 0755 ${WORKDIR}/vendor/qcom/opensource/safelinux-dbg-modules/extern_dbg_mod.conf -D ${D}${libdir}/modules-load.d/extern_dbg_mod.conf
+}
+
+RPROVIDES:${PN} += "${@'kernel-module-minidump-${KERNEL_VERSION}'.replace('_', '-')}"
+RPROVIDES:${PN} += "${@'kernel-module-kaslr_store-${KERNEL_VERSION}'.replace('_', '-')}"
+RPROVIDES:${PN} += "${@'kernel-module-memory_dump_v2-${KERNEL_VERSION}'.replace('_', '-')}"
+RPROVIDES:${PN} += "${@'kernel-module-dump_boot_log-${KERNEL_VERSION}'.replace('_', '-')}"
 
 FILES:${PN} += "${libdir}/modules-load.d/*"
-FILES:${PN} += "${nonarch_base_libdir}/modules/*"
+FILES:${PN} += "${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/*"

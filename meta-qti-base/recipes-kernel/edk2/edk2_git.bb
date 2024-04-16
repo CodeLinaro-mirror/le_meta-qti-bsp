@@ -29,6 +29,8 @@ LOAD_KM_SET_ROT ?= "0"
 LOAD_KM_SET_ROT:sa8775 = "1"
 SCMI_UPDATES_NEEDED ?= "0"
 SCMI_UPDATES_NEEDED:sa8775 = "1"
+PVM_SKIP_DTBO ?= "0"
+PVM_SKIP_DTBO:sa8775 = "${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', '0', '1', d)}"
 
 EXTRA_OEMAKE = "'CLANG_BIN=${STAGING_BINDIR_NATIVE}/' \
                 'CLANG_PREFIX=${STAGING_BINDIR_NATIVE}/${TARGET_SYS}/${TARGET_PREFIX}' \
@@ -48,12 +50,21 @@ EXTRA_OEMAKE = "'CLANG_BIN=${STAGING_BINDIR_NATIVE}/' \
                 'SUPPORT_DISABLE_NON_BOOTDEVICE=${DISABLE_NONBOOTDEVICE_ENABLED}' \
                 'TARGET_BOARD_TYPE_AUTO=1' \
                 'SCMI_UPDATES_NEEDED=${SCMI_UPDATES_NEEDED}' \
+                'PVM_SKIP_DTBO=${PVM_SKIP_DTBO}' \
+                ${@bb.utils.contains('DISTRO_FEATURES', 'qti-avb', 'VERIFIED_BOOT_ENABLED=1', '', d)} \
                 ${@bb.utils.contains('DISTRO_FEATURES', 'qti-avb', 'VERIFIED_BOOT_2=1', '', d)} "
 
 EXTRA_OEMAKE:append:sa8775 = " 'SUPPORT_AB_BOOT_LXC=1' \
                                'AB_RETRYCOUNT_DISABLE=1' \
-                               'ENABLE_LV_ATOMIC_AB=1' "
+                               'ENABLE_LV_ATOMIC_AB=1' \
+                               'ENABLE_SAIL_FLASHING=1' \
+                               'ENABLE_SAIL_BOOT=1' "
 
+EXTRA_OEMAKE:append:sa7255 = " 'SUPPORT_AB_BOOT_LXC=1' \
+                               'AB_RETRYCOUNT_DISABLE=1' \
+                               'ENABLE_LV_ATOMIC_AB=1' \
+                               'ENABLE_SAIL_FLASHING=1' \
+                               'ENABLE_SAIL_BOOT=1' "
 do_configure[noexec] = "1"
 do_compile () {
     export BUILD_CC=${STAGING_BINDIR_NATIVE}/clang

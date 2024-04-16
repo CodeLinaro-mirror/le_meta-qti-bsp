@@ -14,3 +14,5 @@ ALLOW_EMPTY:${PN} = "1"
 RDEPENDS:${PN} += "\
     ${@bb.utils.contains_any("PREFERRED_VERSION_linux-msm", "5.15 6.1", "cameradlkm", "", d)} \
     "
+
+RDEPENDS:${PN}:quin-gvm-lemans = ""

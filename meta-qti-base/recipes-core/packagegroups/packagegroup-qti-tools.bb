@@ -16,4 +16,5 @@ RDEPENDS:${PN} += "\
     libgpiod-tools \
     exfat-utils \
     ${@bb.utils.contains('DISTRO_FEATURES', 'asan', 'gcc-sanitizers', '', d)}  \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'lttng-modules lttng-tools lttng-ust', '', d)} \
     "

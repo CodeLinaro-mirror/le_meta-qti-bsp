@@ -74,8 +74,11 @@ allow qseecomd_t self:process { setcap };
 files_list_default(qseecomd_t)
 
 # /data/tzstorage
-files_manage_default_dirs(qseecomd_t)
-files_manage_default_files(qseecomd_t)
+qseecomd_manage_data(qseecomd_t)
+
+# /persist/data
+qseecomd_rw_persist(qseecomd_t)
+qseecomd_manage_persist(qseecomd_t)
 
 # connect to leprop-service socket
 connect_to_leprop_sockets(qseecomd_t)
