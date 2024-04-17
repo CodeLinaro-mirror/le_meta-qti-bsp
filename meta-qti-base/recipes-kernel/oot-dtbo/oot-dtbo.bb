@@ -37,13 +37,20 @@ do_compile() {
 
 OOT_DTBS ?= ""
 
+do_install:append() {
+    if [ -d ${S}/oot-dt-bindings/ ]; then
+        install -d ${D}${includedir}/safelinux-system-cfg/oot-dt-bindings
+        install -m 0644 ${S}/oot-dt-bindings/*.h ${D}${includedir}/safelinux-system-cfg/oot-dt-bindings/
+    fi
+}
+
 do_deploy() {
     if [ -n "${OOT_DTBS}" ]; then
-        install -d ${DEPLOYDIR}/dtbs
+        install -d ${DEPLOYDIR}/build-artifacts/dtb
 
         for dtb in ${OOT_DTBS}; do
             if [ -f ${S}/$dtb ]; then
-                install -m 0644 ${S}/$dtb ${DEPLOYDIR}/dtbs/
+                install -m 0644 ${S}/$dtb ${DEPLOYDIR}/build-artifacts/dtb/
             fi
         done
     fi
