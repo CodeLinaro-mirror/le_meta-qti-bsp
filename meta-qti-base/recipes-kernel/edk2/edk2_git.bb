@@ -29,8 +29,7 @@ LOAD_KM_SET_ROT ?= "0"
 LOAD_KM_SET_ROT:sa8775 = "1"
 SCMI_UPDATES_NEEDED ?= "0"
 SCMI_UPDATES_NEEDED:sa8775 = "1"
-PVM_SKIP_DTBO ?= "0"
-PVM_SKIP_DTBO:sa8775 = "${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', '0', '1', d)}"
+PVM_SKIP_DTBO = "${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', '0', '1', d)}"
 
 EXTRA_OEMAKE = "'CLANG_BIN=${STAGING_BINDIR_NATIVE}/' \
                 'CLANG_PREFIX=${STAGING_BINDIR_NATIVE}/${TARGET_SYS}/${TARGET_PREFIX}' \
