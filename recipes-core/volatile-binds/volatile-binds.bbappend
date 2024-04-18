@@ -106,6 +106,7 @@ VOLATILE_BINDS_sa525m = "\
 /systemrw/commonapi4someip.ini /etc/commonapi4someip.ini\n\
 /systemrw/vsomeip-location.json /etc/vsomeip-location.json\n\
 /systemrw/sensors.conf /etc/sensors.conf\n\
+/systemrw/qmi_fw.conf /vendor/etc/qmi_fw.conf\n\
 "
 
 VOLATILE_BINDS_sa525m-televm = "\
@@ -114,11 +115,13 @@ VOLATILE_BINDS_sa525m-televm = "\
 /systemrw/power_state.conf /etc/power_state.conf\n\
 /systemrw/tel.conf /etc/tel.conf\n\
 /systemrw/ObeConfig.conf /etc/ObeConfig.conf\n\
+/systemrw/qmi_fw.conf /vendor/etc/qmi_fw.conf\n\
 "
 
 VOLATILE_BINDS_sa525m-fotavm = "\
 /systemrw/power_state.conf /etc/power_state.conf\n\
 /systemrw/tel.conf /etc/tel.conf\n\
+/systemrw/qmi_fw.conf /vendor/etc/qmi_fw.conf\n\
 "
 
 VOLATILE_BINDS_sa515m = "\
