@@ -45,7 +45,9 @@ STATUS_OK=0
 STATUS_ERR=1
 
 DEV_NUM=-1
+UEVENT_PATH=""
 SYS_MMC_PATH="/sys/class/block"
+MAX_RETRY=150
 
 KPI_FILE_PATH="/sys/kernel/boot_kpi/kpi_values"
 
@@ -53,15 +55,16 @@ LOGD() {
   busybox echo "$1"
 }
 
-WaitMmcDevReady()
+WaitDevReady()
 {
     local maxTrials=300
 
     while [ ! "$1" "$2" ]; do
-        usleep 10000
+        usleep 100000
         maxTrials=$( echo $(( ${maxTrials} - 1 )) )
         if [ ${maxTrials} -eq 0 ]; then
-	   return ${STATUS_ERR}
+           LOGD "Error: WaitDevReady Timed Out $maxTrails"
+           return ${STATUS_ERR}
         fi
     done
     return ${STATUS_OK}
@@ -70,6 +73,7 @@ WaitMmcDevReady()
 EmmcGetPartitionID() {
    DEV_NUM=-1
    local PART_NAME=$1
+   local retry_count=0
 
    # We will only take "_a" and "_b" as correct active slot
    # Else all will be ignored and DEV_NUM will set as -1
@@ -81,18 +85,20 @@ EmmcGetPartitionID() {
       return
    fi
 
-   # Wait for uevent to ready
-   WaitMmcDevReady "-e" "$SYS_MMC_PATH/mmcblk0p1/uevent"
-   if [ $? -ne ${STATUS_OK} ]; then
-       LOGD "Error: wait for ${SYS_MMC_PATH} timeout"
-       return ${STATUS_ERR}
-   fi
    # Fetch active part uevent then parse dev num from PARTN
 
-   UEVENT_PATH=$(busybox grep -w $PART_NAME$act_slot $SYS_MMC_PATH/mmcblk0p*/uevent | busybox cut -d ":" -f 1)
-   if [ ! -z $UEVENT_PATH ]; then
-      DEV_NUM=$(busybox grep -w PARTN $UEVENT_PATH | busybox awk -F '=' '{print $2}')
-   fi
+   while [ -z $UEVENT_PATH ]
+   do
+      UEVENT_PATH=$(busybox grep -w $PART_NAME$act_slot ${SYS_MMC_PATH}/mmcblk0p*/uevent | busybox cut -d ":" -f 1)
+      busybox usleep 100000
+      retry_count=$(( retry_count + 1))
+      if [ $retry_count -ge $MAX_RETRY ]; then
+         LOGD "Error: EmmcGetPartitionID timed out $retry_count"
+         break
+      fi
+   done
+
+   DEV_NUM=$(busybox grep -w PARTN $UEVENT_PATH | busybox awk -F '=' '{print $2}')
 }
 
 EarlySetup() {
