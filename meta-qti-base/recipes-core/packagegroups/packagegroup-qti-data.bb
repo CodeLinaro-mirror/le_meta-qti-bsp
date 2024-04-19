@@ -29,3 +29,4 @@ RDEPENDS:${PN} += "\
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', 'proftpd', d)} \
     openssh \
 "
+RDEPENDS:${PN}:append:quin-gvm-lemans = " dataeth-dlkm"

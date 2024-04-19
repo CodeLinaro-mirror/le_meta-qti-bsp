@@ -8,7 +8,7 @@ RH_SRC = "${SRC_DIR_ROOT}/kernel/rh-kernel-5.14"
 PATCH_DIR = "${SRC_DIR_ROOT}/meta-qti-bsp/meta-qti-base/recipes-kernel/linux-ark/files/"
 
 DEPENDS += "\
-    dtc-native elfutils-native flex-native kern-tools-native \
+    dtc-native elfutils-native kern-tools-native \
     mkbootimg-native openssl-native pahole-native rsync-native \
 "
 DEPENDS:append:aarch64 = " libgcc"
@@ -66,6 +66,9 @@ python do_uncompressed_kernel_patch () {
 
 addtask do_uncompressed_kernel_patch after do_install before do_deploy
 
+do_rh_config[depends] += "flex-native:do_populate_sysroot"
+do_rh_config[depends] += "bison-native:do_populate_sysroot"
+
 do_rh_config () {
     make -C ${RH_SRC}/redhat ARCH=arm64 dist-configs
     cp ${RH_SRC}/redhat/configs/kernel-automotive-5.14.0-aarch64.config ${S}/arch/arm64/configs/defconfig
@@ -76,8 +79,6 @@ do_rh_config () {
     cp ${B}/defconfig ${S}/arch/arm64/configs/defconfig
 }
 addtask do_rh_config after do_unpack before do_kernel_metadata
-do_rh_config[depends] += "virtual/${TARGET_PREFIX}binutils:do_populate_sysroot"
-do_rh_config[depends] += "gcc-cross-${TARGET_ARCH}:do_populate_sysroot"
 
 KERNEL_PRIORITY = "9001"
 # Add V=1 to KERNEL_EXTRA_ARGS for verbose

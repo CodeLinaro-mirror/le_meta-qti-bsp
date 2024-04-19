@@ -49,6 +49,6 @@ PAGE_SIZE ?= '4096'
 IMAGE_ROOTFS_ALIGNMENT = "4096"
 EXTRA_IMAGECMD_ext4 += " -b 4096 "
 
-#IMAGE_CLASSES += "qimage"
+IMAGE_CLASSES += "qimage"
 
 EXTRA_IMAGEDEPENDS += "qti-image-ark-boot:do_makeboot"

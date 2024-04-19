@@ -31,4 +31,4 @@
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /etc/initscripts/sfs_config    --    gen_context(system_u:object_r:sfs_config_initscript_exec_t,s0)
-/etc/systemd/system/sfsconfig.service	--	gen_context(system_u:object_r:sfs_config_unit_t,s0)
+/usr/lib/systemd/system/sfsconfig.service	--	gen_context(system_u:object_r:sfs_config_unit_t,s0)
