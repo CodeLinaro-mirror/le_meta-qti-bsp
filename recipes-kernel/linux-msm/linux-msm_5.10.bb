@@ -163,6 +163,12 @@ do_prebuilt_shared_workdir() {
     if [ -e "${B}/scripts/module.lds" ]; then
         install -m 0644 ${B}/scripts/module.lds ${STAGING_KERNEL_BUILDDIR}/scripts/module.lds
     fi
+    mkdir -p $kerneldir/kernel-certs
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains('MACHINE_FEATURES', 'dm-verity-initramfs-v2', 'true', 'false', d), 'false', d)}; then
+        install -m 0755 ${B}/certs/verity_cert.pem ${STAGING_KERNEL_BUILDDIR}/kernel-certs/verity_cert.pem
+        install -m 0644 ${B}/certs/verity_key.pem ${STAGING_KERNEL_BUILDDIR}/kernel-certs/verity_key.pem
+    fi
+
     #Install build scripts
     mkdir -p $kerneldir/build
     install -m 0755 ${B}/build/build_module.sh $kerneldir/build
