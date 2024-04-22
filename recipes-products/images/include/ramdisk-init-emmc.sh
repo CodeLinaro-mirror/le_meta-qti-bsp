@@ -45,13 +45,26 @@ STATUS_OK=0
 STATUS_ERR=1
 
 DEV_NUM=-1
-
-SYS_MMC_PATH="/sys/class/block/"
+SYS_MMC_PATH="/sys/class/block"
 
 KPI_FILE_PATH="/sys/kernel/boot_kpi/kpi_values"
 
 LOGD() {
   busybox echo "$1"
+}
+
+WaitMmcDevReady()
+{
+    local maxTrials=300
+
+    while [ ! "$1" ]; do
+        usleep 10000
+        maxTrials=$( echo $(( ${maxTrials} - 1 )) )
+        if [ ${maxTrials} -eq 0 ]; then
+	   return ${STATUS_ERR}
+        fi
+    done
+    return ${STATUS_OK}
 }
 
 EmmcGetPartitionID() {
@@ -68,6 +81,12 @@ EmmcGetPartitionID() {
       return
    fi
 
+   # Wait for uevent to ready
+   WaitMmcDevReady "$SYS_MMC_PATH/mmcblk0p1/uevent"
+   if [ $? -ne ${STATUS_OK} ]; then
+       LOGD "Error: wait for ${SYS_MMC_PATH} timeout"
+       return ${STATUS_ERR}
+   fi
    # Fetch active part uevent then parse dev num from PARTN
 
    UEVENT_PATH=$(busybox grep -w $PART_NAME$act_slot $SYS_MMC_PATH/mmcblk0p*/uevent | busybox cut -d ":" -f 1)
