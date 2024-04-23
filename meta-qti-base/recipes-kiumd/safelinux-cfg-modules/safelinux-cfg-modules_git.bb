@@ -15,7 +15,7 @@ SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/vendor/qcom/opensource/safelinux-cfg-modules/safelinux-modules"
 
-TECHPACK_MODULES = "apps_pinctrl.ko scm_user_intf.ko vfio_iommu_qcom.ko iommu_iova_map.ko kiumd.ko qcom_uscmi.ko kryo_arm64_edac.ko kiumd_kgsl.ko mhi_ep_net.ko"
+TECHPACK_MODULES = "apps_pinctrl.ko scm_user_intf.ko qcom_dload_mode.ko vfio_iommu_qcom.ko iommu_iova_map.ko kiumd.ko qcom_uscmi.ko kryo_arm64_edac.ko kiumd_kgsl.ko mhi_ep_net.ko"
 inherit qti-techpack
 
 do_patch_more() {
@@ -40,6 +40,7 @@ EXTRA_OECONF += "--disable-doc --disable-Werror"
 
 RPROVIDES:${PN} += "kernel-module-apps-pinctrl-${KERNEL_VERSION}"
 RPROVIDES:${PN} += "kernel-module-scm-user-intf-${KERNEL_VERSION}"
+RPROVIDES:${PN} += "kernel-module-qcom-dload-mode-${KERNEL_VERSION}"
 RPROVIDES:${PN} += "kernel-module-vfio-iommu-qcom-${KERNEL_VERSION}"
 RPROVIDES:${PN} += "kernel-module-iommu-iova-map-${KERNEL_VERSION}"
 RPROVIDES:${PN} += "kernel-module-kiumd-${KERNEL_VERSION}"
