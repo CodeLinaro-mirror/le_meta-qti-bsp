@@ -57,7 +57,7 @@ WaitMmcDevReady()
 {
     local maxTrials=300
 
-    while [ ! "$1" ]; do
+    while [ ! "$1" "$2" ]; do
         usleep 10000
         maxTrials=$( echo $(( ${maxTrials} - 1 )) )
         if [ ${maxTrials} -eq 0 ]; then
@@ -82,7 +82,7 @@ EmmcGetPartitionID() {
    fi
 
    # Wait for uevent to ready
-   WaitMmcDevReady "$SYS_MMC_PATH/mmcblk0p1/uevent"
+   WaitMmcDevReady "-e" "$SYS_MMC_PATH/mmcblk0p1/uevent"
    if [ $? -ne ${STATUS_OK} ]; then
        LOGD "Error: wait for ${SYS_MMC_PATH} timeout"
        return ${STATUS_ERR}
