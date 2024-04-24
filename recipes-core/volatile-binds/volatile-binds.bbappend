@@ -116,12 +116,14 @@ VOLATILE_BINDS_sa525m-televm = "\
 /systemrw/tel.conf /etc/tel.conf\n\
 /systemrw/ObeConfig.conf /etc/ObeConfig.conf\n\
 /systemrw/qmi_fw.conf /vendor/etc/qmi_fw.conf\n\
+/systemrw/gps.conf /etc/gps.conf\n\
 "
 
 VOLATILE_BINDS_sa525m-fotavm = "\
 /systemrw/power_state.conf /etc/power_state.conf\n\
 /systemrw/tel.conf /etc/tel.conf\n\
 /systemrw/qmi_fw.conf /vendor/etc/qmi_fw.conf\n\
+/systemrw/gps.conf /etc/gps.conf\n\
 "
 
 VOLATILE_BINDS_sa515m = "\
