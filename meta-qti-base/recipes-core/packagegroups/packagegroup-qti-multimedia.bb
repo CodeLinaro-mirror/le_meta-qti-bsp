@@ -26,3 +26,6 @@ RDEPENDS:${PN} = "\
         ${@bb.utils.contains('DISTRO_FEATURES', 'qti-gstdeinterlace', 'gstreamer1.0-plugins-qvdeinterlace', '', d)} \
         ${@bb.utils.contains('DISTRO_FEATURES', 'qti-gstqvrate', 'gstreamer1.0-plugins-qvrate', '', d)} \
 "
+
+# codec2-service is enabled on quin-gvm-gen4-2, so not need codec2-app for this target
+RDEPENDS:${PN}:remove:quin-gvm-gen4-2 = "codec2-app"
