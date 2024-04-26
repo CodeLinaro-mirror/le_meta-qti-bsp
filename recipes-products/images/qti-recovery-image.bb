@@ -92,10 +92,9 @@ do_fsconfig() {
     chmod go-r ${IMAGE_ROOTFS}/etc/passwd
 }
 
+create_system_dir[cleandirs] = "${IMAGE_ROOTFS}/system"
 create_system_dir() {
-    if [ ! -e ${IMAGE_ROOTFS}/system ]; then
-        mkdir -p ${IMAGE_ROOTFS}/system
-    fi
+    mkdir -p ${IMAGE_ROOTFS}/system
 }
 
 remove_generator_binaries() {
