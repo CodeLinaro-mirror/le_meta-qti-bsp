@@ -21,6 +21,7 @@ SRC_URI = "\
     file://dm.cfg \
     ${@bb.utils.contains_any('VARIANT', 'perf user', 'file://perf.cfg', '', d)} \
     file://usb_adb.cfg \
+    file://wlan.cfg \
 "
 
 SRCREV_kernel = "${AUTOREV}"
