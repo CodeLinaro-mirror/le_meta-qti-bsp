@@ -1,31 +1,25 @@
-DESCRIPTION = "Boot image creation tool from Android"
-HOMEPAGE = "http://android.git.kernel.org/?p=platform/system/core.git"
+SUMMARY = "Tool used for creating boot image"
+DESCRIPTION = "Python tool to generate boot imgages for LRH targets"
+HOMEPAGE = "https://android.googlesource.com/platform/system/tools/mkbootimg"
 LICENSE = "Apache-2.0"
-LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
-${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
-
-DEPENDS = "libmincrypt-native glib-2.0-native"
+LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 
 PROVIDES = "mkbootimg-native"
 
-PR = "r6"
-
-SRCREV = "${AUTOREV}"
 SRC_URI = "${PATH_TO_REPO}/system/core/.git;protocol=${PROTO};destsuffix=system/core;usehead=1"
-SRC_URI:append = " file://makefile;subdir=system/core/mkbootimg"
+SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/system/core/mkbootimg"
 
 inherit native
 
-CFLAGS += "-Dstrlcpy=g_strlcpy "
-EXTRA_OEMAKE = "INCLUDES='-Imincrypt' LIBS='-lmincrypt -lglib-2.0'"
-
 do_configure[noexec] = "1"
+do_compile[noexec] = "1"
 
 do_install() {
-        install -d ${D}${bindir}
-        install ${S}/mkbootimg ${D}${bindir}
+    install -d ${D}/${bindir}/scripts/
+    install -m 0755 ${S}/mkbootimg.py ${D}/${bindir}/scripts/
+    install -d ${D}/${bindir}/scripts/gki/
+    install -m 0755 ${S}/gki/generate_gki_certificate.py ${D}/${bindir}/scripts/gki/
 }
 
-NATIVE_INSTALL_WORKS = "1"
