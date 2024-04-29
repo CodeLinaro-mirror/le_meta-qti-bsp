@@ -20,8 +20,6 @@ RDEPENDS:${PN} += "\
     libxml2 \
     libnl \
     coreutils \
-    powerapp-reboot \
-    powerapp-shutdown \
     sec-config \
     libsensors \
     ${DSP_DRIV} \
