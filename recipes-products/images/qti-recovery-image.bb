@@ -83,6 +83,48 @@ create_ubinize_config() {
 }
 
 fakeroot do_create_recoveryfs_ubi() {
+    rm -rf ${IMAGE_ROOTFS}/usr/bin/thermal-engine
+    rm -rf ${IMAGE_ROOTFS}/usr/lib/libarchive.so.13.6.2
+    rm -rf ${IMAGE_ROOTFS}/usr/bin/diag-router
+    rm -rf ${IMAGE_ROOTFS}/usr/lib/libsolv.so.1
+    rm -rf ${IMAGE_ROOTFS}/lib/libext2fs.so.2.4
+    rm -rf ${IMAGE_ROOTFS}/lib/libext2fs.so.2
+    rm -rf ${IMAGE_ROOTFS}/usr/lib/libqmi_cci.so.1.0.0
+    rm -rf ${IMAGE_ROOTFS}/usr/lib/libqmi_cci.so.1
+    rm -rf ${IMAGE_ROOTFS}/usr/lib/libqmi_common_so.so.1.0.0
+    rm -rf ${IMAGE_ROOTFS}/usr/lib/libqmi_common_so.so.1
+    rm -rf ${IMAGE_ROOTFS}/usr/lib/libqmi_csi.so.1.0.0
+    rm -rf ${IMAGE_ROOTFS}/usr/lib/libqmi_csi.so.1
+    rm -rf ${IMAGE_ROOTFS}/usr/lib/libqmi_encdec.so.1.0.0
+    rm -rf ${IMAGE_ROOTFS}/usr/lib/libqmi_encdec.so.1
+    rm -rf ${IMAGE_ROOTFS}/usr/lib/libqmi_sap.so.1.0.0
+    rm -rf ${IMAGE_ROOTFS}/usr/lib/libqmi_sap.so.1
+    rm -rf ${IMAGE_ROOTFS}/usr/lib/libqrtr.so.1.0.0
+    rm -rf ${IMAGE_ROOTFS}/usr/lib/libqrtr.so.1
+    rm -rf ${IMAGE_ROOTFS}/sbin/fsck.ext2
+    rm -rf ${IMAGE_ROOTFS}/sbin/fsck.ext3
+    rm -rf ${IMAGE_ROOTFS}/sbin/fsck.ext4
+    rm -rf ${IMAGE_ROOTFS}/sbin/fsck.util-linux
+    rm -rf ${IMAGE_ROOTFS}/sbin/e2fsck
+    rm -rf ${IMAGE_ROOTFS}/sbin/fsck
+    rm -rf ${IMAGE_ROOTFS}/usr/bin/qmi_test_mt_client_init_instance
+    rm -rf ${IMAGE_ROOTFS}/usr/bin/qmi_test_service_clnt_test_0000
+    rm -rf ${IMAGE_ROOTFS}/usr/bin/qmi_test_service_clnt_test_0001
+    rm -rf ${IMAGE_ROOTFS}/usr/bin/qmi_test_service_clnt_test_1000
+    rm -rf ${IMAGE_ROOTFS}/usr/bin/qmi_test_service_clnt_test_1001
+    rm -rf ${IMAGE_ROOTFS}/usr/bin/qmi_test_service_clnt_test_2000
+    rm -rf ${IMAGE_ROOTFS}/usr/bin/qmi_test_service_clnt_test_3000
+    rm -rf ${IMAGE_ROOTFS}/usr/bin/qmi_test_service_clnt_test_3001
+    rm -rf ${IMAGE_ROOTFS}/usr/bin/qmi_test_service_clnt_test_4000
+    rm -rf ${IMAGE_ROOTFS}/usr/bin/qmi_test_service_clnt_test_4001
+    rm -rf ${IMAGE_ROOTFS}/usr/bin/qmi_test_service_start_svc
+    rm -rf ${IMAGE_ROOTFS}/usr/bin/qmi_test_service_test
+    rm -rf ${IMAGE_ROOTFS}/usr/bin/qrtr-cfg
+    rm -rf ${IMAGE_ROOTFS}/usr/bin/qrtr-filter
+    rm -rf ${IMAGE_ROOTFS}/usr/bin/qrtr-lookup
+    rm -rf ${IMAGE_ROOTFS}/usr/bin/qrtr-ns
+    rm -rf ${IMAGE_ROOTFS}/usr/bin/qrtr_test_client
+    rm -rf ${IMAGE_ROOTFS}/usr/bin/qrtr_test_server
     mkfs.ubifs -r ${IMAGE_ROOTFS} ${RECOVERY_UBI_SELINUX_OPTIONS} -o ${RECOVOERY_UBIFS_IMAGE} ${RECOVERY_MKUBIFS_ARGS}
     ubinize -o ${RECOVOERY_UBI_IMAGE} ${UBINIZE_ARGS} ${RECOVERY_UBINIZE_CFG}
     chmod 644 ${RECOVOERY_UBI_IMAGE}
