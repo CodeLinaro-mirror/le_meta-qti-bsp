@@ -10,6 +10,9 @@ SRC_URI_append_sa515m += "${@bb.utils.contains('COMBINED_FEATURES', 'vbleima', '
 S         =  "${WORKDIR}/kernel/msm-5.4"
 PR        =  "r0"
 
+#QRB5165 IFB kernel configuraion file
+SRC_URI_append_qrb5165-ifb += "file://qrb5165_ifb_kernel.cfg"
+
 # QCS610 specific
 SRC_URI_append_qcs610 += "file://qcs610.cfg"
 SRC_URI_append_qcs610 += "file://android_binderfs.cfg"
