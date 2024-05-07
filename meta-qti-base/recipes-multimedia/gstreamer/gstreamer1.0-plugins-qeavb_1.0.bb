@@ -34,6 +34,8 @@ CFLAGS += "-I${STAGING_INCDIR} \
            -I${STAGING_INCDIR}/c++ \
            -I${STAGING_INCDIR}/c++/${TARGET_SYS} \
            -I${STAGING_INCDIR}/gstreamer-1.0 \
-           -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}"
+           -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel} \
+           ${@oe.utils.version_less_or_equal('${preferred-kernel}', '5.16', '', '-DKPI_USE_SYSLOG', d)} \
+          "
 
 RDEPENDS:${PN} += "avb-utils"
