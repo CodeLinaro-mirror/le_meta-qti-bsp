@@ -71,16 +71,10 @@ do_deploy () {
 
      if ${@oe.utils.conditional('OEMVM_SUPPORT', 'True', 'true', 'false', d)}; then
          mkdir -p ${DEPLOYDIR}/build-artifacts/oemvm-dtb
-         cp -a ${KERNEL_PREBUILT_PATH}/${VM_TARGET}-vm-*.dtb ${DEPLOYDIR}/build-artifacts/dtb
-         cp -a ${KERNEL_PREBUILT_PATH}/${VM_TARGET}p-vm-*.dtb ${DEPLOYDIR}/build-artifacts/dtb
-         cp -a ${KERNEL_PREBUILT_PATH}/${VM_TARGET}-oemvm-*.dtb ${DEPLOYDIR}/build-artifacts/oemvm-dtb
-         cp -a ${KERNEL_PREBUILT_PATH}/${VM_TARGET}p-oemvm-*.dtb ${DEPLOYDIR}/build-artifacts/oemvm-dtb
-         cp -a ${KERNEL_PREBUILT_PATH}/cliffs-vm-*.dtb ${DEPLOYDIR}/build-artifacts/dtb
-         cp -a ${KERNEL_PREBUILT_PATH}/cliffs-oemvm-*.dtb ${DEPLOYDIR}/build-artifacts/oemvm-dtb
+         cp -a ${KERNEL_PREBUILT_PATH}/*-vm-*.dtb ${DEPLOYDIR}/build-artifacts/dtb
+         cp -a ${KERNEL_PREBUILT_PATH}/*-oemvm-*.dtb ${DEPLOYDIR}/build-artifacts/oemvm-dtb
      else
-         cp -a ${KERNEL_PREBUILT_PATH}/${VM_TARGET}-vm-*.dtb  ${DEPLOYDIR}/build-artifacts/dtb
-         cp -a ${KERNEL_PREBUILT_PATH}/${VM_TARGET}p-vm-*.dtb  ${DEPLOYDIR}/build-artifacts/dtb
-         cp -a ${KERNEL_PREBUILT_PATH}/cliffs-vm-*.dtb ${DEPLOYDIR}/build-artifacts/dtb
+         cp -a ${KERNEL_PREBUILT_PATH}/*-vm-*.dtb ${DEPLOYDIR}/build-artifacts/dtb
      fi
      cp -a ${KERNEL_PREBUILT_PATH}/vmlinux ${DEPLOYDIR}
      cp -a ${KERNEL_PREBUILT_PATH}/System.map ${DEPLOYDIR}

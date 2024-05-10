@@ -17,10 +17,16 @@ PACKAGECONFIG ??= " \
 PACKAGECONFIG[glib] = "--with-glib, --without-glib, glib-2.0"
 
 do_install_append() {
+      install -d ${D}/data/
+      install -d ${D}/data/ramdump/
+      touch ${D}/data/logTimeStamp
       install -d ${D}${systemd_unitdir}/system/
       install -m 0644 ${S}/crash-collect.service -D ${D}${systemd_unitdir}/system/crash-collect.service
 }
 
-SYSTEMD_SERVICE_${PN} = "crash-collect.service"
+#SYSTEMD_SERVICE_${PN} = "crash-collect.service"
 
 FILES_${PN} += "${systemd_unitdir}/system/*"
+FILES_${PN} += "/data/*"
+FILES_${PN} += "/data/logTimeStamp"
+FILES_${PN} += "/data/ramdump"
