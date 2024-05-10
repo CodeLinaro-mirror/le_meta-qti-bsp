@@ -166,7 +166,10 @@ do_deploy () {
     install -d ${DEPLOYDIR}/build-artifacts
     install -d ${DEPLOYDIR}/build-artifacts/kernel_scripts/scripts
     install -d ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr
-    cp  ${STAGING_KERNEL_BUILDDIR}/usr/gen_init_cpio ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr
+
+    if [ -f ${STAGING_KERNEL_BUILDDIR}/usr/gen_init_cpio ]; then
+        cp  ${STAGING_KERNEL_BUILDDIR}/usr/gen_init_cpio ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr
+    fi
 
     # Copy Image and dtbs to deploydir
     install -m 0644 vmlinux ${DEPLOYDIR}
