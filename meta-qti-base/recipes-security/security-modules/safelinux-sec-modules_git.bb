@@ -20,6 +20,7 @@ do_install:append() {
     install -m 0755 ${S}/modules-load/smcinvoke.conf -D ${D}${sysconfdir}/modules-load.d/smcinvoke.conf
     install -m 0755 ${S}/modules-load/qcom_scm_oot.conf -D ${D}${sysconfdir}/modules-load.d/qcom_scm_oot.conf
     install -m 0644 ${S}/drivers/smcinvoke.h ${D}${includedir}/linux
+    install -m 0644 ${S}/Module.symvers ${D}${includedir}/safelinux-sec-modules
 }
 
 RPROVIDES:${PN} += "kernel-module-tz-log-${KERNEL_VERSION}"
