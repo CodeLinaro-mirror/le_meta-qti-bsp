@@ -375,8 +375,15 @@ CheckTmpDirectorySizeForFde () {
 FdeInitialize ()
 {
     busybox insmod /lib/modules/smcinvoke.ko
-    if ! busybox lsmod | ${Bgrep} -q "smcinvoke"; then
-        echo "ERR: Failed to load smcinvoke module"
+    busybox insmod /lib/modules/dm-crypt.ko
+
+    if ! ${Bgrep} -wq "smcinvoke_dlkm" /proc/modules; then
+        LOGD "Error: Failed to load smcinvoke module"
+        return ${STATUS_ERR}
+    fi
+
+    if ! ${Bgrep} -wq "dm_crypt" /proc/modules; then
+        LOGD "Error: Failed to load dmcrypt module"
         return ${STATUS_ERR}
     fi
 
