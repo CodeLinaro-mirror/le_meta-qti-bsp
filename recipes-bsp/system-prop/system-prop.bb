@@ -24,6 +24,10 @@ do_compile() {
     sed -e 's/#.*$//' -e '/^$/d' ${WORKDIR}/${BASEMACHINE}/system.prop >> ${S}/build.prop
 }
 
+do_compile_append_qrb5165-ifb() {
+    echo "persist.vendor.sensors.enable.ifb=true" >> ${S}/build.prop
+}
+
 do_install() {
     install -d ${D}
     install -m 0644 ${S}/build.prop ${D}/build.prop
