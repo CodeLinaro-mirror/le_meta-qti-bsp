@@ -50,6 +50,10 @@ do_install:append:sa7255() {
     install -m 0755 ${S}/vfio-device-probe/sa7255_dev.conf -D ${D}${libdir}/vfio-bind.d/sa7255_dev.conf
 }
 
+do_install:append:sa8797() {
+    # install -m 0755 ${S}/vfio-device-probe/sa8797_dev.conf -D ${D}${libdir}/vfio-bind.d/sa8797_dev.conf
+}
+
 FILES:${PN} += "${libdir}/modules-load.d/*"
 FILES:${PN} += "${libdir}/vfio-bind.d/*"
 FILES:${PN} += "${sysconfdir}/*"
