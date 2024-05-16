@@ -19,10 +19,6 @@ SRC_URI = "\
     file://vmm_pwr_key.conf \
 "
 
-SRC_URI:append:sa7255 = " \
-    file://vfio-device-bind.sh \
-"
-
 SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/vendor/qcom/opensource/safelinux-system-cfg"
