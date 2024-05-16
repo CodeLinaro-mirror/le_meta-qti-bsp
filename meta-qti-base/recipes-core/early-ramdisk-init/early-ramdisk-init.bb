@@ -25,7 +25,10 @@ do_install:append() {
     install -d ${D}/realroot
     install -d ${D}/etc/modules-load.f
     touch ${D}/init
-    install -m 0755 ${S}/conf/${MACHINE}/* -D ${D}/etc/modules-load.f/
+    install -m 0755 ${S}/conf/${MACHINE}/*.conf -D ${D}/etc/modules-load.f/
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'qti-external-boot', 'true', 'false', d)}; then
+        install -m 0755 ${S}/conf/${MACHINE}/02-external-bootup.conf.in -D ${D}/etc/modules-load.f/02-external-bootup.conf
+    fi
 }
 
 FILES:${PN} += "\
