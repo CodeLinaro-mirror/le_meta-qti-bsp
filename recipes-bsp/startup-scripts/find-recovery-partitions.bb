@@ -1,7 +1,8 @@
 DESCRIPTION = "Start up script for finding partitions used in recovery"
 HOMEPAGE = "http://codeaurora.org"
-LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/BSD;md5=3775480a712fc46a69647678acb234cb"
-LICENSE = "BSD"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
+LICENSE = "BSD-3-Clause"
+
 
 SRC_URI +="file://${BASEMACHINE}/find_recovery_partitions.sh"
 SRC_URI +="file://find-recovery-partitions.service"

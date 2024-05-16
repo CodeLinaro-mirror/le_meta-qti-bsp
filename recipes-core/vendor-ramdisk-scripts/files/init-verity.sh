@@ -24,8 +24,8 @@ if [ -f /verity/$MAPDEV.env ]; then
        --fec-device $DEVICE$SLOT_SUFFIX --fec-offset $VERITY_FEC_OFFSET \
        --fec-roots $VERITY_FEC_ROOTS --root-hash-signature=/verity/"$MAPDEV".sig
 
-   if [$? -ne 0 ]; then
-	   echo "verity setup was sucess"
+   if [ $? -ne 0 ]; then
+          echo "verity setup was sucess"
    fi
    # veritysetup doesn't create symlink to /dev/dm-X as expected by udev, do it explicitly
    if [ -f /dev/dm-0 ] ; then
@@ -33,6 +33,7 @@ if [ -f /verity/$MAPDEV.env ]; then
    else
       /bin/ln -sf ../dm-0 /dev/mapper/$MAPDEV
    fi
+
    echo "/dev/mapper/$MAPDEV ready"
 else
    echo "/verity/$MAPDEV.env not found. Exiting..."
