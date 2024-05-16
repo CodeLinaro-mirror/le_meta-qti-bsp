@@ -12,12 +12,16 @@ SRCREV = "${AUTOREV}"
 S = "${WORKDIR}/vendor/qcom/opensource/data-eth"
 
 TECHPACK_MODULE_OUT = "${WORKDIR}/dataeth-dlkm"
-TECHPACK_MODULES = "drivers/emac_ctrl_fe/emac_ctrl_fe_virtio.ko drivers/emac_shim/stmmac.ko"
+TECHPACK_MODULES = "drivers/emac_ctrl_fe/emac_ctrl_fe_virtio.ko drivers/emac_shim/emac_thin.ko"
+TECHPACK_MAKE_ARGS = "\
+                 CONFIG_EMAC_SHIM=m \
+                 CONFIG_EMAC_CTRL_FE=m \
+                 "
 
 inherit qti-techpack
 
 RPROVIDES:${PN} += "kernel-module-emac-ctrl-fe-virtio-${KERNEL_VERSION}"
-RPROVIDES:${PN} += "kernel-module-stmmac-${KERNEL_VERSION}"
+RPROVIDES:${PN} += "kernel-module-emac-thin-${KERNEL_VERSION}"
 
 FILES:${PN} += "${nonarch_base_libdir}/modules/${KERNEL_VERSION}/*"
 FILES:${PN} += "${sysconfdir}/*"
