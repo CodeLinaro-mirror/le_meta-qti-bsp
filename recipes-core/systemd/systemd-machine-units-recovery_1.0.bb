@@ -20,7 +20,7 @@ do_install_append () {
         # Install systemrw.conf
         install -m 0744 ${S}/systemrw.conf ${D}${systemd_unitdir}/system/systemrw.mount.d/systemrw.conf
         # Install mountpartition rules to enable sdcard support
-        install -m 0744 ${S}/mountpartitions.rules ${D}${sysconfdir}/udev/rules.d/mountpartitions.rules
+        install -m 0644 ${S}/mountpartitions.rules ${D}${sysconfdir}/udev/rules.d/mountpartitions.rules
         install -m 0744 ${WORKDIR}/automountsdcard.sh ${D}${sysconfdir}/udev/scripts/automountsdcard.sh
     fi
 }
