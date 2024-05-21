@@ -23,6 +23,7 @@ EXTRA_OECONF += "\
 
 MIXER_PATHS_XML ?= "mixer_paths_gvmauto8295_adp_star.xml"
 MIXER_PATHS_XML:quin-gvm-lemans = "mixer_paths_gvmauto8255_adp_star.xml"
+MIXER_PATHS_XML:quin-gvm-monaco = "mixer_paths_gvmauto7255_adp_star.xml"
 
 do_install:append() {
     install -d ${D}${sysconfdir}
