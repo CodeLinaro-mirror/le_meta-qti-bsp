@@ -22,10 +22,11 @@ if [ -f /verity/$MAPDEV.env ]; then
        $DEVICE$SLOT_SUFFIX $VERITY_ROOT_HASH --salt $VERITY_SALT \
        --hash-offset $VERITY_HASH_OFFSET --data-blocks $VERITY_DATA_BLOCKS \
        --fec-device $DEVICE$SLOT_SUFFIX --fec-offset $VERITY_FEC_OFFSET \
-       --fec-roots $VERITY_FEC_ROOTS --root-hash-signature=/verity/"$MAPDEV".sig
+       --fec-roots $VERITY_FEC_ROOTS --root-hash-signature=/verity/"$MAPDEV".sig \
+       --restart-on-corruption
 
    if [ $? -ne 0 ]; then
-          echo "verity setup was sucess"
+      echo "verity setup was sucess"
    fi
    # veritysetup doesn't create symlink to /dev/dm-X as expected by udev, do it explicitly
    if [ -f /dev/dm-0 ] ; then
@@ -37,8 +38,10 @@ if [ -f /verity/$MAPDEV.env ]; then
    echo "/dev/mapper/$MAPDEV ready"
 else
    echo "/verity/$MAPDEV.env not found. Exiting..."
+   /sbin/reboot -f
 fi
 
 if [ $? -ne 0 ]; then
-    echo "mounting /dev/mapper/$MAPDEV failed"
+   echo "mounting /dev/mapper/$MAPDEV failed"
+   /sbin/reboot -f
 fi
