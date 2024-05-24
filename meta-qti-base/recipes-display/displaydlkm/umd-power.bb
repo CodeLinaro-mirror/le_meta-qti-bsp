@@ -13,11 +13,11 @@ SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/vendor/qcom/opensource/display-drivers/umd-mm"
 
-inherit qti-techpack
-
 TECHPACK_MODULE_OUT = "${WORKDIR}/display-drivers"
 TECHPACK_MODULES = "umd_power.ko"
 TECHPACK_HEADERS = "${S}/include/uapi"
+
+inherit qti-techpack
 
 RPROVIDES:${PN} += "kernel-module-umd-power-${KERNEL_VERSION}"
 
