@@ -24,7 +24,7 @@ USERADD_PARAM:${PN} = "-g adb --no-create-home --shell /bin/false adb"
 
 EXTRA_OECONF += "\
     --with-glib \
-    --with-mkbootimg-includes=${WORKDIR}/system/core/mkbootimg \
+    --with-mkbootimg-includes=${WORKDIR}/system/core/mkbootimg/include/bootimg \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', '--enable-adb-verity', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', '--with-systemd', '', d)} \
 "
