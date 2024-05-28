@@ -86,6 +86,8 @@ char audiostr[AUDIO_CONFIG_LIINE][LINE_MAX] = {
 	"<end>"};
 #define gid_is_valid(gid)  uid_is_valid(gid)
 
+FILE* f = NULL;
+
 static void inline safe_free(char** p)
 {
 	if (*p)
@@ -526,6 +528,9 @@ static inline int parse_line(char* p)
 			if (strncmp(p, END_TAG, strlen(END_TAG)))
 				goto out;
 
+			fflush(stdout);
+			fflush(stderr);
+
 			pid = fork();
 			if (pid < 0) {
 				perror("fork child process failed \r\n");
@@ -615,6 +620,8 @@ static inline int parse_line(char* p)
 				if (app_launcher.cmd) {
 					execvpe(app_launcher.cmd, app_launcher.argv, app_launcher.env);
 				}
+				if (f != NULL)
+					fclose(f);
 				exit(0);
 			}
 
@@ -694,7 +701,6 @@ static inline void audio_drv_loading()
 
 int main(int argc, char* argv[])
 {
-	FILE* f;
 	char line[LINE_MAX];
 	int fd;
 
@@ -714,12 +720,6 @@ int main(int argc, char* argv[])
 	safe_close(fd);
 	safe_close(fd);
 
-	f = fopen(DEFAULT_CONF, "re");
-	if (f == NULL) {
-		perror("open early_init.conf failed.\r\n");
-		return -1;
-	}
-
 	write_marker("early-init-start-up");
 
 	/* Trigger firmware loading parallelly */
@@ -730,6 +730,11 @@ int main(int argc, char* argv[])
 #ifdef EARLY_USERSPACE_AUDIO
 	audio_drv_loading();
 #endif
+	f = fopen(DEFAULT_CONF, "re");
+	if (f == NULL) {
+		perror("open early_init.conf failed.\r\n");
+		return -1;
+	}
 
 	while (1) {
 
