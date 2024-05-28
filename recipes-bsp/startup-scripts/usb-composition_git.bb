@@ -14,3 +14,8 @@ fixup_usb_service() {
       fi
    fi
 }
+
+do_install_append(){
+       chmod 0555 ${D}${bindir}/usbd
+       chmod 0555 ${D}${bindir}/usb_composition_switch
+}
