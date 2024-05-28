@@ -27,6 +27,5 @@ RDEPENDS:${PN} += "\
     tcp-wrappers \
     netkit-telnet \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', 'proftpd', d)} \
-    openssh \
 "
 RDEPENDS:${PN}:append:quin-gvm-lemans = " dataeth-dlkm"

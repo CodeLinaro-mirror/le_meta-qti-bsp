@@ -51,4 +51,4 @@ EXTRA_IMAGECMD_ext4 += " -b 4096 "
 
 IMAGE_CLASSES += "qimage"
 
-EXTRA_IMAGEDEPENDS += "qti-image-ark-boot:do_makeboot"
+EXTRA_IMAGEDEPENDS += "qti-image-ark-boot:do_sign_boot_img"

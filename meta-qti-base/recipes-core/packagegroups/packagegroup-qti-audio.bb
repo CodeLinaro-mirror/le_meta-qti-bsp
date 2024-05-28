@@ -9,8 +9,9 @@ inherit packagegroup
 PACKAGES = "${PN}"
 
 # qti-audio is for elite framework, qti-audio-ar is for AR framework
+# KMD means Kernel Mode Driver compare with UMD as User Mode Driver
 # NOTE: For kernel 5.4 + AR + hyp, uses audiodlkm rather than ar-audiodlkm
-AUDIO_RDEPENDS = "\
+KMD_RDEPENDS = "\
     alsa-lib \
     alsa-utils \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-audio', 'audiodlkm  init-audio', '', d)} \
@@ -19,7 +20,7 @@ AUDIO_RDEPENDS = "\
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-audio-ar', oe.utils.version_less_or_equal('${preferred-kernel}', '5.14', '', 'ar-audiodlkm', d), '', d)} \
 "
 
-AUDIO_RDEPENDS:append:qti-dpk = " \
+KMD_RDEPENDS:append:qti-dpk = " \
     agm-tinyalsa-plugin \
     ar-pal \
     pal-control-plugin \
@@ -32,9 +33,4 @@ AUDIOLITE_RDEPENDS = "\
     audiolite-dlkm \
 "
 
-RDEPENDS:${PN} += " \
-    ${@bb.utils.contains('TARGET_USES_AUDIO_FRAMEWORK', 'audiolite', \
-    '${AUDIOLITE_RDEPENDS}', \
-    bb.utils.contains('MACHINE_FEATURES', 'qti-umd qti-gunyah', '', '${AUDIO_RDEPENDS}', d), \
-    d)} \
-"
+RDEPENDS:${PN} += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-gunyah qti-umd', '${AUDIOLITE_RDEPENDS}', '${KMD_RDEPENDS}', d)}"

@@ -6,4 +6,8 @@ do_install:append() {
     # Use powerkey to do suspend on qti platform.
     install -d ${D}${systemd_unitdir} ${D}${systemd_unitdir}/logind.conf.d
     install -m 0644 ${WORKDIR}/90-powerkey-conf.conf ${D}${systemd_unitdir}/logind.conf.d
+    #Override default setting and add RuntimeWatchdogSec support for ark kernel
+    if ${@bb.utils.contains('PREFERRED_PROVIDER_virtual/kernel', 'linux-ark', 'true', 'false', d)}; then
+        echo "RuntimeWatchdogSec=10" >> ${D}${systemd_unitdir}/system.conf.d/00-${PN}.conf
+    fi
 }
