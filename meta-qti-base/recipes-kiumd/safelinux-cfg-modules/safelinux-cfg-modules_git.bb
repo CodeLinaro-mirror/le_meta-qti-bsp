@@ -30,6 +30,9 @@ addtask patch_more after do_patch before do_compile
 python __anonymous () {
     d.setVar('KBUILD_EXTRA_SYMBOLS', "${STAGING_INCDIR}/safelinux-sec-modules/Module.symvers")
 }
+
+EXTRA_OEMAKE += "CONFIG_PROFILER=y"
+
 do_install:append() {
     install -m 0755 ${WORKDIR}/umd_load.conf -D ${D}${sysconfdir}/modules-load.d/umd_load.conf
     install -d ${D}${includedir}/linux
