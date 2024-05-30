@@ -15,6 +15,7 @@ inherit qti-techpack
 
 do_install:append() {
     install -d ${D}${includedir}/linux
+    install -d ${D}${includedir}/safelinux-sec-modules
     install -m 0755 ${S}/modules-load/tz_log.conf -D ${D}${sysconfdir}/modules-load.d/tz_log.conf
     install -m 0755 ${S}/modules-load/qtee_shmbridge.conf -D ${D}${sysconfdir}/modules-load.d/qtee_shmbridge.conf
     install -m 0755 ${S}/modules-load/smcinvoke.conf -D ${D}${sysconfdir}/modules-load.d/smcinvoke.conf
