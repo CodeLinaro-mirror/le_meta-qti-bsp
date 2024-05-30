@@ -8,12 +8,12 @@ DEPENDS += "bison-native"
 
 SRC_URI = "\
            ${PATH_TO_REPO}/vendor/qcom/opensource/safelinux-system-cfg/devicetree/.git;protocol=${PROTO};usehead=1 \
-           ${PATH_TO_REPO}/kernel/rh-kernel-5.14/.git;protocol=${PROTO};usehead=1 \
+           ${PATH_TO_REPO}/kernel/${RH_KERNEL_NAME}/.git;protocol=${PROTO};usehead=1 \
 "
 SRCREV = "${AUTOREV}"
-KERNEL_DIR_SRC = "${SRC_DIR_ROOT}/kernel/rh-kernel-5.14"
+KERNEL_DIR_SRC = "${SRC_DIR_ROOT}/kernel/${RH_KERNEL_NAME}"
 KERNEL_DIR_DESTINATION = "${WORKDIR}/vendor/qcom/opensource/safelinux-system-cfg/devicetree/centos-stream-9"
-KERNEL_WORKDIR = "${WORKDIR}/kernel/rh-kernel-5.14"
+KERNEL_WORKDIR = "${WORKDIR}/kernel/${RH_KERNEL_NAME}"
 
 S = "${WORKDIR}/vendor/qcom/opensource/safelinux-system-cfg/devicetree"
 

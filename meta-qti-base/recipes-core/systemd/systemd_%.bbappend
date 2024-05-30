@@ -16,6 +16,7 @@ SRC_URI:append = " ${@bb.utils.contains("DISTRO_FEATURES", "early_init", "file:/
 
 # Config root user as lingering to avoid weston socket lost on 8255/8775/8650
 SRC_URI:append:sa8775 = " file://0001-systemd-config-linger-for-root-user.patch"
+SRC_URI:append:sa8797 = " file://0001-systemd-config-linger-for-root-user.patch"
 
 SRC_URI:append = " ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "5.15", "file://platform_load.conf", "", d)}"
 

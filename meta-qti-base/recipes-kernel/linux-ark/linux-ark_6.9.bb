@@ -8,7 +8,7 @@ RH_SRC = "${SRC_DIR_ROOT}/kernel/${RH_KERNEL_NAME}"
 PATCH_DIR = "${SRC_DIR_ROOT}/meta-qti-bsp/meta-qti-base/recipes-kernel/linux-ark/files/"
 
 DEPENDS += "\
-    dtc-native elfutils-native kern-tools-native \
+    dtc-native elfutils-native flex-native kern-tools-native \
     mkbootimg-native openssl-native pahole-native rsync-native \
 "
 DEPENDS:append:aarch64 = " libgcc"
@@ -20,9 +20,7 @@ SRC_URI = "\
     ${PATH_TO_REPO}/kernel/${RH_KERNEL_NAME}/.git;protocol=${PROTO};name=kernel;destsuffix=kernel/${RH_KERNEL_NAME};usehead=1 \
     file://dm.cfg \
     ${@bb.utils.contains_any('VARIANT', 'perf user', 'file://perf.cfg', '', d)} \
-    file://nr_cpus.cfg \
     file://usb_adb.cfg \
-    file://wlan.cfg \
 "
 
 SRCREV_kernel = "${AUTOREV}"
@@ -32,6 +30,8 @@ inherit kernel kernel-yocto qsigning ${@bb.utils.contains('TARGET_KERNEL_ARCH', 
 S = "${WORKDIR}/kernel/${RH_KERNEL_NAME}"
 
 EXTRA_OEMAKE += "INSTALL_MOD_STRIP=1 --include-dir=${S}"
+#Fix redhat Makefile Missing an $(UPSTREAM_BRANCH) branch error.
+EXTRA_OEMAKE += "UPSTREAM_BRANCH=HEAD"
 
 LDFLAGS:aarch64 = "-O1 --hash-style=gnu --as-needed"
 TARGET_CXXFLAGS += "-Wno-format"
@@ -70,10 +70,11 @@ addtask do_uncompressed_kernel_patch after do_install before do_deploy
 
 do_rh_config[depends] += "flex-native:do_populate_sysroot"
 do_rh_config[depends] += "bison-native:do_populate_sysroot"
+do_rh_config[depends] += "rpm-native:do_populate_sysroot"
 
+#    cp ${RH_SRC}/redhat/configs/kernel-automotive-5.14.0-aarch64.config ${S}/arch/arm64/configs/defconfig
 do_rh_config () {
     make -C ${RH_SRC}/redhat ARCH=arm64 dist-configs
-    cp ${RH_SRC}/redhat/configs/kernel-automotive-5.14.0-aarch64.config ${S}/arch/arm64/configs/defconfig
     rm -rf ${RH_SRC}/.config ${RH_SRC}/include/config/ \
     ${RH_SRC}/include/generated/ ${RH_SRC}/arch/$ARCH/include/generated/
     make -C ${S} O=${B} CROSS_COMPILE="" defconfig
@@ -102,6 +103,14 @@ do_validate_branches[noexec] = "1"
 
 do_compile () {
     oe_runmake CC="${KERNEL_CC}" LD="${KERNEL_LD}" ${KERNEL_EXTRA_ARGS} $use_alternate_initrd
+}
+
+do_install:prepend() {
+    #Fix can't remove source in kernel.bbclass kernel_do_install()
+    if [ ! -f ${nonarch_base_libdir}/modules/${KERNEL_VERSION}/source ]; then
+        install -d -p ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}
+        touch ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/source
+    fi
 }
 
 do_shared_workdir[dirs] = "${DEPLOYDIR}"
@@ -166,10 +175,7 @@ do_deploy () {
     install -d ${DEPLOYDIR}/build-artifacts
     install -d ${DEPLOYDIR}/build-artifacts/kernel_scripts/scripts
     install -d ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr
-
-    if [ -f ${STAGING_KERNEL_BUILDDIR}/usr/gen_init_cpio ]; then
-        cp  ${STAGING_KERNEL_BUILDDIR}/usr/gen_init_cpio ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr
-    fi
+    cp  ${STAGING_KERNEL_BUILDDIR}/usr/gen_init_cpio ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr
 
     # Copy Image and dtbs to deploydir
     install -m 0644 vmlinux ${DEPLOYDIR}
