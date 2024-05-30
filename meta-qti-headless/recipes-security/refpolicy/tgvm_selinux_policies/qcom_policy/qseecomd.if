@@ -206,3 +206,22 @@ interface(`qseecomd_manage_persist_dirs',`
 
     manage_dirs_pattern($1, qseecomd_persist_t, qseecomd_persist_t)
 ')
+
+
+########################################
+## <summary>
+##     Set attribute to qseecomd data directories.
+## </summary>
+## <param name="domain">
+##     <summary>
+##     Domain allowed access.
+##     </summary>
+## </param>
+#
+interface(`qseecomd_setattr_data_dirs',`
+    gen_require(`
+        type qseecomd_data_t;
+    ')
+
+    setattr_dirs_pattern($1, qseecomd_data_t, qseecomd_data_t)
+')
