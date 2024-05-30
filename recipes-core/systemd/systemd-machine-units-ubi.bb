@@ -44,7 +44,7 @@ do_install:append () {
 add_ubi_scripts () {
     for entry in ${MACHINE_MNT_POINTS}; do
         mountname="${entry:1}"
-        if [ "$mountname" = "firmware" -o "$mountname" = "bt_firmware" -o "$mountname" = "dsp" ]; then
+        if [ "$mountname" = "firmware" -o "$mountname" = "bt_firmware" -o "$mountname" = "dsp" -o "$mountname" = "vm-bootsys" ]; then
             install -m 0744 ${S}/${mountname}-ubi-mount.sh ${D}${sysconfdir}/initscripts/${mountname}-ubi-mount.sh
         fi
 

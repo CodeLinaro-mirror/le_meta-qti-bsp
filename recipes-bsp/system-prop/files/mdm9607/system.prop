@@ -10,6 +10,7 @@ ro.debuggable=1
 #ro.hardware.camera=qcom
 
 #Audio features
+vendor.audio.feature.compress_meta_data.enable=true
 #ro.vendor.audio.sdk.ssr=false
 ##fluencetype can be "fluence" or "fluencepro" or "none"
 #ro.vendor.audio.sdk.fluencetype=none
