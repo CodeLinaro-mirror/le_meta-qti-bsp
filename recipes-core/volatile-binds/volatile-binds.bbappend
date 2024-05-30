@@ -93,6 +93,7 @@ VOLATILE_BINDS_sa525m = "\
 /systemrw/tm.conf /etc/tm.conf\n\
 /systemrw/c2c /etc/c2c/\n\
 /systemrw/tel.conf /etc/tel.conf\n\
+/systemrw/OSNMA_MerkleTree.xml /etc/OSNMA_MerkleTree.xml\n\
 /systemrw/resourcemanager.xml /etc/resourcemanager.xml\n\
 /systemrw/enable /etc/cv2x/enable\n\
 /systemrw/ObeConfig.conf /etc/ObeConfig.conf\n\
@@ -114,6 +115,7 @@ VOLATILE_BINDS_sa525m-televm = "\
 /systemrw/data /etc/data/\n\
 /systemrw/power_state.conf /etc/power_state.conf\n\
 /systemrw/tel.conf /etc/tel.conf\n\
+/systemrw/OSNMA_MerkleTree.xml /etc/OSNMA_MerkleTree.xml\n\
 /systemrw/ObeConfig.conf /etc/ObeConfig.conf\n\
 /systemrw/qmi_fw.conf /vendor/etc/qmi_fw.conf\n\
 /systemrw/gps.conf /etc/gps.conf\n\
