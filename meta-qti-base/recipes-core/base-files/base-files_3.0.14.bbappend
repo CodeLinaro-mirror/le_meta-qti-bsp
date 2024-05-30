@@ -35,3 +35,17 @@ do_install:append(){
         sed -i "/^\${localstatedir}/d" ${D}${sysconfdir}/fstab
     fi
 }
+
+
+do_install:append:sa81x5(){
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'true', 'false', d)}; then
+        sed -i '/^PARTLABEL=dsp/ s/slotselect/&,context=system_u:object_r:dsp_file_t:s0/' ${D}${sysconfdir}/fstab
+    fi
+}
+
+
+do_install:append:sa6155(){
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'true', 'false', d)}; then
+        sed -i '/^PARTLABEL=dsp/ s/slotselect/&,context=system_u:object_r:dsp_file_t:s0/' ${D}${sysconfdir}/fstab
+    fi
+}
