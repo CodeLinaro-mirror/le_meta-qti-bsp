@@ -503,6 +503,7 @@ do_nbdtab()
     sed -i 's+/dev/disk/by-partlabel/userdata+/dev/nbd3+g' data.mount
     sed -i 's+/dev/disk/by-partlabel/cache+/dev/nbd4+g' cache.mount
     if [ -f firmware-mount.service ]; then
+        sed -i '/modemDirCheck/,/modemDirCheckend/d' firmware-mount.service
         sed -i 's+/dev/disk/by-partlabel/modem${SLOT_SUFFIX}+/dev/nbd5+g' firmware-mount.service
         sed -i '/BindsTo=/d' firmware-mount.service
         sed -i '/After=/d' firmware-mount.service
@@ -513,6 +514,7 @@ do_nbdtab()
     fi
 
     if [ -f manifest-mount.service ]; then
+        sed -i '/manifestDirCheck/,/manifestDirCheckend/d' manifest-mount.service
         sed -i '/\/dev\/disk\/by-partlabel\/manifest_b/d' manifest-mount.service
         sed -i 's+/dev/disk/by-partlabel/manifest_a+/dev/nbd7+g' manifest-mount.service
         sed -i '/BindsTo=/d' manifest-mount.service
