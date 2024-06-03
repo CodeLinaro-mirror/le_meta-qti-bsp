@@ -9,6 +9,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         glib-2.0 \
         gki-kernel-modules-second-stage \
         kernel-modules \
+        libmeminfo \
         packagegroup-android-utils \
         packagegroup-filesystem-utils \
         packagegroup-qti-audio \
