@@ -43,6 +43,7 @@ do_install:append() {
     install -b -m 0644 /dev/null ${D}${sysconfdir}/usb/boot_hsic_comp
     echo ${COMPOSITION} > ${D}${sysconfdir}/usb/boot_hsusb_comp
 
+    install -d ${D}${base_sbindir}
     install -m 0755 ${S}/usb/usb_composition -D ${D}${base_sbindir}/
     install -d ${D}${base_sbindir}/usb/compositions/
     install -m 0755 ${S}/usb/compositions/* -D ${D}${base_sbindir}/usb/compositions/
@@ -132,7 +133,7 @@ FILES:${PN}-early-boot += "\
 "
 
 FILES:${PN}-leprop += "\
-    ${base_sbindir}/leprop-service \
+    ${sbindir}/leprop-service \
     ${bindir}/getprop \
     ${bindir}/setprop \
     ${systemd_unitdir}/system/leprop.service \

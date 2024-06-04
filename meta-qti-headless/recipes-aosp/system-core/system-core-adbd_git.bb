@@ -30,7 +30,7 @@ EXTRA_OECONF += "\
 "
 
 FILES:${PN} += "\
-    ${base_sbindir}/adbd \
+    ${sbindir}/adbd \
     ${libdir}/libadbd.so.* \
     ${systemd_unitdir}/system/adbd.service \
     ${systemd_unitdir}/system/multi-user.target.wants/adbd.service \
