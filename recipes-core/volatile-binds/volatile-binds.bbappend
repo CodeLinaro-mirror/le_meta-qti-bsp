@@ -97,7 +97,7 @@ VOLATILE_BINDS_sa525m = "\
 /systemrw/resourcemanager.xml /etc/resourcemanager.xml\n\
 /systemrw/enable /etc/cv2x/enable\n\
 /systemrw/ObeConfig.conf /etc/ObeConfig.conf\n\
-/systemrw/qgptp_params /etc/qgptp_params\n\
+/systemrw/gptp_cfg.ini /etc/gptp_cfg.ini\n\
 /systemrw/power_state.conf /etc/power_state.conf\n\
 /systemrw/qvirtmgr.json  /etc/qvirtmgr.json\n\
 /systemrw/izat.conf /etc/izat.conf\n\
