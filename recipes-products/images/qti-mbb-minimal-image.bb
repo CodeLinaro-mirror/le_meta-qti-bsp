@@ -22,6 +22,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
               packagegroup-qti-core \
               packagegroup-qti-securemsm \
               packagegroup-qti-ss-mgr \
+              ${@bb.utils.contains('BASEMACHINE', 'sdxlemur', "crash-collect", "", d)} \
               ${@bb.utils.contains('MACHINE_FEATURES', 'qti-location', 'packagegroup-qti-location', '', d)} \
               ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
 "

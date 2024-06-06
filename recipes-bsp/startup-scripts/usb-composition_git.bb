@@ -14,3 +14,11 @@ fixup_usb_service() {
       fi
    fi
 }
+
+do_install:append:qcs6490-odk() {
+   cmdline="${@d.getVar('KERNEL_CMD_PARAMS')}"
+   default_usbcontroller=$(echo "${cmdline}" | sed -n 's/.*usbcontroller=\([^ ]*\).*/\1/p')
+
+   install -b -m 0644 /dev/null ${D}${sysconfdir}/usb/usb_udc_config
+   echo -n ${default_usbcontroller} > ${D}${sysconfdir}/usb/usb_udc_config
+}

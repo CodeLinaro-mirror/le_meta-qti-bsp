@@ -38,7 +38,9 @@ add_mount_files () {
                 else
                     install -m 0644 ${S}/${mountname}-mount.service ${D}${systemd_unitdir}/system/${mountname}-mount-${IMAGETYPE}.service
                 fi
-        else
+        elif [[ "$mountname" == "manifest" ]] ; then
+            install -m 0644 ${S}/${mountname}-mount.service ${D}${systemd_unitdir}/system/${mountname}-mount-${IMAGETYPE}.service
+	else
             install -m 0644 ${S}/${mountname}.mount ${D}${systemd_unitdir}/system/${mountname}-${IMAGETYPE}.mount
         fi
     done
@@ -77,6 +79,7 @@ fix_sepolicies () {
     sed -i "s#,rootcontext=system_u:object_r:system_data_t:s0##g" ${WORKDIR}/systemrw.mount
     sed -i "s#,context=system_u:object_r:vm-bootsys_t:s0##g" ${WORKDIR}/vm-bootsys.mount
     sed -i "s#,context=system_u:object_r:vm-bootsys_t:s0##g" ${WORKDIR}/vm-bootsys-mount.service
+    sed -i "s#,context=system_u:object_r:manifest_t:s0##g" ${WORKDIR}/manifest-mount.service
 
     # TODO: figure out the selinux context for the overlays
     sed -i "s#,rootcontext=system_u:object_r:overlay_t:s0##g" ${WORKDIR}/overlay.mount
