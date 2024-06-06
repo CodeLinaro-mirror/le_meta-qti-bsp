@@ -1,14 +1,14 @@
-SUMMARY = "Linux Kernel"
-DESCRIPTION = "Linux Kernel for QTI MSM SoC"
+SUMMARY = "ARK Linux Kernel"
+DESCRIPTION = "ARK Linux Kernel for QTI SoC"
 HOMEPAGE = "https://git.codelinaro.org"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 
-RH_SRC = "${SRC_DIR_ROOT}/kernel/rh-kernel-5.14"
+RH_SRC = "${SRC_DIR_ROOT}/kernel/${RH_KERNEL_NAME}"
 PATCH_DIR = "${SRC_DIR_ROOT}/meta-qti-bsp/meta-qti-base/recipes-kernel/linux-ark/files/"
 
 DEPENDS += "\
-    dtc-native elfutils-native flex-native kern-tools-native \
+    dtc-native elfutils-native kern-tools-native \
     mkbootimg-native openssl-native pahole-native rsync-native \
 "
 DEPENDS:append:aarch64 = " libgcc"
@@ -17,17 +17,19 @@ KERNEL_CC:append:aarch64 = " ${TOOLCHAIN_OPTIONS}"
 KERNEL_LD:append:aarch64 = " ${TOOLCHAIN_OPTIONS}"
 
 SRC_URI = "\
-    ${PATH_TO_REPO}/kernel/rh-kernel-5.14/.git;protocol=${PROTO};name=kernel;destsuffix=kernel/rh-kernel-5.14;usehead=1 \
+    ${PATH_TO_REPO}/kernel/${RH_KERNEL_NAME}/.git;protocol=${PROTO};name=kernel;destsuffix=kernel/${RH_KERNEL_NAME};usehead=1 \
     file://dm.cfg \
     ${@bb.utils.contains_any('VARIANT', 'perf user', 'file://perf.cfg', '', d)} \
+    file://nr_cpus.cfg \
     file://usb_adb.cfg \
+    file://wlan.cfg \
 "
 
 SRCREV_kernel = "${AUTOREV}"
 
 inherit kernel kernel-yocto qsigning ${@bb.utils.contains('TARGET_KERNEL_ARCH', 'aarch64', 'qtikernel-arch', '', d)}
 
-S = "${WORKDIR}/kernel/rh-kernel-5.14"
+S = "${WORKDIR}/kernel/${RH_KERNEL_NAME}"
 
 EXTRA_OEMAKE += "INSTALL_MOD_STRIP=1 --include-dir=${S}"
 
@@ -65,6 +67,9 @@ python do_uncompressed_kernel_patch () {
 }
 
 addtask do_uncompressed_kernel_patch after do_install before do_deploy
+
+do_rh_config[depends] += "flex-native:do_populate_sysroot"
+do_rh_config[depends] += "bison-native:do_populate_sysroot"
 
 do_rh_config () {
     make -C ${RH_SRC}/redhat ARCH=arm64 dist-configs
@@ -161,7 +166,10 @@ do_deploy () {
     install -d ${DEPLOYDIR}/build-artifacts
     install -d ${DEPLOYDIR}/build-artifacts/kernel_scripts/scripts
     install -d ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr
-    cp  ${STAGING_KERNEL_BUILDDIR}/usr/gen_init_cpio ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr
+
+    if [ -f ${STAGING_KERNEL_BUILDDIR}/usr/gen_init_cpio ]; then
+        cp  ${STAGING_KERNEL_BUILDDIR}/usr/gen_init_cpio ${DEPLOYDIR}/build-artifacts/kernel_scripts/usr
+    fi
 
     # Copy Image and dtbs to deploydir
     install -m 0644 vmlinux ${DEPLOYDIR}

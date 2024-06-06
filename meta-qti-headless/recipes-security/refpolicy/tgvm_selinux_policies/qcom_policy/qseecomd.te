@@ -78,7 +78,8 @@ qseecomd_manage_data(qseecomd_t)
 
 # /persist/data
 qseecomd_rw_persist(qseecomd_t)
-qseecomd_manage_persist(qseecomd_t)
+qseecomd_create_persist(qseecomd_t)
+qseecomd_delete_persist(qseecomd_t)
 
 # connect to leprop-service socket
 connect_to_leprop_sockets(qseecomd_t)

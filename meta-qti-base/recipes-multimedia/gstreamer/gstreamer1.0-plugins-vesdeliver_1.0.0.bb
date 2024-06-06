@@ -32,6 +32,10 @@ EXTRA_OEMESON += "\
     ${@oe.utils.version_less_or_equal('${preferred-kernel}', '5.4', '', '-Dusedmaheap=true', d)} \
 "
 
+EXTRA_OEMESON += "\
+    ${@oe.utils.version_less_or_equal('${preferred-kernel}', '5.16', '', '-Dcontiguous_mem_option=op1 -Ddisable_secure_copy=true', d)} \
+"
+
 SOLIBS = ".so"
 FILES_SOLIBSDEV = ""
 

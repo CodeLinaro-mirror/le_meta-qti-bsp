@@ -42,6 +42,8 @@ qseecomd_relabel_data(setfiles_t)
 # selinux-relabeldev.service will restorecon /dev
 # /dev/qseecom
 qseecomd_relabel_dev(setfiles_t)
+qseecomd_manage_data(setfiles_t)
 
 # relabel /persist/data
 qseecomd_relabel_persist(setfiles_t)
+qseecomd_rw_persist(setfiles_t)

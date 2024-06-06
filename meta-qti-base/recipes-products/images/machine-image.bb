@@ -19,3 +19,6 @@ add_extra_modules() {
 }
 
 ROOTFS_POSTPROCESS_COMMAND:append = " add_extra_modules;"
+
+# Makes image suitable for development (e.g. enable ssh for login, allows root logins and logins without passwords by ssh)
+IMAGE_FEATURES:append = " ${@bb.utils.contains('VARIANT', 'debug', 'debug-tweaks ssh-server-openssh', '', d)}"

@@ -24,14 +24,12 @@ MAKE_TARGETS = "\
 
 do_compile() {
     if [ -n "${TECHPACK_DTBS}" ] || [ -n "${TECHPACK_DTBOS}" ] || [ -n "${TECHPACK_MODULES}" ]; then
-        # lock to avoid parallel compiling
-        (
-        flock -x 9 || exit 1
         module_do_compile
-        ) 9>${TMPDIR}/dtbs_lock.lock
     fi
 }
 
+# lock to avoid parallel compiling
+do_compile[lockfiles] += "${TMPDIR}/qti-techpack.lock"
 do_compile[depends] += "virtual/kernel:do_shared_workdir"
 
 do_install() {

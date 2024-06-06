@@ -27,7 +27,6 @@ IMAGE_INSTALL += "\
     tcp-wrappers \
     netkit-telnet \
     proftpd \
-    openssh \
 "
 
 IMAGE_LINGUAS = ""

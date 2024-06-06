@@ -1,6 +1,6 @@
-SUMMARY = "MSM Linux Kernel Headers"
-DESCRIPTION = "Installs MSM kernel headers required to build userspace. \
-These headers are installed in ${includedir}/linux-msm path."
+SUMMARY = "ARK Linux Kernel Headers"
+DESCRIPTION = "Installs ARK kernel headers required to build userspace. \
+These headers are installed in ${includedir}/linux-ark path."
 HOMEPAGE = "https://git.codelinaro.org"
 SECTION = "kernel"
 LICENSE = "GPLv2.0-with-linux-syscall-note"
