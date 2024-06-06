@@ -30,8 +30,6 @@ inherit kernel kernel-yocto qsigning ${@bb.utils.contains('TARGET_KERNEL_ARCH', 
 S = "${WORKDIR}/kernel/${RH_KERNEL_NAME}"
 
 EXTRA_OEMAKE += "INSTALL_MOD_STRIP=1 --include-dir=${S}"
-#Fix redhat Makefile Missing an $(UPSTREAM_BRANCH) branch error.
-EXTRA_OEMAKE += "UPSTREAM_BRANCH=HEAD"
 
 LDFLAGS:aarch64 = "-O1 --hash-style=gnu --as-needed"
 TARGET_CXXFLAGS += "-Wno-format"
@@ -74,9 +72,7 @@ do_rh_config[depends] += "rpm-native:do_populate_sysroot"
 
 #    cp ${RH_SRC}/redhat/configs/kernel-automotive-5.14.0-aarch64.config ${S}/arch/arm64/configs/defconfig
 do_rh_config () {
-    make -C ${RH_SRC}/redhat ARCH=arm64 dist-configs
-    rm -rf ${RH_SRC}/.config ${RH_SRC}/include/config/ \
-    ${RH_SRC}/include/generated/ ${RH_SRC}/arch/$ARCH/include/generated/
+    git checkout -b master || true
     make -C ${S} O=${B} CROSS_COMPILE="" defconfig
     make -C ${S} O=${B} CROSS_COMPILE="" savedefconfig
     cp ${B}/defconfig ${S}/arch/arm64/configs/defconfig
