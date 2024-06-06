@@ -11,7 +11,11 @@ DISTRO_FEATURES:append:qtiquingvm = " qti-omx qti-gstqeavb"
 DISTRO_FEATURES:append:qtiquingvm8295 = " qti-codec2 qti-gstdeinterlace qti-gstqeavb qti-gstqvrate"
 DISTRO_FEATURES:append:quin-gvm-gen4 = " qti-codec2 qti-gstqeavb qti-gstdeinterlace"
 DISTRO_FEATURES:append:quin-gvm-gen4-2 = " qti-codec2 qti-gstdeinterlace qti-gstqeavb qti-gstqvrate"
-DISTRO_FEATURES:append:quin-gvm-lemans = " qti-codec2 qti-gstdeinterlace qti-qcx"
+DISTRO_FEATURES:append:quin-gvm-lemans = " qti-codec2 qti-gstdeinterlace"
+
+# Camera
+DISTRO_FEATURES:append:quin-gvm-lemans = " qti-qcx"
+DISTRO_FEATURES:append:quin-gvm-monaco = " qti-qcx"
 
 # Display
 DISTRO_FEATURES:append = " wayland"
