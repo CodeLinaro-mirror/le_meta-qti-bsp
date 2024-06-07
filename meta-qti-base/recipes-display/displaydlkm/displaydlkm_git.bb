@@ -13,14 +13,14 @@ SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/vendor/qcom/opensource/display-drivers"
 
-inherit qti-techpack
-
 TECHPACK_MODULE_OUT = "${WORKDIR}/display-drivers"
 TECHPACK_MODULES = "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', \
                     'msm-hyp/msm_hyp.ko msm-cfg/msm_cfg.ko', 'msm/msm_drm.ko', d)}"
 TECHPACK_HEADERS = "${S}/include/uapi"
 HDCP_QSEECOM_PATCH = "${STAGING_INCDIR}/hdcp_qseecom"
 TECHPACK_MAKE_ARGS = "KBUILD_EXTRA_SYMBOLS=${HDCP_QSEECOM_PATCH}/Module.symvers"
+
+inherit qti-techpack
 
 do_install:append:sa81x5(){
     install -m 0644 ${S}/config/display_augen3_load.conf -D ${D}${sysconfdir}/modules-load.d/display_load.conf

@@ -11,10 +11,10 @@ SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/vendor/qcom/opensource/hsi2s-kernel"
 
-inherit qti-techpack module module-sign qperf ${@oe.utils.ifelse(d.getVar('PREFERRED_PROVIDER_virtual/kernel') == 'linux-msm',"qti-kernel-arch-clang", "")}
-
 TECHPACK_MODULE_OUT = "${WORKDIR}/vendor/qcom/opensource/hsi2s-kernel"
 TECHPACK_MODULES = "${@bb.utils.contains('BASEMACHINE', 'sa81x5', 'hsi2s.ko', 'driver/hsi2s.ko', d)}"
+
+inherit qti-techpack module module-sign ${@oe.utils.ifelse(d.getVar('PREFERRED_PROVIDER_virtual/kernel') == 'linux-msm',"qti-kernel-arch-clang", "")}
 
 TECHPACK_MAKE_ARGS = "${@bb.utils.contains_any('PREFERRED_VERSION_linux-msm', '5.15 6.1', "${EXTRA_OEMAKE} QTI_TECHPACK=true", "", d)} LEGACY_PATH="${S}""
 
