@@ -11,6 +11,7 @@ SRC_URI   = "file://releasetools/"
 SRC_URI  += "file://releasetools.py"
 SRC_URI  += "file://full_ota.sh"
 SRC_URI  += "file://incremental_ota.sh"
+SRC_URI  += "file://mplane_full_ota.sh"
 
 S = "${WORKDIR}/releasetools"
 
@@ -21,6 +22,7 @@ do_install_append() {
     install -d ${D}${bindir}/releasetools/
     install -m 755 ${WORKDIR}/full_ota.sh ${D}${bindir}/releasetools/
     install -m 755 ${WORKDIR}/incremental_ota.sh ${D}${bindir}/releasetools/
+    install -m 755 ${WORKDIR}/mplane_full_ota.sh ${D}${bindir}/releasetools/
     install -m 755 ${WORKDIR}/releasetools.py ${D}${bindir}/releasetools/
     cp -rf ${S}/* ${D}${bindir}/releasetools/
 }
@@ -29,6 +31,7 @@ do_deploy[cleandirs] = "${DEPLOYDIR}/ota-scripts"
 do_deploy() {
     install -m 755 ${WORKDIR}/full_ota.sh  ${DEPLOYDIR}/ota-scripts
     install -m 755 ${WORKDIR}/incremental_ota.sh ${DEPLOYDIR}/ota-scripts
+    install -m 755 ${WORKDIR}/mplane_full_ota.sh ${DEPLOYDIR}/ota-scripts
     install -m 755 ${WORKDIR}/releasetools.py ${DEPLOYDIR}/ota-scripts
     install -m 755 ${S}/blockimgdiff.py ${DEPLOYDIR}/ota-scripts
     install -m 755 ${S}/common.py ${DEPLOYDIR}/ota-scripts
