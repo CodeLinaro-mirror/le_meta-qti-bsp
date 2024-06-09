@@ -20,6 +20,7 @@ VBLEIMA = "${@bb.utils.contains('COMBINED_FEATURES', 'vbleima','1', '0', d)}"
 VBLEEVM = "${@bb.utils.contains('COMBINED_FEATURES', 'vbleevm','1', '0', d)}"
 
 VERITY_ENABLED = "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains('MACHINE_FEATURES', 'dm-verity-bootloader', '1', '0', d), '0', d)}"
+RESTORE_FDE_KEY = "${@bb.utils.contains('DISTRO_FEATURES', 'full-disk-encryption', bb.utils.contains('MACHINE_FEATURES', 'hibernate-data-encrypt', '1', '0', d), '0', d)}"
 
 EARLY_ETH = "${@bb.utils.contains('DISTRO_FEATURES', 'qti-early-eth', '1', '0', d)}"
 
@@ -58,6 +59,7 @@ EXTRA_OEMAKE = " \
 EXTRA_OEMAKE_append_qcs40x = " 'DISABLE_PARALLEL_DOWNLOAD_FLASH=1'"
 NAND_SQUASHFS_SUPPORT = "${@bb.utils.contains('DISTRO_FEATURES', 'nand-squashfs', '1', '0', d)}"
 EXTRA_OEMAKE_append = " 'NAND_SQUASHFS_SUPPORT=${NAND_SQUASHFS_SUPPORT}'"
+EXTRA_OEMAKE_append = " 'RESTORE_FDE_KEY=${RESTORE_FDE_KEY}'"
 EXTRA_OEMAKE_append_qti-distro-base-user = " 'VERITY_LE_USE_EXT4_GLUEBI=1'"
 
 do_compile () {
