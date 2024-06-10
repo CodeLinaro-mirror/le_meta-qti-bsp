@@ -17,7 +17,7 @@ ExecStartPre=/bin/sh -c " \
                 fi \
             "
 ExecStart=/bin/mount -o noexec,nodev,rw,context=system_u:object_r:manifest_t:s0 -t vfat /dev/disk/by-partlabel/manifest_a /manifest
-ExecStart=/bin/mount -o noexec,nodev,rw,context=system_u:object_r:manifestb_t:s0 -t vfat /dev/disk/by-partlabel/manifest_b /manifest_b
+ExecStart=/bin/mount -o noexec,nodev,rw,context=system_u:object_r:manifest_t:s0 -t vfat /dev/disk/by-partlabel/manifest_b /manifest_b
 Nice=-20
 
 [Install]
