@@ -511,7 +511,17 @@ do_nbdtab()
     else
         echo "firmware.mount or firmware-mount.service are not found"
     fi
-    sed -i 's+/dev/disk/by-partlabel/manifest+/dev/nbd7+g' manifest.mount
+
+    if [ -f manifest-mount.service ]; then
+        sed -i '/context=system_u:object_r:manifestb_t/d' manifest-mount.service
+        sed -i 's+/dev/disk/by-partlabel/manifest_a+/dev/nbd7+g' manifest-mount.service
+        sed -i '/BindsTo=/d' manifest-mount.service
+        sed -i '/After=/d' manifest-mount.service
+    elif [ -f manifest.mount ]; then
+        sed -i 's+/dev/disk/by-partlabel/manifest+/dev/nbd7+g' manifest.mount
+    else
+        echo "manifest.mount or manifest-mount.service are not found"
+    fi
 
     # set debug transport
     echo "Set debug transport to $4"
