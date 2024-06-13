@@ -15,6 +15,7 @@ RDEPENDS:${PN} += "\
     hostap-daemon-qcacld \
     wireless-tools \
     iw \
+    iputils-ping \
     wlan-platform-dlkm\
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-wlan-rome', 'qcacld32-ll-rome', '', d)} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-wlan-genoa', 'qcacld32-ll-genoa', '', d)} \
