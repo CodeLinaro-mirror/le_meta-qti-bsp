@@ -15,6 +15,7 @@ RDEPENDS:${PN} += "\
     hostap-daemon-qcacld \
     wireless-tools \
     iw \
+    iputils-ping \
     wlan-platform-dlkm\
     qcacld32-ll-genoa \
     qcacld32-ll-hasting-cnss0 \
