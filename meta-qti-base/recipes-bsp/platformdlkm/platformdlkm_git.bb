@@ -14,8 +14,6 @@ SRCREV_FORMAT = "dspkernel_platformkernel"
 
 S = "${WORKDIR}/vendor/qcom/opensource/platform-kernel"
 
-inherit qti-techpack
-
 METAL_MODULES_BUILD = "drivers/aop-set-ddr.ko drivers/silent_boot.ko drivers/wallpower_charger.ko drivers/dump_boot_log.ko drivers/silent-mode-hw-monitoring.ko"
 
 VIRT_MODULES_BUILD = "drivers/socinfo_dt.ko drivers/subsystem_notif_virt.ko"
@@ -23,6 +21,8 @@ VIRT_MODULES_BUILD:append:quin-gvm-gen4 = " drivers/virtual_fastrpc/vfastrpc.ko"
 VIRT_MODULES_BUILD:append:quin-gvm-lemans = " drivers/virtual_fastrpc/hfastrpc.ko"
 
 TECHPACK_MODULES = "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '${VIRT_MODULES_BUILD}', '${METAL_MODULES_BUILD}', d)}"
+
+inherit qti-techpack
 
 METAL_PROVIDES_MODULES = "\
     kernel-module-aop-set-ddr-${KERNEL_VERSION} \

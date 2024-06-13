@@ -11,11 +11,11 @@ SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/vendor/qcom/opensource/qcx-kernel"
 
-inherit qti-techpack
-
 TECHPACK_MODULE_OUT = "${WORKDIR}/qcx-kernel"
 TECHPACK_MODULES = "camera.ko"
 TECHPACK_HEADERS = "${S}/include/uapi"
+
+inherit qti-techpack
 
 do_compile:prepend() {
     export ROOT_DIR=""

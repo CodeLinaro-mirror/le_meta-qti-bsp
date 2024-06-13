@@ -11,8 +11,6 @@ SRC_URI:append = " file://audio_load.conf"
 SRCREV = "${AUTOREV}"
 S = "${WORKDIR}/vendor/qcom/opensource/audio-kernel"
 
-inherit ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', "qti-techpack", "module module-sign qperf qti-kernel-arch-clang", d)}
-
 EXTRA_OEMAKE += "TARGET_SUPPORT=${@bb.utils.contains('BASEMACHINE', 'sa81x5', 'sa8155', '${BASEMACHINE}', d)}"
 EXTRA_OEMAKE += "AR_SUPPORT=${@bb.utils.contains('MACHINE_FEATURES', 'qti-audio-ar', 'yes', 'no', d)}"
 
@@ -33,6 +31,8 @@ TECHPACK_MODULES = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', 
 TECHPACK_HEADERS = "${S}/include/uapi/audio"
 TECHPACK_HEADERS_OUT = "audio-kernel/audio"
 TECHPACK_MAKE_ARGS = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', "${EXTRA_OEMAKE} QTI_TECHPACK=true", "", d)} LEGACY_PATH="${S}""
+
+inherit ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', "qti-techpack", "module module-sign qperf qti-kernel-arch-clang", d)}
 
 do_configure() {
     if ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.4', 'true', 'false', d)}; then

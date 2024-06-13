@@ -25,6 +25,7 @@ RDEPENDS:${PN} = "\
         ${@bb.utils.contains('DISTRO_FEATURES', 'qti-codec2', 'codec2 gstreamer1.0-plugins-codec2 codec2-app gstreamer1.0-plugins-vesdeliver gstreamer1.0-plugins-drmdecryptor drm-player-example', '', d)} \
         ${@bb.utils.contains('DISTRO_FEATURES', 'qti-gstdeinterlace', 'gstreamer1.0-plugins-qvdeinterlace', '', d)} \
         ${@bb.utils.contains('DISTRO_FEATURES', 'qti-gstqvrate', 'gstreamer1.0-plugins-qvrate', '', d)} \
+        ${@bb.utils.contains('DISTRO_FEATURES', 'qti-gstqvais', 'gstreamer1.0-plugin-qvais', '', d)} \
 "
 
 # codec2-service is enabled on quin-gvm-gen4-2, so not need codec2-app for this target

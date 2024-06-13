@@ -13,12 +13,12 @@ SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/vendor/qcom/opensource/ais-kernel"
 
-inherit qti-techpack
-
 TECHPACK_MODULE_OUT = "${WORKDIR}/ais-kernel"
 TECHPACK_MODULES = "ais.ko"
 TECHPACK_HEADERS = "${S}/include/uapi"
 TECHPACK_MAKE_ARGS = "${@bb.utils.contains_any('PREFERRED_VERSION_linux-msm', '5.15 6.1', "${EXTRA_OEMAKE} QTI_TECHPACK=true", "", d)}"
+
+inherit qti-techpack
 
 do_compile:prepend() {
     export ROOT_DIR=""
