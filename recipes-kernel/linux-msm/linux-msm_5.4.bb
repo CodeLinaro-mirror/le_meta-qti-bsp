@@ -42,6 +42,18 @@ DTBO_SRC_PATH = "${STAGING_KERNEL_BUILDDIR}/arch/${ARCH}/boot/dts/vendor/qcom/"
 # Auto generate kernel config by appending .cfg(s) from kernel tree.
 DYNAMIC_DEFCONFIG = "${@d.getVar('KERNEL_DYNAMIC_DEFCONFIG') or "False"}"
 
+# append DTB
+# msm kernel trees have a special treatment for DTS, and both arm and
+# arm64 DTS are located in arch/arm64/boot/dts/qcom folder, which
+# confuses kernel-devicetree class, so we can't use it. Instead let's
+# make sure that we generate all DTBs using the kernel 'dtbs' target,
+# then we can append the DTBs that we need for $MACHINE.
+KERNEL_IMAGETYPE_FOR_MAKE += "dtbs"
+KERNEL_IMAGETYPE_FOR_MAKE += "${KERNEL_IMAGETYPE}"
+KERNEL_IMAGETYPE_FOR_MAKE += "modules"
+
+do_compile_kernelmodules[noexec] = "1"
+
 do_generate_defconfig () {
         ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} REAL_CC=${STAGING_BINDIR_NATIVE}/clang \
         LD=${CCACHE}${HOST_PREFIX}ld KERN_OUT=${STAGING_KERNEL_BUILDDIR} \
@@ -71,6 +83,22 @@ do_shared_workdir_append () {
 
         # Generate kernel headers
         oe_runmake_call -C ${STAGING_KERNEL_DIR} ARCH=${ARCH} CC="${KERNEL_CC}" LD="${KERNEL_LD}" headers_install O=${STAGING_KERNEL_BUILDDIR}
+}
+
+do_compile:append() {
+    if (grep -q -i -e '^CONFIG_MODULES=y$' ${B}/.config); then
+        # Module.symvers gets updated during the
+        # building of the kernel modules. We need to
+        # update this in the shared workdir since some
+        # external kernel modules has a dependency on
+        # other kernel modules and will look at this
+        # file to do symbol lookups
+        cp ${B}/Module.symvers ${STAGING_KERNEL_BUILDDIR}/
+        # 5.10+ kernels have module.lds that we need to copy for external module builds
+        if [ -e "${B}/scripts/module.lds" ]; then
+            install -Dm 0644 ${B}/scripts/module.lds ${STAGING_KERNEL_BUILDDIR}/scripts/module.lds
+        fi
+    fi
 }
 
 do_deploy_append () {

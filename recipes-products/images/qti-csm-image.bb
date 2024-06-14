@@ -21,6 +21,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
               e2fsprogs-mke2fs \
               e2fsprogs-tune2fs \
               powerapp \
+              deviceinfo \
               crash-collect-hlos \
               powerapp-powerconfig \
               powerapp-reboot \
