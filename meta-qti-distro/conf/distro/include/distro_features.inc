@@ -56,4 +56,4 @@ DISTRO_FEATURES_NATIVE:append:sa8775 = " selinux"
 
 # Preferred refpolicy
 PREFERRED_PROVIDER_virtual/refpolicy:sa8775 = "selinux-policy"
-DEFAULT_ENFORCING:sa8775 = "permissive"
+DEFAULT_ENFORCING:sa8775 = "enforcing"
