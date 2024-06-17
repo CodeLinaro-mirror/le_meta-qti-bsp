@@ -1,4 +1,5 @@
 include conf/machine/include/basemachine.inc
+include conf/machine/include/hgy-bbmask.inc
 
 SOC_FAMILY ?= "sa-common"
 include conf/machine/include/soc-family.inc
