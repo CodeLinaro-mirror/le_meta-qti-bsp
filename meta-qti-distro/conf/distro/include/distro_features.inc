@@ -35,7 +35,7 @@ DISTRO_FEATURES:append = " qti-early-eth"
 DISTRO_FEATURES:append = " hibernation"
 
 # Use systemd init manager.
-DISTRO_FEATURES:append = " systemd"
+DISTRO_FEATURES:append = " systemd ${@bb.utils.contains('LAYERSERIES_CORENAMES', 'scarthgap', 'usrmerge', '', d)}"
 DISTRO_FEATURES_BACKFILL_CONSIDERED += "sysvinit"
 
 DISTRO_FEATURES:append = " vulkan"
