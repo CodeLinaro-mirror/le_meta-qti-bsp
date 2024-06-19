@@ -30,10 +30,6 @@ BBMASK += "meta-qti-bsp/meta-qti-base/recipes-wlan"
 BBMASK += "meta-qti-bsp/meta-qti-base/recipes-kernel/edk2/edk2_4.0.bb"
 BBMASK += "meta-qti-bsp/meta-qti-base/recipes-kernel/edk2/edk2_5.0.bb"
 
-RUSTVERSION = "1.66%"
-BBMASK += "poky/meta/recipes-devtools/cargo"
-BBMASK += "poky/meta/recipes-devtools/rust"
-
 # Enables timestamping functionality during building the kernel
 KERNEL_DEBUG_TIMESTAMPS = "1"
 # mesa provides these packags and others like virtual/libgl.
