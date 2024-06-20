@@ -35,8 +35,8 @@ do
 echo $addr > probe
 echo online > memory$num/state
 let n++
-addr=`cat aligned_blocks_addr | cut -d ',' -f $n`
-num=`cat aligned_blocks_num | cut -d ',' -f $n`
+addr=`cat aligned_blocks_addr | cut -d ',' -f $n -s`
+num=`cat aligned_blocks_num | cut -d ',' -f $n -s`
 done
 # tune kernel max-threads
 totalram=`grep MemTotal /proc/meminfo | awk '{print $2}'`
