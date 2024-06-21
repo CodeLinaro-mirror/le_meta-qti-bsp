@@ -49,3 +49,11 @@ DISTRO_FEATURES:append:quin-gvm-gen4 = " qti-bluetooth"
 DISTRO_FEATURES:append:quin-gvm-gen4-2 = " qti-bluetooth"
 DISTRO_FEATURES:append:quin-gvm-lemans = " qti-bluetooth"
 DISTRO_FEATURES:append:quin-gvm-monaco = " qti-bluetooth"
+
+# SELinux
+DISTRO_FEATURES:append:sa8775 = " selinux"
+DISTRO_FEATURES_NATIVE:append:sa8775 = " selinux"
+
+# Preferred refpolicy
+PREFERRED_PROVIDER_virtual/refpolicy:sa8775 = "selinux-policy"
+DEFAULT_ENFORCING:sa8775 = "permissive"
