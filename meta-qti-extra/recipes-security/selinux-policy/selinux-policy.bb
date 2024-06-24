@@ -190,6 +190,14 @@ install_misc_files() {
     install -m0644 ${WORKDIR}/selinux-policy/setrans-targeted.conf ${D}/${sysconfdir}/selinux/targeted/setrans.conf
     install -m0644 ${WORKDIR}/selinux-policy/customizable_types ${D}/${sysconfdir}/selinux/targeted/contexts/customizable_types
 
+    echo "\
+# busybox aliases
+# quickly match up the busybox built-in tree to the base filesystem tree
+/usr/lib/busybox/bin /usr/bin
+/usr/lib/busybox/sbin /usr/sbin
+/usr/lib/busybox/usr /usr
+" >> ${D}/${sysconfdir}/selinux/targeted/contexts/files/file_contexts.subs_dist
+
     # install policy headers
     oe_runmake 'DESTDIR=${D}' 'prefix=${D}${prefix}' install-headers
 }
