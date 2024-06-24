@@ -4,8 +4,7 @@
 You can now run 'bitbake <target>'
 
 Supported image targets are:
-    qti-console-image
-    qti-multimedia-image
+    qti-robotics-image
 
 Run 'bitbake <pkg-name>' to build a required package, example:
     bitbake lk
