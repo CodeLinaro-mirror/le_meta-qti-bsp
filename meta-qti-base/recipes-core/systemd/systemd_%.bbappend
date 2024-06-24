@@ -5,12 +5,13 @@ FILESEXTRAPATHS =. "${FILESBBAPPENDPATH}/${BP}:${FILESBBAPPENDPATH}/${BPN}:"
 DEPENDS += "glib-2.0"
 
 SRC_URI:append = " \
-    file://0001-systemd-add-slotselect-support-in-fstab.patch \
     file://0033-systemd-Make-root-s-home-directory-configurable-2.patch \
-    file://0001-systemd-skip-smack-copy-issue-in-systemd.patch \
     file://0001-systemd-avoid-active-seat-change-to-NULL.patch \
     file://60-misc.rules \
 "
+
+SRC_URI:append:sa81x5 = " file://0001-systemd-add-slotselect-support-in-fstab.patch"
+
 # Config root user as lingering to avoid weston socket lost after LPM in build with early_init
 SRC_URI:append = " ${@bb.utils.contains("DISTRO_FEATURES", "early_init", "file://0001-systemd-config-linger-for-root-user.patch", "", d)}"
 
