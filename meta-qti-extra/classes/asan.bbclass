@@ -3,7 +3,7 @@
 
 # Add AddressSanitizer function for recipes.
 python __anonymous() {
-    #Determine whether this function needs to be turned on
+    # Determine whether this function needs to be turned on
     is_turn = bb.utils.contains('DISTRO_FEATURES', 'asan', True, False, d)
     if not is_turn:
         return
@@ -29,48 +29,64 @@ python __anonymous() {
 
     recipe_name = d.getVar('PN', True)
 
-    if "native" in recipe_name or "linux-msm" in recipe_name or "packagegroup" in recipe_name:
+    if "native" in recipe_name or "linux" in recipe_name or "packagegroup" in recipe_name or "kernel" in recipe_name:
         return
 
-    is_clang = bb.utils.contains('TOOLCHAIN', 'clang', True, False, d)
-    if is_clang:
-        return
-
-    #Because all dependent libraries cannot link to asan, these recipes are temporarily blocked.
-    if recipe_name in ['wlan-sigma-dut', 'qcacld32-ll-hmt', 'qcacld32-ll-hasting-cnss2', 'qcacld32-ll-hasting-cnss0', 'qcacld32-ll-hsp', 'gstreamer1.0-plugins-vesdeliver', 'btcli', 'system-core-adbd', 'libuhab']:
-        return
-
-    if recipe_name in ['adreno', 'gbm-headers', 'gbm', 'wpa-supplicant', 'hostap-daemon-qcacld', 'libnpu', 'libion', 'libsync', 'libdmabufheap', 'gstreamer1.0-qvconv', 'wayland-ivi-extension']:
-        return
-
-    if recipe_name in ['libutils', 'libhardware', 'weston-sdm-extension', 'weston-sdm-extension-headers', 'display-hal-linux', 'display-hal-headers', 'display-commonsys-intf-linux', 'acdbloaderservice']:
+    if recipe_name in ['system-core-adbd', 'libuhab', 'wayland-ivi-extension', 'btcli', 'qcrosvm']:
         return
 
     d.appendVar('DEPENDS', ' gcc-sanitizers')
-    d.appendVar('CFLAGS', ' -fsanitize=address')
     d.appendVar('LDFLAGS', ' -lasan')
+
+    # Inherit meson, needs add compile flags at meson-configure file additionally
+    if recipe_name in ['weston-sdm-extension', 'gstreamer1.0-qvconv', 'gstreamer1.0-plugins-drmdecryptor', 'gstreamer1.0-plugins-vesdeliver', 'gstreamer1.0-plugins-qvdeinterlace', 'gstreamer1.0-plugins-codec2', 'gstreamer1.0-plugins-qeavb']:
+        d.appendVar('EXTRA_OEMESON', ' -DASAN=true')
+        return
+
+    if recipe_name in ['fastcv', 'fastcv-noship']:
+        d.appendVar('EXTRA_OECONF', ' --enable-asan')
+        return
+
+    d.appendVar('CFLAGS', ' -fsanitize=address')
     d.appendVar('CPPFLAGS', ' -fsanitize=address')
+
+    # Using Makefile, needs add link library additionally
+    if recipe_name in ['wlan-sigma-dut', 'libnpu', 'wpa-supplicant', 'hostap-daemon-qcacld', 'hsi2s-qmi-test']:
+        d.appendVar('EXTRA_OEMAKE', ' ASAN=y')
+
+    # Using CMakefile.txt, needs add link library additionally
+    if recipe_name in ['safetymonitor', 'libkiumd', 'fadas']:
+        d.appendVar('EXTRA_OECMAKE', ' -DASAN=ON')
+
+    # TOOLCHAIN is clang, need libclang_rt.asan.a
+    if recipe_name in ['media-external', 'media-codec2', 'media-noship', 'codec2', 'codec2-app', 'codec2-service', 'video-driver', 'vidc-test-app', 'vidc-enc-test', 'vidc-dec-test']:
+        d.appendVar('DEPENDS', ' compiler-rt')
 }
 
 ROOTFS_POSTPROCESS_COMMAND:append = " ${@bb.utils.contains("DISTRO_FEATURES", "asan", "add_asan_preload;", "", d)}"
-
 #add some asan option for service
 add_asan_preload() {
     if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/agm.service" ]; then
-        sed -i '/^\[Service\]/a Environment="ASAN_OPTIONS=detect_odr_violation=0"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/agm.service
         sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.6"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/agm.service
     fi
     if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/init_codec2.service" ]; then
         sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.6"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/init_codec2.service
-    fi
-    if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/pdmapper.service" ]; then
-        sed -i '/^\[Service\]/a Environment="ASAN_OPTIONS=detect_odr_violation=0"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/pdmapper.service
     fi
     if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/ab-updater.service" ]; then
         sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.6"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/ab-updater.service
     fi
     if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/ais_server.service" ]; then
         sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.6"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/ais_server.service
+    fi
+    if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/weston@.service" ]; then
+        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.6"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/weston@.service
+    fi
+    # waiting to fix the error of leum711, will delete below code
+    if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/agm.service" ]; then
+        sed -i '/^\[Service\]/a Environment="ASAN_OPTIONS=detect_odr_violation=0"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/agm.service
+    fi
+    if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/pdmapper.service" ]; then
+        sed -i '/^\[Service\]/a Environment="ASAN_OPTIONS=detect_odr_violation=0"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/pdmapper.service
     fi
     if [ -f "${IMAGE_ROOTFS}/etc/systemd/system/thermal-engine.service" ]; then
         sed -i '/^\[Service\]/a Environment="ASAN_OPTIONS=detect_odr_violation=0"' ${IMAGE_ROOTFS}/etc/systemd/system/thermal-engine.service
