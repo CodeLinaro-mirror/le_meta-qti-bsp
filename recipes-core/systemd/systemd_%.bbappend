@@ -9,3 +9,11 @@ do_install:append() {
         sed -i 's/#children_max=/children_max=5/' ${D}/etc/udev/udev.conf
     fi
 }
+
+do_install:append:mdm9607() {
+   #  Mask journaling services by default.
+   #  'systemctl unmask' can be used on device to enable them if needed.
+   ln -sf /dev/null ${D}${systemd_unitdir}/system/systemd-journald.service
+   ln -sf /dev/null ${D}${systemd_unitdir}/system/sysinit.target.wants/systemd-journal-flush.service
+   ln -sf /dev/null ${D}${systemd_unitdir}/system/sysinit.target.wants/systemd-journal-catalog-update.service
+}
