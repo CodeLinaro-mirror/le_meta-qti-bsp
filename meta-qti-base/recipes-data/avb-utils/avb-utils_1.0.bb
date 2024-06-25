@@ -8,7 +8,7 @@ HOMEPAGE = "http://git.codelinaro.org/"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://NOTICE;md5=b45eb38359bd16993272b40c311aa89f"
 
-DEPENDS += "glib-2.0 open-avb"
+DEPENDS += "glib-2.0"
 
 SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/avb-utils/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/avb-utils;usehead=1"
 
@@ -32,5 +32,3 @@ do_install() {
 
 SOLIBS = ".so"
 FILES_SOLIBSDEV = ""
-
-RDEPENDS:avb-utils += "open-avb"
