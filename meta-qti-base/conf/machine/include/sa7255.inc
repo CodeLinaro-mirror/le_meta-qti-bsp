@@ -30,7 +30,7 @@ BBMASK += "meta-qti-bsp/meta-qti-base/recipes-kernel/edk2/edk2_4.0.bb"
 BBMASK += "meta-qti-bsp/meta-qti-base/recipes-kernel/edk2/edk2_5.0.bb"
 BBMASK += "meta-qti-bsp/meta-qti-base/recipes-products/images/qti-image-boot.bb"
 
-RUSTVERSION = "1.66%"
+RUSTVERSION = "1.75%"
 BBMASK += "poky/meta/recipes-devtools/cargo"
 BBMASK += "poky/meta/recipes-devtools/rust"
 
