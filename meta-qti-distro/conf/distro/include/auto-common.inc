@@ -22,6 +22,8 @@ VIRTUAL-RUNTIME_init_manager = "systemd"
 
 INCOMPATIBLE_LICENSE = "GPL-3.0-only LGPL-3.0-only AGPL-3.0-only"
 
+INCOMPATIBLE_LICENSE:sa8797 = " "
+
 IMAGE_FEATURES:append = " read-only-rootfs"
 
 LICENSE_FLAGS_ACCEPTED += "commercial_gstreamer1.0-libav commercial_gstreamer1.0-omx"
