@@ -50,6 +50,7 @@ _WLAN_CFG_OVERRIDE = "\
                         CONFIG_BAND_6GHZ=y \
                         CONFIG_CONNECTION_ROAMING_CFG=n \
                         CONFIG_DBR_HOLD_LARGE_MEM=n \
+                        CONFIG_DP_MULTIPASS_SUPPORT=n \
                         "
 EXTRA_OEMAKE:append = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE}"
 
