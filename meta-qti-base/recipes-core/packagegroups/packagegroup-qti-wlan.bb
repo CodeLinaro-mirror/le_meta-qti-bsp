@@ -28,3 +28,5 @@ RDEPENDS:${PN} += "\
     wlan-conf \
     cnss-wlan-load \
     "
+
+RDEPENDS:${PN}:append:quin-gvm-gen4-2 = " hs20-osu-client"
