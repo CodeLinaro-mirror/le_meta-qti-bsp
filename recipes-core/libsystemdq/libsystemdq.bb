@@ -31,6 +31,7 @@ SRC_URI += "file://touchscreen.rules \
            file://0001-core-when-deserializing-state-always-use-read_line-L.patch \
            file://0001-chown-recursive-let-s-rework-the-recursive-logic-to-.patch \
            file://0001-dhcp6-make-sure-we-have-enough-space-for-the-DHCP6-o.patch \
+           file://0001-debug-extra-option.patch \
            "
 
 SRC_URI += "file://remove-udev-references-from-meson-build.patch \
