@@ -22,10 +22,6 @@ do_install:append:sa81x5() {
     install -m 0644 ${S}/config/autoload_sa81x5.conf -D ${D}${sysconfdir}/modules-load.d/graphics_load.conf
 }
 
-do_install:append:lemans() {
-    install -m 0644 ${S}/config/autoload_lemans.conf -D ${D}${sysconfdir}/modules-load.d/graphics_load.conf
-}
-
 do_install:append:monaco() {
     install -m 0644 ${S}/config/autoload_monaco_auto.conf -D ${D}${sysconfdir}/modules-load.d/graphics_load.conf
 }

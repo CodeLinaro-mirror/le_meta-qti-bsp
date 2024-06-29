@@ -18,7 +18,6 @@ DEPENDS += "\
     videodlkm \
 "
 
-DEPENDS:append:lemans = " displaydlkm"
 DEPENDS:append:quin-gvm-lemans = " displaydlkm"
 DEPENDS:append:quin-gvm-monaco = " displaydlkm"
 
@@ -29,11 +28,6 @@ S = "${WORKDIR}/gstreamer/gst-plugins-qti-oss/gst-plugin-qvdeinterlace"
 inherit meson pkgconfig
 
 CFLAGS += "-I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}"
-
-CFLAGS:append:lemans = " -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}/display"
-EXTRA_OEMESON:append:lemans = " \
-    -Dmmmcolorfmt=true \
-"
 
 CFLAGS:append:quin-gvm-lemans = " -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}/display"
 EXTRA_OEMESON:append:quin-gvm-lemans = " \
