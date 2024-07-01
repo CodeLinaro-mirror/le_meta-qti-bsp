@@ -38,6 +38,8 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         systemd-machine-units \
         ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
         packagegroup-qti-qesdk-core \
+        packagegroup-qti-dcf-lib \
+        packagegroup-qti-dcf-hal \
 "
 
 #Install packages for display
