@@ -47,6 +47,10 @@ do_patch:append() {
     patch -f -p1 < ${WORKDIR}/0001-QCLINUX-vfio-Disable-iommu_group_claim_dma_owner-tem.patch
 }
 
+do_compile:prepend() {
+    export DTC_FLAGS="-@"
+}
+
 do_shared_workdir:append () {
     mkdir -p $kerneldir/certs
     install -m 0644 certs/signing_key.x509 $kerneldir/certs/
