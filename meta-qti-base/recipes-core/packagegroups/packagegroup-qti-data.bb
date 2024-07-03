@@ -13,6 +13,8 @@ ALLOW_EMPTY:${PN} = "1"
 RDEPENDS:${PN} += "\
     bridge-utils \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'setup-network', '', d)} \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-gunyah', 'setup-network-host', '', d)} \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-lxc', 'setup-network-host', '', d)} \
     net-tools \
     ethtool \
     iperf2 \
