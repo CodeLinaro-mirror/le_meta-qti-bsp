@@ -69,6 +69,7 @@ MACHINE_FEATURES += "\
     qti-vmm \
     qti-camera \
     qti-safety \
+    qti-data \
     qti-vnw \
     early-ramdisk-init \
     qti-security \
