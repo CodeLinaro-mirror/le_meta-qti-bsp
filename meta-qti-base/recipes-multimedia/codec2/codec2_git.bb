@@ -40,6 +40,7 @@ EXTRA_OECMAKE += "\
 "
 EXTRA_OECMAKE:append:quin-gvm-lemans = " -DLOAD_CORE_LIB:BOOL=ON"
 EXTRA_OECMAKE:append:quin-gvm-gen4-2 = " -DUSE_AGL_C2SERVICE:BOOL=ON"
+EXTRA_OECMAKE:append:quin-gvm-gen4-dpk = " -DUSE_AGL_C2SERVICE:BOOL=ON"
 
 EXTRA_OECMAKE:append:quin-gvm-monaco = " -DLOAD_CORE_LIB:BOOL=ON"
 
