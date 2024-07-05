@@ -33,9 +33,6 @@ EXTRA_OEMAKE:append:sa81x5 = " 'AB_RETRYCOUNT_DISABLE=1' \
                                'BOOTIMAGE_LOAD_VERIFY_IN_PARALLEL=1' \
                                'ENABLE_LV_ATOMIC_AB=1' "
 
-EXTRA_OEMAKE:append:lemans = " 'AB_RETRYCOUNT_DISABLE=1' \
-                               'ENABLE_LV_ATOMIC_AB=1' "
-
 EXTRA_OEMAKE:append:monaco = " 'AB_RETRYCOUNT_DISABLE=1' \
                                'ENABLE_LV_ATOMIC_AB=1' "
 

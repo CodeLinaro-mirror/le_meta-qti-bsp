@@ -22,11 +22,6 @@ do_compile:prepend() {
     export KERNEL_DIR=${STAGING_KERNEL_DIR}
 }
 
-do_install:append:lemans() {
-    install -d -p ${D}${includedir}/dt-bindings
-    install -m 0755 ${WORKDIR}/vendor/qcom/opensource/qcx-kernel/dt-bindings/msm-camera.h -D ${D}${includedir}/dt-bindings/msm-camera.h
-}
-
 RPROVIDES:${PN} += "kernel-module-camera-${KERNEL_VERSION}"
 
 FILES:${PN} += "${nonarch_base_libdir}/modules/${KERNEL_VERSION}/*"
