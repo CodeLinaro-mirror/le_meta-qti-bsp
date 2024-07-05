@@ -25,4 +25,4 @@ CPPFLAGS:append = " -I${STAGING_INCDIR}/cutils"
 
 BBCLASSEXTEND = "native"
 
-MACHINEOVERRIDES:class-native = "${MACHINE}"
+MACHINEOVERRIDES:class-native = "${MACHINE}:${SOC_FAMILY}"
