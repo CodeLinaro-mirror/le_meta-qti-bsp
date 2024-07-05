@@ -3,7 +3,7 @@ DESCRIPTION = "avb (audio video bridge) plugins for GStreamer, receive pcm data 
 HOMEPAGE = "https://git.codelinaro.org/"
 SECTION = "multimedia"
 LICENSE = "BSD-3-Clause"
-LIC_FILES_CHKSUM = "file://README;md5=d41d8cd98f00b204e9800998ecf8427e"
+LIC_FILES_CHKSUM = "file://NOTICE.txt;md5=a2bd2b12cb1c303823d7af2d87a3ba8d"
 
 DEPENDS += "avb-utils \
             glib-2.0 \
@@ -20,7 +20,7 @@ SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/gstreamer/gst-plugins-qti-oss/gst-plugins-qeavb"
 
-inherit autotools-brokensep pkgconfig
+inherit meson pkgconfig
 
 FILES:${PN} += "${libdir}/gstreamer-1.0/*.so"
 FILES:${PN}-dbg += "${libdir}/gstreamer-1.0/.debug"
