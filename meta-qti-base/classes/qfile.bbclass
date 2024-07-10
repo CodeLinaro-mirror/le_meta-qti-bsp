@@ -26,6 +26,9 @@
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+# Skip get_checksum_file_list function detection
+do_fetch[file-checksums] = "${@get_lic_checksum_file_list(d)}"
+
 python __anonymous(){
     import re
 
