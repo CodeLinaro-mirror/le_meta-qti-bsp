@@ -15,6 +15,7 @@ do_install_append () {
     fi
 
     if ${@bb.utils.contains('MACHINE_MNT_POINTS', '/manifest', 'true', 'false', d)}; then
+        install -d ${D}/manifest_a
         install -d ${D}/manifest_b
     fi
 
@@ -33,4 +34,5 @@ do_install_append () {
 
 SYSTEMD_SERVICE_${PN} += "${@bb.utils.contains('COMBINED_FEATURES','qti-ab-boot',' set-slotsuffix.service','',d)}"
 
+FILES_${PN} += "${@bb.utils.contains('MACHINE_MNT_POINTS', '/manifest', '/manifest_a', '', d)}"
 FILES_${PN} += "${@bb.utils.contains('MACHINE_MNT_POINTS', '/manifest', '/manifest_b', '', d)}"

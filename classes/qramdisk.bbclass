@@ -11,6 +11,7 @@ PACKAGE_INSTALL += "${@oe.utils.conditional('ENABLE_ADB', 'True', 'adbd usb-comp
 PACKAGE_INSTALL += "${@oe.utils.conditional('USB_AUTOSUSPEND_SUPPORT', 'True', 'usb-composition-usbd', '', d)}"
 PACKAGE_INSTALL += "${@oe.utils.conditional('TOYBOX_RAMDISK', 'True', 'toybox mksh gawk coreutils ethtool iputils devmem2 tcpdump', '', d)}"
 PACKAGE_INSTALL += "${@oe.utils.conditional('FLASHLESS_MCU', 'True', 'nbd-client techpack-ecpri csm-ru-nwboot-client', '', d)}"
+PACKAGE_INSTALL += "${@oe.utils.conditional('MACHINE_FEATURES', 'qti-csm', 'powerapp powerapp-reboot', '', d)}"
 DEPENDS += "${@oe.utils.conditional('FLASHLESS_MCU', 'True', 'binutils-cross-${TARGET_ARCH}', '', d)}"
 
 # Adding mtd-utils to support dm-verity v4 for NAND
@@ -51,6 +52,11 @@ fakeroot do_ramdisk_create() {
         mkdir -p ${RAMDISKDIR}/sys
         cd ${RAMDISKDIR}
         ln -s bin sbin
+
+        if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-csm', 'true', 'false', d)}; then
+           cp ${IMAGE_ROOTFS}/sbin/sys_reboot bin/
+        fi
+
         if [[ "${TOYBOX_RAMDISK}" == "True" ]]; then
             cp ${IMAGE_ROOTFS}/usr/lib/libcrypt.so.2 lib/libcrypt.so.2
             cp ${IMAGE_ROOTFS}/bin/toybox bin/
