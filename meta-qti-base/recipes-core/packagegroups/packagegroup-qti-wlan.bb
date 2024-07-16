@@ -29,4 +29,4 @@ RDEPENDS:${PN} += "\
     cnss-wlan-load \
     "
 
-RDEPENDS:${PN}:append:quin-gvm-gen4-2 = " hs20-osu-client"
+RDEPENDS:${PN}:append:quin-gvm-gen4-2 = " hs20-osu-client dhcpcd"
