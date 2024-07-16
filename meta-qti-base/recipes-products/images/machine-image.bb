@@ -1,4 +1,3 @@
-require automotive-image.inc
 SUMMARY = "Machine image"
 DESCRIPTION = "Build the full machine image depend on different parameters"
 LICENSE = "BSD-3-Clause"
@@ -6,6 +5,8 @@ LICENSE = "BSD-3-Clause"
 DEPENDS += "mkbootimg-native"
 
 inherit core-image
+
+require automotive-image.inc
 
 KERNEL_VERSION = "${@oe.utils.read_file('${STAGING_KERNEL_BUILDDIR}/kernel-abiversion')}"
 
