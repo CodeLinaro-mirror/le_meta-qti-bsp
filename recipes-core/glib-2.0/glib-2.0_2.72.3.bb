@@ -66,13 +66,13 @@ def find_meson_cross_files(d):
 
 python () {
     import os
-    download_path = "${WORKSPACE}/poky/meta-qti-bsp/recipes-core/glib-2.0/glib-2.0/"
+    download_path = d.getVar('WORKSPACE') + "/poky/meta-qti-bsp/recipes-core/glib-2.0/glib-2.0/"
     cmd = "mkdir -p " + download_path + "meson.cross.d"
-    os.system(cmd)
+    ret = os.system(cmd)
     files = [ "meson.cross.d/common", "meson.cross.d/common-glibc", "meson.cross.d/common-linux", "meson.cross.d/common-mingw", "meson.cross.d/common-musl"]
     for entry in files:
-        cmd = "wget ${BASE_URL}/" + entry + "${BRANCH} -O " + download_path + entry
-        os.system(cmd)
+        cmd = "wget " + d.getVar('BASE_URL') + "/" + entry + d.getVar('BRANCH') + " -O " + download_path + entry
+        ret = os.system(cmd)
 
     find_meson_cross_files(d)
 }
