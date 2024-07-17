@@ -16,6 +16,7 @@ SRC_URI = "\
     file://generic.cfg \
     ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'file://selinux.cfg', '', d)} \
     ${@bb.utils.contains_any('VARIANT', 'perf user', '', 'file://devmem.cfg', d)} \
+    file://0001-QCLINUX-vfio-Disable-iommu_group_claim_dma_owner-tem.patch \
 "
 
 SRCREV_kernel = "${AUTOREV}"
@@ -40,6 +41,11 @@ do_generate_base_defconfig() {
     ${S}/scripts/kconfig/merge_config.sh -m -r -y ${base_defconfig} ${qcom_addon_config} 1>&2
 }
 addtask do_generate_base_defconfig after do_unpack before do_kernel_metadata
+
+do_patch:append() {
+    cd ${S}
+    patch -f -p1 < ${WORKDIR}/0001-QCLINUX-vfio-Disable-iommu_group_claim_dma_owner-tem.patch
+}
 
 do_shared_workdir:append () {
     mkdir -p $kerneldir/certs
