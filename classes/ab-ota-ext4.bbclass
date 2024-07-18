@@ -163,8 +163,11 @@ do_gen_ota_incremental_zip_ext4() {
 
 do_gen_ota_full_zip_ext4[dirs] += "${DEPLOY_DIR_IMAGE}/ota-scripts"
 do_gen_ota_full_zip_ext4() {
-    ./full_ota.sh ${OTA_TARGET_FILES_EXT4_PATH} ${IMAGE_ROOTFS} ext4 --block --system_path ${IMAGE_SYSTEM_MOUNT_POINT} ${SIGN_OTA_PACKAGE} ${MIRROR_SYNC} ${INSTALL_ONLY}
-
+    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-mplane-spec', 'true', 'false', d)}; then
+        ./mplane_full_ota.sh 1 ${OTA_TARGET_FILES_EXT4_PATH} ${IMAGE_ROOTFS} ext4 --block --system_path ${IMAGE_SYSTEM_MOUNT_POINT} ${SIGN_OTA_PACKAGE} ${MIRROR_SYNC} ${INSTALL_ONLY}
+    else
+        ./full_ota.sh ${OTA_TARGET_FILES_EXT4_PATH} ${IMAGE_ROOTFS} ext4 --block --system_path ${IMAGE_SYSTEM_MOUNT_POINT} ${SIGN_OTA_PACKAGE} ${MIRROR_SYNC} ${INSTALL_ONLY}
+    fi
     cp update_ext4.zip ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${OTA_FULL_UPDATE_EXT4}
 }
 addtask do_gen_ota_full_zip_ext4 after do_recovery_ext4 before do_build
