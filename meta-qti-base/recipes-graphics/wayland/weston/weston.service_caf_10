@@ -1,8 +1,10 @@
 [Unit]
 Description=Weston reference Wayland compositor
-Conflicts=getty@tty2.service
+Conflicts=getty@tty2.service shutdown.target
 Requires=dev-dri-card0.device
 After=dbus.service rc.pvr.service dev-dri-card0.device
+DefaultDependencies=no
+Before=shutdown.target
 
 [Service]
 User=root
