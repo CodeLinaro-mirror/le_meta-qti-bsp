@@ -34,5 +34,5 @@
 # cache and userdata entries only
 /dev/block/bootdevice/by-name/cache       /cache      ext4     defaults     0  0
 /dev/block/bootdevice/by-name/userdata    /data       ext4     defaults     0  0
-/dev/block/bootdevice/by-name/manifest_a  /manifest   vfat     noexec,nodev,rw,context=system_u:object_r:manifest_t:s0     0  0
-/dev/block/bootdevice/by-name/manifest_b  /manifest_b vfat     noexec,nodev,rw,context=system_u:object_r:manifestb_t:s0    0  0
+/dev/block/bootdevice/by-name/manifest_a  /manifest_a vfat     noexec,nodev,rw,context=system_u:object_r:manifest_t:s0     0  0
+/dev/block/bootdevice/by-name/manifest_b  /manifest_b vfat     noexec,nodev,rw,context=system_u:object_r:manifest_t:s0    0  0

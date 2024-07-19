@@ -29,7 +29,7 @@ RDEPENDS_packagegroup-android-utils-base = "\
 
 # Startup scripts needed during device bootup
 RDEPENDS_packagegroup-startup-scripts-base = "\
-    ${@bb.utils.contains('COMBINED_FEATURES', 'qti-ab-boot', bb.utils.contains('MACHINE_FEATURES', 'qti-csm', '', 'ab-slot-util', d), '', d)} \
+    ${@bb.utils.contains('COMBINED_FEATURES', 'qti-ab-boot', 'ab-slot-util', '', d)} \
     ${@oe.utils.conditional('USB_SUPPORT', 'True', 'usb-composition', '', d)} \
     ${@oe.utils.conditional('USB_AUTOSUSPEND_SUPPORT', 'True', 'usb-composition-usbd', '', d)} \
     post-boot \
