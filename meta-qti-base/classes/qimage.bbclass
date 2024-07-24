@@ -96,3 +96,12 @@ do_make_avb_image(){
 }
 
 addtask do_make_avb_image after do_image_complete before do_build
+
+# create dummy vm_bootloader image
+VM_BOOTLOAD_IMG_CMD = " \
+    dd if=/dev/zero of=${DEPLOY_DIR_IMAGE}/vm-bootloader.img bs=1M count=6; \
+"
+# compress the image to lemans
+IMAGE_CMD:ext4:append:gh-gvm-lemans = "; \
+  ${VM_BOOTLOAD_IMG_CMD} \
+"
