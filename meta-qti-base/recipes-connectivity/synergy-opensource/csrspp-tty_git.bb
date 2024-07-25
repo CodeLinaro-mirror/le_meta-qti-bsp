@@ -20,6 +20,6 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 _MODNAME = "csrspp-tty"
 PROVIDES_NAME = "kernel-module-${_MODNAME}"
 
-FILES:${PN} += "lib/modules/${KERNEL_VERSION}/extra/*"
+FILES:${PN} += "${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/*"
 
 RPROVIDES:${PN} += "${PROVIDES_NAME}-${KERNEL_VERSION}"
