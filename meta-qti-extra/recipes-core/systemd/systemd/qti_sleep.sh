@@ -66,12 +66,14 @@ case $1/$2 in
     fi
 
     # Unbind the xhci for the usb qcom controller
+    echo "Destroy USB host instances"
     for dev in `ls $usb_xhci_dev_path`
     do
         echo $dev >> "$mode_file_path/$usb_xhci_file"
         echo $dev > $usb_xhci_dev_path/unbind
     done
 
+    echo "Destroy USB device instances"
     # Disable the ssusb and hsusb for the msm usb controllers
     for dev in `ls $usb_dev_path | grep 'susb$'`
     do
@@ -80,19 +82,13 @@ case $1/$2 in
         echo none > $usb_dev_path/$dev/mode
     done
 
-    # Put the connected devices with qcom usb controllers to suspend
-    echo "Putting all connected USB devices to auto suspend forcefully"
-    for j in /sys/bus/usb/devices/*/power/control
-    do
-        echo auto > $j
-    done
-
     # Add delay to allow usb instance tear down for msm usb controllers
     sleep 2
     ;;
   post/*)
     echo "Exiting from $2..."
 
+    echo "Enable USB device instances"
     if [ ! -f "$mode_file_path/$usb_mode_file" ]; then
         echo "USB mode recover failed for $usb_mode_file dose not exist."
     else
@@ -104,6 +100,7 @@ case $1/$2 in
         done
     fi
 
+    echo "Enable USB Host insances"
    if [ ! -f "$mode_file_path/$usb_xhci_file" ]; then
         echo "USB xhci recover failed for $usb_xhci_file dose not exist."
     else
@@ -113,7 +110,6 @@ case $1/$2 in
             echo $usb_xhci > $usb_xhci_dev_path/bind
         done
     fi
-
 
     systemctl restart synergy.service
 

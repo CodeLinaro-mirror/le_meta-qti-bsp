@@ -43,6 +43,7 @@ do_install:append() {
     install -b -m 0644 /dev/null ${D}${sysconfdir}/usb/boot_hsic_comp
     echo ${COMPOSITION} > ${D}${sysconfdir}/usb/boot_hsusb_comp
 
+    install -d ${D}${base_sbindir}
     install -m 0755 ${S}/usb/usb_composition -D ${D}${base_sbindir}/
     install -d ${D}${base_sbindir}/usb/compositions/
     install -m 0755 ${S}/usb/compositions/* -D ${D}${base_sbindir}/usb/compositions/
@@ -89,7 +90,7 @@ do_install:append() {
         if ${@bb.utils.contains('TCMODE', 'external-ubuntu', 'false', 'true', d)}; then
             sed -i -e '/^Descr/a\Requires=var-usb.service' ${D}${systemd_unitdir}/system/usb.service
         fi
-        sed -i -e '/^Descr/a\After=var-volatile.mount leprop.service' ${D}${systemd_unitdir}/system/usb.service
+        sed -i -e '/^Descr/a\After=var-volatile.mount leprop.service systemd-modules-load.service' ${D}${systemd_unitdir}/system/usb.service
         sed -i -e '/^ExecStartPre/d' ${D}${systemd_unitdir}/system/usb.service
         sed -i -e '/^Descr/a\ConditionVirtualization=!container' ${D}${systemd_unitdir}/system/usb.service
     fi
@@ -132,7 +133,7 @@ FILES:${PN}-early-boot += "\
 "
 
 FILES:${PN}-leprop += "\
-    ${base_sbindir}/leprop-service \
+    ${sbindir}/leprop-service \
     ${bindir}/getprop \
     ${bindir}/setprop \
     ${systemd_unitdir}/system/leprop.service \

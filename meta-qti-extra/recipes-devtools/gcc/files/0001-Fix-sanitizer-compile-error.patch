@@ -4,6 +4,7 @@ Date: Fri, 22 Dec 2023 09:06:03 +0000
 Subject: [PATCH] Fix-sanitizer-compile-error
 
 Signed-off-by: Baihui Zeng <quic_baihzeng@quicinc.com>
+Upstream-Status: Pending
 ---
  libsanitizer/asan/Makefile.in   | 1 +
  libsanitizer/hwasan/Makefile.in | 1 +

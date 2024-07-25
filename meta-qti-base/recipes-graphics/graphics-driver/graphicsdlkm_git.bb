@@ -12,18 +12,14 @@ SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/vendor/qcom/opensource/graphics-kernel"
 
-inherit qti-techpack
-
 TECHPACK_MODULE_OUT = "${WORKDIR}/graphics-kernel"
 TECHPACK_MODULES = "msm_kgsl.ko"
 TECHPACK_HEADERS = "${S}/include/uapi"
 
+inherit qti-techpack
+
 do_install:append:sa81x5() {
     install -m 0644 ${S}/config/autoload_sa81x5.conf -D ${D}${sysconfdir}/modules-load.d/graphics_load.conf
-}
-
-do_install:append:lemans() {
-    install -m 0644 ${S}/config/autoload_lemans.conf -D ${D}${sysconfdir}/modules-load.d/graphics_load.conf
 }
 
 do_install:append:monaco() {

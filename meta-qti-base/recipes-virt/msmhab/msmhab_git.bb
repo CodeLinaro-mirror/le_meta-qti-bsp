@@ -11,10 +11,10 @@ SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/vendor/qcom/opensource/mmhab-drv"
 
-inherit qti-techpack
-
 TECHPACK_MODULE_OUT = "${WORKDIR}/vendor/qcom/opensource/mmhab-drv"
 TECHPACK_MODULES = "msm_hab.ko"
+
+inherit qti-techpack
 
 do_patch_more() {
     rm -rf ${WORKDIR}/vendor/qcom/opensource/mmhab-drv/vhost.h

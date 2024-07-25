@@ -9,8 +9,8 @@ DEPENDS += "\
 
 # Make sparse rootfs by default
 create_sparsesystem() {
-    mv ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.ext4 ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.tmp
-    img2simg ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.tmp ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.ext4
+    mv ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${IMAGE_FSTYPES} ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.tmp
+    img2simg ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.tmp ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${IMAGE_FSTYPES}
     rm -f ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.tmp
 }
 
@@ -39,15 +39,15 @@ do_make_avb_image(){
         if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'true', 'false', d)}; then
             #For lvgvm avb2.0, add hashtree for system image and generate vbmeta.img.
             avbtool add_hashtree_footer \
-                --image ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
+                --image ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.${IMAGE_FSTYPES} \
                 --partition_name system \
                 --partition_size ${rootfs_partition_size} \
                 --hash_algorithm sha256 \
                 --do_not_generate_fec
             avbtool make_vbmeta_image \
 	        --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET} \
-	        --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
-	        --setup_rootfs_from_kernel ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
+	        --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.${IMAGE_FSTYPES}\
+	        --setup_rootfs_from_kernel ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.${IMAGE_FSTYPES} \
                 --algorithm SHA256_RSA4096 \
                 --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/vbgvm_private_key_4096.pem \
                 --rollback_index 0 \
@@ -58,7 +58,7 @@ do_make_avb_image(){
         else
             #For lv avb2.0, add hashtree for system image and generate vbmeta.img.
             avbtool add_hashtree_footer \
-                --image ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
+                --image ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.${IMAGE_FSTYPES} \
                 --partition_size ${rootfs_partition_size} \
                 --partition_name system  \
                 --hash_algorithm sha256 \
@@ -70,8 +70,8 @@ do_make_avb_image(){
                    --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET} \
                    --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${PRODUCT}-dtbo.img \
                    --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${PRODUCT}-vendor_boot.img \
-                   --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
-                   --setup_rootfs_from_kernel ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
+                   --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.${IMAGE_FSTYPES} \
+                   --setup_rootfs_from_kernel ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.${IMAGE_FSTYPES} \
                    --algorithm SHA256_RSA4096 \
                    --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/testkey_rsa4096.pem \
                    --rollback_index 0 \
@@ -82,8 +82,8 @@ do_make_avb_image(){
                avbtool make_vbmeta_image \
                    --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET} \
                    ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', '--include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${PRODUCT}-dtbo.img', '', d)} \
-                   --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
-                   --setup_rootfs_from_kernel ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
+                   --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.${IMAGE_FSTYPES} \
+                   --setup_rootfs_from_kernel ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.${IMAGE_FSTYPES} \
                    --algorithm SHA256_RSA4096 \
                    --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/testkey_rsa4096.pem \
                    --rollback_index 0 \
@@ -96,3 +96,19 @@ do_make_avb_image(){
 }
 
 addtask do_make_avb_image after do_image_complete before do_build
+
+# create dummy vbmeta image
+VBMETA_IMAGE_CMD = " \
+    dd if=/dev/zero of=${DEPLOY_DIR_IMAGE}/${VBMETAIMAGE_TARGET} bs=1K count=4; \
+"
+
+# compress the image to sa8775 & sa7255
+IMAGE_CMD:ext4:append:sa7255 = "; \
+  ${VBMETA_IMAGE_CMD} \
+"
+
+IMAGE_CMD:ext4:append:sa8775 = "; \
+  ${VBMETA_IMAGE_CMD} \
+"
+
+

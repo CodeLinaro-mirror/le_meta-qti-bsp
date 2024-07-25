@@ -117,6 +117,8 @@ EXT_COMPILE_OPTIONS = "\
  "
 
 # Platform packages
+TARGET_CFLAGS:remove = "${@bb.utils.contains('SECURITY_CFLAGS', '-Werror=uninitialized', '-Wno-error=maybe-uninitialized', '', d)}"
+
 SECURITY_CFLAGS:append:pn-liblog = " ${EXT_COMPILE_OPTIONS}"
 SECURITY_CFLAGS:remove:pn-liblog = " -Werror=format-truncation=2"
 
@@ -169,6 +171,31 @@ SECURITY_CFLAGS:append:pn-system-core = " ${EXT_COMPILE_OPTIONS}"
 SECURITY_CFLAGS:remove:pn-system-core = " -Werror=conversion \
                                           -Werror=sign-conversion \
                                           -Werror=missing-field-initializers"
+
+SECURITY_CFLAGS:append:pn-libhardware = " ${EXT_COMPILE_OPTIONS}"
+SECURITY_CFLAGS:remove:pn-libhardware = " -Werror=conversion \
+                                          -Werror=sign-conversion"
+
+SECURITY_CFLAGS:append:pn-ss-services = " ${EXT_COMPILE_OPTIONS}"
+SECURITY_CFLAGS:remove:pn-ss-services = " -Werror=conversion \
+                                          -Werror=sign-conversion"
+
+SECURITY_CFLAGS:append:pn-qmi-framework = " ${EXT_COMPILE_OPTIONS}"
+SECURITY_CFLAGS:remove:pn-qmi-framework = " -Werror=conversion \
+                                            -Werror=sign-conversion \
+                                            -Werror=missing-field-initializers \
+                                            -Werror=clobbered \"
+
+
+SECURITY_CFLAGS:append:pn-time-genoff = " ${EXT_COMPILE_OPTIONS}"
+SECURITY_CFLAGS:remove:pn-time-genoff = " -Werror=conversion \
+                                          -Werror=sign-conversion"
+
+SECURITY_CFLAGS:append:pn-time-services = " ${EXT_COMPILE_OPTIONS}"
+SECURITY_CFLAGS:remove:pn-time-services = " -Werror=conversion \
+                                            -Werror=sign-conversion \
+                                            -Werror=missing-field-initializers \
+                                            -Werror=format-truncation=2 \"
 
 # Video packages
 SECURITY_CFLAGS:append:quin-gvm-gen4-2:pn-codec2-app = " ${EXT_COMPILE_OPTIONS}"

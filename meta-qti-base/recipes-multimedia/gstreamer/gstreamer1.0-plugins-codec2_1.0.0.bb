@@ -19,7 +19,15 @@ DEPENDS += "\
     virtual/kernel-headers \
 "
 
-DEPENDS:append:lemans = " displaydlkm"
+DEPENDS:append:quin-gvm-gen4-2 = " binder codec2-service"
+EXTRA_OEMESON:append:quin-gvm-gen4-2 = " \
+    -Dagl-c2service=true \
+"
+DEPENDS:append:quin-gvm-gen4-dpk = " binder codec2-service"
+EXTRA_OEMESON:append:quin-gvm-gen4-dpk = " \
+    -Dagl-c2service=true \
+"
+
 DEPENDS:append:quin-gvm-lemans = " displaydlkm"
 DEPENDS:append:monaco = " displaydlkm"
 DEPENDS:append:quin-gvm-monaco = " displaydlkm"
@@ -42,42 +50,32 @@ CXXFLAGS += "\
     -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel} \
 "
 
-CFLAGS:append:lemans = " -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}/display"
-CXXFLAGS:append:lemans = " -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}/display"
-EXTRA_OEMESON:append:lemans = " \
-    -Dc2dec-deinterlace=disabled \
-    -Dqprange=disabled \
-    -Dir-cyclic=enabled \
-    -Dav1-dec=enabled \
-    -Dmmmcolorfmt=true \
-"
-
 CFLAGS:append:quin-gvm-lemans = " -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}/display"
 CXXFLAGS:append:quin-gvm-lemans = " -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}/display"
 EXTRA_OEMESON:append:quin-gvm-lemans = " \
     -Dc2dec-deinterlace=disabled \
-    -Dqprange=disabled \
-    -Dir-cyclic=enabled \
     -Dav1-dec=enabled \
     -Dmmmcolorfmt=true \
+    -Dqprange_option=op1 \
+    -Dreport_frame_qp_option=op1 \
 "
 
 CFLAGS:append:monaco = " -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}/display"
 CXXFLAGS:append:monaco = " -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}/display"
 EXTRA_OEMESON:append:monaco = " \
     -Dc2dec-deinterlace=disabled \
-    -Dqprange=disabled \
-    -Dir-cyclic=enabled \
     -Dmmmcolorfmt=true \
+    -Dqprange_option=op1 \
+    -Dreport_frame_qp_option=op1 \
 "
 
 CFLAGS:append:quin-gvm-monaco = " -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}/display"
 CXXFLAGS:append:quin-gvm-monaco = " -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}/display"
 EXTRA_OEMESON:append:quin-gvm-monaco = " \
     -Dc2dec-deinterlace=disabled \
-    -Dqprange=disabled \
-    -Dir-cyclic=enabled \
     -Dmmmcolorfmt=true \
+    -Dqprange_option=op1 \
+    -Dreport_frame_qp_option=op1 \
 "
 
 EXTRA_OEMESON += "\

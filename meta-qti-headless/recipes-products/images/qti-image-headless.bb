@@ -26,7 +26,6 @@ IMAGE_INSTALL += "\
     xinetd \
     tcp-wrappers \
     netkit-telnet \
-    openssh \
     libcap \
     libcap-bin \
     attr \
@@ -44,3 +43,6 @@ remove_data_bind() {
 }
 
 ROOTFS_POSTPROCESS_COMMAND:append = " remove_data_bind;"
+
+# Makes image suitable for development (e.g. enable ssh for login, allows root logins and logins without passwords by ssh)
+IMAGE_FEATURES:append = " ${@bb.utils.contains('VARIANT', 'debug', 'debug-tweaks ssh-server-openssh', '', d)}"

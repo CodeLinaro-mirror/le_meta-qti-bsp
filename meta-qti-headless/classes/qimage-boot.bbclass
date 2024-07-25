@@ -30,12 +30,10 @@ do_merge_dtbs[cleandirs] = " \
 
 addtask do_merge_dtbs after do_image before do_makeboot
 
-MKBOOTUTIL = '${@oe.utils.conditional("PREFERRED_PROVIDER_mkbootimg-native", "mkbootimg-gki-native", "scripts/mkbootimg.py", "mkbootimg", d)}'
-
 python do_makeboot () {
     import subprocess
 
-    mkboot_bin_path = d.getVar('STAGING_BINDIR_NATIVE', True) + "/" + d.getVar('MKBOOTUTIL')
+    mkboot_bin_path = d.getVar('STAGING_BINDIR_NATIVE', True) + "/scripts/mkbootimg.py"
 
     kernel_path = d.getVar('DEPLOY_DIR_IMAGE', True) + "/" + d.getVar('KERNEL_IMAGETYPE', True)
     dtb_path = d.getVar('DEPLOY_DIR_IMAGE', True) + "/dtbs/dtb.img"

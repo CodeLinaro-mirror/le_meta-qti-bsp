@@ -2,22 +2,34 @@ SUMMARY = "QTI ARK Kernel Boot image"
 DESCRIPTION = "Build QTI ARK kernel boot image"
 LICENSE = "BSD-3-Clause-Clear"
 
-DEPENDS += "mkbootimg-native mkdtimg-native openssl-native python3-native virtual/kernel"
-DEPENDS += "${@bb.utils.contains('TARGET_USES_AUDIO_FRAMEWORK', 'audiolite', 'audiolite-devicetree', 'oot-dtbo', d)}"
+DEPENDS += "mkbootimg-native mkdtimg-native openssl-native  python3-native virtual/kernel"
+DEPENDS += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'oot-dtbo', '', d)}"
+DEPENDS += "${@bb.utils.contains_any('COMBINED_FEATURES', 'qti-audio qti-audio-ar', bb.utils.contains('MACHINE_FEATURES', 'qti-gunyah qti-umd', 'audiolite-devicetree', '', d), '', d)}"
 
 IMAGE_CLASSES:remove = "qimage"
 IMAGE_FEATURES:remove = "ssh-server-openssh"
 
-inherit image
+inherit image ark-dtb-merge
 
 EXTRA_IMAGE_FEATURES = ""
 
 KERNEL_VERSION = "${@oe.utils.read_file('${STAGING_KERNEL_BUILDDIR}/kernel-abiversion')}"
 
 do_make_dtb() {
-     cat ${DEPLOY_DIR_IMAGE}/dtbs/*.dtb* > ${DEPLOY_DIR_IMAGE}/dtbs/dtb.img
+    install -d ${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbs
+    install -d ${DEPLOY_DIR_IMAGE}/build-artifacts/dtb
+    install -d ${DEPLOY_DIR_IMAGE}/dtbs
+
+    dtb_dir=${DEPLOY_DIR_IMAGE}/build-artifacts/dtb
+    dtbo_dir=${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbs
+    out_dir=${DEPLOY_DIR_IMAGE}/dtbs
+
+    merge_dtbos $dtb_dir $dtbo_dir $out_dir
+
+    cat ${DEPLOY_DIR_IMAGE}/dtbs/*.dtb* > ${DEPLOY_DIR_IMAGE}/dtbs/dtb.img
 }
-do_make_dtb[depends] += "${@bb.utils.contains('TARGET_USES_AUDIO_FRAMEWORK', 'audiolite', 'audiolite-devicetree:do_deploy', 'oot-dtbo:do_deploy', d)}"
+do_make_dtb[depends] += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'oot-dtbo:do_deploy', '', d)}"
+do_make_dtb[depends] += "${@bb.utils.contains_any('COMBINED_FEATURES', 'qti-audio qti-audio-ar', bb.utils.contains('MACHINE_FEATURES', 'qti-gunyah qti-umd', 'audiolite-devicetree:do_deploy', '', d), '', d)}"
 
 addtask do_make_dtb after do_image before do_makeboot
 

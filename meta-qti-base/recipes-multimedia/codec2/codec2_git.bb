@@ -38,8 +38,11 @@ EXTRA_OECMAKE += "\
     -DAGL_LINUX:BOOL=ON \
     ${@oe.utils.version_less_or_equal('${preferred-kernel}', '5.4', '', '-DSUPPORT_DMABUF_HEAP:BOOL=ON', d)} \
 "
-EXTRA_OECMAKE:append:lemans = " -DLOAD_CORE_LIB:BOOL=ON"
 EXTRA_OECMAKE:append:quin-gvm-lemans = " -DLOAD_CORE_LIB:BOOL=ON"
+EXTRA_OECMAKE:append:quin-gvm-gen4-2 = " -DUSE_AGL_C2SERVICE:BOOL=ON"
+EXTRA_OECMAKE:append:quin-gvm-gen4-dpk = " -DUSE_AGL_C2SERVICE:BOOL=ON"
+
+EXTRA_OECMAKE:append:quin-gvm-monaco = " -DLOAD_CORE_LIB:BOOL=ON"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 

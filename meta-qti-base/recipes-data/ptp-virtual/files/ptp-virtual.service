@@ -29,6 +29,8 @@
 Description=Modprobe_ptp_virtual_module
 
 [Service]
+User=vnw
+Group=vnw
 Type=simple
 RemainAfterExit=yes
 NoNewPrivileges=true

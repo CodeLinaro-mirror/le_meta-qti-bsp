@@ -15,9 +15,13 @@ SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/vendor/qcom/opensource/ptp-virtual"
 
-inherit module module-sign kernel-arch qperf qti-kernel-arch-clang
+inherit module module-sign kernel-arch qperf qti-kernel-arch-clang systemd useradd
 INHIBIT_PACKAGE_STRIP = "1"
 EXTRA_OEMAKE += "CONFIG_ARCH_MSM=y"
+
+USERADD_PACKAGES = "${PN}"
+GROUPADD_PARAM:${PN} = "vnw"
+USERADD_PARAM:${PN} = "--no-create-home -g vnw --shell /bin/false vnw"
 
 do_install:append() {
     install -d ${D}${systemd_unitdir}/system

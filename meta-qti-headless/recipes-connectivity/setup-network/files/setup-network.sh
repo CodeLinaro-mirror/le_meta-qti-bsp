@@ -115,6 +115,10 @@ function setup_network_agl_vm_1()
     echo "Setup route"
     ip route add default dev eth0 via 192.168.1.10 table default
 
+    echo "Create vlan"
+    ip link add link eth0 name eth0.4 type vlan id 4
+    ifconfig eth0.4 192.168.4.2 up
+
     echo "Enable forwarding"
     sysctl -w net.ipv4.conf.all.forwarding=1
     sysctl -w net.core.rmem_max=67108864
@@ -131,6 +135,10 @@ function setup_network_agl_vm_2()
 
     echo "Setup route"
     ip route add default dev eth0 via 192.168.1.10
+
+    echo "Create vlan"
+    ip link add link eth0 name eth0.4 type vlan id 4
+    ifconfig eth0.4 192.168.4.3 up
 
     echo "Enable forwarding"
     sysctl -w net.ipv4.conf.all.forwarding=1

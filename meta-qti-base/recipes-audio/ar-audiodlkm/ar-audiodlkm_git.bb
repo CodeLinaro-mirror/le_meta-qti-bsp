@@ -14,9 +14,6 @@ SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/vendor/qcom/opensource/audio-kernel-ar"
 
-inherit ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.4', "module module-sign qperf qti-kernel-arch-clang", "qti-techpack qperf", d)}
-
-EXTRA_OEMAKE:lemans += "TARGET_SUPPORT=lemans"
 EXTRA_OEMAKE:sa81x5 += "TARGET_SUPPORT=sa8155"
 EXTRA_OEMAKE:quin-gvm-gen4-2 += "TARGET_SUPPORT=no AUTO_GVM=yes"
 EXTRA_OEMAKE:quin-gvm-lemans += "TARGET_SUPPORT=no AUTO_GVM=yes"
@@ -47,6 +44,8 @@ TECHPACK_MODULES = "${MODULES}"
 TECHPACK_HEADERS = "${S}/include/uapi"
 TECHPACK_HEADERS_OUT = "audio-kernel-ar/audio"
 TECHPACK_MAKE_ARGS = "${EXTRA_OEMAKE} QTI_TECHPACK=true KERNEL_SRC=${STAGING_KERNEL_DIR}"
+
+inherit ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.4', "module module-sign qperf qti-kernel-arch-clang", "qti-techpack", d)}
 
 do_configure() {
     if ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.4', 'true', 'false', d)}; then

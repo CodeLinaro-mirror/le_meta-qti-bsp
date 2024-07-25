@@ -19,6 +19,9 @@ SRC_URI = "\
     ${PATH_TO_REPO}/external/rust/crates/simplelog/.git;protocol=${PROTO};destsuffix=external/rust/crates/simplelog;usehead=1 \
     ${PATH_TO_REPO}/external/rust/crates/vmm_vhost/.git;protocol=${PROTO};destsuffix=external/rust/crates/vmm_vhost;usehead=1 \
 "
+SRC_URI:append = " \
+    file://0001-qcrosvm-Add-patch-file-for-patching-vhost-user-gp-su.patch \
+"
 
 SRCREV = "${AUTOREV}"
 
@@ -28,9 +31,14 @@ inherit ${@bb.utils.contains("BBFILE_COLLECTIONS", "rust-layer", "cargo", "", d)
 
 CARGO_DISABLE_BITBAKE_VENDORING = "1"
 
-do_install:append() {
+do_install:append:sa8775() {
     install -d ${D}${systemd_unitdir}/system/
     install -m 0644 ${S}/qcrosvm.service ${D}/${systemd_unitdir}/system/qcrosvm.service
+}
+
+do_install:append:sa7255() {
+    install -d ${D}${systemd_unitdir}/system/
+    install -m 0644 ${S}/qcrosvm_sa7255.service ${D}/${systemd_unitdir}/system/qcrosvm.service
 }
 
 # Once upgrade Yocto to 4.2 and upgrade Python to 3.11 in the future, we can inherit cargo-update-recipe-crates and delete this line

@@ -1,6 +1,6 @@
-EXTRA_OEMAKE:append = " UAPIDIR=${includedir}"
+EXTRA_OEMAKE:append:class-native = " UAPIDIR=${includedir}"
 
-do_install:append() {
+do_install:append:class-native() {
     oe_runmake install_uapi_headers
 }
 
