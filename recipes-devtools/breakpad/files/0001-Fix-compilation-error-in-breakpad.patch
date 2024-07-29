@@ -1,0 +1,31 @@
+#This patch file is from Qualcomm Innovation Center, Inc. and is provided under the following license:
+
+#Copyright (c) 2024 Qualcomm Innovation Center, Inc. All rights reserved.
+#SPDX-License-Identifier: BSD-3-Clause-Clear
+
+From 3304b58db5ecac51f60e0ad6718c29d0ec4ddf12 Mon Sep 17 00:00:00 2001
+From: GANGA BHAVANI YENUGULA <quic_gyenugul@quicinc.com>
+Date: Wed, 15 May 2024 12:10:11 +0530
+Subject: [PATCH] Fix compilation error in breakpad
+
+Caused by SIGSTCKZ no longer being compile time constant in glibc-2.34.
+---
+ src/client/linux/handler/exception_handler.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/client/linux/handler/exception_handler.cc b/src/client/linux/handler/exception_handler.cc
+index b895f6d7..36bfc91c 100644
+--- a/src/client/linux/handler/exception_handler.cc
++++ b/src/client/linux/handler/exception_handler.cc
+@@ -138,7 +138,7 @@ void InstallAlternateStackLocked() {
+   // SIGSTKSZ may be too small to prevent the signal handlers from overrunning
+   // the alternative stack. Ensure that the size of the alternative stack is
+   // large enough.
+-  static const unsigned kSigStackSize = std::max(16384, SIGSTKSZ);
++  static const unsigned kSigStackSize = std::max<size_t>(16384, SIGSTKSZ);
+ 
+   // Only set an alternative stack if there isn't already one, or if the current
+   // one is too small.
+-- 
+2.17.1
+

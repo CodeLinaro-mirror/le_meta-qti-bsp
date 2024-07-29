@@ -8,6 +8,7 @@ SRC_URI += "file://ion.rules"
 SRC_URI += "file://kgsl.rules"
 SRC_URI += "file://set-usb-nodes.rules"
 SRC_URI += "file://sysctl.conf"
+SRC_URI += "file://99-sysctl.conf"
 SRC_URI += "file://platform.conf"
 SRC_URI += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-vm', 'file://trusted_touch.conf', '',d)}"
 SRC_URI += "file://sd-bus-Allow-extra-users-to-communicate.patch"
@@ -90,7 +91,13 @@ do_install_append () {
    ln -sf /lib/systemd/system/getty.target ${D}/lib/systemd/system/ffbm.target.wants/getty.target
    ln -sf /lib/systemd/system/systemd-ask-password-wall.path ${D}/lib/systemd/system/ffbm.target.wants/systemd-ask-password-wall.path
    install -d /etc/sysctl.d/
-   install -m 0644 ${WORKDIR}/sysctl.conf -D ${D}/etc/sysctl.d/sysctl.conf
+   
+   if ${@bb.utils.contains('BASEMACHINE', 'neo', 'true', 'false', d)}; then
+       install -m 0644 ${WORKDIR}/99-sysctl.conf -D ${D}/etc/sysctl.d/sysctl.conf
+   else 
+       install -m 0644 ${WORKDIR}/sysctl.conf -D ${D}/etc/sysctl.d/sysctl.conf
+   fi
+   
    install -m 0644 ${WORKDIR}/platform.conf -D ${D}/etc/tmpfiles.d/platform.conf
 
    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-vm', 'true', 'false', d)}; then
