@@ -17,4 +17,5 @@ RDEPENDS:${PN} += "\
     exfat-utils \
     ${@bb.utils.contains('DISTRO_FEATURES', 'asan', 'gcc-sanitizers', '', d)}  \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'lttng-modules lttng-tools lttng-ust', '', d)} \
+    ${@bb.utils.contains_any('VARIANT', 'perf user', '', 'devmem2', d)} \
     "
