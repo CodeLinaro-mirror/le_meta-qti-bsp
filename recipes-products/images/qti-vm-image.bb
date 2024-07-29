@@ -37,3 +37,8 @@ IMAGE_FEATURES += "vm"
 do_compose_vmimage[recrdeptask] = "do_ramdisk_create"
 do_compose_vmimage[recrdeptask] += "do_merge_dtbs"
 do_compose_vmimage[recrdeptask] += "do_extracpio_create"
+
+do_makesystem:prepend() {
+	rm -rf ${IMAGE_ROOTFS_EXT4}/usr/lib/python3.10
+}
+
