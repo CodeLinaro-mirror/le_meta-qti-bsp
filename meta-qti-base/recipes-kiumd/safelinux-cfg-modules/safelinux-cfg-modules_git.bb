@@ -4,7 +4,7 @@ HOMEPAGE = "https://www.codeaurora.org"
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=801f80980d171dd6425610833a22dbe6"
 
-DEPENDS += "safelinux-sec-modules"
+DEPENDS += "${@bb.utils.contains('PREFERRED_PROVIDER_virtual/kernel', 'linux-ark', 'safelinux-sec-modules','', d)}"
 
 SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/safelinux-cfg-modules/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/safelinux-cfg-modules;usehead=1"
 SRC_URI:append = " \
@@ -27,11 +27,8 @@ do_patch_more() {
 }
 addtask patch_more after do_patch before do_compile
 
-python __anonymous () {
-    d.setVar('KBUILD_EXTRA_SYMBOLS', "${STAGING_INCDIR}/safelinux-sec-modules/Module.symvers")
-}
-
 EXTRA_OEMAKE += "CONFIG_PROFILER=y"
+TECHPACK_MAKE_ARGS = "${@bb.utils.contains('PREFERRED_PROVIDER_virtual/kernel', 'linux-ark', 'KBUILD_EXTRA_SYMBOLS=${STAGING_INCDIR}/safelinux-sec-modules/Module.symvers','', d)}"
 
 do_install:append() {
     install -m 0755 ${WORKDIR}/umd_load.conf -D ${D}${sysconfdir}/modules-load.d/umd_load.conf
