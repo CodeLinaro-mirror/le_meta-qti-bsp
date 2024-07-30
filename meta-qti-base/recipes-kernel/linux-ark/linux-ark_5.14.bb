@@ -23,6 +23,7 @@ SRC_URI = "\
     file://nr_cpus.cfg \
     file://usb_adb.cfg \
     file://wlan.cfg \
+    ${@bb.utils.contains_any('VARIANT', 'perf user', '', 'file://devmem.cfg', d)} \
 "
 
 SRCREV_kernel = "${AUTOREV}"
