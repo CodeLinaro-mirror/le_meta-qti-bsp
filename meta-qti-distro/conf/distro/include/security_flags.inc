@@ -81,6 +81,9 @@ SECURITY_CFLAGS:remove:pn-setools = "${SECURITY_STRINGFORMAT}"
 
 SECURITY_CFLAGS:pn-tbb = "${SECURITY_PIC_CFLAGS}"
 
+# OSS freetype can't compile with -pie -fPIE
+SECURITY_CFLAGS:pn-freetype = "${SECURITY_PIC_CFLAGS}"
+
 # Enable some warning options to error.
 EXT_COMPILE_OPTIONS = "\
     -Wall \
