@@ -4,8 +4,10 @@ include conf/machine/include/hgy-bbmask.inc
 SOC_FAMILY ?= "sa-common"
 include conf/machine/include/soc-family.inc
 PRODUCT = "${MACHINE}"
-PREFERRED_PROVIDER_virtual/kernel = "linux-ark"
-PREFERRED_PROVIDER_virtual/kernel-headers = "linux-ark-headers"
+ACTUAL_KERNEL = "${@oe.utils.ifelse((os.path.exists(d.getVar('BSPDIR', True) + '/kernel/rh-fedora-kernel-6.9')), 'linux-ark', 'linux-qcom')}"
+PREFERRED_PROVIDER_virtual/kernel = "${ACTUAL_KERNEL}"
+PREFERRED_PROVIDER_virtual/kernel-headers = "${ACTUAL_KERNEL}-headers"
+PREFERRED_VERSION_linux-qcom = "6.6"
 PREFERRED_VERSION_linux-ark = "6.9"
 # PREFERRED_VERSION_linux-ark = "6.7"
 
@@ -15,8 +17,8 @@ PREFERRED_VERSION_wayland = "1.18.0"
 PREFERRED_VERSION_wayland-native = "1.18.0"
 PREFERRED_VERSION_wayland-protocols = "1.20"
 PREFERRED_VERSION_wayland-ivi-extension = "2.2.0"
-preferred-kernel = "${@oe.utils.ifelse(d.getVar('PREFERRED_PROVIDER_virtual/kernel') == 'linux-ark', 'PREFERRED_VERSION_linux-ark', 'PREFERRED_VERSION_linux-msm')}"
-kernel-version = "${@oe.utils.ifelse(d.getVar('PREFERRED_PROVIDER_virtual/kernel') == 'linux-ark', '6.9', '5.4')}"
+preferred-kernel = "${@oe.utils.ifelse(d.getVar('PREFERRED_PROVIDER_virtual/kernel') == 'linux-ark', 'PREFERRED_VERSION_linux-ark', 'PREFERRED_VERSION_linux-qcom')}"
+kernel-version = "${@oe.utils.ifelse(d.getVar('PREFERRED_PROVIDER_virtual/kernel') == 'linux-ark', '6.9', '6.6')}"
 # Prefer gbm
 PREFERRED_PROVIDER_virtual/libgbm = "gbm"
 
