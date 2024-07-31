@@ -31,7 +31,7 @@ index d85c658..e021725 100644
  --vhost-user-hab "/tmp/linux-vm2-cam-skt",label=3E,device-id=92,queue-num=4 \
 +--vhost-user-gp /tmp/gp_hello,label=44 \
 +--vhost-user-frpc "/tmp/sock_file_frpc",label=45 \
- --input=/dev/input/event0,label=3F \
+ --input=/dev/input/event1,label=3F \
  --input=/dev/input/vmm-pwr-key,label=40
  
 -- 
