@@ -42,9 +42,9 @@ do_compile:prepend() {
 
 RPROVIDES:${PN} += "${PROVIDES_NAME}-${KERNEL_VERSION}"
 
-FILES:${PN} += "lib/firmware/wlan/*"
-FILES:${PN} += "lib/firmware/*"
-FILES:${PN} += "lib/modules/${KERNEL_VERSION}/extra/*"
+FILES:${PN} += "${nonarch_base_libdir}/firmware/wlan/*"
+FILES:${PN} += "${nonarch_base_libdir}/firmware/*"
+FILES:${PN} += "${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/*"
 
 LDFLAGS:aarch64 = "-O1 --hash-style=gnu --as-needed"
 
