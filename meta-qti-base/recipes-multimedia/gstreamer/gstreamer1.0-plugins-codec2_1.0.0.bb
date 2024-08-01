@@ -81,6 +81,7 @@ CFLAGS:append:quin-gvm-monaco = " -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtu
 CXXFLAGS:append:quin-gvm-monaco = " -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}/display"
 EXTRA_OEMESON:append:quin-gvm-monaco = " \
     -Dc2dec-deinterlace=disabled \
+    -Dav1-dec=enabled \
     -Dmmmcolorfmt=true \
     -Dqprange_option=op1 \
     -Dreport_frame_qp_option=op1 \
