@@ -14,4 +14,5 @@ CORE_IMAGE_EXTRA_INSTALL += "\
                     bb.utils.contains('MACHINE_SUPPORTS_PDMAPPER', 'True', 'ss-services', '', d), '', d)} \
                ${@bb.utils.contains('BBFILE_COLLECTIONS', 'qti-ss-mgr-prop', \
                     bb.utils.contains('MACHINE_SUPPORTS_SSR', 'True', 'subsystem-ramdump', '', d), '', d)} \
+               ${@bb.utils.contains('BBFILE_COLLECTIONS', 'qti-ss-mgr-prop','modem-ssr-kpi', '', d)} \
 "
