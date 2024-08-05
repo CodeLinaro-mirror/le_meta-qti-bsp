@@ -22,6 +22,7 @@ RDEPENDS:${PN} += "\
     coreutils \
     sec-config \
     libsensors \
+    libatomic \
     ${DSP_DRIV} \
     "
 
