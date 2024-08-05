@@ -9,9 +9,9 @@ SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/vendor/qcom/opensource/dsp-kernel"
 
-inherit qti-techpack
-
 TECHPACK_MODULES = "frpc-adsprpc.ko cdsp-loader.ko"
+
+inherit qti-techpack
 
 RPROVIDES:${PN} += "kernel-module-frpc-adsprpc-${KERNEL_VERSION} \
                     kernel-module-cdsp-loader-${KERNEL_VERSION}"

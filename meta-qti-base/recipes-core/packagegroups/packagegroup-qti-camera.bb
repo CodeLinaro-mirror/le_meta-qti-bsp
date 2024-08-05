@@ -16,3 +16,4 @@ RDEPENDS:${PN} += "\
     "
 
 RDEPENDS:${PN}:quin-gvm-lemans = ""
+RDEPENDS:${PN}:quin-gvm-monaco = ""

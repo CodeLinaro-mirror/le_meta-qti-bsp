@@ -15,11 +15,17 @@ inherit qti-techpack
 
 do_install:append() {
     install -d ${D}${includedir}/linux
-    install -m 0755 ${S}/modules-load/tz_log.conf -D ${D}${sysconfdir}/modules-load.d/tz_log.conf
+    install -d ${D}${includedir}/safelinux-sec-modules
     install -m 0755 ${S}/modules-load/qtee_shmbridge.conf -D ${D}${sysconfdir}/modules-load.d/qtee_shmbridge.conf
     install -m 0755 ${S}/modules-load/smcinvoke.conf -D ${D}${sysconfdir}/modules-load.d/smcinvoke.conf
     install -m 0755 ${S}/modules-load/qcom_scm_oot.conf -D ${D}${sysconfdir}/modules-load.d/qcom_scm_oot.conf
     install -m 0644 ${S}/drivers/smcinvoke.h ${D}${includedir}/linux
+    install -m 0644 ${S}/Module.symvers ${D}${includedir}/safelinux-sec-modules
+
+    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-gunyah', 'false', 'true', d)}; then
+        install -m 0755 ${S}/modules-load/tz_log.conf -D ${D}${sysconfdir}/modules-load.d/tz_log.conf
+    fi
+
 }
 
 RPROVIDES:${PN} += "kernel-module-tz-log-${KERNEL_VERSION}"

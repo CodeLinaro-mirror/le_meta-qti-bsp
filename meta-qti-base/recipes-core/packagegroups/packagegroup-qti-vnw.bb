@@ -13,6 +13,7 @@ ALLOW_EMPTY:${PN} = "1"
 RDEPENDS:${PN} += "\
     hsi2s \
     hsi2s-test \
+    ${@bb.utils.contains('PREFERRED_PROVIDER_virtual/kernel', 'linux-ark', 'hsi2s-qmi-test', '', d)} \
     gptp \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'ptp-virtual', '', d)} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'avb-utils', '', d)} \

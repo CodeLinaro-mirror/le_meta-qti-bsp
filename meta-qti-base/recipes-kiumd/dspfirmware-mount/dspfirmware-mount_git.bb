@@ -43,6 +43,9 @@ do_install:append() {
         ln -sf ${systemd_unitdir}/system/firmware-vm-boot.mount \
             ${D}${systemd_unitdir}/system/multi-user.target.wants/firmware-vm-boot.mount
     fi
+    if [ -f ${S}/99-persist-storage-ab.rules ]; then
+        install -m 0644 ${S}/99-persist-storage-ab.rules -D ${D}${sysconfdir}/udev/rules.d/99-persist-storage-ab.rules
+    fi
 
     install -d ${D}${sysconfdir}/sysconfig/
     install -m 0777 ${S}/lpass_cfg ${D}${sysconfdir}/sysconfig/lpass_cfg

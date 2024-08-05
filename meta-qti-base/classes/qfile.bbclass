@@ -26,6 +26,9 @@
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+# Skip get_checksum_file_list function detection
+do_fetch[file-checksums] = "${@get_lic_checksum_file_list(d)}"
+
 python __anonymous(){
     import re
 
@@ -71,6 +74,8 @@ python __anonymous(){
     if need_change:
         d.prependVar("FILESPATH", "${SRC_DIR_ROOT}/:")
         new_src_uri = " ".join(new_src_uri_list)
+        # Workaround to skip AUTOREV/SRCPV set too late issue.
+        d.setVar("__BBAUTOREV_ACTED_UPON", True)
         d.setVar("SRC_URI", new_src_uri)
         d.setVar("SRCREV", '')
 

@@ -11,12 +11,14 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/BSD-3-Clause;m
 WESTON_MAJOR_VERSION = "10"
 
 DEPENDS += "cairo \
+            dbus \
             display-hal-headers display-hal-linux display-noship-linux display-ship-linux \
             gbm gbm-headers \
             ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'libuhab', '', d)} \
             libinput \
             virtual/kernel-headers \
             pixman virtual/egl \
+            systemd \
             wayland wayland-native wayland-protocols \
             weston \
             ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'bootkpi-logging', '', d)} \
@@ -47,4 +49,5 @@ PACKAGECONFIG[early] = "-Denable-early-boot=true,-Denable-early-boot=false"
 
 FILES:${PN} += "\
     ${libdir}/libweston-${WESTON_MAJOR_VERSION}/* \
+    ${libdir}/weston/* \
 "

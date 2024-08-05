@@ -16,6 +16,7 @@ IMAGE_INSTALL += "\
     ${@bb.utils.contains('COMBINED_FEATURES', 'qti-graphics', 'packagegroup-qti-graphics', '', d)} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'packagegroup-qti-umd', '', d)} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-vmm', 'packagegroup-qti-vmm', '', d)} \
+    ${@bb.utils.contains('VARIANT', 'debug', 'packagegroup-qti-debug', '', d)} \
     "
 
 IMAGE_LINGUAS = ""
