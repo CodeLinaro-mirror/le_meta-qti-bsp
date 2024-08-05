@@ -22,6 +22,7 @@ RDEPENDS:${PN} += "\
     iproute2-ss \
     iproute2-tc \
     tcpdump \
+    phytool \
     vlan \
     strongswan \
     xinetd \
