@@ -14,6 +14,7 @@ SRC_URI = "\
     file://vfio.conf \
     file://vfio_param.conf \
     file://vmm_pwr_key.conf \
+    file://0001-vfio-device-probe-service-remove-delay-after-start-o.patch \
 "
 
 SRCREV = "${AUTOREV}"
