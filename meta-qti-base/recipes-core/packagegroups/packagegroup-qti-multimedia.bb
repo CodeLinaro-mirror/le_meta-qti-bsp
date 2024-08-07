@@ -28,5 +28,6 @@ RDEPENDS:${PN} = "\
         ${@bb.utils.contains('DISTRO_FEATURES', 'qti-gstqvais', 'gstreamer1.0-plugin-qvais', '', d)} \
 "
 
-# codec2-service is enabled on quin-gvm-gen4-2, so not need codec2-app for this target
+# codec2-service is enabled on quin-gvm-gen4-2 and quin-gvm-gen4-dpk, so not need codec2-app for this target
 RDEPENDS:${PN}:remove:quin-gvm-gen4-2 = "codec2-app"
+RDEPENDS:${PN}:remove:quin-gvm-gen4-dpk = "codec2-app"

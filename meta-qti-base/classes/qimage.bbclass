@@ -97,18 +97,11 @@ do_make_avb_image(){
 
 addtask do_make_avb_image after do_image_complete before do_build
 
-# create dummy vbmeta image
-VBMETA_IMAGE_CMD = " \
-    dd if=/dev/zero of=${DEPLOY_DIR_IMAGE}/${VBMETAIMAGE_TARGET} bs=1K count=4; \
+# create dummy vm_bootloader image
+VM_BOOTLOAD_IMG_CMD = " \
+    dd if=/dev/zero of=${DEPLOY_DIR_IMAGE}/vm-bootloader.img bs=1M count=6; \
 "
-
-# compress the image to sa8775 & sa7255
-IMAGE_CMD:ext4:append:sa7255 = "; \
-  ${VBMETA_IMAGE_CMD} \
+# compress the image to lemans
+IMAGE_CMD:ext4:append:gh-gvm-lemans = "; \
+  ${VM_BOOTLOAD_IMG_CMD} \
 "
-
-IMAGE_CMD:ext4:append:sa8775 = "; \
-  ${VBMETA_IMAGE_CMD} \
-"
-
-

@@ -59,3 +59,34 @@ IMAGE_INSTALL += "\
 IMAGE_FEATURES += "ssh-server-openssh"
 
 # EXTRA_IMAGEDEPENDS += "qti-image-ark-boot:do_sign_boot_img"
+
+IMAGE_FEATURES:append = " read-only-rootfs"
+
+MACHINE_FEATURES += "\
+    qti-core \
+    qti-tools \
+    qti-multimedia \
+    qti-display \
+    qti-audio \
+    qti-vmm \
+    qti-camera \
+    qti-safety \
+    qti-vnw \
+    early-ramdisk-init \
+    qti-security \
+    qti-umd \
+    qti-gunyah \
+"
+MACHINE_FEATURES:remove = "\
+    qti-multimedia \
+    qti-display \
+    qti-audio \
+    qti-camera \
+    qti-safety \
+    qti-vnw \
+    early-ramdisk-init \
+    qti-security \
+    qti-umd \
+"
+
+SECTOOLS_VERSION = "sectools-v2"
