@@ -9,6 +9,52 @@ DEPENDS += "\
     sectool5-native \
     virtual/kernel \
 "
+ghgvm_pilsplitter() {
+    KP3_PATH="${TOPDIR}/../../kernel/kernel-6.1/kernel_platform"
+    SECTOOLS_PATH="${KP3_PATH}/prebuilts/qcom_boot_artifacts/sectools"
+    PILTOOLS_PATH="${KP3_PATH}/prebuilts/qcom_boot_artifacts/vm/pil_tools"
+    SEC_PROFILES_PATH="${TOPDIR}/../../security/securemsm/security_profiles/"
+
+    MKDTBOIMGPY_PATH=${TOPDIR}/../../system/libufdt/utils/src
+    DTB_FILE_LIST=$(find ${DEPLOY_DIR_IMAGE}/build-artifacts/dtb -name "*.dtb" | sort)
+    if [ -z "${DTB_FILE_LIST}" ]; then
+        echo "No *.dtb files found in $DEPLOY_DIR_IMAGE/dtbs"
+        exit 1
+    else
+        # $MKDTBOIMGPY_PATH/mkdtboimg.py create ${DEPLOY_DIR_IMAGE}/dtbs/dtb.img $DTB_FILE_LIST
+        $MKDTBOIMGPY_PATH/mkdtboimg.py create ${DEPLOY_DIR_IMAGE}/dtbs/dtb.img ${DEPLOY_DIR_IMAGE}/build-artifacts/dtb/lemans-gunyah-vm-lv-cob.dtb ${DEPLOY_DIR_IMAGE}/build-artifacts/dtb/lemans-gunyah-vm-lv-qam.dtb
+    fi
+
+    install -d ${DEPLOY_DIR_IMAGE}/signing
+
+    # copy necessary files into signing dir
+    cp ${DEPLOY_DIR_IMAGE}/Image ${DEPLOY_DIR_IMAGE}/signing
+    cp ${DEPLOY_DIR_IMAGE}/ramdisk.img ${DEPLOY_DIR_IMAGE}/signing
+    cp ${DEPLOY_DIR_IMAGE}/dtbs/dtb.img ${DEPLOY_DIR_IMAGE}/signing
+    cp ${SEC_PROFILES_PATH}/lemans_tz_security_profile.xml ${DEPLOY_DIR_IMAGE}/signing
+
+    cd ${DEPLOY_DIR_IMAGE}/signing
+    python3 ${PILTOOLS_PATH}/image_header.py autoghgvmlv-boot.elf Image,0x0 dtb.img,0x3000000 ramdisk.img,0x3100000 --32
+    ${SECTOOLS_PATH}/sectools secure-image autoghgvmlv-boot.elf --image-id GVM1 --security-profile lemans_tz_security_profile.xml --sign --signing-mode TEST --outfile autoghgvmlv_signed-boot.elf
+    ${SECTOOLS_PATH}/sectools secure-image autoghgvmlv-boot.elf --inspect
+
+    install -d ${DEPLOY_DIR_IMAGE}/signing/boot
+    python3 ${PILTOOLS_PATH}/pil-splitter.py autoghgvmlv_signed-boot.elf boot/autoghgvmlv
+
+    ${KP3_PATH}/prebuilts/kernel-build-tools/linux-x86/bin/mkuserimg_mke2fs ${DEPLOY_DIR_IMAGE}/signing/boot ${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET} ext4 / 60000000
+}
+
+do_ghgvm_pilsplitter() {
+    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-ghgvm', 'true', 'false', d)}; then
+        touch ${DEPLOY_DIR_IMAGE}/ramdisk.img
+        set +e
+        ghgvm_pilsplitter
+        set -e
+    fi
+}
+
+do_ghgvm_pilsplitter[cleandirs] = "${DEPLOY_DIR_IMAGE}/signing"
+addtask do_ghgvm_pilsplitter after do_makeboot before do_build
 
 do_merge_dtbs() {
      install -d ${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbs
