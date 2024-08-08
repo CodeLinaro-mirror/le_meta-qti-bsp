@@ -25,15 +25,15 @@ do_make_avb_image(){
         if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'true', 'false', d)}; then
             #For lvgvm avb2.0, add hashtree for system image and generate vbmeta.img.
             avbtool add_hashtree_footer \
-                --image ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
+                --image ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.${IMAGE_FSTYPES} \
                 --partition_name system \
                 --partition_size ${rootfs_partition_size} \
                 --hash_algorithm sha256 \
                 --do_not_generate_fec
             avbtool make_vbmeta_image \
 	        --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET} \
-	        --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
-	        --setup_rootfs_from_kernel ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 \
+	        --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.${IMAGE_FSTYPES}\
+	        --setup_rootfs_from_kernel ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.${IMAGE_FSTYPES} \
                 --algorithm SHA256_RSA4096 \
                 --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/vbgvm_private_key_4096.pem \
                 --rollback_index 0 \
@@ -41,16 +41,44 @@ do_make_avb_image(){
             # Workaround, to keep two vbmeta images here with different vbmeta name.
             install -m 644 ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}-vbmeta.img ${DEPLOY_DIR_IMAGE}/${PRODUCT}-vbmeta.img
             install -m 644 ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}-vbmeta.img ${DEPLOY_DIR_IMAGE}/vbmeta.img
+        else
+            #For lv avb2.0, add hashtree for system image and generate vbmeta.img.
+            avbtool add_hashtree_footer \
+                --image ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.${IMAGE_FSTYPES} \
+                --partition_size ${rootfs_partition_size} \
+                --partition_name system  \
+                --hash_algorithm sha256 \
+                --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/testkey_rsa4096.pem \
+                --rollback_index 0 \
+                --do_not_generate_fec
+            if [ -f ${DEPLOY_DIR_IMAGE}/${PRODUCT}-vendor_boot.img ]; then
+               avbtool make_vbmeta_image \
+                   --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET} \
+                   --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${PRODUCT}-dtbo.img \
+                   --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${PRODUCT}-vendor_boot.img \
+                   --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.${IMAGE_FSTYPES} \
+                   --setup_rootfs_from_kernel ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.${IMAGE_FSTYPES} \
+                   --algorithm SHA256_RSA4096 \
+                   --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/testkey_rsa4096.pem \
+                   --rollback_index 0 \
+                   --prop "com.android.build.boot.security_patch:${@time.strftime('%Y-%m-%d',time.gmtime())}" \
+                   --prop "com.android.build.boot.os_version:${@time.strftime('%Y-%m-%d',time.gmtime())}" \
+                   --output ${DEPLOY_DIR_IMAGE}/${VBMETAIMAGE_TARGET}
+            else
+               avbtool make_vbmeta_image \
+                   --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET} \
+                   ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', '--include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${PRODUCT}-dtbo.img', '', d)} \
+                   --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.${IMAGE_FSTYPES} \
+                   --setup_rootfs_from_kernel ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.${IMAGE_FSTYPES} \
+                   --algorithm SHA256_RSA4096 \
+                   --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/testkey_rsa4096.pem \
+                   --rollback_index 0 \
+                   --prop "com.android.build.boot.security_patch:${@time.strftime('%Y-%m-%d',time.gmtime())}" \
+                   --prop "com.android.build.boot.os_version:${@time.strftime('%Y-%m-%d',time.gmtime())}" \
+                   --output ${DEPLOY_DIR_IMAGE}/${VBMETAIMAGE_TARGET}
+            fi
         fi
     fi
 }
 
 addtask do_make_avb_image after do_image_complete before do_build
-
-# create dummy vendor-boot & vbmeta image
-# create dummy boot-init image for Andriod container
-VENDORBOOT_IMG_CMD = " \
-    dd if=/dev/zero of=${DEPLOY_DIR_IMAGE}/${VENDORBOOTIMAGE_TARGET} bs=1M count=48; \
-    dd if=/dev/zero of=${DEPLOY_DIR_IMAGE}/${BOOTINIT_TARGET} bs=1K count=1; \
-"
-
