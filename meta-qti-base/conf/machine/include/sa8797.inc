@@ -70,14 +70,14 @@ MACHINE_FEATURES += "\
     qti-multimedia \
     qti-display \
     qti-audio \
-    qti-vmm \
+    ${@bb.utils.contains("ACTUAL_KERNEL", "linux-ark", "qti-vmm", "", d)} \
     qti-camera \
     qti-safety \
     qti-vnw \
     early-ramdisk-init \
     qti-security \
     qti-umd \
-    qti-gunyah \
+    ${@bb.utils.contains("ACTUAL_KERNEL", "linux-ark", "qti-gunyah", "", d)} \
 "
 MACHINE_FEATURES:remove = "\
     qti-multimedia \
