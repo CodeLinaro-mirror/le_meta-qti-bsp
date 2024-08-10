@@ -175,7 +175,7 @@ class FOTA(object):
             logger.info('Existing workspace there.....')
         if not os.path.exists(self.ota_loc):
             self.image_path = get_config()
-            ota_cd = os.path.join(self.apps_path, self.image_path, "ota-scripts")
+            ota_cd = os.path.join(self.meta_loc, self.image_path, "ota-scripts")
             logger.info("ota workspace {}".format(ota_cd))
             copy_file(ota_cd, self.ota_loc)
             logger.info('ota-scripts not there, copying...')
@@ -457,6 +457,13 @@ class FOTA(object):
         self.copy_manifest(meta_loc, radio)
         return unzipd
 
+    def get_device_build(self, manifest):
+        root = self.xml_root(manifest)
+        try:
+            return root['xml']['products']['product']['build-Id']
+        except Exception as e:
+            return 'default'
+
     def prepare_target_file(self, meta, meta_loc, target_zip):
         """Zip and prepare the target file
         Args:
@@ -470,7 +477,11 @@ class FOTA(object):
         self.copy_nhlosbins_tmp_loc(meta_loc)
         unzipd = self.copy_nhlos_files(meta_loc, target_zip)
         os.chdir(unzipd)
-        target = '{}/target_{}.zip'.format(self.dest_loc, meta)
+        if os.path.exists('./RADIO/manifest.xml'):
+            build_id = self.get_device_build('./RADIO/manifest.xml')
+        else:
+            build_id = 'default'
+        target = '{}/target_{}_{}.zip'.format(self.dest_loc, meta, build_id)
         zip_cmd = ['zip', '-qry', target, '.']
         logger.info("zip command is {}".format(zip_cmd))
         run_shell_cmd(zip_cmd)
