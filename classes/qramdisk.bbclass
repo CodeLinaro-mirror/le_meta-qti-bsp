@@ -157,7 +157,6 @@ fakeroot do_ramdisk_create() {
 
         if ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'true', 'false', d)}; then
             cp ${IMAGE_ROOTFS}/lib/libselinux.so.1 lib/libselinux.so.1
-            cp ${IMAGE_ROOTFS}/lib/libpcre.so.1 lib/libpcre.so.1
         fi
 
         # meta-selinux layer does not currently check for distro_features

@@ -30,6 +30,7 @@ BOOTLOADER_NAME = "${@bb.utils.contains('MACHINE_FEATURES', 'emmc-boot', 'emmc_a
 emmc_bootloader = "${@bb.utils.contains('MACHINE_FEATURES', 'emmc-boot', '1', '0', d)}"
 
 LIBGCC = "${STAGING_LIBDIR}/${TARGET_SYS}/8.2.0/libgcc.a"
+LIBGCC:mdm9607 = "${STAGING_LIBDIR}/${TARGET_SYS}/11.4.0/libgcc.a"
 
 # Disable display for nodisplay products
 DISPLAY_SCREEN = "1"
@@ -62,6 +63,7 @@ EXTRA_OEMAKE:append = " ${@bb.utils.contains('TUNE_FEATURES', 'callconvention-ha
 
 #add more cflags to lk, if GCC6.3 version
 EXTRA_OEMAKE:append = " 'LKLE_CFLAGS=-Wno-shift-negative-value -Wno-misleading-indentation -Wunused-const-variable=0 -DINIT_BIN_LE=\"/sbin/init\"' "
+EXTRA_OEMAKE:append:mdm9607 = " 'LKLE_CFLAGS= -fcommon -Wno-shift-negative-value -Wno-misleading-indentation -Wunused-const-variable=0 -DINIT_BIN_LE=\"/sbin/init\"' "
 
 do_install() {
         install -d ${D}/boot
@@ -79,3 +81,4 @@ do_deploy() {
 addtask deploy before do_build after do_install
 
 PACKAGE_STRIP = "no"
+INSANE_SKIP:${PN}:mdm9607 += "already-stripped"

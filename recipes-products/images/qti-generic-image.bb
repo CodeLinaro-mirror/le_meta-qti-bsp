@@ -7,6 +7,7 @@ IMAGE_FEATURES += "ssh-server-openssh"
 
 # This image doesn't support abl generation
 EXTRA_IMAGEDEPENDS:remove = "edk2"
+EXTRA_IMAGEDEPENDS:remove = "lk"
 
 KERN_MODS ?= "kernel-modules"
 KERN_MODS:waipio = "gki-kernel-modules-second-stage"
@@ -19,6 +20,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-startup-scripts-base \
         systemd-machine-units \
         ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
+	${@bb.utils.contains('MACHINE_FEATURES', 'nand-boot', 'mtd-utils-ubifs', '', d)} \
 "
 # Install display packages
 CORE_IMAGE_EXTRA_INSTALL += " \

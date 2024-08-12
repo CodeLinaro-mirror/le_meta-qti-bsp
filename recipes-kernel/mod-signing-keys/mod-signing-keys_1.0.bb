@@ -21,7 +21,7 @@ do_compile() {
 
     if "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'true', 'false', d)}"; then
         # generate verity root hash signing keys
-        openssl req -new -nodes -utf8 -newkey rsa:1024 -days 36500 -batch \
+        openssl req -new -nodes -utf8 -newkey rsa:4096 -days 36500 -batch \
             -x509 -config x509.genkey -outform PEM -out verity_cert.pem \
             -keyout verity_key.pem
     fi
