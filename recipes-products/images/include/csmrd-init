@@ -503,6 +503,7 @@ do_nbdtab()
     sed -i 's+/dev/disk/by-partlabel/userdata+/dev/nbd3+g' data.mount
     sed -i 's+/dev/disk/by-partlabel/cache+/dev/nbd4+g' cache.mount
     if [ -f firmware-mount.service ]; then
+        sed -i '/modemDirCheck/,/modemDirCheckend/d' firmware-mount.service
         sed -i 's+/dev/disk/by-partlabel/modem${SLOT_SUFFIX}+/dev/nbd5+g' firmware-mount.service
         sed -i '/BindsTo=/d' firmware-mount.service
         sed -i '/After=/d' firmware-mount.service
@@ -513,6 +514,7 @@ do_nbdtab()
     fi
 
     if [ -f manifest-mount.service ]; then
+        sed -i '/manifestDirCheck/,/manifestDirCheckend/d' manifest-mount.service
         sed -i '/\/dev\/disk\/by-partlabel\/manifest_b/d' manifest-mount.service
         sed -i 's+/dev/disk/by-partlabel/manifest_a+/dev/nbd7+g' manifest-mount.service
         sed -i '/BindsTo=/d' manifest-mount.service
@@ -656,33 +658,37 @@ case $fstab_suffix in
         #mount system partition
         mnt_dir="/mnt/system"
         mkdir -p $mnt_dir
-# if DM-Verity is enabled then only this file verity.env exits
-# verity protection
+
+# DM-Verity protection
+# if DM-Verity is enabled, then file verity.env is expected to be present
 verity_cmdline="$(sed -e 's/ /\n/g' /proc/cmdline | egrep 'verity')"
 if [ -n "$verity_cmdline" ] && [ -f /etc/verity.env ]; then
-     source /etc/verity.env
-     veritysetup open $partition system $partition $VERITY_ROOT_HASH --salt $VERITY_SALT --hash-offset $VERITY_HASH_OFFSET --data-blocks $VERITY_DATA_BLOCKS --fec-device $partition --fec-offset $VERITY_FEC_OFFSET --fec-roots $VERITY_FEC_ROOTS --root-hash-signature=/etc/verity_sig.txt --restart-on-corruption
+    source /etc/verity.env
+    veritysetup open $partition system $partition $VERITY_ROOT_HASH --salt $VERITY_SALT --hash-offset $VERITY_HASH_OFFSET --data-blocks $VERITY_DATA_BLOCKS --fec-device $partition --fec-offset $VERITY_FEC_OFFSET --fec-roots $VERITY_FEC_ROOTS --root-hash-signature=/etc/verity_sig.txt --restart-on-corruption
 
     timeout=30
     # Wait till the block device is available
-     while [ ! -e /dev/mapper/system ]; do
-     echo "waiting for /dev/mapper/system $partition"
-     sleep 1
-     ((timeout -= 1))
-            if [ "$timeout" -le 0 ]; then
-                echo "$partition not available"
-# If open fails we are still starting rdshell which is not needed
-# we are expected to  reboot needs to be disable and reboot for production builds
-                 start_rdshell
-            fi
-     done
-     echo "/dev/mapper/system ready, time = $counter ms"
-     mount -t ext4 -o ro /dev/mapper/system $mnt_dir
+    while [ ! -e /dev/mapper/system ]; do
+    echo "waiting for /dev/mapper/system $partition"
+    sleep 1
+    ((timeout -= 1))
+        if [ "$timeout" -le 0 ]; then
+            echo "verity setup failed with $partition not available"
+            # reboot the device, with the reboot reason
+            /sbin/sys_reboot "dm-verity device corrupted" -f
+        fi
+    done
+    echo "/dev/mapper/system ready, time = $counter ms"
+    mount -t ext4 -o ro /dev/mapper/system $mnt_dir
+# if DM-Verity is enabled, but file verity.env is not present
+elif [ -n "$verity_cmdline" ] && [ ! -f /etc/verity.env ]; then
+    echo "verity env is not present or corrupted"
+    /sbin/sys_reboot "dm-verity device corrupted" -f
 else
-#case when dm-verity is not eanbled
-     mount -o ro $partition $mnt_dir
-
+#case when dm-verity is not enabled
+    mount -o ro $partition $mnt_dir
 fi   # end of  if verity file exist check.
+
         umount /sys/kernel/debug /sys /proc /dev
         echo "Switching to system partition on $partition"
         exec /bin/switch_root -c /dev/console $mnt_dir /sbin/init

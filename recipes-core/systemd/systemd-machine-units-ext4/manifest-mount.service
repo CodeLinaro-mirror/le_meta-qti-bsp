@@ -2,21 +2,31 @@
 # SPDX-License-Identifier: BSD-3-Clause-Clear
 
 [Unit]
-BindsTo=dev-disk-by\x2dpartlabel-manifest.device dev-disk-by\x2dpartlabel-manifest_b.device
-After=dev-disk-by\x2dpartlabel-manifest.device dev-disk-by\x2dpartlabel-manifest_b.device
+BindsTo=dev-disk-by\x2dpartlabel-manifest_b.device
+After=dev-disk-by\x2dpartlabel-manifest.device dev-disk-by\x2dpartlabel-manifest_a.device dev-disk-by\x2dpartlabel-manifest_b.device
 Before=local-fs.target
 DefaultDependencies=no
 
 [Service]
 Type=oneshot
 RemainAfterExit=yes
+#manifestDirCheck
+ExecStartPre=/bin/sh -c " \
+                cd /dev/disk/by-partlabel/; \
+                if [[ -e manifest || -e manifest_a ]]; then \
+                    return 0; \
+                else \
+                    return 1; \
+                fi \
+            "
+#manifestDirCheckend
 ExecStartPre=/bin/sh -c " \
                 cd /dev/disk/by-partlabel/; \
                 if [[ -e manifest  && ! -e manifest_a ]]; \
                     then ln -s manifest manifest_a; \
                 fi \
             "
-ExecStart=/bin/mount -o noexec,nodev,rw,context=system_u:object_r:manifest_t:s0 -t vfat /dev/disk/by-partlabel/manifest_a /manifest
+ExecStart=/bin/mount -o noexec,nodev,rw,context=system_u:object_r:manifest_t:s0 -t vfat /dev/disk/by-partlabel/manifest_a /manifest_a
 ExecStart=/bin/mount -o noexec,nodev,rw,context=system_u:object_r:manifest_t:s0 -t vfat /dev/disk/by-partlabel/manifest_b /manifest_b
 Nice=-20
 
