@@ -23,4 +23,6 @@ EXTRA_OEMAKE += "\
 TECHPACK_DTBS = "\
     sa8775p_audiolite_common.dtbo \
     ${@bb.utils.contains('TARGET_USES_AUDIO_FRAMEWORK', 'audiolite', 'sa8775p_audiolite_overlay.dtbo', '', d)} \
+    sa8255p_audiolite_common.dtbo \
+    ${@bb.utils.contains('TARGET_USES_AUDIO_FRAMEWORK', 'audiolite', 'sa8255p_audiolite_overlay.dtbo', '', d)} \
 "
