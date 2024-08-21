@@ -48,7 +48,7 @@ do_install:append:sa8775() {
 }
 
 do_install:append:sa8797() {
-    # install -m 0755 ${S}/vfio-device-probe/sa8797_dev.conf -D ${D}${libdir}/vfio-bind.d/sa8797_dev.conf
+    install -m 0755 ${S}/vfio-device-probe/sa8797_dev.conf -D ${D}${libdir}/vfio-bind.d/sa8797_dev.conf
 }
 
 FILES:${PN} += "${libdir}/modules-load.d/*"
