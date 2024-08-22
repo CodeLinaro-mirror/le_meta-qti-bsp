@@ -1,5 +1,7 @@
 # Support systemd-user-session
 DISTRO_FEATURES:append = " pam"
+#SA8797 RUMI bringup remove pam.
+DISTRO_FEATURES:remove:sa8797 = "pam"
 
 # Video
 DISTRO_FEATURES:append:sa6155 = " qti-carcamsrc qti-omx"
