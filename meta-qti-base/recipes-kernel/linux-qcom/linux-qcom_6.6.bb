@@ -29,6 +29,7 @@ SRC_URI = "\
     file://0010-PENDING-usb-dwc3-qcom-Add-support-for-sa8255p-for-qc.patch \
     file://0011-PENDING-phy-qcom-snps-femto-v2-Call-qcom_snps_hsphy_.patch \
     file://0012-PENDING-phy-qcom-snps-femto-v2-Add-support-for-SA825.patch \
+    file://0001-FROMLIST-of-of_reserved_mem-Increase-limit-for-reser.patch \
 "
 
 SRCREV_kernel = "${AUTOREV}"
@@ -68,6 +69,7 @@ do_patch:append() {
     patch -f -p1 < ${WORKDIR}/0010-PENDING-usb-dwc3-qcom-Add-support-for-sa8255p-for-qc.patch
     patch -f -p1 < ${WORKDIR}/0011-PENDING-phy-qcom-snps-femto-v2-Call-qcom_snps_hsphy_.patch
     patch -f -p1 < ${WORKDIR}/0012-PENDING-phy-qcom-snps-femto-v2-Add-support-for-SA825.patch
+    patch -f -p1 < ${WORKDIR}/0001-FROMLIST-of-of_reserved_mem-Increase-limit-for-reser.patch
 }
 
 do_compile:prepend() {
