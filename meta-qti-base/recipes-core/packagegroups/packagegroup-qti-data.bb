@@ -25,7 +25,6 @@ RDEPENDS:${PN} += "\
     phytool \
     vlan \
     strongswan \
-    xinetd \
     tcp-wrappers \
     ${@bb.utils.contains('LAYERSERIES_CORENAMES', 'scarthgap', '', 'netkit-telnet', d)} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', 'proftpd', d)} \
