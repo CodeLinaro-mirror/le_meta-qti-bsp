@@ -17,6 +17,17 @@ SRC_URI = "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'file://selinux.cfg', '', d)} \
     ${@bb.utils.contains_any('VARIANT', 'perf user', '', 'file://devmem.cfg', d)} \
     file://0001-QCLINUX-vfio-Disable-iommu_group_claim_dma_owner-tem.patch \
+    file://0002-PENDING-soc-qcom-geni-se-Enable-QUPs-on-SA8255p-Qual.patch \
+    file://0003-PENDING-serial-qcom-geni-Enable-Serial-on-SA8255p-pl.patch \
+    file://0004-PENDING-i2c-qcom-geni-Enable-I2C-on-SA8255p-Qualcomm.patch \
+    file://0005-PENDING-spi-geni-qcom-Enable-SPI-on-SA8255p-Qualcomm.patch \
+    file://0006-PENDING-spi-geni-qcom-Enable-SPI-GSI-mode-for-SA8255.patch \
+    file://0007-PENDING-scsi-ufs-qcom-Enable-sa8255p-platform.patch \
+    file://0008-PENDING-phy-qcom-qmp-usb-Call-qmp_usb_remove-during-.patch \
+    file://0009-PENDING-phy-qcom-qmp-usb-Add-support-for-SA8255P.patch \
+    file://0010-PENDING-usb-dwc3-qcom-Add-support-for-sa8255p-for-qc.patch \
+    file://0011-PENDING-phy-qcom-snps-femto-v2-Call-qcom_snps_hsphy_.patch \
+    file://0012-PENDING-phy-qcom-snps-femto-v2-Add-support-for-SA825.patch \
 "
 
 SRCREV_kernel = "${AUTOREV}"
@@ -45,6 +56,17 @@ addtask do_generate_base_defconfig after do_unpack before do_kernel_metadata
 do_patch:append() {
     cd ${S}
     patch -f -p1 < ${WORKDIR}/0001-QCLINUX-vfio-Disable-iommu_group_claim_dma_owner-tem.patch
+    patch -f -p1 < ${WORKDIR}/0002-PENDING-soc-qcom-geni-se-Enable-QUPs-on-SA8255p-Qual.patch
+    patch -f -p1 < ${WORKDIR}/0003-PENDING-serial-qcom-geni-Enable-Serial-on-SA8255p-pl.patch
+    patch -f -p1 < ${WORKDIR}/0004-PENDING-i2c-qcom-geni-Enable-I2C-on-SA8255p-Qualcomm.patch
+    patch -f -p1 < ${WORKDIR}/0005-PENDING-spi-geni-qcom-Enable-SPI-on-SA8255p-Qualcomm.patch
+    patch -f -p1 < ${WORKDIR}/0006-PENDING-spi-geni-qcom-Enable-SPI-GSI-mode-for-SA8255.patch
+    patch -f -p1 < ${WORKDIR}/0007-PENDING-scsi-ufs-qcom-Enable-sa8255p-platform.patch
+    patch -f -p1 < ${WORKDIR}/0008-PENDING-phy-qcom-qmp-usb-Call-qmp_usb_remove-during-.patch
+    patch -f -p1 < ${WORKDIR}/0009-PENDING-phy-qcom-qmp-usb-Add-support-for-SA8255P.patch
+    patch -f -p1 < ${WORKDIR}/0010-PENDING-usb-dwc3-qcom-Add-support-for-sa8255p-for-qc.patch
+    patch -f -p1 < ${WORKDIR}/0011-PENDING-phy-qcom-snps-femto-v2-Call-qcom_snps_hsphy_.patch
+    patch -f -p1 < ${WORKDIR}/0012-PENDING-phy-qcom-snps-femto-v2-Add-support-for-SA825.patch
 }
 
 do_compile:prepend() {
