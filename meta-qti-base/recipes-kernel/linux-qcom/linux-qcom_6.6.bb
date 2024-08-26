@@ -30,6 +30,7 @@ SRC_URI = "\
     file://0011-PENDING-phy-qcom-snps-femto-v2-Call-qcom_snps_hsphy_.patch \
     file://0012-PENDING-phy-qcom-snps-femto-v2-Add-support-for-SA825.patch \
     file://0001-FROMLIST-of-of_reserved_mem-Increase-limit-for-reser.patch \
+    file://0013-net-stmmac-dwmac-qcom-ethqos-Enable-SCMI-ETH.patch \
 "
 
 SRCREV_kernel = "${AUTOREV}"
@@ -70,6 +71,7 @@ do_patch:append() {
     patch -f -p1 < ${WORKDIR}/0011-PENDING-phy-qcom-snps-femto-v2-Call-qcom_snps_hsphy_.patch
     patch -f -p1 < ${WORKDIR}/0012-PENDING-phy-qcom-snps-femto-v2-Add-support-for-SA825.patch
     patch -f -p1 < ${WORKDIR}/0001-FROMLIST-of-of_reserved_mem-Increase-limit-for-reser.patch
+    patch -f -p1 < ${WORKDIR}/0013-net-stmmac-dwmac-qcom-ethqos-Enable-SCMI-ETH.patch
 }
 
 do_compile:prepend() {
