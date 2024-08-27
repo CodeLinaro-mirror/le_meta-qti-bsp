@@ -17,6 +17,7 @@ SRC_URI = "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'file://selinux.cfg', '', d)} \
     ${@bb.utils.contains_any('VARIANT', 'perf user', '', 'file://devmem.cfg', d)} \
     file://0001-QCLINUX-vfio-Disable-iommu_group_claim_dma_owner-tem.patch \
+    file://dm.cfg \
 "
 
 SRCREV_kernel = "${AUTOREV}"
