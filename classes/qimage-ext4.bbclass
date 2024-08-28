@@ -94,6 +94,10 @@ create_symlink_systemd_ext4_mount_rootfs() {
         fi
     done
    # Remove generator binaries and ensure that we don't rely on generators for mount or service files.
+   if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-csm', 'true', 'false', d)}; then
+       rm -rf ${IMAGE_ROOTFS_EXT4}/manifest
+       rm -rf ${IMAGE_ROOTFS}/manifest
+   fi
    rm -rf ${IMAGE_ROOTFS_EXT4}/lib/systemd/system-generators/systemd-debug-generator
    rm -rf ${IMAGE_ROOTFS_EXT4}/lib/systemd/system-generators/systemd-fstab-generator
    rm -rf ${IMAGE_ROOTFS_EXT4}/lib/systemd/system-generators/systemd-gpt-auto-generator
