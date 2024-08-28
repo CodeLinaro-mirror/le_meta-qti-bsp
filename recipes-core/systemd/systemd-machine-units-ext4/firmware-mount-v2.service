@@ -5,8 +5,8 @@
 Description=Mount modem partition to /firmware mount point
 ConditionDirectoryNotEmpty=!/firmware
 
-BindsTo=dev-disk-by\x2dpartlabel-modem.device dev-disk-by\x2dpartlabel-modem_b.device
-After=dev-disk-by\x2dpartlabel-modem.device dev-disk-by\x2dpartlabel-modem_b.device
+BindsTo=dev-disk-by\x2dpartlabel-modem_b.device
+After=dev-disk-by\x2dpartlabel-modem.device dev-disk-by\x2dpartlabel-modem_a.device dev-disk-by\x2dpartlabel-modem_b.device
 Before=local-fs.target
 DefaultDependencies=no
 
@@ -16,6 +16,16 @@ IgnoreOnIsolate=true
 Type=oneshot
 RemainAfterExit=yes
 PassEnvironment="SLOT_SUFFIX"
+#modemDirCheck
+ExecStartPre=/bin/sh -c " \
+                cd /dev/disk/by-partlabel/; \
+                if [[ -e modem || -e modem_a ]]; then \
+                    return 0; \
+                else \
+                    return 1; \
+                fi \
+            "
+#modemDirCheckend
 ExecStartPre=/bin/sh -c " \
                 cd /dev/disk/by-partlabel/; \
                 if [[ -e modem  && ! -e modem_a ]]; \
