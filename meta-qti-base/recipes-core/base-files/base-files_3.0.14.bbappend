@@ -11,6 +11,8 @@ dirs755:append = " \
     ${userfsdatadir} ${MACHINE_MNT_POINTS} \
 "
 
+dirs755:append:sa8775 = " /data/var_upper /data/var_work "
+
 do_install:append(){
     if(${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'true', 'false', d)}); then
         ln -s ${nonarch_base_libdir} ${D}/lib64
@@ -30,4 +32,5 @@ do_install:append(){
         sed -i "/^\/data/d" ${D}${sysconfdir}/fstab
         sed -i "/^\${localstatedir}/d" ${D}${sysconfdir}/fstab
     fi
+
 }

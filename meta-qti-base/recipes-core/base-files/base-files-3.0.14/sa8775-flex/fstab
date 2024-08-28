@@ -42,7 +42,7 @@ PARTLABEL=userdata   /data           auto      defaults,noauto_da_alloc,discard,
 PARTLABEL=persist    /persist            auto      defaults                         0  0
 
 # Bind /home to /data
-# /data                /home                auto       defaults,bind         0  0
+/data                /home                auto       defaults,bind         0  0
 
 overlay /var overlay x-systemd.requires=/data,x-systemd.requires=/persist,lowerdir=/persist,upperdir=/data/var_upper,workdir=/data/var_work 0 0
 
