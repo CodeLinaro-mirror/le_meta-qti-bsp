@@ -11,6 +11,18 @@ SRC_URI += "\
     ${@bb.utils.contains('MACHINE_MNT_POINTS', '/systemrw', 'file://umount-copybind', '', d)} \
     ${@bb.utils.contains('MACHINE_MNT_POINTS', '/systemrw', 'file://volatile-binds.service.in', '', d)} \
 "
+do_compile:append () {
+     if ${@bb.utils.contains('MACHINE', 'mdm9607', 'true', 'false', d)}; then
+         if  [ -e var-volatile-lib.service ]; then
+             # As systemd-logind need /var/lib, ensure that this service runs
+             # after the volatile /var/lib is mounted.
+              sed -i -e "/^Before=/s/\$/ systemd-logind.service/" \
+                  -e "/^WantedBy=/s/\$/ systemd-logind.service/" \
+                  var-volatile-lib.service
+          fi
+     fi
+}
+
 do_install:append () {
     if ${@bb.utils.contains('MACHINE_MNT_POINTS', '/systemrw', 'true', 'false', d)}; then
         install -d ${D}${base_sbindir}
