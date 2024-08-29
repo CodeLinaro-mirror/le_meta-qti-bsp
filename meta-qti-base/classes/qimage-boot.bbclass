@@ -54,7 +54,7 @@ do_ghgvm_pilsplitter() {
 }
 
 do_ghgvm_pilsplitter[cleandirs] = "${DEPLOY_DIR_IMAGE}/signing"
-addtask do_ghgvm_pilsplitter after do_makeboot before do_build
+addtask do_ghgvm_pilsplitter after do_makeboot before do_sign_boot_img
 
 do_merge_dtbs() {
      install -d ${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbs
