@@ -72,6 +72,8 @@ EXTRA_OEMAKE += "tc_usrbindir=${STAGING_BINDIR_NATIVE}"
 EXTRA_OEMAKE += "OUTPUT_POLICY=`${STAGING_BINDIR_NATIVE}/checkpolicy -V | cut -d' ' -f1`"
 EXTRA_OEMAKE += "CC='${BUILD_CC}' CFLAGS='${BUILD_CFLAGS}' PYTHON='${PYTHON}'"
 
+EXTRA_CONTRIB_POLICY_MODULES = "networkmanager dbus virt irqbalance logrotate mta rpm pcp"
+
 extract_lv_sepolicy() {
     input_file="${S}/policy/modules.conf"
     output_file="${S}/policy/modules-lv-sepolicy.conf"
@@ -103,7 +105,11 @@ generate_selinux_conf() {
 
     if [ -f "${WORKDIR}/selinux-policy/modules-targeted-contrib.conf" ] ; then
         cp -f ${WORKDIR}/selinux-policy/modules-targeted-contrib.conf ${S}/policy/modules-contrib.conf
-        cat ${WORKDIR}/selinux-policy/modules-targeted-contrib.conf >> ${S}/policy/modules.conf
+        sed -i 's/= *module/= off/g' ${S}/policy/modules-contrib.conf
+        for module in ${EXTRA_CONTRIB_POLICY_MODULES} ; do
+            sed -i "s/^\(\<${module}\>\) *= *.*$/\1 = module/" ${S}/policy/modules-contrib.conf
+        done
+        cat ${S}/policy/modules-contrib.conf >> ${S}/policy/modules.conf
     fi
 
     if [ -f "${S}/policy/modules-lv-sepolicy.conf" ] ; then
