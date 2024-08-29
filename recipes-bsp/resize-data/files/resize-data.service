@@ -1,0 +1,16 @@
+[Unit]
+Description=Expand userdata service
+Before=data.mount
+After=dev-disk-by\x2dpartlabel-userdata.device
+BindsTo=dev-disk-by\x2dpartlabel-userdata.device
+DefaultDependencies=no
+
+[Service]
+Type=oneshot
+ExecStartPre=/bin/sh -c 'echo "Userdata will be expanded to available partition size."'
+ExecStart=/bin/sh -c "/sbin/e2fsck -pfv /dev/disk/by-partlabel/userdata; /sbin/resize2fs -f /dev/disk/by-partlabel/userdata;"
+StandardOutput=journal+console
+
+
+[Install]
+WantedBy=local-fs.target
