@@ -29,17 +29,25 @@ python __anonymous() {
 
     recipe_name = d.getVar('PN', True)
 
-    if "native" in recipe_name or "linux" in recipe_name or "packagegroup" in recipe_name or "kernel" in recipe_name:
+    if "native" in recipe_name or "linux" in recipe_name or "packagegroup" in recipe_name or "kernel" in recipe_name or "system" in recipe_name:
         return
 
-    if recipe_name in ['system-core-adbd', 'libuhab', 'wayland-ivi-extension', 'btcli', 'qcrosvm']:
+    #tmp for LVAU050
+    if recipe_name in ['libvirtdiag', 'diag-reboot-app', 'diag-router', 'diag', 'qmi-framework']:
+        return
+
+    if recipe_name in ['synergy', 'system-core-adbd', 'libuhab', 'wayland-ivi-extension', 'btcli', 'qcrosvm']:
+        return
+
+    #tmp for hgy
+    if recipe_name in ['cntvct-log', 'glink-service-lrm', 'video-driver']:
         return
 
     d.appendVar('DEPENDS', ' gcc-sanitizers')
     d.appendVar('LDFLAGS', ' -lasan')
 
     # Inherit meson, needs add compile flags at meson-configure file additionally
-    if recipe_name in ['weston-sdm-extension', 'gstreamer1.0-qvconv', 'gstreamer1.0-plugins-drmdecryptor', 'gstreamer1.0-plugins-vesdeliver', 'gstreamer1.0-plugins-qvdeinterlace', 'gstreamer1.0-plugins-codec2', 'gstreamer1.0-plugins-qeavb']:
+    if recipe_name in ['gstreamer1.0-plugin-qvais', 'gstreamer1.0-plugins-qvrate', 'weston-sdm-extension', 'gstreamer1.0-qvconv', 'gstreamer1.0-plugins-drmdecryptor', 'gstreamer1.0-plugins-vesdeliver', 'gstreamer1.0-plugins-qvdeinterlace', 'gstreamer1.0-plugins-codec2', 'gstreamer1.0-plugins-qeavb']:
         d.appendVar('EXTRA_OEMESON', ' -DASAN=true')
         return
 
@@ -55,11 +63,11 @@ python __anonymous() {
         d.appendVar('EXTRA_OEMAKE', ' ASAN=y')
 
     # Using CMakefile.txt, needs add link library additionally
-    if recipe_name in ['safetymonitor', 'libkiumd', 'fadas']:
+    if recipe_name in ['ais', 'softsku-daemon', 'safetymonitor', 'libkiumd', 'fadas', 'compute-resmon', 'camera-qcx']:
         d.appendVar('EXTRA_OECMAKE', ' -DASAN=ON')
 
     # TOOLCHAIN is clang, need libclang_rt.asan.a
-    if recipe_name in ['media-external', 'media-codec2', 'media-noship', 'codec2', 'codec2-app', 'codec2-service', 'video-driver', 'vidc-test-app', 'vidc-enc-test', 'vidc-dec-test']:
+    if recipe_name in ['libtpp', 'media-external', 'media-codec2', 'media-noship', 'codec2', 'codec2-app', 'codec2-service', 'vidc-test-app', 'vidc-enc-test', 'vidc-dec-test']:
         d.appendVar('DEPENDS', ' compiler-rt')
 }
 
@@ -67,19 +75,19 @@ ROOTFS_POSTPROCESS_COMMAND:append = " ${@bb.utils.contains("DISTRO_FEATURES", "a
 #add some asan option for service
 add_asan_preload() {
     if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/agm.service" ]; then
-        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.6"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/agm.service
+        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.8"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/agm.service
     fi
     if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/init_codec2.service" ]; then
-        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.6"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/init_codec2.service
+        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.8"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/init_codec2.service
     fi
     if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/ab-updater.service" ]; then
-        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.6"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/ab-updater.service
+        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.8"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/ab-updater.service
     fi
     if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/ais_server.service" ]; then
-        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.6"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/ais_server.service
+        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.8"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/ais_server.service
     fi
     if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/weston@.service" ]; then
-        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.6"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/weston@.service
+        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.8"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/weston@.service
     fi
     # waiting to fix the error of leum711, will delete below code
     if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/agm.service" ]; then
@@ -90,5 +98,46 @@ add_asan_preload() {
     fi
     if [ -f "${IMAGE_ROOTFS}/etc/systemd/system/thermal-engine.service" ]; then
         sed -i '/^\[Service\]/a Environment="ASAN_OPTIONS=detect_odr_violation=0"' ${IMAGE_ROOTFS}/etc/systemd/system/thermal-engine.service
+    fi
+
+    #for hgy
+    if [ -f "${IMAGE_ROOTFS}/etc/systemd/system/apss_stl.service" ]; then
+        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.8"' ${IMAGE_ROOTFS}/etc/systemd/system/apss_stl.service
+    fi
+        if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/eva.service" ]; then
+        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.8"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/eva.service
+    fi
+        if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/evastl.service" ]; then
+        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.8"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/evastl.service
+    fi
+        if [ -f "${IMAGE_ROOTFS}/etc/systemd/system/safetymonitor.service" ]; then
+        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.8"' ${IMAGE_ROOTFS}/etc/systemd/system/safetymonitor.service
+    fi
+        if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/ssgtz-daemon.service" ]; then
+        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.8"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/ssgtz-daemon.service
+    fi
+        if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/qcx_be_server.service" ]; then
+        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.8"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/qcx_be_server.service
+    fi
+        if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/openwfd_server_@.service" ]; then
+        sed -i '/^\[Service\]/a Environment="ASAN_OPTIONS=detect_odr_violation=0"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/openwfd_server_@.service
+    fi
+        if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/gsl_hab_server.service" ]; then
+        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.8"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/gsl_hab_server.service
+    fi
+        if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/kgsl.service" ]; then
+        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.8"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/kgsl.service
+    fi
+        if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/glink-service-lrm.service" ]; then
+        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.8"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/glink-service-lrm.service
+    fi
+        if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/weston.service" ]; then
+        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.8"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/weston.service
+    fi
+        if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/audio-chime.service" ]; then
+        sed -i '/^\[Service\]/a Environment="LSAN_OPTIONS=verbosity=1:log_threads=1"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/audio-chime.service
+    fi
+        if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/qcx_server.service" ]; then
+        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.8"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/qcx_server.service
     fi
 }
