@@ -43,6 +43,7 @@ DISTRO_FEATURES:append = " vulkan"
 
 # WLAN
 DISTRO_FEATURES:append = " qti-wlan wifi"
+DISTRO_FEATURES:remove:sa8797 = "wifi"
 
 # BT
 DISTRO_FEATURES:append:qtiquingvm8295 = " qti-bluetooth"
