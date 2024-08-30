@@ -99,9 +99,18 @@ addtask do_make_avb_image after do_image_complete before do_build
 
 # create dummy vm_bootloader image
 VM_BOOTLOAD_IMG_CMD = " \
-    dd if=/dev/zero of=${DEPLOY_DIR_IMAGE}/vm-bootloader.img bs=1M count=6; \
+    dd if=/dev/zero of=${DEPLOY_DIR_IMAGE}/vm-bootloader.img bs=1M count=6 \
 "
 # compress the image to lemans
 IMAGE_CMD:ext4:append:gh-gvm-lemans = "; \
   ${VM_BOOTLOAD_IMG_CMD} \
+"
+
+# create dummy vbmeta image
+VBMETA_IMAGE_CMD = " \
+    dd if=/dev/zero of=${DEPLOY_DIR_IMAGE}/${VBMETAIMAGE_TARGET} bs=1K count=4 \
+"
+# compress the image to gh-gvm-lemans
+IMAGE_CMD:ext4:append:gh-gvm-lemans = "; \
+  ${VBMETA_IMAGE_CMD} \
 "
