@@ -79,7 +79,6 @@ MACHINE_FEATURES += "\
     ${@bb.utils.contains("ACTUAL_KERNEL", "linux-ark", "qti-gunyah", "", d)} \
 "
 MACHINE_FEATURES:remove = "\
-    qti-multimedia \
     qti-display \
     qti-audio \
     qti-camera \
