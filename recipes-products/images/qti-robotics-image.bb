@@ -83,6 +83,7 @@ CORE_IMAGE_EXTRA_INSTALL:append:kalama = " packagegroup-qti-qcawifi"
 CORE_IMAGE_EXTRA_INSTALL:append:kalama = " tzdata tzcode"
 CORE_IMAGE_EXTRA_INSTALL:append:kalama = " qcrosvm"
 CORE_IMAGE_EXTRA_INSTALL:append:kalama = " vmsharememory-test"
+CORE_IMAGE_EXTRA_INSTALL:append:kalama = " packagegroup-qcom-voiceai"
 
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-data"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "packagegroup-qti-eva"
