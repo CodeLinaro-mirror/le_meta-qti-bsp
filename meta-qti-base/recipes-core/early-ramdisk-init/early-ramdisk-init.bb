@@ -16,6 +16,9 @@ EXTRA_OECONF += "--bindir=${base_sbindir} --sbindir=${base_sbindir}"
 CFLAGS += '-DLOG_DIR=\\"/boot/early-ramdisk\\"'
 CFLAGS += "${@bb.utils.contains('DISTRO_FEATURES', 'early_init', '-DEARLY_INIT', '', d)}"
 
+TARGET_PATH_NAME ?= "${MACHINE}"
+TARGET_PATH_NAME:sa8775 = "sa8775"
+
 do_install:append() {
     install -d ${D}/dev
     install -d ${D}/sys
@@ -25,9 +28,9 @@ do_install:append() {
     install -d ${D}/realroot
     install -d ${D}/etc/modules-load.f
     touch ${D}/init
-    install -m 0755 ${S}/conf/${MACHINE}/*.conf -D ${D}/etc/modules-load.f/
+    install -m 0755 ${S}/conf/${TARGET_PATH_NAME}/*.conf -D ${D}/etc/modules-load.f/
     if ${@bb.utils.contains('DISTRO_FEATURES', 'qti-external-boot', 'true', 'false', d)}; then
-        install -m 0755 ${S}/conf/${MACHINE}/02-external-bootup.conf.in -D ${D}/etc/modules-load.f/02-external-bootup.conf
+        install -m 0755 ${S}/conf/${TARGET_PATH_NAME}/02-external-bootup.conf.in -D ${D}/etc/modules-load.f/02-external-bootup.conf
     fi
 }
 

@@ -19,13 +19,22 @@ DEPENDS += "\
     virtual/kernel-headers \
 "
 
-# Enable AGL C2 service only on Makena, TODO: remove this when it's ready on Lemans
-DEPENDS:append:quin-gvm-gen4-2 = " codec2-service"
-EXTRA_OEMESON:append:quin-gvm-gen4-2 = " \
-    -Dagl-c2service=true \
-"
+# default enable C2 service on all targets and disable on Lemans
+DEPENDS:append = " binder codec2-service"
+EXTRA_OEMESON:append = " -Dagl-c2service=true"
 
-DEPENDS:append:lemans = " displaydlkm"
+DEPENDS:remove:quin-gvm-lemans = "binder codec2-service"
+EXTRA_OEMESON:remove:quin-gvm-lemans = "-Dagl-c2service=true"
+
+DEPENDS:remove:quin-gvm-lemans-dpk = "binder codec2-service"
+EXTRA_OEMESON:remove:quin-gvm-lemans-dpk = "-Dagl-c2service=true"
+
+DEPENDS:remove:quin-gvm-monaco = "binder codec2-service"
+EXTRA_OEMESON:remove:quin-gvm-monaco = "-Dagl-c2service=true"
+
+DEPENDS:remove:quin-gvm-monaco-dpk = "binder codec2-service"
+EXTRA_OEMESON:remove:quin-gvm-monaco-dpk = "-Dagl-c2service=true"
+
 DEPENDS:append:quin-gvm-lemans = " displaydlkm"
 DEPENDS:append:monaco = " displaydlkm"
 DEPENDS:append:quin-gvm-monaco = " displaydlkm"
@@ -46,16 +55,6 @@ CFLAGS += "\
 CXXFLAGS += "\
     -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}/vidc \
     -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel} \
-"
-
-CFLAGS:append:lemans = " -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}/display"
-CXXFLAGS:append:lemans = " -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}/display"
-EXTRA_OEMESON:append:lemans = " \
-    -Dc2dec-deinterlace=disabled \
-    -Dav1-dec=enabled \
-    -Dmmmcolorfmt=true \
-    -Dqprange_option=op1 \
-    -Dreport_frame_qp_option=op1 \
 "
 
 CFLAGS:append:quin-gvm-lemans = " -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}/display"
@@ -81,6 +80,7 @@ CFLAGS:append:quin-gvm-monaco = " -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtu
 CXXFLAGS:append:quin-gvm-monaco = " -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}/display"
 EXTRA_OEMESON:append:quin-gvm-monaco = " \
     -Dc2dec-deinterlace=disabled \
+    -Dav1-dec=enabled \
     -Dmmmcolorfmt=true \
     -Dqprange_option=op1 \
     -Dreport_frame_qp_option=op1 \

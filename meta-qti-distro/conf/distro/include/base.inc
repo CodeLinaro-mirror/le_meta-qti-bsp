@@ -33,7 +33,7 @@ COMMON_OPTIMIZATION = " \
 
 FULL_OPTIMIZATION         = "-O2 -fomit-frame-pointer ${COMMON_OPTIMIZATION} "
 # Enable debug option as default for variant-debug distro build
-FULL_OPTIMIZATION:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'variant-debug', '-g', '', d)}"
+FULL_OPTIMIZATION:append = " ${@bb.utils.contains('VARIANT', 'debug', '-g', '', d)}"
 DEBUG_OPTIMIZATION:append = " ${COMMON_OPTIMIZATION} "
 
 # NLS
@@ -66,5 +66,5 @@ DEPLOY_DIR_IMAGE = "${DEPLOY_DIR}/images/${DEPLOY_NAME}"
 
 # Static Users for QTI
 USERADDEXTENSION ?= "useradd-staticids"
-USERADD_UID_TABLES:append = " files/qti_passwd"
-USERADD_GID_TABLES:append = " files/qti_group"
+USERADD_UID_TABLES:prepend = "files/qti_passwd "
+USERADD_GID_TABLES:prepend = "files/qti_group "

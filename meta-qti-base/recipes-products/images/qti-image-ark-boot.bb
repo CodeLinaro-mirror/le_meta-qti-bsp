@@ -2,7 +2,8 @@ SUMMARY = "QTI ARK Kernel Boot image"
 DESCRIPTION = "Build QTI ARK kernel boot image"
 LICENSE = "BSD-3-Clause-Clear"
 
-DEPENDS += "mkbootimg-native mkdtimg-native openssl-native oot-dtbo python3-native virtual/kernel"
+DEPENDS += "mkbootimg-native mkdtimg-native openssl-native  python3-native virtual/kernel"
+DEPENDS += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'oot-dtbo', '', d)}"
 DEPENDS += "${@bb.utils.contains_any('COMBINED_FEATURES', 'qti-audio qti-audio-ar', bb.utils.contains('MACHINE_FEATURES', 'qti-gunyah qti-umd', 'audiolite-devicetree', '', d), '', d)}"
 
 IMAGE_CLASSES:remove = "qimage"
@@ -19,20 +20,15 @@ do_make_dtb() {
     install -d ${DEPLOY_DIR_IMAGE}/build-artifacts/dtb
     install -d ${DEPLOY_DIR_IMAGE}/dtbs
 
-    dtb_files=$(find ${DEPLOY_DIR_IMAGE}/build-artifacts/dtb -name "*.dtb*")
-    dtbo_files=$(find ${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbs -name "*.dtbo")
+    dtb_dir=${DEPLOY_DIR_IMAGE}/build-artifacts/dtb
+    dtbo_dir=${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbs
+    out_dir=${DEPLOY_DIR_IMAGE}/dtbs
 
-    if [ -n "$dtbo_files" ]; then
-        for dtb in $dtb_files; do
-            merge_dtbos $dtb $dtbo_files ${DEPLOY_DIR_IMAGE}/dtbs
-        done
-    else
-        cp ${DEPLOY_DIR_IMAGE}/build-artifacts/dtb/* ${DEPLOY_DIR_IMAGE}/dtbs
-    fi
+    merge_dtbos $dtb_dir $dtbo_dir $out_dir
 
     cat ${DEPLOY_DIR_IMAGE}/dtbs/*.dtb* > ${DEPLOY_DIR_IMAGE}/dtbs/dtb.img
 }
-do_make_dtb[depends] += "oot-dtbo:do_deploy"
+do_make_dtb[depends] += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'oot-dtbo:do_deploy', '', d)}"
 do_make_dtb[depends] += "${@bb.utils.contains_any('COMBINED_FEATURES', 'qti-audio qti-audio-ar', bb.utils.contains('MACHINE_FEATURES', 'qti-gunyah qti-umd', 'audiolite-devicetree:do_deploy', '', d), '', d)}"
 
 addtask do_make_dtb after do_image before do_makeboot

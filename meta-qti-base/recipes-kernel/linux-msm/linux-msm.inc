@@ -1,7 +1,7 @@
 DEPENDS += "elfutils-native kern-tools-native mkbootimg-native mkdtimg-native openssl-native pahole-native rsync-native signing-keys"
 DEPENDS:append:aarch64 = " libgcc"
 
-COMPATIBLE_MACHINE = "sa81x5|lemans|quin-gvm-gen4-2|quin-gvm-lemans|monaco|qtiquingvm8295"
+COMPATIBLE_MACHINE = "sa81x5|quin-gvm-gen4-2|quin-gvm-lemans|monaco|qtiquingvm8295"
 
 SRC_URI = "${PATH_TO_REPO}/kernel/kernel-${PV}/kernel_platform/msm-kernel/.git;protocol=${PROTO};name=kernel;destsuffix=kernel/kernel-${PV}/kernel_platform/msm-kernel;usehead=1"
 
@@ -72,7 +72,7 @@ do_configure:prepend() {
     echo "CONFIG_LOCALVERSION="\"${LINUX_VERSION_EXTENSION}\" >> ${B}/.config
 }
 
-MODULESPATH = "${D}/lib/modules/${KERNEL_VERSION}"
+MODULESPATH = "${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}"
 
 do_compile:prepend() {
         if ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'true', 'false', d)}; then

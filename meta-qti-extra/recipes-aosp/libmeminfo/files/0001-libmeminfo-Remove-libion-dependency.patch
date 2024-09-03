@@ -1,0 +1,63 @@
+From 5f37250587a38fcf81294ab1e396637a6e2d50ea Mon Sep 17 00:00:00 2001
+From: Lei wang <leiwan@quicinc.com>
+Date: Thu, 25 Apr 2024 18:02:03 +0800
+Subject: [PATCH] libmeminfo: Remove libion dependency
+
+Disable libion support as ack does not support ion header anymore.
+
+Upstream-Status:Inappropriate [Backport for non-ack kernel]
+
+Signed-off-by: Lei wang <leiwan@quicinc.com>
+---
+ configure.ac                    | 6 +++---
+ libdmabufinfo/Makefile.am       | 4 ++--
+ libdmabufinfo/tools/Makefile.am | 2 +-
+ 3 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 61979bb..d0c6818 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -22,9 +22,9 @@ PKG_CHECK_MODULES([LIBBASE], [libbase])
+ AC_SUBST([LIBBASE_CFLAGS])
+ AC_SUBST([LIBBASE_LIBS])
+ 
+-PKG_CHECK_MODULES([LIBBASE], [libion])
+-AC_SUBST([LIBION_CFLAGS])
+-AC_SUBST([LIBION_LIBS])
++# PKG_CHECK_MODULES([LIBBASE], [libion])
++# AC_SUBST([LIBION_CFLAGS])
++# AC_SUBST([LIBION_LIBS])
+ 
+ PKG_CHECK_MODULES([GTEST], [gtest])
+ AC_SUBST([GTEST_CFLAGS])
+diff --git a/libdmabufinfo/Makefile.am b/libdmabufinfo/Makefile.am
+index 1714fa7..24cf8e6 100644
+--- a/libdmabufinfo/Makefile.am
++++ b/libdmabufinfo/Makefile.am
+@@ -20,8 +20,8 @@ libdmabufinfo_la_CPPFLAGS += $(AM_CPPFLAGS) -Wno-error=pointer-to-int-cast
+ libdmabufinfo_la_CPPFLAGS += -std=c++17
+ libdmabufinfo_la_CPPFLAGS += -I$(srcdir)/include
+ 
+-libdmabufinfo_la_CPPFLAGS += @LIBBASE_CFLAGS@ @LIBION_CFLAGS@
+-libdmabufinfo_la_LDFLAGS = @LIBBASE_LIBS@ @LIBION_LIBS@  -lion
++libdmabufinfo_la_CPPFLAGS += @LIBBASE_CFLAGS@
++libdmabufinfo_la_LDFLAGS = @LIBBASE_LIBS@
+ 
+ # Export headers
+ dmabufinfo_includedir=$(includedir)/dmabufinfo
+diff --git a/libdmabufinfo/tools/Makefile.am b/libdmabufinfo/tools/Makefile.am
+index fe4acb9..fbe2845 100644
+--- a/libdmabufinfo/tools/Makefile.am
++++ b/libdmabufinfo/tools/Makefile.am
+@@ -16,6 +16,6 @@ dmabuf_dump_CPPFLAGS += -I$(top_srcdir)/include
+ dmabuf_dump_CPPFLAGS += -std=c++17
+ dmabuf_dump_CPPFLAGS += @LIBBASE_CFLAGS@ 
+ dmabuf_dump_CPPFLAGS += -I$(srcdir)/../include
+-dmabuf_dump_LDFLAGS = @LIBBASE_LIBS@ @LIBION_LIBS@ -lion
++dmabuf_dump_LDFLAGS = @LIBBASE_LIBS@
+ dmabuf_dump_LDADD   = ../libdmabufinfo.la
+ 
+-- 
+2.25.1
+

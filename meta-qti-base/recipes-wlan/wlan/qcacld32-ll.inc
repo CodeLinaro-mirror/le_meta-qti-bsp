@@ -33,7 +33,8 @@ do_compile:prepend() {
     CFG80211_FLAG="ccflags-y += -DCFG80211_SINGLE_NETDEV_MULTI_LINK_SUPPORT \
                    -DCFG80211_TX_CONTROL_PORT_LINK_SUPPORT \
                    -DCFG80211_11BE_BASIC \
-                   -DCFG80211_EXTERNAL_AUTH_MLO_SUPPORT"
+                   -DCFG80211_EXTERNAL_AUTH_MLO_SUPPORT \
+                   -DCFG80211_MULTI_AKM_CONNECT_SUPPORT"
     FRAME_SIZE_FLAG="ccflags-y += -Wframe-larger-than=4096"
     sed -i -e "/$(CONFIG_QCA_CLD_WLAN_PROFILE)_defconfig$/i${CFG80211_FLAG}" ${S}/Kbuild
     sed -i -e "/$(CONFIG_QCA_CLD_WLAN_PROFILE)_defconfig$/i${FRAME_SIZE_FLAG}" ${S}/Kbuild
@@ -41,9 +42,9 @@ do_compile:prepend() {
 
 RPROVIDES:${PN} += "${PROVIDES_NAME}-${KERNEL_VERSION}"
 
-FILES:${PN} += "lib/firmware/wlan/*"
-FILES:${PN} += "lib/firmware/*"
-FILES:${PN} += "lib/modules/${KERNEL_VERSION}/extra/*"
+FILES:${PN} += "${nonarch_base_libdir}/firmware/wlan/*"
+FILES:${PN} += "${nonarch_base_libdir}/firmware/*"
+FILES:${PN} += "${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/*"
 
 LDFLAGS:aarch64 = "-O1 --hash-style=gnu --as-needed"
 

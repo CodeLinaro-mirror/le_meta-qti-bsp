@@ -11,7 +11,7 @@ SRC_URI = "${PATH_TO_REPO}/external/vhost-device/.git;protocol=${PROTO};destsuff
 SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/external/vhost-device"
-CARGO_SRC_DIR = "crates/i2c"
+CARGO_SRC_DIR = "vhost-device-i2c"
 
 inherit cargo
 include vhost-device-i2c-crates.inc
