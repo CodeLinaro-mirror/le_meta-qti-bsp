@@ -16,6 +16,7 @@ RDEPENDS:${PN} += "\
     wireless-tools \
     iw \
     iputils-ping \
+    iputils-arping \
     wlan-platform-dlkm\
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-wlan-rome', 'qcacld32-ll-rome', '', d)} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-wlan-genoa', 'qcacld32-ll-genoa', '', d)} \
@@ -29,4 +30,4 @@ RDEPENDS:${PN} += "\
     cnss-wlan-load \
     "
 
-RDEPENDS:${PN}:append:quin-gvm-gen4-2 = " hs20-osu-client"
+RDEPENDS:${PN}:append:quin-gvm-gen4-2 = " hs20-osu-client dhcpcd"

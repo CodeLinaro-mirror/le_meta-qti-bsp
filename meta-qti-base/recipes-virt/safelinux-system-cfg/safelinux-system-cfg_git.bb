@@ -10,13 +10,11 @@ SYSTEMD_SERVICE:${PN} = "\
 
 SRC_URI = "\
     ${PATH_TO_REPO}/vendor/qcom/opensource/safelinux-system-cfg/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/safelinux-system-cfg;usehead=1 \
-    file://eth0.network \
-    file://br0.network \
-    file://br0.netdev \
     file://vm_net.conf \
     file://vfio.conf \
     file://vfio_param.conf \
     file://vmm_pwr_key.conf \
+    file://0001-vfio-device-probe-service-remove-delay-after-start-o.patch \
 "
 
 SRCREV = "${AUTOREV}"
@@ -39,11 +37,6 @@ do_install:append() {
 
     install -m 0755 ${WORKDIR}/vm_net.conf -D ${D}${libdir}/modules-load.d/vm_net.conf
     install -m 0755 ${WORKDIR}/vmm_pwr_key.conf -D ${D}${libdir}/modules-load.d/vmm_pwr_key.conf
-
-    install -d ${D}${sysconfdir}/systemd/network/
-    install -m 0644 ${WORKDIR}/eth0.network ${D}${sysconfdir}/systemd/network/eth0.network
-    install -m 0644 ${WORKDIR}/br0.network ${D}${sysconfdir}/systemd/network/br0.network
-    install -m 0644 ${WORKDIR}/br0.netdev ${D}${sysconfdir}/systemd/network/br0.netdev
 }
 
 do_install:append:sa7255() {

@@ -15,6 +15,11 @@ S = "${WORKDIR}/vendor/qcom/opensource/kiumd/dspfirmware-mount"
 do_compile[noexec] = "1"
 
 do_install:append() {
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'true', 'false', d)}; then
+        sed -i '/^Options=/s/defaults/&,context=system_u:object_r:qcrosvm_boot_t:s0/' ${S}/firmware-vm-boot.mount
+        sed -i '/^Options=/s/defaults/&,context=system_u:object_r:dsp_file_t:s0/' ${S}/vendor-dsp.mount
+    fi
+
     install -d -p ${D}${systemd_unitdir}/system/multi-user.target.wants/
 
     install -d -p ${D}/firmware/qcom/sa8775p

@@ -10,6 +10,7 @@ SRC_URI = "\
     file://0001-tinyalsa-Fix-interger-comparison-warning.patch \
     file://0001-Enable-TinyAlsa-plugin-support.patch \
     file://0001-Call-pcm_start-for-capture-case-in-NON-MMAP-mode.patch \
+    file://0001-add-tinyhostless-for-tinyalsa-new.patch \
 "
 
 SRCREV = "f78ed25aced2dfea743867b8205a787bfb091340"

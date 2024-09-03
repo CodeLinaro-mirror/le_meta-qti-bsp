@@ -3,7 +3,7 @@ DESCRIPTION = "Hs20-osu-client is a sign up tool to obtain the certificate \
                for passpoint， especially for WFA pre-cert test. \
               "
 HOMEPAGE = "https://git.codelinaro.org/"
-LICENSE = "BSD"
+LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://${WORKDIR}/external/wpa_supplicant_8/COPYING;md5=5ebcb90236d1ad640558c3d3cd3035df"
 
 DEPENDS += "curl libnl libxml2 pkgconfig"

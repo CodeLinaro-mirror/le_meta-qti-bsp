@@ -64,11 +64,11 @@ MACHINE_FEATURES += "\
     qti-tools \
     qti-multimedia \
     qti-display \
-    qti-qcrosvm \
     qti-audio \
     qti-vmm \
     qti-camera \
     qti-safety \
+    qti-data \
     qti-vnw \
     early-ramdisk-init \
     qti-security \

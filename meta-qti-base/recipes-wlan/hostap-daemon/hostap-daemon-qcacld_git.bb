@@ -8,7 +8,7 @@ DESCRIPTION = "Hostapd (host access point daemon) is a user space daemon \
                device can connect to this Access Point to get some service. \
                "
 HOMEPAGE = "https://git.codelinaro.org/"
-LICENSE = "BSD"
+LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://${WORKDIR}/external/wpa_supplicant_8/COPYING;md5=5ebcb90236d1ad640558c3d3cd3035df"
 
 DEPENDS += "libnl openssl pkgconfig"

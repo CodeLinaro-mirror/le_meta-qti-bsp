@@ -72,7 +72,7 @@ do_configure:prepend() {
     echo "CONFIG_LOCALVERSION="\"${LINUX_VERSION_EXTENSION}\" >> ${B}/.config
 }
 
-MODULESPATH = "${D}/lib/modules/${KERNEL_VERSION}"
+MODULESPATH = "${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}"
 
 do_compile:prepend() {
         if ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'true', 'false', d)}; then
