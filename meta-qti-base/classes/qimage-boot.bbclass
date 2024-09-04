@@ -11,9 +11,9 @@ DEPENDS += "\
 "
 ghgvm_pilsplitter() {
     KP3_PATH="${TOPDIR}/../../kernel/kernel-6.1/kernel_platform"
-    SECTOOLS_PATH="${KP3_PATH}/prebuilts/qcom_boot_artifacts/sectools"
-    PILTOOLS_PATH="${KP3_PATH}/prebuilts/qcom_boot_artifacts/vm/pil_tools"
-    SEC_PROFILES_PATH="${TOPDIR}/../../security/securemsm/security_profiles/"
+    SECTOOLS_PATH=${SECTOOLS_V2_DIR}
+    PILTOOLS_PATH="${STAGING_BINDIR_NATIVE}/scripts/pil_tools"
+    SEC_PROFILES_PATH="${TOPDIR}/../../security/securemsm/security_profiles"
 
     MKDTBOIMGPY_PATH=${TOPDIR}/../../system/libufdt/utils/src
     DTB_FILE_LIST=$(find ${DEPLOY_DIR_IMAGE}/build-artifacts/dtb -name "*.dtb" | sort)
@@ -21,8 +21,8 @@ ghgvm_pilsplitter() {
         echo "No *.dtb files found in $DEPLOY_DIR_IMAGE/dtbs"
         exit 1
     else
-        # $MKDTBOIMGPY_PATH/mkdtboimg.py create ${DEPLOY_DIR_IMAGE}/dtbs/dtb.img $DTB_FILE_LIST
-        $MKDTBOIMGPY_PATH/mkdtboimg.py create ${DEPLOY_DIR_IMAGE}/dtbs/dtb.img ${DEPLOY_DIR_IMAGE}/build-artifacts/dtb/lemans-gunyah-vm-lv-cob.dtb ${DEPLOY_DIR_IMAGE}/build-artifacts/dtb/lemans-gunyah-vm-lv-qam.dtb
+        # python2 $MKDTBOIMGPY_PATH/mkdtboimg.py create ${DEPLOY_DIR_IMAGE}/dtbs/dtb.img $DTB_FILE_LIST
+        python2 $MKDTBOIMGPY_PATH/mkdtboimg.py create ${DEPLOY_DIR_IMAGE}/dtbs/dtb.img ${DEPLOY_DIR_IMAGE}/build-artifacts/dtb/lemans-gunyah-vm-lv-cob.dtb ${DEPLOY_DIR_IMAGE}/build-artifacts/dtb/lemans-gunyah-vm-lv-qam.dtb
     fi
 
     install -d ${DEPLOY_DIR_IMAGE}/signing
@@ -34,7 +34,13 @@ ghgvm_pilsplitter() {
     cp ${SEC_PROFILES_PATH}/lemans_tz_security_profile.xml ${DEPLOY_DIR_IMAGE}/signing
 
     cd ${DEPLOY_DIR_IMAGE}/signing
+
+    # autoghgvmlv-boot.elf is not a standard elf file, verify_elf in image_header.py
+    # will fail and return 1.bypass yocto by adding 'set +e' and 'set -e'
+    set +e
     python3 ${PILTOOLS_PATH}/image_header.py autoghgvmlv-boot.elf Image,0x0 dtb.img,0x3000000 ramdisk.img,0x3100000 --32
+    set -e
+
     ${SECTOOLS_PATH}/sectools secure-image autoghgvmlv-boot.elf --image-id GVM1 --security-profile lemans_tz_security_profile.xml --sign --signing-mode TEST --outfile autoghgvmlv_signed-boot.elf
     ${SECTOOLS_PATH}/sectools secure-image autoghgvmlv-boot.elf --inspect
 
@@ -47,9 +53,7 @@ ghgvm_pilsplitter() {
 do_ghgvm_pilsplitter() {
     if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-ghgvm', 'true', 'false', d)}; then
         touch ${DEPLOY_DIR_IMAGE}/ramdisk.img
-        set +e
         ghgvm_pilsplitter
-        set -e
     fi
 }
 
