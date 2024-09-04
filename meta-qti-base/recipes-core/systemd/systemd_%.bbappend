@@ -5,7 +5,6 @@ FILESEXTRAPATHS =. "${FILESBBAPPENDPATH}/${BP}:${FILESBBAPPENDPATH}/${BPN}:"
 DEPENDS += "glib-2.0"
 
 SRC_URI:append = " \
-    file://0033-systemd-Make-root-s-home-directory-configurable-2.patch \
     file://0001-systemd-avoid-active-seat-change-to-NULL.patch \
     file://60-misc.rules \
     file://0001-systemd-config-linger-for-root-user.patch \
