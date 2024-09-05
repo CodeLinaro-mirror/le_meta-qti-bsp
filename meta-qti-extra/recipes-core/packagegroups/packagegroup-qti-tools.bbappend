@@ -2,6 +2,4 @@
 RDEPENDS:${PN} += "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'ktf', 'ktf', '', d)} \
     googletest \
-    libprocinfo \
-    libmeminfo \
     "
