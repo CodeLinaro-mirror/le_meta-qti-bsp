@@ -26,3 +26,5 @@ do_patch:append() {
 }
 
 S = "${WORKDIR}/kernel/kernel-${PV}/kernel_platform/msm-kernel"
+
+KERNEL_CC:append = " -Wno-error=format"
