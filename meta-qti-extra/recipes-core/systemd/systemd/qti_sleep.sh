@@ -44,6 +44,14 @@ case $1/$2 in
         echo 0 > /sys/kernel/boot_adsp/boot
     fi
 
+    # disable wlan interfaces
+    echo "Disable WLAN interfaces"
+    for iface in `iw dev | grep Interface | awk '{print $2}'`
+    do
+        ifconfig $iface down
+    done
+    sleep 1
+
     # disable BT as hsuart could block suspend
     systemctl stop synergy.service
 
@@ -112,6 +120,12 @@ case $1/$2 in
     fi
 
     systemctl restart synergy.service
+
+    echo "Enable WLAN interfaces"
+    for iface in `iw dev | grep Interface | awk '{print $2}'`
+    do
+        ifconfig $iface up
+    done
 
     if [ $2 = "hibernate" ]; then
         echo 1 > /sys/kernel/boot_adsp/boot
