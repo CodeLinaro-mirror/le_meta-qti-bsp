@@ -1,6 +1,6 @@
-From 6343e626f637bab2ce1cfd48fbbc133f239569c6 Mon Sep 17 00:00:00 2001
-From: Lei wang <quic_leiwan@quicinc.com>
-Date: Wed, 7 Jun 2023 14:48:07 +0800
+From ee6bda44d62a5872ad96c7a9b7c16018525875a8 Mon Sep 17 00:00:00 2001
+From: pengy <quic_pengy@quicinc.com>
+Date: Thu, 23 May 2024 09:52:30 +0800
 Subject: [PATCH] lttng-modules: Fix lttng-modules compile issue on android
  kernel5.15
 
@@ -10,6 +10,7 @@ Add MODULE_IMPORT_NS for kallsyms module.
 
 Upstream-Status: Inappropriate [other]
 
+Change-Id: If220d7821cd41c3be99902f6bd09201b0aaf52a2
 Signed-off-by: Lei wang <quic_leiwan@quicinc.com>
 ---
  include/instrumentation/events/mm_vmscan.h | 3 +++
@@ -18,10 +19,10 @@ Signed-off-by: Lei wang <quic_leiwan@quicinc.com>
  3 files changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/include/instrumentation/events/mm_vmscan.h b/include/instrumentation/events/mm_vmscan.h
-index 4ba907b..1a15f01 100644
+index ea6f4b7..34fef6e 100644
 --- a/include/instrumentation/events/mm_vmscan.h
 +++ b/include/instrumentation/events/mm_vmscan.h
-@@ -825,4 +825,7 @@ LTTNG_TRACEPOINT_EVENT_MAP(update_swap_token_priority,
+@@ -851,4 +851,7 @@ LTTNG_TRACEPOINT_EVENT_MAP(update_swap_token_priority,
  #endif /* LTTNG_TRACE_MM_VMSCAN_H */
  
  /* This part must be outside protection */
@@ -43,14 +44,17 @@ index a464e69..7d9a130 100644
  
  struct trace_syscall_entry {
 diff --git a/src/wrapper/kallsyms.c b/src/wrapper/kallsyms.c
-index 061224d..19e31fb 100644
+index 6293e07..0e80484 100644
 --- a/src/wrapper/kallsyms.c
 +++ b/src/wrapper/kallsyms.c
-@@ -84,3 +84,4 @@ unsigned long wrapper_kallsyms_lookup_name(const char *name)
- EXPORT_SYMBOL_GPL(wrapper_kallsyms_lookup_name);
+@@ -120,6 +120,7 @@ EXPORT_SYMBOL_GPL(wrapper_kallsyms_lookup_name);
  
  #endif
+ 
 +MODULE_IMPORT_NS(VFS_internal_I_am_really_a_filesystem_and_am_NOT_a_driver);
+ #if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,4,0) && defined(CONFIG_ANDROID))
+ MODULE_IMPORT_NS(VFS_internal_I_am_really_a_filesystem_and_am_NOT_a_driver);
+ #endif
 -- 
-2.34.1
+2.25.1
 
