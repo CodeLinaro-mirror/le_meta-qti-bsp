@@ -18,6 +18,9 @@ SRC_URI:append = " ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "5.15", "
 # Remove backlight - Loads/Saves Screen Backlight Brightness, not required.
 PACKAGECONFIG:remove = "backlight "
 
+#Disable systemd-timesyncd which not used in project.
+PACKAGECONFIG:remove = "timesyncd "
+
 # Use glib-2.0 for g_strlcat
 CFLAGS:append = " \
     -fPIC \
