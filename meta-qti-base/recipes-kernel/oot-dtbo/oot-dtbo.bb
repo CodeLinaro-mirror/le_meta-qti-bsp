@@ -14,7 +14,7 @@ SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/vendor/qcom/opensource/safelinux-system-cfg/devicetree"
 
-inherit ark-dtb-merge deploy kernel-arch
+inherit ark-dtb-merge deploy kernel-arch qti-techpack
 
 EXTRA_OEMAKE += "KDIR=${STAGING_KERNEL_DIR}"
 CONFIG_ARCH ?= ""
@@ -23,7 +23,6 @@ CONFIG_ARCH:sa7255 = "CONFIG_ARCH_SA7255=y"
 do_compile() {
     make dtbos KDIR=${STAGING_KERNEL_DIR} O=${STAGING_KERNEL_BUILDDIR} ${CONFIG_ARCH} CC="${KERNEL_CC}" LD="${KERNEL_LD}"
 }
-do_compile[lockfiles] += "${TMPDIR}/qti-techpack.lock"
 
 do_merge_dtb() {
     if [ -z "${KERNEL_BASE_DTB}" ]; then
