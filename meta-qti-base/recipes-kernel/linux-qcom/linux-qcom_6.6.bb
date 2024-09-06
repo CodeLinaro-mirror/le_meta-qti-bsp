@@ -4,7 +4,7 @@ HOMEPAGE = "https://git.codelinaro.org"
 LICENSE = "GPLv2.0-with-linux-syscall-note"
 LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 
-COMPATIBLE_MACHINE = "sa8775|sa8797"
+COMPATIBLE_MACHINE = "sa8775|sa8797|sa7255"
 
 DEPENDS += "\
     elfutils-native kern-tools-native openssl-native \
