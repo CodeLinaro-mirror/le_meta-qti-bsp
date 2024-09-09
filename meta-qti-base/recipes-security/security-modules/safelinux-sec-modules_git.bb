@@ -39,6 +39,8 @@ RPROVIDES:${PN} += "kernel-module-smcinvoke-${KERNEL_VERSION}"
 RPROVIDES:${PN} += "kernel-module-qcom-scm-oot-${KERNEL_VERSION}"
 
 RPROVIDES:${PN}:remove:sa8775-flex = "kernel-module-tz-log-${KERNEL_VERSION}"
+RPROVIDES:${PN}:remove:sa8255-ivi = "kernel-module-tz-log-${KERNEL_VERSION}"
+RPROVIDES:${PN}:remove:sa8650-adas = "kernel-module-tz-log-${KERNEL_VERSION}"
 
 FILES:${PN} += "${sysconfdir}/modules-load.d/*"
 FILES:${PN} += "${nonarch_base_libdir}/modules/*"
