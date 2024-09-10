@@ -21,4 +21,5 @@ RDEPENDS:${PN} = "\
     gvm-net-config \
     vhost-device-i2c \
     hyp-udmabuf \
+    hyp-udmabuf-test \
 "
