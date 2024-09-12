@@ -39,6 +39,7 @@ inherit kernel kernel-yocto
 
 S = "${WORKDIR}/kernel/kernel_platform/kernel"
 
+KERNEL_ARCH ?= "gen4auto"
 KBRANCH ?= ""
 KMETA = "kernel-meta"
 KCONFIG_MODE = "--alldefconfig"
@@ -51,8 +52,9 @@ do_validate_branches[noexec] = "1"
 do_generate_base_defconfig() {
     export KCONFIG_CONFIG="${S}/arch/arm64/configs/${KBUILD_DEFCONFIG}"
     base_defconfig="${S}/arch/arm64/configs/qcom_defconfig"
-    qcom_addon_config="${S}/arch/arm64/configs/qcom_addons.config"
-    ${S}/scripts/kconfig/merge_config.sh -m -r -y ${base_defconfig} ${qcom_addon_config} 1>&2
+    kernel_arch_config="${S}/arch/arm64/configs/qcom_${KERNEL_ARCH}.config"
+    kernel_arch_config+="${@bb.utils.contains_any('VARIANT', 'debug user', ' ${S}/arch/arm64/configs/qcom_${KERNEL_ARCH}_debug.config', '', d)}"
+    ${S}/scripts/kconfig/merge_config.sh -m -r -y ${base_defconfig} ${kernel_arch_config} 1>&2
 }
 addtask do_generate_base_defconfig after do_unpack before do_kernel_metadata
 
