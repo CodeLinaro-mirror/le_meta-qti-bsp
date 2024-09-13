@@ -30,7 +30,7 @@ do_install() {
     rm -rf ${B}
     oe_runmake_call -C ${STAGING_KERNEL_DIR} ARCH=${ARCH} CC="${KERNEL_CC}" LD="${KERNEL_LD}" headers_install O=${B}
     install -d ${D}${includedir}
-    mv ${B}${includedir} ${D}${includedir}/linux-qcom
+    mv ${B}${includedir} ${D}${includedir}/${PREFERRED_PROVIDER_virtual/kernel}
 
     # Need to create a hierarchy that works for Adreno's expectation that
     # its KERN_INCDIR variable is pointed at a directory with usr/include
@@ -41,7 +41,7 @@ do_install() {
     # A separate hierarchy as opposed to one under ${D}/usr/include/linux-qcom is
     # used to avoid issues from a symlink loop.
     install -d ${D}${includedir}/kernel/usr
-    ln -sf ../../linux-qcom ${D}${includedir}/kernel/usr/include
+    ln -sf ../../${PREFERRED_PROVIDER_virtual/kernel} ${D}${includedir}/kernel/usr/include
 }
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"

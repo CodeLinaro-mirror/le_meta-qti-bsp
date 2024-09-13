@@ -10,14 +10,14 @@ SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/vendor/qcom/opensource/safelinux-sec-modules/security-modules"
 
-TECHPACK_MODULES = "${@bb.utils.contains('PREFERRED_PROVIDER_virtual/kernel', 'linux-qcom', '', 'tz_log.ko qtee_shmbridge.ko smcinvoke.ko qcom_scm_oot.ko', d)}"
+TECHPACK_MODULES = "${@bb.utils.contains_any('PREFERRED_PROVIDER_virtual/kernel', 'linux-qcom-custom linux-qcom-custom-rt', '', 'tz_log.ko qtee_shmbridge.ko smcinvoke.ko qcom_scm_oot.ko', d)}"
 inherit qti-techpack
 
 do_install:append() {
     install -d ${D}${includedir}/linux
     install -d ${D}${includedir}/safelinux-sec-modules
 
-    if ${@bb.utils.contains('PREFERRED_PROVIDER_virtual/kernel', 'linux-qcom', 'false', 'true', d)}; then
+    if ${@bb.utils.contains_any('PREFERRED_PROVIDER_virtual/kernel', 'linux-qcom-custom linux-qcom-custom-rt', 'false', 'true', d)}; then
         install -m 0755 ${S}/modules-load/qtee_shmbridge.conf -D ${D}${sysconfdir}/modules-load.d/qtee_shmbridge.conf
         install -m 0755 ${S}/modules-load/smcinvoke.conf -D ${D}${sysconfdir}/modules-load.d/smcinvoke.conf
         install -m 0755 ${S}/modules-load/qcom_scm_oot.conf -D ${D}${sysconfdir}/modules-load.d/qcom_scm_oot.conf
