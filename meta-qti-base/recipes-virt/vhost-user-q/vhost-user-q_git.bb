@@ -17,7 +17,7 @@ SYSTEMD_SERVICE:${PN} = "\
 "
 
 DEPENDS += "virtual/kernel-headers"
-DEPENDS += "${@bb.utils.contains_any("PREFERRED_PROVIDER_virtual/kernel", "linux-ark linux-qcom", "msmhab", "", d)}"
+DEPENDS += "${@bb.utils.contains("MACHINE_FEATURES", "qti-umd", "msmhab", "", d)}"
 
 SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/vhost-user/.git;protocol=${PROTO};destsuffix=vhost-user-q;usehead=1"
 SRCREV = "${AUTOREV}"
@@ -27,7 +27,7 @@ S = "${WORKDIR}/vendor/qcom/opensource/vhost-user"
 inherit cmake systemd
 
 CFLAGS += "\
-    -I${STAGING_DIR_TARGET}/usr/include/linux-ark \
+    -I${STAGING_DIR_TARGET}/usr/include/${PREFERRED_PROVIDER_virtual/kernel} \
     --sysroot=${STAGING_DIR_TARGET} \
     -DCONFIG_HGY_PLATFORM \
     -D__linux__ \
