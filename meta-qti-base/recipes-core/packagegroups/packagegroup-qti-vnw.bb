@@ -21,3 +21,6 @@ RDEPENDS:${PN} += "\
     "
 
 RDEPENDS:${PN}:append:sa81x5 = " gptp open-avb"
+
+RDEPENDS:${PN}:remove:sa8775-flex = "hsi2s \
+    hsi2s-test"
