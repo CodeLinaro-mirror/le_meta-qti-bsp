@@ -42,7 +42,7 @@ PARTLABEL=userdata   /data           auto      defaults,noauto_da_alloc,discard,
 PARTLABEL=persist    /var            auto      defaults                         0  0
 
 # Bind /home to /data
-/data                /home                auto       defaults,bind         0  0
+# /data                /home                auto       defaults,bind         0  0
 /var                 /persist             auto       defaults,bind         0  0
 
 # uncomment this if your device has a SD/MMC/Transflash slot
