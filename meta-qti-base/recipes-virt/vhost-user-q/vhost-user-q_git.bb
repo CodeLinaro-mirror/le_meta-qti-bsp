@@ -11,6 +11,9 @@ SYSTEMD_SERVICE:${PN} = "\
     vhost-user-aud.service \
     vhost-user-vid.service \
     vhost-user-cam.service \
+    vhost-user-vnw.service \
+    vhost-user-ext.service \
+    vhost-user-gpce.service \
 "
 
 DEPENDS += "virtual/kernel-headers"
@@ -39,4 +42,7 @@ do_install:append() {
     install -m 0644 ${S}/vhost-user-aud.service -D ${D}${systemd_unitdir}/system/vhost-user-aud.service
     install -m 0644 ${S}/vhost-user-vid.service -D ${D}${systemd_unitdir}/system/vhost-user-vid.service
     install -m 0644 ${S}/vhost-user-cam.service -D ${D}${systemd_unitdir}/system/vhost-user-cam.service
+    install -m 0644 ${S}/vhost-user-vnw.service -D ${D}${systemd_unitdir}/system/vhost-user-vnw.service
+    install -m 0644 ${S}/vhost-user-ext.service -D ${D}${systemd_unitdir}/system/vhost-user-ext.service
+    install -m 0644 ${S}/vhost-user-gpce.service -D ${D}${systemd_unitdir}/system/vhost-user-gpce.service
 }
