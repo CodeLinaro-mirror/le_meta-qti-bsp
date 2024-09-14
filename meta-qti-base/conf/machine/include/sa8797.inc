@@ -56,6 +56,8 @@ IMAGE_INSTALL += "\
     openssh-sftp \
     openssh-sftp-server \
     "
+IMAGE_INSTALL:remove = "${@bb.utils.contains('DISTRO_FEATURES', 'qti-rumi', 'openssh-scp openssh-ssh openssh-sshd openssh-sftp openssh-sftp-server', '', d)}"
+
 
 IMAGE_FEATURES += "ssh-server-openssh"
 
