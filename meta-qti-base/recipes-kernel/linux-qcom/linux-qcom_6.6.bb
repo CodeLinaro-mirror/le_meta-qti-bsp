@@ -31,6 +31,7 @@ SRC_URI = "\
     file://0012-PENDING-phy-qcom-snps-femto-v2-Add-support-for-SA825.patch \
     file://0001-FROMLIST-of-of_reserved_mem-Increase-limit-for-reser.patch \
     file://0013-net-stmmac-dwmac-qcom-ethqos-Enable-SCMI-ETH.patch \
+    file://0014-PENDING-qcom-Add-sa7255p-compatibles-for-core-driver.patch \
     file://scm_adci/0001-QCLINUX-arm64-dts-qcom-sa8255p-Modify-correct-dt-nam.patch \
     file://scm_adci/0002-BACKPORT-FROMLIST-firmware-qcom-scm-Support-multiple.patch \
     file://scm_adci/0003-PENDING-firmware-qcom-scm-Add-support-for-WAITQ_WAKE.patch \
@@ -82,6 +83,7 @@ do_patch:append() {
     patch -f -p1 < ${WORKDIR}/0012-PENDING-phy-qcom-snps-femto-v2-Add-support-for-SA825.patch
     patch -f -p1 < ${WORKDIR}/0001-FROMLIST-of-of_reserved_mem-Increase-limit-for-reser.patch
     patch -f -p1 < ${WORKDIR}/0013-net-stmmac-dwmac-qcom-ethqos-Enable-SCMI-ETH.patch
+    patch -f -p1 < ${WORKDIR}/0014-PENDING-qcom-Add-sa7255p-compatibles-for-core-driver.patch
     patch -f -p1 < ${WORKDIR}/scm_adci/0001-QCLINUX-arm64-dts-qcom-sa8255p-Modify-correct-dt-nam.patch
     patch -f -p1 < ${WORKDIR}/scm_adci/0002-BACKPORT-FROMLIST-firmware-qcom-scm-Support-multiple.patch
     patch -f -p1 < ${WORKDIR}/scm_adci/0003-PENDING-firmware-qcom-scm-Add-support-for-WAITQ_WAKE.patch
