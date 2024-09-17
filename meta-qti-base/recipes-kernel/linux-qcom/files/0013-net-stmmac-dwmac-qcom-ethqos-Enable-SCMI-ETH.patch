@@ -1,7 +1,8 @@
-From 0f6a2c8dcb289b8979e571a61043c81512c2e3c6 Mon Sep 17 00:00:00 2001
+From 9404a10ab2d5bc31e7d0fbb734fe0a57a6b5e63d Mon Sep 17 00:00:00 2001
 From: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
-Date: Tue, 10 Sep 2024 15:28:34 -0700
-Subject: [PATCH] net: stmmac: dwmac-qcom-ethqos: Enable SCMI ETH
+Date: Tue, 17 Sep 2024 22:02:15 -0700
+Subject:[PATCH] net: stmmac: dwmac-qcom-ethqos: Enable SCMI
+ ETH
 
 On sa8255p platforms, resource such as clocks, regulators etc.
 are managed in the firmware. The Linux driver uses power and
@@ -18,14 +19,15 @@ D0 <--> D1 :: Turn on/off 'mdio' supplier
 Performance domain represents the serdes phy with link speed
 being used as performance levels.
 
-Change-Id: Iceba0d26be327bee62a2c9133cffa60ef7b549a6
+Change-Id: Ib082d3c154aef778bf4a1cc02f4f175798269e45
+Signed-off-by: Sarosh Hasan <quic_sarohasa@quicinc.com>
 Signed-off-by: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
 ---
- .../stmicro/stmmac/dwmac-qcom-ethqos.c        | 206 ++++++++++++++++--
- 1 file changed, 192 insertions(+), 14 deletions(-)
+ .../stmicro/stmmac/dwmac-qcom-ethqos.c        | 210 ++++++++++++++++--
+ 1 file changed, 196 insertions(+), 14 deletions(-)
 
 diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-index 749c91b7d02d..ee5c921f513c 100644
+index 749c91b7d02d..899731866981 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
 @@ -7,6 +7,8 @@
@@ -186,7 +188,7 @@ index 749c91b7d02d..ee5c921f513c 100644
  		ethqos->serdes_speed = SPEED_1000;
  		stmmac_pcs_ctrl_ane(priv, priv->ioaddr, 1, 0, 0);
  		break;
-@@ -733,6 +807,86 @@ static void qcom_ethqos_serdes_powerdown(struct net_device *ndev, void *priv)
+@@ -733,6 +807,90 @@ static void qcom_ethqos_serdes_powerdown(struct net_device *ndev, void *priv)
  	phy_exit(ethqos->serdes_phy);
  }
  
@@ -194,6 +196,10 @@ index 749c91b7d02d..ee5c921f513c 100644
 +{
 +	struct qcom_ethqos *ethqos = priv;
 +	int ret = 0;
++
++	ret = qcom_ethqos_domain_on(ethqos, PERF_SERDES);
++	if (ret < 0)
++		return ret;
 +
 +	ret = qcom_ethqos_serdes_set_level(ethqos);
 +
@@ -273,7 +279,7 @@ index 749c91b7d02d..ee5c921f513c 100644
  static int ethqos_clks_config(void *priv, bool enabled)
  {
  	struct qcom_ethqos *ethqos = priv;
-@@ -830,6 +984,25 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
+@@ -830,6 +988,25 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
  	}
  
  	ethqos->pdev = pdev;
@@ -299,7 +305,7 @@ index 749c91b7d02d..ee5c921f513c 100644
  	ethqos->rgmii_base = devm_platform_ioremap_resource_byname(pdev, "rgmii");
  	if (IS_ERR(ethqos->rgmii_base))
  		return dev_err_probe(dev, PTR_ERR(ethqos->rgmii_base),
-@@ -844,11 +1017,12 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
+@@ -844,11 +1021,12 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
  	ethqos->has_emac_ge_3 = data->has_emac_ge_3;
  	ethqos->needs_sgmii_loopback = data->needs_sgmii_loopback;
  
@@ -317,7 +323,7 @@ index 749c91b7d02d..ee5c921f513c 100644
  	ret = ethqos_clks_config(ethqos, true);
  	if (ret)
  		return ret;
-@@ -870,7 +1044,10 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
+@@ -870,7 +1048,10 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
  	plat_dat->bsp_priv = ethqos;
  	plat_dat->fix_mac_speed = ethqos_fix_mac_speed;
  	plat_dat->dump_debug_regs = rgmii_dump;
@@ -329,7 +335,7 @@ index 749c91b7d02d..ee5c921f513c 100644
  	plat_dat->has_gmac4 = 1;
  	if (ethqos->has_emac_ge_3)
  		plat_dat->dwmac4_addrs = &data->dwmac4_addrs;
-@@ -899,6 +1076,7 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
+@@ -899,6 +1080,7 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
  static const struct of_device_id qcom_ethqos_match[] = {
  	{ .compatible = "qcom,qcs404-ethqos", .data = &emac_v2_3_0_data},
  	{ .compatible = "qcom,qcs8300-ethqos", .data = &emac_v4_0_0_data},
