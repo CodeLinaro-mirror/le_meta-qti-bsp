@@ -5,9 +5,9 @@ DESCRIPTION = "Package group bringing in much needed utility packages missing in
 
 LICENSE = "BSD-3-Clause-Clear"
 
-inherit packagegroup
-
 PACKAGE_ARCH = "${MACHINE_ARCH}"
+
+inherit packagegroup
 
 RDEPENDS:${PN} = "\
     base-passwd \

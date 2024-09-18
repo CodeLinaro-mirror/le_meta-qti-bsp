@@ -32,7 +32,7 @@ EXTRA_OECONF:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'qti-ab-boot', '
 EXTRA_OECONF:append = " ${@bb.utils.contains('MACHINE_FEATURES', 'qti-abc-boot', 'TARGET_SUPPORTS_ABC=true', '', d)}"
 
 FILES:${PN}  = "${bindir} ${libdir} ${systemd_unitdir} ${includedir} /res /cache"
-SYSTEMD_SERVICE:${PN} = "update_engine.service"
+SYSTEMD_SERVICE:${PN} = " ${@bb.utils.contains('DISTRO_FEATURES', 'qti-ab-boot', bb.utils.contains('COMBINED_FEATURES', 'qti-nad-core', '', 'update_engine.service', d), '', d)}"
 
 RM_WORK_EXCLUDE += "${PN}"
 INITSCRIPT_NAME = "update_engine"
@@ -47,7 +47,9 @@ do_install[prefuncs] += "${@bb.utils.contains('MACHINE_FEATURES', 'ota-package-v
 
 do_install:append() {
         install -d ${D}/res/
-        install -d ${D}/cache/recovery
+        if ${@bb.utils.contains('COMBINED_FEATURES', 'qti-nad-core', 'false', 'true', d)}; then
+            install -d ${D}/cache/recovery
+        fi
         if ${@bb.utils.contains('IMAGE_FSTYPES', 'ext4', 'true', 'false', d)}; then
             if ${@bb.utils.contains_any('MACHINE_MNT_POINTS', '/overlay', 'true', 'false', d)}; then
                 install -m 0755 ${WORKDIR}/fstab_AB -D ${D}/res/recovery_volume_config
@@ -55,9 +57,13 @@ do_install:append() {
                 install -m 0755 ${WORKDIR}/fstab_AB_cache_ext4 -D ${D}/res/recovery_volume_config
             fi
         fi
+
         install -d ${D}${systemd_unitdir}/system/
-        install -m 0644 ${WORKDIR}/update_engine.service -D \
-                 ${D}${systemd_unitdir}/system/update_engine.service
+
+        if ${@bb.utils.contains('DISTRO_FEATURES', 'qti-ab-boot', bb.utils.contains('COMBINED_FEATURES', 'qti-nad-core', 'false', 'true', d), 'false', d)}; then
+            install -m 0644 ${WORKDIR}/update_engine.service -D \
+                     ${D}${systemd_unitdir}/system/update_engine.service
+        fi
         if ${@bb.utils.contains('MACHINE_FEATURES', 'ota-package-verification', 'true', 'false', d)}; then
             install -m 0755 ${WORKDIR}/public.pem -D ${D}/res/public.pem
         fi
