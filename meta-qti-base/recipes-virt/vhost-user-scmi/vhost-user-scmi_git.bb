@@ -4,6 +4,8 @@ HOMEPAGE = "https://git.codelinaro.org"
 LICENSE = "BSD-3-Clause-Clear"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=7a434440b651f4a472ca93716d01033a"
 
+SYSTEMD_SERVICE:${PN} = "vhost-user-scmi.service"
+
 DEPENDS += "safelinux-cfg-modules vhost-user-lib"
 
 SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/vhost-user-scmi/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/vhost-user-scmi;usehead=1"
@@ -11,4 +13,9 @@ SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/vendor/qcom/opensource/vhost-user-scmi"
 
-inherit cmake
+do_install:append() {
+    install -d ${D}${systemd_unitdir}/system/
+    install -m 0644 ${S}/vhost-user-scmi.service ${D}/${systemd_unitdir}/system/vhost-user-scmi.service
+}
+
+inherit cmake systemd
