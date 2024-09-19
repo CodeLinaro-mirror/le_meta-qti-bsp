@@ -121,11 +121,10 @@ case $1/$2 in
 
     systemctl restart synergy.service
 
+    # Enable primary interface wlan0 to restore wlan, other interfaces
+    # shall be enabled on demand.
     echo "Enable WLAN interfaces"
-    for iface in `iw dev | grep Interface | awk '{print $2}'`
-    do
-        ifconfig $iface up
-    done
+    ifconfig wlan0 up
 
     if [ $2 = "hibernate" ]; then
         echo 1 > /sys/kernel/boot_adsp/boot
