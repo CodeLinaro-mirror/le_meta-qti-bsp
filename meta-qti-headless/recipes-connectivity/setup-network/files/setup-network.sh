@@ -64,6 +64,8 @@ CMDLINE_PATH=/proc/cmdline
 AGL1_IFACE_ARRAY=(eth0)
 AGL2_IFACE_ARRAY=(eth0)
 
+AGL1_IFACE_ARRAY1=(eth1)
+
 function get_gvm_version()
 {
     local cmdline_value
@@ -109,7 +111,7 @@ function check_all_interfaces_up()
 
 function setup_network_agl_vm_1()
 {
-    echo "Assign IP address"
+    echo "Assign Static IP Address for eth0"
     ifconfig eth0 192.168.1.2 up
 
     echo "Setup route"
@@ -148,21 +150,38 @@ function setup_network_agl_vm_2()
 get_gvm_version
 gvm_version=$?
 
+ietf1_configured=false
+ietf2_configured=false
 
 # try 10 times
 for i in {1..10}
 do
     if [[ ${gvm_version} -eq 1 ]]
     then
+        if [ $ietf1_configured = true ] && [ $ietf2_configured = true ]; then
+            echo "Both eth0 and eth1 are configured."
+            break;
+        fi
+
         check_all_interfaces_up "${AGL1_IFACE_ARRAY[*]}"
-        iface_is_up=$?
-        echo "current interface status is ${iface_is_up}"
-        if [[ "${iface_is_up}" -eq 1 ]]
-        then
+        iface1_is_up=$?
+        echo "current interface status is ${iface1_is_up}"
+        if [ $iface1_is_up -eq 1 ] && [ $ietf1_configured = false ]; then
             setup_network_agl_vm_1
-            break
+            ietf1_configured=true
         else
-            echo " ERR : Ethernet Interfaces are not Ready !!!"
+            echo " ERR : Ethernet Interfaces(eth0) are not Ready or already configured !!!"
+        fi
+
+        check_all_interfaces_up "${AGL1_IFACE_ARRAY1[*]}"
+        iface2_is_up=$?
+        echo "current interface status is ${iface2_is_up}"
+        if [ $iface2_is_up -eq 1 ] && [ $ietf2_configured = false ]; then
+            echo "Qti-headless:Assign Static IP Address for eth1"
+            ifconfig eth1 192.168.6.2 up
+            ietf2_configured=true
+        else
+            echo " ERR : Ethernet Interfaces(eth1) are not Ready or already configured !!!"
         fi
     else
         check_all_interfaces_up "${AGL2_IFACE_ARRAY[*]}"
