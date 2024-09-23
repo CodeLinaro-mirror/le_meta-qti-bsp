@@ -4,3 +4,4 @@ SRC_URI:append = " ${PATH_TO_REPO}/gstreamer/gstreamer/.git;protocol=${PROTO};de
 SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/gstreamer/gstreamer/subprojects/gst-plugins-base"
+PACKAGECONFIG:remove:sa8797 = "egl"
