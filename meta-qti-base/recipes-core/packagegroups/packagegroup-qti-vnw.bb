@@ -24,3 +24,7 @@ RDEPENDS:${PN}:append:sa81x5 = " gptp open-avb"
 
 RDEPENDS:${PN}:remove:sa8775-flex = "hsi2s \
     hsi2s-test"
+RDEPENDS:${PN}:remove:sa8255-ivi = "hsi2s \
+    hsi2s-test"
+RDEPENDS:${PN}:remove:sa8650-adas = "hsi2s \
+    hsi2s-test"
