@@ -91,3 +91,4 @@ MACHINE_FEATURES:remove = "\
 "
 
 SECTOOLS_VERSION = "sectools-v2"
+SECTOOLS_SECURITY_PROFILE = "nord_tz_security_profile.xml"
