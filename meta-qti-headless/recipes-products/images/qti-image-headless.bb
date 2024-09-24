@@ -25,7 +25,6 @@ IMAGE_INSTALL += "\
     vlan \
     xinetd \
     tcp-wrappers \
-    netkit-telnet \
     libcap \
     libcap-bin \
     attr \
