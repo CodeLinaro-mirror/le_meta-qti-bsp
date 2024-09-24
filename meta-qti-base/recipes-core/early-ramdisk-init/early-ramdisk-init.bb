@@ -18,6 +18,7 @@ CFLAGS += "${@bb.utils.contains('DISTRO_FEATURES', 'early_init', '-DEARLY_INIT',
 
 TARGET_PATH_NAME ?= "${MACHINE}"
 TARGET_PATH_NAME:sa8775 = "sa8775"
+TARGET_PATH_NAME:sa7255 = "sa7255"
 
 do_install:append() {
     install -d ${D}/dev

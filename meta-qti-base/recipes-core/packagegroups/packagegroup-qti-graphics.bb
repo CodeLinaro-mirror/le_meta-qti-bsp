@@ -12,7 +12,7 @@ PACKAGES = "\
 ALLOW_EMPTY:${PN} = "1"
 
 RDEPENDS:${PN} += "\
-    ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "5.15", "graphicsdlkm", "", d)} \
-    ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "6.1", "graphicsdlkm", "", d)} \
+    ${@bb.utils.contains_any('PREFERRED_VERSION_linux-msm', '5.15 6.1', 'graphicsdlkm', '', d)} \
+    ${@bb.utils.contains_any('PREFERRED_PROVIDER_virtual/kernel', 'linux-ark linux-qcom', 'ksyncdlkm', '', d)} \
     vulkan-loader \
     "

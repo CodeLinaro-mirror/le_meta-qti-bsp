@@ -66,5 +66,5 @@ DEPLOY_DIR_IMAGE = "${DEPLOY_DIR}/images/${DEPLOY_NAME}"
 
 # Static Users for QTI
 USERADDEXTENSION ?= "useradd-staticids"
-USERADD_UID_TABLES:append = " files/qti_passwd"
-USERADD_GID_TABLES:append = " files/qti_group"
+USERADD_UID_TABLES:prepend = "files/qti_passwd "
+USERADD_GID_TABLES:prepend = "files/qti_group "

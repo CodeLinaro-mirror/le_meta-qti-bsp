@@ -22,7 +22,9 @@ RDEPENDS:${PN} += "\
     coreutils \
     sec-config \
     libsensors \
+    libatomic \
     ${DSP_DRIV} \
     "
 
 RDEPENDS:${PN}:remove:qti-dpk = "resize-service"
+RDEPENDS:${PN}:remove:sa8775 = "resize-service"

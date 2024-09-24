@@ -22,11 +22,12 @@ RDEPENDS:${PN} += "\
     iproute2-ss \
     iproute2-tc \
     tcpdump \
+    phytool \
     vlan \
     strongswan \
-    xinetd \
     tcp-wrappers \
     ${@bb.utils.contains('LAYERSERIES_CORENAMES', 'scarthgap', '', 'netkit-telnet', d)} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', 'proftpd', d)} \
+    ${@bb.utils.contains_any('PREFERRED_PROVIDER_virtual/kernel', 'linux-ark linux-qcom', 'setup-qos', '', d)} \
 "
 RDEPENDS:${PN}:append:quin-gvm-lemans = " dataeth-dlkm"
