@@ -63,6 +63,8 @@ python __anonymous(){
 
     if need_change:
         d.prependVar("FILESPATH", "${SRC_DIR_ROOT}/:")
+        # Workaround to skip AUTOREV/SRCPV set too late issue.
+        d.setVar("__BBAUTOREV_ACTED_UPON", True)
         new_src_uri = " ".join(new_src_uri_list)
         d.setVar("SRC_URI", new_src_uri)
         d.setVar("SRCREV", '')
