@@ -4,38 +4,41 @@ HOMEPAGE = "https://git.codelinaro.org"
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=801f80980d171dd6425610833a22dbe6"
 
-DEPENDS += "bison-native dtc-native"
+DEPENDS += "bison-native dtc-native virtual/kernel"
 
 SRC_URI = "\
            ${PATH_TO_REPO}/vendor/qcom/opensource/safelinux-system-cfg/devicetree/.git;protocol=${PROTO};usehead=1 \
            ${PATH_TO_REPO}/kernel/${RH_KERNEL_NAME}/.git;protocol=${PROTO};usehead=1 \
 "
 SRCREV = "${AUTOREV}"
-KERNEL_DIR_SRC = "${SRC_DIR_ROOT}/kernel/${RH_KERNEL_NAME}"
-KERNEL_DIR_DESTINATION = "${WORKDIR}/vendor/qcom/opensource/safelinux-system-cfg/devicetree/centos-stream-9"
-KERNEL_WORKDIR = "${WORKDIR}/kernel/${RH_KERNEL_NAME}"
 
 S = "${WORKDIR}/vendor/qcom/opensource/safelinux-system-cfg/devicetree"
 
-inherit deploy
+inherit ark-dtb-merge deploy kernel-arch qti-techpack
 
-do_unpack[depends] += "virtual/kernel:do_configure"
-
-do_compile:prepend() {
-    # Copy only the required git metadata needed for "git log", so that we can build defconfigs
-    GIT_METADATA_PATH_REFS=`realpath ${KERNEL_DIR_SRC}/.git/refs`
-    GIT_METADATA_PATH_OBJECTS=`realpath ${KERNEL_DIR_SRC}/.git/objects`
-    rm -rf ${KERNEL_DIR_DESTINATION}
-    cp -rf ${KERNEL_WORKDIR} ${KERNEL_DIR_DESTINATION}
-    rm -rf ${KERNEL_DIR_DESTINATION}/.git/objects ${KERNEL_DIR_DESTINATION}/.git/refs
-    cp -rf ${GIT_METADATA_PATH_OBJECTS} ${GIT_METADATA_PATH_REFS} ${KERNEL_DIR_DESTINATION}/.git
-}
+EXTRA_OEMAKE += "KDIR=${STAGING_KERNEL_DIR}"
+CONFIG_ARCH ?= ""
+CONFIG_ARCH:sa7255 = "CONFIG_ARCH_SA7255=y"
+IS_QCLINUX_BUILD = "${@bb.utils.contains_any("PREFERRED_PROVIDER_virtual/kernel", "linux-qcom", "QCLINUX_BUILD=true", "", d)}"
 
 do_compile() {
-    make
+    make dtbos KDIR=${STAGING_KERNEL_DIR} O=${STAGING_KERNEL_BUILDDIR} ${CONFIG_ARCH} CC="${KERNEL_CC}" LD="${KERNEL_LD}" ${IS_QCLINUX_BUILD}
 }
 
-OOT_DTBS ?= ""
+do_merge_dtb() {
+    if [ -z "${KERNEL_BASE_DTB}" ]; then
+        return 0
+    fi
+
+    install -d ${S}/out
+
+    dtb_dir=${DEPLOY_DIR_IMAGE}/build-artifacts/kernel-dtb
+    dtbo_dir=${S}
+    out_dir=${S}/out
+    merge_dtbos $dtb_dir $dtbo_dir $out_dir
+}
+do_merge_dtb[depends] += "virtual/kernel:do_deploy"
+addtask do_merge_dtb after do_compile before do_install
 
 do_install:append() {
     if [ -d ${S}/oot-dt-bindings/ ]; then
@@ -44,6 +47,7 @@ do_install:append() {
     fi
 }
 
+OOT_DTBS ?= ""
 do_deploy() {
     if [ -n "${OOT_DTBS}" ]; then
         install -d ${DEPLOYDIR}/build-artifacts/dtb

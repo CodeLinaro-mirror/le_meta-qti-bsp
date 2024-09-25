@@ -6,11 +6,11 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5
 
 DEPENDS += "virtual/kernel"
 
-SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/gunyah-drivers/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/gunyah-drivers;usehead=1"
+SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/hyp-udmabuf/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/hyp-udmabuf;usehead=1"
 
 SRCREV = "${AUTOREV}"
 
-S = "${WORKDIR}/vendor/qcom/opensource/gunyah-drivers/hyp-udmabuf"
+S = "${WORKDIR}/vendor/qcom/opensource/hyp-udmabuf/drivers"
 
 TECHPACK_MODULES = "\
     hyp-udmabuf.ko \
