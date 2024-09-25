@@ -31,6 +31,14 @@ SRC_URI = "\
     file://0012-PENDING-phy-qcom-snps-femto-v2-Add-support-for-SA825.patch \
     file://0001-FROMLIST-of-of_reserved_mem-Increase-limit-for-reser.patch \
     file://0013-net-stmmac-dwmac-qcom-ethqos-Enable-SCMI-ETH.patch \
+    file://scm_adci/0001-QCLINUX-arm64-dts-qcom-sa8255p-Modify-correct-dt-nam.patch \
+    file://scm_adci/0002-BACKPORT-FROMLIST-firmware-qcom-scm-Support-multiple.patch \
+    file://scm_adci/0003-PENDING-firmware-qcom-scm-Add-support-for-WAITQ_WAKE.patch \
+    file://scm_adci/0004-PENDING-firmware-qcom-scm-Selectively-skip-mutex-for.patch \
+    file://scm_adci/0005-UPSTREAM-firmware-qcom-scm-Remove-QCOM_SMC_WAITQ_FLA.patch \
+    file://scm_adci/0006-PENDING-firmware-qcom-scm-Introduce-new-locking-mech.patch \
+    file://scm_adci/0007-BACKPORT-UPSTREAM-firmware-qcom-scm-Mark-get_wq_ctx-.patch \
+    file://scm_adci/0008-BACKPORT-UPSTREAM-firmware-qcom-scm-add-support-for-.patch \
 "
 
 SRCREV_kernel = "${AUTOREV}"
@@ -74,6 +82,14 @@ do_patch:append() {
     patch -f -p1 < ${WORKDIR}/0012-PENDING-phy-qcom-snps-femto-v2-Add-support-for-SA825.patch
     patch -f -p1 < ${WORKDIR}/0001-FROMLIST-of-of_reserved_mem-Increase-limit-for-reser.patch
     patch -f -p1 < ${WORKDIR}/0013-net-stmmac-dwmac-qcom-ethqos-Enable-SCMI-ETH.patch
+    patch -f -p1 < ${WORKDIR}/scm_adci/0001-QCLINUX-arm64-dts-qcom-sa8255p-Modify-correct-dt-nam.patch
+    patch -f -p1 < ${WORKDIR}/scm_adci/0002-BACKPORT-FROMLIST-firmware-qcom-scm-Support-multiple.patch
+    patch -f -p1 < ${WORKDIR}/scm_adci/0003-PENDING-firmware-qcom-scm-Add-support-for-WAITQ_WAKE.patch
+    patch -f -p1 < ${WORKDIR}/scm_adci/0004-PENDING-firmware-qcom-scm-Selectively-skip-mutex-for.patch
+    patch -f -p1 < ${WORKDIR}/scm_adci/0005-UPSTREAM-firmware-qcom-scm-Remove-QCOM_SMC_WAITQ_FLA.patch
+    patch -f -p1 < ${WORKDIR}/scm_adci/0006-PENDING-firmware-qcom-scm-Introduce-new-locking-mech.patch
+    patch -f -p1 < ${WORKDIR}/scm_adci/0007-BACKPORT-UPSTREAM-firmware-qcom-scm-Mark-get_wq_ctx-.patch
+    patch -f -p1 < ${WORKDIR}/scm_adci/0008-BACKPORT-UPSTREAM-firmware-qcom-scm-add-support-for-.patch
 }
 
 do_compile:prepend() {
