@@ -28,7 +28,6 @@ PREFERRED_PROVIDER_virtual/egl          = "adreno"
 PREFERRED_PROVIDER_virtual/libgles1     = "adreno"
 PREFERRED_PROVIDER_virtual/libgles2     = "adreno"
 
-BBMASK:sa8797 += "meta-qti-bsp/meta-qti-base/recipes-wlan"
 BBMASK:sa8797 += "meta-qti-bsp/meta-qti-base/recipes-kernel/edk2/edk2_4.0.bb"
 BBMASK:sa8797 += "meta-qti-bsp/meta-qti-base/recipes-kernel/edk2/edk2_5.0.bb"
 
