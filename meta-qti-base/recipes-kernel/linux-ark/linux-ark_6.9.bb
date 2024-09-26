@@ -31,6 +31,9 @@ S = "${WORKDIR}/kernel/${RH_KERNEL_NAME}"
 
 EXTRA_OEMAKE += "INSTALL_MOD_STRIP=1 --include-dir=${S}"
 
+#Fix redhat Makefile Missing an $(UPSTREAM_BRANCH) branch error.
+EXTRA_OEMAKE += "UPSTREAM_BRANCH=HEAD"
+
 LDFLAGS:aarch64 = "-O1 --hash-style=gnu --as-needed"
 TARGET_CXXFLAGS += "-Wno-format"
 
@@ -96,6 +99,10 @@ LINUX_VERSION_EXTENSION = "${@['-perf', ''][d.getVar('VARIANT', True) == ('' or 
 
 do_kernel_checkout[noexec] = "1"
 do_validate_branches[noexec] = "1"
+
+do_compile:prepend() {
+    export DTC_FLAGS="-@"
+}
 
 do_compile () {
     oe_runmake CC="${KERNEL_CC}" LD="${KERNEL_LD}" ${KERNEL_EXTRA_ARGS} $use_alternate_initrd
@@ -179,6 +186,26 @@ do_deploy () {
     if [ "${KERNEL_IMAGE_HEADER_VERSION}" = "2" ]; then
         cp ${B}/arch/arm64/boot/Image ${D}/${KERNEL_IMAGEDEST}/Image
         install -m 0644 ${D}/${KERNEL_IMAGEDEST}/Image ${DEPLOYDIR}
+        if [ -n "${KERNEL_BASE_DTB}" ]; then
+            install -d ${DEPLOYDIR}/build-artifacts/kernel-dtb
+
+            for dtb in ${KERNEL_BASE_DTB}; do
+                if [ -f ${B}/$dtb ]; then
+                    install -m 0644 ${B}/$dtb ${DEPLOYDIR}/build-artifacts/kernel-dtb
+                fi
+            done
+        fi
+
+        if [ -n "${KERNEL_MACHINE_DTB}" ]; then
+            install -d ${DEPLOYDIR}/build-artifacts/dtb
+
+            for dtb in ${KERNEL_MACHINE_DTB}; do
+                if [ -f ${B}/$dtb ]; then
+                    install -m 0644 ${B}/$dtb ${DEPLOYDIR}/build-artifacts/dtb
+                fi
+            done
+        fi
+
     elif [ "${KERNEL_IMAGE_HEADER_VERSION}" = "1" ]; then
         cat ${B}/arch/arm64/boot/Image.gz \
             ${B}/arch/arm64/boot/dts/qcom/${KERNEL_MACHINE_DTB} > ${D}/${KERNEL_IMAGEDEST}/Image.gz-dtb

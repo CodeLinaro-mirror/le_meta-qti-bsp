@@ -64,6 +64,7 @@ MACHINE_FEATURES += "\
     qti-tools \
     qti-multimedia \
     qti-display \
+    qti-graphics \
     qti-audio \
     qti-vmm \
     qti-camera \

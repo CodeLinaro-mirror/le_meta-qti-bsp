@@ -9,21 +9,22 @@ DEPENDS += "bison-native dtc-native virtual/kernel"
 SRC_URI = "\
            ${PATH_TO_REPO}/vendor/qcom/opensource/safelinux-system-cfg/devicetree/.git;protocol=${PROTO};usehead=1 \
            ${PATH_TO_REPO}/kernel/${RH_KERNEL_NAME}/.git;protocol=${PROTO};usehead=1 \
+           file://0001-devicetree-Adding-early-ramdisk-bootargs.patch \
 "
 SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/vendor/qcom/opensource/safelinux-system-cfg/devicetree"
 
-inherit ark-dtb-merge deploy kernel-arch
+inherit ark-dtb-merge deploy kernel-arch qti-techpack
 
 EXTRA_OEMAKE += "KDIR=${STAGING_KERNEL_DIR}"
 CONFIG_ARCH ?= ""
 CONFIG_ARCH:sa7255 = "CONFIG_ARCH_SA7255=y"
+IS_QCLINUX_BUILD = "${@bb.utils.contains_any("PREFERRED_PROVIDER_virtual/kernel", "linux-qcom", "QCLINUX_BUILD=true", "", d)}"
 
 do_compile() {
-    make dtbos KDIR=${STAGING_KERNEL_DIR} O=${STAGING_KERNEL_BUILDDIR} ${CONFIG_ARCH} CC="${KERNEL_CC}" LD="${KERNEL_LD}"
+    make dtbos KDIR=${STAGING_KERNEL_DIR} O=${STAGING_KERNEL_BUILDDIR} ${CONFIG_ARCH} CC="${KERNEL_CC}" LD="${KERNEL_LD}" ${IS_QCLINUX_BUILD}
 }
-do_compile[lockfiles] += "${TMPDIR}/qti-techpack.lock"
 
 do_merge_dtb() {
     if [ -z "${KERNEL_BASE_DTB}" ]; then

@@ -1,5 +1,4 @@
 include conf/machine/include/basemachine.inc
-include conf/machine/include/hgy-bbmask.inc
 
 SOC_FAMILY ?= "sa-common"
 include conf/machine/include/soc-family.inc
@@ -29,9 +28,9 @@ PREFERRED_PROVIDER_virtual/egl          = "adreno"
 PREFERRED_PROVIDER_virtual/libgles1     = "adreno"
 PREFERRED_PROVIDER_virtual/libgles2     = "adreno"
 
-BBMASK += "meta-qti-bsp/meta-qti-base/recipes-wlan"
-BBMASK += "meta-qti-bsp/meta-qti-base/recipes-kernel/edk2/edk2_4.0.bb"
-BBMASK += "meta-qti-bsp/meta-qti-base/recipes-kernel/edk2/edk2_5.0.bb"
+BBMASK:sa8797 += "meta-qti-bsp/meta-qti-base/recipes-wlan"
+BBMASK:sa8797 += "meta-qti-bsp/meta-qti-base/recipes-kernel/edk2/edk2_4.0.bb"
+BBMASK:sa8797 += "meta-qti-bsp/meta-qti-base/recipes-kernel/edk2/edk2_5.0.bb"
 
 # Enables timestamping functionality during building the kernel
 KERNEL_DEBUG_TIMESTAMPS = "1"
@@ -57,10 +56,12 @@ IMAGE_INSTALL += "\
     openssh-sftp \
     openssh-sftp-server \
     "
+IMAGE_INSTALL:remove = "${@bb.utils.contains('DISTRO_FEATURES', 'qti-rumi', 'openssh-scp openssh-ssh openssh-sshd openssh-sftp openssh-sftp-server', '', d)}"
+
 
 IMAGE_FEATURES += "ssh-server-openssh"
 
-# EXTRA_IMAGEDEPENDS += "qti-image-ark-boot:do_sign_boot_img"
+EXTRA_IMAGEDEPENDS += "qti-image-ark-boot:do_sign_boot_img"
 
 IMAGE_FEATURES:append = " read-only-rootfs"
 
@@ -88,6 +89,7 @@ MACHINE_FEATURES:remove = "\
     qti-vnw \
     early-ramdisk-init \
     qti-security \
+    qti-vmm \
     qti-umd \
 "
 

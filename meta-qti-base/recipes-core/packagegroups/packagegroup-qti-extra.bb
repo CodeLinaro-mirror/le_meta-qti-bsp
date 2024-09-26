@@ -27,3 +27,4 @@ RDEPENDS:${PN} += "\
     "
 
 RDEPENDS:${PN}:remove:qti-dpk = "resize-service"
+RDEPENDS:${PN}:remove:sa8775 = "resize-service"

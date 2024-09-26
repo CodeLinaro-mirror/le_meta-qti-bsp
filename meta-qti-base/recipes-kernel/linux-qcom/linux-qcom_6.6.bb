@@ -4,7 +4,7 @@ HOMEPAGE = "https://git.codelinaro.org"
 LICENSE = "GPLv2.0-with-linux-syscall-note"
 LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 
-COMPATIBLE_MACHINE = "sa8775|sa8797"
+COMPATIBLE_MACHINE = "sa8775|sa8797|sa7255"
 
 DEPENDS += "\
     elfutils-native kern-tools-native openssl-native \
@@ -14,6 +14,7 @@ DEPENDS += "\
 SRC_URI = "\
     ${PATH_TO_REPO}/kernel/kernel_platform/kernel/.git;protocol=${PROTO};destsuffix=kernel/kernel_platform/kernel;usehead=1 \
     file://generic.cfg \
+    file://dm.cfg \
     ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'file://selinux.cfg', '', d)} \
     ${@bb.utils.contains_any('VARIANT', 'perf user', '', 'file://devmem.cfg', d)} \
     file://0001-QCLINUX-vfio-Disable-iommu_group_claim_dma_owner-tem.patch \
@@ -28,6 +29,8 @@ SRC_URI = "\
     file://0010-PENDING-usb-dwc3-qcom-Add-support-for-sa8255p-for-qc.patch \
     file://0011-PENDING-phy-qcom-snps-femto-v2-Call-qcom_snps_hsphy_.patch \
     file://0012-PENDING-phy-qcom-snps-femto-v2-Add-support-for-SA825.patch \
+    file://0001-FROMLIST-of-of_reserved_mem-Increase-limit-for-reser.patch \
+    file://0013-net-stmmac-dwmac-qcom-ethqos-Enable-SCMI-ETH.patch \
 "
 
 SRCREV_kernel = "${AUTOREV}"
@@ -36,6 +39,7 @@ inherit kernel kernel-yocto
 
 S = "${WORKDIR}/kernel/kernel_platform/kernel"
 
+KERNEL_ARCH ?= "gen4auto"
 KBRANCH ?= ""
 KMETA = "kernel-meta"
 KCONFIG_MODE = "--alldefconfig"
@@ -48,8 +52,9 @@ do_validate_branches[noexec] = "1"
 do_generate_base_defconfig() {
     export KCONFIG_CONFIG="${S}/arch/arm64/configs/${KBUILD_DEFCONFIG}"
     base_defconfig="${S}/arch/arm64/configs/qcom_defconfig"
-    qcom_addon_config="${S}/arch/arm64/configs/qcom_addons.config"
-    ${S}/scripts/kconfig/merge_config.sh -m -r -y ${base_defconfig} ${qcom_addon_config} 1>&2
+    kernel_arch_config="${S}/arch/arm64/configs/qcom_${KERNEL_ARCH}.config"
+    kernel_arch_config+="${@bb.utils.contains_any('VARIANT', 'debug user', ' ${S}/arch/arm64/configs/qcom_${KERNEL_ARCH}_debug.config', '', d)}"
+    ${S}/scripts/kconfig/merge_config.sh -m -r -y ${base_defconfig} ${kernel_arch_config} 1>&2
 }
 addtask do_generate_base_defconfig after do_unpack before do_kernel_metadata
 
@@ -67,6 +72,8 @@ do_patch:append() {
     patch -f -p1 < ${WORKDIR}/0010-PENDING-usb-dwc3-qcom-Add-support-for-sa8255p-for-qc.patch
     patch -f -p1 < ${WORKDIR}/0011-PENDING-phy-qcom-snps-femto-v2-Call-qcom_snps_hsphy_.patch
     patch -f -p1 < ${WORKDIR}/0012-PENDING-phy-qcom-snps-femto-v2-Add-support-for-SA825.patch
+    patch -f -p1 < ${WORKDIR}/0001-FROMLIST-of-of_reserved_mem-Increase-limit-for-reser.patch
+    patch -f -p1 < ${WORKDIR}/0013-net-stmmac-dwmac-qcom-ethqos-Enable-SCMI-ETH.patch
 }
 
 do_compile:prepend() {
