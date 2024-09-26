@@ -23,6 +23,7 @@ VIRTUAL-RUNTIME_init_manager = "systemd"
 INCOMPATIBLE_LICENSE = "GPL-3.0-only LGPL-3.0-only AGPL-3.0-only"
 
 INCOMPATIBLE_LICENSE:quin-gvm-gen4 = " "
+INCOMPATIBLE_LICENSE:quin-tgvm-gen4 = " "
 INCOMPATIBLE_LICENSE:sa8797 = " "
 
 IMAGE_FEATURES:append = " read-only-rootfs"
