@@ -11,6 +11,7 @@ inherit ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'selinux-image', '', 
 IMAGE_ROOTFS_SIZE = "716800"
 
 IMAGE_INSTALL += "\
+    platformdlkm \
     system-core-adbd \
     system-core-leprop \
     system-core-post-boot \
