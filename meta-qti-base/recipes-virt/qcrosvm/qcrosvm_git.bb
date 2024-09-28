@@ -8,7 +8,6 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/BSD-3-Clause-C
                     file://${COREBASE}/meta/files/common-licenses/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 
 SYSTEMD_SERVICE:${PN} = "qcrosvm.service"
-SYSTEMD_SERVICE:${PN}:append:sa8775 = " qcrosvm_lv.service"
 
 DEPENDS += "cargo-native libcap rust-native rust-llvm-native pkgconfig-native"
 
@@ -35,7 +34,6 @@ CARGO_DISABLE_BITBAKE_VENDORING = "1"
 do_install:append:sa8775() {
     install -d ${D}${systemd_unitdir}/system/
     install -m 0644 ${S}/qcrosvm.service ${D}/${systemd_unitdir}/system/qcrosvm.service
-    install -m 0644 ${S}/qcrosvm_lv.service ${D}/${systemd_unitdir}/system/qcrosvm_lv.service
 }
 
 do_install:append:sa7255() {
