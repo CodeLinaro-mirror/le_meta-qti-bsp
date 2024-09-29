@@ -89,7 +89,6 @@ MACHINE_FEATURES:remove = "\
     early-ramdisk-init \
     qti-security \
     qti-vmm \
-    qti-umd \
 "
 
 SECTOOLS_VERSION = "sectools-v2"
