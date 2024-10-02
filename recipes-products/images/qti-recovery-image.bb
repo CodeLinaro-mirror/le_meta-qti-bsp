@@ -32,7 +32,7 @@ CORE_IMAGE_EXTRA_INSTALL:remove:mdm9607 += " packagegroup-qti-debug-tools packag
 RM_WORK_EXCLUDE += "${PN}"
 
 # Configs for generating recovery.ubi
-RECOVERY_MKUBIFS_ARGS = "-m 4096 -e 253952 -c 233 -F"
+RECOVERY_MKUBIFS_ARGS = "-m 4096 -e 253952 -c 200 -F"
 RECOVERY_UBINIZE_CFG = "ubinize-recoveryfs.cfg"
 RECOVOERY_UBIFS_IMAGE = "recoveryfs.ubifs"
 RECOVOERY_UBI_IMAGE = "recoveryfs.ubi"
