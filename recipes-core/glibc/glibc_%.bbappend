@@ -20,3 +20,7 @@ EXTRA_OECONF += "\
             ${@bb.utils.contains('DEBUG_OPTIMIZATION', '-fstack-protector-all', '--enable-stack-protector=all', '', d)} \
             ${@bb.utils.contains('DEBUG_OPTIMIZATION', '-fstack-protector-strong', '--enable-stack-protector=strong', '', d)} \
 "
+
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
+SRC_URI += "file://CVE-2024-2961.patch \
+"
