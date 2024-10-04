@@ -21,6 +21,7 @@ inherit qdlkm
 
 do_ramdisk_create[depends] += "virtual/kernel:do_deploy"
 do_ramdisk_create[cleandirs] += "${RAMDISKDIR}"
+do_ramdisk_create[cleandirs] += "${RAMDISKDIR}/etc"
 fakeroot do_ramdisk_create() {
         mkdir -p ${RAMDISKDIR}/bin
         mkdir -p ${RAMDISKDIR}/etc

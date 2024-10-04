@@ -20,6 +20,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
               e2fsprogs-e2fsck \
               e2fsprogs-mke2fs \
               e2fsprogs-tune2fs \
+              e2fsprogs-resize2fs \
               powerapp \
               deviceinfo \
               crash-collect-hlos \
@@ -43,6 +44,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
               libbootreason \
               packagegroup-modem-ald-transport-simulation \
               packagegroup-ru-modem-client \
+              resize-data \
 "
 
 do_merge_dtbs() {
