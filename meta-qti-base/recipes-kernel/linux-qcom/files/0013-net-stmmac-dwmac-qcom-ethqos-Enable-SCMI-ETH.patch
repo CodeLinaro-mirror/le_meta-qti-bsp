@@ -1,8 +1,7 @@
-From 9404a10ab2d5bc31e7d0fbb734fe0a57a6b5e63d Mon Sep 17 00:00:00 2001
+From 993d75fd548179c01a72f576575a9a5122ff8f16 Mon Sep 17 00:00:00 2001
 From: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
-Date: Tue, 17 Sep 2024 22:02:15 -0700
-Subject:[PATCH] net: stmmac: dwmac-qcom-ethqos: Enable SCMI
- ETH
+Date: Thu, 26 Sep 2024 11:46:15 -0700
+Subject: [PATCH] net: stmmac: dwmac-qcom-ethqos: Enable SCMI ETH
 
 On sa8255p platforms, resource such as clocks, regulators etc.
 are managed in the firmware. The Linux driver uses power and
@@ -19,15 +18,15 @@ D0 <--> D1 :: Turn on/off 'mdio' supplier
 Performance domain represents the serdes phy with link speed
 being used as performance levels.
 
-Change-Id: Ib082d3c154aef778bf4a1cc02f4f175798269e45
+Change-Id: Ida5621362aab59f4a8ffa626188dafbb63702b04
 Signed-off-by: Sarosh Hasan <quic_sarohasa@quicinc.com>
 Signed-off-by: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
 ---
- .../stmicro/stmmac/dwmac-qcom-ethqos.c        | 210 ++++++++++++++++--
- 1 file changed, 196 insertions(+), 14 deletions(-)
+ .../stmicro/stmmac/dwmac-qcom-ethqos.c        | 211 ++++++++++++++++--
+ 1 file changed, 197 insertions(+), 14 deletions(-)
 
 diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-index 749c91b7d02d..899731866981 100644
+index 749c91b7d02d..3c46215d457c 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
 @@ -7,6 +7,8 @@
@@ -279,12 +278,13 @@ index 749c91b7d02d..899731866981 100644
  static int ethqos_clks_config(void *priv, bool enabled)
  {
  	struct qcom_ethqos *ethqos = priv;
-@@ -830,6 +988,25 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
+@@ -830,6 +988,26 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
  	}
  
  	ethqos->pdev = pdev;
 +
-+	if (of_device_is_compatible(np, "qcom,sa8255p-ethqos")) {
++	if (of_device_is_compatible(np, "qcom,sa8255p-ethqos") || 
++		of_device_is_compatible(np, "qcom,sa8620p-ethqos")) {
 +		ret = qcom_ethqos_domain_attach(ethqos);
 +		if (ret < 0) {
 +			dev_err(dev, "Failed to attach domains.\n");
@@ -305,7 +305,7 @@ index 749c91b7d02d..899731866981 100644
  	ethqos->rgmii_base = devm_platform_ioremap_resource_byname(pdev, "rgmii");
  	if (IS_ERR(ethqos->rgmii_base))
  		return dev_err_probe(dev, PTR_ERR(ethqos->rgmii_base),
-@@ -844,11 +1021,12 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
+@@ -844,11 +1022,12 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
  	ethqos->has_emac_ge_3 = data->has_emac_ge_3;
  	ethqos->needs_sgmii_loopback = data->needs_sgmii_loopback;
  
@@ -323,7 +323,7 @@ index 749c91b7d02d..899731866981 100644
  	ret = ethqos_clks_config(ethqos, true);
  	if (ret)
  		return ret;
-@@ -870,7 +1048,10 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
+@@ -870,7 +1049,10 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
  	plat_dat->bsp_priv = ethqos;
  	plat_dat->fix_mac_speed = ethqos_fix_mac_speed;
  	plat_dat->dump_debug_regs = rgmii_dump;
@@ -335,7 +335,7 @@ index 749c91b7d02d..899731866981 100644
  	plat_dat->has_gmac4 = 1;
  	if (ethqos->has_emac_ge_3)
  		plat_dat->dwmac4_addrs = &data->dwmac4_addrs;
-@@ -899,6 +1080,7 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
+@@ -899,6 +1081,7 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
  static const struct of_device_id qcom_ethqos_match[] = {
  	{ .compatible = "qcom,qcs404-ethqos", .data = &emac_v2_3_0_data},
  	{ .compatible = "qcom,qcs8300-ethqos", .data = &emac_v4_0_0_data},
