@@ -22,7 +22,7 @@ ghgvm_pilsplitter() {
         exit 1
     else
         # python2 $MKDTBOIMGPY_PATH/mkdtboimg.py create ${DEPLOY_DIR_IMAGE}/dtbs/dtb.img $DTB_FILE_LIST
-        python2 $MKDTBOIMGPY_PATH/mkdtboimg.py create ${DEPLOY_DIR_IMAGE}/dtbs/dtb.img ${DEPLOY_DIR_IMAGE}/build-artifacts/dtb/lemans-gunyah-vm-lv-cob.dtb ${DEPLOY_DIR_IMAGE}/build-artifacts/dtb/lemans-gunyah-vm-lv-qam.dtb
+        python2 $MKDTBOIMGPY_PATH/mkdtboimg.py create ${DEPLOY_DIR_IMAGE}/dtbs/dtb.img ${DEPLOY_DIR_IMAGE}/dtbs/lemans-gunyah-vm-lv-cob.dtb ${DEPLOY_DIR_IMAGE}/dtbs/lemans-gunyah-vm-lv-qam.dtb
     fi
 
     install -d ${DEPLOY_DIR_IMAGE}/signing
