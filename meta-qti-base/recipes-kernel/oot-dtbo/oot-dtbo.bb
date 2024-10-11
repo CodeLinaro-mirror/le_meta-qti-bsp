@@ -35,14 +35,14 @@ do_merge_dtb() {
     install -d ${S}/dtbodir
 
     if [ -z "${OOT_DTBOS}" ]; then
-        install -m 0644 ${S}/*.dtbo ${S}/dtbodir/
-    else
-        for oot_dtbo in ${OOT_DTBOS}; do
-            if [ -f ${S}/${oot_dtbo} ]; then
-                install -m 0644 ${S}/${oot_dtbo} ${S}/dtbodir/
-            fi
-        done
+        OOT_DTBOS=$(find ${S} -not -path "${S}/oot/*" -name "*.dtbo" -printf "%P\n")
     fi
+
+    for oot_dtbo in ${OOT_DTBOS}; do
+        if [ -f ${S}/${oot_dtbo} ]; then
+            install -m 0644 ${S}/${oot_dtbo} ${S}/dtbodir/
+        fi
+    done
 
     dtb_dir=${DEPLOY_DIR_IMAGE}/build-artifacts/kernel-dtb
     dtbo_dir=${S}/dtbodir
