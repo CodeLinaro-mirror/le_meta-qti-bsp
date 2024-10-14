@@ -79,6 +79,9 @@ def parse_commandline_args():
         type=str, required=True,
         help='Metabuild from which the FOTA package should be generated.')
     parser.add_argument(
+        '--build-variant', default="debug",
+        help='Creates FOTA for build-variant')
+    parser.add_argument(
         '--dest-loc', default=None,
         help='Creates FOTA in desired location')
     parser.add_argument(
@@ -125,17 +128,17 @@ def copy_file(source, destination):
         else:
             shutil.copy(source, destination)
     except Exception as e:
-        logger.error("Error occurred while copying file.{}".format(str(e)))
+        logger.debug("Error occurred while copying file.{}".format(str(e)))
 
 
-def get_config(chipset="Lassen"):
-    """setting up Lassen configs
+def get_config(chipset="cinder", build_variant='debug'):
+    """setting up chipset configs
     Returns:
         target path
     """
-    if chipset == "Lassen":
+    if chipset == "cinder":
         apps_proc = 'apps_proc'
-        distro = 'build-qti-distro-base-debug'
+        distro = 'build-qti-distro-base-{}'.format(build_variant)
         image_name = 'cinder'
         return os.path.join(apps_proc, distro, 'tmp-glibc/deploy/images',
                             image_name)
@@ -158,7 +161,7 @@ def run_shell_cmd(cmd):
 
 
 class FOTA(object):
-    def __init__(self, meta_loc=None, dest_loc=None):
+    def __init__(self, meta_loc=None, dest_loc=None, build_variant='debug'):
         self.cwd = os.getcwd()
         self.meta = None
         self.meta_loc = meta_loc
@@ -174,8 +177,8 @@ class FOTA(object):
         else:
             logger.info('Existing workspace there.....')
         if not os.path.exists(self.ota_loc):
-            self.image_path = get_config()
-            ota_cd = os.path.join(self.apps_path, self.image_path, "ota-scripts")
+            self.image_path = get_config(build_variant=build_variant)
+            ota_cd = os.path.join(self.meta_loc, self.image_path, "ota-scripts")
             logger.info("ota workspace {}".format(ota_cd))
             copy_file(ota_cd, self.ota_loc)
             logger.info('ota-scripts not there, copying...')
@@ -325,7 +328,6 @@ class FOTA(object):
                                                   flavor='asic')
         var_list.append(var_file_list_fbc)
         var_list.append(var_file_list_fb)
-        logger.info(var_list)
         for dict in var_list:
             for key, val in list(dict.items()):
                 var_file_list.setdefault(key, list())
@@ -457,6 +459,13 @@ class FOTA(object):
         self.copy_manifest(meta_loc, radio)
         return unzipd
 
+    def get_device_build(self, manifest):
+        root = self.xml_root(manifest)
+        try:
+            return root['xml']['products']['product']['build-Id']
+        except Exception as e:
+            return 'default'
+
     def prepare_target_file(self, meta, meta_loc, target_zip):
         """Zip and prepare the target file
         Args:
@@ -470,7 +479,11 @@ class FOTA(object):
         self.copy_nhlosbins_tmp_loc(meta_loc)
         unzipd = self.copy_nhlos_files(meta_loc, target_zip)
         os.chdir(unzipd)
-        target = '{}/target_{}.zip'.format(self.dest_loc, meta)
+        if os.path.exists('./RADIO/manifest.xml'):
+            build_id = self.get_device_build('./RADIO/manifest.xml')
+        else:
+            build_id = 'default'
+        target = '{}/target_{}_{}.zip'.format(self.dest_loc, meta, build_id)
         zip_cmd = ['zip', '-qry', target, '.']
         logger.info("zip command is {}".format(zip_cmd))
         run_shell_cmd(zip_cmd)
@@ -515,12 +528,15 @@ def copy_fota_zip_to_dest(dest_loc):
         file_match = re.search(new_file, file_name)
         if file_match:
             break
+        elif "ORU" in file_name:
+            break
     if file_match:
         new_file = file_match.group()
-        new_tgtfiles_zip = os.path.join(cwd, file_match.group())
+    elif "ORU" in file_name:
+        new_file = file_name
     else:
         new_file = 'update_ext4.zip'
-        new_tgtfiles_zip = os.path.join(cwd, new_file)
+    new_tgtfiles_zip = os.path.join(cwd, new_file)
     copy_file(new_tgtfiles_zip, dest_loc)
     logger.info("Final ota-zip is located at {}/{}".format(dest_loc, new_file))
 
@@ -585,7 +601,7 @@ def run_ota_cmd(target_list, dest_loc, ota_workspace, package_name=None):
     copy_fota_zip_to_dest(dest_loc)
     os.chdir(cwd)
 
-def get_target_list(meta_loc, ota_workspace):
+def get_target_list(meta_loc, ota_workspace, build_variant):
     """Return target list after packing nhlos
     Args:
         meta_loc (str): meta_loc
@@ -597,12 +613,13 @@ def get_target_list(meta_loc, ota_workspace):
     for meta in meta_loc:
         if meta == '' or meta is None:
             raise EmptyFileError('empty meta location provided')
-        fota = FOTA(meta, ota_workspace)
+        fota = FOTA(meta, ota_workspace, build_variant)
         image = 'qti-csm-image'
-        target_zip = os.path.join(meta, get_config(), image,
+        target_zip = os.path.join(meta, get_config(build_variant=build_variant), image,
                                   'target-files-ext4.zip')
         logger.info("target {}".format(target_zip))
         tar = fota.create_fota_package(meta, target_zip)
+        shutil.rmtree(os.path.dirname(fota.nh_tmp_dir))
         target_list.append(tar)
     return target_list
 
@@ -618,6 +635,7 @@ def main():
     update_release = args.update_release
     vendor_code = args.vendor_code
     dest_loc = args.dest_loc
+    build_variant = args.build_variant
     target_list = list()
     package_name = list()
     ota_workspace = None
@@ -629,7 +647,7 @@ def main():
             ota_workspace = create_ws()
         else:
             ota_workspace = os.path.join(dest_loc, 'Fota_location')
-        target_list = get_target_list(meta_loc, ota_workspace)
+        target_list = get_target_list(meta_loc, ota_workspace, build_variant)
         if is_package_name:
             package_name = get_package_creation_cmd(
                 is_package_name, vendor_code, update_release,
