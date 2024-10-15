@@ -20,9 +20,6 @@ SRC_URI = "\
     ${PATH_TO_REPO}/external/rust/crates/simplelog/.git;protocol=${PROTO};destsuffix=external/rust/crates/simplelog;usehead=1 \
     ${PATH_TO_REPO}/external/rust/crates/vmm_vhost/.git;protocol=${PROTO};destsuffix=external/rust/crates/vmm_vhost;usehead=1 \
 "
-SRC_URI:append = " \
-    file://0001-qcrosvm-Add-patch-file-for-patching-vhost-user-gp-su.patch \
-"
 
 SRCREV = "${AUTOREV}"
 
