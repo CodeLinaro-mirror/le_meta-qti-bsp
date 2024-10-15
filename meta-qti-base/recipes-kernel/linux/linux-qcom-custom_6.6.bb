@@ -29,6 +29,7 @@ SRC_URI = "\
     file://0001-FROMLIST-of-of_reserved_mem-Increase-limit-for-reser.patch \
     file://0013-net-stmmac-dwmac-qcom-ethqos-Enable-SCMI-ETH.patch \
     file://0014-PENDING-qcom-Add-sa7255p-compatibles-for-core-driver.patch \
+    file://0015-PENDING-PCI-Add-Qualcomm-PCIe-ECAM-root-complex-driv.patch \
     file://scm_adci/0001-QCLINUX-arm64-dts-qcom-sa8255p-Modify-correct-dt-nam.patch \
     file://scm_adci/0002-BACKPORT-FROMLIST-firmware-qcom-scm-Support-multiple.patch \
     file://scm_adci/0003-PENDING-firmware-qcom-scm-Add-support-for-WAITQ_WAKE.patch \
