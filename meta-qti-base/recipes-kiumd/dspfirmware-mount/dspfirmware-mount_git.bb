@@ -18,6 +18,7 @@ do_install:append() {
     if ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'true', 'false', d)}; then
         sed -i '/^Options=/s/defaults/&,context=system_u:object_r:qcrosvm_boot_t:s0/' ${S}/firmware-vm-boot.mount
         sed -i '/^Options=/s/defaults/&,context=system_u:object_r:dsp_file_t:s0/' ${S}/vendor-dsp.mount
+        sed -i '/^Options=/s/defaults/&,context=system_u:object_r:qcrosvm_boot_t:s0/' ${S}/firmware-lvgvm-boot.mount
     fi
 
     install -d -p ${D}${systemd_unitdir}/system/multi-user.target.wants/
@@ -39,14 +40,21 @@ do_install:append() {
 
     if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-vmm', 'true', 'false', d)}; then
         install -d -p ${D}/firmware/vm/boot
+        install -d -p ${D}/firmware/lvgvm/boot
 
         install -m 0777 ${S}/firmware-vm-boot.automount ${D}${systemd_unitdir}/system/firmware-vm-boot.automount
+        install -m 0777 ${S}/firmware-lvgvm-boot.automount ${D}${systemd_unitdir}/system/firmware-lvgvm-boot.automount
         install -m 0777 ${S}/firmware-vm-boot.mount ${D}${systemd_unitdir}/system/firmware-vm-boot.mount
+        install -m 0777 ${S}/firmware-lvgvm-boot.mount ${D}${systemd_unitdir}/system/firmware-lvgvm-boot.mount
 
         ln -sf ${systemd_unitdir}/system/firmware-vm-boot.automount \
             ${D}${systemd_unitdir}/system/multi-user.target.wants/firmware-vm-boot.automount
+        ln -sf ${systemd_unitdir}/system/firmware-lvgvm-boot.automount \
+            ${D}${systemd_unitdir}/system/multi-user.target.wants/firmware-lvgvm-boot.automount
         ln -sf ${systemd_unitdir}/system/firmware-vm-boot.mount \
             ${D}${systemd_unitdir}/system/multi-user.target.wants/firmware-vm-boot.mount
+        ln -sf ${systemd_unitdir}/system/firmware-lvgvm-boot.mount \
+            ${D}${systemd_unitdir}/system/multi-user.target.wants/firmware-lvgvm-boot.mount
     fi
     if [ -f ${S}/99-persist-storage-ab.rules ]; then
         install -m 0644 ${S}/99-persist-storage-ab.rules -D ${D}${sysconfdir}/udev/rules.d/99-persist-storage-ab.rules
