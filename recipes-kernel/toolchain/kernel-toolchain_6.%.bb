@@ -6,7 +6,8 @@ PROVIDES = "virtual/kernel-toolchain-native"
 
 KERNEL_VERSION = "${@d.getVar('VM_KERNEL_VERSION')}"
 
-CLANG_VERSION = "${@'r522817' if d.getVar('KERNEL_VERSION') == '6.7' else 'r510928'}"
+CLANG_VERSION ?= "${@'r522817' if d.getVar('KERNEL_VERSION') == '6.7' else 'r510928'}"
+CLANG_VERSION:trustedvm-v2 = "clang-r487747c"
 
 FILESEXTRAPATHS:prepend := "${KERNEL_PLATFORM_PATH}/prebuilts/clang/host/linux-x86/:"
 SRC_URI    = "file://clang-${CLANG_VERSION}"
