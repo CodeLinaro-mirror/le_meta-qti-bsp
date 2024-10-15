@@ -27,6 +27,6 @@ RDEPENDS:${PN} += "\
     ${@bb.utils.contains("DISTRO_FEATURES", "early_init", "early-init", "" ,d)} \
     ${@bb.utils.contains("COMBINED_FEATURES", "hibernation", "hibernation", "" ,d)} \
     ${@bb.utils.contains("MACHINE_FEATURES", "qti-dlkm", "system-core-dlkm", "", d)} \
-    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', bb.utils.contains_any('PREFERRED_PROVIDER_virtual/kernel', 'linux-ark linux-qcom', 'irqbalance', '', d), d)} \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', bb.utils.contains_any('PREFERRED_PROVIDER_virtual/kernel', 'linux-ark linux-qcom-custom linux-qcom-custom-rt', 'irqbalance', '', d), d)} \
     "
 RDEPENDS:${PN}:append:monaco = " reboot-daemon"

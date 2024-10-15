@@ -29,7 +29,7 @@ do_make_avb_image(){
 
         rootfs_size=$(expr $rootfs_size_kb \* 1024)
 
-        if ${@bb.utils.contains_any('PREFERRED_PROVIDER_virtual/kernel', 'linux-ark linux-qcom', 'true', 'false', d)}; then
+        if ${@bb.utils.contains_any('PREFERRED_PROVIDER_virtual/kernel', 'linux-ark linux-qcom-custom linux-qcom-custom-rt', 'true', 'false', d)}; then
            overhead_size_kb=$(expr $rootfs_size_kb / 3)
         else
            overhead_size_kb=$(expr $rootfs_size_kb / 5)
