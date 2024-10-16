@@ -18,7 +18,7 @@ SRC_URI = "\
 
 inherit systemd
 
-do_install:append:sa8775() {
+do_install() {
   install -d ${D}${systemd_system_unitdir}
   install -d ${D}${bindir}
 
@@ -36,5 +36,4 @@ do_install:append:sa8775() {
   fi
 }
 
-SYSTEMD_SERVICE:${PN}:sa8775 = "setup-network-host.service"
-
+SYSTEMD_SERVICE:${PN} = "setup-network-host.service"
