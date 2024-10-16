@@ -19,21 +19,9 @@ DEPENDS += "\
     virtual/kernel-headers \
 "
 
-# default enable C2 service on all targets and disable on Lemans
+# default enable C2 service on all targets
 DEPENDS:append = " binder codec2-service"
 EXTRA_OEMESON:append = " -Dagl-c2service=true"
-
-DEPENDS:remove:quin-gvm-lemans = "binder codec2-service"
-EXTRA_OEMESON:remove:quin-gvm-lemans = "-Dagl-c2service=true"
-
-DEPENDS:remove:quin-gvm-lemans-dpk = "binder codec2-service"
-EXTRA_OEMESON:remove:quin-gvm-lemans-dpk = "-Dagl-c2service=true"
-
-DEPENDS:remove:quin-gvm-monaco = "binder codec2-service"
-EXTRA_OEMESON:remove:quin-gvm-monaco = "-Dagl-c2service=true"
-
-DEPENDS:remove:quin-gvm-monaco-dpk = "binder codec2-service"
-EXTRA_OEMESON:remove:quin-gvm-monaco-dpk = "-Dagl-c2service=true"
 
 DEPENDS:append:quin-gvm-lemans = " displaydlkm"
 DEPENDS:append:monaco = " displaydlkm"
