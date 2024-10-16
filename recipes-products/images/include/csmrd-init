@@ -527,6 +527,11 @@ do_nbdtab()
 
     # remove resize-data service
     rm -f resize-data.service
+    # remove unused services
+    rm -f hlos-partition-repair.service
+    rm -f persist-backup.service
+    rm -f persist-backup.timer
+
     # set debug transport
     echo "Set debug transport to $4"
     # mount userdata.img
