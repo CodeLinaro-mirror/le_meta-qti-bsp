@@ -5,7 +5,7 @@ Subject: [PATCH 4/6] sink-input: Code cleanup regarding volume ramping
 
 Remove unused parameter of pa_sink_input_set_volume_ramp().
 Use bool instead of pa_bool_t.
-
+Upstream-Status: Inappropriate [oe specific]
 Signed-off-by: Sangchul Lee <sc11.lee@samsung.com>
 ---
  src/pulsecore/sink-input.c | 7 ++-----

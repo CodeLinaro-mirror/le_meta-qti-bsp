@@ -4,43 +4,18 @@ Date: Thu, 15 Apr 2021 16:28:09 +0800
 Subject: [PATCH] Support PulseAudio Client API for Module Codec Control
 
 Rebase this patch to utilize meson build.
-
+Upstream-Status: Inappropriate [oe specific]
 Signed-off-by: Cong Tang <congt@codeaurora.org>
 Signed-off-by: Guodong Hu <guodhu@codeaurora.org>
 ---
- src/map-file                  |  14 +
- src/pulse/ext-codec-control.c | 845 ++++++++++++++++++++++++++++++++++++++++++
- src/pulse/ext-codec-control.h | 320 ++++++++++++++++
+ src/pulse/ext-codec-control.c | 845 ++++++++++++++++++++++++++++++++++
+ src/pulse/ext-codec-control.h | 320 +++++++++++++
+ src/pulse/map-file            |  14 +
  src/pulse/meson.build         |   3 +
  4 files changed, 1182 insertions(+)
  create mode 100644 src/pulse/ext-codec-control.c
  create mode 100644 src/pulse/ext-codec-control.h
 
-diff --git a/src/map-file b/src/map-file
-index b4fd736..bcbd4f7 100644
---- a/src/map-file
-+++ b/src/map-file
-@@ -173,6 +173,20 @@ pa_ext_device_restore_save_formats;
- pa_ext_device_restore_set_subscribe_cb;
- pa_ext_device_restore_subscribe;
- pa_ext_device_restore_test;
-+pa_ext_codec_control_test;
-+pa_ext_codec_control_set_pp_volume;
-+pa_ext_codec_control_set_pp_mute;
-+pa_ext_codec_control_set_pp_fade;
-+pa_ext_codec_control_set_pp_balance;
-+pa_ext_codec_control_set_pp_bmt;
-+pa_ext_codec_control_set_pp_eq;
-+pa_ext_codec_control_get_pp_volume;
-+pa_ext_codec_control_get_pp_fade;
-+pa_ext_codec_control_get_pp_balance;
-+pa_ext_codec_control_get_pp_bmt;
-+pa_ext_codec_control_get_pp_eq;
-+pa_ext_codec_control_get_pp_eq_subbands;
-+pa_ext_codec_control_tunnel_cmd;
- pa_ext_stream_restore_delete;
- pa_ext_stream_restore_read;
- pa_ext_stream_restore_set_subscribe_cb;
 diff --git a/src/pulse/ext-codec-control.c b/src/pulse/ext-codec-control.c
 new file mode 100644
 index 0000000..db7b07c
@@ -1218,20 +1193,45 @@ index 0000000..a109bbb
 +PA_C_DECL_END
 +
 +#endif
+diff --git a/src/pulse/map-file b/src/pulse/map-file
+index 9eac4cf..eeb1b8b 100644
+--- a/src/pulse/map-file
++++ b/src/pulse/map-file
+@@ -174,6 +174,20 @@ pa_ext_device_restore_save_formats;
+ pa_ext_device_restore_set_subscribe_cb;
+ pa_ext_device_restore_subscribe;
+ pa_ext_device_restore_test;
++pa_ext_codec_control_test;
++pa_ext_codec_control_set_pp_volume;
++pa_ext_codec_control_set_pp_mute;
++pa_ext_codec_control_set_pp_fade;
++pa_ext_codec_control_set_pp_balance;
++pa_ext_codec_control_set_pp_bmt;
++pa_ext_codec_control_set_pp_eq;
++pa_ext_codec_control_get_pp_volume;
++pa_ext_codec_control_get_pp_fade;
++pa_ext_codec_control_get_pp_balance;
++pa_ext_codec_control_get_pp_bmt;
++pa_ext_codec_control_get_pp_eq;
++pa_ext_codec_control_get_pp_eq_subbands;
++pa_ext_codec_control_tunnel_cmd;
+ pa_ext_stream_restore_delete;
+ pa_ext_stream_restore_read;
+ pa_ext_stream_restore_set_subscribe_cb;
 diff --git a/src/pulse/meson.build b/src/pulse/meson.build
-index aaebff5..ddd464d 100644
+index c132630..aef4efe 100644
 --- a/src/pulse/meson.build
 +++ b/src/pulse/meson.build
-@@ -70,6 +70,9 @@ if glib_dep.found()
-   libpulse_headers += 'glib-mainloop.h'
- endif
+@@ -66,6 +66,9 @@ libpulse_headers = [
+   'xmalloc.h',
+ ]
  
 +libpulse_sources += 'ext-codec-control.c'
 +libpulse_headers += 'ext-codec-control.h'
 +
- versioning_link_args = '-Wl,-version-script=' + join_paths(meson.source_root(), 'src', 'map-file')
- 
- libpulse = shared_library('pulse',
+ if glib_dep.found()
+   libpulse_headers += 'glib-mainloop.h'
+ endif
 -- 
-2.7.4
+2.17.1
 

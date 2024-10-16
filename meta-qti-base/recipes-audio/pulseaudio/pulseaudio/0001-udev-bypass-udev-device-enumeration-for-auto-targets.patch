@@ -5,7 +5,7 @@ Subject: [PATCH] udev: bypass udev device enumeration for auto targets
 
 ALSA devices enumeration is completed by audio policy
 manager, thus bypass udev enumeration to avoid conflict.
-
+Upstream-Status: Inappropriate [oe specific]
 Signed-off-by: Deru Wang <deruwang@codeaurora.org>
 ---
  src/modules/alsa/90-pulseaudio.rules | 4 ++++
