@@ -1,5 +1,8 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/systemd:"
 
+SRC_URI_remove = "git://github.com/systemd/systemd.git;protocol=git"
+SRC_URI_prepend = " git://git.codelinaro.org/clo/yocto-mirrors/github/systemd/systemd.git;protocol=https;branch=main "
+
 SRC_URI += "file://sysctl-coredump.conf"
 SRC_URI += "file://limits-coredump.conf"
 
