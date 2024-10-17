@@ -15,8 +15,8 @@ tmpfs                /tmp            tmpfs     defaults              0  0
 
 /dev/vdc             /var            auto      defaults,nofail       0  2
 /dev/vdb             /data           auto      defaults,nofail       0  2
-/dev/vdh             /dsp            auto      defaults,nofail       0  2
-/dev/vde             /firmware       auto      defaults,nofail       0  2
+/dev/vdh             /dsp            auto      defaults,ro,nofail       0  0
+/dev/vde             /firmware       auto      defaults,ro,nofail       0  0
 
 # Bind /home to /data
 /data                /home                auto       defaults,bind         0  0
