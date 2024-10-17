@@ -1,5 +1,8 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
+SRC_URI_remove = "git://github.com/systemd/systemd.git;protocol=git"
+SRC_URI_prepend = " git://git.codelinaro.org/clo/yocto-mirrors/github/systemd/systemd.git;protocol=https;branch=main "
+
 SRC_URI += "file://Disable-unused-mount-points.patch"
 SRC_URI += "file://mountpartitions.rules"
 SRC_URI += "file://systemd-udevd.service"
