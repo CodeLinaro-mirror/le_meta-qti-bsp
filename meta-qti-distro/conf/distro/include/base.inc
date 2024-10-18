@@ -25,9 +25,11 @@ ARM_INSTRUCTION_SET       ?= "arm"
 # Optimization flags.
 ##################################################################
 COMMON_OPTIMIZATION = " \
-  -Wa,--noexecstack -fexpensive-optimizations \
-  -frename-registers -ftree-vectorize \
-  -finline-functions -finline-limit=64 \
+  -Wa,--noexecstack -ftree-vectorize -finline-functions \
+  "
+
+COMMON_OPTIMIZATION:class-target:toolchain-gcc = " \
+  -fexpensive-optimizations -frename-registers -finline-limit=64 \
   -Wno-error=maybe-uninitialized -Wno-error=unused-result \
   "
 
