@@ -41,6 +41,7 @@ imagefv.elf             /dev/block/bootdevice/by-name/imagefv
 km4.mbn                 /dev/block/bootdevice/by-name/keymaster
 logfs_ufs_8mb.bin       /dev/block/bootdevice/by-name/logfs
 multi_image.mbn         /dev/block/bootdevice/by-name/multiimgoem
+multi_image_qti.mbn     /dev/block/bootdevice/by-name/multiimgqti
 persist.img             /dev/block/bootdevice/by-name/persist
 qupv3fw.elf             /dev/block/bootdevice/by-name/qupfw
 spunvm.bin              /dev/block/bootdevice/by-name/spunvm
