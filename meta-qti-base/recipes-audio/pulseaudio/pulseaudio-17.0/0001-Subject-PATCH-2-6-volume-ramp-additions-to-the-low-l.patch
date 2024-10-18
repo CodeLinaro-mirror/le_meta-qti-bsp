@@ -7,7 +7,7 @@ Subject: [PATCH] Subject: [PATCH 2/6] volume ramp: additions to the low level
 The original patch is
  - https://review.tizen.org/git/?p=platform/upstream/pulseaudio.git;a=commit;h=df1c4275ed79e0b708c75b92f9d247e0492bc1f0
  - by Jaska Uimonen <jaska.uimonen <at> helsinki.fi>
-
+Upstream-Status: Inappropriate [oe specific]
 Signed-off-by: Sangchul Lee <sc11.lee@samsung.com>
 ---
  src/pulse/def.h     |  13 ++-

@@ -1,7 +1,7 @@
 SUMMARY = "Audio Drivers Kernel Modules for AudioReach"
 DESCRIPTION = "This is the AudioReach based audio driver based on ASoC architecture, used to communicate with DSP."
 HOMEPAGE = "https://www.codelinaro.org/"
-LICENSE = "GPL-2.0-only-WITH-Linux-syscall-note"
+LICENSE = "GPL-2.0 & BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://NOTICE;md5=53c09804050a00b1d27bd609c4e1fc5a"
 DEPENDS += "audio-devicetree"
 DEPENDS += "virtual/kernel"

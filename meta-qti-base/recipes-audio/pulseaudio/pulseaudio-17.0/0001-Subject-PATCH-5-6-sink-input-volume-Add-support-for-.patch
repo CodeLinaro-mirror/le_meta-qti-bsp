@@ -16,14 +16,14 @@ APIs are added as below.
  - pa_cvolume_ramp_compatible()
  - pa_sw_cvolume_ramp_multiply()
  - pa_cvolume_ramp_valid()
-
+Upstream-Status: Inappropriate [oe specific]
 Signed-off-by: Sangchul Lee <sc11.lee@samsung.com>
 ---
  src/pulse/map-file         |   3 ++
- src/pulse/volume.c         |  44 ++++++++++++++++++
+ src/pulse/volume.c         |  44 +++++++++++++++
  src/pulse/volume.h         |   9 ++++
- src/pulsecore/sink-input.c | 108 +++++++++++++++++++++++++++++++++++++++++++++
- src/pulsecore/sink-input.h |   5 +++
+ src/pulsecore/sink-input.c | 108 +++++++++++++++++++++++++++++++++++++
+ src/pulsecore/sink-input.h |   5 ++
  5 files changed, 169 insertions(+)
 
 diff --git a/src/pulse/map-file b/src/pulse/map-file
@@ -100,7 +100,7 @@ index e7bf84d..4271b05 100644
 +    return 1;
 +}
 diff --git a/src/pulse/volume.h b/src/pulse/volume.h
-index 6e95853..dcf71b1 100644
+index 30e8f59..e2745d9 100644
 --- a/src/pulse/volume.h
 +++ b/src/pulse/volume.h
 @@ -464,12 +464,21 @@ int pa_cvolume_ramp_equal(const pa_cvolume_ramp *a, const pa_cvolume_ramp *b);
@@ -126,12 +126,12 @@ index 6e95853..dcf71b1 100644
  
  #endif
 diff --git a/src/pulsecore/sink-input.c b/src/pulsecore/sink-input.c
-index 5e7657c..fb3540e 100644
+index 4380087..0663ac1 100644
 --- a/src/pulsecore/sink-input.c
 +++ b/src/pulsecore/sink-input.c
-@@ -53,6 +53,11 @@ struct volume_factor_entry {
-     pa_cvolume volume;
- };
+@@ -114,6 +114,11 @@ static size_t calculate_resampler_history_bytes(pa_sink_input *i, size_t in_rewi
+     return history_frames * r->i_fz;
+ }
  
 +struct volume_ramp_factor_entry {
 +    char *key;
@@ -141,7 +141,7 @@ index 5e7657c..fb3540e 100644
  static struct volume_factor_entry *volume_factor_entry_new(const char *key, const pa_cvolume *volume) {
      struct volume_factor_entry *entry;
  
-@@ -83,6 +88,37 @@ static void volume_factor_from_hashmap(pa_cvolume *v, pa_hashmap *items, uint8_t
+@@ -144,6 +149,37 @@ static void volume_factor_from_hashmap(pa_cvolume *v, pa_hashmap *items, uint8_t
          pa_sw_cvolume_multiply(v, v, &entry->volume);
  }
  
@@ -179,7 +179,7 @@ index 5e7657c..fb3540e 100644
  static void sink_input_free(pa_object *o);
  static void set_real_ratio(pa_sink_input *i, const pa_cvolume *v);
  
-@@ -522,6 +558,8 @@ int pa_sink_input_new(
+@@ -585,6 +621,8 @@ int pa_sink_input_new(
      i->volume_factor_sink_items = data->volume_factor_sink_items;
      data->volume_factor_sink_items = NULL;
      volume_factor_from_hashmap(&i->volume_factor_sink, i->volume_factor_sink_items, i->sink->sample_spec.channels);
@@ -188,7 +188,7 @@ index 5e7657c..fb3540e 100644
  
      i->real_ratio = i->reference_ratio = data->volume;
      pa_cvolume_reset(&i->soft_volume, i->sample_spec.channels);
-@@ -789,6 +827,9 @@ static void sink_input_free(pa_object *o) {
+@@ -875,6 +913,9 @@ static void sink_input_free(pa_object *o) {
      if (i->preferred_sink)
          pa_xfree(i->preferred_sink);
  
@@ -198,7 +198,7 @@ index 5e7657c..fb3540e 100644
      pa_xfree(i->driver);
      pa_xfree(i);
  }
-@@ -1533,6 +1574,73 @@ void pa_sink_input_set_property_arbitrary(pa_sink_input *i, const char *key, con
+@@ -1685,6 +1726,73 @@ void pa_sink_input_set_property_arbitrary(pa_sink_input *i, const char *key, con
      }
  }
  
@@ -273,7 +273,7 @@ index 5e7657c..fb3540e 100644
  void pa_sink_input_update_proplist(pa_sink_input *i, pa_update_mode_t mode, pa_proplist *p) {
      void *state;
 diff --git a/src/pulsecore/sink-input.h b/src/pulsecore/sink-input.h
-index d3de6e3..4afe989 100644
+index 7a75c0f..9f08bde 100644
 --- a/src/pulsecore/sink-input.h
 +++ b/src/pulsecore/sink-input.h
 @@ -115,6 +115,9 @@ struct pa_sink_input {
@@ -286,7 +286,7 @@ index d3de6e3..4afe989 100644
      bool volume_writable:1;
  
      bool muted:1;
-@@ -380,6 +383,8 @@ void pa_sink_input_set_volume(pa_sink_input *i, const pa_cvolume *volume, bool s
+@@ -400,6 +403,8 @@ void pa_sink_input_set_volume(pa_sink_input *i, const pa_cvolume *volume, bool s
  void pa_sink_input_add_volume_factor(pa_sink_input *i, const char *key, const pa_cvolume *volume_factor);
  int pa_sink_input_remove_volume_factor(pa_sink_input *i, const char *key);
  pa_cvolume *pa_sink_input_get_volume(pa_sink_input *i, pa_cvolume *volume, bool absolute);
@@ -296,5 +296,5 @@ index d3de6e3..4afe989 100644
  void pa_sink_input_set_mute(pa_sink_input *i, bool mute, bool save);
  
 -- 
-2.7.4
+2.17.1
 

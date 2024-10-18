@@ -13,7 +13,7 @@ inherit autotools-brokensep pkgconfig
 
 EXTRA_OECONF += "--enable-target=${AUDIO_BUILD_TARGET}"
 EXTRA_OECONF += "--with-glib"
-VERSION = "${@bb.utils.contains('LAYERSERIES_COMPAT_yocto', 'kirkstone', '15.0', '14.2', d)}"
+VERSION = "17.0"
 
 do_configure:prepend () {
     sed -i -e "s|%PULSEAUDIO_VERSION%|${VERSION}|" ${S}/configure.ac
@@ -21,9 +21,9 @@ do_configure:prepend () {
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-FILES:${PN} += "${libdir}/pulse-*/modules/"
-FILES:${PN}-staticdev += "${libdir}/pulse-*/modules/*.a"
-FILES:${PN}-dbg += "${libdir}/pulse-*/modules/.debug"
+FILES:${PN} += "${libdir}/pulseaudio/modules/"
+FILES:${PN}-staticdev += "${libdir}/pulseaudio/modules/*.a"
+FILES:${PN}-dbg += "${libdir}/pulseaudio/modules/.debug"
 
 RDEPENDS:${PN} = "pulseaudio-misc pulseaudio-module-null-source pulseaudio-server"
 

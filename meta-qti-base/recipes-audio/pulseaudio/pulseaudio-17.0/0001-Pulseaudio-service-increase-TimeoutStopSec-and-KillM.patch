@@ -4,7 +4,7 @@ Date: Thu, 8 Jun 2023 16:46:17 +0530
 Subject: [PATCH] Pulseaudio service increase TimeoutStopSec and  KillMode
 
 Prevent reboot hang caused by pulseaudio long timeout.
-
+Upstream-Status: Inappropriate [oe specific]
 Signed-off-by: Jing Wang <quic_jingwa@quicinc.com>
 ---
  src/daemon/systemd/user/pulseaudio.service.in | 2 ++
