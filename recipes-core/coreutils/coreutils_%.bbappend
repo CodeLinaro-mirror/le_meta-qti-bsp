@@ -16,8 +16,13 @@ ALTERNATIVE:${PN}-doc = ""
 PACKAGE_PREPROCESS_FUNCS += "${@oe.utils.conditional('CUSTOMIZE_COREUTILS_COMMANDS', 'True', 'remove_extra_progs', '', d)}"
 remove_extra_progs() {
     cd ${PKGD}${bindir}
-    find . -type f ! -name '${bindir_progs}.${BPN}' -delete
 
-    cd ${PKGD}${base_bindir}
-    find . -type f ! -name '${base_bindir_progs}.${BPN}' -delete
+    if ${@bb.utils.contains('DISTRO_FEATURES','usrmerge','true','false',d)}; then
+       find . -type f ! -name '${bindir_progs}.${BPN}' -a ! -name '${base_bindir_progs}.${BPN}'  -delete
+    else
+       find . -type f ! -name '${bindir_progs}.${BPN}' -delete
+
+       cd ${PKGD}${base_bindir}
+       find . -type f ! -name '${base_bindir_progs}.${BPN}' -delete
+    fi
 }
