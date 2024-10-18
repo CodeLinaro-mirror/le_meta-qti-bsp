@@ -21,6 +21,7 @@ RDEPENDS:${PN} += "\
     system-core-post-boot \
     system-core-usb \
     system-prop \
+    binder \
     memory-hotplug \
     ${@bb.utils.contains("MACHINE_FEATURES", "qti-gunyah", "modules-load-late", "" ,d)} \
     ${@bb.utils.contains("MACHINE_FEATURES", "qti-hypervisor", "", "system-core-early-boot", d)} \
