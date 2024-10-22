@@ -14,6 +14,7 @@ SRC_URI = "\
     file://dm.cfg \
     ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'file://selinux.cfg', '', d)} \
     ${@bb.utils.contains_any('VARIANT', 'perf user', '', 'file://devmem.cfg', d)} \
+    ${@bb.utils.contains_any('VARIANT', 'perf user', 'file://perf.cfg', '', d)} \
     file://0001-QCLINUX-vfio-Disable-iommu_group_claim_dma_owner-tem.patch \
     file://0002-PENDING-soc-qcom-geni-se-Enable-QUPs-on-SA8255p-Qual.patch \
     file://0003-PENDING-serial-qcom-geni-Enable-Serial-on-SA8255p-pl.patch \
