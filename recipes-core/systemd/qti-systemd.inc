@@ -1,6 +1,5 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/systemd:"
 
-SRC_URI += "file://Disable-unused-mount-points.patch"
 SRC_URI += "file://systemd-udevd.service"
 SRC_URI += "file://ffbm.target"
 SRC_URI += "file://mtpserver.rules"
@@ -11,13 +10,10 @@ SRC_URI += "file://set-usb-nodes.rules"
 SRC_URI += "file://sysctl.conf"
 SRC_URI += "file://platform.conf"
 SRC_URI += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-vm', 'file://trusted_touch.conf', '',d)}"
-SRC_URI += "file://sd-bus-Allow-extra-users-to-communicate.patch"
-SRC_URI += "file://fstab-generator-Honor-verity-enabled-cmdline.patch"
 SRC_URI += "file://set-mhi-nodes.rules"
 SRC_URI += "file://99-gpiochardev.rules"
 SRC_URI += "file://kmem.rules"
 SRC_URI += "file://mmc-rpmb.rules"
-SRC_URI += "file://0001-cgroup-downgrade-warning-if-we-can-t-get-ID-off-cgro.patch"
 
 # Custom setup for PACKAGECONFIG to get a slimmer systemd.
 # Removed following:
