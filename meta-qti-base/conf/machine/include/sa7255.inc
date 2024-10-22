@@ -53,6 +53,7 @@ IMAGE_FEATURES:append = " read-only-rootfs"
 
 MACHINE_FEATURES += "\
     qti-vmm \
+    qti-data \
     qti-gunyah \
     qti-core \
     qti-tools \
