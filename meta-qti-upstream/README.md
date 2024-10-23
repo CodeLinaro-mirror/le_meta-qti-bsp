@@ -1,4 +1,4 @@
-The recipes in meta-qti-upstream are from upstream without any change.
+The recipes and files in meta-qti-upstream are from upstream without any change.
 
 recipe: recipes-graphics/wayland/wayland-ivi-extension_2.2.0.bb
 source: meta-ivi/recipes-graphics/wayland/wayland-ivi-extension_git.bb
@@ -7,3 +7,7 @@ source: meta-ivi/recipes-graphics/wayland/wayland-ivi-extension_git.bb
 recipe: recipes-multimedia/pulseaudio/agl-audio-plugin_0.1.bb
 source: meta-agl/meta-agl/recipes-multimedia/pulseaudio/agl-audio-plugin_0.1.bb
         https://git.codelinaro.org/clo/le/AGL/meta-agl/-/tree/automotivelinux/eel/meta-agl/recipes-multimedia/pulseaudio
+
+file: recipes-core/systemd/systemd-systemctl/systemctl
+source: meta/recipes-core/systemd/systemd-systemctl/systemctl
+        https://git.openembedded.org/openembedded-core/tree/meta/recipes-core/systemd/systemd-systemctl/systemctl?h=scarthgap
