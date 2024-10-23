@@ -11,7 +11,7 @@ Before=shutdown.target
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=modprobe tz_log
+ExecStart=modprobe -a tz_log aquantia marvell qcom_geni_serial
 
 [Install]
 WantedBy=multi-user.target

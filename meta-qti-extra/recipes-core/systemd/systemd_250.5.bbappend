@@ -11,6 +11,9 @@ SRC_URI:append = " \
              ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', bb.utils.contains('MACHINE_FEATURES', 'qti-gunyah', '', 'file://qti_lxc_umd_sleep.sh', d), '', d)} \
              ${@bb.utils.contains('MACHINE_FEATURES', 'qti-gunyah', 'file://0001-modules-load-implement-parallel-module-loading.patch', '', d)}"
 
+SRC_URI:append:sa8775 = " \
+             ${@bb.utils.contains('MACHINE_FEATURES', 'early-ramdisk-init', 'file://0001-change-systemd-modules-load-service-type-to-simple.patch', '', d)}"
+
 do_install:append() {
    if ${@bb.utils.contains_any('MACHINE_FEATURES', 'qti-umd', 'false', 'true', d)} ; then
       install -d ${D}/${base_libdir}/systemd/system-sleep
