@@ -86,7 +86,6 @@ MACHINE_FEATURES:remove = "\
     qti-safety \
     qti-vnw \
     early-ramdisk-init \
-    qti-security \
     qti-vmm \
 "
 
