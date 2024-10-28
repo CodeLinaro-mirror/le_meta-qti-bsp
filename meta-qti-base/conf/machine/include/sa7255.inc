@@ -59,6 +59,7 @@ MACHINE_FEATURES += "\
     early-ramdisk-init \
     qti-umd \
     qti-display \
+    qti-graphics \
     qti-multimedia \
     qti-camera \
     qti-security \
