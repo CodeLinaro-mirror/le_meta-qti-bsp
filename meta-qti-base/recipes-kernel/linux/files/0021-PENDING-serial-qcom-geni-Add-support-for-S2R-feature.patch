@@ -1,0 +1,77 @@
+From d55416c5096fb01de76f131126074d3d6106dd05 Mon Sep 17 00:00:00 2001
+From: Zahir Shabbir Khan <quic_zshabbir@quicinc.com>
+Date: Fri, 25 Oct 2024 12:17:20 +0530
+Subject: [PATCH] PENDING: serial: qcom-geni: Add support for S2R feature
+
+In the context of S2R, a mode intended for prolonged
+sleep cycles, the system-on-chip (SoC) is powered down
+and its state is preserved and subsequently restored
+from DRAM during entry/exit phases of S2R.
+
+Within S2R, hardware context is relinquished,whereas
+software context persists. As a result, serial engine
+configurations undergo re-initialization, resembling
+a probe-like process.
+
+The flag PM_SUSPEND_MEM is used to determine whether the system
+is in S2R or not.
+
+Change-Id: I27f62c520e6cb5ac529540264a1cd868cd5febba
+Signed-off-by: Praveen Talari <quic_ptalari@quicinc.com>
+Signed-off-by: Zahir Shabbir Khan <quic_zshabbir@quicinc.com>
+---
+ drivers/tty/serial/qcom_geni_serial.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/tty/serial/qcom_geni_serial.c b/drivers/tty/serial/qcom_geni_serial.c
+index fbcccee9090f..620c34dea3a6 100644
+--- a/drivers/tty/serial/qcom_geni_serial.c
++++ b/drivers/tty/serial/qcom_geni_serial.c
+@@ -20,6 +20,7 @@
+ #include <linux/serial.h>
+ #include <linux/serial_core.h>
+ #include <linux/slab.h>
++#include <linux/suspend.h>
+ #include <linux/tty.h>
+ #include <linux/tty_flip.h>
+ #include <dt-bindings/interconnect/qcom,icc.h>
+@@ -850,9 +851,6 @@ static void qcom_geni_serial_handle_rx_dma(struct uart_port *uport, bool drop)
+ 	if (!port->rx_dma_addr)
+ 		return;
+ 
+-	geni_se_rx_dma_unprep(&port->se, port->rx_dma_addr, DMA_RX_BUF_SIZE);
+-	port->rx_dma_addr = 0;
+-
+ 	rx_in = readl(uport->membase + SE_DMA_RX_LEN_IN);
+ 	if (!rx_in) {
+ 		dev_warn(uport->dev, "serial engine reports 0 RX bytes in!\n");
+@@ -862,6 +860,9 @@ static void qcom_geni_serial_handle_rx_dma(struct uart_port *uport, bool drop)
+ 	if (!drop)
+ 		handle_rx_uart(uport, rx_in, drop);
+ 
++	geni_se_rx_dma_unprep(&port->se, port->rx_dma_addr, DMA_RX_BUF_SIZE);
++	port->rx_dma_addr = 0;
++
+ 	ret = geni_se_rx_dma_prep(&port->se, port->rx_buf,
+ 				  DMA_RX_BUF_SIZE,
+ 				  &port->rx_dma_addr);
+@@ -1912,8 +1913,16 @@ static int qcom_geni_serial_sys_resume(struct device *dev)
+ 	struct uart_port *uport = &port->uport;
+ 	struct qcom_geni_private_data *private_data = uport->private_data;
+ 
++	if (pm_suspend_target_state == PM_SUSPEND_MEM) {
++		dev_dbg(port->se.dev, "%s: S2R exit\n", __func__);
++		port->setup = false;
++	}
++
+ 	trace_serial_info(uport->dev, __func__, "Start");
+ 	ret = uart_resume_port(private_data->drv, uport);
++	if (ret)
++		return ret;
++
+ 	if (uart_console(uport)) {
+ 		geni_icc_set_tag(&port->se, QCOM_ICC_TAG_ALWAYS);
+ 		geni_icc_set_bw(&port->se);
+-- 
+2.17.1
+
