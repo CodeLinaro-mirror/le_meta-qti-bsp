@@ -65,6 +65,7 @@ AGL1_IFACE_ARRAY=(eth0)
 AGL2_IFACE_ARRAY=(eth0)
 
 AGL1_IFACE_ARRAY1=(eth1)
+AGL1_IFACE_ARRAY2=(eth2)
 
 function get_gvm_version()
 {
@@ -174,6 +175,7 @@ gvm_version=$?
 
 ietf1_configured=false
 ietf2_configured=false
+ietf3_configured=false
 
 # try 10 times
 for i in {1..10}
@@ -192,8 +194,8 @@ do
         fi
     else
 
-        if [ $ietf1_configured = true ] && [ $ietf2_configured = true ]; then
-            echo "Both eth0 and eth1 are configured."
+        if [ $ietf1_configured = true ] && [ $ietf2_configured = true ] && [ $ietf3_configured = true ]; then
+            echo " eth0, eth1, and eth2 are all configured."
             break;
         fi
 
@@ -216,6 +218,17 @@ do
             ietf2_configured=true
         else
             echo " ERR : Ethernet Interfaces(eth1) are not Ready or already configured !!!"
+        fi
+
+        check_all_interfaces_up "${AGL1_IFACE_ARRAY2[*]}"
+        iface3_is_up=$?
+        echo "current interface status is ${iface3_is_up}"
+        if [ $iface3_is_up -eq 1 ] && [ $ietf3_configured = false ]; then
+            echo "Qti-base:Assign Static IP Address for eth2"
+            ifconfig eth2 192.168.7.2 up
+            ietf3_configured=true
+        else
+            echo " ERR : Ethernet Interfaces(eth2) are not Ready or already configured !!!"
         fi
     fi
 
