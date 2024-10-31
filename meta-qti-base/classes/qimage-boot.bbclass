@@ -19,7 +19,10 @@ ghgvm_pilsplitter() {
         echo "No *.dtb files found in $DEPLOY_DIR_IMAGE/dtbs"
         exit 1
     else
-        ${STAGING_BINDIR_NATIVE}/build/prebuilts/kernel-build-tools/linux-x86/bin/mkdtimg create ${DEPLOY_DIR_IMAGE}/dtbs/dtb.img ${DEPLOY_DIR_IMAGE}/dtbs/lemans-gunyah-vm-lv-cob.dtb ${DEPLOY_DIR_IMAGE}/dtbs/lemans-gunyah-vm-lv-qam.dtb
+        ${STAGING_BINDIR_NATIVE}/build/prebuilts/kernel-build-tools/linux-x86/bin/mkdtimg create ${DEPLOY_DIR_IMAGE}/dtbs/dtb.img \
+            ${DEPLOY_DIR_IMAGE}/dtbs/lemans-gunyah-vm-lv-cob.dtb \
+            ${DEPLOY_DIR_IMAGE}/dtbs/lemans-gunyah-vm-lv-qam.dtb \
+            ${DEPLOY_DIR_IMAGE}/dtbs/monaco-gunyah-vm-lv-qam.dtb
     fi
 
     install -d ${DEPLOY_DIR_IMAGE}/signing
