@@ -70,6 +70,7 @@ MACHINE_FEATURES += "\
     qti-multimedia \
     qti-display \
     qti-audio \
+    qti-data \
     ${@bb.utils.contains("ACTUAL_KERNEL", "linux-ark", "qti-vmm", "", d)} \
     qti-camera \
     qti-safety \
