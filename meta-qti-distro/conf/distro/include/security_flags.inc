@@ -201,8 +201,8 @@ SECURITY_CFLAGS:remove:pn-time-services = " -Werror=conversion \
                                             -Werror=format-truncation=2 \"
 
 # Video packages
-SECURITY_CFLAGS:append:quin-gvm-gen4-2:pn-codec2-app = " ${EXT_COMPILE_OPTIONS}"
-SECURITY_CFLAGS:remove:quin-gvm-gen4-2:pn-codec2-app = " -Werror=conversion \
+SECURITY_CFLAGS:append:quin-gvm-gen4:pn-codec2-app = " ${EXT_COMPILE_OPTIONS}"
+SECURITY_CFLAGS:remove:quin-gvm-gen4:pn-codec2-app = " -Werror=conversion \
                                                          -Werror=sign-conversion \
                                                          -Werror=missing-field-initializers"
 
