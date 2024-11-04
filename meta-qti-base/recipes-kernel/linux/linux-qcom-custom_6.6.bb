@@ -36,8 +36,7 @@ SRC_URI = "\
     file://scm_adci/0004-PENDING-firmware-qcom-scm-Selectively-skip-mutex-for.patch \
     file://scm_adci/0005-UPSTREAM-firmware-qcom-scm-Remove-QCOM_SMC_WAITQ_FLA.patch \
     file://scm_adci/0006-PENDING-firmware-qcom-scm-Introduce-new-locking-mech.patch \
-    file://scm_adci/0007-BACKPORT-UPSTREAM-firmware-qcom-scm-Mark-get_wq_ctx-.patch \
-    file://scm_adci/0008-BACKPORT-UPSTREAM-firmware-qcom-scm-add-support-for-.patch \
+    file://scm_adci/0007-BACKPORT-UPSTREAM-firmware-qcom-scm-add-support-for-.patch \
     file://scm_adci/0009-QCLINUX-arm64-dts-qcom-sa7255p-Modify-correct-dt-nam.patch \
 "
 
