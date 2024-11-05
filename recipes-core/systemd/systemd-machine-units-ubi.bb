@@ -16,6 +16,7 @@ SRC_URI += " file://firmware-ubi-mount.sh"
 SRC_URI += " file://bt_firmware-mount.service"
 SRC_URI += " file://mountpartitions.rules"
 SRC_URI += " file://bt_firmware-ubi-mount.sh"
+SRC_URI += " file://ecm.rules"
 
 IMAGETYPE = "ubi"
 
@@ -42,6 +43,11 @@ do_install:append () {
     fi
     install -d 0644 ${D}${sysconfdir}/udev/rules.d
     install -m 0644 ${S}/mountpartitions.rules ${D}${sysconfdir}/udev/rules.d/mountpartitions
+}
+
+do_install:append:mdm9607() {
+   install -d 0644 ${D}${sysconfdir}/udev/rules.d
+   install -m 0744 ${S}/ecm.rules ${D}${sysconfdir}/udev/rules.d/ecm.rules
 }
 
 add_ubi_scripts () {
