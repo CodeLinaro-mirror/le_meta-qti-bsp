@@ -3,6 +3,8 @@ require conf/distro/include/msm.inc
 
 require conf/distro/include/security_flags.inc
 
+require conf/distro/include/non-gplv3-license.inc
+
 require conf/distro/include/distro_features.inc
 
 DISTRO_NAME = "automotive"

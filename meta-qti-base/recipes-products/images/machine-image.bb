@@ -25,4 +25,5 @@ ROOTFS_POSTPROCESS_COMMAND:remove:sa8797 = "add_extra_modules;"
 # Makes image suitable for development (e.g. enable ssh for login, allows root logins and logins without passwords by ssh)
 IMAGE_FEATURES:append = " ${@bb.utils.contains('VARIANT', 'debug', 'debug-tweaks ssh-server-openssh', '', d)}"
 
-INCOMPATIBLE_LICENSE:sa8797 = "GPL-3.0-only LGPL-3.0-only AGPL-3.0-only"
+INCOMPATIBLE_LICENSE_EXCEPTIONS:quin-gvm-gen4 = "bash:GPL-3.0-or-later"
+INCOMPATIBLE_LICENSE:quin-gvm-gen4 = "GPL-3.0* LGPL-3.0* AGPL-3.0*"
