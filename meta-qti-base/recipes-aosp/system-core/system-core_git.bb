@@ -72,8 +72,6 @@ do_install:append() {
         install -m 0644 ${S}/rootdir/etc/dlkm.service -D ${D}${systemd_unitdir}/system/dlkm.service
 
         install -m 0644 ${S}/rootdir/etc/init_post_boot.service -D ${D}${systemd_unitdir}/system/init_post_boot.service
-        ln -sf ${systemd_unitdir}/system/init_post_boot.service \
-            ${D}${systemd_unitdir}/system/multi-user.target.wants/init_post_boot.service
 
         install -m 0644 ${S}/rootdir/etc/init_early_boot.service -D ${D}${systemd_unitdir}/system/init_early_boot.service
         ln -sf ${systemd_unitdir}/system/init_early_boot.service \
@@ -101,6 +99,9 @@ do_install:append() {
 
 PACKAGES =+ "${PN}-usb ${PN}-dlkm ${PN}-post-boot ${PN}-early-boot ${PN}-leprop"
 
+SYSTEMD_SERVICE:${PN}-post-boot = "init_post_boot.service"
+SYSTEMD_AUTO_ENABLE:${PN}-post-boot = "disable"
+
 FILES:${PN}-usb += "\
     ${base_sbindir}/usb_composition \
     ${bindir}/usb_composition_switch \
@@ -122,7 +123,6 @@ FILES:${PN}-dlkm += "\
 
 FILES:${PN}-post-boot += "\
     ${systemd_unitdir}/system/init_post_boot.service \
-    ${systemd_unitdir}/system/multi-user.target.wants/init_post_boot.service \
     ${sysconfdir}/initscripts/init_post_boot \
 "
 
