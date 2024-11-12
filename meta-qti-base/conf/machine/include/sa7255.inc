@@ -64,7 +64,7 @@ MACHINE_FEATURES += "\
     qti-multimedia \
     qti-camera \
     qti-security \
-    qti-audio-ar \
+    qti-audio \
 "
 
 SECTOOLS_VERSION = "sectools-v2"
