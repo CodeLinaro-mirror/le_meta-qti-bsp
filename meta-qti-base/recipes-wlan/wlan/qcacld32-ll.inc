@@ -11,6 +11,7 @@ WLAN_PLATFORM_CFG = " \
                      CONFIG_CNSS_UTILS=m \
                      CONFIG_CNSS2_CONDITIONAL_POWEROFF=y \
                      WLAN_PLATFORM_INC=${WLAN_PLATFORM_PATH}/inc \
+                     CONFIG_AUTO_PLATFORM=y \
                      KBUILD_EXTRA="${WLAN_KBUILD_EXTRA}" \
                    "
 DEPENDS += "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', 'wlan-platform-dlkm', '', d)}"
