@@ -5,7 +5,7 @@ stripped-down version of the former, not needing Murphy anymore and using \
 either a JSON configuration file or its own embedded configuration."
 HOMEPAGE = "http://www.iot.bzh"
 
-LICENSE = "LGPL-2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=2d5025d4aa3495befef8f17206a5b0a1"
 
 DEPENDS = "json-c pulseaudio"
