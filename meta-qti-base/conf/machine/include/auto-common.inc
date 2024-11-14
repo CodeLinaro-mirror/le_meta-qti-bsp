@@ -25,6 +25,10 @@ PREFERRED_PROVIDER_virtual/wayland-egl  = "adreno"
 PREFERRED_PROVIDER_virtual/egl          = "adreno"
 PREFERRED_PROVIDER_virtual/libgles1     = "adreno"
 PREFERRED_PROVIDER_virtual/libgles2     = "adreno"
+VIRTUAL-RUNTIME_wayland-egl  = "adreno"
+VIRTUAL-RUNTIME_egl          = "adreno"
+VIRTUAL-RUNTIME_libgles1     = "adreno"
+VIRTUAL-RUNTIME_libgles2     = "adreno"
 
 # mesa provides these packags and others like virtual/libgl.
 # This is to enable mesa, adreno and gbm work together, and pass
