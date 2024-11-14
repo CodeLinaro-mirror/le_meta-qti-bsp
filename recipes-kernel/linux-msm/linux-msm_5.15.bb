@@ -103,14 +103,12 @@ do_prebuilt_configure() {
     install -m 0644 ../${KERNEL_TYPE}/scripts/module.lds ${B}/scripts/module.lds
     install -m 0644 ../${KERNEL_TYPE}/include/generated/utsrelease.h ${B}/include/generated
     install -m 0644 ../${KERNEL_TYPE}/certs/signing_key.pem ${B}/certs/signing_key.pem
-    #install -m 0644 ../${KERNEL_TYPE}/certs/verity_cert.pem ${B}/certs/verity_cert.pem
-    #install -m 0644 ../${KERNEL_TYPE}/certs/verity_key.pem ${B}/certs/verity_key.pem
 
-    # update paths of signature checking certificates to reflect current host
-    #sed -i -e '/CONFIG_MODULE_SIG_KEY[ =]/d' ${B}/.config
-    #echo "CONFIG_MODULE_SIG_KEY="\"${STAGING_DIR_TARGET}/kernel-certs/signing_key.pem\" >> ${B}/.config
-    #sed -i -e '/CONFIG_SYSTEM_TRUSTED_KEYS[ =]/d' ${B}/.config
-    #echo "CONFIG_SYSTEM_TRUSTED_KEYS="\"${STAGING_DIR_TARGET}/kernel-certs/verity_cert.pem\" >> ${B}/.config
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains('MACHINE_FEATURES', 'dm-verity-initramfs-v3', 'true', 'false', d), 'false', d)}; then
+        install -m 0644 ../${KERNEL_TYPE}/certs/verity_cert.pem ${B}/certs/verity_cert.pem
+        install -m 0644 ../${KERNEL_TYPE}/certs/verity_key.pem ${B}/certs/verity_key.pem
+	fi
+
 
     install -d ${B}/${KERNEL_OUTPUT_DIR}
     for typeformake in ${KERNEL_IMAGETYPE_FOR_MAKE} ; do
@@ -149,6 +147,12 @@ do_prebuilt_shared_workdir() {
     mkdir -p $kerneldir/scripts
     mkdir -p $kerneldir/include/generated
     mkdir -p $kerneldir/usr
+
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains('MACHINE_FEATURES', 'dm-verity-initramfs-v3', 'true', 'false', d), 'false', d)}; then
+        mkdir -p $kerneldir/certs
+        install -m 0755 ${B}/certs/verity_cert.pem ${STAGING_KERNEL_BUILDDIR}/certs/verity_cert.pem
+        install -m 0644 ${B}/certs/verity_key.pem ${STAGING_KERNEL_BUILDDIR}/certs/verity_key.pem
+    fi
 
     install -m 0644 include/config/kernel.release $kerneldir/include/config/kernel.release
     install -m 0644 include/generated/utsrelease.h $kerneldir/include/generated/utsrelease.h
