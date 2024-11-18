@@ -13,3 +13,6 @@ do_install:append() {
     # Remove orignal 60-persistent-v4l.rules which is not applicable for QTI video
     rm ${D}${nonarch_base_libdir}/udev/rules.d/60-persistent-v4l.rules
 }
+
+# Disable rfkill
+PACKAGECONFIG:remove = "rfkill"
