@@ -1,11 +1,13 @@
 From d03951ed8df8b9b1eca54e8dba0b4b0440274356 Mon Sep 17 00:00:00 2001
-From: Lei wang <leiwan@codeaurora.org>
+From: Lei wang <quic_leiwan@quicinc.com>
 Date: Wed, 30 Sep 2020 15:07:33 +0800
 Subject: [PATCH] systemd: Make root's home directory configurabl
 
 change default root home from /root/ to /home/root/.
 
-Signed-off-by: Lei wang <leiwan@codeaurora.org>
+Upstream-Status: Inappropriate
+
+Signed-off-by: Lei wang <quic_leiwan@quicinc.com>
 ---
  src/basic/user-util.c | 4 ++--
  src/nspawn/nspawn.c   | 4 ++--

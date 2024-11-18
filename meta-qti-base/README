@@ -19,3 +19,10 @@ Machines
 ========
 
 Supported machines: sa6155, sa8155, sa8195 and qtiquingvm.
+
+
+Maintenance
+========
+Layer maintainer: xubaoj <quic_xubaoj@quicinc.com>
+Please see the MAINTAINERS file for information on contacting the
+maintainers of this layer, as well as instructions for submitting patches.

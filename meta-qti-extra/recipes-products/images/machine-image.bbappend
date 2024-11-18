@@ -6,9 +6,6 @@ IMAGE_INSTALL += "\
 # Add libgomp support
 IMAGE_INSTALL += "libgomp"
 
-# Add resize userdata function
-IMAGE_INSTALL += "resize-service"
-
 # Introducing selinux-image.bbclass is to label selinux contexts when build.
 inherit ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'selinux-image', '', d)}
 

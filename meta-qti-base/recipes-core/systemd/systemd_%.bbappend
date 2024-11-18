@@ -5,7 +5,6 @@ FILESEXTRAPATHS =. "${FILESBBAPPENDPATH}/${BP}:${FILESBBAPPENDPATH}/${BPN}:"
 DEPENDS += "glib-2.0"
 
 SRC_URI:append = " \
-    file://0033-systemd-Make-root-s-home-directory-configurable-2.patch \
     file://0001-systemd-avoid-active-seat-change-to-NULL.patch \
     file://60-misc.rules \
     file://0001-systemd-config-linger-for-root-user.patch \
@@ -15,8 +14,47 @@ SRC_URI:append:sa81x5 = " file://0001-systemd-add-slotselect-support-in-fstab.pa
 
 SRC_URI:append = " ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "5.15", "file://platform_load.conf", "", d)}"
 
+SRC_URI:append = " ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'file://0033-systemd-Make-root-s-home-directory-configurable-2.patch', '', d)} "
+
 # Remove backlight - Loads/Saves Screen Backlight Brightness, not required.
-PACKAGECONFIG:remove = "backlight "
+RUMI_PACKAGECONFIG = "\
+    ${@bb.utils.filter('DISTRO_FEATURES', 'acl audit efi ldconfig pam selinux smack usrmerge polkit seccomp', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'wifi', 'rfkill', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'xkbcommon', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', '', 'link-udev-shared', d)} \
+    backlight \
+    binfmt \
+    gshadow \
+    hibernate \
+    hostnamed \
+    idn \
+    ima \
+    localed \
+    logind \
+    machined \
+    myhostname \
+    networkd \
+    nss \
+    nss-mymachines \
+    nss-resolve \
+    quotacheck \
+    randomseed \
+    resolved \
+    set-time-epoch \
+    sysusers \
+    sysvinit \
+    timedated \
+    timesyncd \
+    userdb \
+    utmp \
+    vconsole \
+    wheel-group \
+    zstd \
+"
+PACKAGECONFIG:remove = "\
+    ${@bb.utils.contains('DISTRO_FEATURES', 'qti-rumi', '${RUMI_PACKAGECONFIG}', '', d)} \
+"
+PACKAGECONFIG:remove = "backlight"
 
 #Disable systemd-timesyncd which not used in project.
 PACKAGECONFIG:remove = "timesyncd "
@@ -47,13 +85,19 @@ do_install:append () {
     if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'true', 'false', d)}; then
         echo "DefaultLimitNOFILE=infinity" >> ${D}${sysconfdir}/systemd/system.conf
         echo "DefaultLimitMSGQUEUE=infinity" >> ${D}${sysconfdir}/systemd/system.conf
+        if ${@bb.utils.contains('DISTRO_FEATURES', 'qti-rumi', 'true', 'false', d)}; then
+            echo "DefaultTimeoutStartSec=5s" >> ${D}${sysconfdir}/systemd/system.conf
+            echo "DefaultTimeoutStopSec=5s" >> ${D}${sysconfdir}/systemd/system.conf
+        fi
     fi
 
     # Use kernel rules for network iface name
     sed -i  's/^NamePolicy.*/NamePolicy=kernel/g' ${D}${systemd_unitdir}/network/99-default.link
 
     #Remove privatetmp=true from hostname service
-    sed -i  '/^PrivateTmp.*/d' ${D}${systemd_system_unitdir}/systemd-hostnamed.service
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'qti-rumi', 'false', 'true', d)}; then
+        sed -i  '/^PrivateTmp.*/d' ${D}${systemd_system_unitdir}/systemd-hostnamed.service
+    fi
 
     # Remove orignal 60-persistent-v4l.rules which is not applicable for QTI video
     rm ${D}${nonarch_base_libdir}/udev/rules.d/60-persistent-v4l.rules
