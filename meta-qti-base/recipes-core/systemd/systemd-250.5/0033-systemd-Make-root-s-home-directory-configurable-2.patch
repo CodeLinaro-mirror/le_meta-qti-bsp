@@ -5,6 +5,8 @@ Subject: [PATCH] systemd: Make root's home directory -configureable
 
 change default root home from /root/ to /home/root/.
 
+Upstream-Status: Inappropriate
+
 Change-Id: Ie236c216680675b759438aaedc745022cc263f37
 Signed-off-by: xubaoj <quic_xubaoj@quicinc.com>
 ---

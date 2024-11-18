@@ -3,12 +3,9 @@ include conf/machine/include/basemachine.inc
 SOC_FAMILY ?= "sa-common"
 include conf/machine/include/soc-family.inc
 PRODUCT = "${MACHINE}"
-ACTUAL_KERNEL = "${@oe.utils.ifelse((os.path.exists(d.getVar('BSPDIR', True) + '/kernel/rh-fedora-kernel-6.9')), 'linux-ark', 'linux-qcom')}"
-PREFERRED_PROVIDER_virtual/kernel = "${ACTUAL_KERNEL}"
-PREFERRED_PROVIDER_virtual/kernel-headers = "${ACTUAL_KERNEL}-headers"
-PREFERRED_VERSION_linux-qcom = "6.6"
-PREFERRED_VERSION_linux-ark = "6.9"
-# PREFERRED_VERSION_linux-ark = "6.7"
+PREFERRED_PROVIDER_virtual/kernel = "linux-qcom-custom"
+PREFERRED_PROVIDER_virtual/kernel-headers = "linux-kernel-qcom-headers"
+PREFERRED_VERSION_linux-qcom-custom = "6.6"
 
 # Prefer Wayland/Weston version
 PREFERRED_VERSION_weston = "8.0.0"
@@ -16,8 +13,8 @@ PREFERRED_VERSION_wayland = "1.18.0"
 PREFERRED_VERSION_wayland-native = "1.18.0"
 PREFERRED_VERSION_wayland-protocols = "1.20"
 PREFERRED_VERSION_wayland-ivi-extension = "2.2.0"
-preferred-kernel = "${@oe.utils.ifelse(d.getVar('PREFERRED_PROVIDER_virtual/kernel') == 'linux-ark', 'PREFERRED_VERSION_linux-ark', 'PREFERRED_VERSION_linux-qcom')}"
-kernel-version = "${@oe.utils.ifelse(d.getVar('PREFERRED_PROVIDER_virtual/kernel') == 'linux-ark', '6.9', '6.6')}"
+preferred-kernel = "PREFERRED_VERSION_linux-qcom-custom"
+kernel-version = "6.6"
 # Prefer gbm
 PREFERRED_PROVIDER_virtual/libgbm = "gbm"
 
@@ -28,7 +25,6 @@ PREFERRED_PROVIDER_virtual/egl          = "adreno"
 PREFERRED_PROVIDER_virtual/libgles1     = "adreno"
 PREFERRED_PROVIDER_virtual/libgles2     = "adreno"
 
-BBMASK:sa8797 += "meta-qti-bsp/meta-qti-base/recipes-wlan"
 BBMASK:sa8797 += "meta-qti-bsp/meta-qti-base/recipes-kernel/edk2/edk2_4.0.bb"
 BBMASK:sa8797 += "meta-qti-bsp/meta-qti-base/recipes-kernel/edk2/edk2_5.0.bb"
 
@@ -56,6 +52,8 @@ IMAGE_INSTALL += "\
     openssh-sftp \
     openssh-sftp-server \
     "
+IMAGE_INSTALL:remove = "${@bb.utils.contains('DISTRO_FEATURES', 'qti-rumi', 'openssh-scp openssh-ssh openssh-sshd openssh-sftp openssh-sftp-server', '', d)}"
+
 
 IMAGE_FEATURES += "ssh-server-openssh"
 
@@ -69,26 +67,22 @@ MACHINE_FEATURES += "\
     qti-multimedia \
     qti-display \
     qti-audio \
-    ${@bb.utils.contains("ACTUAL_KERNEL", "linux-ark", "qti-vmm", "", d)} \
+    qti-data \
     qti-camera \
     qti-safety \
     qti-vnw \
     early-ramdisk-init \
     qti-security \
     qti-umd \
-    ${@bb.utils.contains("ACTUAL_KERNEL", "linux-ark", "qti-gunyah", "", d)} \
 "
 MACHINE_FEATURES:remove = "\
-    qti-multimedia \
     qti-display \
     qti-audio \
     qti-camera \
     qti-safety \
     qti-vnw \
     early-ramdisk-init \
-    qti-security \
     qti-vmm \
-    qti-umd \
 "
 
 SECTOOLS_VERSION = "sectools-v2"

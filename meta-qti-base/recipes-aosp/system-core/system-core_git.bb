@@ -55,6 +55,7 @@ do_install:append() {
     install -m 0755 ${S}/usb/debuger/usb_debug -D ${D}${base_sbindir}/
 
     install -b -m 0644 /dev/null -D ${D}${sysconfdir}/build.prop
+    chown leprop:leprop ${D}${sysconfdir}/build.prop
 
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
         install -m 0755 ${S}/usb/start_usb -D ${D}${sysconfdir}/initscripts/usb

@@ -11,10 +11,22 @@ SYSTEMD_SERVICE:${PN} = "\
     vhost-user-aud.service \
     vhost-user-vid.service \
     vhost-user-cam.service \
+    vhost-user-vnw.service \
+    vhost-user-ext.service \
+    vhost-user-gpce.service \
+    vhost-user-disp-vm3.service \
+    vhost-user-gpu-vm3.service \
+    vhost-user-misc-vm3.service \
+    vhost-user-aud-vm3.service \
+    vhost-user-vid-vm3.service \
+    vhost-user-cam-vm3.service \
+    vhost-user-vnw-vm3.service \
+    vhost-user-ext-vm3.service \
+    vhost-user-gpce-vm3.service \
 "
 
 DEPENDS += "virtual/kernel-headers"
-DEPENDS += "${@bb.utils.contains_any("PREFERRED_PROVIDER_virtual/kernel", "linux-ark linux-qcom", "msmhab", "", d)}"
+DEPENDS += "${@bb.utils.contains("MACHINE_FEATURES", "qti-umd", "msmhab", "", d)}"
 
 SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/vhost-user/.git;protocol=${PROTO};destsuffix=vhost-user-q;usehead=1"
 SRCREV = "${AUTOREV}"
@@ -24,7 +36,7 @@ S = "${WORKDIR}/vendor/qcom/opensource/vhost-user"
 inherit cmake systemd
 
 CFLAGS += "\
-    -I${STAGING_DIR_TARGET}/usr/include/linux-ark \
+    -I${STAGING_DIR_TARGET}/usr/include/${PREFERRED_PROVIDER_virtual/kernel} \
     --sysroot=${STAGING_DIR_TARGET} \
     -DCONFIG_HGY_PLATFORM \
     -D__linux__ \
@@ -39,4 +51,16 @@ do_install:append() {
     install -m 0644 ${S}/vhost-user-aud.service -D ${D}${systemd_unitdir}/system/vhost-user-aud.service
     install -m 0644 ${S}/vhost-user-vid.service -D ${D}${systemd_unitdir}/system/vhost-user-vid.service
     install -m 0644 ${S}/vhost-user-cam.service -D ${D}${systemd_unitdir}/system/vhost-user-cam.service
+    install -m 0644 ${S}/vhost-user-vnw.service -D ${D}${systemd_unitdir}/system/vhost-user-vnw.service
+    install -m 0644 ${S}/vhost-user-ext.service -D ${D}${systemd_unitdir}/system/vhost-user-ext.service
+    install -m 0644 ${S}/vhost-user-gpce.service -D ${D}${systemd_unitdir}/system/vhost-user-gpce.service
+    install -m 0644 ${S}/vhost-user-disp-vm3.service -D ${D}${systemd_unitdir}/system/vhost-user-disp-vm3.service
+    install -m 0644 ${S}/vhost-user-gpu-vm3.service -D ${D}${systemd_unitdir}/system/vhost-user-gpu-vm3.service
+    install -m 0644 ${S}/vhost-user-misc-vm3.service -D ${D}${systemd_unitdir}/system/vhost-user-misc-vm3.service
+    install -m 0644 ${S}/vhost-user-aud-vm3.service -D ${D}${systemd_unitdir}/system/vhost-user-aud-vm3.service
+    install -m 0644 ${S}/vhost-user-vid-vm3.service -D ${D}${systemd_unitdir}/system/vhost-user-vid-vm3.service
+    install -m 0644 ${S}/vhost-user-cam-vm3.service -D ${D}${systemd_unitdir}/system/vhost-user-cam-vm3.service
+    install -m 0644 ${S}/vhost-user-vnw-vm3.service -D ${D}${systemd_unitdir}/system/vhost-user-vnw-vm3.service
+    install -m 0644 ${S}/vhost-user-ext-vm3.service -D ${D}${systemd_unitdir}/system/vhost-user-ext-vm3.service
+    install -m 0644 ${S}/vhost-user-gpce-vm3.service -D ${D}${systemd_unitdir}/system/vhost-user-gpce-vm3.service
 }

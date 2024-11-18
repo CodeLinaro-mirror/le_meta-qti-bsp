@@ -3,4 +3,6 @@ do_install:append() {
     if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'true', 'false', d)}; then
         sed -i "$ a\/dev\/vd*" ${D}${sysconfdir}/udev/mount.ignorelist
     fi
+    # Temporary sheilding dev/sda
+    sed -i "$ a\/dev\/sda" ${D}${sysconfdir}/udev/mount.ignorelist
 }

@@ -52,6 +52,7 @@ _WLAN_CFG_OVERRIDE = "\
                       CONFIG_WLAN_FEATURE_LINK_LAYER_STATS=y \
                       CONFIG_HIF_DEBUG=y \
                       CONFIG_HIF_CE_DEBUG_DATA_BUF=y \
+                      CONFIG_SIR_SAP_MAX_NUM_PEERS=32 \
                       "
 
 _WLAN_CFG_OVERRIDE:append:sa6155 = " CONFIG_IPA_DISABLE_OVERRIDE=y"

@@ -1,11 +1,8 @@
 include conf/machine/include/basemachine.inc
 
-SOC_FAMILY ?= "sa-common"
+SOC_FAMILY ?= "sa7255"
 include conf/machine/include/soc-family.inc
 PRODUCT = "${MACHINE}"
-PREFERRED_PROVIDER_virtual/kernel = "linux-ark"
-PREFERRED_PROVIDER_virtual/kernel-headers = "linux-ark-headers"
-PREFERRED_VERSION_linux-ark = "5.14"
 
 # Prefer Wayland/Weston version
 PREFERRED_VERSION_weston = "8.0.0"
@@ -13,8 +10,7 @@ PREFERRED_VERSION_wayland = "1.18.0"
 PREFERRED_VERSION_wayland-native = "1.18.0"
 PREFERRED_VERSION_wayland-protocols = "1.20"
 PREFERRED_VERSION_wayland-ivi-extension = "2.2.0"
-preferred-kernel = "${@oe.utils.ifelse(d.getVar('PREFERRED_PROVIDER_virtual/kernel') == 'linux-ark', 'PREFERRED_VERSION_linux-ark', 'PREFERRED_VERSION_linux-msm')}"
-kernel-version = "${@oe.utils.ifelse(d.getVar('PREFERRED_PROVIDER_virtual/kernel') == 'linux-ark', '5.14', '5.4')}"
+
 # Prefer gbm
 PREFERRED_PROVIDER_virtual/libgbm = "gbm"
 
@@ -52,3 +48,23 @@ EXTRA_IMAGECMD_ext4 += " -b 4096 "
 IMAGE_CLASSES += "qimage"
 
 EXTRA_IMAGEDEPENDS += "qti-image-ark-boot:do_sign_boot_img"
+
+IMAGE_FEATURES:append = " read-only-rootfs"
+
+MACHINE_FEATURES += "\
+    qti-vmm \
+    qti-data \
+    qti-gunyah \
+    qti-core \
+    qti-tools \
+    early-ramdisk-init \
+    qti-umd \
+    qti-display \
+    qti-graphics \
+    qti-multimedia \
+    qti-camera \
+    qti-security \
+    qti-audio-ar \
+"
+
+SECTOOLS_VERSION = "sectools-v2"

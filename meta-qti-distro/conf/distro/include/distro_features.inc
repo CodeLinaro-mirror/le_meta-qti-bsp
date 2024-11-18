@@ -1,5 +1,7 @@
 # Support systemd-user-session
 DISTRO_FEATURES:append = " pam"
+#SA8797 RUMI bringup remove pam.
+DISTRO_FEATURES:remove:sa8797 = "pam"
 
 # Video
 DISTRO_FEATURES:append:sa6155 = " qti-carcamsrc qti-omx"
@@ -41,6 +43,7 @@ DISTRO_FEATURES:append = " vulkan"
 
 # WLAN
 DISTRO_FEATURES:append = " qti-wlan wifi"
+DISTRO_FEATURES:remove:sa8797 = "wifi"
 
 # BT
 DISTRO_FEATURES:append:qtiquingvm8295 = " qti-bluetooth"
@@ -51,8 +54,12 @@ DISTRO_FEATURES:append:quin-gvm-monaco = " qti-bluetooth"
 
 # SELinux
 DISTRO_FEATURES:append:sa8775 = " selinux"
+DISTRO_FEATURES:append:sa7255 = " selinux"
 DISTRO_FEATURES_NATIVE:append:sa8775 = " selinux"
+DISTRO_FEATURES_NATIVE:append:sa7255 = " selinux"
 
 # Preferred refpolicy
 PREFERRED_PROVIDER_virtual/refpolicy:sa8775 = "selinux-policy"
+PREFERRED_PROVIDER_virtual/refpolicy:sa7255 = "selinux-policy"
 DEFAULT_ENFORCING:sa8775 = "enforcing"
+DEFAULT_ENFORCING:sa7255 = "enforcing"

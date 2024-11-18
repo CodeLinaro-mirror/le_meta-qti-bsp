@@ -30,9 +30,9 @@ LOAD_KM_SET_ROT:sa8775 = "1"
 LOAD_KM_SET_ROT:sa7255 = "1"
 LOAD_KM_SET_ROT:sa8797 = "1"
 SCMI_UPDATES_NEEDED ?= "0"
+SCMI_UPDATES_NEEDED:sa7255 = "1"
 SCMI_UPDATES_NEEDED:sa8775 = "1"
 SCMI_UPDATES_NEEDED:sa8797 = "1"
-SCMI_UPDATES_NEEDED:sa8775-flex = "0"
 PVM_SKIP_DTBO = "${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', '0', '1', d)}"
 
 EXTRA_OEMAKE = "'CLANG_BIN=${STAGING_BINDIR_NATIVE}/' \
@@ -58,7 +58,6 @@ EXTRA_OEMAKE = "'CLANG_BIN=${STAGING_BINDIR_NATIVE}/' \
                 ${@bb.utils.contains('DISTRO_FEATURES', 'qti-avb', 'VERIFIED_BOOT_2=1', '', d)} "
 
 EXTRA_OEMAKE:append:sa8775 = " 'SUPPORT_AB_BOOT_LXC=1' \
-                               'AB_RETRYCOUNT_DISABLE=1' \
                                'ENABLE_LV_ATOMIC_AB=1' \
                                'ENABLE_SAIL_FLASHING=1' \
                                'ENABLE_SAIL_BOOT=1' "
