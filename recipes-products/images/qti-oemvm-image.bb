@@ -10,6 +10,7 @@ CORE_IMAGE_EXTRA_INSTALL += " \
     post-boot \
     sdcard-scripts-automount \
     e2fsprogs-mke2fs \
+    bash \
 "
 CORE_IMAGE_EXTRA_INSTALL += " ${@oe.utils.conditional('ENABLE_SECUREMSM', 'True', 'packagegroup-qti-securemsm-oemvm', '', d)}"
 CORE_IMAGE_EXTRA_INSTALL += " ${@oe.utils.conditional('ENABLE_MINK', 'True', 'packagegroup-qti-mink-oemvm', '', d)}"
