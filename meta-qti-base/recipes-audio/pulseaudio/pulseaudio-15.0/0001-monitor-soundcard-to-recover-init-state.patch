@@ -1,0 +1,145 @@
+From 2e0a61a2a33f84d2d16d3fbf9e81e38eb0126b47 Mon Sep 17 00:00:00 2001
+From: Xuewen Liu <quic_xuewliu@quicinc.com>
+Date: Tue, 19 Nov 2024 11:51:03 +0800
+Subject: [PATCH] monitor soundcard to recover init state after SSR
+
+monitor sound card state to revocer pulseaudio init state
+after SSR, to fix issue that pluseaudio can't run usecase after ssr.
+
+Signed-off-by: Xuewen Liu <quic_xuewliu@quicinc.com>
+---
+ src/pulse/mainloop.c | 64 ++++++++++++++++++++++++++++++++++++++++++++
+ src/pulse/mainloop.h |  7 +++++
+ 2 files changed, 71 insertions(+)
+
+diff --git a/src/pulse/mainloop.c b/src/pulse/mainloop.c
+index 90112f5..77fec6b 100644
+--- a/src/pulse/mainloop.c
++++ b/src/pulse/mainloop.c
+@@ -27,6 +27,13 @@
+ #include <stdlib.h>
+ #include <fcntl.h>
+ #include <errno.h>
++#include <sys/stat.h>
++#include <pthread.h>
++#include <ctype.h>
++#define CARD_STATUS_NONE   -1
++#define CARD_STATUS_OFFLINE 0
++#define CARD_STATUS_ONLINE  1
++pthread_t thread;
+ 
+ #ifndef HAVE_PIPE
+ #include <pulsecore/pipe.h>
+@@ -130,6 +137,7 @@ struct pa_mainloop {
+     pa_poll_func poll_func;
+     void *poll_func_userdata;
+     int poll_func_ret;
++    FILE* fp;
+ };
+ 
+ static short map_flags_to_libc(pa_io_event_flags_t flags) {
+@@ -935,6 +943,58 @@ int pa_mainloop_get_retval(const pa_mainloop *m) {
+     return m->retval;
+ }
+ 
++FILE* open_soundcard() {
++    FILE *fp;
++    fp = open("/sys/kernel/snd_card/card_state", O_RDONLY);
++	if (fp < 0){
++        pa_log("Failed to open snd card ");
++		return NULL;
++	}
++    return fp;
++}
++
++int check_soundcard(FILE* fp) {
++    char *sndcard_state = "";
++	int status = CARD_STATUS_NONE;
++	int pre_status = CARD_STATUS_ONLINE;
++	struct stat buf;
++	void* hook_data;
++	void* slot_data;
++	void* call_data;
++	char scan_buf[10];
++	int card_status = 0;
++
++    if(!fp) {
++        pa_log("Failed to check sound card state" );
++        return 2;
++    }
++    memset(scan_buf ,0 ,sizeof(scan_buf));
++    read(fp, scan_buf, 10);
++    lseek(fp, 0L, SEEK_SET);
++    sscanf(scan_buf, "%d", &card_status);
++    if (card_status == 0) {
++		status = CARD_STATUS_OFFLINE;
++    } else if (card_status == 1) {
++        status = CARD_STATUS_ONLINE;
++    } else {
++        pa_log_info("unknown state, %d", status);
++    }
++    if (status == pre_status) {
++        /* nothing change,,no action*/
++    } else if (status == CARD_STATUS_OFFLINE) {
++        //ssr down. need stop current stream
++        pa_log_info("sound card status change to offline");
++        pre_status = status;
++        return -1;
++    } else if (status == CARD_STATUS_ONLINE) {
++        pa_log_info("sound card status change to online");
++        pre_status = status;
++        return 1;
++    }
++    usleep(1000);
++    return 1;
++}
++
+ int pa_mainloop_iterate(pa_mainloop *m, int block, int *retval) {
+     int r;
+     pa_assert(m);
+@@ -948,6 +1008,8 @@ int pa_mainloop_iterate(pa_mainloop *m, int block, int *retval) {
+     if ((r = pa_mainloop_dispatch(m)) < 0)
+         goto quit;
+ 
++    r = check_soundcard(m->fp);
++
+     return r;
+ 
+ quit:
+@@ -960,6 +1022,8 @@ quit:
+ int pa_mainloop_run(pa_mainloop *m, int *retval) {
+     int r;
+ 
++    m->fp = open_soundcard();
++
+     while ((r = pa_mainloop_iterate(m, 1, retval)) >= 0)
+         ;
+ 
+diff --git a/src/pulse/mainloop.h b/src/pulse/mainloop.h
+index f1069da..7dae254 100644
+--- a/src/pulse/mainloop.h
++++ b/src/pulse/mainloop.h
+@@ -21,6 +21,7 @@
+   along with PulseAudio; if not, see <http://www.gnu.org/licenses/>.
+ ***/
+ 
++#include <stdio.h>
+ #include <pulse/mainloop-api.h>
+ #include <pulse/cdecl.h>
+ 
+@@ -129,6 +130,12 @@ typedef int (*pa_poll_func)(struct pollfd *ufds, unsigned long nfds, int timeout
+ /** Change the poll() implementation */
+ void pa_mainloop_set_poll_func(pa_mainloop *m, pa_poll_func poll_func, void *userdata);
+ 
++/** open soundcard */
++FILE* open_soundcard();
++
++/** check state of sound card */
++int check_soundcard(FILE* fp);
++
+ PA_C_DECL_END
+ 
+ #endif
+-- 
+2.25.1
+
