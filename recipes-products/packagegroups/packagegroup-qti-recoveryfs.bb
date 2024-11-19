@@ -4,6 +4,8 @@ LICENSE = "BSD-3-Clause"
 
 inherit packagegroup
 
+MLIBPREFIX ?= ""
+
 PROVIDES = "${PACKAGES}"
 
 USB_AUTOSUSPEND_SUPPORT = "${@d.getVar('MACHINE_SUPPORTS_USB_AUTOSUSPEND') or "True"}"
@@ -25,5 +27,5 @@ RDEPENDS:packagegroup-qti-recoveryfs = " \
             ${@bb.utils.contains('MACHINE_FEATURES', 'qti-sdx', 'systemd-machine-units-recovery', '', d)} \
             ${@bb.utils.contains('DISTRO_FEATURES', 'ota-package-verification', 'openssl', '', d)} \
             ${@bb.utils.contains('DISTRO_FEATURES', 'ota-package-verification', 'openssl-bin', '', d)} \
-            ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'packagegroup-selinux-minimal', '', d)} \
+            ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', '${MLIBPREFIX}packagegroup-selinux-minimal', '', d)} \
 "

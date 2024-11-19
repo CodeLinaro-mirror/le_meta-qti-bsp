@@ -16,6 +16,7 @@ SRC_URI += " file://firmware-ubi-mount.sh"
 SRC_URI += " file://bt_firmware-mount.service"
 SRC_URI += " file://mountpartitions.rules"
 SRC_URI += " file://bt_firmware-ubi-mount.sh"
+SRC_URI += " file://ecm.rules"
 
 IMAGETYPE = "ubi"
 
@@ -44,6 +45,11 @@ do_install:append () {
     install -m 0644 ${S}/mountpartitions.rules ${D}${sysconfdir}/udev/rules.d/mountpartitions
 }
 
+do_install:append:mdm9607() {
+   install -d 0644 ${D}${sysconfdir}/udev/rules.d
+   install -m 0744 ${S}/ecm.rules ${D}${sysconfdir}/udev/rules.d/ecm.rules
+}
+
 add_ubi_scripts () {
     for entry in ${MACHINE_MNT_POINTS}; do
         mountname="${entry:1}"
@@ -59,9 +65,9 @@ add_ubi_scripts () {
 
 add_squashfs_scripts () {
     if ${@bb.utils.contains('MACHINE_FEATURES','tele-squashfs-ubi','true','false',d)}; then
-        install -m 0744 ${S}/non-hlos-squash.sh ${D}${sysconfdir}/initscripts/non-hlos-squash.sh
+        install -m 0544 ${S}/non-hlos-squash.sh ${D}${sysconfdir}/initscripts/non-hlos-squash.sh
         sed -i -e 's/FindAndMountUBI modem/FindAndMountUBIVol firmware/' ${D}${sysconfdir}/initscripts/non-hlos-squash.sh
     elif ${@bb.utils.contains('MACHINE_MNT_POINTS', '/firmware', 'true', 'false', d)}; then
-        install -m 0744 ${S}/non-hlos-squash.sh ${D}${sysconfdir}/initscripts/firmware-ubi-mount.sh
+        install -m 0544 ${S}/non-hlos-squash.sh ${D}${sysconfdir}/initscripts/firmware-ubi-mount.sh
     fi
 }
