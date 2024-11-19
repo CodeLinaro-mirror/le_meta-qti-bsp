@@ -1,0 +1,29 @@
+From 39855e93586fb0dbcea618542cde479213c54313 Mon Sep 17 00:00:00 2001
+From: Ya Tang <quic_yatang@quicinc.com>
+Date: Tue, 15 Oct 2024 15:38:38 +0800
+Subject: [PATCH] Add EXTRASYSCONFDIR macro definition
+
+Upstream-Status: Inappropriate[Vendor image]
+
+Change-Id: I34330f3ecd69e684ea9ff972f27c1a4d2079a01f
+Signed-off-by: Ya Tang <quic_yatang@quicinc.com>
+---
+ CMakeLists.txt | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index eba079c63..1e08f8702 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -32,6 +32,10 @@ set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS API_NAME="Vulkan")
+ # Enable beta Vulkan extensions
+ add_definitions(-DVK_ENABLE_BETA_EXTENSIONS)
+ 
++if (NOT "${EXTRASYSCONFDIR}" STREQUAL "")
++    add_definitions(-DEXTRASYSCONFDIR="${EXTRASYSCONFDIR}")
++endif()
++
+ if (UPDATE_DEPS)
+     find_package(PythonInterp 3 REQUIRED)
+ 
+
