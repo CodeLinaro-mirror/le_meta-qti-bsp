@@ -1,0 +1,22 @@
+# Copyright (c) 2024 Qualcomm Innovation Center, Inc. All rights reserved.
+# SPDX-License-Identifier: BSD-3-Clause-Clear
+
+## <summary>Policy for SELinux policy and userland applications.</summary>
+
+########################################
+## <summary>
+##  Relabel symbolic links in the /var directory.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`files_relabel_var_symlinks',`
+    gen_require(`
+        type var_t;
+    ')
+
+    relabel_lnk_files_pattern($1, var_t, var_t)
+')

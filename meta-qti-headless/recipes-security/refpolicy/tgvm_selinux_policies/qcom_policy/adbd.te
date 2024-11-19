@@ -38,11 +38,8 @@ type adbd_initscript_t;
 type adbd_initscript_exec_t;
 type adbd_launch_t;
 type adbd_devpts_t;
-type machine_id_t;
 
 role system_r types adbd_t;
-
-access_machine_id(machine_id_t)
 
 #init_daemon_domain(adbd_t, adbd_exec_t)
 init_can_exec_adbd(adbd_exec_t)
