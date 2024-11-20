@@ -1,8 +1,6 @@
 FILESEXTRAPATHS:append := " :${THISDIR}/weston/"
 SRC_URI = "file://weston.service_caf \
-           file://weston.service_caf_10 \
            file://weston_early.service_caf \
-           file://weston_early.service_caf_10 \
            file://weston.ini_caf \
            file://weston-autologin \
            file://msm-display-node.rules \
@@ -16,10 +14,10 @@ REQUIRED_DISTRO_FEATURES:remove = "opengl"
 do_install() {
     # Install systemd unit files
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
-        install -m 644 -p -D ${WORKDIR}/weston.service_caf_10 ${D}${systemd_system_unitdir}/weston.service
+        install -m 644 -p -D ${WORKDIR}/weston.service_caf ${D}${systemd_system_unitdir}/weston.service
         install -m 644 -p -D ${WORKDIR}/weston.socket ${D}${systemd_system_unitdir}/weston.socket
         if ${@bb.utils.contains('DISTRO_FEATURES', 'early_init', 'true', 'false', d)}; then
-            install -m 644 -p -D ${WORKDIR}/weston_early.service_caf_10 ${D}${systemd_system_unitdir}/weston.service
+            install -m 644 -p -D ${WORKDIR}/weston_early.service_caf ${D}${systemd_system_unitdir}/weston.service
         fi
     fi
     if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'true', 'false', d)}; then
