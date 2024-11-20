@@ -5,6 +5,7 @@ system:x:1000:1000::
 camera:x:1006:1006::
 gps:x:1021:1021::
 adb:x:2000:2000::
+net_admin:x:3005:3005::
 sensors:x:3011:3011::
 locclient:x:4021:4021::
 vnw:x:4022:4022::
