@@ -69,12 +69,12 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         system-sample-apps \
         qti-c2-module \
 "
+
+CORE_IMAGE_EXTRA_INSTALL:append:pineapple = " packagegroup-qcom-sensors"
+CORE_IMAGE_EXTRA_INSTALL:append:pineapple = " packagegroup-qcom-synx"
 CORE_IMAGE_EXTRA_INSTALL:remove:pineapple = "alsa-utils"
 CORE_IMAGE_EXTRA_INSTALL:remove:pineapple = "can-utils"
 CORE_IMAGE_EXTRA_INSTALL:remove:pineapple = "chronyc"
-CORE_IMAGE_EXTRA_INSTALL:remove:pineapple = "packagegroup-qti-bluetooth"
-CORE_IMAGE_EXTRA_INSTALL:remove:pineapple = "packagegroup-qti-camera"
-CORE_IMAGE_EXTRA_INSTALL:remove:pineapple = "packagegroup-qti-camera-kernel"
 CORE_IMAGE_EXTRA_INSTALL:remove:pineapple = "packagegroup-qti-cvp"
 CORE_IMAGE_EXTRA_INSTALL:remove:pineapple = "packagegroup-qti-eva"
 CORE_IMAGE_EXTRA_INSTALL:remove:pineapple = "packagegroup-qti-data"
@@ -88,7 +88,6 @@ CORE_IMAGE_EXTRA_INSTALL:remove:pineapple = "packagegroup-qti-robos"
 CORE_IMAGE_EXTRA_INSTALL:remove:pineapple = "packagegroup-qti-robos-addon"
 CORE_IMAGE_EXTRA_INSTALL:remove:pineapple = "packagegroup-qti-securemsm"
 CORE_IMAGE_EXTRA_INSTALL:remove:pineapple = "packagegroup-qti-test-sensors-see"
-CORE_IMAGE_EXTRA_INSTALL:remove:pineapple = "packagegroup-qti-video"
 CORE_IMAGE_EXTRA_INSTALL:remove:pineapple = "yavta"
 CORE_IMAGE_EXTRA_INSTALL:remove:pineapple = "packagegroup-qti-sensors-ship"
 CORE_IMAGE_EXTRA_INSTALL:remove:pineapple = "packagegroup-qti-sensors-see"
