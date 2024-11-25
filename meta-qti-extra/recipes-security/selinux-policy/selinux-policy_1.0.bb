@@ -13,7 +13,7 @@ DEPENDS += "bzip2-replacement-native checkpolicy-native m4-native policycoreutil
 
 PROVIDES = "virtual/refpolicy"
 
-SRC_URI = "git://github.com/fedora-selinux/selinux-policy.git;protocol=https;branch=c9s;name=refpolicy;destsuffix=refpolicy \
+SRC_URI = "git://git.codelinaro.org/clo/yocto-mirrors/github/fedora-selinux/seinux-policy.git;protocol=https;branch=c9s;name=refpolicy;destsuffix=refpolicy \
         git://github.com/containers/container-selinux.git;protocol=https;branch=main;name=container-selinux;destsuffix=container-selinux \
         git://gitlab.com/redhat/centos-stream/rpms/selinux-policy.git;protocol=https;branch=c9s;name=selinux-policy;destsuffix=selinux-policy \
 "
@@ -248,3 +248,8 @@ do_install() {
     install_misc_files
     install_config
 }
+
+# Don't increment compilation because compile often fail if unused policy files are left in pw server
+do_fetch[nostamp] = "1"
+do_patch[nostamp] = "1"
+do_compile[nostamp] = "1"
