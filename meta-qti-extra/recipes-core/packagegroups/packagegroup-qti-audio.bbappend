@@ -6,4 +6,8 @@ AUDIO_EXTRA_RDEPENDS = "\
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-audio-ar', bb.utils.contains('MACHINE_FEATURES','qti-hypervisor','', 'pulseaudio-module-codec-control',d), 'pulseaudio-module-acdb pulseaudio-module-codec-control' ,d)} \
 "
 
-RDEPENDS:${PN} += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-gunyah qti-umd', '', '${AUDIO_EXTRA_RDEPENDS}', d)}"
+RDEPENDS:${PN} += "\
+    ${@bb.utils.contains('COMBINED_FEATURES', 'qti-audio-aw', '', \
+        bb.utils.contains('MACHINE_FEATURES', 'qti-gunyah qti-umd', '', '${AUDIO_EXTRA_RDEPENDS}', d), \
+    d)} \
+"
