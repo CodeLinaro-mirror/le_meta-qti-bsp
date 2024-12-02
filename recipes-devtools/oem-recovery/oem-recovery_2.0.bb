@@ -12,6 +12,7 @@ SRC_URI = "file://OTA/device/qcom/common/recovery/oem-recovery/"
 S = "${WORKDIR}/OTA/device/qcom/common/recovery/oem-recovery"
 
 DEPENDS += "virtual/kernel linux-msm-headers"
+DEPENDS:pineapple += "securemsmdlkm-headers"
 
 # To get kernel headers for compilation
 do_configure[depends] += "virtual/kernel:do_shared_workdir"
