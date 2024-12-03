@@ -2,7 +2,7 @@ SUMMARY = "hsi2s-test"
 DESCRIPTION = "Recipe to generate the HS-I2S test application. The application interacts with the HS-I2S driver using IOCTLs on the exposed device nodes for each interface. It is used to dump the data received on the HS-I2S interfaces into an output file. It also supports various test modes."
 HOMEPAGE = "https://git.codelinaro.org/"
 
-LICENSE = "GPL-2.0"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://../../NOTICE;md5=434b8411d18d7f18ebe745bd3cc502ed"
 
 PROVIDES = "hsi2s-test"
