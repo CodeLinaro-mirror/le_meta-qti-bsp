@@ -32,3 +32,12 @@ if [ ! -d "/persist/display" ]; then
 else
     echo "/persist/display already created"
 fi
+
+if [ ! -d "/persist/c2pa" ]; then
+    mkdir -p /persist/c2pa/
+    chown -R system:system /persist/c2pa
+    chmod 770 /persist/c2pa
+    restorecon /persist/c2pa
+else
+    echo "/persist/c2pa already created"
+fi

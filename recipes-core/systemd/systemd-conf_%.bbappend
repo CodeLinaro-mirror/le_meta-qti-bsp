@@ -10,6 +10,9 @@ COREDUMP = "1"
 COREDUMP:qti-distro-user = ""
 no_logs_to_console = "${@d.getVar('NO_SYS_JOURNAL_LOGS_TO_CONSOLE')}"
 
+KMSGLOGS ?= "0"
+KMSGLOGS:qti-distro-perf ?= "1"
+
 SYSTEMD_COREDUMP_PATH ?= "${userfsdatadir}/coredump"
 
 do_install:append() {
@@ -25,7 +28,7 @@ do_install:append() {
        rm -f ${D}${sysconfdir}/systemd/coredump.conf
    fi
 
-   if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-vm', 'true', 'false', d)}; then
+   if ${@bb.utils.contains_any('MACHINE_FEATURES', 'qti-vm qti-vm-guest', 'true', 'false', d)}; then
       sed -i -e 's/.*RuntimeMaxUse.*/RuntimeMaxUse=5M/' ${D}${systemd_unitdir}/journald.conf.d/00-${PN}.conf
    fi
 }
@@ -40,6 +43,11 @@ do_install:append() {
        sed -i '$aTTYPath=/dev/ttyMSM0' ${D}${systemd_unitdir}/journald.conf.d/00-${PN}.conf
        sed -i '$aMaxLevelConsole=warning' ${D}${systemd_unitdir}/journald.conf.d/00-${PN}.conf
        sed -i '$aReadKMsg=yes' ${D}${systemd_unitdir}/journald.conf.d/00-${PN}.conf
+   fi
+  
+   if [ "${KMSGLOGS}" != "0" ]; then
+       sed -i '$aForwardToKMsg=yes' ${D}${systemd_unitdir}/journald.conf.d/00-${PN}.conf
+       sed -i '$aMaxLevelKMsg=debug' ${D}${systemd_unitdir}/journald.conf.d/00-${PN}.conf
    fi
 }
 
@@ -59,6 +67,11 @@ do_install:append() {
    else
        # Set LogTarget as syslog
        sed -i '$aLogTarget=syslog' ${D}${systemd_unitdir}/system.conf.d/00-${PN}.conf
+   fi
+   if [ "${KMSGLOGS}" != "0" ]; then
+       sed -i '$aLogTarget=journal-or-kmsg' ${D}${systemd_unitdir}/system.conf.d/00-${PN}.conf
+       sed -i '$aLogLevel=info' ${D}${systemd_unitdir}/system.conf.d/00-${PN}.conf
+       sed -i '/LogTarget=syslog/d' ${D}${systemd_unitdir}/system.conf.d/00-${PN}.conf
    fi
 }
 

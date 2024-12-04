@@ -10,9 +10,11 @@ CORE_IMAGE_EXTRA_INSTALL += " \
     post-boot \
     sdcard-scripts-automount \
     e2fsprogs-mke2fs \
+    bash \
 "
 CORE_IMAGE_EXTRA_INSTALL += " ${@oe.utils.conditional('ENABLE_SECUREMSM', 'True', 'packagegroup-qti-securemsm-oemvm', '', d)}"
 CORE_IMAGE_EXTRA_INSTALL += " ${@oe.utils.conditional('ENABLE_MINK', 'True', 'packagegroup-qti-mink-oemvm', '', d)}"
+CORE_IMAGE_EXTRA_INSTALL += " ${@bb.utils.contains('MACHINE_FEATURES', 'qti-vm-persist', 'packagegroup-qti-encryption', '', d)}"
 
 #Exclude packages
 PACKAGE_EXCLUDE += "readline"
@@ -27,3 +29,7 @@ IMAGE_FEATURES += "vm oemvm"
 do_compose_vmimage[recrdeptask] = "do_ramdisk_create"
 do_compose_vmimage[recrdeptask] += "do_merge_dtbs"
 do_compose_vmimage[recrdeptask] += "do_extracpio_create"
+
+do_makesystem:prepend() {
+      rm -rf ${IMAGE_ROOTFS_EXT4}/usr/lib/python3.10
+}

@@ -22,22 +22,30 @@ if [ -f /verity/$MAPDEV.env ]; then
        $DEVICE$SLOT_SUFFIX $VERITY_ROOT_HASH --salt $VERITY_SALT \
        --hash-offset $VERITY_HASH_OFFSET --data-blocks $VERITY_DATA_BLOCKS \
        --fec-device $DEVICE$SLOT_SUFFIX --fec-offset $VERITY_FEC_OFFSET \
-       --fec-roots $VERITY_FEC_ROOTS --root-hash-signature=/verity/"$MAPDEV".sig
+       --fec-roots $VERITY_FEC_ROOTS --root-hash-signature=/verity/"$MAPDEV".sig \
+       --restart-on-corruption
 
-   if [$? -ne 0 ]; then
-	   echo "verity setup was sucess"
+   if [ $? -ne 0 ]; then
+      echo "Veritysetup failed."
+      echo "Rebooting the device."
+      systemctl reboot "dm-verity device corrupted" -f
+   else
+      echo "verity setup is sucessful"
    fi
+
    # veritysetup doesn't create symlink to /dev/dm-X as expected by udev, do it explicitly
    if [ -f /dev/dm-0 ] ; then
       /bin/ln -sf ../dm-1 /dev/mapper/$MAPDEV
    else
       /bin/ln -sf ../dm-0 /dev/mapper/$MAPDEV
    fi
-   echo "/dev/mapper/$MAPDEV ready"
-else
-   echo "/verity/$MAPDEV.env not found. Exiting..."
-fi
 
-if [ $? -ne 0 ]; then
-    echo "mounting /dev/mapper/$MAPDEV failed"
+   echo "/dev/mapper/$MAPDEV ready"
+   if [ $? -ne 0 ]; then
+      echo "dm-verity error: symlink to /dev/mapper/$MAPDEV has failed. Rebooting the device."
+      systemctl reboot "dm-verity device corrupted" -f
+   fi
+else
+   echo "/verity/$MAPDEV.env not found. Rebooting the device."
+   systemctl reboot "dm-verity device corrupted" -f
 fi
