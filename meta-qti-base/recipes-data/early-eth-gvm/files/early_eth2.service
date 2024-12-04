@@ -1,0 +1,25 @@
+# Copyright (c) 2024 Qualcomm Innovation Center, Inc. All rights reserved.
+# SPDX-License-Identifier: BSD-3-Clause-Clear
+# This service file is designed to enable early ethernet mode on GVM.
+# Customer needs to enable this service file based on the requirement.
+# Flexibility is provided for the customers to modify IP and mac addresses.
+
+[Unit]
+Description=eth2 installer
+DefaultDependencies=no
+Before=sysinit.target
+
+[Service]
+User=net_admin
+Group=net_admin
+AmbientCapabilities=CAP_NET_ADMIN
+Type=simple
+RemainAfterExit=yes
+ExecStart=ifconfig eth2 up
+ExecStop=ifconfig eth2 down
+Nice=-20
+Restart=on-failure
+RestartSec=1ms
+
+[Install]
+WantedBy=sysinit.target
