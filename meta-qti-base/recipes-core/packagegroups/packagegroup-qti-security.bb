@@ -1,6 +1,8 @@
 SUMMARY = "QTI package group for security"
 DESCRIPTION = "This is the minimal set of packages required for linux userspace security utilities."
 
+PACKAGE_ARCH = "${TUNE_PKGARCH}"
+
 inherit packagegroup
 
 PACKAGES = "\
@@ -16,3 +18,5 @@ RDEPENDS:${PN} += "\
     ${@bb.utils.contains_any("PREFERRED_VERSION_linux-msm", "5.15 6.1", "securemsmdlkm", "", d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'qti-fde', 'enable-fde', '', d)} \
 "
+
+RDEPENDS:${PN}:append:sa8775-flex = " optee-libckteec"
