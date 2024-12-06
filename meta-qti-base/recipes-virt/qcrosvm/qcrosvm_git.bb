@@ -8,6 +8,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/BSD-3-Clause-C
                     file://${COREBASE}/meta/files/common-licenses/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 
 SYSTEMD_SERVICE:${PN} = "qcrosvm.service"
+SYSTEMD_SERVICE:${PN}:append:sa8255-ivi = " qcrosvm_lv.service"
 
 DEPENDS += "cargo-native libcap rust-native rust-llvm-native pkgconfig-native"
 
@@ -36,6 +37,11 @@ do_install:append:sa8775() {
 do_install:append:sa7255() {
     install -d ${D}${systemd_unitdir}/system/
     install -m 0644 ${S}/qcrosvm_sa7255.service ${D}/${systemd_unitdir}/system/qcrosvm.service
+}
+
+do_install:append:sa8255-ivi() {
+    install -d ${D}${systemd_unitdir}/system/
+    install -m 0644 ${S}/qcrosvm_lv.service ${D}/${systemd_unitdir}/system/qcrosvm_lv.service
 }
 
 # Once upgrade Yocto to 4.2 and upgrade Python to 3.11 in the future, we can inherit cargo-update-recipe-crates and delete this line
