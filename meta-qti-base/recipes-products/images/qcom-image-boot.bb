@@ -1,5 +1,5 @@
-SUMMARY = "QTI ARK Kernel Boot image"
-DESCRIPTION = "Build QTI ARK kernel boot image"
+SUMMARY = "Kernel Boot image"
+DESCRIPTION = "Build kernel boot image"
 LICENSE = "BSD-3-Clause-Clear"
 
 DEPENDS += "mkbootimg-native mkdtimg-native openssl-native  python3-native virtual/kernel"
@@ -11,7 +11,7 @@ DEPENDS += "${@bb.utils.contains_any('COMBINED_FEATURES', 'qti-audio qti-audio-a
 IMAGE_CLASSES:remove = "qimage"
 IMAGE_FEATURES:remove = "ssh-server-openssh"
 
-inherit image ark-dtb-merge
+inherit image qcom-dtb-merge
 
 EXTRA_IMAGE_FEATURES = ""
 
