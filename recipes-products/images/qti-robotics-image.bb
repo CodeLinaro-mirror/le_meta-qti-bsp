@@ -95,7 +95,6 @@ CORE_IMAGE_EXTRA_INSTALL:remove:pineapple = "packagegroup-qti-perf"
 CORE_IMAGE_EXTRA_INSTALL:remove:pineapple = "tdk-chx01-get-data-app"
 CORE_IMAGE_EXTRA_INSTALL:remove:pineapple = "tdk-thermistor-app"
 CORE_IMAGE_EXTRA_INSTALL:remove:pineapple = "system-sample-apps"
-CORE_IMAGE_EXTRA_INSTALL:remove:pineapple = "recovery-ab"
 
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "chronyc"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-ml"
