@@ -6,6 +6,14 @@ include ${QTI_SYSTEMD_INC}
 do_install:append() {
     sed -i '/group:wheel/d' ${D}${exec_prefix}/lib/tmpfiles.d/systemd.conf
     if ${@bb.utils.contains_any('MACHINE_FEATURES', 'qti-vm', 'true', 'false', d)}; then
-        sed -i 's/#children_max=/children_max=5/' ${D}/etc/udev/udev.conf
+        sed -i 's/#children_max=/children_max=2/' ${D}/etc/udev/udev.conf
     fi
+}
+
+do_install:append:mdm9607() {
+   #  Mask journaling services by default.
+   #  'systemctl unmask' can be used on device to enable them if needed.
+   ln -sf /dev/null ${D}${systemd_unitdir}/system/systemd-journald.service
+   ln -sf /dev/null ${D}${systemd_unitdir}/system/sysinit.target.wants/systemd-journal-flush.service
+   ln -sf /dev/null ${D}${systemd_unitdir}/system/sysinit.target.wants/systemd-journal-catalog-update.service
 }

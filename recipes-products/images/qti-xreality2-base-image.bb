@@ -9,6 +9,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         glib-2.0 \
         gki-kernel-modules-second-stage \
         kernel-modules \
+        libmeminfo \
         packagegroup-android-utils \
         packagegroup-filesystem-utils \
         packagegroup-qti-audio \
@@ -36,6 +37,9 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         powerapp-powerconfig \
         systemd-machine-units \
         ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
+        packagegroup-qti-qesdk-core \
+        packagegroup-qti-dcf-lib \
+        packagegroup-qti-dcf-hal \
 "
 
 #Install packages for display

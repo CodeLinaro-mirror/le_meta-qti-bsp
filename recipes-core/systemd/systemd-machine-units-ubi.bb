@@ -16,6 +16,7 @@ SRC_URI += " file://firmware-ubi-mount.sh"
 SRC_URI += " file://bt_firmware-mount.service"
 SRC_URI += " file://mountpartitions.rules"
 SRC_URI += " file://bt_firmware-ubi-mount.sh"
+SRC_URI += " file://ecm.rules"
 
 IMAGETYPE = "ubi"
 
@@ -37,25 +38,36 @@ do_install:append () {
     if ${@bb.utils.contains('DISTRO_FEATURES','nand-squashfs','true','false',d)}; then
         add_squashfs_scripts
     fi
+    if ${@bb.utils.contains('MACHINE_FEATURES','tele-squashfs-ubi','true','false',d)}; then
+        add_squashfs_scripts
+    fi
     install -d 0644 ${D}${sysconfdir}/udev/rules.d
-    install -m 0744 ${S}/mountpartitions.rules ${D}${sysconfdir}/udev/rules.d/mountpartitions
+    install -m 0644 ${S}/mountpartitions.rules ${D}${sysconfdir}/udev/rules.d/mountpartitions
+}
+
+do_install:append:mdm9607() {
+   install -d 0644 ${D}${sysconfdir}/udev/rules.d
+   install -m 0744 ${S}/ecm.rules ${D}${sysconfdir}/udev/rules.d/ecm.rules
 }
 
 add_ubi_scripts () {
     for entry in ${MACHINE_MNT_POINTS}; do
         mountname="${entry:1}"
-        if [ "$mountname" = "firmware" -o "$mountname" = "bt_firmware" -o "$mountname" = "dsp" ]; then
+        if [ "$mountname" = "firmware" -o "$mountname" = "bt_firmware" -o "$mountname" = "dsp" -o "$mountname" = "vm-bootsys" -o "$mountname" = "lxcrootfs" ]; then
             install -m 0744 ${S}/${mountname}-ubi-mount.sh ${D}${sysconfdir}/initscripts/${mountname}-ubi-mount.sh
         fi
 
         if [ "$mountname" = "systemrw" ]; then
-            install -m 0744 ${S}/systemrw.conf ${D}/lib/systemd/system/systemrw-ubi.conf
+            install -m 0744 ${S}/systemrw.conf ${D}${systemd_system_unitdir}/systemrw-ubi.conf
         fi
     done
 }
 
 add_squashfs_scripts () {
-    if ${@bb.utils.contains('MACHINE_MNT_POINTS', '/firmware', 'true', 'false', d)}; then
-        install -m 0744 ${S}/non-hlos-squash.sh ${D}${sysconfdir}/initscripts/firmware-ubi-mount.sh
+    if ${@bb.utils.contains('MACHINE_FEATURES','tele-squashfs-ubi','true','false',d)}; then
+        install -m 0544 ${S}/non-hlos-squash.sh ${D}${sysconfdir}/initscripts/non-hlos-squash.sh
+        sed -i -e 's/FindAndMountUBI modem/FindAndMountUBIVol firmware/' ${D}${sysconfdir}/initscripts/non-hlos-squash.sh
+    elif ${@bb.utils.contains('MACHINE_MNT_POINTS', '/firmware', 'true', 'false', d)}; then
+        install -m 0544 ${S}/non-hlos-squash.sh ${D}${sysconfdir}/initscripts/firmware-ubi-mount.sh
     fi
 }

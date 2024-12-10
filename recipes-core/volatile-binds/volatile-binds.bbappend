@@ -1,9 +1,7 @@
 FILESEXTRAPATHS:prepend:cinder := "${THISDIR}/files:"
 FILESEXTRAPATHS:prepend:sdxlemur := "${THISDIR}/files:"
-FILESEXTRAPATHS:prepend:sa2150p-nand := "${THISDIR}/files:"
-FILESEXTRAPATHS:prepend:sa410m := "${THISDIR}/files:"
-FILESEXTRAPATHS:prepend:sa515m := "${THISDIR}/files:"
-FILESEXTRAPATHS:prepend:mdm9607 := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend:sa525m := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend:sa510m := "${THISDIR}/files:"
 
 REQUIRED_DISTRO_FEATURES = ""
 SRC_URI += "\
@@ -11,6 +9,16 @@ SRC_URI += "\
     ${@bb.utils.contains('MACHINE_MNT_POINTS', '/systemrw', 'file://umount-copybind', '', d)} \
     ${@bb.utils.contains('MACHINE_MNT_POINTS', '/systemrw', 'file://volatile-binds.service.in', '', d)} \
 "
+do_compile:append:mdm9607() {
+    if  [ -e var-volatile-lib.service ]; then
+        # As systemd-logind need /var/lib, ensure that this service runs
+        # after the volatile /var/lib is mounted.
+        sed -i -e "/^Before=/s/\$/ systemd-logind.service/" \
+          -e "/^WantedBy=/s/\$/ systemd-logind.service/" \
+          var-volatile-lib.service
+    fi
+}
+
 do_install:append () {
     if ${@bb.utils.contains('MACHINE_MNT_POINTS', '/systemrw', 'true', 'false', d)}; then
         install -d ${D}${base_sbindir}
