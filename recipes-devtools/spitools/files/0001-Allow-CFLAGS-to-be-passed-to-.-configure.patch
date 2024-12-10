@@ -1,0 +1,35 @@
+From 00ddd20644bb97dc019a1e8af8ecef30a8023e17 Mon Sep 17 00:00:00 2001
+From: Marco Sirabella <marco@sirabella.org>
+Date: Wed, 14 Feb 2024 10:03:19 -0800
+Subject: [PATCH] Allow CFLAGS to be passed to ./configure
+
+Signed-off-by: Twinkle Goyal <quic_twingoya@quicinc.com>
+---
+ configure.ac | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 32c834a..a0939b2 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -63,13 +63,13 @@ AC_MSG_RESULT([$debugit])
+ 
+ if test x"$debugit" = x"yes"; then
+     AC_DEFINE([DEBUG],[],[Debug Mode])
+-    AM_CFLAGS="-g -Wall -Werror -Wno-uninitialized -O0"
+-    AM_CXXFLAGS="-g -Wall -Werror -Wno-uninitialized -O0"
++    AM_CFLAGS="$CFLAGS -g -Wall -Werror -Wno-uninitialized -O0"
++    AM_CXXFLAGS="$CXXFLAGS -g -Wall -Werror -Wno-uninitialized -O0"
+     AC_MSG_NOTICE([Debug Mode on.])
+ else
+     AC_DEFINE([NDEBUG],[],[No-debug Mode])
+-    AM_CFLAGS="$AM_CFLAGS -O0"
+-    AM_CXXFLAGS="$AM_CXXFLAGS -O0"
++    AM_CFLAGS="-O0 $AM_CFLAGS $CFLAGS"
++    AM_CXXFLAGS="-O0 $AM_CXXFLAGS $CXXFLAGS"
+     AC_MSG_NOTICE([Debug Mode off.])
+ fi
+ 
+-- 
+2.17.1
+
