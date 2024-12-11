@@ -1,0 +1,27 @@
+From 88b5ab05685d2a217238486ebe4d91f031ba7355 Mon Sep 17 00:00:00 2001
+From: Mrunali Nesarkar <quic_mnesarka@quicinc.com>
+Date: Wed, 13 Nov 2024 00:16:33 +0530
+Subject: [PATCH 1/1] systemd: Disable unused mount points
+
+---
+ src/shared/mount-setup.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/shared/mount-setup.c b/src/shared/mount-setup.c
+index 1226ca121e..9646a9dba6 100644
+--- a/src/shared/mount-setup.c
++++ b/src/shared/mount-setup.c
+@@ -83,8 +83,8 @@ static const MountPoint mount_table[] = {
+           NULL,          MNT_FATAL|MNT_IN_CONTAINER },
+         { "devtmpfs",    "/dev",                      "devtmpfs",   "mode=0755" TMPFS_LIMITS_DEV,               MS_NOSUID|MS_STRICTATIME,
+           NULL,          MNT_FATAL|MNT_IN_CONTAINER },
+-        { "securityfs",  "/sys/kernel/security",      "securityfs", NULL,                                       MS_NOSUID|MS_NOEXEC|MS_NODEV,
+-          NULL,          MNT_NONE                   },
++//        { "securityfs",  "/sys/kernel/security",      "securityfs", NULL,                                       MS_NOSUID|MS_NOEXEC|MS_NODEV,
++//          NULL,          MNT_NONE                   },
+ #if ENABLE_SMACK
+         { "smackfs",     "/sys/fs/smackfs",           "smackfs",    "smackfsdef=*",                             MS_NOSUID|MS_NOEXEC|MS_NODEV,
+           mac_smack_use, MNT_FATAL                  },
+-- 
+2.34.1
+

@@ -1,0 +1,67 @@
+From 27a080be40428206ff18a957c68fbec1127332ba Mon Sep 17 00:00:00 2001
+From: Abhilasha Manna <quic_amanna@quicinc.com>
+Date: Tue, 22 Oct 2024 15:11:40 +0530
+Subject: [PATCH] [PATCH] fstab-generator: Honor 'verity=enabled' cmdline.
+
+When 'verity=enabled' is present in kernel cmdline assume verity
+is enabled even if root, roothash values are not present and use
+"root" DM device as root.
+---
+ src/fstab-generator/fstab-generator.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/src/fstab-generator/fstab-generator.c b/src/fstab-generator/fstab-generator.c
+index 016f3baa7f..6549a792af 100644
+--- a/src/fstab-generator/fstab-generator.c
++++ b/src/fstab-generator/fstab-generator.c
+@@ -72,6 +72,7 @@ static char *arg_usr_what = NULL;
+ static char *arg_usr_fstype = NULL;
+ static char *arg_usr_options = NULL;
+ static char *arg_usr_hash = NULL;
++static char *arg_usr_verity = NULL;
+ static VolatileMode arg_volatile_mode = _VOLATILE_MODE_INVALID;
+ static bool arg_verity = true;
+ static Mount *arg_mounts = NULL;
+@@ -85,6 +86,7 @@ STATIC_DESTRUCTOR_REGISTER(arg_usr_what, freep);
+ STATIC_DESTRUCTOR_REGISTER(arg_usr_fstype, freep);
+ STATIC_DESTRUCTOR_REGISTER(arg_usr_options, freep);
+ STATIC_DESTRUCTOR_REGISTER(arg_usr_hash, freep);
++STATIC_DESTRUCTOR_REGISTER(arg_usr_verity, freep);
+ STATIC_ARRAY_DESTRUCTOR_REGISTER(arg_mounts, arg_n_mounts, mount_array_free);
+ 
+ static void mount_done(Mount *m) {
+@@ -1432,6 +1434,14 @@ static int parse_proc_cmdline_item(const char *key, const char *value, void *dat
+ 
+                 return free_and_strdup_warn(&arg_root_hash, empty_to_null(value));
+ 
++        } else if (streq(key, "verity")) {
++
++                if (proc_cmdline_value_missing(key, value))
++                        return 0;
++
++                if (free_and_strdup(&arg_usr_verity, value) < 0)
++                        return log_oom();
++
+         } else if (streq(key, "mount.usr")) {
+ 
+                 if (proc_cmdline_value_missing(key, value))
+@@ -1550,6 +1560,16 @@ static int determine_device(
+ }
+ 
+ static int determine_root(void) {
++        /* If we have verity=enabled then Verity is used, and we use the "root" DM device as root. */
++        if (!isempty(arg_usr_verity) && streq(arg_usr_verity, "enabled")) {
++                log_info("Found a verity=enabled entry on the kernel command line.");
++                if (free_and_strdup(&arg_root_what, "/dev/mapper/root") < 0)
++                        return log_oom();
++
++                log_info("Using verity root device %s.", arg_root_what);
++                return 1;
++        }
++
+         return determine_device(&arg_root_what, &arg_root_rw, NULL, arg_root_hash, "root");
+ }
+ 
+-- 
+2.34.1
+
