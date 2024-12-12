@@ -72,7 +72,6 @@ CORE_IMAGE_EXTRA_INSTALL += "\
 CORE_IMAGE_EXTRA_INSTALL:remove:pineapple = "alsa-utils"
 CORE_IMAGE_EXTRA_INSTALL:remove:pineapple = "can-utils"
 CORE_IMAGE_EXTRA_INSTALL:remove:pineapple = "chronyc"
-CORE_IMAGE_EXTRA_INSTALL:remove:pineapple = "packagegroup-qti-bluetooth"
 CORE_IMAGE_EXTRA_INSTALL:remove:pineapple = "packagegroup-qti-camera"
 CORE_IMAGE_EXTRA_INSTALL:remove:pineapple = "packagegroup-qti-camera-kernel"
 CORE_IMAGE_EXTRA_INSTALL:remove:pineapple = "packagegroup-qti-cvp"
