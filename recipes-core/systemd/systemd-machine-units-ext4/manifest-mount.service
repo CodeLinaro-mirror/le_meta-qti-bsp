@@ -26,8 +26,14 @@ ExecStartPre=/bin/sh -c " \
                     then ln -s manifest manifest_a; \
                 fi \
             "
-ExecStart=/bin/mount -o noexec,nodev,rw,context=system_u:object_r:manifest_t:s0 -t vfat /dev/disk/by-partlabel/manifest_a /manifest_a
-ExecStart=/bin/mount -o noexec,nodev,rw,context=system_u:object_r:manifest_t:s0 -t vfat /dev/disk/by-partlabel/manifest_b /manifest_b
+ExecStart=/bin/sh -c " \
+                /bin/mount -o noexec,nodev,rw,context=system_u:object_r:manifest_t:s0 -t vfat /dev/disk/by-partlabel/manifest_a /manifest_a; \
+                status_a=$?; \
+                /bin/mount -o noexec,nodev,rw,context=system_u:object_r:manifest_t:s0 -t vfat /dev/disk/by-partlabel/manifest_b /manifest_b; \
+                status_b=$?; \
+                st=$((status_a | status_b)); \
+                exit $st; \
+             "
 Nice=-20
 
 [Install]
