@@ -69,6 +69,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         system-sample-apps \
         qti-c2-module \
 "
+CORE_IMAGE_EXTRA_INSTALL:append:pineapple = " packagegroup-qcom-sensors"
 CORE_IMAGE_EXTRA_INSTALL:remove:pineapple = "alsa-utils"
 CORE_IMAGE_EXTRA_INSTALL:remove:pineapple = "can-utils"
 CORE_IMAGE_EXTRA_INSTALL:remove:pineapple = "chronyc"
