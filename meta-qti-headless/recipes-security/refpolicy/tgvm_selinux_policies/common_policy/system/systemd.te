@@ -20,3 +20,7 @@ fs_list_tmpfs(systemd_journal_init_t)
 
 files_read_var_symlinks(systemd_tmpfiles_t)
 files_relabel_var_symlinks(systemd_tmpfiles_t)
+
+seutil_read_bin_policy(systemd_networkd_t)
+
+seutil_read_bin_policy(systemd_generator_t)

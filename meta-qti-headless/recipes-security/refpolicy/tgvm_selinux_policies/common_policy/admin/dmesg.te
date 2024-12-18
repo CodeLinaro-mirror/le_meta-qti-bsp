@@ -8,3 +8,5 @@ term_use_generic_ptys(dmesg_t)
 corecmd_mmap_bin_files(dmesg_t)
 
 kernel_read_system_state(dmesg_t)
+
+seutil_read_bin_policy(dmesg_t)

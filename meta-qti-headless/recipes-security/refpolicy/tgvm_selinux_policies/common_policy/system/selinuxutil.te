@@ -47,3 +47,5 @@ qseecomd_manage_data(setfiles_t)
 # relabel /persist/data
 qseecomd_relabel_persist(setfiles_t)
 qseecomd_rw_persist(setfiles_t)
+
+kernel_getattr_proc(setfiles_t)
