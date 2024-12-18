@@ -39,3 +39,7 @@ init_read_runtime_files(sshd_t)
 
 # when login in with ssh, will transfer bash domain to unconfined_t under targeted policy
 unconfined_transition(sshd_t)
+
+kernel_getattr_proc(sshd_t)
+
+seutil_read_bin_policy(ssh_keygen_t)

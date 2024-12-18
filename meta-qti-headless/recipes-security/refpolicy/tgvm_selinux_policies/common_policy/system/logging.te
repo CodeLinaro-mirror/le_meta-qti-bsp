@@ -8,3 +8,5 @@ files_read_var_symlinks(syslogd_t)
 files_read_var_symlinks(auditd_t)
 
 fs_search_tmpfs(syslogd_t)
+
+seutil_read_bin_policy(klogd_t)
