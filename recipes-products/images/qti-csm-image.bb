@@ -21,9 +21,12 @@ CORE_IMAGE_EXTRA_INSTALL += "\
               e2fsprogs-mke2fs \
               e2fsprogs-tune2fs \
               e2fsprogs-resize2fs \
+              dosfstools \
               powerapp \
+              hlos-partition-repair \
               deviceinfo \
               crash-collect-hlos \
+              dump \
               powerapp-powerconfig \
               powerapp-reboot \
               powerapp-shutdown \
@@ -40,6 +43,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
               packagegroup-transceiver-perf-measurement \
               packagegroup-transceiver-fault-management \
               packagegroup-transceiver-logger \
+              packagegroup-transceiver-dualspeed-management \
               packagegroup-sw-management \
               libbootreason \
               packagegroup-modem-ald-transport-simulation \
