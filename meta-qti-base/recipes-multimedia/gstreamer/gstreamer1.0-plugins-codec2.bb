@@ -75,6 +75,8 @@ EXTRA_OEMESON += "\
     ${@oe.utils.version_less_or_equal('${preferred-kernel}', '5.4', '', '-Dusedmaheap=true', d)} \
 "
 
+EXTRA_OEMESON:append:quin-gvm-gen4 = " -Dset_dec_input_framerate=true"
+
 PACKAGE_ARCH ?= "${MACHINE_ARCH}"
 
 SOLIBS = ".so"
