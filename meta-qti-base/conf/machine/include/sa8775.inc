@@ -84,7 +84,6 @@ MACHINE_FEATURES:remove = "\
 SECTOOLS_VERSION = "sectools-v2"
 
 EARLY_RAMDISK_KERNEL_MODULES = "\
-    kernel-module-qcom-ice-${KERNEL_VERSION} \
     kernel-module-pinctrl-msm-${KERNEL_VERSION} \
     kernel-module-qcom-geni-se-${KERNEL_VERSION} \
     kernel-module-qcom-geni-serial-${KERNEL_VERSION} \
