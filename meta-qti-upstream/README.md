@@ -11,3 +11,11 @@ source: meta-agl/meta-agl/recipes-multimedia/pulseaudio/agl-audio-plugin_0.1.bb
 file: recipes-core/systemd/systemd-systemctl/systemctl
 source: meta/recipes-core/systemd/systemd-systemctl/systemctl
         https://git.openembedded.org/openembedded-core/tree/meta/recipes-core/systemd/systemd-systemctl/systemctl?h=scarthgap
+
+recipe: recipes-kernel/libtraceevent/libtraceevent_1.7.3.bb
+source: meta/recipes-kernel/libtracefs/libtraceevent_1.7.3.bb
+        https://git.openembedded.org/openembedded-core/tree/meta/recipes-kernel/libtraceevent?h=scarthgap
+
+recipe: recipes-kernel/libtracefs/libtracefs_1.7.0.bb
+source: meta-oe/recipes-kernel/libtracefs/libtracefs_1.7.0.bb
+        https://git.openembedded.org/meta-openembedded/tree/meta-oe/recipes-kernel/libtracefs?h=scarthgap
