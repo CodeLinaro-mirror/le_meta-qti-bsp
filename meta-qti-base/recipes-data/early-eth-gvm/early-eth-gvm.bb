@@ -27,6 +27,3 @@ SYSTEMD_SERVICE:${PN} = "early_eth1.service \
                          early_eth2.service \
 "
 
-FILES:${PN} += "\
-     ${systemd_unitdir}/system/early_eth1.service \
-     ${systemd_unitdir}/system/early_eth2.service \
