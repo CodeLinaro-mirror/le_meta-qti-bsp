@@ -1,0 +1,47 @@
+From 412b6168b3da465cc0ded247bc259b46b15b80de Mon Sep 17 00:00:00 2001
+From: Mrinmay Sarkar <quic_msarkar@quicinc.com>
+Date: Thu, 14 Nov 2024 19:40:58 +0530
+Subject: [PATCH 2/2] PENDING: bus: mhi: host: pci_generic: Disable auto
+ suspend feature for SA8775P
+
+If there is no traffic over the link it will automatically triggers suspend.
+Disable auto suspend as we dont require this for SA8775P.
+
+Change-Id: Id8190dd33204a617468ec42c4be395506be44b4a
+Signed-off-by: Mrinmay Sarkar <quic_msarkar@quicinc.com>
+---
+ drivers/bus/mhi/host/pci_generic.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/bus/mhi/host/pci_generic.c b/drivers/bus/mhi/host/pci_generic.c
+index dff17f14b0414..aacdb224018ea 100644
+--- a/drivers/bus/mhi/host/pci_generic.c
++++ b/drivers/bus/mhi/host/pci_generic.c
+@@ -48,6 +48,7 @@ struct mhi_pci_dev_info {
+ 	unsigned int dma_data_width;
+ 	unsigned int mru_default;
+ 	bool sideband_wake;
++	bool disable_auto_suspend;
+ };
+ 
+ #define MHI_CHANNEL_CONFIG_UL(ch_num, ch_name, el_count, ev_ring) \
+@@ -307,6 +308,7 @@ static const struct mhi_pci_dev_info mhi_qcom_sa8775p_info = {
+ 	.dma_data_width = 32,
+ 	.mru_default = 32768,
+ 	.sideband_wake = false,
++	.disable_auto_suspend = true,
+ };
+ 
+ static const struct mhi_pci_dev_info mhi_qcom_sdx65_info = {
+@@ -1019,7 +1021,7 @@ static int mhi_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 	mod_timer(&mhi_pdev->health_check_timer, jiffies + HEALTH_CHECK_PERIOD);
+ 
+ 	/* Only allow runtime-suspend if PME capable (for wakeup) */
+-	if (pci_pme_capable(pdev, PCI_D3hot)) {
++	if (!info->disable_auto_suspend  && pci_pme_capable(pdev, PCI_D3hot)) {
+ 		pm_runtime_set_autosuspend_delay(&pdev->dev, 2000);
+ 		pm_runtime_use_autosuspend(&pdev->dev);
+ 		pm_runtime_mark_last_busy(&pdev->dev);
+-- 
+2.25.1
+
