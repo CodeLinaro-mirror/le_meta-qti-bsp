@@ -11,6 +11,7 @@ COMPATIBLE_MACHINE = "sa8775|sa8797|sa7255"
 SRC_URI = "\
     ${PATH_TO_REPO}/kernel/kernel_platform/kernel/.git;protocol=${PROTO};destsuffix=kernel/kernel_platform/kernel;usehead=1 \
     file://generic.cfg \
+    file://earlyboot.cfg \
     ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'file://selinux.cfg', '', d)} \
     ${@bb.utils.contains_any('VARIANT', 'perf user', '', 'file://devmem.cfg', d)} \
     ${@bb.utils.contains_any('VARIANT', 'perf user', 'file://perf.cfg', '', d)} \
@@ -44,5 +45,6 @@ SRC_URI = "\
 S = "${WORKDIR}/kernel/kernel_platform/kernel"
 
 KERNEL_CONFIG_FRAGMENTS:append = " ${WORKDIR}/generic.cfg"
+KERNEL_CONFIG_FRAGMENTS:append = " ${WORKDIR}/earlyboot.cfg"
 KERNEL_CONFIG_FRAGMENTS:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', '${WORKDIR}/selinux.cfg', '', d)}"
 KERNEL_CONFIG_FRAGMENTS:append = " ${@bb.utils.contains_any('VARIANT', 'perf user', '', '${WORKDIR}/devmem.cfg', d)}"
