@@ -85,6 +85,7 @@ MACHINE_FEATURES:remove = "\
 "
 
 SECTOOLS_VERSION = "sectools-v2"
+SECTOOLS_SECURITY_PROFILE = "lemans_tz_security_profile.xml"
 
 EARLY_RAMDISK_KERNEL_MODULES = "\
     kernel-module-pinctrl-msm-${KERNEL_VERSION} \
