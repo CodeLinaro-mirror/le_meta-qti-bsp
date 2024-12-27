@@ -224,6 +224,14 @@ python do_merge_techpack_dtbos () {
         bb.debug(1, "merge_techpack_dtbos cmd: %s" % (cmd))
         try:
             subprocess.check_output(cmd, shell=True)
+        except subprocess.CalledProcessError as e:
+            # Adapt the new invocation method of merge tool
+            cmd = mrgdtbos_bin_path + " --base "+ dtbokpdir +" --techpack "+ dtbotpdir +" --out "+ dtbodir
+            bb.debug(1, "try again merge_techpack_dtbos cmd: %s" % (cmd))
+            try:
+                subprocess.check_output(cmd, shell=True)
+            except RuntimeError as e:
+                bb.error("cmd: %s failed with error %s" % (cmd, str(e)))
         except RuntimeError as e:
             bb.error("cmd: %s failed with error %s" % (cmd, str(e)))
     else:

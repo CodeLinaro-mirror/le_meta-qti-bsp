@@ -156,6 +156,104 @@ get_system_verity_metdata_info(){
         --salt ${VERITY_SALT} > ${WORKDIR}/system_verity_metadata.txt
 }
 
+# Applicable only for (DISTRO_FEATURES->dm-verity and MACHINE_FEATURES->dm-verity-initramfs-v3)
+# Where, Verity metadata and root signature are saved into the image itself, instead in ramfs
+# $1 is path of system image.
+# This function creates a 4096-byte block containing Verity metadata and a signature.
+# The structure of the block is as follows:
+# -------------------------------------
+# |          root.env                 |
+# |-----------------------------------|
+# |          reserved bytes           |
+# |-----------------------------------|
+# |          root.sig                 |
+# |-----------------------------------|
+# |          reserved bytes           |
+# -------------------------------------
+# Total: 4096 bytes
+#
+# This block is then added to the last block of system.img.
+# system.img:
+# -------------------------------------
+# |          Total Size               |
+# |                                   |
+# |                                   |
+# |                                   |
+# |                                   |
+# |                                   |
+# |                                   |
+# |-----------------------------------|
+# |  Last 4096 bytes                  |
+# | (root.env + root.sig)             |
+# -------------------------------------
+
+add_verity_v3metadata() {
+    local ImgPath=$1
+
+    VERITY_SALT="aee087a5be3b982978c923f566a94613496b417f2af592639bc80d141e34dfe7"
+    BLOCK_SIZE="4096"
+    FEC_ROOTS="2"
+
+    # Compute for system
+            root_hash=`awk -F ':' '{ if ($1 == "Root hash") print $2 }' ${WORKDIR}/system_verity_metadata.txt | sed "s/^[ \t]*//"`
+            data_blocks=`awk -F ':' '{ if ($1 == "Data blocks") print $2 }' ${WORKDIR}/system_verity_metadata.txt  |  sed "s/^[ \t]*//"`
+            fec_offset=`awk -F ':' '{ if ($1 == "fec_offset") print $2 }' ${WORKDIR}/system_verity_metadata.txt  |  sed "s/^[ \t]*//"`
+            hash_offset=`expr $data_blocks \* 4096`
+
+    cat > ${WORKDIR}/root.env <<EOF
+VERITY_DATA_BLOCKS=${data_blocks}
+VERITY_HASH_OFFSET=${hash_offset}
+VERITY_FEC_OFFSET=${fec_offset}
+VERITY_FEC_ROOTS=${FEC_ROOTS}
+VERITY_SALT=${VERITY_SALT}
+VERITY_ROOT_HASH=${root_hash}
+EOF
+
+    # Sign the root hash
+    echo -n "${root_hash}" > ${WORKDIR}/roothash.txt
+
+    openssl smime -sign -nocerts -noattr -binary -in ${WORKDIR}/roothash.txt \
+        -inkey ${STAGING_KERNEL_BUILDDIR}/certs/verity_key.pem -signer \
+        ${STAGING_KERNEL_BUILDDIR}/certs/verity_cert.pem -outform der -out ${WORKDIR}/root.sig
+
+    # Get the sizes of root.env and root.sig
+    metadata_size=$(stat -c%s "${WORKDIR}/root.env")
+    root_sig_size=$(stat -c%s "${WORKDIR}/root.sig")
+
+    # Create a temporary file to hold the combined metadata and signature
+    temp_file=$(mktemp)
+
+    # Write root.env to the first part of the temporary file
+    dd if=${WORKDIR}/root.env of=$temp_file bs=1 count=$metadata_size conv=notrunc
+
+    # Calculate padding needed after root.env to align to 2048 bytes
+    metadata_padding=`expr 2048 - $metadata_size`
+
+    # Add padding after root.env
+    dd if=/dev/zero bs=1 count=$metadata_padding >> $temp_file
+
+    # Write root.sig to the next part of the temporary file
+    dd if=${WORKDIR}/root.sig of=$temp_file bs=1 seek=2048 count=$root_sig_size conv=notrunc
+
+    # Calculate the remaining padding to make the total size 4096 bytes
+    remaining_padding=`expr 4096 - 2048 - $root_sig_size`
+
+    # Add remaining padding to the temporary file
+    dd if=/dev/zero bs=1 count=$remaining_padding >> $temp_file
+
+    # Define the total size in blocks (assuming 4096 bytes per block)
+    total_size_in_blocks=`expr ${SYSTEM_IMAGE_ROOTFS_SIZE} / 4096`
+
+    # Calculate the offset for the last block
+    offset=`expr $total_size_in_blocks - 1`
+
+    # Append the temporary file to the image at the calculated offset
+    dd if=$temp_file of=${ImgPath} bs=4096 seek=$offset conv=notrunc
+
+    # Clean up the temporary file
+    rm $temp_file
+}
+
 do_makesystem() {
     # Empty the folders that have seperate mount points
     # so that they doesn't end up in system image as well
@@ -181,10 +279,10 @@ do_makesystem() {
                         ${IMAGE_EXT4_SELINUX_OPTIONS} \
                         ${ImgPath} ${IMAGE_ROOTFS_EXT4} /dev/null || invalid_image=1
 
-        if [ $invalid_image -eq 1 ]; then
-            echo "Unsparse image generation failed...exiting."
-            break
-        fi
+            if [ $invalid_image -eq 1 ]; then
+                echo "Unsparse image generation failed...exiting."
+                break
+            fi
 
             # Get verity metadata for generated image.
             get_system_verity_metdata_info "${ImgPath}"
@@ -198,7 +296,7 @@ do_makesystem() {
             if [ "$systemSize" -gt "${SYSTEM_IMAGE_ROOTFS_SIZE}" ]; then
                 echo "Size mismatch ($systemSize Vs ${SYSTEM_IMAGE_ROOTFS_SIZE})...recreating unsparse image."
                 continue
-           fi
+            fi
 
             # Calculate offset
             hash_offset=$adjustedSystemSize
@@ -206,6 +304,10 @@ do_makesystem() {
             fec_offset=`expr ${hash_offset} + ${hash_size}`
             echo "fec_offset:$fec_offset" >> ${WORKDIR}/system_verity_metadata.txt
             echo "Calculated fec offset: $fec_offset"
+
+            if ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains('MACHINE_FEATURES', 'dm-verity-initramfs-v3', 'true', 'false', d), 'false', d)}; then
+                add_verity_v3metadata "${ImgPath}"
+            fi
 
             # Convert to sparse image
             sparseImgPath="${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMIMAGE_TARGET}"
