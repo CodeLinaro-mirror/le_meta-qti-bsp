@@ -1,0 +1,18 @@
+From 8a0d6b4b3a91de6c0589679241e40c97fe4e51d3 Mon Sep 17 00:00:00 2001
+From: Mohammed Javid <mjavid@codeaurora.org>
+Date: Wed, 12 Jul 2017 10:51:24 +0530
+Subject: [PATCH] new
+
+---
+ group.master | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/group.master b/group.master
+index 0e0a452..b203da4 100644
+--- a/group.master
++++ b/group.master
+@@ -44,3 +44,4 @@ sdcard:*:1015:diag
+ diag:*:53:
+ rebooters:*:1301:diag
+ nogroup:*:65534:
++inet:x:3003:nobody,root
