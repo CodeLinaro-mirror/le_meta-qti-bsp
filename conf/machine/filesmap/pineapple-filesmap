@@ -1,0 +1,67 @@
+# Copyright (c) 2013-2015, The Linux Foundation. All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above
+#       copyright notice, this list of conditions and the following
+#       disclaimer in the documentation and/or other materials provided
+#       with the distribution.
+#     * Neither the name of The Linux Foundation nor the names of its
+#       contributors may be used to endorse or promote products derived
+#       from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
+# WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT
+# ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
+# BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+# BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+# OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+# IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+# filename              partition
+
+NON-HLOS.bin            /dev/block/bootdevice/by-name/modem
+abl.elf                 /dev/block/bootdevice/by-name/abl
+aop.mbn                 /dev/block/bootdevice/by-name/aop
+apdp.mbn                /dev/block/bootdevice/by-name/apdp
+aop_devcfg.mbn          /dev/block/bootdevice/by-name/aop_config
+BTFM.bin                /dev/block/bootdevice/by-name/bluetooth
+Core_NON-HLOS.bin       /dev/block/bootdevice/by-name/core_nhlos
+cpucp.elf               /dev/block/bootdevice/by-name/cpucp
+zeros_5sectors.bin      /dev/block/bootdevice/by-name/ddr
+devcfg_rfcomm.mbn       /dev/block/bootdevice/by-name/devcfg
+dspso.bin               /dev/block/bootdevice/by-name/dsp
+dtbo.img                /dev/block/bootdevice/by-name/dtbo
+featenabler.mbn         /dev/block/bootdevice/by-name/featenabler
+hypvm.mbn               /dev/block/bootdevice/by-name/hyp
+imagefv.elf             /dev/block/bootdevice/by-name/imagefv
+ipa_fws.elf             /dev/block/bootdevice/by-name/ipa_fw
+keymint.mbn             /dev/block/bootdevice/by-name/keymaster
+logfs_ufs_8mb.bin       /dev/block/bootdevice/by-name/logfs
+multi_image.mbn         /dev/block/bootdevice/by-name/multiimgoem
+multi_image_qti.mbn     /dev/block/bootdevice/by-name/multiimgqti
+hyp.mbn                 /dev/block/bootdevice/by-name/qhee
+Quantum.fv              /dev/block/bootdevice/by-name/quantumfv
+quantumsdk.fv           /dev/block/bootdevice/by-name/quantumsdk
+qupv3fw.elf             /dev/block/bootdevice/by-name/qupfw
+xbl_no_preamble.elf     /dev/block/bootdevice/by-name/sbl
+shrm.elf                /dev/block/bootdevice/by-name/shrm
+storsec.mbn             /dev/block/bootdevice/by-name/storsec
+sec.elf                 /dev/block/bootdevice/by-name/sec
+tools.fv                /dev/block/bootdevice/by-name/toolsfv
+tz.mbn                  /dev/block/bootdevice/by-name/tz
+devcfg.mbn              /dev/block/bootdevice/by-name/tz_devcfg
+uefi.elf                /dev/block/bootdevice/by-name/uefi
+uefi_sec.mbn            /dev/block/bootdevice/by-name/uefisecapp
+vm-bootsys.img          /dev/block/bootdevice/by-name/vm-bootsys
+vm-persist.img          /dev/block/bootdevice/by-name/vm-persist
+xbl_config.elf          /dev/block/bootdevice/by-name/xbl_config
+XblRamdump.elf          /dev/block/bootdevice/by-name/xbl_ramdump
+xbl_s.melf              /dev/block/bootdevice/by-name/xbl
