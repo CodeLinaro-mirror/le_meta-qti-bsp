@@ -21,3 +21,4 @@ RDEPENDS:${PN} += "\
 "
 
 RDEPENDS:${PN}:append:quin-gvm-gen4-5 = " optee-libckteec"
+RDEPENDS:${PN}:append:gvm-gen4-5 = " optee-libckteec"
