@@ -70,3 +70,4 @@ MACHINE_FEATURES += "\
 "
 
 SECTOOLS_VERSION = "sectools-v2"
+SECTOOLS_SECURITY_PROFILE = "${BSPDIR}/security/securemsm/security_profiles/monaco_tz_security_profile.xml"
