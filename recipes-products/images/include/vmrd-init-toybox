@@ -29,13 +29,22 @@
 # Changes from Qualcomm Innovation Center are provided under the following license:
 # Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
 # SPDX-License-Identifier: BSD-3-Clause-Clear
-
 /bin/mount -n -o mode=0755 -t devtmpfs none "/dev"
-echo "mounted devtmpfsr"
 /bin/mount proc /proc -t proc
-echo "mounted proc"
 /bin/mount -o remount,rw  /
 /bin/mkdir -p /mnt/vfs
+
+if [ -d "/extra" ]; then
+    /bin/mkdir -p /lib/modules/$(uname -r)/extra/soc-repo
+    /bin/mv /extra/* /lib/modules/$(uname -r)/extra/soc-repo/
+    /bin/depmod
+    while IFS= read -r line; do
+        echo "Inserting modules" > /dev/kmsg
+        module=$(echo $line | cut -d':' -f1)
+        /bin/modprobe -s $(basename $module .ko) > /dev/kmsg
+        echo  "Inserted module: $module"  > /dev/kmsg
+    done < /lib/modules/$(uname -r)/extra/soc-repo/modules.dep
+fi
 
 # verity protection
 if [ -f /etc/verity.env ]; then
@@ -58,8 +67,7 @@ else
 fi
 
 if [ $? -ne 0]; then
-    echo "mounting rootfs failed"
+    echo "mounting rootfs failed" > /dev/kmsg
 fi
 
-echo "Switching root"
 exec switch_root -c /dev/console /mnt/vfs /sbin/init
