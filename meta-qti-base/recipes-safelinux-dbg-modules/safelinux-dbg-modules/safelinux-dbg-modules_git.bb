@@ -29,9 +29,7 @@ do_install:append() {
     install -m 0755 ${S}/qcom_dcc/qcom_dcc_config.sh -D ${D}${bindir}/qcom_dcc_config.sh
     install -d ${D}${systemd_unitdir}/system/
     install -m 0644 ${S}/qcom_dcc/qcom-dcc.service -D ${D}/${systemd_unitdir}/system/qcom-dcc.service
-}
 
-do_install:append:sa8775() {
     install -d ${D}/${sysconfdir}/qcom_dcc
     install -m 0755 ${S}/qcom_dcc/qcom_dcc_sa8775.conf -D ${D}/${sysconfdir}/qcom_dcc/qcom_dcc_sa8775.conf
 }
