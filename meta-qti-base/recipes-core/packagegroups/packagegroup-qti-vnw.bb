@@ -28,3 +28,7 @@ RDEPENDS:${PN}:remove:sa8255-ivi = "hsi2s \
     hsi2s-test"
 RDEPENDS:${PN}:remove:sa8650-adas = "hsi2s \
     hsi2s-test"
+RDEPENDS:${PN}:remove:sa7255-ivi = "hsi2s \
+    hsi2s-test"
+RDEPENDS:${PN}:remove:sa8620-adas = "hsi2s \
+    hsi2s-test"

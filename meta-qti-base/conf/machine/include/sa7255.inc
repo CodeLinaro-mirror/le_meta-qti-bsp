@@ -64,6 +64,7 @@ MACHINE_FEATURES += "\
     qti-multimedia \
     qti-camera \
     qti-security \
+    qti-vnw \
     qti-audio \
     qti-compute-platform \
 "
