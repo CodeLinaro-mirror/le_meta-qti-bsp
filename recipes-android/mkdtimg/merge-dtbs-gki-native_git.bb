@@ -1,4 +1,4 @@
-inherit native utils
+inherit native
 
 DESCRIPTION = "Tool from Android to validate and merge dtbo files before creating dtbo.img"
 
@@ -23,12 +23,12 @@ do_compile[noexec] = "1"
 do_install() {
     # Install  bin
     install -d ${D}${bindir}/merge_dtbs/
-    if [ -e ${S}/bin/merge_dtbs.py]; then
+    if [ -e ${S}/bin/merge_dtbs.py ]; then
         install -m 0755 ${S}/bin/merge_dtbs.py ${D}${bindir}/merge_dtbs/
     else
         install -m 0755 ${S}/../build/kernel/android/merge_dtbs.py ${D}${bindir}/merge_dtbs/
     fi
-    if [ -e ${S}/bin/ufdt_apply_overlay]; then
+    if [ -e ${S}/bin/ufdt_apply_overlay ]; then
         install -m 0755 ${S}/bin/ufdt_apply_overlay  ${D}${bindir}/merge_dtbs/
     else
         install -m 0755 ${S}/../prebuilts/kernel-build-tools/linux-x86/bin/ufdt_apply_overlay  ${D}${bindir}/merge_dtbs/

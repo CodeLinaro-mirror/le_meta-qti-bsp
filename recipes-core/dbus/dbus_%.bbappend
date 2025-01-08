@@ -19,8 +19,8 @@ do_install:append() {
       ln -fs ../dbus.service ${D}${systemd_system_unitdir}/sockets.target.wants/dbus.service
       rm -rf ${D}${systemd_system_unitdir}/multi-user.target.wants/dbus.service
 
-      install -d ${D}/lib/systemd/system/dbus.service.d
-      install -m 0666 ${WORKDIR}/dbus.conf ${D}/lib/systemd/system/dbus.service.d/dbus.conf
+      install -d ${D}/${base_libdir}/systemd/system/dbus.service.d
+      install -m 0666 ${WORKDIR}/dbus.conf ${D}/${base_libdir}/systemd/system/dbus.service.d/dbus.conf
       install -m 0644 ${WORKDIR}/extra-users-reboot.conf -D ${D}${datadir}/dbus-1/system.d/extra-users-reboot.conf
    fi
 }
