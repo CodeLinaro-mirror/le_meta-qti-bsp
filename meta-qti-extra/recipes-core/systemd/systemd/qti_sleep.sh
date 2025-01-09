@@ -73,6 +73,15 @@ case $1/$2 in
 
     # Add delay to allow usb instance tear down for msm usb controllers
     sleep 2
+
+    # For Lemans, will use s2idle for suspend
+    case `cat /sys/devices/soc0/machine` in
+        LEMANSAU_IVI | LEMANSAU_IVI_ADAS )
+        # write s2idle for suspend to RAM
+        echo s2idle > /sys/power/mem_sleep
+        ;;
+    esac
+
     ;;
   post/*)
     echo "Exiting from $2..."
