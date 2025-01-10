@@ -211,7 +211,7 @@ python do_generate_prebuilt() {
     prebuiltstrippeddir = os.path.join(d.getVar('PREBUILT_DIR'), "stripped")
     prebuiltdatadir = d.getVar('PREBUILT_DATA_DIR')
     inputdir = d.getVar('D')
-    licensedir = os.path.join(d.getVar('LICENSE_DIRECTORY'), pn)
+    licensedir = os.path.join(d.getVar('LICENSE_DIRECTORY'), arch, pn)
 
     # Copy ${D}
     shutil.copytree(inputdir, prebuiltdir, True)
