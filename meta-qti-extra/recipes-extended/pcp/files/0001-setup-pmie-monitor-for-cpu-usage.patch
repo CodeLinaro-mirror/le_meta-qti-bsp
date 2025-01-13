@@ -25,7 +25,7 @@ index 2998e2e..d5b1ba1 100644
  #Host		P?  S?	Log File 				  Arguments
 -LOCALHOSTNAME   y   n   PCP_LOG_DIR/pmie/LOCALHOSTNAME/pmie.log   -c config.default
 +#LOCALHOSTNAME   y   n   PCP_LOG_DIR/pmie/LOCALHOSTNAME/pmie.log   -c config.default
-+LOCALHOSTNAME   y   n   PCP_LOG_DIR/pmie/LOCALHOSTNAME/cpu_usage.log -c /var/lib/pcp/config/pmie/cpu_usage_monitor
++LOCALHOSTNAME   y   n   /data/cpu_usage.log -c /var/lib/pcp/config/pmie/cpu_usage_monitor
 +
 diff --git a/src/pmie/pmie.service.in b/src/pmie/pmie.service.in
 index d659c39..d234c8a 100644
