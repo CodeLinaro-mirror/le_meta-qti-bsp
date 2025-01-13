@@ -130,7 +130,7 @@ python do_makeboot () {
     except RuntimeError as e:
          bb.error("do_makeboot cmd: %s failed with error %s" % (cmd, str(e)))
 
-    if bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'true', 'false', d):
+    if bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', True, False, d):
         cmd = "mkdtimg create %s-dtbo.img --page_size=%s dtbos/*.dtbo" \
             % (d.getVar('PRODUCT'), d.getVar('PAGE_SIZE'))
         bb.debug(1, "mkdtimg cmd: %s" % (cmd))
