@@ -34,6 +34,7 @@ SRC_URI = "\
     file://0016-PENDING-ice-Enable-ICE-on-SA8255p-Qualcomm-platforms.patch \
     file://0017-PCI-qcom-ep-Add-support-for-SCMI-based-PCIe-EP.patch \
     file://0018-PENDING-bus-mhi-host-pci_generic-Disable-auto-suspen.patch \
+    file://0019-PCI-Safety-Initial-Commit.patch \
     file://scm_adci/0001-QCLINUX-arm64-dts-qcom-sa8255p-Modify-correct-dt-nam.patch \
     file://scm_adci/0002-QCLINUX-arm64-dts-qcom-sa8775p-Modify-correct-dt-nam.patch \
     file://scm_adci/0003-QCLINUX-arm64-dts-qcom-sa7255p-Modify-correct-dt-nam.patch \
