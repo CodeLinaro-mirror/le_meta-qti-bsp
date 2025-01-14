@@ -183,8 +183,22 @@ avb_sign_boot_image() {
             --partition_size ${boot_partition_size}  \
             --partition_name boot \
             --algorithm SHA256_RSA4096 \
-            --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/vbgvm_private_key_4096.pem \
+            ${@bb.utils.contains('MACHINE_FEATURES', 'qti-ghgvm', '--key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/testkey_rsa4096.pem', '--key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/vbgvm_private_key_4096.pem', d)} \
             --rollback_index 0
+        if [ -f ${DEPLOY_DIR_IMAGE}/${PRODUCT}-dtbo.img ]; then
+            dtbo_partition_size=$(avbtool calc_min_partition_size \
+                              --image ${DEPLOY_DIR_IMAGE}/${PRODUCT}-dtbo.img \
+                              --partition_name dtbo \
+                              --hash_algorithm sha256 \
+                              --no_hashtree)
+            avbtool add_hash_footer  \
+                --image ${DEPLOY_DIR_IMAGE}/${PRODUCT}-dtbo.img  \
+                --partition_size ${dtbo_partition_size} \
+                --partition_name dtbo \
+                --algorithm SHA256_RSA4096 \
+                --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/testkey_rsa4096.pem \
+                --rollback_index 0
+        fi
 
     else
         # For lv avb2.0, add hash for boot image, dtbo image and vendor-boot image.
