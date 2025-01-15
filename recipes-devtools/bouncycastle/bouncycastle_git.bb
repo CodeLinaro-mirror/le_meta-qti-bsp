@@ -10,6 +10,8 @@ LICENSE = "MIT & Apache-2.0"
 LIC_FILES_CHKSUM = "file://../bouncycastle/MODULE_LICENSE_BSD_LIKE;md5=d41d8cd98f00b204e9800998ecf8427e \
                     file://../bouncycastle/NOTICE;md5=f119ce72da0b21fb194f4fd5d968741a \
                    "
+
+SRCREV_FORMAT = "bouncycastle_verity_security"
 # Commits of git repositories mentioned below are from LA.UM.5.6.c1 branch.
 
 #######################################
