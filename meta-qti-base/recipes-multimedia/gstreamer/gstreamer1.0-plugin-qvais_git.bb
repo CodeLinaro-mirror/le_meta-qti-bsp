@@ -19,6 +19,8 @@ DEPENDS += "\
     vpp-headers \
 "
 
+DEPENDS:append:quin-gvm-lemans = " displaydlkm"
+
 SRC_URI = "${PATH_TO_REPO}/gstreamer/gst-plugins-qti-oss/.git;protocol=${PROTO};destsuffix=gstreamer/gst-plugins-qti-oss;usehead=1"
 SRCREV = "${AUTOREV}"
 S = "${WORKDIR}/gstreamer/gst-plugins-qti-oss/gst-plugin-qvais"
@@ -27,6 +29,9 @@ inherit meson pkgconfig
 
 CFLAGS += "-I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}"
 CXXFLAGS += "-I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}"
+
+CFLAGS:append:quin-gvm-lemans = " -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}/display"
+EXTRA_OEMESON:append:quin-gvm-lemans = " -Dmmmcolorfmt=true"
 
 SOLIBS = ".so"
 FILES_SOLIBSDEV = ""
