@@ -56,3 +56,9 @@ do_install:prepend:trustedvm (){
    sed -e '/-z "\$PS1"/d' -i ${WORKDIR}/profile
    sed -i "/# Set the prompt for bash/a [ -z \"\$PS1\" ] || PS1='~ # '" ${WORKDIR}/profile
 }
+
+do_install:prepend:trustedvm-v4 (){
+   sed -e '/-z "\$PS1"/d' -i ${WORKDIR}/profile
+   sed -i "/# Set the prompt for bash/a [ -z \"\$PS1\" ] || PS1='~ # '" ${WORKDIR}/profile
+   echo 'cd /' >> ${WORKDIR}/profile
+}
