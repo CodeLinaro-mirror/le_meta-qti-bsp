@@ -14,3 +14,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
               packagegroup-startup-scripts \
 "
 
+IMAGE_FEATURES:remove:qcm2290-mtp = "persist-volume"
+
+CORE_IMAGE_EXTRA_INSTALL:remove:qcm2290-mtp = "kernel-modules"
+CORE_IMAGE_EXTRA_INSTALL:append:qcm2290-mtp = " gki-kernel-modules-second-stage"
