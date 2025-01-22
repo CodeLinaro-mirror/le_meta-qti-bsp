@@ -38,3 +38,12 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         systemd-machine-units \
         ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
 "
+<<<<<<< HEAD   (454ec2 qcm2290-mtp: Update mkbootimg-gki-native version)
+=======
+
+CORE_IMAGE_EXTRA_INSTALL:remove:qcm2290-mtp = "kernel-modules"
+CORE_IMAGE_EXTRA_INSTALL:remove:qcm2290-mtp = "graphite-client"
+CORE_IMAGE_EXTRA_INSTALL:remove:qcm2290-mtp = "packagegroup-qti-pulseaudio"
+CORE_IMAGE_EXTRA_INSTALL:append:qcm2290-mtp = " gki-kernel-modules-second-stage"
+CORE_IMAGE_EXTRA_INSTALL:append:qcm2290-mtp = " diag-router"
+>>>>>>> CHANGE (39a78e meta-qt-bsp: Resolve graphite-client compile error for qcm22)
