@@ -18,8 +18,8 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-pulseaudio \
         packagegroup-qti-bluetooth \
         packagegroup-qti-camera \
+        packagegroup-qti-camera-kernel \
         packagegroup-qti-core \
-        packagegroup-qti-data \
         packagegroup-qti-display \
         packagegroup-qti-dsp \
         packagegroup-qti-fastcv \
