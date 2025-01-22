@@ -9,13 +9,11 @@ IMAGE_FEATURES += "ssh-server-openssh"
 CORE_IMAGE_EXTRA_INSTALL += "\
         glib-2.0 \
         kernel-modules \
-        libdrm-tests \
         graphite-client \
         alsa-utils \
         packagegroup-android-utils \
         packagegroup-filesystem-utils \
         packagegroup-qti-audio \
-        packagegroup-qti-pulseaudio \
         packagegroup-qti-bluetooth \
         packagegroup-qti-camera \
         packagegroup-qti-camera-kernel \
