@@ -63,7 +63,6 @@ if [ -f /etc/verity.env ]; then
     /bin/mount -t ext4 -o ro /dev/mapper/system /mnt/vfs
 else
     /bin/mount -t ext4 -o ro /dev/vda /mnt/vfs
-    /bin/mount -t ext4 -o rw /dev/vdb /mnt/vfs/persist
 fi
 
 if [ $? -ne 0]; then
