@@ -1,5 +1,5 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'libselinux-native', '', d)}"
-SRC_URI += "file://0001-squashfs-tools-Allow-setting-selinux-xattrs-through-.patch;striplevel=2"
+SRC_URI:append:kirkstone = "file://0001-squashfs-tools-Allow-setting-selinux-xattrs-through-.patch;striplevel=2"
 EXTRA_OEMAKE:append = "${@bb.utils.contains('DISTRO_FEATURES', 'selinux', ' WITH_SELINUX=1', '', d)}"
 CFLAGS:append = "${@bb.utils.contains('DISTRO_FEATURES', 'selinux', ' -I${STAGING_INCDIR}/libselinux', '', d)}"
