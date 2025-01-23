@@ -95,6 +95,7 @@ do_install:append() {
             sed -i -e '/^Descr/a\After=var-volatile.mount leprop.service systemd-modules-load.service' ${D}${systemd_unitdir}/system/usb.service
         else
             sed -i -e '/^Descr/a\After=var-volatile.mount leprop.service systemd-modules-load.service usb-gadget.target' ${D}${systemd_unitdir}/system/usb.service
+            sed -i -e '/^Descr/a\Wants=usb-gadget.target' ${D}${systemd_unitdir}/system/usb.service
         fi
         sed -i -e '/^ExecStartPre/d' ${D}${systemd_unitdir}/system/usb.service
         sed -i -e '/^Descr/a\ConditionVirtualization=!container' ${D}${systemd_unitdir}/system/usb.service
