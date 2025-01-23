@@ -13,6 +13,7 @@ WITH_DEXPREOPT=true
 BOARD_SEPOLICY_VERS=30.0
 PLATFORM_SEPOLICY_VERSION=30.0
 POLICYVERS=30
+BOARD_API_LEVEL=1000000
 
 PRIVATE_MLS_SENS := $(MLS_SENS)
 PRIVATE_MLS_CATS := $(MLS_CATS)
@@ -24,6 +25,7 @@ PRIVATE_ADDITIONAL_M4DEFS := $(LOCAL_ADDITIONAL_M4DEFS)
 PRIVATE_SEPOLICY_SPLIT := $(PRODUCT_SEPOLICY_SPLIT)
 PRIVATE_COMPATIBLE_PROPERTY := $(PRODUCT_COMPATIBLE_PROPERTY)
 PRIVATE_TREBLE_SYSPROP_NEVERALLOW := $(treble_sysprop_neverallow)
+PRIVATE_BOARD_API_LEVEL := $(BOARD_API_LEVEL)
 
 VERSIONPOLICY = ./version_policy
 
@@ -47,7 +49,11 @@ endif
 
 
 sepolicy_build_cil_workaround_files := technical_debt.cil
-sepolicy_build_files := security_classes \
+
+
+
+sepolicy_build_files := flagging_macros \
+                        security_classes \
                         initial_sids \
                         access_vectors \
                         global_macros \
@@ -69,6 +75,7 @@ sepolicy_build_files := security_classes \
                         genfs_contexts \
                         port_contexts
 
+
 ###########################################################
 # Command to turn collection of policy files into a policy.conf file to be
 # processed by checkpolicy
@@ -87,9 +94,14 @@ $(M4) --fatal-warnings $(PRIVATE_ADDITIONAL_M4DEFS) \
 	-D target_treble_sysprop_neverallow=$(PRIVATE_TREBLE_SYSPROP_NEVERALLOW) \
 	-D target_exclude_build_test=$(PRIVATE_EXCLUDE_BUILD_TEST) \
 	-D target_requires_insecure_execmem_for_swiftshader=$(PRODUCT_REQUIRES_INSECURE_EXECMEM_FOR_SWIFTSHADER) \
+	-D target_board_api_level=$(PRIVATE_BOARD_API_LEVEL) \
 	$(PRIVATE_TGT_RECOVERY) \
 	-s $(PRIVATE_POLICY_FILES) > $@
 endef
+
+#define starting_at_board_api
+#ifelse(eval(target_board_api_level >= $1), 1, $2)
+#endef
 
 ###########################################################
 # Compute policy files to be used in policy build.
