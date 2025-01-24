@@ -70,4 +70,4 @@ MACHINE_FEATURES += "\
 "
 
 SECTOOLS_VERSION = "sectools-v2"
-SECTOOLS_SECURITY_PROFILE = "lemans_tz_security_profile.xml"
+SECTOOLS_SECURITY_PROFILE = "monaco_tz_security_profile.xml"
