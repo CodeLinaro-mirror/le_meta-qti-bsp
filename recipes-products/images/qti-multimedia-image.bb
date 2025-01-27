@@ -34,6 +34,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-ss-mgr \
         packagegroup-qti-video \
         packagegroup-qti-wifi \
+        packagegroup-qti-touch \
         packagegroup-startup-scripts \
         packagegroup-support-utils \
         systemd-machine-units \
