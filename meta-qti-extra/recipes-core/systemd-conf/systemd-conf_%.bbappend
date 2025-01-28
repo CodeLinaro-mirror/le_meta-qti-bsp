@@ -11,8 +11,9 @@ do_install:append() {
         echo -e "HandlePowerKey=ignore\nHandleSuspendKey=ignore" > ${D}${systemd_unitdir}/logind.conf.d/90-powerkey-conf.conf
     fi
 
-    #Override default setting and add RuntimeWatchdogSec support for ark/qclinux kernel
+    #Override default setting and add RuntimeWatchdogSec & RebootWatchdogSec support for ark/qclinux kernel
     if ${@bb.utils.contains_any('PREFERRED_PROVIDER_virtual/kernel', 'linux-ark linux-qcom-custom linux-qcom-custom-rt', 'true', 'false', d)}; then
         echo "RuntimeWatchdogSec=10" >> ${D}${systemd_unitdir}/system.conf.d/00-${PN}.conf
+        echo "RebootWatchdogSec=32" >> ${D}${systemd_unitdir}/system.conf.d/00-${PN}.conf
     fi
 }
