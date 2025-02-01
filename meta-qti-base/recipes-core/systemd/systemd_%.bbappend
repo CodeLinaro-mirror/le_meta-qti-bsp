@@ -15,6 +15,8 @@ SRC_URI:append:quin-gvm-gen4-5 = " file://70-vblk.rules"
 
 SRC_URI:append:gvm-gen5 = " file://60-vblk.rules"
 
+SRC_URI:append:gvm-gen4-5 = " file://60-vblk.rules"
+
 SRC_URI:append:sa81x5 = " file://0001-systemd-add-slotselect-support-in-fstab.patch"
 
 SRC_URI:append = " ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "6.1", "file://platform_load.conf", "", d)}"
@@ -79,5 +81,9 @@ do_install:append:quin-gvm-gen4-5() {
 }
 
 do_install:append:gvm-gen5() {
+    install -m 0644 ${WORKDIR}/60-vblk.rules ${D}${sysconfdir}/udev/rules.d/
+}
+
+do_install:append:gvm-gen4-5() {
     install -m 0644 ${WORKDIR}/60-vblk.rules ${D}${sysconfdir}/udev/rules.d/
 }
