@@ -39,9 +39,6 @@ IMAGE_ROOTFS_UBI = "${WORKDIR}/rootfs-ubi"
 NVRAM_VOLUME_SIZE = "56MiB"
 RDKLOGS_VOLUME_SIZE = "6MiB"
 
-MACHINE_FSCONFIG_CONF_SEARCH_PATH ?= "${@':'.join('%s/conf/machine/fsconfig' % p for p in '${BBPATH}'.split(':'))}}"
-MACHINE_FSCONFIG_CONF_FULL_PATH = "${@machine_search(d.getVar('MACHINE_UBIFS_FSCONFIG_CONF'), d.getVar('MACHINE_FSCONFIG_CONF_SEARCH_PATH')) or ''}"
-
 create_symlink_userfs[cleandirs] = "${USERIMAGE_ROOTFS}"
 create_symlink_userfs() {
 
@@ -207,8 +204,7 @@ do_makesystem_ubi[postfuncs] += "${@bb.utils.contains('INHERIT', 'uninative', 'd
 do_makesystem_ubi[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
 
 fakeroot do_makesystem_ubi() {
-    cp ${MACHINE_FSCONFIG_CONF_FULL_PATH} ${WORKDIR}/rootfs-fsconfig.conf
-    mkfs.ubifs -r ${IMAGE_ROOTFS_UBI} ${IMAGE_UBIFS_SELINUX_OPTIONS} -o ${SYSTEMIMAGE_UBIFS_TARGET} ${MKUBIFS_ARGS} -D ${WORKDIR}/rootfs-fsconfig.conf
+    mkfs.ubifs -r ${IMAGE_ROOTFS_UBI} ${IMAGE_UBIFS_SELINUX_OPTIONS} -o ${SYSTEMIMAGE_UBIFS_TARGET} ${MKUBIFS_ARGS}
     mkfs.ubifs -r ${USERIMAGE_ROOTFS} ${IMAGE_UBIFS_SELINUX_OPTIONS_DATA} -o ${USERIMAGE_UBIFS_TARGET} ${MKUBIFS_ARGS}
     ubinize -o ${SYSTEMIMAGE_UBI_TARGET} ${UBINIZE_ARGS} ${UBINIZE_CFG}
 }
