@@ -67,6 +67,7 @@ MACHINE_FEATURES += "\
     qti-vnw \
     qti-audio \
     qti-compute-platform \
+    qti-safety \
 "
 
 SECTOOLS_VERSION = "sectools-v2"
