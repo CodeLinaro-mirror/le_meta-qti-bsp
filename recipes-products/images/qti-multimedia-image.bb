@@ -38,3 +38,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         systemd-machine-units \
         ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
 "
+
+CORE_IMAGE_EXTRA_INSTALL:remove:qcm2290-mtp = "kernel-modules"
+CORE_IMAGE_EXTRA_INSTALL:append:qcm2290-mtp = " gki-kernel-modules-second-stage"
+CORE_IMAGE_EXTRA_INSTALL:append:qcm2290-mtp = " diag-router"
