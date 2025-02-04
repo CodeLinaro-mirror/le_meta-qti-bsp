@@ -50,3 +50,10 @@ python () {
     else:
         d.setVar("kern_mods", "gki-kernel-modules-first-stage")
 }
+
+PACKAGE_INSTALL:remove:pineapple = "\
+    adbd \
+    usb-composition \
+    usb-composition-usbd \
+    first-stage-scripts-init \
+"
