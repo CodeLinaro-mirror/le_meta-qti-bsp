@@ -15,7 +15,7 @@ EXTRA_OEMAKE = "'CLANG_BIN=${STAGING_BINDIR_NATIVE}/'\
                 'TARGET_ARCHITECTURE=${TARGET_ARCH}'\
                 'BUILDDIR=${S}'\
                 'BOOTLOADER_OUT=${S}/out'\
-                'ENABLE_LE_VARIANT=true'\
+                'ENABLE_LE_VARIANT=${LE_VARIANT}'\
                 'VERIFIED_BOOT_LE=0'\
                 'VERITY_LE=0'\
                 'INIT_BIN_LE=/sbin/init'\
