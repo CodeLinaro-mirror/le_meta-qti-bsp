@@ -32,5 +32,5 @@ RDEPENDS:${PN} += "\
     ${@bb.utils.contains_any('MACHINE_FEATURES', 'qti-umd', 'early-eth', '', d)} \
     ${@bb.utils.contains_any('MACHINE_FEATURES', 'qti-umd', 'netlink-service-infra', '', d)} \
 "
-RDEPENDS:${PN}:append:quin-gvm-monaco = " dataeth-dlkm"
+RDEPENDS:${PN}:append:quin-gvm-monaco = " dataeth-dlkm early-eth-gvm"
 RDEPENDS:${PN}:append:quin-gvm-lemans = " dataeth-dlkm early-eth-gvm"

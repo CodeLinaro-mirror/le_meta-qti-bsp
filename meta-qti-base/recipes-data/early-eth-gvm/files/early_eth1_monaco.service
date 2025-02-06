@@ -1,0 +1,25 @@
+# Copyright (c) 2025 Qualcomm Innovation Center, Inc. All rights reserved.
+# SPDX-License-Identifier: BSD-3-Clause-Clear
+# This service file is designed to enable early ethernet mode on GVM.
+# Customer needs to enable this service file based on the requirement.
+# Flexibility is provided for the customers to modify IP and mac addresses.
+
+[Unit]
+Description=eth1 installer
+DefaultDependencies=no
+After=systemd-modules-load.service
+Before=sysinit.target
+
+[Service]
+User=net_admin
+Group=net_admin
+AmbientCapabilities=CAP_NET_ADMIN
+Type=simple
+RemainAfterExit=yes
+ExecStart=/usr/bin/early_eth1_monaco.sh
+Nice=0
+Restart=on-failure
+RestartSec=50ms
+
+[Install]
+WantedBy=sysinit.target
