@@ -1,7 +1,7 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}-${PV}:"
 DEPENDS = "base-passwd"
 
-SRC_URI:append = "file://fstab"
+SRC_URI:append = " file://fstab"
 
 dirs755:append = " /media/cf /media/net /media/ram \
             /media/union /media/realroot /media/hdd /media/mmc1"
