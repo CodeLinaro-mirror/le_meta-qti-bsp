@@ -38,8 +38,8 @@ add_mount_files () {
                 else
                     install -m 0644 ${S}/${mountname}-mount.service ${D}${systemd_unitdir}/system/${mountname}-mount-${IMAGETYPE}.service
                 fi
-        elif [[ "$mountname" == "manifest" ]] ; then
-            install -m 0644 ${S}/${mountname}-mount.service ${D}${systemd_unitdir}/system/${mountname}-mount-${IMAGETYPE}.service
+        elif [[ "$mountname" == "manifest_a" || "$mountname" == "manifest_b" ]] ; then
+            install -m 0644 ${S}/manifest-mount.service ${D}${systemd_unitdir}/system/manifest-mount-${IMAGETYPE}.service
 	else
             install -m 0644 ${S}/${mountname}.mount ${D}${systemd_unitdir}/system/${mountname}-${IMAGETYPE}.mount
         fi
