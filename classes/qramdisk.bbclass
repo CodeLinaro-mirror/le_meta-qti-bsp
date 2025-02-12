@@ -23,6 +23,8 @@ do_ramdisk_create[depends] += "virtual/kernel:do_deploy"
 do_ramdisk_create[cleandirs] += "${RAMDISKDIR}"
 do_ramdisk_create[cleandirs] += "${RAMDISKDIR}/etc"
 fakeroot do_ramdisk_create() {
+        rm -rf ${RAMDISKDIR}
+        mkdir -p ${RAMDISKDIR}
         mkdir -p ${RAMDISKDIR}/bin
         mkdir -p ${RAMDISKDIR}/etc
         mkdir -p ${RAMDISKDIR}/etc/init.d
