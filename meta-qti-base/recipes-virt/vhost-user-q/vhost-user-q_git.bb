@@ -14,6 +14,9 @@ SYSTEMD_SERVICE:${PN} = "\
     vhost-user-vnw.service \
     vhost-user-ext.service \
     vhost-user-gpce.service \
+"
+
+SYSTEMD_SERVICE:${PN}:append:sa8255-ivi = "\
     vhost-user-disp-vm3.service \
     vhost-user-gpu-vm3.service \
     vhost-user-misc-vm3.service \
@@ -54,6 +57,10 @@ do_install:append() {
     install -m 0644 ${S}/vhost-user-vnw.service -D ${D}${systemd_unitdir}/system/vhost-user-vnw.service
     install -m 0644 ${S}/vhost-user-ext.service -D ${D}${systemd_unitdir}/system/vhost-user-ext.service
     install -m 0644 ${S}/vhost-user-gpce.service -D ${D}${systemd_unitdir}/system/vhost-user-gpce.service
+}
+
+do_install:append:sa8255-ivi() {
+    install -d ${D}${systemd_unitdir}/system/
     install -m 0644 ${S}/vhost-user-disp-vm3.service -D ${D}${systemd_unitdir}/system/vhost-user-disp-vm3.service
     install -m 0644 ${S}/vhost-user-gpu-vm3.service -D ${D}${systemd_unitdir}/system/vhost-user-gpu-vm3.service
     install -m 0644 ${S}/vhost-user-misc-vm3.service -D ${D}${systemd_unitdir}/system/vhost-user-misc-vm3.service

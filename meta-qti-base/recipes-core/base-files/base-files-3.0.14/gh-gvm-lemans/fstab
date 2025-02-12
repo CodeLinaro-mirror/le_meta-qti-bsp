@@ -17,11 +17,11 @@ tmpfs                /media/ram      tmpfs     defaults,noauto       0  0
 # mounting /tmp as a tmpfs is some usual implementation.
 tmpfs                /tmp            tmpfs     defaults              0  0
 
-/dev/vdc             /var            auto      defaults,nofail       0  2
-/dev/vdb             /data           auto      defaults,nofail       0  2
-/dev/vdg             /dsp            auto      defaults,nofail       0  2
-/dev/vde             /firmware       auto      defaults,nofail       0  2
-/dev/vdd             /bluetooth      auto      defaults,nofail       0  0
+/dev/disk/by-path/platform-70004000.virtio_blk_lv_dsp_a              /dsp            auto      defaults,nofail       0  2
+/dev/disk/by-path/platform-70009000.virtio_blk_lv_bluetooth_a        /bluetooth      auto      defaults,nofail       0  0
+/dev/disk/by-path/platform-70010000.virtio_blk_lv_persist            /var            auto      defaults,nofail       0  2
+/dev/disk/by-path/platform-7000b000.virtio_blk_lv_modem_a            /firmware       auto      defaults,nofail       0  2
+/dev/disk/by-path/platform-70012000.virtio_blk_lv_userdata           /data           auto      defaults,nofail       0  2
 
 # Bind /home to /data
 /data                /home                auto       defaults,bind         0  0

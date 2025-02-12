@@ -4,6 +4,9 @@ SOC_FAMILY = "sa8775"
 include conf/machine/include/soc-family.inc
 PRODUCT = "${MACHINE}"
 
+# Gen4(sa8775/sa8255/sa8650) board chip belongs to Cortex-A78C(CPU part: 0xd4b).
+include ${@bb.utils.contains('BBFILE_COLLECTIONS', 'ubuntu', 'conf/machine/include/arm/armv8-2a/tune-cortexa76.inc', 'conf/machine/include/tune-cortexa78c.inc', d)}
+
 # Prefer Wayland/Weston version
 PREFERRED_VERSION_weston = "8.0.0"
 PREFERRED_VERSION_wayland = "1.18.0"
@@ -55,7 +58,7 @@ IMAGE_INSTALL += "\
 
 IMAGE_FEATURES += "ssh-server-openssh"
 
-EXTRA_IMAGEDEPENDS += "qti-image-ark-boot:do_sign_boot_img"
+EXTRA_IMAGEDEPENDS += "qcom-image-boot:do_sign_boot_img"
 
 IMAGE_FEATURES:append = " read-only-rootfs"
 
@@ -82,3 +85,38 @@ MACHINE_FEATURES:remove = "\
 "
 
 SECTOOLS_VERSION = "sectools-v2"
+SECTOOLS_SECURITY_PROFILE = "lemans_tz_security_profile.xml"
+
+EARLY_RAMDISK_KERNEL_MODULES = "\
+    kernel-module-pinctrl-msm-${KERNEL_VERSION} \
+    kernel-module-qcom-geni-se-${KERNEL_VERSION} \
+    kernel-module-qcom-geni-serial-${KERNEL_VERSION} \
+    kernel-module-qcom-ipcc-${KERNEL_VERSION} \
+    kernel-module-phy-qcom-qmp-ufs-${KERNEL_VERSION} \
+    kernel-module-ufs-qcom-${KERNEL_VERSION} \
+    kernel-module-ufshcd-core-${KERNEL_VERSION} \
+    kernel-module-ufshcd-pltfrm-${KERNEL_VERSION} \
+    kernel-module-pinctrl-sa8775p-${KERNEL_VERSION} \
+    kernel-module-aquantia-${KERNEL_VERSION}  \
+    kernel-module-marvell-${KERNEL_VERSION} \
+    kernel-module-virtio-mmio-${KERNEL_VERSION} \
+    kernel-module-ipv6-${KERNEL_VERSION} \
+    kernel-module-kiumd-${KERNEL_VERSION} \
+    kernel-module-iommu-iova-map-${KERNEL_VERSION} \
+    kernel-module-scm-user-intf-${KERNEL_VERSION} \
+    kernel-module-vfio-platform-base-${KERNEL_VERSION} \
+    kernel-module-vfio-platform-${KERNEL_VERSION} \
+    kernel-module-kiumd-kgsl-${KERNEL_VERSION} \
+    kernel-module-vfio-iommu-qcom-${KERNEL_VERSION} \
+    kernel-module-ipcc-shmem-test-module-${KERNEL_VERSION} \
+    kernel-module-i2c-qcom-geni-${KERNEL_VERSION} \
+    kernel-module-qcom-scm-oot-${KERNEL_VERSION} \
+    kernel-module-qtee-shmbridge-${KERNEL_VERSION} \
+    kernel-module-qcom-smcinvoke-${KERNEL_VERSION} \
+    kernel-module-spidev-${KERNEL_VERSION} \
+    kernel-module-qcom-dload-mode-${KERNEL_VERSION} \
+    kernel-module-qcom-uscmi-${KERNEL_VERSION} \
+    kernel-module-mhi-ep-net-${KERNEL_VERSION} \
+    kernel-module-kryo-arm64-edac-${KERNEL_VERSION} \
+    kernel-module-socinfo-${KERNEL_VERSION} \
+"

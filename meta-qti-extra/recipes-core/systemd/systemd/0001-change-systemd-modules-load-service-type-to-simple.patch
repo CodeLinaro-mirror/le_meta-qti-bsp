@@ -1,0 +1,30 @@
+From f44cf60a5b449cdb5d9be71ca792ab3d22c9a550 Mon Sep 17 00:00:00 2001
+From: Naiwen Yu <quic_naiwyu@quicinc.com>
+Date: Thu, 7 Nov 2024 14:52:45 +0800
+Subject: [PATCH] systemd: change systemd-modules-load service type to simple
+
+To optimize boot time, modules loaded by systemd-modules-load are now loaded in early-ramdisk-init and 
+modules-load-late service, change systemd-modules-load type to simple to avoid blocking other services.
+
+Upstream-Status:Inappropriate
+
+Signed-off-by: Naiwen Yu <quic_naiwyu@quicinc.com>
+---
+ units/systemd-modules-load.service.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/units/systemd-modules-load.service.in b/units/systemd-modules-load.service.in
+index 604d8712a0..f34563d1cd 100644
+--- a/units/systemd-modules-load.service.in
++++ b/units/systemd-modules-load.service.in
+@@ -23,7 +23,7 @@ ConditionKernelCommandLine=|modules-load
+ ConditionKernelCommandLine=|rd.modules-load
+
+ [Service]
+-Type=oneshot
++Type=simple
+ RemainAfterExit=yes
+ ExecStart={{ROOTLIBEXECDIR}}/systemd-modules-load
+ TimeoutSec=90s
+--
+2.25.1

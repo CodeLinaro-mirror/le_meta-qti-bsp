@@ -1,5 +1,5 @@
-SUMMARY = "QTI ARK Kernel Boot image"
-DESCRIPTION = "Build QTI ARK kernel boot image"
+SUMMARY = "Kernel Boot image"
+DESCRIPTION = "Build kernel boot image"
 LICENSE = "BSD-3-Clause-Clear"
 
 DEPENDS += "mkbootimg-native mkdtimg-native openssl-native  python3-native virtual/kernel"
@@ -11,7 +11,7 @@ DEPENDS += "${@bb.utils.contains_any('COMBINED_FEATURES', 'qti-audio qti-audio-a
 IMAGE_CLASSES:remove = "qimage"
 IMAGE_FEATURES:remove = "ssh-server-openssh"
 
-inherit image ark-dtb-merge
+inherit image qcom-dtb-merge
 
 EXTRA_IMAGE_FEATURES = ""
 
@@ -91,9 +91,14 @@ do_sign_boot_img () {
 
 avb_sign_boot_image() {
     img="$1"
+    boot_partition_size=$(avbtool calc_min_partition_size \
+                              --image ${img} \
+                              --partition_name boot \
+                              --hash_algorithm sha256 \
+                              --no_hashtree)
     avbtool add_hash_footer  \
         --image ${img}  \
-        --partition_size 0x04000000  \
+        --partition_size ${boot_partition_size}  \
         --partition_name boot \
         --algorithm SHA256_RSA4096 \
         --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/testkey_rsa4096.pem \
@@ -111,7 +116,7 @@ avb_sign_boot_image() {
 
 #Sign boot image after generation
 do_sign_boot_img[dirs] = "${DEPLOY_DIR_IMAGE}"
-do_sign_boot_img[depends] += "sectool5-native:do_populate_sysroot avbtool-native:do_populate_sysroot"
+do_sign_boot_img[depends] += "sectools-native:do_populate_sysroot avbtool-native:do_populate_sysroot"
 
 addtask do_makeboot_setscene
 

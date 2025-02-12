@@ -17,11 +17,9 @@ DEPENDS += "\
     media-external \
     videodlkm \
     virtual/kernel-headers \
+    binder \
+    codec2-service \
 "
-
-# default enable C2 service on all targets
-DEPENDS:append = " binder codec2-service"
-EXTRA_OEMESON:append = " -Dagl-c2service=true"
 
 DEPENDS:append:quin-gvm-lemans = " displaydlkm"
 DEPENDS:append:monaco = " displaydlkm"
@@ -43,6 +41,11 @@ CFLAGS += "\
 CXXFLAGS += "\
     -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}/vidc \
     -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel} \
+"
+
+EXTRA_OEMESON += "\
+    ${@oe.utils.version_less_or_equal('${preferred-kernel}', '5.4', '', '-Dusedmaheap=true', d)} \
+    -Dagl-c2service=true \
 "
 
 CFLAGS:append:quin-gvm-lemans = " -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}/display"
@@ -71,9 +74,7 @@ EXTRA_OEMESON:append:quin-gvm-monaco = " \
     -Dreport_frame_qp_option=op1 \
 "
 
-EXTRA_OEMESON += "\
-    ${@oe.utils.version_less_or_equal('${preferred-kernel}', '5.4', '', '-Dusedmaheap=true', d)} \
-"
+EXTRA_OEMESON:append:quin-gvm-gen4 = " -Dset_dec_input_framerate=true"
 
 PACKAGE_ARCH ?= "${MACHINE_ARCH}"
 

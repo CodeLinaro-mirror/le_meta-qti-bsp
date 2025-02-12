@@ -1,0 +1,40 @@
+From 30c79c97f85a8530bb3e36abe71b5c9ed5348bf9 Mon Sep 17 00:00:00 2001
+From: Jing Wang <quic_jingwa@quicinc.com>
+Date: Fri, 6 Dec 2024 14:31:03 +0800
+Subject: [PATCH] utils: tinycap: support 8bits record
+
+Upstream-Status: Pending
+Signed-off-by: Jing Wang <quic_jingwa@quicinc.com>
+---
+ utils/tinycap.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/utils/tinycap.c b/utils/tinycap.c
+index 617d16a..78831c7 100644
+--- a/utils/tinycap.c
++++ b/utils/tinycap.c
+@@ -26,6 +26,11 @@
+ ** DAMAGE.
+ */
+
++// Changes from Qualcomm Innovation Center, Inc. are provided under the following license:
++//
++// Copyright (c) 2024 Qualcomm Innovation Center, Inc. All rights reserved.
++// SPDX-License-Identifier: BSD-3-Clause-Clear
++
+ #include <tinyalsa/asoundlib.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+@@ -169,6 +174,9 @@ int main(int argc, char **argv)
+     case 16:
+         format = PCM_FORMAT_S16_LE;
+         break;
++    case 8:
++        format = PCM_FORMAT_S8;
++        break;
+     default:
+         fprintf(stderr, "%u bits is not supported.\n", bits);
+         fclose(file);
+-- 
+2.17.1
+

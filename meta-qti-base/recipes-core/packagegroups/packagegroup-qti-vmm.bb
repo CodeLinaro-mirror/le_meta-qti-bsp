@@ -22,4 +22,5 @@ RDEPENDS:${PN} = "\
     vhost-device-i2c \
     vhost-device-ssr \
     hyp-udmabuf \
+    hyp-udmabuf-test \
 "
