@@ -30,6 +30,8 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-qmmf \
         ${@bb.utils.contains('COMBINED_FEATURES', 'qti-security', 'packagegroup-qti-securemsm', '', d)} \
         ${@bb.utils.contains('MACHINE_FEATURES', 'qti-sensors', 'packagegroup-qti-sensors', '', d)} \
+        ${@bb.utils.contains('MACHINE_FEATURES', 'qti-sensors-prop', 'packagegroup-qti-sensors-see', '', d)} \
+        ${@bb.utils.contains('MACHINE_FEATURES', 'qti-sensors-prop', 'packagegroup-qti-test-sensors-see', '', d)} \
         ${@bb.utils.contains('MACHINE_FEATURES', 'qti-location', 'packagegroup-qti-location', '', d)} \
         packagegroup-qti-ss-mgr \
         packagegroup-qti-video \
