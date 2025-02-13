@@ -8,6 +8,7 @@ LIC_FILES_CHKSUM = " \
 INHIBIT_DEFAULT_DEPS = "1"
 FILESEXTRAPATHS:prepend := "${KERNEL_PREBUILT_PATH}/abl-userdebug:"
 FILESEXTRAPATHS:prepend:pineapple := "${KERNEL_PREBUILT_PATH}/dist/abl-userdebug:"
+FILESEXTRAPATHS:prepend:sun := "${KERNEL_PREBUILT_PATH}/dist/abl-userdebug:"
 
 SRC_URI = "file://unsigned_abl.elf"
 
@@ -15,7 +16,7 @@ do_install[noexec]="1"
 do_configure[noexec]="1"
 
 do_deploy() {
-    install -m 644 ${WORKDIR}/abl.elf ${DEPLOYDIR}
+    install -m 644 ${WORKDIR}/unsigned_abl.elf ${DEPLOYDIR}/abl.elf
 }
 
 do_deploy[dirs] = "${DEPLOYDIR}"
