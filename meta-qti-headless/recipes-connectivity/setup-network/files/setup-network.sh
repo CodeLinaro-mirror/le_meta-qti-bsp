@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Copyright (c) 2019, The Linux Foundation. All rights reserved.
 #
@@ -61,15 +61,16 @@
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 CMDLINE_PATH=/proc/cmdline
-AGL1_IFACE_ARRAY=(eth0)
-AGL2_IFACE_ARRAY=(eth0)
+AGL1_IFACE_ARRAY="eth0"
+AGL2_IFACE_ARRAY="eth0"
 
-function get_gvm_version()
+get_gvm_version()
 {
     local cmdline_value
     local system_name_value
     echo "Setup Network"
     cmdline_value=$(cat $CMDLINE_PATH)
+    ## echo "[DBG] cmdline_value  ${cmdline_value}"
     system_name_value=${cmdline_value#*system_name=}
     system_name_value=${system_name_value%% *}
     echo "system_name_value=${system_name_value}!"
@@ -83,20 +84,20 @@ function get_gvm_version()
     esac
 }
 
-
-
-function check_all_interfaces_up()
+check_all_interfaces_up()
 {
     local iface_name
     local iface_cnt
     local iface_arr
 
     iface_arr=$1
+    ## echo "[DBG] iface_arr : $iface_arr"
 
-    for iface_name in ${iface_arr[*]}
+    for iface_name in ${iface_arr}
     do
         iface_cnt=$(ifconfig -a | grep $iface_name | wc -l)
-        if [[ ${iface_cnt} -ne 1 ]]
+
+        if [ ${iface_cnt} -lt 1 ]
         then
             echo " WARN : $iface_name is not Ready"
             return 0;
@@ -107,7 +108,7 @@ function check_all_interfaces_up()
 }
 
 
-function setup_network_agl_vm_1()
+setup_network_agl_vm_1()
 {
     echo "Assign IP address"
     ifconfig eth0 192.168.1.2 up
@@ -128,7 +129,7 @@ function setup_network_agl_vm_1()
     sysctl -p
 }
 
-function setup_network_agl_vm_2()
+setup_network_agl_vm_2()
 {
     echo "Assign IP address"
     ifconfig eth0 192.168.1.3 up
@@ -147,17 +148,16 @@ function setup_network_agl_vm_2()
 
 get_gvm_version
 gvm_version=$?
-
+echo "GVM version is ${gvm_version}"
 
 # try 10 times
-for i in {1..10}
-do
-    if [[ ${gvm_version} -eq 1 ]]
+for i in `seq 1 10` ; do
+    if [ ${gvm_version} -eq 1 ]
     then
-        check_all_interfaces_up "${AGL1_IFACE_ARRAY[*]}"
+        check_all_interfaces_up "${AGL1_IFACE_ARRAY}"
         iface_is_up=$?
         echo "current interface status is ${iface_is_up}"
-        if [[ "${iface_is_up}" -eq 1 ]]
+        if [ "${iface_is_up}" -eq 1 ]
         then
             setup_network_agl_vm_1
             break
@@ -165,10 +165,10 @@ do
             echo " ERR : Ethernet Interfaces are not Ready !!!"
         fi
     else
-        check_all_interfaces_up "${AGL2_IFACE_ARRAY[*]}"
+        check_all_interfaces_up "${AGL2_IFACE_ARRAY}"
         iface_is_up=$?
         echo "current interface status is ${iface_is_up}"
-        if [[ "${iface_is_up}" -eq 1 ]]
+        if [ "${iface_is_up}" -eq 1 ]
         then
             setup_network_agl_vm_2
             break
@@ -179,3 +179,4 @@ do
 
     sleep 2
 done
+

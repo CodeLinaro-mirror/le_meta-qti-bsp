@@ -19,6 +19,10 @@ EXTRA_OEMAKE:append = " ${WLAN_PLATFORM_CFG} "
 
 _LINUX_BUILD_TOP = "${WORKDIR}/wlan"
 
+SRC_URI:append = "\
+           file://0001-qcacld-3.0-Change-from-python-python3.patch \
+           "
+
 do_unpack[deptask] = "do_populate_sysroot"
 do_compile:prepend() {
     #Add gnu99 for compiler compatible issues

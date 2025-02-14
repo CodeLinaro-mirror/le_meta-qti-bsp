@@ -1,0 +1,29 @@
+From b8122b2a4552e7cd9a259cd7e0ee6b95d3d57113 Mon Sep 17 00:00:00 2001
+From: Chaoli Zhou <quic_zchaoli@quicinc.com>
+Date: Fri, 17 Jan 2025 14:22:28 +0800
+Subject: [PATCH] qcacld-3.0: Change from python python3
+
+Change python to python3 for yocto 5.0.
+
+Change-Id: Icd49fb26101844cf716217a32dc013f824892097
+Signed-off-by: Chaoli Zhou <quic_zchaoli@quicinc.com>
+---
+ Kbuild | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Kbuild b/Kbuild
+index 2ad54ebef4..2f546f213f 100644
+--- a/Kbuild
++++ b/Kbuild
+@@ -34,7 +34,7 @@ ifneq ($(ANDROID_BUILD_TOP),)
+       override WLAN_COMMON_INC := $(ANDROID_BUILD_TOP_REL)/$(WLAN_COMMON_INC)
+       override WLAN_FW_API := $(ANDROID_BUILD_TOP_REL)/$(WLAN_FW_API)
+ else ifneq ($(LINUX_BUILD_TOP),)
+-      LINUX_BUILD_TOP_REL := $(shell python -c "import os.path; print(os.path.relpath('$(LINUX_BUILD_TOP)'))")
++      LINUX_BUILD_TOP_REL := $(shell python3 -c "import os.path; print(os.path.relpath('$(LINUX_BUILD_TOP)'))")
+       $(warning "LINUX_BUILD_TOP_REL=: $(LINUX_BUILD_TOP_REL)")
+       override WLAN_ROOT := $(LINUX_BUILD_TOP_REL)/qcacld-3.0
+       override WLAN_COMMON_ROOT ?= cmn
+-- 
+2.17.1
+
