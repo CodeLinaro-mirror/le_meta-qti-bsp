@@ -36,6 +36,9 @@ EXTRA_OEMAKE:append:sa81x5 = " 'AB_RETRYCOUNT_DISABLE=1' \
 EXTRA_OEMAKE:append:monaco = " 'AB_RETRYCOUNT_DISABLE=1' \
                                'ENABLE_LV_ATOMIC_AB=1' "
 
+EXTRA_OEMAKE:append:gh-gvm-lemans = " 'AUTO_VIRT_ABL=1' \
+                               'DISABLE_KERNEL_PROTOCOL=1' "
+
 do_configure[noexec] = "1"
 do_compile () {
     export BUILD_CC=${STAGING_BINDIR_NATIVE}/clang
@@ -59,6 +62,11 @@ do_deploy() {
       install -m 0644 ${S}/../unsigned_abl.elf ${DEPLOYDIR}
     fi
 }
+
+do_deploy:append:gh-gvm-lemans() {
+    install -m 0644 ${S}/../LinuxLoader.efi ${DEPLOYDIR}
+}
+
 do_deploy[dirs] = "${S} ${DEPLOYDIR}"
 do_deploy[nostamp] = "1"
 
