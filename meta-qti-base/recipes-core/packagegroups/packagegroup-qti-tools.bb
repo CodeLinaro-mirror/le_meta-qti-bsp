@@ -32,3 +32,6 @@ RDEPENDS:${PN}:remove = "${@bb.utils.contains('TCMODE', 'external-ubuntu', 'syst
 RDEPENDS:${PN}:remove = "${@bb.utils.contains('TCMODE', 'external-ubuntu', 'lttng-tools lttng-ust', '', d)}"
 
 RDEPENDS:${PN}:remove = "${@bb.utils.contains('TCMODE', 'external-ubuntu', 'evtest lsof', '', d)}"
+
+# headless need exclude lttng related modules
+RDEPENDS:${PN}:remove = "${@bb.utils.contains('DISTRO_NAME', 'headless', 'lttng-modules lttng-tools lttng-ust', '', d)}"
