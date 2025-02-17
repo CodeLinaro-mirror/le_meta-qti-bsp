@@ -15,6 +15,9 @@ CORE_IMAGE_EXTRA_INSTALL += "\
 "
 
 IMAGE_FEATURES:remove:qcm2290-mtp = "persist-volume"
+IMAGE_FEATURES:remove:qcs610-odk-64 = "persist-volume"
 
 CORE_IMAGE_EXTRA_INSTALL:remove:qcm2290-mtp = "kernel-modules"
 CORE_IMAGE_EXTRA_INSTALL:append:qcm2290-mtp = " gki-kernel-modules-second-stage"
+CORE_IMAGE_EXTRA_INSTALL:remove:qcs610-odk-64 = "kernel-modules"
+CORE_IMAGE_EXTRA_INSTALL:append:qcs610-odk-64 = " gki-kernel-modules-second-stage"
