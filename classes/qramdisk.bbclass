@@ -1,5 +1,6 @@
 INIT_RAMDISK = "${@d.getVar('MACHINE_SUPPORTS_INIT_RAMDISK') or "False"}"
 FLASHLESS_MCU = "${@d.getVar('MACHINE_SUPPORTS_FLASHLESS_MEMORY') or "False"}"
+SOC_REPO = "${@d.getVar('KERNEL_IS_SOC_REPO') or "False"}"
 RAMDISKDIR = "${WORKDIR}/ramdisk"
 
 TOYBOX_RAMDISK ?= "False"
@@ -38,6 +39,10 @@ fakeroot do_ramdisk_create() {
             cp ${IMAGE_ROOTFS}/usr/lib/libcrypt.so.2 lib/libcrypt.so.2
             cp ${IMAGE_ROOTFS}/bin/toybox bin/
             cp ${IMAGE_ROOTFS}/bin/mksh bin/
+            cp ${IMAGE_ROOTFS}/usr/lib/liblzma.so.5 lib/
+            cp ${IMAGE_ROOTFS}/bin/kmod bin/
+            ln -s kmod bin/modprobe
+            ln -s kmod bin/depmod
             ln -s mksh bin/sh
 
             # Don't install redundant packages for VM image
@@ -184,14 +189,22 @@ fakeroot do_ramdisk_create() {
             cp ${IMAGE_ROOTFS}/lib/libmount.so.1 lib/
         fi
 
-        #gen_initramfs_list.sh expects to be run from kernel directory
-        cd ${DEPLOY_DIR_IMAGE}/build-artifacts/kernel_scripts
-        # remove the initrd.gz file if exist
-        rm -rf ${IMGDEPLOYDIR}/${PN}-initrd.gz
-        if ${@bb.utils.contains_any('PREFERRED_VERSION_linux-msm', '5.10 5.15', 'true', 'false', d)}; then
-            bash ./scripts/gen_initramfs.sh -o ${IMGDEPLOYDIR}/${PN}-initrd.gz -u 0 -g 0 ${RAMDISKDIR}
+
+        if [[ "${SOC_REPO}" == "True" ]]; then
+            mkdir -p extra
+            cp -rp ${KERNEL_PREBUILT_DISTDIR}/*.ko extra/
+            cp -rp ${KERNEL_PREBUILT_DISTDIR}/modules.dep extra/
+            find . | cpio -ov --format=newc >  ${IMGDEPLOYDIR}/${PN}-initrd.gz
         else
-            bash ./scripts/gen_initramfs_list.sh -o ${IMGDEPLOYDIR}/${PN}-initrd.gz -u 0 -g 0 ${RAMDISKDIR}
+            #gen_initramfs_list.sh expects to be run from kernel directory
+            cd ${DEPLOY_DIR_IMAGE}/build-artifacts/kernel_scripts
+            # remove the initrd.gz file if exist
+            rm -rf ${IMGDEPLOYDIR}/${PN}-initrd.gz
+            if ${@bb.utils.contains_any('PREFERRED_VERSION_linux-msm', '5.10 5.15', 'true', 'false', d)}; then
+                bash ./scripts/gen_initramfs.sh -o ${IMGDEPLOYDIR}/${PN}-initrd.gz -u 0 -g 0 ${RAMDISKDIR}
+            else
+                bash ./scripts/gen_initramfs_list.sh -o ${IMGDEPLOYDIR}/${PN}-initrd.gz -u 0 -g 0 ${RAMDISKDIR}
+            fi
         fi
 
         cd ${CURRENT_DIR}
