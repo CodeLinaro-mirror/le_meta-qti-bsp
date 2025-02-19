@@ -41,8 +41,8 @@ do_install:append(){
 }
 
 do_install:append() {
-    install -d ${D}/lib/firmware
-    ln -s /firmware/image ${D}/lib/firmware/updates
+    install -d ${D}/${base_libdir}/firmware
+    ln -s /firmware/image ${D}/${base_libdir}/firmware/updates
 # Don't install fstab for systemd targets
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
         rm ${D}${sysconfdir}/fstab
@@ -55,4 +55,10 @@ do_install:append() {
 do_install:prepend:trustedvm (){
    sed -e '/-z "\$PS1"/d' -i ${WORKDIR}/profile
    sed -i "/# Set the prompt for bash/a [ -z \"\$PS1\" ] || PS1='~ # '" ${WORKDIR}/profile
+}
+
+do_install:prepend:trustedvm-v4 (){
+   sed -e '/-z "\$PS1"/d' -i ${WORKDIR}/profile
+   sed -i "/# Set the prompt for bash/a [ -z \"\$PS1\" ] || PS1='~ # '" ${WORKDIR}/profile
+   echo 'cd /' >> ${WORKDIR}/profile
 }

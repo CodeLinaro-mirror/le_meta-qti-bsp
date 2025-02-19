@@ -1,0 +1,19 @@
+From ffa6472401e2fa6d74d3357c5ea02b4be78157cc Mon Sep 17 00:00:00 2001
+From: John Lima <jlima@codeaurora.org>
+Date: Tue, 3 Jul 2012 15:58:43 -0700
+Subject: [PATCH] add reboot daemon group
+
+---
+ group.master | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/group.master b/group.master
+index 0092a3a..0e0a452 100644
+--- a/group.master
++++ b/group.master
+@@ -42,4 +42,5 @@ wheel:*:80:
+ users:*:100:
+ sdcard:*:1015:diag
+ diag:*:53:
++rebooters:*:1301:diag
+ nogroup:*:65534:
