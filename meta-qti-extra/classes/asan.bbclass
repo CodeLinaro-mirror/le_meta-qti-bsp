@@ -77,18 +77,19 @@ add_asan_preload() {
     if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/agm.service" ]; then
         sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.8"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/agm.service
     fi
-    if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/init_codec2.service" ]; then
-        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.8"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/init_codec2.service
-    fi
-    if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/ab-updater.service" ]; then
-        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.8"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/ab-updater.service
-    fi
-    if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/ais_server.service" ]; then
-        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.8"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/ais_server.service
-    fi
     if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/weston@.service" ]; then
         sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.8"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/weston@.service
     fi
+    if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/ais_v4l2_proxy.service" ]; then
+        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.8"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/ais_v4l2_proxy.service
+    fi
+    if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/qseecomd.service" ]; then
+        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.8"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/qseecomd.service
+    fi
+    if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/synergy.service" ]; then
+        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.8"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/synergy.service
+    fi
+
     # waiting to fix the error of leum711, will delete below code
     if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/agm.service" ]; then
         sed -i '/^\[Service\]/a Environment="ASAN_OPTIONS=detect_odr_violation=0"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/agm.service
@@ -96,48 +97,7 @@ add_asan_preload() {
     if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/pdmapper.service" ]; then
         sed -i '/^\[Service\]/a Environment="ASAN_OPTIONS=detect_odr_violation=0"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/pdmapper.service
     fi
-    if [ -f "${IMAGE_ROOTFS}/etc/systemd/system/thermal-engine.service" ]; then
-        sed -i '/^\[Service\]/a Environment="ASAN_OPTIONS=detect_odr_violation=0"' ${IMAGE_ROOTFS}/etc/systemd/system/thermal-engine.service
-    fi
-
-    #for hgy
-    if [ -f "${IMAGE_ROOTFS}/etc/systemd/system/apss_stl.service" ]; then
-        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.8"' ${IMAGE_ROOTFS}/etc/systemd/system/apss_stl.service
-    fi
-        if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/eva.service" ]; then
-        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.8"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/eva.service
-    fi
-        if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/evastl.service" ]; then
-        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.8"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/evastl.service
-    fi
-        if [ -f "${IMAGE_ROOTFS}/etc/systemd/system/safetymonitor.service" ]; then
-        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.8"' ${IMAGE_ROOTFS}/etc/systemd/system/safetymonitor.service
-    fi
-        if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/ssgtz-daemon.service" ]; then
-        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.8"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/ssgtz-daemon.service
-    fi
-        if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/qcx_be_server.service" ]; then
-        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.8"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/qcx_be_server.service
-    fi
-        if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/openwfd_server_@.service" ]; then
-        sed -i '/^\[Service\]/a Environment="ASAN_OPTIONS=detect_odr_violation=0"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/openwfd_server_@.service
-    fi
-        if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/gsl_hab_server.service" ]; then
-        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.8"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/gsl_hab_server.service
-    fi
-        if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/kgsl.service" ]; then
-        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.8"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/kgsl.service
-    fi
-        if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/glink-service-lrm.service" ]; then
-        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.8"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/glink-service-lrm.service
-    fi
-        if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/weston.service" ]; then
+    if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/weston.service" ]; then
         sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.8"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/weston.service
-    fi
-        if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/audio-chime.service" ]; then
-        sed -i '/^\[Service\]/a Environment="LSAN_OPTIONS=verbosity=1:log_threads=1"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/audio-chime.service
-    fi
-        if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/qcx_server.service" ]; then
-        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.8"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/qcx_server.service
     fi
 }
