@@ -20,3 +20,5 @@ BBCLASSEXTEND = "native"
 EXTRA_OECONF:append:class-target = " --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
 EXTRA_OECONF:append:class-native = " --with-core-headers=${STAGING_INCDIR_NATIVE}"
 EXTRA_OECONF:append:class-native = " ${@oe.utils.conditional('DISTRO_FEATURES', 'selinux', ' --enable-selinux', '', d)}"
+
+EXTRA_OECONF += "${@bb.utils.contains('DISTRO_FEATURES', 'selinux', '--enable-selinux', '', d)}"
