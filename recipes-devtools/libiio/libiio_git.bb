@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING.txt;md5=7c13b3376cea0ce68d2d2da0a1b3a72c"
 SRCREV = "e0fc3845506ccb19ab02e4b1d81cddeeee0805ab"
 PV = "0.7+git${SRCPV}"
 
-SRC_URI = "git://github.com/analogdevicesinc/libiio.git"
+SRC_URI = "git://github.com/analogdevicesinc/libiio.git;protocol=https;branch=main"
 
 S = "${WORKDIR}/git"
 
