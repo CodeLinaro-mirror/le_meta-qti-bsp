@@ -21,6 +21,7 @@ DEPENDS += "cairo \
             wayland wayland-native wayland-protocols \
             weston \
             ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'bootkpi-logging power-utils', '', d)} \
+            ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'compute-resmgr', '', d)} \
 "
 
 SRC_URI = "${PATH_TO_REPO}/graphics/weston-sdm-extension/.git;protocol=${PROTO};destsuffix=graphics/weston-sdm-extension;usehead=1"
@@ -31,6 +32,8 @@ S = "${WORKDIR}/graphics/weston-sdm-extension"
 inherit meson pkgconfig
 #Introducing sleep-notify-service.bbclass for sleep-notify service
 inherit ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'systemd sleep-notify-service', '', d)}
+
+EXTRA_OECMAKE += "-DRT_SCHEDULE:BOOL=${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'ON', 'OFF', d)}"
 
 TARGET_CPPFLAGS += "-I${STAGING_INCDIR}/libdrm \
                     -I${STAGING_INCDIR}/qcom/display \
