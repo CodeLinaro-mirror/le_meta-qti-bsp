@@ -33,8 +33,6 @@ inherit meson pkgconfig
 #Introducing sleep-notify-service.bbclass for sleep-notify service
 inherit ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'systemd sleep-notify-service', '', d)}
 
-EXTRA_OECMAKE += "-DRT_SCHEDULE:BOOL=${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'ON', 'OFF', d)}"
-
 TARGET_CPPFLAGS += "-I${STAGING_INCDIR}/libdrm \
                     -I${STAGING_INCDIR}/qcom/display \
                     -I${STAGING_INCDIR}/sdm \
@@ -48,6 +46,7 @@ TARGET_CPPFLAGS += "-I${STAGING_INCDIR}/libdrm \
 TARGET_CPPFLAGS += "-fno-operator-names"
 
 PACKAGECONFIG ??= "${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'pmsnservice', '', d)} \
+                   ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'rt_schedule', '', d)} \
                    ${@bb.utils.contains('DISTRO_FEATURES', 'early_init', 'early', '', d)} \
 "
 # early-init
@@ -55,6 +54,8 @@ PACKAGECONFIG[early] = "-Denable-early-boot=true,-Denable-early-boot=false"
 # pm
 PACKAGECONFIG[pmsnservice] = "-Denable-pm-snservice=true,-Denable-pm-snservice=false"
 PACKAGECONFIG[pmdbus] = "-Denable-pm-dbus=true,-Denable-pm-dbus=false"
+# rt_schedule
+PACKAGECONFIG[rt_schedule] = "-Denable-rt_schedule=true,-Denable-rt_schedule=false"
 
 do_install:append() {
     if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'true', 'false', d)}; then
