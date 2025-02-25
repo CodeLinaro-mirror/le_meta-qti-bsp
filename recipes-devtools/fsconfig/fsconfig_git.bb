@@ -8,7 +8,8 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 HOMEPAGE = "http://android.git.kernel.org/?p=platform/system/core.git"
 
-DEPENDS += "libselinux libcutils"
+DEPENDS += "libcutils"
+DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'libselinux', '', d)}"
 
 FILESEXTRAPATHS:prepend := "${WORKSPACE}:"
 SRC_URI = "file://OTA/build/tools/fs_config/"
