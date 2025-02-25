@@ -1,0 +1,623 @@
+From e07be71b3dd2fd82d7749bcbd46dd48c7367d356 Mon Sep 17 00:00:00 2001
+From: Nitesh Gupta <quic_nitegupt@quicinc.com>
+Date: Tue, 9 Jul 2024 22:03:47 +0530
+Subject: [PATCH] PCI: Safety Initial Commit
+
+Change to support safety feature in pcie ecam driver.
+
+Change-Id: Ie5b6e0bc2f552267beb4d39a2110a54039b72aee
+Signed-off-by: Nitesh Gupta <quic_nitegupt@quicinc.com>
+---
+ arch/arm64/boot/dts/qcom/sa8255p.dtsi   |  20 +-
+ drivers/pci/controller/pcie-qcom-ecam.c | 471 +++++++++++++++++++++++-
+ 2 files changed, 472 insertions(+), 19 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/qcom/sa8255p.dtsi b/arch/arm64/boot/dts/qcom/sa8255p.dtsi
+index ad2fd9996096..0207692aab90 100644
+--- a/arch/arm64/boot/dts/qcom/sa8255p.dtsi
++++ b/arch/arm64/boot/dts/qcom/sa8255p.dtsi
+@@ -1759,7 +1759,9 @@ ethernet0: ethernet@23040000 {
+ 
+ 		pcie0: pci@400000000 {
+ 			compatible = "qcom,pcie-ecam-rc";
+-			reg = <0x4 0x00000000 0x0 0x10000000>;
++			reg = <0x4 0x00000000 0x0 0x10000000>,
++			      <0x0 0x01c00000 0x0 0x3000>;
++			reg-names = "dbi", "parf";
+ 
+ 			device_type = "pci";
+ 
+@@ -1782,7 +1784,11 @@ pcie0: pci@400000000 {
+ 				     <GIC_SPI 313 IRQ_TYPE_LEVEL_HIGH>,
+ 				     <GIC_SPI 314 IRQ_TYPE_LEVEL_HIGH>,
+ 				     <GIC_SPI 374 IRQ_TYPE_LEVEL_HIGH>,
+-				     <GIC_SPI 375 IRQ_TYPE_LEVEL_HIGH>;
++				     <GIC_SPI 375 IRQ_TYPE_LEVEL_HIGH>,
++				     <GIC_SPI 306 IRQ_TYPE_LEVEL_HIGH>;
++			interrupt-names = "msi0", "msi1", "msi2", "msi3",
++					  "msi4", "msi5", "msi6", "msi7",
++					  "global_int";
+ 			interrupt-parent = <&intc>;
+ 
+ 			iommus = <&pcie_smmu 0x00 0x7f>;
+@@ -1796,7 +1802,9 @@ pcie0: pci@400000000 {
+ 
+ 		pcie1: pci@600000000 {
+ 			compatible = "qcom,pcie-ecam-rc";
+-			reg = <0x6 0x00000000 0x0 0x10000000>;
++			reg = <0x6 0x00000000 0x0 0x10000000>,
++			      <0x0 0x01c10000 0x0 0x3000>;
++			reg-names = "dbi", "parf";
+ 
+ 			device_type = "pci";
+ 
+@@ -1819,7 +1827,11 @@ pcie1: pci@600000000 {
+ 				     <GIC_SPI 143 IRQ_TYPE_LEVEL_HIGH>,
+ 				     <GIC_SPI 144 IRQ_TYPE_LEVEL_HIGH>,
+ 				     <GIC_SPI 145 IRQ_TYPE_LEVEL_HIGH>,
+-				     <GIC_SPI 146 IRQ_TYPE_LEVEL_HIGH>;
++				     <GIC_SPI 146 IRQ_TYPE_LEVEL_HIGH>,
++			             <GIC_SPI 518 IRQ_TYPE_LEVEL_HIGH>;
++			interrupt-names = "msi0", "msi1", "msi2", "msi3",
++					  "msi4", "msi5", "msi6", "msi7",
++					  "global_int";
+ 			interrupt-parent = <&intc>;
+ 
+ 			iommus = <&pcie_smmu 0x80 0x7f>;
+diff --git a/drivers/pci/controller/pcie-qcom-ecam.c b/drivers/pci/controller/pcie-qcom-ecam.c
+index 82084d36e67a..ae235626bd42 100644
+--- a/drivers/pci/controller/pcie-qcom-ecam.c
++++ b/drivers/pci/controller/pcie-qcom-ecam.c
+@@ -21,6 +21,7 @@
+ #include <linux/pm_domain.h>
+ #include <linux/pm_runtime.h>
+ #include <linux/slab.h>
++#include <linux/device.h>
+ #include <linux/types.h>
+ 
+ #define PCIE_MSI_CTRL_BASE			(0x820)
+@@ -34,6 +35,133 @@
+ #define	MSI_DB_ADDR	0xa0000000
+ #define MSI_IRQ_PER_GRP (32)
+ 
++#define PCI_DBI_SIZE   0x10000000
++#define DBI_BASE_ADDR	0x350
++#define DBI_BASE_ADDR_HIGH	0x354
++
++#define ADDR_LOW(n) (n & GENMASK(31, 0))
++#define ADDR_HIGH(n) ((n & GENMASK_ULL(63, 32)) >> 32)
++
++/* Error Reporting Parf Registers */
++#define PARF_INT_ALL_STATUS			0x224
++#define PARF_INT_ALL_CLEAR			0x228
++#define PARF_INT_CLEAR				0x21c
++#define PARF_INT_STATUS			0x220
++#define PARF_INT_ALL_MASK			0x22c
++#define PARF_INT_ALL_2_CLEAR			0x504
++#define PARF_INT_ALL_2_STATUS			0x500
++#define PARF_INT_ALL_3_CLEAR			0x2e14
++#define PARF_INT_ALL_3_STATUS			0x2e10
++#define PARF_INT_ALL_4_CLEAR			0x2dd8
++#define PARF_INT_ALL_4_STATUS			0x2dd0
++#define PARF_INT_ALL_5_CLEAR			0x2ddc
++#define PARF_INT_ALL_5_STATUS			0x2dd4
++#define PARF_CFG_SAFETY_INT_MASK_CTRL		0x2c60
++
++
++#define PCIE_AER_EXT_CAP_ID			0x01
++#define PCI_EXT_CAP_RASDP_ID			0x0b
++
++/* Interrupt Masks */
++#define CFGPCIE_INT_ALL_STATUS_MASK		0x3ff3e
++#define CFGPCIE_PARF_INT_STATUS_MASK		0x1b
++#define CFGPCIE_INTERFACE_TIMER_STATUS_MASK	0xe7b
++#define CFGPCIE_INT_ALL_2_STATUS_MASK		GENMASK(24, 0)
++#define CFGPCIE_INT_ALL_3_STATUS_MASK		GENMASK(31, 0)
++#define CFGPCIE_INT_ALL_4_STATUS_MASK		GENMASK(31, 0)
++#define CFGPCIE_INT_ALL_5_STATUS_MASK		GENMASK(31, 0)
++
++/* PCI_INTERRUPT_LINE register field */
++#define SERR_EN					BIT(17)
++
++/* DBI_ROOT_CONTROL_ROOT_CAPABILITIES_REG register fields */
++#define PCIE_CAP_SYS_ERR_ON_CORR_ERR_EN		BIT(0)
++#define PCIE_CAP_SYS_ERR_ON_NON_FATAL_ERR_EN	BIT(1)
++#define PCIE_CAP_SYS_ERR_ON_FATAL_ERR_EN	BIT(2)
++
++/* DBI_DEVICE_CONTROL_DEVICE_STATUS register fields */
++#define PCIE_CAP_UNSUPPORT_REQ_REP_EN		BIT(3)
++#define PCIE_CAP_FATAL_ERR_REPORT_EN		BIT(2)
++#define PCIE_CAP_NON_FATAL_ERR_REPORT_EN	BIT(1)
++#define PCIE_CAP_CORR_ERR_REPORT_EN		BIT(0)
++
++/* PARF_CFG_SAFETY_INT_MASK_CTRL register fields */
++#define CFG_SAFETY_UNCORR_INT_MASK		BIT(0)
++#define CFG_SAFETY_CORR_INT_MASK		BIT(1)
++
++/* DBI_ADV_ERR_CAP_CTRL_OFF register fields */
++#define ECRC_GEN_EN				BIT(6)
++#define ECRC_CHECK_EN				BIT(8)
++
++/* DBI_ROOT_ERR_CMD_OFF register fields */
++#define CORR_ERR_REPORTING_EN			BIT(0)
++#define NON_FATAL_ERR_REPORTING_EN		BIT(1)
++#define FATAL_ERR_REPORTING_EN			BIT(2)
++
++/* DBI_SAFETY_MASK_OFF register fields */
++#define SAFETY_INT_MASK			GENMASK(5, 0)
++
++/* DBI_SAFETY_STATUS register fields */
++#define PCIE_RASDP_UNCORR_ERR			BIT(0)
++#define PCIE_IFACE_TMR_ERR			BIT(1)
++#define PCIE_CDM_CHK_ERR			BIT(2)
++#define PCIE_AER_UNCORR_ERR			BIT(3)
++#define PCIE_AER_CORR_ERR			BIT(4)
++#define PCIE_RASDP_CORR_ERR			BIT(5)
++
++#define PCIE_MISC_CONTROL_1_OFF		0x8BC
++#define PCIE_DBI_RO_WR_EN		BIT(0)
++
++/*
++ * Error Reporting DBI register
++ */
++#define DBI_DEVICE_CONTROL_DEVICE_STATUS	0x78
++#define DBI_ROOT_CONTROL_ROOT_CAPABILITIES_REG	0x8c
++#define DBI_INTERFACE_TIMER_STATUS		0x938
++#define DBI_SAFETY_MASK_OFF			0x960
++#define DBI_SAFETY_STATUS			0x964
++
++#define DBI_ADV_ERR_CAP_CTRL_OFF		0x18
++#define DBI_ROOT_ERR_CMD_OFF			0x12c
++
++/*
++ * RAS-DP register
++ */
++#define PCIE_RASDP_ERROR_MODE_EN_REG		0x3B4
++#define RASDP_ERROR_MODE_EN			BIT(0)
++
++/*
++ * Interface Timer register
++ */
++#define PCIE_INTERFACE_TIMER_CONTROL		0x930
++#define INTERFACE_TIMER_EN			BIT(0)
++#define INTERFACE_TIMER_AER_EN			BIT(1)
++
++#define PCIE_PL_CHK_REG_CONTROL_STATUS		0xB20
++#define PCIE_PL_CHK_REG_CHK_REG_START		BIT(0)
++#define PCIE_PL_CHK_REG_CHK_REG_CONTINUOUS	BIT(1)
++#define PCIE_PL_CHK_REG_CHK_REG_COMPARISON_ERROR	BIT(16)
++#define PCIE_PL_CHK_REG_CHK_REG_LOGIC_ERROR	BIT(17)
++#define PCIE_PL_CHK_REG_CHK_REG_COMPLETE	BIT(18)
++
++enum qcom_pcie_fault_code {
++	RASDP_UNCORR_ERROR,	/* RASDP uncorrectable error */
++	RASDP_CORR_ERROR,	/* RASDP correctable error */
++	CDM_REG_CHK_ERROR,	/* CDM register check error */
++	INTERFACE_TIMER_ERROR,	/* PCIe local bus interface timer error */
++	PCIE_SPURIOUS_INT,	/* Spurious Interrupt received */
++	MAX_PCIE_SAFETY_FAULT	/* Maximum PCIe fault source code supported */
++};
++
++static const char * const pcie_fault_string[] = {
++	"RASDP_Uncorr_Error",
++	"RASDP_Corr_Error",
++	"CDM_Reg_Chk_Error",
++	"Interface_Timer_Error",
++	"PCIe_Spurious_Interrupt",
++	"TOTAL_PCIE_FAULTS",
++};
++
+ /**
+  * struct qcom_msi_irq - MSI IRQ information
+  * @client:	pointer to MSI client struct
+@@ -116,6 +244,28 @@ struct qcom_msi_client {
+ 	phys_addr_t msi_addr;
+ };
+ 
++/**
++ * struct qcom_pcie - PCIe root port information
++ * @dev:	pointer to the device node
++ * @parf:	parf address in memory map
++ * @dbi_base:	dbi address in memory map
++ * @global_irq	multiplexed irq for error interrupts
++ * @safety_lock	spinlock for exclusion btw safety errors
++ * pcie_fault	Count of each error type
++ * pcie_fault_total	Total count of all errors occured on a RP
++ * @msi: pointer to the qcom_msi structure
++ */
++struct qcom_pcie {
++	struct device *dev;
++	void __iomem *parf;
++	void __iomem *dbi_base;
++	unsigned int global_irq;
++	spinlock_t safety_lock;
++	u32 pcie_fault[MAX_PCIE_SAFETY_FAULT];
++	u32 pcie_fault_total;
++	struct qcom_msi *msi;
++};
++
+ static void qcom_msi_handler(struct irq_desc *desc)
+ {
+ 	struct irq_chip *chip = irq_desc_get_chip(desc);
+@@ -439,10 +589,11 @@ static void qcom_msi_deinit(struct qcom_msi *msi)
+ 	irq_domain_remove(msi->inner_domain);
+ }
+ 
+-static struct qcom_msi *qcom_msi_init(struct device *dev)
++static struct qcom_msi *qcom_msi_init(struct qcom_pcie *pcie)
+ {
+ 	struct qcom_msi *msi;
+ 	struct of_phandle_args irq;
++	struct device *dev = pcie->dev;
+ 	u64 addr;
+ 	int ret;
+ 	int nr = 0;
+@@ -459,21 +610,14 @@ static struct qcom_msi *qcom_msi_init(struct device *dev)
+ 	msi->msi_db_addr = MSI_DB_ADDR;
+ 	while (of_irq_parse_one(dev->of_node, nr, &irq) == 0)
+ 		nr++;
+-	msi->nr_hwirqs = nr;
++	msi->nr_hwirqs = nr - 1;
+ 	if (!msi->nr_hwirqs) {
+ 		dev_err(msi->dev, "no hwirqs found\n");
+ 		return ERR_PTR(-ENODEV);
+ 	}
+ 
+-	if (of_property_read_reg(dev->of_node, 0, &addr, NULL) < 0) {
+-		dev_err(msi->dev, "failed to get reg address\n");
+-		return ERR_PTR(-ENODEV);
+-	}
+-
+-	dev_dbg(msi->dev, "hwirq:%d pcie_msi_cfg:%llx\n", msi->nr_hwirqs, addr);
+-	msi->pcie_msi_cfg = devm_ioremap(dev, addr + PCIE_MSI_CTRL_BASE, PCIE_MSI_CTRL_SIZE);
+-	if (!msi->pcie_msi_cfg)
+-		return ERR_PTR(-ENOMEM);
++	dev_dbg(msi->dev, "hwirq:%d pcie_msi_cfg:%llx\n", msi->nr_hwirqs, pcie->dbi_base);
++	msi->pcie_msi_cfg = pcie->dbi_base + PCIE_MSI_CTRL_BASE;
+ 
+ 	msi->nr_virqs = msi->nr_hwirqs * MSI_IRQ_PER_GRP;
+ 	msi->nr_grps = msi->nr_hwirqs;
+@@ -500,6 +644,251 @@ static struct qcom_msi *qcom_msi_init(struct device *dev)
+ 	return msi;
+ }
+ 
++static void qcom_pcie_enable_error_reporting(struct qcom_pcie *pcie)
++{
++	u32 val, offset, mask ;
++
++	/* Clear all the interrupts before we enable it */
++	writel(0, pcie->dbi_base + DBI_SAFETY_STATUS);
++	writel(0, pcie->dbi_base + DBI_INTERFACE_TIMER_STATUS);
++
++	/* Enable interrupts which are aggregated using GLOBAL_INT */
++	writel(CFGPCIE_INT_ALL_STATUS_MASK, pcie->parf + PARF_INT_ALL_CLEAR);
++	writel(CFGPCIE_PARF_INT_STATUS_MASK, pcie->parf + PARF_INT_CLEAR);
++	writel(CFGPCIE_INT_ALL_2_STATUS_MASK, pcie->parf + PARF_INT_ALL_2_CLEAR);
++	writel(CFGPCIE_INT_ALL_3_STATUS_MASK, pcie->parf + PARF_INT_ALL_3_CLEAR);
++	writel(CFGPCIE_INT_ALL_4_STATUS_MASK, pcie->parf + PARF_INT_ALL_4_CLEAR);
++	writel(CFGPCIE_INT_ALL_5_STATUS_MASK, pcie->parf + PARF_INT_ALL_5_CLEAR);
++
++	val = readl(pcie->dbi_base + PCIE_MISC_CONTROL_1_OFF);
++	val |= PCIE_DBI_RO_WR_EN;
++	writel(val, pcie->dbi_base + PCIE_MISC_CONTROL_1_OFF);
++
++	val = readl(pcie->dbi_base + PCI_INTERRUPT_LINE);
++	val |= SERR_EN;
++	writel(val, pcie->dbi_base + PCI_INTERRUPT_LINE);
++
++	val = readl(pcie->dbi_base + DBI_DEVICE_CONTROL_DEVICE_STATUS);
++	val |= (PCIE_CAP_CORR_ERR_REPORT_EN | PCIE_CAP_NON_FATAL_ERR_REPORT_EN |
++			PCIE_CAP_FATAL_ERR_REPORT_EN | PCIE_CAP_UNSUPPORT_REQ_REP_EN);
++	writel(val, pcie->dbi_base + DBI_DEVICE_CONTROL_DEVICE_STATUS);
++
++	val = readl(pcie->dbi_base + DBI_ROOT_CONTROL_ROOT_CAPABILITIES_REG);
++	val |= (PCIE_CAP_SYS_ERR_ON_CORR_ERR_EN | PCIE_CAP_SYS_ERR_ON_NON_FATAL_ERR_EN |
++			PCIE_CAP_SYS_ERR_ON_FATAL_ERR_EN);
++	writel(val, pcie->dbi_base + DBI_ROOT_CONTROL_ROOT_CAPABILITIES_REG);
++
++	val = readl(pcie->dbi_base + PCIE_MISC_CONTROL_1_OFF);
++	val &= ~PCIE_DBI_RO_WR_EN;
++	writel(val, pcie->dbi_base + PCIE_MISC_CONTROL_1_OFF);
++
++	/* Enable RAS-DP Interrupts */
++	val = readl(pcie->dbi_base + PCIE_RASDP_ERROR_MODE_EN_REG);
++	val |= RASDP_ERROR_MODE_EN;
++	writel(val, pcie->dbi_base + PCIE_RASDP_ERROR_MODE_EN_REG);
++
++	/* Enable CDM Check */
++	val = readl(pcie->dbi_base + PCIE_PL_CHK_REG_CONTROL_STATUS);
++	/* Enable continuous CMD register check mode */
++	val |= PCIE_PL_CHK_REG_CHK_REG_CONTINUOUS;
++	/* Start the CDM register check */
++	val |= PCIE_PL_CHK_REG_CHK_REG_START;
++	/* Enable comparison CDM register check mode */
++	val |= PCIE_PL_CHK_REG_CHK_REG_COMPARISON_ERROR;
++	/* Enable logic CDM register check mode */
++	val |= PCIE_PL_CHK_REG_CHK_REG_LOGIC_ERROR;
++	writel(val, pcie->dbi_base + PCIE_PL_CHK_REG_CONTROL_STATUS);
++
++	/* Interface Timer Enable */
++	val = readl(pcie->dbi_base + PCIE_INTERFACE_TIMER_CONTROL);
++	val |=  (INTERFACE_TIMER_EN | INTERFACE_TIMER_AER_EN);
++	writel(val, pcie->dbi_base + PCIE_INTERFACE_TIMER_CONTROL);
++
++	/* Enable safety correctable and uncorrectable error reporting */
++	val = readl(pcie->parf + PARF_CFG_SAFETY_INT_MASK_CTRL);
++	val |= (CFG_SAFETY_UNCORR_INT_MASK | CFG_SAFETY_CORR_INT_MASK);
++	writel(val, pcie->parf + PARF_CFG_SAFETY_INT_MASK_CTRL);
++
++	/* Enable CRC check and generation */
++	val = readl(pcie->dbi_base + DBI_ADV_ERR_CAP_CTRL_OFF);
++	val |= (ECRC_GEN_EN | ECRC_CHECK_EN);
++	writel(val, pcie->dbi_base + DBI_ADV_ERR_CAP_CTRL_OFF);
++
++	/* Enable AER */
++	val = readl(pcie->dbi_base + DBI_ROOT_ERR_CMD_OFF);
++	val |= (CORR_ERR_REPORTING_EN | NON_FATAL_ERR_REPORTING_EN
++		| FATAL_ERR_REPORTING_EN);
++	writel(val, pcie->dbi_base + DBI_ROOT_ERR_CMD_OFF);
++
++	/* Enable interrupts */
++	val = readl(pcie->dbi_base + DBI_SAFETY_MASK_OFF);
++	val &= ~(SAFETY_INT_MASK);
++	writel(val, pcie->dbi_base + DBI_SAFETY_MASK_OFF);
++
++	/* Disable Legacy Interrupts */
++	val = readl(pcie->parf + PARF_INT_ALL_MASK);
++	/* Mask the first 22 bits */
++	mask = ~0 << 22;
++	val = val & mask;
++	writel(val, pcie->parf + PARF_INT_ALL_MASK);
++}
++
++static void qcom_pcie_check_spurious_int(struct qcom_pcie *pcie)
++{
++	u32 *pcie_fault = pcie->pcie_fault;
++	struct device *dev = pcie->dev;
++	struct kobject *kobj_ref = &dev->kobj;
++	u32 val;
++
++	val = readl(pcie->dbi_base + DBI_INTERFACE_TIMER_STATUS);
++	if (val & CFGPCIE_INTERFACE_TIMER_STATUS_MASK)
++		return;
++
++	val = readl(pcie->parf + PARF_INT_ALL_STATUS);
++	if (val & CFGPCIE_INT_ALL_STATUS_MASK)
++		return;
++
++	val = readl(pcie->parf + PARF_INT_STATUS);
++	if (val & CFGPCIE_PARF_INT_STATUS_MASK)
++		return;
++
++	val = readl(pcie->parf + PARF_INT_ALL_2_STATUS);
++	if (val & CFGPCIE_INT_ALL_2_STATUS_MASK)
++		return;
++
++	val = readl(pcie->parf + PARF_INT_ALL_3_STATUS);
++	if (val & CFGPCIE_INT_ALL_3_STATUS_MASK)
++		return;
++
++	val = readl(pcie->parf + PARF_INT_ALL_4_STATUS);
++	if (val & CFGPCIE_INT_ALL_4_STATUS_MASK)
++		return;
++
++	val = readl(pcie->parf + PARF_INT_ALL_5_STATUS);
++	if (val & CFGPCIE_INT_ALL_5_STATUS_MASK)
++		return;
++
++	dev_err(pcie->dev, "PCIe Spurious Interrupt");
++	pcie_fault[PCIE_SPURIOUS_INT]++;
++	pcie->pcie_fault_total++;
++	sysfs_notify(kobj_ref, NULL, "qcom_pcie_error_report");
++}
++
++static irqreturn_t qcom_pcie_global_irq_thread(int irq, void *data)
++{
++	struct qcom_pcie *pcie = data;
++	u32 *pcie_fault = pcie->pcie_fault;
++	struct device *dev = pcie->dev;
++	struct kobject *kobj_ref = &dev->kobj;
++	unsigned long irqsave_flags;
++	u32 val, int_status;
++
++	spin_lock_irqsave(&pcie->safety_lock, irqsave_flags);
++
++	int_status = readl(pcie->dbi_base + DBI_SAFETY_STATUS);
++	writel(0, pcie->dbi_base + DBI_SAFETY_STATUS);
++
++	if (int_status) {
++		dev_err(pcie->dev, "global interrupt fired status: %u", int_status);
++
++		if (int_status & PCIE_RASDP_UNCORR_ERR) {
++			dev_err(pcie->dev, "RASDP uncorrectable error triggered");
++			pcie_fault[RASDP_UNCORR_ERROR]++;
++			pcie->pcie_fault_total++;
++			sysfs_notify(kobj_ref, NULL, "qcom_pcie_error_report");
++
++			/*
++			 * rasdp_uncorr_err ends up triggering a
++			 * pcie_uncorr error continuously. So masking
++			 * pcie_uncorr interrupts .
++			 */
++			val = readl(pcie->dbi_base + DBI_SAFETY_MASK_OFF);
++			val |= PCIE_AER_UNCORR_ERR;
++			writel(val, pcie->dbi_base + DBI_SAFETY_MASK_OFF);
++		}
++
++		if (int_status & PCIE_CDM_CHK_ERR) {
++			dev_err(pcie->dev, "CDM error triggered");
++			val = readl(pcie->dbi_base + PCIE_PL_CHK_REG_CONTROL_STATUS);
++
++			if (val & PCIE_PL_CHK_REG_CHK_REG_COMPARISON_ERROR) {
++				pcie_fault[CDM_REG_CHK_ERROR]++;
++				pcie->pcie_fault_total++;
++				sysfs_notify(kobj_ref, NULL, "qcom_pcie_error_report");
++
++				/*
++				 * cdm_chk_err injection results in a continuous
++				 * interrupt storm on certain targets, so masking it.
++				 */
++				val = readl(pcie->dbi_base + DBI_SAFETY_MASK_OFF);
++				val |= (PCIE_CDM_CHK_ERR | PCIE_AER_UNCORR_ERR);
++				writel(val, pcie->dbi_base + DBI_SAFETY_MASK_OFF);
++			}
++		}
++
++		if (int_status & PCIE_IFACE_TMR_ERR) {
++			dev_err(pcie->dev, "Iface Timeout error triggered");
++			pcie_fault[INTERFACE_TIMER_ERROR]++;
++			pcie->pcie_fault_total++;
++			sysfs_notify(kobj_ref, NULL, "qcom_pcie_error_report");
++
++			/*
++			 * interface_timer_err injection results in a continuous
++			 * interrupt storm on certain targets, so masking it.
++			 */
++			val = readl(pcie->dbi_base + DBI_SAFETY_MASK_OFF);
++			val |= (PCIE_IFACE_TMR_ERR | PCIE_AER_UNCORR_ERR);
++			writel(val, pcie->dbi_base + DBI_SAFETY_MASK_OFF);
++		}
++
++		if (int_status & PCIE_RASDP_CORR_ERR) {
++			dev_err(pcie->dev, "RASDP correctable error triggered");
++			pcie_fault[RASDP_CORR_ERROR]++;
++			pcie->pcie_fault_total++;
++			sysfs_notify(kobj_ref, NULL, "qcom_pcie_error_report");
++		}
++	} else {
++		qcom_pcie_check_spurious_int(pcie);
++	}
++
++	spin_unlock_irqrestore(&pcie->safety_lock, irqsave_flags);
++	return IRQ_HANDLED;
++}
++
++static ssize_t qcom_pcie_error_report_show(struct device *dev,
++		struct device_attribute *attr,
++		char *buf)
++{
++	unsigned int i;
++	struct qcom_pcie *pcie = (struct qcom_pcie *)dev_get_drvdata(dev);
++	u32 *pcie_fault = pcie->pcie_fault;
++	size_t len = 0;
++
++	for (i = 0; i < MAX_PCIE_SAFETY_FAULT; i++) {
++		if (pcie_fault_string[i])
++			len += sysfs_emit_at(buf, len, "%s: %lu\n",
++					pcie_fault_string[i],
++					pcie_fault[i]);
++	}
++
++	len += sysfs_emit_at(buf, len, "%s: %lu\n",
++					pcie_fault_string[i],
++					pcie->pcie_fault_total);
++
++	return len;
++}
++static DEVICE_ATTR_RO(qcom_pcie_error_report);
++
++static struct attribute *qcom_pcie_attrs[] = {
++	&dev_attr_qcom_pcie_error_report.attr,
++	NULL,
++};
++
++static const struct attribute_group qcom_pcie_attribute_group = {
++	.attrs = qcom_pcie_attrs,
++	.name = "qcom_pcie"
++};
++
+ static int qcom_pcie_ecam_suspend_noirq(struct device *dev)
+ {
+ 	if(atomic_read(&dev->power.usage_count) > 1)
+@@ -510,8 +899,10 @@ static int qcom_pcie_ecam_suspend_noirq(struct device *dev)
+ 
+ static int qcom_pcie_ecam_resume_noirq(struct device *dev)
+ {
+-	struct qcom_msi *msi = (struct qcom_msi *)dev_get_drvdata(dev);
++	struct qcom_msi *msi;
++	struct qcom_pcie *pcie = (struct qcom_pcie *)dev_get_drvdata(dev);
+ 
++	msi = pcie->msi;
+ 	qcom_msi_config(msi->msi_domain);
+ 	pm_runtime_get_noresume(dev);
+ 
+@@ -522,7 +913,39 @@ static int qcom_pcie_ecam_probe(struct platform_device *pdev)
+ {
+ 	struct device *dev = &pdev->dev;
+ 	struct qcom_msi *msi;
+-	int ret;
++	int ret = 0;
++	u64 addr;
++	struct qcom_pcie *pcie;
++
++	pcie = devm_kzalloc(dev, sizeof(*pcie), GFP_KERNEL);
++	if (!pcie)
++		return -ENOMEM;
++
++	pcie->dev = dev;
++
++	pcie->parf = devm_platform_ioremap_resource_byname(pdev, "parf");
++	if (IS_ERR(pcie->parf)) {
++		ret = PTR_ERR(pcie->parf);
++		dev_err(dev, "Failed to get parf address\n");
++		return ret;
++	}
++
++	if (of_property_read_reg(dev->of_node, 0, &addr, NULL) < 0) {
++		dev_err(dev, "Failed to get dbi address\n");
++		return -ENODEV;
++	}
++
++	pcie->dbi_base = devm_ioremap(dev, addr, PCI_DBI_SIZE);;
++	if (!pcie->dbi_base) {
++		dev_err(dev, "Failed to map dbi address\n");
++		return -ENOMEM;
++	}
++
++	pcie->global_irq = platform_get_irq_byname(pdev, "global_int");
++	if (pcie->global_irq < 0) {
++		ret = pcie->global_irq;
++		dev_err(dev, "Failed to get Global IRQ\n");
++	}
+ 
+ 	ret = devm_pm_runtime_enable(dev);
+ 	if (ret)
+@@ -533,7 +956,10 @@ static int qcom_pcie_ecam_probe(struct platform_device *pdev)
+ 		return ret;
+ 	}
+ 
+-	msi = qcom_msi_init(dev);
++	writel_relaxed(ADDR_LOW(addr), pcie->parf + DBI_BASE_ADDR);
++	writel_relaxed(ADDR_HIGH(addr), pcie->parf + DBI_BASE_ADDR_HIGH);
++
++	msi = qcom_msi_init(pcie);
+ 	if (IS_ERR(msi)) {
+ 		pm_runtime_put_sync(dev);
+ 		return PTR_ERR(msi);
+@@ -545,7 +971,22 @@ static int qcom_pcie_ecam_probe(struct platform_device *pdev)
+ 		qcom_msi_deinit(msi);
+ 		pm_runtime_put_sync(dev);
+ 	}
+-	dev_set_drvdata(&pdev->dev, msi);
++
++	pcie->msi = msi;
++	platform_set_drvdata(pdev, pcie);
++
++	sysfs_create_group(&pdev->dev.kobj, &qcom_pcie_attribute_group);
++
++	qcom_pcie_enable_error_reporting(pcie);
++
++	ret = devm_request_threaded_irq(dev, pcie->global_irq, NULL,
++					qcom_pcie_global_irq_thread,
++					IRQF_ONESHOT,
++					"global_irq", pcie);
++	if (ret) {
++		dev_err(dev, "Failed to request Global IRQ\n");
++		return ret;
++	}
+ 
+ 	return ret;
+ }
+-- 
+2.25.1
+
