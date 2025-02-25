@@ -29,7 +29,7 @@ do_install:append() {
    fi
 
    if ${@bb.utils.contains_any('MACHINE_FEATURES', 'qti-vm qti-vm-guest', 'true', 'false', d)}; then
-      sed -i -e 's/.*RuntimeMaxUse.*/RuntimeMaxUse=5M/' ${D}${systemd_unitdir}/journald.conf.d/00-${PN}.conf
+      sed -i -e 's/.*RuntimeMaxUse.*/RuntimeMaxUse=1M/' ${D}${systemd_unitdir}/journald.conf.d/00-${PN}.conf
    fi
 }
 

@@ -1,6 +1,5 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/systemd:"
 
-SRC_URI += "file://Disable-unused-mount-points.patch"
 SRC_URI += "file://systemd-udevd.service"
 SRC_URI += "file://ffbm.target"
 SRC_URI += "file://mtpserver.rules"
@@ -11,13 +10,10 @@ SRC_URI += "file://set-usb-nodes.rules"
 SRC_URI += "file://sysctl.conf"
 SRC_URI += "file://platform.conf"
 SRC_URI += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-vm', 'file://trusted_touch.conf', '',d)}"
-SRC_URI += "file://sd-bus-Allow-extra-users-to-communicate.patch"
-SRC_URI += "file://fstab-generator-Honor-verity-enabled-cmdline.patch"
 SRC_URI += "file://set-mhi-nodes.rules"
 SRC_URI += "file://99-gpiochardev.rules"
 SRC_URI += "file://kmem.rules"
 SRC_URI += "file://mmc-rpmb.rules"
-SRC_URI += "file://0001-cgroup-downgrade-warning-if-we-can-t-get-ID-off-cgro.patch"
 
 # Custom setup for PACKAGECONFIG to get a slimmer systemd.
 # Removed following:
@@ -77,9 +73,9 @@ SYSTEMD_ENABLE_JOURNAL:qti-distro-perf ?= "0"
 
 do_install:append () {
    install -d ${D}/etc/systemd/system/
-   install -d ${D}/lib/systemd/system/ffbm.target.wants
+   install -d ${D}${base_libdir}/systemd/system/ffbm.target.wants
    install -d ${D}/etc/systemd/system/ffbm.target.wants
-   rm ${D}/lib/udev/rules.d/60-persistent-v4l.rules
+   rm -f ${D}${base_libdir}/udev/rules.d/60-persistent-v4l.rules
 
    # Place systemd-udevd.service in /etc/systemd/system
    install -m 0644 ${WORKDIR}/systemd-udevd.service \
@@ -88,9 +84,9 @@ do_install:append () {
        -D ${D}/etc/systemd/system/ffbm.target
 
    # Enable logind/getty/password-wall service in FFBM mode
-   ln -sf /lib/systemd/system/systemd-logind.service ${D}/lib/systemd/system/ffbm.target.wants/systemd-logind.service
-   ln -sf /lib/systemd/system/getty.target ${D}/lib/systemd/system/ffbm.target.wants/getty.target
-   ln -sf /lib/systemd/system/systemd-ask-password-wall.path ${D}/lib/systemd/system/ffbm.target.wants/systemd-ask-password-wall.path
+   ln -sf ${base_libdir}/systemd/system/systemd-logind.service ${D}${base_libdir}/systemd/system/ffbm.target.wants/systemd-logind.service
+   ln -sf ${base_libdir}/systemd/system/getty.target ${D}${base_libdir}/systemd/system/ffbm.target.wants/getty.target
+   ln -sf ${base_libdir}/systemd/system/systemd-ask-password-wall.path ${D}${base_libdir}/systemd/system/ffbm.target.wants/systemd-ask-password-wall.path
    install -d /etc/sysctl.d/
    install -m 0644 ${WORKDIR}/sysctl.conf -D ${D}/etc/sysctl.d/sysctl.conf
    install -m 0644 ${WORKDIR}/platform.conf -D ${D}/etc/tmpfiles.d/platform.conf
@@ -122,9 +118,9 @@ do_install:append () {
 
    # Update persistent-storage.rules to create bootdevice/by-name symlinks
    sed -i 's/LABEL="persistent_storage_end"/# block\/bootdevice\/by-name links'"\n"'LABEL="persistent_storage_end"/g' \
-       ${D}/lib/udev/rules.d/60-persistent-storage.rules
+       ${D}/${base_libdir}/udev/rules.d/60-persistent-storage.rules
    sed -i 's/LABEL="persistent_storage_end"/ENV{ID_PART_ENTRY_SCHEME}=="gpt", ENV{ID_PART_ENTRY_NAME}=="?*", SYMLINK+="block\/bootdevice\/by-name\/$env{ID_PART_ENTRY_NAME}"'"\n\n"'LABEL="persistent_storage_end"/g' \
-       ${D}/lib/udev/rules.d/60-persistent-storage.rules
+       ${D}/${base_libdir}/udev/rules.d/60-persistent-storage.rules
 }
 
 # Run fsck as part of local-fs-pre.target instead of local-fs.target
@@ -136,7 +132,6 @@ do_install:append () {
 }
 
 RRECOMMENDS:${PN}:remove = "systemd-extra-utils"
-PACKAGES:remove = "${PN}-extra-utils"
 
 FILES:${PN} += "/etc/initscripts \
                 ${sysconfdir}/udev/rules.d ${userfsdatadir}/*"

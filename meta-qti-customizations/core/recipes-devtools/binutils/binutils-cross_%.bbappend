@@ -1,2 +1,4 @@
-#Below Package is Fetch from the Codelinaro
-BINUTILS_GIT_URI = " ${CLO_LE_GIT}/binutils-gdb.git;protocol=https;branch=binutils-gdb/${SRCBRANCH} "
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
+SRC_URI += "file://CVE-2023-45853.patch \
+            file://CVE-2021-3998.patch \
+"
