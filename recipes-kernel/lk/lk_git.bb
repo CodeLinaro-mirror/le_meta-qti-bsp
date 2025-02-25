@@ -31,6 +31,7 @@ emmc_bootloader = "${@bb.utils.contains('MACHINE_FEATURES', 'emmc-boot', '1', '0
 
 LIBGCC = "${STAGING_LIBDIR}/${TARGET_SYS}/8.2.0/libgcc.a"
 LIBGCC_mdm9607 = "${STAGING_LIBDIR}/${TARGET_SYS}/9.3.0/libgcc.a"
+LIBGCC_mdm9650 = "${STAGING_LIBDIR}/${TARGET_SYS}/9.5.0/libgcc.a"
 
 # Disable display for nodisplay products
 DISPLAY_SCREEN = "1"
@@ -62,7 +63,7 @@ EXTRA_OEMAKE_append_robot-som = "TARGET_USE_QSEECOM_V4=1"
 EXTRA_OEMAKE_append = " ${@bb.utils.contains('TUNE_FEATURES', 'callconvention-hard', 'ENABLE_HARD_FPU=1', '', d)}"
 
 #add more cflags to lk, if GCC6.3 version
-EXTRA_OEMAKE_append = " 'LKLE_CFLAGS=-Wno-shift-negative-value -Wno-misleading-indentation -Wunused-const-variable=0 -DINIT_BIN_LE=\"/sbin/init\"' "
+EXTRA_OEMAKE_append = " 'LKLE_CFLAGS=-Wno-shift-negative-value -Wno-misleading-indentation -Wunused-const-variable=0 -Wno-attributes -Wno-pointer-compare -Wno-implicit-fallthrough -Wno-unused-variable -Wno-switch-unreachable -Wno-cast-function-type -Wno-multistatement-macros -Wno-address-of-packed-member -DINIT_BIN_LE=\"/sbin/init\"'  "
 
 do_install() {
         install -d ${D}/boot
