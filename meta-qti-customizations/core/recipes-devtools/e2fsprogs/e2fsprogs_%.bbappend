@@ -9,3 +9,5 @@ SRCREV = "aad34909b6648579f42dade5af5b46821aa4d845"
 
 SRC_URI += "file://CVE-2014-9114.patch \
 "
+UNKNOWN_CONFIGURE_OPT_IGNORE += "--disable-silent-rules --disable-dependency-tracking \
+                                 --with-libtool-sysroot --enable-largefile"
