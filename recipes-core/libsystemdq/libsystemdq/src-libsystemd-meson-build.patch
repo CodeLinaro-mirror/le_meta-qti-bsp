@@ -1,0 +1,50 @@
+From 25d02bbe9d16ee390680fa2d873bf5e4e88dffcf Mon Sep 17 00:00:00 2001
+From: Remil Ram <remilr@codeaurora.org>
+Date: Fri, 24 Jul 2020 11:52:14 -0700
+Subject: [PATCH] src-libsystemd-meson-build
+
+---
+ src/libsystemd/meson.build | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/src/libsystemd/meson.build b/src/libsystemd/meson.build
+index aa1ed9b..d9c02d4 100644
+--- a/src/libsystemd/meson.build
++++ b/src/libsystemd/meson.build
+@@ -17,7 +17,7 @@ sd_event_sources = files('''
+ 
+ sd_login_sources = files('sd-login/sd-login.c')
+ 
+-libsystemd_sources = files('''
++libsystemdq_sources = files('''
+         sd-bus/bus-common-errors.c
+         sd-bus/bus-common-errors.h
+         sd-bus/bus-container.c
+@@ -94,19 +94,19 @@ libsystemd_sources = files('''
+ 
+ disable_mempool_c = files('disable-mempool.c')
+ 
+-libsystemd_c_args = ['-fvisibility=default']
++libsystemdq_c_args = ['-fvisibility=default']
+ 
+-libsystemd_static = static_library(
++libsystemdq_static = static_library(
+         'systemd_static',
+-        libsystemd_sources,
++        libsystemdq_sources,
+         install : false,
+         include_directories : includes,
+         link_with : libbasic,
+         dependencies : [threads,
+                         librt],
+-        c_args : libsystemd_c_args)
++        c_args : libsystemdq_c_args)
+ 
+-libsystemd_sym = 'src/libsystemd/libsystemd.sym'
++libsystemdq_sym = 'src/libsystemd/libsystemd.sym'
+ 
+ configure_file(
+         input : 'libsystemd.pc.in',
+-- 
+2.7.4
+
