@@ -30,6 +30,7 @@
 ; OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 ; IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 (type nsfs_t)
+(type service)
 (roletype object_r nsfs_t)
 (typeattribute filesystem_type)
 (typeattributeset filesystem_type nsfs_t)

@@ -94,5 +94,4 @@ interface(`grant_all_permissions',`
 	allow $1 $2:binder {impersonate call set_context_mgr transfer};
 	allow $1 $2:key {view read write search link setattr create};
 	allow $1 $2:dbus { acquire_svc send_msg };
-	allow $1 $2:passwd { passwd chfn chsh rootok crontab };
 ')
