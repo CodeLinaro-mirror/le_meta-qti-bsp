@@ -1,3 +1,4 @@
+Upstream-Status: Pending
 --- /dev/null
 +++ b/miscutils/lock.c
 @@ -0,0 +1,158 @@

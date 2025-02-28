@@ -3,6 +3,7 @@ From: Mrunali Nesarkar <quic_mnesarka@quicinc.com>
 Date: Wed, 13 Nov 2024 00:16:33 +0530
 Subject: [PATCH 1/1] systemd: Disable unused mount points
 
+Upstream-Status: Inappropriate [Qualcomm specific]
 ---
  src/shared/mount-setup.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
