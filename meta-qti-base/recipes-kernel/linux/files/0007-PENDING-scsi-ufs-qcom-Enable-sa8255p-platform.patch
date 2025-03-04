@@ -1,4 +1,4 @@
-From bebaa04219f91ebd7abb29abf86e4fb673d81726 Mon Sep 17 00:00:00 2001
+From 5f6dfad8d0ec4fb940e0c76694d65995a97829c3 Mon Sep 17 00:00:00 2001
 From: Shazad Hussain <quic_shazhuss@quicinc.com>
 Date: Mon, 9 Dec 2024 20:32:22 +0530
 Subject: [PATCH] PENDING: scsi: ufs: qcom: Enable sa8255p platform
@@ -21,11 +21,11 @@ Co-developed-by: Nikunj Kela <quic_nkela@quicinc.com>
 Signed-off-by: Nikunj Kela <quic_nkela@quicinc.com>
 Signed-off-by: Shazad Hussain <quic_shazhuss@quicinc.com>
 ---
- drivers/ufs/host/ufs-qcom.c | 210 ++++++++++++++++++++++++++++--------
- 1 file changed, 166 insertions(+), 44 deletions(-)
+ drivers/ufs/host/ufs-qcom.c | 235 +++++++++++++++++++++++++++++-------
+ 1 file changed, 189 insertions(+), 46 deletions(-)
 
 diff --git a/drivers/ufs/host/ufs-qcom.c b/drivers/ufs/host/ufs-qcom.c
-index 73cf6aebbd59..78ca35e6a938 100644
+index a5e34ae39587..9ab8c550f9fd 100644
 --- a/drivers/ufs/host/ufs-qcom.c
 +++ b/drivers/ufs/host/ufs-qcom.c
 @@ -15,6 +15,7 @@
@@ -36,7 +36,7 @@ index 73cf6aebbd59..78ca35e6a938 100644
  
  #include <soc/qcom/ice.h>
  
-@@ -596,6 +597,31 @@ static int ufs_qcom_hce_enable_notify(struct ufs_hba *hba,
+@@ -584,6 +585,30 @@ static int ufs_qcom_hce_enable_notify(struct ufs_hba *hba,
  	return err;
  }
  
@@ -48,7 +48,6 @@ index 73cf6aebbd59..78ca35e6a938 100644
 +
 +	switch (status) {
 +	case PRE_CHANGE:
-+		hba->spm_lvl = UFS_PM_LVL_5;
 +		ufs_qcom_select_unipro_mode(host);
 +		break;
 +	case POST_CHANGE:
@@ -68,7 +67,7 @@ index 73cf6aebbd59..78ca35e6a938 100644
  /**
   * ufs_qcom_cfg_timers - Configure ufs qcom cfg timers
   *
-@@ -860,6 +886,31 @@ static int ufs_qcom_resume(struct ufs_hba *hba, enum ufs_pm_op pm_op)
+@@ -848,6 +873,31 @@ static int ufs_qcom_resume(struct ufs_hba *hba, enum ufs_pm_op pm_op)
  	return ufs_qcom_ice_resume(host);
  }
  
@@ -100,7 +99,7 @@ index 73cf6aebbd59..78ca35e6a938 100644
  static void ufs_qcom_dev_ref_clk_ctrl(struct ufs_qcom_host *host, bool enable)
  {
  	if (host->dev_ref_clk_ctrl_mmio &&
-@@ -1243,24 +1294,14 @@ static int ufs_qcom_icc_init(struct ufs_qcom_host *host)
+@@ -1231,24 +1281,14 @@ static int ufs_qcom_icc_init(struct ufs_qcom_host *host)
  	return 0;
  }
  
@@ -128,7 +127,7 @@ index 73cf6aebbd59..78ca35e6a938 100644
  
  	host = devm_kzalloc(dev, sizeof(*host), GFP_KERNEL);
  	if (!host) {
-@@ -1277,29 +1318,12 @@ static int ufs_qcom_init(struct ufs_hba *hba)
+@@ -1265,29 +1305,12 @@ static int ufs_qcom_init(struct ufs_hba *hba)
  	if (IS_ERR(host->core_reset)) {
  		err = dev_err_probe(dev, PTR_ERR(host->core_reset),
  				    "Failed to get reset control\n");
@@ -160,7 +159,7 @@ index 73cf6aebbd59..78ca35e6a938 100644
  
  	host->device_reset = devm_gpiod_get_optional(dev, "reset",
  						     GPIOD_OUT_HIGH);
-@@ -1307,7 +1331,7 @@ static int ufs_qcom_init(struct ufs_hba *hba)
+@@ -1295,7 +1318,7 @@ static int ufs_qcom_init(struct ufs_hba *hba)
  		err = PTR_ERR(host->device_reset);
  		if (err != -EPROBE_DEFER)
  			dev_err(dev, "failed to acquire reset gpio: %d\n", err);
@@ -169,7 +168,7 @@ index 73cf6aebbd59..78ca35e6a938 100644
  	}
  
  	ufs_qcom_get_controller_revision(hba, &host->hw_ver.major,
-@@ -1338,18 +1362,9 @@ static int ufs_qcom_init(struct ufs_hba *hba)
+@@ -1326,18 +1349,9 @@ static int ufs_qcom_init(struct ufs_hba *hba)
  			clki->keep_link_active = true;
  	}
  
@@ -189,7 +188,7 @@ index 73cf6aebbd59..78ca35e6a938 100644
  
  	if (hba->dev->id < MAX_UFS_QCOM_HOSTS)
  		ufs_qcom_hosts[hba->dev->id] = host;
-@@ -1367,6 +1382,56 @@ static int ufs_qcom_init(struct ufs_hba *hba)
+@@ -1355,6 +1369,56 @@ static int ufs_qcom_init(struct ufs_hba *hba)
  	 */
  	host->hs_gear = UFS_HS_G2;
  
@@ -246,7 +245,7 @@ index 73cf6aebbd59..78ca35e6a938 100644
  	return 0;
  
  out_variant_clear:
-@@ -1384,6 +1449,31 @@ static void ufs_qcom_exit(struct ufs_hba *hba)
+@@ -1372,6 +1436,31 @@ static void ufs_qcom_exit(struct ufs_hba *hba)
  	phy_exit(host->generic_phy);
  }
  
@@ -278,7 +277,7 @@ index 73cf6aebbd59..78ca35e6a938 100644
  /**
   * ufs_qcom_set_clk_40ns_cycles - Configure 40ns clk cycles
   *
-@@ -2084,6 +2174,32 @@ static const struct ufs_hba_variant_ops ufs_hba_qcom_vops = {
+@@ -2069,6 +2158,32 @@ static const struct ufs_hba_variant_ops ufs_hba_qcom_vops = {
  	.config_esi		= ufs_qcom_config_esi,
  };
  
@@ -311,7 +310,7 @@ index 73cf6aebbd59..78ca35e6a938 100644
  /**
   * ufs_qcom_probe - probe routine of the driver
   * @pdev: pointer to Platform device handle
-@@ -2094,9 +2210,14 @@ static int ufs_qcom_probe(struct platform_device *pdev)
+@@ -2079,9 +2194,14 @@ static int ufs_qcom_probe(struct platform_device *pdev)
  {
  	int err;
  	struct device *dev = &pdev->dev;
@@ -327,14 +326,49 @@ index 73cf6aebbd59..78ca35e6a938 100644
  	if (err)
  		return dev_err_probe(dev, err, "ufshcd_pltfrm_init() failed\n");
  
-@@ -2121,6 +2242,7 @@ static int ufs_qcom_remove(struct platform_device *pdev)
+@@ -2104,8 +2224,31 @@ static int ufs_qcom_remove(struct platform_device *pdev)
+ 	return 0;
+ }
  
++static int ufs_qcom_suspend_prepare(struct device *dev)
++{
++	struct ufs_hba *hba = dev_get_drvdata(dev);
++
++	if(device_get_match_data(dev)) {
++		hba->spm_lvl = UFS_PM_LVL_5;
++	}
++
++	return ufshcd_suspend_prepare(dev);
++}
++
++static void ufs_qcom_resume_complete(struct device *dev)
++{
++	struct ufs_hba *hba = dev_get_drvdata(dev);
++
++	if(device_get_match_data(dev)) {
++		hba->spm_lvl = UFS_PM_LVL_3;
++	}
++
++	return ufshcd_resume_complete(dev);
++}
++
  static const struct of_device_id ufs_qcom_of_match[] __maybe_unused = {
  	{ .compatible = "qcom,ufshc"},
 +	{ .compatible = "qcom,sa8255p-ufshc", .data = &ufs_hba_qcom_fmr_vops},
  	{},
  };
  MODULE_DEVICE_TABLE(of, ufs_qcom_of_match);
+@@ -2120,8 +2263,8 @@ MODULE_DEVICE_TABLE(acpi, ufs_qcom_acpi_match);
+ 
+ static const struct dev_pm_ops ufs_qcom_pm_ops = {
+ 	SET_RUNTIME_PM_OPS(ufshcd_runtime_suspend, ufshcd_runtime_resume, NULL)
+-	.prepare	 = ufshcd_suspend_prepare,
+-	.complete	 = ufshcd_resume_complete,
++	.prepare	 = ufs_qcom_suspend_prepare,
++	.complete	 = ufs_qcom_resume_complete,
+ #ifdef CONFIG_PM_SLEEP
+ 	.suspend         = ufshcd_system_suspend,
+ 	.resume          = ufshcd_system_resume,
 -- 
 2.17.1
 
