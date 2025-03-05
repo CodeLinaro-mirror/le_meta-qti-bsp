@@ -16,7 +16,7 @@ do_install[noexec]="1"
 do_configure[noexec]="1"
 
 do_deploy() {
-    install -m 644 ${WORKDIR}/unsigned_abl.elf ${DEPLOYDIR}/abl.elf
+    install -m 644 ${WORKDIR}/abl.elf ${DEPLOYDIR}
 }
 
 do_deploy[dirs] = "${DEPLOYDIR}"
