@@ -13,6 +13,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
               glib-2.0 \
               kernel-modules \
               coreutils \
+              procrank \
               powerapp \
               powerapp-powerconfig \
               powerapp-reboot \

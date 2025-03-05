@@ -16,6 +16,15 @@ fix_etcdibbler_service () {
 }
 do_install[prefuncs] += " ${@bb.utils.contains('BBFILE_COLLECTIONS', 'qti-rdkb', 'fix_etcdibbler_service', '', d)}"
 
+fix_afc_service () {
+    sed -i "s#systemrw/pairing /etc/pairing#systemrw/pairing /etc/pairing dir#g" ${WORKDIR}/systemrw-pairing.service
+    sed -i "s#systemrw/afc /etc/afc#systemrw/afc /etc/afc dir#g" ${WORKDIR}/systemrw-afc.service
+    sed -i "s#systemrw/afc-daemon /etc/afc-daemon#systemrw/afc-daemon /etc/afc-daemon dir#g" ${WORKDIR}/systemrw-afc-daemon.service
+    sed -i "s#systemrw/qca-afc-daemon /etc/qca-afc-daemon#systemrw/qca-afc-daemon /etc/qca-afc-daemon dir#g" ${WORKDIR}/systemrw-qca-afc-daemon.service
+    sed -i "s#systemrw/misc /etc/misc#systemrw/misc /etc/misc dir#g" ${WORKDIR}/systemrw-misc.service
+}
+do_install[prefuncs] += " ${@bb.utils.contains('BBFILE_COLLECTIONS', 'qti-rdkb', 'fix_afc_service', '', d)}"
+
 do_install_append () {
     if ${@bb.utils.contains('MACHINE_MNT_POINTS', '/systemrw', 'true', 'false', d)}; then
         install -d ${D}${base_sbindir}
@@ -48,6 +57,11 @@ VOLATILE_BINDS:sdxpinn = "\
 /systemrw/resolv.conf /etc/resolv.conf\n\
 /var/volatile/lib /var/lib\n\
 ${@bb.utils.contains('BBFILE_COLLECTIONS', 'qti-rdkb', '/systemrw/dibbler /etc/dibbler', '', d)}\n\
+${@bb.utils.contains('BBFILE_COLLECTIONS', 'qti-rdkb', '/systemrw/afc /etc/afc', '', d)}\n\
+${@bb.utils.contains('BBFILE_COLLECTIONS', 'qti-rdkb', '/systemrw/afc-daemon /etc/afc-daemon', '', d)}\n\
+${@bb.utils.contains('BBFILE_COLLECTIONS', 'qti-rdkb', '/systemrw/qca-afc-daemon /etc/qca-afc-daemon', '', d)}\n\
+${@bb.utils.contains('BBFILE_COLLECTIONS', 'qti-rdkb', '/systemrw/pairing /etc/pairing', '', d)}\n\
+${@bb.utils.contains('BBFILE_COLLECTIONS', 'qti-rdkb', '/systemrw/misc /etc/misc', '', d)}\n\
 "
 
 VOLATILE_BINDS_sdxlemur = "\
