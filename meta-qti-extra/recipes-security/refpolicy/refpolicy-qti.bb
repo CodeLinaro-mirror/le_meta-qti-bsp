@@ -36,7 +36,7 @@ EXTRA_OEMAKE += "\
 "
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 PROVIDES += "virtual/refpolicy"
-RPROVIDES_${PN} += "refpolicy"
+RPROVIDES:${PN} += "refpolicy"
 FILES:${PN} += "\
     ${sysconfdir}/selinux/${POLICY_NAME}/ \
     ${datadir}/selinux/${POLICY_NAME}/*.pp \
