@@ -20,58 +20,49 @@ ARM_FLOAT_ABI = "hard"
 
 include conf/machine/include/tune-cortexa8.inc
 
-BBMASK = ".*/*/recipes-kernel/linux-msm-4.4"
-BBMASK .= "|.*/*/recipes-security/libselinux/"
-BBMASK .= "|.*/*/recipes-devtools/mtd/"
-
-MACHINE_DISPLAY_WIDTH_PIXELS ?= "480"
-MACHINE_DISPLAY_HEIGHT_PIXELS ?= "640"
+PREFERRED_PROVIDER_virtual/kernel = "linux-msm"
+PREFERRED_VERSION_linux-msm = "5.4"
+PREFERRED_VERSION_linux-msm-headers = "5.4"
+PREFERRED_VERSION_powermanager-daemon = "1.0"
 
 SERIAL_CONSOLES ?= "115200;ttyMSM0"
+KERNEL_IMAGETYPE = "zImage"
+KERNEL_BASE = "0x80000000"
+KERNEL_TAGS_OFFSET = "0x82000000"
 
-DISTRO ?= "mdm"
+KERNEL_DYNAMIC_DEFCONFIG = "True"
 
-DISTRO_FEATURES_append = " persist-volume"
+KERNEL_CONFIG ?= "vendor/mdm9650_auto_defconfig"
+KERNEL_CONFIG_qti-distro-debug ?= "vendor/mdm9650_auto-debug_defconfig"
 
-MACHINE_FEATURES += "kernel26 keyboard ipa-offload dm-verity-none"
+KERNEL_CMD_PARAMS = "noinitrd ro rootwait earlycon=msm_serial_dm,0x78b1000 console=ttyMSM0,115200,n8 androidboot.hardware=qcom androidboot.console=ttyMSM0 lpm_levels.sleep_disabled=1 service_locator.enable=1 firmware_class.path=/lib/firmware/updates msm_rtb.filter=0x237"
 
-#PAGE_SIZE = '4096'
-#UBINIZE_ARGS = "-m 4096 -p 256KiB -s 4096"
-#MKUBIFS_ARGS = "-m 4096 -e 253952 -c 2146 -F"
+KERNEL_DTB_NAMES    = "\
+                        vendor/qcom/mdm9650-ttp.dtb \
+                        vendor/qcom/mdm9650-mtp.dtb \
+"
 
-PAGE_SIZE = '2048'
-UBINIZE_ARGS = "-m 2048 -p 128KiB -s 2048"
-MKUBIFS_ARGS = "-m 2048 -e 126976 -c 2047 -F"
+# Bootloader configuration
+EXTRA_IMAGEDEPENDS += "lk"
 
-#PAGE_SIZE ?= '4096'
+# MACHINE_FEATURES ##
+# qti-security:           Machine supports QTI security solution
+# qti-wifi:               Machine supports QTI WiFi solution
+# qti-audio:              Machine supports QTI audio solution
+# qti-bluetooth:          Machine supports QTI bluetooth solution
+# qti-location:           Machine supports Location solution
+# qti-data-modem:         Machine supports QTI data modem solution
+# qti-modem:              Machine supports QTI modem solution
 
-# Max supported inodes
-EXTRA_IMAGECMD ?= "-N 2048"
+MACHINE_FEATURES += "qti-sdx dm-verity-none nand-boot qwesd"
 
-#UBINIZE Args
-#UBINIZE_ARGS ?= "-m 4096 -p 256KiB -s 4096"
-#MKUBIFS Args
-#MKUBIFS_ARGS ?= "-m 4096 -e 253952 -c 2146 -F"
-#Volume sizes
-SYSTEM_VOLUME_SIZE ?= "120MiB"
-CACHE_VOLUME_SIZE ?= "6MiB"
-SYSTEMRW_VOLUME_SIZE ?= "6MiB"
-PERSIST_VOLUME_SIZE ?= "6MiB"
-
-# Sizes for EXT4 (in bytes)
-SYSTEM_SIZE_EXT4 ?= "200000000"
-SYSTEMRW_SIZE_EXT4 ?= "8388608"
-USERDATA_SIZE_EXT4 ?= "2000000000"
-CACHE_SIZE_EXT4 ?= "80000000"
-
-# Enable LE Verified Boot
-DISTRO_FEATURES_append = " vble"
-
-#Disable rpmb listener
-DISTRO_FEATURES_append = " no-rpmb-listener-support"
-
-#Disable ssd listener
-DISTRO_FEATURES_append = " no-ssd-listener-support"
+MACHINE_MNT_POINTS = " \
+    /firmware \
+    /persist \
+    /cache \
+    /data \
+    /systemrw \
+"
 
 #Enable SDK feature
 SDK_IMAGE ?= "1"
@@ -83,14 +74,33 @@ IMAGE_FSTYPES += "ubi"
 TARGET_CFLAGS_append = " -DTARGET_ION_ABI_VERSION=2 "
 TARGET_CXXFLAGS_append = " -DTARGET_ION_ABI_VERSION=2 "
 
-# Use systemd init manager.
-DISTRO_FEATURES_remove = "sysvinit"
-DISTRO_FEATURES_append = " systemd"
-DISTRO_FEATURES_BACKFILL_CONSIDERED += "sysvinit"
-VIRTUAL-RUNTIME_dev_manager = "udev"
-VIRTUAL-RUNTIME_init_manager = "systemd"
+MACHINE_SUPPORTS_PDMAPPER = "False"
+MACHINE_SUPPORTS_INIT_RAMDISK = "False"
+MACHINE_SUPPORTS_ANDROID_PROPERTIES = "False"
 
-# Change Image features for systemd.
-IMAGE_DEV_MANAGER = "udev"
-IMAGE_INIT_MANAGER = "systemd"
-IMAGE_INITSCRIPTS = ""
+# Disable autosuspend for USB peripheral mode
+MACHINE_SUPPORTS_USB_AUTOSUSPEND = "False"
+
+# File indicating firmware residing places on device.
+MACHINE_FILESMAP_CONF = "mdm9607-filesmap"
+
+USBCOMPOSITION = "9025"
+
+# On msm-5.4 or above ufs driver supports BSG Device.
+UFS_BSG_DEV_USAGE = "True"
+
+PREFERRED_VERSION_openssl = "1.1.1s"
+PREFERRED_VERSION_protobuf = "3.11.4"
+PREFERRED_VERSION_protobuf-native = "3.11.4"
+PREFERRED_VERSION_python3-protobuf = "3.11.3"
+PREFERRED_VERSION_python3-protobuf-native = "3.11.3"
+PREFERRED_VERSION_protobuf-c = "1.3.3"
+PREFERRED_VERSION_iproute2 = "5.5.0"
+
+# y2038: Support for Y2038 safe time on 32 bit systems
+TARGET_CFLAGS += "-D_TIME_BITS=64 -D_FILE_OFFSET_BITS=64"
+TARGET_CPPFLAGS += "-D_TIME_BITS=64 -D_FILE_OFFSET_BITS=64"
+
+DISTRO_FEATURES_remove = "qti-telux"
+
+DEFAULT_ENFORCING = "permissive"
