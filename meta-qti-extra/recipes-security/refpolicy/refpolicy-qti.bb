@@ -49,6 +49,40 @@ FILES:${PN}-dev += "\
 DEFAULT_ENFORCING ??= "permissive"
 POLICY_TYPE = "qti"
 POLICY_NAME = "qti"
+
+fix_platcil() {
+    cilfile="$1"
+    sed -i '1i(type audio_property)' ${cilfile}
+    sed -i '1i(type tunnel_audio_property)' ${cilfile}
+    sed -i '1i(type av_property)' ${cilfile}
+    sed -i '1i(type nfc_property)' ${cilfile}
+    sed -i '1i(type camera_property)' ${cilfile}
+    sed -i '1i(type debug_property)' ${cilfile}
+    sed -i '1i(type lmk_property)' ${cilfile}
+    sed -i '1i(type config_property)' ${cilfile}
+    sed -i '1i(type systemd_journal)' ${cilfile}
+    sed -i '1i(type system_bootstrap_lib_file)' ${cilfile}
+    sed -i '1i(type adsprpcd_file)' ${cilfile}
+    sed -i '1i(type bt_firmware_file)' ${cilfile}
+    sed -i '1i(type vendor_ssgtzd_exec)' ${cilfile}
+    sed -i '1i(type vendor_cdsprpcd_exec)' ${cilfile}
+    sed -i '1i(type media_property)' ${cilfile}
+    sed -i '1i(type persist_property)' ${cilfile}
+    sed -i '1i(type vendor_buildprop)' ${cilfile}
+    sed -i '1i(type carwatchdogd)' ${cilfile}
+    sed -i '1i(type service)' ${cilfile}
+    sed -i '1i(type dbus)' ${cilfile}
+    sed -i '1i(type adsprpcd_file)' ${cilfile}
+    sed -i '1i(type vendor_sysfs_memory_offline)' ${cilfile}
+    sed -i '1i(type cgroup_bpf)' ${cilfile}
+    sed -i '1i(type ais_v4l2_proxy)' ${cilfile}
+    sed -i '1i(type vendor_hal_automotive_vehicle_qti)' ${cilfile}
+    sed -i 's/(typeattributeset domain (/&carwatchdogd /' ${cilfile}
+    sed -i 's/(class system (ipc_info syslog_read syslog_mod syslog_console module_request module_load /&halt reboot status start stop enable disable reload/' ${cilfile}
+    sed -i 's/keystore2_key diced drmservice /&service dbus passwd/' ${cilfile}
+    sed -i '$a (class passwd ( passwd chfn chsh rootok crontab ))' ${cilfile}
+}
+
 # Need add module name into here once add a new module in vendor-modules.
 # we want to get the cil file of vendor-modules with module defined in modules.conf,
 # we can't config module which we added in vendor-modules as base in modules.conf because it would re-declaration when we combine host cil with android cils,
@@ -65,36 +99,7 @@ fakeroot do_configure() {
     echo "<summary>Policy modules for the Qti selinux.</summary>" > ${S_HOST_MODULES}/metadata.xml
     cp -rf ${S_HOST_MODULES} ${S_GIT_REFPOLICY}/policy/modules/
     sed -i '1 i\r:host_exec_t:s0 r:host_exec_t:s0' ${S_GIT_REFPOLICY}/config/appconfig-qti/default_contexts
-    sed -i '1i(type audio_property)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
-    sed -i '1i(type tunnel_audio_property)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
-    sed -i '1i(type av_property)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
-    sed -i '1i(type nfc_property)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
-    sed -i '1i(type camera_property)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
-    sed -i '1i(type debug_property)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
-    sed -i '1i(type lmk_property)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
-    sed -i '1i(type config_property)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
-    sed -i '1i(type systemd_journal)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
-    sed -i '1i(type system_bootstrap_lib_file)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
-    sed -i '1i(type adsprpcd_file)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
-    sed -i '1i(type bt_firmware_file)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
-    sed -i '1i(type vendor_ssgtzd_exec)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
-    sed -i '1i(type vendor_cdsprpcd_exec)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
-    sed -i '1i(type media_property)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
-    sed -i '1i(type persist_property)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
-    sed -i '1i(type vendor_buildprop)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
-    sed -i '1i(type carwatchdogd)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
-    sed -i '1i(type service)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
-    sed -i '1i(type adsprpcd_file)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
-    sed -i '1i(type vendor_sysfs_memory_offline)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
-    sed -i '1i(type cgroup_bpf)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
-    sed -i '1i(type ais_v4l2_proxy)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
-    sed -i 's/(typeattributeset domain (/&carwatchdogd /' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
-    sed -i 's/(classorder (/&service /' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
-    sed -i 's/(classorder (/&dbus /' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
-    sed -i 's/(classorder (/&passwd /' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
-    sed -i 's/class system (ipc_info syslog_read syslog_mod syslog_console module_request module_load /&halt reboot status start stop enable disable reload/' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
-    sed -i 's/keystore_key drmservice /&service dbus passwd/' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
-    sed -i '$a (class passwd ( passwd chfn chsh rootok crontab ))' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
+    fix_platcil "${S_ANDROID_CILS}/system/plat_sepolicy.cil"
 }
 fakeroot do_compile() {
     oe_runmake conf
@@ -131,13 +136,29 @@ prepare_policy_store () {
 }
 # some statements can't be recognized by sepolicy when compile sepolicy and refpolicy
 compatibility_fix() {
+    sed -i '1i(roletype object_r vendor_sysfs_memory_offline)' ${S_PRECOMBINED_CILS}/host.cil
+    sed -i '1i(type vendor_sysfs_memory_offline)' ${S_PRECOMBINED_CILS}/host.cil
+    sed -i '1i(roletype object_r ais_v4l2_proxy)' ${S_PRECOMBINED_CILS}/host.cil
+    sed -i '1i(type ais_v4l2_proxy)' ${S_PRECOMBINED_CILS}/host.cil
     sed -i '/roleattributeset cil_gen_require system_r/d' ${S_PRECOMBINED_CILS}/host.cil
 }
+
 rebuild_policy () {
     install -d ${D}/${sysconfdir}/selinux/${POLICY_NAME}/policy
     SECILC_BIN=${STAGING_DIR_NATIVE}${prefix}/bin/secilc
-    ${SECILC_BIN} ${S_PRECOMBINED_CILS}/host.cil ${S_PRECOMBINED_CILS}/fix.cil ${S_ANDROID_CILS}/system/plat_sepolicy.cil ${S_ANDROID_CILS}/system/30.0.cil ${S_ANDROID_CILS}/vendor/vendor_sepolicy.cil ${S_ANDROID_CILS}/vendor/plat_pub_versioned.cil ${S_ANDROID_CILS}/product/30.0.cil ${S_ANDROID_CILS}/product/product_sepolicy.cil ${S_ANDROID_CILS}/system_ext/30.0.cil ${S_ANDROID_CILS}/system_ext/system_ext_sepolicy.cil ${S_HOST_REFPOLICY}/host_append.cil -m -M true -G -N -c 30 -o ${D}${sysconfdir}/selinux/${POLICY_NAME}/policy/policy.30
+    ${SECILC_BIN} ${S_PRECOMBINED_CILS}/host.cil ${S_PRECOMBINED_CILS}/fix.cil \
+    ${S_ANDROID_CILS}/product/product_sepolicy.cil \
+    ${S_ANDROID_CILS}/product/33.0.cil \
+    ${S_ANDROID_CILS}/system/plat_sepolicy.cil \
+    ${S_ANDROID_CILS}/system/33.0.cil \
+    ${S_ANDROID_CILS}/system_ext/system_ext_sepolicy.cil \
+    ${S_ANDROID_CILS}/system_ext/33.0.cil \
+    ${S_ANDROID_CILS}/vendor/plat_pub_versioned.cil \
+    ${S_ANDROID_CILS}/vendor/vendor_sepolicy.cil \
+    ${S_HOST_REFPOLICY}/host_append.cil \
+    -m -M true -G -N -c 33 -o ${D}${sysconfdir}/selinux/${POLICY_NAME}/policy/policy.33
 }
+
 install_misc_files () {
     echo "user_tty_device_t" > \
         ${D}${sysconfdir}/selinux/${POLICY_NAME}/contexts/customizable_types
