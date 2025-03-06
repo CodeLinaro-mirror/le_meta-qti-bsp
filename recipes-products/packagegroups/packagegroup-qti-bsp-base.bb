@@ -56,6 +56,7 @@ RDEPENDS:packagegroup-support-utils-base = "\
 
 EXFAT_SUPPORT ?= "False"
 EXFAT_SUPPORT:kalama = "True"
+EXFAT_SUPPORT:pineapple = "True"
 
 RDEPENDS:packagegroup-filesystem-utils-base = "\
     e2fsprogs \
