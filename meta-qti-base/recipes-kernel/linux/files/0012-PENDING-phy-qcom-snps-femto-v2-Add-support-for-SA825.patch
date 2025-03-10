@@ -1,8 +1,7 @@
-From f9a5f49d6d60a9a52bc9c986a09a4d2a98a0d8fe Mon Sep 17 00:00:00 2001
+From 8213193ad8d56dfe9add2982a3f3af8e763beed6 Mon Sep 17 00:00:00 2001
 From: Sriram Dash <quic_sriramd@quicinc.com>
 Date: Mon, 8 Jul 2024 11:41:52 +0530
-Subject: [PATCH 13/14] PENDING: phy: qcom-snps-femto-v2: Add support for
- SA8255P
+Subject: [PATCH 5/5] PENDING: phy: qcom-snps-femto-v2: Add support for SA8255P
 
 QCOM SoC sa8255p allow multiple resources to be managed
 by firmware. On this platform, tasks related to clocks, regulators,
@@ -30,7 +29,7 @@ Signed-off-by: Sriram Dash <quic_sriramd@quicinc.com>
  1 file changed, 109 insertions(+), 13 deletions(-)
 
 diff --git a/drivers/phy/qualcomm/phy-qcom-snps-femto-v2.c b/drivers/phy/qualcomm/phy-qcom-snps-femto-v2.c
-index 2affa2538e76..0937bd789f02 100644
+index 2affa2538e764..1ea62b8cd4e4c 100644
 --- a/drivers/phy/qualcomm/phy-qcom-snps-femto-v2.c
 +++ b/drivers/phy/qualcomm/phy-qcom-snps-femto-v2.c
 @@ -12,6 +12,7 @@
@@ -97,11 +96,11 @@ index 2affa2538e76..0937bd789f02 100644
 +       if (!hsphy->pd_list)
 +               return 0;
 +
++       ret = pm_runtime_resume_and_get(hsphy->pd_list->pd_devs[1]);
++
 +       ret = pm_runtime_resume_and_get(hsphy->pd_list->pd_devs[0]);
 +       if (ret)
 +               return ret;
-+
-+       ret = pm_runtime_resume_and_get(hsphy->pd_list->pd_devs[1]);
 +
 +       return ret;
 +}
@@ -294,5 +293,5 @@ index 2affa2538e76..0937bd789f02 100644
  	reset_control_assert(hsphy->phy_reset);
  	clk_bulk_disable_unprepare(hsphy->num_clks, hsphy->clks);
 -- 
-2.34.1
+2.17.1
 

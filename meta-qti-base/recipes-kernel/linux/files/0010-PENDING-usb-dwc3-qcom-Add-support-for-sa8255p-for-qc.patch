@@ -1,7 +1,8 @@
-From 406a335187a5b661e860adc1bb87f1ab7d905c2f Mon Sep 17 00:00:00 2001
+From 38402fa6c5bfcf9a4a9b143dbc710f4b033ffdb2 Mon Sep 17 00:00:00 2001
 From: Sriram Dash <quic_sriramd@quicinc.com>
-Date: Mon, 8 Jul 2024 11:39:05 +0530
-Subject: [PATCH] PENDING: usb: dwc3: qcom: Add support for sa8255p for qcom usb
+Date: Thu, 27 Feb 2025 20:49:10 +0530
+Subject: [PATCH 3/5] PENDING: usb: dwc3: qcom: Add support for sa8255p for
+ qcom usb
 
 QCOM SoC sa8255p allow multiple resources to be managed
 by firmware. On this platform, tasks related to clocks, regulators,
@@ -24,14 +25,13 @@ transition: d0 <--> d1  :: only transfer supplier
 
 Change-Id: Iaa236081cd76d263279d23115534bd2b81ec70ba
 Signed-off-by: Sriram Dash <quic_sriramd@quicinc.com>
-Signed-off-by: Nikunj Kela <quic_nkela@quicinc.com>
 Signed-off-by: Shazad Hussain <quic_shazhuss@quicinc.com>
 ---
- drivers/usb/dwc3/dwc3-qcom.c | 128 ++++++++++++++++++++++++++++++++++-
- 1 file changed, 125 insertions(+), 3 deletions(-)
+ drivers/usb/dwc3/dwc3-qcom.c | 129 ++++++++++++++++++++++++++++++++++-
+ 1 file changed, 126 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/usb/dwc3/dwc3-qcom.c b/drivers/usb/dwc3/dwc3-qcom.c
-index ebad092be3f4..2c0b6e3d60f6 100644
+index c5ceddae6f5d9..952df33e28fb6 100644
 --- a/drivers/usb/dwc3/dwc3-qcom.c
 +++ b/drivers/usb/dwc3/dwc3-qcom.c
 @@ -16,6 +16,7 @@
@@ -53,8 +53,8 @@ index ebad092be3f4..2c0b6e3d60f6 100644
  struct dwc3_qcom {
  	struct device		*dev;
  	void __iomem		*qscratch_base;
-@@ -94,8 +99,83 @@ struct dwc3_qcom {
- 	bool			enable_rt;
+@@ -95,8 +100,83 @@ struct dwc3_qcom {
+ 	bool			ignore_pipe_clk;
  	enum usb_role		current_role;
  	struct notifier_block	xhci_nb;
 +
@@ -97,11 +97,11 @@ index ebad092be3f4..2c0b6e3d60f6 100644
 +	if (!qcom->pd_list)
 +		return 0;
 +
++	ret = pm_runtime_resume_and_get(qcom->pd_list->pd_devs[1]);
++
 +	ret = pm_runtime_resume_and_get(qcom->pd_list->pd_devs[0]);
 +	if (ret)
 +		return ret;
-+
-+	ret = pm_runtime_resume_and_get(qcom->pd_list->pd_devs[1]);
 +
 +	return ret;
 +}
@@ -137,7 +137,7 @@ index ebad092be3f4..2c0b6e3d60f6 100644
  static inline void dwc3_qcom_setbits(void __iomem *base, u32 offset, u32 val)
  {
  	u32 reg;
-@@ -458,6 +538,10 @@ static int dwc3_qcom_suspend(struct dwc3_qcom *qcom, bool wakeup)
+@@ -476,6 +556,10 @@ static int dwc3_qcom_suspend(struct dwc3_qcom *qcom, bool wakeup)
  	val = readl(qcom->qscratch_base + PWR_EVNT_IRQ_STAT_REG);
  	if (!(val & PWR_EVNT_LPM_IN_L2_MASK))
  		dev_err(qcom->dev, "HS-PHY not in L2\n");
@@ -148,7 +148,7 @@ index ebad092be3f4..2c0b6e3d60f6 100644
  
  	for (i = qcom->num_clocks - 1; i >= 0; i--)
  		clk_disable_unprepare(qcom->clks[i]);
-@@ -501,6 +585,16 @@ static int dwc3_qcom_resume(struct dwc3_qcom *qcom, bool wakeup)
+@@ -519,6 +603,16 @@ static int dwc3_qcom_resume(struct dwc3_qcom *qcom, bool wakeup)
  	if (dwc3_qcom_is_host(qcom) && wakeup)
  		dwc3_qcom_disable_interrupts(qcom);
  
@@ -165,7 +165,15 @@ index ebad092be3f4..2c0b6e3d60f6 100644
  	for (i = 0; i < qcom->num_clocks; i++) {
  		ret = clk_prepare_enable(qcom->clks[i]);
  		if (ret < 0) {
-@@ -960,6 +1054,7 @@ static int dwc3_qcom_probe(struct platform_device *pdev)
+@@ -728,6 +822,7 @@ static int dwc3_qcom_clk_init(struct dwc3_qcom *qcom, int count)
+ 
+ static const struct property_entry dwc3_qcom_props[] = {
+ 	PROPERTY_ENTRY_BOOL("snps,allow-role-switch-userspace-control"),
++	PROPERTY_ENTRY_BOOL("xhci-reset-on-resume"),
+ 	{ },
+ };
+ 
+@@ -977,6 +1072,7 @@ static int dwc3_qcom_probe(struct platform_device *pdev)
  	struct device_node	*np = pdev->dev.of_node;
  	struct device		*dev = &pdev->dev;
  	struct dwc3_qcom	*qcom;
@@ -173,7 +181,7 @@ index ebad092be3f4..2c0b6e3d60f6 100644
  	struct resource		*res, *parent_res = NULL;
  	struct resource		local_res;
  	int			ret, i;
-@@ -971,6 +1066,8 @@ static int dwc3_qcom_probe(struct platform_device *pdev)
+@@ -988,6 +1084,8 @@ static int dwc3_qcom_probe(struct platform_device *pdev)
  	if (!qcom)
  		return -ENOMEM;
  
@@ -182,9 +190,9 @@ index ebad092be3f4..2c0b6e3d60f6 100644
  	legacy_binding = dwc3_qcom_has_separate_dwc3_of_node(dev);
  
  	if (!legacy_binding)
-@@ -981,6 +1078,20 @@ static int dwc3_qcom_probe(struct platform_device *pdev)
- 	qcom->dev = &pdev->dev;
- 	qcom->dwc.dev = qcom->dev;
+@@ -1002,6 +1100,20 @@ static int dwc3_qcom_probe(struct platform_device *pdev)
+ 	if (ret)
+ 		return ret;
  
 +	if (priv_data && priv_data->fw_managed) {
 +		ret = dwc3_qcom_domain_attach(qcom);
@@ -203,7 +211,7 @@ index ebad092be3f4..2c0b6e3d60f6 100644
  	if (has_acpi_companion(dev)) {
  		qcom->acpi_pdata = acpi_device_get_match_data(dev);
  		if (!qcom->acpi_pdata) {
-@@ -1004,14 +1115,13 @@ static int dwc3_qcom_probe(struct platform_device *pdev)
+@@ -1025,14 +1137,13 @@ static int dwc3_qcom_probe(struct platform_device *pdev)
  	if (legacy_binding) {
  		qcom->resets = devm_reset_control_array_get_optional_exclusive(dev);
  		if (IS_ERR(qcom->resets)) {
@@ -220,7 +228,7 @@ index ebad092be3f4..2c0b6e3d60f6 100644
  		}
  
  		usleep_range(10, 1000);
-@@ -1136,6 +1246,11 @@ static int dwc3_qcom_probe(struct platform_device *pdev)
+@@ -1157,6 +1268,11 @@ static int dwc3_qcom_probe(struct platform_device *pdev)
  reset_assert:
  	reset_control_assert(qcom->resets);
  
@@ -232,7 +240,7 @@ index ebad092be3f4..2c0b6e3d60f6 100644
  	return ret;
  }
  
-@@ -1160,6 +1275,9 @@ static void dwc3_qcom_remove(struct platform_device *pdev)
+@@ -1181,6 +1297,9 @@ static void dwc3_qcom_remove(struct platform_device *pdev)
  	else
  		platform_device_put(pdev);
  
@@ -242,7 +250,7 @@ index ebad092be3f4..2c0b6e3d60f6 100644
  	for (i = qcom->num_clocks - 1; i >= 0; i--) {
  		clk_disable_unprepare(qcom->clks[i]);
  		clk_put(qcom->clks[i]);
-@@ -1287,6 +1405,10 @@ static const struct dev_pm_ops dwc3_qcom_dev_pm_ops = {
+@@ -1308,6 +1427,10 @@ static const struct dev_pm_ops dwc3_qcom_dev_pm_ops = {
  };
  
  static const struct of_device_id dwc3_qcom_of_match[] = {
