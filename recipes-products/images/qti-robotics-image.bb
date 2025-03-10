@@ -68,6 +68,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         tdk-thermistor-app \
         system-sample-apps \
         qti-c2-module \
+        packagegroup-qti-telematics \
 "
 CORE_IMAGE_EXTRA_INSTALL:remove:pineapple = "alsa-utils"
 CORE_IMAGE_EXTRA_INSTALL:remove:pineapple = "can-utils"
