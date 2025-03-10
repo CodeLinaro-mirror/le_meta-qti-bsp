@@ -1,0 +1,114 @@
+From 75606813e8e65bcd57e97df889cf9d8fd608303b Mon Sep 17 00:00:00 2001
+From: Zahir Shabbir Khan <quic_zshabbir@quicinc.com>
+Date: Fri, 25 Oct 2024 12:22:15 +0530
+Subject: [PATCH] PENDING: spi: spi-geni-qcom:Add support for S2R feature
+
+In the context of S2R(System to RAM), a mode intended for
+prolonged sleep cycles, the system-on-chip (SoC)
+is powered down and its state is preserved and subsequently
+restored from DRAM during entry/exit phases of S2R.
+
+Within S2R, hardware context is relinquished,whereas
+software context persists. As a result, serial engine
+configurations undergo re-initialization, resembling
+a probe-like process.
+
+The flag PM_SUSPEND_MEM is used to determine whether the system
+is in S2R or not.
+
+This change support only in FIFO/SE-DMA mode and later we will do
+for GSI mode support.
+
+Change-Id: Icad8214ecb3833dbd26a4ab11026f0ff4a5fcc90
+Signed-off-by: Praveen Talari <quic_ptalari@quicinc.com>
+Signed-off-by: Zahir Shabbir Khan <quic_zshabbir@quicinc.com>
+---
+ drivers/spi/spi-geni-qcom.c | 34 ++++++++++++++++++++++------------
+ 1 file changed, 22 insertions(+), 12 deletions(-)
+
+diff --git a/drivers/spi/spi-geni-qcom.c b/drivers/spi/spi-geni-qcom.c
+index 2cdb13181376..76a8fa9d92c4 100644
+--- a/drivers/spi/spi-geni-qcom.c
++++ b/drivers/spi/spi-geni-qcom.c
+@@ -17,6 +17,7 @@
+ #include <linux/soc/qcom/geni-se.h>
+ #include <linux/spi/spi.h>
+ #include <linux/spinlock.h>
++#include <linux/suspend.h>
+ 
+ /* SPI SE specific registers and respective register fields */
+ #define SE_SPI_CPHA		0x224
+@@ -713,6 +714,9 @@ static int spi_geni_init(struct spi_geni_master *mas)
+ 	u32 spi_tx_cfg, fifo_disable;
+ 	int ret = -ENXIO;
+ 
++	if (mas->cur_xfer_mode != GENI_SE_INVALID)
++		return 0;
++
+ 	pm_runtime_get_sync(mas->dev);
+ 
+ 	proto = geni_se_read_proto(se);
+@@ -752,21 +756,15 @@ static int spi_geni_init(struct spi_geni_master *mas)
+ 	switch (fifo_disable) {
+ 	case 1:
+ 		ret = spi_geni_grab_gpi_chan(mas);
+-		if (!ret) { /* success case */
+-			mas->cur_xfer_mode = GENI_GPI_DMA;
+-			geni_se_select_mode(se, GENI_GPI_DMA);
+-			spi_trace_log(mas->dev, "Using GPI DMA mode for SPI\n");
+-			break;
+-		} else if (ret == -EPROBE_DEFER) {
++		if (ret) {
++			dev_err(mas->dev, "Failed to allocate GPI DMA channel\n");
+ 			goto out_pm;
+ 		}
+-		/*
+-		 * in case of failure to get gpi dma channel, we can still do the
+-		 * FIFO mode, so fallthrough
+-		 */
+-		dev_warn(mas->dev, "FIFO mode disabled, but couldn't get DMA, fall back to FIFO mode\n");
+-		fallthrough;
+ 
++		mas->cur_xfer_mode = GENI_GPI_DMA;
++		geni_se_select_mode(se, GENI_GPI_DMA);
++		spi_trace_log(mas->dev, "Using GPI DMA mode for SPI\n");
++		break;
+ 	case 0:
+ 		mas->cur_xfer_mode = GENI_SE_FIFO;
+ 		geni_se_select_mode(se, GENI_SE_FIFO);
+@@ -1293,6 +1291,8 @@ static int spi_geni_probe(struct platform_device *pdev)
+ 	if (device_property_read_bool(&pdev->dev, "spi-slave"))
+ 		spi->target = true;
+ 
++	mas->cur_xfer_mode = GENI_SE_INVALID;
++
+ 	ret = spi_geni_init(mas);
+ 	if (ret)
+ 		goto spi_geni_probe_runtime_disable;
+@@ -1401,6 +1401,7 @@ static int __maybe_unused spi_geni_suspend(struct device *dev)
+ static int __maybe_unused spi_geni_resume(struct device *dev)
+ {
+ 	struct spi_controller *spi = dev_get_drvdata(dev);
++	struct spi_geni_master *mas = spi_master_get_devdata(spi);
+ 	int ret;
+ 
+ 	trace_spi_info(dev, __func__, "start");
+@@ -1408,6 +1409,15 @@ static int __maybe_unused spi_geni_resume(struct device *dev)
+ 	if (ret)
+ 		return ret;
+ 
++	if (pm_suspend_target_state == PM_SUSPEND_MEM) {
++		dev_dbg(dev, "%s: In S2R\n", __func__);
++		mas->cur_xfer_mode = GENI_SE_INVALID;
++
++		ret = spi_geni_init(mas);
++		if (ret)
++			return ret;
++	}
++
+ 	ret = spi_controller_resume(spi);
+ 	if (ret)
+ 		pm_runtime_force_suspend(dev);
+-- 
+2.17.1
+
