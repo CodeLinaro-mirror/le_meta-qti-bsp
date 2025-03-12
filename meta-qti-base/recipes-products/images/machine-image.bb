@@ -27,3 +27,17 @@ IMAGE_FEATURES:append = " ${@bb.utils.contains('VARIANT', 'debug', 'debug-tweaks
 
 INCOMPATIBLE_LICENSE_EXCEPTIONS:quin-gvm-gen4 = "bash:GPL-3.0-or-later"
 INCOMPATIBLE_LICENSE:quin-gvm-gen4 = "GPL-3.0* LGPL-3.0* AGPL-3.0*"
+
+INCOMPATIBLE_LICENSE_EXCEPTIONS:quin-gvm-lemans = "\
+    gdbserver:GPL-3.0-only \
+    gdbserver:LGPL-3.0-only \
+    gdb:GPL-3.0-only \
+    gdb:LGPL-3.0-only \
+    binutils:GPL-3.0-only \
+    python3-docutils:GPL-3.0-only \
+    bison:GPL-3.0-only \
+    gawk:GPL-3.0-only \
+    tar:GPL-3.0-only \
+    m4:GPL-3.0-only \
+    "
+INCOMPATIBLE_LICENSE:quin-gvm-lemans = "GPL-3.0* LGPL-3.0* AGPL-3.0*"
