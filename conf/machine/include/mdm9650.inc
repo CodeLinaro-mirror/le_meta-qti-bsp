@@ -54,7 +54,7 @@ EXTRA_IMAGEDEPENDS += "lk"
 # qti-data-modem:         Machine supports QTI data modem solution
 # qti-modem:              Machine supports QTI modem solution
 
-MACHINE_FEATURES += "qti-sdx dm-verity-none nand-boot qwesd"
+MACHINE_FEATURES += "qti-sdx dm-verity-none nand-boot qwesd qti-security no-rpmb-listener-support no-ssd-listener-support"
 
 MACHINE_MNT_POINTS = " \
     /firmware \
