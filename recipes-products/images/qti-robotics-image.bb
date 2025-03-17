@@ -12,20 +12,27 @@ ROS_FEATURES_PKG += "\
 "
 
 CORE_IMAGE_EXTRA_INSTALL += "\
+        alsa-utils \
         can-utils \
         chronyc \
         glib-2.0 \
         packagegroup-android-utils \
         packagegroup-filesystem-utils \
+        packagegroup-qti-audio \
+        packagegroup-qti-bluetooth \
         packagegroup-qti-core \
         packagegroup-qti-core-prop \
         diag-router \
         packagegroup-qti-eva \
         packagegroup-qti-display \
+        packagegroup-qti-touch \
         packagegroup-qti-dsp \
         packagegroup-qti-gfx \
         packagegroup-qti-gst \
         packagegroup-qti-mmframeworks \
+        packagegroup-qti-pulseaudio \
+        packagegroup-qti-video \
+        packagegroup-qti-wifi \
         packagegroup-startup-scripts \
         packagegroup-support-utils \
         systemd-machine-units \
@@ -69,10 +76,18 @@ CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-test-sensors-see"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "tdk-chx01-get-data-app"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "tdk-thermistor-app"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "packagegroup-qti-sensors-see"
-#CORE_IMAGE_EXTRA_INSTALL:append:kalama = " packagegroup-qti-qcawifi"
-#CORE_IMAGE_EXTRA_INSTALL:append:kalama = " tzdata tzcode"
-#CORE_IMAGE_EXTRA_INSTALL:append:kalama = " qcrosvm"
-#CORE_IMAGE_EXTRA_INSTALL:append:kalama = " vmsharememory-test"
+CORE_IMAGE_EXTRA_INSTALL:append:kalama = " packagegroup-qti-qcawifi"
+CORE_IMAGE_EXTRA_INSTALL:append:kalama = " tzdata tzcode"
+CORE_IMAGE_EXTRA_INSTALL:append:kalama = " qcrosvm"
+CORE_IMAGE_EXTRA_INSTALL:append:kalama = " vmsharememory-test"
+
+# For lxc on kalama
+CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "${@bb.utils.contains('DISTRO_FEATURES', 'lxc', 'packagegroup-qti-wifi', '', d)}"
+CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "${@bb.utils.contains('DISTRO_FEATURES', 'lxc', 'packagegroup-qti-qcawifi', '', d)}"
+CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "${@bb.utils.contains('DISTRO_FEATURES', 'lxc', 'packagegroup-qti-bluetooth', '', d)}"
+CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "${@bb.utils.contains('DISTRO_FEATURES', 'lxc', 'tzdata tzcode', '', d)}"
+CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "${@bb.utils.contains('DISTRO_FEATURES', 'lxc', 'qcrosvm', '', d)}"
+CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "${@bb.utils.contains('DISTRO_FEATURES', 'lxc', 'vmsharememory-test', '', d)}"
 CORE_IMAGE_EXTRA_INSTALL:append:kalama = "${@bb.utils.contains('DISTRO_FEATURES', 'lxc', 'lxc', '', d)}"
 PERSISTIMAGE_TARGET:kalama = "${@bb.utils.contains('DISTRO_FEATURES', 'lxc', 'lxc-persist.img', 'persist.img', d)}"
 
