@@ -6,6 +6,9 @@ SRC_URI:append = " ${@bb.utils.contains_any('PREFERRED_PROVIDER_virtual/kernel',
 SRC_URI:append = " ${@bb.utils.contains_any('PREFERRED_PROVIDER_virtual/kernel', 'linux-qcom-custom linux-qcom-custom-rt', "file://fix-mm-introduce-vma-vm_flags-wrapper-functions.patch","" ,d)}"
 SRC_URI:append = " ${@bb.utils.contains_any('PREFERRED_PROVIDER_virtual/kernel', 'linux-qcom-custom linux-qcom-custom-rt', "file://fix-uuid-Decouple-guid_t-and-uuid_le-types-and-respective-macros.patch","" ,d)}"
 SRC_URI:append = " ${@bb.utils.contains_any('PREFERRED_PROVIDER_virtual/kernel', 'linux-qcom-custom linux-qcom-custom-rt', "file://fix-net-add-location-to-trace_consume_skb.patch","" ,d)}"
+SRC_URI:append = " ${@bb.utils.contains_any('PREFERRED_PROVIDER_virtual/kernel', 'linux-qcom-custom linux-qcom-custom-rt', "file://fix-sched-stat-runtime-changed-in-linux-6.8.0-rc1.patch","" ,d)}"
+SRC_URI:append = " ${@bb.utils.contains_any('PREFERRED_PROVIDER_virtual/kernel', 'linux-qcom-custom linux-qcom-custom-rt', "file://fix-sched_stat_runtime-changed-in-Linux-6.6.66.patch","" ,d)}"
+
 
 inherit ${@bb.utils.contains('PREFERRED_PROVIDER_virtual/kernel', 'linux-msm', "qti-kernel-arch-clang", "", d)}
 
