@@ -7,7 +7,6 @@
 [Unit]
 Description=eth1 installer
 DefaultDependencies=no
-After=systemd-modules-load.service
 Before=sysinit.target
 
 [Service]
