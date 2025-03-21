@@ -1,0 +1,33 @@
+From 528552cdcde3ea8d459f7bfc999d33083e20d384 Mon Sep 17 00:00:00 2001
+From: Lei wang <quic_leiwan@quicinc.com>
+Date: Tue, 1 Nov 2022 18:06:51 +0800
+Subject: [PATCH] lxc: handle cgroup device not available gracefully
+
+We need configure devices may not exist in some case, like uart
+in perf build and for metal/gvm, we have different devices
+available, but we need to use one common conf for all conditions,
+so handle devices not available more gracefully other than return
+error and refuse launching lxc container.
+
+Upstream-Status: Pending
+Signed-off-by: Lei wang <quic_leiwan@quicinc.com>
+---
+ src/lxc/cgroups/cgfsng.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/lxc/cgroups/cgfsng.c b/src/lxc/cgroups/cgfsng.c
+index 82535bc3f..93064df40 100644
+--- a/src/lxc/cgroups/cgfsng.c
++++ b/src/lxc/cgroups/cgfsng.c
+@@ -2770,7 +2770,7 @@ __cgfsng_ops static bool cgfsng_setup_limits_legacy(struct cgroup_ops *ops,
+ 	list_for_each_entry(cgroup, cgroup_settings, head) {
+ 		if (do_devices == strnequal("devices", cgroup->subsystem, 7)) {
+ 			if (cg_legacy_set_data(ops, cgroup->subsystem, cgroup->value, strnequal("cpuset", cgroup->subsystem, 6))) {
+-				if (do_devices && (errno == EACCES || errno == EPERM)) {
++				if (do_devices && (errno == EACCES || errno == EPERM || errno == ENOENT)) {
+ 					SYSWARN("Failed to set \"%s\" to \"%s\"", cgroup->subsystem, cgroup->value);
+ 					continue;
+ 				}
+-- 
+2.37.3
+
