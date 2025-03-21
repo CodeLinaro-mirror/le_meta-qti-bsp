@@ -24,10 +24,10 @@ lxc.cgroup2.devices.allow = b *:* m
 
 lxc.signal.halt = SIGKILL
 # android will failed if mount /proc failed
-# lxc.mount.auto = proc:mixed sys:mixed cgroup:mixed
+lxc.mount.auto = proc:mixed sys:mixed cgroup:mixed
 
 # lxc.mount.entry = /tmp share/socket/camera none bind,create=dir 0 0
-lxc.mount.entry = /data data none bind,create=dir 0 0
+#lxc.mount.entry = /data data none bind,create=dir 0 0
 #lxc.mount.entry = /dev/tty50 dev/console none bind,create=file 0 0
 lxc.mount.entry = /dev/dma_heap dev/dma_heap none bind,create=dir 0 0
 lxc.mount.entry = /dev/input dev/input none bind,create=dir 0 0
