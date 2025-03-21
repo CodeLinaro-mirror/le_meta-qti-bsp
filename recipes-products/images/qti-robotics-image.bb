@@ -68,6 +68,8 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         tdk-thermistor-app \
         system-sample-apps \
         qti-c2-module \
+        displaydlkm \
+        displaydevicetree \
 "
 CORE_IMAGE_EXTRA_INSTALL:append:pineapple = " packagegroup-qcom-sensors"
 CORE_IMAGE_EXTRA_INSTALL:append:pineapple = " packagegroup-qti-ppat"
