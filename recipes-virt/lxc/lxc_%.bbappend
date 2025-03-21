@@ -3,6 +3,9 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 SRC_URI:append = " \
         file://autodev.sh \
         file://config \
+        file://0002-lxc-support-deny-device-by-devpth.patch \
+        file://0003-lxc-handle-cgroup-device-not-available-gracefully.patch \
+        file://0004-skip-fetch-seccomp-config-on-lxc-without-seccomp.patch \
 "
 
 FILES:${PN} += "lxc/bin"
