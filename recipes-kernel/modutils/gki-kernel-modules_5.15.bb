@@ -37,14 +37,14 @@ KERNEL_VERSION = "${@get_kernelversion_file("${STAGING_KERNEL_BUILDDIR}")}"
 do_install[depends] += "virtual/kernel:do_prebuilt_shared_workdir"
 do_install() {
     # Install modules
-    mkdir -p ${D}/lib/modules/${KERNEL_VERSION}
+    mkdir -p ${D}/${base_libdir}/modules/${KERNEL_VERSION}
     for mod in *.ko; do
         if [ -f $mod ]; then
-            install -m 0644 $mod ${D}/lib/modules/${KERNEL_VERSION}
+            install -m 0644 $mod ${D}/${base_libdir}/modules/${KERNEL_VERSION}
         fi
     done
     # Create empty modules.load as a place holder to mimic Android GKI ramdisk
-    touch ${D}/lib/modules/${KERNEL_VERSION}/modules.load
+    touch ${D}/${base_libdir}/modules/${KERNEL_VERSION}/modules.load
 
     # Install systemd configuration file for auto load
     install -d ${D}${sysconfdir}/modules-load.d/
@@ -60,7 +60,7 @@ ALLOW_EMPTY:${PN} = "1"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 PACKAGES = "${PN}-first-stage ${PN}-second-stage ${PN}-linkmodulesload ${PN}-dbg"
 FILES:${PN}-linkmodulesload += "${systemd_unitdir}/system/linkmodulesload.service"
-FILES:${PN}-dbg += "/lib/modules/${KERNEL_VERSION}/.debug"
+FILES:${PN}-dbg += "${base_libdir}/modules/${KERNEL_VERSION}/.debug"
 
 inherit systemd
 
@@ -73,13 +73,13 @@ python get_files_pn_from_conf() {
     f_conf = os.path.join(d.getVar('D'), 'etc/modules-load.d', '00-firstmods.conf')
     s_conf = os.path.join(d.getVar('D'), 'etc/modules-load.d', '00-secondmods.conf')
 
-    f_mods = [ '/etc/modules-load.d/00-firstmods.conf', '/lib/modules/*/modules.load' ]
+    f_mods = [ '/etc/modules-load.d/00-firstmods.conf', '${base_libdir}/modules/*/modules.load' ]
     with open(f_conf) as f:
         lines = f.readlines()
         for line in lines:
             if line.startswith('#'):
                 continue
-            f_mods += [ '/lib/modules/*/' + line.rstrip() + '.ko' ]
+            f_mods += [ '${base_libdir}/modules/*/' + line.rstrip() + '.ko' ]
     d.setVar('FILES:' + pn + '-first-stage', " ".join(f_mods))
 
     s_mods = [ '/etc/modules-load.d/00-secondmods.conf' ]
@@ -88,7 +88,7 @@ python get_files_pn_from_conf() {
         for line in lines:
             if line.startswith('#'):
                 continue
-            s_mods += [ '/lib/modules/*/' + line.rstrip() + '.ko' ]
+            s_mods += [ '${base_libdir}/modules/*/' + line.rstrip() + '.ko' ]
     d.setVar('FILES:' + pn + '-second-stage', " ".join(s_mods))
 }
 
