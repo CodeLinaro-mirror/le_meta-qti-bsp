@@ -92,3 +92,6 @@ persist.vendor.audio.avs.afe_api_version=7
 vendor.audio.gsl.shmem.dmaheap.uncached=true
 
 AUDIO_FEATURE_ENABLED_EC_REF_CAPTURE :=true
+
+#property to select target platform for Video
+vendor.media.target_variant=_scuba_v1
