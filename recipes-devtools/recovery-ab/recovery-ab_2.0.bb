@@ -30,7 +30,6 @@ PARALLEL_MAKE = ""
 
 EXTRA_OECONF:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'qti-ab-boot', 'TARGET_SUPPORTS_AB=true', '', d)}"
 EXTRA_OECONF:append = " ${@bb.utils.contains('MACHINE_FEATURES', 'qti-abc-boot', 'TARGET_SUPPORTS_ABC=true', '', d)}"
-EXTRA_OECONF += "${@bb.utils.contains('DISTRO_FEATURES', 'selinux', '--enable-selinux', '', d)}"
 
 FILES:${PN}  = "${bindir} ${libdir} ${systemd_unitdir} ${includedir} /res /cache"
 SYSTEMD_SERVICE:${PN} = " ${@bb.utils.contains('DISTRO_FEATURES', 'qti-ab-boot', bb.utils.contains('COMBINED_FEATURES', 'qti-nad-core', '', 'update_engine.service', d), '', d)}"
