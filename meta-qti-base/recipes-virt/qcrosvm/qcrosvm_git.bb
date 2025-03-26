@@ -30,6 +30,15 @@ inherit ${@bb.utils.contains("BBFILE_COLLECTIONS", "rust-layer", "cargo", "", d)
 
 CARGO_DISABLE_BITBAKE_VENDORING = "1"
 
+VM_CONFIG_XML ?= "vm_config_la.xml"
+VM_CONFIG_XML:sa8255-ivi = "vm_config_lalv.xml"
+VM_CONFIG_XML:sa7255-ivi = "vm_config_lalv.xml"
+
+do_install:append() {
+    install -d ${D}${sysconfdir}
+    install -m 0644 ${S}/vm_config_xml/${VM_CONFIG_XML} ${D}${sysconfdir}/vm_config.xml
+}
+
 do_install:append:sa8775() {
     install -d ${D}${systemd_unitdir}/system/
     install -m 0644 ${S}/qcrosvm.service ${D}/${systemd_unitdir}/system/qcrosvm.service
