@@ -49,7 +49,7 @@ ghgvm_pilsplitter() {
     install -d ${DEPLOY_DIR_IMAGE}/signing/boot
     python3 ${PILTOOLS_PATH}/pil-splitter.py autoghgvmlv_signed-boot.elf boot/autoghgvmlv
 
-    ${STAGING_BINDIR_NATIVE}/build/prebuilts/kernel-build-tools/linux-x86/bin/mkuserimg_mke2fs ${DEPLOY_DIR_IMAGE}/signing/boot ${DEPLOY_DIR_IMAGE}/vm-boot.img ext4 / 60000000
+    ${STAGING_BINDIR_NATIVE}/build/prebuilts/kernel-build-tools/linux-x86/bin/mkuserimg_mke2fs ${DEPLOY_DIR_IMAGE}/signing/boot ${DEPLOY_DIR_IMAGE}/vm-bootloader.img ext4 / 60000000
 
     sectools secure-image autoghgvmlv-bootloader.elf --image-id GVM1 --security-profile ${STAGING_BINDIR_NATIVE}/${SECTOOLS_SECURITY_PROFILE} --sign --signing-mode TEST --outfile autoghgvmlv_signed-bootloader.elf
     sectools secure-image autoghgvmlv-bootloader.elf --inspect
@@ -57,7 +57,7 @@ ghgvm_pilsplitter() {
     install -d ${DEPLOY_DIR_IMAGE}/signing/bootloader
     python3 ${PILTOOLS_PATH}/pil-splitter.py autoghgvmlv_signed-bootloader.elf bootloader/autoghgvmlv
 
-    ${STAGING_BINDIR_NATIVE}/build/prebuilts/kernel-build-tools/linux-x86/bin/mkuserimg_mke2fs ${DEPLOY_DIR_IMAGE}/signing/bootloader ${DEPLOY_DIR_IMAGE}/vm-bootloader.img ext4 / 6000000
+    ${STAGING_BINDIR_NATIVE}/build/prebuilts/kernel-build-tools/linux-x86/bin/mkuserimg_mke2fs ${DEPLOY_DIR_IMAGE}/signing/bootloader ${DEPLOY_DIR_IMAGE}/${PRODUCT}-bootloader.img ext4 / 6000000
 }
 
 do_ghgvm_pilsplitter() {
