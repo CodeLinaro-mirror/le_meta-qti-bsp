@@ -55,10 +55,6 @@ do_install:append:sa8797() {
     install -m 0755 ${S}/vfio-device-probe/sa8797_dev.conf -D ${D}${libdir}/vfio-bind.d/sa8797_dev.conf
 }
 
-do_install:append:gh-gvm-lemans() {
-    install -m 0644 ${WORKDIR}/eth0-gh-gvm-lemans.network ${D}${sysconfdir}/systemd/network/eth0.network
-}
-
 FILES:${PN} += "${libdir}/modules-load.d/*"
 FILES:${PN} += "${libdir}/vfio-bind.d/*"
 FILES:${PN} += "${sysconfdir}/*"
