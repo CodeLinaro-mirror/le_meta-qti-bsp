@@ -182,7 +182,9 @@ addtask do_makepersist_sqsh after do_image before do_makesystem_sqsh
 do_copy_image() {
     mkdir -p ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${FS_TYPE_SQSH}
     cp ${DEPLOY_DIR_IMAGE}/abl.elf ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${FS_TYPE_SQSH}/abl.elf
+    cp ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${BOOTIMAGE_TARGET} ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${FS_TYPE_SQSH}/${BOOTIMAGE_TARGET}
     cp ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${DTBOIMAGE_TARGET} ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${FS_TYPE_SQSH}/${DTBOIMAGE_TARGET}
 }
 
+addtask do_copy_image after do_makeboot
 addtask do_copy_image after do_image before do_build
