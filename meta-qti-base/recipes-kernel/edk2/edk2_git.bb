@@ -60,6 +60,7 @@ EXTRA_OEMAKE = "'CLANG_BIN=${STAGING_BINDIR_NATIVE}/' \
 EXTRA_OEMAKE:append:sa8775 = " 'SUPPORT_AB_BOOT_LXC=1' \
                                'ENABLE_LV_ATOMIC_AB=1' \
                                'ENABLE_SAIL_FLASHING=1' \
+                               'BOOTIMAGE_LOAD_VERIFY_IN_PARALLEL=1' \
                                'ENABLE_SAIL_BOOT=1' "
 
 EXTRA_OEMAKE:append:sa8797 = " 'SUPPORT_AB_BOOT_LXC=1' \
@@ -70,7 +71,10 @@ EXTRA_OEMAKE:append:sa7255 = " 'SUPPORT_AB_BOOT_LXC=1' \
                                'AB_RETRYCOUNT_DISABLE=1' \
                                'ENABLE_LV_ATOMIC_AB=1' \
                                'ENABLE_SAIL_FLASHING=1' \
-                               'ENABLE_SAIL_BOOT=1' "
+                               'BOOTIMAGE_LOAD_VERIFY_IN_PARALLEL=1' \
+                               'ENABLE_SAIL_BOOT=1' \
+                               'EMMC_MULTI_LUN_SUPPORT=1' "
+
 do_configure[noexec] = "1"
 do_compile () {
     export BUILD_CC=${STAGING_BINDIR_NATIVE}/clang

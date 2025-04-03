@@ -39,8 +39,8 @@ def normalize_module_format(src_dir):
                 generate_if_file(te_file_path)
                 generate_fc_file(te_file_path)
 
-def install_device_policy(d, src_root):
-    src_dir = os.path.join(d.getVar("WORKDIR"), src_root)
+def install_device_policy(d, src_root, sub_src):
+    src_dir = os.path.join(d.getVar("WORKDIR"), src_root, sub_src)
     dst_dir = os.path.join(d.getVar("S"), "policy", "modules", "hgy_lv")
     file_extensions = ['.te', '.if', '.fc']
     copy_files_with_extensions(src_dir, dst_dir, file_extensions)
@@ -61,7 +61,7 @@ def apply_container_selinux(d, src_root):
     subprocess.run(["sed", "-i", "/user_namespace/d", os.path.join(dst_dir, "container.te")])
 
 do_patch:append() {
-    install_device_policy(d, "lv-sepolicy")
+    install_device_policy(d, "lv-sepolicy", "lrh")
     apply_container_selinux(d, "container-selinux")
 }
 

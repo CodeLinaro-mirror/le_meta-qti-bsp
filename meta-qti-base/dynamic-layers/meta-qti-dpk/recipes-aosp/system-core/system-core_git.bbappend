@@ -10,4 +10,7 @@ do_install:append() {
     sed -i 's;/sbin;/vendor/sbin;g' ${D}${base_sbindir}/usb_composition
     sed -i 's;/etc;/vendor/etc;g' ${D}${base_sbindir}/usb_composition
     sed -i 's;/sbin;/vendor/sbin;g' ${D}${base_sbindir}/usb_debug
+
+    # add '/vendor' at path for usb composition
+    find ${D}${base_sbindir}/usb/compositions -type f -exec sed -i 's;/sbin/usb/target;/vendor/sbin/usb/target;g' {} \;
 }

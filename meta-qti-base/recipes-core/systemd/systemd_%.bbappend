@@ -10,6 +10,8 @@ SRC_URI:append = " \
     file://0001-systemd-config-linger-for-root-user.patch \
 "
 
+SRC_URI:append:gh-gvm-lemans = " file://60-vblk.rules"
+
 SRC_URI:append:sa81x5 = " file://0001-systemd-add-slotselect-support-in-fstab.patch"
 
 SRC_URI:append = " ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "5.15", "file://platform_load.conf", "", d)}"
@@ -59,6 +61,9 @@ PACKAGECONFIG:remove = "backlight"
 #Disable systemd-timesyncd which not used in project.
 PACKAGECONFIG:remove = "timesyncd "
 
+#Enable coredump by default for lemans
+PACKAGECONFIG:append:sa8775 = " coredump"
+
 # Use glib-2.0 for g_strlcat
 CFLAGS:append = " \
     -fPIC \
@@ -94,6 +99,12 @@ do_install:append () {
     # Use kernel rules for network iface name
     sed -i  's/^NamePolicy.*/NamePolicy=kernel/g' ${D}${systemd_unitdir}/network/99-default.link
 
+    # Create a symlink to the touchscreen input device via USB1
+    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-vmm', 'true', 'false', d)}; then
+        echo '# Create a symlink to the touchscreen input device via USB1' >> ${D}${sysconfdir}/udev/rules.d/touchscreen.rules
+        echo 'SUBSYSTEM=="input", KERNEL=="event[0-9]*", ENV{ID_INPUT_TOUCHSCREEN}=="1", ENV{ID_BUS}=="usb", DEVPATH=="*usb1*", SYMLINK+="input/usb1_touchscreen0"' >> ${D}${sysconfdir}/udev/rules.d/touchscreen.rules
+    fi
+
     #Remove privatetmp=true from hostname service
     if ${@bb.utils.contains('DISTRO_FEATURES', 'qti-rumi', 'false', 'true', d)}; then
         sed -i  '/^PrivateTmp.*/d' ${D}${systemd_system_unitdir}/systemd-hostnamed.service
@@ -107,4 +118,6 @@ do_install:append () {
         install -m 0664 ${WORKDIR}/platform_load.conf ${D}${sysconfdir}/modules-load.d/
     fi
 }
-
+do_install:append:gh-gvm-lemans() {
+    install -m 0644 ${WORKDIR}/60-vblk.rules ${D}${sysconfdir}/udev/rules.d/
+}

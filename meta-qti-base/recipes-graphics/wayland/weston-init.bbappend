@@ -32,6 +32,7 @@ do_install() {
         sed -i '/Environment/a\ExecStartPre=\/bin\/chmod 700 \/run\/user\/0' ${D}${systemd_system_unitdir}/weston.service
         sed -i '/Environment/a\ExecStartPre=\/bin\/chmod 700 \/run\/user' ${D}${systemd_system_unitdir}/weston.service
         sed -i '/Environment/a\ExecStartPre=\/bin\/mkdir -p \/run\/user\/0' ${D}${systemd_system_unitdir}/weston.service
+        sed -i '/Environment/a\Slice=pvm.slice' ${D}${systemd_system_unitdir}/weston.service
     fi
     if [ "${@bb.utils.filter('DISTRO_FEATURES', 'pam', d)}" ]; then
         install -D -p -m0644 ${WORKDIR}/weston-autologin ${D}${sysconfdir}/pam.d/weston-autologin
@@ -49,6 +50,11 @@ do_install() {
     # Install display udev rule
     install -d ${D}${sysconfdir}/udev/rules.d/
     install -m 0644 ${WORKDIR}/msm-display-node.rules ${D}${sysconfdir}/udev/rules.d/msm-display-node.rules
+
+    # Install pm module for umd
+    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'true', 'false', d)}; then
+    sed -i 's/systemd-notify.so/systemd-notify.so,compositor-pm-ds-snservice.so/g' ${D}${systemd_system_unitdir}/weston.service
+    fi
 }
 
 do_install:append:monaco() {
@@ -58,8 +64,3 @@ do_install:append:monaco() {
     fi
 }
 
-do_install:append:sa8775() {
-    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'true', 'false', d)}; then
-        sed -i 's/systemd-notify.so/systemd-notify.so,compositor-pm-ds.so/g' ${D}${systemd_system_unitdir}/weston.service
-    fi
-}

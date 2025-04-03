@@ -3,12 +3,9 @@ include conf/machine/include/basemachine.inc
 SOC_FAMILY ?= "sa-common"
 include conf/machine/include/soc-family.inc
 PRODUCT = "${MACHINE}"
-ACTUAL_KERNEL = "${@oe.utils.ifelse((os.path.exists(d.getVar('BSPDIR', True) + '/kernel/rh-fedora-kernel-6.9')), 'linux-ark', 'linux-qcom-custom')}"
-PREFERRED_PROVIDER_virtual/kernel = "${ACTUAL_KERNEL}"
-PREFERRED_PROVIDER_virtual/kernel-headers = "${@oe.utils.ifelse(d.getVar('PREFERRED_PROVIDER_virtual/kernel') == 'linux-ark', 'linux-ark-headers', 'linux-kernel-qcom-headers')}"
-PREFERRED_VERSION_linux-qcom-custom = "6.6"
-PREFERRED_VERSION_linux-ark = "6.9"
-# PREFERRED_VERSION_linux-ark = "6.7"
+PREFERRED_PROVIDER_virtual/kernel = "linux-qcom-custom-rt"
+PREFERRED_PROVIDER_virtual/kernel-headers = "linux-kernel-qcom-headers"
+PREFERRED_VERSION_linux-qcom-custom-rt = "6.6"
 
 # Prefer Wayland/Weston version
 PREFERRED_VERSION_weston = "8.0.0"
@@ -16,8 +13,8 @@ PREFERRED_VERSION_wayland = "1.18.0"
 PREFERRED_VERSION_wayland-native = "1.18.0"
 PREFERRED_VERSION_wayland-protocols = "1.20"
 PREFERRED_VERSION_wayland-ivi-extension = "2.2.0"
-preferred-kernel = "${@oe.utils.ifelse(d.getVar('PREFERRED_PROVIDER_virtual/kernel') == 'linux-ark', 'PREFERRED_VERSION_linux-ark', 'PREFERRED_VERSION_linux-qcom-custom')}"
-kernel-version = "${@oe.utils.ifelse(d.getVar('PREFERRED_PROVIDER_virtual/kernel') == 'linux-ark', '6.9', '6.6')}"
+preferred-kernel = "PREFERRED_VERSION_linux-qcom-custom-rt"
+kernel-version = "6.6"
 # Prefer gbm
 PREFERRED_PROVIDER_virtual/libgbm = "gbm"
 
@@ -60,7 +57,7 @@ IMAGE_INSTALL:remove = "${@bb.utils.contains('DISTRO_FEATURES', 'qti-rumi', 'ope
 
 IMAGE_FEATURES += "ssh-server-openssh"
 
-EXTRA_IMAGEDEPENDS += "qti-image-ark-boot:do_sign_boot_img"
+EXTRA_IMAGEDEPENDS += "qcom-image-boot:do_sign_boot_img"
 
 IMAGE_FEATURES:append = " read-only-rootfs"
 
@@ -69,20 +66,17 @@ MACHINE_FEATURES += "\
     qti-tools \
     qti-multimedia \
     qti-display \
-    qti-audio \
+    qti-audio-aw \
     qti-data \
-    ${@bb.utils.contains("ACTUAL_KERNEL", "linux-ark", "qti-vmm", "", d)} \
     qti-camera \
     qti-safety \
     qti-vnw \
     early-ramdisk-init \
     qti-security \
     qti-umd \
-    ${@bb.utils.contains("ACTUAL_KERNEL", "linux-ark", "qti-gunyah", "", d)} \
 "
 MACHINE_FEATURES:remove = "\
     qti-display \
-    qti-audio \
     qti-camera \
     qti-safety \
     qti-vnw \
@@ -91,3 +85,4 @@ MACHINE_FEATURES:remove = "\
 "
 
 SECTOOLS_VERSION = "sectools-v2"
+SECTOOLS_SECURITY_PROFILE = "nord_tz_security_profile.xml"

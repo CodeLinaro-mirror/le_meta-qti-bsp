@@ -35,10 +35,14 @@ EXTRA_OEMAKE += "ENABLE_LIBGPTP=1"
 EXTRA_OEMAKE += "ENABLE_LIBGPTP_TEST=1"
 EXTRA_OEMAKE += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', 'ENABLE_GPTP_SERVICE=1', d)}"
 EXTRA_OEMAKE += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'AVB_FEATURE_GVM_MODE=1', '', d)}"
-#EXTRA_OEMAKE += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'GPTP_VFIO=1', '', d)}"
+EXTRA_OEMAKE:append:sa8775 += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'GPTP_VFIO=1', '', d)}"
+EXTRA_OEMAKE:append:sa8775-flex += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'GPTP_VFIO=1', '', d)}"
 SYSTEMD_SERVICE:${PN} = "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', 'gptp.service', d)}"
 
 do_compile() {
+    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'true', 'false', d)}; then
+    export AVB_FEATURE_GVM_MODE=1
+    fi
     oe_runmake gptp
     oe_runmake libgptp
     oe_runmake libgptp_test

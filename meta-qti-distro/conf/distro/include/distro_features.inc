@@ -12,7 +12,7 @@ DISTRO_FEATURES:append:qtiquingvm = " qti-omx qti-gstqeavb"
 DISTRO_FEATURES:append:qtiquingvm8295 = " qti-codec2 qti-gstdeinterlace qti-gstqeavb qti-gstqvrate qti-gstqvais"
 DISTRO_FEATURES:append:quin-gvm-gen4 = " qti-codec2 qti-gstqeavb qti-gstdeinterlace"
 DISTRO_FEATURES:append:quin-gvm-gen4-2 = " qti-codec2 qti-gstdeinterlace qti-gstqeavb qti-gstqvrate qti-gstqvais"
-DISTRO_FEATURES:append:quin-gvm-lemans = " qti-codec2 qti-gstdeinterlace qti-gstqeavb"
+DISTRO_FEATURES:append:quin-gvm-lemans = " qti-codec2 qti-gstdeinterlace qti-gstqeavb qti-gstqvrate qti-gstqvais qti-gstqcarcamsrc"
 
 # Camera
 DISTRO_FEATURES:append:quin-gvm-lemans = " qti-qcx"
@@ -55,11 +55,18 @@ DISTRO_FEATURES:append:quin-gvm-monaco = " qti-bluetooth"
 # SELinux
 DISTRO_FEATURES:append:sa8775 = " selinux"
 DISTRO_FEATURES:append:sa7255 = " selinux"
+DISTRO_FEATURES:append:quin-gvm-lemans = " selinux"
 DISTRO_FEATURES_NATIVE:append:sa8775 = " selinux"
 DISTRO_FEATURES_NATIVE:append:sa7255 = " selinux"
+DISTRO_FEATURES_NATIVE:append:quin-gvm-lemans = " selinux"
 
 # Preferred refpolicy
 PREFERRED_PROVIDER_virtual/refpolicy:sa8775 = "selinux-policy"
 PREFERRED_PROVIDER_virtual/refpolicy:sa7255 = "selinux-policy"
+PREFERRED_PROVIDER_virtual/refpolicy:quin-gvm-lemans = "selinux-policy"
 DEFAULT_ENFORCING:sa8775 = "enforcing"
 DEFAULT_ENFORCING:sa7255 = "enforcing"
+DEFAULT_ENFORCING:quin-gvm-lemans = "enforcing"
+PREFERRED_VERSION_selinux-policy:sa8775 = "1.0"
+PREFERRED_VERSION_selinux-policy:sa7255 = "1.0"
+PREFERRED_VERSION_selinux-policy:quin-gvm-lemans = "2.0"
