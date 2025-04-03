@@ -1,4 +1,4 @@
-inherit qimage ${@bb.utils.contains('MACHINE_FEATURES', 'dm-verity-initramfs', 'qramdisk', 'qcpioimage', d)}
+inherit qimage populate_sdk_qti ${@bb.utils.contains('MACHINE_FEATURES', 'dm-verity-initramfs', 'qramdisk', 'qcpioimage', d)}
 
 DEPENDS += " virtual/kernel"
 
