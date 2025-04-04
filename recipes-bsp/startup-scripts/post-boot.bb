@@ -17,6 +17,7 @@ PACKAGECONFIG_append_genericarmv8 = "${@bb.utils.contains('DEBUG_BUILD', \
                                        '1', " debug", "", d)}"
 PACKAGECONFIG_append_sa410m = "debug"
 PACKAGECONFIG_append_sa525m = "debug"
+PACKAGECONFIG_append_mdm9650 = "debug"
 PACKAGECONFIG[logrestrict] = "--enable-logrestrict,--disable-logrestrict"
 PACKAGECONFIG[debug] = "--enable-debug,--disable-debug"
 
