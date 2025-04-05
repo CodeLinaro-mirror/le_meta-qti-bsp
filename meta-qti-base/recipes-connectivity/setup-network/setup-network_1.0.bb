@@ -10,6 +10,8 @@ ${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
 SRC_URI = "\
     file://setup-network.sh \
     file://setup-network.service \
+    file://setup-network-gh-lvgvm.sh \
+    file://setup-network-gh-lvgvm.service \
 "
 
 inherit systemd
@@ -19,6 +21,13 @@ do_install() {
   install -d ${D}${bindir}
   install -m 0755 ${WORKDIR}/setup-network.sh ${D}${bindir}/setup-network.sh
   install -m 0644 ${WORKDIR}/setup-network.service ${D}${systemd_unitdir}/system/
+}
+
+do_install:append:gh-gvm-lemans() {
+  install -d ${D}${systemd_system_unitdir}
+  install -d ${D}${bindir}
+  install -m 0755 ${WORKDIR}/setup-network-gh-lvgvm.sh ${D}${bindir}/setup-network.sh
+  install -m 0644 ${WORKDIR}/setup-network-gh-lvgvm.service ${D}${systemd_unitdir}/system/setup-network.service
 }
 
 SYSTEMD_SERVICE:${PN} = "setup-network.service"
