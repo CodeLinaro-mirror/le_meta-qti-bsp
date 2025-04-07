@@ -4,4 +4,5 @@ RDEPENDS:${PN} += "\
     googletest \
     libprocinfo \
     libmeminfo \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'scmi-test', '', d)} \
     "

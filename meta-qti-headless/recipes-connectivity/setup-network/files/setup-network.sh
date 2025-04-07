@@ -109,6 +109,30 @@ function check_all_interfaces_up()
     return 1;
 }
 
+function perf_net_config()
+{
+    echo "Enable network perf configuration"
+
+    sysctl -w net.core.rmem_max=33554432
+    sysctl -w net.core.wmem_max=33554432
+    sysctl -w net.ipv4.udp_mem="786432 1048576 16777216"
+    sysctl -w net.ipv4.tcp_mem="8388608 1048576 16777216"
+
+    sysctl -w net.core.rmem_default=16777216
+    sysctl -w net.core.wmem_default=16777216
+    sysctl -w net.core.optmem_max=25165824
+    sysctl -w net.ipv4.tcp_rmem="8192 87380 16777216"
+    sysctl -w net.ipv4.tcp_wmem="8192 87380 16777216"
+
+    sysctl -w net.core.somaxconn=10000
+    sysctl -w net.core.netdev_max_backlog=10000
+    sysctl -w net.ipv4.tcp_timestamps=0
+
+    sysctl -w net.ipv4.ipfrag_high_thresh=50000000
+    sysctl -w net.ipv6.ip6frag_high_thresh=50000000
+    sysctl -w net.ipv4.ipfrag_time=2
+    sysctl -w net.ipv6.ip6frag_time=2
+}
 
 function setup_network_agl_vm_1()
 {
@@ -129,6 +153,8 @@ function setup_network_agl_vm_1()
     sysctl -w net.ipv4.tcp_rmem="4096 87380 33554432"
     sysctl -w net.ipv4.tcp_wmem="4096 65536 33554432"
     sysctl -p
+
+    perf_net_config
 }
 
 function setup_network_agl_vm_2()

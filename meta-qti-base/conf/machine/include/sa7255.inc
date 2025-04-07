@@ -47,7 +47,7 @@ EXTRA_IMAGECMD_ext4 += " -b 4096 "
 
 IMAGE_CLASSES += "qimage"
 
-EXTRA_IMAGEDEPENDS += "qti-image-ark-boot:do_sign_boot_img"
+EXTRA_IMAGEDEPENDS += "qcom-image-boot:do_sign_boot_img"
 
 IMAGE_FEATURES:append = " read-only-rootfs"
 
@@ -67,7 +67,8 @@ MACHINE_FEATURES += "\
     qti-vnw \
     qti-audio \
     qti-compute-platform \
+    qti-safety \
 "
 
 SECTOOLS_VERSION = "sectools-v2"
-SECTOOLS_SECURITY_PROFILE = "${BSPDIR}/security/securemsm/security_profiles/monaco_tz_security_profile.xml"
+SECTOOLS_SECURITY_PROFILE = "monaco_tz_security_profile.xml"
