@@ -68,6 +68,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         tdk-thermistor-app \
         system-sample-apps \
         qti-c2-module \
+        matter \
 "
 CORE_IMAGE_EXTRA_INSTALL:append:pineapple = " packagegroup-qcom-sensors"
 CORE_IMAGE_EXTRA_INSTALL:append:pineapple = " packagegroup-qti-ppat"
@@ -82,7 +83,6 @@ CORE_IMAGE_EXTRA_INSTALL:remove:pineapple = "packagegroup-qti-mmframeworks"
 CORE_IMAGE_EXTRA_INSTALL:remove:pineapple = "packagegroup-qti-robotics"
 CORE_IMAGE_EXTRA_INSTALL:remove:pineapple = "packagegroup-qti-robos"
 CORE_IMAGE_EXTRA_INSTALL:remove:pineapple = "packagegroup-qti-robos-addon"
-CORE_IMAGE_EXTRA_INSTALL:remove:pineapple = "packagegroup-qti-securemsm"
 CORE_IMAGE_EXTRA_INSTALL:remove:pineapple = "packagegroup-qti-test-sensors-see"
 CORE_IMAGE_EXTRA_INSTALL:remove:pineapple = "yavta"
 CORE_IMAGE_EXTRA_INSTALL:remove:pineapple = "packagegroup-qti-sensors-ship"
