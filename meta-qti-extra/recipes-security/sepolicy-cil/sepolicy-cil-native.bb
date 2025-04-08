@@ -81,7 +81,7 @@ do_compile() {
     oe_runmake LDFLAGS="-L${B}/libsepol/src ${LDFLAGS}" -C ${B}/libsepol
     prepare_libsepol
     cd ${B}/sepolicy-cil
-    oe_runmake -f ${B}/sepolicy-cil/Makefile
+    oe_runmake -j1 -f ${B}/sepolicy-cil/Makefile
 }
 
 prepare_libsepol() {
