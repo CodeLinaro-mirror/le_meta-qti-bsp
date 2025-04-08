@@ -7,20 +7,19 @@
 [Unit]
 Description=eth1 installer
 DefaultDependencies=no
+Before=sysinit.target
 
 [Service]
 User=net_admin
 Group=net_admin
 AmbientCapabilities=CAP_NET_ADMIN
-Type=oneshot
+Type=simple
 RemainAfterExit=yes
-ExecStartPre=/bin/sh -c "echo 1 > /proc/sys/net/ipv4/conf/all/arp_ignore"
-ExecStartPre=/bin/sh -c "echo 1 > /proc/sys/net/ipv4/conf/default/arp_ignore"
-ExecStart=ifconfig eth1 up
+ExecStart=/usr/bin/early_eth1.sh
 ExecStop=ifconfig eth1 down
-Nice=-20
+Nice=-10
 Restart=on-failure
 RestartSec=1ms
 
 [Install]
-WantedBy=sys-devices-platform-soc-23049000.qcom\x2cethernet-net-eth1.device
+WantedBy=sysinit.target
