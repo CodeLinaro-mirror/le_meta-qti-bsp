@@ -52,6 +52,23 @@ do_configure:prepend() {
         ( cd ${WORKDIR} && ${S}/scripts/kconfig/merge_config.sh -m -r -y -O ${B} ${B}/.config ${KERNEL_CONFIG_FRAGMENTS} 1>&2 )
     fi
 
+    # generate pair of private/public keys for module signing
+    mkdir -p certs
+    openssl req -new -nodes -utf8 -sha256 -days 36500 -batch -x509 \
+        -config ${STAGING_KERNEL_DIR}/certs/qcom_x509.genkey -outform PEM -out ${B}/certs/signing_key.pem \
+        -keyout ${B}/certs/signing_key.pem
+
+    if "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'true', 'false', d)}"; then
+        # generate verity root hash signing keys
+        openssl req -new -nodes -utf8 -newkey rsa:4096 -days 36500 -batch \
+            -x509 -config ${STAGING_KERNEL_DIR}/certs/qcom_x509.genkey -outform PEM -out ${B}/certs/verity_cert.pem \
+            -keyout ${B}/certs/verity_key.pem
+
+        ${STAGING_KERNEL_DIR}/scripts/config --file ${B}/.config \
+	    --set-str CONFIG_MODULE_SIG_KEY "${B}/certs/signing_key.pem" \
+	    --set-str CONFIG_SYSTEM_TRUSTED_KEYS "${B}/certs/verity_cert.pem"
+    fi
+
     echo "# Global settings from linux recipe" >> ${B}/.config
     echo "CONFIG_LOCALVERSION="\"${LINUX_VERSION_EXTENSION}\" >> ${B}/.config
 }
@@ -80,6 +97,14 @@ do_install:append() {
         fi
     done
     rm -rf ${D}/lib/modules/${KERNEL_VERSION}/kernel/
+
+    if "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'true', 'false', d)}"; then
+
+        install -d ${STAGING_KERNEL_BUILDDIR}/kernel-certs
+        install -m 0644 ${B}/certs/signing_key.pem ${STAGING_KERNEL_BUILDDIR}/kernel-certs/
+        install -m 0644 ${B}/certs/verity_key.pem ${STAGING_KERNEL_BUILDDIR}/kernel-certs/
+        install -m 0644 ${B}/certs/verity_cert.pem ${STAGING_KERNEL_BUILDDIR}/kernel-certs/
+    fi
 }
 
 do_deploy() {
