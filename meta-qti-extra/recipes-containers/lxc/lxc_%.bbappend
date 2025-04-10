@@ -4,6 +4,7 @@ SRC_URI:append = " \
         file://0002-lxc-support-deny-device-by-devpth.patch \
         file://0003-lxc-handle-cgroup-device-not-available-gracefully.patch \
         file://0004-skip-fetch-seccomp-config-on-lxc-without-seccomp.patch \
+        file://0006-lxc-modify-lxc-attach-shell-default-context-of-android-container.patch \
         "
 
 # Enable container launching automatically

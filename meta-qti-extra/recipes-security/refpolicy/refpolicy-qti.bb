@@ -4,7 +4,7 @@ HOMEPAGE = "https://selinuxproject.org/"
 SECTION = "admin"
 LICENSE = "GPLv2 & BSD-3-Clause-Clear"
 LIC_FILES_CHKSUM = "file://${S}/COPYING;md5=393a5ca445f6965873eca0259a17f833 \
-                    file://${COREBASE}/meta/files/common-licenses/BSD;md5=3775480a712fc46a69647678acb234cb"
+                    file://${COREBASE}/meta/files/common-licenses/BSD-3-Clause-Clear;md5=7a434440b651f4a472ca93716d01033a"
 DEPENDS += "bzip2-replacement-native secilc-native checkpolicy-native policycoreutils-native semodule-utils-native m4-native sepolicy-cil-native"
 SRCREV = "ad7217f906e89c49835fdc305110a97b56865442"
 SRC_URI = "\
@@ -36,13 +36,13 @@ EXTRA_OEMAKE += "\
 "
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 PROVIDES += "virtual/refpolicy"
-RPROVIDES_${PN} += "refpolicy"
-FILES_${PN} += "\
+RPROVIDES:${PN} += "refpolicy"
+FILES:${PN} += "\
     ${sysconfdir}/selinux/${POLICY_NAME}/ \
     ${datadir}/selinux/${POLICY_NAME}/*.pp \
     ${localstatedir}/lib/selinux/${POLICY_NAME}/ \
 "
-FILES_${PN}-dev += "\
+FILES:${PN}-dev += "\
     ${datadir}/selinux/${POLICY_NAME}/include/ \
     ${sysconfdir}/selinux/sepolgen.conf \
 "
@@ -65,6 +65,33 @@ fakeroot do_configure() {
     echo "<summary>Policy modules for the Qti selinux.</summary>" > ${S_HOST_MODULES}/metadata.xml
     cp -rf ${S_HOST_MODULES} ${S_GIT_REFPOLICY}/policy/modules/
     sed -i '1 i\r:host_exec_t:s0 r:host_exec_t:s0' ${S_GIT_REFPOLICY}/config/appconfig-qti/default_contexts
+    sed -i '1i(type audio_property)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
+    sed -i '1i(type tunnel_audio_property)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
+    sed -i '1i(type av_property)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
+    sed -i '1i(type nfc_property)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
+    sed -i '1i(type camera_property)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
+    sed -i '1i(type debug_property)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
+    sed -i '1i(type lmk_property)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
+    sed -i '1i(type config_property)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
+    sed -i '1i(type systemd_journal)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
+    sed -i '1i(type system_bootstrap_lib_file)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
+    sed -i '1i(type adsprpcd_file)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
+    sed -i '1i(type bt_firmware_file)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
+    sed -i '1i(type vendor_ssgtzd_exec)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
+    sed -i '1i(type vendor_cdsprpcd_exec)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
+    sed -i '1i(type media_property)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
+    sed -i '1i(type persist_property)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
+    sed -i '1i(type vendor_buildprop)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
+    sed -i '1i(type carwatchdogd)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
+    sed -i '1i(type service)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
+    sed -i '1i(type adsprpcd_file)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
+    sed -i '1i(type vendor_sysfs_memory_offline)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
+    sed -i '1i(type cgroup_bpf)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
+    sed -i '1i(type ais_v4l2_proxy)' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
+    sed -i 's/(typeattributeset domain (/&carwatchdogd /' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
+    sed -i 's/(classorder (/&service /' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
+    sed -i 's/(classorder (/&dbus /' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
+    sed -i 's/(classorder (/&passwd /' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
     sed -i 's/class system (ipc_info syslog_read syslog_mod syslog_console module_request module_load /&halt reboot status start stop enable disable reload/' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
     sed -i 's/keystore_key drmservice /&service dbus passwd/' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
     sed -i '$a (class passwd ( passwd chfn chsh rootok crontab ))' ${S_ANDROID_CILS}/system/plat_sepolicy.cil
