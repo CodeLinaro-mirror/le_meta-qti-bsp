@@ -37,6 +37,14 @@ PRODUCT_PUBLIC_POLICY := ${PACKAGES_POLICY}/car_product/sepolicy/public ${PACKAG
 PRODUCT_PRIVATE_POLICY := ${PACKAGES_POLICY}/car_product/sepolicy/private ${PACKAGES_POLICY}/watchdog/sepolicy/private ${DEVICE_SEPOLICY}/generic/product/private ${DEVICE_SEPOLICY}/qva/product/private
 REQD_MASK_POLICY := ${SYSTEM_SEPOLICY}/reqd_mask
 PLAT_VENDOR_POLICY := ${SYSTEM_SEPOLICY}/vendor
+TMPD1 := ./tt_1
+TMPD2 := ./tt_2
+TMPD3 := ./tt_3
+TMPD4 := ./tt_4
+TMPD5 := ./tt_5
+TMPD6 := ./tt_6
+TMPD7 := ./tt_7
+TMPD8 := ./tt_8
 
 ifeq (user, $(TARGET_BUILD_VARIANT))
 BOARD_VENDOR_SEPOLICY_DIRS := ${DEVICE_SEPOLICYVNDR}/generic/vendor/common ${DEVICE_SEPOLICYVNDR}/qva/vendor/common/sysmonapp \
@@ -81,22 +89,23 @@ sepolicy_build_files := flagging_macros \
 # processed by checkpolicy
 ###########################################################
 define transform-policy-to-conf
-@mkdir -p $(dir $@)
-$(M4) --fatal-warnings $(PRIVATE_ADDITIONAL_M4DEFS) \
-	-D mls_num_sens=$(PRIVATE_MLS_SENS) -D mls_num_cats=$(PRIVATE_MLS_CATS) \
-	-D target_build_variant=$(PRIVATE_TARGET_BUILD_VARIANT) \
-	-D target_with_dexpreopt=$(WITH_DEXPREOPT) \
-	-D target_arch=$(PRIVATE_TGT_ARCH) \
-	-D target_with_asan=$(PRIVATE_TGT_WITH_ASAN) \
-	-D target_with_native_coverage=$(PRIVATE_TGT_WITH_NATIVE_COVERAGE) \
-	-D target_full_treble=$(PRIVATE_SEPOLICY_SPLIT) \
-	-D target_compatible_property=$(PRIVATE_COMPATIBLE_PROPERTY) \
-	-D target_treble_sysprop_neverallow=$(PRIVATE_TREBLE_SYSPROP_NEVERALLOW) \
-	-D target_exclude_build_test=$(PRIVATE_EXCLUDE_BUILD_TEST) \
-	-D target_requires_insecure_execmem_for_swiftshader=$(PRODUCT_REQUIRES_INSECURE_EXECMEM_FOR_SWIFTSHADER) \
-	-D target_board_api_level=$(PRIVATE_BOARD_API_LEVEL) \
-	$(PRIVATE_TGT_RECOVERY) \
-	-s $(PRIVATE_POLICY_FILES) > $@
+    cat tmpf | xargs $(M4) --fatal-warnings $(PRIVATE_ADDITIONAL_M4DEFS) \
+        -D mls_num_sens=$(PRIVATE_MLS_SENS) -D mls_num_cats=$(PRIVATE_MLS_CATS) \
+        -D target_build_variant=$(PRIVATE_TARGET_BUILD_VARIANT) \
+        -D target_with_dexpreopt=$(WITH_DEXPREOPT) \
+        -D target_arch=$(PRIVATE_TGT_ARCH) \
+        -D target_with_asan=$(PRIVATE_TGT_WITH_ASAN) \
+        -D target_with_native_coverage=$(PRIVATE_TGT_WITH_NATIVE_COVERAGE) \
+        -D target_full_treble=$(PRIVATE_SEPOLICY_SPLIT) \
+        -D target_compatible_property=$(PRIVATE_COMPATIBLE_PROPERTY) \
+        -D target_treble_sysprop_neverallow=$(PRIVATE_TREBLE_SYSPROP_NEVERALLOW) \
+        -D target_exclude_build_test=$(PRIVATE_EXCLUDE_BUILD_TEST) \
+        -D target_requires_insecure_execmem_for_swiftshader=$(PRODUCT_REQUIRES_INSECURE_EXECMEM_FOR_SWIFTSHADER) \
+        -D target_board_api_level=$(PRIVATE_BOARD_API_LEVEL) \
+        $(PRIVATE_TGT_RECOVERY) \
+        -s > $@
+
+    @rm -rf tmpf
 endef
 
 #define starting_at_board_api
@@ -110,6 +119,20 @@ endef
 ###########################################################
 define build_policy
 $(foreach type, $(1), $(foreach file, $(addsuffix /$(type), $(2)), $(sort $(wildcard $(file)))))
+endef
+
+define prepare_policy
+    $(shell mkdir -p $(3))
+    $(shell touch tmpf)
+    $(foreach type, $(1), \
+        $(foreach file, $(addsuffix /$(type), $(2)), \
+            $(foreach f, $(sort $(wildcard $(file))), \
+	        $(eval COUNT=$(shell expr $(COUNT) + 1)) \
+	        $(shell cp $(f) $(3)/$(COUNT)_$(notdir $(f))) \
+		$(shell echo $(3)/$(COUNT)_$(notdir $(f)) >> tmpf) \
+	    ) \
+        ) \
+    )
 endef
 
 .PHONY: all
@@ -132,10 +155,10 @@ version_policy.o: version_policy.c
 # which will ship with the device.  The platform will always reflect the most
 # recent platform version and is not currently being attributized.
 ###########################################################
-policy_files := $(call build_policy, $(sepolicy_build_files), \
-  $(PLAT_PUBLIC_POLICY) $(PLAT_PRIVATE_POLICY))
-plat_policy.conf: PRIVATE_POLICY_FILES := $(policy_files)
-plat_policy.conf: $(policy_files) $(M4)
+plat_tmp_files:
+	$(call prepare_policy, $(sepolicy_build_files), \
+		$(PLAT_PUBLIC_POLICY) $(PLAT_PRIVATE_POLICY), $(TMPD1))
+plat_policy.conf: plat_tmp_files $(M4)
 	$(transform-policy-to-conf)
 
 PRIVATE_ADDITIONAL_CIL_FILES := \
@@ -149,11 +172,11 @@ plat_sepolicy.cil: plat_policy.conf $(CHECKPOLICY)
 # system_ext_policy.conf - A combination of the private and public system_ext policy
 # which will ship with the device. System_ext policy is not attributized.
 ###########################################################
-policy_files := $(call build_policy, $(sepolicy_build_files), \
-  $(PLAT_PUBLIC_POLICY) $(PLAT_PRIVATE_POLICY) \
-  $(SYSTEM_EXT_PUBLIC_POLICY) $(SYSTEM_EXT_PRIVATE_POLICY))
-system_ext_policy.conf: PRIVATE_POLICY_FILES := $(policy_files)
-system_ext_policy.conf: $(policy_files) $(M4)
+system_ext_tmp_files:
+	$(call prepare_policy, $(sepolicy_build_files), \
+		$(PLAT_PUBLIC_POLICY) $(PLAT_PRIVATE_POLICY) \
+		$(SYSTEM_EXT_PUBLIC_POLICY) $(SYSTEM_EXT_PRIVATE_POLICY), $(TMPD2))
+system_ext_policy.conf: system_ext_tmp_files $(M4)
 	$(transform-policy-to-conf)
 
 system_ext_sepolicy.cil: system_ext_policy.conf plat_sepolicy.cil $(CHECKPOLICY)
@@ -166,12 +189,12 @@ system_ext_sepolicy.cil: system_ext_policy.conf plat_sepolicy.cil $(CHECKPOLICY)
 # product_policy.conf - A combination of the private and public product policy
 # which will ship with the device. Product policy is not attributized.
 ###########################################################
-policy_files := $(call build_policy, $(sepolicy_build_files), \
-  $(PLAT_PUBLIC_POLICY) $(PLAT_PRIVATE_POLICY) \
-  $(SYSTEM_EXT_PUBLIC_POLICY) $(SYSTEM_EXT_PRIVATE_POLICY) \
-  $(PRODUCT_PUBLIC_POLICY) $(PRODUCT_PRIVATE_POLICY))
-product_policy.conf: PRIVATE_POLICY_FILES := $(policy_files)
-product_policy.conf: $(policy_files) $(M4)
+product_tmp_files:
+	$(call prepare_policy, $(sepolicy_build_files), \
+		$(PLAT_PUBLIC_POLICY) $(PLAT_PRIVATE_POLICY) \
+		$(SYSTEM_EXT_PUBLIC_POLICY) $(SYSTEM_EXT_PRIVATE_POLICY) \
+		$(PRODUCT_PUBLIC_POLICY) $(PRODUCT_PRIVATE_POLICY), $(TMPD3))
+product_policy.conf: product_tmp_files $(M4)
 	$(transform-policy-to-conf)
 
 product_sepolicy.cil: product_policy.conf plat_sepolicy.cil system_ext_sepolicy.cil $(CHECKPOLICY)
@@ -189,9 +212,10 @@ product_sepolicy.cil: product_policy.conf plat_sepolicy.cil system_ext_sepolicy.
 # the compilation of public policy and subsequent removal of CIL policy that
 # should not be exported.
 ###########################################################
-policy_files := $(call build_policy, $(sepolicy_build_files), $(REQD_MASK_POLICY))
-reqd_policy_mask.conf: PRIVATE_POLICY_FILES := $(policy_files)
-reqd_policy_mask.conf: $(policy_files) $(M4)
+reqd_tmp_files:
+	$(call prepare_policy, $(sepolicy_build_files), \
+		$(REQD_MASK_POLICY), $(TMPD4))
+reqd_policy_mask.conf: reqd_tmp_files $(M4)
 	$(transform-policy-to-conf)
 
 reqd_policy_mask.cil: reqd_policy_mask.conf $(CHECKPOLICY)
@@ -216,10 +240,10 @@ reqd_policy_mask.cil: reqd_policy_mask.conf $(CHECKPOLICY)
 #   - plat_pub_versioned.cil: the versioned, exported 'product', 'system_ext' and 'system'
 #                             policy in vendor partition.
 ###########################################################
-policy_files := $(call build_policy, $(sepolicy_build_files), \
-  $(PLAT_PUBLIC_POLICY) $(SYSTEM_EXT_PUBLIC_POLICY) $(PRODUCT_PUBLIC_POLICY) $(REQD_MASK_POLICY))
-pub_policy.conf: PRIVATE_POLICY_FILES := $(policy_files)
-pub_policy.conf: $(policy_files) $(M4)
+pub_tmp_files:
+	$(call prepare_policy, $(sepolicy_build_files), \
+		$(PLAT_PUBLIC_POLICY) $(SYSTEM_EXT_PUBLIC_POLICY) $(PRODUCT_PUBLIC_POLICY) $(REQD_MASK_POLICY), $(TMPD5))
+pub_policy.conf: pub_tmp_files $(M4)
 	$(transform-policy-to-conf)
 
 pub_policy.cil: PRIVATE_POL_CONF := pub_policy.conf
@@ -240,10 +264,10 @@ plat_pub_versioned.cil : pub_policy.cil version_policy
 ###########################################################
 # plat_pub_policy.cil: exported 'system' policy.
 ###########################################################
-policy_files := $(call build_policy, $(sepolicy_build_files), \
-  $(PLAT_PUBLIC_POLICY) $(REQD_MASK_POLICY))
-plat_pub_policy.conf: PRIVATE_POLICY_FILES := $(policy_files)
-plat_pub_policy.conf: $(policy_files) $(M4)
+plat_pub_tmp_files:
+	$(call prepare_policy, $(sepolicy_build_files), \
+		$(PLAT_PUBLIC_POLICY) $(REQD_MASK_POLICY), $(TMPD6))
+plat_pub_policy.conf: plat_pub_tmp_files $(M4)
 	$(transform-policy-to-conf)
 
 plat_pub_policy.cil: PRIVATE_POL_CONF := plat_pub_policy.conf
@@ -263,10 +287,10 @@ plat_mapping_file.cil : plat_pub_policy.cil $(VERSIONPOLICY)
 ###########################################################
 # system_ext_pub_policy.cil: exported 'system_ext' and 'system' policy.
 ###########################################################
-policy_files := $(call build_policy, $(sepolicy_build_files), \
-  $(PLAT_PUBLIC_POLICY) $(SYSTEM_EXT_PUBLIC_POLICY) $(REQD_MASK_POLICY))
-system_ext_pub_policy.conf: PRIVATE_POLICY_FILES := $(policy_files)
-system_ext_pub_policy.conf: $(policy_files) $(M4)
+system_ext_pub_tmp_files:
+	$(call prepare_policy, $(sepolicy_build_files), \
+		$(PLAT_PUBLIC_POLICY) $(SYSTEM_EXT_PUBLIC_POLICY) $(REQD_MASK_POLICY), $(TMPD7))
+system_ext_pub_policy.conf: system_ext_pub_tmp_files $(M4)
 	$(transform-policy-to-conf)
 
 system_ext_pub_policy.cil: PRIVATE_POL_CONF := system_ext_pub_policy.conf
@@ -298,12 +322,11 @@ product_mapping_file.cil : pub_policy.cil $(VERSIONPOLICY) system_ext_mapping_fi
 # with the platform-provided policy.  It makes use of the reqd_policy_mask files from private
 # policy and the platform public policy files in order to use checkpolicy.
 ###########################################################
-policy_files := $(call build_policy, $(sepolicy_build_files), \
-  $(PLAT_PUBLIC_POLICY) $(SYSTEM_EXT_PUBLIC_POLICY) $(PRODUCT_PUBLIC_POLICY) \
-  $(REQD_MASK_POLICY) $(PLAT_VENDOR_POLICY) $(BOARD_VENDOR_SEPOLICY_DIRS))
-
-vendor_policy.conf: PRIVATE_POLICY_FILES := $(policy_files)
-vendor_policy.conf: $(policy_files) $(M4)
+vendor_tmp_files:
+	$(call prepare_policy, $(sepolicy_build_files), \
+		$(PLAT_PUBLIC_POLICY) $(SYSTEM_EXT_PUBLIC_POLICY) $(PRODUCT_PUBLIC_POLICY) \
+		$(REQD_MASK_POLICY) $(PLAT_VENDOR_POLICY) $(BOARD_VENDOR_SEPOLICY_DIRS), $(TMPD8))
+vendor_policy.conf: vendor_tmp_files $(M4)
 	$(transform-policy-to-conf)
 
 vendor_sepolicy.cil: PRIVATE_REQD_MASK := reqd_policy_mask.cil
@@ -331,4 +354,4 @@ install:
 
 .PHONY: clean
 clean:
-	rm -rf *.conf *.cil *.tmp*
+	rm -rf *.conf *.cil *.tmp* tt_*
