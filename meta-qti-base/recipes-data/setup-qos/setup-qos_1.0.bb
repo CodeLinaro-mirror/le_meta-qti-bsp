@@ -28,11 +28,19 @@ do_install() {
   fi
 }
 
+do_install:append:sa7255() {
+	 rm -f ${D}${systemd_unitdir}/system/setup_eth1.service
+}
+
 SYSTEMD_SERVICE:${PN} = "\
        setup_eth0.service \
        setup_eth1.service \
 "
 SYSTEMD_AUTO_ENABLE:${PN} = "enable"
+
+SYSTEMD_SERVICE:${PN}:remove:sa7255 = "\
+       setup_eth1.service \
+"
 
 FILES:${PN} += "\
     ${systemd_unitdir}/system/setup_eth0.service \
@@ -41,3 +49,6 @@ FILES:${PN} += "\
     ${sysconfdir}/initscripts/config.ini \
 "
 
+FILES:${PN}:remove:sa7255 = "\
+    ${systemd_unitdir}/system/setup_eth1.service \
+"
