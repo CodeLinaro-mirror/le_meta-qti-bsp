@@ -70,10 +70,6 @@ SDK_IMAGE ?= "1"
 # Formats of root filesystem images.
 IMAGE_FSTYPES += "ubi"
 
-# Userspace needs below given macro to support libion after kernel 4.12.
-TARGET_CFLAGS_append = " -DTARGET_ION_ABI_VERSION=2 "
-TARGET_CXXFLAGS_append = " -DTARGET_ION_ABI_VERSION=2 "
-
 MACHINE_SUPPORTS_PDMAPPER = "False"
 MACHINE_SUPPORTS_INIT_RAMDISK = "False"
 MACHINE_SUPPORTS_ANDROID_PROPERTIES = "False"
