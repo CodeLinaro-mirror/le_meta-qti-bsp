@@ -68,10 +68,10 @@ index 000000000..16905a4e5
 +#endif
 +
 +#define BUFSIZE 8192
-+#define SERVER_IP "192.168.7.1"
++#define SERVER_IP "192.168.1.1"
 +#define SERVER_PORT 8888
-+#define MAX_RETRIES 10
-+#define RETRY_DELAY 3
++#define MAX_RETRIES 20
++#define RETRY_DELAY 500000
 +
 +int client_sock = -1;
 +
@@ -278,7 +278,7 @@ index 000000000..16905a4e5
 +			return 0;
 +
 +		printToKmsg("inet bind failed, retrying...");
-+		sleep(RETRY_DELAY);
++		usleep(RETRY_DELAY);
 +		attempts++;
 +	}
 +	printToKmsg("inet bind failed after maximum retries");
