@@ -38,6 +38,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-gfx \
         packagegroup-qti-gst \
         ${@bb.utils.contains('MACHINE_FEATURES', 'qti-location', 'packagegroup-qti-location', '', d)} \
+        packagegroup-qti-telsdk \
         packagegroup-qti-ml \
         packagegroup-qti-mmframeworks \
         packagegroup-qti-pulseaudio \
