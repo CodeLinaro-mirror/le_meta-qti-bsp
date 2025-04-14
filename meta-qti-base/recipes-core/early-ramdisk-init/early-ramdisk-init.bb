@@ -19,6 +19,7 @@ CFLAGS += "${@bb.utils.contains('DISTRO_FEATURES', 'early_init', '-DEARLY_INIT',
 CFLAGS:append:sa8775 = " ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', '-DVFIO_BIND_DEVICE', '', d)}"
 CFLAGS:append:sa8775 = " ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', '-DVENDOR_DSP_MOUNT', '', d)}"
 CFLAGS:append:sa8775 = " ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', '-DFIRMWARE_MOUNT', '', d)}"
+CFLAGS:append:sa8775 = " ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', '-DPRELOAD_UNIT', '', d)}"
 
 TARGET_PATH_NAME ?= "${MACHINE}"
 TARGET_PATH_NAME:sa8775 = "sa8775"
