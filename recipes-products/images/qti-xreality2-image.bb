@@ -2,3 +2,5 @@
 # QTI Linux eXtended Reality image with splitxr support.
 
 require qti-xreality2-base-image.bb
+
+CORE_IMAGE_EXTRA_INSTALL:append:ar-sg1 = " packagegroup-qcom-synx"
