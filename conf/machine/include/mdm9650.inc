@@ -47,12 +47,10 @@ EXTRA_IMAGEDEPENDS += "lk"
 
 # MACHINE_FEATURES ##
 # qti-security:           Machine supports QTI security solution
-# qti-wifi:               Machine supports QTI WiFi solution
 # qti-audio:              Machine supports QTI audio solution
-# qti-bluetooth:          Machine supports QTI bluetooth solution
 # qti-location:           Machine supports Location solution
 # qti-data-modem:         Machine supports QTI data modem solution
-# qti-modem:              Machine supports QTI modem solution
+# nand-boot:              Machine supports boot from NAND flash
 
 MACHINE_FEATURES += "qti-sdx qti-recovery dm-verity-none nand-boot qwesd qti-security no-rpmb-listener-support no-ssd-listener-support"
 
@@ -64,7 +62,7 @@ MACHINE_MNT_POINTS = " \
     /systemrw \
 "
 
-#Enable SDK feature
+# Enable SDK feature
 SDK_IMAGE ?= "1"
 
 # Formats of root filesystem images.
@@ -85,7 +83,6 @@ USBCOMPOSITION = "901D"
 # On msm-5.4 or above ufs driver supports BSG Device.
 UFS_BSG_DEV_USAGE = "True"
 
-PREFERRED_VERSION_openssl = "1.1.1s"
 PREFERRED_VERSION_protobuf = "3.11.4"
 PREFERRED_VERSION_protobuf-native = "3.11.4"
 PREFERRED_VERSION_python3-protobuf = "3.11.3"
