@@ -1,7 +1,6 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 SRC_URI:append = " \
              ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', 'file://0032-systemd-add-bootkpi-marker-for-user-session.patch', '', d)} \
-             ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', 'file://0001-systemd-assign-prime-core-to-manager_dispatch_load_q.patch', d)} \
              ${@bb.utils.contains('DISTRO_FEATURES', 'early_init', 'file://0034-systemd-add-handover-support-for-early-service.patch', '', d)} \
              file://power-switch.rules \
              ${@bb.utils.contains_any('MACHINE_FEATURES', 'qti-umd', '', 'file://qti_sleep.sh', d)} \
