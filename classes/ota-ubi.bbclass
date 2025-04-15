@@ -232,7 +232,7 @@ do_recovery_ubi() {
 
 addtask do_recovery_ubi after do_image_complete before do_build
 
-do_gen_otazip_ubi[depends] += "payload-gen-native:do_compile"
+do_gen_otazip_ubi[depends] += "${@bb.utils.contains('COMBINED_FEATURES', 'qti-nad-core', 'payload-gen-native:do_compile', '', d)}"
 do_gen_otazip_ubi[dirs] += "${DEPLOY_DIR_IMAGE}/ota-scripts"
 do_gen_otazip_ubi() {
     ./full_ota.sh ${OTA_TARGET_FILES_UBI_PATH} ${IMAGE_ROOTFS_UBI} ubi --system_path ${IMAGE_SYSTEM_MOUNT_POINT}
