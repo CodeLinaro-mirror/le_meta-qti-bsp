@@ -33,7 +33,7 @@ ConditionDirectoryNotEmpty=!/firmware
 # Hence wait for both _a & _b dev nodes before attepting to mount
 BindsTo=@MODEMDEVICE@
 After=@MODEMDEVICE@
-Before=local-fs.target
+Before=local-fs.target systemd-modules-load.service
 DefaultDependencies=no
 
 IgnoreOnIsolate=true
