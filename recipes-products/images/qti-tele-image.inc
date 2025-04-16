@@ -42,7 +42,7 @@ do_gen_kpi(){
 
 TOOLCHAIN_TARGET_TASK += "sensor-hal-daemon-hdr telux"
 
-TOOLCHAIN_TARGET_TASK_remove_mdm9650 = "sensor-hal-daemon-hdr telux"
+TOOLCHAIN_TARGET_TASK_remove_mdm9650 = "sensor-hal-daemon-hdr"
 
 # Remove unsupported SDK packages
 TOOLCHAIN_TARGET_TASK_remove = "ath6kl-utils-staticdev"
