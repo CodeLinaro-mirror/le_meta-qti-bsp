@@ -56,3 +56,6 @@ featenabler.mbn         /dev/block/bootdevice/by-name/featenabler
 XblRamdump.elf          /dev/block/bootdevice/by-name/xbl_ramdump
 cpucp_dtbs.elf          /dev/block/bootdevice/by-name/cpucp_dtb
 spu_service.mbn         /dev/block/bootdevice/by-name/spuservice
+storsec.mbn             /dev/block/bootdevice/by-name/storsec
+tools.fv                /dev/block/bootdevice/by-name/toolsfv
+zeros_5sectors.bin      /dev/block/bootdevice/by-name/ddr
