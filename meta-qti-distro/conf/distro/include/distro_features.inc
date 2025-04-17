@@ -60,6 +60,7 @@ DISTRO_FEATURES:append:quin-gvm-lemans = " selinux"
 DISTRO_FEATURES_NATIVE:append:sa8775 = " selinux"
 DISTRO_FEATURES_NATIVE:append:sa7255 = " selinux"
 DISTRO_FEATURES_NATIVE:append:quin-gvm-lemans = " selinux"
+DISTRO_FEATURES:remove:pn-core-image-minimal = "selinux"
 
 # Preferred refpolicy
 PREFERRED_PROVIDER_virtual/refpolicy:sa8775 = "selinux-policy"
