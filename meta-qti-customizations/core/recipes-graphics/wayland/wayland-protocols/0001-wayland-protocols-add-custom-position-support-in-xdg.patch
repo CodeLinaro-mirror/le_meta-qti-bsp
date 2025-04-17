@@ -7,6 +7,8 @@ Subject: [PATCH] wayland-protocols: add custom position support in xdg_shell
 Add set_position API in xdg_shell protocol which allows custom
 window positioning by the clients
 
+Upstream-Status: Pending
+
 Signed-off-by: Kai Xing <kxing@codeaurora.org>
 ---
  stable/xdg-shell/xdg-shell.xml | 14 ++++++++++++++
