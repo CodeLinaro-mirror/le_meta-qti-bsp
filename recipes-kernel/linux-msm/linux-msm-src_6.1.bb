@@ -16,12 +16,9 @@ PR = "r0"
 DEPENDS += "virtual/kernel-toolchain-native rsync-native"
 DEPENDS:append:aarch64 = " libgcc"
 
-LDFLAGS:aarch64 = "-O1 --as-needed"
-#TARGET_CXXFLAGS += "-Wno-format"
 KERNEL_CC = "${STAGING_BINDIR_NATIVE}/clang/bin/clang -target ${TARGET_ARCH}${TARGET_VENDOR}-${TARGET_OS}"
+KERNEL_LD = "${STAGING_BINDIR_NATIVE}/clang/bin/ld.lld"
 
-BUILD_CFLAGS:remove = "-Og -g"
-BUILD_CXXFLAGS:remove = "-Og -g"
 #Add DTC_FLAGS to compile DTB with symbols.
 KERNEL_DTC_FLAGS += "-@"
 
@@ -89,7 +86,6 @@ do_install:append() {
     # Copy the modules to the staging directory
     for mod in $(find . -name '*.ko'); do
         if [ -f $mod ]; then
-            ${STRIP} --strip-unneeded $mod
             install -m 0644 $mod ${STAGING_KERNEL_BUILDDIR}/lib/modules/${KERNEL_VERSION}
         fi
     done
