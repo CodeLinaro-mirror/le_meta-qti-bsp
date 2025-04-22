@@ -76,7 +76,7 @@ MACHINE_SUPPORTS_ANDROID_PROPERTIES = "False"
 MACHINE_SUPPORTS_USB_AUTOSUSPEND = "False"
 
 # File indicating firmware residing places on device.
-MACHINE_FILESMAP_CONF = "mdm9607-filesmap"
+MACHINE_FILESMAP_CONF = "mdm9650-filesmap"
 
 USBCOMPOSITION = "901D"
 
