@@ -14,6 +14,7 @@ PREFERRED_VERSION_wayland-ivi-extension = "2.2.0"
 # Prefer gbm
 PREFERRED_PROVIDER_virtual/libgbm = "gbm"
 
+PREFERRED_VERSION_android-tools = "5.1.1.r37"
 PREFERRED_VERSION_adreno = "0.1"
 # Prefer adreno
 PREFERRED_PROVIDER_virtual/wayland-egl  = "adreno"
