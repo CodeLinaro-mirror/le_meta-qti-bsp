@@ -82,6 +82,7 @@ MACHINE_FEATURES += "\
 "
 MACHINE_FEATURES:remove = "\
     ${@bb.utils.contains('TCMODE', 'external-ubuntu', 'qti-vmm', '', d)} \
+    ${@bb.utils.contains('FACTORY_TEST', '1', 'qti-vmm', '', d)} \
 "
 
 SECTOOLS_VERSION = "sectools-v2"
