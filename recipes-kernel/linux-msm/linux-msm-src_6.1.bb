@@ -81,7 +81,7 @@ do_configure:append() {
 # make sure that we generate all DTBs using the kernel 'dtbs' target,
 # then we can append the DTBs that we need for $MACHINE.
 KERNEL_EXTRA_ARGS += "dtbs"
-KERNEL_EXTRA_ARGS += "DTC_EXT=${STAGING_DIR_NATIVE}/usr/bin/dtc/bin/dtc"
+KERNEL_EXTRA_ARGS += "DTC_EXT=${STAGING_DIR_NATIVE}/usr/bin/dtc/bin/dtc DTC_FLAGS+='${KERNEL_DTC_FLAGS}'"
 
 do_install:append() {
     mkdir -p ${STAGING_KERNEL_BUILDDIR}/lib/modules/${KERNEL_VERSION}
