@@ -37,7 +37,7 @@ EXTRA_OECONF:append = " \
     --disable-demuxer=thp --disable-demuxer=tiertexseq --disable-demuxer=tta --disable-demuxer=txd \
     --disable-demuxer=vmd --disable-demuxer=voc --disable-demuxer=wc3 --disable-demuxer=wsaud \
     --disable-demuxer=wsvqa --disable-demuxer=xa --disable-demuxer=yuv4mpegpipe --enable-demuxer=matroska \
-    --disable-altivec --enable-fft --libdir=${base_libdir} --shlibdir=${base_libdir} \
+    --disable-altivec --libdir=${base_libdir} --shlibdir=${base_libdir} \
     --prefix=${base_libdir} --incdir=${includedir} \
 "
 
