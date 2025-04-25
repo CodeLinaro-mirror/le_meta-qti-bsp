@@ -151,7 +151,7 @@ do_makeuserdata_sqsh() {
     cp ${MACHINE_FSCONFIG_CONF_FULL_PATH} ${WORKDIR}/rootfs-fsconfig.conf
     make_ext4fs -B ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${FS_TYPE_SQSH}/${USERDATAIMAGE_MAP_TARGET} \
                 -a /data ${IMAGE_EXT4_SELINUX_OPTIONS} \
-                -s -b 4096 -l ${USERDATA_SIZE_EXT4} \
+                -s -b 4096 -l ${USERDATA_SIZE} \
                 ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${FS_TYPE_SQSH}/${USERDATAIMAGE_TARGET} \
                 ${IMAGE_ROOTFS}/${USERDATA_DIR}
 }

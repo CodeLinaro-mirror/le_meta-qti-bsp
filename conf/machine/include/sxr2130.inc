@@ -17,7 +17,7 @@ MACHINE_MNT_POINTS = "/firmware \
 
 # Sizes for EXT4
 SYSTEM_SIZE_EXT4 ?= "500MiB"
-USERDATA_SIZE_EXT4 ?= "2GiB"
+USERDATA_SIZE ?= "2GiB"
 
 # Formats of root filesystem images.
 IMAGE_FSTYPES += "ext4"
