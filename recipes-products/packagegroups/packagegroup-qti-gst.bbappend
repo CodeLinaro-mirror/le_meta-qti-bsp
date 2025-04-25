@@ -1,0 +1,35 @@
+RDEPENDS:packagegroup-qti-gst:remove:sun = " \
+      gstd \
+      gstreamer1.0-plugins-qti-oss-base \
+      gstreamer1.0-plugins-qti-oss-tools \
+      gstreamer1.0-plugins-qti-oss-examples \
+      gstreamer1.0-plugins-qti-oss-codec2 \
+      gstreamer1.0-plugins-qti-oss-mlmeta \
+      gstreamer1.0-plugins-qti-oss-overlay \
+      gstreamer1.0-plugins-qti-oss-socket \
+      gstreamer1.0-plugins-qti-oss-vtransform \
+      gstreamer1.0-plugins-qti-oss-vsplit \
+      gstreamer1.0-plugins-qti-oss-vcomposer \
+      gstreamer1.0-plugins-qti-oss-voverlay \
+      gstreamer1.0-plugins-qti-oss-batch \
+      gstreamer1.0-plugins-qti-oss-metamux \
+      gstreamer1.0-plugins-qti-oss-mlvconverter \
+      gstreamer1.0-plugins-qti-oss-mlvdetection \
+      gstreamer1.0-plugins-qti-oss-mlvclassification \
+      gstreamer1.0-plugins-qti-oss-mlvsegmentation \
+      gstreamer1.0-plugins-qti-oss-mlvsuperresolution \
+      gstreamer1.0-plugins-qti-oss-mlvpose \
+      gstreamer1.0-plugins-qti-oss-mldemux \
+      gstreamer1.0-plugins-qti-oss-mlaic \
+      gstreamer1.0-plugins-qti-oss-mltflite \
+      gstreamer1.0-plugins-qti-oss-mlsnpe \
+      gstreamer1.0-plugins-qti-oss-mlqnn \
+      gstreamer1.0-plugins-qti-oss-umd-daemon \
+      gstreamer1.0-plugins-qti-oss-qmmfsrc \
+      gstreamer1.0-plugins-qti-oss-dfs \
+      gstreamer1.0-plugins-qti-oss-cv-imgpyramid \
+      gstreamer1.0-plugins-qti-oss-cv-optclflow \
+      gstreamer1.0-plugins-qti-oss-jpegenc \
+      gstreamer1.0-plugins-qti-oss-camreproc \
+      gstreamer1.0-plugins-qti-oss-drmdecryptor \
+"
