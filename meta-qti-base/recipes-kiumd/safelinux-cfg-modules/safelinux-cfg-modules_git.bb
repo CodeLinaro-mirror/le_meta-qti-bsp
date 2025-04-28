@@ -17,7 +17,7 @@ SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/vendor/qcom/opensource/safelinux-cfg-modules/safelinux-modules"
 
-TECHPACK_MODULES = "apps_pinctrl.ko scm_user_intf.ko qcom_dload_mode.ko vfio_iommu_qcom.ko iommu_iova_map.ko kiumd.ko qcom_uscmi.ko kryo_arm64_edac.ko kiumd_kgsl.ko mhi_ep_net.ko profiler.ko qcom_ethqos_filter.ko arm-smmu-qcom-fusa.ko pinctrl_fusa.ko qcom_l3_cache_config.ko"
+TECHPACK_MODULES = "apps_pinctrl.ko scm_user_intf.ko qcom_dload_mode.ko vfio_iommu_qcom.ko iommu_iova_map.ko kiumd.ko qcom_uscmi.ko kryo_arm64_edac.ko kiumd_kgsl.ko mhi_ep_net.ko profiler.ko qcom_ethqos_filter.ko arm-smmu-qcom-fusa.ko pinctrl_fusa.ko qcom_l3_cache_config.ko iommu_faults.ko"
 inherit qti-techpack
 
 do_patch_more() {
@@ -53,6 +53,7 @@ RPROVIDES:${PN} += "kernel-module-arm-smmu-qcom-fusa-${KERNEL_VERSION}"
 RPROVIDES:${PN} += "kernel-module-vfio-iommu-qcom-${KERNEL_VERSION}"
 RPROVIDES:${PN} += "kernel-module-iommu-iova-map-${KERNEL_VERSION}"
 RPROVIDES:${PN} += "kernel-module-kiumd-${KERNEL_VERSION}"
+RPROVIDES:${PN} += "kernel-module-iommu-faults-${KERNEL_VERSION}"
 RPROVIDES:${PN} += "kernel-module-qcom-uscmi-${KERNEL_VERSION}"
 RPROVIDES:${PN} += "kernel-module-kryo-arm64-edac-${KERNEL_VERSION}"
 RPROVIDES:${PN} += "kernel-module-kiumd-kgsl-${KERNEL_VERSION}"
