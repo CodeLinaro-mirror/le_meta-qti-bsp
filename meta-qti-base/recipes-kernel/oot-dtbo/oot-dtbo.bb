@@ -14,6 +14,8 @@ SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/vendor/qcom/opensource/safelinux-system-cfg/devicetree"
 OVERLAYED_OOT_DTBS_OUT = "${S}/out"
+INTERMEDIATE_OUT = "${S}/temp"
+DDR_DTBO_DIR = "${S}/ddrdtbodir"
 
 inherit qcom-dtb-merge deploy kernel-arch qti-techpack
 
@@ -32,6 +34,7 @@ do_merge_dtb() {
     fi
 
     install -d ${OVERLAYED_OOT_DTBS_OUT}
+    install -d ${INTERMEDIATE_OUT}
     install -d ${S}/dtbodir
 
     if [ -z "${OOT_DTBOS}" ]; then
@@ -46,7 +49,21 @@ do_merge_dtb() {
 
     dtb_dir=${DEPLOY_DIR_IMAGE}/build-artifacts/kernel-dtb
     dtbo_dir=${S}/dtbodir
-    merge_dtbos_single $dtb_dir $dtbo_dir ${OVERLAYED_OOT_DTBS_OUT}
+    merge_dtbos_single $dtb_dir $dtbo_dir ${INTERMEDIATE_OUT}
+
+    if [ -n "${OOT_DDR_DTBOS}" ] && [ "${FACTORY_TEST_VAL}" = "0" ]; then
+        install -d ${DDR_DTBO_DIR}
+
+        for oot_dtbo in ${OOT_DDR_DTBOS}; do
+            if [ -f ${S}/${oot_dtbo} ]; then
+                install -m 0644 ${S}/${oot_dtbo} ${DDR_DTBO_DIR}
+            fi
+        done
+
+        merge_ddr_dtbos_single ${INTERMEDIATE_OUT} ${DDR_DTBO_DIR} ${OVERLAYED_OOT_DTBS_OUT}
+    else
+        install -m 0644  ${INTERMEDIATE_OUT}/* ${OVERLAYED_OOT_DTBS_OUT}
+    fi
 }
 do_merge_dtb[depends] += "virtual/kernel:do_deploy"
 addtask do_merge_dtb after do_compile before do_install
