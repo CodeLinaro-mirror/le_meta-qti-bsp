@@ -25,8 +25,8 @@ BUILD_CXXFLAGS:remove = "-Og -g"
 #Add DTC_FLAGS to compile DTB with symbols.
 KERNEL_DTC_FLAGS += "-@"
 
-KERNEL_CONFIG_FRAGMENTS:append = " ${S}/arch/arm64/configs/vendor/neo.config"
-KERNEL_CONFIG_FRAGMENTS:append = " ${@oe.utils.vartrue('DEBUG_BUILD', '${S}/arch/arm64/configs/vendor/neo_debug.config', '', d)}"
+KERNEL_CONFIG_FRAGMENTS:append = " ${S}/arch/arm64/configs/vendor/neo_le.config"
+KERNEL_CONFIG_FRAGMENTS:append = " ${@oe.utils.vartrue('DEBUG_BUILD', '${S}/arch/arm64/configs/vendor/neo_le_debug.config', '', d)}"
 
 do_configure:prepend() {
     if [ ! -f "${S}/arch/${ARCH}/configs/${KERNEL_CONFIG}" ]; then
