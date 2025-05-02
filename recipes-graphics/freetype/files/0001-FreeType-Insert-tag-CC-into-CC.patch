@@ -4,6 +4,8 @@ Date: Tue, 8 Jan 2019 12:20:21 +0530
 Subject: [PATCH] FreeType: Insert --tag=CC into @CC@.
 
    * Helps libtool to infer tagged configuration.
+
+Upstream-Status: Pending
 ---
  builds/unix/unix-cc.in | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
