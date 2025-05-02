@@ -23,4 +23,5 @@ RDEPENDS:${PN} = "\
     vhost-device-ssr \
     hyp-udmabuf \
     hyp-udmabuf-test \
+    vmm-boot-lcm \
 "
