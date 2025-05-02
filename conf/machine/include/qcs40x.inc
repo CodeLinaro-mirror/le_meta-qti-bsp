@@ -23,7 +23,7 @@ MACHINE_MNT_POINTS = " \
 
 # Sizes for EXT4 (in bytes)
 SYSTEM_SIZE_EXT4 ?= "681574400"
-USERDATA_SIZE_EXT4 ?= "4831838208"
+USERDATA_SIZE ?= "4831838208"
 
 # Formats of root filesystem images
 IMAGE_FSTYPES += "ext4"
