@@ -9,6 +9,7 @@ include conf/machine/include/arm/arch-armv8a.inc
 PREFERRED_PROVIDER_virtual/kernel = "linux-msm"
 PREFERRED_PROVIDER_virtual/mkbootimg = "mkbootimg-gki"
 PREFERRED_PROVIDER_virtual/mkdtimg   = "mkdtimg-gki"
+PREFERRED_PROVIDER_gtest = "googletest"
 PREFERRED_VERSION_linux-msm ?= "6.6"
 PREFERRED_VERSION_linux-msm-headers ?= "6.6"
 PREFERRED_VERSION_kernel-toolchain ?= "6.6"
