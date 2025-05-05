@@ -78,7 +78,7 @@ MACHINE_SUPPORTS_USB_AUTOSUSPEND = "False"
 # File indicating firmware residing places on device.
 MACHINE_FILESMAP_CONF = "mdm9650-filesmap"
 
-USBCOMPOSITION = "901D"
+USBCOMPOSITION = "9025"
 
 # On msm-5.4 or above ufs driver supports BSG Device.
 UFS_BSG_DEV_USAGE = "True"
