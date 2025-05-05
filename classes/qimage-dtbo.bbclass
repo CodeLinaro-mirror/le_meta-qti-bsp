@@ -31,7 +31,7 @@
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ## Generate dtbo.img
-MKDTUTIL = '${@oe.utils.conditional("PREFERRED_PROVIDER_virtual/mkdtimg-native", "mkdtimg-gki-native", "mkdtboimg/bin/mkdtboimg.py", "mkdtimg", d)}'
+MKDTUTIL = '${@oe.utils.conditional("PREFERRED_PROVIDER_virtual/mkdtimg-native", "mkdtimg-gki-native", "mkdtboimg/bin/mkdtboimg*", "mkdtimg", d)}'
 DTBODEPLOYDIR = "${WORKDIR}/deploy-${PN}-dtboimage-complete"
 DTBOIMAGE_TARGET ?= "dtbo.img"
 

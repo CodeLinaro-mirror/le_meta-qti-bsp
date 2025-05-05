@@ -14,3 +14,18 @@ CORE_IMAGE_EXTRA_INSTALL += "\
               packagegroup-startup-scripts \
 "
 
+IMAGE_FEATURES:remove:qcm2290-mtp = "persist-volume"
+IMAGE_FEATURES:remove:qcs610-odk-64 = "persist-volume"
+
+CORE_IMAGE_EXTRA_INSTALL:remove:qcm2290-mtp = "kernel-modules"
+CORE_IMAGE_EXTRA_INSTALL:append:qcm2290-mtp = " gki-kernel-modules-second-stage"
+
+CORE_IMAGE_EXTRA_INSTALL:remove:qcs610-odk-64 = "kernel-modules"
+CORE_IMAGE_EXTRA_INSTALL:append:qcs610-odk-64 = " gki-kernel-modules-second-stage"
+
+IMAGE_FEATURES:remove:qcm4325-mtp = "persist-volume"
+IMAGE_FEATURES:remove:qcm4325-mtp = "read-only-rootfs"
+
+CORE_IMAGE_EXTRA_INSTALL:remove:qcm4325-mtp = "kernel-modules"
+CORE_IMAGE_EXTRA_INSTALL:append:qcm4325-mtp = " gki-kernel-modules-second-stage"
+CORE_IMAGE_EXTRA_INSTALL:append:qcm4325-mtp = " diag-router"

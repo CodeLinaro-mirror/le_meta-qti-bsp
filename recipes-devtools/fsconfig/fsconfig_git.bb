@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 HOMEPAGE = "http://android.git.kernel.org/?p=platform/system/core.git"
 
-DEPENDS += "libselinux libcutils"
+DEPENDS += "libcutils"
 
 FILESEXTRAPATHS:prepend := "${WORKSPACE}:"
 SRC_URI = "file://OTA/build/tools/fs_config/"
@@ -16,6 +16,10 @@ SRC_URI = "file://OTA/build/tools/fs_config/"
 S = "${WORKDIR}/OTA/build/tools/fs_config"
 
 BBCLASSEXTEND = "native"
+
+PACKAGECONFIG ??= " ${@bb.utils.filter('DISTRO_FEATURES', 'selinux', d)} \
+                  "
+PACKAGECONFIG[selinux] = "--enable-selinux,--disable-selinux,libselinux"
 
 EXTRA_OECONF:append:class-target = " --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
 EXTRA_OECONF:append:class-native = " --with-core-headers=${STAGING_INCDIR_NATIVE}"
