@@ -29,9 +29,11 @@ CORE_IMAGE_EXTRA_INSTALL += "\
 "
 
 RM_WORK_EXCLUDE += "${PN}"
+PACKAGE_EXCLUDE += "shared-mime-info"
+NO_RECOMMENDATIONS_pn-qti-recovery-image = "1"
 
 # Configs for generating recovery.ubi
-RECOVERY_MKUBIFS_ARGS = "-m 4096 -e 253952 -c 200 -F"
+RECOVERY_MKUBIFS_ARGS = "${@bb.utils.contains('PAGE_SIZE', '2048', '-m 2048 -e 126976 -c 220 -F', '-m 4096 -e 253952 -c 220 -F', d)}"
 RECOVERY_UBINIZE_CFG = "ubinize-recoveryfs.cfg"
 RECOVOERY_UBIFS_IMAGE = "recoveryfs.ubifs"
 RECOVOERY_UBI_IMAGE = "recoveryfs.ubi"
