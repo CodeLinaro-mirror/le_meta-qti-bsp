@@ -1,9 +1,7 @@
 RDEPENDS:packagegroup-qti-gst:remove:sun = " \
       gstd \
-      gstreamer1.0-plugins-qti-oss-base \
       gstreamer1.0-plugins-qti-oss-tools \
       gstreamer1.0-plugins-qti-oss-examples \
-      gstreamer1.0-plugins-qti-oss-codec2 \
       gstreamer1.0-plugins-qti-oss-mlmeta \
       gstreamer1.0-plugins-qti-oss-overlay \
       gstreamer1.0-plugins-qti-oss-socket \
