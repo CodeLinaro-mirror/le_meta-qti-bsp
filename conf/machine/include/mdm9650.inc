@@ -78,7 +78,7 @@ MACHINE_SUPPORTS_USB_AUTOSUSPEND = "False"
 # File indicating firmware residing places on device.
 MACHINE_FILESMAP_CONF = "mdm9650-filesmap"
 
-USBCOMPOSITION = "901D"
+USBCOMPOSITION = "9025"
 
 # On msm-5.4 or above ufs driver supports BSG Device.
 UFS_BSG_DEV_USAGE = "True"
@@ -93,7 +93,5 @@ PREFERRED_VERSION_iproute2 = "5.5.0"
 # y2038: Support for Y2038 safe time on 32 bit systems
 TARGET_CFLAGS += "-D_TIME_BITS=64 -D_FILE_OFFSET_BITS=64"
 TARGET_CPPFLAGS += "-D_TIME_BITS=64 -D_FILE_OFFSET_BITS=64"
-
-DISTRO_FEATURES_remove = "qti-telux"
 
 DEFAULT_ENFORCING = "permissive"
