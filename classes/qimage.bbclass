@@ -120,6 +120,10 @@ do_deploy_fixup () {
     for f in ${EXTRA_IMAGEDEPENDS}; do
         if [ "$f" = "edk2" ] || [ "$f" = "lib64-edk2" ]; then
             install -m 0644 ${DEPLOY_DIR_IMAGE}/abl.elf .
+            if ${@bb.utils.contains('IMAGE_FSTYPES', 'squashfs', 'true', 'false', d)}; then
+                mkdir -p ./squashfs
+                install -m 0644 ${DEPLOY_DIR_IMAGE}/abl.elf ./squashfs
+            fi
         elif [ "$f" = "lk" ]; then
             install -m 0644 ${DEPLOY_DIR_IMAGE}/*appsboot.mbn .
         fi
