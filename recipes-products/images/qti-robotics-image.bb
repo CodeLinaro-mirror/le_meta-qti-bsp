@@ -117,7 +117,6 @@ CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "tdk-chx01-get-data-app"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrb5165 = "tdk-thermistor-app"
 
 CORE_IMAGE_EXTRA_INSTALL:append:sun= " packagegroup-qcom-perf"
-CORE_IMAGE_EXTRA_INSTALL:remove:sun = "alsa-utils"
 CORE_IMAGE_EXTRA_INSTALL:remove:sun = "can-utils"
 CORE_IMAGE_EXTRA_INSTALL:remove:sun = "chronyc"
 CORE_IMAGE_EXTRA_INSTALL:remove:sun = "packagegroup-qti-bluetooth"
