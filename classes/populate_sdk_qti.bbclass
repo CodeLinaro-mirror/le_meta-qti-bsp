@@ -54,20 +54,6 @@ python copy_buildsystem:append() {
     cmd = "%s %s %s" % (d.getVar('COPY_DIRECTORY_TREE'), src_kernel_defconfig, dest_kernel_defconfig)
     subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
 
-    # Copy security artifacts to extensible SDK
-    src_security = os.path.abspath(d.getVar('WORKSPACE') + '/security') + '/securemsm/security_profiles'
-    dest_security = baseoutpath + '/src/security/securemsm/security_profiles'
-    bb.utils.mkdirhier(dest_security)
-    cmd = "%s %s %s" % (d.getVar('COPY_DIRECTORY_TREE'), src_security, dest_security)
-    subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
-
-    # Copy vendor artifacts to extensible SDK
-    src_vendor = os.path.abspath(d.getVar('WORKSPACE') + '/vendor') + '/qcom/proprietary/sectools/Linux'
-    dest_vendor = baseoutpath + '/src/vendor/qcom/proprietary/sectools/Linux'
-    bb.utils.mkdirhier(dest_vendor)
-    cmd = "%s %s %s" % (d.getVar('COPY_DIRECTORY_TREE'), src_vendor, dest_vendor)
-    subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
-
     # Copy prebuilt tar to eSDK and set PREBUILT_SRC_DIR
     prebuilt_src_dir_sdk = ""
     default_prebuilt_src_dir = d.getVar('DEFAULT_PREBUILT_SRC_DIR')
