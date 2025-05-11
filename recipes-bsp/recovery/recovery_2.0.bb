@@ -19,6 +19,10 @@ EXTRA_OECONF = "--with-glib --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/
 EXTRA_OECONF += "${@bb.utils.contains('DISTRO_FEATURES', 'ota-package-verification', 'TARGET_SUPPORTS_OTA_VERIFICATION=true', '', d)}"
 EXTRA_OECONF:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', 'TARGET_SUPPORTS_NAND_DM_VERITY=true', '', d)}"
 
+PACKAGECONFIG ??= " ${@bb.utils.filter('DISTRO_FEATURES', 'selinux', d)} \
+                  "
+PACKAGECONFIG[selinux] = "--enable-selinux,--disable-selinux,libselinux"
+
 CFLAGS += "-lsparse -llog"
 
 PARALLEL_MAKE = ""
