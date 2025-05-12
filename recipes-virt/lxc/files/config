@@ -34,6 +34,8 @@ lxc.mount.entry = /dev/input dev/input none bind,create=dir 0 0
 lxc.mount.entry = /dev/dri/renderD128 dev/dri/renderD128 none bind,create=file 0 0
 #lxc.mount.entry = /dev/dri/card2 dev/dri/card0 none bind,create=file 0 0
 lxc.mount.entry = /dev/fifo dev/fifo none bind,create=dir 0 0
+lxc.mount.entry = /dev/snd dev/snd none bind,optional,create=dir
+lxc.mount.entry = /dev/socket/agm dev/socket/agm none bind,create=dir 0 0
 
 # Cgroup configuration
 lxc.cgroup2.devices.deny                = c 226:0 m
