@@ -9,19 +9,19 @@ LIC_FILES_CHKSUM = "file://${WORKDIR}/system-sepolicy/NOTICE;md5=6553f4761e321f4
 
 DEPENDS += "checkpolicy-native glib-2.0-native"
 
-SRC_URI = "git://git.codelinaro.org/clo/la/platform/system/sepolicy.git;protocol=https;branch=automotive-aosp-va.lnx.15.0.r1-rel;name=system-sepolicy;destsuffix=system-sepolicy \
-           git://git.codelinaro.org/clo/la/device/qcom/sepolicy.git;protocol=https;branch=auto-sepolicy-sysintf.lnx.15.0.r1-rel;name=device-sepolicy;destsuffix=device-sepolicy \
-           git://git.codelinaro.org/clo/la/platform/external/selinux.git;protocol=https;branch=aosp.lnx.15.0.r5-rel;name=selinux;destsuffix=selinux \
-           git://git.codelinaro.org/clo/la/platform/packages/services/Car.git;protocol=https;branch=automotive-aosp-va.lnx.15.0.r1-rel;name=packages-sepolicy;destsuffix=packages-sepolicy \
-           git://git.codelinaro.org/clo/la/device/qcom/sepolicy_vndr.git;protocol=https;branch=sepolicy.vndr.lnx.13.0.r29-rel;name=device-sepolicyvndr;destsuffix=device-sepolicyvndr \
+SRC_URI = "git://git.codelinaro.org/clo/la/platform/system/sepolicy.git;protocol=https;branch=automotive-aosp-va.lnx.15.0;name=system-sepolicy;destsuffix=system-sepolicy \
+           git://git.codelinaro.org/clo/la/device/qcom/sepolicy.git;protocol=https;branch=auto-sepolicy-sysintf.lnx.15.0;name=device-sepolicy;destsuffix=device-sepolicy \
+           git://git.codelinaro.org/clo/la/platform/external/selinux.git;protocol=https;branch=aosp/android15-qpr1-release;name=selinux;destsuffix=selinux \
+           git://git.codelinaro.org/clo/la/platform/packages/services/Car.git;protocol=https;branch=automotive-aosp-va.lnx.15.0;name=packages-sepolicy;destsuffix=packages-sepolicy \
+           git://git.codelinaro.org/clo/la/device/qcom/sepolicy_vndr.git;protocol=https;branch=sepolicy.vndr.lnx.13.0.c1;name=device-sepolicyvndr;destsuffix=device-sepolicyvndr \
            file://Makefile \
            "
 SRCREV_FORMAT = "system-sepolicy"
-SRCREV_system-sepolicy = "d47885e3487fb6fcee5c76452ed71b903e17d21e"
-SRCREV_device-sepolicy = "453886de8df478af55e1ca61ec50a04d383b87ac"
-SRCREV_selinux = "8d5c7f06d074449dbb3dad7fcb531ec02ff0c0d1"
-SRCREV_packages-sepolicy = "2077c72ba04c06e39daf0cb3d626ed9c5d94faf1"
-SRCREV_device-sepolicyvndr = "7701c5e1f4113e43c37e4ec8df6f9945a285624a"
+SRCREV_system-sepolicy = "a569d3187f8377699305d91d224acab93404ea0c"
+SRCREV_device-sepolicy = "09e7777d234a86649bba31eb59d985308dbce76e"
+SRCREV_selinux = "cae32d3a1af2e64f094ab9e0b4adfde7e1bf63f5"
+SRCREV_packages-sepolicy = "2b81bee4c94196f941092925d37df1e62e0de1af"
+SRCREV_device-sepolicyvndr = "9b6a08e34c27c627cb3e993dba410829f8b2467a"
 
 inherit native
 
@@ -64,17 +64,14 @@ do_configure() {
     insert_include "${WORKDIR}/packages-sepolicy/cpp/watchdog/sepolicy/public/te_macros" "${WORKDIR}/packages-sepolicy/cpp/powerpolicy/sepolicy/public/attributes"
     sed -i '1iattribute carpowerpolicycallback_domain;' ${WORKDIR}/packages-sepolicy/cpp/watchdog/sepolicy/public/te_macros
     insert_include "${WORKDIR}/device-sepolicyvndr/generic/vendor/common/attribute/attributes" "${WORKDIR}/device-sepolicyvndr/generic/vendor/common/cnd.te"
-    insert_include "${WORKDIR}/packages-sepolicy/cpp/powerpolicy/sepolicy/public/te_macros" "${WORKDIR}/device-sepolicyvndr/generic/vendor/common/hal_audiocontrol_default.te"
     insert_include "${WORKDIR}/packages-sepolicy/cpp/powerpolicy/sepolicy/public/te_macros" "${WORKDIR}/packages-sepolicy/car_product/sepolicy/private/carservice_app.te"
     sed -i '1isystem_internal_prop(carwatchdog_config_prop)' ${WORKDIR}/packages-sepolicy/cpp/watchdog/sepolicy/public/attributes
     insert_include "${WORKDIR}/system-sepolicy/microdroid/system/public/te_macros" "${WORKDIR}/packages-sepolicy/cpp/watchdog/sepolicy/public/attributes"
     sed -i '1itype carpowerpolicyd_service, service_manager_type;' ${WORKDIR}/packages-sepolicy/cpp/watchdog/sepolicy/private/property.te
     sed -i '1itype carpowerpolicyd_service, service_manager_type;' ${WORKDIR}/packages-sepolicy/cpp/watchdog/sepolicy/public/attributes
-    sed -i '1iattribute carpowerpolicycallback_domain;' ${WORKDIR}/device-sepolicyvndr/generic/vendor/common/hal_audiocontrol_default.te
     sed -i '31iattribute vendor_service;' ${WORKDIR}/device-sepolicyvndr/generic/vendor/common/service.te
-    insert_include "${WORKDIR}/packages-sepolicy/cpp/powerpolicy/sepolicy/public/carpowerpolicy.te" "${WORKDIR}/device-sepolicyvndr/generic/vendor/common/carpowerpolicy.te"
-    insert_include "${WORKDIR}/packages-sepolicy/cpp/watchdog/sepolicy/public/attributes" "${WORKDIR}/packages-sepolicy/cpp/powerpolicy/sepolicy/public/carpowerpolicy.te"
     insert_include "${WORKDIR}/device-sepolicyvndr/qva/vendor/test/sysmonapp/sysmonapp_app_test.te" "${WORKDIR}/device-sepolicyvndr/generic/vendor/common/domain.te"
+    sed -i '1itype vendor_aidl_hal_automotive_vehicle_qti;' ${WORKDIR}/device-sepolicyvndr/qva/vendor/common/qseecomd.te
 }
 
 do_compile() {

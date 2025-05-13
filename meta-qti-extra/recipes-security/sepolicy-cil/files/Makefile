@@ -10,10 +10,12 @@ with_native_coverage=false
 PRODUCT_SEPOLICY_SPLIT=true
 PRODUCT_COMPATIBLE_PROPERTY=true
 WITH_DEXPREOPT=true
-BOARD_SEPOLICY_VERS=30.0
-PLATFORM_SEPOLICY_VERSION=30.0
-POLICYVERS=30
-BOARD_API_LEVEL=1000000
+BOARD_SEPOLICY_VERS=33.0
+PLATFORM_SEPOLICY_VERSION=33.0
+POLICYVERS=33
+BOARD_API_LEVEL=202404
+VAL_TRUE=true
+VAL_FALSE=false
 
 PRIVATE_MLS_SENS := $(MLS_SENS)
 PRIVATE_MLS_CATS := $(MLS_CATS)
@@ -26,6 +28,8 @@ PRIVATE_SEPOLICY_SPLIT := $(PRODUCT_SEPOLICY_SPLIT)
 PRIVATE_COMPATIBLE_PROPERTY := $(PRODUCT_COMPATIBLE_PROPERTY)
 PRIVATE_TREBLE_SYSPROP_NEVERALLOW := $(treble_sysprop_neverallow)
 PRIVATE_BOARD_API_LEVEL := $(BOARD_API_LEVEL)
+PRIVATE_TRUE := $(VAL_TRUE)
+PRIVATE_FALSE := $(VAL_FALSE)
 
 VERSIONPOLICY = ./version_policy
 
@@ -101,6 +105,11 @@ define transform-policy-to-conf
         -D target_treble_sysprop_neverallow=$(PRIVATE_TREBLE_SYSPROP_NEVERALLOW) \
         -D target_exclude_build_test=$(PRIVATE_EXCLUDE_BUILD_TEST) \
         -D target_requires_insecure_execmem_for_swiftshader=$(PRODUCT_REQUIRES_INSECURE_EXECMEM_FOR_SWIFTSHADER) \
+        -D target_enforce_sysprop_owner=$(PRIVATE_TRUE) \
+        -D target_enforce_debugfs_restriction=$(PRIVATE_TRUE) \
+        -D target_flag_RELEASE_AVF_ENABLE_DEVICE_ASSIGNMENT=$(PRIVATE_TRUE) \
+        -D target_flag_RELEASE_AVF_ENABLE_LLPVM_CHANGES=$(PRIVATE_TRUE) \
+        -D target_flag_RELEASE_HARDWARE_BLUETOOTH_RANGING_SERVICE=$(PRIVATE_TRUE) \
         -D target_board_api_level=$(PRIVATE_BOARD_API_LEVEL) \
         $(PRIVATE_TGT_RECOVERY) \
         -s > $@
@@ -344,11 +353,11 @@ install:
 	install -d ${TARGET_INSTALL_DIR}/android_cils/system_ext
 	install -d ${TARGET_INSTALL_DIR}/android_cils/vendor
 	install -m 0644 ${CIL_OUTPUT_DIR}/product_sepolicy.cil ${TARGET_INSTALL_DIR}/android_cils/product
-	install -m 0644 ${CIL_OUTPUT_DIR}/product_mapping_file.cil ${TARGET_INSTALL_DIR}/android_cils/product/30.0.cil
+	install -m 0644 ${CIL_OUTPUT_DIR}/product_mapping_file.cil ${TARGET_INSTALL_DIR}/android_cils/product/33.0.cil
 	install -m 0644 ${CIL_OUTPUT_DIR}/plat_sepolicy.cil ${TARGET_INSTALL_DIR}/android_cils/system
-	install -m 0644 ${CIL_OUTPUT_DIR}/plat_mapping_file.cil ${TARGET_INSTALL_DIR}/android_cils/system/30.0.cil
+	install -m 0644 ${CIL_OUTPUT_DIR}/plat_mapping_file.cil ${TARGET_INSTALL_DIR}/android_cils/system/33.0.cil
 	install -m 0644 ${CIL_OUTPUT_DIR}/system_ext_sepolicy.cil ${TARGET_INSTALL_DIR}/android_cils/system_ext
-	install -m 0644 ${CIL_OUTPUT_DIR}/system_ext_mapping_file.cil ${TARGET_INSTALL_DIR}/android_cils/system_ext/30.0.cil
+	install -m 0644 ${CIL_OUTPUT_DIR}/system_ext_mapping_file.cil ${TARGET_INSTALL_DIR}/android_cils/system_ext/33.0.cil
 	install -m 0644 ${CIL_OUTPUT_DIR}/plat_pub_versioned.cil ${TARGET_INSTALL_DIR}/android_cils/vendor
 	install -m 0644 ${CIL_OUTPUT_DIR}/vendor_sepolicy.cil ${TARGET_INSTALL_DIR}/android_cils/vendor
 
