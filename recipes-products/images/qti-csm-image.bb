@@ -49,6 +49,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
               packagegroup-modem-ald-transport-simulation \
               packagegroup-ru-modem-client \
               resize-data \
+              collect-shutdown-logs \
 "
 
 do_merge_dtbs() {
