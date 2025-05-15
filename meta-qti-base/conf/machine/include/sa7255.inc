@@ -70,5 +70,9 @@ MACHINE_FEATURES += "\
     qti-safety \
 "
 
+MACHINE_FEATURES:remove = "\
+    ${@bb.utils.contains('FACTORY_TEST', '1', 'qti-vmm', '', d)} \
+"
+
 SECTOOLS_VERSION = "sectools-v2"
 SECTOOLS_SECURITY_PROFILE = "monaco_tz_security_profile.xml"
