@@ -10,6 +10,7 @@ inet:x:3003:
 net_raw:x:3004:
 net_admin:x:3005:
 sensors:x:3011:
+modules-load:x:3020:
 locclient:x:4021:
 vnw:x:4022:
 acdb-loader:x:4050:
