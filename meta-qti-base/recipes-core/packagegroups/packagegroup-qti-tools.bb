@@ -35,3 +35,6 @@ RDEPENDS:${PN}:remove = "${@bb.utils.contains('TCMODE', 'external-ubuntu', 'evte
 
 # headless need exclude lttng related modules
 RDEPENDS:${PN}:remove = "${@bb.utils.contains('DISTRO_NAME', 'headless', 'lttng-modules lttng-tools lttng-ust', '', d)}"
+
+RDEPENDS:${PN}:append:gh-gvm-lemans = " cntvct-log"
+RDEPENDS:${PN}:remove:gh-gvm-lemans = " lttng-modules lttng-tools lttng-ust"
