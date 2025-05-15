@@ -19,10 +19,14 @@ SRC_URI = "\
     file://0001-libdp-Create-symlink-for-dynamic-partitions.patch \
     file://0001-libdp-libdm-add-uuid-link-for-partions.patch \
     file://0001-libdp-update-fs_mgr-to-work-in-LV.patch \
+    file://0005-libdp-add-build-support-for-libfs_avb.patch \
+    file://0006-libdp-set-verity-devices-for-android-container.patch \
 "
 SRCREV = "f9a075a9078eaebee234fb9be2f043613fe63da8"
 
 S = "${WORKDIR}/git"
+
+DEPENDS += "avbtool fmt"
 
 inherit autotools pkgconfig
 
