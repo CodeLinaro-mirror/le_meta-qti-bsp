@@ -41,6 +41,17 @@ do_install:append() {
 
 do_install:append:sa7255() {
     install -m 0755 ${S}/vfio-device-probe/sa7255_dev.conf -D ${D}${libdir}/vfio-bind.d/sa7255_dev.conf
+    if ${@bb.utils.contains('MACHINE_FEATURES', 'early-ramdisk-init', 'true', 'false', d)}; then
+        sed -i '/After=systemd-modules-load.service/d' ${D}${systemd_unitdir}/system/vfio-device-probe.service
+        sed -i 's#/usr/bin/vfio-device-bind.sh#/bin/echo "vfio already run in early-ramdisk"#g' ${D}${systemd_unitdir}/system/vfio-device-probe.service
+    fi
+}
+
+do_install:append:sa8620-adas() {
+    if ${@bb.utils.contains('MACHINE_FEATURES', 'early-ramdisk-init', 'true', 'false', d)}; then
+        sed -i '/After=systemd-modules-load.service/d' ${D}${systemd_unitdir}/system/vfio-device-probe.service
+        sed -i 's#/usr/bin/vfio-device-bind.sh#/bin/echo "vfio already run in early-ramdisk"#g' ${D}${systemd_unitdir}/system/vfio-device-probe.service
+    fi
 }
 
 do_install:append:sa8775() {
