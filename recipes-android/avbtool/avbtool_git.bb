@@ -1,12 +1,13 @@
-HOMEPAGE = "https://github.com/AndroidBootloader/platform_external_avb"
-DESCRIPTION = "avbtool: Image signing tool"
+
+DESCRIPTION = "Command-line tool for working with Android Verified Boot images"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${S}/LICENSE;md5=f0f3a517d46b5f0ca048b58f503b6dc1"
 
 BBCLASSEXTEND =+ "native"
 
+SRCREV = "b27a9aa53d2db7720e4d88d6950dcd979da97de3"
+
 SRC_URI = "git://github.com/AndroidBootloader/platform_external_avb.git;branch=master;protocol=https"
-SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/git"
 
@@ -14,6 +15,6 @@ do_configure[noexec] = "1"
 do_compile[noexec] = "1"
 
 do_install() {
-   install -d ${D}${bindir}
-  install -m 0755 ${S}/avbtool.py ${D}${bindir}/avbtool.py
+    install -d ${D}${bindir}
+    install -m 0755 ${S}/avbtool.py ${D}${bindir}/avbtool.py
 }
