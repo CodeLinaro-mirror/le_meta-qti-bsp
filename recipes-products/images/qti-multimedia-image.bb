@@ -50,3 +50,4 @@ CORE_IMAGE_EXTRA_INSTALL:append:qcs610-odk-64 = " gki-kernel-modules-second-stag
 CORE_IMAGE_EXTRA_INSTALL:append:qcs610-odk-64 = " diag-router"
 CORE_IMAGE_EXTRA_INSTALL:remove:qcs610-odk-64 = "packagegroup-qti-display"
 CORE_IMAGE_EXTRA_INSTALL:append:qcs610-odk-64 = " packagegroup-qcom-display"
+CORE_IMAGE_EXTRA_INSTALL:remove:qcs610-odk-64 = "graphite-client"
