@@ -28,7 +28,7 @@
 #
 # Changes from Qualcomm Innovation Center are provided under the following license:
 #
-# Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+# Copyright (c) 2022, 2025 Qualcomm Innovation Center, Inc. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted (subject to the limitations in the
@@ -118,3 +118,19 @@ while [ $n -le 5 ]
 done
 echo "##########Load wlanhost driver done################"
 
+sleep 1
+n=0
+while [ $n -le 5 ]
+	do
+	if (ls -la /sys/class/net/ | grep wlan0);then
+		ifconfig wlan0 up
+		sleep 1
+		if (ifconfig wlan0 | grep UP);then
+			echo "wlan0 up ready"
+			break
+		fi
+	fi
+	n=$((n + 1))
+	echo "Retry loading wlan @$n"
+	sleep 1
+done

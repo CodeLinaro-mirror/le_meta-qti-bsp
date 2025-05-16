@@ -27,6 +27,7 @@ RDEPENDS:${PN} = "\
         ${@bb.utils.contains('DISTRO_FEATURES', 'qti-gstqvrate', 'gstreamer1.0-plugins-qvrate', '', d)} \
         ${@bb.utils.contains('DISTRO_FEATURES', 'qti-gstqvais', 'gstreamer1.0-plugin-qvais', '', d)} \
         ${@bb.utils.contains('DISTRO_FEATURES', 'qti-gstqcarcamsrc', 'gstreamer1.0-plugins-qcarcamsrc', '', d)} \
+        gstreamer1.0-plugins-extpoolsink \
 "
 
 RDEPENDS:${PN}:remove:sa8797 = "\

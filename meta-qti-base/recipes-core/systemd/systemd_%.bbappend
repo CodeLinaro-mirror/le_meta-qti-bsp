@@ -10,6 +10,8 @@ SRC_URI:append = " \
     file://0001-systemd-config-linger-for-root-user.patch \
 "
 
+SRC_URI:append:gh-gvm-lemans = " file://60-vblk.rules"
+
 SRC_URI:append:sa81x5 = " file://0001-systemd-add-slotselect-support-in-fstab.patch"
 
 SRC_URI:append = " ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "5.15", "file://platform_load.conf", "", d)}"
@@ -115,4 +117,7 @@ do_install:append () {
     if ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "5.15", "true", "false", d)}; then
         install -m 0664 ${WORKDIR}/platform_load.conf ${D}${sysconfdir}/modules-load.d/
     fi
+}
+do_install:append:gh-gvm-lemans() {
+    install -m 0644 ${WORKDIR}/60-vblk.rules ${D}${sysconfdir}/udev/rules.d/
 }

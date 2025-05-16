@@ -29,6 +29,8 @@ ghgvm_pilsplitter() {
 
     # copy necessary files into signing dir
     cp ${DEPLOY_DIR_IMAGE}/Image ${DEPLOY_DIR_IMAGE}/signing
+    cp ${DEPLOY_DIR_IMAGE}/LinuxLoader.efi ${DEPLOY_DIR_IMAGE}/signing
+    cp ${DEPLOY_DIR_IMAGE}/FVMAIN_COMPACT.Fv ${DEPLOY_DIR_IMAGE}/signing
     cp ${DEPLOY_DIR_IMAGE}/ramdisk.img ${DEPLOY_DIR_IMAGE}/signing
     cp ${DEPLOY_DIR_IMAGE}/dtbs/dtb.img ${DEPLOY_DIR_IMAGE}/signing
 
@@ -38,6 +40,7 @@ ghgvm_pilsplitter() {
     # will fail and return 1.bypass yocto by adding 'set +e' and 'set -e'
     set +e
     python3 ${PILTOOLS_PATH}/image_header.py autoghgvmlv-boot.elf Image,0x0 dtb.img,0x3000000 ramdisk.img,0x3100000 --32
+    python3 ${PILTOOLS_PATH}/image_header.py autoghgvmlv-bootloader.elf FVMAIN_COMPACT.Fv,0x0 dtb.img,0x9700000 LinuxLoader.efi,0x9800000 --32
     set -e
 
     sectools secure-image autoghgvmlv-boot.elf --image-id GVM1 --security-profile ${STAGING_BINDIR_NATIVE}/${SECTOOLS_SECURITY_PROFILE} --sign --signing-mode TEST --outfile autoghgvmlv_signed-boot.elf
@@ -46,7 +49,15 @@ ghgvm_pilsplitter() {
     install -d ${DEPLOY_DIR_IMAGE}/signing/boot
     python3 ${PILTOOLS_PATH}/pil-splitter.py autoghgvmlv_signed-boot.elf boot/autoghgvmlv
 
-    ${STAGING_BINDIR_NATIVE}/build/prebuilts/kernel-build-tools/linux-x86/bin/mkuserimg_mke2fs ${DEPLOY_DIR_IMAGE}/signing/boot ${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET} ext4 / 60000000
+    ${STAGING_BINDIR_NATIVE}/build/prebuilts/kernel-build-tools/linux-x86/bin/mkuserimg_mke2fs ${DEPLOY_DIR_IMAGE}/signing/boot ${DEPLOY_DIR_IMAGE}/vm-bootloader.img ext4 / 60000000
+
+    sectools secure-image autoghgvmlv-bootloader.elf --image-id GVM1 --security-profile ${STAGING_BINDIR_NATIVE}/${SECTOOLS_SECURITY_PROFILE} --sign --signing-mode TEST --outfile autoghgvmlv_signed-bootloader.elf
+    sectools secure-image autoghgvmlv-bootloader.elf --inspect
+
+    install -d ${DEPLOY_DIR_IMAGE}/signing/bootloader
+    python3 ${PILTOOLS_PATH}/pil-splitter.py autoghgvmlv_signed-bootloader.elf bootloader/autoghgvmlv
+
+    ${STAGING_BINDIR_NATIVE}/build/prebuilts/kernel-build-tools/linux-x86/bin/mkuserimg_mke2fs ${DEPLOY_DIR_IMAGE}/signing/bootloader ${DEPLOY_DIR_IMAGE}/${PRODUCT}-bootloader.img ext4 / 6000000
 }
 
 do_ghgvm_pilsplitter() {
@@ -55,6 +66,8 @@ do_ghgvm_pilsplitter() {
 }
 
 do_ghgvm_pilsplitter[cleandirs] = "${DEPLOY_DIR_IMAGE}/signing"
+do_ghgvm_pilsplitter[depends] += "virtual/guest-bootloader:do_deploy"
+do_ghgvm_pilsplitter[depends] += "virtual/bootloader:do_deploy"
 
 python () {
     if bb.utils.contains('MACHINE_FEATURES', 'qti-ghgvm', True, False, d):
@@ -183,8 +196,22 @@ avb_sign_boot_image() {
             --partition_size ${boot_partition_size}  \
             --partition_name boot \
             --algorithm SHA256_RSA4096 \
-            --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/vbgvm_private_key_4096.pem \
+            ${@bb.utils.contains('MACHINE_FEATURES', 'qti-ghgvm', '--key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/testkey_rsa4096.pem', '--key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/vbgvm_private_key_4096.pem', d)} \
             --rollback_index 0
+        if [ -f ${DEPLOY_DIR_IMAGE}/${PRODUCT}-dtbo.img ]; then
+            dtbo_partition_size=$(avbtool calc_min_partition_size \
+                              --image ${DEPLOY_DIR_IMAGE}/${PRODUCT}-dtbo.img \
+                              --partition_name dtbo \
+                              --hash_algorithm sha256 \
+                              --no_hashtree)
+            avbtool add_hash_footer  \
+                --image ${DEPLOY_DIR_IMAGE}/${PRODUCT}-dtbo.img  \
+                --partition_size ${dtbo_partition_size} \
+                --partition_name dtbo \
+                --algorithm SHA256_RSA4096 \
+                --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/testkey_rsa4096.pem \
+                --rollback_index 0
+        fi
 
     else
         # For lv avb2.0, add hash for boot image, dtbo image and vendor-boot image.

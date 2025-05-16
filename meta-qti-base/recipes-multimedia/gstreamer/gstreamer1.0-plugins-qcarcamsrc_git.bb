@@ -6,6 +6,9 @@ LICENSE = "BSD-3-Clause-Clear & BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${QTI_LICENSE_DIR}/BSD-3-Clause-Clear;md5=b796c0007db682166a1721da80267bb2 \
                     file://${COREBASE}/meta/files/common-licenses/BSD-3-Clause;md5=550794465ba0ec5312d6919e203a55f9 \
                    "
+
+PV = "1.0"
+
 DEPENDS += "\
     gbm-headers \
     gstreamer1.0 \

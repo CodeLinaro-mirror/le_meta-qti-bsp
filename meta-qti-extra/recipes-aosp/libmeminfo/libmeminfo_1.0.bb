@@ -6,10 +6,10 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 DEPENDS += "virtual/kernel-headers libbase libprocinfo "
 
-SRC_URI = "${PATH_TO_REPO}/src/system/memory/libmeminfo/.git;protocol=${PROTO};destsuffix=src/system/memory/libmeminfo;subpath=libmeminfo;usehead=1 \
-           file://0001-libmeminfo-Remove-libion-dependency.patch \
-           "
-SRCREV = "${AUTOREV}"
+SRC_URI = "${CLO_LE_GIT}/platform/system/memory/libmeminfo;protocol=https;branch=memory-le-apps.lnx.1.0;destsuffix=src/system/memory/libmeminfo \
+           file://0001-libmeminfo-Remove-libion-dependency.patch"
+
+SRCREV = "e5690f41db4637600d40b74d7eb8207837edfb85"
 
 S = "${WORKDIR}/src/system/memory/libmeminfo"
 

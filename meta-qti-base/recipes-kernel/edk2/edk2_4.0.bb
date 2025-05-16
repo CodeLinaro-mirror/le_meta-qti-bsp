@@ -12,6 +12,7 @@ require recipes-kernel/edk2/edk2-common.inc
 EARLY_ETH = "${@bb.utils.contains('DISTRO_FEATURES', 'qti-early-eth', '1', '0', d)}"
 HIBERNATION = "${@bb.utils.contains('COMBINED_FEATURES', 'hibernation', '1', '0', d)}"
 AB_BOOT_LXC = "${@bb.utils.contains('MACHINE_FEATURES', 'qti-lxc', '1', '0', d)}"
+LE_VARIANT = "${@bb.utils.contains('MACHINE_FEATURES', 'qti-ghgvm', '0', '1', d)}"
 
 SRC_URI = "${PATH_TO_REPO}/kernel/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/bootable/bootloader/edk2/.git;protocol=${PROTO};destsuffix=kernel/kernel-${PREFERRED_VERSION_linux-msm}/kernl_platform/bootable/bootloader/edk2;usehead=1"
 

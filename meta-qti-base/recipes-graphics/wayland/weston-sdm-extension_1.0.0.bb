@@ -21,6 +21,7 @@ DEPENDS += "cairo \
             wayland wayland-native wayland-protocols \
             weston \
             ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'bootkpi-logging power-utils', '', d)} \
+            ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'compute-resmgr', '', d)} \
 "
 
 SRC_URI = "${PATH_TO_REPO}/graphics/weston-sdm-extension/.git;protocol=${PROTO};destsuffix=graphics/weston-sdm-extension;usehead=1"
@@ -45,6 +46,7 @@ TARGET_CPPFLAGS += "-I${STAGING_INCDIR}/libdrm \
 TARGET_CPPFLAGS += "-fno-operator-names"
 
 PACKAGECONFIG ??= "${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'pmsnservice', '', d)} \
+                   ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'rt_schedule', '', d)} \
                    ${@bb.utils.contains('DISTRO_FEATURES', 'early_init', 'early', '', d)} \
 "
 # early-init
@@ -52,6 +54,8 @@ PACKAGECONFIG[early] = "-Denable-early-boot=true,-Denable-early-boot=false"
 # pm
 PACKAGECONFIG[pmsnservice] = "-Denable-pm-snservice=true,-Denable-pm-snservice=false"
 PACKAGECONFIG[pmdbus] = "-Denable-pm-dbus=true,-Denable-pm-dbus=false"
+# rt_schedule
+PACKAGECONFIG[rt_schedule] = "-Denable-rt_schedule=true,-Denable-rt_schedule=false"
 
 do_install:append() {
     if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'true', 'false', d)}; then
