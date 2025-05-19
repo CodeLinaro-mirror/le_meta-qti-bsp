@@ -9,6 +9,7 @@ DEPENDS += "\
     glib-2.0 \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'libuhab', '', d)} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'ptp-vk', '', d)} \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'power-utils', '', d)} \
 "
 
 SRC_URI = "\
@@ -37,6 +38,7 @@ EXTRA_OEMAKE += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', 
 EXTRA_OEMAKE += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'AVB_FEATURE_GVM_MODE=1', '', d)}"
 EXTRA_OEMAKE:append:sa8775 += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'GPTP_VFIO=1', '', d)}"
 EXTRA_OEMAKE:append:sa8775-flex += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'GPTP_VFIO=1', '', d)}"
+EXTRA_OEMAKE += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'GPTP_DSQB_ENABLED=1', 'GPTP_DSQB_ENABLED=0', d)}"
 SYSTEMD_SERVICE:${PN} = "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', 'gptp.service', d)}"
 
 do_compile() {
