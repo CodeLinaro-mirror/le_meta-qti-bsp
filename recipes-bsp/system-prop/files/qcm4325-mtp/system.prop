@@ -1,0 +1,35 @@
+#
+# Default properties to be set for qcm4325-mtp
+#
+ro.product.board=qcm4325-mtp
+
+# If ro.debuggable is 1, then enable adb root
+ro.debuggable=1
+
+# Camera hal module
+ro.hardware.camera=qcom
+
+#enable weston during boot
+persist.display.launch.weston.at.bootup=true
+
+#property to select sensor OEM registry file
+persist.vendor.sensors.enable.tdkMezzCard=false
+persist.vendor.sensors.enable.NavMezzCard=false
+
+##fluencetype can be "fluence" or "fluencepro" or "none"
+ro.vendor.audio.sdk.fluencetype=none
+persist.vendor.audio.fluence.voicecall=false
+persist.vendor.audio.fluence.voicerec=false
+persist.vendor.audio.fluence.speaker=false
+persist.vendor.audio.fluence.audiorec=false
+
+#Speaker Protection
+vendor.audio.feature.spkr_prot.enable=true
+persist.vendor.audio.speaker.prot.enable=true
+persist.vendor.audio.spv3.enable=true
+persist.vendor.audio.avs.afe_api_version=7
+
+#Audio playback/capture
+vendor.audio.gsl.shmem.dmaheap.uncached=true
+
+AUDIO_FEATURE_ENABLED_EC_REF_CAPTURE :=true
