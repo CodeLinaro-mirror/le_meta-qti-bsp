@@ -1,0 +1,59 @@
+From 8241154757ac040b7962ef78ee28f2c2a1aa5812 Mon Sep 17 00:00:00 2001
+From: Houffaneh Osman <hosman@qti.qualcomm.com>
+Date: Thu, 15 Apr 2021 16:04:38 +0200
+Subject: [PATCH] vrend: Disable texture_view feature to work around a bug in
+ Qualcomm.
+
+This patch file is from Qualcomm Technologies, Inc.  and is provided under the following license:
+
+Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+SPDX-License-Identifier: BSD-3-Clause-Clear
+
+Texture views can be, in a way, compared to SQL views in that they
+present a subset of an existing texture. In virglrenderer this is
+being used for example in certain blitting processes, including these
+which resolve a multisampled texture / FBO into a non-multisampled
+texture / FBO.
+
+On Qualcomm platforms the combination of texture view and
+multisampling triggers a kernel IOMMU fault message, plus the blitting
+itself fails. However, coqos-virtio-gpu-virgl isn't receiving any
+abort condition from that and continues to run.
+
+This was triggered by creating a multisampled surface on a guest
+system (i.e. EGL_SAMPLES = 4, EGL_SAMPLEBUFFERS = 1 for the surface
+creation configuration).
+
+The fix disables texture view support by returning "false" when this
+feature is being requested for. Samsung/Exynos(= Mali) platforms don't
+have support for texture view to begin with, and virglrenderer takes
+slightly different code pathes as a consequence then.
+
+NOTE: Texture view is not part of the core OpenGL/ES spec, and as such
+      its use is optional. It is treated accordingly in virglrenderer,
+      which means this fix can be used on non-Qualcomm platforms as well.
+
+Project: E0910
+Qualcomm case number: 05166692 (managed by Banma)
+
+Issue: COQOS-8881, E0910-90
+---
+ src/vrend_renderer.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/vrend_renderer.c b/src/vrend_renderer.c
+index b8b2a36..be68f10 100644
+--- a/src/vrend_renderer.c
++++ b/src/vrend_renderer.c
+@@ -363,7 +363,7 @@ static inline bool has_feature(enum features_id feature_id)
+    VREND_DEBUG(dbg_feature_use, NULL, "Try using feature %s:%d\n",
+                feature_list[feature_id].log_name,
+                vrend_state.features[feature_id]);
+-   return vrend_state.features[feature_id];
++   return (feature_id != feat_texture_view) && vrend_state.features[feature_id];
+ }
+ 
+ static inline void set_feature(enum features_id feature_id)
+-- 
+2.31.1
+

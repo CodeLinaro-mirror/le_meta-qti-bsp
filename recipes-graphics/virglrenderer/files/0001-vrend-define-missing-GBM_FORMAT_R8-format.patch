@@ -1,0 +1,48 @@
+From 2e1c2114aa65ec8a9c117af4a688d517b918aff8 Mon Sep 17 00:00:00 2001
+From: Houffaneh Osman <hosman@qti.qualcomm.com>
+Date: Thu, 18 Feb 2021 20:40:44 +0100
+Subject: [PATCH 1/1] vrend: define the 'GBM_FORMAT_R8' format to workaround
+ undeclared compilation error
+
+This patch file is from Qualcomm Technologies, Inc.  and is provided under the following license:
+
+Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+SPDX-License-Identifier: BSD-3-Clause-Clear
+
+The 'gbm.h' header in Qualcomm sa8155p LV SDK (up to ES7.1) does not contain
+'GBM_FORMAT_R8' definition. To workaround this, introduce the define
+from https://github.com/mesa3d/mesa/blob/master/src/gbm/main/gbm.h#L95
+
+Original location of the patch is:
+
+repo: ssh://gerrit.opensynergy.com:29418/opsy/proj-e0721/linux/meta-opsy-qti-sa8155
+File: recipes-graphics/virglrenderer/virglrenderer/0001-Workaround-GBM_FORMAT_R8-undeclared-compilation-erro.patch
+branch: es6
+commit: f30af0a01d1e9d89001ab0adbc2a769bb204b6df
+
+Issue: COQOS-9363, EXDCCXXI-429
+---
+ src/vrend_winsys_gbm.h | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/src/vrend_winsys_gbm.h b/src/vrend_winsys_gbm.h
+index 53b7d0b..bd710b7 100644
+--- a/src/vrend_winsys_gbm.h
++++ b/src/vrend_winsys_gbm.h
+@@ -29,6 +29,13 @@
+ #include "vrend_iov.h"
+ #include "virglrenderer.h"
+ 
++/* define the 'GBM_FORMAT_R8' format to workaround undeclared compilation error */
++/* 8 bpp Red */
++#ifndef GBM_FORMAT_R8
++#define GBM_FORMAT_R8		__gbm_fourcc_code('R', '8', ' ', ' ') /* [7:0] R */
++#endif
++
++
+ #ifdef GBM_MAX_PLANES
+ #define VIRGL_GBM_MAX_PLANES GBM_MAX_PLANES
+ #else
+-- 
+2.31.1
+
