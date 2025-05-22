@@ -17,4 +17,8 @@ do_compile[noexec] = "1"
 do_install() {
     install -d ${D}${bindir}
     install -m 0755 ${S}/avbtool.py ${D}${bindir}/avbtool.py
+    install -d ${D}${sysconfdir}
+    install -d ${D}${sysconfdir}/avb
+    install -d ${D}${sysconfdir}/avb/sigkeys
+    install -m 0755 ${S}/test/data/testkey_rsa4096.pem ${D}${sysconfdir}/avb/sigkeys/testkey_rsa4096.pem
 }
