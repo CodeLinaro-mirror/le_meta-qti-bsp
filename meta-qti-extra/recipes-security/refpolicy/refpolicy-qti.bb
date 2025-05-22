@@ -79,6 +79,7 @@ fix_platcil() {
     sed -i '1i(type vendor_hal_automotive_vehicle_qti)' ${cilfile}
     sed -i 's/(typeattributeset domain (/&carwatchdogd /' ${cilfile}
     sed -i 's/(class system (ipc_info syslog_read syslog_mod syslog_console module_request module_load /&halt reboot status start stop enable disable reload/' ${cilfile}
+    sed -i 's/(common cap2 (mac_override mac_admin syslog wake_alarm block_suspend audit_read perfmon /&bpf/' ${cilfile}
     sed -i 's/keystore2_key diced drmservice /&service dbus passwd/' ${cilfile}
     sed -i '$a (class passwd ( passwd chfn chsh rootok crontab ))' ${cilfile}
 }

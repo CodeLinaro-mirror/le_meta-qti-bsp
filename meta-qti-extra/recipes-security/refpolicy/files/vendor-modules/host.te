@@ -233,6 +233,10 @@ require {
     type hal_graphics_allocator_default;
     type proc_loadavg;
     type toolbox_exec;
+    type proc_cgroups;
+    type cgroup_v2;
+    type sysfs_devices_cs_etm;
+    type sysfs_uhid;
     class service { status start stop reload enable disable };
     class dbus { acquire_svc send_msg };
     class passwd { passwd chfn chsh rootok crontab };
@@ -267,6 +271,17 @@ grant_all_permissions(host_exec_t,proc_diskstats)
 grant_all_permissions(host_exec_t,proc_stat)
 grant_all_permissions(host_exec_t,proc_iomem)
 grant_all_permissions(host_exec_t,proc_version)
+#-------------- kernel5.15 ------------------
+grant_all_permissions(host_exec_t,proc_cgroups)
+grant_all_permissions(host_exec_t,cgroup_v2)
+grant_all_permissions(host_exec_t,sysfs_devices_cs_etm)
+grant_all_permissions(host_exec_t,debugfs_tracing_debug)
+grant_all_permissions(host_device_t,mqueue)
+grant_all_permissions(host_exec_t,sysfs_uhid)
+grant_all_permissions(host_exec_t,vendor_sysfs_scsi_target)
+grant_all_permissions(host_exec_t,vendor_sysfs_system_memory)
+grant_all_permissions(host_exec_t,sysfs_uprobe)
+#--------------------------------------------
 grant_all_permissions(host_exec_t,pstorefs)
 grant_all_permissions(host_exec_t,port)
 grant_all_permissions(host_exec_t,node)
