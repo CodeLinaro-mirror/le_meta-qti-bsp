@@ -16,17 +16,14 @@ PR = "r0"
 DEPENDS += "virtual/kernel-toolchain-native rsync-native"
 DEPENDS:append:aarch64 = " libgcc"
 
-LDFLAGS:aarch64 = "-O1 --as-needed"
-#TARGET_CXXFLAGS += "-Wno-format"
 KERNEL_CC = "${STAGING_BINDIR_NATIVE}/clang/bin/clang -target ${TARGET_ARCH}${TARGET_VENDOR}-${TARGET_OS}"
+KERNEL_LD = "${STAGING_BINDIR_NATIVE}/clang/bin/ld.lld"
 
-BUILD_CFLAGS:remove = "-Og -g"
-BUILD_CXXFLAGS:remove = "-Og -g"
 #Add DTC_FLAGS to compile DTB with symbols.
 KERNEL_DTC_FLAGS += "-@"
 
-KERNEL_CONFIG_FRAGMENTS:append = " ${S}/arch/arm64/configs/vendor/neo.config"
-KERNEL_CONFIG_FRAGMENTS:append = " ${@oe.utils.vartrue('DEBUG_BUILD', '${S}/arch/arm64/configs/vendor/neo_debug.config', '', d)}"
+KERNEL_CONFIG_FRAGMENTS:append = " ${S}/arch/arm64/configs/vendor/neo_le.config"
+KERNEL_CONFIG_FRAGMENTS:append = " ${@oe.utils.vartrue('DEBUG_BUILD', '${S}/arch/arm64/configs/vendor/neo_le_debug.config', '', d)}"
 
 do_configure:prepend() {
     if [ ! -f "${S}/arch/${ARCH}/configs/${KERNEL_CONFIG}" ]; then
@@ -68,9 +65,6 @@ do_configure:prepend() {
 	    --set-str CONFIG_MODULE_SIG_KEY "${B}/certs/signing_key.pem" \
 	    --set-str CONFIG_SYSTEM_TRUSTED_KEYS "${B}/certs/verity_cert.pem"
     fi
-
-    echo "# Global settings from linux recipe" >> ${B}/.config
-    echo "CONFIG_LOCALVERSION="\"${LINUX_VERSION_EXTENSION}\" >> ${B}/.config
 }
 
 do_configure:append() {
@@ -84,7 +78,7 @@ do_configure:append() {
 # make sure that we generate all DTBs using the kernel 'dtbs' target,
 # then we can append the DTBs that we need for $MACHINE.
 KERNEL_EXTRA_ARGS += "dtbs"
-KERNEL_EXTRA_ARGS += "DTC_EXT=${STAGING_DIR_NATIVE}/usr/bin/dtc/bin/dtc"
+KERNEL_EXTRA_ARGS += "DTC_EXT=${STAGING_DIR_NATIVE}/usr/bin/dtc/bin/dtc DTC_FLAGS+='${KERNEL_DTC_FLAGS}'"
 
 do_install:append() {
     mkdir -p ${STAGING_KERNEL_BUILDDIR}/lib/modules/${KERNEL_VERSION}
@@ -92,7 +86,6 @@ do_install:append() {
     # Copy the modules to the staging directory
     for mod in $(find . -name '*.ko'); do
         if [ -f $mod ]; then
-            ${STRIP} --strip-unneeded $mod
             install -m 0644 $mod ${STAGING_KERNEL_BUILDDIR}/lib/modules/${KERNEL_VERSION}
         fi
     done
