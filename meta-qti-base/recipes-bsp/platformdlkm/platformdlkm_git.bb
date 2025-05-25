@@ -18,8 +18,8 @@ METAL_MODULES_BUILD = "drivers/aop-set-ddr.ko drivers/silent_boot.ko drivers/wal
 
 VIRT_MODULES_BUILD = "drivers/socinfo_dt.ko drivers/subsystem_notif_virt.ko"
 VIRT_MODULES_BUILD:append:quin-gvm-gen4 = " drivers/virtual_fastrpc/vfastrpc.ko"
-VIRT_MODULES_BUILD:append:quin-gvm-lemans = " drivers/virtual_fastrpc/hfastrpc.ko"
-VIRT_MODULES_BUILD:append:quin-gvm-monaco = " drivers/virtual_fastrpc/hfastrpc.ko"
+VIRT_MODULES_BUILD:append:quin-gvm-lemans = " drivers/virtual_fastrpc/hfastrpc.ko drivers/rsm_fe/rsm_fe.ko"
+VIRT_MODULES_BUILD:append:quin-gvm-monaco = " drivers/virtual_fastrpc/hfastrpc.ko drivers/rsm_fe/rsm_fe.ko"
 
 TECHPACK_MODULES = "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '${VIRT_MODULES_BUILD}', '${METAL_MODULES_BUILD}', d)}"
 
@@ -38,8 +38,8 @@ VIRT_PROVIDES_MODULES = "\
     kernel-module-subsystem-notif-virt-${KERNEL_VERSION} \
 "
 VIRT_PROVIDES_MODULES:append:quin-gvm-gen4 = " kernel-module-vfastrpc-${KERNEL_VERSION}"
-VIRT_PROVIDES_MODULES:append:quin-gvm-lemans = " kernel-module-hfastrpc-${KERNEL_VERSION}"
-VIRT_PROVIDES_MODULES:append:quin-gvm-monaco = " kernel-module-hfastrpc-${KERNEL_VERSION}"
+VIRT_PROVIDES_MODULES:append:quin-gvm-lemans = " kernel-module-hfastrpc-${KERNEL_VERSION} kernel-module-rsm-fe-${KERNEL_VERSION}"
+VIRT_PROVIDES_MODULES:append:quin-gvm-monaco = " kernel-module-hfastrpc-${KERNEL_VERSION} kernel-module-rsm-fe-${KERNEL_VERSION}"
 
 do_configure:prepend() {
     ln -sf ${WORKDIR}/vendor/qcom/opensource/dsp-kernel/dsp/adsprpc_compat.h ${S}/drivers/virtual_fastrpc/dsp/adsprpc_compat.h
