@@ -98,4 +98,4 @@ BBMASK:quin-gvm-lemans += "meta-qti-bsp/meta-qti-extra/recipes-test/virt-spmi-ut
 BBMASK:quin-gvm-lemans += "meta-qti-bsp/meta-qti-base/recipes-multimedia/virtio-video/virtio-video-header_git.bb"
 BBMASK:quin-gvm-lemans += "meta-qti-bsp/meta-qti-base/recipes-wlan"
 BBMASK:quin-gvm-lemans += "meta-qti-base/recipes-connectivity/bt-dlkm/bt-dlkm_git.bb"
-BBMASK:quin-gvm-lemans += "meta-qti-base/recipes-connectivity/synergy-opensource/synergy-opensource_git.bb"
+BBMASK:quin-gvm-lemans += "meta-qti-base/recipes-connectivity/synergy-opensource"
