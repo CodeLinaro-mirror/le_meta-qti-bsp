@@ -71,3 +71,6 @@ DEFAULT_ENFORCING:quin-gvm-lemans = "enforcing"
 PREFERRED_VERSION_selinux-policy:sa8775 = "1.0"
 PREFERRED_VERSION_selinux-policy:sa7255 = "1.0"
 PREFERRED_VERSION_selinux-policy:quin-gvm-lemans = "2.0"
+
+# change /var to tmpfs
+DISTRO_FEATURES:append:quin-gvm-lemans = " volatiled-var"
