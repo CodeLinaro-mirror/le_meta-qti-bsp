@@ -24,7 +24,7 @@ lxc.cgroup2.devices.allow = b *:* m
 
 lxc.signal.halt = SIGKILL
 # android will failed if mount /proc failed
-lxc.mount.auto = proc:mixed sys:mixed cgroup:mixed
+lxc.mount.auto = proc:mixed sys:rw cgroup:mixed
 
 # lxc.mount.entry = /tmp share/socket/camera none bind,create=dir 0 0
 #lxc.mount.entry = /data data none bind,create=dir 0 0
