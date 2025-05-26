@@ -18,8 +18,8 @@ avbsign_images() {
                                --key ${AVBSIGN_KEY} \
                                --algorithm SHA256_RSA4096 \
                                --partition_size 0x4600000 \
-                               --prop os_version:4.0.26 \
-                               --prop os_patch_level:2025-05-01 \
+                               --prop com.android.build.boot.os_version:4.0.26 \
+                               --prop com.android.build.boot.security_patch:2025-05-01 \
                                --rollback_index 0
 
     #sign vendor boot image
@@ -28,8 +28,8 @@ avbsign_images() {
                                --key ${AVBSIGN_KEY} \
                                --algorithm SHA256_RSA4096 \
                                --partition_size 0x1800000 \
-                               --prop os_version:4.0.26 \
-                               --prop os_patch_level:2025-05-01 \
+                               --prop com.android.build.vendor_boot.os_version:4.0.26 \
+                               --prop com.android.build.vendor_boot.security_patch:2025-05-01 \
                                --rollback_index 0
 
     # sign dtbo image
@@ -38,8 +38,8 @@ avbsign_images() {
                                --key ${AVBSIGN_KEY} \
                                --algorithm SHA256_RSA4096 \
                                --partition_size 0x7d0000 \
-                               --prop os_version:4.0.26 \
-                               --prop os_patch_level:2025-05-01 \
+                               --prop com.android.build.dtbo.os_version:4.0.26 \
+                               --prop com.android.build.dtbo.security_patch:2025-05-01 \
                                --rollback_index 0
 
     # sign vendor dlkm image
@@ -48,8 +48,8 @@ avbsign_images() {
                                 --key ${AVBSIGN_KEY} \
                                 --algorithm SHA256_RSA4096 \
                                 --partition_size 0x6400000 \
-                                --prop os_version:4.0.26 \
-                                --prop os_patch_level:2025-05-01 \
+                                --prop com.android.build.vendor_dlkm.os_version:4.0.26 \
+                                --prop com.android.build.vendor_dlkm.security_patch:2025-05-01 \
                                 --rollback_index 0
 
     #sign system image
@@ -58,8 +58,8 @@ avbsign_images() {
                                --key ${AVBSIGN_KEY} \
                                --algorithm SHA256_RSA4096 \
                                --partition_size 0x3FB70000 \
-                               --prop os_version:4.0.26 \
-                               --prop os_patch_level:2025-05-01 \
+                               --prop com.android.build.system.os_version:4.0.26 \
+                               --prop com.android.build.system.security_patch:2025-05-01 \
                                --rollback_index 0
 }
 
