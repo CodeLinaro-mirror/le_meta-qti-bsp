@@ -31,3 +31,14 @@
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ## <summary>Used to fix LA rules in host</summary>
+
+
+
+interface(`grant_la_permissions',`
+        gen_require(`
+                type $2;
+        ')
+
+        allow $1 $2:file {open ioctl read write create getattr setattr map };
+')
+

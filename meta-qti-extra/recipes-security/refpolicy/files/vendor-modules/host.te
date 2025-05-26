@@ -237,6 +237,18 @@ require {
     type cgroup_v2;
     type sysfs_devices_cs_etm;
     type sysfs_uhid;
+    type flags_health_check;
+    type hal_audio_default;
+    type tee;
+    type vendor_hal_evs_driver;
+    type netd;
+    type network_stack;
+    type secure_element;
+    type toolbox;
+    type hal_bluetooth_default;
+    type vendor_aidl_hal_automotive_vehicle_qti;
+    type vendor_ais_v4l2_proxy;
+    type vendor_hal_gnss_qti;
     class service { status start stop reload enable disable };
     class dbus { acquire_svc send_msg };
     class passwd { passwd chfn chsh rootok crontab };
@@ -281,6 +293,69 @@ grant_all_permissions(host_exec_t,sysfs_uhid)
 grant_all_permissions(host_exec_t,vendor_sysfs_scsi_target)
 grant_all_permissions(host_exec_t,vendor_sysfs_system_memory)
 grant_all_permissions(host_exec_t,sysfs_uprobe)
+grant_all_permissions(host_exec_t,sysfs_wakeup_reasons)
+grant_all_permissions(host_exec_t,sysfs_dma_heap)
+grant_all_permissions(host_exec_t,sysfs_transparent_hugepage)
+grant_all_permissions(host_exec_t,sysfs_dmabuf_stats)
+grant_all_permissions(host_exec_t,debugfs_tracing_instances)
+grant_all_permissions(host_exec_t,debugfs_wifi_tracing)
+grant_all_permissions(host_exec_t,debugfs_bootreceiver_tracing)
+grant_all_permissions(host_exec_t,debugfs_tracing)
+grant_all_permissions(host_exec_t,vendor_debugfs_kgsl)
+grant_all_permissions(host_exec_t,debugfs_kprobes)
+grant_all_permissions(host_exec_t,sysfs_udc)
+grant_all_permissions(host_exec_t,vendor_sysfs_graphics)
+grant_all_permissions(host_exec_t,vendor_sysfs_kgsl_proc)
+grant_all_permissions(host_exec_t,vendor_sysfs_data)
+grant_all_permissions(host_exec_t,sysfs_fs_f2fs)
+grant_all_permissions(host_exec_t,sysfs_fs_incfs_metrics)
+grant_all_permissions(host_exec_t,vendor_sysfs_devicetree_soc)
+grant_all_permissions(host_exec_t,vendor_sysfs_drv)
+grant_all_permissions(host_exec_t,sysfs_dt_firmware_android)
+grant_all_permissions(host_exec_t,vendor_sysfs_devicetree_cpu)
+grant_all_permissions(host_exec_t,binderfs_features)
+grant_all_permissions(host_exec_t,proc_kallsyms)
+grant_all_permissions(host_exec_t,vendor_sysfs_boot_cdsp)
+grant_all_permissions(host_exec_t,system_dlkm_file)
+grant_all_permissions(host_exec_t,vendor_acdb_loader_service_exec)
+grant_all_permissions(kernel,proc_bootconfig)
+grant_all_permissions(host_exec_t,proc_loadavg)
+grant_all_permissions(host_exec_t,proc_modules)
+grant_all_permissions(host_exec_t,proc_watermark_scale_factor)
+grant_all_permissions(vendor_init,default_prop)
+grant_all_permissions(vendor_init,bluetooth_prop)
+grant_all_permissions(vendor_init,audio_prop)
+grant_all_permissions(vendor_init,persist_debug_prop)
+grant_all_permissions(vendor_init,config_prop)
+grant_all_permissions(vendor_init,vendor_persist_camera_prop)
+grant_all_permissions(host_exec_t,host_device_t)
+grant_all_permissions(tee,device)
+grant_all_permissions(vendor_hal_evs_driver,unlabeled)
+grant_all_permissions(vendor_aidl_hal_automotive_vehicle_qti,input_device)
+grant_all_permissions(vendor_ais_v4l2_proxy,vendor_camera_socket)
+grant_all_permissions(vendor_ais_v4l2_proxy,host_file_t)
+grant_all_permissions(netd,system_file)
+grant_all_permissions(vendor_hal_gnss_qti,property_socket)
+grant_all_permissions(vendor_hal_gnss_qti,vendor_default_prop)
+grant_all_permissions(vendor_qti_init_shell,boot_status_prop)
+grant_all_permissions(network_stack,proc_net)
+grant_all_permissions(vendor_qti_init_shell,adbd_config_prop)
+grant_all_permissions(crash_dump,resourcecache_data_file)
+grant_all_permissions(crash_dump,vendor_overlay_file)
+grant_all_permissions(secure_element,system_data_file)
+grant_all_permissions(toolbox,selinuxfs)
+grant_all_permissions(toolbox,kernel)
+grant_all_permissions(system_server,default_android_service)
+grant_all_permissions(hal_bluetooth_default,vendor_debugfs_ipc)
+grant_all_permissions(vendor_ais_v4l2_proxy,unlabeled)
+grant_all_permissions(vendor_init,system_file)
+grant_all_permissions(system_server,default_android_service)
+grant_all_permissions(network_stack,proc_net)
+grant_all_permissions(secure_element,system_data_file)
+# for android attaching
+grant_all_permissions(host_exec_t,init)
+allow host_exec_t host_exec_t:passwd { rootok };
+
 #--------------------------------------------
 grant_all_permissions(host_exec_t,pstorefs)
 grant_all_permissions(host_exec_t,port)
@@ -373,9 +448,9 @@ allowxperm host_exec_t self:udp_socket ioctl { 0x8946 0x8916 0x8914 0x8927 0x897
 allowxperm host_exec_t self:tcp_socket ioctl { 0x89a2 };
 allowxperm host_exec_t self:blk_file ioctl { 0x1272 0x1260 0x204 };
 allowxperm host_exec_t kernel:file ioctl { 0x5401 };
-allowxperm host_exec_t host_device_t:blk_file ioctl { 0x2285 0x1272 0x1260 0x204 0x5331 0x1268 0x125e 0x125f 0x127c 0x4c00 0x4c01 };
+allowxperm host_exec_t host_device_t:blk_file ioctl { 0x2285 0x1272 0x1260 0x204 0x5331 0x1268 0x125e 0x125f 0x127c 0x4c00 0x4c01 0x5395 };
 allowxperm host_exec_t functionfs:file ioctl { 0x6782 };
-allowxperm host_exec_t devpts:chr_file ioctl { 0x5404 0x540d 0x4b45 0x5437 0x4b3a 0x5429 0x4b44 0x5456 0x5457 0x5430 0x5431 };
+allowxperm host_exec_t devpts:chr_file ioctl { 0x5404 0x540d 0x4b45 0x5437 0x4b3a 0x5429 0x4b44 0x5456 0x5457 0x5430 0x5431 0x5441 };
 allowxperm host_exec_t rootfs:blk_file ioctl { 0x1272 0x1268 };
 allowxperm host_exec_t vendor_file:blk_file ioctl { 0x1272 0x1268 };
 allowxperm host_exec_t unlabeled:file ioctl { 0x9409 0x5413 };
