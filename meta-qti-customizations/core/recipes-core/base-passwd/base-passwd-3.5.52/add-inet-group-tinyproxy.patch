@@ -4,7 +4,7 @@ Subject: [PATCH] new
 
 --- a/group.master 2017-07-03 21:08:40.412699700 +0530
 +++ b/group.master 2017-07-12 17:19:06.129289315 +0530
-@@ -42,3 +42,4 @@
+@@ -44,3 +44,4 @@ sdcard:*:1015:diag
  diag:*:53:
  rebooters:*:1301:diag
  nogroup:*:65534:
