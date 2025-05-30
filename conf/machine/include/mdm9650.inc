@@ -52,7 +52,7 @@ EXTRA_IMAGEDEPENDS += "lk"
 # qti-data-modem:         Machine supports QTI data modem solution
 # nand-boot:              Machine supports boot from NAND flash
 
-MACHINE_FEATURES += "qti-sdx qti-recovery dm-verity-none nand-boot qwesd qti-security no-rpmb-listener-support no-ssd-listener-support qti-data-modem qti-audio qti-sensors qti-location"
+MACHINE_FEATURES += "qti-sdx qti-recovery dm-verity-none nand-boot qwesd qti-security no-rpmb-listener-support no-ssd-listener-support qti-data-modem qti-audio qti-sensors qti-location qti-dynamic-tsensreset"
 
 MACHINE_MNT_POINTS = " \
     /firmware \
