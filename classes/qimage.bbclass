@@ -4,7 +4,7 @@ QIMGCLASSES += "${@bb.utils.contains('MACHINE_SUPPORTS_DTBO', 'True', 'qimage-dt
 QIMGCLASSES += "${@bb.utils.contains('IMAGE_FSTYPES', 'ext4', 'qimage-ext4', '', d)}"
 QIMGCLASSES += "${@bb.utils.contains('IMAGE_FSTYPES', 'squashfs', 'qimage-squashfs', '', d)}"
 QIMGCLASSES += "${@bb.utils.contains('IMAGE_FSTYPES', 'ubi', 'qimage-ubi', '', d)}"
-QIMGCLASSES += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-avb', 'qimage-vbmeta', '', d)}"
+QIMGCLASSES += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-avb', 'qimage-vbmeta avb-verity-initramfs', '', d)}"
 QIMGCLASSES += "qimage-userdata"
 
 # Use the following to extend qimage with custom functions like signing

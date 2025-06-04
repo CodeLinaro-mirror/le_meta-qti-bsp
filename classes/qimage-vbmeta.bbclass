@@ -63,25 +63,6 @@ avbsign_images() {
                                --prop com.android.build.dtbo.security_patch:2025-05-01 \
                                --rollback_index 0
 
-    # sign vendor dlkm image
-     avbtool.py add_hash_footer --image ${VDLKMIMAGE_TARGET} \
-                                --partition_name vendor_dlkm \
-                                --key ${AVBSIGN_KEY} \
-                                --algorithm SHA256_RSA4096 \
-                                --partition_size $(calculate_partition_size "vendor_dlkm.img" --logical) \
-                                --prop com.android.build.vendor_dlkm.os_version:4.0.26 \
-                                --prop com.android.build.vendor_dlkm.security_patch:2025-05-01 \
-                                --rollback_index 0
-
-    #sign system image
-    avbtool.py add_hash_footer --image ${SYSTEMIMAGE_TARGET} \
-                               --partition_name system \
-                               --key ${AVBSIGN_KEY} \
-                               --algorithm SHA256_RSA4096 \
-                               --partition_size $(calculate_partition_size "system.img" --logical) \
-                               --prop com.android.build.system.os_version:4.0.26 \
-                               --prop com.android.build.system.security_patch:2025-05-01 \
-                               --rollback_index 0
 }
 
 # Generate vbmeta and vbmeta_system images.
@@ -97,6 +78,7 @@ do_makevbmeta_images() {
                                  --include_descriptors_from_image ${DTBOIMAGE_TARGET} \
                                  --include_descriptors_from_image ${VDLKMIMAGE_TARGET} \
                                  --include_descriptors_from_image ${SYSTEMIMAGE_TARGET}
+
 
 }
 addtask makevbmeta_images after do_image_complete before do_build
