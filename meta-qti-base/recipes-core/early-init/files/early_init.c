@@ -855,6 +855,18 @@ static inline void mount_cmd()
 		}
 
 		mount(firmware_dev, "/firmware", "vfat", MS_RDONLY, NULL);
+
+		i = 0;
+		while (access("/dev/spidev22.0", R_OK | W_OK) != 0) {
+			usleep(10000);
+			/* Timeout 1s */
+			if (i >= 100) {
+				perror("Failed to open /dev/spidev22.0. Timeout.\n");
+				goto out;
+			}
+			i++;
+		}
+
 		system("audio-nxp-auto");
 out:
 		write_marker("mount_cmd-exit");
