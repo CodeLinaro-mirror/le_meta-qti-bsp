@@ -40,6 +40,7 @@ KERNEL_CMD_PARAMS = "noinitrd ro rootwait earlycon=msm_serial_dm,0x78b1000 conso
 KERNEL_DTB_NAMES    = "\
                         vendor/qcom/mdm9650-ttp.dtb \
                         vendor/qcom/mdm9650-mtp.dtb \
+                        vendor/qcom/mdm9650-pcie-ep-ttp.dtb \
 "
 
 # Bootloader configuration
