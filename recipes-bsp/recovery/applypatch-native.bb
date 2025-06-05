@@ -7,7 +7,7 @@ HOMEPAGE = "https://www.codeaurora.org/gitweb/quic/la?p=platform/bootable/recove
 
 PR = "r1"
 
-DEPENDS += "bzip2-replacement-native"
+DEPENDS += "bzip2-replacement-native zlib-native"
 RDEPENDS:${PN} = "zlib"
 
 FILESEXTRAPATHS:prepend := "${WORKSPACE}/OTA/recovery/:"
