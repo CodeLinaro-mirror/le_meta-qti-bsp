@@ -35,6 +35,7 @@ WLAN_PLATFORM_CFG = "\
                      CONFIG_CNSS2_CONDITIONAL_POWEROFF=y \
                      CONFIG_CNSS_REQ_FW_DIRECT=y \
                      CONFIG_CNSS2_ENUM_WITH_LOW_SPEED=y \
+                     CONFIG_CNSS2_SSR_DRIVER_DUMP=y \
                      "
 
 WLAN_PLATFORM_CFG_PROD = "\
@@ -51,6 +52,8 @@ WLAN_PLATFORM_CFG_PROD = "\
                      CONFIG_CNSS_SUPPORT_DUAL_DEV=y \
                      CONFIG_CNSS_REQ_FW_DIRECT=y \
                      "
+
+WLAN_PLATFORM_CFG:append = " ${@bb.utils.contains('PREFERRED_PROVIDER_virtual/kernel', 'linux-msm', '', 'CONFIG_PINCTRL_MSM=n ', d)}"
 
 EXTRA_OEMAKE:append = " ${WLAN_PLATFORM_CFG}"
 TECHPACK_MAKE_ARGS = "${EXTRA_OEMAKE} QTI_TECHPACK=true"
