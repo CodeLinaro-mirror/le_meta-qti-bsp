@@ -108,6 +108,23 @@ do_install:append:sa7255-ivi() {
     fi
 }
 
+do_install:append:sa8775-flex() {
+    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-vmm', 'true', 'false', d)}; then
+        install -d -p ${D}/firmware/lvgvm/boot
+        install -m 0777 ${S}/firmware-lvgvm-boot.automount ${D}${systemd_unitdir}/system/firmware-lvgvm-boot.automount
+        install -m 0777 ${S}/firmware-lvgvm-boot.mount ${D}${systemd_unitdir}/system/firmware-lvgvm-boot.mount
+
+        if ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'true', 'false', d)}; then
+            sed -i '/^Options=/s/defaults/&,context=system_u:object_r:qcrosvm_boot_t:s0/' ${D}${systemd_unitdir}/system/firmware-lvgvm-boot.mount
+        fi
+
+        ln -sf ${systemd_unitdir}/system/firmware-lvgvm-boot.automount \
+            ${D}${systemd_unitdir}/system/multi-user.target.wants/firmware-lvgvm-boot.automount
+        ln -sf ${systemd_unitdir}/system/firmware-lvgvm-boot.mount \
+            ${D}${systemd_unitdir}/system/multi-user.target.wants/firmware-lvgvm-boot.mount
+    fi
+}
+
 FILES:${PN} += "${systemd_unitdir}/*"
 FILES:${PN} += "${sysconfdir}/*"
 FILES:${PN} += "${libdir}/modules-load.d/*"
