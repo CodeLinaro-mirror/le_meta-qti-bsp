@@ -21,9 +21,9 @@ do_install:append() {
     install -d -p ${D}/vendor/dsp
 
     install -m 0755 ${WORKDIR}/mnt_fs.conf -D ${D}${libdir}/modules-load.d/mnt_fs.conf
-    install -m 0777 ${S}/firmware-qcom-sa8775p.mount -D ${D}${systemd_unitdir}/system/firmware-qcom-sa8775p.mount
-    install -m 0777 ${S}/vendor-dsp.mount -D ${D}${systemd_unitdir}/system/vendor-dsp.mount
-    install -m 0777 ${S}/vendor-dsp.automount -D ${D}${systemd_unitdir}/system/vendor-dsp.automount
+    install -m 0644 ${S}/firmware-qcom-sa8775p.mount -D ${D}${systemd_unitdir}/system/firmware-qcom-sa8775p.mount
+    install -m 0644 ${S}/vendor-dsp.mount -D ${D}${systemd_unitdir}/system/vendor-dsp.mount
+    install -m 0644 ${S}/vendor-dsp.automount -D ${D}${systemd_unitdir}/system/vendor-dsp.automount
 
     if ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'true', 'false', d)}; then
         sed -i '/^Options=/s/defaults/&,context=system_u:object_r:dsp_file_t:s0/' ${D}${systemd_unitdir}/system/vendor-dsp.mount
@@ -39,8 +39,8 @@ do_install:append() {
     if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-vmm', 'true', 'false', d)}; then
         install -d -p ${D}/firmware/vm/boot/autoghgvm
 
-        install -m 0777 ${S}/firmware-vm-boot-autoghgvm.automount ${D}${systemd_unitdir}/system/firmware-vm-boot-autoghgvm.automount
-        install -m 0777 ${S}/firmware-vm-boot-autoghgvm.mount ${D}${systemd_unitdir}/system/firmware-vm-boot-autoghgvm.mount
+        install -m 0644 ${S}/firmware-vm-boot-autoghgvm.automount ${D}${systemd_unitdir}/system/firmware-vm-boot-autoghgvm.automount
+        install -m 0644 ${S}/firmware-vm-boot-autoghgvm.mount ${D}${systemd_unitdir}/system/firmware-vm-boot-autoghgvm.mount
 
         if ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'true', 'false', d)}; then
             sed -i '/^Options=/s/defaults/&,context=system_u:object_r:qcrosvm_boot_t:s0/' ${D}${systemd_unitdir}/system/firmware-vm-boot-autoghgvm.mount
@@ -53,8 +53,8 @@ do_install:append() {
     fi
 
     if ${@bb.utils.contains('COMBINED_FEATURES', 'qti-bluetooth', 'true', 'false', d)}; then
-        install -m 0777 ${S}/bluetooth.mount -D ${D}${systemd_unitdir}/system/bluetooth.mount
-        install -m 0777 ${S}/bluetooth.automount -D ${D}${systemd_unitdir}/system/bluetooth.automount
+        install -m 0644 ${S}/bluetooth.mount -D ${D}${systemd_unitdir}/system/bluetooth.mount
+        install -m 0644 ${S}/bluetooth.automount -D ${D}${systemd_unitdir}/system/bluetooth.automount
 
         ln -sf ${systemd_unitdir}/system/bluetooth.mount \
             ${D}${systemd_unitdir}/system/multi-user.target.wants/bluetooth.mount
@@ -77,8 +77,8 @@ do_install:append() {
 do_install:append:sa8255-ivi() {
     if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-vmm', 'true', 'false', d)}; then
         install -d -p ${D}/firmware/vm/boot/autoghgvmlv
-        install -m 0777 ${S}/firmware-vm-boot-autoghgvmlv.automount ${D}${systemd_unitdir}/system/firmware-vm-boot-autoghgvmlv.automount
-        install -m 0777 ${S}/firmware-vm-boot-autoghgvmlv.mount ${D}${systemd_unitdir}/system/firmware-vm-boot-autoghgvmlv.mount
+        install -m 0644 ${S}/firmware-vm-boot-autoghgvmlv.automount ${D}${systemd_unitdir}/system/firmware-vm-boot-autoghgvmlv.automount
+        install -m 0644 ${S}/firmware-vm-boot-autoghgvmlv.mount ${D}${systemd_unitdir}/system/firmware-vm-boot-autoghgvmlv.mount
 
         if ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'true', 'false', d)}; then
             sed -i '/^Options=/s/defaults/&,context=system_u:object_r:qcrosvm_boot_t:s0/' ${D}${systemd_unitdir}/system/firmware-vm-boot-autoghgvmlv.mount
@@ -94,8 +94,25 @@ do_install:append:sa8255-ivi() {
 do_install:append:sa7255-ivi() {
     if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-vmm', 'true', 'false', d)}; then
         install -d -p ${D}/firmware/vm/boot/autoghgvmlv
-        install -m 0777 ${S}/firmware-vm-boot-autoghgvmlv.automount ${D}${systemd_unitdir}/system/firmware-vm-boot-autoghgvmlv.automount
-        install -m 0777 ${S}/firmware-vm-boot-autoghgvmlv.mount ${D}${systemd_unitdir}/system/firmware-vm-boot-autoghgvmlv.mount
+        install -m 0644 ${S}/firmware-vm-boot-autoghgvmlv.automount ${D}${systemd_unitdir}/system/firmware-vm-boot-autoghgvmlv.automount
+        install -m 0644 ${S}/firmware-vm-boot-autoghgvmlv.mount ${D}${systemd_unitdir}/system/firmware-vm-boot-autoghgvmlv.mount
+
+        if ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'true', 'false', d)}; then
+            sed -i '/^Options=/s/defaults/&,context=system_u:object_r:qcrosvm_boot_t:s0/' ${D}${systemd_unitdir}/system/firmware-vm-boot-autoghgvmlv.mount
+        fi
+
+        ln -sf ${systemd_unitdir}/system/firmware-vm-boot-autoghgvmlv.automount \
+            ${D}${systemd_unitdir}/system/multi-user.target.wants/firmware-vm-boot-autoghgvmlv.automount
+        ln -sf ${systemd_unitdir}/system/firmware-vm-boot-autoghgvmlv.mount \
+            ${D}${systemd_unitdir}/system/multi-user.target.wants/firmware-vm-boot-autoghgvmlv.mount
+    fi
+}
+
+do_install:append:sa8775-flex() {
+    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-vmm', 'true', 'false', d)}; then
+        install -d -p ${D}/firmware/vm/boot/autoghgvmlv
+        install -m 0644 ${S}/firmware-vm-boot-autoghgvmlv.automount ${D}${systemd_unitdir}/system/firmware-vm-boot-autoghgvmlv.automount
+        install -m 0644 ${S}/firmware-vm-boot-autoghgvmlv.mount ${D}${systemd_unitdir}/system/firmware-vm-boot-autoghgvmlv.mount
 
         if ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'true', 'false', d)}; then
             sed -i '/^Options=/s/defaults/&,context=system_u:object_r:qcrosvm_boot_t:s0/' ${D}${systemd_unitdir}/system/firmware-vm-boot-autoghgvmlv.mount
