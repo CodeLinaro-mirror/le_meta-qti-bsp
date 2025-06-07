@@ -13,7 +13,7 @@ SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/synergy/synergy-opensource/platform/msm/spp"
 
-inherit module module-sign qti-kernel-arch-clang
+inherit module module-sign ${@oe.utils.ifelse(d.getVar('PREFERRED_PROVIDER_virtual/kernel') == 'linux-msm',"qti-kernel-arch-clang", "")}
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
