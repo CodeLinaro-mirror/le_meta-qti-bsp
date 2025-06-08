@@ -80,6 +80,10 @@ do_configure:append() {
 KERNEL_EXTRA_ARGS += "dtbs"
 KERNEL_EXTRA_ARGS += "DTC_EXT=${STAGING_DIR_NATIVE}/usr/bin/dtc/bin/dtc DTC_FLAGS+='${KERNEL_DTC_FLAGS}'"
 
+do_shared_workdir:append() {
+     install -m 0644 scripts/dtc/dtc ${STAGING_KERNEL_DIR}/scripts/dtc
+}
+
 do_install:append() {
     mkdir -p ${STAGING_KERNEL_BUILDDIR}/lib/modules/${KERNEL_VERSION}
 
