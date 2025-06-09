@@ -65,9 +65,6 @@ do_configure:prepend() {
 	    --set-str CONFIG_MODULE_SIG_KEY "${B}/certs/signing_key.pem" \
 	    --set-str CONFIG_SYSTEM_TRUSTED_KEYS "${B}/certs/verity_cert.pem"
     fi
-
-    echo "# Global settings from linux recipe" >> ${B}/.config
-    echo "CONFIG_LOCALVERSION="\"${LINUX_VERSION_EXTENSION}\" >> ${B}/.config
 }
 
 do_configure:append() {

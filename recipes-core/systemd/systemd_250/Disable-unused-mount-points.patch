@@ -1,12 +1,12 @@
-From 34589a0d620bfacba922e97dd87553bf8bc8627d Mon Sep 17 00:00:00 2001
+From 3276a10b138f861cef6d6c27a00a4f5ba9de6a06 Mon Sep 17 00:00:00 2001
 From: chenghen <quic_chenghen@quicinc.com>
 Date: Tue, 18 Oct 2022 11:04:10 +0800
 Subject: [PATCH] systemd: Disable unused mount points
 
 ---
  src/basic/random-util.c  | 6 +++++-
- src/shared/mount-setup.c | 8 ++++----
- 2 files changed, 9 insertions(+), 5 deletions(-)
+ src/shared/mount-setup.c | 4 ++--
+ 2 files changed, 7 insertions(+), 3 deletions(-)
 
 diff --git a/src/basic/random-util.c b/src/basic/random-util.c
 index 227b82f790..a686df257d 100644
@@ -27,7 +27,7 @@ index 227b82f790..a686df257d 100644
          return loop_read_exact(fd, p, n, true);
  }
 diff --git a/src/shared/mount-setup.c b/src/shared/mount-setup.c
-index 7917968497..3e9a25eaf0 100644
+index 7ba579ef63..b427878dbb 100644
 --- a/src/shared/mount-setup.c
 +++ b/src/shared/mount-setup.c
 @@ -68,8 +68,8 @@ static const MountPoint mount_table[] = {
@@ -41,17 +41,6 @@ index 7917968497..3e9a25eaf0 100644
  #if ENABLE_SMACK
          { "smackfs",     "/sys/fs/smackfs",           "smackfs",    "smackfsdef=*",                            MS_NOSUID|MS_NOEXEC|MS_NODEV,
            mac_smack_use, MNT_FATAL                  },
-@@ -102,8 +102,8 @@ static const MountPoint mount_table[] = {
-           cg_is_legacy_wanted, MNT_IN_CONTAINER     },
-         { "cgroup",      "/sys/fs/cgroup/systemd",    "cgroup",     "none,name=systemd",                       MS_NOSUID|MS_NOEXEC|MS_NODEV,
-           cg_is_legacy_wanted, MNT_FATAL|MNT_IN_CONTAINER },
--        { "pstore",      "/sys/fs/pstore",            "pstore",     NULL,                                      MS_NOSUID|MS_NOEXEC|MS_NODEV,
--          NULL,          MNT_NONE                   },
-+//        { "pstore",      "/sys/fs/pstore",            "pstore",     NULL,                                      MS_NOSUID|MS_NOEXEC|MS_NODEV,
-+//          NULL,          MNT_NONE                   },
- #if ENABLE_EFI
-         { "efivarfs",    "/sys/firmware/efi/efivars", "efivarfs",   NULL,                                      MS_NOSUID|MS_NOEXEC|MS_NODEV,
-           is_efi_boot,   MNT_NONE                   },
 -- 
-2.17.1
+2.34.1
 
