@@ -9,19 +9,25 @@ LIC_FILES_CHKSUM = "file://${WORKDIR}/system-sepolicy/NOTICE;md5=6553f4761e321f4
 
 DEPENDS += "checkpolicy-native glib-2.0-native"
 
-SRC_URI = "git://git.codelinaro.org/clo/la/platform/system/sepolicy.git;protocol=https;branch=automotive-aosp-va.lnx.15.0;name=system-sepolicy;destsuffix=system-sepolicy \
-           git://git.codelinaro.org/clo/la/device/qcom/sepolicy.git;protocol=https;branch=auto-sepolicy-sysintf.lnx.15.0;name=device-sepolicy;destsuffix=device-sepolicy \
-           git://git.codelinaro.org/clo/la/platform/external/selinux.git;protocol=https;branch=aosp/android15-qpr1-release;name=selinux;destsuffix=selinux \
-           git://git.codelinaro.org/clo/la/platform/packages/services/Car.git;protocol=https;branch=automotive-aosp-va.lnx.15.0;name=packages-sepolicy;destsuffix=packages-sepolicy \
-           git://git.codelinaro.org/clo/la/device/qcom/sepolicy_vndr.git;protocol=https;branch=sepolicy.vndr.lnx.13.0.c1;name=device-sepolicyvndr;destsuffix=device-sepolicyvndr \
+#===================================================================== QSSI15 and Vendor13 selinux gits ===============================================================================
+# Mon Jun  9 15:47:58 CST 2025
+# updated to AU_LINUX_ANDROID_LA_AU.QSSI.15.0.0.R1.11.00.00.1198.045
+
+CODESER = "git://git.codelinaro.org/clo/la"
+SRC_URI = "${CODESER}/platform/system/sepolicy.git;protocol=https;branch=automotive-aosp-va.lnx.15.0.r1-rel;name=system-sepolicy;destsuffix=system-sepolicy \
+           ${CODESER}/device/qcom/sepolicy.git;protocol=https;branch=auto-sepolicy-sysintf.lnx.15.0.r1-rel;name=device-sepolicy;destsuffix=device-sepolicy \
+           ${CODESER}/platform/external/selinux.git;protocol=https;branch=aosp.lnx.15.2.r1-rel;name=selinux;destsuffix=selinux \
+           ${CODESER}/platform/packages/services/Car.git;protocol=https;branch=automotive-aosp-va.lnx.15.0.r1-rel;name=packages-sepolicy;destsuffix=packages-sepolicy \
+           ${CODESER}/device/qcom/sepolicy_vndr.git;protocol=https;branch=sepolicy.vndr.lnx.13.0.c1;name=device-sepolicyvndr;destsuffix=device-sepolicyvndr \
            file://Makefile \
            "
 SRCREV_FORMAT = "system-sepolicy"
-SRCREV_system-sepolicy = "a569d3187f8377699305d91d224acab93404ea0c"
-SRCREV_device-sepolicy = "09e7777d234a86649bba31eb59d985308dbce76e"
-SRCREV_selinux = "cae32d3a1af2e64f094ab9e0b4adfde7e1bf63f5"
-SRCREV_packages-sepolicy = "2b81bee4c94196f941092925d37df1e62e0de1af"
+SRCREV_system-sepolicy = "92e8e684261dabdff858124be40283ff834cee5b"
+SRCREV_device-sepolicy = "c54892dd3f54f2b9a2536787ec6e6d3367de4abb"
+SRCREV_selinux = "2d543d20722ada2425b5bdab9d0d1d29470e7bba"
+SRCREV_packages-sepolicy = "6868770c69f9ce6d7358704f510460941a4e60ac"
 SRCREV_device-sepolicyvndr = "9b6a08e34c27c627cb3e993dba410829f8b2467a"
+#=======================================================================================================================================================================================
 
 inherit native
 
