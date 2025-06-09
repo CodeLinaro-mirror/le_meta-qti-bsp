@@ -3,7 +3,8 @@ inherit kernel
 DESCRIPTION = "CAF Linux Kernel"
 LICENSE = "GPLv2.0-with-linux-syscall-note"
 
-COMPATIBLE_MACHINE = "trustedvm-v4|trustedvm-v3-1|trustedvm-v3|mdm9607|trustedvm-v2|pineapple"
+COMPATIBLE_MACHINE = "trustedvm-v4|trustedvm-v3-1|trustedvm-v3|mdm9607|trustedvm-v2|trustedvm-v2-1|pineapple|qcs610|qcs610-odk-64"
+
 
 FILESEXTRAPATHS:prepend := "${WORKSPACE}:"
 FILESEXTRAPATHS:prepend := "${WORKSPACE}:${KERNEL_PREBUILT_PATH}:"
