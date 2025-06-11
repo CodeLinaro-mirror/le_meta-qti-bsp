@@ -12,7 +12,7 @@ DISTROOVERRIDES =. "automotive:"
 # Support SDP
 ID_LIKE = "automotive"
 
-PRODUCT ?= "${MACHINE}" 
+PRODUCT ?= "${MACHINE}"
 DEPLOY_NAME_BASE = "${PRODUCT}-automotive"
 IMAGE_NAME = "${IMAGE_BASENAME}-${PRODUCT}${IMAGE_VERSION_SUFFIX}"
 IMAGE_LINK_NAME = "${IMAGE_BASENAME}-${PRODUCT}"
@@ -27,6 +27,7 @@ INCOMPATIBLE_LICENSE = "GPL-3.0-only LGPL-3.0-only AGPL-3.0-only"
 INCOMPATIBLE_LICENSE:quin-gvm-gen4 = " "
 INCOMPATIBLE_LICENSE:quin-tgvm-gen4 = " "
 INCOMPATIBLE_LICENSE:sa8797 = " "
+INCOMPATIBLE_LICENSE:quin-gvm-lemans = " "
 
 IMAGE_FEATURES:append = " read-only-rootfs"
 

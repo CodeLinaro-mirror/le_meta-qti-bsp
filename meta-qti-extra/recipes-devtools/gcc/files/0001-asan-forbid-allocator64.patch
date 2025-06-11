@@ -1,0 +1,27 @@
+From 8c2da54208d09cb60edc376fa8b185f428d87bcf Mon Sep 17 00:00:00 2001
+From: Baihui Zeng <quic_baihzeng@quicinc.com>
+Date: Thu, 20 Feb 2025 17:37:00 +0800
+Subject: [PATCH] asan-forbid-allocator64
+
+Signed-off-by: Baihui Zeng <quic_baihzeng@quicinc.com>
+Upstream-Status: Pending
+---
+ libsanitizer/sanitizer_common/sanitizer_platform.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libsanitizer/sanitizer_common/sanitizer_platform.h b/libsanitizer/sanitizer_common/sanitizer_platform.h
+index 7ecc465be..82fc4624f 100644
+--- a/libsanitizer/sanitizer_common/sanitizer_platform.h
++++ b/libsanitizer/sanitizer_common/sanitizer_platform.h
+@@ -287,7 +287,7 @@
+ #  if (SANITIZER_ANDROID && defined(__aarch64__)) || SANITIZER_FUCHSIA
+ #    define SANITIZER_CAN_USE_ALLOCATOR64 1
+ #  elif defined(__mips64) || defined(__arm__) || defined(__i386__) || \
+-      SANITIZER_RISCV64 || defined(__hexagon__)
++      SANITIZER_RISCV64 || defined(__hexagon__) || defined(__aarch64__)
+ #    define SANITIZER_CAN_USE_ALLOCATOR64 0
+ #  else
+ #    define SANITIZER_CAN_USE_ALLOCATOR64 (SANITIZER_WORDSIZE == 64)
+-- 
+2.34.1
+

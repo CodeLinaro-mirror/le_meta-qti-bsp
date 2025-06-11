@@ -10,6 +10,7 @@ DISTRO_FEATURES:append:qtiquingvm = " qti-omx qti-gstqeavb"
 DISTRO_FEATURES:append:qtiquingvm8295 = " qti-codec2 qti-gstdeinterlace qti-gstqeavb qti-gstqvrate qti-gstqvais"
 DISTRO_FEATURES:append:quin-gvm-gen4 = " qti-codec2 qti-gstdeinterlace qti-gstqeavb qti-gstqvrate qti-gstqvais"
 DISTRO_FEATURES:append:quin-gvm-lemans = " qti-codec2 qti-gstdeinterlace qti-gstqeavb"
+DISTRO_FEATURES:append:quin-gvm-monaco = " qti-codec2 qti-gstdeinterlace qti-gstqeavb"
 
 # Camera
 DISTRO_FEATURES:append:quin-gvm-lemans = " qti-qcx"

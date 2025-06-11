@@ -8,30 +8,25 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/GPL-2.0-only;m
 DEPENDS += "virtual/kernel"
 
 SRC_URI = "\
-    ${PATH_TO_REPO}/vendor/qcom/opensource/avb-utils/virtio-eavb/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/avb-utils/virtio-eavb;usehead=1 \
-    file://virtio-eavb.service \
+    ${PATH_TO_REPO}/vendor/qcom/opensource/eavb/eavb-fe/kernel/driver/virtio-eavb/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/eavb/eavb-fe/kernel/driver/virtio-eavb;usehead=1 \
+    file://virtio-eavb_load.conf \
 "
 SRCREV = "${AUTOREV}"
 
-S = "${WORKDIR}/vendor/qcom/opensource/avb-utils/virtio-eavb"
+S = "${WORKDIR}/vendor/qcom/opensource/eavb/eavb-fe/kernel/driver/virtio-eavb"
 
-inherit module module-sign kernel-arch qperf qti-kernel-arch-clang systemd useradd
+inherit module module-sign kernel-arch qperf qti-kernel-arch-clang
 INHIBIT_PACKAGE_STRIP = "1"
 EXTRA_OEMAKE += "CONFIG_ARCH_MSM=y"
 
-USERADD_PACKAGES = "${PN}"
-GROUPADD_PARAM:${PN} = "vnw"
-USERADD_PARAM:${PN} = "--no-create-home -g vnw --shell /bin/false vnw"
-
 do_install:append() {
-    install -d ${D}${systemd_unitdir}/system
-    install -m 0644 ${WORKDIR}/virtio-eavb.service ${D}${systemd_unitdir}/system/virtio-eavb.service
+    install -m 0755 ${WORKDIR}/virtio-eavb_load.conf -D ${D}${sysconfdir}/modules-load.d/virtio-eavb_load.conf
 }
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 FILES:${PN} += "\
-    ${systemd_unitdir}/system/virtio-eavb.service \
+    ${sysconfdir}/* \
     ${nonarch_base_libdir}/modules/${KERNEL_VERSION}/* \
 "
 
