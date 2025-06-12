@@ -20,6 +20,8 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 _MODNAME = "csrspp-tty"
 PROVIDES_NAME = "kernel-module-${_MODNAME}"
 
+EXTRA_OEMAKE:append = " INSTALL_MOD_STRIP=1"
+
 FILES:${PN} += "lib/modules/${KERNEL_VERSION}/extra/${_MODNAME}.ko"
 
 RPROVIDES:${PN} += "${PROVIDES_NAME}-${KERNEL_VERSION}"
