@@ -3,6 +3,7 @@ From: Abhilasha Manna <quic_amanna@quicinc.com>
 Date: Tue, 22 Oct 2024 15:11:40 +0530
 Subject: [PATCH] [PATCH] fstab-generator: Honor 'verity=enabled' cmdline.
 
+Upstream-Status: Inappropriate [Qualcomm specific]
 When 'verity=enabled' is present in kernel cmdline assume verity
 is enabled even if root, roothash values are not present and use
 "root" DM device as root.
