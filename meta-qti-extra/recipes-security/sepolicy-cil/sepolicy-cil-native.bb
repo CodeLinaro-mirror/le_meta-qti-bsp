@@ -45,18 +45,6 @@ EXTRA_OEMAKE = "'VERSION_POLICY_INCLUDES=-I${B}/sepolicy-cil'\
                 'CIL_OUTPUT_DIR=${B}/sepolicy-cil' \
                 'TARGET_INSTALL_DIR=${D}${datadir}'"
 
-insert_include() {
-    te_file="$2"
-    include_file="$1"
-
-    if ! grep -q "include(\`${include_file}')" "${te_file}"; then
-        sed -i '1iinclude('${include_file}')' ${te_file}
-        bbnote "Added include(\`${include_file}') to ${te_file}"
-    else
-        bbnote "include(\`${include_file}') already exists in ${te_file}"
-    fi
-}
-
 do_configure() {
     cp -rf ${WORKDIR}/selinux/libsepol --no-preserve=ownership ${B}
     install -m 0755 -d ${B}/sepolicy-cil
@@ -64,20 +52,7 @@ do_configure() {
     install -m 0755 ${WORKDIR}/Makefile ${B}/sepolicy-cil
     cp -rf ${B}/libsepol/include/sepol --no-preserve=ownership ${B}/sepolicy-cil
     cp -rf ${B}/libsepol/cil/include/cil --no-preserve=ownership ${B}/sepolicy-cil
-    insert_include "${WORKDIR}/system-sepolicy/flagging/flagging_macros" "${WORKDIR}/system-sepolicy/private/access_vectors"
-    insert_include "${WORKDIR}/packages-sepolicy/cpp/watchdog/sepolicy/public/attributes" "${WORKDIR}/packages-sepolicy/cpp/watchdog/sepolicy/public/te_macros"
-    insert_include "${WORKDIR}/packages-sepolicy/cpp/watchdog/sepolicy/public/te_macros" "${WORKDIR}/packages-sepolicy/car_product/sepolicy/private/carservice_app.te"
-    insert_include "${WORKDIR}/packages-sepolicy/cpp/watchdog/sepolicy/public/te_macros" "${WORKDIR}/packages-sepolicy/cpp/powerpolicy/sepolicy/public/attributes"
-    sed -i '1iattribute carpowerpolicycallback_domain;' ${WORKDIR}/packages-sepolicy/cpp/watchdog/sepolicy/public/te_macros
-    insert_include "${WORKDIR}/device-sepolicyvndr/generic/vendor/common/attribute/attributes" "${WORKDIR}/device-sepolicyvndr/generic/vendor/common/cnd.te"
-    insert_include "${WORKDIR}/packages-sepolicy/cpp/powerpolicy/sepolicy/public/te_macros" "${WORKDIR}/packages-sepolicy/car_product/sepolicy/private/carservice_app.te"
-    sed -i '1isystem_internal_prop(carwatchdog_config_prop)' ${WORKDIR}/packages-sepolicy/cpp/watchdog/sepolicy/public/attributes
-    insert_include "${WORKDIR}/system-sepolicy/microdroid/system/public/te_macros" "${WORKDIR}/packages-sepolicy/cpp/watchdog/sepolicy/public/attributes"
-    sed -i '1itype carpowerpolicyd_service, service_manager_type;' ${WORKDIR}/packages-sepolicy/cpp/watchdog/sepolicy/private/property.te
-    sed -i '1itype carpowerpolicyd_service, service_manager_type;' ${WORKDIR}/packages-sepolicy/cpp/watchdog/sepolicy/public/attributes
-    sed -i '31iattribute vendor_service;' ${WORKDIR}/device-sepolicyvndr/generic/vendor/common/service.te
-    insert_include "${WORKDIR}/device-sepolicyvndr/qva/vendor/test/sysmonapp/sysmonapp_app_test.te" "${WORKDIR}/device-sepolicyvndr/generic/vendor/common/domain.te"
-    sed -i '1itype vendor_aidl_hal_automotive_vehicle_qti;' ${WORKDIR}/device-sepolicyvndr/qva/vendor/common/qseecomd.te
+    sed -i '1iattribute vendor_service;' "${WORKDIR}/device-sepolicyvndr/generic/vendor/common/service.te"
 }
 
 do_compile() {

@@ -34,12 +34,25 @@ PRIVATE_FALSE := $(VAL_FALSE)
 VERSIONPOLICY = ./version_policy
 
 PLAT_PUBLIC_POLICY := ${SYSTEM_SEPOLICY}/public
-PLAT_PRIVATE_POLICY := ${SYSTEM_SEPOLICY}/private
+PLAT_PRIVATE_POLICY := ${SYSTEM_SEPOLICY}/flagging ${SYSTEM_SEPOLICY}/private
 SYSTEM_EXT_PUBLIC_POLICY := ${DEVICE_SEPOLICY}/generic/public ${DEVICE_SEPOLICY}/qva/public
 SYSTEM_EXT_PRIVATE_POLICY := ${DEVICE_SEPOLICY}/generic/private ${DEVICE_SEPOLICY}/qva/private
-PRODUCT_PUBLIC_POLICY := ${PACKAGES_POLICY}/car_product/sepolicy/public ${PACKAGES_POLICY}/watchdog/sepolicy/public ${DEVICE_SEPOLICY}/generic/product/public ${DEVICE_SEPOLICY}/qva/product/public
-PRODUCT_PRIVATE_POLICY := ${PACKAGES_POLICY}/car_product/sepolicy/private ${PACKAGES_POLICY}/watchdog/sepolicy/private ${DEVICE_SEPOLICY}/generic/product/private ${DEVICE_SEPOLICY}/qva/product/private
-REQD_MASK_POLICY := ${SYSTEM_SEPOLICY}/reqd_mask
+
+PRODUCT_PUBLIC_POLICY := \
+	${PACKAGES_POLICY}/cpp/powerpolicy/sepolicy/public \
+	${PACKAGES_POLICY}/car_product/sepolicy/public \
+	${PACKAGES_POLICY}/cpp/watchdog/sepolicy/public \
+	${DEVICE_SEPOLICY}/generic/product/public \
+	${DEVICE_SEPOLICY}/qva/product/public
+
+PRODUCT_PRIVATE_POLICY := \
+	${PACKAGES_POLICY}/cpp/powerpolicy/sepolicy/private \
+	${PACKAGES_POLICY}/car_product/sepolicy/private \
+	${PACKAGES_POLICY}/cpp/watchdog/sepolicy/private \
+	${DEVICE_SEPOLICY}/generic/product/private \
+	${DEVICE_SEPOLICY}/qva/product/private
+
+REQD_MASK_POLICY := ${SYSTEM_SEPOLICY}/flagging ${SYSTEM_SEPOLICY}/reqd_mask
 PLAT_VENDOR_POLICY := ${SYSTEM_SEPOLICY}/vendor
 TMPD1 := ./tt_1
 TMPD2 := ./tt_2
@@ -51,12 +64,32 @@ TMPD7 := ./tt_7
 TMPD8 := ./tt_8
 
 ifeq (user, $(TARGET_BUILD_VARIANT))
-BOARD_VENDOR_SEPOLICY_DIRS := ${DEVICE_SEPOLICYVNDR}/generic/vendor/common ${DEVICE_SEPOLICYVNDR}/qva/vendor/common/sysmonapp \
-  ${DEVICE_SEPOLICYVNDR}/qva/vendor/ssg ${DEVICE_SEPOLICYVNDR}/qva/vendor/common ${DEVICE_SEPOLICYVNDR}/generic/vendor/gen3_metal ${DEVICE_SEPOLICYVNDR}/qva/vendor/gen3_metal
+BOARD_VENDOR_SEPOLICY_DIRS := \
+	${DEVICE_SEPOLICYVNDR}/generic/vendor/common/attribute \
+	${DEVICE_SEPOLICYVNDR}/generic/vendor/common \
+	${DEVICE_SEPOLICYVNDR}/generic/vendor/car_common \
+	${DEVICE_SEPOLICYVNDR}/qva/vendor/common/sysmonapp \
+	${DEVICE_SEPOLICYVNDR}/qva/vendor/ssg \
+	${DEVICE_SEPOLICYVNDR}/qva/vendor/common \
+	${DEVICE_SEPOLICYVNDR}/qva/vendor/car_common \
+	${DEVICE_SEPOLICYVNDR}/generic/vendor/gen3_metal \
+	${DEVICE_SEPOLICYVNDR}/qva/vendor/gen3_metal
 else
-BOARD_VENDOR_SEPOLICY_DIRS := ${PACKAGES_POLICY}/car_product/sepolicy/test ${PACKAGES_POLICY}/watchdog/testclient/sepolicy ${DEVICE_SEPOLICYVNDR}/generic/vendor/common ${DEVICE_SEPOLICYVNDR}/qva/vendor/common/sysmonapp \
-  ${DEVICE_SEPOLICYVNDR}/qva/vendor/ssg ${DEVICE_SEPOLICYVNDR}/qva/vendor/common ${DEVICE_SEPOLICYVNDR}/generic/vendor/gen3_metal ${DEVICE_SEPOLICYVNDR}/qva/vendor/gen3_metal ${DEVICE_SEPOLICYVNDR}/generic/vendor/test \
-  ${DEVICE_SEPOLICYVNDR}/qva/vendor/test
+BOARD_VENDOR_SEPOLICY_DIRS := \
+	${PACKAGES_POLICY}/car_product/sepolicy/test \
+	${PACKAGES_POLICY}/watchdog/testclient/sepolicy \
+	${DEVICE_SEPOLICYVNDR}/qva/vendor/test/sysmonapp \
+	${DEVICE_SEPOLICYVNDR}/generic/vendor/common/attribute \
+	${DEVICE_SEPOLICYVNDR}/generic/vendor/common \
+	${DEVICE_SEPOLICYVNDR}/generic/vendor/car_common \
+	${DEVICE_SEPOLICYVNDR}/qva/vendor/common/sysmonapp \
+	${DEVICE_SEPOLICYVNDR}/qva/vendor/ssg \
+	${DEVICE_SEPOLICYVNDR}/qva/vendor/common \
+	${DEVICE_SEPOLICYVNDR}/qva/vendor/car_common \
+	${DEVICE_SEPOLICYVNDR}/generic/vendor/gen3_metal \
+	${DEVICE_SEPOLICYVNDR}/qva/vendor/gen3_metal \
+	${DEVICE_SEPOLICYVNDR}/generic/vendor/test \
+	${DEVICE_SEPOLICYVNDR}/qva/vendor/test
 endif
 
 
