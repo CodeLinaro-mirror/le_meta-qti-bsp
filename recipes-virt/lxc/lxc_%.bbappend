@@ -10,12 +10,13 @@ SRC_URI:append = " \
 
 FILES:${PN} += "lxc/bin"
 FILES:${PN} += "lxc/lxc-conf"
-FILES:${PN} += "vendor/vm-system"
+FILES:${PN} += "/vendor_early_services/vendor/vm-system"
+FILES:${PN} += "/vendor_early_services/run"
 
 EXTRA_OECONF += " --enable-static-binaries"
-EXTRA_OECONF += " --with-config-path=/vendor/vm-system/lxc/lxc-conf"
-EXTRA_OECONF += " --with-runtime-path=/mnt/lxc/run"
-EXTRA_OECONF += " --with-rootfs-path=/vendor/vm-system"
+EXTRA_OECONF += " --with-config-path=/vendor_early_services/vendor/vm-system/lxc/lxc-conf"
+EXTRA_OECONF += " --with-runtime-path=/vendor_early_services/run/lxc/run"
+EXTRA_OECONF += " --with-rootfs-path=/vendor_early_services/vendor/vm-system"
 
 do_install:append() {
     for file in ${D}/usr/bin/*; do
