@@ -29,18 +29,27 @@
 # Changes from Qualcomm Innovation Center are provided under the following license:
 # Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
 # SPDX-License-Identifier: BSD-3-Clause-Clear
-
 /bin/mount -n -o mode=0755 -t devtmpfs none "/dev"
-echo "mounted devtmpfsr"
 /bin/mount proc /proc -t proc
-echo "mounted proc"
 /bin/mount -o remount,rw  /
 /bin/mkdir -p /mnt/vfs
+
+if [ -d "/extra" ]; then
+    /bin/mkdir -p /lib/modules/$(uname -r)/extra/soc-repo
+    /bin/mv /extra/* /lib/modules/$(uname -r)/extra/soc-repo/
+    /bin/depmod
+    while IFS= read -r line; do
+        echo "Inserting modules" > /dev/kmsg
+        module=$(echo $line | cut -d':' -f1)
+        /bin/modprobe -s $(basename $module .ko) > /dev/kmsg
+        echo  "Inserted module: $module"  > /dev/kmsg
+    done < /lib/modules/$(uname -r)/extra/soc-repo/modules.dep
+fi
 
 # verity protection
 if [ -f /etc/verity.env ]; then
     source /etc/verity.env
-    /usr/sbin/veritysetup open /dev/vda system /dev/vda $VERITY_ROOT_HASH --salt $VERITY_SALT --hash-offset $VERITY_HASH_OFFSET --data-blocks $VERITY_DATA_BLOCKS --fec-device /dev/vda --fec-offset $VERITY_FEC_OFFSET --fec-roots $VERITY_FEC_ROOTS --root-hash-signature=/etc/verity_sig.txt
+    /bin/veritysetup open /dev/vda system /dev/vda $VERITY_ROOT_HASH --salt $VERITY_SALT --hash-offset $VERITY_HASH_OFFSET --data-blocks $VERITY_DATA_BLOCKS --fec-device /dev/vda --fec-offset $VERITY_FEC_OFFSET --fec-roots $VERITY_FEC_ROOTS --root-hash-signature=/etc/verity_sig.txt
 
     # Wait till the block device is available
     echo "waiting for /dev/mapper/system"
@@ -54,12 +63,10 @@ if [ -f /etc/verity.env ]; then
     /bin/mount -t ext4 -o ro /dev/mapper/system /mnt/vfs
 else
     /bin/mount -t ext4 -o ro /dev/vda /mnt/vfs
-    /bin/mount -t ext4 -o rw /dev/vdb /mnt/vfs/persist
 fi
 
 if [ $? -ne 0]; then
-    echo "mounting rootfs failed"
+    echo "mounting rootfs failed" > /dev/kmsg
 fi
 
-echo "Switching root"
 exec switch_root -c /dev/console /mnt/vfs /sbin/init

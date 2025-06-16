@@ -3,7 +3,7 @@ inherit kernel
 DESCRIPTION = "CAF Linux Kernel"
 LICENSE = "GPLv2.0-with-linux-syscall-note"
 
-COMPATIBLE_MACHINE = "kalama|qrb5165|vt-64|kalama-robotics-vm"
+COMPATIBLE_MACHINE = "kalama|qrb5165|vt-64|kalama-robotics-vm|qcm2290-mtp|qcm4325-mtp"
 
 FILESEXTRAPATHS:prepend := "${WORKSPACE}:"
 FILESEXTRAPATHS:prepend := "${WORKSPACE}:${KERNEL_PREBUILT_PATH}:"

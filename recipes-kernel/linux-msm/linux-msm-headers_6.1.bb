@@ -6,23 +6,25 @@ These headers are installed in ${includedir}/linux-msm path."
 LICENSE = "GPLv2.0-with-linux-syscall-note"
 LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 
-COMPATIBLE_MACHINE = "mdm9607|trustedvm-v2|pineapple"
+COMPATIBLE_MACHINE = "mdm9607|trustedvm-v2|trustedvm-v2-1|pineapple"
 
-FILESEXTRAPATHS:prepend := "${WORKSPACE}:"
+FILESEXTRAPATHS:prepend := "${WORKSPACE}:${KERNEL_PREBUILT_PATH}:"
 
-SRC_URI   =  "file://kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/msm-kernel"
+SRC_URI =  " \
+       file://kernel-${PV}/kernel_platform/msm-kernel/COPYING \
+       file://${KERNEL_PREBUILT_DISTDIR}/kernel-uapi-headers.tar.gz \
+"
 
-S  =  "${WORKDIR}/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/msm-kernel"
+S  =  "${WORKDIR}/kernel-${PV}/kernel_platform/msm-kernel"
 
 do_configure[noexec] = "1"
 do_compile[noexec] = "1"
 
 do_populate_kernel_header_artifacts() {
     mkdir -p ${B}/headers
-    cp -a ${KERNEL_PREBUILT_DISTDIR}/kernel-uapi-headers.tar.gz ${B}/headers
-    cd ${B}/headers
-    tar -xvzf kernel-uapi-headers.tar.gz
-    rm -f kernel-uapi-headers.tar.gz
+
+    ## copy extracted tarball contents
+    cp -a ${WORKDIR}/usr/ ${B}/headers/
 }
 
 addtask do_populate_kernel_header_artifacts after do_compile before do_install

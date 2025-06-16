@@ -1,4 +1,4 @@
-inherit native utils
+inherit native
 
 DESCRIPTION = "Tool from Android to validate and merge dtbo files before creating dtbo.img"
 

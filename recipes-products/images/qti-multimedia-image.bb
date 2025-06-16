@@ -18,6 +18,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-pulseaudio \
         packagegroup-qti-bluetooth \
         packagegroup-qti-camera \
+        packagegroup-qti-camera-kernel \
         packagegroup-qti-core \
         packagegroup-qti-data \
         packagegroup-qti-display \
@@ -29,6 +30,8 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-qmmf \
         ${@bb.utils.contains('COMBINED_FEATURES', 'qti-security', 'packagegroup-qti-securemsm', '', d)} \
         ${@bb.utils.contains('MACHINE_FEATURES', 'qti-sensors', 'packagegroup-qti-sensors', '', d)} \
+        ${@bb.utils.contains('MACHINE_FEATURES', 'qti-sensors-prop', 'packagegroup-qti-sensors-see', '', d)} \
+        ${@bb.utils.contains('MACHINE_FEATURES', 'qti-sensors-prop', 'packagegroup-qti-test-sensors-see', '', d)} \
         ${@bb.utils.contains('MACHINE_FEATURES', 'qti-location', 'packagegroup-qti-location', '', d)} \
         packagegroup-qti-ss-mgr \
         packagegroup-qti-video \
@@ -38,3 +41,14 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         systemd-machine-units \
         ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
 "
+
+CORE_IMAGE_EXTRA_INSTALL:remove:qcm2290-mtp = "kernel-modules"
+CORE_IMAGE_EXTRA_INSTALL:remove:qcm2290-mtp = "graphite-client"
+CORE_IMAGE_EXTRA_INSTALL:append:qcm2290-mtp = " gki-kernel-modules-second-stage"
+CORE_IMAGE_EXTRA_INSTALL:append:qcm2290-mtp = " diag-router"
+CORE_IMAGE_EXTRA_INSTALL:append:qcm2290-mtp = " packagegroup-qti-touch"
+
+CORE_IMAGE_EXTRA_INSTALL:remove:qcm4325-mtp = "kernel-modules"
+CORE_IMAGE_EXTRA_INSTALL:append:qcm4325-mtp = " gki-kernel-modules-second-stage"
+CORE_IMAGE_EXTRA_INSTALL:append:qcm4325-mtp = " diag-router"
+CORE_IMAGE_EXTRA_INSTALL:remove:qcm4325-mtp = "graphite-client"

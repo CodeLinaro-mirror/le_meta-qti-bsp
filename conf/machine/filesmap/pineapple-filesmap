@@ -1,4 +1,4 @@
-# Copyright (c) 2013-2015, The Linux Foundation. All rights reserved.
+# Copyright (c) 2013-2015 The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -24,44 +24,38 @@
 # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# Changes from Qualcomm Innovation Center, Inc. are provided under the following license:
+#
+# Copyright (c) 2024 Qualcomm Innovation Center, Inc. All rights reserved.
+# SPDX-License-Identifier: BSD-3-Clause-Clear
 
 # filename              partition
-
-NON-HLOS.bin            /dev/block/bootdevice/by-name/modem
-abl.elf                 /dev/block/bootdevice/by-name/abl
-aop.mbn                 /dev/block/bootdevice/by-name/aop
-apdp.mbn                /dev/block/bootdevice/by-name/apdp
-aop_devcfg.mbn          /dev/block/bootdevice/by-name/aop_config
-BTFM.bin                /dev/block/bootdevice/by-name/bluetooth
-Core_NON-HLOS.bin       /dev/block/bootdevice/by-name/core_nhlos
-cpucp.elf               /dev/block/bootdevice/by-name/cpucp
-zeros_5sectors.bin      /dev/block/bootdevice/by-name/ddr
-devcfg_rfcomm.mbn       /dev/block/bootdevice/by-name/devcfg
-dspso.bin               /dev/block/bootdevice/by-name/dsp
-dtbo.img                /dev/block/bootdevice/by-name/dtbo
-featenabler.mbn         /dev/block/bootdevice/by-name/featenabler
-hypvm.mbn               /dev/block/bootdevice/by-name/hyp
-imagefv.elf             /dev/block/bootdevice/by-name/imagefv
-ipa_fws.elf             /dev/block/bootdevice/by-name/ipa_fw
-keymint.mbn             /dev/block/bootdevice/by-name/keymaster
-logfs_ufs_8mb.bin       /dev/block/bootdevice/by-name/logfs
-multi_image.mbn         /dev/block/bootdevice/by-name/multiimgoem
-multi_image_qti.mbn     /dev/block/bootdevice/by-name/multiimgqti
-hyp.mbn                 /dev/block/bootdevice/by-name/qhee
-Quantum.fv              /dev/block/bootdevice/by-name/quantumfv
-quantumsdk.fv           /dev/block/bootdevice/by-name/quantumsdk
-qupv3fw.elf             /dev/block/bootdevice/by-name/qupfw
-xbl_no_preamble.elf     /dev/block/bootdevice/by-name/sbl
-shrm.elf                /dev/block/bootdevice/by-name/shrm
-storsec.mbn             /dev/block/bootdevice/by-name/storsec
-sec.elf                 /dev/block/bootdevice/by-name/sec
-tools.fv                /dev/block/bootdevice/by-name/toolsfv
-tz.mbn                  /dev/block/bootdevice/by-name/tz
-devcfg.mbn              /dev/block/bootdevice/by-name/tz_devcfg
-uefi.elf                /dev/block/bootdevice/by-name/uefi
-uefi_sec.mbn            /dev/block/bootdevice/by-name/uefisecapp
-vm-bootsys.img          /dev/block/bootdevice/by-name/vm-bootsys
-vm-persist.img          /dev/block/bootdevice/by-name/vm-persist
-xbl_config.elf          /dev/block/bootdevice/by-name/xbl_config
-XblRamdump.elf          /dev/block/bootdevice/by-name/xbl_ramdump
 xbl_s.melf              /dev/block/bootdevice/by-name/xbl
+xbl_config.elf          /dev/block/bootdevice/by-name/xbl_config
+multi_image_qti.mbn     /dev/block/bootdevice/by-name/multiimgqti
+multi_image.mbn         /dev/block/bootdevice/by-name/multiimgoem
+uefi.elf                /dev/block/bootdevice/by-name/uefi
+aop.mbn                 /dev/block/bootdevice/by-name/aop
+aop_devcfg.mbn          /dev/block/bootdevice/by-name/aop_config
+tz.mbn                  /dev/block/bootdevice/by-name/tz
+hypvm.mbn               /dev/block/bootdevice/by-name/hyp
+NON-HLOS.bin            /dev/block/bootdevice/by-name/modem
+BTFM.bin                /dev/block/bootdevice/by-name/bluetooth
+abl.elf                 /dev/block/bootdevice/by-name/abl
+dspso.bin               /dev/block/bootdevice/by-name/dsp
+km41.mbn                /dev/block/bootdevice/by-name/keymaster
+devcfg.mbn              /dev/block/bootdevice/by-name/devcfg
+qupv3fw.elf             /dev/block/bootdevice/by-name/qupfw
+dtbo.img                /dev/block/bootdevice/by-name/dtbo
+uefi_sec.mbn            /dev/block/bootdevice/by-name/uefisecapp
+imagefv.elf             /dev/block/bootdevice/by-name/imagefv
+shrm.elf                /dev/block/bootdevice/by-name/shrm
+cpucp.elf               /dev/block/bootdevice/by-name/cpucp
+featenabler.mbn         /dev/block/bootdevice/by-name/featenabler
+XblRamdump.elf          /dev/block/bootdevice/by-name/xbl_ramdump
+cpucp_dtbs.elf          /dev/block/bootdevice/by-name/cpucp_dtb
+spu_service.mbn         /dev/block/bootdevice/by-name/spuservice
+storsec.mbn             /dev/block/bootdevice/by-name/storsec
+tools.fv                /dev/block/bootdevice/by-name/toolsfv
+zeros_5sectors.bin      /dev/block/bootdevice/by-name/ddr
