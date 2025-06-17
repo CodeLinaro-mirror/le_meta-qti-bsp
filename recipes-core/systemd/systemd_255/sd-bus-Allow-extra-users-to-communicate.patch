@@ -3,6 +3,7 @@ From: Keerthi Gowda Balehalli Satyanarayana <kbalehal@codeaurora.org>
 Date: Thu, 1 Aug 2019 10:13:04 -0700
 Subject: [PATCH] sd-bus: Allow extra users to communicate
 
+Upstream-Status: Pending
 ---
  src/libsystemd/sd-bus/bus-convenience.c | 6 ++++--
  1 file changed, 4 insertions(+), 2 deletions(-)
