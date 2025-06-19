@@ -84,7 +84,12 @@ MACHINE_FEATURES += "\
 
 MACHINE_FEATURES:append = "\
     ${@bb.utils.contains('FACTORY_TEST', '1', 'qti-bluetooth', '', d)} \
+    ${@bb.utils.contains('FACTORY_TEST', '1', 'qti-wlan', '', d)} \
+    ${@bb.utils.contains('FACTORY_TEST', '1', 'qti-wlan-hsp', '', d)} \
+    ${@bb.utils.contains('FACTORY_TEST', '1', 'qti-wlan-hmt', '', d)} \
 "
+
+BBMASK:remove:auto-slt = "meta-qti-bsp/meta-qti-base/recipes-wlan"
 
 MACHINE_FEATURES:remove = "\
     ${@bb.utils.contains('TCMODE', 'external-ubuntu', 'qti-vmm', '', d)} \
