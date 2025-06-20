@@ -14,6 +14,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-android-utils \
         packagegroup-filesystem-utils \
         packagegroup-qti-audio \
+        packagegroup-qti-pulseaudio \
         packagegroup-qti-bluetooth \
         packagegroup-qti-camera \
         packagegroup-qti-camera-kernel \
