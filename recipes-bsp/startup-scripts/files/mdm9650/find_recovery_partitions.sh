@@ -153,4 +153,7 @@ eval FindAndMountUBI cachefs /cache
 
 FindAndMountMTD misc /misc
 
+# Set SELinux to Permissive mode before we start recovery executable
+/usr/sbin/setenforce 0
+
 exit
