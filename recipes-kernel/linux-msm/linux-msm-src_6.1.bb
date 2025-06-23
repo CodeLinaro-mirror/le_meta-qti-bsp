@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 
 COMPATIBLE_MACHINE = "ar-sg1"
 
-FILESEXTRAPATHS:prepend := "${WORKSPACE}/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/:"
+FILESEXTRAPATHS:prepend := "${WORKSPACE}/kernel-6.1/kernel_platform/:"
 
 SRC_URI = "file://msm-kernel"
 
