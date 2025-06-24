@@ -127,4 +127,5 @@ EARLY_RAMDISK_KERNEL_MODULES = "\
     kernel-module-stmmac-${KERNEL_VERSION} \
     kernel-module-stmmac-platform-${KERNEL_VERSION} \
     kernel-module-dwmac-qcom-ethqos-${KERNEL_VERSION} \
+    kernel-module-qcom-l3-cache-config-${KERNEL_VERSION} \
 "
