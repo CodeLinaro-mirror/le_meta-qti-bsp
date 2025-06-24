@@ -161,6 +161,9 @@ do_deploy() {
         install -m 0644 $kmod ${DEPLOYDIR}/kernel_modules
     done
 
+    # Copy unstripped modules to deploydir
+    cp -rp unstripped  ${DEPLOYDIR}/
+
 }
 
 # Put the zImage in the kernel-dev pkg
