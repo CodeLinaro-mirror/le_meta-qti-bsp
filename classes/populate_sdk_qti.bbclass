@@ -50,9 +50,11 @@ python copy_buildsystem:append() {
 
     src_kernel_defconfig =  os.path.abspath(d.getVar('WORKSPACE') + '/kernel-' + d.getVar('PREFERRED_VERSION_linux-msm')) + '/out/' + d.getVar('KERNEL_DEFCONFIG')
     dest_kernel_defconfig =  baseoutpath + '/src/kernel-' + d.getVar('PREFERRED_VERSION_linux-msm') + '/out/' + d.getVar('KERNEL_DEFCONFIG')
-    bb.utils.mkdirhier(dest_kernel_defconfig)
-    cmd = "%s %s %s" % (d.getVar('COPY_DIRECTORY_TREE'), src_kernel_defconfig, dest_kernel_defconfig)
-    subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
+
+    if os.path.exists(src_kernel_defconfig):
+        bb.utils.mkdirhier(dest_kernel_defconfig)
+        cmd = "%s %s %s" % (d.getVar('COPY_DIRECTORY_TREE'), src_kernel_defconfig, dest_kernel_defconfig)
+        subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
 
     # Copy prebuilt tar to eSDK and set PREBUILT_SRC_DIR
     prebuilt_src_dir_sdk = ""

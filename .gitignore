@@ -3,4 +3,7 @@ recipes-blast
 recipes-frameworks
 recipes-le-codec2-frameworks
 recipes-mmrm-kernel
+recipes-multimedia/adsprpc
+recipes-pulseaudio
 recipes-video-kernel
+recipes-video-userspace

@@ -1,4 +1,4 @@
-inherit qimage ${@bb.utils.contains('MACHINE_FEATURES', 'dm-verity-initramfs', 'qramdisk', 'qcpioimage', d)}
+inherit qimage populate_sdk_qti_prop ${@bb.utils.contains('MACHINE_FEATURES', 'dm-verity-initramfs', 'qramdisk', 'qcpioimage', d)}
 
 DEPENDS += " virtual/kernel"
 
@@ -21,8 +21,8 @@ CORE_IMAGE_EXTRA_INSTALL += " ${@oe.utils.conditional('ENABLE_DISPLAY', 'True', 
 CORE_IMAGE_EXTRA_INSTALL += " ${@oe.utils.conditional('ENABLE_TOUCH', 'True', 'packagegroup-qti-touch', '', d)}"
 CORE_IMAGE_EXTRA_INSTALL += " ${@oe.utils.conditional('ENABLE_SECUREMSM', 'True', 'packagegroup-qti-securemsm', '', d)}"
 CORE_IMAGE_EXTRA_INSTALL += " ${@oe.utils.conditional('ENABLE_MINK', 'True', 'packagegroup-qti-mink', '', d)}"
-CORE_IMAGE_EXTRA_INSTALL += " ${@bb.utils.contains('MACHINE', 'trustedvm-v3', 'dsp-devicetree', '', d)}"
-CORE_IMAGE_EXTRA_INSTALL += " ${@bb.utils.contains_any('MACHINE', 'trustedvm-v2  trustedvm-v3', 'fastrpc-kernel', '', d)}"
+CORE_IMAGE_EXTRA_INSTALL += " ${@bb.utils.contains_any('MACHINE', 'trustedvm-v3 trustedvm-v4', 'dsp-devicetree', '', d)}"
+CORE_IMAGE_EXTRA_INSTALL += " ${@bb.utils.contains_any('MACHINE', 'trustedvm-v2 trustedvm-v2-1 trustedvm-v3 trustedvm-v4', 'fastrpc-kernel', '', d)}"
 CORE_IMAGE_EXTRA_INSTALL += " ${@bb.utils.contains('MACHINE_FEATURES', 'vm-dynamic-memresize', 'psi-daemon', '', d)}"
 
 #Exclude packages

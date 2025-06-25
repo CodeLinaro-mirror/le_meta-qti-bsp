@@ -1,17 +1,19 @@
-From c9bb037cdcabc5eb032d5bd71de1a31daa06486f Mon Sep 17 00:00:00 2001
-From: Abhilasha Manna <quic_amanna@quicinc.com>
+From b5e58bf901f0619a41dc9309573b393edf939b11 Mon Sep 17 00:00:00 2001
+From: Abhilasha Manna <amanna@qti.qualcomm.com>
 Date: Mon, 22 Jan 2024 18:34:50 +0530
-Subject: [PATCH] [PATCH] fstab-generator: Honor 'verity=enabled' cmdline.
+Subject: [PATCH] fstab-generator: Honor 'verity=enabled' cmdline.
 
-When 'verity=enabled' is present in kernel cmdline assume verity
+When 'verity=enabled' & 'avb-verity=enabled'is present in kernel cmdline assume verity
 is enabled even if root, roothash values are not present and use
 "root" DM device as root.
+
+Signed-off-by: Abhilasha Manna<amanna@qti.qualcomm.com>
 ---
- src/fstab-generator/fstab-generator.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ src/fstab-generator/fstab-generator.c | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
 diff --git a/src/fstab-generator/fstab-generator.c b/src/fstab-generator/fstab-generator.c
-index 9b32383a76..87be09bbde 100644
+index 9b32383a76..c2166c38b0 100644
 --- a/src/fstab-generator/fstab-generator.c
 +++ b/src/fstab-generator/fstab-generator.c
 @@ -52,6 +52,7 @@ static char *arg_usr_what = NULL;
@@ -30,7 +32,7 @@ index 9b32383a76..87be09bbde 100644
  
  static int write_options(FILE *f, const char *options) {
          _cleanup_free_ char *o = NULL;
-@@ -1024,6 +1026,13 @@ static int parse_proc_cmdline_item(const char *key, const char *value, void *dat
+@@ -1024,6 +1026,21 @@ static int parse_proc_cmdline_item(const char *key, const char *value, void *dat
                          return 0;
  
                  return free_and_strdup_warn(&arg_root_hash, value);
@@ -41,10 +43,18 @@ index 9b32383a76..87be09bbde 100644
 +
 +                if (free_and_strdup(&arg_verity, value) < 0)
 +                        return log_oom();
++
++        } else if (streq(key, "avb-verity")) {
++
++                if (proc_cmdline_value_missing(key, value))
++                        return 0;
++
++                if (free_and_strdup(&arg_verity, value) < 0)
++                        return log_oom();
  
          } else if (streq(key, "mount.usr")) {
  
-@@ -1104,6 +1113,16 @@ static int determine_device(char **what, const char *hash, const char *name) {
+@@ -1104,6 +1121,16 @@ static int determine_device(char **what, const char *hash, const char *name) {
  }
  
  static int determine_root(void) {
@@ -62,5 +72,5 @@ index 9b32383a76..87be09bbde 100644
  }
  
 -- 
-2.17.1
+2.34.1
 
