@@ -19,10 +19,8 @@ S = "${WORKDIR}/system/core/liblog"
 
 inherit autotools-brokensep pkgconfig
 
-CFLAGS += "-Dstrlcpy=g_strlcpy "
-LDFLAGS += "-lglib-2.0 "
-
 EXTRA_OECONF += "\
+    --with-glib \
     --with-core-includes=${WORKDIR}/system/core/include \
     --disable-static \
 "
