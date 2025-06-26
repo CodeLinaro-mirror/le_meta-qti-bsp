@@ -1,20 +1,22 @@
-From 0ec6a16c63f41253d7a90414736963668d341f4a Mon Sep 17 00:00:00 2001
+From 93b8c0c22a1b7c8e0f9f230876aed55d92bbae08 Mon Sep 17 00:00:00 2001
 From: Lei wang <leiwan@qti.qualcomm.com>
-Date: Tue, 8 Apr 2025 13:22:43 +0800
+Date: Tue, 24 Jun 2025 09:22:25 +0800
 Subject: [PATCH] systemd: shutdown: shorten file-sync timeout
 
 Qcom wdt max timeout is 30sec, Need to shorten file-sync timeout
 to 15sec
+Re-ping the watchdog when dirty pages reduced.
+Reduce shutdown scripts timeout from 90s to 10s.
 
 Upstream-Status: Inappropriate [Qcom wdt timeout limitation]
 
 Signed-off-by: Lei wang <leiwan@qti.qualcomm.com>
 ---
- src/shutdown/shutdown.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ src/shutdown/shutdown.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
 diff --git a/src/shutdown/shutdown.c b/src/shutdown/shutdown.c
-index 7ad9930677..eeb1c81491 100644
+index 7ad9930677..01f974a2cf 100644
 --- a/src/shutdown/shutdown.c
 +++ b/src/shutdown/shutdown.c
 @@ -40,7 +40,7 @@
@@ -26,6 +28,30 @@ index 7ad9930677..eeb1c81491 100644
  
  static char* arg_verb;
  static uint8_t arg_exit_code;
+@@ -255,8 +255,10 @@ static void sync_with_progress(void) {
+                 else if (r == -ETIMEDOUT) {
+                         /* Reset the check counter if the "Dirty" value is
+                          * decreasing */
+-                        if (sync_making_progress(&dirty) > 0)
++                        if (sync_making_progress(&dirty) > 0) {
+                                 checks = 0;
++                                watchdog_ping();
++                        }
+                 } else {
+                         log_error_errno(r, "Failed to sync filesystems and block devices: %m");
+                         return;
+@@ -537,7 +539,10 @@ int main(int argc, char *argv[]) {
+         arguments[0] = NULL;
+         arguments[1] = arg_verb;
+         arguments[2] = NULL;
+-        (void) execute_directories(dirs, DEFAULT_TIMEOUT_USEC, NULL, NULL, arguments, NULL, EXEC_DIR_PARALLEL | EXEC_DIR_IGNORE_ERRORS);
++        log_info("calling execute_directories callback");
++        (void) execute_directories(dirs, DEFAULT_TIMEOUT_USEC/90, NULL, NULL, arguments, NULL, EXEC_DIR_PARALLEL | EXEC_DIR_IGNORE_ERRORS);
++        log_info("Successfully returned from execute_directories");
++        watchdog_ping();
+ 
+         (void) rlimit_nofile_safe();
+ 
 -- 
 2.34.1
 
