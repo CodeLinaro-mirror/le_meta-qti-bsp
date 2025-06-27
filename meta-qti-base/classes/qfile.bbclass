@@ -67,7 +67,9 @@ python __anonymous(){
                           "SRCREV_audio-kernel-ar",
                           "SRCREV_audio-kernel",
                           "SRCREV_dspkernel",
-                          "SRCREV_platformkernel"]
+                          "SRCREV_platformkernel",
+                          "SRCREV_sm",
+                          "SRCREV_sm-compresmgr-client"]
 
     if need_change:
         d.prependVar("FILESPATH", "${SRC_DIR_ROOT}/:")
