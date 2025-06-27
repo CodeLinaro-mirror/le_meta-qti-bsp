@@ -32,7 +32,7 @@ lxc.mount.entry = /dev/dma_heap dev/dma_heap none bind,create=dir 0 0
 lxc.mount.entry = /dev/dri/renderD128 dev/dri/renderD128 none bind,create=file 0 0
 lxc.mount.entry = /dev/kgsl-3d0 dev/kgsl-3d0 none bind,create=file 0 0
 #lxc.mount.entry = /dev/snd dev/snd none bind,optional,create=dir
-#lxc.mount.entry = /dev/socket/agm dev/socket/agm none bind,create=dir 0 0
+lxc.mount.entry = /dev/socket/agm dev/socket/agm none bind,create=dir 0 0
 
 # Cgroup configuration
 lxc.cgroup2.devices.deny                = c 226:0 m
