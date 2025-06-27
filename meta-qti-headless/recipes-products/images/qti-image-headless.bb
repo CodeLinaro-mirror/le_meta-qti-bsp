@@ -22,6 +22,7 @@ IMAGE_INSTALL += "\
     net-tools \
     iproute2 \
     iproute2-ss \
+    procps \
     iproute2-tc \
     vlan \
     xinetd \
