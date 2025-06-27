@@ -7,3 +7,5 @@ DEPENDS += "ext4-utils-native mkbootimg-native"
 
 inherit core-image
 
+# Inherit selinux-image.bbclass to label selinux contexts during rootfs generation
+inherit ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'selinux-image', '', d)}
