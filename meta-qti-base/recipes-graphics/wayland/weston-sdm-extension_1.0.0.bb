@@ -20,7 +20,7 @@ DEPENDS += "cairo \
             systemd \
             wayland wayland-native wayland-protocols \
             weston \
-            ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'bootkpi-logging power-utils', '', d)} \
+            ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'bootkpi-logging power-utils powercyclemgr', '', d)} \
             ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'compute-resmgr', '', d)} \
 "
 
