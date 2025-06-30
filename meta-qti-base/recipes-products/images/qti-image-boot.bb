@@ -14,3 +14,5 @@ EXTRA_IMAGE_FEATURES = ""
 do_rootfs[noexec] = "1"
 do_image[noexec] = "1"
 do_image_complete[noexec] = "1"
+
+deltask ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '6.12', 'do_merge_dtbs', '', d)}

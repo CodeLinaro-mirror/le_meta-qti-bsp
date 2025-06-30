@@ -22,3 +22,4 @@ RDEPENDS:${PN} += "\
     "
 
 RDEPENDS:${PN}:remove = "${@bb.utils.contains('TCMODE', 'external-ubuntu', 'cntvct-log', '', d)}"
+RDEPENDS:${PN}:remove = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '6.12', 'lttng-modules lttng-tools lttng-ust', '', d)}"
