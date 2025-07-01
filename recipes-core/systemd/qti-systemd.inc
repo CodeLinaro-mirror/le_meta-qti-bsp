@@ -3,8 +3,8 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/systemd:"
 SRC_URI += "file://systemd-udevd.service"
 SRC_URI += "file://ffbm.target"
 SRC_URI += "file://mtpserver.rules"
-SRC_URI += "file://ion.rules"
-SRC_URI += "file://tui.rules"
+SRC_URI += "${@bb.utils.contains('DISTRO_FEATURES', 'lxc', '', 'file://ion.rules',d)}"
+SRC_URI += "${@bb.utils.contains('DISTRO_FEATURES', 'lxc', '', 'file://tui.rules',d)}"
 SRC_URI += "file://kgsl.rules"
 SRC_URI += "file://set-usb-nodes.rules"
 SRC_URI += "file://sysctl.conf"
@@ -12,7 +12,7 @@ SRC_URI += "file://platform.conf"
 SRC_URI += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-vm', 'file://trusted_touch.conf', '',d)}"
 SRC_URI += "file://set-mhi-nodes.rules"
 SRC_URI += "file://99-gpiochardev.rules"
-SRC_URI += "file://kmem.rules"
+SRC_URI += "${@bb.utils.contains('DISTRO_FEATURES', 'lxc', '', 'file://kmem.rules',d)}"
 SRC_URI += "file://mmc-rpmb.rules"
 
 # Custom setup for PACKAGECONFIG to get a slimmer systemd.
@@ -105,13 +105,15 @@ do_install:append () {
        ln -sf /dev/null ${D}${systemd_unitdir}/system/sockets.target.wants/systemd-journald.socket
    fi
    install -d ${D}${sysconfdir}/udev/rules.d/
-   install -m 0644 ${WORKDIR}/ion.rules -D ${D}${sysconfdir}/udev/rules.d/ion.rules
-   install -m 0644 ${WORKDIR}/tui.rules -D ${D}${sysconfdir}/udev/rules.d/tui.rules
    install -m 0644 ${WORKDIR}/kgsl.rules -D ${D}${sysconfdir}/udev/rules.d/kgsl.rules
    install -m 0644 ${WORKDIR}/set-mhi-nodes.rules -D ${D}${sysconfdir}/udev/rules.d/set-mhi-nodes.rules
    install -m 0644 ${WORKDIR}/99-gpiochardev.rules -D ${D}${sysconfdir}/udev/rules.d/99-gpiochardev.rules
-   install -m 0644 ${WORKDIR}/kmem.rules -D ${D}${sysconfdir}/udev/rules.d/kmem.rules
    install -m 0644 ${WORKDIR}/mmc-rpmb.rules -D ${D}${sysconfdir}/udev/rules.d/mmc-rpmb.rules
+   if ${@bb.utils.contains("DISTRO_FEATURES", "lxc", "false", "true", d)}; then
+       install -m 0644 ${WORKDIR}/ion.rules -D ${D}${sysconfdir}/udev/rules.d/ion.rules
+       install -m 0644 ${WORKDIR}/tui.rules -D ${D}${sysconfdir}/udev/rules.d/tui.rules
+       install -m 0644 ${WORKDIR}/kmem.rules -D ${D}${sysconfdir}/udev/rules.d/kmem.rules
+   fi
 
    # Mask dev-ttyS0.device
    ln -sf /dev/null ${D}/etc/systemd/system/dev-ttyS0.device
