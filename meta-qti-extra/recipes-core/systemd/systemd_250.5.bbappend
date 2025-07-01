@@ -19,7 +19,7 @@ do_install:append() {
       install -d ${D}/${base_libdir}/systemd/system-sleep
       install -m 0755 ${WORKDIR}/qti_sleep.sh -D ${D}/${base_libdir}/systemd/system-sleep/qti_sleep.sh
       if ${@bb.utils.contains('DISTRO_FEATURES', 'volatiled-var', 'true', 'false', d)}; then
-          sed -i -e 's/^usb_mode_file=.*$/usb_mode_file="\/persist\/usb\/usb_mode.txt"/' ${D}/${base_libdir}/systemd/system-sleep/qti_sleep.sh
+          sed -i -e 's/^mode_file_path=.*$/mode_file_path="\/persist\/usb"/' ${D}/${base_libdir}/systemd/system-sleep/qti_sleep.sh
       fi
    fi
 
