@@ -11,6 +11,8 @@ SRC_URI = "\
     file://early_eth2.service \
     file://early_eth1_monaco.service \
     file://early_eth1_monaco.sh \
+    file://early_eth1.sh \
+    file://early_eth2.sh \
 "
 
 inherit systemd useradd
@@ -21,8 +23,11 @@ USERADD_PARAM:${PN} = "--no-create-home -g net_admin --shell /bin/false net_admi
 
 do_install:append:quin-gvm-lemans() {
     install -d ${D}${systemd_unitdir}/system
+    install -d ${D}${bindir}
     install -m 755 ${WORKDIR}/early_eth1.service ${D}${systemd_unitdir}/system/early_eth1.service
     install -m 755 ${WORKDIR}/early_eth2.service ${D}${systemd_unitdir}/system/early_eth2.service
+    install -m 0755 ${WORKDIR}/early_eth1.sh ${D}${bindir}/early_eth1.sh
+    install -m 0755 ${WORKDIR}/early_eth2.sh ${D}${bindir}/early_eth2.sh
 }
 
 SYSTEMD_SERVICE:${PN}:quin-gvm-lemans = "early_eth1.service \

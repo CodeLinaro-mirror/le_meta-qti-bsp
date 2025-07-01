@@ -15,9 +15,9 @@ Group=net_admin
 AmbientCapabilities=CAP_NET_ADMIN
 Type=simple
 RemainAfterExit=yes
-ExecStart=ifconfig eth2 up
+ExecStart=/usr/bin/early_eth2.sh
 ExecStop=ifconfig eth2 down
-Nice=-20
+Nice=0
 Restart=on-failure
 RestartSec=1ms
 
