@@ -8,6 +8,7 @@ do_install:append() {
     if ${@bb.utils.contains_any('MACHINE_FEATURES', 'qti-vm', 'true', 'false', d)}; then
         sed -i 's/#children_max=/children_max=2/' ${D}/etc/udev/udev.conf
     fi
+    ln -sf /dev/null ${D}${systemd_unitdir}/system/systemd-modules-load.service
 }
 
 do_install:append:mdm9607() {
