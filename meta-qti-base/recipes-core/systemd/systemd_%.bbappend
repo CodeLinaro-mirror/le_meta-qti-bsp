@@ -61,8 +61,9 @@ PACKAGECONFIG:remove = "backlight"
 #Disable systemd-timesyncd which not used in project.
 PACKAGECONFIG:remove = "timesyncd "
 
-#Enable coredump by default for lemans
+#Enable coredump by default for lemans & monaco
 PACKAGECONFIG:append:sa8775 = " coredump"
+PACKAGECONFIG:append:sa7255 = " coredump"
 
 # Use glib-2.0 for g_strlcat
 CFLAGS:append = " \
