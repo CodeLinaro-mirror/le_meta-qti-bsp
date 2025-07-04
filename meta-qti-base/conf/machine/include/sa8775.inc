@@ -130,4 +130,5 @@ EARLY_RAMDISK_KERNEL_MODULES = "\
     kernel-module-mhi-ep-net-${KERNEL_VERSION} \
     kernel-module-kryo-arm64-edac-${KERNEL_VERSION} \
     kernel-module-socinfo-${KERNEL_VERSION} \
+    kernel-module-ipcc-shmem-test-module-${KERNEL_VERSION} \
 "
