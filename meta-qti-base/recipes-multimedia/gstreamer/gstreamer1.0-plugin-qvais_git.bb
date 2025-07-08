@@ -31,7 +31,7 @@ CFLAGS += "-I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}"
 CXXFLAGS += "-I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}"
 
 CFLAGS:append:quin-gvm-lemans = " -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}/display"
-EXTRA_OEMESON:append:quin-gvm-lemans = " -Dmmmcolorfmt=true"
+EXTRA_OEMESON:append:quin-gvm-lemans = " -Dmmmcolorfmt=true -DGPP_ENABLED=true"
 
 SOLIBS = ".so"
 FILES_SOLIBSDEV = ""
