@@ -25,3 +25,4 @@ ab-updater:x:4060
 security:x:4070:
 qseecomd:x:4080:
 display:x:4090:
+video-driver:x:5000:
