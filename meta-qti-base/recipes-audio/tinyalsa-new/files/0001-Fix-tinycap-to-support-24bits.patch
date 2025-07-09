@@ -1,0 +1,51 @@
+From 316c78417afe6d6077d6e1ebd54fb4e6659a27e3 Mon Sep 17 00:00:00 2001
+From: Lakshay Dutta <ldutta@qti.qualcomm.com>
+Date: Wed, 9 Jul 2025 12:16:35 +0530
+Subject: [PATCH] meta-qti-bsp: Fix tinycap to support 24bits
+
+-Mapped 24bit case to PCM_FORMAT_S24_3LE so that it picks correct format
+in pcm_format_to_bits fucntion
+
+Change-Id:I316c78417afe6d6077d6e1ebd54fb4e6659a27e3
+Signed-off-by: Lakshay Dutta <ldutta@qti.qualcomm.com>
+---
+ ...utils-tinycap-support-24bits-support.patch | 27 +++++++++++++++++++
+ 1 file changed, 27 insertions(+)
+ create mode 100644 meta-qti-base/recipes-audio/tinyalsa-new/files/0001-Fix-tinycap-to-support-24bits.patch
+
+diff --git a/meta-qti-base/recipes-audio/tinyalsa-new/files/0001-Fix-tinycap-to-support-24bits.patch b/meta-qti-base/recipes-audio/tinyalsa-new/files/0001-Fix-tinycap-to-support-24bits.patch
+new file mode 100644
+index 000000000..b44880d0e
+--- /dev/null
++++ b/meta-qti-base/recipes-audio/tinyalsa-new/files/0001-Fix-tinycap-to-support-24bits.patch
+@@ -0,0 +1,27 @@
++diff --git a/utils/tinycap.c b/utils/tinycap.c
++index 617d16a..49eaa46 100644
++--- a/utils/tinycap.c
+++++ b/utils/tinycap.c
++@@ -26,6 +26,13 @@
++ ** DAMAGE.
++ */
++
+++/*
+++**Changes from Qualcomm Technologies, Inc. are provided under the following license:
+++
+++**Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+++**SPDX-License-Identifier: BSD-3-Clause-Clear
+++*/
+++
++ #include <tinyalsa/asoundlib.h>
++ #include <stdio.h>
++ #include <stdlib.h>
++@@ -164,7 +171,7 @@ int main(int argc, char **argv)
++         format = PCM_FORMAT_S32_LE;
++         break;
++     case 24:
++-        format = PCM_FORMAT_S24_LE;
+++        format = PCM_FORMAT_S24_3LE;
++         break;
++     case 16:
++         format = PCM_FORMAT_S16_LE;
+--
+2.25.1
+
