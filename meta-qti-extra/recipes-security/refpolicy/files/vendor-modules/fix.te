@@ -139,6 +139,19 @@ require {
     type qtidiagservices_app;
     type vendor_location_xtra_daemon;
     type logcat_exec;
+    type vendor_location_slim_daemon;
+    type hal_sensors_default;
+    type adbd_tradeinmode_prop;
+    type ctl_prefetch_prop;
+    type ctl_uprobestats_prop;
+    type mmd_prop;
+    type pm_16kb_app_compat_prop;
+    type prefetch_boot_prop;
+    type prefetch_service_prop;
+    type remote_prov_cert_prop;
+    type trusty_security_vm_sys_prop;
+    type trusty_security_vm_sys_vendor_prop;
+    type vendor_hal_ais_qti;
     class dir { add_name create getattr open read remove_name rename reparent search setattr write ioctl };
     class file { create entrypoint execute execute_no_trans getattr ioctl link map open read setattr write };
     class lnk_file { read setattr };
@@ -668,4 +681,20 @@ grant_la_permissions(flags_health_check,build_attestation_prop)
 grant_la_permissions(flags_health_check,camerax_extensions_prop)
 grant_la_permissions(flags_health_check,apexd_config_prop)
 grant_la_permissions(flags_health_check,ctl_apex_load_prop)
+#for cs
+allow vendor_location_slim_daemon vendor_default_prop:property_service { set };
+allow vendor_hal_usb_qti vendor_sysfs_sensors:lnk_file { read };
+allow hal_sensors_default sysfs:file { write };
+allow flags_health_check adbd_tradeinmode_prop:file { open };
+allow flags_health_check ctl_prefetch_prop:file { open };
+allow flags_health_check ctl_uprobestats_prop:file { open };
+allow flags_health_check mmd_prop:file { open };
+allow flags_health_check pm_16kb_app_compat_prop:file { open };
+allow flags_health_check prefetch_boot_prop:file { open };
+allow flags_health_check prefetch_service_prop:file { open };
+allow flags_health_check remote_prov_cert_prop:file { open };
+allow flags_health_check trusty_security_vm_sys_prop:file { open };
+allow flags_health_check trusty_security_vm_sys_vendor_prop:file { open };
+allow vendor_hal_ais_qti unlabeled:dir { search };
+
 # end of qssi15
