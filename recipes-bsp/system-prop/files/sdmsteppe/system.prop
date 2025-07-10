@@ -80,7 +80,7 @@ persist.vendor.audio.ambisonic.auto.profile=false
 persist.qmmf.ubwcstream.enable=1
 
 #Make qmmf rescalar run on GPU by default
-persist.qmmf.rescaler.type=C2D
+persist.qmmf.rescaler.type=FastCV
 
 #enable weston during boot
 persist.display.launch.weston.at.bootup=false
