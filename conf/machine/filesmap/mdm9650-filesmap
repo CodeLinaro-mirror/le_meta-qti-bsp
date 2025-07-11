@@ -7,6 +7,6 @@ NON-HLOS.ubi            modem
 sbl1.mbn                sbl
 appsboot.mbn            aboot
 tz.mbn                  tz
-devcfg.mbn              tz_devcfg
+devcfg.mbn              devcfg
 rpm.mbn                 rpm
 sec.dat                 sec
