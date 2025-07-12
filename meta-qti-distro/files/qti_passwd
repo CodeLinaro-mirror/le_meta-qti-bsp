@@ -22,3 +22,4 @@ ab-updater:x:4060:4060::
 fde:x:4070:4070::
 qseecomd:x:4080:4080::
 display:x:4090:4090::
+video-driver:x:5000:5000::
