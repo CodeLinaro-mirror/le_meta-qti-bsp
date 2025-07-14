@@ -1,34 +1,36 @@
-From 93b8c0c22a1b7c8e0f9f230876aed55d92bbae08 Mon Sep 17 00:00:00 2001
+From f8c889241def172fad04bf75f6a4b71431c8b8c9 Mon Sep 17 00:00:00 2001
 From: Lei wang <leiwan@qti.qualcomm.com>
-Date: Tue, 24 Jun 2025 09:22:25 +0800
+Date: Mon, 14 Jul 2025 23:40:21 +0800
 Subject: [PATCH] systemd: shutdown: shorten file-sync timeout
 
 Qcom wdt max timeout is 30sec, Need to shorten file-sync timeout
 to 15sec
 Re-ping the watchdog when dirty pages reduced.
 Reduce shutdown scripts timeout from 90s to 10s.
+Reduce kill timeout to 5s.
 
 Upstream-Status: Inappropriate [Qcom wdt timeout limitation]
 
 Signed-off-by: Lei wang <leiwan@qti.qualcomm.com>
 ---
- src/shutdown/shutdown.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ src/shutdown/shutdown.c | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
 
 diff --git a/src/shutdown/shutdown.c b/src/shutdown/shutdown.c
-index 7ad9930677..01f974a2cf 100644
+index 7ad9930677..f54e4fe35c 100644
 --- a/src/shutdown/shutdown.c
 +++ b/src/shutdown/shutdown.c
-@@ -40,7 +40,7 @@
+@@ -40,7 +40,8 @@
  #include "watchdog.h"
  
  #define SYNC_PROGRESS_ATTEMPTS 3
 -#define SYNC_TIMEOUT_USEC (10*USEC_PER_SEC)
 +#define SYNC_TIMEOUT_USEC (5*USEC_PER_SEC)
++#define KILL_TIMEOUT_USEC (5*USEC_PER_SEC)
  
  static char* arg_verb;
  static uint8_t arg_exit_code;
-@@ -255,8 +255,10 @@ static void sync_with_progress(void) {
+@@ -255,8 +256,10 @@ static void sync_with_progress(void) {
                  else if (r == -ETIMEDOUT) {
                          /* Reset the check counter if the "Dirty" value is
                           * decreasing */
@@ -40,7 +42,20 @@ index 7ad9930677..01f974a2cf 100644
                  } else {
                          log_error_errno(r, "Failed to sync filesystems and block devices: %m");
                          return;
-@@ -537,7 +539,10 @@ int main(int argc, char *argv[]) {
+@@ -409,10 +412,10 @@ int main(int argc, char *argv[]) {
+         disable_binfmt();
+ 
+         log_info("Sending SIGTERM to remaining processes...");
+-        broadcast_signal(SIGTERM, true, true, arg_timeout);
++        broadcast_signal(SIGTERM, true, true, KILL_TIMEOUT_USEC);
+ 
+         log_info("Sending SIGKILL to remaining processes...");
+-        broadcast_signal(SIGKILL, true, false, arg_timeout);
++        broadcast_signal(SIGKILL, true, false, KILL_TIMEOUT_USEC);
+ 
+         need_umount = !in_container;
+         need_swapoff = !in_container;
+@@ -537,7 +540,10 @@ int main(int argc, char *argv[]) {
          arguments[0] = NULL;
          arguments[1] = arg_verb;
          arguments[2] = NULL;
