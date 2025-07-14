@@ -159,3 +159,6 @@ VOLATILE_BINDS_mdm9607 = "\
 /systemrw/boot_hsic_comp /etc/usb/boot_hsic_comp\n\
 /systemrw/tel.conf /etc/tel.conf\n\
 "
+
+VOLATILE_BINDS_mdm9650 = "\
+"

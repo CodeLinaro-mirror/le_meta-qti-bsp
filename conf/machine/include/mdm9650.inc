@@ -40,6 +40,7 @@ KERNEL_CMD_PARAMS = "noinitrd ro rootwait earlycon=msm_serial_dm,0x78b1000 conso
 KERNEL_DTB_NAMES    = "\
                         vendor/qcom/mdm9650-ttp.dtb \
                         vendor/qcom/mdm9650-mtp.dtb \
+                        vendor/qcom/mdm9650-pcie-ep-ttp.dtb \
 "
 
 # Bootloader configuration
@@ -52,7 +53,7 @@ EXTRA_IMAGEDEPENDS += "lk"
 # qti-data-modem:         Machine supports QTI data modem solution
 # nand-boot:              Machine supports boot from NAND flash
 
-MACHINE_FEATURES += "qti-sdx qti-recovery dm-verity-none nand-boot qwesd qti-security no-rpmb-listener-support no-ssd-listener-support qti-data-modem qti-audio"
+MACHINE_FEATURES += "qti-sdx qti-recovery dm-verity-none nand-boot qwesd qti-security no-rpmb-listener-support no-ssd-listener-support qti-data-modem qti-audio qti-sensors qti-location qti-dynamic-tsensreset"
 
 MACHINE_MNT_POINTS = " \
     /firmware \
@@ -93,5 +94,3 @@ PREFERRED_VERSION_iproute2 = "5.5.0"
 # y2038: Support for Y2038 safe time on 32 bit systems
 TARGET_CFLAGS += "-D_TIME_BITS=64 -D_FILE_OFFSET_BITS=64"
 TARGET_CPPFLAGS += "-D_TIME_BITS=64 -D_FILE_OFFSET_BITS=64"
-
-DEFAULT_ENFORCING = "permissive"
