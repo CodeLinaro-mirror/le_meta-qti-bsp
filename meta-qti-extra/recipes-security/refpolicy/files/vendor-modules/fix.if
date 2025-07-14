@@ -39,6 +39,7 @@ interface(`grant_la_permissions',`
                 type $2;
         ')
 
-        allow $1 $2:file {open ioctl read write create getattr setattr map };
+        allow $1 $2:file {open ioctl read write create getattr setattr };
+        allow $1 $2:dir {open ioctl read write create getattr setattr add_name };
 ')
 
