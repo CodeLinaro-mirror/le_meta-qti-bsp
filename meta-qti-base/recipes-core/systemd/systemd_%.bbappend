@@ -11,6 +11,8 @@ SRC_URI:append = " \
     file://0001-systemd-config-linger-for-root-user.patch \
 "
 
+SRC_URI:append:quin-gvm-gen4-5 = " file://70-vblk.rules"
+
 SRC_URI:append:sa81x5 = " file://0001-systemd-add-slotselect-support-in-fstab.patch"
 
 SRC_URI:append = " ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "6.1", "file://platform_load.conf", "", d)}"
@@ -70,3 +72,6 @@ do_install:append () {
     fi
 }
 
+do_install:append:quin-gvm-gen4-5() {
+    install -m 0644 ${WORKDIR}/70-vblk.rules ${D}${sysconfdir}/udev/rules.d/
+}
