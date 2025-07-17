@@ -11,6 +11,7 @@ BBMASK:quin-gvm-gen4 += "meta-qti-bsp/meta-qti-base/recipes-data/emac-dwc-eqos/e
 BBMASK:quin-gvm-gen4 += "meta-qti-bsp/meta-qti-base/recipes-graphics/wayland/weston_10.0.%.bbappend"
 BBMASK:quin-gvm-gen4 += "meta-qti-bsp/meta-qti-base/recipes-kernel/edk2/edk2_git.bb"
 BBMASK:quin-gvm-gen4 += "meta-qti-bsp/meta-qti-base/recipes-kernel/oot-dtbo/oot-dtbo.bb"
+BBMASK:quin-gvm-gen4 += "meta-qti-bsp/meta-qti-base/recipes-kernel/linux-msm/linux-msm-headers_6.12.bb"
 BBMASK:quin-gvm-gen4 += "meta-qti-bsp/meta-qti-base/recipes-kiumd/dspfirmware-mount/dspfirmware-mount_git.bb"
 BBMASK:quin-gvm-gen4 += "meta-qti-bsp/meta-qti-base/recipes-kiumd/gvm-net-config/gvm-net-config_git.bb"
 BBMASK:quin-gvm-gen4 += "meta-qti-bsp/meta-qti-base/recipes-kiumd/kiumd-headers/kiumd-headers_git.bb"
