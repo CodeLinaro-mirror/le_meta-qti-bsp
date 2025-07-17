@@ -41,6 +41,14 @@ python do_rootfs:prepend() {
             bb.debug(1, "add install module: %s" % (kpack))
 }
 
+do_rootfs:append() {
+    bb.build.exec_func('do_image_clean', d)
+}
+
+fakeroot do_image_clean() {
+   rm -rf ${IMAGE_ROOTFS}/boot/*
+}
+
 # Do not pollute the initrd image with rootfs features
 IMAGE_FEATURES = ""
 

@@ -21,9 +21,7 @@ TARGET_PATH_NAME:sa8775 = "sa8775"
 
 do_install:append() {
     install -d ${D}/dev
-    install -d ${D}/sys
     install -d ${D}/etc
-    install -d ${D}/proc
     install -d ${D}/boot/early-ramdisk
     install -d ${D}/realroot
     install -d ${D}/etc/modules-load.f
@@ -37,9 +35,7 @@ do_install:append() {
 FILES:${PN} += "\
          init \
          dev/ \
-         sys/ \
          etc/ \
-         proc/ \
          boot/early-ramdisk \
          realroot/ \
          etc/modules-load.f/* \
