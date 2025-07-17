@@ -4,6 +4,9 @@ DEPENDS += "base-passwd"
 
 SRC_URI:append = " file://fstab"
 
+SRC_URI:append:sa8775 = " file://sh_login"
+SRC_URI:append:sa7255 = " file://sh_login"
+
 dirs755:append = " \
     /media/cf /media/net /media/ram \
     /media/union /media/realroot /media/hdd /media/mmc1 \
@@ -33,4 +36,12 @@ do_install:append(){
         sed -i "/^\${localstatedir}/d" ${D}${sysconfdir}/fstab
     fi
 
+}
+
+do_install:append:sa8775() {
+    install -m 0755 ${WORKDIR}/sh_login ${D}${base_bindir}/sh_login
+}
+
+do_install:append:sa7255() {
+    install -m 0755 ${WORKDIR}/sh_login ${D}${base_bindir}/sh_login
 }
