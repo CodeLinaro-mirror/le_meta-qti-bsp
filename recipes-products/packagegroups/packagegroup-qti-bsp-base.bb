@@ -24,8 +24,12 @@ ENABLE_ADB ?= "True"
 ENABLE_ADB:qti-distro-base-user ?= "False"
 
 # Android Core Image and Debugging utilities
+ENABLE_BINDER ?= "False"
+ENABLE_BINDER:kera = "True"
+
 RDEPENDS:packagegroup-android-utils-base = "\
     ${@oe.utils.conditional('ENABLE_ADB', 'True', 'adbd', '', d)} \
+    ${@oe.utils.conditional('ENABLE_BINDER', 'True', 'binder', '', d)} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-sdx', '', 'leproperties', d)} \
     logcat \
     logd \
