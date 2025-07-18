@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 
 inherit kernel
 
-COMPATIBLE_MACHINE = "quin-gvm-lemans| quin-gvm-monaco"
+COMPATIBLE_MACHINE = "quin-gvm-lemans|quin-gvm-monaco|quin-gvm-gen4-5"
 
 FILESPATH =+ "${SRC_DIR_ROOT}/kernel:"
 SRC_URI = "file://kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/common"
