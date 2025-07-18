@@ -100,19 +100,16 @@ do_prebuilt_configure() {
     install -m 0644 ../${KERNEL_TYPE}/.config ${B}
     install -m 0644 ../${KERNEL_TYPE}/Module.symvers ${B}
     install -m 0644 ../${KERNEL_TYPE}/signing_key.pem ${B}/certs/signing_key.pem
-    install -m 0644 ../${KERNEL_TYPE}/verity_cert.pem ${B}/certs/verity_cert.pem
-    install -m 0644 ../${KERNEL_TYPE}/verity_key.pem ${B}/certs/verity_key.pem
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains('MACHINE_FEATURES', 'dm-verity-initramfs-v3', 'true', 'false', d), 'false', d)}; then
+        install -m 0644 ../${KERNEL_TYPE}/verity_cert.pem ${B}/certs/verity_cert.pem
+        install -m 0644 ../${KERNEL_TYPE}/verity_key.pem ${B}/certs/verity_key.pem
+    fi
     if [ -f module.lds ]; then
     install -m 0644 module.lds ${B}/scripts/module.lds
     fi
     if [ -f utsrelease.h ]; then
     install -m 0644 utsrelease.h ${B}/include/generated
     fi
-    # update paths of signature checking certificates to reflect current host
-    sed -i -e '/CONFIG_MODULE_SIG_KEY[ =]/d' ${B}/.config
-    echo "CONFIG_MODULE_SIG_KEY="\"${STAGING_DIR_TARGET}/kernel-certs/signing_key.pem\" >> ${B}/.config
-    sed -i -e '/CONFIG_SYSTEM_TRUSTED_KEYS[ =]/d' ${B}/.config
-    echo "CONFIG_SYSTEM_TRUSTED_KEYS="\"${STAGING_DIR_TARGET}/kernel-certs/verity_cert.pem\" >> ${B}/.config
 
     install -d ${B}/${KERNEL_OUTPUT_DIR}
     for typeformake in ${KERNEL_IMAGETYPE_FOR_MAKE} ; do
@@ -152,6 +149,12 @@ do_prebuilt_shared_workdir() {
     mkdir -p $kerneldir/include/generated
     if [ -e "${B}/scripts/module.lds" ]; then
         install -m 0644 ${B}/scripts/module.lds ${STAGING_KERNEL_BUILDDIR}/scripts/module.lds
+    fi
+
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains('MACHINE_FEATURES', 'dm-verity-initramfs-v3', 'true', 'false', d), 'false', d)}; then
+        mkdir -p $kerneldir/certs
+        install -m 0755 ${B}/certs/verity_cert.pem ${STAGING_KERNEL_BUILDDIR}/certs/verity_cert.pem
+        install -m 0644 ${B}/certs/verity_key.pem ${STAGING_KERNEL_BUILDDIR}/certs/verity_key.pem
     fi
 }
 
