@@ -23,3 +23,6 @@ qti-bt:x:4057:
 agm:x:4058:
 security:x:4070:
 qseecomd:x:4080:
+video-driver:x:5000:
+vidc-test-app:x:5010:
+hyp-video-be:x:5020:
