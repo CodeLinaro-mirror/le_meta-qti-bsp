@@ -128,6 +128,12 @@ python create_rootfs_sqsh () {
 
 do_makesystem_sqsh[prefuncs] += "create_rootfs_sqsh"
 do_makesystem_sqsh[prefuncs] += "create_symlink_systemd_sqsh_mount_rootfs"
+
+# Ensure SELinux file context variable is defined
+SELINUX_FILE_CONTEXTS ?= ""
+SELINUX_IMG_SQSH_CF = "${@['-context-file ${SELINUX_FILE_CONTEXTS}', ''][d.getVar('SELINUX_FILE_CONTEXTS') == '']}"
+IMAGE_SQSH_SELINUX_OPTIONS = "${@bb.utils.contains('DISTRO_FEATURES', 'selinux', '${SELINUX_IMG_SQSH_CF}', '', d)}"
+
 # The system image size update that happens in do_make_verity_enabled_system_image
 #  step is not persistent outside that task scope. Update it again within this
 #  task's scope.
@@ -140,7 +146,7 @@ fakeroot do_makesystem_sqsh() {
     rm -rf ${IMAGE_ROOTFS_SQSH}/persist/*
     mkdir -p ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${FS_TYPE_SQSH}
     mksquashfs ${IMAGE_ROOTFS_SQSH} ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${FS_TYPE_SQSH}/${SYSTEMIMAGE_TARGET} \
-                -noappend -comp xz -Xdict-size 32K -noI -Xbcj arm -b 65536 -processors 1
+                -noappend -comp xz -Xdict-size 32K -noI -Xbcj arm -b 65536 -processors 1 ${IMAGE_SQSH_SELINUX_OPTIONS}
 }
 addtask do_makesystem_sqsh after do_image before do_image_complete
 
