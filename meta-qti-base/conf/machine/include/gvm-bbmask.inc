@@ -40,6 +40,7 @@ BBMASK:quin-gvm-gen4 += "meta-qti-bsp/meta-qti-extra/recipes-test/virt-fastrpc-u
 BBMASK:quin-gvm-gen4 += "meta-qti-bsp/meta-qti-extra/recipes-test/virtio-i2c-test/virtio-i2c-test.bb"
 BBMASK:quin-gvm-gen4 += "meta-qti-bsp/meta-qti-extra/recipes-test/virt-reg-ut/virt-reg-ut.bb"
 BBMASK:quin-gvm-gen4 += "meta-qti-bsp/meta-qti-extra/recipes-test/virt-spmi-ut/virt-spmi-ut.bb"
+BBMASK:quin-gvm-gen4 += "meta-qti-bsp/meta-qti-base/recipes-security/securemsm-devicetree/securemsm-devicetree.bb"
 
 # BBMASK drops some recipe that checksum file not found in quin-gvm-lemans target
 BBMASK:quin-gvm-lemans += "meta-qti-bsp/meta-qti-base/recipes-audio/audiolite-dlkm/audiolite-devicetree_git.bb"
@@ -206,3 +207,4 @@ BBMASK:qtiquingvm8295 += "meta-qti-bsp/meta-qti-extra/recipes-test/virtio-i2c-te
 BBMASK:qtiquingvm8295 += "meta-qti-bsp/meta-qti-extra/recipes-test/virt-reg-ut/virt-reg-ut.bb"
 BBMASK:qtiquingvm8295 += "meta-qti-bsp/meta-qti-extra/recipes-test/virt-spmi-ut/virt-spmi-ut.bb"
 BBMASK:qtiquingvm8295 += "meta-qti-bsp/meta-qti-base/recipes-kernel/linux-msm/linux-msm_5.15.bb"
+BBMASK:quin-gvm-gen4 += "meta-qti-bsp/meta-qti-base/recipes-security/securemsm-devicetree/securemsm-devicetree.bb"
