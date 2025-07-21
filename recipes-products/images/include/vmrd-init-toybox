@@ -65,8 +65,10 @@ else
     /bin/mount -t ext4 -o ro /dev/vda /mnt/vfs
 fi
 
-if [ $? -ne 0]; then
+if [ $? -eq 0 ] && [ -f /mnt/vfs/sbin/init ]; then
+    echo "Switching root" > /dev/kmsg
+    exec switch_root -c /dev/console /mnt/vfs /sbin/init
+else
     echo "mounting rootfs failed" > /dev/kmsg
+    exec reboot -f
 fi
-
-exec switch_root -c /dev/console /mnt/vfs /sbin/init
