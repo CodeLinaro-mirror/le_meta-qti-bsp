@@ -21,6 +21,8 @@ SRC_URI_append_qrb5165 += " file://qcn9000.cfg"
 SRC_URI_append_qcs6490 += " file://qcs6490.cfg"
 SRC_URI_append_qcs6490 += " file://android_binderfs.cfg"
 
+SRC_URI_append_mdm9650 += " file://0001-Revert-soc-qcom-memory_dump-fix-register-dump-table-.patch"
+
 DEPENDS += "llvm-arm-toolchain-native virtual/dtc-native rsync-native clang-native"
 TOOLCHAIN = "clang"
 RUNTIME = "llvm"
