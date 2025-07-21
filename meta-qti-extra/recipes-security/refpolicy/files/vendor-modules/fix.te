@@ -152,6 +152,10 @@ require {
     type trusty_security_vm_sys_prop;
     type trusty_security_vm_sys_vendor_prop;
     type vendor_hal_ais_qti;
+    type apk_data_file;
+    type proc_overcommit_memory;
+    type system_app;
+    type iio_device;
     class dir { add_name create getattr open read remove_name rename reparent search setattr write ioctl };
     class file { create entrypoint execute execute_no_trans getattr ioctl link map open read setattr write };
     class lnk_file { read setattr };
@@ -345,9 +349,7 @@ allow vendor_init config_prop:property_service { set };
 allow vendor_init vendor_persist_camera_prop:property_service { set };
 allow host_exec_t host_device_t:blk_file { ioctl };
 allowxperm vendor_aidl_hal_automotive_vehicle_qti input_device:dir ioctl { 0x4506 };
-allow vendor_aidl_hal_automotive_vehicle_qti device:dir { read open };
 allow vendor_hal_gnss_qti vendor_default_prop:property_service { set };
-allow hal_audio_default tmpfs:dir { write };
 allow vendor_qti_init_shell unlabeled:file { read getattr };
 allow network_stack proc_net:file { read };
 allow vendor_qti_init_shell adbd_config_prop:property_service { set };
@@ -681,20 +683,32 @@ grant_la_permissions(flags_health_check,build_attestation_prop)
 grant_la_permissions(flags_health_check,camerax_extensions_prop)
 grant_la_permissions(flags_health_check,apexd_config_prop)
 grant_la_permissions(flags_health_check,ctl_apex_load_prop)
-#for cs
+#for multimedia test
+grant_la_permissions(system_app,apk_data_file)
+grant_la_permissions(system_app,system_data_file)
+grant_la_permissions(flags_health_check,adbd_tradeinmode_prop)
+grant_la_permissions(flags_health_check,ctl_prefetch_prop)
+grant_la_permissions(flags_health_check,ctl_uprobestats_prop)
+grant_la_permissions(flags_health_check,mmd_prop)
+grant_la_permissions(flags_health_check,pm_16kb_app_compat_prop)
+grant_la_permissions(flags_health_check,prefetch_boot_prop)
+grant_la_permissions(flags_health_check,prefetch_service_prop)
+grant_la_permissions(flags_health_check,remote_prov_cert_prop)
+grant_la_permissions(flags_health_check,trusty_security_vm_sys_prop)
+grant_la_permissions(flags_health_check,trusty_security_vm_sys_vendor_prop)
+grant_la_permissions(host_exec_t,proc_overcommit_memory)
+#
+grant_la_permissions(vendor_aidl_hal_automotive_vehicle_qti,device)
+grant_la_permissions(hal_sensors_default,sysfs)
+grant_la_permissions(hal_sensors_default,iio_device)
+grant_la_permissions(hal_audio_default,tmpfs)
+grant_la_permissions(vendor_qti_init_shell,unlabeled)
+grant_la_permissions(network_stack,proc_net)
+grant_la_permissions(mediaserver,system_data_file)
+
 allow vendor_location_slim_daemon vendor_default_prop:property_service { set };
 allow vendor_hal_usb_qti vendor_sysfs_sensors:lnk_file { read };
-allow hal_sensors_default sysfs:file { write };
-allow flags_health_check adbd_tradeinmode_prop:file { open };
-allow flags_health_check ctl_prefetch_prop:file { open };
-allow flags_health_check ctl_uprobestats_prop:file { open };
-allow flags_health_check mmd_prop:file { open };
-allow flags_health_check pm_16kb_app_compat_prop:file { open };
-allow flags_health_check prefetch_boot_prop:file { open };
-allow flags_health_check prefetch_service_prop:file { open };
-allow flags_health_check remote_prov_cert_prop:file { open };
-allow flags_health_check trusty_security_vm_sys_prop:file { open };
-allow flags_health_check trusty_security_vm_sys_vendor_prop:file { open };
 allow vendor_hal_ais_qti unlabeled:dir { search };
+
 
 # end of qssi15
