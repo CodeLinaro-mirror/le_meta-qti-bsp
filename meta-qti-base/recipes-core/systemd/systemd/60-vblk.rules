@@ -17,5 +17,5 @@ SUBSYSTEM=="block", DEVPATH=="*virtio_blk_lv_modem_b*",SYMLINK+="block/platform/
 SUBSYSTEM=="block", DEVPATH=="*virtio_blk_lv_dsp_a*",SYMLINK+="block/platform/dsp_a"
 SUBSYSTEM=="block", DEVPATH=="*virtio_blk_lv_dsp_b*",SYMLINK+="block/platform/dsp_b"
 SUBSYSTEM=="block", DEVPATH=="*virtio_blk_lv_devinfo*",SYMLINK+="block/platform/devinfo"
-SUBSYSTEM=="block", DEVPATH=="*virtio_blk_misc*",SYMLINK+="block/platform/misc"
+SUBSYSTEM=="block", DEVPATH=="*virtio_blk_lv_misc*",SYMLINK+="block/platform/lv_misc"
 SUBSYSTEM=="block", DEVPATH=="*virtio_blk_lv_firmware*",SYMLINK+="block/platform/firmware"
