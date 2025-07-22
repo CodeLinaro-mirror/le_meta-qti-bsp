@@ -253,10 +253,10 @@ EOF
     dd if=/dev/zero bs=1 count=$remaining_padding >> $temp_file
 
     # Define the total size in blocks (assuming 4096 bytes per block)
-    #total_size_in_blocks=`expr 1050214400 / 4096`
+    #total_size_in_blocks=`expr $SYSTEM_SIZE_EXT4 / 4096`
     systemSize=`wc -c ${ImgPath} | awk '{print $1}'`
-    if [ "$systemSize" -gt "1050214400" ]; then
-        echo "Size mismatch ($systemSize Vs 1050214400)...recreating unsparse image."
+    if [ "$systemSize" -gt "$SYSTEM_SIZE_EXT4" ]; then
+        echo "Size mismatch ($systemSize Vs $SYSTEM_SIZE_EXT4)...recreating unsparse image."
         continue
     fi
 
@@ -292,8 +292,8 @@ fakeroot do_makesystem_sqsh() {
 
     # Check if size is within the range
     systemSize=`wc -c ${ImgPath} | awk '{print $1}'`
-    if [ "$systemSize" -gt "1050214400" ]; then
-        echo "Size mismatch ($systemSize Vs 1050214400)..."
+    if [ "$systemSize" -gt "$SYSTEM_SIZE_EXT4" ]; then
+        echo "Size mismatch ($systemSize Vs $SYSTEM_SIZE_EXT4)..."
     fi
 
     echo "systemSize before appeding v3 meta:$systemSize"

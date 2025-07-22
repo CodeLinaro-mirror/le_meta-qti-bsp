@@ -17,6 +17,9 @@ if [[ "$1" == "-d" ]]; then
     shift; shift
 fi
 
+#get the first four bytes of the image header.
+#Compare with "sqsh" in little endian to know whether sqaushfs image.
+#68 - h, 73 - s, 71 - q, 73 - s
 dd if=$DEVICE$SLOT_SUFFIX bs=1 count=4 2>/dev/null | hexdump -v -e '4/1 "%02x"' | grep -q '^68737173$' && echo "Valid Squashfs image" && Squashfs=1 || echo "Not a Squashfs image"
 
 if [ "$Squashfs" == "1" ]; then
