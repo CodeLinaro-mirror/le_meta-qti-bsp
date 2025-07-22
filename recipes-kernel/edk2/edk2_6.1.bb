@@ -9,8 +9,7 @@ BUILD_OS = "linux"
 DEPENDS += "util-linux-native"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
-#FILESEXTRAPATHS:prepend := "${WORKSPACE}/bootable/bootloader/:"
-FILESEXTRAPATHS:prepend := "${WORKSPACE}/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/bootable/bootloader/:"
+FILESEXTRAPATHS:prepend := "${WORKSPACE}/kernel-6.1/kernel_platform/bootable/bootloader/:"
 
 SRC_URI = "file://edk2"
 S         =  "${WORKDIR}/edk2"
