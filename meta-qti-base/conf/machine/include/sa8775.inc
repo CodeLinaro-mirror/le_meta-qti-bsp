@@ -141,4 +141,5 @@ EARLY_RAMDISK_KERNEL_MODULES = "\
     kernel-module-gunyah-${KERNEL_VERSION} \
     kernel-module-hvc-gunyah-${KERNEL_VERSION} \
     kernel-module-ipcc-shmem-test-module-${KERNEL_VERSION} \
+    kernel-module-qcom-l3-cache-config-${KERNEL_VERSION} \
 "
