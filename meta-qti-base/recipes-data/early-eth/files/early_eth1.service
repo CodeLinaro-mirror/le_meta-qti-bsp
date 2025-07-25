@@ -6,6 +6,8 @@
 [Unit]
 Description=eth1 installer
 DefaultDependencies=no
+Conflicts=shutdown.target
+Before=shutdown.target
 
 [Service]
 Type=oneshot
@@ -18,4 +20,4 @@ Restart=on-failure
 RestartSec=1ms
 
 [Install]
-WantedBy=sys-devices-platform-soc\x400-23040000.ethernet-net-eth1.device
+WantedBy=sysinit.target
