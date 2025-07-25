@@ -40,9 +40,9 @@ update_usb_composition() {
 }
 
 # Default Image names
-BOOTIMAGE_TARGET ?= "boot.img"
-DTBOIMAGE_TARGET ?= "dtbo.img"
-VBOOTIMAGE_TARGET ?= "vendor_boot.img"
+BOOTIMAGE_TARGET ?= "qcm8538-boot.img"
+DTBOIMAGE_TARGET ?= "qcm8538-dtbo.img"
+VBOOTIMAGE_TARGET ?= "qcm8538-vendor_boot.img"
 
 #Set appropriate partion:Image map
 NONAB_BOOT_PARTITION_IMAGE_MAP = "boot='${BOOTIMAGE_TARGET}',system='${SYSTEMIMAGE_TARGET}',userdata='${USERDATAIMAGE_TARGET}',persist='${PERSISTIMAGE_TARGET}',dtbo='${DTBOIMAGE_TARGET}'"
@@ -119,7 +119,7 @@ do_deploy_fixup () {
     # copy the bootloader ELF file
     for f in ${EXTRA_IMAGEDEPENDS}; do
         if [ "$f" = "edk2" ] || [ "$f" = "lib64-edk2" ]; then
-            install -m 0644 ${DEPLOY_DIR_IMAGE}/abl.elf .
+            install -m 0644 ${DEPLOY_DIR_IMAGE}/qcm8538-abl.elf .
         elif [ "$f" = "lk" ]; then
             install -m 0644 ${DEPLOY_DIR_IMAGE}/*appsboot.mbn .
         fi

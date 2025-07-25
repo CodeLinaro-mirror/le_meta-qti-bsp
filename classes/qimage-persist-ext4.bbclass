@@ -35,8 +35,8 @@
 # Convert human readable partition sizes into bytes
 PERSIST_IMAGE_ROOTFS_SIZE  = "${@get_size_in_bytes(d.getVar('PERSIST_SIZE_EXT4') or '6MiB')}"
 
-PERSISTIMAGE_TARGET ?= "persist.img"
-PERSISTIMAGE_MAP_TARGET ?= "persist.map"
+PERSISTIMAGE_TARGET ?= "qcm8538-persist.img"
+PERSISTIMAGE_MAP_TARGET ?= "qcm8538-persist.map"
 
 do_makepersist[dirs] = "${IMGDEPLOYDIR}/${IMAGE_BASENAME}"
 do_makepersist() {

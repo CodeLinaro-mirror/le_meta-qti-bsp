@@ -1,8 +1,8 @@
 ################################################
 ### Generate userdata.img ###
 ################################################
-USERDATAIMAGE_TARGET ?= "userdata.img"
-USERDATAIMAGE_MAP_TARGET ?= "userdata.map"
+USERDATAIMAGE_TARGET ?= "qcm8538-userdata.img"
+USERDATAIMAGE_MAP_TARGET ?= "qcm8538-userdata.map"
 USERDATA_DIR ??= "data"
 USERDATA_IMAGE_ROOTFS_SIZE = "${@get_size_in_bytes(d.getVar('USERDATA_SIZE') or '1GB')}"
 

@@ -63,7 +63,7 @@ do_install[noexec]="1"
 do_configure[noexec]="1"
 
 do_deploy() {
-    install -m 644 ${WORKDIR}/abl.elf ${DEPLOYDIR}
+    install -m 644 ${WORKDIR}/abl.elf ${DEPLOYDIR}/qcm8538-abl.elf
 }
 
 do_deploy[dirs] = "${S} ${DEPLOYDIR}"

@@ -15,13 +15,13 @@ do_image_squashfs[noexec] = "1"
 FS_TYPE_SQSH = "squashfs"
 
 # Default Image names
-SYSTEMIMAGE_TARGET ?= "system.img"
-SYSTEMIMAGE_MAP_TARGET ?= "system.map"
-USERDATAIMAGE_TARGET ?= "userdata.img"
-USERDATAIMAGE_MAP_TARGET ?= "userdata.map"
-PERSISTIMAGE_TARGET ?= "persist.img"
-PERSISTIMAGE_MAP_TARGET ?= "persist.map"
-DTBOIMAGE_TARGET ?= "dtbo.img"
+SYSTEMIMAGE_TARGET ?= "qcm8538-system.img"
+SYSTEMIMAGE_MAP_TARGET ?= "qcm8538-system.map"
+USERDATAIMAGE_TARGET ?= "qcm8538-userdata.img"
+USERDATAIMAGE_MAP_TARGET ?= "qcm8538-userdata.map"
+PERSISTIMAGE_TARGET ?= "qcm8538-persist.img"
+PERSISTIMAGE_MAP_TARGET ?= "qcm8538-persist.map"
+DTBOIMAGE_TARGET ?= "qcm8538-dtbo.img"
 
 DEPENDS += "\
     squashfs-tools-native \
@@ -181,7 +181,7 @@ addtask do_makepersist_sqsh after do_image before do_makesystem_sqsh
 
 do_copy_image() {
     mkdir -p ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${FS_TYPE_SQSH}
-    cp ${DEPLOY_DIR_IMAGE}/abl.elf ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${FS_TYPE_SQSH}/abl.elf
+    cp ${DEPLOY_DIR_IMAGE}/qcm8538-abl.elf ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${FS_TYPE_SQSH}/qcm8538-abl.elf
     cp ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${DTBOIMAGE_TARGET} ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${FS_TYPE_SQSH}/${DTBOIMAGE_TARGET}
 }
 

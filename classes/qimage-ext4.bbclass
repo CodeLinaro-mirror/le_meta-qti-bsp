@@ -26,12 +26,12 @@ CORE_IMAGE_EXTRA_INSTALL += "systemd-machine-units-ext4"
 
 do_image_ext4[noexec] = "1"
 # Default Image names
-SYSTEMIMAGE_TARGET ?= "system.img"
-SYSTEMIMAGE_UNSPARSE_TARGET ?= "system.img.unsparse"
-SYSTEMIMAGE_MAP_TARGET ?= "system.map"
-VDLKMIMAGE_TARGET ?= "vendor_dlkm.img"
-VDLKMIMAGE_UNSPARSE_TARGET ?= "vendor_dlkm.img.unspase"
-VDLKMIMAGE_MAP_TARGET ?= "vendor_dlkm.map"
+SYSTEMIMAGE_TARGET ?= "qcm8538-system.img"
+SYSTEMIMAGE_UNSPARSE_TARGET ?= "qcm8538-system.img.unsparse"
+SYSTEMIMAGE_MAP_TARGET ?= "qcm8538-system.map"
+VDLKMIMAGE_TARGET ?= "qcm8538-vendor_dlkm.img"
+VDLKMIMAGE_UNSPARSE_TARGET ?= "qcm8538-vendor_dlkm.img.unspase"
+VDLKMIMAGE_MAP_TARGET ?= "qcm8538-vendor_dlkm.map"
 
 # Ensure SELinux file context variable is defined
 SELINUX_FILE_CONTEXTS ?= ""

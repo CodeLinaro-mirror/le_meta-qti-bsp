@@ -33,7 +33,7 @@
 ## Generate dtbo.img
 MKDTUTIL = '${@oe.utils.conditional("PREFERRED_PROVIDER_virtual/mkdtimg-native", "mkdtimg-gki-native", "mkdtboimg/bin/mkdtboimg.py", "mkdtimg", d)}'
 DTBODEPLOYDIR = "${WORKDIR}/deploy-${PN}-dtboimage-complete"
-DTBOIMAGE_TARGET ?= "dtbo.img"
+DTBOIMAGE_TARGET ?= "qcm8538-dtbo.img"
 
 # Create dtbo.img if DTBO support is enabled
 python do_makedtbo () {
