@@ -40,6 +40,9 @@ interface(`grant_la_permissions',`
         ')
 
         allow $1 $2:file {open ioctl read write create getattr setattr };
-        allow $1 $2:dir {open ioctl read write create getattr setattr add_name };
+        allow $1 $2:service_manager { find };
+        allow $1 $2:property_service { set };
+        allow $1 $2:blk_file { ioctl };
+	allow $1 $2:dir {open ioctl read write create getattr setattr add_name  search };
 ')
 

@@ -156,22 +156,372 @@ require {
     type proc_overcommit_memory;
     type system_app;
     type iio_device;
+    type proc_asound;
+    type vendor_proc_audiod;
+    type tradeinmode_metadata_file;
+    type build_prop;
+    type ueventd;
+    type gsi_metadata_file;
+    type vendor_sys_qti_display_exec;
+    type vendor_hal_capabilityconfigstore_qti_default;
+    type vendor_cap_configstore_dbg_prop;
+    type vendor_hal_soter_qti;
+    type vfat;
+    type vendor_per_mgr;
+    type vendor_pd_locater_dbg_prop;
+    type hal_bluetooth_default;
+    type vendor_ramdump_vendor_data_file;
+    type debugfs_tracing_instances;
+    type aac_drc_prop;
+    type ab_update_gki_prop;
+    type adaptive_haptics_prop;
+    type adbd_prop;
+    type apexd_config_prop;
+    type apexd_payload_metadata_prop;
+    type apexd_prop;
+    type apk_verity_prop;
+    type audio_config_prop;
+    type avf_virtualizationservice_prop;
+    type bluetooth_audio_hal_prop;
+    type bluetooth_finder_prop;
+    type bootanim_config_prop;
+    type bootanim_system_prop;
+    type bootloader_boot_reason_prop;
+    type boottime_prop;
+    type boottime_public_prop;
+    type bpf_progs_loaded_prop;
+    type build_attestation_prop;
+    type build_bootimage_prop;
+    type build_config_prop;
+    type camera2_extensions_prop;
+    type camera_calibration_prop;
+    type camerax_extensions_prop;
+    type car_boot_prop;
+    type carwatchdog_config_prop;
+    type charger_config_prop;
+    type charger_prop;
+    type charger_status_prop;
+    type codec2_config_prop;
+    type cold_boot_done_prop;
+    type composd_vm_art_prop;
+    type composd_vm_vendor_prop;
+    type cpu_variant_prop;
+    type crashrecovery_prop;
+    type ctl_adbd_prop;
+    type ctl_apex_load_prop;
+    type ctl_apexd_prop;
+    type ctl_artd_pre_reboot_prop;
+    type ctl_bootanim_prop;
+    type ctl_bugreport_prop;
+    type ctl_console_prop;
+    type ctl_default_prop;
+    type ctl_dpmd_prop;
+    type ctl_dumpstate_prop;
+    type ctl_fuse_prop;
+    type ctl_gsid_prop;
+    type ctl_interface_restart_prop;
+    type ctl_interface_start_prop;
+    type ctl_interface_stop_prop;
+    type ctl_mdnsd_prop;
+    type ctl_mediatranscoding_prop;
+    type ctl_odsign_prop;
+    type ctl_restart_prop;
+    type ctl_rildaemon_prop;
+    type ctl_sigstop_prop;
+    type ctl_snapuserd_prop;
+    type ctl_start_prop;
+    type ctl_stop_prop;
+    type ctl_tcmd_prop;
+    type dck_prop;
+    type debug_tracing_desktop_mode_visible_tasks_prop;
+    type debugfs_restriction_prop;
+    type device_config_activity_manager_native_boot_prop;
+    type device_config_boot_count_prop;
+    type device_config_camera_native_prop;
+    type device_config_configuration_prop;
+    type device_config_connectivity_prop;
+    type device_config_core_experiments_team_internal_prop;
+    type device_config_edgetpu_native_prop;
+    type device_config_input_native_boot_prop;
+    type device_config_lmkd_native_prop;
+    type device_config_mglru_native_prop;
+    type device_config_mmd_native_prop;
+    type device_config_netd_native_prop;
+    type device_config_nnapi_native_prop;
+    type device_config_profcollect_native_boot_prop;
+    type device_config_remote_key_provisioning_native_prop;
+    type device_config_reset_performed_prop;
+    type device_config_statsd_native_boot_prop;
+    type device_config_statsd_native_prop;
+    type device_config_storage_native_boot_prop;
+    type device_config_surface_flinger_native_boot_prop;
+    type device_config_swcodec_native_prop;
+    type device_config_sys_traced_prop;
+    type device_config_tethering_u_or_later_native_prop;
+    type device_config_vendor_system_native_boot_prop;
+    type device_config_vendor_system_native_prop;
+    type device_config_virtualization_framework_native_prop;
+    type device_config_window_manager_native_boot_prop;
+    type device_logging_prop;
+    type dmesgd_start_prop;
+    type drm_forcel3_prop;
+    type drm_service_config_prop;
+    type dumpstate_options_prop;
+    type dynamic_system_prop;
+    type enable_16k_pages_prop;
+    type exported_bluetooth_prop;
+    type exported_overlay_prop;
+    type fastbootd_protocol_prop;
+    type ffs_control_prop;
+    type firstboot_prop;
+    type framework_watchdog_config_prop;
+    type fstype_prop;
+    type future_pm_prop;
+    type game_manager_config_prop;
+    type gesture_prop;
+    type gsid_prop;
+    type hal_dumpstate_config_prop;
+    type heapprofd_enabled_prop;
+    type hibernation_config_prop;
+    type hibernation_prop;
+    type hidl_memory_prop;
+    type high_barometer_quality_prop;
+    type hypervisor_prop;
+    type hypervisor_pvmfw_prop;
+    type hypervisor_restricted_prop;
+    type hypervisor_virtualizationmanager_prop;
+    type incremental_prop;
+    type init_perf_lsm_hooks_prop;
+    type init_storage_prop;
+    type init_svc_debug_prop;
+    type input_device_config_prop;
+    type kcmdline_prop;
+    type keyguard_config_prop;
+    type keystore_config_prop;
+    type keystore_crash_prop;
+    type keystore_listen_prop;
+    type last_boot_reason_prop;
+    type llkd_prop;
+    type lmkd_prop;
+    type logd_auditrate_prop;
+    type logpersistd_logging_prop;
+    type lower_kptr_restrict_prop;
+    type lowpan_prop;
+    type lpdumpd_prop;
+    type media_config_prop;
+    type misctrl_prop;
+    type mm_events_config_prop;
+    type mmc_prop;
+    type mock_ota_prop;
+    type net_464xlat_fromvendor_prop;
+    type net_connectivity_prop;
+    type net_dns_prop;
+    type netd_stable_secret_prop;
+    type next_boot_prop;
+    type nnapi_ext_deny_product_prop;
+    type odsign_prop;
+    type oem_unlock_prop;
+    type ota_build_prop;
+    type overlay_prop;
+    type packagemanager_config_prop;
+    type page_size_prop;
+    type perf_drop_caches_prop;
+    type persist_sysui_builder_extras_prop;
+    type persist_sysui_ranking_update_prop;
+    type persist_vendor_debug_wifi_prop;
+    type persist_wm_debug_prop;
+    type persistent_properties_ready_prop;
+    type power_debug_prop;
+    type profcollectd_etr_prop;
+    type profcollectd_node_id_prop;
+    type provisioned_prop;
+    type qemu_hw_prop;
+    type qemu_sf_lcd_density_prop;
+    type quick_start_prop;
+    type radio_cdma_ecm_prop;
+    type rebootescrow_hal_prop;
+    type recovery_config_prop;
+    type recovery_usb_config_prop;
+    type remote_prov_prop;
+    type retaildemo_prop;
+    type safemode_prop;
+    type sendbug_config_prop;
+    type sensors_config_prop;
+    type serialno_prop;
+    type smart_idle_maint_enabled_prop;
+    type snapshotctl_prop;
+    type snapuserd_prop;
+    type storage_config_prop;
+    type surfaceflinger_display_prop;
+    type suspend_debug_prop;
+    type suspend_prop;
+    type system_adbd_prop;
+    type system_audio_config_prop;
+    type system_boot_reason_prop;
+    type system_jvmti_agent_prop;
+    type system_lmk_prop;
+    type system_service_enable_prop;
+    type system_trace_prop;
+    type system_user_mode_emulation_prop;
+    type test_boot_reason_prop;
+    type test_harness_prop;
+    type theme_prop;
+    type threadnetwork_config_prop;
+    type time_prop;
+    type timezone_metadata_prop;
+    type tombstone_config_prop;
+    type traced_enabled_prop;
+    type traced_lazy_prop;
+    type traced_oome_heap_session_count_prop;
+    type traced_perf_enabled_prop;
+    type tuner_config_prop;
+    type tuner_server_ctl_prop;
+    type uprobestats_start_with_config_prop;
+    type usb_uvc_enabled_prop;
+    type vehicle_hal_prop;
+    type vendor_AMSIPC_service_prop;
+    type vendor_adsprpc_prop;
+    type vendor_alarm_boot_prop;
+    type vendor_audio_prop;
+    type vendor_audio_ssr_prop;
+    type vendor_board_suffix_prop;
+    type vendor_boot_mode_prop;
+    type vendor_bootreceiver_prop;
+    type vendor_bservice_prop;
+    type vendor_camera_prop;
+    type vendor_cgroup_follow_prop;
+    type vendor_cnd_prop;
+    type vendor_cnd_vendor_prop;
+    type vendor_confqmaa;
+    type vendor_console_log_level_prop;
+    type vendor_core_ctl_prop;
+    type vendor_crash_cnt_prop;
+    type vendor_crash_detect_prop;
+    type vendor_ctl_netmgrd_prop;
+    type vendor_ctl_port-bridge_prop;
+    type vendor_ctl_qcrild_prop;
+    type vendor_ctl_qmuxd_prop;
+    type vendor_ctl_vendor_hbtp_prop;
+    type vendor_ctl_vendor_imsrcsservice_prop;
+    type vendor_ctl_vendor_mmid_prop;
+    type vendor_ctl_vendor_rmt_storage_prop;
+    type vendor_ctl_vendor_wigigsvc_prop;
+    type vendor_data_ko_prop;
+    type vendor_data_qmipriod_prop;
+    type vendor_data_shsusr_prop;
+    type vendor_dataadpl_prop;
+    type vendor_dataqdp_prop;
+    type vendor_dataqti_prop;
+    type vendor_dcvs_prop;
+    type vendor_disable_spu_prop;
+    type vendor_display_notch_prop;
+    type vendor_display_prop;
+    type vendor_dynamic_sensor_prop;
+    type vendor_ese_prop;
+    type vendor_ese_strongbox_prop;
+    type vendor_fst_prop;
+    type vendor_gpu_prop;
+    type vendor_hiber_prop;
+    type vendor_hvdcp_opti_prop;
+    type vendor_ims_prop;
+    type vendor_initsvc_bootanim_prop;
+    type vendor_iop_prop;
+    type vendor_ipacm-diag_prop;
+    type vendor_ipacm_prop;
+    type vendor_km_strongbox_version_prop;
+    type vendor_location_prop;
+    type vendor_lpm_prop;
+    type vendor_mdm_helper_prop;
+    type vendor_media_performance_class;
+    type vendor_mm_osal_prop;
+    type vendor_mm_parser_prop;
+    type vendor_mm_video_prop;
+    type vendor_mmi_prop;
+    type vendor_modem_diag_prop;
+    type vendor_modprobe_prop;
+    type vendor_mpctl_prop;
+    type vendor_msm_irqbalance_prop;
+    type vendor_mwqem_prop;
+    type vendor_nfc_nq_prop;
+    type vendor_pasr_prop;
+    type vendor_pcie_prop;
+    type vendor_per_mgr_state_prop;
+    type vendor_persist_camera_prop;
+    type vendor_persist_rcs_prop;
+    type vendor_persist_tcm_prop;
+    type vendor_procomp_prop;
+    type vendor_qcc_prop;
+    type vendor_qcom_wlan_prop;
+    type vendor_qdcmss_prop;
+    type vendor_qesdk_ready_prop;
+    type vendor_qms_prop;
+    type vendor_qspm_prop;
+    type vendor_qteeconnector_opti_prop;
+    type vendor_qtr_prop;
+    type vendor_qvirtmgr_prop;
+    type vendor_qvr_persist_prop;
+    type vendor_qvr_prop;
+    type vendor_qvrd_persist_prop;
+    type vendor_qvrd_prop;
+    type vendor_radio_prop;
+    type vendor_ramdump_prop;
+    type vendor_reschedule_service_prop;
+    type vendor_ril_daemon_prop;
+    type vendor_scroll_prop;
+    type vendor_sensors_prop;
+    type vendor_slm_prop;
+    type vendor_soc_id_prop;
+    type vendor_soc_model_prop;
+    type vendor_soc_name_prop;
+    type vendor_spcomlib_prop;
+    type vendor_ssr_prop;
+    type vendor_sxr_prop;
+    type vendor_sys_bugreport_cpuinfo_disable;
+    type vendor_sys_video_prop;
+    type vendor_sysboot_completed_prop;
+    type vendor_system_prop;
+    type vendor_tee_listener_prop;
+    type vendor_time_service_prop;
+    type vendor_usb_prop;
+    type vendor_video_prop;
+    type vendor_wfd_service_prop;
+    type vendor_wfd_sys_debug_prop;
+    type vendor_wfd_sys_prop;
+    type vendor_wifi_prop;
+    type vendor_wifi_version;
+    type vendor_wigig_core_prop;
+    type vendor_wigig_prop;
+    type vendor_wlc_prop;
+    type vendor_wlc_public_prop;
+    type vendor_xlat_prop;
+    type vendor_xrcb_prop;
+    type verity_status_prop;
+    type virtual_ab_prop;
+    type virtual_face_prop;
+    type virtual_fingerprint_prop;
+    type virtualizationservice_prop;
+    type vold_post_fs_data_prop;
+    type wifi_config_prop;
+    type wifi_hal_prop;
+    type wifi_prop;
+    type zram_config_prop;
+    type zram_control_prop;
     class dir { add_name create getattr open read remove_name rename reparent search setattr write ioctl };
     class file { create entrypoint execute execute_no_trans getattr ioctl link map open read setattr write };
     class lnk_file { read setattr };
-    class capability kill;
-    class fd use;
+    class capability { kill };
+    class fd { use };
     class chr_file { getattr ioctl open read write };
     class netlink_route_socket { bind create getattr nlmsg_read nlmsg_write read setopt write };
     class udp_socket { create ioctl };
-    class property_service set;
-    class sock_file write;
-    class unix_stream_socket connectto;
-    class key view;
+    class property_service { set };
+    class sock_file { write };
+    class unix_stream_socket { connectto };
+    class key { view };
     class process { sigkill getattr noatsecure rlimitinh siginh transition };
     class unix_dgram_socket { ioctl sendto };
     class binder { call transfer };
-    class system syslog_read;
+    class system { syslog_read };
     class blk_file { read write open ioctl };
     class service_manager { find };
 }
@@ -712,3 +1062,372 @@ allow vendor_hal_ais_qti unlabeled:dir { search };
 
 
 # end of qssi15
+#-avc log-
+grant_la_permissions(kernel,proc_asound)
+grant_la_permissions(kernel,vendor_proc_audiod)
+grant_la_permissions(kernel,tmpfs)
+grant_la_permissions(kernel,tradeinmode_metadata_file)
+grant_la_permissions(vendor_init,build_prop)
+grant_la_permissions(ueventd,gsi_metadata_file)
+grant_la_permissions(vendor_aidl_hal_automotive_vehicle_qti,device)
+grant_la_permissions(init,vendor_sys_qti_display_exec)
+grant_la_permissions(vendor_hal_capabilityconfigstore_qti_default,vendor_cap_configstore_dbg_prop)
+grant_la_permissions(vendor_hal_soter_qti,vfat)
+grant_la_permissions(vendor_per_mgr,sysfs)
+grant_la_permissions(vendor_qti_init_shell,unlabeled)
+grant_la_permissions(vendor_hal_gnss_qti,vendor_pd_locater_dbg_prop)
+grant_la_permissions(hal_bluetooth_default,vendor_ramdump_vendor_data_file)
+grant_la_permissions(hal_bluetooth_default,debugfs_tracing_instances)
+grant_la_permissions(system_app,default_android_service)
+grant_la_permissions(flags_health_check,adbd_tradeinmode_prop)
+grant_la_permissions(flags_health_check,ctl_prefetch_prop)
+grant_la_permissions(flags_health_check,ctl_uprobestats_prop)
+grant_la_permissions(flags_health_check,mmd_prop)
+grant_la_permissions(flags_health_check,pm_16kb_app_compat_prop)
+grant_la_permissions(flags_health_check,prefetch_boot_prop)
+grant_la_permissions(flags_health_check,prefetch_service_prop)
+grant_la_permissions(flags_health_check,remote_prov_cert_prop)
+grant_la_permissions(flags_health_check,trusty_security_vm_sys_prop)
+grant_la_permissions(flags_health_check,trusty_security_vm_sys_vendor_prop)
+grant_la_permissions(toolbox,aac_drc_prop)
+grant_la_permissions(toolbox,ab_update_gki_prop)
+grant_la_permissions(toolbox,adaptive_haptics_prop)
+grant_la_permissions(toolbox,adbd_config_prop)
+grant_la_permissions(toolbox,adbd_prop)
+grant_la_permissions(toolbox,apexd_config_prop)
+grant_la_permissions(toolbox,apexd_payload_metadata_prop)
+grant_la_permissions(toolbox,apexd_prop)
+grant_la_permissions(toolbox,apk_verity_prop)
+grant_la_permissions(toolbox,audio_config_prop)
+grant_la_permissions(toolbox,avf_virtualizationservice_prop)
+grant_la_permissions(toolbox,bluetooth_a2dp_offload_prop)
+grant_la_permissions(toolbox,bluetooth_audio_hal_prop)
+grant_la_permissions(toolbox,bluetooth_finder_prop)
+grant_la_permissions(toolbox,bluetooth_prop)
+grant_la_permissions(toolbox,bootanim_config_prop)
+grant_la_permissions(toolbox,bootanim_system_prop)
+grant_la_permissions(toolbox,bootloader_boot_reason_prop)
+grant_la_permissions(toolbox,boottime_prop)
+grant_la_permissions(toolbox,boottime_public_prop)
+grant_la_permissions(toolbox,bpf_progs_loaded_prop)
+grant_la_permissions(toolbox,build_attestation_prop)
+grant_la_permissions(toolbox,build_bootimage_prop)
+grant_la_permissions(toolbox,build_config_prop)
+grant_la_permissions(toolbox,camera2_extensions_prop)
+grant_la_permissions(toolbox,camera_calibration_prop)
+grant_la_permissions(toolbox,camerax_extensions_prop)
+grant_la_permissions(toolbox,car_boot_prop)
+grant_la_permissions(toolbox,carwatchdog_config_prop)
+grant_la_permissions(toolbox,charger_config_prop)
+grant_la_permissions(toolbox,charger_prop)
+grant_la_permissions(toolbox,charger_status_prop)
+grant_la_permissions(toolbox,codec2_config_prop)
+grant_la_permissions(toolbox,cold_boot_done_prop)
+grant_la_permissions(toolbox,composd_vm_art_prop)
+grant_la_permissions(toolbox,composd_vm_vendor_prop)
+grant_la_permissions(toolbox,cpu_variant_prop)
+grant_la_permissions(toolbox,crashrecovery_prop)
+grant_la_permissions(toolbox,ctl_adbd_prop)
+grant_la_permissions(toolbox,ctl_apex_load_prop)
+grant_la_permissions(toolbox,ctl_apexd_prop)
+grant_la_permissions(toolbox,ctl_artd_pre_reboot_prop)
+grant_la_permissions(toolbox,ctl_bootanim_prop)
+grant_la_permissions(toolbox,ctl_bugreport_prop)
+grant_la_permissions(toolbox,ctl_console_prop)
+grant_la_permissions(toolbox,ctl_default_prop)
+grant_la_permissions(toolbox,ctl_dpmd_prop)
+grant_la_permissions(toolbox,ctl_dumpstate_prop)
+grant_la_permissions(toolbox,ctl_fuse_prop)
+grant_la_permissions(toolbox,ctl_gsid_prop)
+grant_la_permissions(toolbox,ctl_interface_restart_prop)
+grant_la_permissions(toolbox,ctl_interface_start_prop)
+grant_la_permissions(toolbox,ctl_interface_stop_prop)
+grant_la_permissions(toolbox,ctl_mdnsd_prop)
+grant_la_permissions(toolbox,ctl_mediatranscoding_prop)
+grant_la_permissions(toolbox,ctl_odsign_prop)
+grant_la_permissions(toolbox,ctl_restart_prop)
+grant_la_permissions(toolbox,ctl_rildaemon_prop)
+grant_la_permissions(toolbox,ctl_sigstop_prop)
+grant_la_permissions(toolbox,ctl_snapuserd_prop)
+grant_la_permissions(toolbox,ctl_start_prop)
+grant_la_permissions(toolbox,ctl_stop_prop)
+grant_la_permissions(toolbox,ctl_tcmd_prop)
+grant_la_permissions(toolbox,dck_prop)
+grant_la_permissions(toolbox,debug_tracing_desktop_mode_visible_tasks_prop)
+grant_la_permissions(toolbox,debugfs_restriction_prop)
+grant_la_permissions(toolbox,device_config_activity_manager_native_boot_prop)
+grant_la_permissions(toolbox,device_config_boot_count_prop)
+grant_la_permissions(toolbox,device_config_camera_native_prop)
+grant_la_permissions(toolbox,device_config_configuration_prop)
+grant_la_permissions(toolbox,device_config_connectivity_prop)
+grant_la_permissions(toolbox,device_config_core_experiments_team_internal_prop)
+grant_la_permissions(toolbox,device_config_edgetpu_native_prop)
+grant_la_permissions(toolbox,device_config_input_native_boot_prop)
+grant_la_permissions(toolbox,device_config_lmkd_native_prop)
+grant_la_permissions(toolbox,device_config_mglru_native_prop)
+grant_la_permissions(toolbox,device_config_mmd_native_prop)
+grant_la_permissions(toolbox,device_config_netd_native_prop)
+grant_la_permissions(toolbox,device_config_nnapi_native_prop)
+grant_la_permissions(toolbox,device_config_profcollect_native_boot_prop)
+grant_la_permissions(toolbox,device_config_remote_key_provisioning_native_prop)
+grant_la_permissions(toolbox,device_config_reset_performed_prop)
+grant_la_permissions(toolbox,device_config_statsd_native_boot_prop)
+grant_la_permissions(toolbox,device_config_statsd_native_prop)
+grant_la_permissions(toolbox,device_config_storage_native_boot_prop)
+grant_la_permissions(toolbox,device_config_surface_flinger_native_boot_prop)
+grant_la_permissions(toolbox,device_config_swcodec_native_prop)
+grant_la_permissions(toolbox,device_config_sys_traced_prop)
+grant_la_permissions(toolbox,device_config_tethering_u_or_later_native_prop)
+grant_la_permissions(toolbox,device_config_vendor_system_native_boot_prop)
+grant_la_permissions(toolbox,device_config_vendor_system_native_prop)
+grant_la_permissions(toolbox,device_config_virtualization_framework_native_prop)
+grant_la_permissions(toolbox,device_config_window_manager_native_boot_prop)
+grant_la_permissions(toolbox,device_logging_prop)
+grant_la_permissions(toolbox,dmesgd_start_prop)
+grant_la_permissions(toolbox,drm_forcel3_prop)
+grant_la_permissions(toolbox,drm_service_config_prop)
+grant_la_permissions(toolbox,dumpstate_options_prop)
+grant_la_permissions(toolbox,dynamic_system_prop)
+grant_la_permissions(toolbox,enable_16k_pages_prop)
+grant_la_permissions(toolbox,exported_bluetooth_prop)
+grant_la_permissions(toolbox,exported_overlay_prop)
+grant_la_permissions(toolbox,fastbootd_protocol_prop)
+grant_la_permissions(toolbox,ffs_control_prop)
+grant_la_permissions(toolbox,firstboot_prop)
+grant_la_permissions(toolbox,framework_watchdog_config_prop)
+grant_la_permissions(toolbox,fstype_prop)
+grant_la_permissions(toolbox,future_pm_prop)
+grant_la_permissions(toolbox,game_manager_config_prop)
+grant_la_permissions(toolbox,gesture_prop)
+grant_la_permissions(toolbox,gsid_prop)
+grant_la_permissions(toolbox,hal_dumpstate_config_prop)
+grant_la_permissions(toolbox,heapprofd_enabled_prop)
+grant_la_permissions(toolbox,hibernation_config_prop)
+grant_la_permissions(toolbox,hibernation_prop)
+grant_la_permissions(toolbox,hidl_memory_prop)
+grant_la_permissions(toolbox,high_barometer_quality_prop)
+grant_la_permissions(toolbox,hwservicemanager_prop)
+grant_la_permissions(toolbox,hypervisor_prop)
+grant_la_permissions(toolbox,hypervisor_pvmfw_prop)
+grant_la_permissions(toolbox,hypervisor_restricted_prop)
+grant_la_permissions(toolbox,hypervisor_virtualizationmanager_prop)
+grant_la_permissions(toolbox,incremental_prop)
+grant_la_permissions(toolbox,init_perf_lsm_hooks_prop)
+grant_la_permissions(toolbox,init_storage_prop)
+grant_la_permissions(toolbox,init_svc_debug_prop)
+grant_la_permissions(toolbox,input_device_config_prop)
+grant_la_permissions(toolbox,kcmdline_prop)
+grant_la_permissions(toolbox,keyguard_config_prop)
+grant_la_permissions(toolbox,keystore_config_prop)
+grant_la_permissions(toolbox,keystore_crash_prop)
+grant_la_permissions(toolbox,keystore_listen_prop)
+grant_la_permissions(toolbox,last_boot_reason_prop)
+grant_la_permissions(toolbox,llkd_prop)
+grant_la_permissions(toolbox,lmkd_prop)
+grant_la_permissions(toolbox,logd_auditrate_prop)
+grant_la_permissions(toolbox,logpersistd_logging_prop)
+grant_la_permissions(toolbox,lower_kptr_restrict_prop)
+grant_la_permissions(toolbox,lowpan_prop)
+grant_la_permissions(toolbox,lpdumpd_prop)
+grant_la_permissions(toolbox,media_config_prop)
+grant_la_permissions(toolbox,media_variant_prop)
+grant_la_permissions(toolbox,misctrl_prop)
+grant_la_permissions(toolbox,mm_events_config_prop)
+grant_la_permissions(toolbox,mmc_prop)
+grant_la_permissions(toolbox,mock_ota_prop)
+grant_la_permissions(toolbox,net_464xlat_fromvendor_prop)
+grant_la_permissions(toolbox,net_connectivity_prop)
+grant_la_permissions(toolbox,net_dns_prop)
+grant_la_permissions(toolbox,netd_stable_secret_prop)
+grant_la_permissions(toolbox,next_boot_prop)
+grant_la_permissions(toolbox,nnapi_ext_deny_product_prop)
+grant_la_permissions(toolbox,odsign_prop)
+grant_la_permissions(toolbox,oem_unlock_prop)
+grant_la_permissions(toolbox,ota_build_prop)
+grant_la_permissions(toolbox,overlay_prop)
+grant_la_permissions(toolbox,packagemanager_config_prop)
+grant_la_permissions(toolbox,page_size_prop)
+grant_la_permissions(toolbox,perf_drop_caches_prop)
+grant_la_permissions(toolbox,persist_sysui_builder_extras_prop)
+grant_la_permissions(toolbox,persist_sysui_ranking_update_prop)
+grant_la_permissions(toolbox,persist_vendor_debug_wifi_prop)
+grant_la_permissions(toolbox,persist_wm_debug_prop)
+grant_la_permissions(toolbox,persistent_properties_ready_prop)
+grant_la_permissions(toolbox,power_debug_prop)
+grant_la_permissions(toolbox,profcollectd_etr_prop)
+grant_la_permissions(toolbox,profcollectd_node_id_prop)
+grant_la_permissions(toolbox,provisioned_prop)
+grant_la_permissions(toolbox,qemu_hw_prop)
+grant_la_permissions(toolbox,qemu_sf_lcd_density_prop)
+grant_la_permissions(toolbox,quick_start_prop)
+grant_la_permissions(toolbox,radio_cdma_ecm_prop)
+grant_la_permissions(toolbox,rebootescrow_hal_prop)
+grant_la_permissions(toolbox,recovery_config_prop)
+grant_la_permissions(toolbox,recovery_usb_config_prop)
+grant_la_permissions(toolbox,remote_prov_prop)
+grant_la_permissions(toolbox,retaildemo_prop)
+grant_la_permissions(toolbox,safemode_prop)
+grant_la_permissions(toolbox,sendbug_config_prop)
+grant_la_permissions(toolbox,sensors_config_prop)
+grant_la_permissions(toolbox,serialno_prop)
+grant_la_permissions(toolbox,smart_idle_maint_enabled_prop)
+grant_la_permissions(toolbox,snapshotctl_prop)
+grant_la_permissions(toolbox,snapuserd_prop)
+grant_la_permissions(toolbox,storage_config_prop)
+grant_la_permissions(toolbox,surfaceflinger_display_prop)
+grant_la_permissions(toolbox,suspend_debug_prop)
+grant_la_permissions(toolbox,suspend_prop)
+grant_la_permissions(toolbox,system_adbd_prop)
+grant_la_permissions(toolbox,system_audio_config_prop)
+grant_la_permissions(toolbox,system_boot_reason_prop)
+grant_la_permissions(toolbox,system_jvmti_agent_prop)
+grant_la_permissions(toolbox,system_lmk_prop)
+grant_la_permissions(toolbox,system_service_enable_prop)
+grant_la_permissions(toolbox,system_trace_prop)
+grant_la_permissions(toolbox,system_user_mode_emulation_prop)
+grant_la_permissions(toolbox,test_boot_reason_prop)
+grant_la_permissions(toolbox,test_harness_prop)
+grant_la_permissions(toolbox,theme_prop)
+grant_la_permissions(toolbox,threadnetwork_config_prop)
+grant_la_permissions(toolbox,time_prop)
+grant_la_permissions(toolbox,timezone_metadata_prop)
+grant_la_permissions(toolbox,tombstone_config_prop)
+grant_la_permissions(toolbox,traced_enabled_prop)
+grant_la_permissions(toolbox,traced_lazy_prop)
+grant_la_permissions(toolbox,traced_oome_heap_session_count_prop)
+grant_la_permissions(toolbox,traced_perf_enabled_prop)
+grant_la_permissions(toolbox,tuner_config_prop)
+grant_la_permissions(toolbox,tuner_server_ctl_prop)
+grant_la_permissions(toolbox,uprobestats_start_with_config_prop)
+grant_la_permissions(toolbox,usb_uvc_enabled_prop)
+grant_la_permissions(toolbox,vehicle_hal_prop)
+grant_la_permissions(toolbox,vendor_AMSIPC_service_prop)
+grant_la_permissions(toolbox,vendor_adsprpc_prop)
+grant_la_permissions(toolbox,vendor_alarm_boot_prop)
+grant_la_permissions(toolbox,vendor_audio_prop)
+grant_la_permissions(toolbox,vendor_audio_ssr_prop)
+grant_la_permissions(toolbox,vendor_bluetooth_prop)
+grant_la_permissions(toolbox,vendor_board_suffix_prop)
+grant_la_permissions(toolbox,vendor_boot_mode_prop)
+grant_la_permissions(toolbox,vendor_bootreceiver_prop)
+grant_la_permissions(toolbox,vendor_bservice_prop)
+grant_la_permissions(toolbox,vendor_camera_prop)
+grant_la_permissions(toolbox,vendor_cgroup_follow_prop)
+grant_la_permissions(toolbox,vendor_cnd_prop)
+grant_la_permissions(toolbox,vendor_cnd_vendor_prop)
+grant_la_permissions(toolbox,vendor_confqmaa)
+grant_la_permissions(toolbox,vendor_console_log_level_prop)
+grant_la_permissions(toolbox,vendor_core_ctl_prop)
+grant_la_permissions(toolbox,vendor_crash_cnt_prop)
+grant_la_permissions(toolbox,vendor_crash_detect_prop)
+grant_la_permissions(toolbox,vendor_ctl_netmgrd_prop)
+grant_la_permissions(toolbox,vendor_ctl_port-bridge_prop)
+grant_la_permissions(toolbox,vendor_ctl_qcrild_prop)
+grant_la_permissions(toolbox,vendor_ctl_qmuxd_prop)
+grant_la_permissions(toolbox,vendor_ctl_vendor_hbtp_prop)
+grant_la_permissions(toolbox,vendor_ctl_vendor_imsrcsservice_prop)
+grant_la_permissions(toolbox,vendor_ctl_vendor_mmid_prop)
+grant_la_permissions(toolbox,vendor_ctl_vendor_rmt_storage_prop)
+grant_la_permissions(toolbox,vendor_ctl_vendor_wigigsvc_prop)
+grant_la_permissions(toolbox,vendor_data_ko_prop)
+grant_la_permissions(toolbox,vendor_data_qmipriod_prop)
+grant_la_permissions(toolbox,vendor_data_shsusr_prop)
+grant_la_permissions(toolbox,vendor_dataadpl_prop)
+grant_la_permissions(toolbox,vendor_dataqdp_prop)
+grant_la_permissions(toolbox,vendor_dataqti_prop)
+grant_la_permissions(toolbox,vendor_dcvs_prop)
+grant_la_permissions(toolbox,vendor_default_prop)
+grant_la_permissions(toolbox,vendor_disable_spu_prop)
+grant_la_permissions(toolbox,vendor_display_notch_prop)
+grant_la_permissions(toolbox,vendor_display_prop)
+grant_la_permissions(toolbox,vendor_dynamic_sensor_prop)
+grant_la_permissions(toolbox,vendor_ese_prop)
+grant_la_permissions(toolbox,vendor_ese_strongbox_prop)
+grant_la_permissions(toolbox,vendor_fst_prop)
+grant_la_permissions(toolbox,vendor_gpu_prop)
+grant_la_permissions(toolbox,vendor_hiber_prop)
+grant_la_permissions(toolbox,vendor_hvdcp_opti_prop)
+grant_la_permissions(toolbox,vendor_ims_prop)
+grant_la_permissions(toolbox,vendor_initsvc_bootanim_prop)
+grant_la_permissions(toolbox,vendor_iop_prop)
+grant_la_permissions(toolbox,vendor_ipacm-diag_prop)
+grant_la_permissions(toolbox,vendor_ipacm_prop)
+grant_la_permissions(toolbox,vendor_km_strongbox_version_prop)
+grant_la_permissions(toolbox,vendor_location_prop)
+grant_la_permissions(toolbox,vendor_lpm_prop)
+grant_la_permissions(toolbox,vendor_mdm_helper_prop)
+grant_la_permissions(toolbox,vendor_media_performance_class)
+grant_la_permissions(toolbox,vendor_mm_osal_prop)
+grant_la_permissions(toolbox,vendor_mm_parser_prop)
+grant_la_permissions(toolbox,vendor_mm_video_prop)
+grant_la_permissions(toolbox,vendor_mmi_prop)
+grant_la_permissions(toolbox,vendor_modem_diag_prop)
+grant_la_permissions(toolbox,vendor_modprobe_prop)
+grant_la_permissions(toolbox,vendor_mpctl_prop)
+grant_la_permissions(toolbox,vendor_msm_irqbalance_prop)
+grant_la_permissions(toolbox,vendor_mwqem_prop)
+grant_la_permissions(toolbox,vendor_nfc_nq_prop)
+grant_la_permissions(toolbox,vendor_pasr_prop)
+grant_la_permissions(toolbox,vendor_pcie_prop)
+grant_la_permissions(toolbox,vendor_per_mgr_state_prop)
+grant_la_permissions(toolbox,vendor_persist_camera_prop)
+grant_la_permissions(toolbox,vendor_persist_rcs_prop)
+grant_la_permissions(toolbox,vendor_persist_tcm_prop)
+grant_la_permissions(toolbox,vendor_procomp_prop)
+grant_la_permissions(toolbox,vendor_qcc_prop)
+grant_la_permissions(toolbox,vendor_qcom_wlan_prop)
+grant_la_permissions(toolbox,vendor_qdcmss_prop)
+grant_la_permissions(toolbox,vendor_qesdk_ready_prop)
+grant_la_permissions(toolbox,vendor_qms_prop)
+grant_la_permissions(toolbox,vendor_qspm_prop)
+grant_la_permissions(toolbox,vendor_qteeconnector_opti_prop)
+grant_la_permissions(toolbox,vendor_qtr_prop)
+grant_la_permissions(toolbox,vendor_qvirtmgr_prop)
+grant_la_permissions(toolbox,vendor_qvr_persist_prop)
+grant_la_permissions(toolbox,vendor_qvr_prop)
+grant_la_permissions(toolbox,vendor_qvrd_persist_prop)
+grant_la_permissions(toolbox,vendor_qvrd_prop)
+grant_la_permissions(toolbox,vendor_radio_prop)
+grant_la_permissions(toolbox,vendor_ramdump_prop)
+grant_la_permissions(toolbox,vendor_reschedule_service_prop)
+grant_la_permissions(toolbox,vendor_ril_daemon_prop)
+grant_la_permissions(toolbox,vendor_scroll_prop)
+grant_la_permissions(toolbox,vendor_sensors_prop)
+grant_la_permissions(toolbox,vendor_slm_prop)
+grant_la_permissions(toolbox,vendor_soc_id_prop)
+grant_la_permissions(toolbox,vendor_soc_model_prop)
+grant_la_permissions(toolbox,vendor_soc_name_prop)
+grant_la_permissions(toolbox,vendor_spcomlib_prop)
+grant_la_permissions(toolbox,vendor_ssr_prop)
+grant_la_permissions(toolbox,vendor_sxr_prop)
+grant_la_permissions(toolbox,vendor_sys_bugreport_cpuinfo_disable)
+grant_la_permissions(toolbox,vendor_sys_video_prop)
+grant_la_permissions(toolbox,vendor_sysboot_completed_prop)
+grant_la_permissions(toolbox,vendor_system_prop)
+grant_la_permissions(toolbox,vendor_tee_listener_prop)
+grant_la_permissions(toolbox,vendor_time_service_prop)
+grant_la_permissions(toolbox,vendor_usb_prop)
+grant_la_permissions(toolbox,vendor_video_prop)
+grant_la_permissions(toolbox,vendor_wfd_service_prop)
+grant_la_permissions(toolbox,vendor_wfd_sys_debug_prop)
+grant_la_permissions(toolbox,vendor_wfd_sys_prop)
+grant_la_permissions(toolbox,vendor_wifi_prop)
+grant_la_permissions(toolbox,vendor_wifi_version)
+grant_la_permissions(toolbox,vendor_wigig_core_prop)
+grant_la_permissions(toolbox,vendor_wigig_prop)
+grant_la_permissions(toolbox,vendor_wlc_prop)
+grant_la_permissions(toolbox,vendor_wlc_public_prop)
+grant_la_permissions(toolbox,vendor_xlat_prop)
+grant_la_permissions(toolbox,vendor_xrcb_prop)
+grant_la_permissions(toolbox,verity_status_prop)
+grant_la_permissions(toolbox,virtual_ab_prop)
+grant_la_permissions(toolbox,virtual_face_prop)
+grant_la_permissions(toolbox,virtual_fingerprint_prop)
+grant_la_permissions(toolbox,virtualizationservice_prop)
+grant_la_permissions(toolbox,vold_post_fs_data_prop)
+grant_la_permissions(toolbox,wifi_config_prop)
+grant_la_permissions(toolbox,wifi_hal_prop)
+grant_la_permissions(toolbox,wifi_prop)
+grant_la_permissions(toolbox,zram_config_prop)
+grant_la_permissions(toolbox,zram_control_prop)
+grant_la_permissions(init,logcat_exec)
