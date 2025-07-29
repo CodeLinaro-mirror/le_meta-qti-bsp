@@ -15,7 +15,7 @@ S = "${WORKDIR}/vendor/qcom/opensource/safelinux-dbg-modules"
 TECHPACK_MODULES = "minidump/minidump.ko \
                     kaslr_store/kaslr_store.ko \
                     memory_dump_v2/memory_dump_v2.ko \
-                    xbl_log/dump_boot_log.ko \
+                    nhlos_log/dump_boot_log.ko \
 "
 inherit qti-techpack systemd
 EXTRA_OEMAKE += "KDIR=${STAGING_KERNEL_DIR}"
