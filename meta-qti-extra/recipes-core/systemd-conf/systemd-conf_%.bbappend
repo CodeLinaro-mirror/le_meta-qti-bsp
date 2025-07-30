@@ -8,7 +8,7 @@ do_install:append() {
     install -m 0644 ${WORKDIR}/90-powerkey-conf.conf ${D}${systemd_unitdir}/logind.conf.d
 
     if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'false', 'true', d)}; then
-        echo -e "HandlePowerKey=ignore\nHandleSuspendKey=ignore" > ${D}${systemd_unitdir}/logind.conf.d/90-powerkey-conf.conf
+        echo -e "[Login]\nHandlePowerKey=ignore\nHandleSuspendKey=ignore" > ${D}${systemd_unitdir}/logind.conf.d/90-powerkey-conf.conf
     fi
 
     #Override default setting and add RuntimeWatchdogSec & RebootWatchdogSec support for ark/qclinux kernel
