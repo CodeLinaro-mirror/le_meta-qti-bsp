@@ -48,5 +48,14 @@ ROOTFS_POSTPROCESS_COMMAND:append = " remove_data_bind;"
 # Makes image suitable for development (e.g. enable ssh for login, allows root logins and logins without passwords by ssh)
 IMAGE_FEATURES:append = " ${@bb.utils.contains('VARIANT', 'debug', 'debug-tweaks ssh-server-openssh', '', d)}"
 
-INCOMPATIBLE_LICENSE_EXCEPTIONS = "bash:GPL-3.0-or-later"
 INCOMPATIBLE_LICENSE = "GPL-3.0* LGPL-3.0* AGPL-3.0*"
+INCOMPATIBLE_LICENSE_EXCEPTIONS = "\
+    bash:GPL-3.0-or-later \
+    coreutils:GPL-3.0-or-later \
+    coreutils-stdbuf:GPL-3.0-or-later \
+    findutils:GPL-3.0-or-later \
+    binutils:GPL-3.0-only \
+    libbfd:GPL-3.0-only \
+    libopcodes:GPL-3.0-only \
+    grep:GPL-3.0-only \
+"
