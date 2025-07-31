@@ -22,13 +22,6 @@ PERSIST_IMAGE_ROOTFS_SIZE ?= "128M"
 VIRTUAL-RUNTIME_dev_manager = "udev"
 VIRTUAL-RUNTIME_init_manager = "systemd"
 
-INCOMPATIBLE_LICENSE = "GPL-3.0-only LGPL-3.0-only AGPL-3.0-only"
-
-INCOMPATIBLE_LICENSE:quin-gvm-gen4 = " "
-INCOMPATIBLE_LICENSE:quin-tgvm-gen4 = " "
-INCOMPATIBLE_LICENSE:sa8797 = " "
-INCOMPATIBLE_LICENSE:quin-gvm-lemans = " "
-
 IMAGE_FEATURES:append = " read-only-rootfs"
 
 LICENSE_FLAGS_ACCEPTED += "commercial_gstreamer1.0-libav commercial_gstreamer1.0-omx"
