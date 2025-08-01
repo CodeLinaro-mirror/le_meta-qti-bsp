@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 
 COMPATIBLE_MACHINE = "ar-sg1"
 
-FILESEXTRAPATHS:prepend := "${WORKSPACE}/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/:"
+FILESEXTRAPATHS:prepend := "${WORKSPACE}/kernel-6.1/kernel_platform/:"
 
 SRC_URI = "file://msm-kernel"
 
@@ -16,12 +16,9 @@ PR = "r0"
 DEPENDS += "virtual/kernel-toolchain-native rsync-native"
 DEPENDS:append:aarch64 = " libgcc"
 
-LDFLAGS:aarch64 = "-O1 --as-needed"
-#TARGET_CXXFLAGS += "-Wno-format"
 KERNEL_CC = "${STAGING_BINDIR_NATIVE}/clang/bin/clang -target ${TARGET_ARCH}${TARGET_VENDOR}-${TARGET_OS}"
+KERNEL_LD = "${STAGING_BINDIR_NATIVE}/clang/bin/ld.lld"
 
-BUILD_CFLAGS:remove = "-Og -g"
-BUILD_CXXFLAGS:remove = "-Og -g"
 #Add DTC_FLAGS to compile DTB with symbols.
 KERNEL_DTC_FLAGS += "-@"
 
@@ -58,7 +55,7 @@ do_configure:prepend() {
         -config ${STAGING_KERNEL_DIR}/certs/qcom_x509.genkey -outform PEM -out ${B}/certs/signing_key.pem \
         -keyout ${B}/certs/signing_key.pem
 
-    if "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains('MACHINE_FEATURES', 'dm-verity-initramfs-v2', 'true', 'false', d), 'false', d)}"; then
+    if ${@bb.utils.contains('MACHINE_FEATURES', 'dm-verity-none', 'false', 'true', d)} ; then
         # generate verity root hash signing keys
         openssl req -new -nodes -utf8 -newkey rsa:4096 -days 36500 -batch \
             -x509 -config ${STAGING_KERNEL_DIR}/certs/qcom_x509.genkey -outform PEM -out ${B}/certs/verity_cert.pem \
@@ -89,13 +86,12 @@ do_install:append() {
     # Copy the modules to the staging directory
     for mod in $(find . -name '*.ko'); do
         if [ -f $mod ]; then
-            ${STRIP} --strip-unneeded $mod
             install -m 0644 $mod ${STAGING_KERNEL_BUILDDIR}/lib/modules/${KERNEL_VERSION}
         fi
     done
     rm -rf ${D}/lib/modules/${KERNEL_VERSION}/kernel/
 
-    if "${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains('MACHINE_FEATURES', 'dm-verity-initramfs-v2', 'true', 'false', d), 'false', d)}"; then
+    if ${@bb.utils.contains('MACHINE_FEATURES', 'dm-verity-none', 'false', 'true', d)} ; then
 
         install -d ${STAGING_KERNEL_BUILDDIR}/kernel-certs
         install -m 0644 ${B}/certs/signing_key.pem ${STAGING_KERNEL_BUILDDIR}/kernel-certs/
