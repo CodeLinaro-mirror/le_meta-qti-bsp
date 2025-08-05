@@ -10,7 +10,7 @@ SECTION = "base/shell"
 
 inherit useradd pkgconfig autotools perlnative update-rc.d update-alternatives qemu systemd ptest gettext bash-completion
 
-SOURCE_SYSTEMD_PATCHES = "https://source.codeaurora.org/quic/ype/external/yoctoproject.org/poky/plain/meta/recipes-core/systemd/systemd/"
+SOURCE_SYSTEMD_PATCHES = "https://git.codelinaro.org/clo/ype/external/yoctoproject.org/poky/-/raw/773e56f0e55760bea9cb79390441145f7953d1a7/meta/recipes-core/systemd/systemd/"
 
 SRC_URI += " \
            ${SOURCE_SYSTEMD_PATCHES}/touchscreen.rules?h=yocto/pyro;downloadfilename=touchscreen.rules;md5sum=c4f9091e52415d87947975b6b659fac7 \

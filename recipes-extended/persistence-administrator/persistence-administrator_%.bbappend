@@ -1,3 +1,4 @@
 SRC_URI = " \
-    ${CAF_GIT}/genivi/persistence/persistence-administrator;protocol=git;branch=genivi/persistence-administrator/master \
+    ${CLO_LE_GIT}/genivi/persistence/persistence-administrator;protocol=${CLO_PROTOCOL};nobranch=1;name=pa \
     "
+SRCREV_pa = "47e5a424c8ef6e33565737f20d3bd81f69c8efc9"

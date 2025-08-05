@@ -15,7 +15,7 @@ DEPENDS += "python-protobuf-native"
 SRCREV = "cc74b9f200176edc5524aa00ba45fa90a5e87d27"
 PV = "0.3.8_git_${SRCREV}"
 
-SRC_URI = "git://source.codeaurora.org/quic/le/nanopb.git;protocol=https;branch=nanopb/master"
+SRC_URI = "${CLO_LE_GIT}/nanopb.git;protocol=${CLO_PROTOCOL};nobranch=1"
 SRC_URI += "file://0001-bitbake-using-cmake.patch"
 
 S = "${WORKDIR}/git"
