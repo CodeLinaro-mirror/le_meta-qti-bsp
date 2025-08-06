@@ -1,0 +1,27 @@
+From c27f84dd47c978113121310e4dc477b52a7f1a9e Mon Sep 17 00:00:00 2001
+From: ziqic <ziqic@qti.qualcomm.com>
+Date: Thu, 17 Jul 2025 12:41:42 +0800
+Subject: [PATCH] udev:make symlink related rules be triggered earlier
+
+qcrosvm.service depends on 60-persistent-storage.rules.
+To optimize bootkpi, make this rule be loaded earlier.
+
+Signed-off-by: ziqic <ziqic@qti.qualcomm.com>
+---
+ units/systemd-udev-trigger.service | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/units/systemd-udev-trigger.service b/units/systemd-udev-trigger.service
+index 3d0f7b4f20..42b43041ce 100644
+--- a/units/systemd-udev-trigger.service
++++ b/units/systemd-udev-trigger.service
+@@ -19,5 +19,6 @@ ConditionPathIsReadWrite=/sys
+ [Service]
+ Type=oneshot
+ RemainAfterExit=yes
++ExecStart=-udevadm trigger -w --subsystem-match=block --type=devices --action=add
+ ExecStart=-udevadm trigger --type=subsystems --action=add
+ ExecStart=-udevadm trigger --type=devices --action=add
+-- 
+2.34.1
+
