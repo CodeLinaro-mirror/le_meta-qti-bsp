@@ -131,4 +131,5 @@ EARLY_RAMDISK_KERNEL_MODULES = "\
     kernel-module-kryo-arm64-edac-${KERNEL_VERSION} \
     kernel-module-socinfo-${KERNEL_VERSION} \
     kernel-module-ipcc-shmem-test-module-${KERNEL_VERSION} \
+    kernel-module-qcom-l3-cache-config-${KERNEL_VERSION} \
 "
