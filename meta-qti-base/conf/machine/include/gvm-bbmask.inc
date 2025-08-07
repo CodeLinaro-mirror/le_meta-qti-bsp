@@ -158,9 +158,9 @@ BBMASK:quin-gvm-gen4-5 += "meta-qti-bsp/meta-qti-extra/recipes-test/virtio-i2c-t
 BBMASK:quin-gvm-gen4-5 += "meta-qti-bsp/meta-qti-extra/recipes-test/virt-reg-ut/virt-reg-ut.bb"
 BBMASK:quin-gvm-gen4-5 += "meta-qti-bsp/meta-qti-extra/recipes-test/virt-spmi-ut/virt-spmi-ut.bb"
 BBMASK:quin-gvm-gen4-5 += "meta-qti-bsp/meta-qti-base/recipes-multimedia/virtio-video/virtio-video-header_git.bb"
-BBMASK:quin-gvm-lemans += "meta-qti-bsp/meta-qti-base/recipes-wlan"
-BBMASK:quin-gvm-lemans += "meta-qti-base/recipes-connectivity/bt-dlkm/bt-dlkm_git.bb"
-BBMASK:quin-gvm-lemans += "meta-qti-base/recipes-connectivity/synergy-opensource"
+BBMASK:quin-gvm-gen4-5 += "meta-qti-bsp/meta-qti-base/recipes-wlan"
+BBMASK:quin-gvm-gen4-5 += "meta-qti-base/recipes-connectivity/bt-dlkm/bt-dlkm_git.bb"
+BBMASK:quin-gvm-gen4-5 += "meta-qti-base/recipes-connectivity/synergy-opensource"
 BBMASK:quin-gvm-gen4-5 += "meta-qti-bsp/meta-qti-base/recipes-kernel/linux-msm/linux-msm_6.1.bb"
 
 # BBMASK drops some recipe that checksum file not found in this target
