@@ -1,6 +1,8 @@
 SUMMARY = "QTI package group for security"
 DESCRIPTION = "This is the minimal set of packages required for linux userspace security utilities."
 
+PACKAGE_ARCH = "${MACHINE_ARCH}"
+
 inherit packagegroup
 
 PACKAGES = "\
