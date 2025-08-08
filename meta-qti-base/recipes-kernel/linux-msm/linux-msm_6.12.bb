@@ -8,13 +8,17 @@ inherit kernel
 COMPATIBLE_MACHINE = "quin-gvm-lemans|quin-gvm-monaco|quin-gvm-gen4-5"
 
 FILESPATH =+ "${SRC_DIR_ROOT}/kernel:"
-SRC_URI = "file://kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/common"
-S = "${WORKDIR}/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/common"
 
 DEPENDS += "python3-native bison-native"
 DEPENDS += "elfutils-native kern-tools-native mkbootimg-native mkdtimg-native openssl-native pahole-native rsync-native signing-keys"
 
-BZ_PREBUILT_ROOT="${SRC_DIR_ROOT}/kernel/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform"
+SRC_URI = "file://kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/common"
+
+S = "${WORKDIR}/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/common"
+
+KERNEL_BUILD_VARIANT = "${@bb.utils.contains_any('VARIANT', 'perf user', '', 'debug-', d)}"
+KERNEL_OUT_VARIANT = "${@bb.utils.contains_any('VARIANT', 'perf user', '', 'debug_', d)}"
+BZ_PREBUILT_ROOT = "${SRC_DIR_ROOT}/kernel/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform"
 
 do_compile[noexec] = "1"
 do_kernel_link_images[noexec] = "1"
@@ -23,7 +27,7 @@ do_compile_kernelmodules[noexec] = "1"
 do_configure () {
     cp -fpPR ${BZ_PREBUILT_ROOT}/bazel-cache/*/sandbox/sandbox_stash/ModulesPrepare/*/execroot/_main/out/common/. ${B}
 
-    cp ${BZ_PREBUILT_ROOT}/bazel-cache/*/sandbox/sandbox_stash/KernelBuild/*/execroot/_main/bazel-out/k8-fastbuild/bin/soc-repo/autogvm_debug-defconfig_dtb_build_kbuild_mixed_tree/* ${B}
+    cp ${BZ_PREBUILT_ROOT}/bazel-cache/*/sandbox/sandbox_stash/KernelBuild/*/execroot/_main/bazel-out/k8-fastbuild/bin/soc-repo/autogvm_${KERNEL_BUILD_VARIANT}defconfig_dtb_build_kbuild_mixed_tree/* ${B}
 
     install -d ${B}/arch/${ARCH}/boot/
     mv ${B}/Image ${B}/arch/${ARCH}/boot/
@@ -67,7 +71,7 @@ do_install() {
     install -d ${D}${sysconfdir}/modprobe.d
 
     install -d ${D}/${libdir}/modules/${KERNEL_VERSION}
-    install ${BZ_PREBUILT_ROOT}/out/msm-kernel-autogvm-debug_defconfig/dist/*.ko ${D}/${libdir}/modules/${KERNEL_VERSION}
+    install ${BZ_PREBUILT_ROOT}/out/msm-kernel-autogvm-${KERNEL_OUT_VARIANT}defconfig/dist/*.ko ${D}/${libdir}/modules/${KERNEL_VERSION}
 
     find ${D} -name '*' -exec chown -h root:root {} \;
 }
@@ -83,7 +87,7 @@ do_deploy () {
     install -m 0644 System.map ${DEPLOYDIR}
 
     mkdir -p ${DEPLOYDIR}/dtbs
-    cat ${BZ_PREBUILT_ROOT}/out/msm-kernel-autogvm-debug_defconfig/dist/*.dtb >  ${DEPLOYDIR}/dtbs/dtb.img
+    cat ${BZ_PREBUILT_ROOT}/out/msm-kernel-autogvm-${KERNEL_OUT_VARIANT}defconfig/dist/*.dtb >  ${DEPLOYDIR}/dtbs/dtb.img
 }
 
 PACKAGES:remove = "${KERNEL_PACKAGE_NAME}-devicetree"
