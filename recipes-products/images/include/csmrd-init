@@ -472,6 +472,8 @@ do_nbdtab()
     nbdclient nbd3 $portno # connect remote userdata.img
     nbdclient nbd4 $portno # connect remote cache.img
     nbdclient nbd5 $portno # connect NON-HLOS
+    echo "Connected nbd0, nbd1, nbd2, nbd3, nbd4, nbd5 "
+
     if [ $config_portno != "0" ]; then
         nbdclient nbd6 $config_portno # connect Modem config files
     fi
@@ -489,11 +491,23 @@ do_nbdtab()
     mount -o rw /dev/nbd0 $mnt_dir
     #umount /sys/kernel/debug /sys /proc /dev
 
+    ls -l /dev/ | grep nbd
     if [ $config_portno != "0" ]; then
         # mount hostmgr config readonly
         mnt_hostmgr_dir="/mnt/system/etc/csm/x100"
         mkdir -p $mnt_hostmgr_dir
+	st=$?
+        echo "mkdir status: $st"
+        if [ $st -eq 0 ]; then
+        while [ ! -d "$mnt_hostmgr_dir" ] || [ ! -b "/dev/nbd6p1" ]; do
+            sleep 1
+            echo "sleeping until dir and /dev/nbd6p1 available. "
+        done
+        fi
         mount /dev/nbd6p1 $mnt_hostmgr_dir
+        st=$?
+        echo "nbd6 mount status $st"
+        mount | grep nbd6
     fi
 
     # update systemd mount files to mount it from nbd devices
