@@ -32,7 +32,7 @@ python __anonymous() {
     if "native" in recipe_name or "linux" in recipe_name or "packagegroup" in recipe_name or "kernel" in recipe_name:
         return
 
-    if recipe_name in ['synergy', 'system-core-adbd', 'libuhab', 'wayland-ivi-extension', 'btcli', 'qcrosvm', 'audio-chime']:
+    if recipe_name in ['a2b-app', 'synergy', 'system-core-adbd', 'libuhab', 'wayland-ivi-extension', 'btcli', 'qcrosvm', 'audio-chime']:
         return
 
     #tmp for hgy
