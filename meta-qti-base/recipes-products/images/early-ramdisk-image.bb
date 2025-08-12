@@ -22,6 +22,7 @@ IMAGE_INSTALL = "\
     early-ramdisk-init libgcc kmod util-linux-libblkid \
     ${EARLY_RAMDISK_KERNEL_MODULES} \
 "
+do_rootfs[depends] += "virtual/kernel:do_shared_workdir"
 
 python do_rootfs:prepend() {
     import re
