@@ -51,10 +51,12 @@ do_install:append:sa8775() {
     fi
 }
 
-do_install:append:sa8775() {
-    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'true', 'false', d)}; then
-        install -m 0755 ${WORKDIR}/vfio_param.conf -D ${D}${sysconfdir}/modprobe.d/vfio.conf
-    fi
+do_install:append:sa8255-ivi() {
+    install -m 0644 ${S}/conf/${TARGET_PATH_NAME}/07-gvm.conf.in -D ${D}/etc/modules-load.f/07-gvm.conf
+}
+
+do_install:append:sa8775-flex() {
+    install -m 0644 ${S}/conf/${TARGET_PATH_NAME}/07-gvm.conf.in -D ${D}/etc/modules-load.f/07-gvm.conf
 }
 
 FILES:${PN} += "\

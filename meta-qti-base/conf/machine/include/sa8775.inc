@@ -115,6 +115,7 @@ EARLY_RAMDISK_KERNEL_MODULES = "\
     kernel-module-kiumd-${KERNEL_VERSION} \
     kernel-module-iommu-iova-map-${KERNEL_VERSION} \
     kernel-module-scm-user-intf-${KERNEL_VERSION} \
+    kernel-module-scm-user-intf-sec-${KERNEL_VERSION} \
     kernel-module-vfio-platform-base-${KERNEL_VERSION} \
     kernel-module-vfio-platform-${KERNEL_VERSION} \
     kernel-module-kiumd-kgsl-${KERNEL_VERSION} \
@@ -130,6 +131,14 @@ EARLY_RAMDISK_KERNEL_MODULES = "\
     kernel-module-mhi-ep-net-${KERNEL_VERSION} \
     kernel-module-kryo-arm64-edac-${KERNEL_VERSION} \
     kernel-module-socinfo-${KERNEL_VERSION} \
+    kernel-module-msm-hab-${KERNEL_VERSION} \
+    kernel-module-hyp-udmabuf-${KERNEL_VERSION} \
+    kernel-module-mdt-loader-${KERNEL_VERSION} \
+    kernel-module-gh-msgq-${KERNEL_VERSION} \
+    kernel-module-gh-arm-drv-${KERNEL_VERSION} \
+    kernel-module-gh-rm-drv-${KERNEL_VERSION} \
+    kernel-module-gunyah-${KERNEL_VERSION} \
+    kernel-module-hvc-gunyah-${KERNEL_VERSION} \
     kernel-module-ipcc-shmem-test-module-${KERNEL_VERSION} \
     kernel-module-qcom-l3-cache-config-${KERNEL_VERSION} \
 "
