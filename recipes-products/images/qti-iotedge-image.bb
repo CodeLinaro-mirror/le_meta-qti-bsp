@@ -12,12 +12,12 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         alsa-utils \
         packagegroup-android-utils \
         packagegroup-filesystem-utils \
+        packagegroup-qcom-display \
         packagegroup-qti-audio \
         packagegroup-qti-bluetooth \
         packagegroup-qti-camera \
         packagegroup-qti-core \
         packagegroup-qti-data \
-        packagegroup-qti-display \
         packagegroup-qti-dsp \
         packagegroup-qti-fastcv \
         packagegroup-qti-gst \
