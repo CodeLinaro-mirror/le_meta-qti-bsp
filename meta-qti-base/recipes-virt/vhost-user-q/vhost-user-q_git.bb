@@ -53,6 +53,7 @@ DEPENDS += "virtual/kernel-headers"
 DEPENDS += "vmm-lib"
 DEPENDS += "${@bb.utils.contains("MACHINE_FEATURES", "qti-umd", "msmhab", "", d)}"
 DEPENDS += "glib-2.0"
+DEPENDS += "systemd"
 
 SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/vhost-user/.git;protocol=${PROTO};destsuffix=vhost-user-q;usehead=1"
 SRCREV = "${AUTOREV}"
