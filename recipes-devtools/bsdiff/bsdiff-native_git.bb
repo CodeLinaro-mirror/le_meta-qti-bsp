@@ -20,7 +20,7 @@ EXTRA_OECONF = "--with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include 
                 --with-core-headers=${STAGING_INCDIR_NATIVE}"
 
 BBCLASSEXTEND = "native"
-
+RM_WORK_EXCLUDE += "${PN}"
 do_deploy[cleandirs] = "${DEPLOYDIR}/ota-scripts"
 do_deploy() {
     install -m 755 ${D}${bindir}/bsdiff ${DEPLOYDIR}/ota-scripts
