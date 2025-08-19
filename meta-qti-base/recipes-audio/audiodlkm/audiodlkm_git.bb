@@ -1,7 +1,7 @@
 SUMMARY = "Audio Drivers Kernel Modules"
 DESCRIPTION = "This is the audio driver based on ASoC architecture, used to communicate with DSP."
 HOMEPAGE = "https://git.codelinaro.org"
-LICENSE = "GPL-2.0"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://NOTICE;md5=689b0a45875711dc09b94e4b6524c3cd"
 DEPENDS += "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', "audio-devicetree", "", d)}"
 DEPENDS += "virtual/kernel"
@@ -26,6 +26,9 @@ MODULES = "\
         asoc/machine_dlkm.ko \
         soc/snd_event_dlkm.ko \
 "
+TECHPACK_MODULE_OUT = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '6.1', "${WORKDIR}/audio-kernel", "", d)}"
+TECHPACK_MODULES = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '6.1', "${MODULES}", "", d)}"
+TECHPACK_MAKE_ARGS = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '6.1', "${EXTRA_OEMAKE} QTI_TECHPACK_KERNEL=true", "", d)} LEGACY_PATH="${S}""
 TECHPACK_MODULE_OUT = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', "${WORKDIR}/audio-kernel", "", d)}"
 TECHPACK_MODULES = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', "${MODULES}", "", d)}"
 TECHPACK_HEADERS = "${S}/include/uapi/audio"
@@ -33,6 +36,7 @@ TECHPACK_HEADERS_OUT = "audio-kernel/audio"
 TECHPACK_MAKE_ARGS = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', "${EXTRA_OEMAKE} QTI_TECHPACK=true", "", d)} LEGACY_PATH="${S}""
 
 inherit ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.15', "qti-techpack", "module module-sign qperf qti-kernel-arch-clang", d)}
+inherit ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '6.1', "qti-techpack", "module module-sign qperf qti-kernel-arch-clang", d)}
 
 do_configure() {
     if ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.4', 'true', 'false', d)}; then
