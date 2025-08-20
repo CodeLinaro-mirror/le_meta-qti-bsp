@@ -119,6 +119,7 @@ CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "${@bb.utils.contains('DISTRO_FEATURES'
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "${@bb.utils.contains('DISTRO_FEATURES', 'lxc', ' vmsharememory-test', '', d)}"
 CORE_IMAGE_EXTRA_INSTALL:append:kalama = "${@bb.utils.contains('DISTRO_FEATURES', 'lxc', ' lxc', '', d)}"
 PERSISTIMAGE_TARGET:kalama = "${@bb.utils.contains('DISTRO_FEATURES', 'lxc', 'lxc-persist.img', 'persist.img', d)}"
+VBMETAIMAGE_TARGET:kalama = "${@bb.utils.contains('DISTRO_FEATURES', 'lxc', 'lxc-vbmeta.img', 'vbmeta.img', d)}"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "${@bb.utils.contains('DISTRO_FEATURES', 'lxc', ' gki-kernel-modules-second-stage', '', d)}"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "${@bb.utils.contains('DISTRO_FEATURES', 'lxc', ' packagegroup-qti-data', '', d)}"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "${@bb.utils.contains('DISTRO_FEATURES', 'lxc', ' packagegroup-qti-fastcv', '', d)}"
