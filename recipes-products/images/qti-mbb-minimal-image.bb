@@ -25,4 +25,5 @@ CORE_IMAGE_EXTRA_INSTALL += "\
               ${@bb.utils.contains('BASEMACHINE', 'sdxlemur', "crash-collect", "", d)} \
               ${@bb.utils.contains('MACHINE_FEATURES', 'qti-location', 'packagegroup-qti-location', '', d)} \
               ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
+              ${@bb.utils.contains('BASEMACHINE', 'sdxlemur', "packagegroup-qti-wifi-qca6174", "", d)} \
 "
