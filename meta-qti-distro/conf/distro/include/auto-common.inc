@@ -43,4 +43,4 @@ WARN_QA:remove = "buildpaths"
 ERROR_QA += "obsolete-license virtual-slash license-format"
 
 #Align with poky/meta-poky/conf/distro/poky.conf
-OE_VERSION ?= "4.0.7"
+OE_VERSION ?= "5.0"
