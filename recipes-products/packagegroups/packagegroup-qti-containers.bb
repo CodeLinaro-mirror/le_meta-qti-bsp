@@ -20,5 +20,5 @@ RDEPENDS:packagegroup-qti-containers= "\
     cgroup-lite \
     docker \
     docker-registry \
-    docker-compose \
+    python3-docker-compose \
 "
