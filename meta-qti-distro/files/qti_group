@@ -29,3 +29,4 @@ display:x:4090:
 video-driver:x:5000:
 vidc-test-app:x:5010:
 hyp-video-be:x:5020:
+eva:x:5030:
