@@ -5,7 +5,7 @@ HOMEPAGE = "http://developer.android.com/"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://NOTICE;md5=9645f39e9db895a4aa6e02cb57294595"
 
-DEPENDS += "liblog"
+DEPENDS += "liblog glib-2.0"
 
 PR = "r1"
 
@@ -40,6 +40,7 @@ EXTRA_OECONF += "\
     --with-host-os=${HOST_OS} \
     --disable-static \
     LE_PROPERTIES_ENABLED=true \
+    --with-glib \
 "
 
 do_install:append() {
