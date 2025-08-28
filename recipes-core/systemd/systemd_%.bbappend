@@ -17,3 +17,9 @@ do_install:append:mdm9607() {
    ln -sf /dev/null ${D}${systemd_unitdir}/system/sysinit.target.wants/systemd-journal-flush.service
    ln -sf /dev/null ${D}${systemd_unitdir}/system/sysinit.target.wants/systemd-journal-catalog-update.service
 }
+
+do_install:append:qcs610-odk-64() {
+   #  For QCS610-odk-64 Oneshot should be replace as simple
+   #  Boot performance improvement for Talos SP 
+    sed -i 's/^Type=oneshot$/Type=simple/' ${D}${systemd_unitdir}/system/systemd-modules-load.service
+}
