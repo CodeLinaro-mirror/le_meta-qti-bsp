@@ -51,6 +51,26 @@ CORE_IMAGE_EXTRA_INSTALL += "\
               ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
 "
 
+CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "packagegroup-qti-audio"
+CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "packagegroup-qti-bluetooth"
+CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "packagegroup-qti-camera"
+CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "packagegroup-qti-containers"
+CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "packagegroup-qti-data"
+CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "packagegroup-qti-dsp"
+CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "packagegroup-qti-fastcv"
+CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "packagegroup-qti-fastmmi"
+CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "packagegroup-qti-gst"
+CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "packagegroup-qti-ml"
+CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "packagegroup-qti-qmmf"
+CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "packagegroup-qti-pulseaudio"
+CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "packagegroup-qti-robotics"
+CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "packagegroup-qti-securemsm"
+CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "packagegroup-qti-sensors-see"
+CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "packagegroup-qti-test-sensors-see"
+CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "packagegroup-qti-video"
+CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "packagegroup-qti-wifi"
+CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "packagegroup-ros2-foxy"
+
 # To include header files in SDK for sample code
 TOOLCHAIN_TARGET_TASK_append = " camera-metadata-dev glm-dev opencv-staticdev"
 
