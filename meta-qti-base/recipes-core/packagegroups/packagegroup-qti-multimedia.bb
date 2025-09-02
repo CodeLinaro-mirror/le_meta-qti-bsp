@@ -28,6 +28,14 @@ RDEPENDS:${PN} = "\
         gstreamer1.0-plugins-extpoolsink \
 "
 
+RDEPENDS:${PN}:remove:quin-gvm-gen4-5 = "\
+        ${@bb.utils.contains('DISTRO_FEATURES', 'qti-codec2', 'gstreamer1.0-plugins-codec2', '', d)} \
+"
+
+RDEPENDS:${PN}:append:quin-gvm-gen4-5 = " \
+        ${@bb.utils.contains('DISTRO_FEATURES', 'qti-codec2', ' gstreamer1.0-plugins-codec2-lemans gstreamer1.0-plugins-codec2-monaco', '', d)} \
+"
+
 RDEPENDS:${PN}:remove:sa8797 = "\
         videodlkm \
 "
