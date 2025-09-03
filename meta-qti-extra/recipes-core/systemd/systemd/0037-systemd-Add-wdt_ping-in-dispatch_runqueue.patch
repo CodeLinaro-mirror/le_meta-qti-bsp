@@ -1,0 +1,42 @@
+From e4929810537db6806618f6037d4626c28db1c1d1 Mon Sep 17 00:00:00 2001
+From: Lei wang <leiwan@qti.qualcomm.com>
+Date: Wed, 3 Sep 2025 18:59:58 +0800
+Subject: [PATCH] systemd: Add wdt_ping in dispatch_runqueue
+
+Systemd may hung in dispatch_runqueue, which may
+lead wdt bite.
+Add a protection to pet dog in dispatch_runqueue.
+
+Signed-off-by: Lei wang <leiwan@qti.qualcomm.com>
+---
+ src/core/manager.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/src/core/manager.c b/src/core/manager.c
+index 7eafa578fe6..e08ade66107 100644
+--- a/src/core/manager.c
++++ b/src/core/manager.c
+@@ -2235,13 +2235,20 @@ void manager_unwatch_pid(Manager *m, pid_t pid) {
+ static int manager_dispatch_run_queue(sd_event_source *source, void *userdata) {
+         Manager *m = userdata;
+         Job *j;
++        int i = 0;
+ 
+         assert(source);
+         assert(m);
+ 
+         while ((j = prioq_peek(m->run_queue))) {
++                i++;
+                 assert(j->installed);
+                 assert(j->in_run_queue);
++                // Avoid long time loop caused wdt bite
++                if (i >= 10) {
++                        i = 0;
++                        (void) watchdog_ping();
++                }
+ 
+                 (void) job_run_and_invalidate(j);
+         }
+-- 
+2.34.1
+
