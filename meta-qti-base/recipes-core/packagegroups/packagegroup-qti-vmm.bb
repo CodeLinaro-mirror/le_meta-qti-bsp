@@ -24,4 +24,5 @@ RDEPENDS:${PN} = "\
     hyp-udmabuf \
     hyp-udmabuf-test \
     vmm-boot-lcm \
+    android-tools \
 "
