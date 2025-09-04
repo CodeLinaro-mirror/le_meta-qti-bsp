@@ -1,4 +1,4 @@
-inherit native
+inherit native python3native
 
 DESCRIPTION = "Tool from Android to validate and merge dtbo files before creating dtbo.img"
 
