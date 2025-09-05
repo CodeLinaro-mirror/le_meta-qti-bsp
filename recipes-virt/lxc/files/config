@@ -41,6 +41,11 @@ lxc.cgroup2.devices.allow               = c 226:2 rwm
 lxc.cgroup2.devices.deny                = c 226:3 m
 lxc.cgroup2.devices.allow               = c 226:128 rwm
 
+# Set memory.max
+lxc.cgroup2.memory.max                  = 1536M
+# Affinity to middle core 3,4, small core 0,1,2
+lxc.cgroup2.cpuset.cpus                 = 0,1,2,3,4
+
 # Network
 lxc.net.0.type = veth
 lxc.net.0.hwaddr = aa:aa:aa:aa:ee:03
