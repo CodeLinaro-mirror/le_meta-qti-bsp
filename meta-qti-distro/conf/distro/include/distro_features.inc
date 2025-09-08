@@ -15,6 +15,7 @@ DISTRO_FEATURES:append:quin-gvm-monaco = " qti-codec2 qti-gstdeinterlace qti-gst
 # Camera
 DISTRO_FEATURES:append:quin-gvm-lemans = " qti-qcx"
 DISTRO_FEATURES:append:quin-gvm-monaco = " qti-qcx"
+DISTRO_FEATURES:append:quin-gvm-gen4-5 = " qti-qcx"
 
 # Display
 DISTRO_FEATURES:append = " wayland"
