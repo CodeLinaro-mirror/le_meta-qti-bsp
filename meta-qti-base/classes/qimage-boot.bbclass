@@ -11,6 +11,8 @@ DEPENDS += "\
     python3-native \
 "
 
+KERNEL_CMD_PARAMS += "${@bb.utils.contains('DISTRO_FEATURES', 'qcvirtio-gvm', 'root=/dev/vdb1 earlycon=hvc0 hvc_dcc.enable=1 earlyprintk', '', d)}"
+
 ghgvm_pilsplitter() {
     PILTOOLS_PATH="${STAGING_BINDIR_NATIVE}/scripts/pil_tools"
 
