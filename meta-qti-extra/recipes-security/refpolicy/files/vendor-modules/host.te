@@ -249,9 +249,20 @@ require {
     type vendor_aidl_hal_automotive_vehicle_qti;
     type vendor_ais_v4l2_proxy;
     type vendor_hal_gnss_qti;
+    type vendor_hal_soter_qti;
+    type vendor_sys_qti_display_exec;
+    type vendor_hal_capabilityconfigstore_qti_default;
+    type vendor_cap_configstore_dbg_prop;
+    type vendor_per_mgr;
+    type cppreopts;
+    type vendor_pd_locater_dbg_prop;
+    type vendor_ramdump_vendor_data_file;
+    type system_app;
     class service { status start stop reload enable disable };
     class dbus { acquire_svc send_msg };
     class passwd { passwd chfn chsh rootok crontab };
+    class service_manager { find };
+    class property_service { set };
 };
 
 #============= host_exec_t ==============
@@ -454,6 +465,7 @@ allowxperm host_exec_t devpts:chr_file ioctl { 0x5404 0x540d 0x4b45 0x5437 0x4b3
 allowxperm host_exec_t rootfs:blk_file ioctl { 0x1272 0x1268 };
 allowxperm host_exec_t vendor_file:blk_file ioctl { 0x1272 0x1268 };
 allowxperm host_exec_t unlabeled:file ioctl { 0x9409 0x5413 };
+allowxperm vendor_aidl_hal_automotive_vehicle_qti device:dir ioctl { 0x4506 };
 
 
 #============= host_device_t ==============
@@ -536,6 +548,7 @@ grant_all_permissions(kernel,vendor_sysfs_usb_c)
 grant_all_permissions(kernel,vendor_sysfs_soc)
 grant_all_permissions(kernel,vendor_sysfs_usb_device)
 grant_all_permissions(kernel,vendor_sysfs_qdss_dev)
+grant_all_permissions(kernel,proc_asound)
 allowxperm kernel self:file ioctl { 0x5401 };
 allowxperm kernel self:udp_socket ioctl { 0x8946 };
 allowxperm kernel self:fifo_file ioctl { 0x5413 };
@@ -618,3 +631,17 @@ allow vendor_hal_ais_qti vendor_camera_socket:lnk_file read;
 allow vendor_hal_ais_qti host_exec_t:unix_stream_socket connectto;
 allow vendor_hal_ais_qti host_file_t:dir search;
 allow vendor_hal_ais_qti host_file_t:sock_file write;
+#-avc log-
+grant_all_permissions(kernel,vendor_proc_audiod)
+grant_all_permissions(vendor_init,build_prop)
+grant_all_permissions(vendor_hal_evs_driver,tmpfs)
+grant_all_permissions(init,vendor_sys_qti_display_exec)
+grant_all_permissions(vendor_hal_gnss_qti,system_file)
+grant_all_permissions(vendor_hal_soter_qti,vfat)
+grant_all_permissions(vendor_hal_capabilityconfigstore_qti_default,vendor_cap_configstore_dbg_prop)
+grant_all_permissions(vendor_per_mgr,sysfs)
+grant_all_permissions(cppreopts,host_file_t)
+grant_all_permissions(vendor_hal_gnss_qti,vendor_pd_locater_dbg_prop)
+grant_all_permissions(hal_bluetooth_default,vendor_ramdump_vendor_data_file)
+grant_all_permissions(hal_bluetooth_default,debugfs_tracing_instances)
+grant_all_permissions(system_app,default_android_service)
