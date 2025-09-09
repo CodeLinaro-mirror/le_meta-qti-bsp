@@ -17,6 +17,7 @@ S = "${WORKDIR}/vendor/qcom/opensource/platform-kernel"
 METAL_MODULES_BUILD = "drivers/aop-set-ddr.ko drivers/silent_boot.ko drivers/wallpower_charger.ko drivers/dump_boot_log.ko drivers/silent-mode-hw-monitoring.ko"
 
 VIRT_MODULES_BUILD = "drivers/socinfo_dt.ko drivers/subsystem_notif_virt.ko"
+VIRT_MODULES_BUILD:append:qtiquingvm8295 = " drivers/virtual_fastrpc/vfastrpc.ko"
 VIRT_MODULES_BUILD:append:quin-gvm-gen4 = " drivers/virtual_fastrpc/vfastrpc.ko"
 VIRT_MODULES_BUILD:append:quin-gvm-lemans = " drivers/virtual_fastrpc/hfastrpc.ko"
 
@@ -38,6 +39,8 @@ VIRT_PROVIDES_MODULES = "\
     kernel-module-socinfo-dt-${KERNEL_VERSION} \
     kernel-module-subsystem-notif-virt-${KERNEL_VERSION} \
 "
+
+VIRT_PROVIDES_MODULES:append:qtiquingvm8295 = " kernel-module-vfastrpc-${KERNEL_VERSION}"
 VIRT_PROVIDES_MODULES:append:quin-gvm-gen4 = " kernel-module-vfastrpc-${KERNEL_VERSION}"
 VIRT_PROVIDES_MODULES:append:quin-gvm-lemans = " kernel-module-hfastrpc-${KERNEL_VERSION}"
 
