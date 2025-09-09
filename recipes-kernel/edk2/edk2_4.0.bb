@@ -11,16 +11,17 @@ FILESEXTRAPATHS:prepend:pineapple := "${KERNEL_PREBUILT_PATH}/dist/abl-userdebug
 FILESEXTRAPATHS:prepend:qcs610-odk-64 := "${KERNEL_PREBUILT_PATH}/dist/abl-userdebug:"
 FILESEXTRAPATHS:prepend:kera := "${KERNEL_PREBUILT_PATH}/dist/abl-userdebug:"
 FILESEXTRAPATHS:prepend:sun := "${KERNEL_PREBUILT_PATH}/dist/abl-userdebug:"
+#FILESEXTRAPATHS:prepend:canoe := "${KERNEL_PREBUILT_PATH}/dist/abl-userdebug:"
 
-SRC_URI = "file://unsigned_abl.elf"
+#SRC_URI = "file://unsigned_abl.elf"
 
-do_install[noexec]="1"
-do_configure[noexec]="1"
+#do_install[noexec]="1"
+#do_configure[noexec]="1"
 
-do_deploy() {
-    install -m 644 ${WORKDIR}/abl.elf ${DEPLOYDIR}
-}
+#do_deploy() {
+#    install -m 644 ${WORKDIR}/unsigned_abl.elf ${DEPLOYDIR}
+#}
 
-do_deploy[dirs] = "${DEPLOYDIR}"
-addtask deploy before do_build after do_install
+#do_deploy[dirs] = "${DEPLOYDIR}"
+#addtask deploy before do_build after do_install
 

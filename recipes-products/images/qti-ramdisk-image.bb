@@ -48,7 +48,7 @@ python () {
         d.setVar("kern_mods", "")
         d.appendVarFlag('do_image', 'depends', ' ${VENDOR_INITRAMFS_IMAGE}:do_image_complete')
     else:
-        d.setVar("kern_mods", "gki-kernel-modules-first-stage")
+        d.setVar("kern_mods", "")
 }
 
 PACKAGE_INSTALL:remove:pineapple = "\
