@@ -39,3 +39,5 @@ python copy_buildsystem:append() {
     with open(baseoutpath + '/conf/bblayers.conf', 'a') as f:
         f.write('WORKSPACE = "$' + '{TOPDIR}/src"\n')
 }
+
+CORE_IMAGE_EXTRA_INSTALL:append:kalama = "${@bb.utils.contains('DISTRO_FEATURES', 'lxc', ' lxc', '', d)}"
