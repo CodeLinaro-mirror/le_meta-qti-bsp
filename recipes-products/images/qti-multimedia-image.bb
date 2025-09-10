@@ -40,6 +40,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-support-utils \
         systemd-machine-units \
         ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
+        ${@bb.utils.contains('DISTRO_FEATURES','virtualization', 'packagegroup-qti-containers', '', d)} \
 "
 
 CORE_IMAGE_EXTRA_INSTALL:remove:qcm2290-mtp = "kernel-modules"
