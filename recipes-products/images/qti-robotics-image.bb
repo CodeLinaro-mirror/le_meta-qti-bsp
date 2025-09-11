@@ -130,7 +130,6 @@ CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "${@bb.utils.contains('DISTRO_FEATURES'
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "${@bb.utils.contains('DISTRO_FEATURES', 'lxc', ' packagegroup-qti-ss-mgr', '', d)}"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "${@bb.utils.contains('DISTRO_FEATURES', 'lxc', ' packagegroup-qti-sensors-ship', '', d)}"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "${@bb.utils.contains('DISTRO_FEATURES', 'lxc', ' system-sample-apps', '', d)}"
-CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "${@bb.utils.contains('DISTRO_FEATURES', 'lxc', ' qti-c2-module', '', d)}"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "${@bb.utils.contains('DISTRO_FEATURES', 'lxc', ' packagegroup-qti-containers', '', d)}"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "${@bb.utils.contains('DISTRO_FEATURES', 'lxc', ' packagegroup-qti-location', '', d)}"
 CORE_IMAGE_EXTRA_INSTALL:remove:kalama = "${@bb.utils.contains('DISTRO_FEATURES', 'lxc', ' ${ROS_FEATURES_PKG}', '', d)}"
