@@ -73,5 +73,4 @@ CORE_IMAGE_EXTRA_INSTALL_remove_mdm9607 = "\
 # Following packages will be enabled later
 CORE_IMAGE_EXTRA_INSTALL_remove_mdm9650 = "\
       packagegroup-qti-ppat \
-      qmi-shutdown-modem \
 "
