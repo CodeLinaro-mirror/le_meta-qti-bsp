@@ -62,6 +62,8 @@ interface(`grant_all_permissions',`
 	')
 
 	allow $1 $2:file {ioctl read write create getattr setattr lock relabelfrom relabelto append map unlink link rename execute quotaon mounton audit_access open execmod watch watch_mount watch_sb watch_with_perm watch_reads execute_no_trans entrypoint};
+        allow $1 $2:service_manager { find };
+        allow $1 $2:property_service { set };
 	allow $1 $2:dir {ioctl read write create getattr setattr lock relabelfrom relabelto append map unlink link rename execute quotaon mounton audit_access open execmod watch watch_mount watch_sb watch_with_perm watch_reads add_name remove_name reparent search rmdir};
 	allow $1 $2:socket {ioctl read write create getattr setattr lock relabelfrom relabelto append map bind connect listen accept getopt setopt shutdown recvfrom sendto name_bind};
 	allow $1 $2:packet_socket {ioctl read write create getattr setattr lock relabelfrom relabelto append map bind connect listen accept getopt setopt shutdown recvfrom sendto name_bind};
@@ -78,6 +80,8 @@ interface(`grant_all_permissions',`
 	allow $1 $2:qipcrtr_socket {ioctl read write create getattr setattr lock relabelfrom relabelto append map bind connect listen accept getopt setopt shutdown recvfrom sendto name_bind};
 	allow $1 $2:rawip_socket {node_bind ioctl read write create getattr setattr lock relabelfrom relabelto append map bind connect listen accept getopt setopt shutdown recvfrom sendto name_bind};
 	allow $1 $2:filesystem {mount remount unmount getattr relabelfrom relabelto associate quotamod quotaget watch};
+        allow $1 $2:service_manager { find };
+        allow $1 $2:property_service { set };
 	allow $1 $2:chr_file {ioctl read write create getattr setattr lock relabelfrom relabelto append map unlink link rename execute quotaon mounton audit_access open execmod watch watch_mount watch_sb watch_with_perm watch_reads};
 	allow $1 $2:blk_file {ioctl read write create getattr setattr lock relabelfrom relabelto append map unlink link rename execute quotaon mounton audit_access open execmod watch watch_mount watch_sb watch_with_perm watch_reads};
 	allow $1 $2:lnk_file {ioctl read write create getattr setattr lock relabelfrom relabelto append map unlink link rename execute quotaon mounton audit_access open execmod watch watch_mount watch_sb watch_with_perm watch_reads};
