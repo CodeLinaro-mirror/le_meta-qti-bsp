@@ -40,6 +40,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-support-utils \
         systemd-machine-units \
         ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
+        ${@bb.utils.contains('DISTRO_FEATURES','virtualization', 'packagegroup-qti-containers', '', d)} \
 "
 
 CORE_IMAGE_EXTRA_INSTALL:remove:qcm2290-mtp = "kernel-modules"
@@ -58,24 +59,17 @@ CORE_IMAGE_EXTRA_INSTALL:remove:kera = "kernel-modules"
 CORE_IMAGE_EXTRA_INSTALL:remove:kera = "libdrm-tests"
 CORE_IMAGE_EXTRA_INSTALL:remove:kera = "graphite-client"
 CORE_IMAGE_EXTRA_INSTALL:remove:kera = "packagegroup-qti-data"
-CORE_IMAGE_EXTRA_INSTALL:remove:kera = "packagegroup-qti-display"
-CORE_IMAGE_EXTRA_INSTALL:remove:kera = "packagegroup-qti-touch"
-CORE_IMAGE_EXTRA_INSTALL:remove:kera = "packagegroup-qti-gfx"
-CORE_IMAGE_EXTRA_INSTALL:remove:kera = "packagegroup-qti-ml"
-CORE_IMAGE_EXTRA_INSTALL:remove:kera = "packagegroup-qti-qmmf"
 CORE_IMAGE_EXTRA_INSTALL:remove:kera = "packagegroup-qti-test-sensors-see"
 CORE_IMAGE_EXTRA_INSTALL:remove:kera = "packagegroup-qti-sensors-see"
-CORE_IMAGE_EXTRA_INSTALL:remove:kera = "packagegroup-qti-perf"
 CORE_IMAGE_EXTRA_INSTALL:remove:kera = "packagegroup-qti-sensors"
 CORE_IMAGE_EXTRA_INSTALL:remove:kera = "packagegroup-qti-internal"
-CORE_IMAGE_EXTRA_INSTALL:remove:kera = "packagegroup-qti-gst"
-CORE_IMAGE_EXTRA_INSTALL:remove:kera = "packagegroup-qti-securemsm"
 CORE_IMAGE_EXTRA_INSTALL:append:kera = " gki-kernel-modules-second-stage"
 CORE_IMAGE_EXTRA_INSTALL:append:kera = " packagegroup-qti-core-prop"
 CORE_IMAGE_EXTRA_INSTALL:append:kera = " packagegroup-qti-mmframeworks"
 CORE_IMAGE_EXTRA_INSTALL:append:kera = " packagegroup-qti-ss-mgr"
 CORE_IMAGE_EXTRA_INSTALL:append:kera = " packagegroup-qcom-sensors"
 CORE_IMAGE_EXTRA_INSTALL:append:kera = " packagegroup-qti-touch"
+CORE_IMAGE_EXTRA_INSTALL:append:kera = " packagegroup-qti-perf"
 
 CORE_IMAGE_EXTRA_INSTALL:remove:sun = "kernel-modules"
 CORE_IMAGE_EXTRA_INSTALL:remove:sun = "packagegroup-qti-data"
@@ -89,3 +83,4 @@ CORE_IMAGE_EXTRA_INSTALL:append:sun = " packagegroup-qti-core-prop"
 CORE_IMAGE_EXTRA_INSTALL:append:sun = " packagegroup-qti-mmframeworks"
 CORE_IMAGE_EXTRA_INSTALL:append:sun = " packagegroup-qti-eva"
 CORE_IMAGE_EXTRA_INSTALL:append:sun = " packagegroup-qti-touch"
+CORE_IMAGE_EXTRA_INSTALL:append:sun = " packagegroup-qti-perf"
