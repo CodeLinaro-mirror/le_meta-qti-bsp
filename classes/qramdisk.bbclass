@@ -183,14 +183,15 @@ fakeroot do_ramdisk_create() {
             cp ${WORKDIR}/verity_sig.txt etc/
 
             # Shared library dependencies for dm-verity feature
+            cp ${IMAGE_ROOTFS}/lib/libcap.so.2 lib/libcap.so.2
             cp ${IMAGE_ROOTFS}/usr/lib/libcryptsetup.so.12 lib/
             cp ${IMAGE_ROOTFS}/lib/libblkid.so.1 lib/
             cp ${IMAGE_ROOTFS}/usr/lib/libpopt.so.0 lib/
-            cp ${IMAGE_ROOTFS}/lib/libuuid.so.1 lib/
+            cp ${IMAGE_ROOTFS}/usr/lib/libuuid.so.1 lib/
             cp ${IMAGE_ROOTFS}/usr/lib/libdevmapper.so.1.02 lib/
-            cp ${IMAGE_ROOTFS}/usr/lib/libssl.so.1.1 lib/
-            cp ${IMAGE_ROOTFS}/usr/lib/libcrypto.so.1.1 lib/
-            cp ${IMAGE_ROOTFS}/usr/lib/libjson-c.so.4 lib/
+            cp ${IMAGE_ROOTFS}/usr/lib/libssl.so.3 lib/
+            cp ${IMAGE_ROOTFS}/usr/lib/libcrypto.so.3 lib/
+            cp ${IMAGE_ROOTFS}/usr/lib/libjson-c.so.5 lib/
             cp ${IMAGE_ROOTFS}/lib/libudev.so.1 lib/
             cp ${IMAGE_ROOTFS}/lib/libmount.so.1 lib/
         fi
