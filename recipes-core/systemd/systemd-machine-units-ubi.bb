@@ -36,7 +36,7 @@ add_ubi_scripts () {
         fi
 
         if [ "$mountname" = "systemrw" ]; then
-            install -m 0744 ${S}/systemrw.conf ${D}/lib/systemd/system/systemrw-ubi.conf
+            install -m 0644 ${S}/systemrw.conf ${D}/lib/systemd/system/systemrw-ubi.conf
         fi
     done
 }
