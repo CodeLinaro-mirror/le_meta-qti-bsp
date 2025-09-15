@@ -8,6 +8,7 @@ SRC_URI:append = " \
     file://0001-systemd-avoid-active-seat-change-to-NULL.patch \
     file://60-misc.rules \
     file://0001-systemd-config-linger-for-root-user.patch \
+    file://0001-systemd-limit-coredump-burst-interval.patch \
 "
 
 SRC_URI:append:gh-gvm-lemans = " file://60-vblk.rules"
