@@ -4,8 +4,6 @@ HOMEPAGE = "https://git.codelinaro.org/"
 LICENSE = "GPLv2.0-with-linux-syscall-note"
 LIC_FILES_CHKSUM = "file://${QTI_LICENSE_DIR}/${LICENSE};md5=8afb6abdac9a14cb18a0d6c9c151e9b4"
 
-DEPENDS += "hgsl-devicetree"
-
 SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/graphics-hgsl/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/graphics-hgsl;usehead=1 \
            file://autogvm_hgsl_load.conf"
 
