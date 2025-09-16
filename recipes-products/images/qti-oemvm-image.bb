@@ -4,6 +4,7 @@ DEPENDS += " virtual/kernel"
 
 ENABLE_SECUREMSM = "${@d.getVar('MACHINE_SUPPORTS_SECUREMSM') or "True"}"
 ENABLE_MINK = "${@d.getVar('MACHINE_SUPPORTS_MINK') or "True"}"
+ENABLE_VSOCK_AGENT = "${@d.getVar('MACHINE_SUPPORTS_VSOCK_AGENT') or "False"}"
 
 CORE_IMAGE_EXTRA_INSTALL += " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'packagegroup-selinux-minimal', '', d)} \
@@ -11,7 +12,7 @@ CORE_IMAGE_EXTRA_INSTALL += " \
     sdcard-scripts-automount \
     e2fsprogs-mke2fs \
     bash \
-    vsock-guest-agent-oemvm \
+    ${@oe.utils.conditional('ENABLE_VSOCK_AGENT', 'True', 'vsock-guest-agent-oemvm', '', d)} \
 "
 CORE_IMAGE_EXTRA_INSTALL += " ${@oe.utils.conditional('ENABLE_SECUREMSM', 'True', 'packagegroup-qti-securemsm-oemvm', '', d)}"
 CORE_IMAGE_EXTRA_INSTALL += " ${@oe.utils.conditional('ENABLE_MINK', 'True', 'packagegroup-qti-mink-oemvm', '', d)}"
