@@ -2,10 +2,7 @@
 # To add more extend bindir_progs, base_bindir_progs by referring
 # original recipe. Accordingly update alternatives to avoid pkg warnings
 
-CUSTOMIZE_COREUTILS_COMMANDS = "${@oe.utils.conditional('TOYBOX_RAMDISK', 'True', 'False', 'True', d)}"
-
 python () {
-    if d.getVar("CUSTOMIZE_COREUTILS_COMMANDS") == "True":
         d.setVar("bindir_progs", "chcon")
         d.setVar("base_bindir_progs", "cp")
 }
@@ -13,7 +10,7 @@ python () {
 ALTERNATIVE:${PN} = "${bindir_progs} ${base_bindir_progs} ${sbindir_progs}"
 ALTERNATIVE:${PN}-doc = ""
 
-PACKAGE_PREPROCESS_FUNCS += "${@oe.utils.conditional('CUSTOMIZE_COREUTILS_COMMANDS', 'True', 'remove_extra_progs', '', d)}"
+PACKAGE_PREPROCESS_FUNCS += "remove_extra_progs"
 remove_extra_progs() {
     cd ${PKGD}${bindir}
 
