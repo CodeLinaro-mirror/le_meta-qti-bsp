@@ -10,6 +10,8 @@ DEPENDS += "\
     virtual/kernel \
 "
 
+do_merge_dtbs[depends] += "virtual/kernel:do_deploy"
+
 do_merge_dtbs() {
      install -d ${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbs
      install -d ${DEPLOY_DIR_IMAGE}/dtbs
