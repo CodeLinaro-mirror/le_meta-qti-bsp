@@ -37,6 +37,8 @@ VM_CONFIG_XML:sa7255-ivi = "vm_config_lalv.xml"
 do_install:append() {
     install -d ${D}${sysconfdir}
     install -m 0644 ${S}/vm_config_xml/${VM_CONFIG_XML} ${D}${sysconfdir}/vm_config.xml
+    install -d ${D}${bindir_native}
+    install -m 0755 ${S}/qcrosvm.sh ${D}${bindir_native}/qcrosvm.sh
 }
 
 do_install:append:sa8775() {
@@ -70,3 +72,5 @@ FILES:${PN} += "\
 
 # Once upgrade Yocto to 4.2 and upgrade Python to 3.11 in the future, we can inherit cargo-update-recipe-crates and delete this line
 do_compile[network] = "1"
+
+FILES:${PN} += "${bindir_native}/qcrosvm.sh"
