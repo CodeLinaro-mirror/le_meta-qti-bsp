@@ -16,3 +16,5 @@ RDEPENDS:${PN} += "\
     ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "6.1", "graphicsdlkm", "", d)} \
     vulkan-loader \
     "
+#Add hgsl dependency on quin-gvm-gen4-5
+RDEPENDS:${PN}:quin-gvm-gen4-5 += "graphics-hgsldlkm"
