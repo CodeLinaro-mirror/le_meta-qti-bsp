@@ -22,10 +22,10 @@ SRC_URI = "${CODESER}/platform/system/sepolicy.git;protocol=https;branch=automot
            file://Makefile \
            "
 SRCREV_FORMAT = "system-sepolicy"
-SRCREV_system-sepolicy = "92e8e684261dabdff858124be40283ff834cee5b"
-SRCREV_device-sepolicy = "c54892dd3f54f2b9a2536787ec6e6d3367de4abb"
+SRCREV_system-sepolicy = "47d80fbd2a9ffbefd0653558c86a4f957672229e"
+SRCREV_device-sepolicy = "2faecd1f0d5699d3800220c63c6a86ba4ec18bb4"
 SRCREV_selinux = "2d543d20722ada2425b5bdab9d0d1d29470e7bba"
-SRCREV_packages-sepolicy = "6868770c69f9ce6d7358704f510460941a4e60ac"
+SRCREV_packages-sepolicy = "299cb626d5345783f8adc7849cad2490e1ce9386"
 SRCREV_device-sepolicyvndr = "9b6a08e34c27c627cb3e993dba410829f8b2467a"
 #=======================================================================================================================================================================================
 
