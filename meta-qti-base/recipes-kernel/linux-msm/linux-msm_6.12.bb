@@ -86,8 +86,8 @@ do_deploy () {
     install -m 0644 vmlinux ${DEPLOYDIR}
     install -m 0644 System.map ${DEPLOYDIR}
 
-    mkdir -p ${DEPLOYDIR}/dtbs
-    cat ${BZ_PREBUILT_ROOT}/out/msm-kernel-autogvm-${KERNEL_OUT_VARIANT}defconfig/dist/*.dtb >  ${DEPLOYDIR}/dtbs/dtb.img
+    install -d ${DEPLOYDIR}/build-artifacts/dtb/
+    install -m 0644 ${BZ_PREBUILT_ROOT}/out/msm-kernel-autogvm-${KERNEL_OUT_VARIANT}defconfig/dist/*.dtb ${DEPLOYDIR}/build-artifacts/dtb/
 }
 
 PACKAGES:remove = "${KERNEL_PACKAGE_NAME}-devicetree"
