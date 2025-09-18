@@ -34,14 +34,14 @@ do_install() {
         install -m 0755 ${S}/../prebuilts/kernel-build-tools/linux-x86/bin/ufdt_apply_overlay  ${D}${bindir}/merge_dtbs/
     fi
 
-    install -m 0755 ${S}/bin/fdtget  ${D}${bindir}/merge_dtbs/
-    install -m 0755 ${S}/bin/fdtoverlaymerge  ${D}${bindir}/merge_dtbs/
-    install -m 0755 ${S}/bin/fdtdump  ${D}${bindir}/merge_dtbs/
-    install -m 0755 ${S}/bin/fdtoverlay  ${D}${bindir}/merge_dtbs/
-    install -m 0755 ${S}/bin/fdtput ${D}${bindir}/merge_dtbs/
+    #install -m 0755 ${S}/bin/fdtget  ${D}${bindir}/merge_dtbs/
+    #install -m 0755 ${S}/bin/fdtoverlaymerge  ${D}${bindir}/merge_dtbs/
+    #install -m 0755 ${S}/bin/fdtdump  ${D}${bindir}/merge_dtbs/
+    #install -m 0755 ${S}/bin/fdtoverlay  ${D}${bindir}/merge_dtbs/
+    #install -m 0755 ${S}/bin/fdtput ${D}${bindir}/merge_dtbs/
     # Copy libfdt libs
-    install -d ${D}${bindir}/merge_dtbs/lib/
-    install -m 0644 ${S}/lib/* ${D}${bindir}/merge_dtbs/lib/
+    #install -d ${D}${bindir}/merge_dtbs/lib/
+    #install -m 0644 ${S}/lib/* ${D}${bindir}/merge_dtbs/lib/
 
     create_wrapper ${D}${bindir}/merge_dtbs/merge_dtbs.py \
         LD_LIBRARY_PATH=${STAGING_BINDIR_NATIVE}/merge_dtbs/lib:$LD_LIBRARY_PATH \
