@@ -71,7 +71,9 @@ do_install:append:quin-gvm-lemans() {
 }
 
 do_install:append:quin-gvm-gen4-5() {
-    install -m 0755 ${S}/drivers/virtual_fastrpc/fastrpc_load.conf -D ${D}${sysconfdir}/modules-load.d/fastrpc_load.conf
+    if ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '6.12', 'false', 'true', d)}; then
+        install -m 0755 ${S}/drivers/virtual_fastrpc/fastrpc_load.conf -D ${D}${sysconfdir}/modules-load.d/fastrpc_load.conf
+    fi
 }
 
 RPROVIDES:${PN} += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '${VIRT_PROVIDES_MODULES}', '${METAL_PROVIDES_MODULES}', d)}"
