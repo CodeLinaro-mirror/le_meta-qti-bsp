@@ -19,6 +19,8 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         ${MLIBPREFIX}packagegroup-qti-audio \
         ${MLIBPREFIX}packagegroup-qti-pulseaudio \
         ${MLIBPREFIX}packagegroup-qti-bluetooth \
+        ${MLIBPREFIX}packagegroup-qti-camera \
+        ${MLIBPREFIX}packagegroup-qti-camera-kernel \
         ${MLIBPREFIX}packagegroup-qti-core \
         ${MLIBPREFIX}packagegroup-qti-data \
         ${MLIBPREFIX}packagegroup-qti-display \
@@ -27,6 +29,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         ${MLIBPREFIX}packagegroup-qti-gst \
         ${MLIBPREFIX}packagegroup-qti-ml \
         ${MLIBPREFIX}packagegroup-qti-gfx \
+        ${MLIBPREFIX}packagegroup-qti-qmmf \
         ${@bb.utils.contains('COMBINED_FEATURES', 'qti-security', '${MLIBPREFIX}packagegroup-qti-securemsm', '', d)} \
         ${@bb.utils.contains('MACHINE_FEATURES', 'qti-sensors', '${MLIBPREFIX}packagegroup-qti-sensors', '', d)} \
         ${@bb.utils.contains('MACHINE_FEATURES', 'qti-sensors-prop', '${MLIBPREFIX}packagegroup-qti-sensors-see', '', d)} \
