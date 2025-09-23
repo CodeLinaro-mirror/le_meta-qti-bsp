@@ -89,3 +89,6 @@ do_copy_abl() {
 # Remove unsupported SDK packages
 TOOLCHAIN_TARGET_TASK_remove = "ath6kl-utils-staticdev"
 TOOLCHAIN_TARGET_TASK_remove = "kernel-devsrc"
+
+# Remove run-postinsts from target image
+ROOTFS_BOOTSTRAP_INSTALL_remove = "run-postinsts"
