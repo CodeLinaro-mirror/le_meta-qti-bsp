@@ -13,9 +13,12 @@ SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/vendor/qcom/opensource/display-drivers"
 
+EXT_MODULE = "vendor/qcom/opensource/display-drivers"
+
 TECHPACK_MODULE_OUT = "${WORKDIR}/display-drivers"
-TECHPACK_MODULES = "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', \
-                    'msm-hyp/msm_hyp.ko msm-cfg/msm_cfg.ko', 'msm/msm_drm.ko', d)}"
+TECHPACK_MODULES = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '6.12', bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', \
+                    'msm_hyp.ko msm_cfg.ko', 'msm_drm.ko', d),bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor',\
+                    'msm-hyp/msm_hyp.ko msm-cfg/msm_cfg.ko', 'msm/msm_drm.ko', d), d)}"
 TECHPACK_HEADERS = "${S}/include/uapi"
 HDCP_QSEECOM_PATCH = "${STAGING_INCDIR}/hdcp_qseecom"
 TECHPACK_MAKE_ARGS = "KBUILD_EXTRA_SYMBOLS=${HDCP_QSEECOM_PATCH}/Module.symvers"
