@@ -12,6 +12,8 @@ SRC_URI:append = " \
 
 SRC_URI:append:gh-gvm-lemans = " file://60-vblk.rules"
 
+SRC_URI:append:quin-gvm-lemans = " file://70-vblk.rules"
+
 SRC_URI:append:sa81x5 = " file://0001-systemd-add-slotselect-support-in-fstab.patch"
 
 SRC_URI:append = " ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "5.15", "file://platform_load.conf", "", d)}"
@@ -120,4 +122,8 @@ do_install:append () {
 }
 do_install:append:gh-gvm-lemans() {
     install -m 0644 ${WORKDIR}/60-vblk.rules ${D}${sysconfdir}/udev/rules.d/
+}
+
+do_install:append:quin-gvm-lemans() {
+    install -m 0644 ${WORKDIR}/70-vblk.rules ${D}${sysconfdir}/udev/rules.d/
 }
