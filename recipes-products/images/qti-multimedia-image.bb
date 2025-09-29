@@ -58,7 +58,6 @@ CORE_IMAGE_EXTRA_INSTALL:remove:vienna = "packagegroup-qti-data"
 CORE_IMAGE_EXTRA_INSTALL:remove:vienna = "packagegroup-qti-ml"
 CORE_IMAGE_EXTRA_INSTALL:append:vienna = " gki-kernel-modules-second-stage"
 CORE_IMAGE_EXTRA_INSTALL:append:vienna = " diag-router"
-CORE_IMAGE_EXTRA_INSTALL:append:vienna = " packagegroup-qti-core-prop"
 
 CORE_IMAGE_EXTRA_INSTALL:remove:kera = "alsa-utils"
 CORE_IMAGE_EXTRA_INSTALL:remove:kera = "kernel-modules"
