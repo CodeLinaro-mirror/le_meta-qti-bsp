@@ -50,6 +50,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         modem-shutdown \
         ${@oe.utils.conditional('POWERAPPMODULE', 'True', 'powerapp powerapp-powerconfig powerapp-reboot powerapp-shutdown', '', d)} \
         ${@oe.utils.conditional('DEBUG_BUILD', '1', 'packagegroup-qti-debug-tools', '', d )} \
+        ${@bb.utils.contains_any('MACHINE', 'sa515m', 'dual-nand-recovery', '', d)} \
 "
 
 # Following packages will be enabled later
