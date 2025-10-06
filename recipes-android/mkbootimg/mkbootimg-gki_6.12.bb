@@ -9,7 +9,7 @@ BBCLASSEXTEND = "native"
 # Add Python dependency for the scripts
 RDEPENDS:${PN}-native += "python3-core"
 
-FILESEXTRAPATHS:prepend := "${WORKSPACE}/kernel-6.12/kernel_platform/tools/mkbootimg/:"
+FILESEXTRAPATHS:prepend := "${WORKSPACE}/kernel-${MSM_KERNEL_VERSION}/kernel_platform/tools/mkbootimg/:"
 SRC_URI = "file://mkbootimg.py"
 SRC_URI += "file://include"
 SRC_URI += "file://gki/generate_gki_certificate.py"
