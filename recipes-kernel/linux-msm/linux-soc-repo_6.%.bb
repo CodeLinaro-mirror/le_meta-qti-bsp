@@ -164,8 +164,9 @@ do_deploy() {
     done
 
     # Copy unstripped modules to deploydir
-    cp -rp unstripped  ${DEPLOYDIR}/
-
+    if [ -d unstripped ]; then
+        cp -rp unstripped  ${DEPLOYDIR}/
+    fi
 }
 
 # Put the zImage in the kernel-dev pkg

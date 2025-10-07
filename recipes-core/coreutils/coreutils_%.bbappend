@@ -26,3 +26,13 @@ remove_extra_progs() {
        find . -type f ! -name '${base_bindir_progs}.${BPN}' -delete
     fi
 }
+
+ALTERNATIVE:${PN}-doc += "base32.1"
+
+ALTERNATIVE_LINK_NAME[base32] = "${base_bindir}/base32"
+ALTERNATIVE_TARGET[base32] = "${bindir}/base32.${BPN}"
+ALTERNATIVE_LINK_NAME[base32.1] = "${mandir}/man1/base32.1"
+
+do_install:append() {
+    mv ${D}${bindir}/base32 ${D}${bindir}/base32.${BPN}
+}
