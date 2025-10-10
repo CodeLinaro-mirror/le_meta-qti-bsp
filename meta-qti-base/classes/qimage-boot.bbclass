@@ -10,6 +10,8 @@ DEPENDS += "\
     virtual/kernel \
 "
 
+do_merge_dtbs[depends] += "virtual/kernel:do_deploy"
+
 do_merge_dtbs() {
      install -d ${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbs
      install -d ${DEPLOY_DIR_IMAGE}/dtbs
@@ -162,5 +164,5 @@ do_sign_boot_img[dirs] = "${DEPLOY_DIR_IMAGE}"
 
 addtask do_makeboot_setscene
 
-addtask do_makeboot after do_merge_dtbs before do_sign_boot_img
+addtask do_makeboot after do_merge_dtbs do_image before do_sign_boot_img
 addtask do_sign_boot_img after do_makeboot before do_build

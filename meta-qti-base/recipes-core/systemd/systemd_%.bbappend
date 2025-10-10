@@ -15,6 +15,8 @@ SRC_URI:append:sa81x5 = " file://0001-systemd-add-slotselect-support-in-fstab.pa
 
 SRC_URI:append = " ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "5.15", "file://platform_load.conf", "", d)}"
 
+SRC_URI:append = " ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "6.12", "file://linux-msm-6.12_modules_load.conf", "", d)}"
+
 # Remove backlight - Loads/Saves Screen Backlight Brightness, not required.
 PACKAGECONFIG:remove = "backlight "
 
@@ -61,6 +63,10 @@ do_install:append () {
     # Add platform_load.conf to /etc/modules-load.d/, systemd will load modules in this file.
     if ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "5.15", "true", "false", d)}; then
         install -m 0664 ${WORKDIR}/platform_load.conf ${D}${sysconfdir}/modules-load.d/
+    fi
+
+    if ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "6.12", "true", "false", d)}; then
+        install -m 0664 ${WORKDIR}/linux-msm-6.12_modules_load.conf ${D}${sysconfdir}/modules-load.d/
     fi
 }
 

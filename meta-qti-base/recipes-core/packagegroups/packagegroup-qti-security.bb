@@ -1,6 +1,8 @@
 SUMMARY = "QTI package group for security"
 DESCRIPTION = "This is the minimal set of packages required for linux userspace security utilities."
 
+PACKAGE_ARCH = "${MACHINE_ARCH}"
+
 inherit packagegroup
 
 PACKAGES = "\
@@ -13,6 +15,7 @@ RDEPENDS:${PN} += "\
     libcap \
     libcap-bin \
     attr \
-    ${@bb.utils.contains_any("PREFERRED_VERSION_linux-msm", "5.15 6.1", "securemsmdlkm", "", d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'qti-security', 'securemsmdlkm', '', d)}  \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'qti-security', bb.utils.contains_any('PREFERRED_VERSION_linux-msm', '5.15 6.1', '', 'securemsm-devicetree', d), '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'qti-fde', 'enable-fde', '', d)} \
 "

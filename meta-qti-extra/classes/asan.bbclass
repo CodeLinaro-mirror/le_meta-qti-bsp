@@ -47,7 +47,7 @@ python __anonymous() {
     d.appendVar('LDFLAGS', ' -lasan')
 
     # Inherit meson, needs add compile flags at meson-configure file additionally
-    if recipe_name in ['gstreamer1.0-plugin-qvais', 'gstreamer1.0-plugins-qvrate', 'weston-sdm-extension', 'gstreamer1.0-qvconv', 'gstreamer1.0-plugins-drmdecryptor', 'gstreamer1.0-plugins-vesdeliver', 'gstreamer1.0-plugins-qvdeinterlace', 'gstreamer1.0-plugins-codec2', 'gstreamer1.0-plugins-qeavb']:
+    if recipe_name in ['gstreamer1.0-plugin-qvais', 'gstreamer1.0-plugins-qvrate', 'weston-sdm-extension', 'gstreamer1.0-plugins-qvconv', 'gstreamer1.0-plugins-drmdecryptor', 'gstreamer1.0-plugins-vesdeliver', 'gstreamer1.0-plugins-qvdeinterlace', 'gstreamer1.0-plugins-codec2', 'gstreamer1.0-plugins-qeavb']:
         d.appendVar('EXTRA_OEMESON', ' -DASAN=true')
         return
 

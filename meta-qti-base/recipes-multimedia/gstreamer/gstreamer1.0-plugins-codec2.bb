@@ -77,6 +77,7 @@ EXTRA_OEMESON:append:quin-gvm-monaco = " \
 "
 
 EXTRA_OEMESON:append:quin-gvm-gen4 = " -Dset_dec_input_framerate=true"
+EXTRA_OEMESON:append:qtiquingvm8295 = " -Dset_dec_input_framerate=true"
 
 PACKAGE_ARCH ?= "${MACHINE_ARCH}"
 

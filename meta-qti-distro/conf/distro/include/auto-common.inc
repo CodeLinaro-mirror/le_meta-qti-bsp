@@ -22,13 +22,6 @@ PERSIST_IMAGE_ROOTFS_SIZE ?= "128M"
 VIRTUAL-RUNTIME_dev_manager = "udev"
 VIRTUAL-RUNTIME_init_manager = "systemd"
 
-INCOMPATIBLE_LICENSE = "GPL-3.0-only LGPL-3.0-only AGPL-3.0-only"
-
-INCOMPATIBLE_LICENSE:quin-gvm-gen4 = " "
-INCOMPATIBLE_LICENSE:quin-tgvm-gen4 = " "
-INCOMPATIBLE_LICENSE:sa8797 = " "
-INCOMPATIBLE_LICENSE:quin-gvm-lemans = " "
-
 IMAGE_FEATURES:append = " read-only-rootfs"
 
 LICENSE_FLAGS_ACCEPTED += "commercial_gstreamer1.0-libav commercial_gstreamer1.0-omx"
@@ -50,4 +43,4 @@ WARN_QA:remove = "buildpaths"
 ERROR_QA += "obsolete-license virtual-slash license-format"
 
 #Align with poky/meta-poky/conf/distro/poky.conf
-OE_VERSION ?= "4.0.7"
+OE_VERSION ?= "5.0"

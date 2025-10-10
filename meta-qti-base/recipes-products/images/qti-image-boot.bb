@@ -14,3 +14,4 @@ EXTRA_IMAGE_FEATURES = ""
 do_rootfs[noexec] = "1"
 do_image[noexec] = "1"
 do_image_complete[noexec] = "1"
+

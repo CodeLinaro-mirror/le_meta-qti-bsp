@@ -9,6 +9,8 @@ PACKAGES = "\
 ALLOW_EMPTY:${PN} = "1"
 
 RDEPENDS:${PN} += "\
-    ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '6.1', 'platformdlkm ', '', d)} \
+    ${@bb.utils.contains_any('PREFERRED_VERSION_linux-msm', '6.1 6.12', 'platformdlkm ', '', d)} \
     packagegroup-core-boot \
     "
+
+RDEPENDS:${PN}:remove:gvm-gen5 = "platformdlkm"
