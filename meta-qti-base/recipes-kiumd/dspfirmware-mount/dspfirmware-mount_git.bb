@@ -12,25 +12,26 @@ SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/vendor/qcom/opensource/kiumd/dspfirmware-mount"
 
+SYSTEMD_SERVICES:${PN} = "usr-lib-firmware-qcom.automount usr-lib-firmware-qcom.mount"
+
 do_compile[noexec] = "1"
 
 do_install:append() {
     install -d -p ${D}${systemd_unitdir}/system/multi-user.target.wants/
 
-    install -d -p ${D}/firmware/qcom/sa8775p
+    install -d -p ${D}${nonarch_base_libdir}/firmware/qcom
     install -d -p ${D}/vendor/dsp
 
     install -m 0755 ${WORKDIR}/mnt_fs.conf -D ${D}${libdir}/modules-load.d/mnt_fs.conf
-    install -m 0644 ${S}/firmware-qcom-sa8775p.mount -D ${D}${systemd_unitdir}/system/firmware-qcom-sa8775p.mount
-    install -m 0644 ${S}/vendor-dsp.mount -D ${D}${systemd_unitdir}/system/vendor-dsp.mount
-    install -m 0644 ${S}/vendor-dsp.automount -D ${D}${systemd_unitdir}/system/vendor-dsp.automount
+    install -m 0777 ${S}/usr-lib-firmware-qcom.mount -D ${D}${systemd_unitdir}/system/usr-lib-firmware-qcom.mount
+    install -m 0777 ${S}/usr-lib-firmware-qcom.automount -D ${D}${systemd_unitdir}/system/usr-lib-firmware-qcom.automount
+    install -m 0777 ${S}/vendor-dsp.mount -D ${D}${systemd_unitdir}/system/vendor-dsp.mount
+    install -m 0777 ${S}/vendor-dsp.automount -D ${D}${systemd_unitdir}/system/vendor-dsp.automount
 
     if ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'true', 'false', d)}; then
         sed -i '/^Options=/s/defaults/&,context=system_u:object_r:dsp_file_t:s0/' ${D}${systemd_unitdir}/system/vendor-dsp.mount
     fi
 
-    ln -sf ${systemd_unitdir}/system/firmware-qcom-sa8775p.mount \
-        ${D}${systemd_unitdir}/system/multi-user.target.wants/firmware-qcom-sa8775p.mount
     ln -sf ${systemd_unitdir}/system/vendor-dsp.mount \
         ${D}${systemd_unitdir}/system/multi-user.target.wants/vendor-dsp.mount
     ln -sf ${systemd_unitdir}/system/vendor-dsp.automount \
@@ -130,3 +131,4 @@ FILES:${PN} += "${sysconfdir}/*"
 FILES:${PN} += "${libdir}/modules-load.d/*"
 FILES:${PN} += "/firmware/*"
 FILES:${PN} += "/vendor/*"
+FILES:${PN} += "${nonarch_base_libdir}/firmware/qcom"
