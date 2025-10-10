@@ -1,0 +1,35 @@
+#Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+#SPDX-License-Identifier: BSD-3-Clause-Clear
+
+# filename              partition
+xbl_s.melf              /dev/block/bootdevice/by-name/xbl
+xbl_config.elf          /dev/block/bootdevice/by-name/xbl_config
+multi_image_qti.mbn     /dev/block/bootdevice/by-name/multiimgqti
+multi_image.mbn         /dev/block/bootdevice/by-name/multiimgoem
+uefi.elf                /dev/block/bootdevice/by-name/uefi
+aop.mbn                 /dev/block/bootdevice/by-name/aop
+aop_devcfg.mbn          /dev/block/bootdevice/by-name/aop_config
+tz.mbn                  /dev/block/bootdevice/by-name/tz
+hypvm.mbn               /dev/block/bootdevice/by-name/hyp
+NON-HLOS.bin            /dev/block/bootdevice/by-name/modem
+BTFM.bin                /dev/block/bootdevice/by-name/bluetooth
+abl.elf                 /dev/block/bootdevice/by-name/abl
+dspso.bin               /dev/block/bootdevice/by-name/dsp
+km41.mbn                /dev/block/bootdevice/by-name/keymaster
+devcfg.mbn              /dev/block/bootdevice/by-name/devcfg
+qupv3fw.elf             /dev/block/bootdevice/by-name/qupfw
+dtbo.img                /dev/block/bootdevice/by-name/dtbo
+uefi_sec.mbn            /dev/block/bootdevice/by-name/uefisecapp
+imagefv.elf             /dev/block/bootdevice/by-name/imagefv
+shrm.elf                /dev/block/bootdevice/by-name/shrm
+cpucp.elf               /dev/block/bootdevice/by-name/cpucp
+featenabler.mbn         /dev/block/bootdevice/by-name/featenabler
+XblRamdump.elf          /dev/block/bootdevice/by-name/xbl_ramdump
+cpucp_dtbs.elf          /dev/block/bootdevice/by-name/cpucp_dtb
+spu_service.mbn         /dev/block/bootdevice/by-name/spuservice
+storsec.mbn             /dev/block/bootdevice/by-name/storsec
+tools.fv                /dev/block/bootdevice/by-name/toolsfv
+zeros_5sectors.bin      /dev/block/bootdevice/by-name/ddr
+logfs_ufs_8mb.bin       /dev/block/bootdevice/by-name/logfs
+sdi.mbn                 /dev/block/bootdevice/by-name/soccp_debug
+dcd.mbn                 /dev/block/bootdevice/by-name/soccp_dcd
