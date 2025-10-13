@@ -13,7 +13,7 @@ EXTRA_OECONF += " --enable-static-binaries"
 EXTRA_OECONF += " --with-config-path=/vendor/vm-system/lxc/lxc-conf"
 EXTRA_OECONF += " --with-runtime-path=/mnt/lxc/run"
 EXTRA_OECONF += " --with-rootfs-path=/vendor/vm-system"
-CFLAGS:append = " -Wno-incompatible-pointer-types"
+CFLAGS:append = " -Wno-incompatible-pointer-types -Wno-stringop-overread"
 
 do_install:append() {
     for file in ${D}/usr/bin/*; do
