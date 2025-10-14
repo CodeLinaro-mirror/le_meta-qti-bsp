@@ -3,6 +3,7 @@ SYSTEM_IMAGE_ROOTFS_SIZE   = "${@get_size_in_bytes(d.getVar('SYSTEM_SIZE_EXT4') 
 
 # support veritysetup tools.
 DEPENDS += "cryptsetup-native"
+DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'qti-avb', 'avbtool-native', '', d)}"
 
 # if A/B support is supported, generate OTA pkg by default.
 GENERATE_AB_OTA_PACKAGE ?= "${@bb.utils.contains('COMBINED_FEATURES', 'qti-ab-boot', '1', '', d)}"
@@ -32,6 +33,7 @@ SYSTEMIMAGE_MAP_TARGET ?= "system.map"
 VDLKMIMAGE_TARGET ?= "vendor_dlkm.img"
 VDLKMIMAGE_UNSPARSE_TARGET ?= "vendor_dlkm.img.unspase"
 VDLKMIMAGE_MAP_TARGET ?= "vendor_dlkm.map"
+VBMETAIMAGE_TARGET ?= "vbmeta.img"
 
 # Ensure SELinux file context variable is defined
 SELINUX_FILE_CONTEXTS ?= ""
@@ -326,5 +328,35 @@ do_makesystem() {
 
         echo "image is good to use..."
 }
+
+do_make_avb_image(){
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'qti-avb', 'true', 'false', d)}; then
+        rootfs_partition_size=$(avbtool calc_min_partition_size \
+                                        --image ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMIMAGE_TARGET} \
+                                        --partition_name vm-bootsys \
+                                        --hash_algorithm sha256 \
+                                        --do_not_generate_fec)
+        echo "Calculated rootfs partition size: $rootfs_partition_size"
+
+        # For container LE, add hashtree for system image and generate vbmeta.img.
+        avbtool add_hashtree_footer \
+                --image ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMIMAGE_TARGET} \
+                --partition_size ${rootfs_partition_size} \
+                --partition_name vm-bootsys  \
+                --hash_algorithm sha256 \
+                --key ${STAGING_DIR_NATIVE}${bindir}/SecImage/sigkeys/testkey_rsa4096.pem \
+                --rollback_index 0 \
+                --do_not_generate_fec
+
+        avbtool make_vbmeta_image \
+                --include_descriptors_from_image ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${SYSTEMIMAGE_TARGET} \
+                --algorithm SHA256_RSA4096 \
+                --key ${STAGING_DIR_NATIVE}${bindir}/SecImage/sigkeys/testkey_rsa4096.pem \
+                --rollback_index 0 \
+                --output ${IMGDEPLOYDIR}/${IMAGE_BASENAME}/${VBMETAIMAGE_TARGET}
+        fi
+}
+
 addtask do_makesystem after do_image before do_image_complete
+addtask do_make_avb_image after do_image_complete before do_build
 
