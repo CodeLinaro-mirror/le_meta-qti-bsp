@@ -1,7 +1,7 @@
 #Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
 #SPDX-License-Identifier: BSD-3-Clause-Clear
 
-DEPENDS += "dtc-native virtual/kernel"
+DEPENDS += "dtc-native virtual/kernel rsync-native"
 
 TECHPACK_MODULE_OUT ?= ""
 TECHPACK_HEADERS ?= ""
