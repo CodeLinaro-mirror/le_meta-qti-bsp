@@ -91,6 +91,7 @@ do_install:append () {
     if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'true', 'false', d)}; then
         echo "DefaultLimitNOFILE=infinity" >> ${D}${sysconfdir}/systemd/system.conf
         echo "DefaultLimitMSGQUEUE=infinity" >> ${D}${sysconfdir}/systemd/system.conf
+        echo "DefaultTimeoutStartSec=10s" >> ${D}${sysconfdir}/systemd/system.conf
         if ${@bb.utils.contains('DISTRO_FEATURES', 'qti-rumi', 'true', 'false', d)}; then
             echo "DefaultTimeoutStartSec=5s" >> ${D}${sysconfdir}/systemd/system.conf
             echo "DefaultTimeoutStopSec=5s" >> ${D}${sysconfdir}/systemd/system.conf
