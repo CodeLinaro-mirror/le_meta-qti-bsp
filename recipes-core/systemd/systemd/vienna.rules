@@ -1,0 +1,53 @@
+# Diag devices
+KERNEL=="diag_am_cntl", MODE="0660", OWNER="system", GROUP="system"
+KERNEL=="diag_am_cmd", MODE="0660", OWNER="system", GROUP="system"
+KERNEL=="diag_am_data", MODE="0660", OWNER="system", GROUP="system"
+KERNEL=="diag_wm_cntl", MODE="0660", OWNER="system", GROUP="system"
+KERNEL=="diag_wm_cmd", MODE="0660", OWNER="system", GROUP="system"
+KERNEL=="diag_wm_data", MODE="0660", OWNER="system", GROUP="system"
+
+# Power state
+KERNEL=="power_state", MODE="0660", OWNER="system", GROUP="system"
+
+# Slatecom and shared memory
+KERNEL=="slate_com_dev", MODE="0660", OWNER="system", GROUP="system"
+KERNEL=="smc_client_dev", MODE="0660", OWNER="system", GROUP="system"
+KERNEL=="am_shared_mem", MODE="0660", OWNER="system", GROUP="system"
+
+# GLink utility and display
+KERNEL=="glink_pkt_utility_am", MODE="0660", OWNER="system", GROUP="system"
+KERNEL=="glink_pkt_am_disp_util", MODE="0660", OWNER="system", GROUP="system"
+KERNEL=="glink_pkt_am_display_ctrl", MODE="0660", OWNER="system", GROUP="system"
+KERNEL=="glink_pkt_am_display_data", MODE="0660", OWNER="system", GROUP="system"
+KERNEL=="glink_pkt_slate_display_data", MODE="0660", OWNER="system", GROUP="system"
+KERNEL=="glink_pkt_utility_wm", MODE="0660", OWNER="system", GROUP="system"
+KERNEL=="glink_pkt_slate_touch_ctrl", MODE="0660", OWNER="system", GROUP="system"
+KERNEL=="glink_pkt_slate_dfu", MODE="0660", OWNER="system", GROUP="system"
+KERNEL=="glink_pkt_slate_custom_data", MODE="0660", OWNER="system", GROUP="system"
+KERNEL=="glink_pkt_slate_ux_ctl", MODE="0660", OWNER="system", GROUP="system"
+KERNEL=="glink_pkt_slate_qcli", MODE="0660", OWNER="system", GROUP="system"
+KERNEL=="glink_pkt_swm_fs", MODE="0660", OWNER="system", GROUP="system"
+KERNEL=="glink_pkt_slate_location_ctrl", MODE="0660", OWNER="system", GROUP="system"
+KERNEL=="glinkpkt_slate_haptics_offload", MODE="0660", OWNER="system", GROUP="system"
+
+# Sensor glink devices
+KERNEL=="glinkpkt_wm_qsh_2_[0-8]", MODE="0666", OWNER="system", GROUP="system"
+
+# Bluetooth glink devices
+KERNEL=="glink_pkt_slate_bt_ctrl", MODE="0660", OWNER="bluetooth", GROUP="bluetooth"
+KERNEL=="glink_pkt_bt_offload_event", MODE="0660", OWNER="bluetooth", GROUP="bluetooth"
+KERNEL=="glink_pkt_slate_bt_app", MODE="0660", OWNER="bluetooth", GROUP="bluetooth"
+KERNEL=="glink_pkt_dcf_bt_ctrl", MODE="0660", OWNER="bluetooth", GROUP="bluetooth"
+KERNEL=="glink_pkt_dcf_bt_data", MODE="0660", OWNER="bluetooth", GROUP="bluetooth"
+KERNEL=="glink_pkt_ss_bt_ctrl", MODE="0660", OWNER="bluetooth", GROUP="bluetooth"
+KERNEL=="glink_pkt_ss_bt_data", MODE="0660", OWNER="bluetooth", GROUP="bluetooth"
+KERNEL=="glink_pkt_ss_bt_le_data", MODE="0660", OWNER="bluetooth", GROUP="bluetooth"
+KERNEL=="glink_pkt_ss_bt_ssr_data", MODE="0660", OWNER="bluetooth", GROUP="bluetooth"
+KERNEL=="glink_pkt_ss_bt_obex_data", MODE="0660", OWNER="bluetooth", GROUP="bluetooth"
+KERNEL=="glink_pkt_hci_arbiter_chnl", MODE="0660", OWNER="bluetooth", GROUP="bluetooth"
+KERNEL=="glink_pkt_bt_socket_hal_chnl", MODE="0660", OWNER="bluetooth", GROUP="bluetooth"
+KERNEL=="glink_pkt_bt_gatt_offload_chnl", MODE="0660", OWNER="bluetooth", GROUP="bluetooth"
+
+
+# Rawdump block device
+SUBSYSTEM=="block", KERNEL=="rawdump", MODE="0660", OWNER="root", GROUP="system"
