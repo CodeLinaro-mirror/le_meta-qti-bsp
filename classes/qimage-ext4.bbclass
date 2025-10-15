@@ -358,5 +358,5 @@ do_make_avb_image(){
 }
 
 addtask do_makesystem after do_image before do_image_complete
-addtask do_make_avb_image after do_image_complete before do_build
+addtask do_make_avb_image after do_makesystem before do_image_complete
 
