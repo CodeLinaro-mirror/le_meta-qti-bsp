@@ -281,3 +281,12 @@ BBMASK:gvm-gen5 += "meta-qti-bsp/meta-qti-extra/recipes-test/virt-fastrpc-ut/vir
 BBMASK:gvm-gen5 += "meta-qti-bsp/meta-qti-extra/recipes-test/virt-reg-ut/virt-reg-ut.bb"
 BBMASK:gvm-gen5 += "meta-qti-bsp/meta-qti-extra/recipes-test/virt-spmi-ut/virt-spmi-ut.bb"
 BBMASK:gvm-gen5 += "meta-qti-bsp/meta-qti-extra/recipes-test/virtio-i2c-test/virtio-i2c-test.bb"
+BBMASK:gvm-gen5 += "meta-qti-bsp/meta-qti-base/recipes-graphics/display-hal/display-hal-linux_git.bb"
+BBMASK:gvm-gen5 += "meta-qti-bsp/meta-qti-base/recipes-graphics/wayland/weston-sdm-extension_1.0.0.bb"
+BBMASK:gvm-gen5 += "meta-qti-bsp/meta-qti-base/recipes-graphics/wayland/weston-sdm-extension-headers.bb"
+BBMASK:gvm-gen5 += "meta-qti-bsp/meta-qti-base/recipes-graphics/display-hal/display-hal-headers_git.bb"
+BBMASK:gvm-gen5 += "meta-qti-bsp/meta-qti-base/recipes-graphics/display-commonsys-intf/display-commonsys-intf-linux_git.bb"
+BBMASK:gvm-gen5 += "meta-qti-bsp/meta-qti-base/recipes-graphics/wayland/weston_13.0.%.bbappend"
+#now don't need for gvm-gen5
+BBMASK:gvm-gen5 += "meta-qti-display"
+BBMASK:gvm-gen5 += "meta-qti-display-internal"
