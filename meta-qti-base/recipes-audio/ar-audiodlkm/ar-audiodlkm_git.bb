@@ -13,6 +13,7 @@ SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/audio-kernel-ar/.git;protocol=
 SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/vendor/qcom/opensource/audio-kernel-ar"
+EXT_MODULE = "vendor/qcom/opensource/audio-kernel-ar"
 
 EXTRA_OEMAKE:sa81x5 += "TARGET_SUPPORT=sa8155"
 EXTRA_OEMAKE:quin-gvm-gen4-2 += "TARGET_SUPPORT=no AUTO_GVM=yes"
@@ -21,6 +22,7 @@ EXTRA_OEMAKE:qtiquingvm8295 += "TARGET_SUPPORT=no AUTO_GVM=yes"
 EXTRA_OEMAKE:monaco += "TARGET_SUPPORT=monaco"
 EXTRA_OEMAKE:quin-gvm-monaco += "TARGET_SUPPORT=no AUTO_GVM=yes"
 EXTRA_OEMAKE:quin-gvm-gen4 += "TARGET_SUPPORT=no AUTO_GVM=yes"
+EXTRA_OEMAKE:quin-gvm-gen4-5 += "TARGET_SUPPORT=no AUTO_GVM=yes"
 
 MODULES = "\
         dsp/spf_core_dlkm.ko  \
@@ -70,6 +72,12 @@ do_install:append() {
     if ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '5.4', 'true', 'false', d)}; then
         for i in $(find ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/. -name "*.ko"); do
             mv ${i} ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/
+        done
+    fi
+
+    if ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '6.12', 'true', 'false', d)}; then
+        for i in $(find ${S}/. -name "*.ko"); do
+            install -m 0755 ${i} ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/
         done
     fi
 
