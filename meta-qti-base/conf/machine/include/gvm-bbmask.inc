@@ -114,7 +114,6 @@ BBMASK:quin-gvm-gen4-5 += "meta-qti-bsp/meta-qti-base/recipes-core/reboot-daemon
 BBMASK:quin-gvm-gen4-5 += "meta-qti-bsp/meta-qti-base/recipes-data/aurix-can/aurix-can_git.bb"
 BBMASK:quin-gvm-gen4-5 += "meta-qti-bsp/meta-qti-base/recipes-data/avb-utils/avb-utils_1.0.bb"
 BBMASK:quin-gvm-gen4-5 += "meta-qti-bsp/meta-qti-base/recipes-data/dataeth-dlkm/dataeth-dlkm_git.bb"
-BBMASK:quin-gvm-gen4-5 += "meta-qti-bsp/meta-qti-base/recipes-data/eavb/eavb-fe-virtio_git.bb"
 BBMASK:quin-gvm-gen4-5 += "meta-qti-bsp/meta-qti-base/recipes-data/emac-dwc-eqos/emac-dwc-eqos_git.bb"
 BBMASK:quin-gvm-gen4-5 += "meta-qti-bsp/meta-qti-base/recipes-kernel/edk2/edk2_git.bb"
 BBMASK:quin-gvm-gen4-5 += "meta-qti-bsp/meta-qti-base/recipes-kernel/linux-msm/linux-msm_5.15.bb"
