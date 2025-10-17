@@ -52,6 +52,8 @@ POLICY_NAME = "qti"
 
 fix_platcil() {
     cilfile="$1"
+    sed -i '1i(typetransition kernel init_exec process init)' ${cilfile}
+    sed -i '1i(type init_exec)' ${cilfile}
     sed -i '1i(type audio_property)' ${cilfile}
     sed -i '1i(type tunnel_audio_property)' ${cilfile}
     sed -i '1i(type av_property)' ${cilfile}
