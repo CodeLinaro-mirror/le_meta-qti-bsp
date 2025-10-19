@@ -3,7 +3,7 @@ inherit kernel
 DESCRIPTION = "CAF Linux Kernel"
 LICENSE = "GPLv2.0-with-linux-syscall-note"
 
-COMPATIBLE_MACHINE = "trustedvm-v4|vienna"
+COMPATIBLE_MACHINE = "trustedvm-v4|vienna|alor"
 
 FILESEXTRAPATHS:prepend := "${WORKSPACE}:"
 FILESEXTRAPATHS:prepend := "${WORKSPACE}:${KERNEL_PREBUILT_PATH}:"
@@ -15,6 +15,7 @@ SRC_URI = "file://kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/soc-repo
 
 S = "${WORKDIR}/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/soc-repo"
 S:vienna = "${WORKDIR}/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/common"
+S:alor = "${WORKDIR}/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/common"
 PR = "r0"
 DEPENDS += "virtual/kernel-toolchain-native virtual/dtc-native rsync-native mod-signing-keys"
 LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
@@ -40,8 +41,10 @@ do_prebuilt_configure() {
     install -m 0644 ../${KERNEL_TYPE}/.config ${B}
     install -m 0644 ../${KERNEL_TYPE}/Module.symvers ${B}
     install -m 0644 ../${KERNEL_TYPE}/signing_key.pem ${B}/certs/signing_key.pem
-    install -m 0644 ../${KERNEL_TYPE}/verity_cert.pem ${B}/certs/verity_cert.pem
-    install -m 0644 ../${KERNEL_TYPE}/verity_key.pem ${B}/certs/verity_key.pem
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains('MACHINE_FEATURES', 'dm-verity-initramfs-v3', 'true', 'false', d), 'false', d)}; then
+        install -m 0644 ../${KERNEL_TYPE}/verity_cert.pem ${B}/certs/verity_cert.pem
+        install -m 0644 ../${KERNEL_TYPE}/verity_key.pem ${B}/certs/verity_key.pem
+    fi
     if [ -f module.lds ]; then
     install -m 0644 module.lds ${B}/scripts/module.lds
     fi
