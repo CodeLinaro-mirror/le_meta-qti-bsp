@@ -45,6 +45,7 @@ do_install:append() {
 EXTRA_OECONF += "--disable-doc --disable-Werror"
 
 RPROVIDES:${PN} += "kernel-module-apps-pinctrl-${KERNEL_VERSION}"
+RPROVIDES:${PN} += "kernel-module-pinctrl-fusa-${KERNEL_VERSION}"
 RPROVIDES:${PN} += "kernel-module-scm-user-intf-${KERNEL_VERSION}"
 RPROVIDES:${PN} += "kernel-module-qcom-dload-mode-${KERNEL_VERSION}"
 RPROVIDES:${PN} += "kernel-module-arm-smmu-qcom-fusa-${KERNEL_VERSION}"
