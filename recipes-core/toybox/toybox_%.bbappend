@@ -6,15 +6,12 @@ do_configure:append() {
     sed -e 's/# CONFIG_MDEV_CONF is not set/CONFIG_MDEV_CONF=y/' -i .config
 
     sed -e 's/# CONFIG_SWAPON is not set/CONFIG_SWAPON=y/' -i .config
-    sed -e 's/CONFIG_EGREP=y/# CONFIG_EGREP is not set/' -i .config
-    sed -e 's/CONFIG_FGREP=y/# CONFIG_FGREP is not set/' -i .config
-    sed -e 's/CONFIG_GREP=y/# CONFIG_GREP is not set/' -i .config
-    sed -e 's/CONFIG_HALT=y/# CONFIG_HALT is not set/' -i .config
-    sed -e 's/CONFIG_CP=y/# CONFIG_CP is not set/' -i .config
 }
 
 do_install:append(){
+      cp -rp ${D}/etc/toybox.links ${D}/etc/toybox.links.ramdisk
 	sed -i '/^\/sbin\/halt$/d' ${D}/etc/toybox.links
+	sed -i '/^\/bin\/cp$/d' ${D}/etc/toybox.links
 	sed -i '/^\/sbin\/insmod$/d' ${D}/etc/toybox.links
 	sed -i '/^\/bin\/login$/d' ${D}/etc/toybox.links
 	sed -i '/^\/sbin\/lsmod$/d' ${D}/etc/toybox.links
