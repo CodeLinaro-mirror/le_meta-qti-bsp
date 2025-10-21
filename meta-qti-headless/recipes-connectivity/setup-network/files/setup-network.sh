@@ -153,7 +153,7 @@ setup_network_agl_vm_1()
 setup_network_agl_vm_2()
 {
     echo "Assign IP address"
-    ifconfig eth0 192.168.1.3 up
+    ifconfig eth0 192.168.1.8 up
 
     echo "Setup route"
     ip route add default dev eth0 via 192.168.1.10
