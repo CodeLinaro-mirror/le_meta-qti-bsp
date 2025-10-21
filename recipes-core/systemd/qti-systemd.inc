@@ -14,6 +14,7 @@ SRC_URI += "file://set-mhi-nodes.rules"
 SRC_URI += "file://99-gpiochardev.rules"
 SRC_URI += "file://kmem.rules"
 SRC_URI += "file://mmc-rpmb.rules"
+SRC_URI += "file://ashmem.rules"
 
 # Custom setup for PACKAGECONFIG to get a slimmer systemd.
 # Removed following:
