@@ -43,12 +43,7 @@ do_install:append() {
 
 do_install:append:sa8775() {
     install -d ${D}${systemd_unitdir}/system/
-
-    if ${@bb.utils.contains('DISTRO_FEATURES', 'qcvirtio', 'true', 'false', d)}; then
-        install -m 0644 ${S}/qcrosvm-trout.service ${D}/${systemd_unitdir}/system/qcrosvm.service
-    else
-        install -m 0644 ${S}/qcrosvm.service ${D}/${systemd_unitdir}/system/qcrosvm.service
-    fi
+    install -m 0644 ${S}/qcrosvm.service ${D}/${systemd_unitdir}/system/qcrosvm.service
 }
 
 do_install:append:sa7255() {
@@ -73,6 +68,10 @@ do_install:append:sa8255-ivi() {
 do_install:append:sa8775-flex() {
     install -d ${D}${systemd_unitdir}/system/
     install -m 0644 ${S}/qcrosvm_lv.service ${D}/${systemd_unitdir}/system/qcrosvm_lv.service
+
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'qcvirtio', 'true', 'false', d)}; then
+        install -m 0644 ${S}/qcrosvm-trout.service ${D}/${systemd_unitdir}/system/qcrosvm.service
+    fi
 }
 
 # Once upgrade Yocto to 4.2 and upgrade Python to 3.11 in the future, we can inherit cargo-update-recipe-crates and delete this line
