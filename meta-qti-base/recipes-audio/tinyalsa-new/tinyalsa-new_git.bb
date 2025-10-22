@@ -14,6 +14,7 @@ SRC_URI = "\
     file://0001-utils-tinycap-support-8bits-record.patch \
     file://0001-utils-tinyplay-check-fopen-return-value-to-prevent-s.patch \
     file://0001-Fix-tinycap-to-support-24bits.patch \
+    file://0001-tinyhostless-bugfix-for-l-alsa-alsa-loopback-case.patch \
 "
 
 SRCREV = "f78ed25aced2dfea743867b8205a787bfb091340"
