@@ -22,7 +22,7 @@ RDEPENDS:packagegroup-qti-recoveryfs = " \
             logd \
             recovery \
             usb-composition-recovery \
-            ${@bb.utils.contains('COMBINED_FEATURES', 'qti-nad-core', '', 'find-recovery-partitions', d)} \
+            find-recovery-partitions \
             ${@oe.utils.conditional('USB_AUTOSUSPEND_SUPPORT', 'True', 'usb-composition-recovery-usbd', '', d)} \
             ${@bb.utils.contains('MACHINE_FEATURES', 'qti-sdx', 'systemd-machine-units-recovery', '', d)} \
             ${@bb.utils.contains('DISTRO_FEATURES', 'ota-package-verification', 'openssl', '', d)} \
