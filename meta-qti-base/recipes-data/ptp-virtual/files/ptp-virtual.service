@@ -37,4 +37,4 @@ NoNewPrivileges=true
 ExecStart=/sbin/modprobe ptp_virtual
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=sysinit.target
