@@ -26,45 +26,4 @@ ROOTFS_POSTPROCESS_COMMAND:remove:sa8797 = "add_extra_modules;"
 IMAGE_FEATURES:append = " ${@bb.utils.contains('VARIANT', 'debug', 'debug-tweaks ssh-server-openssh', '', d)}"
 
 INCOMPATIBLE_LICENSE = "GPL-3.0* LGPL-3.0* AGPL-3.0*"
-INCOMPATIBLE_LICENSE_EXCEPTIONS:quin-gvm-gen4 = "bash:GPL-3.0-or-later"
 
-INCOMPATIBLE_LICENSE_EXCEPTIONS:qtiquingvm8295 = "\
-    gdbserver:GPL-3.0-only \
-    gdbserver:LGPL-3.0-only \
-    gdb:GPL-3.0-only \
-    gdb:LGPL-3.0-only \
-    binutils:GPL-3.0-only \
-    python3-docutils:GPL-3.0-only \
-    bison:GPL-3.0-only \
-    gawk:GPL-3.0-only \
-    tar:GPL-3.0-only \
-    m4:GPL-3.0-only \
-    bash:GPL-3.0-or-later \
-    "
-INCOMPATIBLE_LICENSE:qtiquingvm8295 = "GPL-3.0* LGPL-3.0* AGPL-3.0*"
-
-INCOMPATIBLE_LICENSE_EXCEPTIONS:quin-gvm-lemans = "\
-    gdbserver:GPL-3.0-only \
-    gdbserver:LGPL-3.0-only \
-    gdb:GPL-3.0-only \
-    gdb:LGPL-3.0-only \
-    binutils:GPL-3.0-only \
-    python3-docutils:GPL-3.0-only \
-    bison:GPL-3.0-only \
-    gawk:GPL-3.0-only \
-    tar:GPL-3.0-only \
-    m4:GPL-3.0-only \
-    "
-
-INCOMPATIBLE_LICENSE_EXCEPTIONS:quin-gvm-gen4-5 = "\
-    gdbserver:GPL-3.0-only \
-    gdbserver:LGPL-3.0-only \
-    gdb:GPL-3.0-only \
-    gdb:LGPL-3.0-only \
-    binutils:GPL-3.0-only \
-    python3-docutils:GPL-3.0-only \
-    bison:GPL-3.0-only \
-    gawk:GPL-3.0-only \
-    tar:GPL-3.0-only \
-    m4:GPL-3.0-only \
-    "
