@@ -21,8 +21,15 @@ CFLAGS:append:quin-gvm-gen4-5 = " -DLIB_UNIFICATION"
 TARGET_PATH_NAME ?= "${MACHINE}"
 TARGET_PATH_NAME:sa8775 = "sa8775"
 
+# In RPM-based builds, the base-files package creates system directories like /sys and /proc
+# during the build process. This behavior can lead to file conflicts when other packages, such as
+# early-ramdisk-init, attempt to include the same directories.
 do_install:append() {
     install -d ${D}/dev
+    if ${@bb.utils.contains('PACKAGE_CLASSES', 'package_rpm', 'false', 'true', d)}; then
+        install -d ${D}/sys
+        install -d ${D}/proc
+    fi
     install -d ${D}/etc
     install -d ${D}/boot/early-ramdisk
     install -d ${D}/realroot
@@ -36,8 +43,10 @@ do_install:append() {
 
 FILES:${PN} += "\
          init \
+         sys/ \
          dev/ \
          etc/ \
+         proc/ \
          boot/early-ramdisk \
          realroot/ \
          etc/modules-load.f/* \
