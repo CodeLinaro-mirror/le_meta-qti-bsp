@@ -1,0 +1,56 @@
+From e1e9c32531c1fabfc2a32fe50c1997972a60c04e Mon Sep 17 00:00:00 2001
+From: Naiwen Yu <naiwyu@qti.qualcomm.com>
+Date: Fri, 24 Oct 2025 13:33:16 +0800
+Subject: [PATCH] systemd: Make systemd init run in high priority.
+
+In RTlinux, many RT process may lead systemd can not pet
+watchdog in time, change systemd to high priority.
+
+Upstream-Status: Inappropriate
+
+Signed-off-by: Naiwen Yu <naiwyu@qti.qualcomm.com>
+---
+ src/core/manager.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/src/core/manager.c b/src/core/manager.c
+index 23d18e61b5..7017ae58fa 100644
+--- a/src/core/manager.c
++++ b/src/core/manager.c
+@@ -10,6 +10,8 @@
+ #include <sys/timerfd.h>
+ #include <sys/wait.h>
+ #include <unistd.h>
++#include <sched.h>
++#include <sys/resource.h>
+ 
+ #if HAVE_AUDIT
+ #include <libaudit.h>
+@@ -3003,6 +3005,7 @@ static int manager_dispatch_jobs_in_progress(sd_event_source *source, usec_t use
+ int manager_loop(Manager *m) {
+         RateLimit rl = { .interval = 1*USEC_PER_SEC, .burst = 50000 };
+         int r;
++        struct sched_param param;
+ 
+         assert(m);
+         assert(m->objective == MANAGER_OK); /* Ensure manager_startup() has been called */
+@@ -3014,6 +3017,16 @@ int manager_loop(Manager *m) {
+         if (r < 0)
+                 return log_error_errno(r, "Failed to enable SIGCHLD event source: %m");
+ 
++        r = setpriority(PRIO_PROCESS, 0, -19);
++        if (r < 0)
++                log_error_errno(r, "Failed to set up systemd priority: %m");
++
++        sched_getparam(0, &param);
++        int policy = sched_getscheduler(0) | SCHED_RESET_ON_FORK;
++        r = sched_setscheduler(0, policy, &param);
++        if (r < 0)
++                log_error_errno(r, "Failed to set up systemd scheduler: %m");
++
+         while (m->objective == MANAGER_OK) {
+ 
+                 (void) watchdog_ping();
+-- 
+2.34.1
+
