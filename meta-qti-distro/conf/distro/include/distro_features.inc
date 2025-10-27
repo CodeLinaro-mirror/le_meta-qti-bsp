@@ -6,11 +6,18 @@ DISTRO_FEATURES:append:sa6155 = " qti-carcamsrc qti-omx"
 DISTRO_FEATURES:append:sa81x5-rt = " qti-carcamsrc qti-omx"
 DISTRO_FEATURES:append:sa81x5 = " qti-carcamsrc qti-fastcv qti-omx"
 DISTRO_FEATURES:append:sa8295 = " qti-codec2"
-DISTRO_FEATURES:append:qtiquingvm = " qti-omx qti-gstqeavb"
-DISTRO_FEATURES:append:qtiquingvm8295 = " qti-codec2 qti-gstdeinterlace qti-gstqeavb qti-gstqvrate qti-gstqvais"
-DISTRO_FEATURES:append:quin-gvm-gen4 = " qti-codec2 qti-gstdeinterlace qti-gstqeavb qti-gstqvrate qti-gstqvais"
-DISTRO_FEATURES:append:quin-gvm-lemans = " qti-codec2 qti-gstdeinterlace qti-gstqeavb"
-DISTRO_FEATURES:append:quin-gvm-monaco = " qti-codec2 qti-gstdeinterlace qti-gstqeavb"
+DISTRO_FEATURES:append:qtiquingvm = " qti-omx"
+DISTRO_FEATURES:append:qtiquingvm8295 = " qti-codec2 qti-gstdeinterlace qti-gstqvrate qti-gstqvais"
+DISTRO_FEATURES:append:quin-gvm-gen4 = " qti-codec2 qti-gstdeinterlace qti-gstqvrate qti-gstqvais"
+DISTRO_FEATURES:append:quin-gvm-lemans = " qti-codec2 qti-gstdeinterlace"
+DISTRO_FEATURES:append:quin-gvm-monaco = " qti-codec2 qti-gstdeinterlace"
+
+# Vnw
+DISTRO_FEATURES:append:qtiquingvm = " qti-gstopenavb"
+DISTRO_FEATURES:append:qtiquingvm8295 = " qti-gstopenavb"
+DISTRO_FEATURES:append:quin-gvm-gen4 = " qti-gstopenavb"
+DISTRO_FEATURES:append:quin-gvm-lemans = " qti-gstopenavb"
+DISTRO_FEATURES:append:quin-gvm-monaco = " qti-gstopenavb"
 
 # Camera
 DISTRO_FEATURES:append:quin-gvm-lemans = " qti-qcx"

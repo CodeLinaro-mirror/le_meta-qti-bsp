@@ -55,6 +55,7 @@ _WLAN_CFG_OVERRIDE = "\
                         CONFIG_DBR_HOLD_LARGE_MEM=n \
                         CONFIG_DP_MULTIPASS_SUPPORT=n \
                         CONFIG_FEATURE_DELAYED_PEER_OBJ_DESTROY=n \
+                        CONFIG_FEATURE_WLAN_CH_AVOID_EXT=y \
                         "
 EXTRA_OEMAKE:append = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE}"
 

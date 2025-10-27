@@ -2,7 +2,7 @@ SUMMARY = "QTI codec2 Plugin for GStreamer"
 DESCRIPTION = "Gstreamer H/W decoder and encoder plugins based on codec2 APIs"
 HOMEPAGE = "https://git.codelinaro.org/"
 SECTION = "multimedia"
-LICENSE = "LGPL-2.0-only & BSD-3-Clause & MIT"
+LICENSE = "BSD-3-Clause & BSD-3-Clause-Clear"
 LIC_FILES_CHKSUM = "file://NOTICE;md5=e45e8fc7bdec198bec59831b0d7d16f7"
 
 DEPENDS += "\
@@ -19,56 +19,31 @@ DEPENDS += "\
     virtual/kernel-headers \
     binder \
     codec2-service \
+    displaydlkm \
 "
-
-DEPENDS:append:quin-gvm-lemans = " displaydlkm"
-DEPENDS:append:monaco = " displaydlkm"
-DEPENDS:append:quin-gvm-monaco = " displaydlkm"
 
 SRC_URI = "${PATH_TO_REPO}/gstreamer/gst-plugins-qti-oss/.git;protocol=${PROTO};destsuffix=gstreamer/gst-plugins-qti-oss;usehead=1"
 SRCREV = "${AUTOREV}"
 S = "${WORKDIR}/gstreamer/gst-plugins-qti-oss/gst-plugin-codec2"
 
 inherit meson pkgconfig
-
 CFLAGS += "\
     -I${STAGING_INCDIR}/c++ \
     -I${STAGING_INCDIR}/c++/${TARGET_SYS} \
     -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}/vidc \
     -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel} \
+    -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}/display \
 "
 
 CXXFLAGS += "\
     -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}/vidc \
     -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel} \
+    -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}/display \
 "
 
 EXTRA_OEMESON += "\
-    ${@oe.utils.version_less_or_equal('${preferred-kernel}', '5.4', '', '-Dusedmaheap=true', d)} \
+    -Dusedmaheap=true \
     -Dagl-c2service=true \
-"
-
-CFLAGS:append:quin-gvm-lemans = " -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}/display"
-CXXFLAGS:append:quin-gvm-lemans = " -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}/display"
-EXTRA_OEMESON:append:quin-gvm-lemans = " \
-    -Dav1-dec=enabled \
-    -Dmmmcolorfmt=true \
-    -Dqprange_option=op1 \
-    -Dreport_frame_qp_option=op1 \
-"
-
-CFLAGS:append:monaco = " -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}/display"
-CXXFLAGS:append:monaco = " -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}/display"
-EXTRA_OEMESON:append:monaco = " \
-    -Dmpeg2-dec=disabled \
-    -Dmmmcolorfmt=true \
-    -Dqprange_option=op1 \
-    -Dreport_frame_qp_option=op1 \
-"
-
-CFLAGS:append:quin-gvm-monaco = " -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}/display"
-CXXFLAGS:append:quin-gvm-monaco = " -I${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel}/display"
-EXTRA_OEMESON:append:quin-gvm-monaco = " \
     -Dav1-dec=enabled \
     -Dmpeg2-dec=disabled \
     -Dmmmcolorfmt=true \
@@ -76,14 +51,17 @@ EXTRA_OEMESON:append:quin-gvm-monaco = " \
     -Dreport_frame_qp_option=op1 \
 "
 
-EXTRA_OEMESON:append:quin-gvm-gen4 = " -Dset_dec_input_framerate=true"
-EXTRA_OEMESON:append:qtiquingvm8295 = " -Dset_dec_input_framerate=true"
+do_install:append(){
+    install -d ${D}/uni/monaco
+    mv ${D}/usr ${D}/uni/monaco/
+}
 
 PACKAGE_ARCH ?= "${MACHINE_ARCH}"
 
 SOLIBS = ".so"
 FILES_SOLIBSDEV = ""
 
-FILES:${PN} += "${libdir}/gstreamer-1.0/*.so"
+FILES:${PN} += "/uni/monaco${libdir}/*.so"
+FILES:${PN} += "/uni/monaco${libdir}/gstreamer-1.0/*.so"
 
 TOOLCHAIN = "clang"

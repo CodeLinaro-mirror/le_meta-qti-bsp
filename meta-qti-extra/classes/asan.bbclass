@@ -47,7 +47,7 @@ python __anonymous() {
     d.appendVar('LDFLAGS', ' -lasan')
 
     # Inherit meson, needs add compile flags at meson-configure file additionally
-    if recipe_name in ['gstreamer1.0-plugin-qvais', 'gstreamer1.0-plugins-qvrate', 'weston-sdm-extension', 'gstreamer1.0-qvconv', 'gstreamer1.0-plugins-drmdecryptor', 'gstreamer1.0-plugins-vesdeliver', 'gstreamer1.0-plugins-qvdeinterlace', 'gstreamer1.0-plugins-codec2', 'gstreamer1.0-plugins-qeavb']:
+    if recipe_name in ['gstreamer1.0-plugin-qvais', 'gstreamer1.0-plugins-qvrate', 'weston-sdm-extension', 'gstreamer1.0-plugins-qvconv', 'gstreamer1.0-plugins-drmdecryptor', 'gstreamer1.0-plugins-vesdeliver', 'gstreamer1.0-plugins-qvdeinterlace', 'gstreamer1.0-plugins-codec2', 'gstreamer1.0-plugins-qeavb']:
         d.appendVar('EXTRA_OEMESON', ' -DASAN=true')
         return
 
@@ -74,30 +74,27 @@ python __anonymous() {
 ROOTFS_POSTPROCESS_COMMAND:append = " ${@bb.utils.contains("DISTRO_FEATURES", "asan", "add_asan_preload;", "", d)}"
 #add some asan option for service
 add_asan_preload() {
-    if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/agm.service" ]; then
-        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.8"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/agm.service
-    fi
-    if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/weston@.service" ]; then
-        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.8"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/weston@.service
-    fi
-    if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/ais_v4l2_proxy.service" ]; then
-        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.8"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/ais_v4l2_proxy.service
-    fi
-    if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/qseecomd.service" ]; then
-        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.8"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/qseecomd.service
-    fi
-    if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/synergy.service" ]; then
-        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.8"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/synergy.service
-    fi
+service_etc_list="\
+"
+service_lib_list="\
+ agm.service \
+ synergy.service \
+ ais_v4l2_proxy.service \
+ weston.service \
+ qseecomd.service \
+"
 
-    # waiting to fix the error of leum711, will delete below code
-    if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/agm.service" ]; then
-        sed -i '/^\[Service\]/a Environment="ASAN_OPTIONS=detect_odr_violation=0"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/agm.service
-    fi
-    if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/pdmapper.service" ]; then
-        sed -i '/^\[Service\]/a Environment="ASAN_OPTIONS=detect_odr_violation=0"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/pdmapper.service
-    fi
-    if [ -f "${IMAGE_ROOTFS}${systemd_unitdir}/system/weston.service" ]; then
-        sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.8"' ${IMAGE_ROOTFS}${systemd_unitdir}/system/weston.service
-    fi
+    for service_etc in $service_etc_list; do
+       service_etc_file="${IMAGE_ROOTFS}/etc/systemd/system/${service_etc}"
+       if [ -f "$service_etc_file" ]; then
+           sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.8"' "$service_etc_file"
+       fi
+    done
+
+    for service_lib in $service_lib_list; do
+       service_lib_file="${IMAGE_ROOTFS}${systemd_unitdir}/system/${service_lib}"
+       if [ -f "$service_lib_file" ]; then
+           sed -i '/^\[Service\]/a Environment="LD_PRELOAD=/usr/lib/libasan.so.8"' "$service_lib_file"
+       fi
+    done
 }
