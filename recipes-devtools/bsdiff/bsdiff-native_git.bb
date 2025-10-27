@@ -1,4 +1,4 @@
-inherit autotools pkgconfig native deploy
+inherit autotools pkgconfig deploy native
 
 PR = "r4"
 

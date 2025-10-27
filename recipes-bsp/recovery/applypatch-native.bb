@@ -1,4 +1,4 @@
-inherit pkgconfig native autotools
+inherit pkgconfig autotools native
 
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
