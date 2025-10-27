@@ -4,7 +4,7 @@ SOC_FAMILY = "sa8775"
 include conf/machine/include/soc-family.inc
 PRODUCT = "${MACHINE}"
 
-# Gen4(sa8775/sa8255/sa8650) board chip belongs to Cortex-A78C(CPU part: 0xd4b).
+# Gen4(sa8775/sa8255/9100) board chip belongs to Cortex-A78C(CPU part: 0xd4b).
 include ${@bb.utils.contains('BBFILE_COLLECTIONS', 'ubuntu', 'conf/machine/include/arm/armv8-2a/tune-cortexa76.inc', 'conf/machine/include/tune-cortexa78c.inc', d)}
 
 # Prefer Wayland/Weston version

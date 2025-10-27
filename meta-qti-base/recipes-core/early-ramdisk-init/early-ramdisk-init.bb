@@ -27,7 +27,7 @@ TARGET_PATH_NAME:sa7255 = "sa7255"
 
 TARGET_PATH_NAME:sa8255-ivi = "sa8775-qclinux"
 TARGET_PATH_NAME:sa8775-flex = "sa8775-qclinux"
-TARGET_PATH_NAME:sa8650-adas = "sa8775-qclinux"
+TARGET_PATH_NAME:9100 = "sa8775-qclinux"
 
 do_install:append() {
     install -d ${D}/dev
