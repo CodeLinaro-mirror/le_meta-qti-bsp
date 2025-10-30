@@ -3,7 +3,7 @@ QTI_SYSTEMD_INC = ""
 QTI_SYSTEMD_INC:qti-distro-base = "${THISDIR}/qti-systemd.inc"
 include ${QTI_SYSTEMD_INC}
 
-SRC_URI:append += "file://platform.rules"
+SRC_URI:append = " file://platform.rules"
 
 do_install:append() {
     sed -i '/group:wheel/d' ${D}${exec_prefix}/lib/tmpfiles.d/systemd.conf
