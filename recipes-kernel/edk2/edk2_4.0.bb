@@ -12,6 +12,7 @@ FILESEXTRAPATHS:prepend:qcs610-odk-64 := "${KERNEL_PREBUILT_PATH}/dist/abl-userd
 FILESEXTRAPATHS:prepend:kera := "${KERNEL_PREBUILT_PATH}/dist/abl-userdebug:"
 FILESEXTRAPATHS:prepend:sun := "${KERNEL_PREBUILT_PATH}/dist/abl-userdebug:"
 FILESEXTRAPATHS:prepend:vienna := "${KERNEL_PREBUILT_PATH}/dist/abl-userdebug:"
+FILESEXTRAPATHS:prepend:alor := "${KERNEL_PREBUILT_PATH}/dist/abl-userdebug:"
 
 SRC_URI = "file://unsigned_abl.elf"
 
@@ -24,4 +25,3 @@ do_deploy() {
 
 do_deploy[dirs] = "${DEPLOYDIR}"
 addtask deploy before do_build after do_install
-
