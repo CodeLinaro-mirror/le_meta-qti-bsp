@@ -22,7 +22,6 @@ RDEPENDS:${PN} += "\
     ${@bb.utils.contains_any('PREFERRED_PROVIDER_virtual/kernel', 'linux-qcom-custom linux-qcom-custom-rt', 'lttng-modules lttng-tools lttng-ust', '', d)} \
     ${@bb.utils.contains_any('VARIANT', 'perf user', '', 'devmem2', d)} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'cntvct-log rtla', '', d)} \
-    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', bb.utils.contains('TCMODE', 'external-ubuntu', '', 'pcp', d), '', d)} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', bb.utils.contains_any('PREFERRED_PROVIDER_virtual/kernel', 'linux-qcom-custom linux-qcom-custom-rt', 'evtest lsof', '', d), d)} \
     "
 
