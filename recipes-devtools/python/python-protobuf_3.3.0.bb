@@ -46,14 +46,6 @@ do_install() {
     bbfatal "${PYTHON_PN} SIX setup.py install execution failed."
     cd ${WORKDIR}/git/python
 
-    # this run installs the egg file in to python2.7/site-packages folder
-    STAGING_INCDIR=${STAGING_INCDIR} \
-    STAGING_LIBDIR=${STAGING_LIBDIR} \
-    PYTHONPATH=${D}${PYTHON_SITEPACKAGES_DIR} \
-    BUILD_SYS=${BUILD_SYS} HOST_SYS=${HOST_SYS} \
-    ${STAGING_BINDIR_NATIVE}/${PYTHON_PN}-native/${PYTHON_PN} setup.py install --install-lib=${D}/${PYTHON_SITEPACKAGES_DIR} || \
-        bbfatal "${PYTHON_PN} setup.py install execution failed."
-
     # the above fails to add the path, just install that into ${D}
     rm -f ${D}${PYTHON_SITEPACKAGES_DIR}/protobuf.pth
     echo "./${SRCNAME}-${PV}-py${PYTHON_BASEVERSION}.egg" > ${D}${PYTHON_SITEPACKAGES_DIR}/protobuf.pth
