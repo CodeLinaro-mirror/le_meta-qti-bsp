@@ -3,6 +3,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 SRC_URI:append = " \
         file://autodev.sh \
         file://config \
+        file://0001-fix-error-msg-Unsupported-config-key-lxc.seccomp.patch \
 "
 
 FILES:${PN} += "lxc/bin"
