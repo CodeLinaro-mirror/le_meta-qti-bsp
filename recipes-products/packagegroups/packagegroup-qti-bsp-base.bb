@@ -16,6 +16,9 @@ PACKAGES = ' \
 ENABLE_ADB ?= "True"
 ENABLE_ADB_qti-distro-base-user ?= "False"
 
+ENABLE_POSTBOOT ?= "True"
+ENABLE_POSTBOOT_mdm9650 ?= "False"
+
 # Android Core Image and Debugging utilities
 RDEPENDS_packagegroup-android-utils-base = "\
     ${@oe.utils.conditional('ENABLE_ADB', 'True', 'adbd', '', d)} \
@@ -33,6 +36,6 @@ RDEPENDS_packagegroup-startup-scripts-base = "\
     ${@bb.utils.contains('COMBINED_FEATURES', 'qti-ab-boot', 'ab-slot-util', '', d)} \
     ${@oe.utils.conditional('USB_SUPPORT', 'True', 'usb-composition', '', d)} \
     ${@oe.utils.conditional('USB_AUTOSUSPEND_SUPPORT', 'True', 'usb-composition-usbd', '', d)} \
-    post-boot \
+    ${@oe.utils.conditional('ENABLE_POSTBOOT', 'True', 'post-boot', '', d)} \
     sdcard-scripts-automount \
     "
