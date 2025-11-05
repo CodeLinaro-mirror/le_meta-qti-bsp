@@ -46,7 +46,7 @@ ghgvm_pilsplitter() {
     python3 ${PILTOOLS_PATH}/image_header.py autoghgvmlv-bootloader.elf FVMAIN_COMPACT.Fv,0x0 dtb.img,0x9700000 LinuxLoader.efi,0x9800000 --32
     set -e
 
-    sectools secure-image autoghgvmlv-boot.elf --image-id GVM1 --security-profile ${STAGING_BINDIR_NATIVE}/${SECTOOLS_SECURITY_PROFILE} --sign --signing-mode TEST --outfile autoghgvmlv_signed-boot.elf
+    sectools secure-image autoghgvmlv-boot.elf --image-id GVM2 --security-profile ${STAGING_BINDIR_NATIVE}/${SECTOOLS_SECURITY_PROFILE} --sign --signing-mode TEST --outfile autoghgvmlv_signed-boot.elf
     sectools secure-image autoghgvmlv-boot.elf --inspect
 
     install -d ${DEPLOY_DIR_IMAGE}/signing/boot
@@ -54,7 +54,7 @@ ghgvm_pilsplitter() {
 
     ${STAGING_BINDIR_NATIVE}/build/prebuilts/kernel-build-tools/linux-x86/bin/mkuserimg_mke2fs ${DEPLOY_DIR_IMAGE}/signing/boot ${DEPLOY_DIR_IMAGE}/vm-bootloader.img ext4 / 60000000
 
-    sectools secure-image autoghgvmlv-bootloader.elf --image-id GVM1 --security-profile ${STAGING_BINDIR_NATIVE}/${SECTOOLS_SECURITY_PROFILE} --sign --signing-mode TEST --outfile autoghgvmlv_signed-bootloader.elf
+    sectools secure-image autoghgvmlv-bootloader.elf --image-id GVM2 --security-profile ${STAGING_BINDIR_NATIVE}/${SECTOOLS_SECURITY_PROFILE} --sign --signing-mode TEST --outfile autoghgvmlv_signed-bootloader.elf
     sectools secure-image autoghgvmlv-bootloader.elf --inspect
 
     install -d ${DEPLOY_DIR_IMAGE}/signing/bootloader
