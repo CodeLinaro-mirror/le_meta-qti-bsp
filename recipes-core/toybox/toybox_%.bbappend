@@ -1,3 +1,6 @@
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+SRC_URI += "file://Revert-Teach-switch_root-to-move-mountpoints-into-th.patch"
+
 do_configure:append() {
     # Enable mdev
     sed -e 's/# CONFIG_MDEV is not set/CONFIG_MDEV=y/' -i .config
@@ -30,3 +33,4 @@ do_install:append(){
 	sed -i '/^\/bin\/cat$/d' ${D}/etc/toybox.links
 
 }
+
