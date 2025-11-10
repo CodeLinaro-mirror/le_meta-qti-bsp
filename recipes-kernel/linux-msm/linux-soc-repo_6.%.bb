@@ -3,7 +3,7 @@ inherit kernel
 DESCRIPTION = "CAF Linux Kernel"
 LICENSE = "GPLv2.0-with-linux-syscall-note"
 
-COMPATIBLE_MACHINE = "trustedvm-v4"
+COMPATIBLE_MACHINE = "trustedvm-v4|trustedvm-v3"
 
 FILESEXTRAPATHS:prepend := "${WORKSPACE}:"
 FILESEXTRAPATHS:prepend := "${WORKSPACE}:${KERNEL_PREBUILT_PATH}:"
@@ -62,6 +62,7 @@ do_prebuilt_configure() {
     for dtbof in $(find . -name "*.dtbo") ; do
         install -m 0644 $dtbof ${B}
     done
+
 }
 
 do_prebuilt_shared_workdir[cleandirs] += " ${STAGING_KERNEL_BUILDDIR}"
@@ -162,8 +163,9 @@ do_deploy() {
     done
 
     # Copy unstripped modules to deploydir
-    cp -rp unstripped  ${DEPLOYDIR}/
-
+    if [ -d unstripped ]; then
+        cp -rp unstripped  ${DEPLOYDIR}/
+    fi
 }
 
 # Put the zImage in the kernel-dev pkg
