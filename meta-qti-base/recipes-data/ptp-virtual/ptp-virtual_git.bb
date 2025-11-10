@@ -9,7 +9,7 @@ DEPENDS += "virtual/kernel"
 
 SRC_URI = "\
     ${PATH_TO_REPO}/vendor/qcom/opensource/ptp-virtual/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/ptp-virtual;usehead=1 \
-    file://ptp-virtual.service \
+    file://ptp-virtual_load.conf \
 "
 SRCREV = "${AUTOREV}"
 
@@ -24,14 +24,13 @@ GROUPADD_PARAM:${PN} = "vnw"
 USERADD_PARAM:${PN} = "--no-create-home -g vnw --shell /bin/false vnw"
 
 do_install:append() {
-    install -d ${D}${systemd_unitdir}/system
-    install -m 0644 ${WORKDIR}/ptp-virtual.service ${D}${systemd_unitdir}/system/ptp-virtual.service
+    install -m 0755 ${WORKDIR}/ptp-virtual_load.conf -D ${D}${sysconfdir}/modules-load.d/ptp-virtual_load.conf
 }
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 FILES:${PN} += "\
-    ${systemd_unitdir}/system/ptp-virtual.service \
+    ${sysconfdir}/* \
     ${nonarch_base_libdir}/modules/${KERNEL_VERSION}/* \
 "
 
