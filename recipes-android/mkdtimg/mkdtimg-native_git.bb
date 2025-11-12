@@ -1,4 +1,4 @@
-inherit native autotools pkgconfig
+inherit autotools pkgconfig native
 
 DESCRIPTION = "DTBO image creation tool from Android"
 LICENSE = "Apache-2.0"
