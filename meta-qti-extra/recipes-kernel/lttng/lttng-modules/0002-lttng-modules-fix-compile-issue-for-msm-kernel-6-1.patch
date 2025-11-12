@@ -9,6 +9,7 @@ vm_flags type mismatch issue.
 Upstream-Status: Inappropriate [other]
 
 Change-Id: I97b2567cfee5bfcb3c39f018a242b29f3eda0618
+Signed-off-by: Peng yang <quic_pengy@quicinc.com>
 ---
  include/wrapper/mm.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
