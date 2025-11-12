@@ -14,7 +14,6 @@ SRC_URI = "file://${BPN}.sh \
 inherit systemd
 
 RDEPENDS:${PN} = "\
-    coreutils \
     libselinux-bin \
     policycoreutils-setfiles \
 "
