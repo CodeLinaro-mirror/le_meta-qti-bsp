@@ -125,5 +125,7 @@ CORE_IMAGE_EXTRA_INSTALL:remove:canoe = "packagegroup-qti-pulseaudio"
 CORE_IMAGE_EXTRA_INSTALL:remove:canoe = "packagegroup-startup-scripts"
 CORE_IMAGE_EXTRA_INSTALL:remove:canoe = "packagegroup-support-utils"
 
+CORE_IMAGE_EXTRA_INSTALL:append:canoe = " weston weston-launch"
+
 CORE_IMAGE_EXTRA_INSTALL:append:canoe = "${@bb.utils.contains('DISTRO_FEATURES', 'lxc', ' lxc', '', d)}"
 PERSISTIMAGE_TARGET:canoe = "${@bb.utils.contains('DISTRO_FEATURES', 'lxc', 'lxc-persist.img', 'persist.img', d)}"
