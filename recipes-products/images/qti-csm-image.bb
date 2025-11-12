@@ -50,6 +50,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
               packagegroup-ru-modem-client \
               resize-data \
               collect-shutdown-logs \
+              process-monitor \
 "
 
 do_merge_dtbs() {

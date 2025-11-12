@@ -17,6 +17,9 @@ CORE_IMAGE_EXTRA_INSTALL += "\
               ${@bb.utils.contains('MACHINE_FEATURES', 'qti-wifi', "packagegroup-qti-wifi", "", d)} \
 "
 
+# Remove qca6174 packagegroup needed only for mbb minimal on sdxlemur
+CORE_IMAGE_EXTRA_INSTALL_remove_sdxlemur = "packagegroup-qti-wifi-qca6174"
+
 do_cleanup_sepolicy() {
 
         policy_version=31
