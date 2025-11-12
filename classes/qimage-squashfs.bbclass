@@ -360,5 +360,4 @@ do_copy_image() {
     cp ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${DTBOIMAGE_TARGET} ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${FS_TYPE_SQSH}/${DTBOIMAGE_TARGET}
 }
 
-addtask do_copy_image after do_makeboot
-addtask do_copy_image after do_image before do_build
+addtask do_copy_image after do_image do_makeboot do_makedtbo before do_image_complete
