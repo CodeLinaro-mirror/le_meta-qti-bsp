@@ -2,7 +2,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 LIC_FILES_CHKSUM = "file://docs/license.rst;md5=63779ec98d78d823a9dc533a0735ef10"
 
-PV = "23.0.3"
+PV = "24.0.7"
 
 SRC_URI = "https://mesa.freedesktop.org/archive/mesa-${PV}.tar.xz \
            file://0001-meson.build-check-for-all-linux-host_os-combinations.patch \
@@ -11,7 +11,7 @@ SRC_URI = "https://mesa.freedesktop.org/archive/mesa-${PV}.tar.xz \
            file://0001-gallium-Fix-jit-compilation-issue.patch \
           "
 
-SRC_URI[sha256sum] = "386362a5d80df3b096636b67f340e1ce67b705b44767d5bdd11d2ed1037192d5"
+SRC_URI[sha256sum] = "7454425f1ed4a6f1b5b107e1672b30c88b22ea0efea000ae2c7d96db93f6c26a"
 
 PACKAGE_ARCH = "${TUNE_PKGARCH}"
 
@@ -28,8 +28,7 @@ PACKAGECONFIG += " \
 
 PACKAGECONFIG:append:class-native = "gallium-llvm"
 
-VULKAN_DRIVERS = "swrast"
-GALLIUMDRIVERS_LLVM = "swrast"
+GALLIUMDRIVERS_LLVM = ",swrast"
 
 PACKAGECONFIG[vulkan] = "-Dvulkan-drivers=${@strip_comma('${VULKAN_DRIVERS}')}, -Dvulkan-drivers='',glslang-native vulkan-loader vulkan-headers"
 
