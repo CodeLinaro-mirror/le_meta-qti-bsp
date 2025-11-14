@@ -119,6 +119,12 @@ EARLY_RAMDISK_KERNEL_MODULES = "\
     kernel-module-mhi-ep-net-${KERNEL_VERSION} \
     kernel-module-kryo-arm64-edac-${KERNEL_VERSION} \
     kernel-module-socinfo-${KERNEL_VERSION} \
-    kernel-module-ipcc-shmem-test-module-${KERNEL_VERSION} \
-    kernel-module-qcom-l3-cache-config-${KERNEL_VERSION} \
+    kernel-module-phylink-${KERNEL_VERSION} \
+    kernel-module-marvell-${KERNEL_VERSION} \
+    kernel-module-aquantia-${KERNEL_VERSION} \
+    kernel-module-pcs-xpcs-${KERNEL_VERSION} \
+    kernel-module-phy-qcom-sgmii-eth-${KERNEL_VERSION} \
+    kernel-module-stmmac-${KERNEL_VERSION} \
+    kernel-module-stmmac-platform-${KERNEL_VERSION} \
+    kernel-module-dwmac-qcom-ethqos-${KERNEL_VERSION} \
 "
