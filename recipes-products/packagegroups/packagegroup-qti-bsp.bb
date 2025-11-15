@@ -22,9 +22,10 @@ RDEPENDS:packagegroup-android-utils = "\
     "
 
 # Startup scripts needed during device bootup
-RDEPENDS:packagegroup-startup-scripts = "\
-    packagegroup-startup-scripts-base \
-    "
+# RDEPENDS:packagegroup-startup-scripts = "\
+#     packagegroup-startup-scripts-base \
+#    "
+
 # Other essential utilites
 CHRONY ?= "chrony"
 CHRONY:sa410m = ""

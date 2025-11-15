@@ -96,7 +96,6 @@ CORE_IMAGE_EXTRA_INSTALL:append:sun = " packagegroup-qti-touch"
 
 CORE_IMAGE_EXTRA_INSTALL:remove:canoe = "alsa-utils"
 CORE_IMAGE_EXTRA_INSTALL:remove:canoe = "kernel-modules"
-CORE_IMAGE_EXTRA_INSTALL:remove:canoe = "packagegroup-android-utils"
 CORE_IMAGE_EXTRA_INSTALL:remove:canoe = "packagegroup-qti-bluetooth"
 CORE_IMAGE_EXTRA_INSTALL:remove:canoe = "packagegroup-filesystem-utils"
 CORE_IMAGE_EXTRA_INSTALL:remove:canoe = "libdrm-tests"
