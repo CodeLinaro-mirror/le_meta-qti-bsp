@@ -133,6 +133,29 @@ do_install:append () {
    sed -i '/Before/s/$/ local-fs-pre.target/' ${D}${systemd_unitdir}/system/systemd-fsck@.service
 }
 
+
+do_install:append:kalama () {
+   if ${@bb.utils.contains("DISTRO_FEATURES", "lxc", "true", "false", d)}; then
+       ln -sf /dev/null ${D}${systemd_unitdir}/system/local-fs.target.wants/data.mount
+       ln -sf /dev/null ${D}${systemd_unitdir}/system/local-fs.target.wants/etc.mount
+       ln -sf /dev/null ${D}${systemd_unitdir}/system/local-fs.target.wants/cache.mount
+       ln -sf /dev/null ${D}${systemd_unitdir}/system/local-fs.target.wants/var-volatile.mount
+       ln -sf /dev/null ${D}${systemd_unitdir}/system/sys-kernel-debug.mount
+       ln -sf /dev/null ${D}${systemd_unitdir}/system/var-volatile.mount
+       ln -sf /dev/null ${D}${systemd_unitdir}/system/ab-updater.service
+       ln -sf /dev/null ${D}${systemd_unitdir}/system/init_post_boot.service
+       ln -sf /dev/null ${D}${systemd_unitdir}/system/modprobe@.service
+       ln -sf /dev/null ${D}${systemd_unitdir}/system/overlay-workdir.service
+       ln -sf /dev/null ${D}${systemd_unitdir}/system/systemd-logind.service
+       ln -sf /dev/null ${D}${systemd_unitdir}/system/touch.service
+       ln -sf /dev/null ${D}${systemd_unitdir}/system/systemd-tmpfiles-setup-dev.service
+       ln -sf /dev/null ${D}${systemd_unitdir}/system/systemd-tmpfiles-setup.service
+       ln -sf /dev/null ${D}${systemd_unitdir}/system/systemd-tmpfiles-clean.service
+       ln -sf /dev/null ${D}${systemd_unitdir}/system/systemd-journald-audit.socket
+   fi
+}
+
+
 RRECOMMENDS:${PN}:remove = "systemd-extra-utils"
 
 FILES:${PN} += "/etc/initscripts \
