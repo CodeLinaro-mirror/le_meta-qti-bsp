@@ -52,5 +52,5 @@ CORE_IMAGE_EXTRA_INSTALL:append:qcm2290-mtp = " ${MLIBPREFIX}packagegroup-qti-to
 
 CORE_IMAGE_EXTRA_INSTALL:remove:qcm4325-mtp = "kernel-modules"
 CORE_IMAGE_EXTRA_INSTALL:append:qcm4325-mtp = " gki-kernel-modules-second-stage"
-CORE_IMAGE_EXTRA_INSTALL:append:qcm4325-mtp = " diag-router"
-CORE_IMAGE_EXTRA_INSTALL:remove:qcm4325-mtp = "graphite-client"
+CORE_IMAGE_EXTRA_INSTALL:append:qcm4325-mtp = " ${MLIBPREFIX}diag-router"
+CORE_IMAGE_EXTRA_INSTALL:remove:qcm4325-mtp = "${MLIBPREFIX}graphite-client"
