@@ -1,5 +1,6 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/systemd:"
 
+SRC_URI  = "${CLO_LE_GIT}/systemd.git;protocol=https;branch=caf_migration/systemd/main"
 SRC_URI += "file://sysctl-coredump.conf"
 SRC_URI += "file://limits-coredump.conf"
 
