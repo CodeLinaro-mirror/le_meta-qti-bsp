@@ -1,0 +1,27 @@
+From 2b904dc5b82ca2cf56b9c2ebbec54a5487e0a3ab Mon Sep 17 00:00:00 2001
+From: Lei wang <leiwan@qti.qualcomm.com>
+Date: Mon, 22 Dec 2025 15:55:13 +0800
+Subject: [PATCH 1/2] lxc: support deny device by devpth
+
+Signed-off-by: Lei Wang <leiwan@qti.qualcomm.com>
+Signed-off-by: Feng Chen <fch@qti.qualcomm.com>
+---
+ src/lxc/cgroups/cgfsng.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/lxc/cgroups/cgfsng.c b/src/lxc/cgroups/cgfsng.c
+index eea2b1f6d..8ef30a19e 100644
+--- a/src/lxc/cgroups/cgfsng.c
++++ b/src/lxc/cgroups/cgfsng.c
+@@ -3371,7 +3371,7 @@ static int cg_legacy_set_data(struct cgroup_ops *ops, const char *filename,
+ 	if (p)
+ 		*p = '\0';
+ 
+-	if (strequal("devices.allow", filename) && value[0] == '/') {
++	if (value[0] == '/') {
+ 		int ret;
+ 
+ 		ret = convert_devpath(value, converted_value);
+-- 
+2.17.1
+
