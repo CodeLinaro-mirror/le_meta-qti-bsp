@@ -126,3 +126,4 @@ CORE_IMAGE_EXTRA_INSTALL:remove:canoe = "packagegroup-support-utils"
 
 CORE_IMAGE_EXTRA_INSTALL:append:canoe = "${@bb.utils.contains('DISTRO_FEATURES', 'lxc', ' lxc', '', d)}"
 PERSISTIMAGE_TARGET:canoe = "${@bb.utils.contains('DISTRO_FEATURES', 'lxc', 'lxc-persist.img', 'persist.img', d)}"
+VBMETAIMAGE_TARGET:canoe = "${@bb.utils.contains('DISTRO_FEATURES', 'lxc', 'lxc-vbmeta.img', 'vbmeta.img', d)}"
