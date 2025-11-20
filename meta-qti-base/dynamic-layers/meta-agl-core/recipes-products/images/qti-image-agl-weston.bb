@@ -75,3 +75,7 @@ IMAGE_INSTALL += "\
 
 # Add the libgomp support.
 IMAGE_INSTALL += "libgomp"
+
+#add lxc
+IMAGE_INSTALL += "${@bb.utils.contains('COMBINED_FEATURES', 'qti-lxc', 'packagegroup-qti-lxc', '', d)}"
+
