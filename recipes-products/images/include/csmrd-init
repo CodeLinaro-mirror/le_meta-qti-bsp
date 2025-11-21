@@ -395,6 +395,122 @@ wait_for_mhi_ch() {
     return 0
 }
 
+wait_for_interface() {
+    local INTERFACE="$1"
+    local MAX_TRIES=600  # 60 seconds / 0.1 second per try
+    local COUNT=0
+
+    while [ $COUNT -lt $MAX_TRIES ]; do
+        if ifconfig -a "$INTERFACE" >/dev/null 2>&1; then
+            echo "Interface $INTERFACE found!"
+            return 0
+        else
+            echo "Interface $INTERFACE not found. Retrying..."
+            sleep 0.1
+            COUNT=$((COUNT + 1))
+        fi
+    done
+    echo "Timeout reached. Interface $INTERFACE not found within 60 seconds."
+    return 1
+}
+
+config_string=""
+retrive_host_ip() {
+    INTERFACE="$1"
+    local ctrl_dev="$2"
+    success=0
+    success_mhi=0
+    success_ip=""
+    success_route=""
+    count=600  # total timeout in seconds
+
+    while [ "$success" -eq 0 ] && [ "$success_mhi" -eq 0 ] && [ "$count" -gt 0 ]; do
+        echo "Remaining time: $count seconds"
+
+        # check if /dev/mhi_pipe_16 is accesssible.
+        wait_for_mhi_ch $ctrl_dev 5
+        ret="$?"
+        if [ "$ret" -eq 0 ]; then
+              success_mhi=1
+              mhi_ch_close $ctrl_dev
+              break
+        fi
+        count=$((count - 5))
+
+        for i in $(seq 0 9); do
+            IP="192.200.101.$i"
+            ROUTE_IP="192.200.100.$i"
+
+            echo "Assigning IP $IP to $INTERFACE..."
+            ifconfig "$INTERFACE" "$IP" netmask 255.255.255.0 up
+
+            echo "Adding route to $ROUTE_IP via $INTERFACE..."
+            ip route add "$ROUTE_IP" dev "$INTERFACE"
+
+            echo "Sending ping to $ROUTE_IP with 1s timeout"
+            ping -c 5 -W 1 "$ROUTE_IP" > /dev/null
+
+            if [ "$?" -eq 0 ]; then
+                echo "Ping to $ROUTE_IP successful."
+                success=1
+                success_ip="$IP"
+                success_route="$ROUTE_IP"
+                config_string="$i"
+                break
+            else
+                echo "Ping to $ROUTE_IP failed. Trying next IP..."
+            fi
+        done
+        count=$((count - 10))
+    done
+}
+
+retrive_host_ch() {
+     local ctrl_dev="$1"
+     wait_for_mhi_ch $ctrl_dev
+     ret="$?"
+     if [ "$ret" -ne 0 ]; then
+          return $ret
+     fi
+
+     echo "Sending sync message"
+     mhi_ch_sendmsg $ctrl_dev START
+     ret="$?"
+     if [ "$ret" -ne 0 ]; then
+          echo "Could not send START"
+          return $ret
+     fi
+
+     echo "Waiting for config"
+     config_string="$(mhi_ch_recvmsg $ctrl_dev 30)"
+     if [ -z "$config_string" ]; then
+          echo "Could not receive config from Host"
+          return $ret
+     fi
+     echo "Received config: $config_string"
+
+     echo "Waiting for debug transport"
+     debug_transport="$(mhi_ch_recvmsg $ctrl_dev 30)"
+     if [ -z "$debug_transport" ]; then
+          echo "Could not receive debug_transport from Host"
+          return $ret
+     fi
+     echo "Received debug transport: $debug_transport"
+
+     mhi_ch_sendmsg $ctrl_dev "Config received '$HOST_ADDR' '$LOCAL_ADDR'"
+     ret="$?"
+     if [ "$ret" -ne 0 ]; then
+          echo "Failed to send message"
+     fi
+
+     mhi_ch_close $ctrl_dev
+     ret="$?"
+     if [ "$ret" -ne 0 ]; then
+          echo "Could not close $ctrl_dev"
+     fi
+     return 0
+}
+
 config_interface()
 {
     LOCAL_INTERFACE="$1"
@@ -720,48 +836,32 @@ fi   # end of  if verity file exist check.
         insmod /lib/modules/gsim.ko
         insmod /lib/modules/ecpri_dmam.ko
 
+        INTERFACE="mhi_swip0"
+        debug_transport="pcie"
         CTRL_DEV="/dev/mhi_pipe_16"
-        wait_for_mhi_ch $CTRL_DEV
+        wait_for_interface $INTERFACE
         ret="$?"
         if [ "$ret" -ne 0 ]; then
+            echo "$INTERFACE could not found, start rdshell"
             start_rdshell
         fi
 
-        echo "Sending sync message"
-        mhi_ch_sendmsg $CTRL_DEV START
-        ret="$?"
-        if [ "$ret" -ne 0 ]; then
-            echo "Could not send START"
-            start_rdshell
-        fi
-
-        echo "Waiting for config"
-        config_string="$(mhi_ch_recvmsg $CTRL_DEV 30)"
-        if [ -z "$config_string" ]; then
-            echo "Could not receive config from Host"
-            start_rdshell
-        fi
-        echo "Received config: $config_string"
-
-        echo "Receive debug transport"
-        debug_transport="$(mhi_ch_recvmsg $CTRL_DEV 30)"
-        if [ -z "$debug_transport" ]; then
-            echo "Could not receive debug_transport from Host"
-            start_rdshell
-        fi
-        echo "Received debug transport: $debug_transport"
-
-
-        mhi_ch_sendmsg $CTRL_DEV "Config received '$HOST_ADDR' '$LOCAL_ADDR'"
-        ret="$?"
-        if [ "$ret" -ne 0 ]; then
-            echo "Failed to send message"
-        fi
-
-        mhi_ch_close $CTRL_DEV
-        ret="$?"
-        if [ "$ret" -ne 0 ]; then
-            echo "Could not close $CTRL_DEV"
+        retrive_host_ip $INTERFACE $CTRL_DEV
+        if [ "$success" -eq 1 ]; then
+              echo "Received config string using ip negotiation: $config_string"
+              echo "Assigned IP: $success_ip"
+              echo "Host IP:    $success_route"
+        elif [ "$success_mhi" -eq 1 ]; then
+              echo "Getting channel number"
+              config_string=""
+              retrive_host_ch $CTRL_DEV
+              if [ "$ret" -ne 0 ]; then
+                   echo "not received config, starting rd shell"
+                   start_rdshell
+              fi
+        else
+             echo "No host IP found in the range."
+             start_rdshell
         fi
 
         # Static IP
