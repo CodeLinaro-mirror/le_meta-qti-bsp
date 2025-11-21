@@ -12,8 +12,10 @@ SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/vendor/qcom/opensource/bt-kernel"
 
+EXT_MODULE = "vendor/qcom/opensource/bt-kernel"
+
 TECHPACK_MODULE_OUT = "${WORKDIR}/bt-dlkm"
-TECHPACK_MODULES = "pwr/btpower.ko"
+TECHPACK_MODULES = "${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "6.12", "btpower.ko", "pwr/btpower.ko", d)}"
 TECHPACK_MAKE_ARGS = "CONFIG_MSM_BT_POWER=m"
 
 inherit qti-techpack
