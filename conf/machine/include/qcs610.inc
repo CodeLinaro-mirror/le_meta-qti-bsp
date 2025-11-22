@@ -6,21 +6,12 @@ include conf/machine/include/soc-family.inc
 
 include conf/machine/include/arm/arch-armv8a.inc
 
-PREFERRED_PROVIDER_virtual/kernel = "linux-msm"
-PREFERRED_PROVIDER_virtual/mkbootimg = "mkbootimg-gki"
-PREFERRED_PROVIDER_virtual/mkdtimg   = "mkdtimg-gki"
-PREFERRED_PROVIDER_gtest = "googletest"
-PREFERRED_VERSION_linux-msm ?= "6.6"
-PREFERRED_VERSION_linux-msm-headers ?= "6.6"
-PREFERRED_VERSION_kernel-toolchain ?= "6.6"
-PREFERRED_VERSION_kernel-toolchain-native ?= "6.6"
-PREFERRED_VERSION_dtc-android-build ?= "1.6.0"
-PREFERRED_VERSION_mkbootimg-gki ?= "6.6"
-PREFERRED_VERSION_mkbootimg-gki-native ?= "6.6"
-PREFERRED_VERSION_mod-signing-keys ?= "6.6"
-PREFERRED_VERSION_synx-kernel ?= "1.0"
+require recipes-kernel/linux-msm/msm-common.inc
 
-PAGE_SIZE ?= '4096'
+MSM_KERNEL_VERSION = "6.6"
+
+PREFERRED_PROVIDER_gtest = "googletest"
+PREFERRED_VERSION_synx-kernel ?= "1.0"
 
 # Max supported inodes
 EXTRA_IMAGECMD ?= "-N 2048"
