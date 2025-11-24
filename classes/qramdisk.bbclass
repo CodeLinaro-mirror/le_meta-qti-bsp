@@ -35,8 +35,15 @@ fakeroot do_ramdisk_create() {
         mkdir -p ${RAMDISKDIR}/sys
         cd ${RAMDISKDIR}
         ln -s bin sbin
+
+        # Yocto scarthgap looks for linker in /usr/lib
+        cd usr && ln -s ../lib lib && cd -
+
         if [[ "${TOYBOX_RAMDISK}" == "True" ]]; then
             cp ${IMAGE_ROOTFS}/usr/lib/libcrypt.so.2 lib/libcrypt.so.2
+
+            # kmod from Scarthgap depends on this
+            cp ${IMAGE_ROOTFS}/usr/lib/libcrypto.so.3 lib/libcrypto.so.3
             cp ${IMAGE_ROOTFS}/bin/toybox bin/
             cp ${IMAGE_ROOTFS}/bin/mksh bin/
             cp ${IMAGE_ROOTFS}/usr/lib/liblzma.so.5 lib/
@@ -76,10 +83,10 @@ fakeroot do_ramdisk_create() {
                 ln -s ip.iproute2 bin/ip
             fi
             # install all the toybox commands
-            if [ -r ${IMAGE_ROOTFS}/etc/toybox.links ]; then
+            if [ -r ${IMAGE_ROOTFS}/etc/toybox.links.ramdisk ]; then
                 while read -r LREAD; do
                     ln -s /bin/toybox ${LREAD:1}
-                done < ${IMAGE_ROOTFS}/etc/toybox.links
+                done < ${IMAGE_ROOTFS}/etc/toybox.links.ramdisk
             fi
         else
             cp ${IMAGE_ROOTFS}/bin/busybox bin/
@@ -167,6 +174,7 @@ fakeroot do_ramdisk_create() {
         # meta-selinux layer does not currently check for distro_features
         if [ -f ${IMAGE_ROOTFS}/usr/lib/libpcre2-8.so.0.12.0 ]; then
             cp ${IMAGE_ROOTFS}/usr/lib/libpcre2-8.so.0.12.0 lib/libpcre2-8.so.0.12.0
+            cp ${IMAGE_ROOTFS}/usr/lib/libpcre2-8.so.0.12.0 lib/libpcre2-8.so.0
         fi
 
         if ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains('MACHINE_FEATURES', 'dm-verity-initramfs', 'true', 'false', d), 'false', d)}; then

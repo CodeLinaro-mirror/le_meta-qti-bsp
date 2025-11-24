@@ -1,4 +1,4 @@
-inherit native python3native
+inherit python3native native
 
 DESCRIPTION = "Prebuilt DTBO image creation tool from Android"
 LICENSE = "Apache-2.0"

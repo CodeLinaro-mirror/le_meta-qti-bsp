@@ -4,4 +4,5 @@ recipes-frameworks
 recipes-le-codec2-frameworks
 recipes-mmrm-kernel
 recipes-video-kernel
+recipes-video-userspace
 recipes-multimedia/adsprpc

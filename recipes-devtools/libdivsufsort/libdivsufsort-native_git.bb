@@ -1,5 +1,5 @@
 
-inherit native autotools-brokensep pkgconfig
+inherit autotools-brokensep pkgconfig native
 
 PR = "r1"
 
