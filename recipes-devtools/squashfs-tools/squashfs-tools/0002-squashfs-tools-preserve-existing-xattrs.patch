@@ -1,0 +1,106 @@
+From c5d2c5370c268c219e2b7e0056e71c2d37535181 Mon Sep 17 00:00:00 2001
+From: Ram Prakash Gupta <rampraka@qti.qualcomm.com>
+Date: Mon, 24 Nov 2025 15:42:52 +0530
+Subject: [PATCH 2/2] squashfs-tools: preserve existing xattrs
+
+Add support for preserving existing system attributes when
+attributes are passed through context file as well at the
+time of image generation.
+
+Signed-off-by: Rahul Agarwal <rahaga@qti.qualcomm.com>
+Signed-off-by: Ram Prakash Gupta <rampraka@qti.qualcomm.com>
+---
+ squashfs-tools/xattr.c | 63 ++++++++++++++++++++++++++++++++----------
+ 1 file changed, 48 insertions(+), 15 deletions(-)
+
+diff --git a/squashfs-tools/xattr.c b/squashfs-tools/xattr.c
+index f7b8695a..f8a60db2 100644
+--- a/squashfs-tools/xattr.c
++++ b/squashfs-tools/xattr.c
+@@ -688,8 +688,12 @@ int read_xattrs(void *d)
+ 	struct inode_info *inode = dir_ent->inode;
+ 	char *filename = pathname(dir_ent);
+ 	char *subpath = subpathname(dir_ent);
+-	struct xattr_list *xattr_list;
+-	int xattrs;
++	struct xattr_list *ctx_xattr_list = NULL;
++	int ctx_xattrs = 0;
++	struct xattr_list *sys_xattr_list = NULL;
++	int sys_xattrs = 0;
++	struct xattr_list *merged_xattr_list = NULL;
++	int merged_xattrs = 0;
+ 
+ 	if(no_xattrs || IS_PSEUDO(inode) || inode->root_entry || inode->dummy_root_dir)
+ 		return SQUASHFS_INVALID_XATTR;
+@@ -698,26 +702,55 @@ int read_xattrs(void *d)
+ 	if (context_file) {
+ 		if (sehnd == NULL)
+ 			sehnd = get_sehnd(context_file);
+-		xattrs = read_xattrs_from_context_file(subpath, inode->buf.st_mode,
+-				sehnd, &xattr_list);
+-	} else {
+-		if(IS_TARFILE(inode))
+-			xattrs = read_xattrs_from_tarfile(inode, &xattr_list);
+-		else
+-			xattrs = read_xattrs_from_system(filename, &xattr_list);
++
++		ctx_xattrs = read_xattrs_from_context_file(subpath,
++							   inode->buf.st_mode,
++							   sehnd, &ctx_xattr_list);
++		if (ctx_xattrs < 0) {
++			ctx_xattr_list = NULL;
++			ctx_xattrs = 0;
++		}
+ 	}
++
+ #else
++    // No SELinux context file support
++#endif
++
+ 	if(IS_TARFILE(inode))
+-		xattrs = read_xattrs_from_tarfile(inode, &xattr_list);
++		sys_xattrs = read_xattrs_from_tarfile(inode, &sys_xattr_list);
+ 	else
+-		xattrs = read_xattrs_from_system(filename, &xattr_list);
+-#endif
+-	if(xattrs == 0)
++		sys_xattrs = read_xattrs_from_system(filename, &sys_xattr_list);
++	if (sys_xattrs < 0) {
++		sys_xattr_list = NULL;
++		sys_xattrs = 0;
++	}
++
++	if (ctx_xattrs > 0 && sys_xattrs > 0) {
++		merged_xattrs = ctx_xattrs + sys_xattrs;
++		merged_xattr_list = malloc(merged_xattrs * sizeof(struct xattr_list));
++	if (!merged_xattr_list) {
++		ERROR("Failed to allocate merged xattr list\n");
+ 		return SQUASHFS_INVALID_XATTR;
++	}
++	memcpy(merged_xattr_list, ctx_xattr_list, ctx_xattrs * sizeof(struct xattr_list));
++	memcpy(merged_xattr_list + ctx_xattrs, sys_xattr_list, sys_xattrs * sizeof(struct xattr_list));
++
++	} else if (ctx_xattrs > 0) {
++		merged_xattr_list = ctx_xattr_list;
++		merged_xattrs = ctx_xattrs;
++	} else if (sys_xattrs > 0) {
++		merged_xattr_list = sys_xattr_list;
++		merged_xattrs = sys_xattrs;
++	} else {
++		merged_xattr_list = NULL;
++		merged_xattrs = 0;
++	}
+ 
+-	return generate_xattrs(xattrs, xattr_list);
+-}
++	if (merged_xattrs == 0)
++		return SQUASHFS_INVALID_XATTR;
+ 
++	return generate_xattrs(merged_xattrs, merged_xattr_list);
++}
+ 
+ /*
+  * Add the existing xattr ids and xattr metadata in the file system being
+-- 
+2.34.1
+
