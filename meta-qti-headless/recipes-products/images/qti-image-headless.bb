@@ -30,7 +30,9 @@ IMAGE_INSTALL += "\
     libcap \
     libcap-bin \
     attr \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'qti-security', 'securemsmdlkm', '', d)} \
+    ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '6.12', 'kernel-modules', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'qti-security', 'securemsmdlkm', '', d)}  \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'qti-security', bb.utils.contains_any('PREFERRED_VERSION_linux-msm', '5.15 6.1', '', 'securemsm-devicetree', d), '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'qti-fde', 'enable-fde', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'packagegroup-selinux-minimal packagegroup-selinux-policycoreutils checkpolicy secilc auditd selinux-relabelvar selinux-relabeldata', '', d)} \
 "
