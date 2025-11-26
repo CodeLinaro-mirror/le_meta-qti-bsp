@@ -8,12 +8,12 @@ SRC_URI:append = " \
 
 FILES:${PN} += "lxc/bin"
 FILES:${PN} += "lxc/lxc-conf"
-FILES:${PN} += "vendor/vm-system"
+FILES:${PN} += "/vendor_early_services/vendor/vm-system"
 
 EXTRA_OEMESON += "--default-library=static -Dc_link_args=-static"
-EXTRA_OEMESON += "-Ddata-path=/vendor/vm-system/lxc/lxc-conf"
-EXTRA_OEMESON += "-Druntime-path=/mnt/lxc/run"
-EXTRA_OEMESON += "-Drootfs-mount-path=/vendor/vm-system"
+EXTRA_OEMESON += "-Ddata-path=/vendor_early_services/vendor/vm-system/lxc/lxc-conf"
+EXTRA_OEMESON += "-Druntime-path=/vendor_early_services/run/lxc/run"
+EXTRA_OEMESON += "-Drootfs-mount-path=/vendor_early_services/vendor/vm-system"
 CFLAGS:append = " -Wno-incompatible-pointer-types -Wno-stringop-overread"
 
 do_configure:prepend() {
