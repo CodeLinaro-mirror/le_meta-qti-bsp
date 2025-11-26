@@ -65,6 +65,8 @@ else
     /bin/mount -t ext4 -o ro /dev/vda /mnt/vfs
 fi
 
+echo 600 > /proc/sys/kernel/threads-max
+
 if [ $? -eq 0 ] && [ -f /mnt/vfs/sbin/init ]; then
     echo "Switching root" > /dev/kmsg
     exec switch_root -c /dev/console /mnt/vfs /sbin/init
