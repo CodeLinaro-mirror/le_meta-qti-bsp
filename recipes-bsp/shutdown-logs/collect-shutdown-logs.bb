@@ -7,7 +7,7 @@ ${LICENSE};md5=3771d4920bd6cdb8cbdf1e8344489ee0"
 
 PR = "r1"
 
-DEPENDS = "zlib"
+DEPENDS = "zlib libarchive"
 RDEPENDS_${PN} = "qru-mplane-app"
 
 FILESEXTRAPATHS_prepend := "${WORKSPACE}/QPlatformUtils:"
