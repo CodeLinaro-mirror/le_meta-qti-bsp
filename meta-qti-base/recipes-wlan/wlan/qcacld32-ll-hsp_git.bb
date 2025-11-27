@@ -39,15 +39,16 @@ EXTRA_OEMAKE:append = " \
                        DYNAMIC_SINGLE_CHIP=${_MODNAME} \
                        MODNAME=${_MODNAME} \
                        WLAN_CTRL_NAME=${_WLAN_CTRL_NAME} \
+                       LINUX_BUILD_TOP=${_LINUX_BUILD_TOP} \
+                       CONFIG_WLAN_PLACEMARKER_PREFIX=108 \
                        "
 
 _WLAN_CFG_OVERRIDE = "\
-                        LINUX_BUILD_TOP=${_LINUX_BUILD_TOP} \
                         CONFIG_WLAN_OPEN_P2P_INTERFACE=y \
                         CONFIG_SUPPORT_P2P_BY_ONE_INTF_WLAN=n \
-                        CONFIG_WLAN_PLACEMARKER_PREFIX=108 \
                         CONFIG_CNSS_GENL=n \
                         CONFIG_QCOM_TDLS=n \
+                        CONFIG_WLAN_SYSFS_TDLS_PEERS=n \
                         CONFIG_CFG_MAX_STA_VDEVS=4 \
                         CONFIG_CFG_BMISS_OFFLOAD_MAX_VDEV=4 \
                         CONFIG_BAND_6GHZ=y \
@@ -56,12 +57,36 @@ _WLAN_CFG_OVERRIDE = "\
                         CONFIG_DP_MULTIPASS_SUPPORT=n \
                         CONFIG_FEATURE_DELAYED_PEER_OBJ_DESTROY=n \
                         CONFIG_FEATURE_WLAN_CH_AVOID_EXT=y \
+                        CONFIG_MULTI_IF_NAME=\"${_MODNAME}\" \
                         "
 EXTRA_OEMAKE:append = " WLAN_CFG_OVERRIDE=${_WLAN_CFG_OVERRIDE}"
 
-do_install() {
-    module_do_install
+EXT_MODULE = "wlan/qcacld-3.0"
+MODNAME_MODULE = "qca6490_modules"
+TECHPACK_MODULE_OUT = "${WORKDIR}/wlan/qcacld-3.0"
+TECHPACK_MODULES = "qca6698.ko"
 
+do_configure:append() {
+    if ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '6.12', 'true', 'false', d)}; then
+        sed -i 's/.*qca_cld3_{}.ko.*/        out = "${TECHPACK_MODULES}"/' ${BSPDIR}/wlan/qcacld-3.0/wlan_qcacld3_modules.bzl
+        CFG_FILE=${BSPDIR}/wlan/qcacld-3.0/configs/autogvm_gki_qca6490_defconfig
+        for cfg in ${_WLAN_CFG_OVERRIDE}
+        do
+            item="${cfg%=*}"
+            if (( `grep -c "$item" ${CFG_FILE}` )); then
+                sed -i "/$item/c\\$cfg" "${CFG_FILE}"
+            else
+                echo "$cfg" >> ${CFG_FILE}
+            fi
+        done
+    fi
+}
+
+do_install() {
+    # install modules
+    install -d ${D}/${nonarch_base_libdir}/modules/${KERNEL_VERSION}
+    install -d ${D}/${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra
+    install -m 0644 ${S}/${_MODNAME}.ko ${D}/${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra
     install -d ${FIRMWARE_PATH}
     install -d ${D}${includedir}/qcacld/
     install -m 0644 ${S1}/utils/nlink/inc/wlan_nlink_common.h ${D}${includedir}/qcacld/
