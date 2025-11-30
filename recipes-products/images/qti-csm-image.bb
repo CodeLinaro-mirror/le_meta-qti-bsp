@@ -48,6 +48,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
               libbootreason \
               packagegroup-modem-ald-transport-simulation \
               packagegroup-ru-modem-client \
+              packagegroup-ru-qrtr-modem-server \
               resize-data \
               collect-shutdown-logs \
               process-monitor \
