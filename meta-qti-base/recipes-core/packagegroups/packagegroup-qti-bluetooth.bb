@@ -17,3 +17,8 @@ RDEPENDS:${PN}:remove:quin-gvm-gen4-5 = "\
     synergy-opensource \
     csrspp-tty \
     "
+
+RDEPENDS:${PN}:remove:gvm-gen4-5 = "\
+    synergy-opensource \
+    csrspp-tty \
+    "
