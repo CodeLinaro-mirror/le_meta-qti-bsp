@@ -19,6 +19,7 @@ gvm_pilsplitter() {
         exit 1
     else
         ${STAGING_BINDIR_NATIVE}/build/prebuilts/kernel-build-tools/linux-x86/bin/mkdtimg create ${DEPLOY_DIR_IMAGE}/dtbs/dtb.img \
+            ${DEPLOY_DIR_IMAGE}/dtbs/lemans-gh-vm-lv-qam-ridesx.dtb \
             ${DEPLOY_DIR_IMAGE}/dtbs/sa8797p-gunyah-vm-qam.dtb
     fi
 
@@ -33,26 +34,26 @@ gvm_pilsplitter() {
 
     cd ${DEPLOY_DIR_IMAGE}/signing
 
-    # autogvmlv-boot.elf is not a standard elf file, verify_elf in image_header.py
+    # autoghgvmlv-boot.elf is not a standard elf file, verify_elf in image_header.py
     # will fail and return 1.bypass yocto by adding 'set +e' and 'set -e'
     set +e
-    python3 ${PILTOOLS_PATH}/image_header.py autogvmlv-boot.elf Image,0x0 dtb.img,0x3000000 ramdisk.img,0x3100000 --32
-    python3 ${PILTOOLS_PATH}/image_header.py autogvmlv-bootloader.elf FVMAIN_COMPACT.Fv,0x0 dtb.img,0x9700000 LinuxLoader.efi,0x9800000 --32
+    python3 ${PILTOOLS_PATH}/image_header.py autoghgvmlv-boot.elf Image,0x0 dtb.img,0x3000000 ramdisk.img,0x3100000 --32
+    python3 ${PILTOOLS_PATH}/image_header.py autoghgvmlv-bootloader.elf FVMAIN_COMPACT.Fv,0x0 dtb.img,0x9300000 LinuxLoader.efi,0x9800000 --32
     set -e
 
-    sectools secure-image autogvmlv-boot.elf --image-id GVM1 --security-profile ${STAGING_BINDIR_NATIVE}/${SECTOOLS_SECURITY_PROFILE} --sign --signing-mode TEST --outfile autogvmlv_signed-boot.elf
-    sectools secure-image autogvmlv-boot.elf --inspect
+    sectools secure-image autoghgvmlv-boot.elf --image-id GVM1 --security-profile ${STAGING_BINDIR_NATIVE}/${SECTOOLS_SECURITY_PROFILE} --sign --signing-mode TEST --outfile autoghgvmlv_signed-boot.elf
+    sectools secure-image autoghgvmlv-boot.elf --inspect
 
     install -d ${DEPLOY_DIR_IMAGE}/signing/boot
-    python3 ${PILTOOLS_PATH}/pil-splitter.py autogvmlv_signed-boot.elf boot/autogvmlv
+    python3 ${PILTOOLS_PATH}/pil-splitter.py autoghgvmlv_signed-boot.elf boot/autoghgvmlv
 
     ${STAGING_BINDIR_NATIVE}/build/prebuilts/kernel-build-tools/linux-x86/bin/mkuserimg_mke2fs ${DEPLOY_DIR_IMAGE}/signing/boot ${DEPLOY_DIR_IMAGE}/vm-bootloader.img ext4 / 60000000
 
-    sectools secure-image autogvmlv-bootloader.elf --image-id GVM1 --security-profile ${STAGING_BINDIR_NATIVE}/${SECTOOLS_SECURITY_PROFILE} --sign --signing-mode TEST --outfile autogvmlv_signed-bootloader.elf
-    sectools secure-image autogvmlv-bootloader.elf --inspect
+    sectools secure-image autoghgvmlv-bootloader.elf --image-id GVM1 --security-profile ${STAGING_BINDIR_NATIVE}/${SECTOOLS_SECURITY_PROFILE} --sign --signing-mode TEST --outfile autoghgvmlv_signed-bootloader.elf
+    sectools secure-image autoghgvmlv-bootloader.elf --inspect
 
     install -d ${DEPLOY_DIR_IMAGE}/signing/bootloader
-    python3 ${PILTOOLS_PATH}/pil-splitter.py autogvmlv_signed-bootloader.elf bootloader/autogvmlv
+    python3 ${PILTOOLS_PATH}/pil-splitter.py autoghgvmlv_signed-bootloader.elf bootloader/autoghgvmlv
 
     ${STAGING_BINDIR_NATIVE}/build/prebuilts/kernel-build-tools/linux-x86/bin/mkuserimg_mke2fs ${DEPLOY_DIR_IMAGE}/signing/bootloader ${DEPLOY_DIR_IMAGE}/${PRODUCT}-bootloader.img ext4 / 6000000
 }
