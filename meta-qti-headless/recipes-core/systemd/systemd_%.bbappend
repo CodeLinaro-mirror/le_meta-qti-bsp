@@ -9,6 +9,9 @@ SRC_URI:append = " \
 
 SRC_URI:append = " ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "6.12", "file://linux-msm-6.12_modules_load.conf", "", d)}"
 
+#Disable systemd-timesyncd which not used in project.
+PACKAGECONFIG:remove = "timesyncd "
+
 do_install:append () {
     # Use kernel rules for network iface name
     sed -i  's/^NamePolicy.*/NamePolicy=kernel/g' ${D}${systemd_unitdir}/network/99-default.link
