@@ -8,3 +8,6 @@ ro.hardware.camera=qcom
 persist.vendor.sensors.enable.tdkMezzCard=false
 persist.vendor.sensors.enable.NavMezzCard=false
 persist.vendor.sensors.enable.NavMezzCard_Rev2=false
+
+#property to enable buffercache for audio-codec2
+vendor.qc2audio.enable.buffercache=false
