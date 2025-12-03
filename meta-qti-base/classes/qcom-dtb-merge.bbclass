@@ -121,7 +121,7 @@ merge_ddr_dtbos_single () {
     dtbo_dir=$2
     out_dir=$3
 
-    ddr_sizes="64gb:0x700 48gb:0x600 36gb:0x500 32gb:0x500 24gb:0x400 16gb:0x300 12gb:0x200 8gb:0x100"
+    ddr_sizes="64gb:0x700 48gb:0x600 36gb:0x500 32gb:0x500 24gb:0x400 18gb:0x300 12gb:0x200 8gb:0x100"
 
     dtb_files=$(find $dtb_dir -name "*.dtb*")
     dtbo_files=$(find $dtbo_dir -name "*.dtbo")
@@ -145,7 +145,7 @@ merge_ddr_dtbos_single () {
             for i in $ddr_sizes; do
                ddr_size=$(echo $i | sed 's,:.*,,g')
                ddr_type=$(echo $i | sed 's,.*:,,g')
-               if [[ "$dtbo_file" == *"$ddr_size"* ]]; then
+               if echo "$dtbo_file" | grep -Eq "(^|[^0-9])${ddr_size}([^0-9]|$)"; then
                   subtype="$ddr_type"
                   break
                fi
