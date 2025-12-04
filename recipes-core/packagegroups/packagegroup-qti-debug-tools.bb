@@ -13,9 +13,10 @@ PACKAGES =  "\
 RDEPENDS:packagegroup-qti-debug-tools = " \
             gdbserver \
             strace \
-            ${@bb.utils.contains_any('MACHINE', 'trustedvm-v4', '', 'valgrind', d)} \
+            valgrind \
             systemd-analyze \
             procrank \
-            ${@bb.utils.contains_any('MACHINE', 'trustedvm-v4 trustedvm-v3', '', 'perf', d)} \
+            ${@bb.utils.contains('MACHINE', 'trustedvm-v4', '', 'perf', d)} \
             atrace \
+            perfetto \
         "
