@@ -4,6 +4,7 @@ SRC_URI:append = " \
         file://autodev.sh \
         file://config \
         file://file_contexts \
+        file://dbus_contexts \
         file://0002-lxc-support-deny-device-by-devpth.patch \
         file://0003-lxc-handle-cgroup-device-not-available-gracefully.patch \
         file://0004-skip-fetch-seccomp-config-on-lxc-without-seccomp.patch \
@@ -31,10 +32,12 @@ do_install:append() {
 
     install -d ${D}/lxc/lxc-conf/lv
     install -d ${D}/etc/selinux/mls/contexts/files
+    install -d ${D}/etc/selinux/targeted/contexts
     mv ${D}/usr/bin ${D}/lxc
     cp ${WORKDIR}/config ${D}/lxc/lxc-conf/lv
     install -m 755 ${WORKDIR}/autodev.sh ${D}/lxc/lxc-conf
     install -m 644 ${WORKDIR}/file_contexts ${D}/etc/selinux/mls/contexts/files
+    install -m 644 ${WORKDIR}/dbus_contexts ${D}/etc/selinux/targeted/contexts
 
     # getenforce can't work if no /etc/selinux/config file
     touch ${D}/etc/selinux/config
