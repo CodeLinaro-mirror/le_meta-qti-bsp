@@ -16,7 +16,7 @@ RDEPENDS:packagegroup-qti-debug-tools = " \
             valgrind \
             systemd-analyze \
             procrank \
-            ${@bb.utils.contains('MACHINE', 'trustedvm-v4', '', 'perf', d)} \
+            ${@bb.utils.contains('BASEMACHINE', 'trustedvm-v4', '', 'perf', d)} \
             atrace \
             perfetto \
         "
