@@ -7,6 +7,9 @@ SRC_URI:append = " \
     file://qti_sleep.sh \
 "
 
+#Disable systemd-timesyncd which not used in project.
+PACKAGECONFIG:remove = "timesyncd "
+
 do_install:append () {
     # Use kernel rules for network iface name
     sed -i  's/^NamePolicy.*/NamePolicy=kernel/g' ${D}${systemd_unitdir}/network/99-default.link
