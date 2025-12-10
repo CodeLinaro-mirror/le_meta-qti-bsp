@@ -15,6 +15,15 @@ PREFERRED_PROVIDER_virtual/egl          = "adreno"
 PREFERRED_PROVIDER_virtual/libgles1     = "adreno"
 PREFERRED_PROVIDER_virtual/libgles2     = "adreno"
 
+# Prefer GStreamer 1.18.5 by default
+PREFERRED_VERSION_gstreamer1.0              ?= "1.18.5"
+PREFERRED_VERSION_gstreamer1.0-plugins-bad  ?= "1.18.5"
+PREFERRED_VERSION_gstreamer1.0-plugins-base ?= "1.18.5"
+PREFERRED_VERSION_gstreamer1.0-plugins-good ?= "1.18.5"
+PREFERRED_VERSION_gstreamer1.0-plugins-ugly ?= "1.18.5"
+PREFERRED_VERSION_gstreamer1.0-libav        ?= "1.18.5"
+PREFERRED_VERSION_gstreamer1.0-omx          ?= "1.18.5"
+
 # mesa provides these packags and others like virtual/libgl.
 # This is to enable mesa, adreno and gbm work together, and pass
 # yocot-check-layer script check.

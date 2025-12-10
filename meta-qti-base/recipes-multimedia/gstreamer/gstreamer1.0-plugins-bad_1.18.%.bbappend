@@ -14,3 +14,5 @@ CPPFLAGS += "-I${STAGING_INCDIR}/linux-msm"
 do_compile:prepend() {
     export GIR_EXTRA_LIBS_PATH="${B}/gst-libs/gst/allocators/.libs"
 }
+
+PACKAGECONFIG:remove = "vulkan"
