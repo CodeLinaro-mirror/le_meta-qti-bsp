@@ -263,6 +263,7 @@ require {
     class passwd { passwd chfn chsh rootok crontab };
     class service_manager { find };
     class property_service { set };
+    class perf_event { cpu };
 };
 
 #============= host_exec_t ==============
@@ -645,3 +646,6 @@ grant_all_permissions(vendor_hal_gnss_qti,vendor_pd_locater_dbg_prop)
 grant_all_permissions(hal_bluetooth_default,vendor_ramdump_vendor_data_file)
 grant_all_permissions(hal_bluetooth_default,debugfs_tracing_instances)
 grant_all_permissions(system_app,default_android_service)
+allow vendor_qti_init_shell sysfs_devices_system_cpu:dir { add_name create };
+allow host_exec_t host_exec_t:perf_event { cpu };
+allowxperm kernel tmpfs:blk_file ioctl { 0x127c 0x125e 0x1272 0x1260 0x204 };
