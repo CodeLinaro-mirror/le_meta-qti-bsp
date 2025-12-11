@@ -34,3 +34,5 @@ RDEPENDS:${PN} += "\
 "
 RDEPENDS:${PN}:append:quin-gvm-monaco = " dataeth-dlkm early-eth-gvm"
 RDEPENDS:${PN}:append:quin-gvm-lemans = " dataeth-dlkm early-eth-gvm"
+RDEPENDS:${PN}:remove:sa8650-adas = "netlink-service-infra"
+RDEPENDS:${PN}:remove:sa8620-adas = "netlink-service-infra"
