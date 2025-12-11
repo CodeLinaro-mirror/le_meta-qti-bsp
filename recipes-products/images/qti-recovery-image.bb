@@ -36,7 +36,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
             ${MLIBPREFIX}packagegroup-qti-recoveryfs \
             ${MLIBPREFIX}packagegroup-qti-core-recovery \
 "
-CORE_IMAGE_EXTRA_INSTALL:remove:mdm9607 += " packagegroup-qti-debug-tools packagegroup-qti-ppat"
+CORE_IMAGE_EXTRA_INSTALL:remove:mdm9607 = " packagegroup-qti-debug-tools packagegroup-qti-ppat"
 
 RM_WORK_EXCLUDE += "${PN}"
 
