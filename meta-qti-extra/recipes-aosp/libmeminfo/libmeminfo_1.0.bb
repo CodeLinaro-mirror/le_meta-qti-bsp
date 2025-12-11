@@ -6,10 +6,12 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 DEPENDS += "virtual/kernel-headers libbase libprocinfo "
 
-SRC_URI = "${CLO_LE_GIT}/platform/system/memory/libmeminfo;protocol=https;branch=memory-le-apps.lnx.1.0;destsuffix=src/system/memory/libmeminfo \
-           file://0001-libmeminfo-Remove-libion-dependency.patch"
+SRC_URI = "${CLO_LA_GIT}/platform/system/memory/libmeminfo;protocol=https;branch=aosp-new/master;destsuffix=src/system/memory/libmeminfo \
+           file://0001-libmeminfo-add-automake.patch \
+           file://0001-libmeminfo-solve-build-issues-under-yocto.patch \
+           "
 
-SRCREV = "e5690f41db4637600d40b74d7eb8207837edfb85"
+SRCREV = "9a8f5952d95c704431bc477f7f0228db47a17ae9"
 
 S = "${WORKDIR}/src/system/memory/libmeminfo"
 
@@ -17,5 +19,4 @@ inherit autotools pkgconfig
 
 EXTRA_OECONF:append = " \
     --disable-static \
-    --with-sanitized-headers=${STAGING_INCDIR}/linux-msm/usr/include \
 "
