@@ -1,11 +1,13 @@
-From e4929810537db6806618f6037d4626c28db1c1d1 Mon Sep 17 00:00:00 2001
+From 356650b787133f16bcd94a561ad7649867f233f5 Mon Sep 17 00:00:00 2001
 From: Lei wang <leiwan@qti.qualcomm.com>
-Date: Wed, 3 Sep 2025 18:59:58 +0800
+Date: Tue, 9 Sep 2025 14:01:15 +0800
 Subject: [PATCH] systemd: Add wdt_ping in dispatch_runqueue
 
 Systemd may hung in dispatch_runqueue, which may
 lead wdt bite.
 Add a protection to pet dog in dispatch_runqueue.
+
+Upstream-Status: Inappropriate [configuration]
 
 Signed-off-by: Lei wang <leiwan@qti.qualcomm.com>
 ---
@@ -13,17 +15,16 @@ Signed-off-by: Lei wang <leiwan@qti.qualcomm.com>
  1 file changed, 7 insertions(+)
 
 diff --git a/src/core/manager.c b/src/core/manager.c
-index 7eafa578fe6..e08ade66107 100644
+index b7cf2b1bae..088deacdc8 100644
 --- a/src/core/manager.c
 +++ b/src/core/manager.c
-@@ -2235,13 +2235,20 @@ void manager_unwatch_pid(Manager *m, pid_t pid) {
+@@ -2443,12 +2443,19 @@ void manager_unwatch_pidref(Manager *m, PidRef *pid) {
  static int manager_dispatch_run_queue(sd_event_source *source, void *userdata) {
-         Manager *m = userdata;
+         Manager *m = ASSERT_PTR(userdata);
          Job *j;
 +        int i = 0;
  
          assert(source);
-         assert(m);
  
          while ((j = prioq_peek(m->run_queue))) {
 +                i++;

@@ -6,7 +6,7 @@ Subject: [PATCH] systemd: journald: optimize kmsg reading performance
 Bypass journal metadata collection for udev devices, which has
 performance issue.
 
-Upstream-Status:Inappropriate
+Upstream-Status: Inappropriate
 
 Signed-off-by: Lei wang <leiwan@qti.qualcomm.com>
 ---
