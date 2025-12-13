@@ -20,7 +20,7 @@ do_install:append () {
         install -m 0644 ${S}/systemrw-ubi.mount ${D}${systemd_unitdir}/system/systemrw.mount
         ln -sf ${systemd_unitdir}/system/systemrw-ubi.mount ${D}${systemd_unitdir}/system/local-fs.target.wants/systemrw.mount
         # Install systemrw.conf
-        install -m 0744 ${S}/systemrw.conf ${D}${systemd_unitdir}/system/systemrw.mount.d/systemrw.conf
+        install -m 0644 ${S}/systemrw.conf ${D}${systemd_unitdir}/system/systemrw.mount.d/systemrw.conf
         # Install mountpartition rules to enable sdcard support
         install -m 0644 ${S}/mountpartitions.rules ${D}${sysconfdir}/udev/rules.d/mountpartitions.rules
     fi
