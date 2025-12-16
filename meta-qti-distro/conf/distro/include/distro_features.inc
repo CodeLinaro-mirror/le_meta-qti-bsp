@@ -64,3 +64,6 @@ DISTRO_FEATURES_NATIVE:append:sa8775 = " selinux"
 # Preferred refpolicy
 PREFERRED_PROVIDER_virtual/refpolicy:sa8775 = "selinux-policy"
 DEFAULT_ENFORCING:sa8775 = "enforcing"
+
+# volatile /var
+DISTRO_FEATURES:append:quin-gvm-gen4-5 = " volatiled-var"
