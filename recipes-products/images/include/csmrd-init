@@ -662,15 +662,16 @@ do_nbdtab()
     rm -f persist-backup.service
     rm -f persist-backup.timer
 
-    # set debug transport
-    echo "Set debug transport to $4"
-    # mount userdata.img
-    mnt_data_dir="/mnt/system/data"
-    mkdir -p $mnt_data_dir
-    mount -o rw /dev/nbd3 $mnt_data_dir
-    echo $4 > $mnt_data_dir/debug_transport.conf
-    umount $mnt_data_dir
-
+    if [ -n "$4" ]; then
+        # set debug transport
+        echo "Set debug transport to $4"
+        # mount userdata.img
+        mnt_data_dir="/mnt/system/data"
+        mkdir -p $mnt_data_dir
+        mount -o rw /dev/nbd3 $mnt_data_dir
+        echo $4 > $mnt_data_dir/debug_transport.conf
+        umount $mnt_data_dir
+    fi
     # Switch root to remote sysfs
     echo "Switching to system partition on $partition"
     exec /bin/switch_root -c /dev/console $mnt_dir /sbin/init
@@ -851,6 +852,7 @@ fi   # end of  if verity file exist check.
               echo "Received config string using ip negotiation: $config_string"
               echo "Assigned IP: $success_ip"
               echo "Host IP:    $success_route"
+              debug_transport=''
         elif [ "$success_mhi" -eq 1 ]; then
               echo "Getting channel number"
               config_string=""
