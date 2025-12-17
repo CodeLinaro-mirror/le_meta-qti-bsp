@@ -1,0 +1,31 @@
+From 6c6411f6a60f8e18f4912e43fe90bdc09020338c Mon Sep 17 00:00:00 2001
+From: Feng Chen <fch@qti.qualcomm.com>
+Date: Fri, 19 Dec 2025 09:56:28 +0800
+Subject: [PATCH] Skip seccomp config while lxc doesn't enable seccomp
+
+lxc 6.0.4 skip to fetch the seccomp config while lxc does not enable seccomp feature.
+This will clean up the error log related with lxc.seccomp while using lxc-attach.
+
+Signed-off-by: Feng Chen <fch@qti.qualcomm.com>
+---
+ src/lxc/attach.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/lxc/attach.c b/src/lxc/attach.c
+index 8f2f7a37c..712bf20f9 100644
+--- a/src/lxc/attach.c
++++ b/src/lxc/attach.c
+@@ -1472,8 +1472,10 @@ int lxc_attach(struct lxc_container *container, lxc_attach_exec_t exec_function,
+ 
+ 	conf = ctx->container->lxc_conf;
+ 
++#if HAVE_SECCOMP
+ 	if (!fetch_seccomp(ctx->container, options))
+ 		WARN("Failed to get seccomp policy");
++#endif
+ 
+ 	if (!no_new_privs(ctx->container, options))
+ 		WARN("Could not determine whether PR_SET_NO_NEW_PRIVS is set");
+-- 
+2.34.1
+

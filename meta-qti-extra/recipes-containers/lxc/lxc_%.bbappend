@@ -21,6 +21,7 @@ SRC_URI_append = "git://github.com/lxc/lxc.git;branch=stable-6.0;protocol=https 
 		file://0001-template-if-busybox-contains-init-use-it-in-containe.patch \
 		file://dnsmasq.conf \
 		file://lxc-net \
+		file://0001-Skip-seccomp-config-while-lxc-doesn-t-enable-seccomp.patch \
     "
 
 DEPENDS_remove = "meson-native"
