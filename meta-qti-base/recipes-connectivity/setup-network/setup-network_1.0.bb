@@ -30,4 +30,11 @@ do_install:append:quin-gvm-gen4-5() {
   install -m 0644 ${WORKDIR}/setup-network-gh-lvgvm.service ${D}${systemd_unitdir}/system/setup-network.service
 }
 
+do_install:append:gvm-gen4-5() {
+  install -d ${D}${systemd_system_unitdir}
+  install -d ${D}${bindir}
+  install -m 0755 ${WORKDIR}/setup-network-gh-lvgvm.sh ${D}${bindir}/setup-network.sh
+  install -m 0644 ${WORKDIR}/setup-network-gh-lvgvm.service ${D}${systemd_unitdir}/system/setup-network.service
+}
+
 SYSTEMD_SERVICE:${PN} = "setup-network.service"
