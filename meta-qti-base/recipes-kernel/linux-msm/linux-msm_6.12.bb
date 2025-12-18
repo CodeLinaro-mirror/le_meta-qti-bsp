@@ -88,6 +88,11 @@ do_deploy () {
 
     install -d ${DEPLOYDIR}/build-artifacts/dtb/
     install -m 0644 ${BZ_PREBUILT_ROOT}/out/msm-kernel-autogvm-${KERNEL_OUT_VARIANT}defconfig/dist/*.dtb ${DEPLOYDIR}/build-artifacts/dtb/
+
+    if ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'true', 'false', d)}; then
+        install -d ${DEPLOYDIR}/build-artifacts/dtbo/
+        install -m 0644 ${BZ_PREBUILT_ROOT}/out/msm-kernel-autogvm-${KERNEL_OUT_VARIANT}defconfig/dist/*.dtbo ${DEPLOYDIR}/build-artifacts/dtbo/
+    fi
 }
 
 PACKAGES:remove = "${KERNEL_PACKAGE_NAME}-devicetree"

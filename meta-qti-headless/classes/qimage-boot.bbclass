@@ -6,7 +6,7 @@ DEPENDS += "\
     dtc-native \
     kernel-aosp-tools-native \
     mkdtimg-native \
-    sectool5-native \
+    sectools-native \
     virtual/kernel \
 "
 

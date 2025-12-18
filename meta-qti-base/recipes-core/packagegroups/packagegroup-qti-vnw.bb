@@ -21,5 +21,3 @@ RDEPENDS:${PN} += "\
     "
 
 RDEPENDS:${PN}:append:sa81x5 = " gptp open-avb"
-#disable hsi2s due to compile issue
-RDEPENDS:${PN}:remove:quin-gvm-gen4-5 = "hsi2s hsi2s-test"

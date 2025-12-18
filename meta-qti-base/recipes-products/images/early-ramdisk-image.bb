@@ -19,7 +19,7 @@ EARLY_RAMDISK_KERNEL_MODULES ?= ""
 
 # We really need just kexecboot, kexec and ubiattach
 IMAGE_INSTALL = "\
-    early-ramdisk-init libgcc kmod util-linux-libblkid \
+    early-ramdisk-init libgcc kmod util-linux-libblkid busybox \
     ${EARLY_RAMDISK_KERNEL_MODULES} \
 "
 do_rootfs[depends] += "virtual/kernel:do_shared_workdir"
@@ -62,3 +62,4 @@ IMAGE_ROOTFS_EXTRA_SPACE = "0"
 # disable runtime dependency on run-postinsts -> update-rc.d
 ROOTFS_BOOTSTRAP_INSTALL = ""
 
+INCOMPATIBLE_LICENSE = "GPL-3.0* LGPL-3.0* AGPL-3.0*"

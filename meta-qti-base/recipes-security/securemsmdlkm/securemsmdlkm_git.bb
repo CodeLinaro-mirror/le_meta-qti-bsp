@@ -16,8 +16,8 @@ EXT_MODULE = "vendor/qcom/opensource/securemsm-kernel"
 
 TECHPACK_MODULE_OUT = "${WORKDIR}/securemsm-kernel-out"
 TECHPACK_MODULES = "qseecom_dlkm.ko tz_log_dlkm.ko qrng_dlkm.ko smcinvoke_dlkm.ko hdcp_qseecom_dlkm.ko qcrypto-msm_dlkm.ko qce50_dlkm.ko qcedev-mod_dlkm.ko"
-TECHPACK_MODULES:remove:quin-gvm-lemans = "qcedev-mod_dlkm.ko"
-TECHPACK_MODULES:append:quin-gvm-lemans = " qcedev_fe_dlkm.ko"
+TECHPACK_MODULES:remove:quin-gvm-gen4-5 = "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'qcedev-mod_dlkm.ko', '', d)}"
+TECHPACK_MODULES:append:quin-gvm-gen4-5 = "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', ' qcedev_fe_dlkm.ko', '', d)}"
 TECHPACK_HEADERS = "${S}/include/uapi"
 
 inherit qti-techpack
@@ -39,8 +39,8 @@ RPROVIDES:${PN} += "kernel-module-hdcp-qseecom-dlkm-${KERNEL_VERSION}"
 RPROVIDES:${PN} += "kernel-module-qcrypto-msm-dlkm-${KERNEL_VERSION}"
 RPROVIDES:${PN} += "kernel-module-qce50-dlkm-${KERNEL_VERSION}"
 RPROVIDES:${PN} += "kernel-module-qcedev-mod-dlkm-${KERNEL_VERSION}"
-RPROVIDES:${PN}:remove:quin-gvm-lemans = "kernel-module-qcedev-mod-dlkm-${KERNEL_VERSION}"
-RPROVIDES:${PN}:append:quin-gvm-lemans = " kernel-module-qcedev-fe-dlkm-${KERNEL_VERSION}"
+RPROVIDES:${PN}:remove:quin-gvm-gen4-5 = "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'kernel-module-qcedev-mod-dlkm-${KERNEL_VERSION}', '', d)}"
+RPROVIDES:${PN}:append:quin-gvm-gen4-5 = "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', ' kernel-module-qcedev-fe-dlkm-${KERNEL_VERSION}', '', d)}"
 
 FILES:${PN} += "${sysconfdir}/*"
 FILES:${PN} += "${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/*"
