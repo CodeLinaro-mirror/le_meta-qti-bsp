@@ -1,4 +1,5 @@
-inherit qimage ${@bb.utils.contains('MACHINE_FEATURES', 'dm-verity-ramdisk', 'qramdisk', 'qcpioimage', d)}
+inherit qimage ${@bb.utils.contains('MACHINE_FEATURES', 'dm-verity-initramfs', 'qramdisk', 'qcpioimage', d)}
+
 DEPENDS += " virtual/kernel"
 
 ENABLE_DISPLAY = "${@d.getVar('MACHINE_SUPPORTS_DISPLAY') or "True"}"
