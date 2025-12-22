@@ -136,23 +136,23 @@ do_install:append () {
 
 do_install:append:kalama () {
    if ${@bb.utils.contains("DISTRO_FEATURES", "lxc", "true", "false", d)}; then
-       ln -sf /dev/null ${D}${systemd_unitdir}/system/local-fs.target.wants/data.mount
-       ln -sf /dev/null ${D}${systemd_unitdir}/system/local-fs.target.wants/etc.mount
-       ln -sf /dev/null ${D}${systemd_unitdir}/system/local-fs.target.wants/cache.mount
-       ln -sf /dev/null ${D}${systemd_unitdir}/system/local-fs.target.wants/var-volatile.mount
-       ln -sf /dev/null ${D}${systemd_unitdir}/system/sys-kernel-debug.mount
-       ln -sf /dev/null ${D}${systemd_unitdir}/system/var-volatile.mount
-       ln -sf /dev/null ${D}${systemd_unitdir}/system/ab-updater.service
-       ln -sf /dev/null ${D}${systemd_unitdir}/system/init_post_boot.service
-       ln -sf /dev/null ${D}${systemd_unitdir}/system/modprobe@.service
-       ln -sf /dev/null ${D}${systemd_unitdir}/system/overlay-workdir.service
-       ln -sf /dev/null ${D}${systemd_unitdir}/system/systemd-logind.service
-       ln -sf /dev/null ${D}${systemd_unitdir}/system/touch.service
-       ln -sf /dev/null ${D}${systemd_unitdir}/system/systemd-tmpfiles-setup-dev.service
-       ln -sf /dev/null ${D}${systemd_unitdir}/system/systemd-tmpfiles-setup.service
-       ln -sf /dev/null ${D}${systemd_unitdir}/system/systemd-tmpfiles-clean.service
-       ln -sf /dev/null ${D}${systemd_unitdir}/system/systemd-journald-audit.socket
-   fi
+        install -d ${D}${sysconfdir}/systemd/system
+        ln -sf /dev/null ${D}${sysconfdir}/systemd/system/data.mount
+        ln -sf /dev/null ${D}${sysconfdir}/systemd/system/etc.mount
+        ln -sf /dev/null ${D}${sysconfdir}/systemd/system/cache.mount
+        ln -sf /dev/null ${D}${sysconfdir}/systemd/system/var-volatile.mount
+        ln -sf /dev/null ${D}${sysconfdir}/systemd/system/sys-kernel-debug.mount
+        ln -sf /dev/null ${D}${sysconfdir}/systemd/system/init_post_boot.service
+        ln -sf /dev/null ${D}${sysconfdir}/systemd/system/overlay-workdir.service
+        ln -sf /dev/null ${D}${sysconfdir}/systemd/system/ab-updater.service
+        ln -sf /dev/null ${D}${sysconfdir}/systemd/system/modprobe@.service
+        ln -sf /dev/null ${D}${sysconfdir}/systemd/system/systemd-logind.service
+        ln -sf /dev/null ${D}${sysconfdir}/systemd/system/touch.service
+        ln -sf /dev/null ${D}${sysconfdir}/systemd/system/systemd-tmpfiles-setup-dev.service
+        ln -sf /dev/null ${D}${sysconfdir}/systemd/system/systemd-tmpfiles-setup.service
+        ln -sf /dev/null ${D}${sysconfdir}/systemd/system/systemd-tmpfiles-clean.service
+        ln -sf /dev/null ${D}${sysconfdir}/systemd/system/systemd-journald-audit.socket
+    fi
 }
 
 
