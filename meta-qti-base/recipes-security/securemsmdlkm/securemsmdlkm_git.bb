@@ -21,6 +21,7 @@ TECHPACK_MODULES:append:quin-gvm-gen4-5 = "${@bb.utils.contains('MACHINE_FEATURE
 TECHPACK_MODULES:remove:gvm-gen4-5 = "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'qcedev-mod_dlkm.ko', '', d)}"
 TECHPACK_MODULES:append:gvm-gen4-5 = "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', ' qcedev_fe_dlkm.ko', '', d)}"
 TECHPACK_HEADERS = "${S}/include/uapi"
+TECHPACK_MODULES:remove:gvm-gen5 = "qseecom_dlkm.ko"
 
 inherit qti-techpack
 

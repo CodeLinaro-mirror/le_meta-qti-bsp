@@ -291,7 +291,6 @@ BBMASK:gvm-gen5 += "meta-qti-bsp/meta-qti-base/recipes-kiumd/safelinux-cfg-modul
 BBMASK:gvm-gen5 += "meta-qti-bsp/meta-qti-base/recipes-multimedia/media/media_0.1.bb"
 BBMASK:gvm-gen5 += "meta-qti-bsp/meta-qti-base/recipes-multimedia/virtio-video/virtio-video-header_git.bb"
 BBMASK:gvm-gen5 += "meta-qti-bsp/meta-qti-base/recipes-safelinux-dbg-modules/safelinux-dbg-modules/safelinux-dbg-modules_git.bb"
-BBMASK:gvm-gen5 += "meta-qti-bsp/meta-qti-base/recipes-security/securemsm-devicetree/securemsm-devicetree.bb"
 BBMASK:gvm-gen5 += "meta-qti-bsp/meta-qti-base/recipes-security/security-modules/safelinux-sec-modules_git.bb"
 BBMASK:gvm-gen5 += "meta-qti-bsp/meta-qti-base/recipes-virt/gunyah-drivers/gunyah-drivers_git.bb"
 BBMASK:gvm-gen5 += "meta-qti-bsp/meta-qti-base/recipes-virt/hyp-udmabuf/hyp-udmabuf_git.bb"
