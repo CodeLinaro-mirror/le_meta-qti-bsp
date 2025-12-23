@@ -7,6 +7,7 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://NOTICE;md5=c1a3ff0b97f199c7ebcfdd4d3fed238e"
 
 DEPENDS += "ext4-utils glib-2.0 libbase libcutils libmincrypt libutils virtual/kernel-headers openssl system-core-adbd"
+DEPENDS += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', 'vmm-lib', d)}"
 
 PR = "r19"
 
@@ -27,6 +28,11 @@ USERADD_PACKAGES = "${PN}-leprop"
 GROUPADD_PARAM:${PN}-leprop = "leprop"
 USERADD_PARAM:${PN}-leprop = "-g leprop --no-create-home --shell /bin/false leprop"
 
+USERADD_PACKAGES += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', '${PN}-disksymlink', d)}"
+
+GROUPADD_PARAM:${PN}-disksymlink = "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', 'disksymlink', d)}"
+USERADD_PARAM:${PN}-disksymlink = "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', '-g disksymlink --no-create-home --shell /bin/false disksymlink', d)}"
+
 CPPFLAGS += "-I${STAGING_INCDIR}/ext4_utils"
 
 EXTRA_OECONF = "\
@@ -35,7 +41,9 @@ EXTRA_OECONF = "\
     --with-sanitized-headers=${STAGING_INCDIR}/${PREFERRED_PROVIDER_virtual/kernel} \
     --disable-debuggerd \
     --disable-libsync \
+    ${@bb.utils.contains('DEPENDS', 'vmm-lib', '--enable-disksymlink', '--disable-disksymlink', d)} \
 "
+
 POST_BOOT_SCRIPT ?= "init.qcom.post_boot.sh"
 POST_BOOT_SCRIPT:sa8775 = "lemans/init.qcom.post_boot.sh"
 POST_BOOT_SCRIPT:sa7255 = "monaco/init.qcom.post_boot.sh"
@@ -82,6 +90,12 @@ do_install:append() {
         ln -sf ${systemd_unitdir}/system/leprop.service \
             ${D}${systemd_unitdir}/system/multi-user.target.wants/leprop.service
 
+        if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'false', 'true', d)}; then
+            install -m 0644 ${S}/disksymlink/disksymlink.service -D ${D}${systemd_unitdir}/system/disksymlink.service
+            ln -sf ${systemd_unitdir}/system/disksymlink.service \
+                ${D}${systemd_unitdir}/system/multi-user.target.wants/disksymlink.service
+        fi
+
         # update usb.service to depend on var-volatile.mount
         sed -i -e '/^After/d' ${D}${systemd_unitdir}/system/usb.service
         sed -i -e '/^Requires/d' ${D}${systemd_unitdir}/system/usb.service
@@ -103,7 +117,8 @@ do_install:append() {
     rm -rf ${D}${includedir}
 }
 
-PACKAGES =+ "${PN}-usb ${PN}-dlkm ${PN}-post-boot ${PN}-leprop"
+PACKAGES =+ "${PN}-usb ${PN}-dlkm ${PN}-post-boot ${PN}-early-boot ${PN}-leprop"
+PACKAGES =+ "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', '${PN}-disksymlink', d)}"
 
 FILES:${PN}-usb += "\
     ${base_sbindir}/usb_composition \
@@ -139,6 +154,14 @@ FILES:${PN}-leprop += "\
     ${systemd_unitdir}/system/multi-user.target.wants/leprop.service \
     ${sysconfdir}/build.prop \
 "
+
+DISKSYMLINK_FILES = "\
+    ${sbindir}/disksymlink-service \
+    ${systemd_unitdir}/system/disksymlink.service \
+    ${systemd_unitdir}/system/multi-user.target.wants/disksymlink.service \
+"
+
+FILES:${PN}-disksymlink += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', '${DISKSYMLINK_FILES}', d)}"
 
 ALLOW_EMPTY:${PN} = "1"
 ALLOW_EMPTY:${PN}-dev = "1"
