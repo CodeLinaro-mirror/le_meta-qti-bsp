@@ -26,9 +26,11 @@ SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/vendor/qcom/opensource/crosvm-gunyah"
 
-inherit ${@bb.utils.contains("BBFILE_COLLECTIONS", "rust-layer", "cargo", "", d)} systemd
+inherit cargo systemd cargo-update-recipe-crates
 
-CARGO_DISABLE_BITBAKE_VENDORING = "1"
+require ${BPN}-crates.inc
+
+CFLAGS:append = " -Wno-error=stringop-overflow="
 
 VM_CONFIG_XML ?= "vm_config_la.xml"
 VM_CONFIG_XML:sa8255-ivi = "vm_config_lalv.xml"
