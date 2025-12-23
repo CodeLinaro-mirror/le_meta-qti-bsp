@@ -1,4 +1,4 @@
-inherit native deploy
+inherit  deploy native
 
 DESCRIPTION = "releasetools used for OTA"
 LICENSE = "Apache-2.0"

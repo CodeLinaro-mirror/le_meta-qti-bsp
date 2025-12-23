@@ -75,7 +75,7 @@ create_symlink_systemd_ext4_mount_rootfs() {
         mountname="${entry:1}"
         # Replace "/" with "-" for systemd to understand mount unit.
         mountname=${mountname//'/'/"-"}
-        if [[ "$mountname" == "firmware" || "$mountname" == "bt_firmware" || "$mountname" == "dsp" ]] && \
+        if [[ "$mountname" == "firmware" || "$mountname" == "bt_firmware" || "$mountname" == "vendor-bt_firmware" || "$mountname" == "dsp" ]] && \
            [[ "${COMBINED_FEATURES}" =~ .*qti-ab-boot.* ]] ; then
             cp ${IMAGE_ROOTFS_EXT4}/lib/systemd/system/${mountname}-mount-ext4.service ${IMAGE_ROOTFS_EXT4}/lib/systemd/system/${mountname}-mount.service
             ln -sf ${systemd_unitdir}/system/${mountname}-mount.service ${IMAGE_ROOTFS_EXT4}/lib/systemd/system/local-fs.target.requires/${mountname}-mount.service
@@ -322,6 +322,9 @@ do_makesystem() {
                         -a / -b 4096 -l ${SYSTEM_IMAGE_ROOTFS_SIZE} \
                         ${IMAGE_EXT4_SELINUX_OPTIONS} \
                         ${sparseImgPath} ${IMAGE_ROOTFS_EXT4} /dev/null || invalid_image=1
+            if [ $invalid_image -eq 1 ]; then
+                bbfatal "make_ext4fs failed to generate sparse system image"
+            fi
     fi
 
         echo "image is good to use..."

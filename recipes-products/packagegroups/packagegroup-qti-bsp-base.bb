@@ -26,6 +26,7 @@ ENABLE_ADB:qti-distro-base-user ?= "False"
 # Android Core Image and Debugging utilities
 ENABLE_BINDER ?= "False"
 ENABLE_BINDER:kera = "True"
+ENABLE_BINDER:alor = "True"
 
 RDEPENDS:packagegroup-android-utils-base = "\
     ${@oe.utils.conditional('ENABLE_ADB', 'True', 'adbd', '', d)} \
@@ -40,6 +41,7 @@ RDEPENDS:packagegroup-android-utils-base = "\
 ADDON_SCRIPTS ?= ""
 ADDON_SCRIPTS:neo = "helios-start"
 ADDON_SCRIPTS:qcs610-odk-64 = "cdsp-start"
+ADDON_SCRIPTS:vienna = "cdsp-start"
 
 # Startup scripts needed during device bootup
 RDEPENDS:packagegroup-startup-scripts-base = "\

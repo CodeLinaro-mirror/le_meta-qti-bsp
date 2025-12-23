@@ -10,10 +10,12 @@ SRC_URI += "file://set-usb-nodes.rules"
 SRC_URI += "file://sysctl.conf"
 SRC_URI += "file://platform.conf"
 SRC_URI += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-vm', 'file://trusted_touch.conf', '',d)}"
+SRC_URI += "${@bb.utils.contains('BASEMACHINE', 'vienna', 'file://vienna.rules', '', d)}"
 SRC_URI += "file://set-mhi-nodes.rules"
 SRC_URI += "file://99-gpiochardev.rules"
 SRC_URI += "file://kmem.rules"
 SRC_URI += "file://mmc-rpmb.rules"
+SRC_URI += "file://ashmem.rules"
 
 # Custom setup for PACKAGECONFIG to get a slimmer systemd.
 # Removed following:

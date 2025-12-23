@@ -7,12 +7,14 @@ LICENSE = "GPLv2.0-with-linux-syscall-note"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta-qti-bsp/files/common-licenses/\
 ${LICENSE};md5=8afb6abdac9a14cb18a0d6c9c151e9b4"
 
-COMPATIBLE_MACHINE = "vienna"
+KERNEL_SRC_TYPE ?= "msm-kernel"
 
-FILESEXTRAPATHS:prepend := "${KERNEL_PREBUILT_PATH}:${KERNEL_PLATFORM_PATH}/soc-repo:"
+# KERNEL_SRC_TYPE can be 'soc-repo' or 'msm-kernel' as per the kernel platform
+FILESEXTRAPATHS:prepend := "${KERNEL_PREBUILT_PATH}:${KERNEL_PLATFORM_PATH}/${KERNEL_SRC_TYPE}:"
 SRC_URI   =  "file://dist"
 SRC_URI  +=  "file://${KERNEL_MODULES_LIST}"
 SRC_URI  +=  "file://linkmodulesload.service"
+SRC_URI:remove:qcs40x = "file://${KERNEL_MODULES_LIST}"
 
 S  =  "${WORKDIR}/dist"
 
