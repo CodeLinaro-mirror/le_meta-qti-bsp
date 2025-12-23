@@ -14,18 +14,18 @@ Signed-off-by: Feng Chen <quic_fch@quicinc.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/sleep/sleep.conf b/src/sleep/sleep.conf
-index dc2ed37f70..eb967c5fb9 100644
+index fad95b3897..a24e8210cf 100644
 --- a/src/sleep/sleep.conf
 +++ b/src/sleep/sleep.conf
-@@ -17,7 +17,7 @@
+@@ -21,7 +21,7 @@
+ #AllowHibernation=yes
  #AllowSuspendThenHibernate=yes
  #AllowHybridSleep=yes
- #SuspendMode=
 -#SuspendState=mem standby freeze
 +SuspendState=mem mem mem
  #HibernateMode=platform shutdown
- #HibernateState=disk
- #HybridSleepMode=suspend platform shutdown
+ #HibernateDelaySec=
+ #SuspendEstimationSec=60min
 -- 
-2.17.1
+2.34.1
 
