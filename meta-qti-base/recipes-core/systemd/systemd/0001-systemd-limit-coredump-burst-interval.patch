@@ -7,7 +7,7 @@ In case of systemd-coredump itself abnormal, systemd-coredump service will keep 
 finally cause thousands of coredump files of same issue in the system. Limit the StartLimitBurst
 to avoid that.
 
-Upstream-Status:Inappropriate
+Upstream-Status: Inappropriate
 Change-Id:f5804a7c070ac01af04daf2dcdfb52186338b8bc
 Signed-off-by: Naiwen Yu <naiwyu@qti.qualcomm.com>
 ---

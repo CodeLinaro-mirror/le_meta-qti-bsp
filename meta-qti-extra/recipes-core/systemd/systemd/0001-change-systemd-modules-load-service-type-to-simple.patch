@@ -6,7 +6,7 @@ Subject: [PATCH] systemd: change systemd-modules-load service type to simple
 To optimize boot time, modules loaded by systemd-modules-load are now loaded in early-ramdisk-init and 
 modules-load-late service, change systemd-modules-load type to simple to avoid blocking other services.
 
-Upstream-Status:Inappropriate
+Upstream-Status: Inappropriate
 
 Signed-off-by: Naiwen Yu <quic_naiwyu@quicinc.com>
 ---

@@ -7,14 +7,14 @@ SRC_URI:append = " \
              file://0001-udev-make-symlink-related-rules-be-triggered-earlier.patch \
              ${@bb.utils.contains_any('MACHINE_FEATURES', 'qti-umd', '', 'file://qti_sleep.sh', d)} \
              ${@bb.utils.contains('DISTRO_FEATURES', 'qti-rumi', 'file://0031-udev-trigger-only-enable-must-part-while-leave-other.patch', '', d)} \
-             ${@bb.utils.contains_any('MACHINE_FEATURES', 'qti-hypervisor qti-gunyah', 'file://0001-systemd-sleep-change-suspend-state-list.patch', '', d)} \
+             ${@bb.utils.contains_any('MACHINE_FEATURES', 'qti-hypervisor', 'file://0001-systemd-sleep-change-suspend-state-list.patch', '', d)} \
              ${@bb.utils.contains('MACHINE_FEATURES', 'deepsleep', 'file://0002-systemd-add-deepsleep-support.patch', '', d)} \
              ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'file://0001-systemd-shutdown-shorten-file-sync-timeout.patch', '', d)} \
              ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'file://0001-systemd-Remove-systemd-watchdog-ping-condition.patch', '', d)} \
              ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'file://0035-systemd-Make-systemd-init-run-in-high-priority.patch', '', d)} \
              ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'file://0037-systemd-Add-wdt_ping-in-dispatch_runqueue.patch', '', d)} \
              ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', bb.utils.contains('MACHINE_FEATURES', 'qti-gunyah', '', 'file://qti_lxc_umd_sleep.sh', d), '', d)} \
-             ${@bb.utils.contains('MACHINE_FEATURES', 'qti-gunyah', 'file://0001-modules-load-implement-parallel-module-loading.patch', '', d)}"
+"
 
 SRC_URI:append:sa8775 = " \
              ${@bb.utils.contains('MACHINE_FEATURES', 'early-ramdisk-init', 'file://0001-change-systemd-modules-load-service-type-to-simple.patch', '', d)}"
