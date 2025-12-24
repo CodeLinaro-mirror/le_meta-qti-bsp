@@ -5,7 +5,7 @@ do_install:append:sa8775() {
     fi
 }
 
-do_install:append:quin-gvm-gen4-5()
+do_install:append:quin-gvm-gen4-5() {
     if ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'true', 'false', d)}; then
         if ${@bb.utils.contains('DISTRO_FEATURES', 'volatiled-var', 'true', 'false', d)}; then
             echo '#Change selinux store path to /persist because we change /var to tmpfs' >> ${D}${sysconfdir}/selinux/semanage.conf
