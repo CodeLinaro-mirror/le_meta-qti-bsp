@@ -27,6 +27,7 @@ ENABLE_ADB:qti-distro-base-user ?= "False"
 ENABLE_BINDER ?= "False"
 ENABLE_BINDER:kera = "True"
 ENABLE_BINDER:alor = "True"
+ENABLE_BINDER:canoe = "True"
 
 RDEPENDS:packagegroup-android-utils-base = "\
     ${@oe.utils.conditional('ENABLE_ADB', 'True', 'adbd', '', d)} \

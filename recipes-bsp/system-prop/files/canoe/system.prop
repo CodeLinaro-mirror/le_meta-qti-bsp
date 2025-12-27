@@ -1,0 +1,18 @@
+# Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+# SPDX-License-Identifier: BSD-3-Clause-Clear
+#
+# Default properties to be set for canoe
+#
+ro.hardware.camera=qcom
+
+#property to select sensor OEM registry file
+persist.vendor.sensors.enable.tdkMezzCard=false
+persist.vendor.sensors.enable.NavMezzCard=false
+persist.vendor.sensors.enable.NavMezzCard_Rev2=false
+
+#property to select target platform for codec2 lib
+vendor.media.target_variant=canoe
+
+#property to enable buffercache for audio-codec2
+vendor.qc2audio.enable.buffercache=false
+

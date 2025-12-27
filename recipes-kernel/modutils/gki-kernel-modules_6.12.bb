@@ -7,7 +7,7 @@ LICENSE = "GPLv2.0-with-linux-syscall-note"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta-qti-bsp/files/common-licenses/\
 ${LICENSE};md5=8afb6abdac9a14cb18a0d6c9c151e9b4"
 
-COMPATIBLE_MACHINE = "vienna|alor"
+COMPATIBLE_MACHINE = "vienna|alor|canoe"
 
 FILESEXTRAPATHS:prepend := "${KERNEL_PREBUILT_PATH}:${KERNEL_PLATFORM_PATH}/soc-repo:"
 SRC_URI   =  "file://dist"

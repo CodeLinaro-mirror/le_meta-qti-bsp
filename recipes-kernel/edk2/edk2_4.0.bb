@@ -13,6 +13,7 @@ FILESEXTRAPATHS:prepend:kera := "${KERNEL_PREBUILT_PATH}/dist/abl-userdebug:"
 FILESEXTRAPATHS:prepend:sun := "${KERNEL_PREBUILT_PATH}/dist/abl-userdebug:"
 FILESEXTRAPATHS:prepend:vienna := "${KERNEL_PREBUILT_PATH}/dist/abl-userdebug:"
 FILESEXTRAPATHS:prepend:alor := "${KERNEL_PREBUILT_PATH}/dist/abl-userdebug:"
+FILESEXTRAPATHS:prepend:canoe := "${KERNEL_PREBUILT_PATH}/dist/abl-userdebug:"
 
 SRC_URI = "file://unsigned_abl.elf"
 
