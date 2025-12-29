@@ -7,7 +7,8 @@ SRC_URI:append = " \
     file://qti_sleep.sh \
 "
 
-#Disable systemd-timesyncd which not used in project.
+SRC_URI:append = " ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "6.12", "file://linux-msm-6.12_modules_load.conf", "", d)}"
+
 PACKAGECONFIG:remove = "timesyncd "
 
 do_install:append () {
@@ -16,4 +17,8 @@ do_install:append () {
 
     install -d ${D}/${base_libdir}/systemd/system-sleep
     install -m 0755 ${WORKDIR}/qti_sleep.sh -D ${D}/${base_libdir}/systemd/system-sleep/qti_sleep.sh
+
+    if ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "6.12", "true", "false", d)}; then
+        install -m 0664 ${WORKDIR}/linux-msm-6.12_modules_load.conf ${D}${sysconfdir}/modules-load.d/
+    fi
 }

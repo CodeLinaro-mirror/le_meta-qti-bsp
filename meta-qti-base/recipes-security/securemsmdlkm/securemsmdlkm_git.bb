@@ -18,7 +18,10 @@ TECHPACK_MODULE_OUT = "${WORKDIR}/securemsm-kernel-out"
 TECHPACK_MODULES = "qseecom_dlkm.ko tz_log_dlkm.ko qrng_dlkm.ko smcinvoke_dlkm.ko hdcp_qseecom_dlkm.ko qcrypto-msm_dlkm.ko qce50_dlkm.ko qcedev-mod_dlkm.ko"
 TECHPACK_MODULES:remove:quin-gvm-gen4-5 = "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'qcedev-mod_dlkm.ko', '', d)}"
 TECHPACK_MODULES:append:quin-gvm-gen4-5 = "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', ' qcedev_fe_dlkm.ko', '', d)}"
+TECHPACK_MODULES:remove:gvm-gen4-5 = "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'qcedev-mod_dlkm.ko', '', d)}"
+TECHPACK_MODULES:append:gvm-gen4-5 = "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', ' qcedev_fe_dlkm.ko', '', d)}"
 TECHPACK_HEADERS = "${S}/include/uapi"
+TECHPACK_MODULES:remove:gvm-gen5 = "qseecom_dlkm.ko"
 
 inherit qti-techpack
 
@@ -41,6 +44,8 @@ RPROVIDES:${PN} += "kernel-module-qce50-dlkm-${KERNEL_VERSION}"
 RPROVIDES:${PN} += "kernel-module-qcedev-mod-dlkm-${KERNEL_VERSION}"
 RPROVIDES:${PN}:remove:quin-gvm-gen4-5 = "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'kernel-module-qcedev-mod-dlkm-${KERNEL_VERSION}', '', d)}"
 RPROVIDES:${PN}:append:quin-gvm-gen4-5 = "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', ' kernel-module-qcedev-fe-dlkm-${KERNEL_VERSION}', '', d)}"
+RPROVIDES:${PN}:remove:gvm-gen4-5 = "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'kernel-module-qcedev-mod-dlkm-${KERNEL_VERSION}', '', d)}"
+RPROVIDES:${PN}:append:gvm-gen4-5 = "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', ' kernel-module-qcedev-fe-dlkm-${KERNEL_VERSION}', '', d)}"
 
 FILES:${PN} += "${sysconfdir}/*"
 FILES:${PN} += "${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/*"

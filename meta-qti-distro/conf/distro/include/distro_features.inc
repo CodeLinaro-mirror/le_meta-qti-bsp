@@ -10,6 +10,7 @@ DISTRO_FEATURES:append:qtiquingvm = " qti-omx"
 DISTRO_FEATURES:append:qtiquingvm8295 = " qti-codec2 qti-gstdeinterlace qti-gstqvrate qti-gstqvais"
 DISTRO_FEATURES:append:quin-gvm-gen4 = " qti-codec2 qti-gstdeinterlace qti-gstqvrate qti-gstqvais"
 DISTRO_FEATURES:append:quin-gvm-gen4-5 = " qti-codec2 qti-gstdeinterlace"
+DISTRO_FEATURES:append:gvm-gen4-5 = " qti-codec2 qti-gstdeinterlace"
 
 # Vnw
 DISTRO_FEATURES:append:qtiquingvm = " qti-gstopenavb"
@@ -22,6 +23,7 @@ DISTRO_FEATURES:append:quin-gvm-monaco = " qti-gstopenavb"
 DISTRO_FEATURES:append:quin-gvm-lemans = " qti-qcx"
 DISTRO_FEATURES:append:quin-gvm-monaco = " qti-qcx"
 DISTRO_FEATURES:append:quin-gvm-gen4-5 = " qti-qcx"
+DISTRO_FEATURES:append:gvm-gen4-5 = " qti-qcx"
 
 # Display
 DISTRO_FEATURES:append = " wayland"
@@ -55,6 +57,7 @@ DISTRO_FEATURES:append:quin-gvm-gen4 = " qti-bluetooth"
 DISTRO_FEATURES:append:quin-gvm-gen4-2 = " qti-bluetooth"
 DISTRO_FEATURES:append:quin-gvm-lemans = " qti-bluetooth"
 DISTRO_FEATURES:append:quin-gvm-gen4-5 = " qti-bluetooth"
+DISTRO_FEATURES:append:gvm-gen4-5 = " qti-bluetooth"
 DISTRO_FEATURES:append:quin-gvm-monaco = " qti-bluetooth"
 
 # SELinux
@@ -64,3 +67,6 @@ DISTRO_FEATURES_NATIVE:append:sa8775 = " selinux"
 # Preferred refpolicy
 PREFERRED_PROVIDER_virtual/refpolicy:sa8775 = "selinux-policy"
 DEFAULT_ENFORCING:sa8775 = "enforcing"
+
+# volatile /var
+DISTRO_FEATURES:append:quin-gvm-gen4-5 = " volatiled-var"

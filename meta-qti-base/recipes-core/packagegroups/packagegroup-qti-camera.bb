@@ -18,3 +18,4 @@ RDEPENDS:${PN} += "\
 RDEPENDS:${PN}:quin-gvm-lemans = ""
 RDEPENDS:${PN}:quin-gvm-monaco = ""
 RDEPENDS:${PN}:quin-gvm-gen4-5 = ""
+RDEPENDS:${PN}:gvm-gen4-5 = ""
