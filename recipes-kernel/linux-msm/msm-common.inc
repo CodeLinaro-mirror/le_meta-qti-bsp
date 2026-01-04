@@ -3,7 +3,7 @@ MSM_KERNEL_VERSION ?= "6.12"
 PREFERRED_PROVIDER_virtual/mkbootimg = "mkbootimg-gki"
 PREFERRED_PROVIDER_virtual/mkdtimg   = "mkdtimg-gki"
 
-PREFERRED_PROVIDER_virtual/kernel = "${@'linux-msm' if d.getVar('MSM_KERNEL_VERSION') in ['6.1', '6.6'] else 'linux-soc-repo'}"
+PREFERRED_PROVIDER_virtual/kernel = "${@'linux-msm' if d.getVar('MSM_KERNEL_VERSION') in ['5.15', '6.1', '6.6'] else 'linux-soc-repo'}"
 
 PREFERRED_VERSION_linux-msm ?= "${MSM_KERNEL_VERSION}"
 PREFERRED_VERSION_linux-soc-repo ?= "${MSM_KERNEL_VERSION}"
@@ -25,7 +25,7 @@ KERNEL_VARIANT:qti-distro-perf ?= "defconfig"
 BUILD_VARIANT:qti-distro-debug ?= "debug_defconfig"
 BUILD_VARIANT:qti-distro-perf ?= "defconfig"
 
-KERNEL_SRC_TYPE = "${@'msm-kernel' if d.getVar('MSM_KERNEL_VERSION') in ['6.1', '6.6'] else 'soc-repo'}"
+KERNEL_SRC_TYPE = "${@'msm-kernel' if d.getVar('MSM_KERNEL_VERSION') in ['5.15', '6.1', '6.6'] else 'soc-repo'}"
 KERNEL_TYPE ?= "dist"
 
 #### Initramfs configuration ####
@@ -45,7 +45,7 @@ KERNEL_PREBUILT_DISTDIR = "${KERNEL_PREBUILT_PATH}/dist"
 KERNEL_OUT_PATH = "${KERNEL_PREBUILT_PATH}"
 
 #### DDK compilation support ####
-DDK_BUILD ?= "${@'true' if d.getVar('MSM_KERNEL_VERSION') not in ['6.1', '6.6'] else ''}"
+DDK_BUILD ?= "${@'true' if d.getVar('MSM_KERNEL_VERSION') not in ['5.15', '6.1', '6.6'] else ''}"
 TARGET_BOARD_PLATFORM ?= "${BASEMACHINE}-le"
 
 #### others ####
