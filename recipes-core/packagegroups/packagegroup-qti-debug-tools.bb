@@ -11,7 +11,7 @@ PACKAGES =  "\
 # on target gdb takes up considerable storage.
 # Avoid gdb on target.
 RDEPENDS:packagegroup-qti-debug-tools = " \
-            gdbserver \
+            ${@bb.utils.contains_any('MACHINE', 'trustedvm-v4 trustedvm-v3', '', 'gdbserver', d)} \
             strace \
             valgrind \
             systemd-analyze \
