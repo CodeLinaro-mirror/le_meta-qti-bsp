@@ -20,4 +20,6 @@ RDEPENDS:${PN} += "\
 "
 
 RDEPENDS:${PN}:append:sa8775-flex = " optee-libckteec"
+RDEPENDS:${PN}:append:sa8255-ivi = " optee-libckteec"
+RDEPENDS:${PN}:append:sa7255-ivi = " optee-libckteec"
 RDEPENDS:${PN}:append:gh-gvm-lemans = " optee-libckteec"
