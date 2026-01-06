@@ -6,8 +6,10 @@ domain, so they have the same access to the system as if SELinux was not \
 enabled. \
 "
 HOMEPAGE = "https://git.codelinaro.org"
-LICENSE = "GPL-2.0 & BSD-3-Clause-Clear"
-LIC_FILES_CHKSUM = "file://${QTI_LICENSE_DIR}/${LICENSE};md5=b796c0007db682166a1721da80267bb2"
+LICENSE = "GPL-2.0-only & BSD-3-Clause-Clear"
+LIC_FILES_CHKSUM = "file://COPYING;md5=393a5ca445f6965873eca0259a17f833 \
+                    file://${QTI_LICENSE_DIR}/BSD-3-Clause-Clear;md5=b796c0007db682166a1721da80267bb2 \
+"
 
 DEPENDS += "bzip2-replacement-native checkpolicy-native m4-native policycoreutils-native semodule-utils-native"
 
