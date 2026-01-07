@@ -152,7 +152,6 @@ BBMASK:gvm-gen4-5 += "meta-qti-bsp/meta-qti-extra/recipes-location/location/loc-
 BBMASK:gvm-gen4-5 += "meta-qti-bsp/meta-qti-extra/recipes-location/location/loc-sll-if_git.bb"
 BBMASK:gvm-gen4-5 += "meta-qti-bsp/meta-qti-extra/recipes-location/location/ntrip-client-integration-api-hdr_git.bb"
 BBMASK:gvm-gen4-5 += "meta-qti-bsp/meta-qti-extra/recipes-location/location/synergy-loc-api_git.bb"
-BBMASK:gvm-gen4-5 += "meta-qti-bsp/meta-qti-extra/recipes-security/selinux-policy/selinux-policy.bb"
 BBMASK:gvm-gen4-5 += "meta-qti-bsp/meta-qti-extra/recipes-test/khab-test/khab-unit-test.bb"
 BBMASK:gvm-gen4-5 += "meta-qti-bsp/meta-qti-extra/recipes-test/virt-clk-ut/virt-clk-ut.bb"
 BBMASK:gvm-gen4-5 += "meta-qti-bsp/meta-qti-extra/recipes-test/virt-fastrpc-ut/virt-fastrpc-ut_git.bb"
