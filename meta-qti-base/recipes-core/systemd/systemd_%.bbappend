@@ -11,6 +11,8 @@ SRC_URI:append = " \
     file://0001-systemd-config-linger-for-root-user.patch \
 "
 
+SRC_URI:append:quin-gvm-gen4-5 = " file://70-vblk.rules"
+
 SRC_URI:append:gvm-gen5 = " file://60-vblk.rules"
 
 SRC_URI:append:gvm-gen4-5 = " file://60-vblk.rules"
@@ -73,6 +75,11 @@ do_install:append () {
         install -m 0664 ${WORKDIR}/linux-msm-6.12_modules_load.conf ${D}${sysconfdir}/modules-load.d/
     fi
 }
+
+do_install:append:quin-gvm-gen4-5() {
+    install -m 0644 ${WORKDIR}/70-vblk.rules ${D}${sysconfdir}/udev/rules.d/
+}
+
 do_install:append:gvm-gen5() {
     install -m 0644 ${WORKDIR}/60-vblk.rules ${D}${sysconfdir}/udev/rules.d/
 }
