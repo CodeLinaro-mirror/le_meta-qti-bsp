@@ -40,7 +40,7 @@ CXXFLAGS += "\
 "
 
 EXTRA_OEMESON += "\
-    ${@oe.utils.version_less_or_equal('${preferred-kernel}', '5.4', '', '-Dusedmaheap=true', d)} \
+    ${@oe.utils.version_less_or_equal('${preferred-kernel}', '5.5', '', '-Dusedmaheap=true', d)} \
     -Dagl-c2service=true \
 "
 
