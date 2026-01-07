@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 
 inherit kernel
 
-COMPATIBLE_MACHINE = "quin-gvm-lemans|quin-gvm-monaco|quin-gvm-gen4-5|gvm-gen5"
+COMPATIBLE_MACHINE = "quin-gvm-lemans|quin-gvm-monaco|gvm-gen4-5|quin-gvm-gen4-5|gvm-gen5"
 
 FILESPATH =+ "${SRC_DIR_ROOT}/kernel:"
 
@@ -88,6 +88,11 @@ do_deploy () {
 
     install -d ${DEPLOYDIR}/build-artifacts/dtb/
     install -m 0644 ${BZ_PREBUILT_ROOT}/out/msm-kernel-autogvm-${KERNEL_OUT_VARIANT}defconfig/dist/*.dtb ${DEPLOYDIR}/build-artifacts/dtb/
+
+    if ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'true', 'false', d)}; then
+        install -d ${DEPLOYDIR}/build-artifacts/dtbo/
+        install -m 0644 ${BZ_PREBUILT_ROOT}/out/msm-kernel-autogvm-${KERNEL_OUT_VARIANT}defconfig/dist/*.dtbo ${DEPLOYDIR}/build-artifacts/dtbo/
+    fi
 }
 
 PACKAGES:remove = "${KERNEL_PACKAGE_NAME}-devicetree"

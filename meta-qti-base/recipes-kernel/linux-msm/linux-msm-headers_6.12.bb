@@ -40,7 +40,6 @@ do_install () {
 
     if [ -d $headerdir/${includedir} ]; then
         cp -fR $headerdir/${includedir}/* $kerneldir/
-        rm -rf $kerneldir/linux/qseecom.h
     fi
 }
 
