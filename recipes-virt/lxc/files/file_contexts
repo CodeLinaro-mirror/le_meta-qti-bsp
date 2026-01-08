@@ -1,0 +1,10 @@
+# Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+# SPDX-License-Identifier: BSD-3-Clause-Clear
+/.*                                 u:object_r:default_in_lxc:s0
+/bin(/.*)?                          u:object_r:app_in_lxc_exec:s0
+/bin/weston                 --      u:object_r:weston_exec:s0
+/bin/weston-.*              --      u:object_r:weston_exec:s0
+/usr/bin/weston             --      u:object_r:weston_exec:s0
+/usr/bin/weston-.*          --      u:object_r:weston_exec:s0
+/sbin/init                  --      u:object_r:app_in_lxc_exec:s0
+/lib/systemd/systemd        --      u:object_r:app_in_lxc_exec:s0
