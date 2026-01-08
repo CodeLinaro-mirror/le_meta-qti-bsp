@@ -33,6 +33,7 @@ do_compile(){
         KBUILD_OPTIONS="ARCH=arm64" \
         EXT_MODULES=../../../${EXT_MODULE} \
         ENABLE_DDK_BUILD=${DDK_BUILD} \
+        SUBTARGET_REGEX=${MODNAME_MODULE} \
         TARGET_BOARD_PLATFORM=${KERNEL_ARCH} \
         VARIANT=${KERNEL_DEFCONFIG_VARIANT} \
         MODULE_OUT=${S} \
