@@ -11,13 +11,10 @@ SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/wlan/platform/.git;protocol=${
 SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/vendor/qcom/opensource/wlan/platform"
+EXT_MODULE = "vendor/qcom/opensource/wlan/platform"
 
 TECHPACK_MODULE_OUT = "${WORKDIR}/wlan-platform-dlkm"
-TECHPACK_MODULES = "cnss2/cnss2.ko"
-TECHPACK_MODULES:append = " cnss_utils/cnss_utils.ko"
-TECHPACK_MODULES:append = " cnss_utils/wlan_firmware_service.ko"
-TECHPACK_MODULES:append = " cnss_utils/cnss_plat_ipc_qmi_svc.ko"
-TECHPACK_MODULES:append = " cnss_genl/cnss_nl.ko"
+TECHPACK_MODULES = "${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "6.12", "cnss2.ko cnss_utils.ko wlan_firmware_service.ko cnss_plat_ipc_qmi_svc.ko cnss_nl.ko cnss_prealloc.ko", "cnss2/cnss2.ko cnss_utils/cnss_utils.ko cnss_utils/wlan_firmware_service.ko cnss_utils/cnss_plat_ipc_qmi_svc.ko cnss_genl/cnss_nl.ko ", d)}"
 
 inherit qti-techpack
 
@@ -68,6 +65,7 @@ RPROVIDES:${PN} += "kernel-module-cnss-plat-ipc-qmi-svc-${KERNEL_VERSION}"
 RPROVIDES:${PN} += "kernel-module-wlan-firmware-service-${KERNEL_VERSION}"
 RPROVIDES:${PN} += "kernel-module-cnss-utils-${KERNEL_VERSION}"
 RPROVIDES:${PN} += "kernel-module-cnss2-${KERNEL_VERSION}"
+RPROVIDES:${PN} += "kernel-module-cnss-prealloc-${KERNEL_VERSION}"
 
 FILES:${PN} += "${nonarch_base_libdir}/modules/${KERNEL_VERSION}/*"
 FILES:${PN} += "${includedir}/wlan-platform/*"
