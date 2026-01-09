@@ -1,0 +1,1 @@
+EXTRA_OECMAKE:append:aarch64 = " -DTBB_ENABLE_IPO=OFF "
