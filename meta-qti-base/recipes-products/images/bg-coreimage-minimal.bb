@@ -7,6 +7,10 @@ IMAGE_LINGUAS = ""
 
 inherit core-image
 
+# Set up for handling the generation of the /usr image
+# partition...
+require recipes-products/images/automotive-usr-image.inc
+
 DEPENDS += "edk2"
 
 CORE_IMAGE_EXTRA_INSTALL += "\
