@@ -2,7 +2,10 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}-${PV}:"
 
 DEPENDS += "base-passwd"
 
-SRC_URI:append = " file://fstab"
+SRC_URI:append = " \
+    file://fstab \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', ' file://sh_login', '', d)} \
+"
 
 SRC_URI:append:gvm-gen4-5 = " \
     file://hgy/fstab \
@@ -27,6 +30,11 @@ do_install:append(){
     fi
 
     install -m 0644 ${WORKDIR}/fstab ${D}${sysconfdir}/fstab
+    # Install login wrapper to enable user login for busybox sh
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'true', 'false', d)}; then
+        install -m 0755 ${WORKDIR}/sh_login ${D}${base_bindir}/sh_login
+    fi
+
 
     # Replace persist/home bind if read-only is not enabled
     if ${@bb.utils.contains('IMAGE_FEATURES', 'read-only-rootfs', 'false', 'true', d)}; then
