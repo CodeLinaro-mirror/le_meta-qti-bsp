@@ -16,6 +16,7 @@ CORE_IMAGE_EXTRA_INSTALL += " \
     procrank \
 "
 
+DEPENDS += " ${@bb.utils.contains_any('MACHINE', 'trustedvm-v4 trustedvm-v5', 'dsp-devicetree', '', d)}"
 CORE_IMAGE_EXTRA_INSTALL += " ${@bb.utils.contains('MACHINE_FEATURES', 'qti-vm-idv', 'libturbojpeg', '', d)}"
 CORE_IMAGE_EXTRA_INSTALL += " ${@bb.utils.contains('MACHINE_FEATURES', 'qti-vm-persist', 'packagegroup-qti-encryption', '', d)}"
 #CORE_IMAGE_EXTRA_INSTALL += " ${@oe.utils.conditional('ENABLE_DISPLAY', 'True', 'packagegroup-qti-display', '', d)}"
