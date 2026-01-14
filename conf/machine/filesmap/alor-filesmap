@@ -33,3 +33,15 @@ zeros_5sectors.bin      /dev/block/bootdevice/by-name/ddr
 logfs_ufs_8mb.bin       /dev/block/bootdevice/by-name/logfs
 sdi.mbn                 /dev/block/bootdevice/by-name/soccp_debug
 dcd.mbn                 /dev/block/bootdevice/by-name/soccp_dcd
+soccp.bin               /dev/block/bootdevice/by-name/soccp
+pdp.elf                 /dev/block/bootdevice/by-name/pdp
+pdp_cdb.elf             /dev/block/bootdevice/by-name/pdp_cdb
+tz_ac_config.mbn        /dev/block/bootdevice/by-name/tz_ac_config
+hyp_ac_config.mbn       /dev/block/bootdevice/by-name/hyp_ac_config
+dcp.bin                 /dev/block/bootdevice/by-name/dcp
+tz_qti_config.mbn       /dev/block/bootdevice/by-name/tz_qti_config
+secretkeeper.mbn        /dev/block/bootdevice/by-name/secretkeeper
+sequencer_ram.mbn       /dev/block/bootdevice/by-name/tme_seq_patch
+tme_config.elf          /dev/block/bootdevice/by-name/tme_config
+xbl_ac_config.mbn       /dev/block/bootdevice/by-name/xbl_ac_config
+signed_firmware_soc_view.elf   /dev/block/bootdevice/by-name/tme_fw

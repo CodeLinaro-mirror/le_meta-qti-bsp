@@ -1,4 +1,4 @@
-inherit qimage ${@bb.utils.contains('MACHINE_FEATURES', 'dm-verity-ramdisk', 'qramdisk', 'qcpioimage', d)} 
+inherit qimage ${@bb.utils.contains('MACHINE_FEATURES', 'dm-verity-initramfs', 'qramdisk', 'qcpioimage', d)} 
 
 DEPENDS += " virtual/kernel"
 
@@ -12,9 +12,9 @@ CORE_IMAGE_EXTRA_INSTALL += " \
     e2fsprogs-mke2fs \
     bash \
 "
-CORE_IMAGE_EXTRA_INSTALL += " ${@oe.utils.conditional('ENABLE_SECUREMSM', 'True', 'packagegroup-qti-securemsm-oemvm', '', d)}"
-CORE_IMAGE_EXTRA_INSTALL += " ${@oe.utils.conditional('ENABLE_MINK', 'True', 'packagegroup-qti-mink-oemvm', '', d)}"
-CORE_IMAGE_EXTRA_INSTALL += " ${@bb.utils.contains('MACHINE_FEATURES', 'qti-vm-persist', 'packagegroup-qti-encryption', '', d)}"
+#CORE_IMAGE_EXTRA_INSTALL += " ${@oe.utils.conditional('ENABLE_SECUREMSM', 'True', 'packagegroup-qti-securemsm-oemvm', '', d)}"
+#CORE_IMAGE_EXTRA_INSTALL += " ${@oe.utils.conditional('ENABLE_MINK', 'True', 'packagegroup-qti-mink-oemvm', '', d)}"
+#CORE_IMAGE_EXTRA_INSTALL += " ${@bb.utils.contains('MACHINE_FEATURES', 'qti-vm-persist', 'packagegroup-qti-encryption', '', d)}"
 
 #Exclude packages
 PACKAGE_EXCLUDE += "readline"
@@ -31,5 +31,5 @@ do_compose_vmimage[recrdeptask] += "do_merge_dtbs"
 do_compose_vmimage[recrdeptask] += "do_extracpio_create"
 
 do_makesystem:prepend() {
-      rm -rf ${IMAGE_ROOTFS_EXT4}/usr/lib/python3.10
+      rm -rf ${IMAGE_ROOTFS_EXT4}/usr/lib/python3.12
 }
