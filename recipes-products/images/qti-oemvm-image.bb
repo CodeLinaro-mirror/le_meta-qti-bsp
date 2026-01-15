@@ -34,4 +34,6 @@ do_compose_vmimage[recrdeptask] += "do_extracpio_create"
 
 do_makesystem:prepend() {
       rm -rf ${IMAGE_ROOTFS_EXT4}/usr/lib/python3.10
+      rm -rf ${IMAGE_ROOTFS_EXT4}/usr/lib/modules/smmu_proxy.ko
+      rm -rf ${IMAGE_ROOTFS_EXT4}/lib/systemd/system/smmu_proxy.service
 }
