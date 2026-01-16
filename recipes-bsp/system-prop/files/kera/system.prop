@@ -14,3 +14,6 @@ vendor.media.target_variant=kera
 #property to enable buffercache for audio-codec2
 vendor.qc2audio.enable.buffercache=false
 
+#property to enable BT a2dp_offload
+ro.bluetooth.a2dp_offload.supported=true
+persist.bluetooth.a2dp_offload.disabled=false
