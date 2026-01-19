@@ -15,6 +15,8 @@ S = "${WORKDIR}/vendor/qcom/opensource/safelinux-system-cfg/devicetree"
 OVERLAYED_OOT_DTBS_OUT = "${S}/out"
 INTERMEDIATE_OUT = "${S}/temp"
 DDR_DTBO_DIR = "${S}/ddrdtbodir"
+BASE_INTERMEDIATE_OUT = "${S}/basetemp"
+BASE_DDR_DTBO_DIR = "${S}/base_ddrdtbodir"
 
 inherit qcom-dtb-merge deploy kernel-arch qti-techpack
 
@@ -36,11 +38,11 @@ do_merge_dtb() {
     install -d ${INTERMEDIATE_OUT}
     install -d ${S}/dtbodir
 
-    if [ -z "${OOT_DTBOS}" ]; then
-        OOT_DTBOS=$(find ${S} -not -path "${S}/oot/*" -name "*.dtbo" -printf "%P\n")
+    if [ -z "${OOT_VM_DTBOS}" ]; then
+        OOT_VM_DTBOS=$(find ${S} -not -path "${S}/oot/*" -name "*.dtbo" -printf "%P\n")
     fi
 
-    for oot_dtbo in ${OOT_DTBOS}; do
+    for oot_dtbo in ${OOT_VM_DTBOS}; do
         if [ -f ${S}/${oot_dtbo} ]; then
             install -m 0644 ${S}/${oot_dtbo} ${S}/dtbodir/
         fi
@@ -50,18 +52,46 @@ do_merge_dtb() {
     dtbo_dir=${S}/dtbodir
     merge_dtbos_single $dtb_dir $dtbo_dir ${INTERMEDIATE_OUT}
 
-    if [ -n "${OOT_DDR_DTBOS}" ] && [ "${FACTORY_TEST_VAL}" = "0" ]; then
+    if [ -n "${OOT_VM_DDR_DTBOS}" ]; then
         install -d ${DDR_DTBO_DIR}
 
-        for oot_dtbo in ${OOT_DDR_DTBOS}; do
+        for oot_dtbo in ${OOT_VM_DDR_DTBOS}; do
             if [ -f ${S}/${oot_dtbo} ]; then
                 install -m 0644 ${S}/${oot_dtbo} ${DDR_DTBO_DIR}
             fi
         done
 
         merge_ddr_dtbos_single ${INTERMEDIATE_OUT} ${DDR_DTBO_DIR} ${OVERLAYED_OOT_DTBS_OUT}
-    else
-        install -m 0644  ${INTERMEDIATE_OUT}/* ${OVERLAYED_OOT_DTBS_OUT}
+    fi
+
+    # Merge base OOT DTBs,
+    install -d ${BASE_INTERMEDIATE_OUT}
+    install -d ${S}/base_dtbodir
+
+    if [ -z "${OOT_BASE_DTBOS}" ]; then
+        OOT_BASE_DTBOS=$(find ${S} -not -path "${S}/oot/*" -name "*.dtbo" -printf "%P\n")
+    fi
+
+    for oot_dtbo in ${OOT_BASE_DTBOS}; do
+        if [ -f ${S}/${oot_dtbo} ]; then
+            install -m 0644 ${S}/${oot_dtbo} ${S}/base_dtbodir/
+        fi
+    done
+
+    dtb_dir=${DEPLOY_DIR_IMAGE}/build-artifacts/kernel-dtb
+    dtbo_dir=${S}/base_dtbodir
+    merge_dtbos_single $dtb_dir $dtbo_dir ${BASE_INTERMEDIATE_OUT}
+
+    if [ -n "${OOT_BASE_DDR_DTBOS}" ]; then
+        install -d ${BASE_DDR_DTBO_DIR}
+
+        for oot_dtbo in ${OOT_BASE_DDR_DTBOS}; do
+            if [ -f ${S}/${oot_dtbo} ]; then
+                install -m 0644 ${S}/${oot_dtbo} ${BASE_DDR_DTBO_DIR}
+            fi
+        done
+
+        merge_ddr_dtbos_single ${BASE_INTERMEDIATE_OUT} ${BASE_DDR_DTBO_DIR} ${OVERLAYED_OOT_DTBS_OUT}
     fi
 }
 do_merge_dtb[depends] += "virtual/kernel:do_deploy"

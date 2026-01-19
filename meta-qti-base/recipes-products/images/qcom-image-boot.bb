@@ -20,13 +20,31 @@ KERNEL_VERSION = "${@oe.utils.read_file('${STAGING_KERNEL_BUILDDIR}/kernel-abive
 do_make_dtb() {
     install -d ${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbs
     install -d ${DEPLOY_DIR_IMAGE}/build-artifacts/dtb
+
+    if [ -d "${DEPLOY_DIR_IMAGE}/dtbs" ]; then
+        rm -r ${DEPLOY_DIR_IMAGE}/dtbs
+    fi
     install -d ${DEPLOY_DIR_IMAGE}/dtbs
+    install -d ${DEPLOY_DIR_IMAGE}/dtbs/1gvm
+    install -d ${DEPLOY_DIR_IMAGE}/dtbs/0gvm
 
     dtb_dir=${DEPLOY_DIR_IMAGE}/build-artifacts/dtb
     dtbo_dir=${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbs
     out_dir=${DEPLOY_DIR_IMAGE}/dtbs
 
     merge_dtbos $dtb_dir $dtbo_dir $out_dir
+
+    dtb_1gvm_files=$(find $out_dir -name "*1gvm*.dtb")
+    if [ -n "$dtb_1gvm_files" ]; then
+        mv $out_dir/*1gvm*.dtb ${DEPLOY_DIR_IMAGE}/dtbs/1gvm/
+        cat ${DEPLOY_DIR_IMAGE}/dtbs/1gvm/*.dtb* > ${DEPLOY_DIR_IMAGE}/dtbs/1gvm/dtb.img
+    fi
+
+    dtb_0gvm_files=$(find $out_dir -name "*0gvm*.dtb")
+    if [ -n "$dtb_0gvm_files" ]; then
+        mv $out_dir/*0gvm*.dtb ${DEPLOY_DIR_IMAGE}/dtbs/0gvm/
+        cat ${DEPLOY_DIR_IMAGE}/dtbs/0gvm/*.dtb* > ${DEPLOY_DIR_IMAGE}/dtbs/0gvm/dtb.img
+    fi
 
     cat ${DEPLOY_DIR_IMAGE}/dtbs/*.dtb* > ${DEPLOY_DIR_IMAGE}/dtbs/dtb.img
 }
@@ -52,6 +70,19 @@ do_makeboot () {
         --ramdisk_offset 0x0 \
         --cmdline "${KERNEL_CMD_PARAMS}" \
         --output  ${DEPLOY_DIR_IMAGE}/${PRODUCT}-boot-${KERNEL_VERSION}.img
+        if [ -f "${DEPLOY_DIR_IMAGE}/dtbs/1gvm/dtb.img" ]; then
+            # Make sgvm bootimage
+            ${STAGING_BINDIR_NATIVE}/scripts/mkbootimg.py --header_version ${KERNEL_IMAGE_HEADER_VERSION} \
+            --kernel  ${DEPLOY_DIR_IMAGE}/Image \
+            --dtb  ${DEPLOY_DIR_IMAGE}/dtbs/1gvm/dtb.img \
+            --ramdisk ${BOOT_RAMDISK_IMG} \
+            --pagesize ${PAGE_SIZE} \
+            --base ${KERNEL_BASE} \
+            --ramdisk_offset 0x0 \
+            --cmdline "${KERNEL_CMD_PARAMS}" \
+            --output  ${DEPLOY_DIR_IMAGE}/${PRODUCT}-lagvm-boot-${KERNEL_VERSION}.img
+            cp ${DEPLOY_DIR_IMAGE}/${PRODUCT}-lagvm-boot-${KERNEL_VERSION}.img ${DEPLOY_DIR_IMAGE}/${PRODUCT}-lagvm-boot.img
+        fi
     elif [ "${KERNEL_IMAGE_HEADER_VERSION}" = "1" ]; then
         # Make bootimage
         ${STAGING_BINDIR_NATIVE}/scripts/mkbootimg.py \
@@ -86,6 +117,10 @@ do_sign_boot_img () {
     imgname="${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET}"
     if ${@bb.utils.contains('DISTRO_FEATURES', 'qti-avb', 'true', 'false', d)}; then
         avb_sign_boot_image ${imgname}
+        if [ -f "${DEPLOY_DIR_IMAGE}/${PRODUCT}-lagvm-boot.img" ]; then
+            imgname="${DEPLOY_DIR_IMAGE}/${PRODUCT}-lagvm-boot.img"
+            avb_sign_boot_image ${imgname}
+        fi
     fi
 }
 
