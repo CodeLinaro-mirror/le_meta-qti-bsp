@@ -51,7 +51,7 @@ do_make_avb_image(){
 	            --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.${IMAGE_FSTYPES}\
 	            --setup_rootfs_from_kernel ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.${IMAGE_FSTYPES} \
                 --algorithm SHA256_RSA4096 \
-                ${@bb.utils.contains('MACHINE_FEATURES', 'qti-gvm', '--key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/testkey_rsa4096.pem --prop com.android.build.boot.security_patch:"%s" --prop com.android.build.boot.os_version:"%s"' %(time.strftime("%Y-%m-%d",time.gmtime()), time.strftime("%Y-%m-%d",time.gmtime())), '--key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/vbgvm_private_key_4096.pem', d)} \
+                --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/vbgvm_private_key_4096.pem \
                 --rollback_index 0 \
                 --output ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}-vbmeta.img
 
