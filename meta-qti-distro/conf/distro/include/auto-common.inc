@@ -28,7 +28,7 @@ LICENSE_FLAGS_ACCEPTED += "commercial_gstreamer1.0-libav commercial_gstreamer1.0
 LICENSE_FLAGS_ACCEPTED += "commercial_gstreamer1.0-plugins-ugly commercial_opencore-amr"
 LICENSE_FLAGS_ACCEPTED += "commercial_ffmpeg"
 
-ERROR_QA:remove:sa8775 = "patch-fuzz"
+ERROR_QA:remove = "patch-fuzz"
 
 include ${DISTRO_INC_FILES}
 
