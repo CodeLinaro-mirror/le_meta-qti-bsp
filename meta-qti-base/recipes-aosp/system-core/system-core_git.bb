@@ -65,11 +65,9 @@ do_install:append() {
         install -m 0750 ${S}/rootdir/etc/dlkm.sh -D ${D}${sysconfdir}/initscripts/dlkm
         install -m 0750 ${S}/rootdir/etc/init.qcom.post_boot.common.sh -D ${D}${sysconfdir}/initscripts/init.qcom.post_boot.common.sh
         install -m 0750 ${S}/rootdir/etc/${POST_BOOT_SCRIPT} -D ${D}${sysconfdir}/initscripts/init_post_boot
-        install -m 0750 ${S}/rootdir/etc/init.qti.early_boot.sh -D ${D}${sysconfdir}/initscripts/init_early_boot
 
         install -d ${D}${systemd_unitdir}/system/
         install -d ${D}${systemd_unitdir}/system/multi-user.target.wants/
-        install -d ${D}${systemd_unitdir}/system/sysinit.target.wants/
 
         install -m 0644 ${S}/usb/usb.service -D ${D}${systemd_unitdir}/system/usb.service
         ln -sf ${systemd_unitdir}/system/usb.service ${D}${systemd_unitdir}/system/multi-user.target.wants/usb.service
@@ -79,10 +77,6 @@ do_install:append() {
         install -m 0644 ${S}/rootdir/etc/init_post_boot.service -D ${D}${systemd_unitdir}/system/init_post_boot.service
         ln -sf ${systemd_unitdir}/system/init_post_boot.service \
             ${D}${systemd_unitdir}/system/multi-user.target.wants/init_post_boot.service
-
-        install -m 0644 ${S}/rootdir/etc/init_early_boot.service -D ${D}${systemd_unitdir}/system/init_early_boot.service
-        ln -sf ${systemd_unitdir}/system/init_early_boot.service \
-            ${D}${systemd_unitdir}/system/sysinit.target.wants/init_early_boot.service
 
         install -m 0644 ${S}/leproperties/leprop.service -D ${D}${systemd_unitdir}/system/leprop.service
         ln -sf ${systemd_unitdir}/system/leprop.service \
@@ -109,7 +103,7 @@ do_install:append() {
     rm -rf ${D}${includedir}
 }
 
-PACKAGES =+ "${PN}-usb ${PN}-dlkm ${PN}-post-boot ${PN}-early-boot ${PN}-leprop"
+PACKAGES =+ "${PN}-usb ${PN}-dlkm ${PN}-post-boot ${PN}-leprop"
 
 FILES:${PN}-usb += "\
     ${base_sbindir}/usb_composition \
@@ -135,12 +129,6 @@ FILES:${PN}-post-boot += "\
     ${systemd_unitdir}/system/multi-user.target.wants/init_post_boot.service \
     ${sysconfdir}/initscripts/init_post_boot \
     ${sysconfdir}/initscripts/init.qcom.post_boot.common.sh \
-"
-
-FILES:${PN}-early-boot += "\
-    ${systemd_unitdir}/system/init_early_boot.service \
-    ${systemd_unitdir}/system/sysinit.target.wants/init_early_boot.service \
-    ${sysconfdir}/initscripts/init_early_boot \
 "
 
 FILES:${PN}-leprop += "\
