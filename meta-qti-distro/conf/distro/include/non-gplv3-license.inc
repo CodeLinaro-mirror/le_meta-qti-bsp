@@ -21,5 +21,5 @@ RDEPENDS:${PN}:remove:pn-selinux-labeldev = "coreutils"
 RDEPENDS:${PN}-sepolicy:remove:pn-selinux-python = "binutils"
 RDEPENDS:${PN}-fixfiles:remove:pn-policycoreutils = "grep findutils"
 
-
-EXTRA_IMAGE_FEATURES:remove:pn-machine-image = "package-management"
+# rpm-related packages will introduce the dependencies of bash
+EXTRA_IMAGE_FEATURES:remove:pn-machine-image = "${@bb.utils.contains('PACKAGE_CLASSES', 'package_rpm', 'package-management', '', d)}"
