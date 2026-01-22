@@ -1,13 +1,4 @@
-do_install:append:sa8775() {
-    if ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'true', 'false', d)}; then
-        echo '#Change selinux store path to /data from /var because no enough space to store policies' >> ${D}${sysconfdir}/selinux/semanage.conf
-        echo 'store-root=/data/lib/selinux' >> ${D}${sysconfdir}/selinux/semanage.conf
-    fi
-}
+FILESEXTRAPATHS:append := "${THISDIR}/libsemanage:"
 
-do_install:append:sa7255() {
-    if ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'true', 'false', d)}; then
-        echo '#Change selinux store path to /data from /var because no enough space to store policies' >> ${D}${sysconfdir}/selinux/semanage.conf
-        echo 'store-root=/data/lib/selinux' >> ${D}${sysconfdir}/selinux/semanage.conf
-    fi
-}
+#Patches
+SRC_URI += "file://0001-libsemanage-Change-sepolicy-store-root-path.patch"
