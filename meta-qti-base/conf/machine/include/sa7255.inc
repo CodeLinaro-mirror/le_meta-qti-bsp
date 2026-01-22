@@ -1,4 +1,5 @@
 include conf/machine/include/basemachine.inc
+include conf/machine/include/hgy-bbmask.inc
 
 SOC_FAMILY ?= "sa7255"
 include conf/machine/include/soc-family.inc
@@ -14,6 +15,8 @@ PREFERRED_VERSION_wayland-ivi-extension = "2.2.0"
 # Prefer gbm
 PREFERRED_PROVIDER_virtual/libgbm = "gbm"
 
+PREFERRED_VERSION_libgpiod = "1.6.4"
+
 PREFERRED_VERSION_android-tools = "5.1.1.r37"
 PREFERRED_VERSION_adreno = "0.1"
 # Prefer adreno
@@ -28,8 +31,6 @@ BBMASK += "meta-qti-bsp/meta-qti-base/recipes-kernel/edk2/edk2_5.0.bb"
 BBMASK += "meta-qti-bsp/meta-qti-base/recipes-products/images/qti-image-boot.bb"
 
 RUSTVERSION = "1.75%"
-BBMASK += "poky/meta/recipes-devtools/cargo"
-BBMASK += "poky/meta/recipes-devtools/rust"
 
 # Enables timestamping functionality during building the kernel
 KERNEL_DEBUG_TIMESTAMPS = "1"
