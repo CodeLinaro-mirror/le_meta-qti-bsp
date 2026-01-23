@@ -10,16 +10,18 @@ lxc.rootfs.path = /vendor_early_services/vendor/vm-system
 # Android host will cover the PATH environment of container
 lxc.environment = PATH=$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
-lxc.init.cmd = /lib/systemd/systemd systemd.unified_cgroup_hierarchy=1
+lxc.init.cmd = /lib/systemd/systemd systemd.log_level=debug systemd.log_target=console systemd.unified_cgroup_hierarchy=0
+
+lxc.console.logfile = /vendor_early_services/run/lxc_console.log
 
 lxc.autodev = 1
 
 # CGroup whitelist
-lxc.cgroup2.devices.allow = a
-lxc.cgroup.devices.deny = a
+#lxc.cgroup2.devices.allow = a
+lxc.cgroup.devices.allow = a
 ## Allow any mknod (but not reading/writing the node)
-lxc.cgroup2.devices.allow = c *:* m
-lxc.cgroup2.devices.allow = b *:* m
+lxc.cgroup.devices.allow = c *:* m
+lxc.cgroup.devices.allow = b *:* m
 
 
 lxc.signal.halt = SIGKILL
@@ -36,22 +38,40 @@ lxc.mount.entry = /dev/kgsl-3d0 dev/kgsl-3d0 none bind,create=file 0 0
 lxc.mount.entry = /dev/socket/agm dev/socket/agm none bind,create=dir 0 0
 lxc.mount.entry = /dev/video32 dev/video32 none bind,create=file 0 0
 lxc.mount.entry = /dev/video33 dev/video33 none bind,create=file 0 0
+lxc.mount.entry = /dev/dri/card2 dev/dri/card2 none bind,create=file 0 0
+
+# /dev/null, /dev/zero, /dev/full, /dev/random, /dev/urandom
+lxc.cgroup.devices.allow = c 1:3 rwm
+lxc.cgroup.devices.allow = c 1:5 rwm
+lxc.cgroup.devices.allow = c 1:7 rwm
+lxc.cgroup.devices.allow = c 1:8 rwm
+lxc.cgroup.devices.allow = c 1:9 rwm
+lxc.cgroup.devices.allow = c 1:9 rwm
+
+# /dev/tty, /dev/console, /dev/ptmx
+lxc.cgroup.devices.allow = c 5:0 rwm
+lxc.cgroup.devices.allow = c 5:1 rwm
+lxc.cgroup.devices.allow = c 5:2 rwm
+lxc.cgroup.devices.allow = c 1:11 rwm
+
+# /dev/pts/*
+lxc.cgroup.devices.allow = c 136:* rwm
 
 # Cgroup configuration
-lxc.cgroup2.devices.deny                = c 226:0 m
-lxc.cgroup2.devices.deny                = c 226:1 m
-lxc.cgroup2.devices.allow               = c 226:2 rwm
-lxc.cgroup2.devices.deny                = c 226:3 m
-lxc.cgroup2.devices.allow               = c 226:128 rwm
+lxc.cgroup.devices.deny                = c 226:0 m
+lxc.cgroup.devices.deny                = c 226:1 m
+lxc.cgroup.devices.allow               = c 226:2 rwm
+lxc.cgroup.devices.deny                = c 226:3 m
+lxc.cgroup.devices.allow               = c 226:128 rwm
 
 # Set memory.max
 lxc.cgroup2.memory.max                  = 1536M
 # Affinity to middle core 3,4, small core 0,1,2
-lxc.cgroup2.cpuset.cpus                 = 0,1,2,3,4
+lxc.cgroup.cpuset.cpus                 = 0,1,2,3,4
 
 # Video device permissions
-lxc.cgroup2.devices.allow               = c 81:0 rwm  # /dev/video32
-lxc.cgroup2.devices.allow               = c 81:1 rwm  # /dev/video33
+lxc.cgroup.devices.allow               = c 81:0 rwm  # /dev/video32
+lxc.cgroup.devices.allow               = c 81:1 rwm  # /dev/video33
 
 # Network
 lxc.net.0.type = veth
