@@ -1,4 +1,4 @@
-inherit qimage ${@bb.utils.contains('MACHINE_FEATURES', 'dm-verity-ramdisk', 'qramdisk', 'qcpioimage', d)} 
+inherit qimage ${@bb.utils.contains('MACHINE_FEATURES', 'dm-verity-initramfs', 'qramdisk', 'qcpioimage', d)} 
 
 DEPENDS += " virtual/kernel"
 
@@ -31,5 +31,5 @@ do_compose_vmimage[recrdeptask] += "do_merge_dtbs"
 do_compose_vmimage[recrdeptask] += "do_extracpio_create"
 
 do_makesystem:prepend() {
-      rm -rf ${IMAGE_ROOTFS_EXT4}/usr/lib/python3.10
+      rm -rf ${IMAGE_ROOTFS_EXT4}/usr/lib/python3.12
 }
