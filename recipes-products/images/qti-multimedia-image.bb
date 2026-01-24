@@ -40,6 +40,10 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-support-utils \
         systemd-machine-units \
         ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
+	adreno-vulkan \
+	${@bb.utils.contains("DISTRO_FEATURES", "c2d", "adreno-c2d", "", d)} \
+	${@bb.utils.contains("DISTRO_FEATURES", "opencl", "adreno-opencl", "", d)} \
+	vulkan-loader \
 "
 
 CORE_IMAGE_EXTRA_INSTALL:remove:qcm2290-mtp = "kernel-modules"
