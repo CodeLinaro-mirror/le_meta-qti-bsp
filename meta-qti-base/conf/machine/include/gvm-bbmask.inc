@@ -42,6 +42,7 @@ BBMASK:quin-gvm-gen4 += "meta-qti-bsp/meta-qti-extra/recipes-test/virtio-i2c-tes
 BBMASK:quin-gvm-gen4 += "meta-qti-bsp/meta-qti-extra/recipes-test/virt-reg-ut/virt-reg-ut.bb"
 BBMASK:quin-gvm-gen4 += "meta-qti-bsp/meta-qti-extra/recipes-test/virt-spmi-ut/virt-spmi-ut.bb"
 BBMASK:quin-gvm-gen4 += "meta-qti-bsp/meta-qti-base/recipes-security/securemsm-devicetree/securemsm-devicetree.bb"
+BBMASK:quin-gvm-gen4 += "meta-qti-bsp/meta-qti-base/recipes-wlan/wlan-devicetree"
 
 # BBMASK drops some recipe that checksum file not found in quin-gvm-lemans target
 BBMASK:quin-gvm-lemans += "meta-qti-bsp/meta-qti-base/recipes-audio/audiolite-dlkm/audiolite-devicetree_git.bb"
@@ -217,7 +218,6 @@ BBMASK:quin-gvm-gen4-5 += "meta-qti-bsp/meta-qti-extra/recipes-test/virtio-i2c-t
 BBMASK:quin-gvm-gen4-5 += "meta-qti-bsp/meta-qti-extra/recipes-test/virt-reg-ut/virt-reg-ut.bb"
 BBMASK:quin-gvm-gen4-5 += "meta-qti-bsp/meta-qti-extra/recipes-test/virt-spmi-ut/virt-spmi-ut.bb"
 BBMASK:quin-gvm-gen4-5 += "meta-qti-bsp/meta-qti-base/recipes-multimedia/virtio-video/virtio-video-header_git.bb"
-BBMASK:quin-gvm-gen4-5 += "meta-qti-bsp/meta-qti-base/recipes-wlan"
 BBMASK:quin-gvm-gen4-5 += "meta-qti-base/recipes-connectivity/synergy-opensource"
 BBMASK:quin-gvm-gen4-5 += "meta-qti-bsp/meta-qti-base/recipes-kernel/linux-msm/linux-msm_6.1.bb"
 
@@ -266,6 +266,7 @@ BBMASK:qtiquingvm8295 += "meta-qti-bsp/meta-qti-extra/recipes-test/virt-reg-ut/v
 BBMASK:qtiquingvm8295 += "meta-qti-bsp/meta-qti-extra/recipes-test/virt-spmi-ut/virt-spmi-ut.bb"
 BBMASK:qtiquingvm8295 += "meta-qti-bsp/meta-qti-base/recipes-kernel/linux-msm/linux-msm_5.15.bb"
 BBMASK:qtiquingvm8295 += "meta-qti-bsp/meta-qti-base/recipes-security/securemsm-devicetree/securemsm-devicetree.bb"
+BBMASK:qtiquingvm8295 += "meta-qti-bsp/meta-qti-base/recipes-wlan/wlan-devicetree"
 
 # BBMASK drops some recipe that checksum file not found in gvm-gen5 target
 BBMASK:gvm-gen5 += "meta-qti-bsp/meta-qti-base/recipes-audio/audiolite-dlkm/audiolite-devicetree_git.bb"
