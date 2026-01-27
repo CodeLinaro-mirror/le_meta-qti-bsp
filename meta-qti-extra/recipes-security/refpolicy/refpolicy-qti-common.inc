@@ -14,7 +14,7 @@ PURGE_POLICY_MODULES += "cgmanager automount xguest amanda portage"
 # Modules inside 'services' and 'apps' layers to keep. All others in these layers are turned off
 CONTRIB_MODULES ?= "chronyd networkmanager shutdown gnome dhcp avahi apache minidlna mta dbus \
                     pulseaudio ppp dnsmasq ddclient bluetooth tinyproxy hostapd xserver nscd \
-                    ais_server qcarcam_test qcarcam_rvc"
+                    ais_server qcarcam_test qcarcam_rvc acdb_loader"
 
 def append_policy_file(src_path, dst_path):
     # Append our policy fragment to the end of the upstream file
