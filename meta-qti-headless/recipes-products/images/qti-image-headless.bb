@@ -8,6 +8,10 @@ inherit core-image
 # Introducing selinux-image.bbclass is to label selinux contexts when build.
 inherit ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'selinux-image', '', d)}
 
+# Set up for handling the generation of the /usr image
+# partition...
+require recipes-products/images/automotive-usr-image.inc
+
 IMAGE_ROOTFS_SIZE = "716800"
 
 IMAGE_INSTALL += "\
