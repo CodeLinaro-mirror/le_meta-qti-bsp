@@ -38,3 +38,5 @@ RDEPENDS:${PN} += "\
         bb.utils.contains('MACHINE_FEATURES', 'qti-gunyah qti-umd', '${AUDIOLITE_RDEPENDS} alsa-utils', '${KMD_RDEPENDS}', d), \
     d)} \
 "
+
+RDEPENDS:${PN}:remove:sa8650-adas = "audiolite-dlkm"

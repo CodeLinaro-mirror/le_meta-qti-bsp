@@ -3,6 +3,7 @@ LICENSE = "BSD-3-Clause-Clear"
 
 DEPENDS += "mkbootimg-native virtual/kernel"
 DEPENDS += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'audiolite-dlkm safelinux-system-cfg safelinux-sec-modules safelinux-cfg-modules', '', d)}"
+DEPENDS:remove:sa8650-adas = "audiolite-dlkm"
 
 IMAGE_CLASSES:remove = "qimage qimage-boot"
 
