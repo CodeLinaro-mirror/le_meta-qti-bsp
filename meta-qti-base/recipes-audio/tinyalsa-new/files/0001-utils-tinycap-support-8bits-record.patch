@@ -1,10 +1,15 @@
+This patch file is from Qualcomm Technologies, Inc. and is provided under the following license:
+
+Copyright (c) Qualcomm Technologies, Inc. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause-Clear
+
 From 30c79c97f85a8530bb3e36abe71b5c9ed5348bf9 Mon Sep 17 00:00:00 2001
-From: Jing Wang <quic_jingwa@quicinc.com>
+From: Jing Wang <jingwa@qti.qualcomm.com>
 Date: Fri, 6 Dec 2024 14:31:03 +0800
 Subject: [PATCH] utils: tinycap: support 8bits record
 
 Upstream-Status: Pending
-Signed-off-by: Jing Wang <quic_jingwa@quicinc.com>
+Signed-off-by: Jing Wang <jingwa@qti.qualcomm.com>
 ---
  utils/tinycap.c | 8 ++++++++
  1 file changed, 8 insertions(+)
@@ -17,9 +22,9 @@ index 617d16a..78831c7 100644
  ** DAMAGE.
  */
 
-+// Changes from Qualcomm Innovation Center, Inc. are provided under the following license:
++// Changes from Qualcomm Technologies, Inc. are provided under the following license:
 +//
-+// Copyright (c) 2024 Qualcomm Innovation Center, Inc. All rights reserved.
++// Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
 +// SPDX-License-Identifier: BSD-3-Clause-Clear
 +
  #include <tinyalsa/asoundlib.h>

@@ -1,3 +1,8 @@
+This patch file is from Qualcomm Technologies, Inc. and is provided under the following license:
+
+Copyright (c) Qualcomm Technologies, Inc. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause-Clear
+
 From c636b2f08cd63467fc3fbf5b299968b7639c3005 Mon Sep 17 00:00:00 2001
 From: Huicheng Liu <huicliu@quicinc.com>
 Date: Tue, 30 Apr 2024 17:41:12 -0400
@@ -33,7 +38,7 @@ index 1b2103a..5133881 100644
 +     * If frames < start_threshold, wait indefinitely.
 +     * Another thread may start capture
 +     */
-+    if (!is_playback && pcm_state(pcm) == PCM_STATE_PREPARED &&
++    if (pcm_state(pcm) == PCM_STATE_PREPARED &&
 +            frames >= pcm->config.start_threshold) {
 +        if (pcm_start(pcm) < 0) {
 +            return -1;
