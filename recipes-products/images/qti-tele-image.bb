@@ -92,3 +92,5 @@ TOOLCHAIN_TARGET_TASK_remove = "kernel-devsrc"
 
 # Remove run-postinsts from target image
 ROOTFS_BOOTSTRAP_INSTALL_remove = "run-postinsts"
+
+TOOLCHAIN_TARGET_TASK_append = " telux"
