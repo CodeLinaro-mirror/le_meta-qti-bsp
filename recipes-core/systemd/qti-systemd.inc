@@ -46,16 +46,6 @@ SRC_URI += "file://ashmem.rules"
 PACKAGECONFIG = " \
     ${@bb.utils.filter('DISTRO_FEATURES', 'selinux', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'wifi', 'rfkill', '', d)} \
-    acl \
-    binfmt \
-    coredump \
-    hibernate \
-    ima \
-    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-sdx', '', 'kmod', d)} \
-    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-sdx', '', 'logind', d)} \
-    randomseed \
-    timedated \
-    xz \
 "
 # Don't support coredump generation for user builds.
 PACKAGECONFIG:remove:qti-distro-user = "coredump"
@@ -70,7 +60,7 @@ CFLAGS:append = " -fPIC"
 SELECTED_OPTIMIZATION = "-O2 -fexpensive-optimizations -frename-registers -fomit-frame-pointer -ftree-vectorize"
 
 # Add a build flag to mask journaling services.
-SYSTEMD_ENABLE_JOURNAL ?= "1"
+SYSTEMD_ENABLE_JOURNAL = "1"
 SYSTEMD_ENABLE_JOURNAL:qti-distro-perf ?= "0"
 
 do_install:append () {
