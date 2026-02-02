@@ -2,7 +2,7 @@
 #SPDX-License-Identifier: BSD-3-Clause-Clear
 
 # filename              partition
-xbl_s.melf              /dev/block/bootdevice/by-name/xbl
+xbl_sc.elf              /dev/block/bootdevice/by-name/xbl
 xbl_config.elf          /dev/block/bootdevice/by-name/xbl_config
 multi_image_qti.mbn     /dev/block/bootdevice/by-name/multiimgqti
 multi_image.mbn         /dev/block/bootdevice/by-name/multiimgoem
@@ -11,12 +11,15 @@ aop.mbn                 /dev/block/bootdevice/by-name/aop
 aop_devcfg.mbn          /dev/block/bootdevice/by-name/aop_config
 tz.mbn                  /dev/block/bootdevice/by-name/tz
 hypvm.mbn               /dev/block/bootdevice/by-name/hyp
+hypvmperformance.mbn    /dev/block/bootdevice/by-name/hyp
 NON-HLOS.bin            /dev/block/bootdevice/by-name/modem
 BTFM.bin                /dev/block/bootdevice/by-name/bluetooth
 abl.elf                 /dev/block/bootdevice/by-name/abl
 dspso.bin               /dev/block/bootdevice/by-name/dsp
 km41.mbn                /dev/block/bootdevice/by-name/keymaster
+keymint.mbn             /dev/block/bootdevice/by-name/keymaster
 devcfg.mbn              /dev/block/bootdevice/by-name/devcfg
+devcfg_rfcomm.mbn       /dev/block/bootdevice/by-name/devcfg
 qupv3fw.elf             /dev/block/bootdevice/by-name/qupfw
 dtbo.img                /dev/block/bootdevice/by-name/dtbo
 uefi_sec.mbn            /dev/block/bootdevice/by-name/uefisecapp
@@ -41,7 +44,8 @@ hyp_ac_config.mbn       /dev/block/bootdevice/by-name/hyp_ac_config
 dcp.bin                 /dev/block/bootdevice/by-name/dcp
 tz_qti_config.mbn       /dev/block/bootdevice/by-name/tz_qti_config
 secretkeeper.mbn        /dev/block/bootdevice/by-name/secretkeeper
-sequencer_ram.mbn       /dev/block/bootdevice/by-name/tme_seq_patch
+sequencer_ram.elf       /dev/block/bootdevice/by-name/tme_seq_patch
 tme_config.elf          /dev/block/bootdevice/by-name/tme_config
 xbl_ac_config.mbn       /dev/block/bootdevice/by-name/xbl_ac_config
 signed_firmware_soc_view.elf   /dev/block/bootdevice/by-name/tme_fw
+Core_NON-HLOS.bin       /dev/block/bootdevice/by-name/core_nhlos
