@@ -12,6 +12,9 @@ inherit ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'selinux-image', '', 
 # partition...
 require recipes-products/images/automotive-usr-image.inc
 
+# Set up for handling the generation of the /persist image
+require recipes-products/images/automotive-persist-image.inc
+
 IMAGE_ROOTFS_SIZE = "716800"
 
 IMAGE_INSTALL += "\
