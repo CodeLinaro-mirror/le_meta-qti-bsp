@@ -22,6 +22,7 @@ VIRT_MODULES_BUILD:append:quin-gvm-gen4 = "${@bb.utils.contains('PREFERRED_VERSI
 VIRT_MODULES_BUILD:append:quin-gvm-lemans = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '6.12', ' hfastrpc.ko', ' drivers/virtual_fastrpc/hfastrpc.ko', d)}"
 VIRT_MODULES_BUILD:append:quin-gvm-gen4-5 = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '6.12', ' hfastrpc.ko', ' drivers/virtual_fastrpc/hfastrpc.ko', d)}"
 VIRT_MODULES_BUILD:append:gvm-gen4-5 = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '6.12', ' hfastrpc.ko', ' drivers/virtual_fastrpc/hfastrpc.ko', d)}"
+VIRT_MODULES_BUILD:append:gvm-gen5 = " hfastrpc.ko"
 
 TECHPACK_MODULES = "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '${VIRT_MODULES_BUILD}', '${METAL_MODULES_BUILD}', d)}"
 
@@ -48,6 +49,7 @@ VIRT_PROVIDES_MODULES:append:quin-gvm-gen4 = " kernel-module-vfastrpc-${KERNEL_V
 VIRT_PROVIDES_MODULES:append:quin-gvm-lemans = " kernel-module-hfastrpc-${KERNEL_VERSION}"
 VIRT_PROVIDES_MODULES:append:quin-gvm-gen4-5 = " kernel-module-hfastrpc-${KERNEL_VERSION}"
 VIRT_PROVIDES_MODULES:append:gvm-gen4-5 = " kernel-module-hfastrpc-${KERNEL_VERSION}"
+VIRT_PROVIDES_MODULES:append:gvm-gen5 = " kernel-module-hfastrpc-${KERNEL_VERSION}"
 
 EXT_MODULE = "vendor/qcom/opensource/platform-kernel"
 
