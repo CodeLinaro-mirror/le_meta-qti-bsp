@@ -17,7 +17,9 @@ do_compile[noexec] = "1"
 
 do_install() {
     install -d ${D}${includedir}/media/hardware
+    install -d ${D}${includedir}/media/drm
     install -m 0644 ${S}/native/include/media/hardware/*.h -D ${D}${includedir}/media/hardware/
+    install -m 0644 ${S}/native/include/media/drm/*.h -D ${D}${includedir}/media/drm/
 }
 
 ALLOW_EMPTY:${PN} = "1"
