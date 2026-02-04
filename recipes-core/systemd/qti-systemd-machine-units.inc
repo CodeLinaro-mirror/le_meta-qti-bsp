@@ -30,7 +30,7 @@ add_mount_files () {
         mountname="${entry:1}"
         # Replace "/" with "-" for systemd to understand mount unit.
         mountname=${mountname//'/'/"-"}
-        if [[ "$mountname" == "firmware" || "$mountname" == "bt_firmware" || "$mountname" == "dsp" || "$mountname" == "lib-modules" || "$mountname" == "vm-bootsys" || "$mountname" == "lxcrootfs" ]] && \
+        if [[ "$mountname" == "firmware" || "$mountname" == "bt_firmware" || "$mountname" == "vendor-bt_firmware" || "$mountname" == "dsp" || "$mountname" == "lib-modules" || "$mountname" == "vm-bootsys" || "$mountname" == "lxcrootfs" ]] && \
            [[ "${IMAGETYPE}" == "ubi" || "${COMBINED_FEATURES}" =~ .*qti-ab-boot.* ]] ; then
             install -m 0644 ${S}/${mountname}-mount.service ${D}${systemd_unitdir}/system/${mountname}-mount-${IMAGETYPE}.service
         else
@@ -80,6 +80,8 @@ fix_sepolicies () {
     sed -i "s#,context=system_u:object_r:firmware_t:s0##g" ${WORKDIR}/firmware-mount.service
     sed -i "s#,context=system_u:object_r:firmware_t:s0##g" ${WORKDIR}/bt_firmware.mount
     sed -i "s#,context=system_u:object_r:firmware_t:s0##g" ${WORKDIR}/bt_firmware-mount.service
+    sed -i "s#,context=system_u:object_r:firmware_t:s0##g" ${WORKDIR}/vendor-bt_firmware.mount
+    sed -i "s#,context=system_u:object_r:firmware_t:s0##g" ${WORKDIR}/vendor-bt_firmware-mount.service
     sed -i "s#,context=system_u:object_r:adsprpcd_t:s0##g" ${WORKDIR}/dsp-mount.service
     sed -i "s#,rootcontext=system_u:object_r:data_t:s0##g" ${WORKDIR}/data.mount
     sed -i "s#,rootcontext=system_u:object_r:persist_t:s0##g" ${WORKDIR}/persist.mount
@@ -115,6 +117,7 @@ fix_mount_services () {
     fi
 
     sed -i "s#@BTDEVICE@#$btdevice#g" ${WORKDIR}/bt_firmware-mount.service
+    sed -i "s#@BTDEVICE@#$btdevice#g" ${WORKDIR}/vendor-bt_firmware-mount.service
     sed -i "s#@DSPDEVICE@#$dspdevice#g" ${WORKDIR}/dsp-mount.service
     sed -i "s#@MODEMDEVICE@#$modemdevice#g" ${WORKDIR}/firmware-mount.service
 }

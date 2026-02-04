@@ -7,7 +7,11 @@ LICENSE = "GPLv2.0-with-linux-syscall-note"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta-qti-bsp/files/common-licenses/\
 ${LICENSE};md5=8afb6abdac9a14cb18a0d6c9c151e9b4"
 
-FILESEXTRAPATHS:prepend := "${KERNEL_PREBUILT_PATH}:${KERNEL_PLATFORM_PATH}/msm-kernel:"
+COMPATIBLE_MACHINE = "vienna|alor|canoe"
+KERNEL_SRC_TYPE ?= "msm-kernel"
+
+# KERNEL_SRC_TYPE can be 'soc-repo' or 'msm-kernel' as per the kernel platform
+FILESEXTRAPATHS:prepend := "${KERNEL_PREBUILT_PATH}:${KERNEL_PLATFORM_PATH}/${KERNEL_SRC_TYPE}:"
 SRC_URI   =  "file://dist"
 SRC_URI  +=  "file://${KERNEL_MODULES_LIST}"
 SRC_URI  +=  "file://linkmodulesload.service"
@@ -17,14 +21,28 @@ S  =  "${WORKDIR}/dist"
 
 do_compile () {
     existing_modules=$(ls *.ko 2> /dev/null || true)
+    if [ ! -f ${WORKDIR}/${KERNEL_MODULES_LIST} ]; then
+        bbfatal "Kernel modules list file ${KERNEL_MODULES_LIST} not found"
+    fi
     first_mod_list=$(cat ${WORKDIR}/${KERNEL_MODULES_LIST} | sed -e '/^ *#/d;/^ *$/d')
+
+    # Check if any modules were found after filtering
+    if [ -z "$first_mod_list" ]; then
+        bbwarn "No modules found in ${KERNEL_MODULES_LIST} after filtering comments and empty lines"
+    fi
+
+    # Check if any modules exist
+    if [ -z "$existing_modules" ]; then
+        bbwarn "No kernel modules (*.ko) found in the working directory"
+    fi
 
     # generate conf file for 1st/2nd stage module
     touch firstmods.conf
     touch secondmods.conf
 
     for module in ${existing_modules}; do
-        echo ${first_mod_list} | grep -q ${module} && is_1st_ko="True" || is_1st_ko="False"
+        # Use word boundaries to ensure exact module name matching
+        echo ${first_mod_list} | grep -qw $(basename ${module} .ko) && is_1st_ko="True" || is_1st_ko="False"
         if [ "${is_1st_ko}" == "True" ]; then
             echo "$(basename ${module} .ko)" >> firstmods.conf
         else
@@ -37,14 +55,16 @@ KERNEL_VERSION = "${@get_kernelversion_file("${STAGING_KERNEL_BUILDDIR}")}"
 do_install[depends] += "virtual/kernel:do_prebuilt_shared_workdir"
 do_install() {
     # Install modules
-    mkdir -p ${D}/${base_libdir}/modules/${KERNEL_VERSION}
-    for mod in *.ko; do
-        if [ -f $mod ]; then
-            install -m 0644 $mod ${D}/${base_libdir}/modules/${KERNEL_VERSION}
-        fi
-    done
+    mkdir -p ${D}${base_libdir}/modules/${KERNEL_VERSION}
+    if ls *.ko 1> /dev/null 2>&1; then
+        for mod in *.ko; do
+            install -m 0644 $mod ${D}${base_libdir}/modules/${KERNEL_VERSION}
+        done
+    else
+        bbwarn "No kernel modules (*.ko) found to install"
+    fi
     # Create empty modules.load as a place holder to mimic Android GKI ramdisk
-    touch ${D}/${base_libdir}/modules/${KERNEL_VERSION}/modules.load
+    touch ${D}${base_libdir}/modules/${KERNEL_VERSION}/modules.load
 
     # Install systemd configuration file for auto load
     install -d ${D}${sysconfdir}/modules-load.d/
@@ -68,27 +88,36 @@ SYSTEMD_PACKAGES = "${PN}-linkmodulesload"
 SYSTEMD_SERVICE:${PN}-linkmodulesload = "linkmodulesload.service"
 
 python get_files_pn_from_conf() {
+    import os
+    import bb
+
     pn = d.getVar('PN')
 
     f_conf = os.path.join(d.getVar('D'), 'etc/modules-load.d', '00-firstmods.conf')
     s_conf = os.path.join(d.getVar('D'), 'etc/modules-load.d', '00-secondmods.conf')
 
     f_mods = [ '/etc/modules-load.d/00-firstmods.conf', '${base_libdir}/modules/*/modules.load' ]
-    with open(f_conf) as f:
-        lines = f.readlines()
-        for line in lines:
-            if line.startswith('#'):
-                continue
-            f_mods += [ '${base_libdir}/modules/*/' + line.rstrip() + '.ko' ]
+    if os.path.exists(f_conf):
+        with open(f_conf) as f:
+            lines = f.readlines()
+            for line in lines:
+                if line.startswith('#'):
+                    continue
+                f_mods += [ '${base_libdir}/modules/*/' + line.rstrip() + '.ko' ]
+    else:
+        bb.warn("First modules conf file not found at %s" % f_conf)
     d.setVar('FILES:' + pn + '-first-stage', " ".join(f_mods))
 
     s_mods = [ '/etc/modules-load.d/00-secondmods.conf' ]
-    with open(s_conf) as f:
-        lines = f.readlines()
-        for line in lines:
-            if line.startswith('#'):
-                continue
-            s_mods += [ '${base_libdir}/modules/*/' + line.rstrip() + '.ko' ]
+    if os.path.exists(s_conf):
+        with open(s_conf) as f:
+            lines = f.readlines()
+            for line in lines:
+                if line.startswith('#'):
+                    continue
+                s_mods += [ '${base_libdir}/modules/*/' + line.rstrip() + '.ko' ]
+    else:
+        bb.warn("Second modules conf file not found at %s" % s_conf)
     d.setVar('FILES:' + pn + '-second-stage', " ".join(s_mods))
 }
 
