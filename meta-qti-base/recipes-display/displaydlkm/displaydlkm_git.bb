@@ -19,6 +19,8 @@ TECHPACK_MODULE_OUT = "${WORKDIR}/display-drivers"
 TECHPACK_MODULES = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '6.12', bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', \
                     'msm_hyp.ko msm_cfg.ko', 'msm_drm.ko', d),bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor',\
                     'msm-hyp/msm_hyp.ko msm-cfg/msm_cfg.ko', 'msm/msm_drm.ko', d), d)}"
+# hw virtualization
+TECHPACK_MODULES:gvm-gen5 = "msm_drm.ko"
 TECHPACK_HEADERS = "${S}/include/uapi"
 HDCP_QSEECOM_PATCH = "${STAGING_INCDIR}/hdcp_qseecom"
 TECHPACK_MAKE_ARGS = "KBUILD_EXTRA_SYMBOLS=${HDCP_QSEECOM_PATCH}/Module.symvers"
@@ -32,6 +34,7 @@ do_install:append:sa81x5(){
 RPROVIDES:${PN} += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', \
                     'kernel-module-msm-hyp-${KERNEL_VERSION} kernel-module-msm-cfg-${KERNEL_VERSION}', \
                     'kernel-module-msm-drm-${KERNEL_VERSION}', d)}"
+RPROVIDES:${PN}:gvm-gen5 += "kernel-module-msm-drm-${KERNEL_VERSION}"
 
 FILES:${PN} += "${nonarch_base_libdir}/modules/${KERNEL_VERSION}/*"
 FILES:${PN} += "${sysconfdir}/*"

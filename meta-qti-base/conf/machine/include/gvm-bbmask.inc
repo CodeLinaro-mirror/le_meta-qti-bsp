@@ -61,6 +61,9 @@ meta-qti-bsp/meta-qti-base/recipes-graphics/graphics-hgsl/graphics-hgsldlkm_git.
 meta-qti-bsp/meta-qti-base/recipes-wlan/wlan-devicetree \
 meta-qti-bsp/meta-qti-base/recipes-data/dataeth-dlkm/dataeth-dlkm_git.bb \
 meta-qti-bsp/meta-qti-extra/recipes-security/selinux-policy/selinux-policy.bb \
+meta-qti-bsp/meta-qti-base/recipes-display/display-la/display-la-headers.bb \
+meta-qti-bsp/meta-qti-base/recipes-display/display-devicetree/display-devicetree_1.0.bb \
+meta-qti-bsp/meta-qti-base/recipes-graphics/display-intf/display-intf-headers.bb \
 meta-qti-bsp/meta-qti-base/recipes-audio/msm-virtio-snd/msm-virtio-snd.bb \
 "
 
@@ -70,6 +73,9 @@ meta-qti-bsp/meta-qti-extra/recipes-containers/softwarecontainer/softwarecontain
 meta-qti-bsp/meta-qti-base/recipes-camera/cameradlkm/cameradlkm_0.1.bb \
 meta-qti-bsp/meta-qti-base/recipes-kernel/linux-msm/linux-msm_6.1.bb \
 meta-qti-bsp/meta-qti-base/recipes-data/avb-utils/avb-utils_1.0.bb \
+meta-qti-bsp/meta-qti-base/recipes-display/display-la/display-la-headers.bb \
+meta-qti-bsp/meta-qti-base/recipes-display/display-devicetree/display-devicetree_1.0.bb \
+meta-qti-bsp/meta-qti-base/recipes-graphics/display-intf/display-intf-headers.bb \
 meta-qti-bsp/meta-qti-base/recipes-audio/msm-virtio-snd/msm-virtio-snd.bb \
 "
 
@@ -78,13 +84,7 @@ MISSING_RECIPE_SRCLIST_BASELINE_LV052 += "\
 meta-qti-bsp/meta-qti-extra/recipes-containers/softwarecontainer/softwarecontainer_git.bb \
 meta-qti-bsp/meta-qti-base/recipes-camera/cameradlkm/cameradlkm_0.1.bb \
 meta-qti-bsp/meta-qti-base/recipes-wlan \
-meta-qti-bsp/meta-qti-base/recipes-graphics/wayland/weston-sdm-extension_1.0.0.bb \
-meta-qti-bsp/meta-qti-base/recipes-graphics/wayland/weston-sdm-extension-headers.bb \
-meta-qti-bsp/meta-qti-base/recipes-graphics/wayland/weston_13.0.%.bbappend \
 meta-qti-bsp/meta-qti-base/recipes-data/dataeth-dlkm/dataeth-dlkm_git.bb \
-meta-qti-bsp/meta-qti-base/recipes-graphics/display-hal/display-hal-linux_git.bb \
-meta-qti-bsp/meta-qti-base/recipes-graphics/display-hal/display-hal-headers_git.bb \
-meta-qti-bsp/meta-qti-base/recipes-graphics/display-commonsys-intf/display-commonsys-intf-linux_git.bb \
 meta-qti-bsp/meta-qti-base/recipes-data/eavb/eavb-fe-virtio_git.bb \
 meta-qti-bsp/meta-qti-base/recipes-connectivity/bt-dlkm/bt-dlkm_git.bb \
 meta-qti-bsp/meta-qti-extra/recipes-security/selinux-policy/selinux-policy.bb \
