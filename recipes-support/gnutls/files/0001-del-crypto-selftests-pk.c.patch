@@ -1,0 +1,26 @@
+From 84422465ca145fc77298ba701ee7bcfdbc0e3a29 Mon Sep 17 00:00:00 2001
+From: xrao <xrao@qti.qualcomm.com>
+Date: Fri, 6 Feb 2026 04:08:25 +0100
+Subject: [PATCH] del crypto-selftests-pk.c
+
+Upstream-Status: Pending
+---
+ lib/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/Makefile.am b/lib/Makefile.am
+index a50d311..56fd6be 100644
+--- a/lib/Makefile.am
++++ b/lib/Makefile.am
+@@ -81,7 +81,7 @@ COBJECTS = range.c record.c compress.c debug.c cipher.c gthreads.h handshake-tls
+ 	safe-memfuncs.c atfork.c atfork.h randomart.c name_val_array.h \
+ 	system-keys.h urls.c urls.h prf.c auto-verify.c dh-session.c \
+ 	cert-session.c handshake-checks.c dtls-sw.c dh-primes.c openpgp_compat.c \
+-	crypto-selftests.c crypto-selftests-pk.c secrets.c extv.c extv.h \
++	crypto-selftests.c secrets.c extv.c extv.h \
+ 	hello_ext_lib.c hello_ext_lib.h ocsp-api.c stek.c cert-cred-rawpk.c \
+ 	iov.c iov.h system/ktls.c system/ktls.h pathbuf.c pathbuf.h
+ 
+-- 
+2.43.0
+
