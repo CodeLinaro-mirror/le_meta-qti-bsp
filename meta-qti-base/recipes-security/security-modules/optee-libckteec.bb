@@ -15,9 +15,9 @@ S = "${WORKDIR}/git"
 
 inherit pkgconfig
 
-CPPFLAGS:append:gvm-gen4-5 = " -DQC_ADD_ONS -DPKCS11_TA_UUID_LSB=0xF0"
+CFLAGS:append:gvm-gen4-5 = " -DQC_ADD_ONS -DPKCS11_TA_UUID_LSB=0xF0"
 
-CPPFLAGS:append:quin-gvm-gen4-5 = " -DQC_ADD_ONS -DPKCS11_TA_UUID_LSB=0xF0"
+CFLAGS:append:quin-gvm-gen4-5 = " -DQC_ADD_ONS -DPKCS11_TA_UUID_LSB=0xF0"
 
 do_compile() {
     oe_runmake -C ${S}/libckteec
