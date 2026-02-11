@@ -1,0 +1,43 @@
+From 75bf049c4f65b75f9170e436255e1687480f23be Mon Sep 17 00:00:00 2001
+From: Hexuan Zhu <hexuzhu@qti.qualcomm.com>
+Date: Mon, 2 Feb 2026 14:13:59 +0800
+Subject: [PATCH] tinyalsa-new: fix memory leak issue in mixer plugin
+
+Upstream-Status: Pending
+
+Signed-off-by: Hexuan Zhu <hexuzhu@qti.qualcomm.com>
+---
+ src/mixer_plugin.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/src/mixer_plugin.c b/src/mixer_plugin.c
+index a07b8f6..9e9c6e5 100644
+--- a/src/mixer_plugin.c
++++ b/src/mixer_plugin.c
+@@ -26,7 +26,10 @@
+ ** OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+ ** IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ **/
+-
++// Changes from Qualcomm Technologies, Inc. are provided under the following license:
++//
++// Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
++// SPDX-License-Identifier: BSD-3-Clause-Clear
+ #include <tinyalsa/plugin.h>
+
+ #include <stdio.h>
+@@ -347,7 +350,10 @@ static void mixer_plug_close(void *data)
+
+     plug_data->ops->close(&plugin);
+     dlclose(plug_data->dl_hdl);
+-
++    if (plug_data->mixer_node) {
++        snd_utils_close_dev_node(plug_data->mixer_node);
++        plug_data->mixer_node = NULL;
++    }
+     free(plug_data);
+     plug_data = NULL;
+ }
+--
+2.43.0
+
