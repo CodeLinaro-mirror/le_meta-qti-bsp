@@ -22,7 +22,7 @@ KERNEL_CC = "${STAGING_BINDIR_NATIVE}/clang/bin/clang \
 
 KERNEL_CONFIG = "generic_le_defconfig"
 
-KERNEL_CONFIG_FRAGMENTS:append = "${KERNEL_PLATFORM_PATH}/${KERNEL_SRC_TYPE}/arch/${ARCH}/configs/consolidate.fragment"
+KERNEL_CONFIG_FRAGMENTS:append = " ${@oe.utils.vartrue('DEBUG_BUILD', '${KERNEL_PLATFORM_PATH}/${KERNEL_SRC_TYPE}/arch/${ARCH}/configs/consolidate.fragment', '', d)}"
 
 do_configure:prepend() {
     cp "${KERNEL_PLATFORM_PATH}/${KERNEL_SRC_TYPE}/arch/${ARCH}/configs/${KERNEL_CONFIG}" ${B}/.config \

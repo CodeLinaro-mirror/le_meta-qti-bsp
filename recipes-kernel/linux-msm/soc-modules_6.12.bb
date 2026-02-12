@@ -25,12 +25,12 @@ EXTRA_OEMAKE += ' CC="${KERNEL_CC}" LD="${KERNEL_LD}" OBJCOPY="${KERNEL_OBJCOPY}
 EXTRA_OEMAKE += ' HOSTCC="${BUILD_CC}" HOSTCFLAGS="${BUILD_CFLAGS}" HOSTLDFLAGS="${BUILD_LDFLAGS}" HOSTCPP="${BUILD_CPP}"'
 EXTRA_OEMAKE += ' HOSTCXX="${BUILD_CXX}" HOSTCXXFLAGS="${BUILD_CXXFLAGS}"'
 
-VENDOR_CONFIG_FRAGMENTS ?= ""
+TARGET_CONFIG_FRAGMENTS ?= ""
 
 do_configure:append() {
     KCONFIG_EXT_PREFIX="${SOC_REPO}/" ${SOC_REPO}/flatten_kconfig.sh ${SOC_REPO}/Kconfig.msm > ${SOC_REPO}/Kconfig.ext
 
-    for frag in ${VENDOR_CONFIG_FRAGMENTS}; do
+    for frag in ${TARGET_CONFIG_FRAGMENTS}; do
         cat "${SOC_REPO}/arch/arm64/configs/${frag}" >> "${KERNEL_BUILD_DIR}/.config"
     done
 
