@@ -52,9 +52,14 @@ python () {
         d.setVar("kern_mods", "gki-kernel-modules-first-stage")
 }
 
-PACKAGE_INSTALL:remove:pineapple = "\
+COMMON_REMOVE_PACKAGES = "\
     adbd \
     usb-composition \
     usb-composition-usbd \
     first-stage-scripts-init \
 "
+
+PACKAGE_INSTALL:remove:pineapple = "${COMMON_REMOVE_PACKAGES}"
+PACKAGE_INSTALL:remove:sun = "${COMMON_REMOVE_PACKAGES}"
+PACKAGE_INSTALL:remove:kera = "${COMMON_REMOVE_PACKAGES}"
+PACKAGE_INSTALL:remove:alor = "${COMMON_REMOVE_PACKAGES}"
