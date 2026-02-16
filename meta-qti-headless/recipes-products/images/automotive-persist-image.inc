@@ -1,11 +1,11 @@
 # This include forces the generation of persist image file for /persist partition
 
-PERSIST_IMAGE_BASENAME?= "${PRODUCT}-persist"
+PERSIST_IMAGE_BASENAME ?= "${PRODUCT}-persist"
 OUTPUT_PERSIST_FILE ?= "${DEPLOY_DIR_IMAGE}/${PERSISTIMAGE_TARGET}"
 PERSIST_IMAGE_ROOTFS_SIZE ?= "6536668"
 PERSIST_IMAGE_ROOTFS ?= "${TMPDIR}/rootfs/${PERSIST_IMAGE_BASENAME}"
 
-ROOTFS_POSTPROCESS_COMMAND:prepend = " create_persist_rootfs; sync_host_fs; "
+ROOTFS_POSTPROCESS_COMMAND:prepend = "create_persist_rootfs; sync_host_fs; "
 
 # Generating persist image in EXT4 format
 IMAGE_PREPROCESS_COMMAND += "${@bb.utils.contains('DISTRO_FEATURES', 'persist-image', 'create_persist_img;', '', d)}"
@@ -13,7 +13,7 @@ IMAGE_PREPROCESS_COMMAND += "${@bb.utils.contains('DISTRO_FEATURES', 'persist-im
 # Add below scripts to populate more stuff to persist & data
 # Move /var to RW partition(persist)
 # Move /home to data to make it writable
-IMAGE_PREPROCESS_COMMAND:prepend = "${@bb.utils.contains('IMAGE_FEATURES', 'read-only-rootfs', " populate_persist_usr; ", '', d)}"
+IMAGE_PREPROCESS_COMMAND:prepend = "${@bb.utils.contains('IMAGE_FEATURES', 'read-only-rootfs', "populate_persist_usr; ", '', d)}"
 
 # Root image is created now
 create_persist_rootfs() {

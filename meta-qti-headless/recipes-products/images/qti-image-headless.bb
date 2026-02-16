@@ -44,6 +44,8 @@ IMAGE_INSTALL += "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'packagegroup-selinux-minimal packagegroup-selinux-policycoreutils checkpolicy secilc auditd selinux-relabelvar selinux-relabeldata', '', d)} \
 "
 
+IMAGE_INSTALL:append:quin-tgvm-gen4-5 = " ${@bb.utils.contains('DISTRO_FEATURES', 'qti-security', 'optee-libckteec', '', d)}"
+
 IMAGE_LINGUAS = ""
 
 EXTRA_IMAGECMD:ext4 = "-i 4096 -b 4096"
