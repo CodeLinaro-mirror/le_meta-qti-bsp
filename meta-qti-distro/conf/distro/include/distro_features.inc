@@ -73,7 +73,7 @@ PREFERRED_PROVIDER_virtual/refpolicy:sa8775 = "selinux-policy"
 PREFERRED_PROVIDER_virtual/refpolicy:gvm-gen4-5 = "selinux-policy"
 PREFERRED_PROVIDER_virtual/refpolicy:quin-gvm-gen4-5 = "selinux-policy"
 DEFAULT_ENFORCING:sa8775 = "enforcing"
-DEFAULT_ENFORCING:gvm-gen4-5 = "permissive"
+DEFAULT_ENFORCING:gvm-gen4-5 = "enforcing"
 DEFAULT_ENFORCING:quin-gvm-gen4-5 = "enforcing"
 
 # volatile /var
