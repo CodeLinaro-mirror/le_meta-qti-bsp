@@ -74,7 +74,7 @@ PREFERRED_PROVIDER_virtual/refpolicy:gvm-gen4-5 = "selinux-policy"
 PREFERRED_PROVIDER_virtual/refpolicy:quin-gvm-gen4-5 = "selinux-policy"
 DEFAULT_ENFORCING:sa8775 = "enforcing"
 DEFAULT_ENFORCING:gvm-gen4-5 = "permissive"
-DEFAULT_ENFORCING:quin-gvm-gen4-5 = "permissive"
+DEFAULT_ENFORCING:quin-gvm-gen4-5 = "enforcing"
 
 # volatile /var
 DISTRO_FEATURES:append:quin-gvm-gen4-5 = " volatiled-var"
