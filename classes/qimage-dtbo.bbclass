@@ -35,6 +35,8 @@ MKDTUTIL = '${@oe.utils.conditional("PREFERRED_PROVIDER_virtual/mkdtimg-native",
 DTBODEPLOYDIR = "${WORKDIR}/deploy-${PN}-dtboimage-complete"
 DTBOIMAGE_TARGET ?= "dtbo.img"
 
+DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'qti-avb', 'avbtool-native', '', d)}"
+
 # Create dtbo.img if DTBO support is enabled
 python do_makedtbo () {
     import subprocess
@@ -73,3 +75,29 @@ python () {
     else:
         bb.build.addtask('do_makedtbo', 'do_image_complete', 'do_image', d)
 }
+
+#sign dtbo image
+do_sign_dtbo_img () {
+    imgname="${DTBOIMAGE_TARGET}"
+    echo "${imgname}"
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'qti-avb', 'true', 'false', d)}; then
+        avb_sign_dtbo_image ${imgname}
+    fi
+}
+
+avb_sign_dtbo_image() {
+    img="$1"
+    echo "${img}"
+    dtbo_partition_size=$(avbtool calc_min_partition_size --image ${img} --partition_name dtbo --hash_algorithm sha256 --no_hashtree)
+    avbtool add_hash_footer  \
+        --image ${img}  \
+        --partition_size ${dtbo_partition_size}  \
+        --partition_name dtbo \
+        --algorithm SHA256_RSA4096 \
+        --key ${STAGING_DIR_NATIVE}${bindir}/SecImage/sigkeys/testkey_rsa4096.pem \
+        --rollback_index 0
+}
+
+do_sign_dtbo_img[dirs] = "${DTBODEPLOYDIR}/${IMAGE_BASENAME}"
+
+addtask do_sign_dtbo_img after do_makedtbo before do_image
