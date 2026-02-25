@@ -38,11 +38,17 @@ EXTRA_OEMAKE:append:monaco = " 'AB_RETRYCOUNT_DISABLE=1' \
 EXTRA_OEMAKE:append:gvm-gen5 = " 'AUTO_VIRT_ABL=1' \
                                'DISABLE_KERNEL_PROTOCOL=1' \
                                'LV_GVM_KM_VIRT=1' \
+                               'ENABLE_LE_VARIANT=false' \
                                'AUTO_LVGVM_ABL=1' "
 
 EXTRA_OEMAKE:append:quin-gvm-gen4-5 = " 'AUTO_VIRT_ABL=1' \
                                       'DISABLE_KERNEL_PROTOCOL=1' \
                                       'AUTO_LVGVM_ABL=1' "
+
+EXTRA_OEMAKE:append:gvm-gen4-5 = " 'AUTO_VIRT_ABL=1' \
+                                 'DISABLE_KERNEL_PROTOCOL=1' \
+                                 'ENABLE_LE_VARIANT=false' \
+                                 'AUTO_LVGVM_ABL=1' "
 
 do_configure[noexec] = "1"
 do_compile () {
@@ -124,6 +130,10 @@ do_deploy() {
 }
 
 do_deploy:append:quin-gvm-gen4-5() {
+    install -m 0644 ${S}/../LinuxLoader.efi ${DEPLOYDIR}
+}
+
+do_deploy:append:gvm-gen4-5() {
     install -m 0644 ${S}/../LinuxLoader.efi ${DEPLOYDIR}
 }
 

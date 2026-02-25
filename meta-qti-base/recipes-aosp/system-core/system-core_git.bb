@@ -7,6 +7,7 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://NOTICE;md5=c1a3ff0b97f199c7ebcfdd4d3fed238e"
 
 DEPENDS += "ext4-utils glib-2.0 libbase libcutils libmincrypt libutils virtual/kernel-headers openssl system-core-adbd"
+DEPENDS += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '', 'vmm-lib', d)}"
 
 PR = "r19"
 

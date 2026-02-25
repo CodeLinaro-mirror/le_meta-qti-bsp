@@ -19,3 +19,6 @@ RDEPENDS:${PN} += "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'qti-security', bb.utils.contains_any('PREFERRED_VERSION_linux-msm', '5.15 6.1', '', 'securemsm-devicetree', d), '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'qti-fde', 'enable-fde', '', d)} \
 "
+
+RDEPENDS:${PN}:append:quin-gvm-gen4-5 = " optee-libckteec"
+RDEPENDS:${PN}:append:gvm-gen4-5 = " optee-libckteec"

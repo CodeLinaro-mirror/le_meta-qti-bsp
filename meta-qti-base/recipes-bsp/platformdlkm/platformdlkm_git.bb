@@ -21,6 +21,7 @@ VIRT_MODULES_BUILD:append:qtiquingvm8295 = "${@bb.utils.contains('PREFERRED_VERS
 VIRT_MODULES_BUILD:append:quin-gvm-gen4 = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '6.12', ' vfastrpc.ko', ' drivers/virtual_fastrpc/vfastrpc.ko', d)}"
 VIRT_MODULES_BUILD:append:quin-gvm-lemans = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '6.12', ' hfastrpc.ko', ' drivers/virtual_fastrpc/hfastrpc.ko', d)}"
 VIRT_MODULES_BUILD:append:quin-gvm-gen4-5 = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '6.12', ' hfastrpc.ko', ' drivers/virtual_fastrpc/hfastrpc.ko', d)}"
+VIRT_MODULES_BUILD:append:gvm-gen4-5 = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '6.12', ' hfastrpc.ko', ' drivers/virtual_fastrpc/hfastrpc.ko', d)}"
 
 TECHPACK_MODULES = "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '${VIRT_MODULES_BUILD}', '${METAL_MODULES_BUILD}', d)}"
 
@@ -46,18 +47,12 @@ VIRT_PROVIDES_MODULES:append:qtiquingvm8295 = " kernel-module-vfastrpc-${KERNEL_
 VIRT_PROVIDES_MODULES:append:quin-gvm-gen4 = " kernel-module-vfastrpc-${KERNEL_VERSION}"
 VIRT_PROVIDES_MODULES:append:quin-gvm-lemans = " kernel-module-hfastrpc-${KERNEL_VERSION}"
 VIRT_PROVIDES_MODULES:append:quin-gvm-gen4-5 = " kernel-module-hfastrpc-${KERNEL_VERSION}"
+VIRT_PROVIDES_MODULES:append:gvm-gen4-5 = " kernel-module-hfastrpc-${KERNEL_VERSION}"
 
 EXT_MODULE = "vendor/qcom/opensource/platform-kernel"
 
 do_configure:prepend() {
-    if ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '6.12', 'true', 'false', d)}; then
-        ln -sf ${BSPDIR}/vendor/qcom/opensource/dsp-kernel/dsp/adsprpc_compat.h ${BSPDIR}/vendor/qcom/opensource/platform-kernel/drivers/virtual_fastrpc/include/uapi/adsprpc_compat.h
-        ln -sf ${BSPDIR}/vendor/qcom/opensource/dsp-kernel/dsp/adsprpc_shared.h ${BSPDIR}/vendor/qcom/opensource/platform-kernel/drivers/virtual_fastrpc/include/uapi/adsprpc_shared.h
-        ln -sf ${BSPDIR}/vendor/qcom/opensource/dsp-kernel/dsp/fastrpc_trace.h ${BSPDIR}/vendor/qcom/opensource/platform-kernel/drivers/virtual_fastrpc/include/uapi/fastrpc_trace.h
-        ln -sf ${BSPDIR}/vendor/qcom/opensource/dsp-kernel/include/uapi/fastrpc_shared.h ${BSPDIR}/vendor/qcom/opensource/platform-kernel/drivers/virtual_fastrpc/include/uapi/fastrpc_shared.h
-        ln -sf ${BSPDIR}/vendor/qcom/opensource/dsp-kernel/dsp/adsprpc_compat.c ${BSPDIR}/vendor/qcom/opensource/platform-kernel/drivers/virtual_fastrpc/dsp/adsprpc_compat.c
-        ln -sf ${BSPDIR}/vendor/qcom/opensource/dsp-kernel/dsp/adsprpc_rpmsg.c ${BSPDIR}/vendor/qcom/opensource/platform-kernel/drivers/virtual_fastrpc/dsp/adsprpc_rpmsg.c
-    else
+    if ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '6.1', 'true', 'false', d)}; then
         ln -sf ${WORKDIR}/vendor/qcom/opensource/dsp-kernel/dsp/adsprpc_compat.h ${S}/drivers/virtual_fastrpc/dsp/adsprpc_compat.h
         ln -sf ${WORKDIR}/vendor/qcom/opensource/dsp-kernel/dsp/adsprpc_shared.h ${S}/drivers/virtual_fastrpc/dsp/adsprpc_shared.h
         ln -sf ${WORKDIR}/vendor/qcom/opensource/dsp-kernel/dsp/fastrpc_trace.h ${S}/drivers/virtual_fastrpc/dsp/fastrpc_trace.h
@@ -67,11 +62,43 @@ do_configure:prepend() {
     fi
 }
 
+do_configure:prepend:gvm-gen4-5() {
+    if ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '6.12', 'true', 'false', d)}; then
+        ln -sf ${BSPDIR}/vendor/qcom/opensource/dsp-kernel/dsp/adsprpc_compat.h ${BSPDIR}/vendor/qcom/opensource/platform-kernel/drivers/virtual_fastrpc/include/uapi/adsprpc_compat.h
+        ln -sf ${BSPDIR}/vendor/qcom/opensource/dsp-kernel/dsp/adsprpc_shared.h ${BSPDIR}/vendor/qcom/opensource/platform-kernel/drivers/virtual_fastrpc/include/uapi/adsprpc_shared.h
+        ln -sf ${BSPDIR}/vendor/qcom/opensource/dsp-kernel/dsp/fastrpc_trace.h ${BSPDIR}/vendor/qcom/opensource/platform-kernel/drivers/virtual_fastrpc/include/uapi/fastrpc_trace.h
+        ln -sf ${BSPDIR}/vendor/qcom/opensource/dsp-kernel/include/uapi/fastrpc_shared.h ${BSPDIR}/vendor/qcom/opensource/platform-kernel/drivers/virtual_fastrpc/include/uapi/fastrpc_shared.h
+        ln -sf ${BSPDIR}/vendor/qcom/opensource/dsp-kernel/dsp/adsprpc_compat.c ${BSPDIR}/vendor/qcom/opensource/platform-kernel/drivers/virtual_fastrpc/dsp/adsprpc_compat.c
+        ln -sf ${BSPDIR}/vendor/qcom/opensource/dsp-kernel/dsp/adsprpc_rpmsg.c ${BSPDIR}/vendor/qcom/opensource/platform-kernel/drivers/virtual_fastrpc/dsp/adsprpc_rpmsg.c
+    fi
+}
+
+do_configure:prepend:quin-gvm-gen4-5() {
+    if ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '6.12', 'true', 'false', d)}; then
+        ln -sf ${BSPDIR}/vendor/qcom/opensource/dsp-kernel/dsp/adsprpc_compat.h ${BSPDIR}/vendor/qcom/opensource/platform-kernel/drivers/virtual_fastrpc/include/uapi/adsprpc_compat.h
+        ln -sf ${BSPDIR}/vendor/qcom/opensource/dsp-kernel/dsp/adsprpc_shared.h ${BSPDIR}/vendor/qcom/opensource/platform-kernel/drivers/virtual_fastrpc/include/uapi/adsprpc_shared.h
+        ln -sf ${BSPDIR}/vendor/qcom/opensource/dsp-kernel/dsp/fastrpc_trace.h ${BSPDIR}/vendor/qcom/opensource/platform-kernel/drivers/virtual_fastrpc/include/uapi/fastrpc_trace.h
+        ln -sf ${BSPDIR}/vendor/qcom/opensource/dsp-kernel/include/uapi/fastrpc_shared.h ${BSPDIR}/vendor/qcom/opensource/platform-kernel/drivers/virtual_fastrpc/include/uapi/fastrpc_shared.h
+        ln -sf ${BSPDIR}/vendor/qcom/opensource/dsp-kernel/dsp/adsprpc_compat.c ${BSPDIR}/vendor/qcom/opensource/platform-kernel/drivers/virtual_fastrpc/dsp/adsprpc_compat.c
+        ln -sf ${BSPDIR}/vendor/qcom/opensource/dsp-kernel/dsp/adsprpc_rpmsg.c ${BSPDIR}/vendor/qcom/opensource/platform-kernel/drivers/virtual_fastrpc/dsp/adsprpc_rpmsg.c
+    fi
+}
+
+do_configure:prepend:gvm-gen5() {
+    ln -sf ${BSPDIR}/vendor/qcom/opensource/dsp-kernel/include/uapi/misc/fastrpc.h ${BSPDIR}/vendor/qcom/opensource/platform-kernel/drivers/virtual_fastrpc/include/uapi/fastrpc.h
+}
+
 do_install:append:quin-gvm-lemans() {
     install -m 0755 ${S}/drivers/virtual_fastrpc/fastrpc_load.conf -D ${D}${sysconfdir}/modules-load.d/fastrpc_load.conf
 }
 
 do_install:append:quin-gvm-gen4-5() {
+    if ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '6.12', 'false', 'true', d)}; then
+        install -m 0755 ${S}/drivers/virtual_fastrpc/fastrpc_load.conf -D ${D}${sysconfdir}/modules-load.d/fastrpc_load.conf
+    fi
+}
+
+do_install:append:gvm-gen4-5() {
     if ${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '6.12', 'false', 'true', d)}; then
         install -m 0755 ${S}/drivers/virtual_fastrpc/fastrpc_load.conf -D ${D}${sysconfdir}/modules-load.d/fastrpc_load.conf
     fi
