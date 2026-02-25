@@ -15,6 +15,8 @@ meta-qti-bsp/meta-qti-base/recipes-graphics/wayland/weston_10.0.%.bbappend \
 
 # Missing recipes globally
 MISSING_RECIPE_SRCLIST += "\
+meta-qti-bsp/meta-qti-base/recipes-bsp/abctl/abctl_1.0.bb \
+meta-qti-bsp/meta-qti-base/recipes-bsp/libgpt/libgpt_1.0.bb \
 meta-qti-bsp/meta-qti-extra/recipes-test/virt-spmi-ut/virt-spmi-ut.bb \
 meta-qti-bsp/meta-qti-extra/recipes-test/virt-reg-ut/virt-reg-ut.bb \
 meta-qti-bsp/meta-qti-extra/recipes-test/virtio-i2c-test/virtio-i2c-test.bb \
