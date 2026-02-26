@@ -6,6 +6,8 @@ inherit qimage populate_sdk_qti
 
 IMAGE_FEATURES += "ssh-server-openssh"
 
+CORE_IMAGE_EXTRA_INSTALL:append = " ${@'gcc-sanitizers compiler-rt-sanitizers' if d.getVar('QTI_SANITIZER') else ''}"
+
 CORE_IMAGE_EXTRA_INSTALL += "\
         glib-2.0 \
         kernel-modules \

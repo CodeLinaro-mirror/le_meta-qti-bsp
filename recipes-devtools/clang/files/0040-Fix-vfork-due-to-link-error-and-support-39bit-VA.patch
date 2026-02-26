@@ -1,0 +1,94 @@
+This patch file is from Qualcomm Technologies, Inc. and is provided under the following license:
+
+Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries. 
+SPDX-License-Identifier: BSD-3-Clause-Clear
+
+From edb800263572e30d9dbef6bed25f8e9d89447805 Mon Sep 17 00:00:00 2001
+From: Qilong Wang <qilowang@qti.qualcomm.com>
+Date: Wed, 29 Oct 2025 16:00:42 +0800
+Subject: [PATCH] Fix vfork due to link error and support 39bit VA for LE
+
+Signed-off-by: Qilong Wang <qilowang@qti.qualcomm.com>
+---
+ compiler-rt/lib/asan/CMakeLists.txt       | 10 +++++-----
+ compiler-rt/lib/asan/asan_allocator.h     |  8 ++++----
+ compiler-rt/lib/asan/asan_interceptors.h  |  2 +-
+ compiler-rt/lib/hwasan/hwasan_allocator.h |  2 +-
+ 4 files changed, 11 insertions(+), 11 deletions(-)
+
+diff --git a/compiler-rt/lib/asan/CMakeLists.txt b/compiler-rt/lib/asan/CMakeLists.txt
+index f83ae82d4..e6e12403a 100644
+--- a/compiler-rt/lib/asan/CMakeLists.txt
++++ b/compiler-rt/lib/asan/CMakeLists.txt
+@@ -32,11 +32,11 @@ set(ASAN_SOURCES
+   asan_win.cpp
+   )
+ 
+-if (NOT WIN32 AND NOT APPLE)
+-  list(APPEND ASAN_SOURCES
+-    asan_interceptors_vfork.S
+-    )
+-endif()
++#if (NOT WIN32 AND NOT APPLE)
++#  list(APPEND ASAN_SOURCES
++#    asan_interceptors_vfork.S
++#    )
++#endif()
+ 
+ set(ASAN_CXX_SOURCES
+   asan_new_delete.cpp
+diff --git a/compiler-rt/lib/asan/asan_allocator.h b/compiler-rt/lib/asan/asan_allocator.h
+index c3c4fae85..fc227229a 100644
+--- a/compiler-rt/lib/asan/asan_allocator.h
++++ b/compiler-rt/lib/asan/asan_allocator.h
+@@ -192,7 +192,7 @@ typedef DefaultSizeClassMap SizeClassMap;
+ const uptr kAllocatorSpace = ~(uptr)0;
+ const uptr kAllocatorSize  =  0x20000000000ULL;  // 2T.
+ typedef DefaultSizeClassMap SizeClassMap;
+-#  elif defined(__aarch64__) && SANITIZER_ANDROID
++#  elif defined(__aarch64__)
+ // Android needs to support 39, 42 and 48 bit VMA.
+ const uptr kAllocatorSpace =  ~(uptr)0;
+ const uptr kAllocatorSize  =  0x2000000000ULL;  // 128G.
+@@ -214,9 +214,9 @@ const uptr kAllocatorSpace = 0x600000000000ULL;
+ const uptr kAllocatorSize  =  0x40000000000ULL;  // 4T.
+ typedef DefaultSizeClassMap SizeClassMap;
+ #  else
+-const uptr kAllocatorSpace = 0x500000000000ULL;
+-const uptr kAllocatorSize = 0x40000000000ULL;  // 4T.
+-typedef DefaultSizeClassMap SizeClassMap;
++const uptr kAllocatorSpace =  ~(uptr)0;
++const uptr kAllocatorSize  =  0x2000000000ULL;  // 128G.
++typedef VeryCompactSizeClassMap SizeClassMap;
+ #  endif
+ template <typename AddressSpaceViewTy>
+ struct AP64 {  // Allocator64 parameters. Deliberately using a short name.
+diff --git a/compiler-rt/lib/asan/asan_interceptors.h b/compiler-rt/lib/asan/asan_interceptors.h
+index 826b45f5a..0b51606b5 100644
+--- a/compiler-rt/lib/asan/asan_interceptors.h
++++ b/compiler-rt/lib/asan/asan_interceptors.h
+@@ -113,7 +113,7 @@ void InitializePlatformInterceptors();
+ #if SANITIZER_LINUX &&                                                \
+     (defined(__arm__) || defined(__aarch64__) || defined(__i386__) || \
+      defined(__x86_64__) || SANITIZER_RISCV64 || SANITIZER_LOONGARCH64)
+-# define ASAN_INTERCEPT_VFORK 1
++# define ASAN_INTERCEPT_VFORK 0
+ #else
+ # define ASAN_INTERCEPT_VFORK 0
+ #endif
+diff --git a/compiler-rt/lib/hwasan/hwasan_allocator.h b/compiler-rt/lib/hwasan/hwasan_allocator.h
+index 2ada2a0b1..c7d2e4984 100644
+--- a/compiler-rt/lib/hwasan/hwasan_allocator.h
++++ b/compiler-rt/lib/hwasan/hwasan_allocator.h
+@@ -75,7 +75,7 @@ struct AP64 {
+   static const uptr kSpaceSize = 1ULL << kAddressTagShift;
+   typedef __sanitizer::DefaultSizeClassMap SizeClassMap;
+ #elif SANITIZER_LINUX && !SANITIZER_ANDROID
+-  static const uptr kSpaceSize = 0x40000000000ULL;  // 4T.
++  static const uptr kSpaceSize = 0x2000000000ULL;  // 128G.
+   typedef __sanitizer::DefaultSizeClassMap SizeClassMap;
+ #else
+   static const uptr kSpaceSize = 0x2000000000ULL;  // 128G.
+-- 
+2.34.1
+
