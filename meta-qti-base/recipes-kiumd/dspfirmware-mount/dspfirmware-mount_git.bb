@@ -125,6 +125,15 @@ do_install:append:sa8775-flex() {
     fi
 }
 
+PACKAGES =+ "${PN}-lvgvm"
+
+FILES:${PN}-lvgvm += "\
+    ${systemd_system_unitdir}/firmware-vm-boot-autoghgvmlv.automount \
+    ${systemd_system_unitdir}/firmware-vm-boot-autoghgvmlv.mount \
+    ${systemd_system_unitdir}/multi-user.target.wants/firmware-vm-boot-autoghgvmlv.automount \
+    ${systemd_system_unitdir}/multi-user.target.wants/firmware-vm-boot-autoghgvmlv.mount \
+"
+
 FILES:${PN} += "${systemd_unitdir}/*"
 FILES:${PN} += "${sysconfdir}/*"
 FILES:${PN} += "${libdir}/modules-load.d/*"

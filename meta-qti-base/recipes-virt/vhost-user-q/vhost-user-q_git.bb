@@ -35,19 +35,15 @@ SYSTEMD_SERVICE:${PN} = "\
     ${LA_BASIC_SERVICES_LIST} \
 "
 
-SYSTEMD_SERVICE:${PN}:append:sa7255-ivi = "\
+SYSTEMD_SERVICE:${PN}-lvgvm:append:sa7255-ivi = "\
     ${LV_SERVICES_LIST} \
 "
 
-SYSTEMD_SERVICE:${PN}:append:sa8255-ivi = "\
-    ${LA_EXTRA_SERVICES_LIST} \
-    ${LV_SERVICES_LIST} \
-"
+SYSTEMD_SERVICE:${PN}:append:sa8255-ivi = " ${LA_EXTRA_SERVICES_LIST}"
+SYSTEMD_SERVICE:${PN}-lvgvm:append:sa8255-ivi = " ${LV_SERVICES_LIST}"
 
-SYSTEMD_SERVICE:${PN}:append:sa8775-flex = "\
-    ${LA_EXTRA_SERVICES_LIST} \
-    ${LV_SERVICES_LIST} \
-"
+SYSTEMD_SERVICE:${PN}:append:sa8775-flex = " ${LA_EXTRA_SERVICES_LIST}"
+SYSTEMD_SERVICE:${PN}-lvgvm:append:sa8775-flex = " ${LV_SERVICES_LIST}"
 
 DEPENDS += "virtual/kernel-headers"
 DEPENDS += "${@bb.utils.contains("MACHINE_FEATURES", "qti-umd", "msmhab", "", d)}"
@@ -100,3 +96,8 @@ do_install:append:sa8775-flex() {
         install -m 0644 ${S}/${service} -D ${D}${systemd_unitdir}/system/
     done
 }
+
+PACKAGES =+ "${PN}-lvgvm"
+SYSTEMD_PACKAGES = "${PN} ${PN}-lvgvm"
+
+FILES:${PN}-lvgvm += "${systemd_system_unitdir}/vhost-user-*vm3.service"

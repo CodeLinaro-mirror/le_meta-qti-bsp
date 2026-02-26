@@ -8,8 +8,8 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/BSD-3-Clause-C
                     file://${COREBASE}/meta/files/common-licenses/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 
 SYSTEMD_SERVICE:${PN} = "qcrosvm.service"
-SYSTEMD_SERVICE:${PN}:append:sa7255-ivi = " qcrosvm_lv.service"
-SYSTEMD_SERVICE:${PN}:append:sa8255-ivi = " qcrosvm_lv.service"
+SYSTEMD_SERVICE:${PN}-lvgvm:append:sa7255-ivi = " qcrosvm_lv.service"
+SYSTEMD_SERVICE:${PN}-lvgvm:append:sa8255-ivi = " qcrosvm_lv.service"
 
 DEPENDS += "cargo-native libcap rust-native rust-llvm-native pkgconfig-native"
 
@@ -29,6 +29,11 @@ S = "${WORKDIR}/vendor/qcom/opensource/crosvm-gunyah"
 inherit cargo systemd cargo-update-recipe-crates
 
 require ${BPN}-crates.inc
+
+PACKAGES =+ "${PN}-lvgvm"
+SYSTEMD_PACKAGES = "${PN} ${PN}-lvgvm"
+
+FILES:${PN}-lvgvm += "${systemd_system_unitdir}/qcrosvm_lv.service"
 
 CFLAGS:append = " -Wno-error=stringop-overflow="
 
