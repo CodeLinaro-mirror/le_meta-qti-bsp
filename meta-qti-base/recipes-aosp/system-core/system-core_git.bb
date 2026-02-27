@@ -20,7 +20,9 @@ inherit autotools pkgconfig systemd useradd
 COMPOSITION = "901D"
 
 SYSTEMD_PACKAGES = "${PN}-dlkm"
+SYSTEMD_PACKAGES += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-gvm', '${PN}-mount-ab', '', d)}"
 SYSTEMD_SERVICE:${PN}-dlkm = "dlkm.service"
+SYSTEMD_SERVICE:${PN}-mount-ab = "mount_ab.service"
 
 USERADD_PACKAGES = "${PN}-leprop"
 
@@ -74,12 +76,18 @@ do_install:append() {
         install -m 0644 ${S}/rootdir/etc/init_post_boot.service -D ${D}${systemd_unitdir}/system/init_post_boot.service
 
         install -m 0644 ${S}/rootdir/etc/init_early_boot.service -D ${D}${systemd_unitdir}/system/init_early_boot.service
+
         ln -sf ${systemd_unitdir}/system/init_early_boot.service \
             ${D}${systemd_unitdir}/system/sysinit.target.wants/init_early_boot.service
 
         install -m 0644 ${S}/leproperties/leprop.service -D ${D}${systemd_unitdir}/system/leprop.service
         ln -sf ${systemd_unitdir}/system/leprop.service \
             ${D}${systemd_unitdir}/system/multi-user.target.wants/leprop.service
+
+        if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-gvm', 'true', 'false', d)}; then
+            install -m 0750 ${S}/rootdir/etc/mount_ab.sh -D ${D}${sysconfdir}/initscripts/mount_ab
+            install -m 0644 ${S}/rootdir/etc/mount_ab.service -D ${D}${systemd_unitdir}/system/mount_ab.service
+        fi
 
         # update usb.service to depend on var-volatile.mount
         sed -i -e '/^After/d' ${D}${systemd_unitdir}/system/usb.service
@@ -106,6 +114,7 @@ do_install:append() {
 }
 
 PACKAGES =+ "${PN}-usb ${PN}-dlkm ${PN}-post-boot ${PN}-early-boot ${PN}-leprop"
+PACKAGES =+ "${@bb.utils.contains('MACHINE_FEATURES', 'qti-gvm', '${PN}-mount-ab', '', d)}"
 
 SYSTEMD_SERVICE:${PN}-post-boot = "init_post_boot.service"
 SYSTEMD_AUTO_ENABLE:${PN}-post-boot = "disable"
@@ -138,6 +147,11 @@ FILES:${PN}-early-boot += "\
     ${systemd_unitdir}/system/init_early_boot.service \
     ${systemd_unitdir}/system/sysinit.target.wants/init_early_boot.service \
     ${sysconfdir}/initscripts/init_early_boot \
+"
+
+FILES:${PN}-mount-ab += "\
+    ${systemd_unitdir}/system/mount_ab.service \
+    ${sysconfdir}/initscripts/mount_ab \
 "
 
 FILES:${PN}-leprop += "\

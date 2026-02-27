@@ -28,5 +28,6 @@ RDEPENDS:${PN} += "\
     ${@bb.utils.contains("DISTRO_FEATURES", "early_init", "early-init", "" ,d)} \
     ${@bb.utils.contains("COMBINED_FEATURES", "hibernation", "hibernation", "" ,d)} \
     ${@bb.utils.contains("MACHINE_FEATURES", "qti-dlkm", "system-core-dlkm", "", d)} \
+    ${@bb.utils.contains("MACHINE_FEATURES", "qti-gvm", "system-core-mount-ab", "", d)} \
     "
 RDEPENDS:${PN}:append:monaco = " reboot-daemon"
