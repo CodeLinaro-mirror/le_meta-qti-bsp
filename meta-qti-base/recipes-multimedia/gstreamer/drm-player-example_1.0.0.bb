@@ -9,6 +9,7 @@ DEPENDS += "\
     glib-2.0 \
     gstreamer1.0 \
     gstreamer1.0-plugins-base \
+    libutils \
     libxml2 \
     curl \
     media-plugin-headers \
