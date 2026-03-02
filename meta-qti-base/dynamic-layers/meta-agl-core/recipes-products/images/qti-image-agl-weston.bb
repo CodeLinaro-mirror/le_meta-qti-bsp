@@ -35,7 +35,8 @@ IMAGE_INSTALL += "\
     "
 
 # default value for rootfs size
-IMAGE_ROOTFS_SIZE = "1572864"
+# IMAGE_ROOTFS_SIZE = "1572864"
+IMAGE_ROOTFS_SIZE = "2097152"
 
 #
 # Add hook to honor debug-tweaks/empty-root-password, since otherwise
@@ -75,6 +76,8 @@ IMAGE_INSTALL += "\
 
 # Add the libgomp support.
 IMAGE_INSTALL += "libgomp"
+
+IMAGE_INSTALL += "container-image-carrier"
 
 #add lxc
 IMAGE_INSTALL += "${@bb.utils.contains('COMBINED_FEATURES', 'qti-lxc', 'packagegroup-qti-lxc', '', d)}"
