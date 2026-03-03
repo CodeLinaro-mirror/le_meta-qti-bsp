@@ -23,10 +23,16 @@ IMAGE_INSTALL = "\
         systemd \
         busybox \
         weston-examples \
+        wayland-ivi-extension \
         alsa-lib \
         alsa-utils \
+        packagegroup-qti-audio \
         packagegroup-qti-multimedia \
+        libselinux \
+        libselinux-bin \
+        libxkbcommon \
+        xkeyboard-config \
+        refpolicy-mcs \
 "
 
 IMAGE_FSTYPES = "ext4"
-
