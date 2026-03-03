@@ -22,6 +22,7 @@ gvm_pilsplitter() {
         exit 1
     else
         ${STAGING_BINDIR_NATIVE}/build/prebuilts/kernel-build-tools/linux-x86/bin/mkdtimg create ${DEPLOY_DIR_IMAGE}/dtbs/dtb.img \
+            ${DEPLOY_DIR_IMAGE}/dtbs/monaco-gh-vm-lv-qam-ridesx.dtb \
             ${DEPLOY_DIR_IMAGE}/dtbs/lemans-gh-vm-lv-qam-ridesx.dtb \
             ${DEPLOY_DIR_IMAGE}/dtbs/sa8797p-gunyah-vm-qam.dtb
     fi
