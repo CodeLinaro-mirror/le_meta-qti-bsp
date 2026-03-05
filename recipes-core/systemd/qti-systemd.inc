@@ -131,6 +131,34 @@ do_install:append () {
    sed -i '/Before/s/$/ local-fs-pre.target/' ${D}${systemd_unitdir}/system/systemd-fsck@.service
 }
 
+do_install:append:canoe () {
+   if ${@bb.utils.contains("DISTRO_FEATURES", "lxc", "true", "false", d)}; then
+        install -d ${D}${sysconfdir}/systemd/system
+        ln -sf /dev/null ${D}${sysconfdir}/systemd/system/data.mount
+        ln -sf /dev/null ${D}${sysconfdir}/systemd/system/etc.mount
+        ln -sf /dev/null ${D}${sysconfdir}/systemd/system/cache.mount
+        ln -sf /dev/null ${D}${sysconfdir}/systemd/system/overlay.mount
+        ln -sf /dev/null ${D}${sysconfdir}/systemd/system/persist.mount
+        ln -sf /dev/null ${D}${sysconfdir}/systemd/system/diag-reboot-app.service
+        ln -sf /dev/null ${D}${sysconfdir}/systemd/system/pulseaudio.service
+        ln -sf /dev/null ${D}${sysconfdir}/systemd/system/rmt_storage.service
+        ln -sf /dev/null ${D}${sysconfdir}/systemd/system/thermal-engine.service
+        ln -sf /dev/null ${D}${sysconfdir}/systemd/system/time_serviced.service
+        ln -sf /dev/null ${D}${sysconfdir}/systemd/system/var-volatile.mount
+        ln -sf /dev/null ${D}${sysconfdir}/systemd/system/sys-kernel-debug.mount
+        ln -sf /dev/null ${D}${sysconfdir}/systemd/system/init_post_boot.service
+        ln -sf /dev/null ${D}${sysconfdir}/systemd/system/overlay-workdir.service
+        ln -sf /dev/null ${D}${sysconfdir}/systemd/system/ab-updater.service
+        ln -sf /dev/null ${D}${sysconfdir}/systemd/system/modprobe@.service
+        ln -sf /dev/null ${D}${sysconfdir}/systemd/system/systemd-logind.service
+        ln -sf /dev/null ${D}${sysconfdir}/systemd/system/touch.service
+        ln -sf /dev/null ${D}${sysconfdir}/systemd/system/systemd-tmpfiles-setup-dev.service
+        ln -sf /dev/null ${D}${sysconfdir}/systemd/system/systemd-tmpfiles-setup.service
+        ln -sf /dev/null ${D}${sysconfdir}/systemd/system/systemd-tmpfiles-clean.service
+        ln -sf /dev/null ${D}${sysconfdir}/systemd/system/systemd-journald-audit.socket
+    fi
+}
+
 RRECOMMENDS:${PN}:remove = "systemd-extra-utils"
 
 FILES:${PN} += "/etc/initscripts \
