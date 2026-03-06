@@ -91,6 +91,12 @@ do_prebuilt_shared_workdir() {
     if [ -e "${B}/scripts/module.lds" ]; then
         install -m 0644 ${B}/scripts/module.lds ${STAGING_KERNEL_BUILDDIR}/scripts/module.lds
     fi
+
+    if [ -e "${KERNEL_PREBUILT_PATH}/host/unifdef" ]; then
+        cp -rp ${KERNEL_PREBUILT_PATH}/host/unifdef $kerneldir/scripts/
+        cp -rp ${KERNEL_PLATFORM_PATH}/soc-repo/scripts/headers_install.sh $kerneldir/
+        sed -i 's|scripts/unifdef|${STAGING_KERNEL_BUILDDIR}/scripts/unifdef|g' ${STAGING_KERNEL_BUILDDIR}/headers_install.sh
+    fi
 }
 
 do_prebuilt_install[dirs] = "${B}"
