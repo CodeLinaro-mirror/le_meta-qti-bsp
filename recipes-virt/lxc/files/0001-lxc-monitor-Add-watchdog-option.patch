@@ -1,0 +1,288 @@
+From 91be634015b50ce01db1595e5836a78859428a2b Mon Sep 17 00:00:00 2001
+From: huayzhon <huayzhon@qti.qualcomm.com>
+Date: Tue, 10 Mar 2026 16:28:34 +0800
+Subject: [PATCH] lxc-monitor: Add watchdog option
+
+This patch adds watchdog functionality to lxc-monitor,
+allowing it to automatically restart containers when they stop.
+
+Signed-off-by: huayzhon <huayzhon@qti.qualcomm.com>
+---
+ src/lxc/tools/lxc_monitor.c | 192 ++++++++++++++++++++++++++++++++++--
+ 1 file changed, 184 insertions(+), 8 deletions(-)
+
+diff --git a/src/lxc/tools/lxc_monitor.c b/src/lxc/tools/lxc_monitor.c
+index 6065f2683..dd49c6856 100644
+--- a/src/lxc/tools/lxc_monitor.c
++++ b/src/lxc/tools/lxc_monitor.c
+@@ -32,8 +32,18 @@
+ #include "utils.h"
+ 
+ #define LXC_MONITORD_PATH LIBEXECDIR "/lxc/lxc-monitord"
++#define LXC_MONITORD_PATH_HLOS "/vendor_early_services/vendor/vm-system/" LIBEXECDIR "/lxc/lxc-monitord"
+ 
+ static bool quit_monitord;
++static bool watchdog_mode;
++
++static volatile sig_atomic_t quit_watchdog;
++
++static void watchdog_sig_handler(int sig)
++{
++	(void)sig;
++	quit_watchdog = 1;
++}
+ 
+ lxc_log_define(lxc_monitor, lxc);
+ 
+@@ -43,6 +53,9 @@ static int my_parser(struct lxc_arguments *args, int c, char *arg)
+ 	case 'Q':
+ 		quit_monitord = true;
+ 		break;
++	case 'W':
++		watchdog_mode = true;
++		break;
+ 	}
+ 
+ 	return 0;
+@@ -50,6 +63,7 @@ static int my_parser(struct lxc_arguments *args, int c, char *arg)
+ 
+ static const struct option my_longopts[] = {
+ 	{"quit", no_argument, 0, 'Q'},
++	{"watchdog", no_argument, 0, 'W'},
+ 	LXC_COMMON_OPTIONS
+ };
+ 
+@@ -63,7 +77,8 @@ lxc-monitor monitors the state of the NAME container\n\
+ Options :\n\
+   -n, --name=NAME   NAME of the container\n\
+                     NAME may be a regular expression\n\
+-  -Q, --quit        tell lxc-monitord to quit\n",
++  -Q, --quit        tell lxc-monitord to quit\n\
++  -W, --watchdog       restart container when it stops (daemonize)\n",
+ 	.name     = ".*",
+ 	.options  = my_longopts,
+ 	.parser   = my_parser,
+@@ -146,6 +161,13 @@ static int lxc_tool_monitord_spawn(const char *lxcpath)
+ 		NULL,
+ 	};
+ 
++	char *const args_hlos[] = {
++		LXC_MONITORD_PATH_HLOS,
++		(char *)lxcpath,
++		pipefd_str,
++		NULL,
++	};
++
+ 	/* double fork to avoid zombies when monitord exits */
+ 	pid1 = fork();
+ 	if (pid1 < 0) {
+@@ -210,6 +232,7 @@ static int lxc_tool_monitord_spawn(const char *lxcpath)
+ 		_exit(EXIT_FAILURE);
+ 	}
+ 
++	execvp(args_hlos[0], args_hlos);
+ 	execvp(args[0], args);
+ 	SYSERROR("Failed to exec lxc-monitord");
+ 
+@@ -243,6 +266,7 @@ int main(int argc, char *argv[])
+ 		if (lxc_log_init(&log))
+ 			exit(rc_main);
+ 	}
++	DEBUG("Starting lxc-monitor with watchdog_mode %u", watchdog_mode);
+ 
+ 	if (quit_monitord) {
+ 		int ret = EXIT_SUCCESS;
+@@ -299,7 +323,9 @@ int main(int argc, char *argv[])
+ 	for (i = 0; (unsigned long)i < nfds; i++) {
+ 		int fd;
+ 
+-		lxc_tool_monitord_spawn(my_args.lxcpath[i]);
++		if (lxc_tool_monitord_spawn(my_args.lxcpath[i]) < 0)
++			ERROR("Failed to spawn monitord on path: %s",
++			      my_args.lxcpath[i]);
+ 
+ 		fd = lxc_monitor_open(my_args.lxcpath[i]);
+ 		if (fd < 0) {
+@@ -312,10 +338,107 @@ int main(int argc, char *argv[])
+ 		fds[i].revents = 0;
+ 	}
+ 
+-	setlinebuf(stdout);
++	/* In watchdog mode, daemonize and register signal handlers. */
++	if (watchdog_mode) {
++		pid_t pid1, pid2;
++		int   fd;
++		struct sigaction sa;
++
++		/* First fork: parent exits so the shell prompt returns. */
++		pid1 = fork();
++		if (pid1 < 0) {
++			SYSERROR("Failed to fork");
++			goto close_and_clean;
++		}
++		if (pid1 > 0)
++			exit(EXIT_SUCCESS);
++
++		/* Create a new session to detach from the controlling terminal. */
++		if (setsid() < 0) {
++			SYSERROR("Failed to setsid");
++			goto close_and_clean;
++		}
++
++		/* Second fork: drop Session Leader status so the process
++		 * can never reacquire a controlling terminal.            */
++		pid2 = fork();
++		if (pid2 < 0) {
++			SYSERROR("Failed to fork");
++			goto close_and_clean;
++		}
++		if (pid2 > 0)
++			exit(EXIT_SUCCESS);
++
++		(void)chdir("/");
++
++		/* stdout/stderr are owned by the lxc log system.
++		 * Only redirect stdin to /dev/null.             */
++		fd = open("/dev/null", O_RDONLY);
++		if (fd >= 0) {
++			dup2(fd, STDIN_FILENO);
++			if (fd > STDIN_FILENO)
++				close(fd);
++		}
++
++		/* SIGTERM/SIGINT set the quit flag; the 1-second poll
++		 * timeout detects it and breaks out of the loop.     */
++		sigemptyset(&sa.sa_mask);
++		sa.sa_flags   = 0;
++		sa.sa_handler = watchdog_sig_handler;
++		sigaction(SIGTERM, &sa, NULL);
++		sigaction(SIGINT,  &sa, NULL);
++
++		INFO("watchdog daemonized for '%s'", my_args.name);
++	} else {
++		setlinebuf(stdout);
++	}
+ 
+ 	for (;;) {
+-		if (lxc_monitor_read_fdset(fds, nfds, &msg, -1) < 0)
++		int ret;
++
++		if (watchdog_mode) {
++			/* 1-second timeout so SIGTERM/SIGINT can be handled promptly. */
++			ret = lxc_monitor_read_fdset(fds, nfds, &msg, 1);
++			if (quit_watchdog) {
++				INFO("watchdog exiting on signal");
++				goto close_and_clean;
++			}
++			if (ret == -2)  /* timed out, loop back to check quit_watchdog */
++				continue;
++			if (ret < 0) {
++				/* monitord died: close the stale fds, try to
++				 * respawn monitord and reconnect.  Give up and
++				 * exit only if respawn fails.               */
++				WARN("monitord disconnected, attempting to respawn...");
++				close_fds(fds, nfds);
++
++				for (i = 0; (unsigned long)i < nfds; i++) {
++					int fd;
++
++					if (lxc_tool_monitord_spawn(my_args.lxcpath[i]) < 0)
++						ERROR("Failed to spawn monitord on path: %s",
++						      my_args.lxcpath[i]);
++
++					fd = lxc_monitor_open(my_args.lxcpath[i]);
++					if (fd < 0) {
++						ERROR("Failed to reconnect to monitord on path: %s",
++						      my_args.lxcpath[i]);
++						goto close_and_clean;
++					}
++
++					fds[i].fd      = fd;
++					fds[i].events  = POLLIN;
++					fds[i].revents = 0;
++				}
++
++				INFO("reconnected to monitord");
++				continue;
++			}
++		} else {
++			ret = lxc_monitor_read_fdset(fds, nfds, &msg, -1);
++		}
++
++		if (ret < 0)
+ 			goto close_and_clean;
+ 
+ 		msg.name[sizeof(msg.name)-1] = '\0';
+@@ -324,12 +447,65 @@ int main(int argc, char *argv[])
+ 
+ 		switch (msg.type) {
+ 		case lxc_msg_state:
+-			printf("'%s' changed state to [%s]\n",
+-			       msg.name, lxc_state2str(msg.value));
++			if (watchdog_mode)
++				INFO("'%s' changed state to [%s]",
++				     msg.name, lxc_state2str(msg.value));
++			else
++				printf("'%s' changed state to [%s]\n",
++				       msg.name, lxc_state2str(msg.value));
++
++			/* Watchdog mode: restart the container when it stops. */
++			if (watchdog_mode && msg.value == STOPPED) {
++				struct lxc_container *c;
++				int try, max_tries = 8;
++
++				INFO("'%s' stopped, restarting...", msg.name);
++
++				for (try = 0; try < max_tries; try++) {
++					if (try > 0) {
++						INFO("'%s' restart attempt %d/%d after %us",
++						     msg.name, try + 1, max_tries,
++						     1 << (try - 1));
++						poll(NULL, 0, (int)((1 << (try - 1)) * 1000));
++					}
++
++					c = lxc_container_new(msg.name, my_args.lxcpath[0]);
++					if (!c) {
++						ERROR("Failed to create container handle for '%s'",
++						      msg.name);
++						continue;
++					}
++
++					/* Confirm the container is not already running to avoid a race. */
++					if (c->is_running(c)) {
++						INFO("'%s' is already running", msg.name);
++						lxc_container_put(c);
++						break;
++					}
++
++					if (c->start(c, 0, NULL)) {
++						INFO("'%s' restarted successfully", msg.name);
++						lxc_container_put(c);
++						break;
++					}
++
++					ERROR("Failed to restart '%s': %s",
++					      msg.name, c->error_string);
++					lxc_container_put(c);
++				}
++
++				if (try == max_tries)
++					ERROR("'%s' failed to restart after %d attempts, giving up",
++					      msg.name, max_tries);
++			}
+ 			break;
+ 		case lxc_msg_exit_code:
+-			printf("'%s' exited with status [%d]\n",
+-			       msg.name, WEXITSTATUS(msg.value));
++			if (watchdog_mode)
++				INFO("'%s' exited with status [%d]",
++				     msg.name, WEXITSTATUS(msg.value));
++			else
++				printf("'%s' exited with status [%d]\n",
++				       msg.name, WEXITSTATUS(msg.value));
+ 			break;
+ 		default:
+ 			/* ignore garbage */
+-- 
+2.34.1
+
