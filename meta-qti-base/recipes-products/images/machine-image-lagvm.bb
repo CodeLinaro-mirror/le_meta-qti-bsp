@@ -19,8 +19,28 @@ add_extra_modules() {
     awk -F / '{print $NF > "modules.load"}' modules.order
 }
 
+modify_vm_config() {
+    if [ -f ${IMAGE_ROOTFS}/etc/vm_config.xml ]; then
+        sed -i '/<vm>/,/<\/vm>/ {
+            /<vm>/ {
+                x
+                s/^/x/
+                /^xx$/ {
+                    :a
+                    N
+                    /<\/vm>/!ba
+                    d
+                }
+                x
+            }
+        }' ${IMAGE_ROOTFS}/etc/vm_config.xml
+        sed -i 's/NUM_VMS="2"/NUM_VMS="1"/' ${IMAGE_ROOTFS}/etc/vm_config.xml
+    fi
+}
+
 ROOTFS_POSTPROCESS_COMMAND:append = " add_extra_modules;"
 ROOTFS_POSTPROCESS_COMMAND:remove:sa8797 = "add_extra_modules;"
+ROOTFS_POSTPROCESS_COMMAND:append = " modify_vm_config;"
 
 # Makes image suitable for development (e.g. enable ssh for login, allows root logins and logins without passwords by ssh)
 IMAGE_FEATURES:append = " ${@bb.utils.contains('VARIANT', 'debug', 'debug-tweaks ssh-server-openssh', '', d)}"

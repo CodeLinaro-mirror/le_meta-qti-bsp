@@ -12,5 +12,7 @@ IMAGE_INSTALL:append = " \
     dspfirmware-mount-lvgvm \
 "
 
+ROOTFS_POSTPROCESS_COMMAND:remove = "modify_vm_config;"
+
 BOOTIMAGE_TARGET = "${PRODUCT}-boot.img"
 VBMETAIMAGE_TARGET = "${PRODUCT}-vbmeta.img"
