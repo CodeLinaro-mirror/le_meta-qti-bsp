@@ -62,6 +62,8 @@ do_merge_dtb() {
         done
 
         merge_ddr_dtbos_single ${INTERMEDIATE_OUT} ${DDR_DTBO_DIR} ${OVERLAYED_OOT_DTBS_OUT}
+    else
+        install -m 0644  ${INTERMEDIATE_OUT}/* ${OVERLAYED_OOT_DTBS_OUT}
     fi
 
     # Merge base OOT DTBs,
