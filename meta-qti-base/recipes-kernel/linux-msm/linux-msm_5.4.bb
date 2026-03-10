@@ -28,6 +28,7 @@ SRC_URI = "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'early_init', ' file://earlyuserspace.cfg', '', d)} \
     file://lxc.cfg \
     file://ipc.cfg \
+    file://i2c-stub.cfg \
 "
 SRCREV = "${AUTOREV}"
 SRCREV_FORMAT = "kernel_data_display_ais_video"
