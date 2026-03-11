@@ -1,3 +1,5 @@
+inherit qimage-utils
+
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 SRC_URI:append = " file://media-card.mount"
@@ -8,6 +10,26 @@ SRC_URI:append = " file://dash.mount"
 
 SRC_URI:append:batcam = " file://pre_hibernate.sh"
 SRC_URI:append:batcam = " file://post_hibernate.sh"
+
+SRC_URI:append:vienna = " \
+    file://factory_reset.service \
+    file://factory_reset.sh \
+"
+USERDATA_IMAGE_SIZE = "${@get_size_in_bytes(d.getVar('USERDATA_SIZE') or '1GB')}"
+
+do_install:append:vienna() {
+    install -d ${D}${sysconfdir}/initscripts
+    install -m 0755 ${WORKDIR}/factory_reset.sh ${D}/${sysconfdir}/initscripts/
+
+    sed -i "s|__USERDATA_IMAGE_SIZE__|${USERDATA_IMAGE_SIZE}|g" ${D}${sysconfdir}/initscripts/factory_reset.sh
+
+    install -d ${D}${systemd_unitdir}/system
+    install -m 0644 ${WORKDIR}/factory_reset.service ${D}${systemd_unitdir}/system/
+
+    install -d ${D}${systemd_unitdir}/system/local-fs.target.wants
+    ln -sf ../factory_reset.service \
+        ${D}${systemd_unitdir}/system/local-fs.target.wants/factory_reset.service
+}
 
 # Various mount related files assume selinux support by default.
 # Explicitly remove sepolicy entries when selinux is not present.
