@@ -14,17 +14,15 @@ PACKAGE_INSTALL = "\
     ext4-utils \
     ${@d.getVar('kern_mods')} \
     fsmgr \
-    first-stage-scripts-init \
+    early-ramdisk-init \
     gki-kernel-modules-linkmodulesload \
     glib-2.0 \
     glibc \
-    initrd-release \
     libbase \
     libcutils \
     libgcc \
     liblog \
     logwrapper \
-    packagegroup-core-boot \
     udev \
     ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'libselinux libpcre', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains('MACHINE_FEATURES', 'dm-verity-initramfs-v3', 'cryptsetup verity-scripts lvm2-udevrules', '', d), '', d)} \
@@ -36,7 +34,6 @@ IMAGE_FEATURES = ""
 IMAGE_LINGUAS = ""
 
 # Set default target to initrd.target
-SYSTEMD_DEFAULT_TARGET = "initrd.target"
 
 inherit core-image
 
@@ -57,3 +54,11 @@ PACKAGE_INSTALL:remove:pineapple = "\
     usb-composition-usbd \
     first-stage-scripts-init \
 "
+
+create_init_symlink() {
+    rm -rf ${IMAGE_ROOTFS}/init
+    rm -rf ${IMAGE_ROOTFS}/sbin/init
+
+    ln -sf ./usr/sbin/early-ramdisk-init ${IMAGE_ROOTFS}/init
+}
+ROOTFS_POSTPROCESS_COMMAND += "create_init_symlink; "
