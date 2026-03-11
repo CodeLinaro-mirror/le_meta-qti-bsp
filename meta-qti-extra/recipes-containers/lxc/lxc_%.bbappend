@@ -22,6 +22,7 @@ SRC_URI_append = "git://github.com/lxc/lxc.git;branch=stable-6.0;protocol=https 
 		file://dnsmasq.conf \
 		file://lxc-net \
 		file://0001-Skip-seccomp-config-while-lxc-doesn-t-enable-seccomp.patch \
+                file://0001-lxc-lxc-is-started-after-the-user-service.patch \
     "
 
 DEPENDS_remove = "meson-native"

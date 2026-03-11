@@ -1,0 +1,29 @@
+From f243099b7931a5b4a4d08ef9d3a7581821fd47d4 Mon Sep 17 00:00:00 2001
+From: Feng Chen <fch@qti.qualcomm.com>
+Date: Thu, 12 Mar 2026 09:47:18 +0800
+Subject: [PATCH] lxc: lxc is started after the user service
+
+container needs to use the user/0 communication device
+
+Signed-off-by: Feng Chen <fch@qti.qualcomm.com>
+---
+ config/init/systemd/lxc.service.in | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/config/init/systemd/lxc.service.in b/config/init/systemd/lxc.service.in
+index 397a6c4d0..d0b977690 100644
+--- a/config/init/systemd/lxc.service.in
++++ b/config/init/systemd/lxc.service.in
+@@ -1,7 +1,8 @@
+ [Unit]
+ Description=LXC Container Initialization and Autoboot Code
+-After=network.target lxc-net.service remote-fs.target
++After=network.target lxc-net.service remote-fs.target user@0.service
+ Wants=lxc-net.service
++Requires=user@0.service
+ Documentation=man:lxc-autostart man:lxc
+ 
+ [Service]
+-- 
+2.17.1
+
