@@ -6,6 +6,9 @@ BUGTRACKER = "https://gitlab.freedesktop.org/gstreamer/gst-plugins-good/-/issues
 
 SRC_URI = "https://gstreamer.freedesktop.org/src/gst-plugins-good/gst-plugins-good-${PV}.tar.xz \
            file://0001-qt-include-ext-qt-gstqtgl.h-instead-of-gst-gl-gstglf.patch \
+           file://0002-do-not-error-if-with-no-protection-events.patch \
+           file://0003-add-support-for-cbcs-encryption-scheme.patch \
+           file://0004-no-need-for-new-application-x-cbcs-caps.patch \
            "
 
 SRC_URI[sha256sum] = "3aaeeea7765fbf8801acce4a503a9b05f73f04e8a35352e9d00232cfd555796b"
