@@ -7,10 +7,11 @@ IMAGE_CLASSES:remove = "qimage qimage-boot"
 
 inherit image
 
+do_rootfs[nostamp] = "1"
+
 IMAGE_FSTYPES = "cpio.lz4"
 
 KERNEL_VERSION = "${@oe.utils.read_file('${STAGING_KERNEL_BUILDDIR}/kernel-abiversion')}"
-
 
 # We really need just kexecboot, kexec and ubiattach
 
