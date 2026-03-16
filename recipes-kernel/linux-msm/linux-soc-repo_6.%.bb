@@ -3,7 +3,7 @@ inherit kernel
 DESCRIPTION = "CAF Linux Kernel"
 LICENSE = "GPLv2.0-with-linux-syscall-note"
 
-COMPATIBLE_MACHINE = "trustedvm-v4"
+COMPATIBLE_MACHINE = "trustedvm-v5|trustedvm-v4|vienna|alor|qrbx210-rbx"
 
 FILESEXTRAPATHS:prepend := "${WORKSPACE}:"
 FILESEXTRAPATHS:prepend := "${WORKSPACE}:${KERNEL_PREBUILT_PATH}:"
@@ -14,8 +14,12 @@ SRC_URI = "file://kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/soc-repo
            "
 
 S = "${WORKDIR}/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/soc-repo"
+S:vienna = "${WORKDIR}/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/common"
+S:alor = "${WORKDIR}/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/common"
+S:qrbx210-rbx = "${WORKDIR}/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/common"
 PR = "r0"
-DEPENDS += "virtual/kernel-toolchain-native virtual/dtc-native rsync-native mod-signing-keys"
+DEPENDS += "virtual/kernel-toolchain-native virtual/dtc-native ${@bb.utils.contains('DDK_BUILD', 'true','', 'rsync-native', d)} mod-signing-keys"
+
 LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 
 KERNEL_USE_PREBUILTS = "${@d.getVar('MACHINE_USES_KERNEL_PREBUILTS') or "False"}"
@@ -39,8 +43,10 @@ do_prebuilt_configure() {
     install -m 0644 ../${KERNEL_TYPE}/.config ${B}
     install -m 0644 ../${KERNEL_TYPE}/Module.symvers ${B}
     install -m 0644 ../${KERNEL_TYPE}/signing_key.pem ${B}/certs/signing_key.pem
-    install -m 0644 ../${KERNEL_TYPE}/verity_cert.pem ${B}/certs/verity_cert.pem
-    install -m 0644 ../${KERNEL_TYPE}/verity_key.pem ${B}/certs/verity_key.pem
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains('MACHINE_FEATURES', 'dm-verity-initramfs-v3', 'true', 'false', d), 'false', d)}; then
+        install -m 0644 ../${KERNEL_TYPE}/verity_cert.pem ${B}/certs/verity_cert.pem
+        install -m 0644 ../${KERNEL_TYPE}/verity_key.pem ${B}/certs/verity_key.pem
+    fi
     if [ -f module.lds ]; then
     install -m 0644 module.lds ${B}/scripts/module.lds
     fi
@@ -86,6 +92,12 @@ do_prebuilt_shared_workdir() {
     mkdir -p $kerneldir/include/generated
     if [ -e "${B}/scripts/module.lds" ]; then
         install -m 0644 ${B}/scripts/module.lds ${STAGING_KERNEL_BUILDDIR}/scripts/module.lds
+    fi
+
+    if [ -e "${KERNEL_PREBUILT_PATH}/host/unifdef" ]; then
+        cp -rp ${KERNEL_PREBUILT_PATH}/host/unifdef $kerneldir/scripts/
+        cp -rp ${KERNEL_PLATFORM_PATH}/soc-repo/scripts/headers_install.sh $kerneldir/
+        sed -i 's|scripts/unifdef|${STAGING_KERNEL_BUILDDIR}/scripts/unifdef|g' ${STAGING_KERNEL_BUILDDIR}/headers_install.sh
     fi
 }
 

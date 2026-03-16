@@ -23,4 +23,6 @@ do_install() {
     install -d ${D}/${bindir}/clang/
     install -d ${D}/${bindir}/clang/bin/
     cp -rf ${S}/bin/* ${D}/${bindir}/clang/bin/
+    install -d ${D}/${bindir}/clang/lib/
+    cp -rf ${S}/lib/* ${D}/${bindir}/clang/lib/
 }
