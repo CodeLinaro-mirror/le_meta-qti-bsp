@@ -1,0 +1,17 @@
+# /etc/udev/rules.d/59-ota-optimization.rules
+
+# 1. Detect OTA mode using your flag file
+SUBSYSTEM=="block", KERNEL=="mmcblk*", PROGRAM="/usr/bin/test -e /run/udev/data/ota_mode", ENV{OTA_ACTIVE}="1"
+
+# 2. If OTA is NOT active, skip this file completely
+ENV{OTA_ACTIVE}!="1", GOTO="ota_end"
+
+# 3. CRITICAL: Import partition info. Without this, ID_PART_ENTRY_NAME is empty!
+IMPORT{builtin}="blkid"
+
+# 4. Create the 'by-name' symlink (This is the "Only" thing you want)
+ENV{ID_PART_ENTRY_SCHEME}=="gpt", ENV{ID_PART_ENTRY_NAME}=="?*", SYMLINK+="block/bootdevice/by-name/$env{ID_PART_ENTRY_NAME}"
+
+ENV{ID_PART_ENTRY_SCHEME}=="gpt", ENV{ID_PART_ENTRY_NAME}=="?*", SYMLINK+="disk/by-partlabel/$env{ID_PART_ENTRY_NAME}"
+
+LABEL="ota_end"
