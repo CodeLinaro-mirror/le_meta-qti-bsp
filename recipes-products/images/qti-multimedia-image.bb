@@ -43,6 +43,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         ${@bb.utils.contains('DISTRO_FEATURES','virtualization', 'packagegroup-qti-containers', '', d)} \
         packagegroup-qti-telematics \
         packagegroup-qti-guestvm \
+        packagegroup-qti-telsdk \
 "
 
 CORE_IMAGE_EXTRA_INSTALL:remove:qcm2290-mtp = "kernel-modules"
