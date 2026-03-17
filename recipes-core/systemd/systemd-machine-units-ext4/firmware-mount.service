@@ -27,7 +27,6 @@
 
 [Unit]
 Description=Mount modem partition to /firmware mount point
-ConditionDirectoryNotEmpty=!/firmware
 
 # Env vars are not reflecting in [Unit] Section for selective wait.
 # Hence wait for both _a & _b dev nodes before attepting to mount
@@ -42,7 +41,7 @@ IgnoreOnIsolate=true
 Type=oneshot
 RemainAfterExit=yes
 PassEnvironment="SLOT_SUFFIX"
-ExecStart=/bin/mount -o noexec,nodev,ro,context=system_u:object_r:firmware_t:s0 -t vfat /dev/disk/by-partlabel/modem${SLOT_SUFFIX} /firmware
+ExecStart=/bin/sh -c 'if grep -qs "/firmware " /proc/mounts; then echo "Already mounted"; exit 0; fi; /bin/mount -o noexec,nodev,ro -t vfat /dev/disk/by-partlabel/modem${SLOT_SUFFIX} /firmware'
 Nice=-20
 
 [Install]

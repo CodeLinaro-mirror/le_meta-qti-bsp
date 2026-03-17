@@ -19,6 +19,7 @@ CFLAGS += "${@bb.utils.contains('DISTRO_FEATURES', 'early_init', '-DEARLY_INIT',
 
 CFLAGS:append:quin-gvm-gen4-5 = " -DLIB_UNIFICATION"
 CFLAGS:append:gvm-gen4-5 = " -DLIB_UNIFICATION"
+CFLAGS:append:canoe = " -DENABLE_LE_VARIANT -DFIRMWARE_MOUNT"
 
 TARGET_PATH_NAME ?= "${MACHINE}"
 
