@@ -838,7 +838,7 @@ static inline void mount_cmd()
 			perror("Failed to read boot slot!\n");
 			goto out;
 		}
-		for (int i = 0; i < FIRMWARE_DEV_TYPES; i++) {
+		for (i = 0; i < FIRMWARE_DEV_TYPES; i++) {
 			if (is_modem_firmware(slot, firmware_names[i])) {
                                 strlcat(firmware_dev, firmware_names[i], sizeof(firmware_dev));
 				break;
