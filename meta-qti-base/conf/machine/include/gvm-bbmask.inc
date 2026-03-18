@@ -69,7 +69,6 @@ meta-qti-bsp/meta-qti-extra/recipes-containers/softwarecontainer/softwarecontain
 meta-qti-bsp/meta-qti-base/recipes-camera/cameradlkm/cameradlkm_0.1.bb \
 meta-qti-bsp/meta-qti-base/recipes-kernel/linux-msm/linux-msm_6.1.bb \
 meta-qti-bsp/meta-qti-base/recipes-data/avb-utils/avb-utils_1.0.bb \
-meta-qti-bsp/meta-qti-base/recipes-connectivity/synergy-opensource \
 "
 
 # Missing recipes in baseline LV.AU.0.5.2 (target for gvm-gen5)
@@ -77,7 +76,6 @@ MISSING_RECIPE_SRCLIST_BASELINE_LV052 += "\
 meta-qti-bsp/meta-qti-extra/recipes-containers/softwarecontainer/softwarecontainer_git.bb \
 meta-qti-bsp/meta-qti-base/recipes-camera/cameradlkm/cameradlkm_0.1.bb \
 meta-qti-bsp/meta-qti-base/recipes-wlan \
-meta-qti-bsp/meta-qti-base/recipes-connectivity/synergy-opensource \
 meta-qti-bsp/meta-qti-base/recipes-graphics/wayland/weston-sdm-extension_1.0.0.bb \
 meta-qti-bsp/meta-qti-base/recipes-graphics/wayland/weston-sdm-extension-headers.bb \
 meta-qti-bsp/meta-qti-base/recipes-graphics/wayland/weston_13.0.%.bbappend \
