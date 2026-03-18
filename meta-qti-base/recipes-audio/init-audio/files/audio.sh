@@ -33,11 +33,26 @@ modprobe q6_dlkm
 modprobe adsp_loader_dlkm
 modprobe stub_dlkm
 
-/bin/echo 0 > /sys/module/subsystem_restart/parameters/enable_debug;
-/bin/echo 2 > /sys/kernel/boot_adsp/boot;
-modprobe platform_dlkm
-modprobe machine_dlkm
-modprobe hdmi_dlkm
+count=0
+
+while true
+do
+    if [ -d "/firmware/image" ] && [ -f "/sys/kernel/boot_adsp/boot" ]; then
+        /bin/echo 0 > /sys/module/subsystem_restart/parameters/enable_debug;
+        /bin/echo 2 > /sys/kernel/boot_adsp/boot;
+        modprobe platform_dlkm
+        modprobe machine_dlkm
+        modprobe hdmi_dlkm
+        break
+    else
+        sleep 0.1
+        count=$(( $count + 1 ))
+        if [ $count -ge 100 ]; then
+            /bin/echo "audio.sh: /firmware/image was not mounted" > /dev/kmsg
+            exit 1
+        fi
+    fi
+done
 
 while true
 do
