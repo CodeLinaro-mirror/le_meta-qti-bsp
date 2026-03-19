@@ -56,6 +56,7 @@ gen_overlayfs() {
 do_fsconfig() {
  chmod go-r ${IMAGE_ROOTFS}/etc/passwd || :
  chmod -R o-rwx ${IMAGE_ROOTFS}/etc/init.d/ || :
+ find "${IMAGE_ROOTFS}/usr/lib" -type f -name "*.so" -exec chmod 0644 {} + || :
 }
 
 do_fsconfig:append:qti-distro-user() {
