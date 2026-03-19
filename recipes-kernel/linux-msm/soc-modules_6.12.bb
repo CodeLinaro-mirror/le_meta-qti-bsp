@@ -12,6 +12,7 @@ FILESEXTRAPATHS:prepend := "${KERNEL_PLATFORM_PATH}/:"
 SRC_URI = "file://soc-repo \
            file://qcom/opensource/devicetree"
 
+PROVIDES= "kernel-module-soc-repo"
 S = "${WORKDIR}/soc-repo/yocto"
 SOC_REPO = "${WORKDIR}/soc-repo"
 
@@ -53,6 +54,9 @@ do_install() {
     done
 
     rm -rf ${D}/lib/modules/${KERNEL_VERSION}/updates/
+
+    # Expose soc-repo symbols for techpacks
+    install -m 0755 ${B}/Module.symvers -D ${D}${includedir}/kernel-module-soc-repo/Module.symvers
 
     install -d ${DEPLOY_DIR_IMAGE}/kernel_dtbs
     for dtbof in ${TARGET_DTBS}; do
