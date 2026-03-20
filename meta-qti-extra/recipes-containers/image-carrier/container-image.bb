@@ -33,6 +33,7 @@ IMAGE_INSTALL = "\
         libxkbcommon \
         xkeyboard-config \
         refpolicy-mcs \
+        wpa-supplicant \
 "
 
 IMAGE_FSTYPES = "ext4"
