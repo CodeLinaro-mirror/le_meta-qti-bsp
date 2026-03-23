@@ -1,0 +1,28 @@
+From 841f808234ab4810ed6f70c623ce7b73f74dc2e5 Mon Sep 17 00:00:00 2001
+From: Shusong Geng <sgeng@qti.qualcomm.com>
+Date: Tue, 11 Nov 2025 10:39:09 +0800
+Subject: [PATCH] fix error msg:Unsupported config key lxc.seccomp
+
+Signed-off-by: Shusong Geng <sgeng@qti.qualcomm.com>
+---
+ src/lxc/attach.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/lxc/attach.c b/src/lxc/attach.c
+index 8f2f7a3..712bf20 100644
+--- a/src/lxc/attach.c
++++ b/src/lxc/attach.c
+@@ -1472,8 +1472,10 @@ int lxc_attach(struct lxc_container *container, lxc_attach_exec_t exec_function,
+ 
+ 	conf = ctx->container->lxc_conf;
+ 
++#if HAVE_SECCOMP
+ 	if (!fetch_seccomp(ctx->container, options))
+ 		WARN("Failed to get seccomp policy");
++#endif
+ 
+ 	if (!no_new_privs(ctx->container, options))
+ 		WARN("Could not determine whether PR_SET_NO_NEW_PRIVS is set");
+-- 
+2.34.1
+

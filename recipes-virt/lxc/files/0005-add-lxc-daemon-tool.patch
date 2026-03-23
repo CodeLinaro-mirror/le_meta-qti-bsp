@@ -1,149 +1,49 @@
-From c2df58ae15d17c280a6c7d6d8f7019532094c281 Mon Sep 17 00:00:00 2001
+From 6fb958674b677054588fe763bd44c1b2350b6bab Mon Sep 17 00:00:00 2001
 From: Wei Wang <wanw@qti.qualcomm.com>
-Date: Thu, 29 Jan 2026 16:51:10 +0800
+Date: Fri, 13 Mar 2026 16:09:47 +0800
 Subject: [PATCH] add lxc-daemon tool
 
-
 Signed-off-by: Wei Wang <wanw@qti.qualcomm.com>
+
 ---
- configure.ac               |  1 +
- src/lxc/Makefile.am        | 89 ++++++++++++++++++++++++++++++++++++++
- src/lxc/tools/lxc_daemon.c | 61 ++++++++++++++++++++++++++
- src/lxc/tools/meson.build  | 10 +++++
- 4 files changed, 161 insertions(+)
+ src/lxc/tools/lxc_daemon.c | 99 ++++++++++++++++++++++++++++++++++++++
+ src/lxc/tools/meson.build  |  2 +-
+ 2 files changed, 100 insertions(+), 1 deletion(-)
  create mode 100644 src/lxc/tools/lxc_daemon.c
 
-diff --git a/configure.ac b/configure.ac
-index f8529c1aa..4ea996b1c 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -1104,6 +1104,7 @@ Binaries
-    - lxc-start:      $enable_tools
-    - lxc-stop:       $enable_tools
-    - lxc-top:        $enable_tools
-+   - lxc-daemon:     $enable_tools
-    - lxc-unfreeze:   $enable_tools
-    - lxc-unshare:    $enable_tools
-    - lxc-wait:       $enable_tools
-diff --git a/src/lxc/Makefile.am b/src/lxc/Makefile.am
-index a1955a838..26978db30 100644
---- a/src/lxc/Makefile.am
-+++ b/src/lxc/Makefile.am
-@@ -309,6 +309,7 @@ bin_PROGRAMS = lxc-attach \
- 	       lxc-start \
- 	       lxc-stop \
- 	       lxc-top \
-+	       lxc-daemon \
- 	       lxc-unfreeze \
- 	       lxc-unshare \
- 	       lxc-wait
-@@ -1666,6 +1667,94 @@ endif
- endif
- endif
- 
-+lxc_daemon_SOURCES = tools/lxc_daemon.c \
-+		  tools/arguments.c tools/arguments.h
-+
-+if ENABLE_STATIC_BINARIES
-+lxc_daemon_SOURCES += $(liblxc_la_SOURCES)
-+lxc_daemon_LDFLAGS = -all-static -pthread
-+else
-+lxc_daemon_SOURCES += af_unix.c af_unix.h \
-+		    caps.c caps.h \
-+		    cgroups/cgfsng.c \
-+		    cgroups/cgroup.c cgroups/cgroup.h \
-+		    cgroups/cgroup2_devices.c cgroups/cgroup2_devices.h \
-+		    cgroups/cgroup_utils.c cgroups/cgroup_utils.h \
-+		    commands.c commands.h \
-+		    commands_utils.c commands_utils.h \
-+		    conf.c conf.h \
-+		    confile.c confile.h \
-+		    confile_utils.c confile_utils.h \
-+		    error.c error.h \
-+		    file_utils.c file_utils.h \
-+		    ../include/netns_ifaddrs.c ../include/netns_ifaddrs.h \
-+		    initutils.c initutils.h \
-+		    log.c log.h \
-+		    lxclock.c lxclock.h \
-+		    mainloop.c mainloop.h \
-+		    monitor.c monitor.h \
-+		    mount_utils.c mount_utils.h \
-+		    namespace.c namespace.h \
-+		    network.c network.h \
-+		    nl.c nl.h \
-+		    parse.c parse.h \
-+		    process_utils.c process_utils.h \
-+		    ringbuf.c ringbuf.h \
-+		    start.c start.h \
-+		    state.c state.h \
-+		    storage/btrfs.c storage/btrfs.h \
-+		    storage/dir.c storage/dir.h \
-+		    storage/loop.c storage/loop.h \
-+		    storage/lvm.c storage/lvm.h \
-+		    storage/nbd.c storage/nbd.h \
-+		    storage/overlay.c storage/overlay.h \
-+		    storage/rbd.c storage/rbd.h \
-+		    storage/rsync.c storage/rsync.h \
-+		    storage/storage.c storage/storage.h \
-+		    storage/storage_utils.c storage/storage_utils.h \
-+		    storage/zfs.c storage/zfs.h \
-+		    string_utils.c string_utils.h \
-+		    sync.c sync.h \
-+		    terminal.c terminal.h \
-+		    utils.c utils.h \
-+		    uuid.c uuid.h \
-+		    $(LSM_SOURCES)
-+if ENABLE_SECCOMP
-+lxc_daemon_SOURCES += seccomp.c lxcseccomp.h
-+endif
-+
-+if !HAVE_STRCHRNUL
-+lxc_daemon_SOURCES += ../include/strchrnul.c ../include/strchrnul.h
-+endif
-+
-+if !HAVE_STRLCPY
-+lxc_daemon_SOURCES += ../include/strlcpy.c ../include/strlcpy.h
-+endif
-+
-+if !HAVE_STRLCAT
-+lxc_daemon_SOURCES += ../include/strlcat.c ../include/strlcat.h
-+endif
-+
-+if !HAVE_OPENPTY
-+lxc_daemon_SOURCES += ../include/openpty.c ../include/openpty.h
-+endif
-+
-+if IS_BIONIC
-+lxc_daemon_SOURCES += ../include/fexecve.c ../include/fexecve.h \
-+		../include/lxcmntent.c ../include/lxcmntent.h
-+endif
-+
-+if !HAVE_GETGRGID_R
-+lxc_daemon_SOURCES += ../include/getgrgid_r.c ../include/getgrgid_r.h
-+endif
-+
-+if !HAVE_PRLIMIT
-+if HAVE_PRLIMIT64
-+lxc_daemon_SOURCES += ../include/prlimit.c ../include/prlimit.h
-+endif
-+endif
-+endif
-+
- lxc_top_SOURCES = tools/lxc_top.c \
- 		  tools/arguments.c tools/arguments.h
- 
 diff --git a/src/lxc/tools/lxc_daemon.c b/src/lxc/tools/lxc_daemon.c
 new file mode 100644
-index 000000000..e6b428b17
+index 000000000..3c1113b52
 --- /dev/null
 +++ b/src/lxc/tools/lxc_daemon.c
-@@ -0,0 +1,61 @@
+@@ -0,0 +1,99 @@
 +//Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
 +//SPDX-License-Identifier: LGPL-2.1+
 +
 +#include <stdio.h>
 +#include <unistd.h>
 +#include <lxc/lxccontainer.h>
++#include "arguments.h"
++#include "log.h"
++
++lxc_log_define(lxc_daemon, lxc);
++
++static const struct option my_longopts[] = {
++	LXC_COMMON_OPTIONS
++};
++
++static struct lxc_arguments my_args = {
++	.progname     = "lxc-daemon",
++	.help         = "\
++--name=NAME\n\
++\n\
++lxc-daemon for NAME container \n\
++\n",
++	.options      = my_longopts,
++	.checker      = NULL,
++	.log_priority = "ERROR",
++	.log_file     = "none",
++};
 +
 +int main(int argc, char *argv[])
 +{
@@ -152,46 +52,63 @@ index 000000000..e6b428b17
 +    const char *lxcpath = NULL;
 +
 +    if (argc < 2) {
-+        fprintf(stderr, "Usage: %s <container_name>\n", argv[0]);
++        TRACE(stderr, "Usage: %s <container_name>\n", argv[0]);
 +        return 1;
 +    }
++	struct lxc_log log;
++
++	if (lxc_arguments_parse(&my_args, argc, argv))
++		exit(EXIT_FAILURE);
++
++	/* Only create log if explicitly instructed */
++	if (my_args.log_file || my_args.log_priority) {
++		log.name = my_args.name;
++		log.file = my_args.log_file;
++		log.level = my_args.log_priority;
++		log.prefix = my_args.progname;
++		log.quiet = my_args.quiet;
++		log.lxcpath = my_args.lxcpath[0];
++
++		if (lxc_log_init(&log))
++			exit(EXIT_FAILURE);
++	}
 +
 +    c = lxc_container_new(name, lxcpath);
 +    if (!c) {
-+        fprintf(stderr, "Failed to setup lxc_container struct for %s\n", name);
++        TRACE(stderr, "Failed to setup lxc_container struct for %s\n", name);
 +        return 1;
 +    }
 +
 +    if (!c->is_defined(c)) {
-+        fprintf(stderr, "Container %s not defined\n", c->name);
++        TRACE(stderr, "Container %s not defined\n", c->name);
 +        lxc_container_put(c);
 +        return 1;
 +    }
 +
-+    printf("Daemon started for container: %s\n", c->name);
++    TRACE("Daemon started for container: %s\n", c->name);
 +
 +    while (1) {
 +        if (!c->is_running(c)) {
-+            printf("Container is stopped. Attempting to start...\n");
++            TRACE("Container is stopped. Attempting to start...\n");
 +
 +            if (!c->start(c, 0, NULL)) {
-+                fprintf(stderr, "Failed to start container. Retrying in 5 seconds...\n");
-+                sleep(5);
++                TRACE(stderr, "Failed to start container. Retrying in 1 seconds...\n");
++                sleep(1);
 +                continue;
 +            } else {
-+                printf("Container started successfully.\n");
++                TRACE("Container started successfully.\n");
 +                c->wait(c, "RUNNING", 10);
 +            }
 +        }
 +
-+        printf("Monitoring container status...\n");
++        TRACE("Monitoring container status...\n");
 +        bool stopped = c->wait(c, "STOPPED", -1);
 +
 +        if (stopped) {
-+            printf("Detected container exit! Preparing to restart...\n");
++            TRACE("Detected container exit! Preparing to restart...\n");
 +            sleep(1);
 +        } else {
-+            fprintf(stderr, "LXC wait error.\n");
++            TRACE(stderr, "LXC wait error.\n");
 +            sleep(2);
 +        }
 +    }
@@ -200,30 +117,18 @@ index 000000000..e6b428b17
 +    return 0;
 +}
 diff --git a/src/lxc/tools/meson.build b/src/lxc/tools/meson.build
-index 3fb8b68a5..241a829fd 100644
+index 1bf3be0c2..cd1b598b3 100644
 --- a/src/lxc/tools/meson.build
 +++ b/src/lxc/tools/meson.build
-@@ -163,6 +163,9 @@ tools_lxc_stop_sources = files(
- tools_lxc_top_sources = files(
- 	'lxc_top.c') + tools_common_sources
+@@ -4,7 +4,7 @@ tools_common_sources = liblxc_sources + files('arguments.c', 'arguments.h') + in
  
-+tools_lxc_daemon_sources = files(
-+	'lxc_daemon.c') + tools_common_sources
-+
- tools_lxc_unfreeze_sources = files(
- 	'lxc_unfreeze.c') + tools_common_sources
+ tools_commands = ['attach', 'autostart', 'cgroup', 'checkpoint', 'config',
+     'console', 'copy', 'create', 'destroy', 'device', 'execute', 'freeze',
+-    'info', 'ls', 'monitor', 'snapshot', 'start', 'stop', 'top', 'unfreeze',
++    'info', 'ls', 'monitor', 'daemon', 'snapshot', 'start', 'stop', 'top', 'unfreeze',
+     'unshare', 'wait']
  
-@@ -298,6 +301,13 @@ public_programs += executable(
- 		dependencies : liblxc_dep,
-                 install : true)
- 
-+public_programs += executable(
-+                'lxc-daemon',
-+		tools_lxc_daemon_sources,
-+                include_directories : tools_liblxc_includes,
-+		dependencies : liblxc_dep,
-+                install : true)
-+
- public_programs += executable(
-                 'lxc-unfreeze',
- 		tools_lxc_unfreeze_sources,
+ if want_tools
+-- 
+2.43.0
+

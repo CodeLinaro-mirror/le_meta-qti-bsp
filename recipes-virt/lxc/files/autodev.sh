@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (c) 2025 Qualcomm Innovation Center, Inc. All rights reserved.
+# Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
 # SPDX-License-Identifier: BSD-3-Clause-Clear
 
 devices="/dev/kgsl-3d0 /dev/video32 /dev/video33 \
@@ -11,3 +11,4 @@ for var in $devices; do
         cp -dpR $var ${LXC_ROOTFS_MOUNT}/dev
     fi
 done
+
