@@ -14,7 +14,7 @@ ConditionPathExists=/persist/factory_reset.flag
 
 [Service]
 Type=oneshot
-ExecStart=/etc/initscripts/factory_reset.sh
+ExecStart=/usr/bin/factory_reset.sh
 
 [Install]
 WantedBy=local-fs.target
