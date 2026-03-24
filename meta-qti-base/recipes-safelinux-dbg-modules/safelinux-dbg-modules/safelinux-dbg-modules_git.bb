@@ -16,6 +16,7 @@ TECHPACK_MODULES = "minidump/minidump.ko \
                     kaslr_store/kaslr_store.ko \
                     memory_dump_v2/memory_dump_v2.ko \
                     nhlos_log/dump_boot_log.ko \
+                    firmware_vm_mini_dump/firmware_vm_mini_dump.ko \
 "
 inherit qti-techpack systemd
 EXTRA_OEMAKE += "KDIR=${STAGING_KERNEL_DIR}"
@@ -38,6 +39,7 @@ RPROVIDES:${PN} += "${@'kernel-module-minidump-${KERNEL_VERSION}'.replace('_', '
 RPROVIDES:${PN} += "${@'kernel-module-kaslr_store-${KERNEL_VERSION}'.replace('_', '-')}"
 RPROVIDES:${PN} += "${@'kernel-module-memory_dump_v2-${KERNEL_VERSION}'.replace('_', '-')}"
 RPROVIDES:${PN} += "${@'kernel-module-dump_boot_log-${KERNEL_VERSION}'.replace('_', '-')}"
+RPROVIDES:${PN} += "${@'kernel-module-firmware_vm_mini_dump-${KERNEL_VERSION}'.replace('_', '-')}"
 
 FILES:${PN} += "${bindir}/*"
 FILES:${PN} += "${sysconfdir}/qcom_dcc/*"
