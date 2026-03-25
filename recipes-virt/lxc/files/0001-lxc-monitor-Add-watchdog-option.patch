@@ -1,6 +1,6 @@
-From 91be634015b50ce01db1595e5836a78859428a2b Mon Sep 17 00:00:00 2001
+From f7f4ef13c4d6952b29a081a22c1490a2e0a69e56 Mon Sep 17 00:00:00 2001
 From: huayzhon <huayzhon@qti.qualcomm.com>
-Date: Tue, 10 Mar 2026 16:28:34 +0800
+Date: Mon, 23 Mar 2026 18:48:13 +0800
 Subject: [PATCH] lxc-monitor: Add watchdog option
 
 This patch adds watchdog functionality to lxc-monitor,
@@ -8,14 +8,22 @@ allowing it to automatically restart containers when they stop.
 
 Signed-off-by: huayzhon <huayzhon@qti.qualcomm.com>
 ---
- src/lxc/tools/lxc_monitor.c | 192 ++++++++++++++++++++++++++++++++++--
- 1 file changed, 184 insertions(+), 8 deletions(-)
+ src/lxc/tools/lxc_monitor.c | 247 +++++++++++++++++++++++++++++++++++-
+ 1 file changed, 245 insertions(+), 2 deletions(-)
 
 diff --git a/src/lxc/tools/lxc_monitor.c b/src/lxc/tools/lxc_monitor.c
-index 6065f2683..dd49c6856 100644
+index 6065f2683..ed7591722 100644
 --- a/src/lxc/tools/lxc_monitor.c
 +++ b/src/lxc/tools/lxc_monitor.c
-@@ -32,8 +32,18 @@
+@@ -16,6 +16,7 @@
+ #include <sys/param.h>
+ #include <sys/socket.h>
+ #include <sys/stat.h>
++#include <sys/syscall.h>
+ #include <sys/types.h>
+ #include <sys/un.h>
+ #include <sys/wait.h>
+@@ -32,8 +33,18 @@
  #include "utils.h"
  
  #define LXC_MONITORD_PATH LIBEXECDIR "/lxc/lxc-monitord"
@@ -34,7 +42,7 @@ index 6065f2683..dd49c6856 100644
  
  lxc_log_define(lxc_monitor, lxc);
  
-@@ -43,6 +53,9 @@ static int my_parser(struct lxc_arguments *args, int c, char *arg)
+@@ -43,6 +54,9 @@ static int my_parser(struct lxc_arguments *args, int c, char *arg)
  	case 'Q':
  		quit_monitord = true;
  		break;
@@ -44,7 +52,7 @@ index 6065f2683..dd49c6856 100644
  	}
  
  	return 0;
-@@ -50,6 +63,7 @@ static int my_parser(struct lxc_arguments *args, int c, char *arg)
+@@ -50,6 +64,7 @@ static int my_parser(struct lxc_arguments *args, int c, char *arg)
  
  static const struct option my_longopts[] = {
  	{"quit", no_argument, 0, 'Q'},
@@ -52,7 +60,7 @@ index 6065f2683..dd49c6856 100644
  	LXC_COMMON_OPTIONS
  };
  
-@@ -63,7 +77,8 @@ lxc-monitor monitors the state of the NAME container\n\
+@@ -63,7 +78,8 @@ lxc-monitor monitors the state of the NAME container\n\
  Options :\n\
    -n, --name=NAME   NAME of the container\n\
                      NAME may be a regular expression\n\
@@ -62,7 +70,7 @@ index 6065f2683..dd49c6856 100644
  	.name     = ".*",
  	.options  = my_longopts,
  	.parser   = my_parser,
-@@ -146,6 +161,13 @@ static int lxc_tool_monitord_spawn(const char *lxcpath)
+@@ -146,6 +162,13 @@ static int lxc_tool_monitord_spawn(const char *lxcpath)
  		NULL,
  	};
  
@@ -76,7 +84,7 @@ index 6065f2683..dd49c6856 100644
  	/* double fork to avoid zombies when monitord exits */
  	pid1 = fork();
  	if (pid1 < 0) {
-@@ -210,6 +232,7 @@ static int lxc_tool_monitord_spawn(const char *lxcpath)
+@@ -210,18 +233,177 @@ static int lxc_tool_monitord_spawn(const char *lxcpath)
  		_exit(EXIT_FAILURE);
  	}
  
@@ -84,7 +92,178 @@ index 6065f2683..dd49c6856 100644
  	execvp(args[0], args);
  	SYSERROR("Failed to exec lxc-monitord");
  
-@@ -243,6 +266,7 @@ int main(int argc, char *argv[])
+ 	_exit(EXIT_FAILURE);
+ }
+ 
++/*
++ * watchdog_do_restart - restart a named container with exponential back-off.
++ *
++ * Called both when a STOPPED message is received via the monitor socket and
++ * when a poll() timeout reveals the container is no longer running (e.g.
++ * after lxc-start was killed with SIGKILL and never sent a STOPPED
++ * notification).
++ */
++static void watchdog_do_restart(const char *name, const char *lxcpath)
++{
++	struct lxc_container *c;
++	int try, max_tries = 8;
++
++	INFO("'%s' stopped, restarting...", name);
++
++	for (try = 0; try < max_tries; try++) {
++		if (try > 0) {
++			INFO("'%s' restart attempt %d/%d after %us",
++			     name, try + 1, max_tries, 1 << (try - 1));
++			poll(NULL, 0, (int)((1 << (try - 1)) * 1000));
++		}
++
++		c = lxc_container_new(name, lxcpath);
++		if (!c) {
++			ERROR("Failed to create container handle for '%s'", name);
++			continue;
++		}
++
++		/* Confirm the container is not already running to avoid a race. */
++		if (c->is_running(c)) {
++			INFO("'%s' is already running", name);
++			lxc_container_put(c);
++			return;
++		}
++
++		if (c->start(c, 0, NULL)) {
++			INFO("'%s' restarted successfully", name);
++			lxc_container_put(c);
++			return;
++		}
++
++		ERROR("Failed to restart '%s': %s", name, c->error_string);
++		lxc_container_put(c);
++	}
++
++	ERROR("'%s' failed to restart after %d attempts, giving up", name, max_tries);
++}
++
++/*
++ * watchdog_run - poll-based watchdog loop (no socket/monitord dependency).
++ *
++ * Instead of subscribing to LXC state-change events via the monitor socket,
++ * this function directly polls the container's init process file descriptor
++ * (pidfd).  A pidfd becomes readable (POLLIN) the instant the process exits,
++ * giving reliable, zero-latency death detection without any dependency on
++ * lxc-monitord.
++ *
++ * Flow per iteration:
++ *   1. Wait (with 1-second poll intervals) until the container is running.
++ *   2. Obtain a pidfd for the init process:
++ *        a. Try c->init_pidfd(c)  – preferred, no extra syscall.
++ *        b. Fall back to pidfd_open(init_pid, 0) if init_pidfd() fails.
++ *   3. poll(POLLIN) on the pidfd with a 1-second timeout so that
++ *      SIGTERM/SIGINT (quit_watchdog) can be handled promptly.
++ *   4. On POLLIN (process exited), call watchdog_do_restart() and loop.
++ */
++static void watchdog_run(const char *name, const char *lxcpath)
++{
++	for (;;) {
++		struct lxc_container *c;
++		int watch_fd = -1;
++		pid_t init_pid_val = -1;
++		struct pollfd pfd;
++		int ret;
++
++		if (quit_watchdog)
++			return;
++
++		/* Step 1: wait until the container is running. */
++		for (;;) {
++			if (quit_watchdog)
++				return;
++
++			c = lxc_container_new(name, lxcpath);
++			if (c) {
++				if (c->is_running(c))
++					break;
++				lxc_container_put(c);
++				c = NULL;
++			}
++			/* 1-second sleep between checks. */
++			poll(NULL, 0, 1000);
++		}
++
++		/*
++		 * Step 2: obtain a pidfd for the init process.
++		 *
++		 * init_pidfd() asks the running lxc-start daemon for its
++		 * pidfd via a single command socket round-trip and returns
++		 * a new file descriptor that we own.
++		 */
++		watch_fd    = c->init_pidfd(c);
++		init_pid_val = c->init_pid(c);
++		lxc_container_put(c);
++
++		if (watch_fd < 0) {
++			ERROR("Failed to obtain pidfd for '%s' (init_pid=%d), "
++			      "retrying in 1s", name, (int)init_pid_val);
++			poll(NULL, 0, 1000);
++			continue;
++		}
++
++		INFO("Watching init_pid %d for container '%s' via pidfd %d",
++		     (int)init_pid_val, name, watch_fd);
++
++		/*
++		 * Step 3: poll the pidfd until the init process exits.
++		 *
++		 * Use a 1-second timeout so that SIGTERM/SIGINT (which set
++		 * quit_watchdog) are handled promptly even while blocking.
++		 */
++		pfd.fd     = watch_fd;
++		pfd.events = POLLIN;
++
++		for (;;) {
++			pfd.revents = 0;
++			ret = poll(&pfd, 1, 1000);
++
++			if (quit_watchdog) {
++				close(watch_fd);
++				return;
++			}
++
++			if (ret > 0)
++				break; /* POLLIN: init process has exited */
++
++			if (ret < 0 && errno != EINTR) {
++				SYSERROR("poll() on pidfd for '%s' failed", name);
++				break;
++			}
++			/* ret == 0 (timeout) or EINTR: keep waiting */
++		}
++
++		close(watch_fd);
++
++		if (ret < 0)
++			continue; /* poll error – retry from the top */
++
++		/* Step 4: init process exited – restart the container. 
++		 * Delay 300ms to wait lxc exit done
++		 */
++		poll(NULL, 0, 300);
++		INFO("'%s' init process %d exited, triggering restart",
++		     name, (int)init_pid_val);
++		watchdog_do_restart(name, lxcpath);
++	}
++}
++
+ int main(int argc, char *argv[])
+ {
+ 	char *regexp;
+ 	struct lxc_msg msg;
+ 	regex_t preg;
+-	struct pollfd *fds;
++	struct pollfd *fds = NULL;
+ 	nfds_t nfds;
+ 	int len, rc_main, rc_snp, i;
+ 	struct lxc_log log;
+@@ -243,6 +425,7 @@ int main(int argc, char *argv[])
  		if (lxc_log_init(&log))
  			exit(rc_main);
  	}
@@ -92,23 +271,12 @@ index 6065f2683..dd49c6856 100644
  
  	if (quit_monitord) {
  		int ret = EXIT_SUCCESS;
-@@ -299,7 +323,9 @@ int main(int argc, char *argv[])
- 	for (i = 0; (unsigned long)i < nfds; i++) {
- 		int fd;
- 
--		lxc_tool_monitord_spawn(my_args.lxcpath[i]);
-+		if (lxc_tool_monitord_spawn(my_args.lxcpath[i]) < 0)
-+			ERROR("Failed to spawn monitord on path: %s",
-+			      my_args.lxcpath[i]);
- 
- 		fd = lxc_monitor_open(my_args.lxcpath[i]);
- 		if (fd < 0) {
-@@ -312,10 +338,107 @@ int main(int argc, char *argv[])
- 		fds[i].revents = 0;
+@@ -288,6 +471,66 @@ int main(int argc, char *argv[])
+ 		goto error;
  	}
  
--	setlinebuf(stdout);
-+	/* In watchdog mode, daemonize and register signal handlers. */
++	/* In watchdog mode, daemonize and run the poll-based loop.
++	 * No socket connection to lxc-monitord is needed.         */
 +	if (watchdog_mode) {
 +		pid_t pid1, pid2;
 +		int   fd;
@@ -118,7 +286,7 @@ index 6065f2683..dd49c6856 100644
 +		pid1 = fork();
 +		if (pid1 < 0) {
 +			SYSERROR("Failed to fork");
-+			goto close_and_clean;
++			goto cleanup;
 +		}
 +		if (pid1 > 0)
 +			exit(EXIT_SUCCESS);
@@ -126,7 +294,7 @@ index 6065f2683..dd49c6856 100644
 +		/* Create a new session to detach from the controlling terminal. */
 +		if (setsid() < 0) {
 +			SYSERROR("Failed to setsid");
-+			goto close_and_clean;
++			goto cleanup;
 +		}
 +
 +		/* Second fork: drop Session Leader status so the process
@@ -134,7 +302,7 @@ index 6065f2683..dd49c6856 100644
 +		pid2 = fork();
 +		if (pid2 < 0) {
 +			SYSERROR("Failed to fork");
-+			goto close_and_clean;
++			goto cleanup;
 +		}
 +		if (pid2 > 0)
 +			exit(EXIT_SUCCESS);
@@ -159,130 +327,17 @@ index 6065f2683..dd49c6856 100644
 +		sigaction(SIGINT,  &sa, NULL);
 +
 +		INFO("watchdog daemonized for '%s'", my_args.name);
-+	} else {
-+		setlinebuf(stdout);
++
++		/* Run the poll-based watchdog loop (no monitord socket needed). */
++		watchdog_run(my_args.name, my_args.lxcpath[0]);
++		rc_main = 0;
++		goto cleanup;
 +	}
- 
- 	for (;;) {
--		if (lxc_monitor_read_fdset(fds, nfds, &msg, -1) < 0)
-+		int ret;
 +
-+		if (watchdog_mode) {
-+			/* 1-second timeout so SIGTERM/SIGINT can be handled promptly. */
-+			ret = lxc_monitor_read_fdset(fds, nfds, &msg, 1);
-+			if (quit_watchdog) {
-+				INFO("watchdog exiting on signal");
-+				goto close_and_clean;
-+			}
-+			if (ret == -2)  /* timed out, loop back to check quit_watchdog */
-+				continue;
-+			if (ret < 0) {
-+				/* monitord died: close the stale fds, try to
-+				 * respawn monitord and reconnect.  Give up and
-+				 * exit only if respawn fails.               */
-+				WARN("monitord disconnected, attempting to respawn...");
-+				close_fds(fds, nfds);
-+
-+				for (i = 0; (unsigned long)i < nfds; i++) {
-+					int fd;
-+
-+					if (lxc_tool_monitord_spawn(my_args.lxcpath[i]) < 0)
-+						ERROR("Failed to spawn monitord on path: %s",
-+						      my_args.lxcpath[i]);
-+
-+					fd = lxc_monitor_open(my_args.lxcpath[i]);
-+					if (fd < 0) {
-+						ERROR("Failed to reconnect to monitord on path: %s",
-+						      my_args.lxcpath[i]);
-+						goto close_and_clean;
-+					}
-+
-+					fds[i].fd      = fd;
-+					fds[i].events  = POLLIN;
-+					fds[i].revents = 0;
-+				}
-+
-+				INFO("reconnected to monitord");
-+				continue;
-+			}
-+		} else {
-+			ret = lxc_monitor_read_fdset(fds, nfds, &msg, -1);
-+		}
-+
-+		if (ret < 0)
- 			goto close_and_clean;
- 
- 		msg.name[sizeof(msg.name)-1] = '\0';
-@@ -324,12 +447,65 @@ int main(int argc, char *argv[])
- 
- 		switch (msg.type) {
- 		case lxc_msg_state:
--			printf("'%s' changed state to [%s]\n",
--			       msg.name, lxc_state2str(msg.value));
-+			if (watchdog_mode)
-+				INFO("'%s' changed state to [%s]",
-+				     msg.name, lxc_state2str(msg.value));
-+			else
-+				printf("'%s' changed state to [%s]\n",
-+				       msg.name, lxc_state2str(msg.value));
-+
-+			/* Watchdog mode: restart the container when it stops. */
-+			if (watchdog_mode && msg.value == STOPPED) {
-+				struct lxc_container *c;
-+				int try, max_tries = 8;
-+
-+				INFO("'%s' stopped, restarting...", msg.name);
-+
-+				for (try = 0; try < max_tries; try++) {
-+					if (try > 0) {
-+						INFO("'%s' restart attempt %d/%d after %us",
-+						     msg.name, try + 1, max_tries,
-+						     1 << (try - 1));
-+						poll(NULL, 0, (int)((1 << (try - 1)) * 1000));
-+					}
-+
-+					c = lxc_container_new(msg.name, my_args.lxcpath[0]);
-+					if (!c) {
-+						ERROR("Failed to create container handle for '%s'",
-+						      msg.name);
-+						continue;
-+					}
-+
-+					/* Confirm the container is not already running to avoid a race. */
-+					if (c->is_running(c)) {
-+						INFO("'%s' is already running", msg.name);
-+						lxc_container_put(c);
-+						break;
-+					}
-+
-+					if (c->start(c, 0, NULL)) {
-+						INFO("'%s' restarted successfully", msg.name);
-+						lxc_container_put(c);
-+						break;
-+					}
-+
-+					ERROR("Failed to restart '%s': %s",
-+					      msg.name, c->error_string);
-+					lxc_container_put(c);
-+				}
-+
-+				if (try == max_tries)
-+					ERROR("'%s' failed to restart after %d attempts, giving up",
-+					      msg.name, max_tries);
-+			}
- 			break;
- 		case lxc_msg_exit_code:
--			printf("'%s' exited with status [%d]\n",
--			       msg.name, WEXITSTATUS(msg.value));
-+			if (watchdog_mode)
-+				INFO("'%s' exited with status [%d]",
-+				     msg.name, WEXITSTATUS(msg.value));
-+			else
-+				printf("'%s' exited with status [%d]\n",
-+				       msg.name, WEXITSTATUS(msg.value));
- 			break;
- 		default:
- 			/* ignore garbage */
++	/* Non-watchdog mode: open socket connections to lxc-monitord. */
+ 	fds = malloc(my_args.lxcpath_cnt * sizeof(struct pollfd));
+ 	if (!fds) {
+ 		ERROR("Out of memory");
 -- 
 2.34.1
 
