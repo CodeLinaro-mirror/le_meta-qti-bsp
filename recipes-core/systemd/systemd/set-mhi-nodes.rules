@@ -1,3 +1,5 @@
 ACTION=="add", KERNEL=="mhi*", OWNER="root", GROUP="radio", MODE="0660"
 ACTION=="add", KERNEL=="android_adb", SUBSYSTEM=="mhi", OWNER="adb", GROUP="adb", MODE="0664"
 ACTION=="add", KERNEL=="mhi_pipe_4", OWNER="system", GROUP="system", MODE="0660"
+ACTION=="add", KERNEL=="mhi_qdss", OWNER="diag", GROUP="root", MODE="0660"
+ACTION=="add", KERNEL=="mhi_qdss", SUBSYSTEM=="qdss_bridge", RUN+="chown diag:root /sys/class/qdss_bridge/mhi_qdss/mode", RUN+="chmod 660 /sys/class/qdss_bridge/mhi_qdss/mode"
