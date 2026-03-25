@@ -11,15 +11,21 @@ KERNEL_SRC_TYPE ?= "msm-kernel"
 
 # KERNEL_SRC_TYPE can be 'soc-repo' or 'msm-kernel' as per the kernel platform
 FILESEXTRAPATHS:prepend := "${KERNEL_PREBUILT_PATH}:${KERNEL_PLATFORM_PATH}/${KERNEL_SRC_TYPE}:"
-SRC_URI   =  "file://dist"
+SRC_URI = "${@bb.utils.contains('MACHINE_USES_KERNEL_PREBUILTS', 'True', ' file://dist', '', d)}"
 SRC_URI  +=  "file://${KERNEL_MODULES_LIST}"
 SRC_URI  +=  "file://linkmodulesload.service"
 SRC_URI:remove:qcs40x = "file://${KERNEL_MODULES_LIST}"
 
 S  =  "${WORKDIR}/dist"
 
+EXISTING_MODULES = "${@bb.utils.contains('MACHINE_USES_KERNEL_PREBUILTS', 'True', \
+    '*.ko', \
+    '${STAGING_KERNEL_BUILDDIR}/lib/modules/${KERNEL_VERSION}/*.ko', d)}"
+
+do_compile[depends] += "${@bb.utils.contains('MACHINE_USES_KERNEL_PREBUILTS', 'True', '', 'soc-modules:do_install', d)}"
 do_compile () {
-    existing_modules=$(ls *.ko 2> /dev/null || true)
+    existing_modules=$(ls ${EXISTING_MODULES} 2> /dev/null || true)
+
     if [ ! -f ${WORKDIR}/${KERNEL_MODULES_LIST} ]; then
         bbfatal "Kernel modules list file ${KERNEL_MODULES_LIST} not found"
     fi
@@ -51,12 +57,12 @@ do_compile () {
 }
 
 KERNEL_VERSION = "${@get_kernelversion_file("${STAGING_KERNEL_BUILDDIR}")}"
-do_install[depends] += "virtual/kernel:do_prebuilt_shared_workdir"
+do_install[depends] += "${@bb.utils.contains('MACHINE_USES_KERNEL_PREBUILTS', 'True', 'virtual/kernel:do_prebuilt_shared_workdir', '', d)}"
 do_install() {
     # Install modules
     mkdir -p ${D}${base_libdir}/modules/${KERNEL_VERSION}
-    if ls *.ko 1> /dev/null 2>&1; then
-        for mod in *.ko; do
+    if ls ${EXISTING_MODULES} 1> /dev/null 2>&1; then
+        for mod in ${EXISTING_MODULES}; do
             install -m 0644 $mod ${D}${base_libdir}/modules/${KERNEL_VERSION}
         done
     else

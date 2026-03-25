@@ -29,6 +29,7 @@ KERNEL=="glink_pkt_slate_qcli", MODE="0660", OWNER="system", GROUP="system"
 KERNEL=="glink_pkt_swm_fs", MODE="0660", OWNER="system", GROUP="system"
 KERNEL=="glink_pkt_slate_location_ctrl", MODE="0660", OWNER="system", GROUP="system"
 KERNEL=="glinkpkt_slate_haptics_offload", MODE="0660", OWNER="system", GROUP="system"
+KERNEL=="glinkpkt_q6_audio_ctrl", MODE="0660", OWNER="system", GROUP="system"
 
 # Sensor glink devices
 KERNEL=="glinkpkt_wm_qsh_2_[0-8]", MODE="0666", OWNER="system", GROUP="system"
