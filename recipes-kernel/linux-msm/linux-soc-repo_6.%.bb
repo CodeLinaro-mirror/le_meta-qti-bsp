@@ -3,7 +3,7 @@ inherit kernel
 DESCRIPTION = "CAF Linux Kernel"
 LICENSE = "GPLv2.0-with-linux-syscall-note"
 
-COMPATIBLE_MACHINE = "trustedvm-v5|trustedvm-v4|vienna|alor"
+COMPATIBLE_MACHINE = "trustedvm-v5|trustedvm-v4|vienna|alor|pebble"
 
 FILESEXTRAPATHS:prepend := "${WORKSPACE}:"
 FILESEXTRAPATHS:prepend := "${WORKSPACE}:${KERNEL_PREBUILT_PATH}:"
@@ -16,6 +16,7 @@ SRC_URI = "file://kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/soc-repo
 S = "${WORKDIR}/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/soc-repo"
 S:vienna = "${WORKDIR}/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/common"
 S:alor = "${WORKDIR}/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/common"
+S:pebble = "${WORKDIR}/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/common"
 PR = "r0"
 DEPENDS += "virtual/kernel-toolchain-native virtual/dtc-native ${@bb.utils.contains('DDK_BUILD', 'true','', 'rsync-native', d)} mod-signing-keys"
 
