@@ -10,7 +10,11 @@ DEPENDS += "liblog linux-msm-headers"
 
 PR = "r1"
 
-SRC_URI = "${PATH_TO_REPO}/system/core/.git;protocol=${PROTO};destsuffix=system/core/libion;subpath=libion;usehead=1"
+SRC_URI = "\
+    ${PATH_TO_REPO}/system/core/.git;protocol=${PROTO};destsuffix=system/core/libion;subpath=libion;usehead=1 \
+    file://0001-libion-extend-api-for-ion-lendbuf.patch \
+"
+
 SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/system/core/libion"
