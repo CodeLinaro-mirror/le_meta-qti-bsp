@@ -117,6 +117,8 @@ PACKAGES_DYNAMIC += "^lib(systemd).*"
 FILES:${PN} = " ${exec_prefix}/lib/systemd \
                "
 
+ERROR_QA:remove = " installed-vs-shipped"
+
 FILES:${PN}-dev += "${base_libdir}/security/*.la ${datadir}/dbus-1/interfaces/ ${sysconfdir}/rpm/macros.systemd"
 
 RDEPENDS:${PN} += "kmod dbus util-linux-mount util-linux-umount util-linux-agetty util-linux-fsck"
