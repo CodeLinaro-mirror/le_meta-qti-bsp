@@ -1,0 +1,13 @@
+[Unit]
+Description=Modprobe ramcarveout module
+Conflicts=shutdown.target
+
+[Service]
+Type=simple
+RemainAfterExit=yes
+ExecStart=/sbin/modprobe ramcarveout
+ExecStop=/sbin/rmmod ramcarveout
+
+[Install]
+WantedBy=multi-user.target
+
