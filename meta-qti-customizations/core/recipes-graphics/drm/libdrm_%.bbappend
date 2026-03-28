@@ -1,3 +1,4 @@
+FILESEXTRAPATHS:prepend = "${WORKSPACE}/display/layers/meta-qti-display/recipes/drm/files:"
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 SRC_URI:append = " \
