@@ -14,9 +14,13 @@ SRC_URI = "\
     file://setup-network-host-gunyah.service \
     file://setup-network-host-gunyah-vmm.sh \
     file://setup-network-host-gunyah-vmm.service \
+    file://setup-network-host-gunyah-vmm_7255.sh \
 "
 
 inherit systemd
+
+VMM_NET_SHELL ?= "setup-network-host-gunyah-vmm.sh"
+VMM_NET_SHELL:sa7255 = "setup-network-host-gunyah-vmm_7255.sh"
 
 do_install() {
   install -d ${D}${systemd_system_unitdir}
@@ -24,7 +28,7 @@ do_install() {
 
   if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-gunyah', 'true', 'false', d)}; then
       if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-vmm', 'true', 'false', d)}; then
-          install -m 0755 ${WORKDIR}/setup-network-host-gunyah-vmm.sh ${D}${bindir}/setup-network-host.sh
+          install -m 0755 ${WORKDIR}/${VMM_NET_SHELL} ${D}${bindir}/setup-network-host.sh
           install -m 0644 ${WORKDIR}/setup-network-host-gunyah-vmm.service ${D}${systemd_unitdir}/system/setup-network-host.service
       else
           install -m 0755 ${WORKDIR}/setup-network-host-gunyah.sh ${D}${bindir}/setup-network-host.sh
