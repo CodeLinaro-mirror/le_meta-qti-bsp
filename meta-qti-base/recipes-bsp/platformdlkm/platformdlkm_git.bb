@@ -16,12 +16,14 @@ S = "${WORKDIR}/vendor/qcom/opensource/platform-kernel"
 
 METAL_MODULES_BUILD = "drivers/aop-set-ddr.ko drivers/silent_boot.ko drivers/wallpower_charger.ko drivers/dump_boot_log.ko drivers/silent-mode-hw-monitoring.ko"
 
-VIRT_MODULES_BUILD = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '6.12', 'socinfo_dt.ko subsystem_notif_virt.ko boot_marker.ko', 'drivers/socinfo_dt.ko drivers/subsystem_notif_virt.ko', d)}"
+VIRT_MODULES_BUILD = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '6.12', 'socinfo_dt.ko subsystem_notif_virt.ko boot_marker.ko virtio_ssr.ko', 'drivers/socinfo_dt.ko drivers/subsystem_notif_virt.ko drivers/virtio_ssr.ko', d)}"
+
 VIRT_MODULES_BUILD:append:qtiquingvm8295 = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '6.12', ' vfastrpc.ko', ' drivers/virtual_fastrpc/vfastrpc.ko', d)}"
 VIRT_MODULES_BUILD:append:quin-gvm-gen4 = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '6.12', ' vfastrpc.ko', ' drivers/virtual_fastrpc/vfastrpc.ko', d)}"
 VIRT_MODULES_BUILD:append:quin-gvm-lemans = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '6.12', ' hfastrpc.ko', ' drivers/virtual_fastrpc/hfastrpc.ko', d)}"
 VIRT_MODULES_BUILD:append:quin-gvm-gen4-5 = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '6.12', ' hfastrpc.ko', ' drivers/virtual_fastrpc/hfastrpc.ko', d)}"
 VIRT_MODULES_BUILD:append:gvm-gen4-5 = "${@bb.utils.contains('PREFERRED_VERSION_linux-msm', '6.12', ' hfastrpc.ko', ' drivers/virtual_fastrpc/hfastrpc.ko', d)}"
+VIRT_MODULES_BUILD:append:gvm-gen5 = " hfastrpc.ko"
 
 TECHPACK_MODULES = "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', '${VIRT_MODULES_BUILD}', '${METAL_MODULES_BUILD}', d)}"
 
@@ -41,6 +43,7 @@ VIRT_PROVIDES_MODULES = "\
     kernel-module-socinfo-dt-${KERNEL_VERSION} \
     kernel-module-subsystem-notif-virt-${KERNEL_VERSION} \
     kernel-module-boot-marker-${KERNEL_VERSION} \
+    kernel-module-virtio-ssr-${KERNEL_VERSION} \
 "
 
 VIRT_PROVIDES_MODULES:append:qtiquingvm8295 = " kernel-module-vfastrpc-${KERNEL_VERSION}"
@@ -48,6 +51,7 @@ VIRT_PROVIDES_MODULES:append:quin-gvm-gen4 = " kernel-module-vfastrpc-${KERNEL_V
 VIRT_PROVIDES_MODULES:append:quin-gvm-lemans = " kernel-module-hfastrpc-${KERNEL_VERSION}"
 VIRT_PROVIDES_MODULES:append:quin-gvm-gen4-5 = " kernel-module-hfastrpc-${KERNEL_VERSION}"
 VIRT_PROVIDES_MODULES:append:gvm-gen4-5 = " kernel-module-hfastrpc-${KERNEL_VERSION}"
+VIRT_PROVIDES_MODULES:append:gvm-gen5 = " kernel-module-hfastrpc-${KERNEL_VERSION}"
 
 EXT_MODULE = "vendor/qcom/opensource/platform-kernel"
 

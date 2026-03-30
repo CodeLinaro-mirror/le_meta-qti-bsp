@@ -12,6 +12,9 @@ inherit ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'selinux-image', '', 
 # partition...
 require recipes-products/images/automotive-usr-image.inc
 
+# Set up for handling the generation of the /persist image
+require recipes-products/images/automotive-persist-image.inc
+
 IMAGE_ROOTFS_SIZE = "716800"
 
 IMAGE_INSTALL += "\
@@ -40,6 +43,8 @@ IMAGE_INSTALL += "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'qti-fde', 'enable-fde', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'packagegroup-selinux-minimal packagegroup-selinux-policycoreutils checkpolicy secilc auditd selinux-relabelvar selinux-relabeldata', '', d)} \
 "
+
+IMAGE_INSTALL:append:quin-tgvm-gen4-5 = " ${@bb.utils.contains('DISTRO_FEATURES', 'qti-security', 'optee-libckteec', '', d)}"
 
 IMAGE_LINGUAS = ""
 

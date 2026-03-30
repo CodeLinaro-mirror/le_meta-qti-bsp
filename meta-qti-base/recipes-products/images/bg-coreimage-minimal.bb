@@ -11,6 +11,9 @@ inherit core-image
 # partition...
 require recipes-products/images/automotive-usr-image.inc
 
+# Set up for handling the generation of the /persist image
+require recipes-products/images/automotive-persist-image.inc
+
 DEPENDS += "edk2"
 
 CORE_IMAGE_EXTRA_INSTALL += "\

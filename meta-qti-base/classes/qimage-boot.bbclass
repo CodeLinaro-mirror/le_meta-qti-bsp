@@ -11,6 +11,9 @@ DEPENDS += "\
     virtual/kernel \
 "
 
+DTB_OFFSET = "0x9300000"
+DTB_OFFSET:gvm-gen5 = "0x9700000"
+
 gvm_pilsplitter() {
     PILTOOLS_PATH="${STAGING_BINDIR_NATIVE}/scripts/pil_tools"
     DTB_FILE_LIST=$(find ${DEPLOY_DIR_IMAGE}/build-artifacts/dtb -name "*.dtb" | sort)
@@ -19,6 +22,7 @@ gvm_pilsplitter() {
         exit 1
     else
         ${STAGING_BINDIR_NATIVE}/build/prebuilts/kernel-build-tools/linux-x86/bin/mkdtimg create ${DEPLOY_DIR_IMAGE}/dtbs/dtb.img \
+            ${DEPLOY_DIR_IMAGE}/dtbs/monaco-gh-vm-lv-qam-ridesx.dtb \
             ${DEPLOY_DIR_IMAGE}/dtbs/lemans-gh-vm-lv-qam-ridesx.dtb \
             ${DEPLOY_DIR_IMAGE}/dtbs/sa8797p-gunyah-vm-qam.dtb
     fi
@@ -38,7 +42,7 @@ gvm_pilsplitter() {
     # will fail and return 1.bypass yocto by adding 'set +e' and 'set -e'
     set +e
     python3 ${PILTOOLS_PATH}/image_header.py autoghgvmlv-boot.elf Image,0x0 dtb.img,0x3000000 ramdisk.img,0x3100000 --32
-    python3 ${PILTOOLS_PATH}/image_header.py autoghgvmlv-bootloader.elf FVMAIN_COMPACT.Fv,0x0 dtb.img,0x9300000 LinuxLoader.efi,0x9800000 --32
+    python3 ${PILTOOLS_PATH}/image_header.py autoghgvmlv-bootloader.elf FVMAIN_COMPACT.Fv,0x0 dtb.img,${DTB_OFFSET} LinuxLoader.efi,0x9800000 --32
     set -e
 
     sectools secure-image autoghgvmlv-boot.elf --image-id GVM2 --security-profile ${STAGING_BINDIR_NATIVE}/${SECTOOLS_SECURITY_PROFILE} --sign --signing-mode TEST --outfile autoghgvmlv_signed-boot.elf

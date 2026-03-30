@@ -51,6 +51,22 @@ do_make_avb_image(){
 	            --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.${IMAGE_FSTYPES}\
 	            --setup_rootfs_from_kernel ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.${IMAGE_FSTYPES} \
                 --algorithm SHA256_RSA4096 \
+                --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/testkey_rsa4096.pem \
+                --rollback_index 0 \
+                --prop "com.android.build.boot.security_patch:${@time.strftime('%Y-%m-%d',time.gmtime())}" \
+                --prop "com.android.build.boot.os_version:${@time.strftime('%Y-%m-%d',time.gmtime())}" \
+                --output ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}-gh-vbmeta.img
+
+            # Workaround, to keep two vbmeta images here with different vbmeta name.
+            install -m 644 ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}-gh-vbmeta.img ${DEPLOY_DIR_IMAGE}/${PRODUCT}-gh-vbmeta.img
+            install -m 644 ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}-gh-vbmeta.img ${DEPLOY_DIR_IMAGE}/gh-vbmeta.img
+
+            # For HQX LVGVM create vbmeta without dtbo and use vbgvm_private_key
+            avbtool make_vbmeta_image \
+                --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET} \
+                --include_descriptors_from_image ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.${IMAGE_FSTYPES}\
+                --setup_rootfs_from_kernel ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.${IMAGE_FSTYPES} \
+                --algorithm SHA256_RSA4096 \
                 --key ${STAGING_DIR_NATIVE}${sysconfdir}/signing_tools/sigkeys/vbgvm_private_key_4096.pem \
                 --rollback_index 0 \
                 --output ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}-vbmeta.img
@@ -58,6 +74,7 @@ do_make_avb_image(){
             # Workaround, to keep two vbmeta images here with different vbmeta name.
             install -m 644 ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}-vbmeta.img ${DEPLOY_DIR_IMAGE}/${PRODUCT}-vbmeta.img
             install -m 644 ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}-vbmeta.img ${DEPLOY_DIR_IMAGE}/vbmeta.img
+
         else
             #For lv avb2.0, add hashtree for system image and generate vbmeta.img.
             avbtool add_hashtree_footer \
