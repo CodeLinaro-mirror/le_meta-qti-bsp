@@ -1,68 +1,83 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+# OpenSSL optimization for low-memory systems
+# This bbappend reduces libcrypto.so.3 size from ~5MB to ~2-3MB
+# by disabling unused cryptographic algorithms and features
+# NOTE: Only applies to machines with MACHINE_FEATURES containing 'qti-vm'
+# NOTE: Only applies to target builds, not native/nativesdk to avoid build tool issues
 
-# Only apply optimizations to target builds, not native tools
+# Base values (always defined, empty by default)
 OPENSSL_OPTIMIZATIONS = ""
-OPENSSL_OPTIMIZATIONS:class-target = "1"
-
-# Disable legacy and rarely-used cryptographic algorithms
-# Keep only modern, commonly-used algorithms (AES, SHA256, RSA, ECDSA, etc.)
-# Only applied to target builds
 DEPRECATED_CRYPTO_FLAGS = ""
-DEPRECATED_CRYPTO_FLAGS:class-target = "\
-    no-aria \
-    no-bf \
-    no-blake2 \
-    no-camellia \
-    no-cast \
-    no-des \
-    no-idea \
-    no-md2 \
-    no-md4 \
-    no-mdc2 \
-    no-rc2 \
-    no-rc4 \
-    no-rc5 \
-    no-rmd160 \
-    no-seed \
-    no-siphash \
-    no-sm2 \
-    no-sm3 \
-    no-sm4 \
-    no-whirlpool \
-"
 
-# Disable weak/deprecated SSL/TLS versions
-DEPRECATED_CRYPTO_FLAGS += "\
-    no-ssl3 \
-    no-ssl3-method \
-    no-weak-ssl-ciphers \
-"
+python () {
+    machine_features = (d.getVar('MACHINE_FEATURES') or '').split()
 
-# Disable additional features not commonly needed in embedded systems
-# Only applied to target builds
-EXTRA_OECONF:append:class-target = " \
-    no-engine \
-    no-hw \
-    no-autoerrinit \
-    no-comp \
-    no-cms \
-    no-ct \
-    no-srp \
-    no-srtp \
-    no-ts \
-    no-gost \
-    no-nextprotoneg \
-    no-psk \
-    no-sctp \
-    no-ocsp \
-"
+    # Only apply optimizations for machines with the 'qti-vm' MACHINE_FEATURES flag
+    if 'qti-vm' not in machine_features:
+        bb.debug(1, "openssl bbappend: skipping size optimizations "
+                    "(qti-vm not in MACHINE_FEATURES)")
+        return
 
-# Optimize for size instead of speed (target only)
-EXTRA_OECONF:append:class-target = " -Os"
+    bb.debug(1, "openssl bbappend: applying size optimizations for qti-vm machine")
 
-# Additional size optimizations (target only)
-TARGET_CFLAGS:append:class-target = " -ffunction-sections -fdata-sections"
-TARGET_LDFLAGS:append:class-target = " -Wl,--gc-sections"
+    # Prepend FILESEXTRAPATHS
+    thisdir = d.getVar('THISDIR') or ''
+    pn = d.getVar('PN') or ''
+    fps = d.getVar('FILESEXTRAPATHS') or ''
+    d.setVar('FILESEXTRAPATHS', '%s/%s:%s' % (thisdir, pn, fps))
+
+    # Only apply optimizations to target builds, not native tools
+    d.setVar('OPENSSL_OPTIMIZATIONS:class-target', '1')
+
+    # Disable legacy and rarely-used cryptographic algorithms
+    # Keep only modern, commonly-used algorithms (AES, SHA256, RSA, ECDSA, etc.)
+    deprecated_flags = (
+        "no-aria "
+        "no-bf "
+        "no-camellia "
+        "no-cast "
+        "no-des "
+        "no-idea "
+        "no-md2 "
+        "no-md4 "
+        "no-mdc2 "
+        "no-rc2 "
+        "no-rc4 "
+        "no-rc5 "
+        "no-rmd160 "
+        "no-seed "
+        "no-siphash "
+        "no-sm2 "
+        "no-sm3 "
+        "no-sm4 "
+        "no-whirlpool "
+        "no-ssl3 "
+        "no-ssl3-method "
+        "no-weak-ssl-ciphers"
+    )
+    d.setVar('DEPRECATED_CRYPTO_FLAGS:class-target', deprecated_flags)
+
+    # Disable additional features not commonly needed in embedded systems (target only)
+    extra_conf = (
+        " no-engine"
+        " no-hw"
+        " no-autoerrinit"
+        " no-comp"
+        " no-cms"
+        " no-ct"
+        " no-srp"
+        " no-srtp"
+        " no-gost"
+        " no-nextprotoneg"
+        " no-psk"
+        " no-sctp"
+        " -Os"
+    )
+    d.setVar('EXTRA_OECONF:append:class-target', extra_conf)
+
+    # Additional size optimizations (target only)
+    d.setVar('TARGET_CFLAGS:append:class-target', ' -ffunction-sections -fdata-sections')
+    d.setVar('TARGET_LDFLAGS:append:class-target', ' -Wl,--gc-sections')
+}
 
 # Note: The following algorithms are KEPT (commonly used):
 # - AES (symmetric encryption)
