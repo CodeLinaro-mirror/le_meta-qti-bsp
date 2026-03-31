@@ -1,4 +1,4 @@
-inherit pkgconfig native autotools
+inherit pkgconfig autotools native
 
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
@@ -7,7 +7,7 @@ HOMEPAGE = "https://www.codeaurora.org/gitweb/quic/la?p=platform/bootable/recove
 
 PR = "r1"
 
-DEPENDS += "bzip2-replacement-native"
+DEPENDS += "bzip2-replacement-native zlib-native"
 RDEPENDS:${PN} = "zlib"
 
 FILESEXTRAPATHS:prepend := "${WORKSPACE}/OTA/recovery/:"
