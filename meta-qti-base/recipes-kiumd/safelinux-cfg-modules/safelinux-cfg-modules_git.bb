@@ -39,6 +39,7 @@ do_install:append() {
     install -m 0644 ${WORKDIR}/vendor/qcom/opensource/safelinux-cfg-modules/safelinux-modules/include/uapi/misc/iommu_iova_map_user.h ${D}${includedir}/uapi/misc
     install -m 0644 ${WORKDIR}/vendor/qcom/opensource/safelinux-cfg-modules/safelinux-modules/include/uapi/misc/kiumd.h ${D}${includedir}/uapi/misc
     install -m 0644 ${WORKDIR}/vendor/qcom/opensource/safelinux-cfg-modules/safelinux-modules/include/uapi/misc/scm_user_intf.h ${D}${includedir}/uapi/misc
+    install -m 0644 ${WORKDIR}/vendor/qcom/opensource/safelinux-cfg-modules/safelinux-modules/include/uapi/misc/qcom_l3_cache_config.h ${D}${includedir}/uapi/misc
     install -m 0644 ${WORKDIR}/vendor/qcom/opensource/safelinux-cfg-modules/safelinux-modules/include/uapi/misc/qcom_uscmi.h ${D}${includedir}/uapi/misc
 }
 
@@ -59,6 +60,7 @@ RPROVIDES:${PN} += "kernel-module-kiumd-kgsl-${KERNEL_VERSION}"
 RPROVIDES:${PN} += "kernel-module-mhi-ep-net-${KERNEL_VERSION}"
 RPROVIDES:${PN} += "kernel-module-profiler-${KERNEL_VERSION}"
 RPROVIDES:${PN} += "kernel-module-qcom-ethqos-filter-${KERNEL_VERSION}"
+RPROVIDES:${PN} += "kernel-module-qcom-l3-cache-config-${KERNEL_VERSION}"
 
 FILES:${PN} += "${sysconfdir}/modules-load.d/*"
 FILES:${PN} += "${nonarch_base_libdir}/modules/*"
