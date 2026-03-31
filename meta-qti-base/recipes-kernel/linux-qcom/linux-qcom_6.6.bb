@@ -4,7 +4,7 @@ HOMEPAGE = "https://git.codelinaro.org"
 LICENSE = "GPLv2.0-with-linux-syscall-note"
 LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 
-COMPATIBLE_MACHINE = "sa8775|sa8797"
+COMPATIBLE_MACHINE = "gvm-gen5"
 
 DEPENDS += "\
     elfutils-native kern-tools-native openssl-native \
@@ -13,67 +13,58 @@ DEPENDS += "\
 
 SRC_URI = "\
     ${PATH_TO_REPO}/kernel/kernel_platform/kernel/.git;protocol=${PROTO};destsuffix=kernel/kernel_platform/kernel;usehead=1 \
+    ${PATH_TO_REPO}/vendor/qcom/opensource/platform-kernel/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/platform-kernel;usehead=1 \
     file://generic.cfg \
     file://dm.cfg \
     ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'file://selinux.cfg', '', d)} \
     ${@bb.utils.contains_any('VARIANT', 'perf user', '', 'file://devmem.cfg', d)} \
-    file://0001-QCLINUX-vfio-Disable-iommu_group_claim_dma_owner-tem.patch \
-    file://0002-PENDING-soc-qcom-geni-se-Enable-QUPs-on-SA8255p-Qual.patch \
-    file://0003-PENDING-serial-qcom-geni-Enable-Serial-on-SA8255p-pl.patch \
-    file://0004-PENDING-i2c-qcom-geni-Enable-I2C-on-SA8255p-Qualcomm.patch \
-    file://0005-PENDING-spi-geni-qcom-Enable-SPI-on-SA8255p-Qualcomm.patch \
-    file://0006-PENDING-spi-geni-qcom-Enable-SPI-GSI-mode-for-SA8255.patch \
-    file://0007-PENDING-scsi-ufs-qcom-Enable-sa8255p-platform.patch \
-    file://0008-PENDING-phy-qcom-qmp-usb-Call-qmp_usb_remove-during-.patch \
-    file://0009-PENDING-phy-qcom-qmp-usb-Add-support-for-SA8255P.patch \
-    file://0010-PENDING-usb-dwc3-qcom-Add-support-for-sa8255p-for-qc.patch \
-    file://0011-PENDING-phy-qcom-snps-femto-v2-Call-qcom_snps_hsphy_.patch \
-    file://0012-PENDING-phy-qcom-snps-femto-v2-Add-support-for-SA825.patch \
-    file://0001-FROMLIST-of-of_reserved_mem-Increase-limit-for-reser.patch \
 "
 
-SRCREV_kernel = "${AUTOREV}"
+SRCREV = "${AUTOREV}"
 
-inherit kernel kernel-yocto
+inherit kernel
 
 S = "${WORKDIR}/kernel/kernel_platform/kernel"
 
-KBRANCH ?= ""
-KMETA = "kernel-meta"
-KCONFIG_MODE = "--alldefconfig"
-KBUILD_DEFCONFIG ?= "${KERNEL_CONFIG}"
+# KBUILD_DEFCONFIG ?= "${KERNEL_CONFIG}"
+KBUILD_DEFCONFIG ?= "vendor/autogvm.config"
 LINUX_VERSION_EXTENSION = "${@['-perf', ''][d.getVar('VARIANT', True) == ('' or 'debug')]}"
 
-do_kernel_checkout[noexec] = "1"
-do_validate_branches[noexec] = "1"
+do_copy_config() {
+    mkdir -p ${S}/arch/arm64/configs/vendor
+    cp ${WORKDIR}/vendor/qcom/opensource/platform-kernel/qclinux/defconfig/.config ${S}/arch/arm64/configs/${KBUILD_DEFCONFIG}
+}
+
+python do_unpack:append() {
+    bb.build.exec_func('do_copy_config', d)
+}
 
 do_generate_base_defconfig() {
-    export KCONFIG_CONFIG="${S}/arch/arm64/configs/${KBUILD_DEFCONFIG}"
-    base_defconfig="${S}/arch/arm64/configs/qcom_defconfig"
-    qcom_addon_config="${S}/arch/arm64/configs/qcom_addons.config"
-    ${S}/scripts/kconfig/merge_config.sh -m -r -y ${base_defconfig} ${qcom_addon_config} 1>&2
-}
-addtask do_generate_base_defconfig after do_unpack before do_kernel_metadata
+    # Generate .config directly in build directory to avoid regeneration in do_configure
+    export KCONFIG_CONFIG="${B}/.config"
 
-do_patch:append() {
-    cd ${S}
-    patch -f -p1 < ${WORKDIR}/0001-QCLINUX-vfio-Disable-iommu_group_claim_dma_owner-tem.patch
-    patch -f -p1 < ${WORKDIR}/0002-PENDING-soc-qcom-geni-se-Enable-QUPs-on-SA8255p-Qual.patch
-    patch -f -p1 < ${WORKDIR}/0003-PENDING-serial-qcom-geni-Enable-Serial-on-SA8255p-pl.patch
-    patch -f -p1 < ${WORKDIR}/0004-PENDING-i2c-qcom-geni-Enable-I2C-on-SA8255p-Qualcomm.patch
-    patch -f -p1 < ${WORKDIR}/0005-PENDING-spi-geni-qcom-Enable-SPI-on-SA8255p-Qualcomm.patch
-    patch -f -p1 < ${WORKDIR}/0006-PENDING-spi-geni-qcom-Enable-SPI-GSI-mode-for-SA8255.patch
-    patch -f -p1 < ${WORKDIR}/0007-PENDING-scsi-ufs-qcom-Enable-sa8255p-platform.patch
-    patch -f -p1 < ${WORKDIR}/0008-PENDING-phy-qcom-qmp-usb-Call-qmp_usb_remove-during-.patch
-    patch -f -p1 < ${WORKDIR}/0009-PENDING-phy-qcom-qmp-usb-Add-support-for-SA8255P.patch
-    patch -f -p1 < ${WORKDIR}/0010-PENDING-usb-dwc3-qcom-Add-support-for-sa8255p-for-qc.patch
-    patch -f -p1 < ${WORKDIR}/0011-PENDING-phy-qcom-snps-femto-v2-Call-qcom_snps_hsphy_.patch
-    patch -f -p1 < ${WORKDIR}/0012-PENDING-phy-qcom-snps-femto-v2-Add-support-for-SA825.patch
-    patch -f -p1 < ${WORKDIR}/0001-FROMLIST-of-of_reserved_mem-Increase-limit-for-reser.patch
+    base_defconfig="${S}/arch/arm64/configs/${KBUILD_DEFCONFIG}"
+    
+    # if ${@bb.utils.contains_any('VARIANT', 'debug user', 'true', 'false', d)}; then
+    #     ${S}/scripts/kconfig/merge_config.sh -m -r \
+    #         ${base_defconfig} \
+    #         ${S}/arch/arm64/configs/vendor/generic_auto_defconfig \
+    #         ${S}/arch/arm64/configs/vendor/generic_auto_debug.fragment \
+    #         ${S}/arch/arm64/configs/vendor/autogvmlv_defconfig \
+    #         ${S}/arch/arm64/configs/vendor/autogvmlv_debug.fragment 1>&2
+    # else
+    #     ${S}/scripts/kconfig/merge_config.sh -m -r \
+    #         ${base_defconfig} \
+    #         ${S}/arch/arm64/configs/vendor/generic_auto_defconfig \
+    #         ${S}/arch/arm64/configs/vendor/autogvmlv_defconfig 1>&2
+    # fi
+    ${S}/scripts/kconfig/merge_config.sh -m -r ${base_defconfig} 1>&2
 }
+addtask do_generate_base_defconfig after do_patch before do_configure
 
 do_compile:prepend() {
     export DTC_FLAGS="-@"
+    export KCFLAGS="-Wno-error=unused-variable -Wno-error=format"
 }
 
 do_shared_workdir:append () {
@@ -153,3 +144,6 @@ KERNEL_IMAGETYPE_FOR_MAKE += "modules"
 
 do_compile_kernelmodules[noexec] = "1"
 
+# remove package kernel-devicetree append in kernel-devicetree.bbclass, kernel-devicetree
+# provide by kernel-devicetree.bb
+PACKAGES:remove = "${KERNEL_PACKAGE_NAME}-devicetree"

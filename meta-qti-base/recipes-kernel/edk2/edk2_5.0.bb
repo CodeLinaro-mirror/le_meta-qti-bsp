@@ -13,8 +13,8 @@ EARLY_ETH = "${@bb.utils.contains('DISTRO_FEATURES', 'qti-early-eth', '1', '0', 
 HIBERNATION = "${@bb.utils.contains('COMBINED_FEATURES', 'hibernation', '1', '0', d)}"
 AB_BOOT_LXC = "${@bb.utils.contains('MACHINE_FEATURES', 'qti-lxc', '1', '0', d)}"
 
-SRC_URI = "${PATH_TO_REPO}/kernel/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/bootable/bootloader/edk2/.git;protocol=${PROTO};destsuffix=kernel/kernel-${PREFERRED_VERSION_linux-msm}/kernl_platform/bootable/bootloader/edk2;usehead=1"
+SRC_URI = "${PATH_TO_REPO}/kernel_platform/bootable/bootloader/edk2/.git;protocol=${PROTO};destsuffix=kernel_platform/bootable/bootloader/edk2;usehead=1"
 
 SRC_URI:append = " file://0001-edk2-remove-register-for-C-17-compiler.patch"
 
-S = "${WORKDIR}/kernel/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/bootable/bootloader/edk2"
+S = "${WORKDIR}/kernel_platform/bootable/bootloader/edk2"

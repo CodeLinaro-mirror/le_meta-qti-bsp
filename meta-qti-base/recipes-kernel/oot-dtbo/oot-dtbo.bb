@@ -1,62 +1,51 @@
-SUMMARY = "External/Out of tree (OOT) device tree overlay"
-DESCRIPTION = "External/out of tree (OOT) device tree overlay"
-HOMEPAGE = "https://git.codelinaro.org"
-LICENSE = "GPL-2.0-only"
-LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=801f80980d171dd6425610833a22dbe6"
+SUMMARY = "Security devicetree"
+DESCRIPTION = "To provide devicetree attributes for gvm kernel"
+LICENSE = "GPLv2.0-with-linux-syscall-note"
+LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 
-DEPENDS += "bison-native dtc-native virtual/kernel"
-
-SRC_URI = "\
-           ${PATH_TO_REPO}/vendor/qcom/opensource/safelinux-system-cfg/devicetree/.git;protocol=${PROTO};usehead=1 \
-           ${PATH_TO_REPO}/kernel/${RH_KERNEL_NAME}/.git;protocol=${PROTO};usehead=1 \
-"
+SRC_URI = "${PATH_TO_REPO}/kernel_platform/qcom/opensource/devicetree/.git;protocol=${PROTO};destsuffix=kernel_platform/qcom/opensource/devicetree;usehead=1 \
+           ${PATH_TO_REPO}/vendor/qcom/opensource/platform-kernel/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/platform-kernel;usehead=1 "
 SRCREV = "${AUTOREV}"
 
-S = "${WORKDIR}/vendor/qcom/opensource/safelinux-system-cfg/devicetree"
+S = "${WORKDIR}/kernel_platform/qcom/opensource/devicetree/qcom"
 
-inherit ark-dtb-merge deploy kernel-arch
+EXT_MODULE = "${WORKDIR}/kernel_platform/qcom/opensource/devicetree/qcom"
 
-EXTRA_OEMAKE += "KDIR=${STAGING_KERNEL_DIR}"
-CONFIG_ARCH ?= ""
-CONFIG_ARCH:sa7255 = "CONFIG_ARCH_SA7255=y"
+DT_MAKE = "${WORKDIR}/vendor/qcom/opensource/platform-kernel/qclinux/devicetree-make"
 
-do_compile() {
-    make dtbos KDIR=${STAGING_KERNEL_DIR} O=${STAGING_KERNEL_BUILDDIR} ${CONFIG_ARCH} CC="${KERNEL_CC}" LD="${KERNEL_LD}"
-}
-do_compile[lockfiles] += "${TMPDIR}/qti-techpack.lock"
+CLEANBROKEN = "1"
 
-do_merge_dtb() {
-    if [ -z "${KERNEL_BASE_DTB}" ]; then
-        return 0
-    fi
+inherit qti-techpack
 
-    install -d ${S}/out
+do_compile[depends] += "soc-repo:do_configure"
 
-    dtb_dir=${DEPLOY_DIR_IMAGE}/build-artifacts/kernel-dtb
-    dtbo_dir=${S}
-    out_dir=${S}/out
-    merge_dtbos $dtb_dir $dtbo_dir $out_dir
-}
-do_merge_dtb[depends] += "virtual/kernel:do_deploy"
-addtask do_merge_dtb after do_compile before do_install
-
-do_install:append() {
-    if [ -d ${S}/oot-dt-bindings/ ]; then
-        install -d ${D}${includedir}/safelinux-system-cfg/oot-dt-bindings
-        install -m 0644 ${S}/oot-dt-bindings/*.h ${D}${includedir}/safelinux-system-cfg/oot-dt-bindings/
+do_configure:append() {
+    find ${S} -maxdepth 1 -name "Makefile" -delete
+    if [ -f ${DT_MAKE}/Makefile ]; then
+        cp ${DT_MAKE}/* ${S}/
+    else
+        bbfatal "Makefile not found in devicetree-make"
     fi
 }
 
-OOT_DTBS ?= ""
-do_deploy() {
-    if [ -n "${OOT_DTBS}" ]; then
-        install -d ${DEPLOYDIR}/build-artifacts/dtb
+TECHPACK_MODULE_OUT = "${S}"
 
-        for dtb in ${OOT_DTBS}; do
-            if [ -f ${S}/$dtb ]; then
-                install -m 0644 ${S}/$dtb ${DEPLOYDIR}/build-artifacts/dtb/
-            fi
-        done
-    fi
+do_deploy () {
+    install -d ${DEPLOYDIR}/build-artifacts/dtb
+    install -d ${DEPLOYDIR}/build-artifacts/dtbo
+
+    for dtb in ${TECHPACK_DTBS}; do
+        if [ -f ${S}/$dtb ]; then
+            install -m 0644 ${S}/$dtb ${DEPLOYDIR}/build-artifacts/dtb/
+        fi
+    done
+
+    for dtbo in ${TECHPACK_DTBOS}; do
+        if [ -f ${S}/$dtbo ]; then
+            install -m 0644 ${S}/$dtbo ${DEPLOYDIR}/build-artifacts/dtbo/
+        fi
+    done
 }
-addtask do_deploy after do_install
+
+TECHPACK_DTBS = "sa8797p-gunyah-vm-lv-qam.dtb"
+TECHPACK_DTBOS = "sa8797p-gunyah-vm-lv-qam-overlay.dtbo"

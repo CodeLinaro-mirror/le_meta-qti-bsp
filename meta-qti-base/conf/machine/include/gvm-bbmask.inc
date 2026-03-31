@@ -38,8 +38,9 @@ meta-qti-bsp/meta-qti-base/recipes-kiumd/safelinux-cfg-modules/safelinux-cfg-mod
 meta-qti-bsp/meta-qti-base/recipes-kiumd/kiumd-headers/kiumd-headers_git.bb \
 meta-qti-bsp/meta-qti-base/recipes-kiumd/gvm-net-config/gvm-net-config_git.bb \
 meta-qti-bsp/meta-qti-base/recipes-kiumd/dspfirmware-mount/dspfirmware-mount_git.bb \
-meta-qti-bsp/meta-qti-base/recipes-kernel/oot-dtbo/oot-dtbo.bb \
 meta-qti-bsp/meta-qti-base/recipes-kernel/edk2/edk2_git.bb \
+meta-qti-bsp/meta-qti-base/recipes-kernel/edk2/edk2_4.0.bb \
+meta-qti-bsp/meta-qti-base/recipes-kernel/dtc/dtc-aosp.bb \
 meta-qti-bsp/meta-qti-base/recipes-data/emac-dwc-eqos/emac-dwc-eqos_git.bb \
 meta-qti-bsp/meta-qti-base/recipes-data/dataeth-dlkm/dataeth-dlkm_git.bb \
 meta-qti-bsp/meta-qti-base/recipes-data/aurix-can/aurix-can_git.bb \

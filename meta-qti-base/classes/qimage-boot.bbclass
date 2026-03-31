@@ -22,8 +22,7 @@ gvm_pilsplitter() {
         exit 1
     else
         ${STAGING_BINDIR_NATIVE}/build/prebuilts/kernel-build-tools/linux-x86/bin/mkdtimg create ${DEPLOY_DIR_IMAGE}/dtbs/dtb.img \
-            ${DEPLOY_DIR_IMAGE}/dtbs/lemans-gh-vm-lv-qam-ridesx.dtb \
-            ${DEPLOY_DIR_IMAGE}/dtbs/sa8797p-gunyah-vm-qam.dtb
+            ${DEPLOY_DIR_IMAGE}/dtbs/sa8797p-gunyah-vm-lv-qam.dtb
     fi
 
     install -d ${DEPLOY_DIR_IMAGE}/signing
@@ -97,17 +96,17 @@ do_merge_dtbs() {
          fi
      else
          ${STAGING_BINDIR_NATIVE}/build/android/merge_dtbs.py \
-         --base ${DEPLOY_DIR_IMAGE}/build-artifacts/dtb \
-         --techpack ${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbs \
-         --out ${DEPLOY_DIR_IMAGE}/dtbs
+         ${DEPLOY_DIR_IMAGE}/build-artifacts/dtb \
+         ${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbs \
+         ${DEPLOY_DIR_IMAGE}/dtbs
 
          if ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'true', 'false', d)}; then
              install -d ${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbos
              install -d ${DEPLOY_DIR_IMAGE}/dtbos
              ${STAGING_BINDIR_NATIVE}/build/android/merge_dtbs.py \
-             --base ${DEPLOY_DIR_IMAGE}/build-artifacts/dtbo \
-             --techpack ${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbos \
-             --out ${DEPLOY_DIR_IMAGE}/dtbos
+             ${DEPLOY_DIR_IMAGE}/build-artifacts/dtbo \
+             ${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbos \
+             ${DEPLOY_DIR_IMAGE}/dtbos
          fi
      fi
 

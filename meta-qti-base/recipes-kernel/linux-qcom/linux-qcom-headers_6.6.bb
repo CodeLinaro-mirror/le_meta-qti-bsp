@@ -16,7 +16,8 @@ B = "${WORKDIR}/build"
 inherit linux-kernel-base kernel-arch
 
 # We need the kernel to be unpacked and patched before we can grab the headers.
-do_install[depends] += "virtual/kernel:do_patch"
+# Also need soc-repo headers to be overlaid before extracting
+do_install[depends] += "virtual/kernel:do_patch soc-repo:do_configure"
 
 # There's nothing to do here, except install the headers where we can package them
 do_fetch[noexec] = "1"
@@ -42,7 +43,14 @@ do_install() {
     # used to avoid issues from a symlink loop.
     install -d ${D}${includedir}/kernel/usr
     ln -sf ../../linux-qcom ${D}${includedir}/kernel/usr/include
+
+    # Create a symlink for linux-qcom-rt -> linux-qcom so that recipes using
+    # ${PREFERRED_PROVIDER_virtual/kernel} (i.e. linux-qcom-rt) to construct
+    # their include path can transparently find the headers.
+    ln -sf linux-qcom ${D}${includedir}/linux-qcom-rt
 }
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 ALLOW_EMPTY:${PN} = "1"
+
+RPROVIDES:${PN}-dev += "linux-qcom-rt-headers-dev"

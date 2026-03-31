@@ -21,7 +21,7 @@ SRC_URI:append:sa81x5 = " file://0001-systemd-add-slotselect-support-in-fstab.pa
 
 SRC_URI:append = " ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "6.1", "file://platform_load.conf", "", d)}"
 
-SRC_URI:append = " ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "6.12", "file://linux-msm-6.12_modules_load.conf", "", d)}"
+SRC_URI:append = " ${@bb.utils.contains("PREFERRED_VERSION_linux-qcom", "6.6", "file://linux-msm-6.12_modules_load.conf", "", d)}"
 
 # Remove backlight - Loads/Saves Screen Backlight Brightness, not required.
 PACKAGECONFIG:remove = "backlight "
@@ -71,7 +71,7 @@ do_install:append () {
         install -m 0664 ${WORKDIR}/platform_load.conf ${D}${sysconfdir}/modules-load.d/
     fi
 
-    if ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "6.12", "true", "false", d)}; then
+    if ${@bb.utils.contains("PREFERRED_VERSION_linux-qcom", "6.6", "true", "false", d)}; then
         install -m 0664 ${WORKDIR}/linux-msm-6.12_modules_load.conf ${D}${sysconfdir}/modules-load.d/
     fi
 }

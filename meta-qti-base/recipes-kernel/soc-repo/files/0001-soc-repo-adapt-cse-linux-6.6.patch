@@ -1,0 +1,89 @@
+From 4b10b168c706aeeed6efbc2a43e5ed73d7d37e2b Mon Sep 17 00:00:00 2001
+From: Zhuo Yang <zhuyan@qti.qualcomm.com>
+Date: Thu, 9 Apr 2026 20:12:51 +0800
+Subject: [PATCH] soc-repo: adapt cse linux 6.6
+
+Change-Id: Ibf8871c6a2f4baa895301701c860880c10e043f8
+---
+ drivers/soc/qcom/hab/hab_linux.c                       |  2 +-
+ drivers/soc/qcom/hab/hab_mem_linux.c                   |  2 +-
+ drivers/soc/qcom/hab/hab_virtio.h                      | 10 +++++-----
+ .../dt-bindings/arm/msm/qcom_dma_heap_dt_constants.h   |  1 +
+ 4 files changed, 8 insertions(+), 7 deletions(-)
+ create mode 120000 qclinux/soc-repo/include/dt-bindings/arm/msm/qcom_dma_heap_dt_constants.h
+
+diff --git a/drivers/soc/qcom/hab/hab_linux.c b/drivers/soc/qcom/hab/hab_linux.c
+index 1d0de51..4471b92 100644
+--- a/drivers/soc/qcom/hab/hab_linux.c
++++ b/drivers/soc/qcom/hab/hab_linux.c
+@@ -592,7 +592,7 @@ static int __init hab_init(void)
+ 	if (!hab_driver.cdev)
+ 		goto cdev_alloc_fail;
+ 
+-	hab_driver.class = class_create(THIS_MODULE, "hab");
++	hab_driver.class = class_create("hab");
+ 
+ 	if (IS_ERR(hab_driver.class)) {
+ 		result = PTR_ERR(hab_driver.class);
+diff --git a/drivers/soc/qcom/hab/hab_mem_linux.c b/drivers/soc/qcom/hab/hab_mem_linux.c
+index 83e2716..f5e3b33 100644
+--- a/drivers/soc/qcom/hab/hab_mem_linux.c
++++ b/drivers/soc/qcom/hab/hab_mem_linux.c
+@@ -276,7 +276,7 @@ static struct dma_buf *habmem_get_dma_buf_from_uva(unsigned long address,
+ 
+ 	mmap_read_lock(current->mm);
+ 
+-	ret = get_user_pages(address, page_count, 0, pages, NULL);
++	ret = get_user_pages(address, page_count, 0, pages);
+ 
+ 	mmap_read_unlock(current->mm);
+ 
+diff --git a/drivers/soc/qcom/hab/hab_virtio.h b/drivers/soc/qcom/hab/hab_virtio.h
+index 357c9a1..617880d 100644
+--- a/drivers/soc/qcom/hab/hab_virtio.h
++++ b/drivers/soc/qcom/hab/hab_virtio.h
+@@ -100,28 +100,28 @@ int virthab_init_vqs_post(struct virtio_hab *vh);
+ 
+ struct virtio_device *virthab_get_vdev(int32_t mmid);
+ #else
+-int virthab_queue_inbufs(struct virtio_hab *vh, int alloc)
++static inline int virthab_queue_inbufs(struct virtio_hab *vh, int alloc)
+ {
+ 	return -ENODEV;
+ }
+ 
+-int virthab_alloc(struct virtio_device *vdev, struct virtio_hab **pvh,
++static inline int virthab_alloc(struct virtio_device *vdev, struct virtio_hab **pvh,
+ 			uint32_t mmid_start, int mmid_range)
+ {
+ 	return -ENODEV;
+ }
+ 
+-int virthab_init_vqs_pre(struct virtio_hab *vh)
++static inline int virthab_init_vqs_pre(struct virtio_hab *vh)
+ {
+ 	return -ENODEV;
+ }
+ 
+-int virthab_init_vqs_post(struct virtio_hab *vh)
++static inline int virthab_init_vqs_post(struct virtio_hab *vh)
+ {
+ 	return -ENODEV;
+ }
+ 
+-struct virtio_device *virthab_get_vdev(int32_t mmid)
++static inline struct virtio_device *virthab_get_vdev(int32_t mmid)
+ {
+ 	return NULL;
+ }
+diff --git a/include/dt-bindings/arm/msm/qcom_dma_heap_dt_constants.h b/include/dt-bindings/arm/msm/qcom_dma_heap_dt_constants.h
+new file mode 120000
+index 0000000..eaa1e5d
+--- /dev/null
++++ b/include/dt-bindings/arm/msm/qcom_dma_heap_dt_constants.h
+@@ -0,0 +1 @@
++../../../linux/qcom_dma_heap_dt_constants.h
+\ No newline at end of file
+-- 
+2.34.1
+

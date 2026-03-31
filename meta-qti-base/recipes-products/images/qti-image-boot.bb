@@ -3,7 +3,7 @@ DESCRIPTION = "Build QTI boot image with qimage-boot.bbclass"
 HOMEPAGE = "https://git.codelinaro.org"
 LICENSE = "BSD-3-Clause-Clear"
 
-DEPENDS += "openssl-native python3-native virtual/kernel"
+DEPENDS += "openssl-native python3-native virtual/kernel soc-repo oot-dtbo"
 
 IMAGE_CLASSES:remove = "qimage"
 

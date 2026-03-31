@@ -1,7 +1,7 @@
 SUMMARY = "Initramfs image for early-ramdisk-init"
 LICENSE = "BSD-3-Clause-Clear"
 
-DEPENDS += "mkbootimg-native virtual/kernel"
+DEPENDS += "mkbootimg-native virtual/kernel soc-repo"
 
 IMAGE_CLASSES:remove = "qimage qimage-boot"
 
