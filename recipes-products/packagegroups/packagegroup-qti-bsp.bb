@@ -39,3 +39,5 @@ RDEPENDS:packagegroup-support-utils = "\
 RDEPENDS:packagegroup-filesystem-utils = "\
     packagegroup-filesystem-utils-base \
     "
+
+RDEPENDS:packagegroup-support-utils:append = " vmm-boot-lcm "
