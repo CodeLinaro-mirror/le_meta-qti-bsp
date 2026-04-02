@@ -31,3 +31,5 @@ CORE_IMAGE_EXTRA_INSTALL:remove:seraph = " \
     libmeminfo \
     kernel-modules \
 "
+
+CORE_IMAGE_EXTRA_INSTALL:append:seraph = " diag-router"
