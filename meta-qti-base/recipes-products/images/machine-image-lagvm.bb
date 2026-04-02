@@ -1,23 +1,12 @@
+require machine-image-pvm.bb
+
 SUMMARY = "Machine image - single LAGVM"
 DESCRIPTION = "Build the machine image with single LAGVM"
 LICENSE = "BSD-3-Clause-Clear"
 
-DEPENDS += "mkbootimg-native"
-
-inherit core-image
-
-require automotive-image.inc
-
-KERNEL_VERSION = "${@oe.utils.read_file('${STAGING_KERNEL_BUILDDIR}/kernel-abiversion')}"
-
-add_extra_modules() {
-    # add modules under /extra and remove qcaxxxx.ko and sat_module.ko)
-    cd ${IMAGE_ROOTFS}/lib/modules/${KERNEL_VERSION}
-    find extra -type f -name "*.ko" | grep -v qca |grep -v sat_module| sort >> modules.order
-
-    # genarate modules.load from modules.order
-    awk -F / '{print $NF > "modules.load"}' modules.order
-}
+IMAGE_INSTALL += "\
+    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-vmm', 'packagegroup-qti-vmm', '', d)} \
+"
 
 modify_vm_config() {
     if [ -f ${IMAGE_ROOTFS}/etc/vm_config.xml ]; then
@@ -38,15 +27,9 @@ modify_vm_config() {
     fi
 }
 
-ROOTFS_POSTPROCESS_COMMAND:append = " add_extra_modules;"
-ROOTFS_POSTPROCESS_COMMAND:remove:sa8797 = "add_extra_modules;"
 ROOTFS_POSTPROCESS_COMMAND:append = " modify_vm_config;"
 
-# Makes image suitable for development (e.g. enable ssh for login, allows root logins and logins without passwords by ssh)
-IMAGE_FEATURES:append = " ${@bb.utils.contains('VARIANT', 'debug', 'debug-tweaks ssh-server-openssh', '', d)}"
-IMAGE_FEATURES:remove = "${@bb.utils.contains('DISTRO_FEATURES', 'qti-rumi', 'ssh-server-openssh read-only-rootfs', '', d)}"
-
-INCOMPATIBLE_LICENSE = "GPL-3.0-only LGPL-3.0-only AGPL-3.0-only"
-
-BOOTIMAGE_TARGET ?= "${PRODUCT}-lagvm-boot.img"
-VBMETAIMAGE_TARGET ?= "${PRODUCT}-lagvm-vbmeta.img"
+DEPLOY_NAME_BASE = "${PRODUCT}-lagvm-automotive"
+USR_IMAGE_BASENAME = "${PRODUCT}-lagvm-usrfs"
+PERSIST_IMAGE_BASENAME = "${PRODUCT}-lagvm-persist"
+BOOTIMAGE_TARGET = "${PRODUCT}-lagvm-boot.img"

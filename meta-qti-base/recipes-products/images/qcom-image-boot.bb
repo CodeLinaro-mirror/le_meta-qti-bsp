@@ -11,6 +11,13 @@ DEPENDS += "${@bb.utils.contains_any('COMBINED_FEATURES', 'qti-audio qti-audio-a
 IMAGE_CLASSES:remove = "qimage"
 IMAGE_FEATURES:remove = "ssh-server-openssh"
 
+DEPLOY_NAME_BASE_LAGVM = "${PRODUCT}-lagvm-automotive"
+DEPLOY_NAME_LAGVM = "${DEPLOY_NAME_BASE_LAGVM}${@['-' + d.getVar('VARIANT', True), ''][d.getVar('VARIANT', True) == ('' or 'debug')]}"
+DEPLOY_DIR_IMAGE_LAGVM = "${DEPLOY_DIR}/images/${DEPLOY_NAME_LAGVM}"
+DEPLOY_NAME_BASE_PVM = "${PRODUCT}-pvm-automotive"
+DEPLOY_NAME_PVM = "${DEPLOY_NAME_BASE_PVM}${@['-' + d.getVar('VARIANT', True), ''][d.getVar('VARIANT', True) == ('' or 'debug')]}"
+DEPLOY_DIR_IMAGE_PVM = "${DEPLOY_DIR}/images/${DEPLOY_NAME_PVM}"
+
 inherit image qcom-dtb-merge
 
 EXTRA_IMAGE_FEATURES = ""
@@ -71,7 +78,10 @@ do_makeboot () {
         --cmdline "${KERNEL_CMD_PARAMS}" \
         --output  ${DEPLOY_DIR_IMAGE}/${PRODUCT}-boot-${KERNEL_VERSION}.img
         if [ -f "${DEPLOY_DIR_IMAGE}/dtbs/1gvm/dtb.img" ]; then
-            # Make sgvm bootimage
+            if [ ! -d "${DEPLOY_DIR_IMAGE_LAGVM}" ]; then
+                install -d ${DEPLOY_DIR_IMAGE_LAGVM}
+            fi
+            # Make lagvm bootimage
             ${STAGING_BINDIR_NATIVE}/scripts/mkbootimg.py --header_version ${KERNEL_IMAGE_HEADER_VERSION} \
             --kernel  ${DEPLOY_DIR_IMAGE}/Image \
             --dtb  ${DEPLOY_DIR_IMAGE}/dtbs/1gvm/dtb.img \
@@ -80,8 +90,24 @@ do_makeboot () {
             --base ${KERNEL_BASE} \
             --ramdisk_offset 0x0 \
             --cmdline "${KERNEL_CMD_PARAMS}" \
-            --output  ${DEPLOY_DIR_IMAGE}/${PRODUCT}-lagvm-boot-${KERNEL_VERSION}.img
-            cp ${DEPLOY_DIR_IMAGE}/${PRODUCT}-lagvm-boot-${KERNEL_VERSION}.img ${DEPLOY_DIR_IMAGE}/${PRODUCT}-lagvm-boot.img
+            --output  ${DEPLOY_DIR_IMAGE_LAGVM}/${PRODUCT}-lagvm-boot-${KERNEL_VERSION}.img
+            cp ${DEPLOY_DIR_IMAGE_LAGVM}/${PRODUCT}-lagvm-boot-${KERNEL_VERSION}.img ${DEPLOY_DIR_IMAGE_LAGVM}/${PRODUCT}-lagvm-boot.img
+        fi
+        if [ -f "${DEPLOY_DIR_IMAGE}/dtbs/0gvm/dtb.img" ]; then
+            if [ ! -d "${DEPLOY_DIR_IMAGE_PVM}" ]; then
+                install -d ${DEPLOY_DIR_IMAGE_PVM}
+            fi
+            # Make pvm bootimage
+            ${STAGING_BINDIR_NATIVE}/scripts/mkbootimg.py --header_version ${KERNEL_IMAGE_HEADER_VERSION} \
+            --kernel  ${DEPLOY_DIR_IMAGE}/Image \
+            --dtb  ${DEPLOY_DIR_IMAGE}/dtbs/0gvm/dtb.img \
+            --ramdisk ${BOOT_RAMDISK_IMG} \
+            --pagesize ${PAGE_SIZE} \
+            --base ${KERNEL_BASE} \
+            --ramdisk_offset 0x0 \
+            --cmdline "${KERNEL_CMD_PARAMS}" \
+            --output  ${DEPLOY_DIR_IMAGE_PVM}/${PRODUCT}-pvm-boot-${KERNEL_VERSION}.img
+            cp ${DEPLOY_DIR_IMAGE_PVM}/${PRODUCT}-pvm-boot-${KERNEL_VERSION}.img ${DEPLOY_DIR_IMAGE_PVM}/${PRODUCT}-pvm-boot.img
         fi
     elif [ "${KERNEL_IMAGE_HEADER_VERSION}" = "1" ]; then
         # Make bootimage
@@ -117,8 +143,12 @@ do_sign_boot_img () {
     imgname="${DEPLOY_DIR_IMAGE}/${BOOTIMAGE_TARGET}"
     if ${@bb.utils.contains('DISTRO_FEATURES', 'qti-avb', 'true', 'false', d)}; then
         avb_sign_boot_image ${imgname}
-        if [ -f "${DEPLOY_DIR_IMAGE}/${PRODUCT}-lagvm-boot.img" ]; then
-            imgname="${DEPLOY_DIR_IMAGE}/${PRODUCT}-lagvm-boot.img"
+        if [ -f "${DEPLOY_DIR_IMAGE_LAGVM}/${PRODUCT}-lagvm-boot.img" ]; then
+            imgname="${DEPLOY_DIR_IMAGE_LAGVM}/${PRODUCT}-lagvm-boot.img"
+            avb_sign_boot_image ${imgname}
+        fi
+        if [ -f "${DEPLOY_DIR_IMAGE_PVM}/${PRODUCT}-pvm-boot.img" ]; then
+            imgname="${DEPLOY_DIR_IMAGE_PVM}/${PRODUCT}-pvm-boot.img"
             avb_sign_boot_image ${imgname}
         fi
     fi
