@@ -58,14 +58,30 @@ do_install:append() {
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
         install -d ${D}${systemd_unitdir}/system/
         install -m 0644 ${WORKDIR}/busybox-syslog.service -D ${D}${systemd_unitdir}/system/busybox-syslog.service
+
         install -d ${D}${systemd_unitdir}/system/multi-user.target.wants/
         # enable the service for multi-user.target
         ln -sf ${systemd_unitdir}/system/busybox-syslog.service \
            ${D}${systemd_unitdir}/system/multi-user.target.wants/busybox-syslog.service
-        install -d ${D}${sysconfdir}/initscripts
-        install -m 0755 ${WORKDIR}/syslog ${D}${sysconfdir}/initscripts/syslog
-        sed -i 's/syslogd -- -n/syslogd -n/' ${D}${sysconfdir}/initscripts/syslog
+
+        # /etc folder execute file/permission is disallow hence syslog and 50default are move to /usr/sbin
+        if ${@bb.utils.contains('BASEMACHINE', 'vienna', 'true', 'false', d)}; then
+            sed -i 's|^ExecStart=/etc|ExecStart=/usr/sbin|' ${D}${systemd_unitdir}/system/busybox-syslog.service
+            sed -i 's|^ExecStop=/etc|ExecStop=/usr/sbin|' ${D}${systemd_unitdir}/system/busybox-syslog.service
+            install -d ${D}${sbindir}/initscripts
+            install -m 0755 ${WORKDIR}/syslog ${D}${sbindir}/initscripts/syslog
+            sed -i 's/syslogd -- -n/syslogd -n/' ${D}${sbindir}/initscripts/syslog
+            sed -i 's|/etc|/usr/sbin|' ${D}${datadir}/udhcpc/default.script
+            install -d ${D}${sbindir}/udhcpc.d
+            install -m 0755 ${D}${sysconfdir}/udhcpc.d/50default ${D}${sbindir}/udhcpc.d/50default
+        else
+            install -d ${D}${sysconfdir}/initscripts
+            install -m 0755 ${WORKDIR}/syslog ${D}${sysconfdir}/initscripts/syslog
+            sed -i 's/syslogd -- -n/syslogd -n/' ${D}${sysconfdir}/initscripts/syslog
+        fi
+
         sed -i 's/init.d/initscripts/g'  ${D}${systemd_unitdir}/system/busybox-syslog.service
+
     else
         install -d ${D}${sysconfdir}/mdev
         install -m 0755 ${WORKDIR}/find-touchscreen.sh ${D}${sysconfdir}/mdev/
