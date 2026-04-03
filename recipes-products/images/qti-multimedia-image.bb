@@ -138,4 +138,6 @@ CORE_IMAGE_EXTRA_INSTALL:remove:canoe = "packagegroup-qti-ml"
 CORE_IMAGE_EXTRA_INSTALL:remove:canoe = "packagegroup-qti-qmmf"
 CORE_IMAGE_EXTRA_INSTALL:remove:canoe = "packagegroup-qti-video"
 CORE_IMAGE_EXTRA_INSTALL:append:canoe = " gki-kernel-modules-second-stage"
+CORE_IMAGE_EXTRA_INSTALL:append:canoe = " packagegroup-qti-openmp"
 CORE_IMAGE_EXTRA_INSTALL:append:canoe = " packagegroup-qti-mmframeworks"
+
