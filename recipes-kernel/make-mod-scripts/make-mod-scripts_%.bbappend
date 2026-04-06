@@ -9,3 +9,18 @@ python() {
         d.setVar('KERNEL_CC', '${STAGING_BINDIR_NATIVE}/clang/bin/clang -target ${TARGET_ARCH}${TARGET_VENDOR}-${TARGET_OS}')
         d.setVar('KERNEL_LD', '${STAGING_BINDIR_NATIVE}/clang/bin/ld.lld')
 }
+
+do_configure:prepend() {
+    kconfig="${STAGING_KERNEL_DIR}/Kconfig"
+
+    if [ -f "${kconfig}" ]; then
+        bbnote "Removing QCOM IPA/RMNET Kconfig includes from ${kconfig}"
+
+        sed -i \
+            -e '\|^source "../qcom/opensource/dataipa/config/Kconfig"$|d' \
+            -e '\|^source "../qcom/opensource/datarmnet/core/Kconfig"$|d' \
+            "${kconfig}"
+    else
+        bbwarn "Kconfig not found at ${kconfig}"
+    fi
+}
