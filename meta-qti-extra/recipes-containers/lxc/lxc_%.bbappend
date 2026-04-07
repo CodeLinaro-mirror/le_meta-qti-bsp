@@ -2,6 +2,7 @@
 # SRCREV = "eaf3c66b93102dd7c093b942443407fbb1a6445f"
 SRCREV = "b185e523fc43538b7f9cc5aba2db230e112c6bc4"
 SRC_URI_remove= "http://linuxcontainers.org/downloads/${BPN}-${PV}.tar.gz \
+                git://github.com/lxc/lxc.git;branch=stable-4.0 \
 		file://lxc-fix-B-S.patch \
 		file://lxc-doc-upgrade-to-use-docbook-3.1-DTD.patch \
 		file://logs-optionally-use-base-filenames-to-report-src-fil.patch \
@@ -9,6 +10,7 @@ SRC_URI_remove= "http://linuxcontainers.org/downloads/${BPN}-${PV}.tar.gz \
 		file://configure-skip-libseccomp-tests-if-it-is-disabled.patch \
 		file://commands-fix-check-for-seccomp-notify-support.patch \
 		file://templates-use-curl-instead-of-wget.patch \
+                file://0001-Patching-an-incoming-CVE-CVE-2022-47952.patch \
 "
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/files"
