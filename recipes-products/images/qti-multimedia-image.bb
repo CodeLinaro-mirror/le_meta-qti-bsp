@@ -94,7 +94,7 @@ CORE_IMAGE_EXTRA_INSTALL:append:sun = " packagegroup-qti-mmframeworks"
 CORE_IMAGE_EXTRA_INSTALL:append:sun = " packagegroup-qti-eva"
 CORE_IMAGE_EXTRA_INSTALL:append:sun = " packagegroup-qti-touch"
 CORE_IMAGE_EXTRA_INSTALL:append:sun = " packagegroup-qti-perf"
-
+CORE_IMAGE_EXTRA_INSTALL:append:sun = " packagegroup-qti-qcawifi"
 
 CORE_IMAGE_EXTRA_INSTALL:remove:alor = "alsa-utils"
 CORE_IMAGE_EXTRA_INSTALL:remove:alor = "kernel-modules"
