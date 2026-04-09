@@ -4,6 +4,7 @@ FILESEXTRAPATHS:prepend:sa525m := "${THISDIR}/files:"
 FILESEXTRAPATHS:prepend:sa510m := "${THISDIR}/files:"
 FILESEXTRAPATHS:prepend:mdm9607 := "${THISDIR}/files:"
 FILESEXTRAPATHS:prepend:sa415m := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend:echo := "${THISDIR}/files:"
 
 REQUIRED_DISTRO_FEATURES = ""
 SRC_URI += "\
