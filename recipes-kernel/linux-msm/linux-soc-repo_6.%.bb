@@ -150,8 +150,10 @@ do_deploy() {
     # Copy vmlinux and zImage into deplydir for boot.img creation
     install -d ${DEPLOYDIR}
     install -m 0644 ${KERNEL_PREBUILT_DISTDIR}/Image ${DEPLOYDIR}/${KERNEL_IMAGETYPE}
-    install -m 0644 ${KERNEL_PREBUILT_DISTDIR}/unstripped_modules.tar.gz ${DEPLOYDIR}/unstripped_modules.tar.gz
-    tar -xvf ${KERNEL_PREBUILT_DISTDIR}/unstripped_modules.tar.gz -C ${DEPLOYDIR}/
+    if [ -f ${KERNEL_PREBUILT_DISTDIR}/unstripped_modules.tar.gz ]; then
+        install -m 0644 ${KERNEL_PREBUILT_DISTDIR}/unstripped_modules.tar.gz ${DEPLOYDIR}/unstripped_modules.tar.gz
+        tar -xvf ${KERNEL_PREBUILT_DISTDIR}/unstripped_modules.tar.gz -C ${DEPLOYDIR}/
+    fi
     install -m 0644 vmlinux ${DEPLOYDIR}
     install -m 0644 System.map ${DEPLOYDIR}
 
