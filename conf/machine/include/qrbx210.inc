@@ -4,11 +4,8 @@ require conf/machine/include/basemachine.inc
 SOC_FAMILY ?= "bengal"
 include conf/machine/include/soc-family.inc
 
+DEFAULTTUNE ?= "aarch64"
 require conf/machine/include/arm/arch-armv8a.inc
-
-PREFERRED_PROVIDER_virtual/kernel = "linux-msm"
-PREFERRED_VERSION_linux-msm ?= "5.4"
-PREFERRED_VERSION_linux-msm-headers ?= "5.4"
 
 MACHINE_MNT_POINTS = "/firmware \
                       /dsp \
@@ -16,10 +13,6 @@ MACHINE_MNT_POINTS = "/firmware \
                       /overlay \
                       /persist \
                      "
-
-# Sizes for EXT4 (in bytes)
-SYSTEM_SIZE_EXT4 ?= "524288000"
-USERDATA_SIZE_EXT4 ?= "33554432"
 
 # Formats of root filesystem images.
 IMAGE_FSTYPES += "ext4"
@@ -29,9 +22,6 @@ PAGE_SIZE ?= '4096'
 
 # On msm-5.4 or above ufs driver supports BSG Device.
 UFS_BSG_DEV_USAGE = "True"
-
-# On msm-5.4 abl supports DMMOD.
-DM_MOD_FOR_KERNEL = "1"
 
 #Disable some default features supported from upstream
 MACHINE_FEATURES_BACKFILL_CONSIDERED += "qemu-usermode rtc"

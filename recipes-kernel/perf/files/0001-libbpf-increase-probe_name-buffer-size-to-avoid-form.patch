@@ -1,0 +1,49 @@
+From 40fbd886447c8ff6eb50e856c4071b18299abda6 Mon Sep 17 00:00:00 2001
+From: Sanjay Chitroda <ckantibh@qti.qualcomm.com>
+Date: Mon, 15 Sep 2025 19:25:53 +0530
+Subject: [PATCH] libbpf: increase probe_name buffer size to avoid
+ format-truncation
+
+Upstream-Status: Inappropriate [Qualcomm specific]
+
+This patch increases the size of the `probe_name` buffer in
+`probe_kern_syscall_wrapper()` from `MAX_EVENT_NAME_LEN` to
+`MAX_EVENT_NAME_LEN * 2`.
+
+The change addresses a build failure in perf builds caused by GCC's
+-Werror=format-truncation warning:
+
+  libbpf.c:11052:45: error: '%s' directive output may be truncated writing up to 63 bytes into a region of size between 34 and 53 [-Werror=format-truncation]
+
+The warning is triggered by a `snprintf()` call that formats a string
+using syscall names and other identifiers. In some cases, the buffer
+size is insufficient, leading to potential truncation.
+
+Debug builds pass because they do not treat warnings as errors, but
+perf builds fail due to `-Werror`.
+
+Increasing the buffer size ensures that the formatted string fits
+safely, resolving the issue without affecting functionality.
+
+Change-Id: I518f459e7d83c19e6d484942a4c6138d30fcd0ed
+Signed-off-by: Sanjay Chitroda <ckantibh@qti.qualcomm.com>
+---
+ tools/lib/bpf/libbpf.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/lib/bpf/libbpf.c b/tools/lib/bpf/libbpf.c
+index 36e341b4b77b..4fd073b89cbf 100644
+--- a/tools/lib/bpf/libbpf.c
++++ b/tools/lib/bpf/libbpf.c
+@@ -11180,7 +11180,7 @@ int probe_kern_syscall_wrapper(int token_fd)
+ 
+ 		return pfd >= 0 ? 1 : 0;
+ 	} else { /* legacy mode */
+-		char probe_name[MAX_EVENT_NAME_LEN];
++		char probe_name[MAX_EVENT_NAME_LEN * 2];
+ 
+ 		gen_probe_legacy_event_name(probe_name, sizeof(probe_name), syscall_name, 0);
+ 		if (add_kprobe_event_legacy(probe_name, false, syscall_name, 0) < 0)
+-- 
+2.34.1
+
