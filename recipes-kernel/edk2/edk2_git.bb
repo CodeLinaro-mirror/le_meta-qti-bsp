@@ -10,6 +10,7 @@ DEPENDS += "util-linux-native"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 FILESEXTRAPATHS:prepend := "${WORKSPACE}/bootable/bootloader/:"
+FILESEXTRAPATHS:prepend := "${KERNEL_PLATFORM_PATH}/bootable/bootloader/:"
 
 SRC_URI = "file://edk2"
 S         =  "${WORKDIR}/edk2"
@@ -39,7 +40,6 @@ EXTRA_OEMAKE = " \
     'ENABLE_DM_MOD_FOR_KERNEL5_4=${DM_MOD_FOR_KERNEL5_4}'\
     'VERIFIED_BOOT_LE=${VBLE}' \
     'VERITY_LE=${VERITY_ENABLED}' \
-    'INIT_BIN_LE=\"/sbin/init\"' \
     'EDK_TOOLS_PATH=${S}/BaseTools' \
     'EARLY_ETH_ENABLED=${EARLY_ETH}' \
     'OVERRIDE_ABL_LOAD_ADDRESS=${ABL_LOAD_ADDRESS}' \
@@ -47,16 +47,19 @@ EXTRA_OEMAKE = " \
     'TARGET_SUPPORTS_EARLY_USB_INIT=${EARLY_USB_INIT}' \
 "
 EXTRA_OEMAKE:append:qcs40x = " 'DISABLE_PARALLEL_DOWNLOAD_FLASH=1'"
+EXTRA_OEMAKE += "INIT_BIN_LE="\"/sbin/init\"""
 NAND_SQUASHFS_SUPPORT = "${@bb.utils.contains('DISTRO_FEATURES', 'nand-squashfs', '1', '0', d)}"
 EXTRA_OEMAKE:append = " 'NAND_SQUASHFS_SUPPORT=${NAND_SQUASHFS_SUPPORT}'"
 EXTRA_OEMAKE:append:qti-distro-base-user = " 'VERITY_LE_USE_EXT4_GLUEBI=1'"
 
 do_compile () {
-    export CC=${BUILD_CC}
-    export CXX=${BUILD_CXX}
-    export LD=${BUILD_LD}
+    export BUILD_CC="clang"
+    export CC=${STAGING_BINDIR_NATIVE}/clang/bin/clang
+    export CXX=${STAGING_BINDIR_NATIVE}/clang/bin/clang++
+    export LD=${STAGING_BINDIR_NATIVE}/clang/bin/clang/bin/ld.lld
     export AR=${BUILD_AR}
-    oe_runmake -f makefile all
+    export PATH="${STAGING_BINDIR_NATIVE}/clang/bin/:${PATH}"
+    oe_runmake -j 1 -f makefile all
 }
 
 do_install[noexec]="1"

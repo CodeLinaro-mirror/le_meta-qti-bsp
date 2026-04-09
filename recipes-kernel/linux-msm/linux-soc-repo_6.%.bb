@@ -17,7 +17,8 @@ S = "${WORKDIR}/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/soc-repo"
 S:vienna = "${WORKDIR}/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/common"
 S:alor = "${WORKDIR}/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/common"
 PR = "r0"
-DEPENDS += "virtual/kernel-toolchain-native virtual/dtc-native rsync-native mod-signing-keys"
+DEPENDS += "virtual/kernel-toolchain-native virtual/dtc-native ${@bb.utils.contains('DDK_BUILD', 'true','', 'rsync-native', d)} mod-signing-keys"
+
 LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 
 KERNEL_USE_PREBUILTS = "${@d.getVar('MACHINE_USES_KERNEL_PREBUILTS') or "False"}"
@@ -90,6 +91,12 @@ do_prebuilt_shared_workdir() {
     mkdir -p $kerneldir/include/generated
     if [ -e "${B}/scripts/module.lds" ]; then
         install -m 0644 ${B}/scripts/module.lds ${STAGING_KERNEL_BUILDDIR}/scripts/module.lds
+    fi
+
+    if [ -e "${KERNEL_PREBUILT_PATH}/host/unifdef" ]; then
+        cp -rp ${KERNEL_PREBUILT_PATH}/host/unifdef $kerneldir/scripts/
+        cp -rp ${KERNEL_PLATFORM_PATH}/soc-repo/scripts/headers_install.sh $kerneldir/
+        sed -i 's|scripts/unifdef|${STAGING_KERNEL_BUILDDIR}/scripts/unifdef|g' ${STAGING_KERNEL_BUILDDIR}/headers_install.sh
     fi
 }
 

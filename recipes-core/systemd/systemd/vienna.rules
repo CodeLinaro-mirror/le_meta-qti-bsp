@@ -29,6 +29,7 @@ KERNEL=="glink_pkt_slate_qcli", MODE="0660", OWNER="system", GROUP="system"
 KERNEL=="glink_pkt_swm_fs", MODE="0660", OWNER="system", GROUP="system"
 KERNEL=="glink_pkt_slate_location_ctrl", MODE="0660", OWNER="system", GROUP="system"
 KERNEL=="glinkpkt_slate_haptics_offload", MODE="0660", OWNER="system", GROUP="system"
+KERNEL=="glinkpkt_q6_audio_ctrl", MODE="0660", OWNER="system", GROUP="system"
 
 # Sensor glink devices
 KERNEL=="glinkpkt_wm_qsh_2_[0-8]", MODE="0666", OWNER="system", GROUP="system"
@@ -48,6 +49,8 @@ KERNEL=="glink_pkt_hci_arbiter_chnl", MODE="0660", OWNER="bluetooth", GROUP="blu
 KERNEL=="glink_pkt_bt_socket_hal_chnl", MODE="0660", OWNER="bluetooth", GROUP="bluetooth"
 KERNEL=="glink_pkt_bt_gatt_offload_chnl", MODE="0660", OWNER="bluetooth", GROUP="bluetooth"
 
+# Uwb device
+KERNEL=="spiuwb", MODE="0660", OWNER="system", GROUP="system"
 
 # Rawdump block device
 SUBSYSTEM=="block", KERNEL=="rawdump", MODE="0660", OWNER="root", GROUP="system"

@@ -53,7 +53,7 @@ echo -n "Watermark boost has been disabled" > /dev/kmsg
 # verity protection
 if [ -f /etc/verity.env ]; then
     source /etc/verity.env
-    /bin/veritysetup open /dev/vda system /dev/vda $VERITY_ROOT_HASH --salt $VERITY_SALT --hash-offset $VERITY_HASH_OFFSET --data-blocks $VERITY_DATA_BLOCKS --fec-device /dev/vda --fec-offset $VERITY_FEC_OFFSET --fec-roots $VERITY_FEC_ROOTS --root-hash-signature=/etc/verity_sig.txt
+    /bin/veritysetup open /dev/vda system /dev/vda $VERITY_ROOT_HASH --salt $VERITY_SALT --hash-offset $VERITY_HASH_OFFSET --data-blocks $VERITY_DATA_BLOCKS --fec-device /dev/vda --fec-offset $VERITY_FEC_OFFSET --fec-roots $VERITY_FEC_ROOTS --root-hash-signature=/etc/verity_sig.txt --use-tasklets --ignore-zero-blocks
 
     # Wait till the block device is available
     echo "waiting for /dev/mapper/system"
@@ -69,8 +69,10 @@ else
     /bin/mount -t ext4 -o ro /dev/vda /mnt/vfs
 fi
 
-if [ $? -ne 0]; then
+if [ $? -eq 0 ] && [ -f /mnt/vfs/sbin/init ]; then
+    echo "Switching root" > /dev/kmsg
+    exec switch_root -c /dev/console /mnt/vfs /sbin/init
+else
     echo "mounting rootfs failed" > /dev/kmsg
+    exec reboot -f
 fi
-
-exec switch_root -c /dev/console /mnt/vfs /sbin/init
