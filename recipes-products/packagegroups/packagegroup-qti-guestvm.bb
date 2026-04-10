@@ -13,4 +13,5 @@ PACKAGES = ' \
 
 RDEPENDS:${PN} = "\
     vhost-user-lib \
+    qcrosvm \
     "
