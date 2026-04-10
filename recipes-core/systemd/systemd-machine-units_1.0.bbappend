@@ -18,10 +18,10 @@ SRC_URI:append:vienna = " \
 USERDATA_IMAGE_SIZE = "${@get_size_in_bytes(d.getVar('USERDATA_SIZE') or '1GB')}"
 
 do_install:append:vienna() {
-    install -d ${D}${sysconfdir}/initscripts
-    install -m 0755 ${WORKDIR}/factory_reset.sh ${D}/${sysconfdir}/initscripts/
+    install -d ${D}${bindir}
+    install -m 0755 ${WORKDIR}/factory_reset.sh ${D}${bindir}/factory_reset.sh
 
-    sed -i "s|__USERDATA_IMAGE_SIZE__|${USERDATA_IMAGE_SIZE}|g" ${D}${sysconfdir}/initscripts/factory_reset.sh
+    sed -i "s|__USERDATA_IMAGE_SIZE__|${USERDATA_IMAGE_SIZE}|g" ${D}${bindir}/factory_reset.sh
 
     install -d ${D}${systemd_unitdir}/system
     install -m 0644 ${WORKDIR}/factory_reset.service ${D}${systemd_unitdir}/system/
