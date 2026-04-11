@@ -26,6 +26,12 @@ EXTRA_OECONF = " --with-sanitized-headers=${STAGING_INCDIR}/linux-msm/usr/includ
 
 FILES:${PN} += "${systemd_unitdir}/*"
 
+# Minimum Movable zone managed memory to be persistent (in MBs)
+MIN_MOVABLE_SIZE_PERSISTENT_MB = "-DMIN_MOVABLE_SIZE_PERSISTENT_MB=16"
+
+# Append to Yocto-managed target C++ flags (DO NOT overwrite)
+TARGET_CXXFLAGS:append = " ${MIN_MOVABLE_SIZE_PERSISTENT_MB}"\
+
 do_install:append() {
     # Start psi_daemon service prior to multi-user.target
     install -d ${D}${systemd_unitdir}/system/multi-user.target.wants
