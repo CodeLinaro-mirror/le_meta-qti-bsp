@@ -94,14 +94,13 @@ do_recovery_ubi() {
         # The fsconfig file is the complete snapshot of file-attributes
         # collected from the fakeroot/pseudo build environment.
         #TODO
-        #cp ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/system.canned.fsconfig ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/.
+        cp ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/system.canned.fsconfig ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/.
     fi
 
     # Pack releasetools.py into META folder itself.
     # This could also have been done by passing "--device_specific" to
     # ota_from_target_files.py but it would be hacky to find the absolute path there.
     cp ${WORKSPACE}/OTA/device/qcom/common/releasetools.py ${OTA_TARGET_IMAGE_ROOTFS_UBI}/META/.
-
     # Since /dev is populated at compile-time, pack the device_table used by 'makedevs'
     # into target-files.zip also so that 'makedevs' can be run during OTA upgrade as well.
     # This only applies for file-based OTA and since nand/ubifs targets use file-based OTA
@@ -163,6 +162,15 @@ do_recovery_ubi() {
 }
 
 addtask do_recovery_ubi after do_image_complete before do_build
+
+fakeroot do_create_rootfs_config() {
+ # stat all the files in rootfs and emit only the <filename, uid, gid, mode(in hex) & remove the leading "./"
+    cd ${IMAGE_ROOTFS} && \
+        find . ! -path . -printf '%P ' -exec stat --printf='%u %g %f\n' '{}' \; \
+        > ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/system.canned.fsconfig && cd -
+}
+
+addtask do_create_rootfs_config after do_rootfs before do_recovery_ubi
 
 do_gen_otazip_ubi[dirs] += "${DEPLOY_DIR_IMAGE}/ota-scripts"
 do_gen_otazip_ubi() {
