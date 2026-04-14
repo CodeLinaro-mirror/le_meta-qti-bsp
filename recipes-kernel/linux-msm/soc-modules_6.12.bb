@@ -57,8 +57,11 @@ do_install() {
 
     # Expose soc-repo symbols for techpacks
     install -m 0755 ${B}/Module.symvers -D ${D}${includedir}/kernel-module-soc-repo/Module.symvers
+}
 
+do_deploy() {
     install -d ${DEPLOY_DIR_IMAGE}/kernel_dtbs
+
     for dtbof in ${TARGET_DTBS}; do
         path=$(find ${WORKDIR} -name "$dtbof" -print -quit)
         if [ -n "$path" ]; then
@@ -68,3 +71,6 @@ do_install() {
         fi
     done
 }
+
+addtask deploy after do_install
+
