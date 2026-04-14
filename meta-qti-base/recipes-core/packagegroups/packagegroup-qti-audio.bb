@@ -33,4 +33,7 @@ AUDIOLITE_RDEPENDS = "\
     audiolite-dlkm \
 "
 
-RDEPENDS:${PN} += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-gunyah qti-umd', '${AUDIOLITE_RDEPENDS}', '${KMD_RDEPENDS}', d)}"
+RDEPENDS:${PN} += "\
+    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-gunyah qti-umd', '${AUDIOLITE_RDEPENDS}', '${KMD_RDEPENDS}', d)} \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-audio-awe', 'msm-virtio-snd', '', d)} \
+    "
