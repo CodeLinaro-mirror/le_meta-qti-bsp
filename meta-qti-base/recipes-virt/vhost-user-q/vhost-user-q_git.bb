@@ -35,10 +35,8 @@ SYSTEMD_SERVICE:${PN} = "\
     ${LA_BASIC_SERVICES_LIST} \
 "
 
-SYSTEMD_SERVICE:${PN}-lvgvm:append:sa7255-ivi = "\
-    ${LV_SERVICES_LIST} \
-    ${LA_EXTRA_SERVICES_LIST} \
-"
+SYSTEMD_SERVICE:${PN}:append:sa7255-ivi = " ${LA_EXTRA_SERVICES_LIST}"
+SYSTEMD_SERVICE:${PN}-lvgvm:append:sa7255-ivi = " ${LV_SERVICES_LIST}"
 
 SYSTEMD_SERVICE:${PN}:append:sa8255-ivi = " ${LA_EXTRA_SERVICES_LIST}"
 SYSTEMD_SERVICE:${PN}-lvgvm:append:sa8255-ivi = " ${LV_SERVICES_LIST}"
