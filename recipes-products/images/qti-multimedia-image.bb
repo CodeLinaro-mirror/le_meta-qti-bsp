@@ -138,3 +138,4 @@ CORE_IMAGE_EXTRA_INSTALL:append:canoe = " gki-kernel-modules-second-stage"
 CORE_IMAGE_EXTRA_INSTALL:append:canoe = " packagegroup-qti-openmp"
 CORE_IMAGE_EXTRA_INSTALL:append:canoe = " packagegroup-qti-mmframeworks"
 
+INCOMPATIBLE_LICENSE = "GPL-3.0* LGPL-3.0* AGPL-3.0*"

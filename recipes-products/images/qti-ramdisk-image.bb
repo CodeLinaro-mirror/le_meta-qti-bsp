@@ -62,3 +62,4 @@ create_init_symlink() {
     ln -sf ./usr/sbin/early-ramdisk-init ${IMAGE_ROOTFS}/init
 }
 ROOTFS_POSTPROCESS_COMMAND += "create_init_symlink; "
+INCOMPATIBLE_LICENSE = "GPL-3.0* LGPL-3.0* AGPL-3.0*"
