@@ -6,6 +6,8 @@ LICENSE = "BSD-3-Clause"
 # Ramdisk image generation doesn't need abl
 EXTRA_IMAGEDEPENDS:remove = "edk2"
 
+EARLY_RAMDISK_KERNEL_MODULES ?= ""
+
 PACKAGE_INSTALL = "\
     adbd \
     usb-composition \
@@ -16,6 +18,8 @@ PACKAGE_INSTALL = "\
     fsmgr \
     early-ramdisk-init \
     gki-kernel-modules-linkmodulesload \
+    gki-kernel-modules-first-stage \
+    ${EARLY_RAMDISK_KERNEL_MODULES} \
     glib-2.0 \
     glibc \
     libbase \
@@ -27,6 +31,7 @@ PACKAGE_INSTALL = "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'libselinux libpcre', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains('MACHINE_FEATURES', 'dm-verity-initramfs-v3', 'cryptsetup verity-scripts lvm2-udevrules', '', d), '', d)} \
 "
+
 
 IMAGE_FSTYPES = "${INITRAMFS_FSTYPES}"
 IMAGE_NAME_SUFFIX = ""

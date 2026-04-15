@@ -49,17 +49,27 @@ RAMDISK_PATH = "${@get_ramdisk_path(d)}"
 
 MKBOOTUTIL = '${@oe.utils.conditional("PREFERRED_PROVIDER_virtual/mkbootimg", "mkbootimg-gki", "scripts/mkbootimg.py", "mkbootimg", d)}'
 
+BOOT_RAMDISK_CMD ?= "${@bb.utils.contains('MACHINE_FEATURES', 'early-ramdisk-init', 'rdinit=/sbin/early-ramdisk-init early-ramdisk.mode=0', '', d)}"
+
 # If BOOT_HEADER_VERSION >= 3, a vendor_boot image will be built
 #  unless SKIP_VENDOR_BOOT is defined as True.
 python do_makeboot () {
     import subprocess
 
+    base_cmd_params = d.getVar('KERNEL_CMD_PARAMS', True) or ""
+    ramdisk_cmd = d.getVar('BOOT_RAMDISK_CMD', True) or ""
+
+    if ramdisk_cmd:
+        final_cmd_params = base_cmd_params + " " + ramdisk_cmd
+    else:
+        final_cmd_params = base_cmd_params
+
     # Set cmdline
     cmdline=""
     if ((int(d.getVar("BOOT_HEADER_VERSION") or "0") < 3) or (d.getVar("SKIP_VENDOR_BOOT") or "True") == "True"):
-        cmdline = " --cmdline " + "\"" + d.getVar('KERNEL_CMD_PARAMS', True) + "\""
+        cmdline = " --cmdline " + "\"" + final_cmd_params + "\""
     else:
-        cmdline     = " --vendor_cmdline " + "\"" + d.getVar('KERNEL_CMD_PARAMS', True) + "\""
+        cmdline     = " --vendor_cmdline " + "\"" + final_cmd_params + "\""
 
     xtra_parms=""
     if bb.utils.contains('MACHINE_FEATURES', 'nand-boot', True, False, d):
