@@ -33,6 +33,8 @@ EXTRA_OEMESON += "\
     ${@oe.utils.version_less_or_equal('${preferred-kernel}', '5.4', '', '-Dusedmaheap=true', d)} \
 "
 
+EXTRA_OEMESON:append:quin-gvm-lemans = " -Ddrm-optimization=true"
+
 SOLIBS = ".so"
 FILES_SOLIBSDEV = ""
 
