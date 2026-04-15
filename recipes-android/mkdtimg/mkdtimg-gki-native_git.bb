@@ -6,7 +6,9 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/${LICENSE};md5=89aea4e17d99a7ca
 
 PROVIDES = "virtual/mkdtimg-native"
 
-FILESEXTRAPATHS:prepend := "${KERNEL_PLATFORM_PATH}/prebuilts/kernel-build-tools/linux-x86/:"
+KERNEL_BUILD_TOOLS_ARCH ?= "linux-x86"
+
+FILESEXTRAPATHS:prepend := "${KERNEL_PLATFORM_PATH}/prebuilts/kernel-build-tools/${KERNEL_BUILD_TOOLS_ARCH}/:"
 SRC_URI  = "file://bin"
 SRC_URI += "file://include"
 SRC_URI += "file://lib64"

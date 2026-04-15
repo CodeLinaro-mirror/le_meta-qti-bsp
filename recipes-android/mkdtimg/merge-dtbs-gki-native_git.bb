@@ -12,10 +12,12 @@ FILESEXTRAPATHS:prepend := "${KERNEL_PREBUILT_PATH}:"
 FILESEXTRAPATHS:prepend := "${KERNEL_PLATFORM_PATH}:"
 FILESEXTRAPATHS:prepend := "${@bb.utils.contains('MACHINE_USES_KERNEL_PREBUILTS', 'True', '', '${KERNEL_PLATFORM_PATH}/external:', d)}"
 
+KERNEL_BUILD_TOOLS_ARCH ?= "linux-x86"
+
 SRC_URI = "${@bb.utils.contains('MACHINE_USES_KERNEL_PREBUILTS', 'True', \
             'file://host', 'file://qcom-dtc/', d)}"
 SRC_URI += "file://build/ \
-            file://prebuilts/kernel-build-tools/linux-x86/"
+            file://prebuilts/kernel-build-tools/${KERNEL_BUILD_TOOLS_ARCH}"
 
 S = "${@bb.utils.contains('MACHINE_USES_KERNEL_PREBUILTS', 'True', \
             '${WORKDIR}/host', '${WORKDIR}/qcom-dtc', d)}"
@@ -42,7 +44,7 @@ do_install() {
     if [ -e ${S}/bin/ufdt_apply_overlay ]; then
         install -m 0755 ${S}/bin/ufdt_apply_overlay  ${D}${bindir}/merge_dtbs/
     else
-        install -m 0755 ${S}/../prebuilts/kernel-build-tools/linux-x86/bin/ufdt_apply_overlay  ${D}${bindir}/merge_dtbs/
+        install -m 0755 ${S}/../prebuilts/kernel-build-tools/${KERNEL_BUILD_TOOLS_ARCH}/bin/ufdt_apply_overlay  ${D}${bindir}/merge_dtbs/
     fi
 
     install -m 0755 ${BIN_PATH}/fdtget  ${D}${bindir}/merge_dtbs/
