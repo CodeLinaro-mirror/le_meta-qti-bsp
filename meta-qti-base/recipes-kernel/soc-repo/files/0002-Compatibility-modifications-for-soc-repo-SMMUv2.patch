@@ -1,0 +1,152 @@
+From 60c2621f5b998b289e56770e1f8c3b88348a14e2 Mon Sep 17 00:00:00 2001
+From: Zhuo Yang <zhuyan@qti.qualcomm.com>
+Date: Thu, 16 Apr 2026 14:19:56 +0800
+Subject: [PATCH] Compatibility modifications for soc-repo SMMUv2
+
+Change-Id: I9b56fa09156e9870fa4c509b01a2fc60c74780cf
+Signed-off-by: Zhuo Yang <zhuyan@qti.qualcomm.com>
+---
+ .../drivers/iommu/arm/arm-smmu/arm-smmu-impl.c         |  4 ----
+ .../drivers/iommu/arm/arm-smmu/arm-smmu-trace.h        |  2 +-
+ drivers/iommu/arm/arm-smmu/arm-smmu.c |  5 +++--
+ drivers/iommu/dma-mapping-fast.c      |  5 ++---
+ drivers/iommu/io-pgtable-fast.c       |  2 --
+ drivers/iommu/qcom-io-pgtable-arm.c   |  2 --
+ drivers/iommu/qcom-iommu-util.c       | 10 ++--------
+ 7 files changed, 8 insertions(+), 22 deletions(-)
+
+diff --git a/drivers/iommu/arm/arm-smmu/arm-smmu-impl.c b/drivers/iommu/arm/arm-smmu/arm-smmu-impl.c
+index a46f25a..fc388d6 100644
+--- a/drivers/iommu/arm/arm-smmu/arm-smmu-impl.c
++++ b/drivers/iommu/arm/arm-smmu/arm-smmu-impl.c
+@@ -211,10 +211,6 @@ struct arm_smmu_device *arm_smmu_impl_init(struct arm_smmu_device *smmu)
+ 	if (of_property_read_bool(np, "calxeda,smmu-secure-config-access"))
+ 		smmu->impl = &calxeda_impl;
+ 
+-	if (of_device_is_compatible(np, "nvidia,tegra234-smmu") ||
+-	    of_device_is_compatible(np, "nvidia,tegra194-smmu") ||
+-	    of_device_is_compatible(np, "nvidia,tegra186-smmu"))
+-		return nvidia_smmu_impl_init(smmu);
+ 
+ 	if (of_device_is_compatible(smmu->dev->of_node, "qcom,qsmmu-v500"))
+ 		return qsmmuv500_impl_init(smmu);
+diff --git a/drivers/iommu/arm/arm-smmu/arm-smmu-trace.h b/drivers/iommu/arm/arm-smmu/arm-smmu-trace.h
+index c678680..bb86b6f 100644
+--- a/drivers/iommu/arm/arm-smmu/arm-smmu-trace.h
++++ b/drivers/iommu/arm/arm-smmu/arm-smmu-trace.h
+@@ -215,7 +215,7 @@ TRACE_EVENT(smmu_init,
+ #endif /* _TRACE_ARM_SMMU_H */
+ 
+ #undef TRACE_INCLUDE_PATH
+-#define TRACE_INCLUDE_PATH ../../drivers/iommu/arm/arm-smmu
++#define TRACE_INCLUDE_PATH .
+ 
+ #undef TRACE_INCLUDE_FILE
+ #define TRACE_INCLUDE_FILE arm-smmu-trace
+diff --git a/drivers/iommu/arm/arm-smmu/arm-smmu.c b/drivers/iommu/arm/arm-smmu/arm-smmu.c
+index 3f4646a..744b14a 100644
+--- a/drivers/iommu/arm/arm-smmu/arm-smmu.c
++++ b/drivers/iommu/arm/arm-smmu/arm-smmu.c
+@@ -2175,11 +2175,12 @@ static int __maybe_unused arm_smmu_map_sg(struct iommu_domain *domain, unsigned
+ 	 * does not exist.
+ 	 */
+ 	for_each_sg(sg, tmp, nents, i) {
+-		ret = ops->map(ops, iova + *mapped, sg_phys(tmp), tmp->length, prot, gfp);
++		size_t sg_mapped = 0;
++		ret = ops->map_pages(ops, iova + *mapped, sg_phys(tmp), tmp->length, 1, prot, gfp, &sg_mapped);
+ 		if (ret)
+ 			break;
+ 
+-		*mapped += tmp->length;
++		*mapped += sg_mapped;
+ 	}
+ 
+ 	arm_smmu_rpm_put(smmu);
+diff --git a/drivers/iommu/dma-mapping-fast.c b/drivers/iommu/dma-mapping-fast.c
+index ba44b91..4e55a29 100644
+--- a/drivers/iommu/dma-mapping-fast.c
++++ b/drivers/iommu/dma-mapping-fast.c
+@@ -732,7 +732,7 @@ static dma_addr_t fast_smmu_dma_map_resource(
+ 	prot |= IOMMU_MMIO;
+ 
+ 	if (iommu_map(mapping->domain, dma_addr, phys_addr - offset,
+-			len, prot)) {
++			len, prot, GFP_KERNEL)) {
+ 		spin_lock_irqsave(&mapping->lock, flags);
+ 		__fast_smmu_free_iova(mapping, dma_addr, len);
+ 		spin_unlock_irqrestore(&mapping->lock, flags);
+@@ -1097,7 +1097,6 @@ EXPORT_SYMBOL(fast_smmu_setup_dma_ops);
+ 
+ int __init dma_mapping_fast_init(void)
+ {
+-	return register_trace_android_rvh_iommu_setup_dma_ops(
+-			__fast_smmu_setup_dma_ops, NULL);
++	return 0;
+ }
+ 
+diff --git a/drivers/iommu/io-pgtable-fast.c b/drivers/iommu/io-pgtable-fast.c
+index ad6e5e3..f959454 100644
+--- a/drivers/iommu/io-pgtable-fast.c
++++ b/drivers/iommu/io-pgtable-fast.c
+@@ -423,9 +423,7 @@ av8l_fast_alloc_pgtable_data(struct io_pgtable_cfg *cfg)
+ 		return NULL;
+ 
+ 	data->iop.ops = (struct io_pgtable_ops) {
+-		.map		= av8l_fast_map,
+ 		.map_pages	= av8l_fast_map_pages,
+-		.unmap		= av8l_fast_unmap,
+ 		.unmap_pages	= av8l_fast_unmap_pages,
+ 		.iova_to_phys	= av8l_fast_iova_to_phys,
+ 	};
+diff --git a/drivers/iommu/qcom-io-pgtable-arm.c b/drivers/iommu/qcom-io-pgtable-arm.c
+index 9369e32..0c45571 100644
+--- a/drivers/iommu/qcom-io-pgtable-arm.c
++++ b/drivers/iommu/qcom-io-pgtable-arm.c
+@@ -1193,9 +1193,7 @@ arm_lpae_alloc_pgtable(struct io_pgtable_cfg *cfg)
+ 	data->pgd_bits = va_bits - (data->bits_per_level * (levels - 1));
+ 
+ 	data->iop.ops = (struct io_pgtable_ops) {
+-		.map		= qcom_arm_lpae_map,
+ 		.map_pages	= qcom_arm_lpae_map_pages,
+-		.unmap		= qcom_arm_lpae_unmap,
+ 		.unmap_pages	= qcom_arm_lpae_unmap_pages,
+ 		.iova_to_phys	= arm_lpae_iova_to_phys,
+ 	};
+diff --git a/drivers/iommu/qcom-iommu-util.c b/drivers/iommu/qcom-iommu-util.c
+index a9e8558..ea75a15 100644
+--- a/drivers/iommu/qcom-iommu-util.c
++++ b/drivers/iommu/qcom-iommu-util.c
+@@ -10,6 +10,7 @@
+  */
+ 
+ #include <linux/dma-mapping-fast.h>
++#include <linux/init.h>
+ #include <linux/module.h>
+ #include <linux/slab.h>
+ #include <linux/qcom-iommu-util.h>
+@@ -232,10 +233,7 @@ EXPORT_SYMBOL(qcom_iommu_generate_resv_regions);
+ 
+ void qcom_iommu_get_resv_regions(struct device *dev, struct list_head *list)
+ {
+-	const struct iommu_ops *ops = dev->bus->iommu_ops;
+-
+-	if (ops && ops->get_resv_regions)
+-		ops->get_resv_regions(dev, list);
++	iommu_get_resv_regions(dev, list);
+ }
+ EXPORT_SYMBOL(qcom_iommu_get_resv_regions);
+ 
+@@ -812,10 +810,6 @@ out_undo:
+ 	}
+ 	return ret;
+ }
+-#if IS_MODULE(CONFIG_QCOM_IOMMU_UTIL)
+ module_init(qcom_iommu_util_init);
+-#else
+-arch_initcall_sync(qcom_iommu_util_init);
+-#endif
+ 
+ MODULE_LICENSE("GPL v2");
+-- 
+2.34.1
+

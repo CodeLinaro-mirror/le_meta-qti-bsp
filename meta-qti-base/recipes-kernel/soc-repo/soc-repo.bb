@@ -16,7 +16,8 @@ CLEANBROKEN = "1"
 # Source location
 SRC_URI = "\
     ${PATH_TO_REPO}/vendor/qcom/opensource/platform-kernel/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/platform-kernel;usehead=1 \
-    file://0001-soc-repo-adapt-cse-linux-6.6.patch "
+    file://0001-soc-repo-adapt-cse-linux-6.6.patch \
+    file://0002-Compatibility-modifications-for-soc-repo-SMMUv2.patch "
 
 SRCREV = "${AUTOREV}"
 
@@ -92,6 +93,9 @@ TECHPACK_MODULES = "\
     drivers/virt/gunyah/gh_dbl.ko \
     drivers/soc/qcom/hab/msm_hab.ko \
     drivers/virtio/virtio_mmio.ko \
+    drivers/iommu/arm/arm-smmu/arm_smmu.ko \
+    drivers/iommu/iommu-logger.ko \
+    drivers/iommu/qcom_iommu_util.ko \
 "
 
 # Exclude KERNEL_VERSION from task hash calculation to avoid metadata instability

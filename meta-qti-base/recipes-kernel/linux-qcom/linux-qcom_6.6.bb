@@ -16,6 +16,8 @@ SRC_URI = "\
     ${PATH_TO_REPO}/vendor/qcom/opensource/platform-kernel/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/platform-kernel;usehead=1 \
     file://generic.cfg \
     file://dm.cfg \
+    file://0001-QcLinux-kernel-adapt-LVGVM.patch \
+    file://0013-net-stmmac-dwmac-qcom-ethqos-Enable-SCMI-ETH.patch \
     ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'file://selinux.cfg', '', d)} \
     ${@bb.utils.contains_any('VARIANT', 'perf user', '', 'file://devmem.cfg', d)} \
 "
