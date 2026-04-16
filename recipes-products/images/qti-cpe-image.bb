@@ -19,7 +19,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
                 powerapp-reboot \
                 powerapp-shutdown \
                 systemd-machine-units \
-		packagegroup-qti-core-prop \
+		packagegroup-qti-core \
                 packagegroup-startup-scripts \
                 packagegroup-android-utils-base \
                 packagegroup-filesystem-utils-base \
