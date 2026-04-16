@@ -152,7 +152,6 @@ do_install:append:canoe () {
         ln -sf /dev/null ${D}${sysconfdir}/systemd/system/modprobe@.service
         ln -sf /dev/null ${D}${sysconfdir}/systemd/system/systemd-logind.service
         ln -sf /dev/null ${D}${sysconfdir}/systemd/system/touch.service
-        ln -sf /dev/null ${D}${sysconfdir}/systemd/system/systemd-tmpfiles-setup-dev.service
         ln -sf /dev/null ${D}${sysconfdir}/systemd/system/systemd-tmpfiles-setup.service
         ln -sf /dev/null ${D}${sysconfdir}/systemd/system/systemd-tmpfiles-clean.service
         ln -sf /dev/null ${D}${sysconfdir}/systemd/system/systemd-journald-audit.socket
