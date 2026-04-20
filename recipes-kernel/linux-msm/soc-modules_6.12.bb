@@ -6,6 +6,7 @@ LIC_FILES_CHKSUM = "file://${SOC_REPO}/COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7
 inherit module
 
 DEPENDS += "virtual/kernel virtual/dtc-native elfutils-native"
+do_deploy[depends] += "virtual/kernel:do_deploy"
 
 FILESEXTRAPATHS:prepend := "${KERNEL_PLATFORM_PATH}/:"
 
