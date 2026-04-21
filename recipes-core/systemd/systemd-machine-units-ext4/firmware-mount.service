@@ -43,8 +43,8 @@ Type=oneshot
 RemainAfterExit=yes
 PassEnvironment="SLOT_SUFFIX"
 ExecStart=/bin/mount -o noexec,nodev,ro,context=system_u:object_r:firmware_t:s0 -t vfat /dev/disk/by-partlabel/modem${SLOT_SUFFIX} /firmware
-ExecStartPost=/bin/sh -c 'echo start > /sys/class/remoteproc/remoteproc0/state'
-ExecStartPost=/bin/sh -c 'echo start > /sys/class/remoteproc/remoteproc1/state'
+ExecStartPost=-/bin/sh -c 'echo start > /sys/class/remoteproc/remoteproc0/state'
+ExecStartPost=-/bin/sh -c 'echo start > /sys/class/remoteproc/remoteproc1/state'
 Nice=-20
 
 [Install]
