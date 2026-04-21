@@ -120,6 +120,9 @@ do_install:append () {
     if ${@bb.utils.contains("PREFERRED_VERSION_linux-msm", "5.15", "true", "false", d)}; then
         install -m 0664 ${WORKDIR}/platform_load.conf ${D}${sysconfdir}/modules-load.d/
     fi
+
+    # Create by-partlabel symlink for la/lv/bluetooth/modem/dsp devices in disksymlink-service service, remove these operations from plain udev rules
+    sed -i 's#ENV{ID_PART_ENTRY_SCHEME}=="gpt", ENV{ID_PART_ENTRY_NAME}=="?\*", SYMLINK+="disk/by-partlabel/$env{ID_PART_ENTRY_NAME}"#ENV{ID_PART_ENTRY_SCHEME}=="gpt", ENV{ID_PART_ENTRY_NAME}=="?\*", ENV{ID_PART_ENTRY_NAME}!="la_*", ENV{ID_PART_ENTRY_NAME}!="lv_*", ENV{ID_PART_ENTRY_NAME}!="bluetooth*", ENV{ID_PART_ENTRY_NAME}!="modem*", ENV{ID_PART_ENTRY_NAME}!="dsp*", SYMLINK+="disk/by-partlabel/$env{ID_PART_ENTRY_NAME}"#' ${D}${rootlibexecdir}/udev/rules.d/60-persistent-storage.rules
 }
 do_install:append:gh-gvm-lemans() {
     install -m 0644 ${WORKDIR}/60-vblk.rules ${D}${sysconfdir}/udev/rules.d/
