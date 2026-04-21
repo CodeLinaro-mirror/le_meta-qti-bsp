@@ -12,4 +12,5 @@ RDEPENDS:${PN} += "\
     synergy-opensource \
     csrspp-tty \
     bt-dlkm \
+    bt-dlkm-secondary \
     "
