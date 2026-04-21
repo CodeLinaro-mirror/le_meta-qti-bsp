@@ -48,13 +48,9 @@ do_install:append() {
             ${D}${systemd_unitdir}/system/multi-user.target.wants/firmware-vm-boot-autoghgvm-mount.service
     fi
 
-    if ${@bb.utils.contains('COMBINED_FEATURES', 'qti-bluetooth', 'true', 'false', d)}; then
-
-        install -m 0777 ${S}/bluetooth-mount.service -D ${D}${systemd_unitdir}/system/bluetooth-mount.service
-
-        ln -sf ${systemd_unitdir}/system/bluetooth-mount.service \
-            ${D}${systemd_unitdir}/system/multi-user.target.wants/bluetooth-mount.service
-    fi
+    install -m 0777 ${S}/bluetooth-mount.service -D ${D}${systemd_unitdir}/system/bluetooth-mount.service
+    ln -sf ${systemd_unitdir}/system/bluetooth-mount.service \
+        ${D}${systemd_unitdir}/system/multi-user.target.wants/bluetooth-mount.service
 
     if [ -f ${S}/99-persist-storage-ab.rules ]; then
         install -m 0644 ${S}/99-persist-storage-ab.rules -D ${D}${sysconfdir}/udev/rules.d/99-persist-storage-ab.rules
@@ -110,7 +106,12 @@ do_install:append:sa8775-flex() {
     fi
 }
 
-PACKAGES =+ "${PN}-lvgvm"
+PACKAGES =+ "${PN}-lvgvm ${PN}-bt"
+
+FILES:${PN}-bt += "\
+    ${systemd_system_unitdir}/bluetooth-mount.service \
+    ${systemd_system_unitdir}/multi-user.target.wants/bluetooth-mount.service \
+"
 
 FILES:${PN}-lvgvm += "\
     ${systemd_system_unitdir}/firmware-vm-boot-autoghgvmlv-mount.service \
