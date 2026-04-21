@@ -25,6 +25,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
                 packagegroup-filesystem-utils-base \
                 packagegroup-startup-scripts-base \
                 packagegroup-qti-ss-mgr \
+                packagegroup-qti-fastrpc \
                 ${@bb.utils.contains('MACHINE_FEATURES', 'qti-ssdk', "packagegroup-qti-ssdk", "", d)} \
 "
 
