@@ -10,6 +10,8 @@ IMAGE_FEATURES += "read-only-rootfs"
 # gluebi is read only and prevents debugging/experimentation. Only enable in user variant
 IMAGE_FEATURES:append:qti-distro-base-user = " gluebi"
 
+IMAGE_INSTALL:append = "${@bb.utils.contains('DISTRO_FEATURES', 'apparmor', ' apparmor ', '', d)}"
+
 CORE_IMAGE_EXTRA_INSTALL += "\
                 glib-2.0 \
                 kernel-modules \
