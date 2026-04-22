@@ -50,8 +50,6 @@ FindAndMountUBI () {
 
    device=/dev/ubi1_0
 
-   ALREADY_MOUNTED_EXIT_CODE=32
-
    MAX_ATTEMPTS=20
    ATTEMPT=0
 
@@ -83,7 +81,7 @@ FindAndMountUBI () {
                 if [ $mount_ret -eq 0 ]; then
                     break 2  # Exit both retry and outer loop
                 else
-                    if [ $mount_ret -eq $ALREADY_MOUNTED_EXIT_CODE ]; then
+                    if grep -s " /firmware " /proc/self/mounts; then
                         log "$device already mounted on $dir"
                         break 2
                     fi
@@ -101,7 +99,7 @@ FindAndMountUBI () {
             done
 
             # If all retries failed
-            if [ $COUNT -eq $MAX_MOUNT_RETRIES]; then
+            if [ $COUNT -eq $MAX_MOUNT_RETRIES ]; then
               log "Mount of $device failed after $MAX_MOUNT_RETRIES attempts"
               exit $mount_ret
             fi
