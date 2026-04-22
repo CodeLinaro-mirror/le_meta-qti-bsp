@@ -56,7 +56,6 @@ CORE_IMAGE_EXTRA_INSTALL:remove:qcs610-odk-64 = "graphite-client"
 
 CORE_IMAGE_EXTRA_INSTALL:remove:vienna = "kernel-modules"
 CORE_IMAGE_EXTRA_INSTALL:remove:vienna = "packagegroup-qti-data"
-CORE_IMAGE_EXTRA_INSTALL:remove:vienna = "packagegroup-qti-ml"
 CORE_IMAGE_EXTRA_INSTALL:remove:vienna = "graphite-client"
 CORE_IMAGE_EXTRA_INSTALL:append:vienna = " packagegroup-qti-coproc"
 CORE_IMAGE_EXTRA_INSTALL:append:vienna = " packagegroup-qti-wear-prop"
@@ -94,7 +93,7 @@ CORE_IMAGE_EXTRA_INSTALL:append:sun = " packagegroup-qti-mmframeworks"
 CORE_IMAGE_EXTRA_INSTALL:append:sun = " packagegroup-qti-eva"
 CORE_IMAGE_EXTRA_INSTALL:append:sun = " packagegroup-qti-touch"
 CORE_IMAGE_EXTRA_INSTALL:append:sun = " packagegroup-qti-perf"
-
+CORE_IMAGE_EXTRA_INSTALL:append:sun = " packagegroup-qti-qcawifi"
 
 CORE_IMAGE_EXTRA_INSTALL:remove:alor = "alsa-utils"
 CORE_IMAGE_EXTRA_INSTALL:remove:alor = "kernel-modules"

@@ -13,7 +13,7 @@ SRC_URI = "file://soc-repo \
            file://qcom/opensource/devicetree"
 
 PROVIDES= "kernel-module-soc-repo"
-S = "${WORKDIR}/soc-repo/yocto"
+S = "${WORKDIR}/soc-repo/build"
 SOC_REPO = "${WORKDIR}/soc-repo"
 
 KERNEL_BUILD_DIR = "${STAGING_KERNEL_BUILDDIR}"
@@ -46,7 +46,7 @@ EXTRA_OEMAKE += 'DTC_INCLUDE="${SOC_REPO}/scripts/dtc/include-prefixes/ ${STAGIN
 do_install() {
     mkdir -p ${STAGING_KERNEL_BUILDDIR}/lib/modules/${KERNEL_VERSION}
 
-    for mod in $(find ${SOC_REPO} -name '*.ko'); do
+    for mod in $(find ${WORKDIR} -name '*.ko'); do
         if [ -f $mod ]; then
             install -m 0644 $mod \
                 ${STAGING_KERNEL_BUILDDIR}/lib/modules/${KERNEL_VERSION}
