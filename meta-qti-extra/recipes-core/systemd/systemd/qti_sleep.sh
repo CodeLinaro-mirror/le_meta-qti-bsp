@@ -62,11 +62,57 @@
 #
 
 usb_mode_file="/var/usb/usb_mode.txt"
+usb_mounts_file="/persist/usb/usb_mounts.txt"
 usb_dev_path="/sys/devices/platform/soc"
+
+# /proc/self/mounts escapes space as \040 etc.
+unescape_mnt() {
+    echo "$1" | sed -e 's/\\040/ /g' -e 's/\\011/\t/g' -e 's/\\012/\n/g' -e 's/\\134/\\/g'
+}
+
+# Resolve symlink to real device node if needed
+realdev() {
+    d="$1"
+    readlink -f "$d" 2>/dev/null || echo "$d"
+}
+
+# Check if this device is USB storage
+is_usb_blockdev() {
+    [ -b "$1" ] || return 1
+
+    udevadm info --query=property --name="$1" 2>/dev/null | grep -q '^ID_BUS=usb' && return 0
+    return 1
+}
+
+# Get filesystem UUID for a partition (sdh1 etc.)
+get_uuid() {
+    udevadm info --query=property --name="$1" 2>/dev/null \
+        | sed -n 's/^ID_FS_UUID=//p' | head -n 1
+}
+
+# Mount with retries to survive USB enumeration delay after resume
+mount_with_retry() {
+    what="$1"  # UUID
+    mp="$2"
+    fs="$3"
+    opts="$4"
+
+    [ -d "$mp" ] || mkdir -p "$mp"
+
+    n=0
+    while [ $n -lt 5 ]; do
+        if mount -t "$fs" -o "$opts" "$what" "$mp" 2>/dev/null; then
+            return 0
+        fi
+        n=$((n + 1))
+        sleep 1
+    done
+    return 1
+}
 
 case $1/$2 in
   pre/*)
-    echo "Entering into $2..."
+    echo "Entering into $1/$2 ..."
 
     systemctl stop loc_launcher.service
     systemctl stop location_hal_daemon.service
@@ -90,7 +136,36 @@ case $1/$2 in
     wait $PID_KW
     wait $PID_KH
 
-    systemctl stop init_qti_wlan_auto.service
+    # save USB mounts (UUID) and unmount them
+    : > "$usb_mounts_file"
+
+    echo "Scanning /proc/self/mounts for USB mounts..."
+    while read -r src mnt fs opts rest; do
+        case "$src" in
+            /dev/*)
+                src_real="$(realdev "$src")"
+                if is_usb_blockdev "$src_real"; then
+                    mnt_real="$(unescape_mnt "$mnt")"
+                    uuid="$(get_uuid "$src_real")"
+
+                    if [ -n "$uuid" ]; then
+                        echo "UUID=$uuid|$mnt_real|$fs|$opts" >> "$usb_mounts_file"
+                        echo "SAVE: UUID=$uuid -> $mnt_real ($fs) opts=$opts"
+                    fi
+                fi
+                ;;
+        esac
+    done < /proc/self/mounts
+
+    if [ -s "$usb_mounts_file" ]; then
+        echo "Unmounting saved USB mountpoints in reverse order..."
+        tac "$usb_mounts_file" | while IFS="|" read -r key mnt_real fs opts; do
+            echo "UMOUNT: $mnt_real"
+            umount "$mnt_real"
+        done
+    else
+        echo "No USB mounts detected; usb_mounts_file remains empty."
+    fi
 
     # save all usb mode to file
     if [ ! -f "$usb_mode_file" ]; then
@@ -106,8 +181,9 @@ case $1/$2 in
     done
     ;;
   post/*)
-    echo "Exiting from $2..."
+    echo "Exiting from $1/$2 ..."
 
+    # restore USB controller modes
     if [ ! -f "$usb_mode_file" ]; then
         echo "USB mode recover failed for $usb_mode_file dose not exist."
     else
@@ -117,6 +193,24 @@ case $1/$2 in
             usb_mode=`echo $line | awk -F '[=]' '{print $2}'`
             echo $usb_mode > $usb_dev_path/$dev/mode
         done
+        rm "$usb_mode_file"
+    fi
+
+    # restore USB mounts by UUID
+    if [ -s "$usb_mounts_file" ]; then
+        echo "Restoring USB mounts from $usb_mounts_file ..."
+        while IFS="|" read -r key mnt_real fs opts; do
+            [ -n "$key" ] || continue
+            echo "MOUNT: $key -> $mnt_real ($fs) opts=$opts"
+
+            if mount_with_retry "$key" "$mnt_real" "$fs" "$opts"; then
+                echo "MOUNT OK: $key -> $mnt_real"
+                continue
+            fi
+        done < "$usb_mounts_file"
+        rm "$usb_mounts_file"
+    else
+        echo "USB mount restore skipped: $usb_mounts_file missing/empty"
     fi
 
     if [ $2 == "hibernate" ]; then
