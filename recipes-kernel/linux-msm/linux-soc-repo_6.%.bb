@@ -99,6 +99,12 @@ do_prebuilt_shared_workdir() {
         cp -rp ${KERNEL_PLATFORM_PATH}/soc-repo/scripts/headers_install.sh $kerneldir/
         sed -i 's|scripts/unifdef|${STAGING_KERNEL_BUILDDIR}/scripts/unifdef|g' ${STAGING_KERNEL_BUILDDIR}/headers_install.sh
     fi
+
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains('MACHINE_FEATURES', 'dm-verity-initramfs-v3', 'true', 'false', d), 'false', d)}; then
+        mkdir -p $kerneldir/certs
+        install -m 0755 ${B}/certs/verity_cert.pem ${STAGING_KERNEL_BUILDDIR}/certs/verity_cert.pem
+        install -m 0644 ${B}/certs/verity_key.pem ${STAGING_KERNEL_BUILDDIR}/certs/verity_key.pem
+    fi
 }
 
 do_prebuilt_install[dirs] = "${B}"
