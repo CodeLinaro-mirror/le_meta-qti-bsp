@@ -29,6 +29,8 @@ CORE_IMAGE_EXTRA_INSTALL += "\
                 ${@bb.utils.contains('MACHINE_FEATURES', 'qti-ssdk', "packagegroup-qti-ssdk", "", d)} \
 "
 
+IMAGE_INSTALL:append = " libatomic"
+
 do_cleanup_sepolicy() {
 
         policy_version=33
