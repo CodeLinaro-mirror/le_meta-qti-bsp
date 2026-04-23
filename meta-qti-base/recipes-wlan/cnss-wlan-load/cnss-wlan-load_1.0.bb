@@ -11,7 +11,10 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/BSD-3-Clause;m
 SRC_URI = "\
            file://init_qti_wlan_auto.service \
            file://init.qti.wlan_on.sh \
+           file://init.gh.qti.wlan_on.sh \
            file://init.qti.wlan_off.sh \
+           file://blacklist-pcie-qcom-ecam.conf \
+           file://blacklist-cnss2.conf \
            "
 
 inherit systemd useradd
@@ -27,7 +30,14 @@ do_compile[noexec] = "1"
 
 do_install() {
     install -d ${D}${bindir}
-    install -D -m 0755 ${WORKDIR}/init.qti.wlan_on.sh ${D}${bindir}/init.qti.wlan_on.sh
+    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-gunyah', 'true', 'false', d)}; then
+        install -D -m 0755 ${WORKDIR}/init.gh.qti.wlan_on.sh ${D}${bindir}/init.qti.wlan_on.sh
+        install -d ${D}${sysconfdir}/modprobe.d
+        install -m 0644 ${WORKDIR}/blacklist-pcie-qcom-ecam.conf -D ${D}${sysconfdir}/modprobe.d/
+        install -m 0644 ${WORKDIR}/blacklist-cnss2.conf -D ${D}${sysconfdir}/modprobe.d/
+    else
+        install -D -m 0755 ${WORKDIR}/init.qti.wlan_on.sh ${D}${bindir}/init.qti.wlan_on.sh
+    fi
     install -D -m 0755 ${WORKDIR}/init.qti.wlan_off.sh ${D}${bindir}/init.qti.wlan_off.sh
     install -d ${D}${systemd_unitdir}/system/
     install -m 0644 ${WORKDIR}/init_qti_wlan_auto.service -D ${D}${systemd_unitdir}/system/init_qti_wlan_auto.service
@@ -39,6 +49,7 @@ do_install() {
 
 FILES:${PN} += "\
                 ${systemd_unitdir}/system/* \
+                ${sysconfdir}/modprobe.d/* \
                 ${bindir}/init.qti.wlan_on.sh \
                 ${bindir}/init.qti.wlan_off.sh \
 "

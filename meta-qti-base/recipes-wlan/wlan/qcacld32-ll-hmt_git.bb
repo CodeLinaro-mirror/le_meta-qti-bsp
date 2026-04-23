@@ -68,10 +68,11 @@ do_install() {
     install -D -m 0644 ${WORKDIR}/device/qcom/wlan/msm_auto/wlan_mac.bin ${FIRMWARE_PATH}/wlan_mac.bin
 
     ln -sf /firmware/image/${FW_PATH_NAME} ${D}${nonarch_base_libdir}/firmware/${FW_PATH_NAME}
+
+    # Disable idle shutdown for HGY
+    if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-gunyah', 'true', 'false', d)} ; then
+        sed -i "s/gInterfaceChangeWait=500/gInterfaceChangeWait=0/g" ${FIRMWARE_PATH}/WCNSS_qcom_cfg.ini
+        sed -i "s/gSuspendMode=3/gSuspendMode=2/g" ${FIRMWARE_PATH}/WCNSS_qcom_cfg.ini
+    fi
 }
 
-# Disable idle shutdown for HGY
-do_install:append:auto-slt() {
-    sed -i "s/gInterfaceChangeWait=500/gInterfaceChangeWait=0/g" ${FIRMWARE_PATH}/WCNSS_qcom_cfg.ini
-    sed -i "s/gSuspendMode=3/gSuspendMode=2/g" ${FIRMWARE_PATH}/WCNSS_qcom_cfg.ini
-}
