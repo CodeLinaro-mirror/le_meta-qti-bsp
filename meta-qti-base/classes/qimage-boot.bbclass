@@ -77,8 +77,10 @@ python () {
 }
 
 do_merge_dtbs[depends] += "virtual/kernel:do_deploy"
+do_merge_dtbs[depends] += "virtual/kernel:do_shared_workdir"
 
 do_merge_dtbs() {
+     export PATH="${STAGING_KERNEL_BUILDDIR}/bin:${PATH}"
      install -d ${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbs
      install -d ${DEPLOY_DIR_IMAGE}/dtbs
 
@@ -97,7 +99,7 @@ do_merge_dtbs() {
              ${DEPLOY_DIR_IMAGE}/dtbos
          fi
      else
-         ${STAGING_BINDIR_NATIVE}/build/android/merge_dtbs.py \
+         KERNEL_TARGET=autogvm ${STAGING_BINDIR_NATIVE}/build/android/merge_dtbs.py \
          --base ${DEPLOY_DIR_IMAGE}/build-artifacts/dtb \
          --techpack ${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbs \
          --out ${DEPLOY_DIR_IMAGE}/dtbs
@@ -105,7 +107,7 @@ do_merge_dtbs() {
          if ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', 'true', 'false', d)}; then
              install -d ${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbos
              install -d ${DEPLOY_DIR_IMAGE}/dtbos
-             ${STAGING_BINDIR_NATIVE}/build/android/merge_dtbs.py \
+             KERNEL_TARGET=autogvm ${STAGING_BINDIR_NATIVE}/build/android/merge_dtbs.py \
              --base ${DEPLOY_DIR_IMAGE}/build-artifacts/dtbo \
              --techpack ${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbos \
              --out ${DEPLOY_DIR_IMAGE}/dtbos
