@@ -25,7 +25,6 @@ PREFERRED_PROVIDER_virtual/egl          = "adreno"
 PREFERRED_PROVIDER_virtual/libgles1     = "adreno"
 PREFERRED_PROVIDER_virtual/libgles2     = "adreno"
 
-BBMASK += "meta-qti-bsp/meta-qti-base/recipes-wlan"
 BBMASK += "meta-qti-bsp/meta-qti-base/recipes-kernel/edk2/edk2_4.0.bb"
 BBMASK += "meta-qti-bsp/meta-qti-base/recipes-kernel/edk2/edk2_5.0.bb"
 BBMASK += "meta-qti-bsp/meta-qti-base/recipes-products/images/qti-image-boot.bb"
@@ -70,16 +69,11 @@ MACHINE_FEATURES += "\
     qti-audio \
     qti-compute-platform \
     qti-safety \
+    qti-bluetooth \
+    qti-wlan \
+    qti-wlan-hsp \
+    qti-wlan-hmt \
 "
-
-MACHINE_FEATURES:append = "\
-    ${@bb.utils.contains('FACTORY_TEST', '1', 'qti-bluetooth', '', d)} \
-    ${@bb.utils.contains('FACTORY_TEST', '1', 'qti-wlan', '', d)} \
-    ${@bb.utils.contains('FACTORY_TEST', '1', 'qti-wlan-hsp', '', d)} \
-    ${@bb.utils.contains('FACTORY_TEST', '1', 'qti-wlan-hmt', '', d)} \
-"
-
-BBMASK:remove:auto-slt = "meta-qti-bsp/meta-qti-base/recipes-wlan"
 
 MACHINE_FEATURES:remove = "\
     ${@bb.utils.contains('FACTORY_TEST', '1', 'qti-vmm', '', d)} \
