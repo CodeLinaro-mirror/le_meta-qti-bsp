@@ -1,0 +1,134 @@
+From 6fb958674b677054588fe763bd44c1b2350b6bab Mon Sep 17 00:00:00 2001
+From: Wei Wang <wanw@qti.qualcomm.com>
+Date: Fri, 13 Mar 2026 16:09:47 +0800
+Subject: [PATCH] add lxc-daemon tool
+
+Signed-off-by: Wei Wang <wanw@qti.qualcomm.com>
+
+---
+ src/lxc/tools/lxc_daemon.c | 99 ++++++++++++++++++++++++++++++++++++++
+ src/lxc/tools/meson.build  |  2 +-
+ 2 files changed, 100 insertions(+), 1 deletion(-)
+ create mode 100644 src/lxc/tools/lxc_daemon.c
+
+diff --git a/src/lxc/tools/lxc_daemon.c b/src/lxc/tools/lxc_daemon.c
+new file mode 100644
+index 000000000..3c1113b52
+--- /dev/null
++++ b/src/lxc/tools/lxc_daemon.c
+@@ -0,0 +1,99 @@
++//Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
++//SPDX-License-Identifier: LGPL-2.1+
++
++#include <stdio.h>
++#include <unistd.h>
++#include <lxc/lxccontainer.h>
++#include "arguments.h"
++#include "log.h"
++
++lxc_log_define(lxc_daemon, lxc);
++
++static const struct option my_longopts[] = {
++	LXC_COMMON_OPTIONS
++};
++
++static struct lxc_arguments my_args = {
++	.progname     = "lxc-daemon",
++	.help         = "\
++--name=NAME\n\
++\n\
++lxc-daemon for NAME container \n\
++\n",
++	.options      = my_longopts,
++	.checker      = NULL,
++	.log_priority = "ERROR",
++	.log_file     = "none",
++};
++
++int main(int argc, char *argv[])
++{
++    struct lxc_container *c;
++    const char *name = argv[1];
++    const char *lxcpath = NULL;
++
++    if (argc < 2) {
++        TRACE(stderr, "Usage: %s <container_name>\n", argv[0]);
++        return 1;
++    }
++	struct lxc_log log;
++
++	if (lxc_arguments_parse(&my_args, argc, argv))
++		exit(EXIT_FAILURE);
++
++	/* Only create log if explicitly instructed */
++	if (my_args.log_file || my_args.log_priority) {
++		log.name = my_args.name;
++		log.file = my_args.log_file;
++		log.level = my_args.log_priority;
++		log.prefix = my_args.progname;
++		log.quiet = my_args.quiet;
++		log.lxcpath = my_args.lxcpath[0];
++
++		if (lxc_log_init(&log))
++			exit(EXIT_FAILURE);
++	}
++
++    c = lxc_container_new(name, lxcpath);
++    if (!c) {
++        TRACE(stderr, "Failed to setup lxc_container struct for %s\n", name);
++        return 1;
++    }
++
++    if (!c->is_defined(c)) {
++        TRACE(stderr, "Container %s not defined\n", c->name);
++        lxc_container_put(c);
++        return 1;
++    }
++
++    TRACE("Daemon started for container: %s\n", c->name);
++
++    while (1) {
++        if (!c->is_running(c)) {
++            TRACE("Container is stopped. Attempting to start...\n");
++
++            if (!c->start(c, 0, NULL)) {
++                TRACE(stderr, "Failed to start container. Retrying in 1 seconds...\n");
++                sleep(1);
++                continue;
++            } else {
++                TRACE("Container started successfully.\n");
++                c->wait(c, "RUNNING", 10);
++            }
++        }
++
++        TRACE("Monitoring container status...\n");
++        bool stopped = c->wait(c, "STOPPED", -1);
++
++        if (stopped) {
++            TRACE("Detected container exit! Preparing to restart...\n");
++            sleep(1);
++        } else {
++            TRACE(stderr, "LXC wait error.\n");
++            sleep(2);
++        }
++    }
++
++    lxc_container_put(c);
++    return 0;
++}
+diff --git a/src/lxc/tools/meson.build b/src/lxc/tools/meson.build
+index 1bf3be0c2..cd1b598b3 100644
+--- a/src/lxc/tools/meson.build
++++ b/src/lxc/tools/meson.build
+@@ -4,7 +4,7 @@ tools_common_sources = liblxc_sources + files('arguments.c', 'arguments.h') + in
+ 
+ tools_commands = ['attach', 'autostart', 'cgroup', 'checkpoint', 'config',
+     'console', 'copy', 'create', 'destroy', 'device', 'execute', 'freeze',
+-    'info', 'ls', 'monitor', 'snapshot', 'start', 'stop', 'top', 'unfreeze',
++    'info', 'ls', 'monitor', 'daemon', 'snapshot', 'start', 'stop', 'top', 'unfreeze',
+     'unshare', 'wait']
+ 
+ if want_tools
+-- 
+2.43.0
+
