@@ -16,4 +16,5 @@ RDEPENDS:${PN} += "\
     system-core-usb \
     ${@bb.utils.contains("MACHINE_FEATURES", "qti-hypervisor", "", "system-core-early-boot", d)} \
     ${@bb.utils.contains("MACHINE_FEATURES", "qti-dlkm", "system-core-dlkm", "", d)} \
+    ${@bb.utils.contains("MACHINE_FEATURES", "qti-gvm", "system-core-mount-ab", "", d)} \
     "

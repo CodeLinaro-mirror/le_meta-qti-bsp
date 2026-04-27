@@ -43,7 +43,6 @@ meta-qti-bsp/meta-qti-base/recipes-kiumd/dspfirmware-mount/dspfirmware-mount_git
 meta-qti-bsp/meta-qti-base/recipes-kernel/oot-dtbo/oot-dtbo.bb \
 meta-qti-bsp/meta-qti-base/recipes-kernel/edk2/edk2_git.bb \
 meta-qti-bsp/meta-qti-base/recipes-data/emac-dwc-eqos/emac-dwc-eqos_git.bb \
-meta-qti-bsp/meta-qti-base/recipes-data/dataeth-dlkm/dataeth-dlkm_git.bb \
 meta-qti-bsp/meta-qti-base/recipes-data/aurix-can/aurix-can_git.bb \
 meta-qti-bsp/meta-qti-base/recipes-core/reboot-daemon/reboot-daemon_2.0.bb \
 meta-qti-bsp/meta-qti-base/recipes-core/bootkpi-logging/bootkpi-logging.bb \
@@ -60,6 +59,7 @@ meta-qti-bsp/meta-qti-base/recipes-security/securemsm-devicetree/securemsm-devic
 meta-qti-bsp/meta-qti-base/recipes-kernel/linux-msm/linux-msm-headers_6.12.bb \
 meta-qti-bsp/meta-qti-base/recipes-graphics/graphics-hgsl/graphics-hgsldlkm_git.bb \
 meta-qti-bsp/meta-qti-base/recipes-wlan/wlan-devicetree \
+meta-qti-bsp/meta-qti-base/recipes-data/dataeth-dlkm/dataeth-dlkm_git.bb \
 meta-qti-bsp/meta-qti-extra/recipes-security/selinux-policy/selinux-policy.bb \
 "
 
@@ -69,7 +69,6 @@ meta-qti-bsp/meta-qti-extra/recipes-containers/softwarecontainer/softwarecontain
 meta-qti-bsp/meta-qti-base/recipes-camera/cameradlkm/cameradlkm_0.1.bb \
 meta-qti-bsp/meta-qti-base/recipes-kernel/linux-msm/linux-msm_6.1.bb \
 meta-qti-bsp/meta-qti-base/recipes-data/avb-utils/avb-utils_1.0.bb \
-meta-qti-bsp/meta-qti-base/recipes-connectivity/synergy-opensource \
 "
 
 # Missing recipes in baseline LV.AU.0.5.2 (target for gvm-gen5)
@@ -77,10 +76,10 @@ MISSING_RECIPE_SRCLIST_BASELINE_LV052 += "\
 meta-qti-bsp/meta-qti-extra/recipes-containers/softwarecontainer/softwarecontainer_git.bb \
 meta-qti-bsp/meta-qti-base/recipes-camera/cameradlkm/cameradlkm_0.1.bb \
 meta-qti-bsp/meta-qti-base/recipes-wlan \
-meta-qti-bsp/meta-qti-base/recipes-connectivity/synergy-opensource \
 meta-qti-bsp/meta-qti-base/recipes-graphics/wayland/weston-sdm-extension_1.0.0.bb \
 meta-qti-bsp/meta-qti-base/recipes-graphics/wayland/weston-sdm-extension-headers.bb \
 meta-qti-bsp/meta-qti-base/recipes-graphics/wayland/weston_13.0.%.bbappend \
+meta-qti-bsp/meta-qti-base/recipes-data/dataeth-dlkm/dataeth-dlkm_git.bb \
 meta-qti-bsp/meta-qti-base/recipes-graphics/display-hal/display-hal-linux_git.bb \
 meta-qti-bsp/meta-qti-base/recipes-graphics/display-hal/display-hal-headers_git.bb \
 meta-qti-bsp/meta-qti-base/recipes-graphics/display-commonsys-intf/display-commonsys-intf-linux_git.bb \

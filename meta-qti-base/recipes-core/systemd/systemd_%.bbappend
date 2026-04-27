@@ -9,6 +9,7 @@ SRC_URI:append = " \
     file://0001-systemd-avoid-active-seat-change-to-NULL.patch \
     file://60-misc.rules \
     file://0001-systemd-config-linger-for-root-user.patch \
+    file://0035-systemd-Change-job-print-method-to-Normal-way.patch \
 "
 
 SRC_URI:append:quin-gvm-gen4-5 = " file://70-vblk.rules"

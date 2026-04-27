@@ -52,6 +52,14 @@ do_shared_workdir () {
     if [ -e "${B}/scripts/module.lds" ]; then
         install -m 0644 ${B}/scripts/module.lds ${STAGING_KERNEL_BUILDDIR}/scripts/module.lds
     fi
+
+    fdtoverlaymerge_bin=$(find ${BZ_PREBUILT_ROOT}/out -path "*/host/bin/fdtoverlaymerge" -type f | head -n 1)
+    if [ -n "${fdtoverlaymerge_bin}" ]; then
+        install -d $kerneldir/bin
+        install -m 0755 ${fdtoverlaymerge_bin} ${kerneldir}/bin/
+    else
+        bbwarn "fdtoverlaymerge not found under ${BZ_PREBUILT_ROOT}/out"
+    fi
 }
 
 do_install() {
