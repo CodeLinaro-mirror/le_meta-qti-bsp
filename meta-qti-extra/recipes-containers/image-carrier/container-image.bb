@@ -34,6 +34,7 @@ IMAGE_INSTALL = "\
         xkeyboard-config \
         refpolicy-mcs \
         wpa-supplicant \
+	display-commonsys-intf-linux \
 "
 
 IMAGE_FSTYPES = "ext4"
