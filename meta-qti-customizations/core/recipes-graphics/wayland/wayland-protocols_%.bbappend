@@ -8,3 +8,8 @@ do_install:append:sun() {
   install -d ${D}${datadir}/wayland-protocols/stable/gbm-buffer-backend/
   cp ${WORKSPACE}/display/vendor/qcom/opensource/display/weston/protocol/gbm-buffer-backend.xml ${D}${datadir}/wayland-protocols/stable/gbm-buffer-backend
 }
+
+do_install:append:qrbx210() {
+  install -d ${D}${datadir}/wayland-protocols/stable/gbm-buffer-backend/
+  cp ${WORKSPACE}/display/vendor/qcom/opensource/display/weston/protocol/gbm-buffer-backend.xml ${D}${datadir}/wayland-protocols/stable/gbm-buffer-backend
+}
