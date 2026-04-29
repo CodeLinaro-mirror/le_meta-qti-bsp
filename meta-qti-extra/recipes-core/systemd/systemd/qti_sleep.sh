@@ -236,7 +236,7 @@ case $1/$2 in
     done
 
     # restart BT service
-    systemctl restart synergy.service
+    systemctl restart synergy.service || true
 
     ;;
 esac
