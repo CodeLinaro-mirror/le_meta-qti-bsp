@@ -7,101 +7,36 @@ Add lendbuf ion lendbuf interfaces
 
 Signed-off-by: Futao He <fhe@qti.qualcomm.com>
 ---
- Makefile.am           |  5 ++-
+ Makefile.am           |  3 +++
  configure.ac          |  1 +
- include/ion/ion_ext.h | 46 +++++++++++++++++++++++++++++
  ion_ext.c             | 69 +++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 140 insertions(+), 1 deletion(-)
- create mode 100644 include/ion/ion_ext.h
+ 3 files changed, 73 insertions(+)
  create mode 100644 ion_ext.c
 
 diff --git a/Makefile.am b/Makefile.am
 index 699aa6e..f3c2dbc 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -12,6 +12,9 @@ else
+@@ -12,5 +12,8 @@ else
  ion_sources = ion_new.c
  endif
- 
+
 +if ENABLE_ION_EXT
 +ion_sources += ion_ext.c
 +endif
  # Build libion.so
  lib_LTLIBRARIES = libion.la
- 
-@@ -45,7 +48,7 @@ iontest_LDFLAGS := -llog
- 
- # Export headers
- ion_includedir=$(includedir)/ion_headers/ion
--ion_include_HEADERS := $(top_srcdir)/include/ion/ion.h
-+ion_include_HEADERS := $(top_srcdir)/include/ion/ion.h $(top_srcdir)/include/ion/ion_ext.h
- 
- pkgconfigdir := $(libdir)/pkgconfig
- pkgconfig_DATA := libion.pc
 diff --git a/configure.ac b/configure.ac
 index d0cc342..df90287 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -61,6 +61,7 @@ AM_CONDITIONAL(X86_64, [test "x$X86_64" = "xyes"])
+@@ -61,5 +61,6 @@ AM_CONDITIONAL(X86_64, [test "x$X86_64" = "xyes"])
  AM_CONDITIONAL(BUILD_HOST, [test "x$X86_64" = "xyes"])
  AM_CONDITIONAL(BUILD_DEVICE, [test "x$ARM$ARM64" != "xnono"])
- 
+
 +AM_CONDITIONAL([ENABLE_ION_EXT], [true])
- 
  AC_CONFIG_FILES([ \
      Makefile \
-diff --git a/include/ion/ion_ext.h b/include/ion/ion_ext.h
-new file mode 100644
-index 0000000..bf87a8a
---- /dev/null
-+++ b/include/ion/ion_ext.h
-@@ -0,0 +1,46 @@
-+/**
-+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
-+ * SPDX-License-Identifier: BSD-3-Clause-Clear
-+ */
-+/* ion_ext.h - libion extension API declarations */
-+#ifndef _ION_EXT_H
-+#define _ION_EXT_H
-+
-+#include <stdint.h>
-+
-+#ifdef __cplusplus
-+extern "C" {
-+#endif
-+
-+/**
-+ * ion_lend_buf() - Lend an ION buffer to a specified secure domain (similar to LendDmabuf)
-+ *
-+ * @ion_fd:    File descriptor of /dev/ion
-+ * @buf_fd:    dma-buf fd returned by ion_alloc_fd()
-+ * @dst_vmid:  Destination VMID (e.g. ION_VMID_CP_PIXEL)
-+ * @dst_perm:  Destination permissions (ION_PERM_READ | ION_PERM_WRITE)
-+ *
-+ * Returns 0 on success, -errno on failure
-+ *
-+ * Note: After lending, the HLOS CPU can no longer access the buffer.
-+ *       Call ion_reclaim_buf() to restore access.
-+ */
-+int ion_lend_buf(int ion_fd, int buf_fd,
-+                 uint32_t dst_vmid, uint32_t dst_perm);
-+
-+/**
-+ * ion_reclaim_buf() - Reclaim buffer access from a secure domain (similar to ReclaimDmabuf)
-+ *
-+ * @ion_fd:    File descriptor of /dev/ion
-+ * @buf_fd:    dma-buf fd that was previously lent out
-+ * @src_vmid:  VMID of the current owner (the destination VMID used during lend)
-+ *
-+ * Returns 0 on success, -errno on failure
-+ */
-+int ion_reclaim_buf(int ion_fd, int buf_fd, uint32_t src_vmid);
-+
-+#ifdef __cplusplus
-+}
-+#endif
-+
-+#endif /* _ION_EXT_H */
 diff --git a/ion_ext.c b/ion_ext.c
 new file mode 100644
 index 0000000..fd9e366
@@ -159,7 +94,7 @@ index 0000000..fd9e366
 +{
 +    return _ion_hyp_assign(ion_fd, buf_fd,
 +                           ION_VMID_HLOS,   /* src: HLOS */
-+                           dst_vmid,         /* dst: target secure domain */
++                           dst_vmid,        /* dst: target secure domain */
 +                           dst_perm,
 +                           ION_HYP_ASSIGN_TO_VM);
 +}
@@ -179,4 +114,3 @@ index 0000000..fd9e366
 +
 -- 
 2.43.0
-
