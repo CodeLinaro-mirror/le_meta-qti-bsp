@@ -3,6 +3,8 @@
 
 require qti-xreality2-base-image.bb
 
+CORE_IMAGE_EXTRA_INSTALL:append:seraph = " diag-router"
+
 CORE_IMAGE_EXTRA_INSTALL:remove:seraph = " \
     packagegroup-qti-audio \
     packagegroup-qti-bluetooth \
