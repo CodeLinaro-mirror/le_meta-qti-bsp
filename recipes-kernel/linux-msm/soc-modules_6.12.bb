@@ -74,3 +74,6 @@ do_deploy() {
 
 addtask deploy after do_install
 
+RPROVIDES:${PN} += "kernel-module-qcom-scm-${KERNEL_VERSION}"
+RPROVIDES:${PN} += "kernel-module-mem-buf-dev-${KERNEL_VERSION}"
+RPROVIDES:${PN} += "kernel-module-pdr-interface-${KERNEL_VERSION}"
