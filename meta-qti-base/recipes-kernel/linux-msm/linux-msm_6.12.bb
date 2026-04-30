@@ -78,8 +78,11 @@ do_install() {
     install -d ${D}${sysconfdir}/modules-load.d
     install -d ${D}${sysconfdir}/modprobe.d
 
-    install -d ${D}/${libdir}/modules/${KERNEL_VERSION}
-    install ${BZ_PREBUILT_ROOT}/out/msm-kernel-autogvm-${KERNEL_OUT_VARIANT}defconfig/dist/*.ko ${D}/${libdir}/modules/${KERNEL_VERSION}
+    install -d ${D}/${nonarch_base_libdir}/modules/${KERNEL_VERSION}
+    install ${BZ_PREBUILT_ROOT}/out/msm-kernel-autogvm-${KERNEL_OUT_VARIANT}defconfig/dist/*.ko ${D}/${nonarch_base_libdir}/modules/${KERNEL_VERSION}
+
+    install -m 0644 ${B}/modules.builtin ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}
+    install -m 0644 ${B}/modules.builtin.modinfo ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}
 
     find ${D} -name '*' -exec chown -h root:root {} \;
 }
