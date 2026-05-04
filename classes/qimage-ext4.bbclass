@@ -18,6 +18,7 @@ QIMGEXT4CLASSES += "${@bb.utils.contains('MNT_POINTS', '/cache', 'qimage-cache-e
 QIMGEXT4CLASSES += "${@bb.utils.contains('MNT_POINTS', '/persist', 'qimage-persist-ext4', '', d)}"
 QIMGEXT4CLASSES += "${@bb.utils.contains('MNT_POINTS', '/systemrw', 'qimage-systemrw-ext4', '', d)}"
 QIMGEXT4CLASSES += "${@bb.utils.contains('MNT_POINTS', '/lib/modules', 'qimage-vdlkm-ext4', '', d)}"
+QIMGEXT4CLASSES += "${@bb.utils.contains('MNT_POINTS', '/nvram', 'qimage-nvram-ext4', '', d)}"
 
 inherit ${QIMGEXT4CLASSES}
 
