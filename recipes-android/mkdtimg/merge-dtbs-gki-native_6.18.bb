@@ -10,6 +10,8 @@ BBCLASSEXTEND = "native"
 
 DEFAULT_PREFERENCE = "-1"
 
+DEPENDS += "dtc-native"
+
 FILESEXTRAPATHS:prepend := "${KERNEL_PLATFORM_PATH}:"
 
 SRC_URI += "file://build/kernel/android/merge_dtbs.py"
@@ -22,6 +24,12 @@ do_install() {
     install -d ${D}${bindir}/merge_dtbs/
     install -m 0755 ${S}/../build/kernel/android/merge_dtbs.py ${D}${bindir}/merge_dtbs/
     install -m 0755 ${S}/../build/kernel/build-tools/path/linux-x86/ufdt_apply_overlay ${D}${bindir}/merge_dtbs/
+
+    # Install fdt tools from dtc-native
+    install -m 0755 ${STAGING_BINDIR_NATIVE}/fdtget ${D}${bindir}/merge_dtbs/
+    install -m 0755 ${STAGING_BINDIR_NATIVE}/fdtput ${D}${bindir}/merge_dtbs/
+    install -m 0755 ${STAGING_BINDIR_NATIVE}/fdtoverlay ${D}${bindir}/merge_dtbs/
+    install -m 0755 ${STAGING_BINDIR_NATIVE}/fdtdump ${D}${bindir}/merge_dtbs/
 
     create_wrapper ${D}${bindir}/merge_dtbs/merge_dtbs.py \
         LD_LIBRARY_PATH=${STAGING_BINDIR_NATIVE}/merge_dtbs/lib:$LD_LIBRARY_PATH \

@@ -116,9 +116,6 @@ do_deploy() {
             install -m 0644 "$dtbf" "${DEPLOYDIR}/kernel_dtbs"
         done
     done
-    for dtbof in $(find . -name "*.dtbo") ; do
-        install -m 0644 $dtbof ${DEPLOYDIR}/kernel_dtbs
-    done
 
     install -d ${DEPLOYDIR}/kernel_modules
     for kmod in $(find . -name "*.ko") ; do
