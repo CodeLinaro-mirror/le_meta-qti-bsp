@@ -1,0 +1,13 @@
+[Unit]
+Description=Setup Journal Storage on ramcarveout
+DefaultDependencies=no
+Requires=ramcarveout.service
+After=ramcarveout.service systemd-journald.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/setup-ramjournal.sh
+
+[Install]
+WantedBy=multi-user.target
