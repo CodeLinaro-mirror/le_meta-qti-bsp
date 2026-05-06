@@ -1,4 +1,4 @@
-inherit kernel
+inherit kernel cml1
 
 DESCRIPTION = "CAF Linux Kernel"
 LICENSE = "GPLv2.0-with-linux-syscall-note"
@@ -24,6 +24,10 @@ KERNEL_CONFIG_FRAGMENTS:append = " ${S}/arch/arm64/configs/vendor/echo-mbb.confi
 KERNEL_CONFIG_FRAGMENTS:append = " ${S}/arch/arm64/configs/vendor/echo-cpe.config"
 KERNEL_CONFIG_FRAGMENTS:append = " ${@oe.utils.vartrue('DEBUG_BUILD', '${S}/arch/arm64/configs/vendor/echo-debug.config', '', d)}"
 
+SRC_URI += " \
+          ${@bb.utils.contains('DISTRO_FEATURES', 'apparmor', 'file://apparmor.cfg', '', d)} \
+          "
+
 do_configure:prepend() {
     if [ ! -f "${S}/arch/${ARCH}/configs/${KERNEL_CONFIG}" ]; then
         bbfatal "KERNEL_CONFIG '${KERNEL_CONFIG}' was specified, but not present in the source tree"
@@ -45,7 +49,7 @@ do_configure:prepend() {
         done
 
         # Now that all the fragments are located merge them.
-        ( cd ${WORKDIR} && ${S}/scripts/kconfig/merge_config.sh -m -r -y -O ${B} ${B}/.config ${KERNEL_CONFIG_FRAGMENTS} 1>&2 )
+        ( cd ${WORKDIR} && ${S}/scripts/kconfig/merge_config.sh -m -r -y -O ${B} ${B}/.config ${KERNEL_CONFIG_FRAGMENTS}  ${@" ".join(find_cfgs(d))} 1>&2 )
     fi
 
     # generate pair of private/public keys for module signing
