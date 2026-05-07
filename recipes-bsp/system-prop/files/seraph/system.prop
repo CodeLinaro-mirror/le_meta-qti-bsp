@@ -1,0 +1,11 @@
+#
+# Default properties to be set for seraph
+#
+
+ro.product.board=seraph
+
+#atrace debug setup
+debug.atrace.tags.enableflags=0
+
+#property to select target platform for codec2 lib
+vendor.media.target_variant=seraph

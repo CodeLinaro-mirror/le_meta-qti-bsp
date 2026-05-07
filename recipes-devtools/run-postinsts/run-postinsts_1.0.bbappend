@@ -20,3 +20,7 @@ do_install:append:vienna() {
     do_install_run_postinsts
 }
 
+do_install:append:seraph() {
+    do_install_run_postinsts
+}
+
