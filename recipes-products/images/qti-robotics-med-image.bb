@@ -72,4 +72,3 @@ CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "packagegroup-qti-test-sensors-see
 CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "packagegroup-qti-video"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "packagegroup-qti-wifi"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "packagegroup-ros2-foxy"
-CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "packagegroup-selinux-minimal"
