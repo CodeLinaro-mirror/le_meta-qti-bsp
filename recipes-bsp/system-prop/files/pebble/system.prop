@@ -1,5 +1,5 @@
 #
-# Default properties to be set for vienna
+# Default properties to be set for pebble
 #
 ro.hardware.camera=qcom
 
@@ -9,8 +9,8 @@ persist.vendor.sensors.enable.NavMezzCard=false
 persist.vendor.sensors.enable.NavMezzCard_Rev2=false
 
 #property to select target platform for codec2 lib
-vendor.media.target_variant=vienna
+vendor.media.target_variant=pebble
 
-#property to enable BT a2dp_offload
-ro.bluetooth.a2dp_offload.supported=true
-persist.bluetooth.a2dp_offload.disabled=false
+#property to enable buffercache for audio-codec2
+vendor.qc2audio.enable.buffercache=false
+
