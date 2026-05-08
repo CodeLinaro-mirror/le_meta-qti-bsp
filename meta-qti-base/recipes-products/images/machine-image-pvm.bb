@@ -8,6 +8,11 @@ inherit core-image auto-qimage-deploy
 
 require automotive-image.inc
 
+IMAGE_INSTALL += "\
+    ${@bb.utils.contains('PN', 'machine-image-pvm', 'packagegroup-qti-wlan', '', d)} \
+    ${@bb.utils.contains('PN', 'machine-image-pvm', 'packagegroup-qti-bluetooth', '', d)} \
+"
+
 KERNEL_VERSION = "${@oe.utils.read_file('${STAGING_KERNEL_BUILDDIR}/kernel-abiversion')}"
 
 add_extra_modules() {

@@ -9,6 +9,7 @@ PACKAGES = "\
 ALLOW_EMPTY:${PN} = "1"
 
 RDEPENDS:${PN} += "\
+    dspfirmware-mount-bt \
     synergy-opensource \
     csrspp-tty \
     bt-dlkm \
