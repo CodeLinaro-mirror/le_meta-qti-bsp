@@ -18,6 +18,7 @@ SRC_URI = "\
 SRC_URI:append = " file://ack/autogvm_extra.fragment"
 SRC_URI:append = " file://ack/common_soc_modules.fragment"
 SRC_URI:append = " file://ack/techpack_modules.fragment"
+SRC_URI:append = " file://ack/0001-scripts-Makefile.lib-add-dts-to-dtbo-rule.patch"
 
 SRCREV_common = "${AUTOREV}"
 SRCREV_socrepo = "${AUTOREV}"

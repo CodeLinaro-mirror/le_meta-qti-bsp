@@ -10,6 +10,7 @@ ALLOW_EMPTY:${PN} = "1"
 
 RDEPENDS:${PN} += "\
     ${@bb.utils.contains_any('PREFERRED_VERSION_linux-msm', '6.1 6.12', 'platformdlkm ', '', d)} \
+    ${@bb.utils.contains_any('PREFERRED_PROVIDER_virtual/kernel', 'linux-ack', 'soc-modules', '', d)} \
     packagegroup-core-boot \
     "
 
