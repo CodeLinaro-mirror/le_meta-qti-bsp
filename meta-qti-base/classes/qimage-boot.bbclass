@@ -12,20 +12,28 @@ DEPENDS += "\
     virtual/kernel \
 "
 
+DTB_FILE_LIST:gvm-gen5 = "\
+    ${DEPLOY_DIR_IMAGE}/dtbs/sa8797p-gunyah-vm-lv-qam.dtb \
+"
+DTB_FILE_LIST:gvm-gen4-5 = "\
+    ${DEPLOY_DIR_IMAGE}/dtbs/monaco-gh-vm-lv-qam-ridesx.dtb \
+    ${DEPLOY_DIR_IMAGE}/dtbs/lemans-gh-vm-lv-qam-ridesx.dtb \
+"
+
 gvm_pilsplitter() {
     PILTOOLS_PATH="${STAGING_BINDIR_NATIVE}/scripts/pil_tools"
-    DTB_FILE_LIST=$(find ${DEPLOY_DIR_IMAGE}/build-artifacts/dtb -name "*.dtb" | sort)
-    if [ -z "${DTB_FILE_LIST}" ]; then
+    DTB_CHECK=$(find ${DEPLOY_DIR_IMAGE}/build-artifacts/dtb -name "*.dtb" | sort)
+    if [ -z "${DTB_CHECK}" ]; then
         echo "No *.dtb files found in $DEPLOY_DIR_IMAGE/dtbs"
         exit 1
     else
         # Use vb-dtb.img to avoid overwriting dtbs/dtb.img used by do_makeboot.
         # dtbs/dtb.img is the full cat *.dtb result for boot.img;
         # vb-dtb.img is the mkdtimg format for PIL signing (bootloader.img).
-        ${STAGING_BINDIR_NATIVE}/build/prebuilts/kernel-build-tools/linux-x86/bin/mkdtimg create ${DEPLOY_DIR_IMAGE}/dtbs/vb-dtb.img \
-            ${DEPLOY_DIR_IMAGE}/dtbs/monaco-gh-vm-lv-qam-ridesx.dtb \
-            ${DEPLOY_DIR_IMAGE}/dtbs/lemans-gh-vm-lv-qam-ridesx.dtb \
-            ${DEPLOY_DIR_IMAGE}/dtbs/sa8797p-gunyah-vm-qam.dtb
+        # DTB_FILE_LIST defines per-machine DTBs with full paths.
+        ${STAGING_BINDIR_NATIVE}/build/prebuilts/kernel-build-tools/linux-x86/bin/mkdtimg create \
+            ${DEPLOY_DIR_IMAGE}/dtbs/vb-dtb.img \
+            ${DTB_FILE_LIST}
     fi
 
     install -d ${DEPLOY_DIR_IMAGE}/signing
