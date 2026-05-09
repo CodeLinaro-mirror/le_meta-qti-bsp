@@ -1,0 +1,40 @@
+diff --git a/Kbuild b/Kbuild
+new file mode 100644
+index 000000000000..f91c722d422c
+--- /dev/null
++++ b/Kbuild
+@@ -0,0 +1,24 @@
++# SPDX-License-Identifier: GPL-2.0
++#
++# soc-repo/Kbuild
++#
++# OOT entry point for building soc-repo modules against a pre-built ACK kernel.
++# Invoked as:
++#   make -C kernel-source O=KBA M=soc-repo/ modules
++#
++# The kernel build system (scripts/Kbuild.include) selects the entry point via:
++#   kbuild-file = $(or $(wildcard $(src)/Kbuild), $(src)/Makefile)
++#
++# This Kbuild file must exist to prevent the build system from falling back to
++# soc-repo/Makefile (a full kernel Makefile v6.11) which would cause version
++# mismatches with kernel-source (v6.12) and trigger unwanted outputmakefile,
++# archprepare, and other full-kernel build targets.
++
++obj-y += arch/arm64/gunyah/
++obj-y += drivers/
++obj-y += kernel/
++obj-y += lib/
++obj-y += mm/
++obj-y += net/qmsgq/
++obj-y += net/qrtr/
++obj-y += sound/
+diff --git a/drivers/ufs/host/Makefile b/drivers/ufs/host/Makefile
+index 736526390091..a35a6b43b655 100644
+--- a/drivers/ufs/host/Makefile
++++ b/drivers/ufs/host/Makefile
+@@ -6,3 +6,5 @@ obj-$(CONFIG_SCSI_UFS_CRYPTO_QTI) += ufshcd-crypto-qti.o
+ 
+ obj-$(CONFIG_SCSI_UFS_QCOM) += ufs-qcom.o
+ 
++obj-$(CONFIG_SCSI_UFS_QCOM_SCMI) += ufs-qcom-scmi.o
++
