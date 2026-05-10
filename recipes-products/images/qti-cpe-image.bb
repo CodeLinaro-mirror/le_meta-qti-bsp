@@ -53,3 +53,6 @@ ROOTFS_POSTPROCESS_COMMAND += "${@bb.utils.contains('DISTRO_FEATURES', 'selinux'
 
 #Install bash
 CORE_IMAGE_EXTRA_INSTALL += "bash"
+
+#Install Audio packagegroup
+CORE_IMAGE_EXTRA_INSTALL += "packagegroup-qcom-audio"
