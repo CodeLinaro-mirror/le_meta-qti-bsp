@@ -12,6 +12,10 @@ IMAGE_FEATURES:append:qti-distro-base-user = " gluebi"
 
 IMAGE_INSTALL:append = "${@bb.utils.contains('DISTRO_FEATURES', 'apparmor', ' apparmor ', '', d)}"
 
+IMAGE_INSTALL:append = "\
+${@bb.utils.contains('BBFILE_COLLECTIONS', 'qti-rdkb', 'packagegroup-rdkb', '', d)} \
+"
+
 CORE_IMAGE_EXTRA_INSTALL += "\
                 glib-2.0 \
                 kernel-modules \
@@ -46,3 +50,5 @@ do_cleanup_sepolicy() {
 
 ROOTFS_POSTPROCESS_COMMAND += "${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'do_cleanup_sepolicy;', '', d)}"
 
+#Install bash
+CORE_IMAGE_EXTRA_INSTALL += "bash"
