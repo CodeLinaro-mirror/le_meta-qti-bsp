@@ -110,6 +110,7 @@ CORE_IMAGE_EXTRA_INSTALL:append:alor = " packagegroup-qti-touch"
 CORE_IMAGE_EXTRA_INSTALL:append:alor = " packagegroup-qcom-sensors"
 CORE_IMAGE_EXTRA_INSTALL:append:alor = " packagegroup-qti-mmframeworks"
 CORE_IMAGE_EXTRA_INSTALL:append:alor = " packagegroup-qti-eva"
+CORE_IMAGE_EXTRA_INSTALL:append:alor = " security-tests"
 CORE_IMAGE_EXTRA_INSTALL:append:alor = " libsv-headers"
 
 CORE_IMAGE_EXTRA_INSTALL:remove:pebble = "kernel-modules"
