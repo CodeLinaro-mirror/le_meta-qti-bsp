@@ -20,9 +20,14 @@ DEPENDS:append:aarch64 = " libgcc"
 #Add DTC_FLAGS to compile DTB with symbols.
 KERNEL_DTC_FLAGS += "-@"
 
-KERNEL_CONFIG_FRAGMENTS:append = " ${S}/arch/arm64/configs/vendor/echo-mbb.config"
-KERNEL_CONFIG_FRAGMENTS:append = " ${S}/arch/arm64/configs/vendor/echo-cpe.config"
-KERNEL_CONFIG_FRAGMENTS:append = " ${@oe.utils.vartrue('DEBUG_BUILD', '${S}/arch/arm64/configs/vendor/echo-debug.config', '', d)}"
+KERNEL_CONFIG_FRAGMENTS:append:echo = " \
+    ${S}/arch/arm64/configs/vendor/echo-mbb.config \
+    ${S}/arch/arm64/configs/vendor/echo-cpe.config \
+    ${S}/arch/arm64/configs/vendor/echo-rdkb.config \
+    ${S}/arch/arm64/configs/vendor/echo-cpe-plus.config \
+    ${S}/arch/arm64/configs/vendor/echo-mbb-plus.config \
+    ${S}/arch/arm64/configs/vendor/echo-rdkb-plus.config"
+KERNEL_CONFIG_FRAGMENTS:append:echo = " ${@oe.utils.vartrue('DEBUG_BUILD', '${S}/arch/arm64/configs/vendor/echo-debug.config', '', d)}"
 
 SRC_URI += " \
           ${@bb.utils.contains('DISTRO_FEATURES', 'apparmor', 'file://apparmor.cfg', '', d)} \
