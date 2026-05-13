@@ -112,6 +112,7 @@ CORE_IMAGE_EXTRA_INSTALL:append:alor = " packagegroup-qti-mmframeworks"
 CORE_IMAGE_EXTRA_INSTALL:append:alor = " packagegroup-qti-eva"
 CORE_IMAGE_EXTRA_INSTALL:append:alor = " security-tests"
 CORE_IMAGE_EXTRA_INSTALL:append:alor = " libsv-headers"
+CORE_IMAGE_EXTRA_INSTALL:append:alor = " packagegroup-qti-ppat"
 
 CORE_IMAGE_EXTRA_INSTALL:remove:pebble = "kernel-modules"
 CORE_IMAGE_EXTRA_INSTALL:remove:pebble = "libdrm-tests"
