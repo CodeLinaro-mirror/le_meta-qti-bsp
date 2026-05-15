@@ -17,7 +17,8 @@ CLEANBROKEN = "1"
 SRC_URI = "\
     ${PATH_TO_REPO}/vendor/qcom/opensource/platform-kernel/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/platform-kernel;usehead=1 \
     file://0001-soc-repo-adapt-cse-linux-6.6.patch \
-    file://0002-Compatibility-modifications-for-soc-repo-SMMUv2.patch "
+    file://0002-Compatibility-modifications-for-soc-repo-SMMUv2.patch \
+    file://0003-Compatibility-modifications-for-gh-and-wdt-driver.patch "
 
 SRCREV = "${AUTOREV}"
 
@@ -67,6 +68,12 @@ do_compile() {
                           sed 's/^/-D/' | \
                           tr '\n' ' ')
 
+        # Append int/hex type CONFIG values as -DCONFIG_FOO=value
+        INT_CFLAGS=$(grep -E '^CONFIG_.*=[0-9]+$' ${DEFCONFIG_FILE} | \
+                     sed 's/^\(CONFIG_[^=]*\)=\(.*\)$/-D\1=\2/' | \
+                     tr '\n' ' ')
+        DEFCONFIG_CFLAGS="${DEFCONFIG_CFLAGS} ${INT_CFLAGS}"
+
         CONFIG_VARS=$(grep -E '^CONFIG_.*=[ym]$' ${DEFCONFIG_FILE} | \
                      sed 's/=y/=m/' | \
                      tr '\n' ' ')
@@ -91,11 +98,18 @@ do_compile() {
 
 TECHPACK_MODULES = "\
     drivers/virt/gunyah/gh_dbl.ko \
+    drivers/virt/gunyah/gh_msgq.ko \
+    drivers/virt/gunyah/gh_rm_drv.ko \
+    arch/arm64/gunyah/gh_arm_drv.ko \
     drivers/soc/qcom/hab/msm_hab.ko \
     drivers/virtio/virtio_mmio.ko \
     drivers/iommu/arm/arm-smmu/arm_smmu.ko \
     drivers/iommu/iommu-logger.ko \
     drivers/iommu/qcom_iommu_util.ko \
+    drivers/soc/qcom/qcom_wdt_core.ko \
+    drivers/soc/qcom/qcom_soc_wdt.ko \
+    drivers/soc/qcom/minidump.ko \
+    drivers/soc/qcom/debug_symbol.ko \
 "
 
 # Exclude KERNEL_VERSION from task hash calculation to avoid metadata instability

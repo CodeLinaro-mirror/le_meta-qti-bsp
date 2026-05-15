@@ -18,6 +18,7 @@ SRC_URI = "\
     file://dm.cfg \
     file://0001-QcLinux-kernel-adapt-LVGVM.patch \
     file://0013-net-stmmac-dwmac-qcom-ethqos-Enable-SCMI-ETH.patch \
+    file://0014-QcLinux-Gunyah-RM-Driver-Adaption.patch \
     ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'file://selinux.cfg', '', d)} \
     ${@bb.utils.contains_any('VARIANT', 'perf user', '', 'file://devmem.cfg', d)} \
 "

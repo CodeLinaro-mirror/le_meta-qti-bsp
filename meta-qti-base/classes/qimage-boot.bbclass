@@ -22,7 +22,8 @@ gvm_pilsplitter() {
         exit 1
     else
         ${STAGING_BINDIR_NATIVE}/build/prebuilts/kernel-build-tools/linux-x86/bin/mkdtimg create ${DEPLOY_DIR_IMAGE}/dtbs/dtb.img \
-            ${DEPLOY_DIR_IMAGE}/dtbs/sa8797p-gunyah-vm-lv-qam.dtb
+            ${DEPLOY_DIR_IMAGE}/dtbs/sa8797p-gunyah-vm-lv-qam.dtb \
+            ${DEPLOY_DIR_IMAGE}/dtbs/sa8797p-v2-gunyah-vm-lv-qam.dtb
     fi
 
     install -d ${DEPLOY_DIR_IMAGE}/signing

@@ -47,5 +47,6 @@ do_deploy () {
     done
 }
 
-TECHPACK_DTBS = "sa8797p-gunyah-vm-lv-qam.dtb"
+TECHPACK_DTBS = "sa8797p-gunyah-vm-lv-qam.dtb \
+                 sa8797p-v2-gunyah-vm-lv-qam.dtb"
 TECHPACK_DTBOS = "sa8797p-gunyah-vm-lv-qam-overlay.dtbo"
