@@ -10,6 +10,12 @@ IMAGE_FEATURES += "read-only-rootfs"
 # gluebi is read only and prevents debugging/experimentation. Only enable in user variant
 IMAGE_FEATURES:append:qti-distro-base-user = " gluebi"
 
+IMAGE_INSTALL:append = "${@bb.utils.contains('DISTRO_FEATURES', 'apparmor', ' apparmor ', '', d)}"
+
+IMAGE_INSTALL:append = "\
+${@bb.utils.contains('BBFILE_COLLECTIONS', 'qti-rdkb', 'packagegroup-rdkb', '', d)} \
+"
+
 CORE_IMAGE_EXTRA_INSTALL += "\
                 glib-2.0 \
                 kernel-modules \
@@ -27,7 +33,9 @@ CORE_IMAGE_EXTRA_INSTALL += "\
                 packagegroup-qti-ss-mgr \
                 packagegroup-support-utils \
                 packagegroup-qti-fastrpc \
+		packagegroup-qti-data \
                 ${@bb.utils.contains('MACHINE_FEATURES', 'qti-ssdk', "packagegroup-qti-ssdk", "", d)} \
+                ${@bb.utils.contains('BBFILE_COLLECTIONS', 'qti-internal', 'packagegroup-qti-internal', '', d)} \
 "
 
 do_cleanup_sepolicy() {
@@ -43,3 +51,5 @@ do_cleanup_sepolicy() {
 
 ROOTFS_POSTPROCESS_COMMAND += "${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'do_cleanup_sepolicy;', '', d)}"
 
+#Install bash
+CORE_IMAGE_EXTRA_INSTALL += "bash"
