@@ -1,0 +1,40 @@
+From 17cb509739fddb8f44e275b77d2fb75a078b2138 Mon Sep 17 00:00:00 2001
+From: Jing Wang <jingwa@qti.qualcomm.com>
+Date: Tue, 12 May 2026 19:23:49 +0800
+Subject: [PATCH] Add unprivileged pulse native & cookie
+
+Add unprivileged pulse native & cookie
+
+Signed-off-by: Jing Wang <jingwa@qti.qualcomm.com>
+---
+ src/daemon/default.pa.in | 1 +
+ src/daemon/system.pa.in  | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/src/daemon/default.pa.in b/src/daemon/default.pa.in
+index acd0611..40d01ac 100755
+--- a/src/daemon/default.pa.in
++++ b/src/daemon/default.pa.in
+@@ -105,6 +105,7 @@ ifelse(@HAVE_AF_UNIX@, 1, [dnl
+ load-module module-esound-protocol-unix
+ .endif
+ load-module module-native-protocol-unix
++load-module module-native-protocol-unix socket=/dev/socket/pulse_unprivileged/native auth-cookie=/dev/socket/pulse_unprivileged/cookie
+ ])dnl
+ 
+ ### Network access (may be configured with paprefs, so leave this commented
+diff --git a/src/daemon/system.pa.in b/src/daemon/system.pa.in
+index b1a4a5c..c17cd4b 100755
+--- a/src/daemon/system.pa.in
++++ b/src/daemon/system.pa.in
+@@ -45,6 +45,7 @@ load-module module-detect
+ load-module module-esound-protocol-unix
+ .endif
+ load-module module-native-protocol-unix
++load-module module-native-protocol-unix socket=/dev/socket/pulse_unprivileged/native auth-cookie=/dev/socket/pulse_unprivileged/cookie
+ 
+ ### Automatically restore the default sink/source when changed by the user
+ ### during runtime
+-- 
+2.34.1
+

@@ -24,6 +24,7 @@ SRC_URI:append = " file://0001-pulseaudio-config-default.pa-to-disable-default-A
 SRC_URI:append = " file://0001-udev-bypass-udev-device-enumeration-for-auto-targets.patch"
 SRC_URI:append = " file://0001-Avoid-pulseaudio-daemon-shutdown-after-lpm.patch"
 SRC_URI:append = " ${@bb.utils.contains('MACHINE_FEATURES', 'qti-audio-ar','file://0001-disable-realtime-schedule-in-pulseaudio.patch','',d)}"
+SRC_URI:append = " file://0001-Add-unprivileged-pulse-native-cookie.patch"
 
 PACKAGES =+ " pulseaudio-module-dev"
 
