@@ -6,6 +6,7 @@ LIC_FILES_CHKSUM = "file://${SOC_REPO}/COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7
 inherit module
 
 DEPENDS += "virtual/kernel virtual/dtc-native elfutils-native"
+do_deploy[depends] += "virtual/kernel:do_deploy"
 
 FILESEXTRAPATHS:prepend := "${KERNEL_PLATFORM_PATH}/:"
 
@@ -13,7 +14,7 @@ SRC_URI = "file://soc-repo \
            file://qcom/opensource/devicetree"
 
 PROVIDES= "kernel-module-soc-repo"
-S = "${WORKDIR}/soc-repo/yocto"
+S = "${WORKDIR}/soc-repo/build"
 SOC_REPO = "${WORKDIR}/soc-repo"
 
 KERNEL_BUILD_DIR = "${STAGING_KERNEL_BUILDDIR}"
@@ -46,7 +47,7 @@ EXTRA_OEMAKE += 'DTC_INCLUDE="${SOC_REPO}/scripts/dtc/include-prefixes/ ${STAGIN
 do_install() {
     mkdir -p ${STAGING_KERNEL_BUILDDIR}/lib/modules/${KERNEL_VERSION}
 
-    for mod in $(find ${SOC_REPO} -name '*.ko'); do
+    for mod in $(find ${WORKDIR} -name '*.ko'); do
         if [ -f $mod ]; then
             install -m 0644 $mod \
                 ${STAGING_KERNEL_BUILDDIR}/lib/modules/${KERNEL_VERSION}
@@ -57,8 +58,11 @@ do_install() {
 
     # Expose soc-repo symbols for techpacks
     install -m 0755 ${B}/Module.symvers -D ${D}${includedir}/kernel-module-soc-repo/Module.symvers
+}
 
+do_deploy() {
     install -d ${DEPLOY_DIR_IMAGE}/kernel_dtbs
+
     for dtbof in ${TARGET_DTBS}; do
         path=$(find ${WORKDIR} -name "$dtbof" -print -quit)
         if [ -n "$path" ]; then
@@ -68,3 +72,6 @@ do_install() {
         fi
     done
 }
+
+addtask deploy after do_install
+

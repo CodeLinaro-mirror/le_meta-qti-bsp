@@ -120,10 +120,11 @@ do_deploy_fixup () {
     # copy the bootloader ELF file
     for f in ${EXTRA_IMAGEDEPENDS}; do
         if [ "$f" = "edk2" ] || [ "$f" = "lib64-edk2" ]; then
-            install -m 0644 ${DEPLOY_DIR_IMAGE}/abl.elf .
+            abl_file="${@bb.utils.contains('ENABLE_UEFI_EFI_BOOT', '1', 'abl.bin', 'abl.elf', d)}"
+            install -m 0644 ${DEPLOY_DIR_IMAGE}/${abl_file} .
             if ${@bb.utils.contains('IMAGE_FSTYPES', 'squashfs', 'true', 'false', d)}; then
                 mkdir -p ./squashfs
-                install -m 0644 ${DEPLOY_DIR_IMAGE}/abl.elf ./squashfs
+                install -m 0644 ${DEPLOY_DIR_IMAGE}/${abl_file} ./squashfs
             fi
         elif [ "$f" = "lk" ]; then
             install -m 0644 ${DEPLOY_DIR_IMAGE}/*appsboot.mbn .

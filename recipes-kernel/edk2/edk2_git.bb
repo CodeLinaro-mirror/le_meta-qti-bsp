@@ -7,6 +7,8 @@ ${LICENSE};md5=550794465ba0ec5312d6919e203a55f9"
 BUILD_OS = "linux"
 
 DEPENDS += "util-linux-native"
+DEPENDS += "${@bb.utils.contains('ENABLE_UEFI_EFI_BOOT', '1', \
+            'virtual/kernel-toolchain-native dosfstools-native mtools-native', '', d)}"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 FILESEXTRAPATHS:prepend := "${WORKSPACE}/bootable/bootloader/:"
@@ -47,6 +49,7 @@ EXTRA_OEMAKE = " \
     'TARGET_SUPPORTS_EARLY_USB_INIT=${EARLY_USB_INIT}' \
 "
 EXTRA_OEMAKE:append:qcs40x = " 'DISABLE_PARALLEL_DOWNLOAD_FLASH=1'"
+EXTRA_OEMAKE:append:pebble = " 'SDAM_ENABLED=1'"
 EXTRA_OEMAKE += "INIT_BIN_LE="\"/sbin/init\"""
 NAND_SQUASHFS_SUPPORT = "${@bb.utils.contains('DISTRO_FEATURES', 'nand-squashfs', '1', '0', d)}"
 EXTRA_OEMAKE:append = " 'NAND_SQUASHFS_SUPPORT=${NAND_SQUASHFS_SUPPORT}'"
@@ -60,13 +63,34 @@ do_compile () {
     export AR=${BUILD_AR}
     export PATH="${STAGING_BINDIR_NATIVE}/clang/bin/:${PATH}"
     oe_runmake -j 1 -f makefile all
+
+    if [ "${ENABLE_UEFI_EFI_BOOT}" = "1" ]; then
+        ABL_BIN="${B}/abl.bin"
+        IMG_SIZE_MB=3
+
+        EFI_SOURCE="${B}/out/Build/DEBUG_CLANG35/AARCH64/LinuxLoader.efi"
+        if [ ! -f "$EFI_SOURCE" ]; then
+            bbfatal "LinuxLoader.efi not found at expected path: $EFI_SOURCE"
+        fi
+
+        dd if=/dev/zero of=${ABL_BIN} bs=1M count=${IMG_SIZE_MB}
+        mkfs.vfat -F 12 -n "ABL" ${ABL_BIN}
+        mmd -i ${ABL_BIN} ::EFI
+        mmd -i ${ABL_BIN} ::EFI/Boot
+        mcopy -i ${ABL_BIN} "$EFI_SOURCE" ::EFI/Boot/bootaa64.efi
+        bbnote "Successfully created FAT12 image at ${ABL_BIN}"
+    fi
 }
 
 do_install[noexec]="1"
 do_configure[noexec]="1"
 
 do_deploy() {
-    install -m 644 ${WORKDIR}/abl.elf ${DEPLOYDIR}
+    if [ "${ENABLE_UEFI_EFI_BOOT}" = "1" ]; then
+        install -m 644 ${B}/abl.bin ${DEPLOYDIR}
+    else
+        install -m 644 ${WORKDIR}/abl.elf ${DEPLOYDIR}
+    fi
 }
 
 do_deploy[dirs] = "${S} ${DEPLOYDIR}"
