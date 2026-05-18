@@ -79,6 +79,7 @@ CORE_IMAGE_EXTRA_INSTALL:append:kera = " packagegroup-qti-ss-mgr"
 CORE_IMAGE_EXTRA_INSTALL:append:kera = " packagegroup-qcom-sensors"
 CORE_IMAGE_EXTRA_INSTALL:append:kera = " packagegroup-qti-touch"
 CORE_IMAGE_EXTRA_INSTALL:append:kera = " packagegroup-qti-perf"
+CORE_IMAGE_EXTRA_INSTALL:append:kera = " packagegroup-qti-nfc"
 
 CORE_IMAGE_EXTRA_INSTALL:remove:sun = "kernel-modules"
 CORE_IMAGE_EXTRA_INSTALL:remove:sun = "packagegroup-qti-data"
