@@ -31,8 +31,6 @@ RDEPENDS:packagegroup-android-utils-base = "\
     ${@oe.utils.conditional('ENABLE_ADB', 'True', 'adbd', '', d)} \
     ${@oe.utils.conditional('ENABLE_BINDER', 'True', 'binder', '', d)} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-sdx', '', 'leproperties', d)} \
-    logcat \
-    logd \
     libsync \
     ${@oe.utils.conditional('PROPERTIES_SUPPORT', 'True', 'system-prop', '', d)} \
     "
