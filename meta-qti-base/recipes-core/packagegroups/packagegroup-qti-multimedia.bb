@@ -47,3 +47,10 @@ RDEPENDS:${PN}:remove:sa8797 = "\
         videodlkm \
 "
 
+RDEPENDS:${PN}:remove:gvm-gen5 = "\
+        ${@bb.utils.contains('DISTRO_FEATURES', 'qti-codec2', 'gstreamer1.0-plugins-codec2', '', d)} \
+"
+
+RDEPENDS:${PN}:append:gvm-gen5 = " \
+        ${@bb.utils.contains('DISTRO_FEATURES', 'qti-codec2', ' gstreamer1.0-plugins-codec2-gen5', '', d)} \
+"
