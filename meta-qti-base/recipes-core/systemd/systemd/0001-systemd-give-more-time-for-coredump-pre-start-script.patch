@@ -1,0 +1,37 @@
+From 4505b4e96d9e8e68cafafc024b4b91aa2beb43e4 Mon Sep 17 00:00:00 2001
+From: Naiwen Yu <naiwyu@qti.qualcomm.com>
+Date: Mon, 15 Sep 2025 15:35:10 +0800
+Subject: [PATCH] systemd: give more time for coredump pre-start script
+
+A custom pre-start script is used to collect contextual information
+(jouranl logs, process info, etc.) prior to coredump processing. As
+we continue to add more diagnostic collection steps, the default
+10-second timeout is insufficient and causes the pre-start phase to be
+terminated prematurely.
+
+Increase TimeoutStartSec from the default 10s to 120s in
+systemd-coredump@.service to ensure the pre-start script has adequate
+time to complete without being killed by systemd.
+
+Upstream-Status: Inappropriate [custom]
+Change-Id:4505b4e96d9e8e68cafafc024b4b91aa2beb43e4
+Signed-off-by: Naiwen Yu <naiwyu@qti.qualcomm.com>
+---
+ units/systemd-coredump@.service.in | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/units/systemd-coredump@.service.in b/units/systemd-coredump@.service.in
+index 15bfb243b4..2093d48658 100644
+--- a/units/systemd-coredump@.service.in
++++ b/units/systemd-coredump@.service.in
+@@ -17,6 +17,7 @@ Requires=systemd-journald.socket
+ Before=shutdown.target
+
+ [Service]
++TimeoutStartSec=120
+ ExecStart=-{{LIBEXECDIR}}/systemd-coredump
+ IPAddressDeny=any
+ LockPersonality=yes
+-- 
+2.34.1
+
