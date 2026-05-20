@@ -22,6 +22,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
               packagegroup-qti-audio \
               ${@bb.utils.contains('COMBINED_FEATURES', 'qti-bluetooth', "packagegroup-qti-bluetooth", "", d)} \
               packagegroup-qti-camera \
+              packagegroup-qti-camera-kernel \
               ${@bb.utils.contains('DISTRO_FEATURES', 'virtualization', 'packagegroup-qti-containers', '', d)} \
               packagegroup-qti-core \
               packagegroup-qti-data \
@@ -54,7 +55,6 @@ CORE_IMAGE_EXTRA_INSTALL:append:qrbx210-rbx = " gki-kernel-modules-second-stage 
 CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "packagegroup-filesystem-utils"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "packagegroup-qti-audio"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "packagegroup-qti-bluetooth"
-CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "packagegroup-qti-camera"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "packagegroup-qti-containers"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "packagegroup-qti-core"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "packagegroup-qti-data"
