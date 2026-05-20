@@ -38,6 +38,8 @@ CORE_IMAGE_EXTRA_INSTALL += "\
                 ${@bb.utils.contains('BBFILE_COLLECTIONS', 'qti-internal', 'packagegroup-qti-internal', '', d)} \
 "
 
+IMAGE_INSTALL:append = " libatomic"
+
 do_cleanup_sepolicy() {
 
         policy_version=33
