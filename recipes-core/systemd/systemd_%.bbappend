@@ -17,3 +17,7 @@ do_install:append:mdm9607() {
    ln -sf /dev/null ${D}${systemd_unitdir}/system/sysinit.target.wants/systemd-journal-flush.service
    ln -sf /dev/null ${D}${systemd_unitdir}/system/sysinit.target.wants/systemd-journal-catalog-update.service
 }
+
+do_install:append:qrbx210-rbx() {
+  sed -i '4 a\ENV{MODALIAS}=="of:N*T*Cqcom,bengal-*-pas", GOTO="drivers_end"' ${D}${rootlibexecdir}/udev/rules.d/80-drivers.rules
+}
