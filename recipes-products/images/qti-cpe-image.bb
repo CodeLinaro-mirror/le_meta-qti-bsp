@@ -19,12 +19,13 @@ CORE_IMAGE_EXTRA_INSTALL += "\
                 powerapp-reboot \
                 powerapp-shutdown \
                 systemd-machine-units \
-		packagegroup-qti-core-prop \
+		packagegroup-qti-core \
                 packagegroup-startup-scripts \
                 packagegroup-android-utils-base \
                 packagegroup-filesystem-utils-base \
                 packagegroup-startup-scripts-base \
                 packagegroup-qti-ss-mgr \
+                packagegroup-qti-fastrpc \
                 ${@bb.utils.contains('MACHINE_FEATURES', 'qti-ssdk', "packagegroup-qti-ssdk", "", d)} \
 "
 

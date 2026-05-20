@@ -93,6 +93,12 @@ fix_sepolicies () {
     sed -i "s#,context=system_u:object_r:lib_t:s0##g" ${WORKDIR}/qti-mount-generator
 }
 
+# Echo-only fix:
+# Drop SELinux rootcontext option from cache.mount as SELinux is not in use
+fix_sepolicies:append:echo () {
+    sed -i "s#,rootcontext=system_u:object_r:cache_t:s0##g" ${WORKDIR}/cache.mount
+}
+
 
 # Mount units have to wait for bootable disk dev nodes before attempting to mount.
 # As selective wait by reading environment is not possible in [Unit] Section, wait
