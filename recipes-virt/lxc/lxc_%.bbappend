@@ -7,6 +7,8 @@ SRC_URI:append = " \
         file://dbus_contexts \
         file://0001-fix-error-msg-Unsupported-config-key-lxc.seccomp.patch \
         file://0001-lxc-monitor-Add-watchdog-option.patch \
+        file://0002-cgroup-hybrid-mode-refine.patch \
+        file://0003-add-lxc-daemon-tool.patch \
 "
 
 FILES:${PN} += "lxc/bin"

@@ -1,0 +1,126 @@
+From 57070979c45479b1b53fcec77a342301d1b635f4 Mon Sep 17 00:00:00 2001
+From: Wei Wang <wanw@qti.qualcomm.com>
+Date: Mon, 23 Mar 2026 17:08:16 +0800
+Subject: [PATCH] cgroup hybrid mode refine
+
+Signed-off-by: Wei Wang <wanw@qti.qualcomm.com>
+---
+ src/lxc/cgroups/cgfsng.c | 14 +++++++-------
+ src/lxc/cgroups/cgroup.h |  5 +++++
+ src/lxc/commands.c       |  8 ++++----
+ 3 files changed, 16 insertions(+), 11 deletions(-)
+
+diff --git a/src/lxc/cgroups/cgfsng.c b/src/lxc/cgroups/cgfsng.c
+index ded281efe..fdfb8a9d3 100644
+--- a/src/lxc/cgroups/cgfsng.c
++++ b/src/lxc/cgroups/cgfsng.c
+@@ -1382,9 +1382,9 @@ __cgfsng_ops static bool cgfsng_monitor_create(struct cgroup_ops *ops, struct lx
+ 			idx++;
+ 			break;
+ 		}
+-	} while (ops->hierarchies[i] && idx > 0 && idx < 1000 && suffix);
++	} while (ops->hierarchies[i] && idx > 0 && idx < 10000 && suffix);
+ 
+-	if (idx == 1000 || (!suffix && idx != 0))
++	if (idx == 10000 || (!suffix && idx != 0))
+ 		return log_error_errno(false, ERANGE, "Failed to create monitor cgroup");
+ 
+ 	ops->monitor_cgroup = move_ptr(monitor_cgroup);
+@@ -1486,9 +1486,9 @@ __cgfsng_ops static bool cgfsng_payload_create(struct cgroup_ops *ops, struct lx
+ 			idx++;
+ 			break;
+ 		}
+-	} while (ops->hierarchies[i] && idx > 0 && idx < 1000 && suffix);
++	} while (ops->hierarchies[i] && idx > 0 && idx < 10000 && suffix);
+ 
+-	if (idx == 1000 || (!suffix && idx != 0))
++	if (idx == 10000 || (!suffix && idx != 0))
+ 		return log_error_errno(false, ERANGE, "Failed to create container cgroup");
+ 
+ 	ops->container_cgroup = move_ptr(container_cgroup);
+@@ -1754,7 +1754,7 @@ __cgfsng_ops static void cgfsng_finalize(struct cgroup_ops *ops)
+ 	 * so no cgroup will exist. So we defer until we have created cgroups
+ 	 * for our container which means we check here.
+ 	 */
+-        if (pure_unified_layout(ops) &&
++        if (pure_unified_or_hybrid_layout(ops) &&
+             !faccessat(ops->unified->dfd_con, "cgroup.freeze", F_OK,
+                        AT_SYMLINK_NOFOLLOW)) {
+ 		TRACE("Unified hierarchy supports freezer");
+@@ -3228,7 +3228,7 @@ __cgfsng_ops static bool cgfsng_setup_limits(struct cgroup_ops *ops,
+ 	if (list_empty(cgroup_settings))
+ 		return true;
+ 
+-	if (!pure_unified_layout(ops))
++	if (!pure_unified_or_hybrid_layout(ops))
+ 		return log_warn_errno(true, EINVAL, "Ignoring cgroup2 limits on legacy cgroup system");
+ 
+ 	if (!ops->unified)
+@@ -3287,7 +3287,7 @@ static bool __cgfsng_delegate_controllers(struct cgroup_ops *ops, const char *cg
+ 	char *cur;
+ 	char **it;
+ 
+-	if (!ops->hierarchies || !pure_unified_layout(ops))
++	if (!ops->hierarchies || !pure_unified_or_hybrid_layout(ops))
+ 		return true;
+ 
+ 	unified = ops->unified;
+diff --git a/src/lxc/cgroups/cgroup.h b/src/lxc/cgroups/cgroup.h
+index 108e5d84e..d9ac0c9be 100644
+--- a/src/lxc/cgroups/cgroup.h
++++ b/src/lxc/cgroups/cgroup.h
+@@ -298,6 +298,11 @@ static inline bool pure_unified_layout(const struct cgroup_ops *ops)
+ 	return ops->cgroup_layout == CGROUP_LAYOUT_UNIFIED;
+ }
+ 
++static inline bool pure_unified_or_hybrid_layout(const struct cgroup_ops *ops)
++{
++	return ops->cgroup_layout == CGROUP_LAYOUT_UNIFIED || ops->cgroup_layout == CGROUP_LAYOUT_HYBRID;
++}
++
+ static inline int cgroup_unified_fd(const struct cgroup_ops *ops)
+ {
+ 	if (!ops->unified)
+diff --git a/src/lxc/commands.c b/src/lxc/commands.c
+index a9c290969..425a7cd64 100644
+--- a/src/lxc/commands.c
++++ b/src/lxc/commands.c
+@@ -1133,7 +1133,7 @@ static int lxc_cmd_stop_callback(int fd, struct lxc_cmd_req *req,
+ 		else
+ 			TRACE("Sent signal %d to pidfd %d", stopsignal, handler->pid);
+ 
+-		if (pure_unified_layout(cgroup_ops))
++		if (pure_unified_or_hybrid_layout(cgroup_ops))
+ 			ret = __cgroup_unfreeze(cgroup_ops->unified->dfd_lim, -1);
+ 		else
+ 			ret = cgroup_ops->unfreeze(cgroup_ops, -1);
+@@ -1688,7 +1688,7 @@ static int lxc_cmd_freeze_callback(int fd, struct lxc_cmd_req *req,
+ 	};
+ 	struct cgroup_ops *ops = handler->cgroup_ops;
+ 
+-	if (pure_unified_layout(ops))
++	if (pure_unified_or_hybrid_layout(ops))
+ 		rsp.ret = ops->freeze(ops, timeout);
+ 
+ 	return lxc_cmd_rsp_send_reap(fd, &rsp);
+@@ -1720,7 +1720,7 @@ static int lxc_cmd_unfreeze_callback(int fd, struct lxc_cmd_req *req,
+ 	};
+ 	struct cgroup_ops *ops = handler->cgroup_ops;
+ 
+-	if (pure_unified_layout(ops))
++	if (pure_unified_or_hybrid_layout(ops))
+ 		rsp.ret = ops->unfreeze(ops, timeout);
+ 
+ 	return lxc_cmd_rsp_send_reap(fd, &rsp);
+@@ -1877,7 +1877,7 @@ static int __lxc_cmd_get_cgroup2_fd_callback(int fd, struct lxc_cmd_req *req,
+ 	struct cgroup_ops *ops = handler->cgroup_ops;
+ 	int send_fd;
+ 
+-	if (!pure_unified_layout(ops) || !ops->unified)
++	if (!pure_unified_or_hybrid_layout(ops) || !ops->unified)
+ 		return lxc_cmd_rsp_send_reap(fd, &rsp);
+ 
+ 	send_fd = limiting_cgroup ? ops->unified->dfd_lim
+-- 
+2.43.0
+
