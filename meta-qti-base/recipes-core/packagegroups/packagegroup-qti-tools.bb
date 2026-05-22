@@ -17,6 +17,7 @@ RDEPENDS:${PN} += "\
     libgpiod-tools \
     exfat-utils \
     ramjournal \
+    e2fsprogs-mke2fs \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'systemd-analyze systemd-bootchart', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'asan', 'gcc-sanitizers', '', d)}  \
     ${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', 'lttng-modules lttng-tools lttng-ust', '', d)} \
