@@ -10,6 +10,8 @@ IMAGE_FEATURES += "read-only-rootfs"
 # gluebi is read only and prevents debugging/experimentation. Only enable in user variant
 IMAGE_FEATURES:append:qti-distro-base-user = " gluebi"
 
+IMAGE_INSTALL:append = "${@bb.utils.contains('DISTRO_FEATURES', 'apparmor', ' apparmor ', '', d)}"
+
 CORE_IMAGE_EXTRA_INSTALL += "\
                 glib-2.0 \
                 kernel-modules \
@@ -19,13 +21,16 @@ CORE_IMAGE_EXTRA_INSTALL += "\
                 powerapp-reboot \
                 powerapp-shutdown \
                 systemd-machine-units \
-		packagegroup-qti-core-prop \
+		packagegroup-qti-core \
                 packagegroup-startup-scripts \
                 packagegroup-android-utils-base \
                 packagegroup-filesystem-utils-base \
                 packagegroup-startup-scripts-base \
                 packagegroup-qti-ss-mgr \
+                packagegroup-support-utils \
+                packagegroup-qti-fastrpc \
                 ${@bb.utils.contains('MACHINE_FEATURES', 'qti-ssdk', "packagegroup-qti-ssdk", "", d)} \
+                ${@bb.utils.contains('BBFILE_COLLECTIONS', 'qti-internal', 'packagegroup-qti-internal', '', d)} \
 "
 
 do_cleanup_sepolicy() {
