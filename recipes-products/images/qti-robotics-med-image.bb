@@ -48,7 +48,6 @@ CORE_IMAGE_EXTRA_INSTALL += "\
               ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
 "
 
-CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "alsa-utils"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "kernel-modules"
 CORE_IMAGE_EXTRA_INSTALL:append:qrbx210-rbx = " gki-kernel-modules-second-stage diag-router"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "packagegroup-filesystem-utils"
