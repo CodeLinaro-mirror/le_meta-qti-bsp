@@ -50,7 +50,6 @@ CORE_IMAGE_EXTRA_INSTALL += "\
               ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains('MACHINE_FEATURES', 'dm-verity-initramfs-v3', 'cryptsetup verity-scripts lvm2-udevrules', '', d), '', d)} \
 "
 
-CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "alsa-utils"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "kernel-modules"
 CORE_IMAGE_EXTRA_INSTALL:append:qrbx210-rbx = " gki-kernel-modules-second-stage diag-router"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "packagegroup-filesystem-utils"
