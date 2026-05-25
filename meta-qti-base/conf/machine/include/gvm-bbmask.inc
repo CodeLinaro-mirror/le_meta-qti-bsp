@@ -61,6 +61,7 @@ meta-qti-bsp/meta-qti-base/recipes-graphics/graphics-hgsl/graphics-hgsldlkm_git.
 meta-qti-bsp/meta-qti-base/recipes-wlan/wlan-devicetree \
 meta-qti-bsp/meta-qti-base/recipes-data/dataeth-dlkm/dataeth-dlkm_git.bb \
 meta-qti-bsp/meta-qti-extra/recipes-security/selinux-policy/selinux-policy.bb \
+meta-qti-bsp/meta-qti-base/recipes-audio/msm-virtio-snd/msm-virtio-snd.bb \
 "
 
 # Missing recipes in baseline LV.AU.0.5.1 (target for quin-gvm-gen4-5 & gvm-gen4-5)
@@ -69,6 +70,7 @@ meta-qti-bsp/meta-qti-extra/recipes-containers/softwarecontainer/softwarecontain
 meta-qti-bsp/meta-qti-base/recipes-camera/cameradlkm/cameradlkm_0.1.bb \
 meta-qti-bsp/meta-qti-base/recipes-kernel/linux-msm/linux-msm_6.1.bb \
 meta-qti-bsp/meta-qti-base/recipes-data/avb-utils/avb-utils_1.0.bb \
+meta-qti-bsp/meta-qti-base/recipes-audio/msm-virtio-snd/msm-virtio-snd.bb \
 "
 
 # Missing recipes in baseline LV.AU.0.5.2 (target for gvm-gen5)
