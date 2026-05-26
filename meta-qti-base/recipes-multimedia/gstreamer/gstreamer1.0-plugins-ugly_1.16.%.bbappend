@@ -1,9 +1,0 @@
-SRC_URI:remove = "https://gstreamer.freedesktop.org/src/gst-plugins-ugly/gst-plugins-ugly-${PV}.tar.xz"
-SRC_URI:append = " ${PATH_TO_REPO}/gstreamer/gst-plugins-ugly/.git;protocol=${PROTO};destsuffix=gstreamer/gst-plugins-ugly;usehead=1"
-
-SRCREV = "${AUTOREV}"
-
-S = "${WORKDIR}/gstreamer/gst-plugins-ugly"
-
-# remove a52dec and mpeg2dec, for don't support.
-PACKAGECONFIG:remove = "a52dec mpeg2dec"
