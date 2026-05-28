@@ -27,7 +27,7 @@ EXTRA_OECONF = " --with-sanitized-headers=${STAGING_INCDIR}/linux-msm/usr/includ
 FILES:${PN} += "${systemd_unitdir}/*"
 
 # Minimum Movable zone managed memory to be persistent (in MBs)
-MIN_MOVABLE_SIZE_PERSISTENT_MB = "-DMIN_MOVABLE_SIZE_PERSISTENT_MB=16"
+MIN_MOVABLE_SIZE_PERSISTENT_MB = "-DMIN_MOVABLE_SIZE_PERSISTENT_MB=4"
 
 # Append to Yocto-managed target C++ flags (DO NOT overwrite)
 TARGET_CXXFLAGS:append = " ${MIN_MOVABLE_SIZE_PERSISTENT_MB}"\
