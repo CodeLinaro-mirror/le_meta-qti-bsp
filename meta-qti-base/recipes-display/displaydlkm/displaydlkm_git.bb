@@ -31,6 +31,8 @@ do_install:append:sa81x5(){
     install -m 0644 ${S}/config/display_augen3_load.conf -D ${D}${sysconfdir}/modules-load.d/display_load.conf
 }
 
+RDEPENDS:${PN}:gvm-gen5 += "msm-ext-display"
+
 RPROVIDES:${PN} += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-hypervisor', \
                     'kernel-module-msm-hyp-${KERNEL_VERSION} kernel-module-msm-cfg-${KERNEL_VERSION}', \
                     'kernel-module-msm-drm-${KERNEL_VERSION}', d)}"
