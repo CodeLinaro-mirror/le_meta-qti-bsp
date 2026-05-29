@@ -5,8 +5,6 @@ LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=801f80980d171dd6425610833a22dbe6"
 
-DEPENDS:append = " ${@bb.utils.contains_any('PREFERRED_PROVIDER_virtual/kernel', 'linux-ack', 'kernel-module-soc-modules', '', d)}"
-
 SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/securemsm-kernel/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/securemsm-kernel;usehead=1 \
           file://security_load.conf \
           file://security_smci_load.conf "
