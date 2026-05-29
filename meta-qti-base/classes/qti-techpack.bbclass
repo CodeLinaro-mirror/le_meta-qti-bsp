@@ -2,6 +2,10 @@
 #SPDX-License-Identifier: BSD-3-Clause-Clear
 
 DEPENDS += "dtc-native virtual/kernel rsync-native"
+# When using linux-ack, depend on kernel-module-soc-modules so
+# module.bbclass automatically adds soc-modules/Module.symvers to
+# KBUILD_EXTRA_SYMBOLS for resolving cross-module symbols (e.g. habmm_*)
+DEPENDS:append = " ${@bb.utils.contains('PREFERRED_PROVIDER_virtual/kernel', 'linux-ack', 'kernel-module-soc-modules', '', d)}"
 
 TECHPACK_MODULE_OUT ?= ""
 TECHPACK_HEADERS ?= ""

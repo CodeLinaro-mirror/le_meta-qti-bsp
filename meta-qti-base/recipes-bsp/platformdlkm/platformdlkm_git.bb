@@ -4,14 +4,6 @@ HOMEPAGE = "https://git.codelinaro.org/"
 LICENSE = "GPLv2.0-with-linux-syscall-note"
 LIC_FILES_CHKSUM = "file://${QTI_LICENSE_DIR}/${LICENSE};md5=8afb6abdac9a14cb18a0d6c9c151e9b4"
 
-# When using linux-ack, depend on kernel-module-soc-modules so
-# module.bbclass automatically adds soc-modules/Module.symvers to
-# KBUILD_EXTRA_SYMBOLS for resolving cross-module symbols (e.g.
-# qcom_ssr_get_subsys exported by rproc_qcom_common.ko, needed by
-# virtio_ssr.ko). Mirrors Bazel platform_kernel.bzl which explicitly adds
-# "//soc-repo:.../rproc_qcom_common" as a dep for all platform-kernel modules.
-DEPENDS:append = " ${@bb.utils.contains_any('PREFERRED_PROVIDER_virtual/kernel', 'linux-ack', 'kernel-module-soc-modules', '', d)}"
-
 SRC_URI = "\
     ${PATH_TO_REPO}/vendor/qcom/opensource/dsp-kernel/.git;protocol=${PROTO};name=dspkernel;destsuffix=vendor/qcom/opensource/dsp-kernel;usehead=1 \
     ${PATH_TO_REPO}/vendor/qcom/opensource/platform-kernel/.git;protocol=${PROTO};name=platformkernel;destsuffix=vendor/qcom/opensource/platform-kernel;;usehead=1 \
