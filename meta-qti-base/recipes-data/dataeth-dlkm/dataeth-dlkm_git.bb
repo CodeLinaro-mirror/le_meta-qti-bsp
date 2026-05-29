@@ -24,6 +24,11 @@ TECHPACK_MAKE_ARGS = "\
 
 inherit qti-techpack
 
+do_configure:prepend() {
+    install -d ${STAGING_KERNEL_DIR}/vendor/qcom/opensource/data-eth/drivers
+    ln -sfn ${S}/drivers/emac_shim ${STAGING_KERNEL_DIR}/vendor/qcom/opensource/data-eth/drivers/emac_shim
+}
+
 RPROVIDES:${PN} += "kernel-module-emac-ctrl-fe-virtio-${KERNEL_VERSION}"
 RPROVIDES:${PN} += "kernel-module-stmmac-thin-core-${KERNEL_VERSION}"
 RPROVIDES:${PN} += "kernel-module-emac-thin-${KERNEL_VERSION}"
