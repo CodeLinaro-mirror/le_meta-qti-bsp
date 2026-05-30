@@ -1,11 +1,10 @@
 DEPENDS += "gbm linux-msm-headers wayland-native weston"
 
-SRC_URI:remove = "https://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-${PV}.tar.xz"
-SRC_URI:append = " ${PATH_TO_REPO}/gstreamer/gst-plugins-bad/.git;protocol=${PROTO};destsuffix=gstreamer/gst-plugins-bad;usehead=1"
-
-SRCREV = "${AUTOREV}"
-
-S = "${WORKDIR}/gstreamer/gst-plugins-bad"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}/waylandsink:"
+SRC_URI:append = " \
+    file://0001-gstwaylandsink-add-P010_10LE-support-statement.patch \
+    file://0002-waylandsink-support-ubwc-modifier-and-zwp_linux_dmab.patch \
+"
 
 EXTRA_OECONF:append = " --with-protocal-xml-path=${STAGING_DATADIR}/weston"
 
