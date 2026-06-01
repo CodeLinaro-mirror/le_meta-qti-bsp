@@ -16,6 +16,7 @@ IMAGE_FEATURES += "ssh-server-openssh"
 CORE_IMAGE_EXTRA_INSTALL += "\
               alsa-utils \
               glib-2.0 \
+              opencv boost \
               kernel-modules \
               packagegroup-android-utils \
               packagegroup-filesystem-utils \
