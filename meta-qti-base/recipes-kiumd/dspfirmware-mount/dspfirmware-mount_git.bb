@@ -106,7 +106,7 @@ do_install:append:sa8775-flex() {
     fi
 }
 
-PACKAGES =+ "${PN}-lvgvm ${PN}-bt ${PN}-vmm"
+PACKAGES =+ "${PN}-lvgvm ${PN}-bt"
 
 FILES:${PN}-bt += "\
     ${systemd_system_unitdir}/bluetooth-mount.service \
@@ -116,14 +116,6 @@ FILES:${PN}-bt += "\
 FILES:${PN}-lvgvm += "\
     ${systemd_system_unitdir}/firmware-vm-boot-autoghgvmlv-mount.service \
     ${systemd_system_unitdir}/multi-user.target.wants/firmware-vm-boot-autoghgvmlv-mount.service \
-    /firmware/vm/boot/autoghgvmlv \
-"
-
-
-FILES:${PN}-vmm += "\
-    ${systemd_unitdir}/system/firmware-vm-boot-autoghgvm-mount.service \
-    ${systemd_unitdir}/system/multi-user.target.wants/firmware-vm-boot-autoghgvm-mount.service \
-    /firmware/vm/boot/autoghgvm \
 "
 
 FILES:${PN} += "${systemd_unitdir}/*"

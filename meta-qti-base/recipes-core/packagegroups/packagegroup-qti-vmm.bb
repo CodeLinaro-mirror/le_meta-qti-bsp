@@ -25,5 +25,4 @@ RDEPENDS:${PN} = "\
     hyp-udmabuf-test \
     vmm-boot-lcm \
     android-tools \
-    dspfirmware-mount-vmm \
 "
