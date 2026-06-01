@@ -7,6 +7,8 @@ ENABLE_TOUCH = "${@d.getVar('MACHINE_SUPPORTS_TOUCH') or "True"}"
 ENABLE_SECUREMSM = "${@d.getVar('MACHINE_SUPPORTS_SECUREMSM') or "True"}"
 ENABLE_MINK = "${@d.getVar('MACHINE_SUPPORTS_MINK') or "True"}"
 
+CORE_IMAGE_EXTRA_INSTALL += "${@oe.utils.conditional('TOYBOX_RAMDISK', 'True', "bash", "", d)}"
+
 CORE_IMAGE_EXTRA_INSTALL += " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'packagegroup-selinux-minimal', '', d)} \
     post-boot \
