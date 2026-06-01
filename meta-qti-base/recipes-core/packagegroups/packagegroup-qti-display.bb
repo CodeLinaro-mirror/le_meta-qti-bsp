@@ -28,3 +28,4 @@ RDEPENDS:${PN} += "\
 RDEPENDS:${PN}:remove:qti-dpk = "wayland-ivi-extension"
 RDEPENDS:${PN}:append:qti-dpk = " weston-udev"
 RDEPENDS:${PN}:remove:qti-dpk = "weston-sdm-extension"
+RDEPENDS:${PN}:remove:gvm-gen5 = "display-commonsys-intf-linux"
