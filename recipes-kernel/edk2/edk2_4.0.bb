@@ -20,8 +20,10 @@ SRC_URI = "file://unsigned_abl.elf"
 do_install[noexec]="1"
 do_configure[noexec]="1"
 
+ABLIMAGE_TARGET ?= "abl.elf"
+
 do_deploy() {
-    install -m 644 ${WORKDIR}/abl.elf ${DEPLOYDIR}
+    install -m 644 ${WORKDIR}/abl.elf ${DEPLOYDIR}/${ABLIMAGE_TARGET}
 }
 
 do_deploy[dirs] = "${DEPLOYDIR}"

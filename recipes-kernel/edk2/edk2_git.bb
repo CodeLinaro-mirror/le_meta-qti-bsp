@@ -51,6 +51,8 @@ NAND_SQUASHFS_SUPPORT = "${@bb.utils.contains('DISTRO_FEATURES', 'nand-squashfs'
 EXTRA_OEMAKE:append = " 'NAND_SQUASHFS_SUPPORT=${NAND_SQUASHFS_SUPPORT}'"
 EXTRA_OEMAKE:append:qti-distro-base-user = " 'VERITY_LE_USE_EXT4_GLUEBI=1'"
 
+ABLIMAGE_TARGET ?= "abl.elf"
+
 do_compile () {
     export CC=${BUILD_CC}
     export CXX=${BUILD_CXX}
@@ -63,7 +65,7 @@ do_install[noexec]="1"
 do_configure[noexec]="1"
 
 do_deploy() {
-    install -m 644 ${WORKDIR}/abl.elf ${DEPLOYDIR}
+    install -m 644 ${WORKDIR}/abl.elf ${DEPLOYDIR}/${ABLIMAGE_TARGET}
 }
 
 do_deploy[dirs] = "${S} ${DEPLOYDIR}"
