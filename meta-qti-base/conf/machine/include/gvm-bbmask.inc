@@ -57,6 +57,7 @@ meta-qti-bsp/meta-qti-extra/recipes-location/ \
 MISSING_RECIPE_SRCLIST_BASELINE_LV050 += "\
 meta-qti-bsp/meta-qti-base/recipes-security/securemsm-devicetree/securemsm-devicetree.bb \
 meta-qti-bsp/meta-qti-base/recipes-kernel/linux-msm/linux-msm-headers_6.12.bb \
+meta-qti-bsp/meta-qti-base/recipes-kernel/linux-msm/qcom-dtc-native.bb \
 meta-qti-bsp/meta-qti-base/recipes-graphics/graphics-hgsl/graphics-hgsldlkm_git.bb \
 meta-qti-bsp/meta-qti-base/recipes-wlan/wlan-devicetree \
 meta-qti-bsp/meta-qti-base/recipes-data/dataeth-dlkm/dataeth-dlkm_git.bb \
