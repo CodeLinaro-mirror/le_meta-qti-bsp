@@ -25,7 +25,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
                 powerapp-reboot \
                 powerapp-shutdown \
                 systemd-machine-units \
-		packagegroup-qti-core \
+                packagegroup-qti-core \
                 packagegroup-startup-scripts \
                 packagegroup-android-utils-base \
                 packagegroup-filesystem-utils-base \
@@ -33,7 +33,8 @@ CORE_IMAGE_EXTRA_INSTALL += "\
                 packagegroup-qti-ss-mgr \
                 packagegroup-support-utils \
                 packagegroup-qti-fastrpc \
-		packagegroup-qti-data \
+                packagegroup-qti-data \
+                packagegroup-qcom-securemsm \
                 ${@bb.utils.contains('MACHINE_FEATURES', 'qti-ssdk', "packagegroup-qti-ssdk", "", d)} \
                 ${@bb.utils.contains('BBFILE_COLLECTIONS', 'qti-internal', 'packagegroup-qti-internal', '', d)} \
 "
