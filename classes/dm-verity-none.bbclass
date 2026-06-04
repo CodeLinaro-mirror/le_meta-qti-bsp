@@ -49,7 +49,7 @@ RAMDISK_PATH = "${@get_ramdisk_path(d)}"
 
 MKBOOTUTIL = '${@oe.utils.conditional("PREFERRED_PROVIDER_virtual/mkbootimg", "mkbootimg-gki", "scripts/mkbootimg.py", "mkbootimg", d)}'
 
-BOOT_RAMDISK_CMD ?= "${@bb.utils.contains('MACHINE_FEATURES', 'early-ramdisk-init', 'rdinit=/sbin/early-ramdisk-init early-ramdisk.mode=0', '', d)}"
+BOOT_RAMDISK_CMD ?= "${@bb.utils.contains('MACHINE_FEATURES', 'early-ramdisk-init', 'rdinit=/sbin/early-ramdisk-init early-ramdisk.mode=1', '', d)}"
 
 # If BOOT_HEADER_VERSION >= 3, a vendor_boot image will be built
 #  unless SKIP_VENDOR_BOOT is defined as True.
