@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 
 inherit kernel
 
-COMPATIBLE_MACHINE = "quin-tgvm-gen4-5"
+COMPATIBLE_MACHINE = "quin-tgvm-gen4-5|gvm-gen4-5-virtio"
 
 FILESPATH =+ "${SRC_DIR_ROOT}/kernel:"
 
