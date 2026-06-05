@@ -6,6 +6,10 @@ LIC_FILES_CHKSUM = "file://${WORKDIR}/kernel/kernel-${PV}/kernel_platform/soc-re
 
 COMPATIBLE_MACHINE = "gvm-gen4-5-virtio"
 
+# soc-modules provides kernel-module-soc-modules, remove self-dependency
+# added by qti-techpack.bbclass to avoid circular dependency.
+DEPENDS:remove = "kernel-module-soc-modules"
+
 # Provide kernel-module-soc-modules at recipe level so other OOT recipes
 # (e.g. platformdlkm) can declare DEPENDS += "kernel-module-soc-modules"
 # and module.bbclass automatically adds Module.symvers to KBUILD_EXTRA_SYMBOLS
