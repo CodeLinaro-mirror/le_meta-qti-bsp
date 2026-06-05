@@ -8,6 +8,8 @@ PREFERRED_PROVIDER_virtual/kernel-headers = "linux-msm-headers"
 PREFERRED_VERSION_linux-msm ?= "5.4"
 preferred-kernel = "PREFERRED_VERSION_linux-msm"
 
+PREFERRED_VERSION_linux-ack ?= "6.12"
+
 PREFERRED_VERSION_edk2 ?= "3.0"
 
 # Prefer camx

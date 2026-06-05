@@ -5,6 +5,7 @@ DEPENDS += "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'qti-avb', 'avbtool-native', '', d)} \
     dtc-native \
     kernel-aosp-tools-native \
+    ${@bb.utils.contains('PREFERRED_PROVIDER_virtual/kernel', 'linux-ack', 'qcom-dtc-native', '', d)} \
     mkdtimg-native \
     sectools-native \
     python3-native \
@@ -14,17 +15,28 @@ DEPENDS += "\
 DTB_OFFSET = "0x9300000"
 DTB_OFFSET:gvm-gen5 = "0x9700000"
 
+DTB_FILE_LIST:gvm-gen5 = "\
+    ${DEPLOY_DIR_IMAGE}/dtbs/sa8797p-gunyah-vm-lv-qam.dtb \
+"
+DTB_FILE_LIST:gvm-gen4-5 = "\
+    ${DEPLOY_DIR_IMAGE}/dtbs/monaco-gh-vm-lv-qam-ridesx.dtb \
+    ${DEPLOY_DIR_IMAGE}/dtbs/lemans-gh-vm-lv-qam-ridesx.dtb \
+"
+
 gvm_pilsplitter() {
     PILTOOLS_PATH="${STAGING_BINDIR_NATIVE}/scripts/pil_tools"
-    DTB_FILE_LIST=$(find ${DEPLOY_DIR_IMAGE}/build-artifacts/dtb -name "*.dtb" | sort)
-    if [ -z "${DTB_FILE_LIST}" ]; then
+    DTB_CHECK=$(find ${DEPLOY_DIR_IMAGE}/build-artifacts/dtb -name "*.dtb" | sort)
+    if [ -z "${DTB_CHECK}" ]; then
         echo "No *.dtb files found in $DEPLOY_DIR_IMAGE/dtbs"
         exit 1
     else
-        ${STAGING_BINDIR_NATIVE}/build/prebuilts/kernel-build-tools/linux-x86/bin/mkdtimg create ${DEPLOY_DIR_IMAGE}/dtbs/dtb.img \
-            ${DEPLOY_DIR_IMAGE}/dtbs/monaco-gh-vm-lv-qam-ridesx.dtb \
-            ${DEPLOY_DIR_IMAGE}/dtbs/lemans-gh-vm-lv-qam-ridesx.dtb \
-            ${DEPLOY_DIR_IMAGE}/dtbs/sa8797p-gunyah-vm-qam.dtb
+        # Use vb-dtb.img to avoid overwriting dtbs/dtb.img used by do_makeboot.
+        # dtbs/dtb.img is the full cat *.dtb result for boot.img;
+        # vb-dtb.img is the mkdtimg format for PIL signing (bootloader.img).
+        # DTB_FILE_LIST defines per-machine DTBs with full paths.
+        ${STAGING_BINDIR_NATIVE}/build/prebuilts/kernel-build-tools/linux-x86/bin/mkdtimg create \
+            ${DEPLOY_DIR_IMAGE}/dtbs/vb-dtb.img \
+            ${DTB_FILE_LIST}
     fi
 
     install -d ${DEPLOY_DIR_IMAGE}/signing
@@ -34,15 +46,15 @@ gvm_pilsplitter() {
     cp ${DEPLOY_DIR_IMAGE}/LinuxLoader.efi ${DEPLOY_DIR_IMAGE}/signing
     cp ${DEPLOY_DIR_IMAGE}/FVMAIN_COMPACT.Fv ${DEPLOY_DIR_IMAGE}/signing
     cp ${DEPLOY_DIR_IMAGE}/ramdisk.img ${DEPLOY_DIR_IMAGE}/signing
-    cp ${DEPLOY_DIR_IMAGE}/dtbs/dtb.img ${DEPLOY_DIR_IMAGE}/signing
+    cp ${DEPLOY_DIR_IMAGE}/dtbs/vb-dtb.img ${DEPLOY_DIR_IMAGE}/signing/vb-dtb.img
 
     cd ${DEPLOY_DIR_IMAGE}/signing
 
     # autoghgvmlv-boot.elf is not a standard elf file, verify_elf in image_header.py
     # will fail and return 1.bypass yocto by adding 'set +e' and 'set -e'
     set +e
-    python3 ${PILTOOLS_PATH}/image_header.py autoghgvmlv-boot.elf Image,0x0 dtb.img,0x3000000 ramdisk.img,0x3100000 --32
-    python3 ${PILTOOLS_PATH}/image_header.py autoghgvmlv-bootloader.elf FVMAIN_COMPACT.Fv,0x0 dtb.img,${DTB_OFFSET} LinuxLoader.efi,0x9800000 --32
+    python3 ${PILTOOLS_PATH}/image_header.py autoghgvmlv-boot.elf Image,0x0 vb-dtb.img,0x3000000 ramdisk.img,0x3100000 --32
+    python3 ${PILTOOLS_PATH}/image_header.py autoghgvmlv-bootloader.elf FVMAIN_COMPACT.Fv,0x0 vb-dtb.img,${DTB_OFFSET} LinuxLoader.efi,0x9800000 --32
     set -e
 
     sectools secure-image autoghgvmlv-boot.elf --image-id GVM2 --security-profile ${STAGING_BINDIR_NATIVE}/${SECTOOLS_SECURITY_PROFILE} --sign --signing-mode TEST --outfile autoghgvmlv_signed-boot.elf
@@ -78,6 +90,7 @@ python () {
 
 do_merge_dtbs[depends] += "virtual/kernel:do_deploy"
 do_merge_dtbs[depends] += "virtual/kernel:do_shared_workdir"
+do_merge_dtbs[depends] += "${@bb.utils.contains('PREFERRED_PROVIDER_virtual/kernel', 'linux-ack', 'qcom-devicetree:do_deploy', '', d)}"
 
 do_merge_dtbs() {
      export PATH="${STAGING_KERNEL_BUILDDIR}/bin:${PATH}"

@@ -5,6 +5,8 @@ LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=801f80980d171dd6425610833a22dbe6"
 
+DEPENDS:append = " ${@bb.utils.contains_any('PREFERRED_PROVIDER_virtual/kernel', 'linux-ack', 'kernel-module-soc-modules', '', d)}"
+
 SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/securemsm-kernel/.git;protocol=${PROTO};destsuffix=vendor/qcom/opensource/securemsm-kernel;usehead=1 \
           file://security_load.conf \
           file://security_smci_load.conf "
@@ -12,6 +14,8 @@ SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/securemsm-kernel/.git;protocol
 SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/vendor/qcom/opensource/securemsm-kernel"
+
+inherit qti-techpack
 
 EXT_MODULE = "vendor/qcom/opensource/securemsm-kernel"
 
@@ -24,7 +28,12 @@ TECHPACK_MODULES:append:gvm-gen4-5 = "${@bb.utils.contains('MACHINE_FEATURES', '
 TECHPACK_HEADERS = "${S}/include/uapi"
 TECHPACK_MODULES:remove:gvm-gen5 = "qseecom_dlkm.ko"
 
-inherit qti-techpack
+# CONFIG_ARCH_LEMANS/MONACO_AUTO/NORD are needed by securemsm-kernel/Kbuild
+# to set enable_qcedev_fe=y which gates obj-$(CONFIG_QCEDEV_FE).
+# This is a real make variable check (not shell export), so ARCH CONFIGs
+# must be passed on the command line for qcedev_fe_dlkm.ko to be compiled.
+TECHPACK_MAKE_ARGS:append:gvm-gen4-5 = " CONFIG_ARCH_LEMANS=y CONFIG_ARCH_MONACO_AUTO=y"
+TECHPACK_MAKE_ARGS:append:gvm-gen5 = " CONFIG_ARCH_NORD=y"
 
 do_install:append() {
     install -d ${D}/uni/hgy/etc/modules-load.d
