@@ -30,6 +30,11 @@ QCOM_DTB_CONFIGS ?= "\
     CONFIG_ARCH_NORD=y \
     CONFIG_ARCH_QTI_VM=y \
 "
+# For gvm-gen4-5-virtio, only enable virtio-specific arch config.
+QCOM_DTB_CONFIGS:gvm-gen4-5-virtio = "\
+    CONFIG_ARCH_LEMANS_QCVIRTIO=y \
+    CONFIG_ARCH_QTI_VM=y \
+"
 
 do_configure[noexec] = "1"
 
