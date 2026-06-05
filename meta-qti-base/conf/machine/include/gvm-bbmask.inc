@@ -66,6 +66,7 @@ meta-qti-bsp/meta-qti-base/recipes-display/display-la/display-la-headers.bb \
 meta-qti-bsp/meta-qti-base/recipes-display/display-devicetree/display-devicetree_1.0.bb \
 meta-qti-bsp/meta-qti-base/recipes-graphics/display-intf/display-intf-headers.bb \
 meta-qti-bsp/meta-qti-base/recipes-audio/msm-virtio-snd/msm-virtio-snd.bb \
+meta-qti-bsp/meta-qti-base/recipes-display/displaydlkm/msm-ext-display_git.bb \
 "
 
 # Missing recipes in baseline LV.AU.0.5.1 (target for quin-gvm-gen4-5 & gvm-gen4-5)
@@ -78,6 +79,7 @@ meta-qti-bsp/meta-qti-base/recipes-display/display-la/display-la-headers.bb \
 meta-qti-bsp/meta-qti-base/recipes-display/display-devicetree/display-devicetree_1.0.bb \
 meta-qti-bsp/meta-qti-base/recipes-graphics/display-intf/display-intf-headers.bb \
 meta-qti-bsp/meta-qti-base/recipes-audio/msm-virtio-snd/msm-virtio-snd.bb \
+meta-qti-bsp/meta-qti-base/recipes-display/displaydlkm/msm-ext-display_git.bb \
 "
 
 # Missing recipes in baseline LV.AU.0.5.2 (target for gvm-gen5)
