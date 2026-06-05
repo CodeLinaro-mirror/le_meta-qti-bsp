@@ -8,7 +8,6 @@ CORE_IMAGE_EXTRA_INSTALL:remove:seraph = " \
     packagegroup-qti-securemsm \
     packagegroup-qti-sensors-see \
     packagegroup-qti-test-sensors-see \
-    packagegroup-qti-wifi \
     packagegroup-qti-qesdk-core \
     packagegroup-qti-dcf-lib \
     packagegroup-qti-dcf-hal \
