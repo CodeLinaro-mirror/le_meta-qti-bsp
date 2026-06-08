@@ -3,7 +3,7 @@ inherit kernel
 DESCRIPTION = "CAF Linux Kernel"
 LICENSE = "GPLv2.0-with-linux-syscall-note"
 
-COMPATIBLE_MACHINE = "trustedvm-v5|trustedvm-v4|vienna|alor"
+COMPATIBLE_MACHINE = "trustedvm-v5|trustedvm-v4|vienna|alor|pebble"
 
 FILESEXTRAPATHS:prepend := "${WORKSPACE}:"
 FILESEXTRAPATHS:prepend := "${WORKSPACE}:${KERNEL_PREBUILT_PATH}:"
@@ -16,8 +16,10 @@ SRC_URI = "file://kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/soc-repo
 S = "${WORKDIR}/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/soc-repo"
 S:vienna = "${WORKDIR}/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/common"
 S:alor = "${WORKDIR}/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/common"
+S:pebble = "${WORKDIR}/kernel-${PREFERRED_VERSION_linux-msm}/kernel_platform/common"
 PR = "r0"
-DEPENDS += "virtual/kernel-toolchain-native virtual/dtc-native rsync-native mod-signing-keys"
+DEPENDS += "virtual/kernel-toolchain-native virtual/dtc-native ${@bb.utils.contains('DDK_BUILD', 'true','', 'rsync-native', d)} mod-signing-keys"
+
 LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 
 KERNEL_USE_PREBUILTS = "${@d.getVar('MACHINE_USES_KERNEL_PREBUILTS') or "False"}"
@@ -149,6 +151,10 @@ do_deploy() {
     # Copy vmlinux and zImage into deplydir for boot.img creation
     install -d ${DEPLOYDIR}
     install -m 0644 ${KERNEL_PREBUILT_DISTDIR}/Image ${DEPLOYDIR}/${KERNEL_IMAGETYPE}
+    if [ -f ${KERNEL_PREBUILT_DISTDIR}/unstripped_modules.tar.gz ]; then
+        install -m 0644 ${KERNEL_PREBUILT_DISTDIR}/unstripped_modules.tar.gz ${DEPLOYDIR}/unstripped_modules.tar.gz
+        tar -xvf ${KERNEL_PREBUILT_DISTDIR}/unstripped_modules.tar.gz -C ${DEPLOYDIR}/
+    fi
     install -m 0644 vmlinux ${DEPLOYDIR}
     install -m 0644 System.map ${DEPLOYDIR}
 

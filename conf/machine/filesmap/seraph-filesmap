@@ -1,0 +1,47 @@
+#Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+#SPDX-License-Identifier: BSD-3-Clause-Clear
+
+# filename              partition
+xbl_s.melf              /dev/block/bootdevice/by-name/xbl
+xbl_config.elf          /dev/block/bootdevice/by-name/xbl_config
+uefi.elf                /dev/block/bootdevice/by-name/uefi
+aop.mbn                 /dev/block/bootdevice/by-name/aop
+aop_devcfg.mbn          /dev/block/bootdevice/by-name/aop_config
+tz.mbn                  /dev/block/bootdevice/by-name/tz
+NON-HLOS.bin            /dev/block/bootdevice/by-name/modem
+BTFM.bin                /dev/block/bootdevice/by-name/bluetooth
+QcomCate.fv             /dev/block/bootdevice/by-name/catefv
+Core_NON-HLOS.bin       /dev/block/bootdevice/by-name/core_nhlos
+zeros_5sectors.bin      /dev/block/bootdevice/by-name/ddr
+featenabler.mbn         /dev/block/bootdevice/by-name/featenabler
+hyp.mbn                 /dev/block/bootdevice/by-name/hyp
+multi_image.mbn         /dev/block/bootdevice/by-name/multiimgoem
+multi_image_qti.mbn     /dev/block/bootdevice/by-name/multiimgqti
+persist.img             /dev/block/bootdevice/by-name/persist
+spunvm.bin              /dev/block/bootdevice/by-name/spunvm
+storsec.mbn             /dev/block/bootdevice/by-name/storesec
+sbl1.mbn                /dev/block/bootdevice/by-name/sbl1
+abl.elf                 /dev/block/bootdevice/by-name/abl
+dspso.bin               /dev/block/bootdevice/by-name/dsp
+cmnlib.mbn              /dev/block/bootdevice/by-name/cmnlib
+cmnlib64.mbn            /dev/block/bootdevice/by-name/cmnlib64
+devcfg.mbn              /dev/block/bootdevice/by-name/devcfg
+keymaster.mbn           /dev/block/bootdevice/by-name/keymaster
+keymaster64.mbn         /dev/block/bootdevice/by-name/keymaster64
+lksecapp.mbn            /dev/block/bootdevice/by-name/lksecapp
+sec.dat                 /dev/block/bootdevice/by-name/sec
+devcfg_rfcomm.mbn       /dev/block/bootdevice/by-name/devcfg
+qupv3fw.elf             /dev/block/bootdevice/by-name/qupfw
+dtbo.img                /dev/block/bootdevice/by-name/dtbo
+uefi_sec.mbn            /dev/block/bootdevice/by-name/uefisecapp
+imagefv.elf             /dev/block/bootdevice/by-name/imagefv
+shrm.elf                /dev/block/bootdevice/by-name/shrm
+cpucp.elf               /dev/block/bootdevice/by-name/cpucp
+hypvm.mbn                /dev/block/bootdevice/by-name/hyp
+km41.mbn                 /dev/block/bootdevice/by-name/keymaster
+logfs_ufs_8mb.mbn        /dev/block/bootdevice/by-name/logfs
+vendor_boot.img         /dev/block/bootdevice/by-name/vendor_boot
+XblRamdump.elf          /dev/block/bootdevice/by-name/xbl_ramdump
+cpucp_dtbs.elf          /dev/block/bootdevice/by-name/cpucp_dtb
+tools.fv                /dev/block/bootdevice/by-name/toolsfv
+logfs_ufs_8mb.bin       /dev/block/bootdevice/by-name/logfs

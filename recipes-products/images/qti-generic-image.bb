@@ -11,6 +11,7 @@ EXTRA_IMAGEDEPENDS:remove = "lk"
 
 KERN_MODS ?= "kernel-modules"
 KERN_MODS:waipio = "gki-kernel-modules-second-stage"
+KERN_MODS:seraph = "gki-kernel-modules-second-stage"
 
 CORE_IMAGE_EXTRA_INSTALL += "\
         glib-2.0 \
