@@ -23,6 +23,7 @@ IMAGE_INSTALL = "\
     ${EARLY_RAMDISK_KERNEL_MODULES} \
 "
 do_rootfs[depends] += "virtual/kernel:do_shared_workdir"
+do_rootfs[depends] += "platformdlkm:do_packagedata"
 
 python do_rootfs:prepend() {
     import re
