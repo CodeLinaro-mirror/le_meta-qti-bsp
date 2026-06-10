@@ -9,14 +9,19 @@ SRC_URI = "${PATH_TO_REPO}/vendor/qcom/opensource/mm-drivers/.git;protocol=${PRO
 
 SRCREV = "${AUTOREV}"
 
-S = "${WORKDIR}/vendor/qcom/opensource/mm-drivers"
+S = "${WORKDIR}/vendor/qcom/opensource/mm-drivers/msm_ext_display"
 
 EXT_MODULE = "vendor/qcom/opensource/mm-drivers/msm_ext_display"
 TECHPACK_MODULE_OUT = "${WORKDIR}/mm-drivers/msm_ext_display"
-TECHPACK_MODULES = "msm_ext_display/msm_ext_display.ko"
+TECHPACK_MODULES = "msm_ext_display.ko"
 TECHPACK_HEADERS = "${WORKDIR}/vendor/qcom/opensource/mm-drivers/msm_ext_display/include/uapi"
 
 inherit qti-techpack
+
+do_install:append:gvm-gen5(){
+    install -d ${D}${includedir}/hw_fence/include
+    install -m 644 ${S}/../hw_fence/include/*.h ${D}${includedir}/hw_fence/include/
+}
 
 RPROVIDES:${PN} += "kernel-module-msm-ext-display-${KERNEL_VERSION}"
 
