@@ -28,6 +28,8 @@ do_install() {
     install -d ${D}/${includedir}
     install -m 644 ${S}/libeavbfe/*.so ${D}/${libdir}
     install -m 644 ${S}/libeavbfe/inc/*.h ${D}/${includedir}
+    install -d ${D}/${bindir}
+    install -m 755 ${S}/eavbfe_app/eavbfe_test ${D}/${bindir}
 }
 
 SOLIBS = ".so"
