@@ -41,6 +41,7 @@ VIRT_PROVIDES_MODULES = "\
 "
 VIRT_PROVIDES_MODULES:append = " kernel-module-vfastrpc-${KERNEL_VERSION}"
 VIRT_PROVIDES_MODULES:append:quin-tgvm-gen4-5 = " kernel-module-hfastrpc-${KERNEL_VERSION}"
+VIRT_PROVIDES_MODULES:append:gvm-gen4-5-virtio = " kernel-module-hfastrpc-${KERNEL_VERSION}"
 
 EXT_MODULE = "vendor/qcom/opensource/platform-kernel"
 
