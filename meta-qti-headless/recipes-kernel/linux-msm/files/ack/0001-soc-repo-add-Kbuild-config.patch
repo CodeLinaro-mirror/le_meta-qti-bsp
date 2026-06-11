@@ -1,0 +1,47 @@
+From 55fc0b9db4883bec3944e2fae9ccbb83f18e8603 Mon Sep 17 00:00:00 2001
+From: Feng Chen <fch@qti.qualcomm.com>
+Date: Thu, 11 Jun 2026 15:11:03 +0800
+Subject: [PATCH] soc-repo: add Kbuild config
+
+add Kbuild config
+
+Change-Id: I7258165ab494fe18a97279379943be3443220447
+Signed-off-by: Feng Chen <fch@qti.qualcomm.com>
+---
+ Kbuild | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
+ create mode 100644 Kbuild
+
+diff --git a/Kbuild b/Kbuild
+new file mode 100644
+index 000000000000..b78491a429f9
+--- /dev/null
++++ b/Kbuild
+@@ -0,0 +1,24 @@
++# SPDX-License-Identifier: GPL-2.0
++#
++# soc-repo/Kbuild
++#
++# OOT entry point for building soc-repo modules against a pre-built ACK kernel.
++# Invoked as:
++#   make -C kernel-source O=KBA M=soc-repo/ modules
++#
++# The kernel build system (scripts/Kbuild.include) selects the entry point via:
++#   kbuild-file = $(or $(wildcard $(src)/Kbuild), $(src)/Makefile)
++#
++# This Kbuild file must exist to prevent the build system from falling back to
++# soc-repo/Makefile (a full kernel Makefile v6.11) which would cause version
++# mismatches with kernel-source (v6.12) and trigger unwanted outputmakefile,
++# archprepare, and other full-kernel build targets.
++
++obj-y += arch/arm64/gunyah/
++obj-y += drivers/
++obj-y += kernel/
++obj-y += lib/
++obj-y += mm/
++obj-y += net/qmsgq/
++obj-y += net/qrtr/
++obj-y += sound/
+-- 
+2.43.0
+
