@@ -4,8 +4,6 @@
 require qti-xreality2-base-image.bb
 
 CORE_IMAGE_EXTRA_INSTALL:remove:seraph = " \
-    packagegroup-qti-bluetooth \
-    packagegroup-qti-securemsm \
     packagegroup-qti-sensors-see \
     packagegroup-qti-test-sensors-see \
     packagegroup-qti-qesdk-core \

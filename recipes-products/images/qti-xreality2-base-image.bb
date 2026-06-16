@@ -24,7 +24,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
         packagegroup-qti-gfx \
         packagegroup-qti-mmframeworks \
         packagegroup-qti-ppat \
-        packagegroup-qti-securemsm \
+        ${@bb.utils.contains('COMBINED_FEATURES', 'qti-security', "packagegroup-qti-securemsm", "", d)} \
         packagegroup-qti-sensors-see \
         packagegroup-qti-ss-mgr \
         packagegroup-qti-test-sensors-see \
