@@ -1,4 +1,4 @@
-inherit kernel
+inherit kernel cml1
 
 DESCRIPTION = "CAF Linux Kernel"
 LICENSE = "GPLv2.0-with-linux-syscall-note"
@@ -20,9 +20,18 @@ DEPENDS:append:aarch64 = " libgcc"
 #Add DTC_FLAGS to compile DTB with symbols.
 KERNEL_DTC_FLAGS += "-@"
 
-KERNEL_CONFIG_FRAGMENTS:append = " ${S}/arch/arm64/configs/vendor/echo-mbb.config"
-KERNEL_CONFIG_FRAGMENTS:append = " ${S}/arch/arm64/configs/vendor/echo-cpe.config"
-KERNEL_CONFIG_FRAGMENTS:append = " ${@oe.utils.vartrue('DEBUG_BUILD', '${S}/arch/arm64/configs/vendor/echo-debug.config', '', d)}"
+KERNEL_CONFIG_FRAGMENTS:append:echo = " \
+    ${S}/arch/arm64/configs/vendor/echo-mbb.config \
+    ${S}/arch/arm64/configs/vendor/echo-cpe.config \
+    ${S}/arch/arm64/configs/vendor/echo-rdkb.config \
+    ${S}/arch/arm64/configs/vendor/echo-cpe-plus.config \
+    ${S}/arch/arm64/configs/vendor/echo-mbb-plus.config \
+    ${S}/arch/arm64/configs/vendor/echo-rdkb-plus.config"
+KERNEL_CONFIG_FRAGMENTS:append:echo = " ${@oe.utils.vartrue('DEBUG_BUILD', '${S}/arch/arm64/configs/vendor/echo-debug.config', '', d)}"
+
+SRC_URI += " \
+          ${@bb.utils.contains('DISTRO_FEATURES', 'apparmor', 'file://apparmor.cfg', '', d)} \
+          "
 
 do_configure:prepend() {
     if [ ! -f "${S}/arch/${ARCH}/configs/${KERNEL_CONFIG}" ]; then
@@ -45,7 +54,7 @@ do_configure:prepend() {
         done
 
         # Now that all the fragments are located merge them.
-        ( cd ${WORKDIR} && ${S}/scripts/kconfig/merge_config.sh -m -r -y -O ${B} ${B}/.config ${KERNEL_CONFIG_FRAGMENTS} 1>&2 )
+        ( cd ${WORKDIR} && ${S}/scripts/kconfig/merge_config.sh -m -r -y -O ${B} ${B}/.config ${KERNEL_CONFIG_FRAGMENTS}  ${@" ".join(find_cfgs(d))} 1>&2 )
     fi
 
     # generate pair of private/public keys for module signing
@@ -115,9 +124,6 @@ do_deploy() {
         for dtbf in $(find . -name "$dtbs") ; do
             install -m 0644 "$dtbf" "${DEPLOYDIR}/kernel_dtbs"
         done
-    done
-    for dtbof in $(find . -name "*.dtbo") ; do
-        install -m 0644 $dtbof ${DEPLOYDIR}/kernel_dtbs
     done
 
     install -d ${DEPLOYDIR}/kernel_modules
