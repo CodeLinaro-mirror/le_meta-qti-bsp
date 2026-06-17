@@ -19,5 +19,6 @@ do_install:append:seraph() {
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 SYSTEMD_SERVICE:${PN} = "cdsp_start.service"
+SYSTEMD_SERVICE:${PN}:vienna = ""
 
 FILES:${PN} += "${systemd_unitdir}/system"
