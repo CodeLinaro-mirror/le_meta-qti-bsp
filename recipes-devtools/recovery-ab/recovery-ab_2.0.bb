@@ -7,6 +7,7 @@ ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 HOMEPAGE = "https://www.codeaurora.org/gitweb/quic/la?p=platform/bootable/recovery.git"
 
 DEPENDS += "glib-2.0 ext4-utils oem-recovery adbd libbase libsparse libmincrypt bzip2 bison-native openssl openssl-native"
+DEPENDS += "${@bb.utils.contains('OTA_WHOLE_FILE_SIGN', 'true', 'releasetools-native dumpkey-native', '', d)}"
 DEPENDS += " ${@bb.utils.contains('COMBINED_FEATURES', 'qti-ab-boot', 'abctl', '', d)}"
 
 RDEPENDS:${PN} += "zlib attr"
@@ -26,6 +27,7 @@ S = "${WORKDIR}/OTA/recovery"
 EXTRA_OECONF = "--with-glib --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include \
                 --with-core-headers=${STAGING_INCDIR}"
 EXTRA_OECONF:append = "${@bb.utils.contains('MACHINE_FEATURES', 'ota-package-verification', 'TARGET_SUPPORTS_OTA_VERIFICATION=true', '', d)}"
+EXTRA_OECONF:append = "${@bb.utils.contains('OTA_WHOLE_FILE_SIGN', 'true', 'TARGET_SUPPORTS_OTA_WHOLE_FILE_SIGN=true', '', d)}"
 CFLAGS += "-lsparse -llog"
 PARALLEL_MAKE = ""
 
@@ -44,7 +46,15 @@ generate_public_key() {
     openssl rsa -in ${TMPDIR}/deploy/images/${MACHINE}/ota-scripts/private.pem -outform PEM -pubout > ${WORKDIR}/public.pem
 }
 
+generate_recovery_keys() {
+    java -jar ${DEPLOY_DIR_IMAGE}/ota-scripts/framework/dumpkey.jar \
+        ${DEPLOY_DIR_IMAGE}/ota-scripts/security/testkey.x509.pem \
+        > ${WORKDIR}/keys
+}
+
 do_install[prefuncs] += "${@bb.utils.contains('MACHINE_FEATURES', 'ota-package-verification', 'generate_public_key', '', d)}"
+do_install[depends] += "${@bb.utils.contains('OTA_WHOLE_FILE_SIGN', 'true', 'releasetools-native:do_deploy dumpkey-native:do_deploy', '', d)}"
+do_install[prefuncs] += "${@bb.utils.contains('OTA_WHOLE_FILE_SIGN', 'true', 'generate_recovery_keys', '', d)}"
 
 do_install:append() {
         install -d ${D}/res/
@@ -71,5 +81,8 @@ do_install:append() {
         fi
         if ${@bb.utils.contains('MACHINE_FEATURES', 'ota-package-verification', 'true', 'false', d)}; then
             install -m 0755 ${WORKDIR}/public.pem -D ${D}/res/public.pem
+        fi
+        if ${@bb.utils.contains('OTA_WHOLE_FILE_SIGN', 'true', 'true', 'false', d)}; then
+            install -m 0644 ${WORKDIR}/keys -D ${D}/res/keys
         fi
 }
