@@ -16,6 +16,7 @@ IMAGE_FEATURES += "ssh-server-openssh"
 CORE_IMAGE_EXTRA_INSTALL += "\
               alsa-utils \
               glib-2.0 \
+              opencv boost \
               kernel-modules \
               packagegroup-android-utils \
               packagegroup-filesystem-utils \
@@ -57,7 +58,6 @@ CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "packagegroup-qti-containers"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "packagegroup-qti-core"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "packagegroup-qti-data"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "packagegroup-qti-fastmmi"
-CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "packagegroup-qti-pulseaudio"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "packagegroup-qti-robotics"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "packagegroup-qti-ss-mgr"
 CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "packagegroup-qti-securemsm"
