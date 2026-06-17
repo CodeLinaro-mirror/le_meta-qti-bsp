@@ -14,7 +14,7 @@ DEPENDS += "rsync-native"
 
 PROVIDES = "linux-msm-headers virtual/kernel-headers"
 
-COMPATIBLE_MACHINE = "gvm-gen4-5-virtio"
+COMPATIBLE_MACHINE = "gvm-gen4-5-virtio|quin-tgvm-gen4-5"
 
 SRC_URI = "\
     ${PATH_TO_REPO}/kernel/kernel-${PV}/kernel_platform/common/.git;protocol=${PROTO};name=common;destsuffix=kernel/kernel-${PV}/kernel_platform/common;usehead=1 \

@@ -6,7 +6,7 @@ HOMEPAGE = "https://git.codelinaro.org"
 LICENSE = "GPLv2.0-with-linux-syscall-note"
 LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 
-COMPATIBLE_MACHINE = "gvm-gen4-5-virtio"
+COMPATIBLE_MACHINE = "gvm-gen4-5-virtio|quin-tgvm-gen4-5"
 
 DEPENDS += "elfutils-native kern-tools-native mkbootimg-native mkdtimg-native openssl-native pahole-native rsync-native signing-keys"
 DEPENDS:append:toolchain-clang = " clang-cross-${TARGET_ARCH}"

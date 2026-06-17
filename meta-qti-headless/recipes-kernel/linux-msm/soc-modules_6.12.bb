@@ -4,7 +4,7 @@ HOMEPAGE = "https://git.codelinaro.org"
 LICENSE = "GPLv2.0-with-linux-syscall-note"
 LIC_FILES_CHKSUM = "file://${WORKDIR}/kernel/kernel-${PV}/kernel_platform/soc-repo/COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 
-COMPATIBLE_MACHINE = "gvm-gen4-5-virtio"
+COMPATIBLE_MACHINE = "gvm-gen4-5-virtio|quin-tgvm-gen4-5"
 
 # soc-modules provides kernel-module-soc-modules, remove self-dependency
 # added by qti-techpack.bbclass to avoid circular dependency.
