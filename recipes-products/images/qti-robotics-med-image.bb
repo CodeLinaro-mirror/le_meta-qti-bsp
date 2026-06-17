@@ -48,7 +48,6 @@ CORE_IMAGE_EXTRA_INSTALL += "\
               packagegroup-support-utils \
               systemd-machine-units \
               ${@bb.utils.contains('DISTRO_FEATURES','selinux', 'packagegroup-selinux-minimal', '', d)} \
-              ${@bb.utils.contains('DISTRO_FEATURES', 'dm-verity', bb.utils.contains('MACHINE_FEATURES', 'dm-verity-initramfs-v3', 'cryptsetup verity-scripts lvm2-udevrules', '', d), '', d)} \
 "
 
 CORE_IMAGE_EXTRA_INSTALL:remove:qrbx210-rbx = "kernel-modules"
