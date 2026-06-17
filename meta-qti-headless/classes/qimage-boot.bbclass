@@ -5,7 +5,7 @@ DEPENDS += "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'qti-avb', 'avbtool-native', '', d)} \
     dtc-native \
     kernel-aosp-tools-native \
-    ${@bb.utils.contains('PREFERRED_PROVIDER_virtual/kernel', 'linux-ack', 'dtc-aosp-native', '', d)} \
+    ${@bb.utils.contains('PREFERRED_PROVIDER_virtual/kernel', 'linux-ack', 'qcom-dtc-native', '', d)} \
     mkdtimg-native \
     sectools-native \
     virtual/kernel \
