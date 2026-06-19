@@ -30,6 +30,7 @@ SRC_URI = "\
     ${PATH_TO_REPO}/kernel/kernel-${PV}/kernel_platform/common/.git;protocol=${PROTO};name=common;destsuffix=kernel/kernel-${PV}/kernel_platform/common;usehead=1 \
     ${PATH_TO_REPO}/kernel/kernel-${PV}/kernel_platform/soc-repo/.git;protocol=${PROTO};name=socrepo;destsuffix=kernel/kernel-${PV}/kernel_platform/soc-repo;usehead=1 \
     "
+SRC_URI:append = " file://ack/0001-soc-repo-add-Kbuild-config.patch"
 SRCREV_common = "${AUTOREV}"
 SRCREV_socrepo = "${AUTOREV}"
 SRCREV_FORMAT = "common_socrepo"
