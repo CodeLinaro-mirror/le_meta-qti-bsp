@@ -9,7 +9,7 @@ LICENSE = "BSD-3-Clause-Clear"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=2998c54c288b081076c9af987bdf4838"
 
 SRC_URI = "git://github.com/qualcomm/userspace-resource-manager-extensions.git;protocol=https;branch=main;"
-SRCREV = "d8594957a0ceaa20b10d2c93fe08c9dd68228b60"
+SRCREV = "706c825eab86aa28b22021e4f2e336eef6d9876c"
 
 SRC_URI:append:seraph = " \
     file://seraph/InitConfig.yaml \
