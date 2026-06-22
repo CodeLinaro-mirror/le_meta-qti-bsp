@@ -76,7 +76,7 @@ python copy_buildsystem:append() {
 
 # To include llvm-arm-toolchain as part of sysroots in eSDK tmp directory
 DEPENDS:append = " ${@ \
-    'llvm-aosp-toolchain-native' if d.getVar('QTI_LLVM_VARIANT') == 'aospllvm' else \
+    'kernel-toolchain-native' if d.getVar('QTI_LLVM_VARIANT') == 'aospllvm' else \
     'llvm-arm-toolchain-native' if d.getVar('QTI_LLVM_VARIANT') == 'sdllvm' else \
     '' \
 }"
@@ -86,7 +86,7 @@ TOOLCHAIN_HOST_TASK:append = " nativesdk-protobuf-compiler "
 
 # Add nativesdk-llvm-arm-toolchain in SDK to run on SDKMACHINE
 TOOLCHAIN_HOST_TASK:append = " ${@ \
-    'nativesdk-llvm-aosp-toolchain' if d.getVar('QTI_LLVM_VARIANT') == 'aospllvm' else \
+    'nativesdk-kernel-toolchain' if d.getVar('QTI_LLVM_VARIANT') == 'aospllvm' else \
     'nativesdk-llvm-arm-toolchain' if d.getVar('QTI_LLVM_VARIANT') == 'sdllvm' else \
     '' \
 }"
