@@ -11,7 +11,7 @@ python() {
 }
 
 do_configure:prepend() {
-    kconfig="${STAGING_KERNEL_DIR}/driver/Kconfig"
+    kconfig="${STAGING_KERNEL_DIR}/drivers/Kconfig"
 
     if [ -f "${kconfig}" ]; then
         bbnote "Removing QCOM IPA/RMNET Kconfig includes from ${kconfig}"
