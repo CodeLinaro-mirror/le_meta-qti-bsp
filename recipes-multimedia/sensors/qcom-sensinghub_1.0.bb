@@ -9,6 +9,7 @@ DEPENDS += "protobuf"
 DEPENDS += "protobuf-native"
 DEPENDS:remove:alor = " syslog-plumber"
 DEPENDS:remove:seraph = " syslog-plumber"
+DEPENDS:append:seraph = " nanopb-runtime nanopb-generator-native glib-2.0"
 
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI  = "file://sensors/sensing-hub/"
