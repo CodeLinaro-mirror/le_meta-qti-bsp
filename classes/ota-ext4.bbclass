@@ -20,6 +20,15 @@ OTA_INCREMENTAL_UPDATE_EXT4_PATH = "${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}/${OTA_
 MACHINE_FILESMAP_SEARCH_PATH_EXT4 ?= "${@':'.join('%s/conf/machine/filesmap' % p for p in '${BBPATH}'.split(':'))}}"
 MACHINE_FILESMAP_FULL_PATH_EXT4 = "${@machine_search(d.getVar('MACHINE_FILESMAP_CONF_EMMC'), d.getVar('MACHINE_FILESMAP_SEARCH_PATH_EXT4')) or ''}"
 
+# Machine specific partition sizes
+# Default value for all machines
+BOOT_PARTITION_SIZE     ?= "0x011DC000"
+RECOVERY_PARTITION_SIZE ?= "0x011DC000"
+
+# echo machine specific (kernel 6.18 - larger boot image)
+BOOT_PARTITION_SIZE:echo     = "0x05000000"
+RECOVERY_PARTITION_SIZE:echo = "0x05000000"
+
 #Create directory structure for targetfiles.zip
 do_recovery_ext4[cleandirs] += "${OTA_TARGET_IMAGE_ROOTFS_EXT4}"
 do_recovery_ext4[cleandirs] += "${OTA_TARGET_IMAGE_ROOTFS_EXT4}/BOOTABLE_IMAGES"
@@ -100,10 +109,10 @@ do_recovery_ext4() {
     echo blocksize=131072 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 
     # boot_size: Size of boot partition from partition.xml
-    echo boot_size=0x011DC000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
+    echo boot_size=${BOOT_PARTITION_SIZE} >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 
     # recovery_size : Size of recovery partition from partition.xml
-    echo recovery_size=0x011DC000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
+    echo recovery_size=${RECOVERY_PARTITION_SIZE} >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 
     #system_size : Size of system partition from partition.xml
     echo system_size=0x10000000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
