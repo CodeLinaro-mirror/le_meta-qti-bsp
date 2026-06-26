@@ -22,7 +22,6 @@ SYSTEMD_SERVICE:${PN} = "\
     offline-target-cpus.service \
     reconfig-cgrp-slices.service \
     "
-SYSTEMD_SERVICE:${PN}:remove:sa7255-ivi = "offline-target-cpus.service reconfig-cgrp-slices.service"
 
 do_install:append() {
     install -d ${D}${systemd_system_unitdir}/
@@ -32,6 +31,12 @@ do_install:append() {
     install -m 0444 ${S}/plat-config-generator/lemans/nonsafe_ivi.ini  -D ${D}/etc/lemans/nonsafe_ivi.ini
     install -m 0444 ${S}/plat-config-generator/lemans/flex.ini         -D ${D}/etc/lemans/flex.ini
     install -m 0444 ${S}/plat-config-generator/lemans/adas.ini         -D ${D}/etc/lemans/adas.ini
+}
+
+do_install:append:sa7255-ivi() {
+    install -m 0444 ${S}/plat-config-generator/monaco/nonsafe_ivi.ini  -D ${D}/etc/monaco/nonsafe_ivi.ini
+    install -m 0444 ${S}/plat-config-generator/monaco/flex.ini         -D ${D}/etc/monaco/flex.ini
+    install -m 0444 ${S}/plat-config-generator/monaco/adas.ini         -D ${D}/etc/monaco/adas.ini
 }
 
 RDEPENDS:${PN} += "minini"
