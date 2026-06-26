@@ -1,0 +1,13 @@
+package(
+    default_visibility = [
+        "//visibility:public",
+    ],
+)
+
+load(":define_modules.bzl", "define_modules", "define_uapi_headers")
+
+define_modules("canoe-le", "debug-defconfig")
+
+define_modules("canoe-le", "defconfig")
+
+define_uapi_headers()
