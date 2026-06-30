@@ -74,7 +74,7 @@ do_compile(){
         fi
     else
         # legacy Yocto OOT build path
-        if [ -n "${TECHPACK_MODULES}" ]; then
+        if [ -n "${TECHPACK_DTBS}" ] || [ -n "${TECHPACK_DTBOS}" ] || [ -n "${TECHPACK_MODULES}" ]; then
             module_do_compile
         fi
     fi

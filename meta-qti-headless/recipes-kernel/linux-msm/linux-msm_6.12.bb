@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 
 inherit kernel
 
-COMPATIBLE_MACHINE = "quin-tgvm-gen4-5"
+COMPATIBLE_MACHINE = "quin-tgvm-gen4-5|gvm-gen4-5-virtio"
 
 FILESPATH =+ "${SRC_DIR_ROOT}/kernel:"
 
@@ -25,9 +25,24 @@ do_kernel_link_images[noexec] = "1"
 do_compile_kernelmodules[noexec] = "1"
 
 do_configure () {
-    cp -fpPR ${BZ_PREBUILT_ROOT}/bazel-cache/*/sandbox/sandbox_stash/ModulesPrepare/*/execroot/_main/out/common/. ${B}
+    # Try sandbox_stash path first (full Bazel build with sandbox enabled).
+    # Fall back to execroot path when sandbox_stash is absent (e.g. mainline
+    # builds where sandbox is disabled or stash was cleaned).
+    MODULES_PREPARE_SRC="${BZ_PREBUILT_ROOT}/bazel-cache/*/sandbox/sandbox_stash/ModulesPrepare/*/execroot/_main/out/common/."
+    KBUILD_MIXED_TREE_SRC="${BZ_PREBUILT_ROOT}/bazel-cache/*/sandbox/sandbox_stash/KernelBuild/*/execroot/_main/bazel-out/k8-fastbuild/bin/soc-repo/autogvm_${KERNEL_BUILD_VARIANT}defconfig_dtb_build_kbuild_mixed_tree/*"
 
-    cp ${BZ_PREBUILT_ROOT}/bazel-cache/*/sandbox/sandbox_stash/KernelBuild/*/execroot/_main/bazel-out/k8-fastbuild/bin/soc-repo/autogvm_${KERNEL_BUILD_VARIANT}defconfig_dtb_build_kbuild_mixed_tree/* ${B}
+    if ls ${MODULES_PREPARE_SRC} > /dev/null 2>&1; then
+        cp -fpPR ${MODULES_PREPARE_SRC} ${B}
+        cp ${KBUILD_MIXED_TREE_SRC} ${B}
+    else
+        # sandbox_stash not available: use execroot directly.
+        # autogvm_*defconfig_dtb_build/ has: .config, include/config/kernel.release
+        # autogvm_*defconfig_dtb_build_kbuild_mixed_tree/ has: gen_init_cpio, scripts/
+        # Copy both; kbuild_mixed_tree is copied last so its files take precedence.
+        EXECROOT="${BZ_PREBUILT_ROOT}/bazel-cache/*/execroot/_main/bazel-out/k8-fastbuild/bin/soc-repo"
+        cp -fpPR ${EXECROOT}/autogvm_${KERNEL_BUILD_VARIANT}defconfig_dtb_build/. ${B}
+        cp -fpPR ${EXECROOT}/autogvm_${KERNEL_BUILD_VARIANT}defconfig_dtb_build_kbuild_mixed_tree/. ${B}
+    fi
 
     install -d ${B}/arch/${ARCH}/boot/
     mv ${B}/Image ${B}/arch/${ARCH}/boot/

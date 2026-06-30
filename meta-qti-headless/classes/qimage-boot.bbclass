@@ -5,6 +5,7 @@ DEPENDS += "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'qti-avb', 'avbtool-native', '', d)} \
     dtc-native \
     kernel-aosp-tools-native \
+    ${@bb.utils.contains('PREFERRED_PROVIDER_virtual/kernel', 'linux-ack', 'qcom-dtc-native', '', d)} \
     mkdtimg-native \
     sectools-native \
     virtual/kernel \
@@ -17,7 +18,7 @@ do_merge_dtbs() {
      install -d ${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbs
      install -d ${DEPLOY_DIR_IMAGE}/dtbs
 
-     if ${@oe.utils.version_less_or_equal('PREFERRED_VERSION_linux-msm', '6.0', 'true', 'false', d)}; then
+     if ${@oe.utils.version_less_or_equal(bb.utils.contains('PREFERRED_PROVIDER_virtual/kernel', 'linux-ack', 'PREFERRED_VERSION_linux-ack', 'PREFERRED_VERSION_linux-msm', d), '6.0', 'true', 'false', d)}; then
          ${STAGING_BINDIR_NATIVE}/build/android/merge_dtbs.py \
          ${DEPLOY_DIR_IMAGE}/build-artifacts/dtb \
          ${DEPLOY_DIR_IMAGE}/build-artifacts/techpack-dtbs \
@@ -53,6 +54,7 @@ do_merge_dtbs[cleandirs] = " \
      ${DEPLOY_DIR_IMAGE}/dtbs \
      ${@bb.utils.contains('MACHINE_FEATURES', 'dt-overlay', '${DEPLOY_DIR_IMAGE}/dtbos ', ' ', d)} \
 "
+do_merge_dtbs[depends] += "${@bb.utils.contains('PREFERRED_PROVIDER_virtual/kernel', 'linux-ack', 'qcom-devicetree:do_deploy', '', d)}"
 
 addtask do_merge_dtbs after do_image before do_makeboot
 

@@ -3,7 +3,7 @@ AUDIO_EXTRA_RDEPENDS = "\
     pulseaudio-misc \
     pulseaudio-module-null-source \
     pulseaudio-server \
-    ${@bb.utils.contains('MACHINE_FEATURES', 'qti-audio-ar', bb.utils.contains('MACHINE_FEATURES','qti-hypervisor','', 'pulseaudio-module-codec-control',d), 'pulseaudio-module-acdb pulseaudio-module-codec-control' ,d)} \
+    ${@bb.utils.contains_any('MACHINE_FEATURES', 'qti-audio-ar qti-audio-awe', bb.utils.contains('MACHINE_FEATURES','qti-hypervisor','', 'pulseaudio-module-codec-control',d), 'pulseaudio-module-acdb pulseaudio-module-codec-control' ,d)} \
 "
 
 RDEPENDS:${PN} += "${@bb.utils.contains('MACHINE_FEATURES', 'qti-gunyah qti-umd', '', '${AUDIO_EXTRA_RDEPENDS}', d)}"
