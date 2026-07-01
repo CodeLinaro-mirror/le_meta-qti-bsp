@@ -20,6 +20,7 @@ SRC_URI:append:sa8775 = " \
              ${@bb.utils.contains('MACHINE_FEATURES', 'early-ramdisk-init', 'file://0001-change-systemd-modules-load-service-type-to-simple.patch', '', d)}"
 
 SRC_URI:append:sa7255 = " \
+             file://0001-systemd-assign-prime-core-to-manager_dispatch_load_q.patch \
              ${@bb.utils.contains('MACHINE_FEATURES', 'early-ramdisk-init', 'file://0001-change-systemd-modules-load-service-type-to-simple.patch', '', d)}"
 
 SRC_URI:append:sa8620-adas = " \
