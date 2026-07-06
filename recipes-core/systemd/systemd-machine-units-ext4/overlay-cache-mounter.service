@@ -1,0 +1,13 @@
+[Unit]
+Description=Mount overlayfs on /cache (alor)
+DefaultDependencies=no
+After=overlay-workdir.service
+Before=local-fs.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/libexec/overlay-mounter cache
+
+[Install]
+WantedBy=local-fs.target
