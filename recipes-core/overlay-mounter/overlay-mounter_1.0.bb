@@ -1,4 +1,4 @@
-SUMMARY = "Dedicated overlay filesystem mounter for alor"
+SUMMARY = "Dedicated overlay filesystem mounter for alor and vienna"
 DESCRIPTION = "Small helper binary that mounts overlayfs on /data or /etc \
 using a dedicated SELinux domain (overlay_mounter_t), replacing the use of \
 the generic mount_t as the stashed mounter credential."
@@ -9,7 +9,7 @@ SRC_URI = "file://overlay-mounter.c"
 
 S = "${WORKDIR}"
 
-COMPATIBLE_MACHINE = "alor"
+COMPATIBLE_MACHINE = "alor|vienna"
 
 do_compile() {
     ${CC} ${CFLAGS} ${LDFLAGS} -o overlay-mounter ${WORKDIR}/overlay-mounter.c
