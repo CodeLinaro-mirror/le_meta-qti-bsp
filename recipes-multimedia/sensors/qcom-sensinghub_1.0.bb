@@ -8,6 +8,7 @@ DEPENDS = "syslog-plumber"
 DEPENDS += "protobuf"
 DEPENDS += "protobuf-native"
 DEPENDS:remove:alor = " syslog-plumber"
+DEPENDS:remove:seraph = " syslog-plumber"
 
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI  = "file://sensors/sensing-hub/"
@@ -15,6 +16,9 @@ S = "${WORKDIR}/sensors/sensing-hub"
 
 SRC_URI:alor  = "file://vendor/qcom/opensource/sensing-hub/"
 S:alor = "${WORKDIR}/vendor/qcom/opensource/sensing-hub"
+
+SRC_URI:seraph  = "file://vendor/qcom/opensource/sensing-hub/"
+S:seraph = "${WORKDIR}/vendor/qcom/opensource/sensing-hub"
 
 EXTRA_OECONF += " --with-systemd"
 
