@@ -9,7 +9,7 @@ SRC_URI = "file://overlay-mounter.c"
 
 S = "${WORKDIR}"
 
-COMPATIBLE_MACHINE = "alor|vienna"
+COMPATIBLE_MACHINE = "alor|vienna|seraph"
 
 do_compile() {
     ${CC} ${CFLAGS} ${LDFLAGS} -o overlay-mounter ${WORKDIR}/overlay-mounter.c

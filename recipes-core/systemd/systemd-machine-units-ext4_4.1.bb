@@ -22,17 +22,7 @@ SRC_URI += " file://overlay-workdir.sh"
 SRC_URI += " file://overlay-workdir.service"
 SRC_URI += " file://overlay-workdir-with-fde.service"
 
-SRC_URI:append:alor = " \
-    file://overlay-data-mounter.service \
-    file://overlay-etc-mounter.service \
-    file://overlay-cache-mounter.service \
-"
-
-SRC_URI:append:vienna = " \
-    file://overlay-data-mounter.service \
-    file://overlay-etc-mounter.service \
-    file://overlay-cache-mounter.service \
-"
+SRC_URI:append = "${@'' if not bb.utils.filter('BASEMACHINE', 'alor vienna seraph', d) else ' file://overlay-data-mounter.service file://overlay-etc-mounter.service file://overlay-cache-mounter.service'}"
 
 SRC_URI += " file://bt_firmware-mount.service"
 SRC_URI += " file://vendor-bt_firmware-mount.service"
@@ -73,7 +63,7 @@ SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('COMBINED_FEATURES','qti-ab-boot'
 # dedicated overlay-mounter service units that use overlay_mounter_t domain
 # so the stashed credential for the overlayfs second-check is not mount_t.
 do_install:append() {
-    if [ "${BASEMACHINE}" == "alor" ] || [ "${BASEMACHINE}" == "vienna" ]; then
+    if [ "${BASEMACHINE}" == "alor" ] || [ "${BASEMACHINE}" == "vienna" ] || [ "${BASEMACHINE}" == "seraph" ]; then
        # Remove the automount-based .mount units for data, etc and cache installed
        # by add_overlay_mount_files(); they are replaced by explicit service units.
        rm -f ${D}${systemd_unitdir}/system/data.mount
@@ -103,6 +93,8 @@ do_install:append() {
 
 SYSTEMD_SERVICE:${PN}:append:alor = " overlay-data-mounter.service overlay-etc-mounter.service overlay-cache-mounter.service"
 SYSTEMD_SERVICE:${PN}:append:vienna = " overlay-data-mounter.service overlay-etc-mounter.service overlay-cache-mounter.service"
+SYSTEMD_SERVICE:${PN}:append:seraph = " overlay-data-mounter.service overlay-etc-mounter.service overlay-cache-mounter.service"
 
 RDEPENDS:${PN}:append:alor = " overlay-mounter"
 RDEPENDS:${PN}:append:vienna = " overlay-mounter"
+RDEPENDS:${PN}:append:seraph = " overlay-mounter"

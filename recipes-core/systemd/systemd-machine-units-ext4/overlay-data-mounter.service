@@ -1,5 +1,5 @@
 [Unit]
-Description=Mount overlayfs on /data (alor, vienna)
+Description=Mount overlayfs on /data
 DefaultDependencies=no
 After=overlay-workdir.service
 Before=local-fs.target
