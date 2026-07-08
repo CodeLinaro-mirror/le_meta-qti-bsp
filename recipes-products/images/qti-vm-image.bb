@@ -13,6 +13,7 @@ CORE_IMAGE_EXTRA_INSTALL += " \
     sdcard-scripts-automount \
     e2fsprogs-mke2fs \
     procrank \
+    vm-time-init \
 "
 
 CORE_IMAGE_EXTRA_INSTALL += " ${@bb.utils.contains('MACHINE_FEATURES', 'qti-vm-idv', 'libturbojpeg', '', d)}"
