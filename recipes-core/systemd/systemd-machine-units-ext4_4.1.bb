@@ -34,6 +34,12 @@ SRC_URI:append:vienna = " \
     file://overlay-cache-mounter.service \
 "
 
+SRC_URI:append:pebble = " \
+    file://overlay-data-mounter.service \
+    file://overlay-etc-mounter.service \
+    file://overlay-cache-mounter.service \
+"
+
 SRC_URI += " file://bt_firmware-mount.service"
 SRC_URI += " file://vendor-bt_firmware-mount.service"
 SRC_URI += " file://vendor-soccp_firmware-mount.service"
@@ -69,11 +75,11 @@ do_install:append () {
 
 SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('COMBINED_FEATURES','qti-ab-boot',' set-slotsuffix.service','',d)}"
 
-# [ alor vienna ]: replace generic automount .mount units for /data and /etc with
+# [ alor vienna pebble ]: replace generic automount .mount units for /data and /etc with
 # dedicated overlay-mounter service units that use overlay_mounter_t domain
 # so the stashed credential for the overlayfs second-check is not mount_t.
 do_install:append() {
-    if [ "${BASEMACHINE}" == "alor" ] || [ "${BASEMACHINE}" == "vienna" ]; then
+    if [ "${BASEMACHINE}" == "alor" ] || [ "${BASEMACHINE}" == "vienna" ] || [ "${BASEMACHINE}" == "pebble" ]; then
        # Remove the automount-based .mount units for data, etc and cache installed
        # by add_overlay_mount_files(); they are replaced by explicit service units.
        rm -f ${D}${systemd_unitdir}/system/data.mount
@@ -103,6 +109,8 @@ do_install:append() {
 
 SYSTEMD_SERVICE:${PN}:append:alor = " overlay-data-mounter.service overlay-etc-mounter.service overlay-cache-mounter.service"
 SYSTEMD_SERVICE:${PN}:append:vienna = " overlay-data-mounter.service overlay-etc-mounter.service overlay-cache-mounter.service"
+SYSTEMD_SERVICE:${PN}:append:pebble = " overlay-data-mounter.service overlay-etc-mounter.service overlay-cache-mounter.service"
 
 RDEPENDS:${PN}:append:alor = " overlay-mounter"
 RDEPENDS:${PN}:append:vienna = " overlay-mounter"
+RDEPENDS:${PN}:append:pebble = " overlay-mounter"
