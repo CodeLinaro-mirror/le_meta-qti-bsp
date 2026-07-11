@@ -14,6 +14,7 @@ CORE_IMAGE_EXTRA_INSTALL += " \
     e2fsprogs-mke2fs \
     procrank \
     toybox \
+    vm-time-init \
 "
 
 CORE_IMAGE_EXTRA_INSTALL += " ${@bb.utils.contains('MACHINE_FEATURES', 'qti-vm-idv', 'libturbojpeg', '', d)}"
