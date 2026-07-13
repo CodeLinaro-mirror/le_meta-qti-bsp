@@ -1,5 +1,5 @@
 [Unit]
-Description=Mount overlayfs on /cache (alor,vienna)
+Description=Mount overlayfs on /cache
 DefaultDependencies=no
 After=overlay-workdir.service
 Before=local-fs.target

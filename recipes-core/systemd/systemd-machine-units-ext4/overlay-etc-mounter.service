@@ -1,5 +1,5 @@
 [Unit]
-Description=Mount overlayfs on /etc (alor, vienna)
+Description=Mount overlayfs on /etc
 DefaultDependencies=no
 After=overlay-workdir.service
 Before=local-fs.target
