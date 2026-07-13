@@ -18,6 +18,7 @@ QIMGEXT4CLASSES += "${@bb.utils.contains('MNT_POINTS', '/cache', 'qimage-cache-e
 QIMGEXT4CLASSES += "${@bb.utils.contains('MNT_POINTS', '/persist', 'qimage-persist-ext4', '', d)}"
 QIMGEXT4CLASSES += "${@bb.utils.contains('MNT_POINTS', '/systemrw', 'qimage-systemrw-ext4', '', d)}"
 QIMGEXT4CLASSES += "${@bb.utils.contains('MNT_POINTS', '/lib/modules', 'qimage-vdlkm-ext4', '', d)}"
+QIMGEXT4CLASSES += "${@bb.utils.contains('MNT_POINTS', '/nvram', 'qimage-nvram-ext4', '', d)}"
 
 inherit ${QIMGEXT4CLASSES}
 
@@ -76,8 +77,9 @@ create_symlink_systemd_ext4_mount_rootfs() {
         mountname="${entry:1}"
         # Replace "/" with "-" for systemd to understand mount unit.
         mountname=${mountname//'/'/"-"}
-        if [[ "$mountname" == "firmware" || "$mountname" == "bt_firmware" || "$mountname" == "dsp" ]] && \
-           [[ "${COMBINED_FEATURES}" =~ .*qti-ab-boot.* ]] ; then
+	if { [[ "$mountname" == "firmware" || "$mountname" == "bt_firmware" || "$mountname" == "dsp" ]] && \
+	     [[ "${COMBINED_FEATURES}" =~ .*qti-ab-boot.* ]]; } || \
+	   { [[ "$mountname" == "dsp" ]] && [[ "${MACHINE_FEATURES}" =~ mount-dsp-usr-lib ]]; }; then
             cp ${IMAGE_ROOTFS_EXT4}/lib/systemd/system/${mountname}-mount-ext4.service ${IMAGE_ROOTFS_EXT4}/lib/systemd/system/${mountname}-mount.service
             ln -sf ${systemd_unitdir}/system/${mountname}-mount.service ${IMAGE_ROOTFS_EXT4}/lib/systemd/system/local-fs.target.requires/${mountname}-mount.service
         else

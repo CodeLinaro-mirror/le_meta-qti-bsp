@@ -4,6 +4,7 @@ FILESEXTRAPATHS:prepend:sa525m := "${THISDIR}/files:"
 FILESEXTRAPATHS:prepend:sa510m := "${THISDIR}/files:"
 FILESEXTRAPATHS:prepend:mdm9607 := "${THISDIR}/files:"
 FILESEXTRAPATHS:prepend:sa415m := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend:echo := "${THISDIR}/files:"
 
 REQUIRED_DISTRO_FEATURES = ""
 SRC_URI += "\
@@ -34,6 +35,30 @@ do_install:append () {
         fi
     fi
 }
+
+VOLATILE_BINDS:echo = "\
+/systemrw/adb_devid  /etc/adb_devid\n\
+/systemrw/build.prop /etc/build.prop\n\
+/systemrw/data /etc/data/\n\
+/systemrw/data/adpl /etc/data/adpl/\n\
+/systemrw/data/usb /etc/data/usb/\n\
+/systemrw/data/miniupnpd /etc/data/miniupnpd/\n\
+/systemrw/data/ipa /etc/data/ipa/\n\
+/systemrw/rt_tables /etc/data/iproute2/rt_tables\n\
+/systemrw/boot_hsusb_comp /etc/usb/boot_hsusb_comp\n\
+/systemrw/boot_hsic_comp /etc/usb/boot_hsic_comp\n\
+/systemrw/misc/wifi /etc/misc/wifi/\n\
+/systemrw/bluetooth /etc/bluetooth/\n\
+/systemrw/allplay /etc/allplay/\n\
+/systemrw/resolv.conf /etc/resolv.conf\n\
+/var/volatile/lib /var/lib\n\
+${@bb.utils.contains('BBFILE_COLLECTIONS', 'qti-rdkb', '/systemrw/dibbler /etc/dibbler', '', d)}\n\
+${@bb.utils.contains('BBFILE_COLLECTIONS', 'qti-rdkb', '/systemrw/afc /etc/afc', '', d)}\n\
+${@bb.utils.contains('BBFILE_COLLECTIONS', 'qti-rdkb', '/systemrw/afc-daemon /etc/afc-daemon', '', d)}\n\
+${@bb.utils.contains('BBFILE_COLLECTIONS', 'qti-rdkb', '/systemrw/qca-afc-daemon /etc/qca-afc-daemon', '', d)}\n\
+${@bb.utils.contains('BBFILE_COLLECTIONS', 'qti-rdkb', '/systemrw/pairing /etc/pairing', '', d)}\n\
+${@bb.utils.contains('BBFILE_COLLECTIONS', 'qti-rdkb', '/systemrw/misc /etc/misc', '', d)}\n\
+"
 
 VOLATILE_BINDS_sdxlemur = "\
 /systemrw/adb_devid  /etc/adb_devid\n\
