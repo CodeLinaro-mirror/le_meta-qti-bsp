@@ -1,4 +1,4 @@
-# Copyright (c) 2018, 2019, The Linux Foundation. All rights reserved.
+# Copyright (c) 2017, The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -24,26 +24,16 @@
 # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
+#
+# Changes from Qualcomm Technologies, Inc. are provided under the following license:
+# Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+# SPDX-License-Identifier: BSD-3-Clause-Clear
 
 [Unit]
-Description=Mount modem partition to /firmware mount point
-ConditionDirectoryNotEmpty=!/firmware
+Before=local-fs.target
+ConditionDirectoryNotEmpty=!/vendor/soccp_firmware
 
-# Env vars are not reflecting in [Unit] Section for selective wait.
-# Hence wait for both _a & _b dev nodes before attepting to mount
-BindsTo=@MODEMDEVICE@
-After=@MODEMDEVICE@
-Before=local-fs.target systemd-modules-load.service
-DefaultDependencies=no
-
-IgnoreOnIsolate=true
-
-[Service]
-Type=oneshot
-RemainAfterExit=yes
-PassEnvironment="SLOT_SUFFIX"
-ExecStart=/bin/mount -o noexec,nodev,ro,context=system_u:object_r:firmware_t:s0 -t vfat /dev/disk/by-partlabel/modem${SLOT_SUFFIX} /firmware
-Nice=-20
-
-[Install]
-WantedBy=local-fs.target
+[Mount]
+What=/dev/disk/by-partlabel/soccp
+Where=/vendor/soccp_firmware
+Options=noexec,nodev,ro,context=system_u:object_r:firmware_t:s0
