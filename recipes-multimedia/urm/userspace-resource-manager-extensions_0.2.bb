@@ -11,11 +11,6 @@ LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=2998c54c288b081076c9af987bdf4838"
 SRC_URI = "git://github.com/qualcomm/userspace-resource-manager-extensions.git;protocol=https;branch=main;"
 SRCREV = "706c825eab86aa28b22021e4f2e336eef6d9876c"
 
-SRC_URI:append:seraph = " \
-    file://seraph/InitConfig.yaml \
-    file://seraph/SignalsConfig.yaml \
-"
-
 S = "${WORKDIR}/git"
 inherit cmake
 DEPENDS += " userspace-resource-manager"
@@ -23,13 +18,3 @@ FILES:${PN}-dev += "${libdir}/urm/libUrmPlugin.so"
 FILES:${PN} += " \
     ${libdir}/urm/libUrmPlugin.so* \
 "
-FILES:${PN}:append:seraph = " \
-    /etc/urm/target/seraph/InitConfig.yaml \
-    /etc/urm/target/seraph/SignalsConfig.yaml \
-"
-
-do_install:append:seraph() {
-    install -d ${D}/etc/urm/target/seraph
-    install -m 0644 ${WORKDIR}/seraph/InitConfig.yaml   ${D}/etc/urm/target/seraph/InitConfig.yaml
-    install -m 0644 ${WORKDIR}/seraph/SignalsConfig.yaml ${D}/etc/urm/target/seraph/SignalsConfig.yaml
-}

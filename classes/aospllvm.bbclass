@@ -1,12 +1,15 @@
+# Path to the clang binaries (installed by kernel-toolchain-native)
+KERNEL_TOOLCHAIN_BIN ?= "${STAGING_BINDIR_NATIVE}/clang/bin"
+
 # Override the necessary toolchain environment variables.
-CC:toolchain-aospllvm  = "${STAGING_BINDIR_NATIVE}/llvm-aosp-toolchain/bin/clang -target ${TARGET_SYS} ${HOST_CC_ARCH}${TOOLCHAIN_OPTIONS}"
-CXX:toolchain-aospllvm = "${STAGING_BINDIR_NATIVE}/llvm-aosp-toolchain/bin/clang++ -target ${TARGET_SYS} ${HOST_CC_ARCH}${TOOLCHAIN_OPTIONS}"
-CPP:toolchain-aospllvm = "${STAGING_BINDIR_NATIVE}/llvm-aosp-toolchain/bin/clang -target ${TARGET_SYS} -E${TOOLCHAIN_OPTIONS} ${HOST_CC_ARCH}"
-CCLD:toolchain-aospllvm = "${STAGING_BINDIR_NATIVE}/llvm-aosp-toolchain/bin/clang ${HOST_CC_ARCH}${TOOLCHAIN_OPTIONS}"
+CC:toolchain-aospllvm  = "${KERNEL_TOOLCHAIN_BIN}/clang -target ${TARGET_SYS} ${HOST_CC_ARCH}${TOOLCHAIN_OPTIONS}"
+CXX:toolchain-aospllvm = "${KERNEL_TOOLCHAIN_BIN}/clang++ -target ${TARGET_SYS} ${HOST_CC_ARCH}${TOOLCHAIN_OPTIONS}"
+CPP:toolchain-aospllvm = "${KERNEL_TOOLCHAIN_BIN}/clang -target ${TARGET_SYS} -E ${TOOLCHAIN_OPTIONS} ${HOST_CC_ARCH}"
+CCLD:toolchain-aospllvm = "${KERNEL_TOOLCHAIN_BIN}/clang ${HOST_CC_ARCH}${TOOLCHAIN_OPTIONS}"
 
 # For cmake
-OECMAKE_C_COMPILER:toolchain-aospllvm   = "${STAGING_BINDIR_NATIVE}/llvm-aosp-toolchain/bin/clang"
-OECMAKE_CXX_COMPILER:toolchain-aospllvm = "${STAGING_BINDIR_NATIVE}/llvm-aosp-toolchain/bin/clang++"
+OECMAKE_C_COMPILER:toolchain-aospllvm   = "${KERNEL_TOOLCHAIN_BIN}/clang"
+OECMAKE_CXX_COMPILER:toolchain-aospllvm = "${KERNEL_TOOLCHAIN_BIN}/clang++"
 OECMAKE_C_FLAGS:toolchain-aospllvm     += " -target ${TARGET_SYS} ${HOST_CC_ARCH} ${TOOLCHAIN_OPTIONS} ${CFLAGS}"
 OECMAKE_CXX_FLAGS:toolchain-aospllvm   += " -target ${TARGET_SYS} ${HOST_CC_ARCH} ${TOOLCHAIN_OPTIONS} ${CXXFLAGS}"
 OECMAKE_EXTRA_ROOT_PATH:toolchain-aospllvm = "${STAGING_BINDIR_TOOLCHAIN}"
@@ -46,6 +49,6 @@ TOOLCHAIN:class-cross = "gcc"
 OVERRIDES =. "${@['', 'toolchain-${TOOLCHAIN}:']['${TOOLCHAIN}' != '']}"
 OVERRIDES[vardepsexclude] += "TOOLCHAIN"
 
-BASEDEPENDS:append:toolchain-aospllvm:class-target = " llvm-aosp-toolchain-native "
+BASEDEPENDS:append:toolchain-aospllvm:class-target = " kernel-toolchain-native"
 
 QTI_LLVM_VARIANT = "aospllvm"
