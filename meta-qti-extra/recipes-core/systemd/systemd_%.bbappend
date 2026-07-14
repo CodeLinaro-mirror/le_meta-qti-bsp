@@ -13,6 +13,7 @@ SRC_URI:append = " \
              ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'file://0001-systemd-Remove-systemd-watchdog-ping-condition.patch', '', d)} \
              ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'file://0035-systemd-Make-systemd-init-run-in-high-priority.patch', '', d)} \
              ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'file://0037-systemd-Add-wdt_ping-in-dispatch_runqueue.patch', '', d)} \
+             file://0001-systemd-sleep-ping-watchdog-before-writing-suspend-s.patch \
              ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', bb.utils.contains('MACHINE_FEATURES', 'qti-gunyah', '', 'file://qti_lxc_umd_sleep.sh', d), '', d)} \
 "
 
