@@ -33,6 +33,10 @@ add_mount_files () {
         if [[ "$mountname" == "firmware" || "$mountname" == "bt_firmware" || "$mountname" == "dsp" || "$mountname" == "lib-modules" || "$mountname" == "vm-bootsys" || "$mountname" == "lxcrootfs" ]] && \
            [[ "${IMAGETYPE}" == "ubi" || "${COMBINED_FEATURES}" =~ .*qti-ab-boot.* ]] ; then
             install -m 0644 ${S}/${mountname}-mount.service ${D}${systemd_unitdir}/system/${mountname}-mount-${IMAGETYPE}.service
+       elif [[ "$mountname" == "dsp" ]] && [[ "${MACHINE_FEATURES}" =~ mount-dsp-usr-lib ]] ; then
+            sed -i '\|^ExecStart=/bin/mount .* /dev/disk/by-partlabel/dsp\${SLOT_SUFFIX} /dsp$| s|/dsp$|/usr/lib/dsp|' ${S}/dsp-mount.service
+            install -d ${D}/usr/lib/dsp
+            install -m 0644 ${S}/${mountname}-mount.service ${D}${systemd_unitdir}/system/${mountname}-mount-${IMAGETYPE}.service
         else
             # Update fstype for userdata
             if [[ "$mountname" == "overlay" ]] ; then
@@ -45,6 +49,9 @@ add_mount_files () {
                 fi
 	    fi
             install -m 0644 ${S}/${mountname}.mount ${D}${systemd_unitdir}/system/${mountname}-${IMAGETYPE}.mount
+            if [[ "$mountname" == "persist" ]] && ${@bb.utils.contains('MACHINE_FEATURES', 'var-persist', 'true', 'false', d)}; then
+                install -m 0644 ${S}/var-persist.mount ${D}${systemd_unitdir}/system/var-persist.mount
+            fi
         fi
 	# Install mount generator
         if [[ ! -z "${GENERATED_MACHINE_MNT_POINTS}" ]] ; then
@@ -91,6 +98,12 @@ fix_sepolicies () {
     sed -i "s#,rootcontext=system_u:object_r:data_t:s0##g" ${WORKDIR}/overlay-data.mount
     sed -i "s#,rootcontext=system_u:object_r:cache_t:s0##g" ${WORKDIR}/overlay-cache.mount
     sed -i "s#,context=system_u:object_r:lib_t:s0##g" ${WORKDIR}/qti-mount-generator
+}
+
+# Echo-only fix:
+# Drop SELinux rootcontext option from cache.mount as SELinux is not in use
+fix_sepolicies:append:echo () {
+    sed -i "s#,rootcontext=system_u:object_r:cache_t:s0##g" ${WORKDIR}/cache.mount
 }
 
 
@@ -143,7 +156,7 @@ PACKAGES =+ " ${PN}-generators "
 
 FILES:${PN} += " ${systemd_unitdir}/*"
 FILES:${PN}-generators = " ${systemd_unitdir}/system-generators/* "
-
+FILES:${PN}:append:echo = " /usr/lib/dsp"
 ALLOW_EMPTY:${PN}-generators = "1"
 
 RDEPENDS:${PN} += "${PN}-generators"
