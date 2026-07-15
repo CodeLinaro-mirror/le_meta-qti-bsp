@@ -8,7 +8,7 @@ SRC_URI:append = " \
     file://0001-systemd-avoid-active-seat-change-to-NULL.patch \
     file://60-misc.rules \
     file://0001-systemd-config-linger-for-root-user.patch \
-    file://0001-systemd-limit-coredump-burst-interval.patch \
+    file://0001-systemd-give-more-time-for-coredump-pre-start-script.patch \
     file://0001-systemd-add-vfio-script-wait-in-systemd-init-process.patch \
 "
 
