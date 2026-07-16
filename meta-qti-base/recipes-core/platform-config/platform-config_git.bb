@@ -15,6 +15,7 @@ S = "${WORKDIR}/vendor/qcom/opensource/safelinux-system-cfg/platform-config"
 
 EXTRA_OECMAKE:append:sa8775-flex = " -D PVM_CPUS:STRING=0-3 -D GVM_CPUS:STRING=4-7"
 EXTRA_OECMAKE:append:sa8255-ivi = " -D PVM_CPUS:STRING=0-1 -D GVM_CPUS:STRING=2-7"
+EXTRA_OECMAKE:append:sa7255-ivi = " -D PVM_CPUS:STRING=0-7 -D GVM_CPUS:STRING=0-7"
 inherit systemd cmake pkgconfig
 
 SYSTEMD_SERVICE:${PN} = "\
@@ -23,6 +24,7 @@ SYSTEMD_SERVICE:${PN} = "\
     offline-target-cpus.service \
     reconfig-cgrp-slices.service \
     "
+SYSTEMD_SERVICE:${PN}:remove:sa7255-ivi = "offline-target-cpus.service reconfig-cgrp-slices.service"
 
 do_install:append() {
     install -d ${D}${systemd_system_unitdir}/
