@@ -1,0 +1,13 @@
+[Unit]
+Description=Mount overlayfs on /data (alor, vienna)
+DefaultDependencies=no
+After=overlay-workdir.service
+Before=local-fs.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/libexec/overlay-mounter data
+
+[Install]
+WantedBy=local-fs.target
