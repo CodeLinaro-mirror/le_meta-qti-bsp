@@ -40,6 +40,7 @@ EXTRA_OECMAKE += "\
 
 VM_CONFIG_XML ?= "vm_config.xml"
 QCROSVM_SERVICE ?= "qcrosvm.service"
+SOCKET_WAIT_SCRIPT = "wait_for_sockets.sh"
 
 do_install:append() {
     install -d ${D}${sysconfdir}
@@ -47,6 +48,9 @@ do_install:append() {
 
     install -d ${D}${systemd_unitdir}/system/
     install -m 0644 ${S}/${QCROSVM_SERVICE} ${D}/${systemd_unitdir}/system/qcrosvm.service
+
+    install -d ${D}${bindir}
+    install -m 0755 ${S}/${SOCKET_WAIT_SCRIPT} ${D}${bindir}/${SOCKET_WAIT_SCRIPT}
 }
 
 INSANE_SKIP:${PN}-dbg += "buildpaths"
