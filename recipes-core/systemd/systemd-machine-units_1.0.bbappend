@@ -18,6 +18,8 @@ SRC_URI:append:vienna = " \
     file://msm_serial_init.service \
     file://mount_partition.sh \
     file://early-mount.service \
+    file://shutdown_perf.service \
+    file://shutdown_perf.sh \
 "
 USERDATA_IMAGE_SIZE = "${@get_size_in_bytes(d.getVar('USERDATA_SIZE') or '1GB')}"
 
@@ -48,6 +50,13 @@ do_install:append:vienna() {
     install -m 0644 ${WORKDIR}/early-mount.service ${D}${systemd_unitdir}/system/
     ln -sf ../early-mount.service \
         ${D}${systemd_unitdir}/system/local-fs.target.wants/early-mount.service
+
+    install -m 0755 ${WORKDIR}/shutdown_perf.sh ${D}${bindir}/shutdown_perf.sh
+
+    install -m 0644 ${WORKDIR}/shutdown_perf.service ${D}${systemd_unitdir}/system/
+    install -d ${D}${systemd_unitdir}/system/poweroff.target.wants
+    ln -sf ../shutdown_perf.service \
+        ${D}${systemd_unitdir}/system/poweroff.target.wants/shutdown_perf.service
 }
 
 # Various mount related files assume selinux support by default.
