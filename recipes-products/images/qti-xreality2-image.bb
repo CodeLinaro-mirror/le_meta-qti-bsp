@@ -12,6 +12,7 @@ CORE_IMAGE_EXTRA_INSTALL:remove:seraph = " \
     packagegroup-qti-gst \
     packagegroup-qti-eva \
     packagegroup-qti-ppat \
+    packagegroup-qti-securemsm \
     packagegroup-qti-mmframeworks \
     packagegroup-qti-sensors-see \
     packagegroup-qti-test-sensors-see \
