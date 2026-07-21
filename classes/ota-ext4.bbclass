@@ -2,9 +2,10 @@
 # add the MACHINE name to this list.
 # This is the "only" list that will control whether
 # OTA upgrade will be supported on a target.
-DEPENDS += "releasetools-native zip-native fsconfig-native applypatch-native bc-native bsdiff-native"
+DEPENDS += "releasetools-native zip-native fsconfig-native applypatch-native bc-native bsdiff-native qti-recovery-image"
 
 RM_WORK_EXCLUDE_ITEMS += "rootfs rootfs-dbg"
+RECOVERY_IMAGE_ROOTFS = "${@d.getVar('IMAGE_ROOTFS').replace('/' + d.getVar('PN') + '/', '/qti-recovery-image/')}"
 
 IMAGE_SYSTEM_MOUNT_POINT = "/"
 
@@ -44,6 +45,10 @@ do_recovery_ext4[cleandirs] += "${OTA_TARGET_IMAGE_ROOTFS_EXT4}/DTBO"
 # Create this folder just for saving file_contexts(SElinux security context file),
 # It will be used to generate OTA packages when selinux_fc is set.
 do_recovery_ext4[cleandirs] += "${OTA_TARGET_IMAGE_ROOTFS_EXT4}/BOOT/RAMDISK"
+
+
+# Use do_build inter-recipe ordering
+do_recovery_ext4[depends] += "qti-recovery-image:do_build"
 
 # recovery rootfs is required for generating OTA files.
 # Wait till all tasks of machine-recovery-image complete.
