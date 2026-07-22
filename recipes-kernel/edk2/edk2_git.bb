@@ -58,6 +58,8 @@ NAND_SQUASHFS_SUPPORT = "${@bb.utils.contains('DISTRO_FEATURES', 'nand-squashfs'
 EXTRA_OEMAKE:append = " 'NAND_SQUASHFS_SUPPORT=${NAND_SQUASHFS_SUPPORT}'"
 EXTRA_OEMAKE:append:qti-distro-base-user = " 'VERITY_LE_USE_EXT4_GLUEBI=1'"
 
+EXTRA_OEMAKE:append:seraph = " 'APPEND_RAM_PARTITIONS_TO_MEM_NODE=1' "
+
 do_compile () {
     export BUILD_CC="clang"
     export CC=${STAGING_BINDIR_NATIVE}/clang/bin/clang
