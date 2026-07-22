@@ -49,6 +49,9 @@ add_mount_files () {
                 fi
 	    fi
             install -m 0644 ${S}/${mountname}.mount ${D}${systemd_unitdir}/system/${mountname}-${IMAGETYPE}.mount
+            if [[ "$mountname" == "persist" ]] && ${@bb.utils.contains('MACHINE_FEATURES', 'var-persist', 'true', 'false', d)}; then
+                install -m 0644 ${S}/var-persist.mount ${D}${systemd_unitdir}/system/var-persist.mount
+            fi
         fi
 	# Install mount generator
         if [[ ! -z "${GENERATED_MACHINE_MNT_POINTS}" ]] ; then
