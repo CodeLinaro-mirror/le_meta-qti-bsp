@@ -9,8 +9,6 @@ CORE_IMAGE_EXTRA_INSTALL:remove:seraph = " \
     packagegroup-qti-qesdk-core \
     packagegroup-qti-dcf-lib \
     packagegroup-qti-dcf-hal \
-    powerapp \
-    powerapp-powerconfig \
     libmeminfo \
     kernel-modules \
 "
