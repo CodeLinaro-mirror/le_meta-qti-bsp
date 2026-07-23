@@ -8,7 +8,7 @@ HOMEPAGE = "https://virgil3d.github.io/"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=c81c08eeefd9418fca8f88309a76db10"
 
-DEPENDS = "libepoxy libdrm"
+DEPENDS = "libepoxy libdrm python3-pyyaml-native"
 
 FILESEXTRAPATHS:prepend := "${WORKSPACE}:"
 
@@ -27,9 +27,11 @@ REQUIRED_DISTRO_FEATURES_class-native = ""
 REQUIRED_DISTRO_FEATURES_class-nativesdk = ""
 
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'vulkan', d)}"
-PACKAGECONFIG[vulkan] = "-Dvenus=true -Dvenus-validate=true,-Dvenus=false,vulkan-loader vulkan-headers vulkan-headers-vk-video"
+PACKAGECONFIG[vulkan] = "-Dvenus=true,-Dvenus=false,vulkan-loader vulkan-headers vulkan-headers-vk-video"
 
 EXTRA_OEMESON:append = " \
             -Dplatforms=egl \
-            ${@bb.utils.contains('PACKAGECONFIG', 'vulkan', '', '-Dvenus=false', d)} \
             "
+
+# This should be removed once qcvirtio changes for format definition are merged
+CFLAGS:append = " -DGBM_FORMAT_GR88=GBM_FORMAT_RG88 -DGBM_FORMAT_XBGR16161616F=GBM_FORMAT_ABGR16161616F"
