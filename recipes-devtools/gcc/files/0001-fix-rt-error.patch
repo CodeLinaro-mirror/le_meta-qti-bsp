@@ -1,0 +1,27 @@
+From 49a1206b9a1fc4849f0840f414d51af6f9a77a47 Mon Sep 17 00:00:00 2001
+From: Shudan Liu <c_shudan@qti.qualcomm.com>
+Date: Tue, 21 Oct 2025 14:45:32 +0800
+Subject: [PATCH] fix rt error
+
+Upstream-Status: Inappropriate [Qualcomm specific]
+Signed-off-by: Shudan Liu <c_shudan@qti.qualcomm.com>
+---
+ libsanitizer/asan/asan_allocator.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libsanitizer/asan/asan_allocator.h b/libsanitizer/asan/asan_allocator.h
+index 0b4dbf03b..52f946a05 100644
+--- a/libsanitizer/asan/asan_allocator.h
++++ b/libsanitizer/asan/asan_allocator.h
+@@ -126,7 +126,7 @@ typedef DefaultSizeClassMap SizeClassMap;
+ const uptr kAllocatorSpace = ~(uptr)0;
+ const uptr kAllocatorSize  =  0x20000000000ULL;  // 2T.
+ typedef DefaultSizeClassMap SizeClassMap;
+-# elif defined(__aarch64__) && SANITIZER_ANDROID
++# elif defined(__aarch64__)
+ // Android needs to support 39, 42 and 48 bit VMA.
+ const uptr kAllocatorSpace =  ~(uptr)0;
+ const uptr kAllocatorSize  =  0x2000000000ULL;  // 128G.
+-- 
+2.34.1
+
