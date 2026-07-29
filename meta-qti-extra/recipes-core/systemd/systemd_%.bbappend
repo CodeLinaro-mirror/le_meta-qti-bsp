@@ -15,17 +15,13 @@ SRC_URI:append = " \
              ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'file://0037-systemd-Add-wdt_ping-in-dispatch_runqueue.patch', '', d)} \
              file://0001-systemd-sleep-ping-watchdog-before-writing-suspend-s.patch \
              ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', bb.utils.contains('MACHINE_FEATURES', 'qti-gunyah', '', 'file://qti_lxc_umd_sleep.sh', d), '', d)} \
+             file://0001-systemd-add-restorecon-operation.patch \
 "
 
-SRC_URI:append:sa8775 = " \
-             ${@bb.utils.contains('MACHINE_FEATURES', 'early-ramdisk-init', 'file://0001-change-systemd-modules-load-service-type-to-simple.patch', '', d)}"
 
 SRC_URI:append:sa7255 = " \
-             file://0001-systemd-assign-prime-core-to-manager_dispatch_load_q.patch \
-             ${@bb.utils.contains('MACHINE_FEATURES', 'early-ramdisk-init', 'file://0001-change-systemd-modules-load-service-type-to-simple.patch', '', d)}"
+             file://0001-systemd-assign-prime-core-to-manager_dispatch_load_q.patch"
 
-SRC_URI:append:sa8620-adas = " \
-             ${@bb.utils.contains('MACHINE_FEATURES', 'early-ramdisk-init', 'file://0001-change-systemd-modules-load-service-type-to-simple.patch', '', d)}"
 
 do_install:append() {
    if ${@bb.utils.contains_any('MACHINE_FEATURES', 'qti-umd', 'false', 'true', d)} ; then
