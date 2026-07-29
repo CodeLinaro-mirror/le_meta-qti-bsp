@@ -1,10 +1,12 @@
-# Copyright (c) 2024 Qualcomm Innovation Center, Inc. All rights reserved.
+# Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
 # SPDX-License-Identifier: BSD-3-Clause-Clear
 # This service file is designed to route TX traffic on eth1 interface.
 # Customer needs to enable this service file based on the requirement.
 # Flexibility is provided for the customers to modify QoS using TC.
 [Unit]
 Description=eth1 QOS installer
+After=early_eth1.service eth_module_load.service
+Requires=eth_module_load.service
 
 [Service]
 Type=oneshot
