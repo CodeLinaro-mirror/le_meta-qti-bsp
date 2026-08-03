@@ -64,6 +64,7 @@ CORE_IMAGE_EXTRA_INSTALL:append:vienna = " diag-router"
 CORE_IMAGE_EXTRA_INSTALL:append:vienna = " packagegroup-qcom-sensors"
 CORE_IMAGE_EXTRA_INSTALL:append:vienna = " packagegroup-qti-uwb"
 CORE_IMAGE_EXTRA_INSTALL:append:vienna = " packagegroup-qti-perf"
+CORE_IMAGE_EXTRA_INSTALL:append:vienna = " packagegroup-qti-ppat"
 
 CORE_IMAGE_EXTRA_INSTALL:remove:kera = "alsa-utils"
 CORE_IMAGE_EXTRA_INSTALL:remove:kera = "kernel-modules"
