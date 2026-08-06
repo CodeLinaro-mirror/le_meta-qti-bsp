@@ -16,12 +16,15 @@ SRC_URI:append = " \
              file://0001-systemd-sleep-ping-watchdog-before-writing-suspend-s.patch \
              ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', bb.utils.contains('MACHINE_FEATURES', 'qti-gunyah', '', 'file://qti_lxc_umd_sleep.sh', d), '', d)} \
              file://0001-systemd-add-restorecon-operation.patch \
+             ${@bb.utils.contains('MACHINE_FEATURES', 'early-ramdisk-init', 'file://0001-systemd-add-i2c-module-wait-in-systemd-init-process.patch', '', d)} \
 "
-
 
 SRC_URI:append:sa7255 = " \
              file://0001-systemd-assign-prime-core-to-manager_dispatch_load_q.patch"
 
+SRC_URI:append:gen5 = " \
+            ${@bb.utils.contains('MACHINE_FEATURES', 'early-ramdisk-init', 'file://0001-systemd-add-mm-vfio-script-wait-in-systemd-init-proc.patch', '', d)} \
+"
 
 do_install:append() {
    if ${@bb.utils.contains_any('MACHINE_FEATURES', 'qti-umd', 'false', 'true', d)} ; then
