@@ -20,6 +20,7 @@ CFLAGS:append = " ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', '-DVFIO_BI
 CFLAGS:append = " ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', '-DVENDOR_DSP_MOUNT', '', d)}"
 CFLAGS:append = " ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', '-DFIRMWARE_MOUNT', '', d)}"
 CFLAGS:append = " ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', '-DPRELOAD_UNIT', '', d)}"
+CFLAGS:append = " ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', '-DEARLY_LOAD_MODULES', '', d)}"
 
 TARGET_PATH_NAME ?= "${MACHINE}"
 TARGET_PATH_NAME:sa8775 = "sa8775"
@@ -50,10 +51,6 @@ do_install:append() {
     if ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', 'true', 'false', d)}; then
         install -m 0755 ${WORKDIR}/vfio_param.conf -D ${D}${sysconfdir}/modprobe.d/vfio.conf
     fi
-}
-
-do_install:append:sa8255-ivi() {
-    install -m 0644 ${S}/conf/${TARGET_PATH_NAME}/07-gvm.conf.in -D ${D}/etc/modules-load.f/07-gvm.conf
 }
 
 do_install:append:sa8775-flex() {
