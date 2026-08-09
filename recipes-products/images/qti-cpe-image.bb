@@ -61,3 +61,5 @@ CORE_IMAGE_EXTRA_INSTALL += "bash"
 
 #Install Audio packagegroup
 CORE_IMAGE_EXTRA_INSTALL += "packagegroup-qcom-audio"
+
+CORE_IMAGE_EXTRA_INSTALL += "packagegroup-qcom-sensors"
