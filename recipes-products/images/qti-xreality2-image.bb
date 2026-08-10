@@ -5,15 +5,20 @@ require qti-xreality2-base-image.bb
 
 CORE_IMAGE_EXTRA_INSTALL:remove:seraph = " \
     packagegroup-qti-bluetooth \
+    packagegroup-qti-audio \
+    packagegroup-qti-video \
+    packagegroup-qti-display \
+    packagegroup-qti-camera \
+    packagegroup-qti-gst \
+    packagegroup-qti-eva \
+    packagegroup-qti-ppat \
     packagegroup-qti-securemsm \
+    packagegroup-qti-mmframeworks \
     packagegroup-qti-sensors-see \
     packagegroup-qti-test-sensors-see \
-    packagegroup-qti-wifi \
     packagegroup-qti-qesdk-core \
     packagegroup-qti-dcf-lib \
     packagegroup-qti-dcf-hal \
-    powerapp \
-    powerapp-powerconfig \
     libmeminfo \
     kernel-modules \
 "
@@ -22,4 +27,3 @@ CORE_IMAGE_EXTRA_INSTALL:append:seraph = " \
     userspace-resource-manager \
     userspace-resource-manager-extensions \
 "
-CORE_IMAGE_EXTRA_INSTALL:append:seraph = " packagegroup-qcom-sensors"
