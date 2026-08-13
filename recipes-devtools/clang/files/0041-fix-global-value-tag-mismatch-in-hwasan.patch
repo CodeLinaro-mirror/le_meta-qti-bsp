@@ -1,0 +1,38 @@
+/* This patch file is from Qualcomm Technologies, Inc. and is provided under the following license:
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+ * SPDX-License-Identifier: BSD-3-Clause-Clear
+ */
+From 5157a7e0e853f945f99e2ccd877bdc57fe8c0b4c Mon Sep 17 00:00:00 2001
+From: Zhenxi Yang <c_zhey@qti.qualcomm.com>
+Date: Tue, 14 Apr 2026 16:35:46 +0800
+Subject: [PATCH] fix global value tag mismatch in hwasan
+
+for glibc, there's no hwasan handle for dlopen case.
+do the InitLoadedGlobals for dlopened library in glibc case.
+
+Signed-off-by: Zhenxi Yang <c_zhey@qti.qualcomm.com>
+---
+ compiler-rt/lib/hwasan/hwasan.cpp | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/compiler-rt/lib/hwasan/hwasan.cpp b/compiler-rt/lib/hwasan/hwasan.cpp
+index 52780becb..e7857ca92 100644
+--- a/compiler-rt/lib/hwasan/hwasan.cpp
++++ b/compiler-rt/lib/hwasan/hwasan.cpp
+@@ -353,7 +353,12 @@ void __hwasan_init_static() {
+ 
+ __attribute__((constructor(0))) void __hwasan_init() {
+   CHECK(!hwasan_init_is_running);
+-  if (hwasan_inited) return;
++  if (hwasan_inited) {
++#if SANITIZER_GLIBC
++     InitLoadedGlobals();
++#endif
++     return;
++  }
+   hwasan_init_is_running = 1;
+   SanitizerToolName = "HWAddressSanitizer";
+ 
+-- 
+2.34.1
+
