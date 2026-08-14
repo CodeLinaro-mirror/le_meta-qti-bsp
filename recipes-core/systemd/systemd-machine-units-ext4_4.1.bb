@@ -33,6 +33,19 @@ SRC_URI += " file://systemrw.conf"
 SRC_URI += " file://systemrw.mount"
 SRC_URI += " file://qti-mount-generator"
 
+SRC_URI:echo = " file://persist.mount \
+                 file://systemrw.mount \
+                 file://cache.mount \
+                 file://nvram.mount \
+                 file://rdklogs.mount \
+                 file://data.mount \
+                 file://var-volatile.mount \
+                 file://set-slotsuffix.service \
+                 file://systemrw.conf \
+                 file://dsp-mount.service \
+                 file://firmware-mount.service \
+                 file://var-persist.mount"
+
 IMAGETYPE = "ext4"
 
 do_install[prefuncs] += " ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', '', 'fix_sepolicies', d)}"
