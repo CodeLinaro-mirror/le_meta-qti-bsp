@@ -34,7 +34,6 @@ CORE_IMAGE_EXTRA_INSTALL += "\
                 packagegroup-support-utils \
                 packagegroup-qti-fastrpc \
                 packagegroup-qti-data \
-                packagegroup-qcom-securemsm \
 		packagegroup-open-mac80211 \
                 ${@bb.utils.contains('MACHINE_FEATURES', 'qti-ssdk', "packagegroup-qti-ssdk", "", d)} \
                 ${@bb.utils.contains('MACHINE_FEATURES', 'qti-location', 'packagegroup-qti-location', '', d)} \
@@ -62,3 +61,5 @@ CORE_IMAGE_EXTRA_INSTALL += "bash"
 
 #Install Audio packagegroup
 CORE_IMAGE_EXTRA_INSTALL += "packagegroup-qcom-audio"
+
+CORE_IMAGE_EXTRA_INSTALL += "packagegroup-qcom-sensors"
