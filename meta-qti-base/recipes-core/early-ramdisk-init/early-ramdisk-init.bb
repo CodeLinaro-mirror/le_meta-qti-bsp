@@ -21,6 +21,7 @@ CFLAGS:append = " ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', '-DVENDOR_
 CFLAGS:append = " ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', '-DFIRMWARE_MOUNT', '', d)}"
 CFLAGS:append = " ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', '-DPRELOAD_UNIT', '', d)}"
 CFLAGS:append = " ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', '-DEARLY_LOAD_MODULES', '', d)}"
+CFLAGS:append:sa7255-ivi = " ${@bb.utils.contains('MACHINE_FEATURES', 'qti-umd', '-DOFFLINE_CPU', '', d)}"
 
 TARGET_PATH_NAME ?= "${MACHINE}"
 TARGET_PATH_NAME:sa8775 = "sa8775"
