@@ -21,6 +21,7 @@ meta-qti-base-prop/recipes-bsp/platform-devicetree/platform-devicetree_git.bb \
 meta-qti-base-prop/recipes-camera/ais/ais_0.1.bb \
 meta-qti-base-prop/recipes-camera/camera-devicetree/camera-devicetree_git.bb \
 meta-qti-base-prop/recipes-camera/camx/camx_0.1.bb \
+meta-qti-base-prop/recipes-camera/camx/camx_0.2.bb \
 meta-qti-base-prop/recipes-camera/camx-lib/camx-lib_0.1.bb \
 meta-qti-base-prop/recipes-camera/cdk/chi-cdk_0.1.bb \
 meta-qti-base-prop/recipes-core/diag-reboot-app/diag-reboot-app_git.bb \
