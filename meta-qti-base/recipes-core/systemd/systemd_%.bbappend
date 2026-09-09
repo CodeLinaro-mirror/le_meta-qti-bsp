@@ -11,6 +11,7 @@ SRC_URI:append = " \
     file://0001-systemd-give-more-time-for-coredump-pre-start-script.patch \
     file://0001-systemd-add-vfio-script-wait-in-systemd-init-process.patch \
     file://0001-sd-bus-drop-half-registered-vtable-members-on-failur.patch \
+    file://0001-journal-replace-a-bunch-of-assert-with-friendlier-ch.patch \
 "
 
 SRC_URI:append:gh-gvm-lemans = " file://60-vblk.rules"
